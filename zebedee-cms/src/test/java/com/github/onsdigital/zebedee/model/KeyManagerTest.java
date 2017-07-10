@@ -17,9 +17,14 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import javax.crypto.SecretKey;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -49,7 +54,7 @@ public class KeyManagerTest {
     private UsersService usersService;
 
     @Mock
-    private Keyring keyring;
+    private Keyring keyring, userKeyring;
 
     @Mock
     private SessionsService sessionsService;
@@ -72,6 +77,9 @@ public class KeyManagerTest {
     @Mock
     private CollectionDescription collectionDescription;
 
+    @Mock
+    private Map<String, SecretKey> schedulerCache;
+
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
@@ -86,6 +94,8 @@ public class KeyManagerTest {
                 .thenReturn(permissionsServiceImpl);
         when(user.getEmail())
                 .thenReturn(EMAIL);
+        when(user.keyring())
+                .thenReturn(userKeyring);
         when(collection.getDescription())
                 .thenReturn(collectionDescription);
         when(collectionDescription.getId())
@@ -338,4 +348,92 @@ public class KeyManagerTest {
         verify(sessionsService, times(1)).find(EMAIL);
         verify(keyring, times(1)).put(COLLECTION_ID, secretKey);
     }
+
+    @Test
+    public void distributeCollectionKey_NewCollectionShouldNotAssignIfKeyRecipientsNull() throws Exception {
+        UserList users = new UserList();
+        users.add(user);
+
+        when(zebedee.getKeyringCache())
+                .thenReturn(keyringCache);
+        when(keyringCache.get(session))
+                .thenReturn(keyring);
+        when(keyring.get(COLLECTION_ID))
+                .thenReturn(secretKey);
+        when(zebedee.getPermissionsService())
+                .thenReturn(permissionsServiceImpl);
+        when(permissionsServiceImpl.getCollectionAccessMapping(collection))
+                .thenReturn(null);
+        when(usersService.list())
+                .thenReturn(users);
+        when(sessionsService.find(EMAIL))
+                .thenReturn(session);
+        when(keyringCache.getSchedulerCache())
+                .thenReturn(schedulerCache);
+
+        KeyManager.distributeCollectionKey(zebedee, session, collection, true);
+
+        verify(usersService, never()).addKeyToKeyring(any(), any(), any());
+        verify(zebedee, times(2)).getKeyringCache();
+        verify(zebedee, times(1)).getPermissionsService();
+        verify(permissionsServiceImpl, times(1)).getCollectionAccessMapping(collection);
+        verify(usersService, never()).removeKeyFromKeyring(EMAIL, COLLECTION_ID);
+        verify(sessionsService, never()).find(EMAIL);
+        verify(keyring, never()).put(COLLECTION_ID, secretKey);
+        verify(schedulerCache, times(1)).put(COLLECTION_ID, secretKey);
+    }
+
+    @Test
+    public void distributeCollectionKey_ExistingCollectionSHouldNotRemoveIs() throws Exception {
+        User user2 = mock(User.class);
+        Keyring user2Keyring = mock(Keyring.class);
+        Session user2Sess = mock(Session.class);
+        String user2Email = "user2@ons.gov.uk";
+
+        UserList allUsers = new UserList();
+        allUsers.add(user);
+        allUsers.add(user2);
+
+        List<User> permittedUsers = new ArrayList<>();
+        permittedUsers.add(user2);
+
+        when(user2.getEmail())
+                .thenReturn(user2Email);
+        when(user2.keyring())
+                .thenReturn(user2Keyring);
+        when(zebedee.getKeyringCache())
+                .thenReturn(keyringCache);
+        when(keyringCache.get(session))
+                .thenReturn(keyring);
+        when(keyringCache.get(user2Sess))
+                .thenReturn(user2Keyring);
+        when(keyring.get(COLLECTION_ID))
+                .thenReturn(secretKey);
+        when(zebedee.getPermissionsService())
+                .thenReturn(permissionsServiceImpl);
+        when(permissionsServiceImpl.getCollectionAccessMapping(collection))
+                .thenReturn(permittedUsers);
+        when(usersService.list())
+                .thenReturn(allUsers);
+        when(sessionsService.find(EMAIL))
+                .thenReturn(session);
+        when(sessionsService.find(user2Email))
+                .thenReturn(user2Sess);
+        when(keyringCache.getSchedulerCache())
+                .thenReturn(schedulerCache);
+
+        KeyManager.distributeCollectionKey(zebedee, session, collection, false);
+
+        verify(zebedee, times(4)).getKeyringCache();
+        verify(zebedee, times(1)).getPermissionsService();
+        verify(permissionsServiceImpl, times(1)).getCollectionAccessMapping(collection);
+        verify(sessionsService, times(1)).find(EMAIL);
+        verify(sessionsService, times(1)).find(user2Email);
+        verify(usersService, times(1)).removeKeyFromKeyring(EMAIL, COLLECTION_ID);
+        verify(usersService, times(1)).addKeyToKeyring(user2Email, COLLECTION_ID, secretKey);
+        verify(keyring, times(1)).remove(COLLECTION_ID);
+        verify(user2Keyring, times(1)).put(COLLECTION_ID, secretKey);
+        verify(schedulerCache, times(1)).put(COLLECTION_ID, secretKey);
+    }
+
 }

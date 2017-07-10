@@ -500,7 +500,8 @@ public class PermissionsServiceImpl implements PermissionsService {
         if (teams != null) {
             for (Team team : teamsServiceSupplier.getService().listTeams()) {
                 boolean isTeamMember = teams.contains(team.getId()) && team.getMembers().contains(standardise(email));
-                boolean inCollectionGroup = getUserCollectionGroup(email, accessMapping).equals(collectionDescription.collectionOwner);
+                boolean inCollectionGroup = getUserCollectionGroup(email, accessMapping)
+                        .equals(collectionDescription.getCollectionOwner());
                 if (isTeamMember && inCollectionGroup) {
                     return true;
                 }
@@ -518,7 +519,8 @@ public class PermissionsServiceImpl implements PermissionsService {
             for (Team team : teamsList) {
                 boolean isTeamMember = teamsOnCollection.contains(team.getId()) && team.getMembers()
                         .contains(standardise(email));
-                boolean inCollectionGroup = getUserCollectionGroup(email, accessMapping).equals(collectionDescription.collectionOwner);
+                boolean inCollectionGroup = getUserCollectionGroup(email, accessMapping)
+                        .equals(collectionDescription.getCollectionOwner());
                 if (isTeamMember && inCollectionGroup) {
                     return true;
                 }

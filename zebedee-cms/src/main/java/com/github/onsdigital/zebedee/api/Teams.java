@@ -4,10 +4,7 @@ import com.github.davidcarboni.restolino.framework.Api;
 import com.github.davidcarboni.restolino.helpers.Path;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.audit.Audit;
-import com.github.onsdigital.zebedee.exceptions.BadRequestException;
-import com.github.onsdigital.zebedee.exceptions.ConflictException;
-import com.github.onsdigital.zebedee.exceptions.NotFoundException;
-import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
+import com.github.onsdigital.zebedee.exceptions.*;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.teams.model.Team;
 import com.github.onsdigital.zebedee.teams.model.TeamList;
@@ -59,7 +56,7 @@ public class Teams {
      * @throws NotFoundException     {@value org.eclipse.jetty.http.HttpStatus#NOT_FOUND_404} if team can not be found/created
      */
     @POST
-    public boolean post(HttpServletRequest request, HttpServletResponse response) throws IOException, ConflictException, UnauthorizedException, NotFoundException, BadRequestException {
+    public boolean post(HttpServletRequest request, HttpServletResponse response) throws IOException, ConflictException, UnauthorizedException, NotFoundException, BadRequestException, ForbiddenException {
 
         String email = request.getParameter("email");
         if (email == null) {
@@ -69,7 +66,7 @@ public class Teams {
         }
     }
 
-    public boolean createTeam(HttpServletRequest request, HttpServletResponse response) throws IOException, ConflictException, UnauthorizedException, NotFoundException {
+    public boolean createTeam(HttpServletRequest request, HttpServletResponse response) throws IOException, ConflictException, UnauthorizedException, NotFoundException, ForbiddenException {
 
         Session session = Root.zebedee.getSessionsService().get(request);
         String teamName = getTeamName(request);
@@ -85,7 +82,7 @@ public class Teams {
         return true;
     }
 
-    public boolean addTeamMember(HttpServletRequest request, HttpServletResponse response) throws UnauthorizedException, IOException, NotFoundException, BadRequestException {
+    public boolean addTeamMember(HttpServletRequest request, HttpServletResponse response) throws UnauthorizedException, IOException, NotFoundException, BadRequestException, ForbiddenException {
         Zebedee zebedee = Root.zebedee;
         Session session = zebedee.getSessionsService().get(request);
 
@@ -120,7 +117,7 @@ public class Teams {
      * @throws BadRequestException   {@value org.eclipse.jetty.http.HttpStatus#CONFLICT_409} if the team cannot be deleted for some other reason
      */
     @DELETE
-    public boolean delete(HttpServletRequest request, HttpServletResponse response) throws IOException, UnauthorizedException, NotFoundException, BadRequestException {
+    public boolean delete(HttpServletRequest request, HttpServletResponse response) throws IOException, UnauthorizedException, NotFoundException, BadRequestException, ForbiddenException {
 
         String email = request.getParameter("email");
         if (email == null) {
@@ -130,7 +127,7 @@ public class Teams {
         }
     }
 
-    public boolean deleteTeam(HttpServletRequest request, HttpServletResponse response) throws NotFoundException, BadRequestException, UnauthorizedException, IOException {
+    public boolean deleteTeam(HttpServletRequest request, HttpServletResponse response) throws NotFoundException, BadRequestException, UnauthorizedException, IOException, ForbiddenException {
 
         String teamName = getTeamName(request);
 
@@ -150,7 +147,7 @@ public class Teams {
         return true;
     }
 
-    public boolean removeTeamMember(HttpServletRequest request, HttpServletResponse response) throws UnauthorizedException, IOException, NotFoundException, BadRequestException {
+    public boolean removeTeamMember(HttpServletRequest request, HttpServletResponse response) throws UnauthorizedException, IOException, NotFoundException, BadRequestException, ForbiddenException {
 
         String teamName = getTeamName(request);
 

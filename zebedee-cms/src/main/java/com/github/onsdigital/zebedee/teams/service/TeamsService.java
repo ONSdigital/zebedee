@@ -1,9 +1,6 @@
 package com.github.onsdigital.zebedee.teams.service;
 
-import com.github.onsdigital.zebedee.exceptions.BadRequestException;
-import com.github.onsdigital.zebedee.exceptions.ConflictException;
-import com.github.onsdigital.zebedee.exceptions.NotFoundException;
-import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
+import com.github.onsdigital.zebedee.exceptions.*;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.teams.model.Team;
 
@@ -49,7 +46,7 @@ public interface TeamsService {
      * @return The created team.
      * @throws IOException If a filesystem error occurs.
      */
-    Team createTeam(String teamName, Session session) throws IOException, UnauthorizedException, ConflictException, NotFoundException;
+    Team createTeam(String teamName, Session session) throws IOException, UnauthorizedException, ConflictException, NotFoundException, ForbiddenException;
 
     /**
      * Delete a team.
@@ -58,7 +55,7 @@ public interface TeamsService {
      * @param session Only an administrator can delete a team.
      * @throws IOException If a filesystem error occurs.
      */
-    void deleteTeam(Team delete, Session session) throws IOException, UnauthorizedException, NotFoundException, BadRequestException;
+    void deleteTeam(Team delete, Session session) throws IOException, UnauthorizedException, NotFoundException, BadRequestException, ForbiddenException;
 
     /**
      * Adds the specified user to the content administrators, giving them access to read content at the given paths and all sub-paths.
@@ -67,7 +64,7 @@ public interface TeamsService {
      * @param team  The team to add the given email to.
      * @throws IOException If a filesystem error occurs.
      */
-    void addTeamMember(String email, Team team, Session session) throws IOException, UnauthorizedException, NotFoundException;
+    void addTeamMember(String email, Team team, Session session) throws IOException, UnauthorizedException, NotFoundException, ForbiddenException;
 
     /**
      * Adds the specified user to the content administrators, giving them access to read content at the given paths and all sub-paths.
@@ -76,12 +73,12 @@ public interface TeamsService {
      * @param team  The team to remove the given email from.
      * @throws IOException If a filesystem error occurs.
      */
-    void removeTeamMember(String email, Team team, Session session) throws IOException, UnauthorizedException, NotFoundException;
+    void removeTeamMember(String email, Team team, Session session) throws IOException, UnauthorizedException, NotFoundException, ForbiddenException;
 
     /**
      * @return on the fly mapping of which teams currently contain which users. Format is teamName -> userEmail.
      * @throws IOException
      */
     List<AbstractMap.SimpleEntry<String, String>> getTeamMembersSummary(Session session) throws IOException,
-            UnauthorizedException;
+            UnauthorizedException, ForbiddenException;
 }

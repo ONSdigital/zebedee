@@ -51,11 +51,15 @@ public class KeyManager {
      */
     public static synchronized void distributeCollectionKey(Zebedee zebedee, Session session, Collection collection,
                                                             boolean isNewCollection) throws IOException {
-        SecretKey key = zebedee.getKeyringCache().get(session).get(collection.getDescription().getId());
+        SecretKey key = zebedee.getKeyringCache()
+                .get(session)
+                .get(collection.getDescription().getId());
 
-        List<User> keyRecipients = zebedee.getPermissionsService().getCollectionAccessMapping(collection);
+        List<User> keyRecipients = nullSafeList(zebedee
+                .getPermissionsService()
+                .getCollectionAccessMapping(collection));
+
         List<User> keyRevoked = new ArrayList<>();
-
         if (!isNewCollection) {
             keyRevoked = zebedee.getUsersService()
                     .list()
@@ -72,7 +76,16 @@ public class KeyManager {
             assignKeyToUser(zebedee, recipient, collection.getDescription().getId(), key);
         }
 
-        zebedee.getKeyringCache().getSchedulerCache().put(collection.getDescription().getId(), key);
+        zebedee.getKeyringCache()
+                .getSchedulerCache()
+                .put(collection.getDescription().getId(), key);
+    }
+
+    private static <T> List<T> nullSafeList(List<T> list) {
+        if (list == null) {
+            return new ArrayList<T>();
+        }
+        return list;
     }
 
     /**

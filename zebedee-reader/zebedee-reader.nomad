@@ -9,7 +9,7 @@ job "zebedee-reader" {
   }
 
   group "web" {
-    count = 2
+    count = "{{WEB_TASK_COUNT}}"
 
     constraint {
       distinct_hosts = true
@@ -57,8 +57,8 @@ job "zebedee-reader" {
       }
 
       resources {
-        cpu    = 2000
-        memory = 2048
+        cpu    = "{{WEB_RESOURCE_CPU}}"
+        memory = "{{WEB_RESOURCE_MEM}}"
 
         network {
           port "http" {}

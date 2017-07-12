@@ -9,7 +9,7 @@ job "zebedee-reader" {
   }
 
   group "web" {
-    count = 2
+    count = "{{WEB_TASK_COUNT}}"
 
     constraint {
       distinct_hosts = true
@@ -24,7 +24,7 @@ job "zebedee-reader" {
       driver = "docker"
 
       artifact {
-        source = "s3::https://s3-eu-west-1.amazonaws.com/{{DEPLOYMENT_BUCKET}}/zebedee-reader/{{REVISION}}.tar.gz"
+        source = "s3::https://s3-eu-west-1.amazonaws.com/{{DEPLOYMENT_BUCKET}}/zebedee/{{REVISION}}.tar.gz"
       }
 
       config {
@@ -57,8 +57,8 @@ job "zebedee-reader" {
       }
 
       resources {
-        cpu    = 2000
-        memory = 2048
+        cpu    = "{{WEB_RESOURCE_CPU}}"
+        memory = "{{WEB_RESOURCE_MEM}}"
 
         network {
           port "http" {}

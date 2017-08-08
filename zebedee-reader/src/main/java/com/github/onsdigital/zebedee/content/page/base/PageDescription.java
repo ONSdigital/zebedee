@@ -81,6 +81,7 @@ public class PageDescription extends Content implements Comparable<PageDescripti
     private Boolean published;
     private String provisionalDate;
     private String versionLabel;
+    private String metaCmd;
 
 
     public PageDescription() {
@@ -436,4 +437,13 @@ public class PageDescription extends Content implements Comparable<PageDescripti
         this.versionLabel = versionLabel;
     }
 
+    public String getMetaCmd() {
+        return metaCmd;
+    }
+
+    public void setMetaCmd(String metaCmd) {
+        this.metaCmd = metaCmd;
+    }
+
 }
+

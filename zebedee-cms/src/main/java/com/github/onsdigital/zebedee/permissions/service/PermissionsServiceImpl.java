@@ -479,10 +479,13 @@ public class PermissionsServiceImpl implements PermissionsService {
 
     private boolean canView(String email, CollectionDescription collectionDescription, AccessMapping accessMapping)
             throws IOException {
+
+        // Check to see if the email is a member of a team associated with the given collection:
         Set<Integer> teams = accessMapping.getCollections().get(collectionDescription.getId());
-        if (teams == null || teams.isEmpty()) {
+        if (teams == null) {
             return false;
         }
+
         return teamsServiceSupplier.getService()
                 .listTeams()
                 .stream()

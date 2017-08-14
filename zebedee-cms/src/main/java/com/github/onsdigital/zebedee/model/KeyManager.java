@@ -19,6 +19,7 @@ import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logWarn;
@@ -48,31 +49,42 @@ public class KeyManager {
      */
     public static synchronized void distributeCollectionKey(Zebedee zebedee, Session session, Collection collection,
                                                             boolean isNewCollection) throws IOException {
-        SecretKey key = zebedee.getKeyringCache().get(session).get(collection.getDescription().getId());
+        SecretKey key = zebedee.getKeyringCache()
+                .get(session)
+                .get(collection.getDescription().getId());
 
-        List<User> keyRecipients = zebedee.getPermissionsService().getCollectionAccessMapping(collection);
-        List<User> removals = new ArrayList<>();
 
+        List<User> keyRecipients = nullSafeList(zebedee
+                .getPermissionsService()
+                .getCollectionAccessMapping(collection));
+
+        List<User> keyRevoked = new ArrayList<>();
         if (!isNewCollection) {
-            zebedee.getUsersService().list().stream().forEach(user -> {
-                if (!keyRecipients.contains(user)) {
-                    removals.add(user);
-                }
-            });
+            keyRevoked = zebedee.getUsersService()
+                    .list()
+                    .stream()
+                    .filter((user -> !keyRecipients.contains(user)))
+                    .collect(Collectors.toList());
         }
 
-        for (User u : zebedee.getUsersService().list()) {
-            if (removals.contains(u)) {
-                removeKeyFromUser(zebedee, u, collection.getDescription().getId());
-                continue;
-            }
-
-            if (keyRecipients.contains(u) && !removals.contains(u)) {
-                assignKeyToUser(zebedee, u, collection.getDescription().getId(), key);
-            }
+        for (User removedUser : keyRevoked) {
+            removeKeyFromUser(zebedee, removedUser, collection.getDescription().getId());
         }
 
-        zebedee.getKeyringCache().getSchedulerCache().put(collection.description.getId(), key);
+        for (User recipient : keyRecipients) {
+            assignKeyToUser(zebedee, recipient, collection.getDescription().getId(), key);
+        }
+
+        zebedee.getKeyringCache()
+                .getSchedulerCache()
+                .put(collection.getDescription().getId(), key);
+    }
+
+    private static <T> List<T> nullSafeList(List<T> list) {
+        if (list == null) {
+            return new ArrayList<T>();
+        }
+        return list;
     }
 
     /**

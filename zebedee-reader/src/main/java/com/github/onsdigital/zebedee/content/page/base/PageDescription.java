@@ -82,6 +82,7 @@ public class PageDescription extends Content implements Comparable<PageDescripti
     private String provisionalDate;
     private String versionLabel;
     private String metaCmd;
+    private String cmdDatasetId;
 
 
     public PageDescription() {
@@ -445,5 +446,11 @@ public class PageDescription extends Content implements Comparable<PageDescripti
         this.metaCmd = metaCmd;
     }
 
-}
+    public String getcmdDatasetId() {
+        return cmdDatasetId;
+    }
 
+    public void setcmdDatasetId(String cmdDatasetId) {
+        this.cmdDatasetId = cmdDatasetId;
+    }
+}

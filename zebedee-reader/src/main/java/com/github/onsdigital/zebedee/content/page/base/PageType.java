@@ -35,7 +35,6 @@ public enum PageType {
     static_adhoc("Static adhoc page"),
     dataset("Dataset page"),
     dataset_landing_page("Dataset landing page"),
-    cmd_dataset_landing_page("CMD Dataset landing page"),
     timeseries_dataset("Timeseries dataset page"),
     release("Release page"),
     reference_tables("Reference tables"),

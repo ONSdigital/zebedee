@@ -3,13 +3,18 @@ job "zebedee" {
   region      = "eu"
   type        = "service"
 
+  constraint {
+    attribute = "${meta.has_disk}"
+    value     = true
+  }
+
   update {
     stagger      = "90s"
     max_parallel = 1
   }
 
   group "publishing" {
-    count = 1
+    count = "{{PUBLISHING_TASK_COUNT}}"
 
     constraint {
       distinct_hosts = true
@@ -57,8 +62,8 @@ job "zebedee" {
       }
 
       resources {
-        cpu    = 2000
-        memory = 2048
+        cpu    = "{{PUBLISHING_RESOURCE_CPU}}"
+        memory = "{{PUBLISHING_RESOURCE_MEM}}"
 
         network {
           port "http" {}

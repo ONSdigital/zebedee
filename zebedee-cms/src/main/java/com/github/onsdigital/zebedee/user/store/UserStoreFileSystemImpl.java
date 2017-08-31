@@ -1,12 +1,12 @@
 package com.github.onsdigital.zebedee.user.store;
 
-import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.model.PathUtils;
 import com.github.onsdigital.zebedee.user.model.User;
 import com.github.onsdigital.zebedee.user.model.UserList;
 import com.github.onsdigital.zebedee.user.model.UserListCollector;
+import com.github.onsdigital.zebedee.util.serialiser.JSONSerialiser;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
@@ -14,7 +14,6 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.function.Function;
 import java.util.stream.StreamSupport;
 
 /**
@@ -26,16 +25,10 @@ public class UserStoreFileSystemImpl implements UserStore {
     private static final Path DS_STORE = Paths.get(".DS_Store");
 
     private Path usersPath;
-
-    private Function<Path, User> userDeserializer = (p) -> {
-        try {
-            return Serialiser.deserialise(p, User.class);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    };
+    private JSONSerialiser<User> userSerialiser;
 
     public UserStoreFileSystemImpl(Path usersPath) {
+        this.userSerialiser = new JSONSerialiser(User.class);
         this.usersPath = usersPath;
     }
 
@@ -47,18 +40,17 @@ public class UserStoreFileSystemImpl implements UserStore {
 
     @Override
     public User get(String email) throws IOException {
-        User result = null;
         if (exists(email)) {
-            result = Serialiser.deserialise(userPath(email), User.class);
+            return userSerialiser.deserialise(userPath(email));
         }
-        return result;
+        return null;
     }
 
     @Override
     public void save(User user) throws IOException {
         user.setEmail(normalise(user.getEmail()));
         Path userPath = userPath(user.getEmail());
-        Serialiser.serialise(userPath, user);
+        userSerialiser.serialise(userPath, user);
     }
 
     @Override
@@ -67,7 +59,7 @@ public class UserStoreFileSystemImpl implements UserStore {
             return StreamSupport.stream(directoryStream.spliterator(), false)
                     .filter(path -> !Files.isDirectory(path) && !path.getFileName().equals(DS_STORE))
                     .map(userPath -> {
-                        return userDeserializer.apply(userPath);
+                        return userSerialiser.deserialiseQuietly(userPath);
                     }).collect(new UserListCollector());
         }
     }

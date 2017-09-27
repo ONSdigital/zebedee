@@ -41,3 +41,4 @@
 /employmentandlabourmarket/peopleinwork/labourproductivity/bulletins/labourproductivity/*=>productivity
 /aboutus/whatwedo/statistics/requestingstatistics=>adhoc, ad-hoc, ad hoc, user requested data
 /economy/grossdomesticproductgdp/bulletins/*=>gdp
+/aboutus/whatwedo/programmesandprojects/onlinehouseholdstudy=>takepart, take part

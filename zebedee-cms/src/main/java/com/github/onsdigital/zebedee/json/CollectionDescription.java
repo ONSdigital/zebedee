@@ -5,8 +5,11 @@ import com.github.onsdigital.zebedee.model.CollectionOwner;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.github.onsdigital.zebedee.model.CollectionOwner.PUBLISHING_SUPPORT;
@@ -28,6 +31,7 @@ public class CollectionDescription extends CollectionBase {
     public Date publishEndDate; // The date the publish process ended.
     public boolean isEncrypted;
     private List<PendingDelete> pendingDeletes;
+    private Set<CollectionInstance> instances;
 
     // Default to PUBLISHING_SUPPORT_TEAM
     public CollectionOwner collectionOwner = PUBLISHING_SUPPORT;
@@ -161,5 +165,37 @@ public class CollectionDescription extends CollectionBase {
 
     public void setApprovalStatus(ApprovalStatus approvalStatus) {
         this.approvalStatus = approvalStatus;
+    }
+
+    public Set<CollectionInstance> getInstances() {
+
+        if (this.instances == null) {
+            this.instances = new HashSet<>();
+        }
+
+        return instances;
+    }
+
+    public Optional<CollectionInstance> getInstance(String instanceID) {
+
+        if (this.instances == null)
+            return Optional.empty();
+
+        return this.instances.stream()
+                .filter(i -> i.getId().equals(instanceID)).findFirst();
+    }
+
+    public void addInstance(CollectionInstance instance) {
+        if (this.instances == null)
+            this.instances = new HashSet<>();
+
+        this.instances.add(instance);
+    }
+
+    public void deleteInstance(CollectionInstance instance) {
+        if (this.instances == null)
+            return;
+
+        this.instances.remove(instance);
     }
 }

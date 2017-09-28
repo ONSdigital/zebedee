@@ -5,11 +5,11 @@ import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.CollectionDetail;
 import com.github.onsdigital.zebedee.json.ContentDetail;
 import com.github.onsdigital.zebedee.json.Events;
-import com.github.onsdigital.zebedee.session.model.Session;
-import com.github.onsdigital.zebedee.teams.model.Team;
 import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.service.ContentDeleteService;
+import com.github.onsdigital.zebedee.session.model.Session;
+import com.github.onsdigital.zebedee.teams.model.Team;
 import com.github.onsdigital.zebedee.util.ContentDetailUtil;
 import org.eclipse.jetty.http.HttpStatus;
 
@@ -82,6 +82,8 @@ public class CollectionDetails {
         teams.forEach(team -> {
             collection.description.teams.add(team.getName());
         });
+
+        result.instances = collection.description.getInstances();
 
         return result;
     }

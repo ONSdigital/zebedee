@@ -48,7 +48,7 @@ public class CollectionDetails {
         }
 
         Session session = Root.zebedee.getSessionsService().get(request);
-        if (!Root.zebedee.getPermissionsService().canView(session.getEmail(), collection.description)) {
+        if (!Root.zebedee.getPermissionsService().canView(session.getEmail(), collection.getDescription())) {
             response.setStatus(HttpStatus.UNAUTHORIZED_401);
             return null;
         }
@@ -56,34 +56,32 @@ public class CollectionDetails {
         CollectionReader collectionReader = new ZebedeeCollectionReader(Root.zebedee, collection, session);
 
         CollectionDetail result = new CollectionDetail();
-        result.id = collection.description.id;
-        result.name = collection.description.name;
-        result.type = collection.description.type;
-        result.publishDate = collection.description.publishDate;
-        result.teams = collection.description.teams;
-        result.releaseUri = collection.description.releaseUri;
-        result.collectionOwner = collection.description.collectionOwner;
+        result.id = collection.getDescription().id;
+        result.name = collection.getDescription().name;
+        result.type = collection.getDescription().type;
+        result.publishDate = collection.getDescription().publishDate;
+        result.teams = collection.getDescription().teams;
+        result.releaseUri = collection.getDescription().releaseUri;
+        result.collectionOwner = collection.getDescription().collectionOwner;
         result.pendingDeletes = contentDeleteService.getDeleteItemsByCollection(collection);
 
         result.inProgress = ContentDetailUtil.resolveDetails(collection.inProgress, collectionReader.getInProgress());
         result.complete = ContentDetailUtil.resolveDetails(collection.complete, collectionReader.getComplete());
         result.reviewed = ContentDetailUtil.resolveDetails(collection.reviewed, collectionReader.getReviewed());
 
-        result.approvalStatus = collection.description.approvalStatus;
-        result.events = collection.description.events;
-        result.timeseriesImportFiles = collection.description.timeseriesImportFiles;
+        result.approvalStatus = collection.getDescription().approvalStatus;
+        result.events = collection.getDescription().events;
+        result.timeseriesImportFiles = collection.getDescription().timeseriesImportFiles;
 
-        addEventsForDetails(result.inProgress, result, collection);
-        addEventsForDetails(result.complete, result, collection);
-        addEventsForDetails(result.reviewed, result, collection);
+        addEventsForDetails(result.inProgress, collection);
+        addEventsForDetails(result.complete, collection);
+        addEventsForDetails(result.reviewed, collection);
 
-        Set<Integer> teamIds = Root.zebedee.getPermissionsService().listViewerTeams(collection.description, session);
+        Set<Integer> teamIds = Root.zebedee.getPermissionsService().listViewerTeams(collection.getDescription(), session);
         List<Team> teams = Root.zebedee.getTeamsService().resolveTeams(teamIds);
-        teams.forEach(team -> {
-            collection.description.teams.add(team.getName());
-        });
+        teams.forEach(team -> collection.getDescription().teams.add(team.getName()));
 
-        result.instances = collection.description.getInstances();
+        result.instances = collection.getDescription().getInstances();
 
         return result;
     }
@@ -91,7 +89,6 @@ public class CollectionDetails {
 
     private void addEventsForDetails(
             List<ContentDetail> detailsToAddEventsFor,
-            CollectionDetail result,
             com.github.onsdigital.zebedee.model.Collection collection
     ) {
 
@@ -102,8 +99,8 @@ public class CollectionDetails {
             } else {
                 language = "_" + contentDetail.description.language;
             }
-            if (collection.description.eventsByUri != null) {
-                Events eventsForFile = collection.description.eventsByUri.get(contentDetail.uri + "/data" + language + ".json");
+            if (collection.getDescription().eventsByUri != null) {
+                Events eventsForFile = collection.getDescription().eventsByUri.get(contentDetail.uri + "/data" + language + ".json");
                 contentDetail.events = eventsForFile;
             } else {
                 contentDetail.events = new Events();

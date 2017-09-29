@@ -114,14 +114,7 @@ public class Collections {
         Path path = Path.newInstance(request);
         List<String> segments = path.segments();
 
-        // /collections/{collection_id}/instances/{instance_id}
-        if (segments.size() < 4 ||
-                !segments.get(2).equalsIgnoreCase("instances")) {
-
-            logInfo("Endpoint for colletions not found").addParameter("path", path).log();
-            response.setStatus(HttpStatus.SC_NOT_FOUND);
-            return;
-        }
+        if (!isValidPath(response, path, segments)) return;
 
         String collectionID = segments.get(1);
         String instanceID = segments.get(3);
@@ -151,14 +144,7 @@ public class Collections {
         Path path = Path.newInstance(request);
         List<String> segments = path.segments();
 
-        // /collections/{collection_id}/instances/{instance_id}
-        if (segments.size() < 4 ||
-                !segments.get(2).equalsIgnoreCase("instances")) {
-
-            logInfo("Endpoint for colletions not found").addParameter("path", path).log();
-            response.setStatus(HttpStatus.SC_NOT_FOUND);
-            return;
-        }
+        if (!isValidPath(response, path, segments)) return;
 
         String collectionID = segments.get(1);
         String instanceID = segments.get(3);
@@ -169,6 +155,20 @@ public class Collections {
                 .log();
 
         datasetService.deleteInstanceFromCollection(collectionID, instanceID);
+    }
+
+    private boolean isValidPath(HttpServletResponse response, Path path, List<String> segments) {
+
+        // /collections/{collection_id}/instances/{instance_id}
+        if (segments.size() < 4 ||
+                !segments.get(2).equalsIgnoreCase("instances")) {
+
+            logInfo("Endpoint for colletions not found").addParameter("path", path).log();
+            response.setStatus(HttpStatus.SC_NOT_FOUND);
+            return false;
+        }
+
+        return true;
     }
 
     /**

@@ -2,8 +2,10 @@ package com.github.onsdigital.zebedee.dataset.api;
 
 import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
+import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.verification.http.ClientConfiguration;
 import com.github.onsdigital.zebedee.verification.http.PooledHttpClient;
+import org.apache.commons.lang.StringUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.util.EntityUtils;
 
@@ -49,7 +51,11 @@ public class DatasetAPIClient implements DatasetClient {
      * @return
      */
     @Override
-    public Dataset getDataset(String datasetID) throws IOException {
+    public Dataset getDataset(String datasetID) throws IOException, BadRequestException {
+
+        if (StringUtils.isEmpty(datasetID)) {
+            throw new BadRequestException("A dataset ID must be provided.");
+        }
 
         String path = "/datasets/" + datasetID;
 
@@ -68,7 +74,11 @@ public class DatasetAPIClient implements DatasetClient {
      * @return
      */
     @Override
-    public Instance getInstance(String instanceID) throws IOException {
+    public Instance getInstance(String instanceID) throws IOException, BadRequestException {
+
+        if (StringUtils.isEmpty(instanceID)) {
+            throw new BadRequestException("An instance ID must be provided.");
+        }
 
         String path = "/instances/" + instanceID;
 
@@ -78,10 +88,5 @@ public class DatasetAPIClient implements DatasetClient {
             String responseString = EntityUtils.toString(response.getEntity());
             return ContentUtil.deserialise(responseString, Instance.class);
         }
-    }
-
-    public static void main(String[] args) throws IOException {
-        Instance instance = DatasetAPIClient.getInstance().getInstance("763e0c3f-02e9-4261-bf50-1727e5a6bd25");
-        System.out.println("Instance! " + instance.getId());
     }
 }

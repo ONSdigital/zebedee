@@ -178,23 +178,26 @@ public class CollectionDescription extends CollectionBase {
 
     public Optional<CollectionInstance> getInstance(String instanceID) {
 
-        if (this.instances == null)
+        if (this.instances == null) {
             return Optional.empty();
+        }
 
         return this.instances.stream()
                 .filter(i -> i.getId().equals(instanceID)).findFirst();
     }
 
     public void addInstance(CollectionInstance instance) {
-        if (this.instances == null)
+
+        if (this.instances == null) {
             this.instances = new HashSet<>();
+        }
 
         this.instances.add(instance);
     }
 
     public void deleteInstance(CollectionInstance instance) {
-        if (this.instances == null)
-            return;
+
+        if (this.instances == null) return;
 
         this.instances.remove(instance);
     }

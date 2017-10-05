@@ -1,7 +1,10 @@
 package com.github.onsdigital.zebedee.dataset.api;
 
-import com.github.onsdigital.zebedee.exceptions.BadRequestException;
+import com.github.onsdigital.zebedee.dataset.api.exception.BadRequestException;
+import com.github.onsdigital.zebedee.dataset.api.exception.DatasetNotFoundException;
+import com.github.onsdigital.zebedee.dataset.api.exception.UnexpectedResponseException;
 
+import javax.management.InstanceNotFoundException;
 import java.io.IOException;
 
 public interface DatasetClient {
@@ -12,7 +15,7 @@ public interface DatasetClient {
      * @param datasetID
      * @return
      */
-    Dataset getDataset(String datasetID) throws IOException, BadRequestException;
+    Dataset getDataset(String datasetID) throws IOException, DatasetNotFoundException, UnexpectedResponseException, BadRequestException;
 
     /**
      * Get the instance for the given instance ID.
@@ -20,5 +23,5 @@ public interface DatasetClient {
      * @param instanceID
      * @return
      */
-    Instance getInstance(String instanceID) throws IOException, BadRequestException;
+    Instance getInstance(String instanceID) throws IOException, InstanceNotFoundException, UnexpectedResponseException, BadRequestException;
 }

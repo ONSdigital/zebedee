@@ -2,13 +2,18 @@ package com.github.onsdigital.zebedee.dataset.api;
 
 import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
-import com.github.onsdigital.zebedee.exceptions.BadRequestException;
-import com.github.onsdigital.zebedee.verification.http.ClientConfiguration;
-import com.github.onsdigital.zebedee.verification.http.PooledHttpClient;
+import com.github.onsdigital.zebedee.dataset.api.exception.BadRequestException;
+import com.github.onsdigital.zebedee.dataset.api.exception.DatasetNotFoundException;
+import com.github.onsdigital.zebedee.dataset.api.exception.UnexpectedResponseException;
 import org.apache.commons.lang.StringUtils;
+import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 
+import javax.management.InstanceNotFoundException;
 import java.io.IOException;
 
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
@@ -20,7 +25,7 @@ public class DatasetAPIClient implements DatasetClient {
 
     private static DatasetClient instance;
     private static String datasetAPIURL = Configuration.getDatasetAPIURL();
-    private static PooledHttpClient client;
+    private static CloseableHttpClient client = HttpClients.createDefault();
 
     private DatasetAPIClient() {
         // private constructor - use getInstance()
@@ -37,7 +42,6 @@ public class DatasetAPIClient implements DatasetClient {
             synchronized (DatasetAPIClient.class) {
                 if (DatasetAPIClient.instance == null) {
                     DatasetAPIClient.instance = new DatasetAPIClient();
-                    DatasetAPIClient.client = new PooledHttpClient(DatasetAPIClient.datasetAPIURL, new ClientConfiguration());
                 }
             }
         }
@@ -51,7 +55,7 @@ public class DatasetAPIClient implements DatasetClient {
      * @return
      */
     @Override
-    public Dataset getDataset(String datasetID) throws IOException, BadRequestException {
+    public Dataset getDataset(String datasetID) throws IOException, DatasetNotFoundException, UnexpectedResponseException, BadRequestException {
 
         if (StringUtils.isEmpty(datasetID)) {
             throw new BadRequestException("A dataset ID must be provided.");
@@ -61,9 +65,22 @@ public class DatasetAPIClient implements DatasetClient {
 
         logInfo("Calling dataset API").addParameter("path", path).log();
 
-        try (CloseableHttpResponse response = client.sendGet(path, null, null)) {
-            String responseString = EntityUtils.toString(response.getEntity());
-            return ContentUtil.deserialise(responseString, Dataset.class);
+        HttpGet httpget = new HttpGet(datasetAPIURL + path);
+
+        try (CloseableHttpResponse response = client.execute(httpget)) {
+
+            switch (response.getStatusLine().getStatusCode()) {
+                case HttpStatus.SC_OK:
+                    String responseString = EntityUtils.toString(response.getEntity());
+                    return ContentUtil.deserialise(responseString, Dataset.class);
+                case HttpStatus.SC_NOT_FOUND:
+                    throw new DatasetNotFoundException("The dataset API returned 404 for " + path);
+                default:
+                    throw new UnexpectedResponseException(
+                            String.format("The dataset API returned a %s response for %s",
+                                    response.getStatusLine().getStatusCode(),
+                                    path));
+            }
         }
     }
 
@@ -74,7 +91,7 @@ public class DatasetAPIClient implements DatasetClient {
      * @return
      */
     @Override
-    public Instance getInstance(String instanceID) throws IOException, BadRequestException {
+    public Instance getInstance(String instanceID) throws IOException, InstanceNotFoundException, UnexpectedResponseException, BadRequestException {
 
         if (StringUtils.isEmpty(instanceID)) {
             throw new BadRequestException("An instance ID must be provided.");
@@ -84,9 +101,22 @@ public class DatasetAPIClient implements DatasetClient {
 
         logInfo("Calling dataset API").addParameter("path", path).log();
 
-        try (CloseableHttpResponse response = client.sendGet(path, null, null)) {
-            String responseString = EntityUtils.toString(response.getEntity());
-            return ContentUtil.deserialise(responseString, Instance.class);
+        HttpGet httpget = new HttpGet(datasetAPIURL + path);
+
+        try (CloseableHttpResponse response = client.execute(httpget)) {
+
+            switch (response.getStatusLine().getStatusCode()) {
+                case HttpStatus.SC_OK:
+                    String responseString = EntityUtils.toString(response.getEntity());
+                    return ContentUtil.deserialise(responseString, Instance.class);
+                case HttpStatus.SC_NOT_FOUND:
+                    throw new InstanceNotFoundException("The dataset API returned 404 for " + path);
+                default:
+                    throw new UnexpectedResponseException(
+                            String.format("The dataset API returned a %s response for %s",
+                                    response.getStatusLine().getStatusCode(),
+                                    path));
+            }
         }
     }
 }

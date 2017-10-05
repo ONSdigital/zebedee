@@ -3,6 +3,10 @@ package com.github.onsdigital.zebedee.api;
 import com.github.davidcarboni.restolino.framework.Api;
 import com.github.davidcarboni.restolino.helpers.Path;
 import com.github.onsdigital.zebedee.dataset.api.DatasetAPIClient;
+import com.github.onsdigital.zebedee.dataset.api.exception.DatasetNotFoundException;
+import com.github.onsdigital.zebedee.dataset.api.exception.UnexpectedResponseException;
+import com.github.onsdigital.zebedee.exceptions.BadRequestException;
+import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnexpectedErrorException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
@@ -15,6 +19,7 @@ import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.util.ZebedeeCmsService;
 import org.apache.http.HttpStatus;
 
+import javax.management.InstanceNotFoundException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.DELETE;
@@ -124,7 +129,15 @@ public class Collections {
                 .addParameter("instanceID", instanceID)
                 .log();
 
-        datasetService.addInstanceToCollection(collectionID, instanceID);
+        try {
+            datasetService.addInstanceToCollection(collectionID, instanceID);
+        } catch (UnexpectedResponseException e) {
+            throw new UnexpectedErrorException(e.getMessage(), HttpStatus.SC_INTERNAL_SERVER_ERROR);
+        } catch (InstanceNotFoundException | DatasetNotFoundException e) {
+            throw new NotFoundException(e.getMessage());
+        } catch (com.github.onsdigital.zebedee.dataset.api.exception.BadRequestException e) {
+            throw new BadRequestException(e.getMessage());
+        }
     }
 
     /**

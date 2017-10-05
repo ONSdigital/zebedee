@@ -3,11 +3,15 @@ package com.github.onsdigital.zebedee.service;
 import com.github.onsdigital.zebedee.dataset.api.Dataset;
 import com.github.onsdigital.zebedee.dataset.api.DatasetClient;
 import com.github.onsdigital.zebedee.dataset.api.Instance;
+import com.github.onsdigital.zebedee.dataset.api.exception.BadRequestException;
+import com.github.onsdigital.zebedee.dataset.api.exception.DatasetNotFoundException;
+import com.github.onsdigital.zebedee.dataset.api.exception.UnexpectedResponseException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.CollectionInstance;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.util.ZebedeeCmsService;
 
+import javax.management.InstanceNotFoundException;
 import java.io.IOException;
 import java.util.Optional;
 
@@ -34,7 +38,7 @@ public class ZebedeeDatasetService implements DatasetService {
      * @throws IOException
      */
     @Override
-    public CollectionInstance addInstanceToCollection(String collectionID, String instanceID) throws ZebedeeException, IOException {
+    public CollectionInstance addInstanceToCollection(String collectionID, String instanceID) throws ZebedeeException, IOException, UnexpectedResponseException, InstanceNotFoundException, BadRequestException, DatasetNotFoundException {
 
         Collection collection = zebedeeCms.getCollection(collectionID);
 
@@ -55,6 +59,7 @@ public class ZebedeeDatasetService implements DatasetService {
         collection.save();
 
         return collectionInstance;
+
     }
 
     // take the instance and dataset model from the dataset API and map the values onto the CollectionInstance model.

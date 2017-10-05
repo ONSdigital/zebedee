@@ -1,8 +1,12 @@
 package com.github.onsdigital.zebedee.service;
 
+import com.github.onsdigital.zebedee.dataset.api.exception.BadRequestException;
+import com.github.onsdigital.zebedee.dataset.api.exception.DatasetNotFoundException;
+import com.github.onsdigital.zebedee.dataset.api.exception.UnexpectedResponseException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.CollectionInstance;
 
+import javax.management.InstanceNotFoundException;
 import java.io.IOException;
 
 public interface DatasetService {
@@ -15,7 +19,7 @@ public interface DatasetService {
      * @throws ZebedeeException
      * @throws IOException
      */
-    CollectionInstance addInstanceToCollection(String collectionID, String instanceID) throws ZebedeeException, IOException;
+    CollectionInstance addInstanceToCollection(String collectionID, String instanceID) throws ZebedeeException, IOException, UnexpectedResponseException, InstanceNotFoundException, BadRequestException, DatasetNotFoundException;
 
     /**
      * Delete the instance for the given instanceID from the collection for the collectionID.

@@ -10,14 +10,13 @@ import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPut;
-import org.apache.http.entity.InputStreamEntity;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 
 import javax.management.InstanceNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
 
@@ -132,17 +131,12 @@ public class DatasetAPIClient implements DatasetClient {
     }
 
     /**
-     * Update the dataset for the given dataset ID with the given json content.
-     * @param datasetID The ID of the dataset to update
-     * @param datasetJson An input stream containing dataset data in json format.
-     * @return
-     * @throws BadRequestException
-     * @throws IOException
-     * @throws DatasetNotFoundException
-     * @throws UnexpectedResponseException
+     * Update the dataset for the given dataset ID with the given dataset instance data.
+     * @param datasetID
+     * @param dataset
      */
     @Override
-    public String updateDataset(String datasetID, InputStream datasetJson) throws BadRequestException, IOException, DatasetNotFoundException, UnexpectedResponseException {
+    public Dataset updateDataset(String datasetID, Dataset dataset) throws BadRequestException, IOException, DatasetNotFoundException, UnexpectedResponseException {
 
         if (StringUtils.isEmpty(datasetID)) {
             throw new BadRequestException("A dataset ID must be provided.");
@@ -159,15 +153,16 @@ public class DatasetAPIClient implements DatasetClient {
         httpPut.setHeader("internal-token", datasetAPIAuthToken);
         httpPut.setHeader("Content-Type", "application/json");
 
-        InputStreamEntity inputStreamEntity = new InputStreamEntity(datasetJson);
-        httpPut.setEntity(inputStreamEntity);
+        String datasetJson = ContentUtil.serialise(dataset);
+        StringEntity stringEntity = new StringEntity(datasetJson);
+        httpPut.setEntity(stringEntity);
 
         try (CloseableHttpResponse response = client.execute(httpPut)) {
 
             switch (response.getStatusLine().getStatusCode()) {
                 case HttpStatus.SC_OK:
                     String responseString = EntityUtils.toString(response.getEntity());
-                    return responseString;
+                    return ContentUtil.deserialise(responseString, Dataset.class);
                 case HttpStatus.SC_NOT_FOUND:
                     throw new DatasetNotFoundException("The dataset API returned 404 for " + path);
                 default:

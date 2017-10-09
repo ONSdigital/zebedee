@@ -6,8 +6,6 @@ It provides the ability to create and approve collections of change and preview 
 
 Pre-release content is encrypted until published and only shared with permitted users
 
-David
-
 #### Example environment variables
 zebedee_root    /Users/thomasridd/Documents/onswebsite
 brian_url   http://localhost:8083/

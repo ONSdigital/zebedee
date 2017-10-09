@@ -79,6 +79,10 @@ public class Configuration {
         return StringUtils.defaultIfBlank(getValue("DATASET_API_URL"), DATASET_API_URL);
     }
 
+    public static String getDatasetAPIAuthToken() {
+        return StringUtils.defaultIfBlank(getValue("DATASET_API_AUTH_TOKEN"), "");
+    }
+
     public static String[] getTheTrainUrls() {
         return StringUtils.split(StringUtils.defaultIfBlank(getValue("publish_url"), DEFAULT_TRAIN_URL), ",");
     }

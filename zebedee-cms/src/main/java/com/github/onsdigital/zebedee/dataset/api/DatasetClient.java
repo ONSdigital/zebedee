@@ -6,6 +6,7 @@ import com.github.onsdigital.zebedee.dataset.api.exception.UnexpectedResponseExc
 
 import javax.management.InstanceNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 
 public interface DatasetClient {
 
@@ -24,4 +25,12 @@ public interface DatasetClient {
      * @return
      */
     Instance getInstance(String instanceID) throws IOException, InstanceNotFoundException, UnexpectedResponseException, BadRequestException;
+
+    /**
+     * Update the dataset for the given dataset ID with the given json content.
+     * @param datasetID The ID of the dataset to update
+     * @param datasetJson An input stream containing dataset data in json format.
+     * @return
+     */
+    String updateDataset(String datasetID, InputStream datasetJson) throws BadRequestException, IOException, DatasetNotFoundException, UnexpectedResponseException;
 }

@@ -3,31 +3,27 @@ package com.github.onsdigital.zebedee.model;
 import com.github.davidcarboni.encryptedfileupload.EncryptedFileItemFactory;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.api.Root;
-import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.data.json.DirectoryListing;
-import com.github.onsdigital.zebedee.dataset.api.Dataset;
-import com.github.onsdigital.zebedee.dataset.api.DatasetAPIClient;
-import com.github.onsdigital.zebedee.dataset.api.exception.DatasetNotFoundException;
-import com.github.onsdigital.zebedee.dataset.api.exception.UnexpectedResponseException;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.CollectionNotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ConflictException;
 import com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
-import com.github.onsdigital.zebedee.exceptions.UnexpectedErrorException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.ApprovalStatus;
 import com.github.onsdigital.zebedee.json.Event;
 import com.github.onsdigital.zebedee.json.EventType;
 import com.github.onsdigital.zebedee.json.Keyring;
+import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
+import com.github.onsdigital.zebedee.permissions.service.PermissionsServiceImpl;
+import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.model.approval.ApprovalQueue;
 import com.github.onsdigital.zebedee.model.approval.ApproveTask;
 import com.github.onsdigital.zebedee.model.publishing.PostPublisher;
 import com.github.onsdigital.zebedee.model.publishing.PublishNotification;
 import com.github.onsdigital.zebedee.model.publishing.Publisher;
-import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.persistence.CollectionEventType;
 import com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDao;
 import com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDaoFactory;
@@ -35,18 +31,15 @@ import com.github.onsdigital.zebedee.persistence.model.CollectionHistoryEvent;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
-import com.github.onsdigital.zebedee.session.model.Session;
-import com.google.gson.JsonIOException;
-import com.google.gson.JsonSyntaxException;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.ProgressListener;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpStatus;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -79,6 +72,7 @@ import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLL
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.DATA_VISUALISATION_COLLECTION_CONTENT_DELETED;
 import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData.contentMoved;
 import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData.contentRenamed;
+import static java.util.Objects.requireNonNull;
 
 public class Collections {
 
@@ -614,7 +608,9 @@ public class Collections {
 
         } else {
             if (validateJson) {
-                savePageContent(uri, requestBody, collectionWriter);
+                try (InputStream inputStream = validateJsonStream(requestBody)) {
+                    collectionWriter.getInProgress().write(inputStream, uri);
+                }
             } else {
                 collectionWriter.getInProgress().write(requestBody, uri);
             }
@@ -624,41 +620,23 @@ public class Collections {
         }
     }
 
-    private void savePageContent(String uri, InputStream inputStream, CollectionWriter collectionWriter) throws IOException, BadRequestException, UnexpectedErrorException, NotFoundException {
-
+    /**
+     * Take an input stream that contains json content and ensure its valid.
+     *
+     * @param inputStream
+     * @return
+     */
+    public InputStream validateJsonStream(InputStream inputStream) throws BadRequestException {
         try {
-            String json = IOUtils.toString(inputStream);
+            byte[] bytes = IOUtils.toByteArray(inputStream);
 
-            try (InputStream saveInputStream = IOUtils.toInputStream(json)) {
-                Page page = ContentUtil.deserialiseContent(json);
-                switch (page.getType()) {
-                    case api_dataset_landing_page: // save api dataset data to the dataset API instead of data.json
-                        saveAPIDataset(json);
-                        collectionWriter.getInProgress().write(saveInputStream, uri);
-                        break;
-                    default:
-                        collectionWriter.getInProgress().write(saveInputStream, uri);
-                        break;
-                }
+            try (ByteArrayInputStream validationInputStream = new ByteArrayInputStream(bytes)) {
+                ContentUtil.deserialiseContent(validationInputStream);
             }
 
-        } catch (JsonSyntaxException | JsonIOException e) {
+            return new ByteArrayInputStream(bytes);
+        } catch (Exception e) {
             throw new BadRequestException("Validation of page content failed. Please try again");
-        }
-    }
-
-    private void saveAPIDataset(String json) throws IOException, UnexpectedErrorException, NotFoundException, BadRequestException {
-        Dataset dataset = ContentUtil.deserialise(json, Dataset.class);
-
-        try {
-            DatasetAPIClient.getInstance().updateDataset(dataset.getId(), dataset);
-
-        } catch (UnexpectedResponseException e) {
-            throw new UnexpectedErrorException(e.getMessage(), HttpStatus.SC_INTERNAL_SERVER_ERROR);
-        } catch (DatasetNotFoundException e) {
-            throw new NotFoundException(e.getMessage());
-        } catch (com.github.onsdigital.zebedee.dataset.api.exception.BadRequestException e) {
-            throw new BadRequestException(e.getMessage());
         }
     }
 

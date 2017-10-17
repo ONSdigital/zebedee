@@ -81,11 +81,11 @@ public class CollectionDetails {
         List<Team> teams = Root.zebedee.getTeamsService().resolveTeams(teamIds);
         teams.forEach(team -> collection.getDescription().teams.add(team.getName()));
 
-        result.instances = collection.getDescription().getInstances();
+        result.datasets = collection.getDescription().getDatasets();
+        result.datasetVersions = collection.getDescription().getDatasetVersions();
 
         return result;
     }
-
 
     private void addEventsForDetails(
             List<ContentDetail> detailsToAddEventsFor,

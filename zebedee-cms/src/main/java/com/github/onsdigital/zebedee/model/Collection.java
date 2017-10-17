@@ -16,7 +16,6 @@ import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.ApprovalStatus;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
-import com.github.onsdigital.zebedee.json.CollectionInstance;
 import com.github.onsdigital.zebedee.json.CollectionType;
 import com.github.onsdigital.zebedee.json.ContentDetail;
 import com.github.onsdigital.zebedee.json.Event;
@@ -1189,18 +1188,6 @@ public class Collection {
 
     public Content getInProgress() {
         return inProgress;
-    }
-
-    public Optional<CollectionInstance> getInstance(String instanceID) {
-        return this.description.getInstance(instanceID);
-    }
-
-    public void addInstance(CollectionInstance instance) {
-        this.description.addInstance(instance);
-    }
-
-    public void deleteInstance(CollectionInstance instance) {
-        this.description.deleteInstance(instance);
     }
 }
 

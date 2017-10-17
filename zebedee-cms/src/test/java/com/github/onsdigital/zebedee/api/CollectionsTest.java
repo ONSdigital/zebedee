@@ -27,13 +27,15 @@ public class CollectionsTest {
 
     private Collections collections = new Collections(mockZebedee, mockDatasetService);
     private String collectionID = "123";
-    private String instanceID = "345";
+    private String datasetID = "345";
+    private String edition = "2014";
+    private String version = "1";
 
     @Test
-    public void TestPut() throws Exception {
+    public void TestPutDataset() throws Exception {
 
-        // Given a PUT request with a valid URL
-        String url = String.format("/collections/%s/instances/%s", collectionID, instanceID);
+        // Given a PUT request with a valid URL for a dataset
+        String url = String.format("/collections/%s/datasets/%s", collectionID, datasetID);
         when(request.getPathInfo()).thenReturn(url);
 
         shouldAuthorise(request, true);
@@ -42,14 +44,32 @@ public class CollectionsTest {
         collections.put(request, response);
 
         // The dataset service is called with the values extracted from the request URL.
-        verify(mockDatasetService, times(1)).addInstanceToCollection(collectionID, instanceID);
+        verify(mockDatasetService, times(1)).addDatasetToCollection(collectionID, datasetID);
+    }
+
+    @Test
+    public void TestPutDatasetVersion() throws Exception {
+
+        // Given a PUT request with a valid URL for a dataset
+        String url = String.format("/collections/%s/datasets/%s/editions/%s/versions/%s",
+                collectionID, datasetID, edition, version);
+        when(request.getPathInfo()).thenReturn(url);
+
+        shouldAuthorise(request, true);
+
+        // When the put method is called
+        collections.put(request, response);
+
+        // The dataset service is called with the values extracted from the request URL.
+        verify(mockDatasetService, times(1)).addDatasetVersionToCollection(
+                collectionID, datasetID, edition, version);
     }
 
     @Test
     public void TestPut_Forbidden() throws Exception {
 
         // Given a PUT request with a valid URL
-        String url = String.format("/collections/%s/instances/%s", collectionID, instanceID);
+        String url = String.format("/collections/%s/datasets/%s", collectionID, datasetID);
         when(request.getPathInfo()).thenReturn(url);
 
         shouldAuthorise(request, false);
@@ -66,8 +86,8 @@ public class CollectionsTest {
 
         shouldAuthorise(request, true);
 
-        // Given a PUT request with a URL that contains less than the expected number of segments
-        String url = "/collections/123/instances";
+        // Given a PUT request with a URL that contains less than the expected 4 segments
+        String url = "/collections/123/datasets";
         when(request.getPathInfo()).thenReturn(url);
 
         // When the put method is called
@@ -78,12 +98,12 @@ public class CollectionsTest {
     }
 
     @Test
-    public void TestPut_ReturnBadRequest_NotInstanceEndpoint() throws Exception {
+    public void TestPut_ReturnBadRequest_NotDatasetsEndpoint() throws Exception {
 
         shouldAuthorise(request, true);
 
-        // Given a PUT request with a URL that contains something other than /collections/{}/instances/{}
-        String url = "/collections/123/datasets/345";
+        // Given a PUT request with a URL that contains something other than /collections/{}/datasets/{}
+        String url = "/collections/123/wut/345";
         when(request.getPathInfo()).thenReturn(url);
 
         // When the put method is called
@@ -99,7 +119,7 @@ public class CollectionsTest {
         shouldAuthorise(request, true);
 
         // Given a PUT request with a URL that contains less than the expected number of segments
-        String url = "/collections/123/instances";
+        String url = "/collections/123/datasets";
 
         when(request.getPathInfo()).thenReturn(url);
 
@@ -111,12 +131,12 @@ public class CollectionsTest {
     }
 
     @Test
-    public void TestDelete_ReturnBadRequest_NotInstanceEndpoint() throws Exception {
+    public void TestDelete_ReturnBadRequest_NotDatasetsEndpoint() throws Exception {
 
         shouldAuthorise(request, true);
 
-        // Given a PUT request with a URL that contains something other than /collections/{}/instances/{}
-        String url = "/collections/123/datasets/345";
+        // Given a PUT request with a URL that contains something other than /collections/{}/datasets/{}
+        String url = "/collections/123/wut/345";
         when(request.getPathInfo()).thenReturn(url);
 
         // When the delete method is called
@@ -127,10 +147,10 @@ public class CollectionsTest {
     }
 
     @Test
-    public void TestDelete() throws Exception {
+    public void TestDeleteDataset() throws Exception {
 
         // Given a DELETE request with a valid URL
-        String url = String.format("/collections/%s/instances/%s", collectionID, instanceID);
+        String url = String.format("/collections/%s/datasets/%s", collectionID, datasetID);
         when(request.getPathInfo()).thenReturn(url);
 
         shouldAuthorise(request, true);
@@ -139,14 +159,32 @@ public class CollectionsTest {
         collections.delete(request, response);
 
         // The dataset service is called with the values extracted from the request URL.
-        verify(mockDatasetService, times(1)).deleteInstanceFromCollection(collectionID, instanceID);
+        verify(mockDatasetService, times(1)).removeDatasetFromCollection(collectionID, datasetID);
+    }
+
+    @Test
+    public void TestDeleteDatasetVersion() throws Exception {
+
+        // Given a DELETE request with a valid URL
+        String url = String.format("/collections/%s/datasets/%s/editions/%s/versions/%s",
+                collectionID, datasetID, edition, version);
+        when(request.getPathInfo()).thenReturn(url);
+
+        shouldAuthorise(request, true);
+
+        // When the delete method is called
+        collections.delete(request, response);
+
+        // The dataset service is called with the values extracted from the request URL.
+        verify(mockDatasetService, times(1)).removeDatasetVersionFromCollection(
+                collectionID, datasetID, edition, version);
     }
 
     @Test
     public void TestDelete_Forbidden() throws Exception {
 
         // Given a PUT request with a valid URL
-        String url = String.format("/collections/%s/instances/%s", collectionID, instanceID);
+        String url = String.format("/collections/%s/datasets/%s", collectionID, datasetID);
 
         when(request.getPathInfo()).thenReturn(url);
 

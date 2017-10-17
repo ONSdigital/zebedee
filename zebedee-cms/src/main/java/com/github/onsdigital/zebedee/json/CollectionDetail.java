@@ -14,5 +14,6 @@ public class CollectionDetail extends CollectionBase {
     public List<PendingDelete> pendingDeletes;
     public Events events;
     public CollectionOwner collectionOwner; // What team created the collection (eg PST or Data vis)
-    public Set<CollectionInstance> instances;
+    public Set<CollectionDataset> datasets;
+    public Set<CollectionDatasetVersion> datasetVersions;
 }

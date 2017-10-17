@@ -2,16 +2,15 @@ package com.github.onsdigital.zebedee.service;
 
 import com.github.onsdigital.zebedee.dataset.api.Dataset;
 import com.github.onsdigital.zebedee.dataset.api.DatasetClient;
-import com.github.onsdigital.zebedee.dataset.api.Instance;
 import com.github.onsdigital.zebedee.dataset.api.exception.BadRequestException;
 import com.github.onsdigital.zebedee.dataset.api.exception.DatasetNotFoundException;
 import com.github.onsdigital.zebedee.dataset.api.exception.UnexpectedResponseException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
-import com.github.onsdigital.zebedee.json.CollectionInstance;
+import com.github.onsdigital.zebedee.json.CollectionDataset;
+import com.github.onsdigital.zebedee.json.CollectionDatasetVersion;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.util.ZebedeeCmsService;
 
-import javax.management.InstanceNotFoundException;
 import java.io.IOException;
 import java.util.Optional;
 
@@ -29,80 +28,97 @@ public class ZebedeeDatasetService implements DatasetService {
     }
 
     /**
-     * Add an instance for the given instanceID to the collection for the collectionID.
-     *
-     * @param collectionID
-     * @param instanceID
-     * @return
-     * @throws ZebedeeException
-     * @throws IOException
+     * Add the dataset for the given datasetID to the collection for the collectionID.
      */
     @Override
-    public CollectionInstance addInstanceToCollection(String collectionID, String instanceID) throws ZebedeeException, IOException, UnexpectedResponseException, InstanceNotFoundException, BadRequestException, DatasetNotFoundException {
+    public CollectionDataset addDatasetToCollection(String collectionID, String datasetID) throws ZebedeeException, IOException, UnexpectedResponseException, DatasetNotFoundException, BadRequestException {
 
         Collection collection = zebedeeCms.getCollection(collectionID);
 
         // if its already been added return.
-        Optional<CollectionInstance> existingInstance = collection.getInstance(instanceID);
-        if (existingInstance.isPresent()) {
-            return existingInstance.get();
+        Optional<CollectionDataset> existingDataset = collection.getDescription().getDataset(datasetID);
+        if (existingDataset.isPresent()) {
+            return existingDataset.get();
         }
 
-        // Get the instance only to determine the dataset ID.
-        Instance instance = datasetClient.getInstance(instanceID);
-        String datasetID = instance.getLinks().dataset.getId();
         Dataset dataset = datasetClient.getDataset(datasetID);
 
-        CollectionInstance collectionInstance = mapToCollectionInstance(instance, dataset);
+        CollectionDataset collectionDataset = new CollectionDataset();
+        collectionDataset.setId(dataset.getId());
+        collectionDataset.setTitle(dataset.getTitle());
 
-        collection.addInstance(collectionInstance);
+        collection.getDescription().addDataset(collectionDataset);
         collection.save();
 
-        return collectionInstance;
-
+        return collectionDataset;
     }
 
-    // take the instance and dataset model from the dataset API and map the values onto the CollectionInstance model.
-    private CollectionInstance mapToCollectionInstance(Instance instance, Dataset dataset) {
 
-        CollectionInstance collectionInstance =
-                new CollectionInstance();
+    /**
+     * Add the dataset version to the collection for the collectionID.
+     */
+    @Override
+    public CollectionDatasetVersion addDatasetVersionToCollection(String collectionID, String datasetID, String edition, String version) throws ZebedeeException, IOException, UnexpectedResponseException, DatasetNotFoundException, BadRequestException {
 
-        collectionInstance.setId(instance.getId());
-        collectionInstance.setEdition(instance.getEdition());
-        collectionInstance.setVersion(instance.getVersion());
+        Collection collection = zebedeeCms.getCollection(collectionID);
 
-        CollectionInstance.CollectionDataset instanceDataset =
-                new CollectionInstance.CollectionDataset();
+        // if its already been added return.
+        Optional<CollectionDatasetVersion> existing =
+                collection.getDescription().getDatasetVersion(datasetID, edition, version);
 
-        instanceDataset.id = dataset.getId();
-        instanceDataset.title = dataset.getTitle();
-        instanceDataset.href = dataset.getUri();
+        if (existing.isPresent()) {
+            return existing.get();
+        }
 
-        collectionInstance.setDataset(instanceDataset);
-        return collectionInstance;
+        Dataset dataset = datasetClient.getDataset(datasetID);
+
+        CollectionDatasetVersion datasetVersion = new CollectionDatasetVersion();
+        datasetVersion.setId(datasetID);
+        datasetVersion.setEdition(edition);
+        datasetVersion.setVersion(version);
+        datasetVersion.setTitle(dataset.getTitle());
+
+        collection.getDescription().addDatasetVersion(datasetVersion);
+        collection.save();
+
+        return datasetVersion;
     }
 
     /**
-     * Delete the instance for the given instanceID from the collection for the collectionID.
-     *
-     * @param collectionID
-     * @param instanceID
-     * @throws ZebedeeException
-     * @throws IOException
+     * Remove the instance for the given datasetID from the collection for the collectionID.
      */
     @Override
-    public void deleteInstanceFromCollection(String collectionID, String instanceID) throws ZebedeeException, IOException {
+    public void removeDatasetFromCollection(String collectionID, String datasetID) throws ZebedeeException, IOException {
 
         Collection collection = zebedeeCms.getCollection(collectionID);
 
         // if its already been added return.
-        Optional<CollectionInstance> existingInstance = collection.getInstance(instanceID);
-        if (!existingInstance.isPresent()) {
+        Optional<CollectionDataset> existingDataset = collection.getDescription().getDataset(datasetID);
+        if (!existingDataset.isPresent()) {
             return;
         }
 
-        collection.deleteInstance(existingInstance.get());
+        collection.getDescription().removeDataset(existingDataset.get());
+        collection.save();
+    }
+
+    /**
+     * Remove the instance for the given datasetID from the collection for the collectionID.
+     */
+    @Override
+    public void removeDatasetVersionFromCollection(String collectionID, String datasetID, String edition, String version) throws ZebedeeException, IOException {
+
+        Collection collection = zebedeeCms.getCollection(collectionID);
+
+        // if its already been added return.
+        Optional<CollectionDatasetVersion> existingDataset =
+                collection.getDescription().getDatasetVersion(datasetID, edition, version);
+
+        if (!existingDataset.isPresent()) {
+            return;
+        }
+
+        collection.getDescription().removeDatasetVersion(existingDataset.get());
         collection.save();
     }
 }

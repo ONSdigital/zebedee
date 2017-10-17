@@ -32,7 +32,7 @@ public class DatasetAPIClient implements DatasetClient {
     private static CloseableHttpClient client = HttpClients.createDefault();
 
     private DatasetAPIClient() {
-        // private constructor - use getInstance()
+        // private constructor - use getDataset()
     }
 
     /**

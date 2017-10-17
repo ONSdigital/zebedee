@@ -19,7 +19,6 @@ import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.util.ZebedeeCmsService;
 import org.apache.http.HttpStatus;
 
-import javax.management.InstanceNotFoundException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.DELETE;
@@ -104,7 +103,7 @@ public class Collections {
 
     /**
      * Put endpoints for /collections.
-     * This supports only /collections/{collection_id}/instances/{instance_id}
+     * This supports only /collections/{collection_id}/datasets/{dataset_id}
      */
     @PUT
     public void put(HttpServletRequest request, HttpServletResponse response) throws ZebedeeException, IOException {
@@ -117,23 +116,35 @@ public class Collections {
         }
 
         Path path = Path.newInstance(request);
-        List<String> segments = path.segments();
+        List<String> pathSegments = path.segments();
 
-        if (!isValidPath(response, path, segments)) return;
+        if (!isValidPath(response, path, pathSegments)) return;
 
-        String collectionID = segments.get(1);
-        String instanceID = segments.get(3);
-
-        logInfo("PUT called on /collections/{collection_id}/instances/{instance_id} endpoint")
-                .addParameter("collectionID", collectionID)
-                .addParameter("instanceID", instanceID)
-                .log();
+        String collectionID = pathSegments.get(1);
+        String datasetID = pathSegments.get(3);
 
         try {
-            datasetService.addInstanceToCollection(collectionID, instanceID);
+            switch (pathSegments.size()) {
+                case 4: // /collections/{collection_id}/datasets/{dataset_id}
+
+                    addDatasetToCollection(collectionID, datasetID);
+                    break;
+
+                case 8: // /collections/{collection_id}/datasets/{dataset_id}/editions/{}/versions/{}
+
+                    String edition = pathSegments.get(5);
+                    String version = pathSegments.get(7);
+
+                    addDatasetVersionToCollection(collectionID, datasetID, edition, version);
+                    break;
+
+                default:
+                    response.setStatus(HttpStatus.SC_NOT_FOUND);
+                    return;
+            }
         } catch (UnexpectedResponseException e) {
             throw new UnexpectedErrorException(e.getMessage(), HttpStatus.SC_INTERNAL_SERVER_ERROR);
-        } catch (InstanceNotFoundException | DatasetNotFoundException e) {
+        } catch (DatasetNotFoundException e) {
             throw new NotFoundException(e.getMessage());
         } catch (com.github.onsdigital.zebedee.dataset.api.exception.BadRequestException e) {
             throw new BadRequestException(e.getMessage());
@@ -142,7 +153,7 @@ public class Collections {
 
     /**
      * Delete endpoints for /collections.
-     * This supports only /collections/{collection_id}/instances/{instance_id}
+     * This supports only /collections/{collection_id}/datasets/{dataset_ID}
      */
     @DELETE
     public void delete(HttpServletRequest request, HttpServletResponse response) throws ZebedeeException, IOException {
@@ -155,26 +166,75 @@ public class Collections {
         }
 
         Path path = Path.newInstance(request);
-        List<String> segments = path.segments();
+        List<String> pathSegments = path.segments();
 
-        if (!isValidPath(response, path, segments)) return;
+        if (!isValidPath(response, path, pathSegments)) return;
 
-        String collectionID = segments.get(1);
-        String instanceID = segments.get(3);
+        String collectionID = pathSegments.get(1);
+        String datasetID = pathSegments.get(3);
 
-        logInfo("DELETE called on /collections/{collection_id}/instances/{instance_id} endpoint")
+        switch (pathSegments.size()) {
+            case 4: // /collections/{collection_id}/datasets/{dataset_id}
+                removeDatasetFromCollection(collectionID, datasetID);
+                break;
+            case 8: // /collections/{collection_id}/datasets/{dataset_id}/editions/{}/versions/{}
+                String edition = pathSegments.get(5);
+                String version = pathSegments.get(7);
+                removeDatasetVersionFromCollection(collectionID, datasetID, edition, version);
+                break;
+            default:
+                response.setStatus(HttpStatus.SC_NOT_FOUND);
+                return;
+        }
+    }
+
+    private void addDatasetVersionToCollection(String collectionID, String datasetID, String edition, String version) throws ZebedeeException, IOException, UnexpectedResponseException, DatasetNotFoundException, com.github.onsdigital.zebedee.dataset.api.exception.BadRequestException {
+        logInfo("PUT called on /collections/{}/datasets/{}/editions/{}/versions/{} endpoint")
                 .addParameter("collectionID", collectionID)
-                .addParameter("instanceID", instanceID)
+                .addParameter("datasetID", datasetID)
+                .addParameter("edition", edition)
+                .addParameter("version", version)
                 .log();
 
-        datasetService.deleteInstanceFromCollection(collectionID, instanceID);
+        datasetService.addDatasetVersionToCollection(collectionID, datasetID, edition, version);
+    }
+
+    private void addDatasetToCollection(String collectionID, String datasetID) throws ZebedeeException, IOException, UnexpectedResponseException, DatasetNotFoundException, com.github.onsdigital.zebedee.dataset.api.exception.BadRequestException {
+        logInfo("PUT called on /collections/{}/datasets/{} endpoint")
+                .addParameter("collectionID", collectionID)
+                .addParameter("datasetID", datasetID)
+                .log();
+
+        datasetService.addDatasetToCollection(collectionID, datasetID);
+    }
+
+    private void removeDatasetVersionFromCollection(String collectionID, String datasetID, String edition, String version) throws ZebedeeException, IOException {
+        logInfo("DELETE called on /collections/{collection_id}/datasets/{}/editions/{}/versions/{} endpoint")
+                .addParameter("collectionID", collectionID)
+                .addParameter("datasetID", datasetID)
+                .addParameter("edition", edition)
+                .addParameter("version", version)
+                .log();
+
+        datasetService.removeDatasetVersionFromCollection(collectionID, datasetID, edition, version);
+    }
+
+    private void removeDatasetFromCollection(String collectionID, String datasetID) throws ZebedeeException, IOException {
+
+        logInfo("DELETE called on /collections/{collection_id}/datasets/{} endpoint")
+                .addParameter("collectionID", collectionID)
+                .addParameter("datasetID", datasetID)
+                .log();
+
+        datasetService.removeDatasetFromCollection(collectionID, datasetID);
     }
 
     private boolean isValidPath(HttpServletResponse response, Path path, List<String> segments) {
 
-        // /collections/{collection_id}/instances/{instance_id}
+        // /collections/{collection_id}/datasets/{dataset_id}
+        // /collections/{collection_id}/datasets/{dataset_id}/editions/{}/versions/{}
         if (segments.size() < 4 ||
-                !segments.get(2).equalsIgnoreCase("instances")) {
+                !segments.get(2).equalsIgnoreCase("datasets")) {
 
             logInfo("Endpoint for colletions not found").addParameter("path", path).log();
             response.setStatus(HttpStatus.SC_NOT_FOUND);

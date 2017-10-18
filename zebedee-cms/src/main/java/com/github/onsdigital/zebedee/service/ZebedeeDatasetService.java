@@ -10,6 +10,7 @@ import com.github.onsdigital.zebedee.json.CollectionDataset;
 import com.github.onsdigital.zebedee.json.CollectionDatasetVersion;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.util.ZebedeeCmsService;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -31,20 +32,25 @@ public class ZebedeeDatasetService implements DatasetService {
      * Add the dataset for the given datasetID to the collection for the collectionID.
      */
     @Override
-    public CollectionDataset addDatasetToCollection(String collectionID, String datasetID) throws ZebedeeException, IOException, UnexpectedResponseException, DatasetNotFoundException, BadRequestException {
+    public CollectionDataset updateDatasetInCollection(String collectionID, String datasetID, CollectionDataset updatedDataset) throws ZebedeeException, IOException, UnexpectedResponseException, DatasetNotFoundException, BadRequestException {
 
         Collection collection = zebedeeCms.getCollection(collectionID);
 
-        // if its already been added return.
+        CollectionDataset collectionDataset;
+
         Optional<CollectionDataset> existingDataset = collection.getDescription().getDataset(datasetID);
         if (existingDataset.isPresent()) {
-            return existingDataset.get();
+            collectionDataset = existingDataset.get();
+        } else {
+            collectionDataset = new CollectionDataset();
+            collectionDataset.setId(datasetID);
+        }
+
+        if (updatedDataset != null && StringUtils.isNotEmpty(updatedDataset.getState())) {
+            collectionDataset.setState(updatedDataset.getState());
         }
 
         Dataset dataset = datasetClient.getDataset(datasetID);
-
-        CollectionDataset collectionDataset = new CollectionDataset();
-        collectionDataset.setId(dataset.getId());
         collectionDataset.setTitle(dataset.getTitle());
 
         collection.getDescription().addDataset(collectionDataset);
@@ -58,24 +64,29 @@ public class ZebedeeDatasetService implements DatasetService {
      * Add the dataset version to the collection for the collectionID.
      */
     @Override
-    public CollectionDatasetVersion addDatasetVersionToCollection(String collectionID, String datasetID, String edition, String version) throws ZebedeeException, IOException, UnexpectedResponseException, DatasetNotFoundException, BadRequestException {
+    public CollectionDatasetVersion updateDatasetVersionInCollection(String collectionID, String datasetID, String edition, String version, CollectionDatasetVersion updatedVersion) throws ZebedeeException, IOException, UnexpectedResponseException, DatasetNotFoundException, BadRequestException {
 
         Collection collection = zebedeeCms.getCollection(collectionID);
+        CollectionDatasetVersion datasetVersion;
 
         // if its already been added return.
         Optional<CollectionDatasetVersion> existing =
                 collection.getDescription().getDatasetVersion(datasetID, edition, version);
 
         if (existing.isPresent()) {
-            return existing.get();
+            datasetVersion = existing.get();
+        } else {
+            datasetVersion = new CollectionDatasetVersion();
+            datasetVersion.setId(datasetID);
+            datasetVersion.setEdition(edition);
+            datasetVersion.setVersion(version);
+        }
+
+        if (updatedVersion != null && StringUtils.isNotEmpty(updatedVersion.getState())) {
+            datasetVersion.setState(updatedVersion.getState());
         }
 
         Dataset dataset = datasetClient.getDataset(datasetID);
-
-        CollectionDatasetVersion datasetVersion = new CollectionDatasetVersion();
-        datasetVersion.setId(datasetID);
-        datasetVersion.setEdition(edition);
-        datasetVersion.setVersion(version);
         datasetVersion.setTitle(dataset.getTitle());
 
         collection.getDescription().addDatasetVersion(datasetVersion);

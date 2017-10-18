@@ -9,6 +9,7 @@ public class CollectionDatasetVersion {
     private String title;
     private String edition;
     private String version;
+    private String state;
 
     public String getId() {
         return id;
@@ -40,6 +41,14 @@ public class CollectionDatasetVersion {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
     }
 
     @Override

@@ -15,14 +15,14 @@ import java.io.IOException;
 public interface DatasetService {
 
     /**
-     * Add a dataset for the given ID to the collection for the given collectionID.
+     * Update a dataset for the given ID to the collection for the given collectionID.
      */
-    CollectionDataset addDatasetToCollection(String collectionID, String datasetID) throws ZebedeeException, IOException, UnexpectedResponseException, DatasetNotFoundException, BadRequestException;
+    CollectionDataset updateDatasetInCollection(String collectionID, String datasetID, CollectionDataset updatedDataset) throws ZebedeeException, IOException, UnexpectedResponseException, DatasetNotFoundException, BadRequestException;
 
     /**
-     * Add the dataset version to the collection for the collectionID.
+     * Update the dataset version to the collection for the collectionID.
      */
-    CollectionDatasetVersion addDatasetVersionToCollection(String collectionID, String datasetID, String edition, String version) throws ZebedeeException, IOException, UnexpectedResponseException, DatasetNotFoundException, BadRequestException;
+    CollectionDatasetVersion updateDatasetVersionInCollection(String collectionID, String datasetID, String edition, String version, CollectionDatasetVersion updatedVersion) throws ZebedeeException, IOException, UnexpectedResponseException, DatasetNotFoundException, BadRequestException;
 
     /**
      * Remove the dataset for the given ID from the collection for the given collectionID.

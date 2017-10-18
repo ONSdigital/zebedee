@@ -1,17 +1,23 @@
 package com.github.onsdigital.zebedee.api;
 
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
+import com.github.onsdigital.zebedee.json.CollectionDataset;
+import com.github.onsdigital.zebedee.json.CollectionDatasetVersion;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.service.DatasetService;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.util.ZebedeeCmsService;
 import org.apache.http.HttpStatus;
 import org.junit.Test;
+import org.mockito.Matchers;
 
+import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
+import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -21,6 +27,7 @@ public class CollectionsTest {
 
     private ZebedeeCmsService mockZebedee = mock(ZebedeeCmsService.class);
     private DatasetService mockDatasetService = mock(DatasetService.class);
+    private ServletInputStream mockServletInputStream = mock(ServletInputStream.class);
 
     private HttpServletRequest request = mock(HttpServletRequest.class);
     private HttpServletResponse response = mock(HttpServletResponse.class);
@@ -31,12 +38,16 @@ public class CollectionsTest {
     private String edition = "2014";
     private String version = "1";
 
-    @Test
-    public void TestPutDataset() throws Exception {
 
-        // Given a PUT request with a valid URL for a dataset
+    @Test
+    public void TestPutDataset_EmptyJSON() throws Exception {
+
+        // Given a PUT request with a bad json input
         String url = String.format("/collections/%s/datasets/%s", collectionID, datasetID);
         when(request.getPathInfo()).thenReturn(url);
+
+        String json = "";
+        mockRequestBody(json);
 
         shouldAuthorise(request, true);
 
@@ -44,7 +55,26 @@ public class CollectionsTest {
         collections.put(request, response);
 
         // The dataset service is called with the values extracted from the request URL.
-        verify(mockDatasetService, times(1)).addDatasetToCollection(collectionID, datasetID);
+        verify(mockDatasetService, times(1)).updateDatasetInCollection(collectionID, datasetID, null);
+    }
+
+    @Test
+    public void TestPutDataset() throws Exception {
+
+        // Given a PUT request with a valid URL for a dataset
+        String url = String.format("/collections/%s/datasets/%s", collectionID, datasetID);
+        when(request.getPathInfo()).thenReturn(url);
+
+        String json = "{ \"state\": \"inProgress\"}";
+        mockRequestBody(json);
+
+        shouldAuthorise(request, true);
+
+        // When the put method is called
+        collections.put(request, response);
+
+        // The dataset service is called with the values extracted from the request URL.
+        verify(mockDatasetService, times(1)).updateDatasetInCollection(collectionID, datasetID, new CollectionDataset());
     }
 
     @Test
@@ -55,14 +85,17 @@ public class CollectionsTest {
                 collectionID, datasetID, edition, version);
         when(request.getPathInfo()).thenReturn(url);
 
+        String json = "{ \"state\": \"inProgress\"}";
+        mockRequestBody(json);
+
         shouldAuthorise(request, true);
 
         // When the put method is called
         collections.put(request, response);
 
         // The dataset service is called with the values extracted from the request URL.
-        verify(mockDatasetService, times(1)).addDatasetVersionToCollection(
-                collectionID, datasetID, edition, version);
+        verify(mockDatasetService, times(1)).updateDatasetVersionInCollection(
+                collectionID, datasetID, edition, version, new CollectionDatasetVersion());
     }
 
     @Test
@@ -207,5 +240,21 @@ public class CollectionsTest {
         when(mockZebedee.getPermissions()).thenReturn(permissionsService);
 
         when(permissionsService.canEdit(session)).thenReturn(authorise);
+    }
+
+    private void mockRequestBody(String json) throws IOException {
+
+        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(json.getBytes());
+
+        // needed this monstrosity to mock the request body input stream.
+        when(mockServletInputStream.read(Matchers.any(), anyInt(), anyInt())).thenAnswer(invocationOnMock -> {
+            Object[] args = invocationOnMock.getArguments();
+            byte[] output = (byte[]) args[0];
+            int offset = (int) args[1];
+            int length = (int) args[2];
+            return byteArrayInputStream.read(output, offset, length);
+        });
+
+        when(request.getInputStream()).thenReturn(mockServletInputStream);
     }
 }

@@ -7,6 +7,7 @@ public class CollectionDataset {
 
     private String id;
     private String title;
+    private String state;
 
     public String getId() {
         return id;
@@ -22,6 +23,14 @@ public class CollectionDataset {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
     }
 
     @Override

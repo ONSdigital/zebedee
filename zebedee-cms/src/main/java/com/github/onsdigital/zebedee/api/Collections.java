@@ -4,6 +4,7 @@ import com.github.davidcarboni.restolino.framework.Api;
 import com.github.davidcarboni.restolino.helpers.Path;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.dataset.api.DatasetAPIClient;
+import com.github.onsdigital.zebedee.dataset.api.exception.DatasetAPIException;
 import com.github.onsdigital.zebedee.dataset.api.exception.DatasetNotFoundException;
 import com.github.onsdigital.zebedee.dataset.api.exception.UnexpectedResponseException;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
@@ -111,7 +112,7 @@ public class Collections {
      * This supports only /collections/{collection_id}/datasets/{dataset_id}
      */
     @PUT
-    public void put(HttpServletRequest request, HttpServletResponse response) throws ZebedeeException, IOException {
+    public void put(HttpServletRequest request, HttpServletResponse response) throws ZebedeeException, IOException, DatasetAPIException {
 
         Session session = zebedeeCmsService.getSession(request);
         if (!zebedeeCmsService.getPermissions().canEdit(session)) {
@@ -193,7 +194,7 @@ public class Collections {
         }
     }
 
-    private void updateDatasetVersionInCollection(String collectionID, String datasetID, String edition, String version, HttpServletRequest request) throws ZebedeeException, IOException, UnexpectedResponseException, DatasetNotFoundException, com.github.onsdigital.zebedee.dataset.api.exception.BadRequestException {
+    private void updateDatasetVersionInCollection(String collectionID, String datasetID, String edition, String version, HttpServletRequest request) throws ZebedeeException, IOException, DatasetAPIException {
         logInfo("PUT called on /collections/{}/datasets/{}/editions/{}/versions/{} endpoint")
                 .addParameter("collectionID", collectionID)
                 .addParameter("datasetID", datasetID)
@@ -211,7 +212,7 @@ public class Collections {
         }
     }
 
-    private void updateDatasetInCollection(String collectionID, String datasetID, HttpServletRequest request) throws ZebedeeException, IOException, UnexpectedResponseException, DatasetNotFoundException, com.github.onsdigital.zebedee.dataset.api.exception.BadRequestException {
+    private void updateDatasetInCollection(String collectionID, String datasetID, HttpServletRequest request) throws ZebedeeException, IOException, DatasetAPIException {
         logInfo("PUT called on /collections/{}/datasets/{} endpoint")
                 .addParameter("collectionID", collectionID)
                 .addParameter("datasetID", datasetID)

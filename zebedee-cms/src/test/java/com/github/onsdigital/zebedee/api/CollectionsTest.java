@@ -244,17 +244,18 @@ public class CollectionsTest {
 
     private void mockRequestBody(String json) throws IOException {
 
-        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(json.getBytes());
+        try (ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(json.getBytes())) {
 
-        // needed this monstrosity to mock the request body input stream.
-        when(mockServletInputStream.read(Matchers.any(), anyInt(), anyInt())).thenAnswer(invocationOnMock -> {
-            Object[] args = invocationOnMock.getArguments();
-            byte[] output = (byte[]) args[0];
-            int offset = (int) args[1];
-            int length = (int) args[2];
-            return byteArrayInputStream.read(output, offset, length);
-        });
+            // needed this monstrosity to mock the request body input stream.
+            when(mockServletInputStream.read(Matchers.any(), anyInt(), anyInt())).thenAnswer(invocationOnMock -> {
+                Object[] args = invocationOnMock.getArguments();
+                byte[] output = (byte[]) args[0];
+                int offset = (int) args[1];
+                int length = (int) args[2];
+                return byteArrayInputStream.read(output, offset, length);
+            });
 
-        when(request.getInputStream()).thenReturn(mockServletInputStream);
+            when(request.getInputStream()).thenReturn(mockServletInputStream);
+        }
     }
 }

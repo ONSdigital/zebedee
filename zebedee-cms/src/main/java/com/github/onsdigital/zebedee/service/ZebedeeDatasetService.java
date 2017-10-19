@@ -2,9 +2,7 @@ package com.github.onsdigital.zebedee.service;
 
 import com.github.onsdigital.zebedee.dataset.api.Dataset;
 import com.github.onsdigital.zebedee.dataset.api.DatasetClient;
-import com.github.onsdigital.zebedee.dataset.api.exception.BadRequestException;
-import com.github.onsdigital.zebedee.dataset.api.exception.DatasetNotFoundException;
-import com.github.onsdigital.zebedee.dataset.api.exception.UnexpectedResponseException;
+import com.github.onsdigital.zebedee.dataset.api.exception.DatasetAPIException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.CollectionDataset;
 import com.github.onsdigital.zebedee.json.CollectionDatasetVersion;
@@ -32,7 +30,7 @@ public class ZebedeeDatasetService implements DatasetService {
      * Add the dataset for the given datasetID to the collection for the collectionID.
      */
     @Override
-    public CollectionDataset updateDatasetInCollection(String collectionID, String datasetID, CollectionDataset updatedDataset) throws ZebedeeException, IOException, UnexpectedResponseException, DatasetNotFoundException, BadRequestException {
+    public CollectionDataset updateDatasetInCollection(String collectionID, String datasetID, CollectionDataset updatedDataset) throws ZebedeeException, IOException, DatasetAPIException {
 
         Collection collection = zebedeeCms.getCollection(collectionID);
 
@@ -65,7 +63,7 @@ public class ZebedeeDatasetService implements DatasetService {
      * Add the dataset version to the collection for the collectionID.
      */
     @Override
-    public CollectionDatasetVersion updateDatasetVersionInCollection(String collectionID, String datasetID, String edition, String version, CollectionDatasetVersion updatedVersion) throws ZebedeeException, IOException, UnexpectedResponseException, DatasetNotFoundException, BadRequestException {
+    public CollectionDatasetVersion updateDatasetVersionInCollection(String collectionID, String datasetID, String edition, String version, CollectionDatasetVersion updatedVersion) throws ZebedeeException, IOException, DatasetAPIException {
 
         Collection collection = zebedeeCms.getCollection(collectionID);
         CollectionDatasetVersion datasetVersion;

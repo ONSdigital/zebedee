@@ -52,6 +52,7 @@ public class ZebedeeDatasetService implements DatasetService {
 
         Dataset dataset = datasetClient.getDataset(datasetID);
         collectionDataset.setTitle(dataset.getTitle());
+        collectionDataset.setUri(dataset.getUri());
 
         collection.getDescription().addDataset(collectionDataset);
         collection.save();

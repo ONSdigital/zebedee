@@ -8,6 +8,7 @@ public class CollectionDataset {
     private String id;
     private String title;
     private String state;
+    private String uri;
 
     public String getId() {
         return id;
@@ -31,6 +32,14 @@ public class CollectionDataset {
 
     public void setState(String state) {
         this.state = state;
+    }
+
+    public String getUri() {
+        return uri;
+    }
+
+    public void setUri(String uri) {
+        this.uri = uri;
     }
 
     @Override

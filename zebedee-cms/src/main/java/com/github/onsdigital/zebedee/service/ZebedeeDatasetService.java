@@ -1,6 +1,6 @@
 package com.github.onsdigital.zebedee.service;
 
-import com.github.onsdigital.zebedee.dataset.api.Dataset;
+import com.github.onsdigital.zebedee.dataset.api.model.Dataset;
 import com.github.onsdigital.zebedee.dataset.api.DatasetClient;
 import com.github.onsdigital.zebedee.dataset.api.exception.DatasetAPIException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
@@ -50,7 +50,7 @@ public class ZebedeeDatasetService implements DatasetService {
 
         Dataset dataset = datasetClient.getDataset(datasetID);
         collectionDataset.setTitle(dataset.getTitle());
-        collectionDataset.setUri(dataset.getUri());
+        collectionDataset.setUri(dataset.getLinks().getSelf().getHref());
 
         collection.getDescription().addDataset(collectionDataset);
         collection.save();

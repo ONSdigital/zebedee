@@ -1,4 +1,4 @@
-package com.github.onsdigital.zebedee.dataset.api;
+package com.github.onsdigital.zebedee.dataset.api.model;
 
 /**
  * The link structure used by the dataset API.

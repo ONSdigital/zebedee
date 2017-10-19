@@ -5,6 +5,9 @@ import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.dataset.api.exception.BadRequestException;
 import com.github.onsdigital.zebedee.dataset.api.exception.DatasetNotFoundException;
 import com.github.onsdigital.zebedee.dataset.api.exception.UnexpectedResponseException;
+import com.github.onsdigital.zebedee.dataset.api.model.Dataset;
+import com.github.onsdigital.zebedee.dataset.api.model.DatasetResponse;
+import com.github.onsdigital.zebedee.dataset.api.model.Instance;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -28,6 +31,7 @@ public class DatasetAPIClient implements DatasetClient {
     private static DatasetClient instance;
     private static String datasetAPIURL = Configuration.getDatasetAPIURL();
     private static String datasetAPIAuthToken = Configuration.getDatasetAPIAuthToken();
+    private static String authTokenHeaderName = "internal-token";
 
     private static CloseableHttpClient client = HttpClients.createDefault();
 
@@ -73,13 +77,15 @@ public class DatasetAPIClient implements DatasetClient {
                 .log();
 
         HttpGet httpget = new HttpGet(datasetAPIURL + path);
+        httpget.addHeader(authTokenHeaderName, datasetAPIAuthToken);
 
         try (CloseableHttpResponse response = client.execute(httpget)) {
 
             switch (response.getStatusLine().getStatusCode()) {
                 case HttpStatus.SC_OK:
                     String responseString = EntityUtils.toString(response.getEntity());
-                    return ContentUtil.deserialise(responseString, Dataset.class);
+                    DatasetResponse datasetResponse = ContentUtil.deserialise(responseString, DatasetResponse.class);
+                    return datasetResponse.getNext();
                 case HttpStatus.SC_NOT_FOUND:
                     throw new DatasetNotFoundException("The dataset API returned 404 for " + path);
                 default:
@@ -112,6 +118,7 @@ public class DatasetAPIClient implements DatasetClient {
                 .log();
 
         HttpGet httpget = new HttpGet(datasetAPIURL + path);
+        httpget.addHeader(authTokenHeaderName, datasetAPIAuthToken);
 
         try (CloseableHttpResponse response = client.execute(httpget)) {
 
@@ -150,7 +157,7 @@ public class DatasetAPIClient implements DatasetClient {
                 .log();
 
         HttpPut httpPut = new HttpPut(datasetAPIURL + path);
-        httpPut.setHeader("internal-token", datasetAPIAuthToken);
+        httpPut.addHeader(authTokenHeaderName, datasetAPIAuthToken);
         httpPut.setHeader("Content-Type", "application/json");
 
         String datasetJson = ContentUtil.serialise(dataset);

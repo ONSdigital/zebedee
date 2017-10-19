@@ -38,7 +38,6 @@ public class CollectionsTest {
     private String edition = "2014";
     private String version = "1";
 
-
     @Test
     public void TestPutDataset_EmptyJSON() throws Exception {
 

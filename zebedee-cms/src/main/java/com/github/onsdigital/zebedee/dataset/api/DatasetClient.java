@@ -3,6 +3,8 @@ package com.github.onsdigital.zebedee.dataset.api;
 import com.github.onsdigital.zebedee.dataset.api.exception.BadRequestException;
 import com.github.onsdigital.zebedee.dataset.api.exception.DatasetNotFoundException;
 import com.github.onsdigital.zebedee.dataset.api.exception.UnexpectedResponseException;
+import com.github.onsdigital.zebedee.dataset.api.model.Dataset;
+import com.github.onsdigital.zebedee.dataset.api.model.Instance;
 
 import javax.management.InstanceNotFoundException;
 import java.io.IOException;

@@ -1,7 +1,8 @@
 package com.github.onsdigital.zebedee.service;
 
-import com.github.onsdigital.zebedee.dataset.api.Dataset;
+import com.github.onsdigital.zebedee.dataset.api.model.Dataset;
 import com.github.onsdigital.zebedee.dataset.api.DatasetClient;
+import com.github.onsdigital.zebedee.dataset.api.model.Link;
 import com.github.onsdigital.zebedee.json.CollectionDataset;
 import com.github.onsdigital.zebedee.json.CollectionDatasetVersion;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
@@ -42,7 +43,11 @@ public class ZebedeeDatasetServiceTest {
 
         dataset.setId(datasetID);
         dataset.setTitle("Dataset title");
-        dataset.setUri("/the/dataset/uri");
+        Dataset.DatasetLinks links = new Dataset.DatasetLinks();
+        Link self = new Link();
+        self.setHref("/the/dataset/uri");
+        links.setSelf(self);
+        dataset.setLinks(links);
 
         when(mockDatasetAPI.getDataset(datasetID)).thenReturn(dataset);
         when(mockZebedee.getCollection(collectionID)).thenReturn(mockCollection);

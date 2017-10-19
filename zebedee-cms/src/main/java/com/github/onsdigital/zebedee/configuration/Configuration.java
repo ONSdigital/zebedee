@@ -19,6 +19,7 @@ public class Configuration {
     private static final String AUDIT_DB_ENABLED_ENV_VAR = "audit_db_enabled";
     private static final String MATHJAX_SERVICE_URL = "http://localhost:8888";
     private static final String DATASET_API_URL = "http://localhost:22000";
+    private static final String DATASET_API_AUTH_TOKEN = "FD0108EA-825D-411C-9B1D-41EF7727F465";
 
     private static final int VERIFY_RETRTY_DELAY = 5000; //milliseconds
     private static final int VERIFY_RETRTY_COUNT = 10;
@@ -80,7 +81,7 @@ public class Configuration {
     }
 
     public static String getDatasetAPIAuthToken() {
-        return StringUtils.defaultIfBlank(getValue("DATASET_API_AUTH_TOKEN"), "");
+        return StringUtils.defaultIfBlank(getValue("DATASET_API_AUTH_TOKEN"), DATASET_API_AUTH_TOKEN);
     }
 
     public static String[] getTheTrainUrls() {

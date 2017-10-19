@@ -1,4 +1,4 @@
-package com.github.onsdigital.zebedee.dataset.api;
+package com.github.onsdigital.zebedee.dataset.api.model;
 
 /**
  * The model of an instance as provided by the dataset API.

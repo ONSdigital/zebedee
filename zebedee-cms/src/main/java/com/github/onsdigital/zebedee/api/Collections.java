@@ -20,6 +20,7 @@ import com.github.onsdigital.zebedee.service.DatasetService;
 import com.github.onsdigital.zebedee.service.ZebedeeDatasetService;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.util.ZebedeeCmsService;
+import com.google.gson.JsonSyntaxException;
 import org.apache.http.HttpStatus;
 
 import javax.servlet.http.HttpServletRequest;
@@ -204,6 +205,9 @@ public class Collections {
 
             CollectionDatasetVersion datasetVersion = ContentUtil.deserialise(body, CollectionDatasetVersion.class);
             datasetService.updateDatasetVersionInCollection(collectionID, datasetID, edition, version, datasetVersion);
+
+        } catch (JsonSyntaxException ex) {
+            throw new BadRequestException(ex.getMessage());
         }
     }
 
@@ -216,6 +220,9 @@ public class Collections {
 
             CollectionDataset dataset = ContentUtil.deserialise(body, CollectionDataset.class);
             datasetService.updateDatasetInCollection(collectionID, datasetID, dataset);
+
+        } catch (JsonSyntaxException ex) {
+            throw new BadRequestException(ex.getMessage());
         }
     }
 

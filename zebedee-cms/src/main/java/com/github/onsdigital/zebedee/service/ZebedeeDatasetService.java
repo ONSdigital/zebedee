@@ -132,15 +132,20 @@ public class ZebedeeDatasetService implements DatasetService {
      * Remove the instance for the given datasetID from the collection for the collectionID.
      */
     @Override
-    public void removeDatasetFromCollection(String collectionID, String datasetID) throws ZebedeeException, IOException {
+    public void removeDatasetFromCollection(String collectionID, String datasetID) throws ZebedeeException, IOException, DatasetAPIException {
 
         Collection collection = zebedeeCms.getCollection(collectionID);
 
-        // if its already been added return.
+        // if its not in the collection then just return.
         Optional<CollectionDataset> existingDataset = collection.getDescription().getDataset(datasetID);
         if (!existingDataset.isPresent()) {
             return;
         }
+
+        Dataset datasetUpdate = new Dataset();
+        datasetUpdate.setCollection_id("");
+        datasetUpdate.setState(State.created);
+        datasetClient.updateDataset(datasetID, datasetUpdate);
 
         collection.getDescription().removeDataset(existingDataset.get());
         collection.save();
@@ -150,17 +155,23 @@ public class ZebedeeDatasetService implements DatasetService {
      * Remove the instance for the given datasetID from the collection for the collectionID.
      */
     @Override
-    public void removeDatasetVersionFromCollection(String collectionID, String datasetID, String edition, String version) throws ZebedeeException, IOException {
+    public void removeDatasetVersionFromCollection(String collectionID, String datasetID, String edition, String version) throws ZebedeeException, IOException, DatasetAPIException {
 
         Collection collection = zebedeeCms.getCollection(collectionID);
 
-        // if its already been added return.
+        // if its not in the collection then return.
         Optional<CollectionDatasetVersion> existingDataset =
                 collection.getDescription().getDatasetVersion(datasetID, edition, version);
 
         if (!existingDataset.isPresent()) {
             return;
         }
+
+        // update the dataset version in the dataset API with a reverted state and blank collection ID.
+        DatasetVersion versionUpdate = new DatasetVersion();
+        versionUpdate.setCollection_id("");
+        versionUpdate.setState(State.created);
+        datasetClient.updateDatasetVersion(datasetID, edition, version, versionUpdate);
 
         collection.getDescription().removeDatasetVersion(existingDataset.get());
         collection.save();

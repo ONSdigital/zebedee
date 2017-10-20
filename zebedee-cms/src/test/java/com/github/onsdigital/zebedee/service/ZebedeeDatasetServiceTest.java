@@ -50,10 +50,11 @@ public class ZebedeeDatasetServiceTest {
         when(mockZebedee.getCollection(collectionID)).thenReturn(mockCollection);
         when(mockCollection.getDescription()).thenReturn(mockCollectionDescription);
         when(mockCollectionDescription.getDataset(datasetID)).thenReturn(Optional.empty());
+        when(mockCollectionDescription.getDatasetVersion(datasetID, edition, version)).thenReturn(Optional.empty());
 
         DatasetVersion datasetVersion = new DatasetVersion();
         datasetVersion.setCollection_id(collectionID);
-        datasetVersion.setState(State.associated);
+        datasetVersion.setState(State.created);
         when(mockDatasetAPI.getDatasetVersion(datasetID, edition, version))
                 .thenReturn(datasetVersion);
 
@@ -94,6 +95,7 @@ public class ZebedeeDatasetServiceTest {
         ArgumentCaptor<Dataset> datasetArgumentCaptor = ArgumentCaptor.forClass(Dataset.class);
         verify(mockDatasetAPI, times(1)).updateDataset(anyString(), datasetArgumentCaptor.capture());
         Assert.assertEquals(datasetArgumentCaptor.getAllValues().get(0).getCollection_id(), collectionID);
+        Assert.assertEquals(datasetArgumentCaptor.getAllValues().get(0).getState(), State.associated);
     }
 
     @Test
@@ -138,12 +140,13 @@ public class ZebedeeDatasetServiceTest {
         DatasetService service = new ZebedeeDatasetService(mockDatasetAPI, mockZebedee);
 
         // When updateDatasetInCollection is called
-        service.updateDatasetInCollection(collectionID, datasetID, collectionDataset);
+        service.updateDatasetVersionInCollection(collectionID, datasetID, edition, version, collectionDatasetVersion);
 
         // Then the dataset API is called to set the collection ID
-        ArgumentCaptor<Dataset> argumentCaptor = ArgumentCaptor.forClass(Dataset.class);
-        verify(mockDatasetAPI, times(1)).updateDataset(anyString(), argumentCaptor.capture());
+        ArgumentCaptor<DatasetVersion> argumentCaptor = ArgumentCaptor.forClass(DatasetVersion.class);
+        verify(mockDatasetAPI, times(1)).updateDatasetVersion(anyString(), anyString(), anyString(), argumentCaptor.capture());
         Assert.assertEquals(argumentCaptor.getAllValues().get(0).getCollection_id(), collectionID);
+        Assert.assertEquals(argumentCaptor.getAllValues().get(0).getState(), State.associated);
     }
 
     @Test
@@ -161,7 +164,7 @@ public class ZebedeeDatasetServiceTest {
         service.updateDatasetInCollection(collectionID, datasetID, collectionDataset);
 
         // Then the dataset API is not called to set the collection ID
-        verify(mockDatasetAPI, times(0)).updateDatasetVersion(anyString(),anyString(),anyString(), anyObject());
+        verify(mockDatasetAPI, times(0)).updateDatasetVersion(anyString(), anyString(), anyString(), anyObject());
     }
 
     @Test(expected = ConflictException.class)
@@ -262,6 +265,11 @@ public class ZebedeeDatasetServiceTest {
         // When removeDatasetFromCollection is called
         service.removeDatasetFromCollection(collectionID, datasetID);
 
+        ArgumentCaptor<Dataset> argumentCaptor = ArgumentCaptor.forClass(Dataset.class);
+        verify(mockDatasetAPI, times(1)).updateDataset(anyString(), argumentCaptor.capture());
+        Assert.assertEquals(argumentCaptor.getAllValues().get(0).getCollection_id(), "");
+        Assert.assertEquals(argumentCaptor.getAllValues().get(0).getState(), State.created);
+
         // Then the collection is prompted to delete the dataset and save.
         verify(mockCollectionDescription, times(1)).removeDataset(collectionDataset);
         verify(mockCollection, times(1)).save();
@@ -280,6 +288,12 @@ public class ZebedeeDatasetServiceTest {
 
         // When removeDatasetFromCollection is called
         service.removeDatasetVersionFromCollection(collectionID, datasetID, edition, version);
+
+        // Then the collection is cleared in the version on the dataset API, and it state is reset to created.
+        ArgumentCaptor<DatasetVersion> argumentCaptor = ArgumentCaptor.forClass(DatasetVersion.class);
+        verify(mockDatasetAPI, times(1)).updateDatasetVersion(anyString(), anyString(), anyString(), argumentCaptor.capture());
+        Assert.assertEquals(argumentCaptor.getAllValues().get(0).getCollection_id(), "");
+        Assert.assertEquals(argumentCaptor.getAllValues().get(0).getState(), State.created);
 
         // Then the collection is prompted to delete the dataset and save.
         verify(mockCollectionDescription, times(1)).removeDatasetVersion(datasetVersion);
@@ -315,6 +329,7 @@ public class ZebedeeDatasetServiceTest {
 
         // When deleteDatasetFromCollection is called
         service.removeDatasetVersionFromCollection(collectionID, datasetID, edition, version);
+
 
         // Then the delete function is not called, as the dataset is not in the collection.
         verify(mockCollectionDescription, times(0)).removeDatasetVersion(collectionDatasetVersion);

@@ -25,10 +25,10 @@ public interface DatasetService {
     /**
      * Remove the dataset for the given ID from the collection for the given collectionID.
      */
-    void removeDatasetFromCollection(String collectionID, String datasetID) throws ZebedeeException, IOException;
+    void removeDatasetFromCollection(String collectionID, String datasetID) throws ZebedeeException, IOException, DatasetAPIException;
 
     /**
      * Remove the instance for the given datasetID from the collection for the collectionID.
      */
-    void removeDatasetVersionFromCollection(String collectionID, String datasetID, String edition, String version) throws ZebedeeException, IOException;
+    void removeDatasetVersionFromCollection(String collectionID, String datasetID, String edition, String version) throws ZebedeeException, IOException, DatasetAPIException;
 }

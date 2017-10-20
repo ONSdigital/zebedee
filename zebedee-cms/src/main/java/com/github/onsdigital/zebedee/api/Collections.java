@@ -162,7 +162,7 @@ public class Collections {
      * This supports only /collections/{collection_id}/datasets/{dataset_ID}
      */
     @DELETE
-    public void delete(HttpServletRequest request, HttpServletResponse response) throws ZebedeeException, IOException {
+    public void delete(HttpServletRequest request, HttpServletResponse response) throws ZebedeeException, IOException, DatasetAPIException {
 
         Session session = zebedeeCmsService.getSession(request);
         if (!zebedeeCmsService.getPermissions().canEdit(session)) {
@@ -227,7 +227,7 @@ public class Collections {
         }
     }
 
-    private void removeDatasetVersionFromCollection(String collectionID, String datasetID, String edition, String version) throws ZebedeeException, IOException {
+    private void removeDatasetVersionFromCollection(String collectionID, String datasetID, String edition, String version) throws ZebedeeException, IOException, DatasetAPIException {
         logInfo("DELETE called on /collections/{collection_id}/datasets/{}/editions/{}/versions/{} endpoint")
                 .addParameter("collectionID", collectionID)
                 .addParameter("datasetID", datasetID)
@@ -238,7 +238,7 @@ public class Collections {
         datasetService.removeDatasetVersionFromCollection(collectionID, datasetID, edition, version);
     }
 
-    private void removeDatasetFromCollection(String collectionID, String datasetID) throws ZebedeeException, IOException {
+    private void removeDatasetFromCollection(String collectionID, String datasetID) throws ZebedeeException, IOException, DatasetAPIException {
 
         logInfo("DELETE called on /collections/{collection_id}/datasets/{} endpoint")
                 .addParameter("collectionID", collectionID)

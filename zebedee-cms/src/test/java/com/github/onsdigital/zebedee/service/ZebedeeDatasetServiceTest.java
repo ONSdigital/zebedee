@@ -1,8 +1,11 @@
 package com.github.onsdigital.zebedee.service;
 
-import com.github.onsdigital.zebedee.dataset.api.model.Dataset;
 import com.github.onsdigital.zebedee.dataset.api.DatasetClient;
+import com.github.onsdigital.zebedee.dataset.api.model.Dataset;
+import com.github.onsdigital.zebedee.dataset.api.model.DatasetVersion;
 import com.github.onsdigital.zebedee.dataset.api.model.Link;
+import com.github.onsdigital.zebedee.dataset.api.model.State;
+import com.github.onsdigital.zebedee.exceptions.ConflictException;
 import com.github.onsdigital.zebedee.json.CollectionDataset;
 import com.github.onsdigital.zebedee.json.CollectionDatasetVersion;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
@@ -15,6 +18,8 @@ import org.mockito.ArgumentCaptor;
 
 import java.util.Optional;
 
+import static org.mockito.Matchers.anyObject;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -28,7 +33,7 @@ public class ZebedeeDatasetServiceTest {
     String collectionID = "345";
     String initialState = "in-progress";
 
-    Dataset dataset = new Dataset();
+    Dataset dataset = createDataset();
 
     DatasetClient mockDatasetAPI = mock(DatasetClient.class);
     ZebedeeCmsService mockZebedee = mock(ZebedeeCmsService.class);
@@ -41,24 +46,23 @@ public class ZebedeeDatasetServiceTest {
     @Before
     public void setUp() throws Exception {
 
-        dataset.setId(datasetID);
-        dataset.setTitle("Dataset title");
-        Dataset.DatasetLinks links = new Dataset.DatasetLinks();
-        Link self = new Link();
-        self.setHref("/the/dataset/uri");
-        links.setSelf(self);
-        dataset.setLinks(links);
-
         when(mockDatasetAPI.getDataset(datasetID)).thenReturn(dataset);
         when(mockZebedee.getCollection(collectionID)).thenReturn(mockCollection);
         when(mockCollection.getDescription()).thenReturn(mockCollectionDescription);
+        when(mockCollectionDescription.getDataset(datasetID)).thenReturn(Optional.empty());
+
+        DatasetVersion datasetVersion = new DatasetVersion();
+        datasetVersion.setCollection_id(collectionID);
+        datasetVersion.setState(State.associated);
+        when(mockDatasetAPI.getDatasetVersion(datasetID, edition, version))
+                .thenReturn(datasetVersion);
 
         collectionDataset.setState(initialState);
         collectionDatasetVersion.setState(initialState);
     }
 
     @Test
-    public void TestDatasetService_addDatasetToCollection_UpdatesStateWhenAlreadyInCollection() throws Exception {
+    public void TestDatasetService_updateDatasetInCollection_UpdatesStateWhenAlreadyInCollection() throws Exception {
 
         // Given a mockCollection that already contains the dataset
         when(mockCollectionDescription.getDataset(datasetID)).thenReturn(Optional.of(new CollectionDataset()));
@@ -78,7 +82,110 @@ public class ZebedeeDatasetServiceTest {
     }
 
     @Test
-    public void TestDatasetService_updateDatasetVersionToCollection_UpdatesStateWhenAlreadyInCollection() throws Exception {
+    public void TestDatasetService_updateDatasetInCollection_SendsCollectionIDToDatasetAPI() throws Exception {
+
+        // Given a dataset in the dataset API that is not associated with a collection
+        DatasetService service = new ZebedeeDatasetService(mockDatasetAPI, mockZebedee);
+
+        // When updateDatasetInCollection is called
+        service.updateDatasetInCollection(collectionID, datasetID, collectionDataset);
+
+        // Then the dataset API is called to set the collection ID
+        ArgumentCaptor<Dataset> datasetArgumentCaptor = ArgumentCaptor.forClass(Dataset.class);
+        verify(mockDatasetAPI, times(1)).updateDataset(anyString(), datasetArgumentCaptor.capture());
+        Assert.assertEquals(datasetArgumentCaptor.getAllValues().get(0).getCollection_id(), collectionID);
+    }
+
+    @Test
+    public void TestDatasetService_updateDatasetInCollection_DoesNotSendCollectionIDToDatasetAPIIfAlreadySet() throws Exception {
+
+        // Given a dataset in the dataset API that is already associated with the collection
+        DatasetService service = new ZebedeeDatasetService(mockDatasetAPI, mockZebedee);
+
+        Dataset dataset = createDataset();
+        dataset.setCollection_id(collectionID);
+        dataset.setState(State.associated);
+        when(mockDatasetAPI.getDataset(datasetID)).thenReturn(dataset);
+
+        // When updateDatasetInCollection is called
+        service.updateDatasetInCollection(collectionID, datasetID, collectionDataset);
+
+        // Then the dataset API is not called to set the collection ID
+        verify(mockDatasetAPI, times(0)).updateDataset(anyString(), anyObject());
+    }
+
+    @Test(expected = ConflictException.class)
+    public void TestDatasetService_updateDatasetInCollection_ThrowsConflictExceptionIfAlreadyInAnotherCollection() throws Exception {
+
+        // Given a dataset in the dataset API that is already associated with a different collection
+        DatasetService service = new ZebedeeDatasetService(mockDatasetAPI, mockZebedee);
+
+        Dataset dataset = createDataset();
+        dataset.setState(State.associated);
+        dataset.setCollection_id("someOtherCollectionID");
+        when(mockDatasetAPI.getDataset(datasetID)).thenReturn(dataset);
+
+        // When updateDatasetInCollection is called
+        service.updateDatasetInCollection(collectionID, datasetID, collectionDataset);
+
+        // Then a conflict exception is thrown
+    }
+
+    @Test
+    public void TestDatasetService_updateDatasetVersionInCollection_SendsCollectionIDToDatasetAPI() throws Exception {
+
+        // Given a dataset version in the dataset API that is not associated with a collection
+        DatasetService service = new ZebedeeDatasetService(mockDatasetAPI, mockZebedee);
+
+        // When updateDatasetInCollection is called
+        service.updateDatasetInCollection(collectionID, datasetID, collectionDataset);
+
+        // Then the dataset API is called to set the collection ID
+        ArgumentCaptor<Dataset> argumentCaptor = ArgumentCaptor.forClass(Dataset.class);
+        verify(mockDatasetAPI, times(1)).updateDataset(anyString(), argumentCaptor.capture());
+        Assert.assertEquals(argumentCaptor.getAllValues().get(0).getCollection_id(), collectionID);
+    }
+
+    @Test
+    public void TestDatasetService_updateDatasetVersionInCollection_DoesNotSendCollectionIDToDatasetAPIIfAlreadySet() throws Exception {
+
+        // Given a dataset version in the dataset API that is already associated with the collection
+        DatasetService service = new ZebedeeDatasetService(mockDatasetAPI, mockZebedee);
+
+        DatasetVersion datasetVersion = new DatasetVersion();
+        datasetVersion.setCollection_id(collectionID);
+        datasetVersion.setState(State.associated);
+        when(mockDatasetAPI.getDatasetVersion(datasetID, edition, version)).thenReturn(datasetVersion);
+
+        // When updateDatasetInCollection is called
+        service.updateDatasetInCollection(collectionID, datasetID, collectionDataset);
+
+        // Then the dataset API is not called to set the collection ID
+        verify(mockDatasetAPI, times(0)).updateDatasetVersion(anyString(),anyString(),anyString(), anyObject());
+    }
+
+    @Test(expected = ConflictException.class)
+    public void TestDatasetService_updateDatasetVersionInCollection_ThrowsConflictExceptionIfAlreadyInAnotherCollection() throws Exception {
+
+        // Given a dataset in the dataset API that is already associated with a collection
+        DatasetService service = new ZebedeeDatasetService(mockDatasetAPI, mockZebedee);
+
+        when(mockCollectionDescription.getDatasetVersion(datasetID, edition, version))
+                .thenReturn(Optional.of(new CollectionDatasetVersion()));
+
+        DatasetVersion datasetVersion = new DatasetVersion();
+        datasetVersion.setState(State.associated);
+        datasetVersion.setCollection_id("someOtherCollectionID");
+        when(mockDatasetAPI.getDatasetVersion(datasetID, edition, version)).thenReturn(datasetVersion);
+
+        // When updateDatasetInCollection is called
+        service.updateDatasetVersionInCollection(collectionID, datasetID, edition, version, collectionDatasetVersion);
+
+        // Then a conflict exception is thrown
+    }
+
+    @Test
+    public void TestDatasetService_updateDatasetVersionInCollection_UpdatesStateWhenAlreadyInCollection() throws Exception {
 
         // Given a mockCollection that already contains a dataset version
         when(mockCollectionDescription.getDatasetVersion(datasetID, edition, version))
@@ -103,7 +210,6 @@ public class ZebedeeDatasetServiceTest {
     public void TestDatasetService_updateDatasetInCollection() throws Exception {
 
         // Given a mockCollection that contains no datasets
-        when(mockCollectionDescription.getDataset(datasetID)).thenReturn(Optional.empty());
         DatasetService service = new ZebedeeDatasetService(mockDatasetAPI, mockZebedee);
 
         // When updateDatasetInCollection is called
@@ -124,11 +230,11 @@ public class ZebedeeDatasetServiceTest {
     public void TestDatasetService_addDatasetVersionToCollection() throws Exception {
 
         // Given a mockCollection that contains no dataset versions
-        when(mockCollectionDescription.getDatasetVersion(datasetID,edition,version)).thenReturn(Optional.empty());
+        when(mockCollectionDescription.getDatasetVersion(datasetID, edition, version)).thenReturn(Optional.empty());
         DatasetService service = new ZebedeeDatasetService(mockDatasetAPI, mockZebedee);
 
         // When updateDatasetInCollection is called
-        CollectionDatasetVersion actualVersion = service.updateDatasetVersionInCollection(collectionID, datasetID,edition,version, collectionDatasetVersion);
+        CollectionDatasetVersion actualVersion = service.updateDatasetVersionInCollection(collectionID, datasetID, edition, version, collectionDatasetVersion);
 
         // Then the dataset API is called to populate the version data, and its added to the collection.
         verify(mockDatasetAPI, times(1)).getDataset(datasetID);
@@ -167,7 +273,7 @@ public class ZebedeeDatasetServiceTest {
         CollectionDatasetVersion datasetVersion = new CollectionDatasetVersion();
 
         // Given a mockCollection that does not contain the dataset we try to delete
-        when(mockCollectionDescription.getDatasetVersion(datasetID,edition,version))
+        when(mockCollectionDescription.getDatasetVersion(datasetID, edition, version))
                 .thenReturn(Optional.of(datasetVersion));
 
         DatasetService service = new ZebedeeDatasetService(mockDatasetAPI, mockZebedee);
@@ -186,7 +292,6 @@ public class ZebedeeDatasetServiceTest {
         CollectionDataset collectionDataset = new CollectionDataset();
 
         // Given a mockCollection that does not contain the dataset we try to delete
-        when(mockCollectionDescription.getDataset(datasetID)).thenReturn(Optional.empty());
 
         DatasetService service = new ZebedeeDatasetService(mockDatasetAPI, mockZebedee);
 
@@ -214,5 +319,18 @@ public class ZebedeeDatasetServiceTest {
         // Then the delete function is not called, as the dataset is not in the collection.
         verify(mockCollectionDescription, times(0)).removeDatasetVersion(collectionDatasetVersion);
         verify(mockCollection, times(0)).save();
+    }
+
+    private Dataset createDataset() {
+        Dataset dataset = new Dataset();
+        dataset.setId(datasetID);
+        dataset.setTitle("Dataset title");
+        dataset.setState(State.created);
+        Dataset.DatasetLinks links = new Dataset.DatasetLinks();
+        Link self = new Link();
+        self.setHref("/the/dataset/uri");
+        links.setSelf(self);
+        dataset.setLinks(links);
+        return dataset;
     }
 }

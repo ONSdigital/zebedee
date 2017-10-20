@@ -7,7 +7,9 @@ public class Dataset {
 
     private String id;
     private String title;
+    private String collection_id;
     private DatasetLinks links;
+    private State state;
 
     public String getId() {
         return id;
@@ -25,12 +27,28 @@ public class Dataset {
         this.title = title;
     }
 
+    public String getCollection_id() {
+        return collection_id;
+    }
+
+    public void setCollection_id(String collection_id) {
+        this.collection_id = collection_id;
+    }
+
     public DatasetLinks getLinks() {
         return links;
     }
 
     public void setLinks(DatasetLinks links) {
         this.links = links;
+    }
+
+    public State getState() {
+        return state;
+    }
+
+    public void setState(State state) {
+        this.state = state;
     }
 
     public static class DatasetLinks {

@@ -1,8 +1,11 @@
 package com.github.onsdigital.zebedee.service;
 
-import com.github.onsdigital.zebedee.dataset.api.model.Dataset;
 import com.github.onsdigital.zebedee.dataset.api.DatasetClient;
 import com.github.onsdigital.zebedee.dataset.api.exception.DatasetAPIException;
+import com.github.onsdigital.zebedee.dataset.api.model.Dataset;
+import com.github.onsdigital.zebedee.dataset.api.model.DatasetVersion;
+import com.github.onsdigital.zebedee.dataset.api.model.State;
+import com.github.onsdigital.zebedee.exceptions.ConflictException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.CollectionDataset;
 import com.github.onsdigital.zebedee.json.CollectionDatasetVersion;
@@ -52,6 +55,21 @@ public class ZebedeeDatasetService implements DatasetService {
         collectionDataset.setTitle(dataset.getTitle());
         collectionDataset.setUri(dataset.getLinks().getSelf().getHref());
 
+        if (dataset.getState().equals(State.created)) {
+            // the dataset has just been added to the collection, so update collection ID on the dataset
+            Dataset datasetUpdate = new Dataset();
+            datasetUpdate.setCollection_id(collectionID);
+            datasetUpdate.setState(State.associated);
+            datasetClient.updateDataset(datasetID, datasetUpdate);
+        }
+
+        if (dataset.getState().equals(State.associated)
+                && !dataset.getCollection_id().equals(collectionID)) {
+            throw new ConflictException("cannot add dataset " + datasetID
+                    + " to collection " + collectionID
+                    + " it is already in collection " + dataset.getCollection_id());
+        }
+
         collection.getDescription().addDataset(collectionDataset);
         collection.save();
 
@@ -66,32 +84,48 @@ public class ZebedeeDatasetService implements DatasetService {
     public CollectionDatasetVersion updateDatasetVersionInCollection(String collectionID, String datasetID, String edition, String version, CollectionDatasetVersion updatedVersion) throws ZebedeeException, IOException, DatasetAPIException {
 
         Collection collection = zebedeeCms.getCollection(collectionID);
-        CollectionDatasetVersion datasetVersion;
+        CollectionDatasetVersion collectionDatasetVersion;
 
         // if its already been added return.
         Optional<CollectionDatasetVersion> existing =
                 collection.getDescription().getDatasetVersion(datasetID, edition, version);
 
         if (existing.isPresent()) {
-            datasetVersion = existing.get();
+            collectionDatasetVersion = existing.get();
         } else {
-            datasetVersion = new CollectionDatasetVersion();
-            datasetVersion.setId(datasetID);
-            datasetVersion.setEdition(edition);
-            datasetVersion.setVersion(version);
+            collectionDatasetVersion = new CollectionDatasetVersion();
+            collectionDatasetVersion.setId(datasetID);
+            collectionDatasetVersion.setEdition(edition);
+            collectionDatasetVersion.setVersion(version);
         }
 
         if (updatedVersion != null && StringUtils.isNotEmpty(updatedVersion.getState())) {
-            datasetVersion.setState(updatedVersion.getState());
+            collectionDatasetVersion.setState(updatedVersion.getState());
         }
 
         Dataset dataset = datasetClient.getDataset(datasetID);
-        datasetVersion.setTitle(dataset.getTitle());
+        DatasetVersion datasetVersion = datasetClient.getDatasetVersion(datasetID, edition, version);
 
-        collection.getDescription().addDatasetVersion(datasetVersion);
+        if (datasetVersion.getState().equals(State.created)) {
+            // the dataset version has just been added to the collection, so update collection ID and set state
+            DatasetVersion versionUpdate = new DatasetVersion();
+            versionUpdate.setCollection_id(collectionID);
+            versionUpdate.setState(State.associated);
+            datasetClient.updateDatasetVersion(datasetID, edition, version, versionUpdate);
+        }
+
+        if (datasetVersion.getState().equals(State.associated)
+                && !datasetVersion.getCollection_id().equals(collectionID)) {
+            throw new ConflictException("cannot add dataset " + datasetID
+                    + " to collection " + collectionID
+                    + " it is already in collection " + dataset.getCollection_id());
+        }
+
+        collectionDatasetVersion.setTitle(dataset.getTitle());
+        collection.getDescription().addDatasetVersion(collectionDatasetVersion);
         collection.save();
 
-        return datasetVersion;
+        return collectionDatasetVersion;
     }
 
     /**

@@ -3,10 +3,13 @@ package com.github.onsdigital.zebedee.dataset.api;
 import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.dataset.api.exception.BadRequestException;
+import com.github.onsdigital.zebedee.dataset.api.exception.DatasetAPIException;
 import com.github.onsdigital.zebedee.dataset.api.exception.DatasetNotFoundException;
+import com.github.onsdigital.zebedee.dataset.api.exception.InstanceNotFoundException;
 import com.github.onsdigital.zebedee.dataset.api.exception.UnexpectedResponseException;
 import com.github.onsdigital.zebedee.dataset.api.model.Dataset;
 import com.github.onsdigital.zebedee.dataset.api.model.DatasetResponse;
+import com.github.onsdigital.zebedee.dataset.api.model.DatasetVersion;
 import com.github.onsdigital.zebedee.dataset.api.model.Instance;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpStatus;
@@ -18,7 +21,6 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 
-import javax.management.InstanceNotFoundException;
 import java.io.IOException;
 
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
@@ -63,7 +65,7 @@ public class DatasetAPIClient implements DatasetClient {
      * @return
      */
     @Override
-    public Dataset getDataset(String datasetID) throws IOException, DatasetNotFoundException, UnexpectedResponseException, BadRequestException {
+    public Dataset getDataset(String datasetID) throws IOException, DatasetAPIException {
 
         if (StringUtils.isEmpty(datasetID)) {
             throw new BadRequestException("A dataset ID must be provided.");
@@ -98,13 +100,56 @@ public class DatasetAPIClient implements DatasetClient {
     }
 
     /**
+     * Get a particular version of a dataset.
+     * @param datasetID
+     * @param edition
+     * @param version
+     * @return
+     * @throws IOException
+     * @throws DatasetAPIException
+     */
+    @Override
+    public DatasetVersion getDatasetVersion(String datasetID, String edition, String version) throws IOException, DatasetAPIException {
+
+        if (StringUtils.isEmpty(datasetID) || StringUtils.isEmpty(edition)) {
+            throw new BadRequestException("A dataset ID, edition, and version must be provided.");
+        }
+
+        String path = "/datasets/" + datasetID + "/editions/" + edition + "/versions/" + version ;
+
+        logInfo("Calling dataset API")
+                .addParameter("path", path)
+                .addParameter("method", "GET")
+                .log();
+
+        HttpGet httpget = new HttpGet(datasetAPIURL + path);
+        httpget.addHeader(authTokenHeaderName, datasetAPIAuthToken);
+
+        try (CloseableHttpResponse response = client.execute(httpget)) {
+
+            switch (response.getStatusLine().getStatusCode()) {
+                case HttpStatus.SC_OK:
+                    String responseString = EntityUtils.toString(response.getEntity());
+                    return ContentUtil.deserialise(responseString, DatasetVersion.class);
+                case HttpStatus.SC_NOT_FOUND:
+                    throw new DatasetNotFoundException("The dataset API returned 404 for " + path);
+                default:
+                    throw new UnexpectedResponseException(
+                            String.format("The dataset API returned a %s response for %s",
+                                    response.getStatusLine().getStatusCode(),
+                                    path));
+            }
+        }
+    }
+
+    /**
      * Get the instance for the given instance ID.
      *
      * @param instanceID
      * @return
      */
     @Override
-    public Instance getInstance(String instanceID) throws IOException, InstanceNotFoundException, UnexpectedResponseException, BadRequestException {
+    public Instance getInstance(String instanceID) throws IOException, DatasetAPIException {
 
         if (StringUtils.isEmpty(instanceID)) {
             throw new BadRequestException("An instance ID must be provided.");
@@ -143,7 +188,7 @@ public class DatasetAPIClient implements DatasetClient {
      * @param dataset
      */
     @Override
-    public Dataset updateDataset(String datasetID, Dataset dataset) throws BadRequestException, IOException, DatasetNotFoundException, UnexpectedResponseException {
+    public Dataset updateDataset(String datasetID, Dataset dataset) throws IOException, DatasetAPIException {
 
         if (StringUtils.isEmpty(datasetID)) {
             throw new BadRequestException("A dataset ID must be provided.");
@@ -161,6 +206,48 @@ public class DatasetAPIClient implements DatasetClient {
         httpPut.setHeader("Content-Type", "application/json");
 
         String datasetJson = ContentUtil.serialise(dataset);
+        StringEntity stringEntity = new StringEntity(datasetJson);
+        httpPut.setEntity(stringEntity);
+
+        try (CloseableHttpResponse response = client.execute(httpPut)) {
+
+            switch (response.getStatusLine().getStatusCode()) {
+                case HttpStatus.SC_OK:
+                    String responseString = EntityUtils.toString(response.getEntity());
+                    return ContentUtil.deserialise(responseString, Dataset.class);
+                case HttpStatus.SC_NOT_FOUND:
+                    throw new DatasetNotFoundException("The dataset API returned 404 for " + path);
+                default:
+                    throw new UnexpectedResponseException(
+                            String.format("The dataset API returned a %s response for %s",
+                                    response.getStatusLine().getStatusCode(),
+                                    path));
+            }
+        }
+    }
+
+    /**
+     * Update the dataset version
+     */
+    @Override
+    public Dataset updateDatasetVersion(String datasetID, String edition, String version, DatasetVersion datasetVersion) throws IOException, DatasetAPIException {
+
+        if (StringUtils.isEmpty(datasetID)) {
+            throw new BadRequestException("A dataset ID must be provided.");
+        }
+
+        String path = "/datasets/" + datasetID + "/editions/" + edition + "/versions/" + version ;
+
+        logInfo("Calling dataset API")
+                .addParameter("path", path)
+                .addParameter("method", "PUT")
+                .log();
+
+        HttpPut httpPut = new HttpPut(datasetAPIURL + path);
+        httpPut.addHeader(authTokenHeaderName, datasetAPIAuthToken);
+        httpPut.setHeader("Content-Type", "application/json");
+
+        String datasetJson = ContentUtil.serialise(datasetVersion);
         StringEntity stringEntity = new StringEntity(datasetJson);
         httpPut.setEntity(stringEntity);
 

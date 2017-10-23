@@ -16,12 +16,15 @@ import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPut;
+import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
 
@@ -73,12 +76,21 @@ public class DatasetAPIClient implements DatasetClient {
 
         String path = "/datasets/" + datasetID;
 
+        URI uri;
+        try {
+            uri = new URIBuilder(datasetAPIURL)
+                    .setPath(path)
+                    .build();
+        } catch (URISyntaxException e) {
+            throw new BadRequestException(e.getMessage());
+        }
+
         logInfo("Calling dataset API")
-                .addParameter("path", path)
+                .addParameter("uri", uri)
                 .addParameter("method", "GET")
                 .log();
 
-        HttpGet httpget = new HttpGet(datasetAPIURL + path);
+        HttpGet httpget = new HttpGet(uri);
         httpget.addHeader(authTokenHeaderName, datasetAPIAuthToken);
 
         try (CloseableHttpResponse response = client.execute(httpget)) {
@@ -115,14 +127,23 @@ public class DatasetAPIClient implements DatasetClient {
             throw new BadRequestException("A dataset ID, edition, and version must be provided.");
         }
 
-        String path = "/datasets/" + datasetID + "/editions/" + edition + "/versions/" + version ;
+        String path = String.format("/datasets/%s/editions/%s/versions/%s", datasetID, edition, version);
+
+        URI uri;
+        try {
+            uri = new URIBuilder(datasetAPIURL)
+                    .setPath(path)
+                    .build();
+        } catch (URISyntaxException e) {
+            throw new BadRequestException(e.getMessage());
+        }
 
         logInfo("Calling dataset API")
-                .addParameter("path", path)
+                .addParameter("uri", uri)
                 .addParameter("method", "GET")
                 .log();
 
-        HttpGet httpget = new HttpGet(datasetAPIURL + path);
+        HttpGet httpget = new HttpGet(uri);
         httpget.addHeader(authTokenHeaderName, datasetAPIAuthToken);
 
         try (CloseableHttpResponse response = client.execute(httpget)) {
@@ -157,12 +178,21 @@ public class DatasetAPIClient implements DatasetClient {
 
         String path = "/instances/" + instanceID;
 
+        URI uri;
+        try {
+            uri = new URIBuilder(datasetAPIURL)
+                    .setPath(path)
+                    .build();
+        } catch (URISyntaxException e) {
+            throw new BadRequestException(e.getMessage());
+        }
+
         logInfo("Calling dataset API")
-                .addParameter("path", path)
+                .addParameter("uri", uri)
                 .addParameter("method", "GET")
                 .log();
 
-        HttpGet httpget = new HttpGet(datasetAPIURL + path);
+        HttpGet httpget = new HttpGet(uri);
         httpget.addHeader(authTokenHeaderName, datasetAPIAuthToken);
 
         try (CloseableHttpResponse response = client.execute(httpget)) {
@@ -196,12 +226,21 @@ public class DatasetAPIClient implements DatasetClient {
 
         String path = "/datasets/" + datasetID;
 
+        URI uri;
+        try {
+            uri = new URIBuilder(datasetAPIURL)
+                    .setPath(path)
+                    .build();
+        } catch (URISyntaxException e) {
+            throw new BadRequestException(e.getMessage());
+        }
+
         logInfo("Calling dataset API")
-                .addParameter("path", path)
+                .addParameter("uri", uri)
                 .addParameter("method", "PUT")
                 .log();
 
-        HttpPut httpPut = new HttpPut(datasetAPIURL + path);
+        HttpPut httpPut = new HttpPut(uri);
         httpPut.addHeader(authTokenHeaderName, datasetAPIAuthToken);
         httpPut.setHeader("Content-Type", "application/json");
 
@@ -236,14 +275,23 @@ public class DatasetAPIClient implements DatasetClient {
             throw new BadRequestException("A dataset ID must be provided.");
         }
 
-        String path = "/datasets/" + datasetID + "/editions/" + edition + "/versions/" + version ;
+        String path = String.format("/datasets/%s/editions/%s/versions/%s", datasetID, edition, version);
+
+        URI uri;
+        try {
+            uri = new URIBuilder(datasetAPIURL)
+                    .setPath(path)
+                    .build();
+        } catch (URISyntaxException e) {
+            throw new BadRequestException(e.getMessage());
+        }
 
         logInfo("Calling dataset API")
-                .addParameter("path", path)
+                .addParameter("uri", uri)
                 .addParameter("method", "PUT")
                 .log();
 
-        HttpPut httpPut = new HttpPut(datasetAPIURL + path);
+        HttpPut httpPut = new HttpPut(uri);
         httpPut.addHeader(authTokenHeaderName, datasetAPIAuthToken);
         httpPut.setHeader("Content-Type", "application/json");
 

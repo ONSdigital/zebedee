@@ -1123,7 +1123,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         // When we attempt to populate the release from the collection.
         FakeCollectionReader collectionReader = new FakeCollectionReader(zebedee.getCollections().path.toString(), collection.description.id);
         FakeCollectionWriter collectionWriter = new FakeCollectionWriter(zebedee.getCollections().path.toString(), collection.description.id);
-        List<ContentDetail> collectionContent = ContentDetailUtil.resolveDetails(collection.reviewed, collectionReader.getReviewed());
+        Iterable<ContentDetail> collectionContent = ContentDetailUtil.resolveDetails(collection.reviewed, collectionReader.getReviewed());
 
         Release result = collection.populateRelease(
                 collectionReader,
@@ -1487,6 +1487,59 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         assertTrue(allContentReviewed);
     }
 
+    @Test
+    public void getDatasetDetails() throws IOException, ZebedeeException {
+
+        // Given a collection with a dataset.
+        Path collectionPath = Files.createTempDirectory(Random.id()); // create a temp directory to generate content into
+        Collection collection = CollectionTest.CreateCollection(collectionPath,"isAllContentReviewed");
+
+        CollectionDataset dataset = new CollectionDataset();
+        dataset.setUri("http://localhost:1234/datasets/123");
+        dataset.setTitle("dataset wut");
+        collection.getDescription().addDataset(dataset);
+
+        // When getDatasetDetails() is called
+        List<ContentDetail> datasetContent = collection.getDatasetDetails();
+
+        // Then the expected values have been set
+        ContentDetail datasetDetail = datasetContent.get(0);
+
+        assertEquals("/datasets/123", datasetDetail.uri);
+        assertEquals(PageType.api_dataset_landing_page.toString(), datasetDetail.type);
+        assertEquals(dataset.getTitle(), datasetDetail.description.title);
+    }
+
+    @Test
+    public void getDatasetVersionDetails() throws IOException, ZebedeeException {
+
+        // Given a collection with a dataset version.
+        Path collectionPath = Files.createTempDirectory(Random.id()); // create a temp directory to generate content into
+        Collection collection = CollectionTest.CreateCollection(collectionPath,"isAllContentReviewed");
+
+        CollectionDatasetVersion datasetVersion = new CollectionDatasetVersion();
+        datasetVersion.setId("123");
+        datasetVersion.setEdition("2015");
+        datasetVersion.setVersion("1");
+        datasetVersion.setTitle("dataset version wut");
+        collection.getDescription().addDatasetVersion(datasetVersion);
+
+        // When getDatasetDetails() is called
+        List<ContentDetail> datasetContent = collection.getDatasetVersionDetails();
+
+        // Then the expected values have been set
+        ContentDetail versionDetail = datasetContent.get(0);
+        assertEquals( "/datasets/123/editions/2015/versions/1", versionDetail.uri);
+        assertEquals(PageType.api_dataset.toString(), versionDetail.type);
+        assertEquals(datasetVersion.getTitle(), versionDetail.description.title);
+
+        // Then an entry for the parent dataset is also added
+        ContentDetail datasetDetail = datasetContent.get(1);
+        assertEquals("/datasets/123", datasetDetail.uri);
+        assertEquals(PageType.api_dataset_landing_page.toString(), datasetDetail.type);
+        assertEquals(datasetVersion.getTitle(), datasetDetail.description.title);
+    }
+
     public static Collection CreateCollection(Path destination, String collectionName) throws CollectionNotFoundException, IOException {
 
         CollectionDescription collection = new CollectionDescription(collectionName);
@@ -1497,8 +1550,6 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         String filename = PathUtils.toFilename(collectionName);
         collection.id = filename + "-" + Random.id();
         Collection.CreateCollectionFolders(filename, destination);
-
-        //collection.AddEvent(new Event(new Date(), EventType.CREATED, "admin"));
 
         // Create the description:
         Path collectionDescriptionPath = destination.resolve(filename + ".json");

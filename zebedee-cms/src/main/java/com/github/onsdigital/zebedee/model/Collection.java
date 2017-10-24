@@ -5,6 +5,7 @@ import com.github.davidcarboni.cryptolite.Random;
 import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.KeyManangerUtil;
 import com.github.onsdigital.zebedee.Zebedee;
+import com.github.onsdigital.zebedee.content.page.base.PageType;
 import com.github.onsdigital.zebedee.content.page.release.Release;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
@@ -47,10 +48,12 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -64,6 +67,7 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.stream.Collectors;
 
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_CONTENT_REVIEWED;
@@ -405,13 +409,7 @@ public class Collection {
         return this.description;
     }
 
-    private Release getReleaseFromCollection(String uri) throws IOException, ZebedeeException {
-        Path collectionReleasePath = this.find(uri);
-        Release release = (Release) ContentUtil.deserialiseContent(FileUtils.openInputStream(collectionReleasePath.toFile()));
-        return release;
-    }
-
-    public Release populateRelease(CollectionReader reader, CollectionWriter collectionWriter, List<ContentDetail> collectionContent) throws IOException, ZebedeeException {
+    public Release populateRelease(CollectionReader reader, CollectionWriter collectionWriter, Iterable<ContentDetail> collectionContent) throws IOException, ZebedeeException {
 
         if (StringUtils.isEmpty(this.description.releaseUri)) {
             throw new BadRequestException("This collection is not associated with a release.");
@@ -1207,6 +1205,38 @@ public class Collection {
                 && completeUris().isEmpty()
                 && allDatasetsReviewed
                 && allDatasetVersionsReviewed);
+    }
+
+    /**
+     * Return a list of ContentDetail items for each data set in the collection.
+     */
+    public List<ContentDetail> getDatasetDetails() {
+
+        return description.getDatasets().stream().map(ds -> {
+
+            String url = URI.create(ds.getUri()).getPath();
+            return new ContentDetail(ds.getTitle(), url  , PageType.api_dataset_landing_page.toString());
+
+        }).collect(Collectors.toList());
+    }
+
+    /**
+     * Return a list of ContentDetail. One for each data set version in the collection,
+     * and also one for each of the parent data sets for those versions
+     */
+    public List<ContentDetail> getDatasetVersionDetails() {
+
+        return description.getDatasetVersions().stream().flatMap(ds -> {
+
+            String datasetURL = "/datasets/" + ds.getId();
+            String versionURL = datasetURL + "/editions/" + ds.getEdition() + "/versions/" + ds.getVersion();
+
+            ContentDetail versionDetail = new ContentDetail(ds.getTitle(), versionURL, PageType.api_dataset.toString());
+            ContentDetail datasetDetail = new ContentDetail(ds.getTitle(), datasetURL, PageType.api_dataset_landing_page.toString());
+
+            return (new ArrayList<>(Arrays.asList(versionDetail, datasetDetail))).stream();
+
+        }).collect(Collectors.toList());
     }
 }
 

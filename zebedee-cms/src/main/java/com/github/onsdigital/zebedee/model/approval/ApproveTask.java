@@ -11,7 +11,6 @@ import com.github.onsdigital.zebedee.json.ContentDetail;
 import com.github.onsdigital.zebedee.json.Event;
 import com.github.onsdigital.zebedee.json.EventType;
 import com.github.onsdigital.zebedee.json.PendingDelete;
-import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.CollectionWriter;
 import com.github.onsdigital.zebedee.model.approval.tasks.CollectionPdfGenerator;
@@ -24,6 +23,7 @@ import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.service.BabbagePdfService;
 import com.github.onsdigital.zebedee.service.content.navigation.ContentTreeNavigator;
+import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.util.ContentDetailUtil;
 import com.github.onsdigital.zebedee.util.SlackNotification;
 
@@ -33,7 +33,9 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Callable;
+import java.util.stream.Collectors;
 
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logDebug;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
@@ -107,8 +109,9 @@ public class ApproveTask implements Callable<Boolean> {
         return updateCommands;
     }
 
-    public static PublishNotification createPublishNotification(CollectionReader collectionReader, Collection collection) {
-        List<String> uriList = collectionReader.getReviewed().listUris();
+    public static PublishNotification createPublishNotification(
+            List<String> uriList,
+            Collection collection) {
 
         // only provide relevent uri's
         //  - remove versioned uris
@@ -137,19 +140,17 @@ public class ApproveTask implements Callable<Boolean> {
 
         try {
 
-            List<ContentDetail> collectionContent = ContentDetailUtil.resolveDetails(collection.reviewed, collectionReader.getReviewed());
-
-            // todo - add dataset pages to collection content
+            Set<ContentDetail> collectionContent = ContentDetailUtil.resolveDetails(collection.reviewed, collectionReader.getReviewed());
+            collectionContent.addAll(collection.getDatasetDetails());
+            collectionContent.addAll(collection.getDatasetVersionDetails());
 
             populateReleasePage(collectionContent);
 
             generateTimeseries(collection, publishedReader, collectionReader, collectionWriter, dataIndex);
             generatePdfFiles(collectionContent);
 
-            // todo - refactor below method to take collectionContent list and create a list of strings from it.
-            // todo - check the new list has the same format as the old list
-
-            PublishNotification publishNotification = createPublishNotification(collectionReader, collection);
+            List<String> uriList = collectionContent.stream().map(c -> c.uri).collect(Collectors.toList());
+            PublishNotification publishNotification = createPublishNotification(uriList, collection);
 
             compressZipFiles(collection, collectionReader, collectionWriter);
             approveCollection();
@@ -193,12 +194,12 @@ public class ApproveTask implements Callable<Boolean> {
         collection.save();
     }
 
-    public void populateReleasePage(List<ContentDetail> collectionContent) throws IOException {
+    public void populateReleasePage(Iterable<ContentDetail> collectionContent) throws IOException {
         // If the collection is associated with a release then populate the release page.
         ReleasePopulator.populateQuietly(collection, collectionReader, collectionWriter, collectionContent);
     }
 
-    public void generatePdfFiles(List<ContentDetail> collectionContent) {
+    public void generatePdfFiles(Iterable<ContentDetail> collectionContent) {
         CollectionPdfGenerator pdfGenerator = new CollectionPdfGenerator(new BabbagePdfService(session, collection));
         pdfGenerator.generatePdfsInCollection(collectionWriter, collectionContent);
     }

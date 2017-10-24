@@ -36,6 +36,7 @@ public enum PageType {
     dataset("Dataset page"),
     dataset_landing_page("Dataset landing page"),
     api_dataset_landing_page("API Dataset landing page"),
+    api_dataset("API Dataset"),
     timeseries_dataset("Timeseries dataset page"),
     release("Release page"),
     reference_tables("Reference tables"),

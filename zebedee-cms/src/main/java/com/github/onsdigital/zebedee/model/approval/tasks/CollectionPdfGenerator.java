@@ -38,7 +38,7 @@ public class CollectionPdfGenerator {
         this.pdfService = pdfService;
     }
 
-    public void generatePdfsInCollection(CollectionWriter collectionWriter, List<ContentDetail> collectionContent) {
+    public void generatePdfsInCollection(CollectionWriter collectionWriter, Iterable<ContentDetail> collectionContent) {
 
         for (ContentDetail contentDetail : collectionContent) {
             boolean pdfShouldBeAdded = pagesWithPdf.contains(PageType.valueOf(contentDetail.type));

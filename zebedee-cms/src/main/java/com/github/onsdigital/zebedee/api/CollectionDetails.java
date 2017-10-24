@@ -88,7 +88,7 @@ public class CollectionDetails {
     }
 
     private void addEventsForDetails(
-            List<ContentDetail> detailsToAddEventsFor,
+            Iterable<ContentDetail> detailsToAddEventsFor,
             com.github.onsdigital.zebedee.model.Collection collection
     ) {
 

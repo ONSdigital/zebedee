@@ -9,7 +9,7 @@ public class CollectionDatasetVersion {
     private String title;
     private String edition;
     private String version;
-    private String state;
+    private ContentStatus state;
 
     public String getId() {
         return id;
@@ -43,11 +43,11 @@ public class CollectionDatasetVersion {
         this.title = title;
     }
 
-    public String getState() {
+    public ContentStatus getState() {
         return state;
     }
 
-    public void setState(String state) {
+    public void setState(ContentStatus state) {
         this.state = state;
     }
 

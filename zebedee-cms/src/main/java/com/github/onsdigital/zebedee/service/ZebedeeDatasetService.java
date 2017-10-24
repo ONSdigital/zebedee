@@ -11,7 +11,6 @@ import com.github.onsdigital.zebedee.json.CollectionDataset;
 import com.github.onsdigital.zebedee.json.CollectionDatasetVersion;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.util.ZebedeeCmsService;
-import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -47,7 +46,7 @@ public class ZebedeeDatasetService implements DatasetService {
             collectionDataset.setId(datasetID);
         }
 
-        if (updatedDataset != null && StringUtils.isNotEmpty(updatedDataset.getState())) {
+        if (updatedDataset != null && updatedDataset.getState() != null) {
             collectionDataset.setState(updatedDataset.getState());
         }
 
@@ -99,7 +98,7 @@ public class ZebedeeDatasetService implements DatasetService {
             collectionDatasetVersion.setVersion(version);
         }
 
-        if (updatedVersion != null && StringUtils.isNotEmpty(updatedVersion.getState())) {
+        if (updatedVersion != null && updatedVersion.getState() != null) {
             collectionDatasetVersion.setState(updatedVersion.getState());
         }
 

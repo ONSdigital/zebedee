@@ -139,9 +139,15 @@ public class ApproveTask implements Callable<Boolean> {
 
             List<ContentDetail> collectionContent = ContentDetailUtil.resolveDetails(collection.reviewed, collectionReader.getReviewed());
 
+            // todo - add dataset pages to collection content
+
             populateReleasePage(collectionContent);
+
             generateTimeseries(collection, publishedReader, collectionReader, collectionWriter, dataIndex);
             generatePdfFiles(collectionContent);
+
+            // todo - refactor below method to take collectionContent list and create a list of strings from it.
+            // todo - check the new list has the same format as the old list
 
             PublishNotification publishNotification = createPublishNotification(collectionReader, collection);
 

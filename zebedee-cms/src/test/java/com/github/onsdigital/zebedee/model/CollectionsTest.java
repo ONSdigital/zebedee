@@ -520,49 +520,21 @@ public class CollectionsTest {
     }
 
     @Test(expected = ConflictException.class)
-    public void shouldNotApproveIfAUriIsInProgress() throws IOException, ZebedeeException {
-        List<String> inProgressURIS = new ArrayList();
-        inProgressURIS.add("data.json");
-
-        when(permissionsServiceMock.canEdit(TEST_EMAIL))
-                .thenReturn(true);
-        when(collectionMock.inProgressUris())
-                .thenReturn(inProgressURIS);
-        when(collectionMock.completeUris())
-                .thenReturn(new ArrayList<String>());
-
-        try {
-            collections.approve(collectionMock, sessionMock);
-        } catch (ConflictException e) {
-            verify(permissionsServiceMock, times(1)).canEdit(TEST_EMAIL);
-            verify(sessionMock, times(1)).getEmail();
-            verify(collectionMock, times(1)).inProgressUris();
-            verify(collectionReaderWriterFactoryMock, never()).getReader(any(), any(), any());
-            verify(collectionReaderWriterFactoryMock, never()).getWriter(any(), any(), any());
-            verify(collectionHistoryDaoMock, never()).saveCollectionHistoryEvent(any(CollectionHistoryEvent.class));
-            throw e;
-        }
-    }
-
-    @Test(expected = ConflictException.class)
-    public void shouldNotApproveIfAUriIsComplete() throws IOException, ZebedeeException {
+    public void shouldNotApproveIfContentIsNotReviewed() throws IOException, ZebedeeException {
         List<String> completeURIS = new ArrayList();
         completeURIS.add("data.json");
 
         when(permissionsServiceMock.canEdit(TEST_EMAIL))
                 .thenReturn(true);
-        when(collectionMock.inProgressUris())
-                .thenReturn(new ArrayList<String>());
-        when(collectionMock.completeUris())
-                .thenReturn(completeURIS);
+        when(collectionMock.isAllContentReviewed())
+                .thenReturn(false);
 
         try {
             collections.approve(collectionMock, sessionMock);
         } catch (ConflictException e) {
             verify(permissionsServiceMock, times(1)).canEdit(TEST_EMAIL);
             verify(sessionMock, times(1)).getEmail();
-            verify(collectionMock, times(1)).inProgressUris();
-            verify(collectionMock, times(1)).completeUris();
+            verify(collectionMock, times(1)).isAllContentReviewed();
             verify(collectionReaderWriterFactoryMock, never()).getReader(any(), any(), any());
             verify(collectionReaderWriterFactoryMock, never()).getWriter(any(), any(), any());
             throw e;
@@ -580,10 +552,8 @@ public class CollectionsTest {
 
         when(permissionsServiceMock.canEdit(TEST_EMAIL))
                 .thenReturn(true);
-        when(collectionMock.inProgressUris())
-                .thenReturn(new ArrayList<String>());
-        when(collectionMock.completeUris())
-                .thenReturn(new ArrayList<String>());
+        when(collectionMock.isAllContentReviewed())
+                .thenReturn(true);
         when(collectionReaderWriterFactoryMock.getReader(zebedeeMock, collectionMock, sessionMock))
                 .thenReturn(collectionReaderMock);
         when(collectionReaderWriterFactoryMock.getWriter(zebedeeMock, collectionMock, sessionMock))
@@ -592,8 +562,7 @@ public class CollectionsTest {
         assertThat(futureMock, equalTo(collections.approve(collectionMock, sessionMock)));
 
         verify(permissionsServiceMock, times(1)).canEdit(TEST_EMAIL);
-        verify(collectionMock, times(1)).inProgressUris();
-        verify(collectionMock, times(1)).completeUris();
+        verify(collectionMock, times(1)).isAllContentReviewed();
         verify(collectionReaderWriterFactoryMock, times(1)).getReader(zebedeeMock, collectionMock, sessionMock);
         verify(collectionReaderWriterFactoryMock, times(1)).getWriter(zebedeeMock, collectionMock, sessionMock);
         verify(collectionHistoryDaoMock, times(1)).saveCollectionHistoryEvent(any(), any(), any());

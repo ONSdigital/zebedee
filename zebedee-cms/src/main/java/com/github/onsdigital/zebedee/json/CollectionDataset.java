@@ -7,7 +7,7 @@ public class CollectionDataset {
 
     private String id;
     private String title;
-    private String state;
+    private ContentStatus state;
     private String uri;
 
     public String getId() {
@@ -26,11 +26,11 @@ public class CollectionDataset {
         this.title = title;
     }
 
-    public String getState() {
+    public ContentStatus getState() {
         return state;
     }
 
-    public void setState(String state) {
+    public void setState(ContentStatus state) {
         this.state = state;
     }
 

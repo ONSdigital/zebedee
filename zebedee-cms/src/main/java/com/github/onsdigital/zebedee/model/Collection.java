@@ -18,6 +18,7 @@ import com.github.onsdigital.zebedee.json.ApprovalStatus;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.CollectionType;
 import com.github.onsdigital.zebedee.json.ContentDetail;
+import com.github.onsdigital.zebedee.json.ContentStatus;
 import com.github.onsdigital.zebedee.json.Event;
 import com.github.onsdigital.zebedee.json.EventType;
 import com.github.onsdigital.zebedee.json.Events;
@@ -1188,6 +1189,24 @@ public class Collection {
 
     public Content getInProgress() {
         return inProgress;
+    }
+
+
+    /**
+     * Return true if this collection has had all of its content reviewed.
+     */
+    public boolean isAllContentReviewed() throws IOException {
+
+        boolean allDatasetsReviewed = description.getDatasets().stream()
+                .allMatch(ds -> ds.getState().equals(ContentStatus.Reviewed));
+
+        boolean allDatasetVersionsReviewed = description.getDatasetVersions().stream()
+                .allMatch(ds -> ds.getState().equals(ContentStatus.Reviewed));
+
+        return (inProgressUris().isEmpty()
+                && completeUris().isEmpty()
+                && allDatasetsReviewed
+                && allDatasetVersionsReviewed);
     }
 }
 

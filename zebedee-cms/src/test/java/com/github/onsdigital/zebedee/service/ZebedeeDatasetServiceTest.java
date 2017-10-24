@@ -9,6 +9,7 @@ import com.github.onsdigital.zebedee.exceptions.ConflictException;
 import com.github.onsdigital.zebedee.json.CollectionDataset;
 import com.github.onsdigital.zebedee.json.CollectionDatasetVersion;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
+import com.github.onsdigital.zebedee.json.ContentStatus;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.util.ZebedeeCmsService;
 import org.junit.Assert;
@@ -31,7 +32,7 @@ public class ZebedeeDatasetServiceTest {
     String edition = "2015";
     String version = "1";
     String collectionID = "345";
-    String initialState = "in-progress";
+    ContentStatus initialState = ContentStatus.InProgress;
 
     Dataset dataset = createDataset();
 
@@ -70,7 +71,7 @@ public class ZebedeeDatasetServiceTest {
         DatasetService service = new ZebedeeDatasetService(mockDatasetAPI, mockZebedee);
 
         // When updateDatasetInCollection is called with an updated state
-        String state = "reviewed";
+        ContentStatus state = ContentStatus.Reviewed;
         collectionDataset.setState(state);
         CollectionDataset updated = service.updateDatasetInCollection(collectionID, datasetID, collectionDataset);
 
@@ -197,7 +198,7 @@ public class ZebedeeDatasetServiceTest {
         DatasetService service = new ZebedeeDatasetService(mockDatasetAPI, mockZebedee);
 
         // When updateDatasetInCollection is called
-        String state = "reviewed";
+        ContentStatus state = ContentStatus.Reviewed;
         collectionDatasetVersion.setState(state);
         CollectionDatasetVersion updated = service.updateDatasetVersionInCollection(collectionID, datasetID, edition, version, collectionDatasetVersion);
 

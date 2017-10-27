@@ -54,15 +54,15 @@ public class ZebedeeDatasetService implements DatasetService {
         collectionDataset.setTitle(dataset.getTitle());
         collectionDataset.setUri(dataset.getLinks().getSelf().getHref());
 
-        if (dataset.getState().equals(State.created)) {
+        if (dataset.getState().equals(State.CREATED)) {
             // the dataset has just been added to the collection, so update collection ID on the dataset
             Dataset datasetUpdate = new Dataset();
             datasetUpdate.setCollection_id(collectionID);
-            datasetUpdate.setState(State.associated);
+            datasetUpdate.setState(State.ASSOCIATED);
             datasetClient.updateDataset(datasetID, datasetUpdate);
         }
 
-        if (dataset.getState().equals(State.associated)
+        if (dataset.getState().equals(State.ASSOCIATED)
                 && !dataset.getCollection_id().equals(collectionID)) {
             throw new ConflictException("cannot add dataset " + datasetID
                     + " to collection " + collectionID
@@ -105,15 +105,15 @@ public class ZebedeeDatasetService implements DatasetService {
         Dataset dataset = datasetClient.getDataset(datasetID);
         DatasetVersion datasetVersion = datasetClient.getDatasetVersion(datasetID, edition, version);
 
-        if (datasetVersion.getState().equals(State.created)) {
+        if (datasetVersion.getState().equals(State.CREATED)) {
             // the dataset version has just been added to the collection, so update collection ID and set state
             DatasetVersion versionUpdate = new DatasetVersion();
             versionUpdate.setCollection_id(collectionID);
-            versionUpdate.setState(State.associated);
+            versionUpdate.setState(State.ASSOCIATED);
             datasetClient.updateDatasetVersion(datasetID, edition, version, versionUpdate);
         }
 
-        if (datasetVersion.getState().equals(State.associated)
+        if (datasetVersion.getState().equals(State.ASSOCIATED)
                 && !datasetVersion.getCollection_id().equals(collectionID)) {
             throw new ConflictException("cannot add dataset " + datasetID
                     + " to collection " + collectionID
@@ -143,7 +143,7 @@ public class ZebedeeDatasetService implements DatasetService {
 
         Dataset datasetUpdate = new Dataset();
         datasetUpdate.setCollection_id("");
-        datasetUpdate.setState(State.created);
+        datasetUpdate.setState(State.CREATED);
         datasetClient.updateDataset(datasetID, datasetUpdate);
 
         collection.getDescription().removeDataset(existingDataset.get());
@@ -169,7 +169,7 @@ public class ZebedeeDatasetService implements DatasetService {
         // update the dataset version in the dataset API with a reverted state and blank collection ID.
         DatasetVersion versionUpdate = new DatasetVersion();
         versionUpdate.setCollection_id("");
-        versionUpdate.setState(State.created);
+        versionUpdate.setState(State.CREATED);
         datasetClient.updateDatasetVersion(datasetID, edition, version, versionUpdate);
 
         collection.getDescription().removeDatasetVersion(existingDataset.get());

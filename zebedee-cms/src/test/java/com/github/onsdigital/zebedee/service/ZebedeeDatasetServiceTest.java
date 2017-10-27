@@ -55,7 +55,7 @@ public class ZebedeeDatasetServiceTest {
 
         DatasetVersion datasetVersion = new DatasetVersion();
         datasetVersion.setCollection_id(collectionID);
-        datasetVersion.setState(State.created);
+        datasetVersion.setState(State.CREATED);
         when(mockDatasetAPI.getDatasetVersion(datasetID, edition, version))
                 .thenReturn(datasetVersion);
 
@@ -96,7 +96,7 @@ public class ZebedeeDatasetServiceTest {
         ArgumentCaptor<Dataset> datasetArgumentCaptor = ArgumentCaptor.forClass(Dataset.class);
         verify(mockDatasetAPI, times(1)).updateDataset(anyString(), datasetArgumentCaptor.capture());
         Assert.assertEquals(datasetArgumentCaptor.getAllValues().get(0).getCollection_id(), collectionID);
-        Assert.assertEquals(datasetArgumentCaptor.getAllValues().get(0).getState(), State.associated);
+        Assert.assertEquals(datasetArgumentCaptor.getAllValues().get(0).getState(), State.ASSOCIATED);
     }
 
     @Test
@@ -107,7 +107,7 @@ public class ZebedeeDatasetServiceTest {
 
         Dataset dataset = createDataset();
         dataset.setCollection_id(collectionID);
-        dataset.setState(State.associated);
+        dataset.setState(State.ASSOCIATED);
         when(mockDatasetAPI.getDataset(datasetID)).thenReturn(dataset);
 
         // When updateDatasetInCollection is called
@@ -124,7 +124,7 @@ public class ZebedeeDatasetServiceTest {
         DatasetService service = new ZebedeeDatasetService(mockDatasetAPI, mockZebedee);
 
         Dataset dataset = createDataset();
-        dataset.setState(State.associated);
+        dataset.setState(State.ASSOCIATED);
         dataset.setCollection_id("someOtherCollectionID");
         when(mockDatasetAPI.getDataset(datasetID)).thenReturn(dataset);
 
@@ -147,7 +147,7 @@ public class ZebedeeDatasetServiceTest {
         ArgumentCaptor<DatasetVersion> argumentCaptor = ArgumentCaptor.forClass(DatasetVersion.class);
         verify(mockDatasetAPI, times(1)).updateDatasetVersion(anyString(), anyString(), anyString(), argumentCaptor.capture());
         Assert.assertEquals(argumentCaptor.getAllValues().get(0).getCollection_id(), collectionID);
-        Assert.assertEquals(argumentCaptor.getAllValues().get(0).getState(), State.associated);
+        Assert.assertEquals(argumentCaptor.getAllValues().get(0).getState(), State.ASSOCIATED);
     }
 
     @Test
@@ -158,7 +158,7 @@ public class ZebedeeDatasetServiceTest {
 
         DatasetVersion datasetVersion = new DatasetVersion();
         datasetVersion.setCollection_id(collectionID);
-        datasetVersion.setState(State.associated);
+        datasetVersion.setState(State.ASSOCIATED);
         when(mockDatasetAPI.getDatasetVersion(datasetID, edition, version)).thenReturn(datasetVersion);
 
         // When updateDatasetInCollection is called
@@ -178,7 +178,7 @@ public class ZebedeeDatasetServiceTest {
                 .thenReturn(Optional.of(new CollectionDatasetVersion()));
 
         DatasetVersion datasetVersion = new DatasetVersion();
-        datasetVersion.setState(State.associated);
+        datasetVersion.setState(State.ASSOCIATED);
         datasetVersion.setCollection_id("someOtherCollectionID");
         when(mockDatasetAPI.getDatasetVersion(datasetID, edition, version)).thenReturn(datasetVersion);
 
@@ -269,7 +269,7 @@ public class ZebedeeDatasetServiceTest {
         ArgumentCaptor<Dataset> argumentCaptor = ArgumentCaptor.forClass(Dataset.class);
         verify(mockDatasetAPI, times(1)).updateDataset(anyString(), argumentCaptor.capture());
         Assert.assertEquals(argumentCaptor.getAllValues().get(0).getCollection_id(), "");
-        Assert.assertEquals(argumentCaptor.getAllValues().get(0).getState(), State.created);
+        Assert.assertEquals(argumentCaptor.getAllValues().get(0).getState(), State.CREATED);
 
         // Then the collection is prompted to delete the dataset and save.
         verify(mockCollectionDescription, times(1)).removeDataset(collectionDataset);
@@ -294,7 +294,7 @@ public class ZebedeeDatasetServiceTest {
         ArgumentCaptor<DatasetVersion> argumentCaptor = ArgumentCaptor.forClass(DatasetVersion.class);
         verify(mockDatasetAPI, times(1)).updateDatasetVersion(anyString(), anyString(), anyString(), argumentCaptor.capture());
         Assert.assertEquals(argumentCaptor.getAllValues().get(0).getCollection_id(), "");
-        Assert.assertEquals(argumentCaptor.getAllValues().get(0).getState(), State.created);
+        Assert.assertEquals(argumentCaptor.getAllValues().get(0).getState(), State.CREATED);
 
         // Then the collection is prompted to delete the dataset and save.
         verify(mockCollectionDescription, times(1)).removeDatasetVersion(datasetVersion);
@@ -341,7 +341,7 @@ public class ZebedeeDatasetServiceTest {
         Dataset dataset = new Dataset();
         dataset.setId(datasetID);
         dataset.setTitle("Dataset title");
-        dataset.setState(State.created);
+        dataset.setState(State.CREATED);
         Dataset.DatasetLinks links = new Dataset.DatasetLinks();
         Link self = new Link();
         self.setHref("/the/dataset/uri");

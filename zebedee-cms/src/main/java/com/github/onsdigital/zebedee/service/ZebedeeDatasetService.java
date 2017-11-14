@@ -15,6 +15,8 @@ import com.github.onsdigital.zebedee.util.ZebedeeCmsService;
 import java.io.IOException;
 import java.util.Optional;
 
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
+
 /**
  * Dataset related services
  */
@@ -51,26 +53,38 @@ public class ZebedeeDatasetService implements DatasetService {
         }
 
         Dataset dataset = datasetClient.getDataset(datasetID);
-        collectionDataset.setTitle(dataset.getTitle());
-        collectionDataset.setUri(dataset.getLinks().getSelf().getHref());
 
-        if (dataset.getState().equals(State.CREATED)) {
-            // the dataset has just been added to the collection, so update collection ID on the dataset
-            Dataset datasetUpdate = new Dataset();
-            datasetUpdate.setCollection_id(collectionID);
-            datasetUpdate.setState(State.ASSOCIATED);
-            datasetClient.updateDataset(datasetID, datasetUpdate);
+        if (dataset != null) {
+
+            collectionDataset.setTitle(dataset.getTitle());
+
+            if (dataset.getLinks() != null && dataset.getLinks().getSelf() != null) {
+                collectionDataset.setUri(dataset.getLinks().getSelf().getHref());
+            } else {
+                logInfo("The dataset URL has not been set on the dataset response.")
+                        .addParameter("collectionID", collectionID)
+                        .addParameter("datasetID", datasetID)
+                        .log();
+            }
+
+            if (State.CREATED.equals(dataset.getState())) {
+                // the dataset has just been added to the collection, so update collection ID on the dataset
+                Dataset datasetUpdate = new Dataset();
+                datasetUpdate.setCollection_id(collectionID);
+                datasetUpdate.setState(State.ASSOCIATED);
+                datasetClient.updateDataset(datasetID, datasetUpdate);
+            }
+
+            if (dataset.getState().equals(State.ASSOCIATED)
+                    && !dataset.getCollection_id().equals(collectionID)) {
+                throw new ConflictException("cannot add dataset " + datasetID
+                        + " to collection " + collectionID
+                        + " it is already in collection " + dataset.getCollection_id());
+            }
+
+            collection.getDescription().addDataset(collectionDataset);
+            collection.save();
         }
-
-        if (dataset.getState().equals(State.ASSOCIATED)
-                && !dataset.getCollection_id().equals(collectionID)) {
-            throw new ConflictException("cannot add dataset " + datasetID
-                    + " to collection " + collectionID
-                    + " it is already in collection " + dataset.getCollection_id());
-        }
-
-        collection.getDescription().addDataset(collectionDataset);
-        collection.save();
 
         return collectionDataset;
     }
@@ -105,7 +119,7 @@ public class ZebedeeDatasetService implements DatasetService {
         Dataset dataset = datasetClient.getDataset(datasetID);
         DatasetVersion datasetVersion = datasetClient.getDatasetVersion(datasetID, edition, version);
 
-        if (datasetVersion.getState().equals(State.CREATED)) {
+        if (State.CREATED.equals(datasetVersion.getState())) {
             // the dataset version has just been added to the collection, so update collection ID and set state
             DatasetVersion versionUpdate = new DatasetVersion();
             versionUpdate.setCollection_id(collectionID);
@@ -113,7 +127,7 @@ public class ZebedeeDatasetService implements DatasetService {
             datasetClient.updateDatasetVersion(datasetID, edition, version, versionUpdate);
         }
 
-        if (datasetVersion.getState().equals(State.ASSOCIATED)
+        if (State.ASSOCIATED.equals(datasetVersion.getState())
                 && !datasetVersion.getCollection_id().equals(collectionID)) {
             throw new ConflictException("cannot add dataset " + datasetID
                     + " to collection " + collectionID

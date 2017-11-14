@@ -235,16 +235,18 @@ public class DatasetAPIClient implements DatasetClient {
             throw new BadRequestException(e.getMessage());
         }
 
+        String datasetJson = ContentUtil.serialise(dataset);
+
         logInfo("Calling dataset API")
                 .addParameter("uri", uri)
                 .addParameter("method", "PUT")
+                .addParameter("body", datasetJson)
                 .log();
 
         HttpPut httpPut = new HttpPut(uri);
         httpPut.addHeader(authTokenHeaderName, datasetAPIAuthToken);
         httpPut.setHeader("Content-Type", "application/json");
 
-        String datasetJson = ContentUtil.serialise(dataset);
         StringEntity stringEntity = new StringEntity(datasetJson);
         httpPut.setEntity(stringEntity);
 
@@ -286,16 +288,18 @@ public class DatasetAPIClient implements DatasetClient {
             throw new BadRequestException(e.getMessage());
         }
 
+        String datasetJson = ContentUtil.serialise(datasetVersion);
+
         logInfo("Calling dataset API")
                 .addParameter("uri", uri)
                 .addParameter("method", "PUT")
+                .addParameter("body", datasetJson)
                 .log();
 
         HttpPut httpPut = new HttpPut(uri);
         httpPut.addHeader(authTokenHeaderName, datasetAPIAuthToken);
         httpPut.setHeader("Content-Type", "application/json");
 
-        String datasetJson = ContentUtil.serialise(datasetVersion);
         StringEntity stringEntity = new StringEntity(datasetJson);
         httpPut.setEntity(stringEntity);
 

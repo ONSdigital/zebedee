@@ -2,6 +2,7 @@ package com.github.onsdigital.zebedee.service;
 
 import com.github.onsdigital.zebedee.dataset.api.DatasetClient;
 import com.github.onsdigital.zebedee.dataset.api.model.Dataset;
+import com.github.onsdigital.zebedee.dataset.api.model.DatasetLinks;
 import com.github.onsdigital.zebedee.dataset.api.model.DatasetVersion;
 import com.github.onsdigital.zebedee.dataset.api.model.Link;
 import com.github.onsdigital.zebedee.dataset.api.model.State;
@@ -342,7 +343,8 @@ public class ZebedeeDatasetServiceTest {
         dataset.setId(datasetID);
         dataset.setTitle("Dataset title");
         dataset.setState(State.CREATED);
-        Dataset.DatasetLinks links = new Dataset.DatasetLinks();
+
+        DatasetLinks links = new DatasetLinks();
         Link self = new Link();
         self.setHref("/the/dataset/uri");
         links.setSelf(self);

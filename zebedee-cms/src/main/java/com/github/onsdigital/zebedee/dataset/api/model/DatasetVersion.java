@@ -9,6 +9,8 @@ public class DatasetVersion {
     private State state;
     private String collection_id;
 
+    private DatasetLinks links;
+
     public String getId() {
         return id;
     }
@@ -59,5 +61,13 @@ public class DatasetVersion {
 
     public void setCollection_id(String collection_id) {
         this.collection_id = collection_id;
+    }
+
+    public DatasetLinks getLinks() {
+        return links;
+    }
+
+    public void setLinks(DatasetLinks links) {
+        this.links = links;
     }
 }

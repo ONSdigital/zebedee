@@ -9,6 +9,7 @@ public class CollectionDatasetVersion {
     private String title;
     private String edition;
     private String version;
+    private String uri;
     private ContentStatus state;
 
     public String getId() {
@@ -49,6 +50,14 @@ public class CollectionDatasetVersion {
 
     public void setState(ContentStatus state) {
         this.state = state;
+    }
+
+    public String getUri() {
+        return uri;
+    }
+
+    public void setUri(String uri) {
+        this.uri = uri;
     }
 
     @Override

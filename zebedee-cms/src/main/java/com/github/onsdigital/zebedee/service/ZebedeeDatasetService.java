@@ -134,6 +134,15 @@ public class ZebedeeDatasetService implements DatasetService {
                     + " it is already in collection " + dataset.getCollection_id());
         }
 
+        if (datasetVersion.getLinks() != null && datasetVersion.getLinks().getSelf() != null) {
+            collectionDatasetVersion.setUri(datasetVersion.getLinks().getSelf().getHref());
+        } else {
+            logInfo("The dataset URL has not been set on the dataset response.")
+                    .addParameter("collectionID", collectionID)
+                    .addParameter("datasetID", datasetID)
+                    .log();
+        }
+
         collectionDatasetVersion.setTitle(dataset.getTitle());
         collection.getDescription().addDatasetVersion(collectionDatasetVersion);
         collection.save();

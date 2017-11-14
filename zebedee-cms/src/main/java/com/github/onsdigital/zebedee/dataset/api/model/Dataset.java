@@ -50,17 +50,5 @@ public class Dataset {
     public void setState(State state) {
         this.state = state;
     }
-
-    public static class DatasetLinks {
-        private Link self;
-
-        public Link getSelf() {
-            return self;
-        }
-
-        public void setSelf(Link self) {
-            this.self = self;
-        }
-    }
 }
 

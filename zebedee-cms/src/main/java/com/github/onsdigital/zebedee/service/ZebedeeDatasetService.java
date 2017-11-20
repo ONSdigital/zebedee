@@ -2,6 +2,7 @@ package com.github.onsdigital.zebedee.service;
 
 import com.github.onsdigital.zebedee.dataset.api.DatasetClient;
 import com.github.onsdigital.zebedee.dataset.api.exception.DatasetAPIException;
+import com.github.onsdigital.zebedee.dataset.api.exception.UnexpectedResponseException;
 import com.github.onsdigital.zebedee.dataset.api.model.Dataset;
 import com.github.onsdigital.zebedee.dataset.api.model.DatasetVersion;
 import com.github.onsdigital.zebedee.dataset.api.model.State;
@@ -65,6 +66,8 @@ public class ZebedeeDatasetService implements DatasetService {
                         .addParameter("collectionID", collectionID)
                         .addParameter("datasetID", datasetID)
                         .log();
+
+                throw new UnexpectedResponseException("The dataset URL has not been set on the dataset response.");
             }
 
             if (State.CREATED.equals(dataset.getState())) {
@@ -137,10 +140,12 @@ public class ZebedeeDatasetService implements DatasetService {
         if (datasetVersion.getLinks() != null && datasetVersion.getLinks().getSelf() != null) {
             collectionDatasetVersion.setUri(datasetVersion.getLinks().getSelf().getHref());
         } else {
-            logInfo("The dataset URL has not been set on the dataset response.")
+            logInfo("The dataset version URL has not been set on the dataset version response.")
                     .addParameter("collectionID", collectionID)
                     .addParameter("datasetID", datasetID)
                     .log();
+
+            throw new UnexpectedResponseException("The dataset version URL has not been set on the dataset version response.");
         }
 
         collectionDatasetVersion.setTitle(dataset.getTitle());

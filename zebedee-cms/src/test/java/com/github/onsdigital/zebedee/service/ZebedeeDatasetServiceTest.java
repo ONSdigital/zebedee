@@ -33,9 +33,13 @@ public class ZebedeeDatasetServiceTest {
     String edition = "2015";
     String version = "1";
     String collectionID = "345";
+    String datasetUrl = "/datasets/" + datasetID;
+    String datasetVersionUrl = "/datasets/" + datasetID + "/" + edition + "/" + version;
+
     ContentStatus initialState = ContentStatus.InProgress;
 
     Dataset dataset = createDataset();
+    DatasetVersion datasetVersion = createDatasetVersion();
 
     DatasetClient mockDatasetAPI = mock(DatasetClient.class);
     ZebedeeCmsService mockZebedee = mock(ZebedeeCmsService.class);
@@ -54,9 +58,8 @@ public class ZebedeeDatasetServiceTest {
         when(mockCollectionDescription.getDataset(datasetID)).thenReturn(Optional.empty());
         when(mockCollectionDescription.getDatasetVersion(datasetID, edition, version)).thenReturn(Optional.empty());
 
-        DatasetVersion datasetVersion = new DatasetVersion();
-        datasetVersion.setCollection_id(collectionID);
-        datasetVersion.setState(State.CREATED);
+
+
         when(mockDatasetAPI.getDatasetVersion(datasetID, edition, version))
                 .thenReturn(datasetVersion);
 
@@ -339,6 +342,7 @@ public class ZebedeeDatasetServiceTest {
     }
 
     private Dataset createDataset() {
+
         Dataset dataset = new Dataset();
         dataset.setId(datasetID);
         dataset.setTitle("Dataset title");
@@ -346,9 +350,26 @@ public class ZebedeeDatasetServiceTest {
 
         DatasetLinks links = new DatasetLinks();
         Link self = new Link();
-        self.setHref("/the/dataset/uri");
+        self.setHref(datasetUrl);
         links.setSelf(self);
         dataset.setLinks(links);
         return dataset;
     }
+
+
+    private DatasetVersion createDatasetVersion() {
+
+        DatasetVersion datasetVersion = new DatasetVersion();
+        datasetVersion.setCollection_id(collectionID);
+        datasetVersion.setState(State.CREATED);
+        DatasetLinks versionLinks = new DatasetLinks();
+        Link self = new Link();
+        self.setHref(datasetVersionUrl);
+        versionLinks.setSelf(self);
+
+        datasetVersion.setLinks(versionLinks);
+
+        return datasetVersion;
+    }
+
 }

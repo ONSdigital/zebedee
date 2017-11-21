@@ -59,7 +59,7 @@ public class DataGenerator {
     private static final Pattern DECIMAL_REGEX = Pattern.compile("^-?\\d+\\.\\d+$");
     private static final String[] MONTHS = "JAN,FEB,MAR,APR,MAY,JUN,JUL,AUG,SEP,OCT,NOV,DEC".split(",");
     private static final String[] QUARTERS = "Q1,Q2,Q3,Q4".split(",");
-    private static final String BASE_FORMAT = "#.";
+    private static final String BASE_FORMAT = "0.";
     private static final String DECIMAL_PLACEHOLDER = "0";
     private static final String UTF8 = "UTF8";
     private static final String MIME_TYPE = "application/octet-stream";

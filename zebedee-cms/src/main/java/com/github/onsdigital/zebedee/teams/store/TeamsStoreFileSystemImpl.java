@@ -4,6 +4,7 @@ import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.model.PathUtils;
 import com.github.onsdigital.zebedee.teams.model.Team;
+import com.github.onsdigital.zebedee.util.serialiser.JSONSerialiser;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
@@ -30,6 +31,7 @@ public class TeamsStoreFileSystemImpl implements TeamsStore {
 
     private Path teamsPath;
     private ReadWriteLock teamLock = new ReentrantReadWriteLock();
+    private JSONSerialiser<Team> teamJSONSerialiser;
 
     /**
      * Return true if the {@link Path} is not null and ends with '.json'.
@@ -41,6 +43,7 @@ public class TeamsStoreFileSystemImpl implements TeamsStore {
      */
     public TeamsStoreFileSystemImpl(Path teamsPath) {
         this.teamsPath = teamsPath;
+        this.teamJSONSerialiser = new JSONSerialiser(Team.class);
     }
 
     @Override
@@ -96,7 +99,10 @@ public class TeamsStoreFileSystemImpl implements TeamsStore {
 
             for (Path path : teams) {
                 try (InputStream input = Files.newInputStream(path)) {
-                    result.add(Serialiser.deserialise(input, Team.class));
+                    Team t = teamJSONSerialiser.deserialiseQuietly(input, path);
+                    if (t != null) {
+                        result.add(t);
+                    }
                 }
             }
         } finally {

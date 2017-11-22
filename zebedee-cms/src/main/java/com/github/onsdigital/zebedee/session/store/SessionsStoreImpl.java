@@ -3,6 +3,7 @@ package com.github.onsdigital.zebedee.session.store;
 import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.model.PathUtils;
 import com.github.onsdigital.zebedee.session.model.Session;
+import com.github.onsdigital.zebedee.util.serialiser.JSONSerialiser;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
@@ -24,8 +25,11 @@ public class SessionsStoreImpl implements SessionsStore {
     private static final String JSON_EXT = ".json";
     private Path sessionsPath;
 
+    private JSONSerialiser<Session> sessionJSONSerialiser;
+
     public SessionsStoreImpl(Path sessionsPath) {
         this.sessionsPath = sessionsPath;
+        this.sessionJSONSerialiser = new JSONSerialiser(Session.class);
     }
 
     /**
@@ -75,7 +79,7 @@ public class SessionsStoreImpl implements SessionsStore {
 
         if (Files.exists(path)) {
             try (InputStream input = Files.newInputStream(path)) {
-                session = Serialiser.deserialise(input, Session.class);
+                session = sessionJSONSerialiser.deserialiseQuietly(input, path);
             }
         }
         return session;
@@ -96,7 +100,8 @@ public class SessionsStoreImpl implements SessionsStore {
             for (Path entry : stream) {
                 if (!Files.isDirectory(entry) && !entry.endsWith(DS_STORE_FILE)) {
                     candidate = read(entry);
-                    if (StringUtils.equalsIgnoreCase(candidate.getEmail(), PathUtils.standardise(email))) {
+                    if (candidate != null
+                            && StringUtils.equalsIgnoreCase(candidate.getEmail(), PathUtils.standardise(email))) {
                         return candidate;
                     }
                     candidate = null;

@@ -25,7 +25,11 @@ public abstract class CustomListCollector<T, R> implements Collector<T, Immutabl
 
     @Override
     public BiConsumer<ImmutableList.Builder<T>, T> accumulator() {
-        return (builder, item) -> builder.add(item);
+        return (builder, item) -> {
+            if (item != null) {
+                builder.add(item);
+            }
+        };
     }
 
     @Override

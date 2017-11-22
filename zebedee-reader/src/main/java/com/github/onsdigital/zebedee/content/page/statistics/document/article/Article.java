@@ -15,6 +15,7 @@ public class Article extends StatisticalDocument {
     /*Body*/
     private List<Link> relatedArticles;
     private List<DownloadSection> pdfTable;
+    private Boolean isPrototypeArticle;
 
 
     public List<DownloadSection> getPdfTable() {
@@ -36,5 +37,13 @@ public class Article extends StatisticalDocument {
 
     public List<Link> getRelatedArticles() {
         return relatedArticles;
+    }
+
+    public Boolean getPrototypeArticle() {
+        return isPrototypeArticle;
+    }
+
+    public void setPrototypeArticle(Boolean prototypeArticle) {
+        isPrototypeArticle = prototypeArticle;
     }
 }

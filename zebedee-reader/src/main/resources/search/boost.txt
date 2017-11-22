@@ -23,8 +23,8 @@
 /economy/grossdomesticproductgdp/compendium/unitedkingdomnationalaccountsthebluebook/*=>flow of funds
 /economy/inflationandpriceindices/bulletins/producerpriceinflation/*=>psi
 /economy/inflationandpriceindices/datasets/consumerpriceinflation=>rpi
-/economy/inflationandpriceindices/timeseries/chaw/*=>rpi
-/economy/inflationandpriceindices/timeseries/czbh/*=>rpi
+/economy/inflationandpriceindices/timeseries/chaw/mm23=>rpi
+/economy/inflationandpriceindices/timeseries/czbh/mm23=>rpi
 /businessindustryandtrade/retailindustry/bulletins/retailsales/*=>retail
 /employmentandlabourmarket/peopleinwork/employmentandemployeetypes/bulletins/uklabourmarket/*=>average earnings index,Labour Force Survey,unemployment,labour market statistics,employment,Claimant Count,average weekly earnings
 /employmentandlabourmarket/peopleinwork/employmentandemployeetypes/datasets/summaryoflabourmarketstatistics=>unemployment,employment
@@ -41,3 +41,4 @@
 /employmentandlabourmarket/peopleinwork/labourproductivity/bulletins/labourproductivity/*=>productivity
 /aboutus/whatwedo/statistics/requestingstatistics=>adhoc, ad-hoc, ad hoc, user requested data
 /economy/grossdomesticproductgdp/bulletins/*=>gdp
+/aboutus/whatwedo/programmesandprojects/onlinehouseholdstudy=>takepart, take part

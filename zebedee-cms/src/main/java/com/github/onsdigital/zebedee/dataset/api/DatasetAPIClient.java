@@ -11,6 +11,7 @@ import com.github.onsdigital.zebedee.dataset.api.model.Dataset;
 import com.github.onsdigital.zebedee.dataset.api.model.DatasetResponse;
 import com.github.onsdigital.zebedee.dataset.api.model.DatasetVersion;
 import com.github.onsdigital.zebedee.dataset.api.model.Instance;
+import com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -86,8 +87,8 @@ public class DatasetAPIClient implements DatasetClient {
         }
 
         logInfo("Calling dataset API")
-                .addParameter("uri", uri)
                 .addParameter("method", "GET")
+                .addParameter("uri", uri)
                 .log();
 
         HttpGet httpget = new HttpGet(uri);
@@ -95,14 +96,25 @@ public class DatasetAPIClient implements DatasetClient {
 
         try (CloseableHttpResponse response = client.execute(httpget)) {
 
+            ZebedeeLogBuilder logBuilder = logInfo("Dataset API response")
+                    .addParameter("method", "GET")
+                    .addParameter("uri", uri)
+                    .addParameter("status", response.getStatusLine());
+
             switch (response.getStatusLine().getStatusCode()) {
+
                 case HttpStatus.SC_OK:
                     String responseString = EntityUtils.toString(response.getEntity());
+                    logBuilder.addParameter("response_body", responseString).log();
                     DatasetResponse datasetResponse = ContentUtil.deserialise(responseString, DatasetResponse.class);
                     return datasetResponse.getNext();
+
                 case HttpStatus.SC_NOT_FOUND:
+                    logBuilder.log();
                     throw new DatasetNotFoundException("The dataset API returned 404 for " + path);
+
                 default:
+                    logBuilder.log();
                     throw new UnexpectedResponseException(
                             String.format("The dataset API returned a %s response for %s",
                                     response.getStatusLine().getStatusCode(),
@@ -139,8 +151,8 @@ public class DatasetAPIClient implements DatasetClient {
         }
 
         logInfo("Calling dataset API")
-                .addParameter("uri", uri)
                 .addParameter("method", "GET")
+                .addParameter("uri", uri)
                 .log();
 
         HttpGet httpget = new HttpGet(uri);
@@ -148,13 +160,24 @@ public class DatasetAPIClient implements DatasetClient {
 
         try (CloseableHttpResponse response = client.execute(httpget)) {
 
+            ZebedeeLogBuilder logBuilder = logInfo("Dataset API response")
+                    .addParameter("method", "GET")
+                    .addParameter("uri", uri)
+                    .addParameter("status", response.getStatusLine());
+
             switch (response.getStatusLine().getStatusCode()) {
+
                 case HttpStatus.SC_OK:
                     String responseString = EntityUtils.toString(response.getEntity());
+                    logBuilder.addParameter("response_body", responseString).log();
                     return ContentUtil.deserialise(responseString, DatasetVersion.class);
+
                 case HttpStatus.SC_NOT_FOUND:
+                    logBuilder.log();
                     throw new DatasetNotFoundException("The dataset API returned 404 for " + path);
+
                 default:
+                    logBuilder.log();
                     throw new UnexpectedResponseException(
                             String.format("The dataset API returned a %s response for %s",
                                     response.getStatusLine().getStatusCode(),
@@ -188,8 +211,8 @@ public class DatasetAPIClient implements DatasetClient {
         }
 
         logInfo("Calling dataset API")
-                .addParameter("uri", uri)
                 .addParameter("method", "GET")
+                .addParameter("uri", uri)
                 .log();
 
         HttpGet httpget = new HttpGet(uri);
@@ -197,13 +220,24 @@ public class DatasetAPIClient implements DatasetClient {
 
         try (CloseableHttpResponse response = client.execute(httpget)) {
 
+            ZebedeeLogBuilder logBuilder = logInfo("Dataset API response")
+                    .addParameter("method", "GET")
+                    .addParameter("uri", uri)
+                    .addParameter("status", response.getStatusLine());
+
             switch (response.getStatusLine().getStatusCode()) {
+
                 case HttpStatus.SC_OK:
                     String responseString = EntityUtils.toString(response.getEntity());
+                    logBuilder.addParameter("response_body", responseString).log();
                     return ContentUtil.deserialise(responseString, Instance.class);
+
                 case HttpStatus.SC_NOT_FOUND:
+                    logBuilder.log();
                     throw new InstanceNotFoundException("The dataset API returned 404 for " + path);
+
                 default:
+                    logBuilder.log();
                     throw new UnexpectedResponseException(
                             String.format("The dataset API returned a %s response for %s",
                                     response.getStatusLine().getStatusCode(),
@@ -238,8 +272,8 @@ public class DatasetAPIClient implements DatasetClient {
         String datasetJson = ContentUtil.serialise(dataset);
 
         logInfo("Calling dataset API")
-                .addParameter("uri", uri)
                 .addParameter("method", "PUT")
+                .addParameter("uri", uri)
                 .addParameter("body", datasetJson)
                 .log();
 
@@ -252,13 +286,25 @@ public class DatasetAPIClient implements DatasetClient {
 
         try (CloseableHttpResponse response = client.execute(httpPut)) {
 
+            ZebedeeLogBuilder logBuilder = logInfo("Dataset API response")
+                    .addParameter("method", "PUT")
+                    .addParameter("uri", uri)
+                    .addParameter("body", datasetJson)
+                    .addParameter("status", response.getStatusLine());
+
             switch (response.getStatusLine().getStatusCode()) {
+
                 case HttpStatus.SC_OK:
                     String responseString = EntityUtils.toString(response.getEntity());
+                    logBuilder.addParameter("response_body", responseString).log();
                     return ContentUtil.deserialise(responseString, Dataset.class);
+
                 case HttpStatus.SC_NOT_FOUND:
+                    logBuilder.log();
                     throw new DatasetNotFoundException("The dataset API returned 404 for " + path);
+
                 default:
+                    logBuilder.log();
                     throw new UnexpectedResponseException(
                             String.format("The dataset API returned a %s response for %s",
                                     response.getStatusLine().getStatusCode(),
@@ -291,8 +337,8 @@ public class DatasetAPIClient implements DatasetClient {
         String datasetJson = ContentUtil.serialise(datasetVersion);
 
         logInfo("Calling dataset API")
-                .addParameter("uri", uri)
                 .addParameter("method", "PUT")
+                .addParameter("uri", uri)
                 .addParameter("body", datasetJson)
                 .log();
 
@@ -305,13 +351,24 @@ public class DatasetAPIClient implements DatasetClient {
 
         try (CloseableHttpResponse response = client.execute(httpPut)) {
 
+            ZebedeeLogBuilder logBuilder = logInfo("Dataset API response")
+                    .addParameter("uri", uri)
+                    .addParameter("method", "PUT")
+                    .addParameter("body", datasetJson)
+                    .addParameter("status", response.getStatusLine());
+
             switch (response.getStatusLine().getStatusCode()) {
                 case HttpStatus.SC_OK:
                     String responseString = EntityUtils.toString(response.getEntity());
+                    logBuilder.addParameter("response_body", responseString).log();
                     return ContentUtil.deserialise(responseString, Dataset.class);
+
                 case HttpStatus.SC_NOT_FOUND:
+                    logBuilder.log();
                     throw new DatasetNotFoundException("The dataset API returned 404 for " + path);
+
                 default:
+                    logBuilder.log();
                     throw new UnexpectedResponseException(
                             String.format("The dataset API returned a %s response for %s",
                                     response.getStatusLine().getStatusCode(),

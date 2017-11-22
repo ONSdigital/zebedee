@@ -361,7 +361,7 @@ public class ZebedeeDatasetServiceTest {
 
         DatasetVersion datasetVersion = new DatasetVersion();
         datasetVersion.setCollection_id(collectionID);
-        datasetVersion.setState(State.CREATED);
+        datasetVersion.setState(State.EDITION_CONFIRMED);
         DatasetLinks versionLinks = new DatasetLinks();
         Link self = new Link();
         self.setHref(datasetVersionUrl);

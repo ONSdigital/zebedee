@@ -122,7 +122,7 @@ public class ZebedeeDatasetService implements DatasetService {
         Dataset dataset = datasetClient.getDataset(datasetID);
         DatasetVersion datasetVersion = datasetClient.getDatasetVersion(datasetID, edition, version);
 
-        if (State.CREATED.equals(datasetVersion.getState())) {
+        if (State.EDITION_CONFIRMED.equals(datasetVersion.getState())) {
             // the dataset version has just been added to the collection, so update collection ID and set state
             DatasetVersion versionUpdate = new DatasetVersion();
             versionUpdate.setCollection_id(collectionID);

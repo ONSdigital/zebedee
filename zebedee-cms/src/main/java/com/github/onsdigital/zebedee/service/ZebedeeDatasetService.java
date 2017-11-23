@@ -7,6 +7,7 @@ import com.github.onsdigital.zebedee.dataset.api.model.Dataset;
 import com.github.onsdigital.zebedee.dataset.api.model.DatasetVersion;
 import com.github.onsdigital.zebedee.dataset.api.model.State;
 import com.github.onsdigital.zebedee.exceptions.ConflictException;
+import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.CollectionDataset;
 import com.github.onsdigital.zebedee.json.CollectionDatasetVersion;
@@ -38,6 +39,9 @@ public class ZebedeeDatasetService implements DatasetService {
     public CollectionDataset updateDatasetInCollection(String collectionID, String datasetID, CollectionDataset updatedDataset) throws ZebedeeException, IOException, DatasetAPIException {
 
         Collection collection = zebedeeCms.getCollection(collectionID);
+        if (collection == null) {
+            logInfo("Collection not found").collectionId(collectionID).logAndThrow(NotFoundException.class);
+        }
 
         CollectionDataset collectionDataset;
 
@@ -100,6 +104,10 @@ public class ZebedeeDatasetService implements DatasetService {
     public CollectionDatasetVersion updateDatasetVersionInCollection(String collectionID, String datasetID, String edition, String version, CollectionDatasetVersion updatedVersion) throws ZebedeeException, IOException, DatasetAPIException {
 
         Collection collection = zebedeeCms.getCollection(collectionID);
+        if (collection == null) {
+            logInfo("Collection not found").collectionId(collectionID).logAndThrow(NotFoundException.class);
+        }
+
         CollectionDatasetVersion collectionDatasetVersion;
 
         // if its already been added return.
@@ -162,6 +170,9 @@ public class ZebedeeDatasetService implements DatasetService {
     public void removeDatasetFromCollection(String collectionID, String datasetID) throws ZebedeeException, IOException, DatasetAPIException {
 
         Collection collection = zebedeeCms.getCollection(collectionID);
+        if (collection == null) {
+            logInfo("Collection not found").collectionId(collectionID).logAndThrow(NotFoundException.class);
+        }
 
         // if its not in the collection then just return.
         Optional<CollectionDataset> existingDataset = collection.getDescription().getDataset(datasetID);
@@ -185,6 +196,9 @@ public class ZebedeeDatasetService implements DatasetService {
     public void removeDatasetVersionFromCollection(String collectionID, String datasetID, String edition, String version) throws ZebedeeException, IOException, DatasetAPIException {
 
         Collection collection = zebedeeCms.getCollection(collectionID);
+        if (collection == null) {
+            logInfo("Collection not found").collectionId(collectionID).logAndThrow(NotFoundException.class);
+        }
 
         // if its not in the collection then return.
         Optional<CollectionDatasetVersion> existingDataset =

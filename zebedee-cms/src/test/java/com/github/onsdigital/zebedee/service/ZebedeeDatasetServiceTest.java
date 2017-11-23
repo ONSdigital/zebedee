@@ -7,6 +7,7 @@ import com.github.onsdigital.zebedee.dataset.api.model.DatasetVersion;
 import com.github.onsdigital.zebedee.dataset.api.model.Link;
 import com.github.onsdigital.zebedee.dataset.api.model.State;
 import com.github.onsdigital.zebedee.exceptions.ConflictException;
+import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.json.CollectionDataset;
 import com.github.onsdigital.zebedee.json.CollectionDatasetVersion;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
@@ -103,6 +104,19 @@ public class ZebedeeDatasetServiceTest {
         Assert.assertEquals(datasetArgumentCaptor.getAllValues().get(0).getState(), State.ASSOCIATED);
     }
 
+    @Test(expected = NotFoundException.class)
+    public void TestDatasetService_updateDatasetInCollection_CollectionNotFound() throws Exception {
+
+        // Given a collection that does not exist
+        when(mockZebedee.getCollection(collectionID)).thenReturn(null);
+        DatasetService service = new ZebedeeDatasetService(mockDatasetAPI, mockZebedee);
+
+        // When updateDatasetInCollection is called
+        service.updateDatasetInCollection(collectionID, datasetID, collectionDataset);
+
+        // Then the expected exception is thrown
+    }
+
     @Test
     public void TestDatasetService_updateDatasetInCollection_DoesNotSendCollectionIDToDatasetAPIIfAlreadySet() throws Exception {
 
@@ -152,6 +166,19 @@ public class ZebedeeDatasetServiceTest {
         verify(mockDatasetAPI, times(1)).updateDatasetVersion(anyString(), anyString(), anyString(), argumentCaptor.capture());
         Assert.assertEquals(argumentCaptor.getAllValues().get(0).getCollection_id(), collectionID);
         Assert.assertEquals(argumentCaptor.getAllValues().get(0).getState(), State.ASSOCIATED);
+    }
+
+    @Test(expected = NotFoundException.class)
+    public void TestDatasetService_updateDatasetVersionInCollection_CollectionNotFound() throws Exception {
+
+        // Given a collection that does not exist
+        when(mockZebedee.getCollection(collectionID)).thenReturn(null);
+        DatasetService service = new ZebedeeDatasetService(mockDatasetAPI, mockZebedee);
+
+        // When updateDatasetInCollection is called
+        service.updateDatasetVersionInCollection(collectionID, datasetID, edition, version, collectionDatasetVersion);
+
+        // Then the expected exception is thrown
     }
 
     @Test
@@ -305,6 +332,19 @@ public class ZebedeeDatasetServiceTest {
         verify(mockCollection, times(1)).save();
     }
 
+    @Test(expected = NotFoundException.class)
+    public void TestDatasetService_deleteDatasetFromCollection_CollectionNotFound() throws Exception {
+
+        // Given a collection that does not exist
+        when(mockZebedee.getCollection(collectionID)).thenReturn(null);
+        DatasetService service = new ZebedeeDatasetService(mockDatasetAPI, mockZebedee);
+
+        // When deleteDatasetFromCollection is called
+        service.removeDatasetFromCollection(collectionID, datasetID);
+
+        // Then the expected exception is thrown
+    }
+
     @Test
     public void TestDatasetService_deleteDatasetFromCollection_ReturnsIfNotInCollection() throws Exception {
 
@@ -332,13 +372,26 @@ public class ZebedeeDatasetServiceTest {
 
         DatasetService service = new ZebedeeDatasetService(mockDatasetAPI, mockZebedee);
 
-        // When deleteDatasetFromCollection is called
+        // When removeDatasetVersionFromCollection is called
         service.removeDatasetVersionFromCollection(collectionID, datasetID, edition, version);
 
 
         // Then the delete function is not called, as the dataset is not in the collection.
         verify(mockCollectionDescription, times(0)).removeDatasetVersion(collectionDatasetVersion);
         verify(mockCollection, times(0)).save();
+    }
+
+    @Test(expected = NotFoundException.class)
+    public void TestDatasetService_deleteDatasetVersionFromCollection_CollectionNotFound() throws Exception {
+
+        // Given a collection that does not exist
+        when(mockZebedee.getCollection(collectionID)).thenReturn(null);
+        DatasetService service = new ZebedeeDatasetService(mockDatasetAPI, mockZebedee);
+
+        // When removeDatasetVersionFromCollection is called
+        service.removeDatasetVersionFromCollection(collectionID, datasetID, edition, version);
+
+        // Then the expected exception is thrown
     }
 
     private Dataset createDataset() {

@@ -165,7 +165,7 @@ public class DataGeneratorTest {
 
         verify(sheetMock, times(9)).createRow(anyInt());
         verify(xlsWorkbookMock, times(1)).createCellStyle();
-        verify(dataFormatMock, times(1)).getFormat("#.00");
+        verify(dataFormatMock, times(1)).getFormat("0.00");
 
         // 8 meta rows containing a label and a value & 1 data row containing a label and a number == 17 string cells
         // & 1 numeric cell.

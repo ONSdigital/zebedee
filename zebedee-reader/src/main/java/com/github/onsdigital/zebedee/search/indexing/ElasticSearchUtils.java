@@ -1,11 +1,13 @@
 package com.github.onsdigital.zebedee.search.indexing;
 
 import com.carrotsearch.hppc.cursors.ObjectObjectCursor;
+import com.github.onsdigital.elasticutils.client.type.DefaultDocumentTypes;
+import org.elasticsearch.action.ActionFuture;
 import org.elasticsearch.action.ActionRequestBuilder;
-import org.elasticsearch.action.ListenableActionFuture;
 import org.elasticsearch.action.admin.indices.alias.IndicesAliasesRequestBuilder;
 import org.elasticsearch.action.admin.indices.alias.IndicesAliasesResponse;
 import org.elasticsearch.action.admin.indices.alias.get.GetAliasesResponse;
+import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequestBuilder;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequestBuilder;
@@ -20,6 +22,7 @@ import org.elasticsearch.client.IndicesAdminClient;
 import org.elasticsearch.cluster.metadata.AliasMetaData;
 import org.elasticsearch.common.collect.ImmutableOpenMap;
 import org.elasticsearch.common.settings.Settings;
+import org.elasticsearch.common.xcontent.XContentType;
 
 import java.io.IOException;
 import java.util.List;
@@ -64,14 +67,17 @@ class ElasticSearchUtils {
      */
     public CreateIndexResponse createIndex(String index, Settings settings, String type, String mappingSource) throws IOException {
         elasticSearchLog("Creating index").addParameter("index", index).log();
-        CreateIndexRequestBuilder createIndexRequest = getIndicesClient().prepareCreate(index);
-        createIndexRequest.setSettings(settings);
-        if (type == null) {
-            createIndexRequest.addMapping(DEFAULT_TYPE, mappingSource);
-        } else {
-            createIndexRequest.addMapping(type, mappingSource);
-        }
-        return createIndexRequest.get();
+
+        CreateIndexRequest request = new CreateIndexRequest()
+                .index(index)
+                .settings(settings);
+//        if (type == null) {
+//            request.mapping(DEFAULT_TYPE, mappingSource);
+//        } else {
+//            request.mapping(type, mappingSource);
+//        }
+        CreateIndexResponse response = this.client.admin().indices().create(request).actionGet();
+        return response;
     }
 
     public DeleteIndexResponse deleteIndex(String index) {
@@ -131,7 +137,7 @@ class ElasticSearchUtils {
      */
     public IndexResponse createDocument(String index, String type, String id, String document) {
         IndexRequestBuilder indexRequestBuilder = prepareIndex(index, type, id);
-        indexRequestBuilder.setSource(document);
+        indexRequestBuilder.setSource(document, XContentType.JSON);
         return indexRequestBuilder.get();
     }
 
@@ -168,7 +174,7 @@ class ElasticSearchUtils {
         return getIndicesClient().prepareAliases();
     }
 
-    private ListenableActionFuture execute(ActionRequestBuilder requestBuilder) {
+    private ActionFuture execute(ActionRequestBuilder requestBuilder) {
         return requestBuilder.execute();
     }
 

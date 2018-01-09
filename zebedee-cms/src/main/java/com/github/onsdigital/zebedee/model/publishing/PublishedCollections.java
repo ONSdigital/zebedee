@@ -8,6 +8,7 @@ import com.github.onsdigital.zebedee.json.publishing.PublishedCollection;
 import com.github.onsdigital.zebedee.json.publishing.PublishedCollectionSearchResult;
 import com.github.onsdigital.zebedee.search.client.ElasticSearchClient;
 import org.apache.commons.lang3.StringUtils;
+import org.elasticsearch.action.ActionFuture;
 import org.elasticsearch.action.ListenableActionFuture;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequestBuilder;
 import org.elasticsearch.action.index.IndexRequestBuilder;
@@ -97,7 +98,7 @@ public class PublishedCollections {
         IndexRequestBuilder indexRequest = client.prepareIndex(index, type);
         indexRequest.setSource(Serialiser.serialise(publishedCollection));
         indexRequest.setId(publishedCollection.id);
-        ListenableActionFuture<IndexResponse> execution = indexRequest.execute();
+        ActionFuture<IndexResponse> execution = indexRequest.execute();
         execution.actionGet();
     }
 
@@ -115,7 +116,10 @@ public class PublishedCollections {
                     .setSearchType(SearchType.QUERY_THEN_FETCH)
                     .setFrom(0)
                     .setSize(100)
-                    .addFields(new String[]{"id", "name", "type", "publishStartDate"})
+                    .addStoredField("id")
+                    .addStoredField("name")
+                    .addStoredField("type")
+                    .addStoredField("publishStartDate")
                     .addSort(new FieldSortBuilder("publishStartDate").order(SortOrder.DESC));
             //.setExplain(true)
 
@@ -183,7 +187,7 @@ public class PublishedCollections {
                     .addParameter("returned", response.getHits().getHits().length).log();
 
             for (SearchHit searchHit : response.getHits()) {
-                result = Serialiser.deserialise(searchHit.sourceAsString(), PublishedCollection.class);
+                result = Serialiser.deserialise(searchHit.toString(), PublishedCollection.class);
             }
         } catch (SearchPhaseExecutionException e) {
             logError(e, "Search published collections failed").log();

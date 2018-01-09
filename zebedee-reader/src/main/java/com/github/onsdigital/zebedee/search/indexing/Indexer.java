@@ -1,5 +1,6 @@
 package com.github.onsdigital.zebedee.search.indexing;
 
+import com.github.onsdigital.elasticutils.util.ElasticSearchHelper;
 import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.content.page.base.PageType;
 import com.github.onsdigital.zebedee.content.partial.Link;
@@ -11,6 +12,7 @@ import com.github.onsdigital.zebedee.search.client.ElasticSearchClient;
 import com.github.onsdigital.zebedee.search.model.SearchDocument;
 import com.github.onsdigital.zebedee.util.URIUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.http.HttpStatus;
 import org.elasticsearch.action.bulk.BulkItemResponse;
 import org.elasticsearch.action.bulk.BulkProcessor;
 import org.elasticsearch.action.bulk.BulkRequest;
@@ -21,6 +23,7 @@ import org.elasticsearch.client.Client;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.unit.ByteSizeUnit;
 import org.elasticsearch.common.unit.ByteSizeValue;
+import org.elasticsearch.common.xcontent.XContentType;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -75,7 +78,7 @@ public class Indexer {
                 boolean aliasAvailable = isIndexAvailable(searchAlias);
                 String oldIndex = searchUtils.getAliasIndex(searchAlias);
                 String newIndex = generateIndexName();
-                elasticSearchLog("Creating index").addParameter("newIndex", newIndex).log();
+                elasticSearchLog("Creating index " + newIndex).addParameter("newIndex", newIndex).log();
                 searchUtils.createIndex(newIndex, getSettings(), getDefaultMapping());
 
                 if (aliasAvailable && oldIndex == null) {
@@ -277,7 +280,7 @@ public class Indexer {
         Page page = getPage(document.getUri());
         if (page != null && page.getType() != null) {
             IndexRequestBuilder indexRequestBuilder = searchUtils.prepareIndex(indexName, page.getType().name(), page.getUri().toString());
-            indexRequestBuilder.setSource(serialise(toSearchDocument(page, document.getSearchTerms())));
+            indexRequestBuilder.setSource(serialise(toSearchDocument(page, document.getSearchTerms())), XContentType.JSON);
             return indexRequestBuilder;
         }
         return null;
@@ -318,9 +321,12 @@ public class Indexer {
     }
 
     private Settings getDepartmentsSetting() {
-        Settings.Builder settingsBuilder = Settings.builder().
-                loadFromStream("departments-index-config.yml", Indexer.class.getResourceAsStream("/search/departments/departments-index-config.yml"));
-        return settingsBuilder.build();
+        try {
+            Settings settings = ElasticSearchHelper.loadSettingsFromFile("/search/departments/", "departments-index-config.yml");
+            return settings;
+        } catch (IOException e) {
+            return Settings.EMPTY;
+        }
     }
 
     private String getDefaultMapping() throws IOException {
@@ -340,9 +346,9 @@ public class Indexer {
     //acquires global lock
     private void lockGlobal() {
         IndexResponse lockResponse = searchUtils.createDocument("fs", "lock", "global", "{}");
-        if (!lockResponse.isCreated()) {
-            throw new IndexInProgressException();
-        }
+//        if (lockResponse.status().getStatus() != HttpStatus.SC_OK) {
+//            throw new IndexInProgressException();
+//        }
     }
 
     private void unlockGlobal() {

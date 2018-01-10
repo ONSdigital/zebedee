@@ -24,7 +24,8 @@
             "search_analyzer": "ons_stem",
             "fields": {
               "title_raw": {
-                "type": "string"
+                "type": "string",
+                "fielddata": true
               },
               "title_no_stem" : {
                 "type" : "string",
@@ -42,7 +43,8 @@
               },
               "title_first_letter": {
                 "type": "string",
-                "analyzer": "first_letter"
+                "analyzer": "first_letter",
+                "fielddata": true
               }
             }
           },

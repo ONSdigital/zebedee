@@ -71,11 +71,11 @@ class ElasticSearchUtils {
         CreateIndexRequest request = new CreateIndexRequest()
                 .index(index)
                 .settings(settings);
-//        if (type == null) {
-//            request.mapping(DEFAULT_TYPE, mappingSource);
-//        } else {
-//            request.mapping(type, mappingSource);
-//        }
+        if (type == null) {
+            request.mapping(DEFAULT_TYPE, mappingSource, XContentType.JSON);
+        } else {
+            request.mapping(type, mappingSource, XContentType.JSON);
+        }
         CreateIndexResponse response = this.client.admin().indices().create(request).actionGet();
         return response;
     }

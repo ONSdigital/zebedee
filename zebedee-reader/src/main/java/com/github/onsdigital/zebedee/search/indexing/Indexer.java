@@ -62,6 +62,7 @@ public class Indexer {
     public static void main(String[] args) {
         try {
             Indexer.getInstance().reload();
+            elasticSearchLog("Index complete");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -263,6 +264,7 @@ public class Indexer {
                     if (indexRequestBuilder == null) {
                         continue;
                     }
+                    indexRequestBuilder.setPipeline(Pipelines.OPENNLP.getPipeline());
                     bulkProcessor.add(indexRequestBuilder.request());
                 } catch (Exception e) {
                     System.err.println("!!!!!!!!!Failed preparing index for " + document.getUri() + " skipping...");
@@ -345,7 +347,7 @@ public class Indexer {
 
     //acquires global lock
     private void lockGlobal() {
-        IndexResponse lockResponse = searchUtils.createDocument("fs", "lock", "global", "{}");
+//        IndexResponse lockResponse = searchUtils.createDocument("fs", "lock", "global", "{}");
 //        if (lockResponse.status().getStatus() != HttpStatus.SC_OK) {
 //            throw new IndexInProgressException();
 //        }
@@ -415,5 +417,19 @@ public class Indexer {
                 .build();
 
         return bulkProcessor;
+    }
+
+    enum Pipelines {
+        OPENNLP("opennlp-pipeline");
+
+        private String pipeline;
+
+        Pipelines(String pipeline) {
+            this.pipeline = pipeline;
+        }
+
+        public String getPipeline() {
+            return this.pipeline;
+        }
     }
 }

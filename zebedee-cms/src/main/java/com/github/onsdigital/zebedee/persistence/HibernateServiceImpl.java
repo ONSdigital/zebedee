@@ -27,7 +27,14 @@ public class HibernateServiceImpl implements HibernateService {
     private static SessionFactory buildSessionFactory() {
         try {
             // Create the SessionFactory from hibernate.cfg.xml
-            return new Configuration().configure().buildSessionFactory();
+            Configuration config = new Configuration();
+            config.configure();
+
+            config.setProperty("hibernate.connection.url", com.github.onsdigital.zebedee.configuration.Configuration.getAuditDBURL());
+            config.setProperty("hibernate.connection.username", com.github.onsdigital.zebedee.configuration.Configuration.getAuditDBUsername());
+            config.setProperty("hibernate.connection.password", com.github.onsdigital.zebedee.configuration.Configuration.getAuditDBPassword());
+
+            return config.buildSessionFactory();
         }
         catch (Throwable ex) {
             // Make sure you log the exception, as it might be swallowed

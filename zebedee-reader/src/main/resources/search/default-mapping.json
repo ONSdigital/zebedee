@@ -1,6 +1,6 @@
 {
   "_default_": {
-    "_all": {"enabled": false},
+    "_all": {"enabled": true},
     "dynamic_date_formats": [
       "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
     ],

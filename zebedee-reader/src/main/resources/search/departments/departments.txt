@@ -21,7 +21,7 @@ hmrc => HM Revenue & Customs => https://www.gov.uk/government/statistics?keyword
 
 ho => The Home Office => https://www.gov.uk/government/statistics?keywords=&topics%5B%5D=all&departments%5B%5D=home-office => HO,arrests,asylum,immigration,firearm,crime,visa,police,terrorism,detention
 
-dclg => The Department for Communities & Local Government => https://www.gov.uk/government/statistics?keywords=&topics%5B%5D=all&departments%5B%5D=department-for-communities-and-local-government => DCLG,revenue expenditure,local authority,council tax,homelessness,social housing,help to buy
+mhclg => Ministry of Housing, Communities and Local Government => https://www.gov.uk/government/statistics?keywords=&topics%5B%5D=all&departments%5B%5D=ministry-of-housing-communities-and-local-government => DCLG,MHCLG,revenue expenditure,local authority,council tax,homelessness,social housing,help to buy
 
 dcms => The Department for Culture, Media & Sports => https://www.gov.uk/government/statistics?keywords=&topics%5B%5D=all&departments%5B%5D=department-for-culture-media-sport => DCMS, charitable giving
 

@@ -19,6 +19,7 @@ import javax.ws.rs.GET;
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Api
 public class CollectionDetails {
@@ -79,9 +80,15 @@ public class CollectionDetails {
 
         Set<Integer> teamIds = Root.zebedee.getPermissionsService().listViewerTeams(collection.description, session);
         List<Team> teams = Root.zebedee.getTeamsService().resolveTeams(teamIds);
-        teams.forEach(team -> {
-            collection.description.teams.add(team.getName());
-        });
+
+        // The members property will always be empty because we're using the Team class, rather than creating a new one
+        // that doesn't include members
+        result.teamsDetails = teams.stream().map(team -> {
+            Team resultTeam = new Team();
+            resultTeam.setId(team.getId());
+            resultTeam.setName(team.getName());
+            return resultTeam;
+        }).collect(Collectors.toList());
 
         return result;
     }

@@ -79,17 +79,7 @@ public class CollectionDetails {
         addEventsForDetails(result.reviewed, result, collection);
 
         Set<Integer> teamIds = Root.zebedee.getPermissionsService().listViewerTeams(collection.description, session);
-        List<Team> teams = Root.zebedee.getTeamsService().resolveTeams(teamIds);
-
-        // The members property will always be empty because we're using the Team class, rather than creating a new one
-        // that doesn't include members
-        result.teamsDetails = teams.stream().map(team -> {
-            Team resultTeam = new Team();
-            resultTeam.setId(team.getId());
-            resultTeam.setName(team.getName());
-            return resultTeam;
-        }).collect(Collectors.toList());
-
+        result.teamsDetails = Root.zebedee.getTeamsService().resolveTeamDetails(teamIds);
         return result;
     }
 

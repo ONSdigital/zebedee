@@ -1,5 +1,6 @@
 package com.github.onsdigital.zebedee.persistence.dao.impl;
 
+import com.github.onsdigital.zebedee.content.page.base.PageType;
 import com.github.onsdigital.zebedee.model.content.deleted.DeletedContentEvent;
 import com.github.onsdigital.zebedee.model.content.deleted.DeletedFile;
 import com.github.onsdigital.zebedee.persistence.HibernateService;
@@ -113,7 +114,7 @@ public class DeletedContentEventDaoImpl implements DeletedContentEventDao {
     public static void main(String[] args) {
         DeletedContentEventDaoImpl deletedContentEventDao = new DeletedContentEventDaoImpl();
 
-        DeletedContentEvent event = new DeletedContentEvent("collectionid", "collectionNAme", new Date(), "/some/uri", "Page title");
+        DeletedContentEvent event = new DeletedContentEvent("collectionid", "collectionNAme", new Date(), "/some/uri", "Page title", PageType.article);
         event.addDeletedFile("/some/uri/data.json");
         event.addDeletedFile("/some/uri/123.json");
         event.addDeletedFile("/some/uri/456.json");
@@ -137,7 +138,8 @@ public class DeletedContentEventDaoImpl implements DeletedContentEventDao {
                 deletedContentEvent.getCollectionName(),
                 deletedContentEvent.getEventDate(),
                 deletedContentEvent.getUri(),
-                deletedContentEvent.getPageTitle());
+                deletedContentEvent.getPageTitle(),
+                deletedContentEvent.getType());
 
         ArrayList<com.github.onsdigital.zebedee.persistence.model.DeletedFile> deletedFiles = new ArrayList<>();
 
@@ -157,7 +159,8 @@ public class DeletedContentEventDaoImpl implements DeletedContentEventDao {
                 deletedContentEvent.getCollectionName(),
                 deletedContentEvent.getEventDate(),
                 deletedContentEvent.getUri(),
-                deletedContentEvent.getPageTitle());
+                deletedContentEvent.getPageTitle(),
+                deletedContentEvent.getPageType());
 
         dto.setId(deletedContentEvent.getId());
         ArrayList<DeletedFile> deletedFiles = new ArrayList<>();

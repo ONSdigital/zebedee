@@ -47,6 +47,7 @@ public class DeletedContentServiceImpl implements DeletedContentService {
                 dateDeleted,
                 deletedPage.getUri().toString(),
                 deletedPage.getDescription().getTitle(),
+                deletedPage.getType(),
                 files);
 
         // Store all the files that were deleted.

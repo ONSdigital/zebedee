@@ -1,5 +1,7 @@
 package com.github.onsdigital.zebedee.model.content.deleted;
 
+import com.github.onsdigital.zebedee.content.page.base.PageType;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -16,17 +18,19 @@ public class DeletedContentEvent {
     private String uri;
     private String pageTitle;
     private List<DeletedFile> deletedFiles;
+    private PageType type;
 
-    public DeletedContentEvent(String collectionId, String collectionName, Date eventDate, String uri, String pageTitle) {
+    public DeletedContentEvent(String collectionId, String collectionName, Date eventDate, String uri, String pageTitle, PageType type) {
         this.collectionId = collectionId;
         this.collectionName = collectionName;
         this.eventDate = eventDate;
         this.uri = uri;
         this.pageTitle = pageTitle;
+        this.type = type;
     }
 
-    public DeletedContentEvent(String collectionId, String collectionName, Date eventDate, String uri, String pageTitle, Collection<String> deletedUrls) {
-        this(collectionId, collectionName, eventDate, uri, pageTitle);
+    public DeletedContentEvent(String collectionId, String collectionName, Date eventDate, String uri, String pageTitle, PageType type, Collection<String> deletedUrls) {
+        this(collectionId, collectionName, eventDate, uri, pageTitle, type);
         deletedUrls.forEach(this::addDeletedFile);
     }
 
@@ -39,6 +43,14 @@ public class DeletedContentEvent {
         }
 
         deletedFiles.add(new DeletedFile(uri));
+    }
+
+    public PageType getType() {
+        return type;
+    }
+
+    public void setType(PageType type) {
+        this.type = type;
     }
 
     public long getId() {

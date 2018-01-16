@@ -1,5 +1,7 @@
 package com.github.onsdigital.zebedee.persistence.model;
 
+import com.github.onsdigital.zebedee.content.page.base.PageType;
+
 import javax.persistence.*;
 import java.util.Date;
 import java.util.List;
@@ -34,17 +36,29 @@ public class DeletedContentEvent {
     @Column(name = "page_title")
     private String pageTitle;
 
+    @Column(name = "page_type")
+    private PageType pageType;
+
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "deletedContentEvent")
     private List<DeletedFile> deletedFiles;
 
     public DeletedContentEvent() { }
 
-    public DeletedContentEvent(String collectionId, String collectionName, Date eventDate, String uri, String pageTitle) {
+    public DeletedContentEvent(String collectionId, String collectionName, Date eventDate, String uri, String pageTitle, PageType type) {
         this.collectionId = collectionId;
         this.collectionName = collectionName;
         this.eventDate = eventDate;
         this.uri = uri;
         this.pageTitle = pageTitle;
+        this.pageType = type;
+    }
+
+    public PageType getPageType() {
+        return pageType;
+    }
+
+    public void setPageType(PageType pageType) {
+        this.pageType = pageType;
     }
 
     public String getPageTitle() {

@@ -1,5 +1,6 @@
 package com.github.onsdigital.zebedee.model.content.deleted;
 
+import com.github.onsdigital.zebedee.content.page.base.PageType;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -13,7 +14,7 @@ public class DeletedContentEventTest {
     @Test
     public void testAddFileInitialisesList() throws Exception {
         // Given a DeletedContentEvent
-        DeletedContentEvent event = new DeletedContentEvent("collectionid", "collectionNAme", new Date(), "/some/uri", "Page title");
+        DeletedContentEvent event = new DeletedContentEvent("collectionid", "collectionNAme", new Date(), "/some/uri", "Page title", PageType.article);
 
         // When the addFile method is called without having initialised the files list
         event.addDeletedFile("/some/uri");

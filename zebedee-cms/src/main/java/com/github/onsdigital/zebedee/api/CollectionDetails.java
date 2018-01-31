@@ -19,6 +19,7 @@ import javax.ws.rs.GET;
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Api
 public class CollectionDetails {
@@ -78,11 +79,7 @@ public class CollectionDetails {
         addEventsForDetails(result.reviewed, result, collection);
 
         Set<Integer> teamIds = Root.zebedee.getPermissionsService().listViewerTeams(collection.description, session);
-        List<Team> teams = Root.zebedee.getTeamsService().resolveTeams(teamIds);
-        teams.forEach(team -> {
-            collection.getDescription().getTeams().add(team.getName());
-        });
-
+        result.teamsDetails = Root.zebedee.getTeamsService().resolveTeamDetails(teamIds);
         return result;
     }
 

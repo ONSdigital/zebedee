@@ -2,6 +2,7 @@ package com.github.onsdigital.zebedee.teams.service;
 
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.ConflictException;
+import com.github.onsdigital.zebedee.exceptions.ForbiddenException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
@@ -35,7 +36,7 @@ import static com.github.onsdigital.zebedee.teams.model.Team.teamIDComparator;
  */
 public class TeamsServiceImpl implements TeamsService {
 
-    private static final String UNAUTORISED_ERR_MSG = "User does not have the required admin permission to perform " +
+    private static final String FORBIDDEN_ERR_MSG = "User does not have the required admin permission to perform " +
             "requested action.";
 
     private static final int DEFAULT_TEAM_ID = 1;
@@ -78,12 +79,19 @@ public class TeamsServiceImpl implements TeamsService {
     }
 
     @Override
+    public List<Team> resolveTeamDetails(Set<Integer> teamIds) throws IOException {
+        return resolveTeams(teamIds).stream()
+                .map(team -> new Team().setId(team.getId()).setName(team.getName()))
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public Team findTeam(String teamName) throws IOException, NotFoundException {
         return teamsStore.get(teamName);
     }
 
     @Override
-    public Team createTeam(String teamName, Session session) throws IOException, UnauthorizedException, ConflictException, NotFoundException {
+    public Team createTeam(String teamName, Session session) throws IOException, UnauthorizedException, ConflictException, NotFoundException, ForbiddenException {
         validateSessionAndPermissions(session);
 
         // Check for a name conflict:
@@ -117,7 +125,7 @@ public class TeamsServiceImpl implements TeamsService {
     }
 
     @Override
-    public void deleteTeam(Team delete, Session session) throws IOException, UnauthorizedException, NotFoundException, BadRequestException {
+    public void deleteTeam(Team delete, Session session) throws IOException, UnauthorizedException, NotFoundException, BadRequestException, ForbiddenException {
         validateSessionAndPermissions(session);
         if (!teamsStore.deleteTeam(delete)) {
             logDebug("Team could not be deleted").addParameter("teamName", delete.getName()).log();
@@ -126,7 +134,7 @@ public class TeamsServiceImpl implements TeamsService {
     }
 
     @Override
-    public void addTeamMember(String email, Team team, Session session) throws IOException, UnauthorizedException, NotFoundException {
+    public void addTeamMember(String email, Team team, Session session) throws IOException, UnauthorizedException, NotFoundException, ForbiddenException {
         validateSessionAndPermissions(session);
         updateTeam(
                 team,
@@ -135,7 +143,7 @@ public class TeamsServiceImpl implements TeamsService {
     }
 
     @Override
-    public void removeTeamMember(String email, Team team, Session session) throws IOException, UnauthorizedException, NotFoundException {
+    public void removeTeamMember(String email, Team team, Session session) throws IOException, UnauthorizedException, NotFoundException, ForbiddenException {
         validateSessionAndPermissions(session);
         updateTeam(
                 team,
@@ -144,7 +152,7 @@ public class TeamsServiceImpl implements TeamsService {
     }
 
     @Override
-    public List<AbstractMap.SimpleEntry<String, String>> getTeamMembersSummary(Session session) throws IOException, UnauthorizedException {
+    public List<AbstractMap.SimpleEntry<String, String>> getTeamMembersSummary(Session session) throws IOException, UnauthorizedException, ForbiddenException {
         validateSessionAndPermissions(session);
         List<AbstractMap.SimpleEntry<String, String>> membersReport = new ArrayList<>();
 
@@ -184,13 +192,13 @@ public class TeamsServiceImpl implements TeamsService {
      *                               admin permission.
      * @throws IOException           problem checking the permission.
      */
-    private void validateSessionAndPermissions(Session session) throws UnauthorizedException, IOException {
+    private void validateSessionAndPermissions(Session session) throws UnauthorizedException, IOException, ForbiddenException {
         if (session == null || StringUtils.isEmpty(session.getEmail())) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
         if (!permissionsServiceSupplier.getService().isAdministrator(session.getEmail())) {
-            logInfo(UNAUTORISED_ERR_MSG).log();
-            throw new UnauthorizedException(UNAUTORISED_ERR_MSG);
+            logInfo(FORBIDDEN_ERR_MSG).log();
+            throw new ForbiddenException(FORBIDDEN_ERR_MSG);
         }
     }
 

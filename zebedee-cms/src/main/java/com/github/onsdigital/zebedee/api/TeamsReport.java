@@ -2,6 +2,7 @@ package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
+import com.github.onsdigital.zebedee.exceptions.ForbiddenException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.service.ServiceSupplier;
 import com.github.onsdigital.zebedee.session.model.Session;
@@ -60,7 +61,7 @@ public class TeamsReport {
      */
     @GET
     public void getReport(HttpServletRequest request, HttpServletResponse response) throws IOException,
-            BadRequestException, UnauthorizedException {
+            BadRequestException, UnauthorizedException, ForbiddenException {
         Session session = serviceServiceSupplier.getService().get(request);
         response.setContentType(APPLICATION_OCTET_STREAM_VALUE);
         response.setHeader(CONTENT_DISPOSITION_HEADER, format(CONTENT_DISPOSITION_VALUE, getDateString()));
@@ -69,7 +70,7 @@ public class TeamsReport {
     }
 
     private void createWorkbook(Session session, HttpServletResponse response) throws IOException,
-            UnauthorizedException {
+            UnauthorizedException, ForbiddenException {
         List<AbstractMap.SimpleEntry<String, String>> teamMembersMapping = teamsServiceSupplier
                 .getService()
                 .getTeamMembersSummary(session);

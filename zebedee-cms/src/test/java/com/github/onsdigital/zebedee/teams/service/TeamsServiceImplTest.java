@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee.teams.service;
 
 import com.github.onsdigital.zebedee.exceptions.ConflictException;
+import com.github.onsdigital.zebedee.exceptions.ForbiddenException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.service.ServiceSupplier;
@@ -21,6 +22,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
+import java.util.stream.Collectors;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -107,6 +109,29 @@ public class TeamsServiceImplTest {
     }
 
     @Test
+    public void resolveTeamDetails_success() throws Exception {
+        Set<Integer> requestedTeamIDs = new HashSet<>();
+        requestedTeamIDs.add(teamA.getId());
+        requestedTeamIDs.add(teamB.getId());
+
+        teamsList.add(teamA);
+        teamsList.add(teamB);
+
+        List<Team> expected = teamsList.stream()
+                .map(team -> new Team().setName(team.getName()).setId(team.getId()))
+                .collect(Collectors.toList());
+
+        when(teamsStore.listTeams())
+                .thenReturn(teamsList);
+
+        List<Team> result = service.resolveTeamDetails(requestedTeamIDs);
+
+        assertThat(result, equalTo(expected));
+
+        verify(teamsStore, times(1)).listTeams();
+    }
+
+    @Test
     public void findTeam_Success() throws Exception {
         when(teamsStore.get(teamA.getName()))
                 .thenReturn(teamA);
@@ -169,7 +194,7 @@ public class TeamsServiceImplTest {
         }
     }
 
-    @Test(expected = UnauthorizedException.class)
+    @Test(expected = ForbiddenException.class)
     public void createTeam_ShouldThrowExeIfUserNotAdmin() throws Exception {
         session.setEmail(EMAIL);
 
@@ -178,7 +203,7 @@ public class TeamsServiceImplTest {
 
         try {
             service.createTeam(TEAM_D_NAME, session);
-        } catch (UnauthorizedException e) {
+        } catch (ForbiddenException e) {
             verify(permissionsService, times(1)).isAdministrator(EMAIL);
             verifyNoMoreInteractions(permissionsService);
             verifyZeroInteractions(teamsStore, readWriteLock, lock);
@@ -287,7 +312,7 @@ public class TeamsServiceImplTest {
         }
     }
 
-    @Test(expected = UnauthorizedException.class)
+    @Test(expected = ForbiddenException.class)
     public void deleteTeam_ShouldThrowExeUserNotAdmin() throws Exception {
         session.setEmail(EMAIL);
 
@@ -296,7 +321,7 @@ public class TeamsServiceImplTest {
 
         try {
             service.deleteTeam(teamA, session);
-        } catch (UnauthorizedException e) {
+        } catch (ForbiddenException e) {
             verify(permissionsService, times(1)).isAdministrator(EMAIL);
             verifyNoMoreInteractions(permissionsService);
             verifyZeroInteractions(teamsStore, readWriteLock, lock);
@@ -377,7 +402,7 @@ public class TeamsServiceImplTest {
         }
     }
 
-    @Test (expected = UnauthorizedException.class)
+    @Test (expected = ForbiddenException.class)
     public void addTeamMemeber_ShouldThrowExIfDUserNotAdmin() throws Exception {
         session.setEmail(EMAIL);
 
@@ -386,7 +411,7 @@ public class TeamsServiceImplTest {
 
         try {
             service.addTeamMember(EMAIL, teamA, session);
-        } catch (UnauthorizedException e) {
+        } catch (ForbiddenException e) {
             verify(permissionsService, times(1)).isAdministrator(EMAIL);
             verifyZeroInteractions(teamsStore, readWriteLock, lock);
             throw e;
@@ -459,7 +484,7 @@ public class TeamsServiceImplTest {
         }
     }
 
-    @Test (expected = UnauthorizedException.class)
+    @Test (expected = ForbiddenException.class)
     public void removeTeamMember_ShouldThrowExIfUserNotAdmin() throws Exception {
         session.setEmail(EMAIL);
 
@@ -468,7 +493,7 @@ public class TeamsServiceImplTest {
 
         try {
             service.removeTeamMember(EMAIL, teamA, session);
-        } catch (UnauthorizedException e) {
+        } catch (ForbiddenException e) {
             verify(permissionsService, times(1)).isAdministrator(EMAIL);
             verifyZeroInteractions(teamsStore, readWriteLock, lock);
             throw e;
@@ -546,7 +571,7 @@ public class TeamsServiceImplTest {
         }
     }
 
-    @Test (expected = UnauthorizedException.class)
+    @Test (expected = ForbiddenException.class)
     public void getTeamMembersSummary_ShouldThrowUnauthorizedExceptionIfUserNotAdmin() throws Exception {
         session.setEmail(EMAIL);
 
@@ -555,7 +580,7 @@ public class TeamsServiceImplTest {
 
         try {
             service.getTeamMembersSummary(session);
-        } catch (UnauthorizedException e) {
+        } catch (ForbiddenException e) {
             verify(permissionsService, times(1)).isAdministrator(EMAIL);
             verifyZeroInteractions(teamsStore);
             throw e;

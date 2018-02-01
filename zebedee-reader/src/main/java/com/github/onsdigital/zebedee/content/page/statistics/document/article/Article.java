@@ -16,7 +16,15 @@ public class Article extends StatisticalDocument {
     private List<Link> relatedArticles;
     private List<DownloadSection> pdfTable;
     private Boolean isPrototypeArticle;
+    private String imageUri;
 
+    public String getImageUri() {
+        return imageUri;
+    }
+
+    public void setImageUri(String imageUri) {
+        this.imageUri = imageUri;
+    }
 
     public List<DownloadSection> getPdfTable() {
         return pdfTable;

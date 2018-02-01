@@ -1,6 +1,5 @@
 package com.github.onsdigital.zebedee.json;
 
-import com.github.onsdigital.zebedee.model.CollectionOwner;
 import com.github.onsdigital.zebedee.teams.model.Team;
 
 import java.util.List;

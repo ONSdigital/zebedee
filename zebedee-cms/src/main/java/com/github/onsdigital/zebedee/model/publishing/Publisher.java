@@ -60,7 +60,9 @@ public class Publisher {
 
         // First get the in-memory (within-JVM) lock.
         // This will block attempts to write to the collection during the publishing process
-        logInfo("Attempting to lock collection before publish.").addParameter("collectionId", collection.description.id).log();
+        logInfo("Attempting to lock collection before publish.")
+                .addParameter("collectionId", collection.getDescription().getId())
+                .log();
         Lock writeLock = collection.getWriteLock();
         writeLock.lock();
 
@@ -138,7 +140,8 @@ public class Publisher {
 
         } catch (IOException e) {
 
-            SlackNotification.alarm(String.format("Exception publishing collection: %s: %s", collection.description.name, e.getMessage()));
+            SlackNotification.alarm(String.format("Exception publishing collection: %s: %s",
+                    collection.getDescription().getName(), e.getMessage()));
             logError(e, "Exception publishing collection").collectionName(collection).log();
             // If an error was caught, attempt to roll back the transaction:
             Map<String, String> transactionIds = collection.description.publishTransactionIds;

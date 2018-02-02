@@ -82,10 +82,10 @@ public class DataProcessorTestBaseFixture extends ZebedeeTestBaseFixture {
         generator = new DataPagesGenerator();
 
         CollectionDescription collectionDescription = new CollectionDescription();
-        collectionDescription.name = "DataPublicationDetails";
+        collectionDescription.setName("DataPublicationDetails");
         collectionDescription.isEncrypted = true;
-        collectionDescription.type = CollectionType.scheduled;
-        collectionDescription.publishDate = new Date();
+        collectionDescription.setType(CollectionType.scheduled);
+        collectionDescription.setPublishDate(new Date());
 
         collection = Collection.create(collectionDescription, zebedee, publisher);
 

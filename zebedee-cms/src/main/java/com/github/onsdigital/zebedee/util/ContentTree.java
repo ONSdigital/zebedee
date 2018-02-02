@@ -1,12 +1,13 @@
 package com.github.onsdigital.zebedee.util;
 
+import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.ContentDetail;
 import com.github.onsdigital.zebedee.model.Collection;
-import com.github.onsdigital.zebedee.model.CollectionOwner;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.service.ContentDeleteService;
+import com.github.onsdigital.zebedee.service.ServiceSupplier;
 
 import java.io.IOException;
 
@@ -18,9 +19,9 @@ import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logDebug;
 public class ContentTree {
 
     private static ContentDetail publishedContentTree;
-    private static ContentDetail publishedDataVisualisationsTree;
 
     private static ContentDeleteService contentDeleteService = ContentDeleteService.getInstance();
+    private static ServiceSupplier<Zebedee> zebedeeServiceSupplier = () -> Root.zebedee;
 
     private ContentTree() {
     }
@@ -31,30 +32,16 @@ public class ContentTree {
      * @return
      * @throws IOException
      */
-    public static ContentDetail get(CollectionOwner collectionOwner) throws IOException {
-        ContentDetail contentTree = getContentTree(collectionOwner);
+    public static ContentDetail get() throws IOException {
+        ContentDetail contentTree = publishedContentTree;
         if (contentTree == null) {
             synchronized (ContentTree.class) {
                 if (contentTree == null) {
-                    contentTree = Root.zebedee.getPublished().nestedDetails(collectionOwner);
-                    if (collectionOwner.equals(CollectionOwner.DATA_VISUALISATION)) {
-                        publishedDataVisualisationsTree = contentTree;
-                    } else {
-                        publishedContentTree = contentTree;
-                    }
+                    publishedContentTree = zebedeeServiceSupplier.getService().getPublished().nestedDetails();
                 }
             }
         }
-        return contentTree;
-    }
-
-    private static ContentDetail getContentTree(CollectionOwner collectionOwner) {
-        switch (collectionOwner) {
-            case DATA_VISUALISATION:
-                return publishedDataVisualisationsTree;
-            default:
-                return publishedContentTree;
-        }
+        return publishedContentTree;
     }
 
 
@@ -65,7 +52,7 @@ public class ContentTree {
      * @return
      */
     public static ContentDetail getOverlayed(Collection collection, CollectionReader reader) throws IOException, ZebedeeException {
-        ContentDetail publishedDetails = get(collection.description.collectionOwner).clone();
+        ContentDetail publishedDetails = get().clone();
         publishedDetails.overlayDetails(ContentDetailUtil.resolveDetails(collection.inProgress, reader.getInProgress()));
         publishedDetails.overlayDetails(ContentDetailUtil.resolveDetails(collection.complete, reader.getComplete()));
         publishedDetails.overlayDetails(ContentDetailUtil.resolveDetails(collection.reviewed, reader.getReviewed()));
@@ -76,6 +63,5 @@ public class ContentTree {
     public static void dropCache() {
         logDebug("Clearing browser tree cache.").log();
         publishedContentTree = null;
-        publishedDataVisualisationsTree = null;
     }
 }

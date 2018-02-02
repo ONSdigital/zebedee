@@ -285,17 +285,12 @@ public class KeyManagerTest {
                 .thenReturn(srcIDS);
         when(collections.getCollection(COLLECTION_ID))
                 .thenReturn(collection);
-        when(collectionDescription.getCollectionOwner())
-                .thenReturn(CollectionOwner.PUBLISHING_SUPPORT);
         when(source.get(COLLECTION_ID))
                 .thenReturn(secretKey);
 
-        KeyManager.transferKeyring(target, source, CollectionOwner.PUBLISHING_SUPPORT);
+        KeyManager.transferKeyring(target, source);
 
         verify(source, times(1)).list();
-        verify(collections, times(1)).getCollection(COLLECTION_ID);
-        verify(collection, times(2)).getDescription();
-        verify(collectionDescription, times(2)).getCollectionOwner();
         verify(source,times(1)).get(COLLECTION_ID);
         verify(target,times(1)).put(COLLECTION_ID, secretKey);
     }

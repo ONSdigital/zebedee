@@ -9,6 +9,7 @@ import com.github.onsdigital.zebedee.content.page.statistics.document.figure.ima
 import com.github.onsdigital.zebedee.content.page.statistics.document.figure.table.Table;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
+import com.github.onsdigital.zebedee.exceptions.ResourceDirectoryNotFileException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.reader.data.language.ContentLanguage;
@@ -362,7 +363,7 @@ public class FileSystemContentReader implements ContentReader {
 
     private void assertNotDirectory(Path path) throws BadRequestException {
         if (isDirectory(path)) {
-            throw new BadRequestException("Requested path is a directory");
+            throw new ResourceDirectoryNotFileException("Requested path is a directory");
         }
     }
 

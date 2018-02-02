@@ -139,7 +139,7 @@ public class ZebedeeLogBuilder extends LogMessageBuilder {
     }
 
     public ZebedeeLogBuilder collectionId(Collection collection) {
-        addParameter(COLLECTION_ID, collection.getDescription().id);
+        addParameter(COLLECTION_ID, collection.getDescription().getId());
         return this;
     }
 

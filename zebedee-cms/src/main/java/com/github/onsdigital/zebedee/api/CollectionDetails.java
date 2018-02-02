@@ -5,11 +5,11 @@ import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.CollectionDetail;
 import com.github.onsdigital.zebedee.json.ContentDetail;
 import com.github.onsdigital.zebedee.json.Events;
-import com.github.onsdigital.zebedee.session.model.Session;
-import com.github.onsdigital.zebedee.teams.model.Team;
 import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.service.ContentDeleteService;
+import com.github.onsdigital.zebedee.session.model.Session;
+import com.github.onsdigital.zebedee.teams.model.Team;
 import com.github.onsdigital.zebedee.util.ContentDetailUtil;
 import org.eclipse.jetty.http.HttpStatus;
 
@@ -57,13 +57,13 @@ public class CollectionDetails {
         CollectionReader collectionReader = new ZebedeeCollectionReader(Root.zebedee, collection, session);
 
         CollectionDetail result = new CollectionDetail();
-        result.id = collection.description.id;
-        result.name = collection.description.name;
-        result.type = collection.description.type;
-        result.publishDate = collection.description.publishDate;
-        result.teams = collection.description.teams;
-        result.releaseUri = collection.description.releaseUri;
-        result.collectionOwner = collection.description.collectionOwner;
+        result.setId(collection.getDescription().getId());
+        result.setName(collection.getDescription().getName());
+        result.setType(collection.getDescription().getType());
+        result.setPublishDate(collection.getDescription().getPublishDate());
+        result.setTeams(collection.getDescription().getTeams());
+        result.setReleaseUri(collection.getDescription().getReleaseUri());
+
         result.pendingDeletes = contentDeleteService.getDeleteItemsByCollection(collection);
 
         result.inProgress = ContentDetailUtil.resolveDetails(collection.inProgress, collectionReader.getInProgress());

@@ -192,7 +192,7 @@ public class ZebedeeTest extends ZebedeeTestBaseFixture {
 		Optional<Collection> blockingCollection = zebedee.checkForCollectionBlockingChange(collectionOne, contentPath);
 
 		assertThat(blockingCollection.isPresent(), is(true));
-		assertThat(blockingCollection.get().getDescription().name, equalTo(collectionTwo.getDescription().name));
+		assertThat(blockingCollection.get().getDescription().getName(), equalTo(collectionTwo.getDescription().getName()));
 		assertThat(collectionTwo.inProgressUris().contains(contentPath), is(true));
 		assertThat(collectionTwo.completeUris().contains(contentPath), is(false));
 		assertThat(collectionTwo.reviewedUris().contains(contentPath), is(false));

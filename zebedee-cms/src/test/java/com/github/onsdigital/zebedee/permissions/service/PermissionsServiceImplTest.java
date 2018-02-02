@@ -603,4 +603,17 @@ public class PermissionsServiceImplTest {
         verify(permissionsStore, times(1)).saveAccessMapping(accessMapping);
         verify(adminsMock, times(1)).add(email2);
     }
+
+    @Test
+    public void canView_ShouldReturnFalseIfCollectionTeamsNull() throws Exception {
+        when(permissionsStore.getAccessMapping())
+                .thenReturn(new AccessMapping());
+        when(teamsService.listTeams())
+                .thenReturn(teamsList);
+
+        assertThat(permissions.canView(userMock, collectionDescription), is(false));
+
+        verify(permissionsStore, times(1)).getAccessMapping();
+        verifyZeroInteractions(teamsService);
+    }
 }

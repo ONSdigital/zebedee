@@ -11,13 +11,15 @@ CONFIG=$(aws --region $AWS_REGION ec2 describe-tags --filters "Name=resource-id,
 
 (aws s3 cp s3://$CONFIG_BUCKET/zebedee-reader/$CONFIG.asc . && gpg --decrypt $CONFIG.asc > $CONFIG) || exit $?
 
+source $CONFIG
+
 if [[ $INSTANCE_NUMBER == 1 ]]; then
   ELASTICSEARCH_HOST=$ELASTICSEARCH_1
 else
   ELASTICSEARCH_HOST=$ELASTICSEARCH_2
 fi
 
-source $CONFIG && docker run -d                                                         \
+docker run -d                                                                           \
   --env=content_dir=/content                                                            \
   --env=enable_splunk_reporting=$ENABLE_SPLUNK_REPORTING                                \
   --env=ELASTIC_SEARCH_CLUSTER=cluster                                                  \

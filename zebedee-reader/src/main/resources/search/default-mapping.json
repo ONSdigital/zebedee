@@ -12,16 +12,16 @@
         "properties": {
           "cdid": {
             "type": "string",
-            "analyzer": "ons_standard"
+            "analyzer": "ons_synonym"
           },
           "datasetId": {
             "type": "string",
-            "analyzer": "ons_standard"
+            "analyzer": "ons_synonym"
           },
           "title": {
             "type": "string",
             "analyzer": "ons_synonym_stem",
-            "search_analyzer": "ons_stem",
+            "search_analyzer": "ons_synonym_stem",
             "fields": {
               "title_raw": {
                 "type": "string",
@@ -30,7 +30,7 @@
               "title_no_stem" : {
                 "type" : "string",
                 "analyzer" : "ons_synonym",
-                "search_analyzer" : "ons_standard"
+                "search_analyzer" : "ons_synonym"
               },
               "title_no_synonym_no_stem" : {
                 "type" : "string",
@@ -39,7 +39,7 @@
               "title_no_dates": {
                 "type": "string",
                 "analyzer": "ons_synonym_stem_clear_dates",
-                "search_analyzer": "ons_stem_clear_dates"
+                "search_analyzer": "ons_synonym_stem_clear_dates"
               },
               "title_first_letter": {
                 "type": "string",
@@ -51,20 +51,20 @@
           "edition": {
             "type": "string",
             "analyzer": "ons_synonym_stem",
-            "search_analyzer": "ons_stem"
+            "search_analyzer": "ons_synonym_stem"
           },
           "metaDescription": {
             "type": "string",
-            "analyzer": "ons_standard"
+            "analyzer": "ons_synonym"
           },
           "summary": {
             "type": "string",
-            "analyzer": "ons_standard"
+            "analyzer": "ons_synonym"
           },
           "keywords": {
             "type": "string",
             "analyzer": "ons_synonym_stem",
-            "search_analyzer": "ons_stem",
+            "search_analyzer": "ons_synonym_stem",
             "fields": {
               "keywords_raw": {
                 "type": "string"
@@ -79,7 +79,7 @@
       "searchBoost": {
         "type": "string",
         "analyzer": "ons_synonym_stem",
-        "search_analyzer": "ons_stem",
+        "search_analyzer": "ons_synonym_stem",
         "norms": {
           "enabled": false
         }

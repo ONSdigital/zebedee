@@ -76,6 +76,10 @@ analysis :
       type: pattern_replace
       pattern : "([1|2]\\d{3})|((?i)january|february|march|april|may|june|july|august|september|october|november|december)"
   filter :
+    synonym :
+        type : synonym
+        synonyms_path : analysis/synonym.txt
+
     stem_exclusion :
         type : keyword_marker
         # Add words to the 'keywords' array below to stop the words being stemmed and to keep the words in thier original form
@@ -176,3 +180,4 @@ analysis :
         - "hi, health inequality"
         - "wellbeing => well being"
         - "psf => public sector finance"
+        - "murder, homicide"

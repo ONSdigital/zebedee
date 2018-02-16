@@ -11,6 +11,7 @@ import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.UnexpectedErrorException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.model.Collection;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 
@@ -209,6 +210,9 @@ public class ZebedeeLogBuilder extends LogMessageBuilder {
 
     @Override
     public ZebedeeLogBuilder addParameter(String key, Object value) {
+        if (StringUtils.isEmpty(key) || null == value || value.toString() == "") {
+            return this;
+        }
         return (ZebedeeLogBuilder) super.addParameter(key, value != null ? value : "");
     }
 

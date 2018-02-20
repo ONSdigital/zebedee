@@ -2,11 +2,8 @@ package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
 import com.github.davidcarboni.restolino.helpers.Path;
+import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
-import com.github.onsdigital.zebedee.dataset.api.DatasetAPIClient;
-import com.github.onsdigital.zebedee.dataset.api.exception.DatasetAPIException;
-import com.github.onsdigital.zebedee.dataset.api.exception.DatasetNotFoundException;
-import com.github.onsdigital.zebedee.dataset.api.exception.UnexpectedResponseException;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnexpectedErrorException;
@@ -22,6 +19,10 @@ import com.github.onsdigital.zebedee.service.ZebedeeDatasetService;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.util.ZebedeeCmsService;
 import com.google.gson.JsonSyntaxException;
+import dp.api.dataset.DatasetAPIClient;
+import dp.api.dataset.exception.DatasetAPIException;
+import dp.api.dataset.exception.DatasetNotFoundException;
+import dp.api.dataset.exception.UnexpectedResponseException;
 import org.apache.http.HttpStatus;
 
 import javax.servlet.http.HttpServletRequest;
@@ -47,10 +48,16 @@ public class Collections {
      * Default constructor used instantiates dependencies itself.
      */
     public Collections() {
+
         zebedeeCmsService = ZebedeeCmsService.getInstance();
+
+        DatasetAPIClient datasetAPIClient = new DatasetAPIClient(
+                Configuration.getDatasetAPIURL(),
+                Configuration.getDatasetAPIAuthToken());
+
         datasetService = new ZebedeeDatasetService(
-                DatasetAPIClient.getInstance(),
-                zebedeeCmsService.getInstance());
+                datasetAPIClient,
+                zebedeeCmsService);
     }
 
     /**
@@ -152,7 +159,7 @@ public class Collections {
             throw new UnexpectedErrorException(e.getMessage(), HttpStatus.SC_INTERNAL_SERVER_ERROR);
         } catch (DatasetNotFoundException e) {
             throw new NotFoundException(e.getMessage());
-        } catch (com.github.onsdigital.zebedee.dataset.api.exception.BadRequestException e) {
+        } catch (dp.api.dataset.exception.BadRequestException e) {
             throw new BadRequestException(e.getMessage());
         }
     }
@@ -202,7 +209,7 @@ public class Collections {
                 .addParameter("version", version)
                 .log();
 
-        try (InputStream body = request.getInputStream()){
+        try (InputStream body = request.getInputStream()) {
 
             CollectionDatasetVersion datasetVersion = ContentUtil.deserialise(body, CollectionDatasetVersion.class);
             datasetService.updateDatasetVersionInCollection(collectionID, datasetID, edition, version, datasetVersion);
@@ -217,7 +224,7 @@ public class Collections {
                 .addParameter("collectionID", collectionID)
                 .addParameter("datasetID", datasetID)
                 .log();
-        try (InputStream body = request.getInputStream()){
+        try (InputStream body = request.getInputStream()) {
 
             CollectionDataset dataset = ContentUtil.deserialise(body, CollectionDataset.class);
             datasetService.updateDatasetInCollection(collectionID, datasetID, dataset);

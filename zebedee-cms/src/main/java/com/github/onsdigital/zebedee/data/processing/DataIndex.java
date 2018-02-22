@@ -62,7 +62,7 @@ public class DataIndex {
             try {
                 Files.walkFileTree(contentReader.getRootFolder(), new IndexBuilder(index, contentReader));
             } catch (IOException e) {
-                logError(e, "Failed to build data index");
+                logError(e, "Failed to build data index").log();
             }
             long duration = System.nanoTime() - startTime;
             logInfo("Finished building data index.").addParameter("entries", index.size()).addParameter("duration_ns", duration).log();

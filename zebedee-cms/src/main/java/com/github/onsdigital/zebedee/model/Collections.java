@@ -1,9 +1,7 @@
 package com.github.onsdigital.zebedee.model;
 
-import com.github.davidcarboni.encryptedfileupload.EncryptedFileItemFactory;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.api.Root;
-import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.data.json.DirectoryListing;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.CollectionNotFoundException;
@@ -30,15 +28,8 @@ import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
 import com.github.onsdigital.zebedee.session.model.Session;
-import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.FileUploadException;
-import org.apache.commons.fileupload.ProgressListener;
-import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import javax.servlet.http.HttpServletRequest;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -501,7 +492,6 @@ public class Collections {
      * @param collection
      * @param uri
      * @param session
-     * @param request
      * @param requestBody
      * @throws ConflictException
      * @throws NotFoundException
@@ -510,10 +500,9 @@ public class Collections {
      * @throws IOException
      */
     public void createContent(
-            Collection collection, String uri, Session session, HttpServletRequest request,
-            InputStream requestBody, CollectionEventType eventType, boolean validateJson
-    ) throws ZebedeeException, IOException,
-            FileUploadException {
+            Collection collection, String uri, Session session,
+            InputStream requestBody, CollectionEventType eventType
+    ) throws ZebedeeException, IOException {
 
         if (this.published.exists(uri)) {
             throw new ConflictException("This URI already exists");
@@ -535,15 +524,14 @@ public class Collections {
             throw new ConflictException("This URI already exists");
         }
 
-        writeContent(collection, uri, session, request, requestBody, false, eventType, validateJson);
+        writeContent(collection, uri, session, requestBody, false, eventType);
     }
 
     public void writeContent(
             Collection collection, String uri,
-            Session session, HttpServletRequest request, InputStream requestBody, Boolean recursive,
-            CollectionEventType eventType,
-            boolean validateJson
-    ) throws IOException, ZebedeeException, FileUploadException {
+            Session session, InputStream requestBody, Boolean recursive,
+            CollectionEventType eventType
+    ) throws IOException, ZebedeeException {
 
         CollectionWriter collectionWriter = collectionReaderWriterFactory.getWriter(zebedeeSupplier.get(), collection, session);
 
@@ -599,42 +587,11 @@ public class Collections {
 
         CollectionHistoryEvent historyEvent = new CollectionHistoryEvent(collection, session, eventType, uri);
 
-        // Detect whether this is a multipart request
-        if (ServletFileUpload.isMultipartContent(request)) {
-            postDataFile(request, uri, collectionWriter, historyEvent);
-
-        } else {
-            if (validateJson) {
-                try (InputStream inputStream = validateJsonStream(requestBody)) {
-                    collectionWriter.getInProgress().write(inputStream, uri);
-                }
-            } else {
-                collectionWriter.getInProgress().write(requestBody, uri);
-            }
-            if (eventType != null) {
-                collectionHistoryDaoSupplier.get().saveCollectionHistoryEvent(historyEvent);
-            }
+        collectionWriter.getInProgress().write(requestBody, uri);
+        if (eventType != null) {
+            collectionHistoryDaoSupplier.get().saveCollectionHistoryEvent(historyEvent);
         }
-    }
 
-    /**
-     * Take an input stream that contains json content and ensure its valid.
-     *
-     * @param inputStream
-     * @return
-     */
-    public InputStream validateJsonStream(InputStream inputStream) throws BadRequestException {
-        try {
-            byte[] bytes = IOUtils.toByteArray(inputStream);
-
-            try (ByteArrayInputStream validationInputStream = new ByteArrayInputStream(bytes)) {
-                ContentUtil.deserialiseContent(validationInputStream);
-            }
-
-            return new ByteArrayInputStream(bytes);
-        } catch (Exception e) {
-            throw new BadRequestException("Validation of page content failed. Please try again");
-        }
     }
 
     public boolean deleteContent(
@@ -688,72 +645,6 @@ public class Collections {
                     eventType, uri));
         }
         return deleted;
-    }
-
-    /**
-     * Save uploaded files.
-     *
-     * @param request
-     * @param uri
-     * @param collectionWriter
-     * @throws FileUploadException
-     * @throws IOException
-     */
-    private void postDataFile(
-            HttpServletRequest request, String uri, CollectionWriter collectionWriter,
-            CollectionHistoryEvent historyEvent
-    )
-            throws FileUploadException, IOException {
-
-        ServletFileUpload upload = getServletFileUpload();
-
-        try {
-            for (FileItem item : upload.parseRequest(request)) {
-                try (InputStream inputStream = item.getInputStream()) {
-                    collectionWriter.getInProgress().write(inputStream, uri);
-                }
-                collectionHistoryDaoSupplier.get().saveCollectionHistoryEvent(historyEvent);
-            }
-        } catch (Exception e) {
-            throw new IOException("Error processing uploaded file", e);
-        }
-    }
-
-    /**
-     * get a file upload object with progress listener
-     *
-     * @return an upload object
-     */
-    public ServletFileUpload getServletFileUpload() {
-        // Set up the objects that do all the heavy lifting
-        // PrintWriter out = response.getWriter();
-        EncryptedFileItemFactory factory = new EncryptedFileItemFactory();
-        ServletFileUpload upload = new ServletFileUpload(factory);
-
-        ProgressListener progressListener = getProgressListener();
-        upload.setProgressListener(progressListener);
-        return upload;
-    }
-
-    /**
-     * get a progress listener
-     *
-     * @return a ProgressListener object
-     */
-    private ProgressListener getProgressListener() {
-        // Set up a progress listener that we can use to power a progress bar
-        return new ProgressListener() {
-            private long megaBytes = -1;
-
-            @Override
-            public void update(long pBytesRead, long pContentLength, int pItems) {
-                long mBytes = pBytesRead / 1000000;
-                if (megaBytes == mBytes) {
-                    return;
-                }
-                megaBytes = mBytes;
-            }
-        };
     }
 
     /**

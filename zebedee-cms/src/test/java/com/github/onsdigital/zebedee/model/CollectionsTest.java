@@ -13,16 +13,16 @@ import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.CollectionType;
 import com.github.onsdigital.zebedee.json.Event;
 import com.github.onsdigital.zebedee.json.EventType;
-import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
-import com.github.onsdigital.zebedee.session.model.Session;
-import com.github.onsdigital.zebedee.user.model.User;
 import com.github.onsdigital.zebedee.model.approval.ApproveTask;
 import com.github.onsdigital.zebedee.model.publishing.PublishNotification;
+import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.persistence.CollectionEventType;
 import com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDao;
 import com.github.onsdigital.zebedee.persistence.model.CollectionHistoryEvent;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
+import com.github.onsdigital.zebedee.session.model.Session;
+import com.github.onsdigital.zebedee.user.model.User;
 import com.github.onsdigital.zebedee.user.service.UsersService;
 import org.apache.commons.fileupload.FileUploadException;
 import org.junit.Before;
@@ -33,7 +33,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -101,9 +100,6 @@ public class CollectionsTest {
 
     @Mock
     private Content publishedContentMock;
-
-    @Mock
-    private HttpServletRequest requestMock;
 
     @Mock
     private CollectionReaderWriterFactory collectionReaderWriterFactoryMock;
@@ -198,7 +194,7 @@ public class CollectionsTest {
 
     @Test(expected = BadRequestException.class)
     public void shouldThrowBadRequestForNullCollectionOnListDirectory() throws IOException, UnauthorizedException,
-            BadRequestException, ConflictException, NotFoundException {
+            BadRequestException, NotFoundException {
         collections.listDirectory(null, "somefile.json", sessionMock);
     }
 
@@ -213,16 +209,14 @@ public class CollectionsTest {
     }
 
     @Test(expected = NotFoundException.class)
-    public void shouldThrowNotFoundForNullCollectionOnWriteContent() throws IOException, ZebedeeException,
-            FileUploadException {
-        HttpServletRequest request = null;
+    public void shouldThrowNotFoundForNullCollectionOnWriteContent() throws IOException, ZebedeeException {
         InputStream inputStream = null;
 
         when(collectionReaderWriterFactoryMock.getWriter(zebedeeMock, null, sessionMock))
                 .thenThrow(new NotFoundException(""));
 
-        collections.writeContent(null, "someURI", sessionMock, request,
-                inputStream, false, CollectionEventType.COLLECTION_PAGE_SAVED, false);
+        collections.writeContent(null, "someURI", sessionMock,
+                inputStream, false, CollectionEventType.COLLECTION_PAGE_SAVED);
     }
 
     @Test(expected = BadRequestException.class)
@@ -334,14 +328,14 @@ public class CollectionsTest {
     }
 
     @Test(expected = UnauthorizedException.class)
-    public void shouldThrowUnauthorizedIfNotLoggedInOnWriteContent() throws IOException, ZebedeeException,
-            FileUploadException {
+    public void shouldThrowUnauthorizedIfNotLoggedInOnWriteContent() throws IOException, ZebedeeException {
+
         InputStream inputStreamMock = mock(InputStream.class);
         when(collectionReaderWriterFactoryMock.getWriter(zebedeeMock, collectionMock, sessionMock))
                 .thenThrow(new UnauthorizedException(""));
         try {
-            collections.writeContent(collectionMock, "someURI", sessionMock, requestMock,
-                    inputStreamMock, false, CollectionEventType.COLLECTION_PAGE_SAVED, true);
+            collections.writeContent(collectionMock, "someURI", sessionMock,
+                    inputStreamMock, false, CollectionEventType.COLLECTION_PAGE_SAVED);
         } catch (UnauthorizedException e) {
             verify(collectionReaderWriterFactoryMock, times(1)).getWriter(zebedeeMock, collectionMock, sessionMock);
             verifyZeroInteractions(collectionMock);
@@ -387,8 +381,8 @@ public class CollectionsTest {
                 .thenReturn(ApprovalStatus.IN_PROGRESS);
 
         try {
-            collections.writeContent(collectionMock, null, sessionMock, requestMock,
-                    inputStreamMock, false, CollectionEventType.COLLECTION_PAGE_SAVED, true);
+            collections.writeContent(collectionMock, null, sessionMock,
+                    inputStreamMock, false, CollectionEventType.COLLECTION_PAGE_SAVED);
         } catch (BadRequestException e) {
             verify(collectionReaderWriterFactoryMock, times(1)).getWriter(zebedeeMock, collectionMock, sessionMock);
             verify(sessionMock, times(1)).getEmail();
@@ -775,8 +769,8 @@ public class CollectionsTest {
         when(collectionMock.find(uri.toString()))
                 .thenReturn(uri);
         try {
-            collections.writeContent(collectionMock, uri.toString(), sessionMock, requestMock, mock(InputStream.class), false,
-                    CollectionEventType.COLLECTION_PAGE_SAVED, false);
+            collections.writeContent(collectionMock, uri.toString(), sessionMock, mock(InputStream.class), false,
+                    CollectionEventType.COLLECTION_PAGE_SAVED);
         } catch (BadRequestException e) {
             verify(collectionReaderWriterFactoryMock, times(1)).getWriter(zebedeeMock, collectionMock, sessionMock);
             verify(collectionDescriptionMock, times(1)).getApprovalStatus();
@@ -792,8 +786,7 @@ public class CollectionsTest {
 
 
     @Test(expected = ConflictException.class)
-    public void shouldThrowConflictForCreatingFileBeingEditedElsewhere() throws IOException, ZebedeeException,
-            FileUploadException {
+    public void shouldThrowConflictForCreatingFileBeingEditedElsewhere() throws IOException, ZebedeeException {
         Path uri = rootDir.newFile("data.json").toPath();
 
         when(collectionReaderWriterFactoryMock.getWriter(zebedeeMock, collectionMock, sessionMock))
@@ -805,8 +798,8 @@ public class CollectionsTest {
         when(collectionMock.edit(TEST_EMAIL, uri.toString(), collectionWriterMock, false))
                 .thenReturn(false);
         try {
-            collections.writeContent(collectionMock, uri.toString(), sessionMock, requestMock, mock(InputStream.class), false,
-                    CollectionEventType.COLLECTION_PAGE_SAVED, false);
+            collections.writeContent(collectionMock, uri.toString(), sessionMock, mock(InputStream.class), false,
+                    CollectionEventType.COLLECTION_PAGE_SAVED);
         } catch (BadRequestException e) {
             verify(collectionReaderWriterFactoryMock, times(1)).getWriter(zebedeeMock, collectionMock, sessionMock);
             verify(collectionDescriptionMock, times(1)).getApprovalStatus();
@@ -822,8 +815,7 @@ public class CollectionsTest {
     }
 
     @Test(expected = ConflictException.class)
-    public void shouldThrowConflictForEditingFileBeingEditedElsewhere() throws IOException, ZebedeeException,
-            FileUploadException {
+    public void shouldThrowConflictForEditingFileBeingEditedElsewhere() throws IOException, ZebedeeException {
         Path uri = rootDir.newFile("data.json").toPath();
 
         when(collectionReaderWriterFactoryMock.getWriter(zebedeeMock, collectionMock, sessionMock))
@@ -835,8 +827,8 @@ public class CollectionsTest {
         when(collectionMock.edit(TEST_EMAIL, uri.toString(), collectionWriterMock, false))
                 .thenReturn(false);
         try {
-            collections.writeContent(collectionMock, uri.toString(), sessionMock, requestMock, mock(InputStream.class), false,
-                    CollectionEventType.COLLECTION_PAGE_SAVED, false);
+            collections.writeContent(collectionMock, uri.toString(), sessionMock, mock(InputStream.class), false,
+                    CollectionEventType.COLLECTION_PAGE_SAVED);
         } catch (BadRequestException e) {
             verify(collectionReaderWriterFactoryMock, times(1)).getWriter(zebedeeMock, collectionMock, sessionMock);
             verify(collectionDescriptionMock, times(1)).getApprovalStatus();
@@ -869,8 +861,8 @@ public class CollectionsTest {
         when(collectionWriterMock.getInProgress())
                 .thenReturn(contentWriterMock);
 
-        collections.writeContent(collectionMock, uri.toString(), sessionMock, requestMock, in, false,
-                CollectionEventType.COLLECTION_PAGE_SAVED, false);
+        collections.writeContent(collectionMock, uri.toString(), sessionMock, in, false,
+                CollectionEventType.COLLECTION_PAGE_SAVED);
 
         verify(collectionReaderWriterFactoryMock, times(1)).getWriter(zebedeeMock, collectionMock, sessionMock);
         verify(collectionDescriptionMock, times(1)).getApprovalStatus();
@@ -971,7 +963,7 @@ public class CollectionsTest {
         when(publishedContentMock.exists(uri))
                 .thenReturn(true);
         try {
-            collections.createContent(collectionMock, uri, sessionMock, null, null, null, false);
+            collections.createContent(collectionMock, uri, sessionMock, null, null);
         } catch (ConflictException e) {
             verify(publishedContentMock, times(1)).exists(uri);
             verifyZeroInteractions(zebedeeMock, collectionReaderWriterFactoryMock, collectionDescriptionMock,
@@ -995,7 +987,7 @@ public class CollectionsTest {
                 .thenReturn("Bob")
                 .thenReturn("Steve");
         try {
-            collections.createContent(collectionMock, uri, sessionMock, null, null, null, false);
+            collections.createContent(collectionMock, uri, sessionMock, null, null);
         } catch (ConflictException e) {
             verify(publishedContentMock, times(1)).exists(uri);
             verify(zebedeeMock, times(1)).checkForCollectionBlockingChange(collectionMock, uri);

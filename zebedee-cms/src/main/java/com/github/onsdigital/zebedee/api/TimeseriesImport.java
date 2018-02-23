@@ -37,7 +37,7 @@ public class TimeseriesImport {
                 throw new BadRequestException("This collection has been approved and cannot be saved to.");
             }
 
-            ServletFileUpload upload = Root.zebedee.getCollections().getServletFileUpload();
+            ServletFileUpload upload = Content.getServletFileUpload();
 
             boolean collectionUpdated = false;
             try {

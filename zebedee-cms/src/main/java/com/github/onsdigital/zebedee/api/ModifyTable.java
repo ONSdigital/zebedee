@@ -9,20 +9,18 @@ import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.TableBuilderException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
-import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
 import com.github.onsdigital.zebedee.persistence.model.CollectionHistoryEvent;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.reader.util.RequestUtils;
+import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.util.XlsToHtmlConverter;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
-import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Node;
 
@@ -63,7 +61,7 @@ public class ModifyTable {
      */
     @POST
     public void modifyTable(HttpServletRequest request, HttpServletResponse response)
-            throws IOException, ZebedeeException, ParserConfigurationException, TransformerException, FileUploadException {
+            throws IOException, ZebedeeException, ParserConfigurationException, TransformerException {
 
         Session session = Root.zebedee.getSessionsService().get(request);
         com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request);
@@ -116,21 +114,20 @@ public class ModifyTable {
                 InputStream htmlInputStream = toInputStream(htmlTableStr);
                 InputStream jsonInputStream = toInputStream(tableJson)
         ) {
-            Boolean validateJson = BooleanUtils.toBoolean(StringUtils.defaultIfBlank(request.getParameter("validateJson"), "true"));
 
             String newXlsFilename = Paths.get(newUri + XLS_FILE_EXT).getFileName().toString();
             String currentXlsFilename = Paths.get(currentUri + XLS_FILE_EXT).getFileName().toString();
 
             boolean recursive = false;
             if (!StringUtils.equals(newXlsFilename, currentXlsFilename)) {
-                Root.zebedee.getCollections().writeContent(collection, newUri + XLS_FILE_EXT, session, request,
-                        currentXlsResource.getData(), recursive, null, validateJson);
+                Root.zebedee.getCollections().writeContent(collection, newUri + XLS_FILE_EXT, session,
+                        currentXlsResource.getData(), recursive, null);
             }
 
-            Root.zebedee.getCollections().writeContent(collection, newUri + HTML_FILE_EXT, session, request,
-                    htmlInputStream, recursive, null, validateJson);
-            Root.zebedee.getCollections().writeContent(collection, newUri + JSON_FILE_EXT, session, request,
-                    jsonInputStream, recursive, null, validateJson);
+            Root.zebedee.getCollections().writeContent(collection, newUri + HTML_FILE_EXT, session,
+                    htmlInputStream, recursive, null);
+            Root.zebedee.getCollections().writeContent(collection, newUri + JSON_FILE_EXT, session,
+                    jsonInputStream, recursive, null);
 
             getCollectionHistoryDao().saveCollectionHistoryEvent(new CollectionHistoryEvent(collection, session,
                     COLLECTION_TABLE_MODIFIED, tableModified(newUri)));

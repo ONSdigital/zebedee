@@ -1,15 +1,24 @@
 package com.github.onsdigital.zebedee.api;
 
+import com.github.davidcarboni.encryptedfileupload.EncryptedFileItemFactory;
 import com.github.davidcarboni.restolino.framework.Api;
 import com.github.onsdigital.zebedee.audit.Audit;
-import com.github.onsdigital.zebedee.exceptions.*;
-import com.github.onsdigital.zebedee.session.model.Session;
+import com.github.onsdigital.zebedee.content.util.ContentUtil;
+import com.github.onsdigital.zebedee.exceptions.BadRequestException;
+import com.github.onsdigital.zebedee.exceptions.ConflictException;
+import com.github.onsdigital.zebedee.exceptions.NotFoundException;
+import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
+import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.persistence.CollectionEventType;
 import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.reader.util.ReaderResponseResponseUtils;
 import com.github.onsdigital.zebedee.reader.util.RequestUtils;
-import org.apache.commons.fileupload.FileUploadException;
+import com.github.onsdigital.zebedee.session.model.Session;
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.ProgressListener;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -18,6 +27,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
@@ -69,8 +79,8 @@ public class Content {
      * @throws NotFoundException     If the file cannot be edited for some other reason
      */
     @POST
-    public boolean saveContent(HttpServletRequest request, HttpServletResponse response) throws IOException,
-            ZebedeeException, FileUploadException {
+    public boolean saveContent(HttpServletRequest request, HttpServletResponse response)
+            throws IOException, ZebedeeException {
 
         // We have to get the request InputStream before reading any request parameters
         // otherwise the call to get a request parameter will actually consume the body:
@@ -86,8 +96,16 @@ public class Content {
         CollectionEventType eventType = getEventType(Paths.get(uri));
         Boolean validateJson = BooleanUtils.toBoolean(StringUtils.defaultIfBlank(request.getParameter("validateJson"), "true"));
 
+        if (ServletFileUpload.isMultipartContent(request)) {
+            return handleMultipartUpload(request, session, collection, uri, recursive, eventType);
+        }
+
+        if (validateJson) {
+            requestBody = validateJsonStream(requestBody);
+        }
+
         if (overwriteExisting) {
-            Root.zebedee.getCollections().writeContent(collection, uri, session, request, requestBody, recursive, eventType, validateJson);
+            Root.zebedee.getCollections().writeContent(collection, uri, session, requestBody, recursive, eventType);
             Audit.Event.CONTENT_OVERWRITTEN
                     .parameters()
                     .host(request)
@@ -96,7 +114,7 @@ public class Content {
                     .user(session.getEmail())
                     .log();
         } else {
-            Root.zebedee.getCollections().createContent(collection, uri, session, request, requestBody, eventType, validateJson);
+            Root.zebedee.getCollections().createContent(collection, uri, session, requestBody, eventType);
             Audit.Event.CONTENT_SAVED
                     .parameters()
                     .host(request)
@@ -107,6 +125,87 @@ public class Content {
         }
 
         return true;
+    }
+
+    private boolean handleMultipartUpload(HttpServletRequest request, Session session, Collection collection, String uri, Boolean recursive, CollectionEventType eventType) throws IOException {
+        ServletFileUpload upload = getServletFileUpload();
+
+        try {
+            for (FileItem item : upload.parseRequest(request)) {
+                try (InputStream inputStream = item.getInputStream()) {
+                    Root.zebedee.getCollections().writeContent(collection, uri, session, inputStream, recursive, eventType);
+                    Audit.Event.CONTENT_OVERWRITTEN
+                            .parameters()
+                            .host(request)
+                            .collection(collection)
+                            .content(uri)
+                            .user(session.getEmail())
+                            .log();
+                }
+            }
+        } catch (Exception e) {
+            throw new IOException("Error processing uploaded file", e);
+        }
+
+        return true;
+    }
+
+    /**
+     * Take an input stream that contains json content and ensure its valid.
+     *
+     * @param inputStream
+     * @return
+     */
+    public InputStream validateJsonStream(InputStream inputStream) throws BadRequestException {
+        try {
+            byte[] bytes = IOUtils.toByteArray(inputStream);
+            inputStream.close();
+
+            try (ByteArrayInputStream validationInputStream = new ByteArrayInputStream(bytes)) {
+                ContentUtil.deserialiseContent(validationInputStream);
+            }
+
+            return new ByteArrayInputStream(bytes);
+        } catch (Exception e) {
+            throw new BadRequestException("Validation of page content failed. Please try again");
+        }
+    }
+
+    /**
+     * get a file upload object with progress listener
+     *
+     * @return an upload object
+     */
+    public static ServletFileUpload getServletFileUpload() {
+        // Set up the objects that do all the heavy lifting
+        // PrintWriter out = response.getWriter();
+        EncryptedFileItemFactory factory = new EncryptedFileItemFactory();
+        ServletFileUpload upload = new ServletFileUpload(factory);
+
+        ProgressListener progressListener = getProgressListener();
+        upload.setProgressListener(progressListener);
+        return upload;
+    }
+
+    /**
+     * get a progress listener
+     *
+     * @return a ProgressListener object
+     */
+    private static ProgressListener getProgressListener() {
+        // Set up a progress listener that we can use to power a progress bar
+        return new ProgressListener() {
+            private long megaBytes = -1;
+
+            @Override
+            public void update(long pBytesRead, long pContentLength, int pItems) {
+                long mBytes = pBytesRead / 1000000;
+                if (megaBytes == mBytes) {
+                    return;
+                }
+                megaBytes = mBytes;
+            }
+        };
     }
 
     /**

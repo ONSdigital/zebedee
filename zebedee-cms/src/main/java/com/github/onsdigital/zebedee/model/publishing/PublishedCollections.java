@@ -92,11 +92,11 @@ public class PublishedCollections {
      */
     public void index(Client client, PublishedCollection publishedCollection) throws IOException {
 
-        logInfo("Indexing collection").addParameter("collectionName", publishedCollection.name).log();
+        logInfo("Indexing collection").addParameter("collectionName", publishedCollection.getName()).log();
 
         IndexRequestBuilder indexRequest = client.prepareIndex(index, type);
         indexRequest.setSource(Serialiser.serialise(publishedCollection));
-        indexRequest.setId(publishedCollection.id);
+        indexRequest.setId(publishedCollection.getId());
         ListenableActionFuture<IndexResponse> execution = indexRequest.execute();
         execution.actionGet();
     }
@@ -131,7 +131,8 @@ public class PublishedCollections {
                 String publishStartDate = "";
                 try {
                     publishStartDate = searchHit.field("publishStartDate").getValue().toString();
-                } catch (NullPointerException e) { } // leave as default value
+                } catch (NullPointerException e) {
+                } // leave as default value
 
                 if (StringUtils.isNotEmpty(publishStartDate)) {
                     PublishedCollection collection = new PublishedCollection(

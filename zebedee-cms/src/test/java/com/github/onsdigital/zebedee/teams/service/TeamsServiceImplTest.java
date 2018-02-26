@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
+import java.util.stream.Collectors;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -101,6 +102,29 @@ public class TeamsServiceImplTest {
         List<Team> expected = new ArrayList<>();
         expected.add(teamA);
         expected.add(teamB);
+
+        assertThat(result, equalTo(expected));
+
+        verify(teamsStore, times(1)).listTeams();
+    }
+
+    @Test
+    public void resolveTeamDetails_success() throws Exception {
+        Set<Integer> requestedTeamIDs = new HashSet<>();
+        requestedTeamIDs.add(teamA.getId());
+        requestedTeamIDs.add(teamB.getId());
+
+        teamsList.add(teamA);
+        teamsList.add(teamB);
+
+        List<Team> expected = teamsList.stream()
+                .map(team -> new Team().setName(team.getName()).setId(team.getId()))
+                .collect(Collectors.toList());
+
+        when(teamsStore.listTeams())
+                .thenReturn(teamsList);
+
+        List<Team> result = service.resolveTeamDetails(requestedTeamIDs);
 
         assertThat(result, equalTo(expected));
 

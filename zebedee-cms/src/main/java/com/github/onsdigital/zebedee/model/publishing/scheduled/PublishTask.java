@@ -29,7 +29,7 @@ public class PublishTask implements Runnable {
     private final Zebedee zebedee;
 
     public PublishTask(Zebedee zebedee, Collection collection) {
-        this.collectionId = collection.description.id;
+        this.collectionId = collection.getDescription().getId();
         this.zebedee = zebedee;
     }
 
@@ -50,12 +50,12 @@ public class PublishTask implements Runnable {
                         .addParameter("collectionId", collectionId).log();
 
                 // Switch to manual
-                collection.description.type = CollectionType.manual;
+                collection.getDescription().setType(CollectionType.manual);
 
                 // TODO Alarm message
 
                 // and save
-                String filename = PathUtils.toFilename(collection.description.name) + ".json";
+                String filename = PathUtils.toFilename(collection.getDescription().getName()) + ".json";
                 Path collectionPath = zebedee.getCollections().path.resolve(filename);
                 try (OutputStream output = Files.newOutputStream(collectionPath)) {
                     Serialiser.serialise(output, collection.description);

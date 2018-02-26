@@ -11,7 +11,6 @@ import com.github.onsdigital.zebedee.json.ContentDetail;
 import com.github.onsdigital.zebedee.json.Event;
 import com.github.onsdigital.zebedee.json.EventType;
 import com.github.onsdigital.zebedee.json.PendingDelete;
-import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.CollectionWriter;
 import com.github.onsdigital.zebedee.model.approval.tasks.CollectionPdfGenerator;
@@ -24,6 +23,7 @@ import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.service.BabbagePdfService;
 import com.github.onsdigital.zebedee.service.content.navigation.ContentTreeNavigator;
+import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.util.ContentDetailUtil;
 import com.github.onsdigital.zebedee.util.SlackNotification;
 
@@ -164,7 +164,8 @@ public class ApproveTask implements Callable<Boolean> {
                 logError(e, "Exception saving collection after approval exception").collectionName(collection).log();
             }
 
-            SlackNotification.alarm(String.format("Exception approving collection %s : %s", collection.description.name, e.getMessage()));
+            SlackNotification.alarm(String.format("Exception approving collection %s : %s",
+                    collection.getDescription().getName(), e.getMessage()));
             return false;
         }
     }
@@ -176,7 +177,8 @@ public class ApproveTask implements Callable<Boolean> {
         if (!verified) {
             String message = "Failed verification of time series zip files";
             logInfo(message).collectionName(collection).log();
-            SlackNotification.alarm(message + " in collection " + collection.description.name + ". Unlock the collection and re-approve to try again.");
+            SlackNotification.alarm(message + " in collection " + collection.getDescription().getName() + ". Unlock the " +
+                    "collection and re-approve to try again.");
         }
     }
 

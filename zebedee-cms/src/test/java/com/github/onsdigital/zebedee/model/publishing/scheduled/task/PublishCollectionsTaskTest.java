@@ -34,8 +34,8 @@ public class PublishCollectionsTaskTest extends ZebedeeTestBaseFixture {
     public void shouldCancelTask() throws IOException, ZebedeeException {
 
         CollectionDescription collectionDescription = new CollectionDescription("FirstCollection");
-        collectionDescription.publishDate = new Date();
-        collectionDescription.type = CollectionType.scheduled;
+        collectionDescription.setPublishDate(new Date());
+        collectionDescription.setType(CollectionType.scheduled);
         Collection collection = Collection.create(collectionDescription, zebedee, session);
 
         ArrayList<PublishCollectionTask> publishCollectionTasks = new ArrayList<>();

@@ -83,7 +83,7 @@ public class CollectionHistoryDaoImplTest {
         eventType = randomEvent();
         event = new CollectionHistoryEvent(TEST_COLLECTION_ID, COLLECTION_NAME, session, eventType);
         collectionDescription = new CollectionDescription(COLLECTION_NAME);
-        collectionDescription.id = TEST_COLLECTION_ID;
+        collectionDescription.setId(TEST_COLLECTION_ID);
 
         when(hibernateServiceMock.getSessionFactory())
                 .thenReturn(sessionFactoryMock);

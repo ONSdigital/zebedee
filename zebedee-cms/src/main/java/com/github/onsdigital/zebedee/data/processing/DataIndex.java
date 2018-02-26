@@ -57,12 +57,15 @@ public class DataIndex {
     public void reindex() {
         indexBuilt = false;
         Runnable build = () -> {
+            logInfo("Start building data index.").log();
+            long startTime = System.nanoTime();
             try {
                 Files.walkFileTree(contentReader.getRootFolder(), new IndexBuilder(index, contentReader));
             } catch (IOException e) {
-                logError(e);
+                logError(e, "Failed to build data index").log();
             }
-            logInfo("Data index built.").addParameter("entries", index.size()).log();
+            long duration = System.nanoTime() - startTime;
+            logInfo("Finished building data index.").addParameter("entries", index.size()).addParameter("duration_ns", duration).log();
             indexBuilt = true;
         };
         pool.submit(build);

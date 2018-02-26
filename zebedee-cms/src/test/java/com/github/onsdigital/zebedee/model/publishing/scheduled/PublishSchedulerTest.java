@@ -36,12 +36,12 @@ public class PublishSchedulerTest extends ZebedeeTestBaseFixture {
 
         // Given a scheduled collection
         CollectionDescription description = new CollectionDescription("collectionName");
-        description.type = CollectionType.scheduled;
+        description.setType(CollectionType.scheduled);
         description.approvalStatus = ApprovalStatus.COMPLETE;
-        description.publishDate = DateTime.now().plusSeconds(2000).toDate();
+        description.setPublishDate(DateTime.now().plusSeconds(2000).toDate());
         Collection collection = Collection.create(description, zebedee, session);
-        Date startDate = description.publishDate;
-        Date prePublishStartDate = new DateTime(description.publishDate).minusSeconds(1).toDate();
+        Date startDate = description.getPublishDate();
+        Date prePublishStartDate = new DateTime(description.getPublishDate()).minusSeconds(1).toDate();
 
         // When the collection is scheduled for pre-publish
         scheduler.schedulePrePublish(collection, zebedee, prePublishStartDate, startDate);
@@ -52,7 +52,7 @@ public class PublishSchedulerTest extends ZebedeeTestBaseFixture {
         Assert.assertNotNull(prePublishTaskData);
         ScheduledPublishTaskData taskData = prePublishTaskData.get(0);
         Assert.assertNotNull(taskData);
-        Assert.assertTrue(taskData.collectionIds.contains(description.id));
+        Assert.assertTrue(taskData.collectionIds.contains(description.getId()));
 
         // check scheduled time is as expected within 50ms tolerance
         Assert.assertEquals(prePublishStartDate.getTime() / 100, taskData.scheduledPublishDate.getTime() / 100);
@@ -66,12 +66,12 @@ public class PublishSchedulerTest extends ZebedeeTestBaseFixture {
 
         // Given a scheduled collection
         CollectionDescription description = new CollectionDescription("collectionName");
-        description.type = CollectionType.scheduled;
+        description.setType(CollectionType.scheduled);
         description.approvalStatus = ApprovalStatus.COMPLETE;
-        description.publishDate = DateTime.now().plusSeconds(2000).toDate();
+        description.setPublishDate(DateTime.now().plusSeconds(2000).toDate());
         Collection collection = Collection.create(description, zebedee, session);
-        Date startDate = description.publishDate;
-        Date prePublishStartDate = new DateTime(description.publishDate).minusSeconds(1).toDate();
+        Date startDate = description.getPublishDate();
+        Date prePublishStartDate = new DateTime(description.getPublishDate()).minusSeconds(1).toDate();
         scheduler.schedulePrePublish(collection, zebedee, prePublishStartDate, startDate);
 
         // When we cancel the scheduled collection publish
@@ -82,7 +82,7 @@ public class PublishSchedulerTest extends ZebedeeTestBaseFixture {
         Assert.assertNotNull(prePublishTaskData);
         ScheduledPublishTaskData taskData = prePublishTaskData.get(0);
         Assert.assertNotNull(taskData);
-        Assert.assertFalse(taskData.collectionIds.contains(description.id));
+        Assert.assertFalse(taskData.collectionIds.contains(description.getId()));
     }
 
     @Test
@@ -90,12 +90,12 @@ public class PublishSchedulerTest extends ZebedeeTestBaseFixture {
 
         // Given a scheduled collection that has been deleted.
         CollectionDescription description = new CollectionDescription("collectionName");
-        description.type = CollectionType.scheduled;
+        description.setType(CollectionType.scheduled);
         description.approvalStatus = ApprovalStatus.COMPLETE;
-        description.publishDate = DateTime.now().plusSeconds(2000).toDate();
+        description.setPublishDate(DateTime.now().plusSeconds(2000).toDate());
         Collection collection = Collection.create(description, zebedee, session);
-        Date startDate = description.publishDate;
-        Date prePublishStartDate = new DateTime(description.publishDate).minusSeconds(1).toDate();
+        Date startDate = description.getPublishDate();
+        Date prePublishStartDate = new DateTime(description.getPublishDate()).minusSeconds(1).toDate();
         scheduler.schedulePrePublish(collection, zebedee, prePublishStartDate, startDate);
         zebedee.getCollections().delete(collection, session);
 
@@ -107,7 +107,7 @@ public class PublishSchedulerTest extends ZebedeeTestBaseFixture {
         Assert.assertNotNull(prePublishTaskData);
         ScheduledPublishTaskData taskData = prePublishTaskData.get(0);
         Assert.assertNotNull(taskData);
-        Assert.assertFalse(taskData.collectionIds.contains(description.id));
+        Assert.assertFalse(taskData.collectionIds.contains(description.getId()));
     }
 
     @Test
@@ -115,13 +115,13 @@ public class PublishSchedulerTest extends ZebedeeTestBaseFixture {
 
         // Given a scheduled collection
         CollectionDescription description = new CollectionDescription("collectionName");
-        description.type = CollectionType.scheduled;
+        description.setType(CollectionType.scheduled);
         description.approvalStatus = ApprovalStatus.COMPLETE;
-        description.publishDate = DateTime.now().plusSeconds(2000).toDate();
+        description.setPublishDate(DateTime.now().plusSeconds(2000).toDate());
         Collection collection = Collection.create(description, zebedee, session);
 
-        Date startDate = description.publishDate;
-        Date prePublishStartDate = new DateTime(description.publishDate).minusSeconds(1).toDate();
+        Date startDate = description.getPublishDate();
+        Date prePublishStartDate = new DateTime(description.getPublishDate()).minusSeconds(1).toDate();
         scheduler.schedulePrePublish(collection, zebedee, prePublishStartDate, startDate);
 
         // When the collection is deleted but not removed from the scheduler.
@@ -139,21 +139,21 @@ public class PublishSchedulerTest extends ZebedeeTestBaseFixture {
 
         // Given two scheduled collections
         CollectionDescription description = new CollectionDescription("collectionName");
-        description.type = CollectionType.scheduled;
+        description.setType(CollectionType.scheduled);
         description.approvalStatus = ApprovalStatus.COMPLETE;
-        description.publishDate = DateTime.now().plusSeconds(2000).toDate();
+        description.setPublishDate(DateTime.now().plusSeconds(2000).toDate());
         Collection collection = Collection.create(description, zebedee, session);
-        Date startDate = description.publishDate;
-        Date prePublishStartDate = new DateTime(description.publishDate).minusSeconds(1).toDate();
+        Date startDate = description.getPublishDate();
+        Date prePublishStartDate = new DateTime(description.getPublishDate()).minusSeconds(1).toDate();
         scheduler.schedulePrePublish(collection, zebedee, prePublishStartDate, startDate);
 
         CollectionDescription description2 = new CollectionDescription("collection2");
-        description2.type = CollectionType.scheduled;
+        description2.setType(CollectionType.scheduled);
         description.approvalStatus = ApprovalStatus.COMPLETE;
-        description2.publishDate = DateTime.now().plusSeconds(3000).toDate();
+        description2.setPublishDate(DateTime.now().plusSeconds(3000).toDate());
         Collection collection2 = Collection.create(description2, zebedee, session);
-        Date startDate2 = description2.publishDate;
-        Date prePublishStartDate2 = new DateTime(description2.publishDate).minusSeconds(1).toDate();
+        Date startDate2 = description2.getPublishDate();
+        Date prePublishStartDate2 = new DateTime(description2.getPublishDate()).minusSeconds(1).toDate();
         scheduler.schedulePrePublish(collection2, zebedee, prePublishStartDate2, startDate2);
 
         // When the second collection is cancelled.
@@ -164,6 +164,6 @@ public class PublishSchedulerTest extends ZebedeeTestBaseFixture {
         Assert.assertNotNull(prePublishTaskData);
         ScheduledPublishTaskData taskData = prePublishTaskData.get(1);
         Assert.assertNotNull(taskData);
-        Assert.assertFalse(taskData.collectionIds.contains(description2.id));
+        Assert.assertFalse(taskData.collectionIds.contains(description2.getId()));
     }
 }

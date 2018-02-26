@@ -41,6 +41,10 @@
         <appender-ref ref="PLAIN_TEXT"/>
     </logger>
 
+    <logger name="com.github.davidcarboni.restolino" level="warn" additivity="false">
+        <appender-ref ref="PLAIN_TEXT"/>
+    </logger>
+
     <root level="info">
         <appender-ref ref="STDOUT"/>
     </root>

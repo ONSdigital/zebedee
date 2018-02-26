@@ -117,6 +117,12 @@ public class Configuration {
     public static String getAuditDBURL() {
         return StringUtils.defaultIfBlank(getValue("db_audit_url"), "");
     }
+    public static String getAuditDBUsername() {
+        return StringUtils.defaultIfBlank(getValue("db_audit_username"), "");
+    }
+    public static String getAuditDBPassword() {
+        return StringUtils.defaultIfBlank(getValue("db_audit_password"), "");
+    }
 
     /**
      * Gets a configured value for the given key from either the system

@@ -10,7 +10,13 @@ import com.github.onsdigital.zebedee.model.publishing.scheduled.task.PublishColl
 import com.github.onsdigital.zebedee.model.publishing.scheduled.task.PublishCollectionsTask;
 import org.joda.time.DateTime;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
@@ -27,7 +33,7 @@ public class PublishScheduler extends Scheduler {
     @Override
     protected void schedule(Collection collection, Zebedee zebedee) {
         logInfo("Scheduling collection using optimised publisher").collectionName(collection).log();
-        Date publishStartDate = collection.description.publishDate;
+        Date publishStartDate = collection.getDescription().getPublishDate();
         int getPreProcessSecondsBeforePublish = Configuration.getPreProcessSecondsBeforePublish();
         Date prePublishStartDate = new DateTime(publishStartDate).minusSeconds(getPreProcessSecondsBeforePublish).toDate();
 

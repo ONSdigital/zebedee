@@ -15,12 +15,12 @@ public interface DatasetService {
     /**
      * Update a dataset for the given ID to the collection for the given collectionID.
      */
-    CollectionDataset updateDatasetInCollection(String collectionID, String datasetID, CollectionDataset updatedDataset) throws ZebedeeException, IOException, DatasetAPIException;
+    CollectionDataset updateDatasetInCollection(String collectionID, String datasetID, CollectionDataset updatedDataset, String user) throws ZebedeeException, IOException, DatasetAPIException;
 
     /**
      * Update the dataset version to the collection for the collectionID.
      */
-    CollectionDatasetVersion updateDatasetVersionInCollection(String collectionID, String datasetID, String edition, String version, CollectionDatasetVersion updatedVersion) throws ZebedeeException, IOException, DatasetAPIException;
+    CollectionDatasetVersion updateDatasetVersionInCollection(String collectionID, String datasetID, String edition, String version, CollectionDatasetVersion updatedVersion, String user) throws ZebedeeException, IOException, DatasetAPIException;
 
     /**
      * Remove the dataset for the given ID from the collection for the given collectionID.

@@ -36,7 +36,7 @@ public class ZebedeeDatasetService implements DatasetService {
      * Add the dataset for the given datasetID to the collection for the collectionID.
      */
     @Override
-    public CollectionDataset updateDatasetInCollection(String collectionID, String datasetID, CollectionDataset updatedDataset) throws ZebedeeException, IOException, DatasetAPIException {
+    public CollectionDataset updateDatasetInCollection(String collectionID, String datasetID, CollectionDataset updatedDataset, String user) throws ZebedeeException, IOException, DatasetAPIException {
 
         Collection collection = zebedeeCms.getCollection(collectionID);
         if (collection == null) {
@@ -53,6 +53,8 @@ public class ZebedeeDatasetService implements DatasetService {
             collectionDataset.setId(datasetID);
         }
 
+        collectionDataset.setLastEditedBy(user);
+        
         if (updatedDataset != null && updatedDataset.getState() != null) {
             collectionDataset.setState(updatedDataset.getState());
         }
@@ -101,7 +103,7 @@ public class ZebedeeDatasetService implements DatasetService {
      * Add the dataset version to the collection for the collectionID.
      */
     @Override
-    public CollectionDatasetVersion updateDatasetVersionInCollection(String collectionID, String datasetID, String edition, String version, CollectionDatasetVersion updatedVersion) throws ZebedeeException, IOException, DatasetAPIException {
+    public CollectionDatasetVersion updateDatasetVersionInCollection(String collectionID, String datasetID, String edition, String version, CollectionDatasetVersion updatedVersion, String user) throws ZebedeeException, IOException, DatasetAPIException {
 
         Collection collection = zebedeeCms.getCollection(collectionID);
         if (collection == null) {

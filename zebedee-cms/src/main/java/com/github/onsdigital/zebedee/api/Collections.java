@@ -115,6 +115,7 @@ public class Collections {
     public void put(HttpServletRequest request, HttpServletResponse response) throws ZebedeeException, IOException, DatasetAPIException {
 
         Session session = zebedeeCmsService.getSession(request);
+        String user = session.getEmail();
         if (!zebedeeCmsService.getPermissions().canEdit(session)) {
             logInfo("Forbidden request made to the collection endpoint").log();
             response.setStatus(HttpStatus.SC_FORBIDDEN);
@@ -133,7 +134,7 @@ public class Collections {
             switch (pathSegments.size()) {
                 case 4: // /collections/{collection_id}/datasets/{dataset_id}
 
-                    updateDatasetInCollection(collectionID, datasetID, request);
+                    updateDatasetInCollection(collectionID, datasetID, request, user);
                     break;
 
                 case 8: // /collections/{collection_id}/datasets/{dataset_id}/editions/{}/versions/{}
@@ -141,7 +142,7 @@ public class Collections {
                     String edition = pathSegments.get(5);
                     String version = pathSegments.get(7);
 
-                    updateDatasetVersionInCollection(collectionID, datasetID, edition, version, request);
+                    updateDatasetVersionInCollection(collectionID, datasetID, edition, version, request, user);
                     break;
 
                 default:
@@ -194,7 +195,7 @@ public class Collections {
         }
     }
 
-    private void updateDatasetVersionInCollection(String collectionID, String datasetID, String edition, String version, HttpServletRequest request) throws ZebedeeException, IOException, DatasetAPIException {
+    private void updateDatasetVersionInCollection(String collectionID, String datasetID, String edition, String version, HttpServletRequest request, String user) throws ZebedeeException, IOException, DatasetAPIException {
         logInfo("PUT called on /collections/{}/datasets/{}/editions/{}/versions/{} endpoint")
                 .addParameter("collectionID", collectionID)
                 .addParameter("datasetID", datasetID)
@@ -205,14 +206,14 @@ public class Collections {
         try (InputStream body = request.getInputStream()){
 
             CollectionDatasetVersion datasetVersion = ContentUtil.deserialise(body, CollectionDatasetVersion.class);
-            datasetService.updateDatasetVersionInCollection(collectionID, datasetID, edition, version, datasetVersion);
+            datasetService.updateDatasetVersionInCollection(collectionID, datasetID, edition, version, datasetVersion, user);
 
         } catch (JsonSyntaxException ex) {
             throw new BadRequestException(ex.getMessage());
         }
     }
 
-    private void updateDatasetInCollection(String collectionID, String datasetID, HttpServletRequest request) throws ZebedeeException, IOException, DatasetAPIException {
+    private void updateDatasetInCollection(String collectionID, String datasetID, HttpServletRequest request, String user) throws ZebedeeException, IOException, DatasetAPIException {
         logInfo("PUT called on /collections/{}/datasets/{} endpoint")
                 .addParameter("collectionID", collectionID)
                 .addParameter("datasetID", datasetID)
@@ -220,7 +221,7 @@ public class Collections {
         try (InputStream body = request.getInputStream()){
 
             CollectionDataset dataset = ContentUtil.deserialise(body, CollectionDataset.class);
-            datasetService.updateDatasetInCollection(collectionID, datasetID, dataset);
+            datasetService.updateDatasetInCollection(collectionID, datasetID, dataset, user);
 
         } catch (JsonSyntaxException ex) {
             throw new BadRequestException(ex.getMessage());

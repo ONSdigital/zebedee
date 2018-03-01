@@ -826,6 +826,10 @@ public class Collection {
         return inProgress.toPath(uri);
     }
 
+    public Path getPath() {
+        return path;
+    }
+
     public List<String> inProgressUris() throws IOException {
         return inProgress.uris();
     }

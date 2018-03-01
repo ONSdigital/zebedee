@@ -35,7 +35,11 @@ public class ZebedeeDatasetService implements DatasetService {
         this.zebedeeCms = zebedeeCms;
     }
 
-    private ContentStatus updatedDatasetStateInCollection(ContentStatus currentState, ContentStatus newState, String lastEditedBy, String user) throws ForbiddenException {
+    private ContentStatus updatedStateInCollection(ContentStatus currentState, ContentStatus newState, String lastEditedBy, String user) throws ForbiddenException {
+        if (currentState == null) {
+            currentState = ContentStatus.InProgress;
+        }
+
         // The same user can't review edits they've submitted for review
         if (!currentState.equals(ContentStatus.Reviewed) && newState.equals(ContentStatus.Reviewed) && lastEditedBy.equalsIgnoreCase(user)) {
             throw new ForbiddenException("User " + user + "doesn't have permission to review a dataset they completed");
@@ -81,7 +85,9 @@ public class ZebedeeDatasetService implements DatasetService {
         }
 
         if (updatedDataset != null && updatedDataset.getState() != null) {
-            collectionDataset.setState(updatedDatasetStateInCollection(collectionDataset.getState(), updatedDataset.getState(), collectionDataset.getLastEditedBy(), user));
+            collectionDataset.setState(updatedStateInCollection(collectionDataset.getState(), updatedDataset.getState(), collectionDataset.getLastEditedBy(), user));
+        } else {
+            collectionDataset.setState(ContentStatus.InProgress);
         }
 
         collectionDataset.setLastEditedBy(user);
@@ -153,8 +159,12 @@ public class ZebedeeDatasetService implements DatasetService {
         }
 
         if (updatedVersion != null && updatedVersion.getState() != null) {
-            collectionDatasetVersion.setState(updatedVersion.getState());
+            collectionDatasetVersion.setState(updatedStateInCollection(collectionDatasetVersion.getState(), updatedVersion.getState(), collectionDatasetVersion.getLastEditedBy(), user));
+        } else {
+            collectionDatasetVersion.setState(ContentStatus.InProgress);
         }
+
+        collectionDatasetVersion.setLastEditedBy(user);
 
         Dataset dataset = datasetClient.getDataset(datasetID);
         DatasetVersion datasetVersion = datasetClient.getDatasetVersion(datasetID, edition, version);

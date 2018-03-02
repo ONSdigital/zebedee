@@ -4,8 +4,8 @@ import com.github.davidcarboni.restolino.framework.Api;
 import com.github.onsdigital.zebedee.audit.Audit;
 import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.content.page.APIDatasetLandingPageCreationHook;
-import com.github.onsdigital.zebedee.content.page.PageUpdateHook;
 import com.github.onsdigital.zebedee.content.page.PageTypeUpdateHook;
+import com.github.onsdigital.zebedee.content.page.PageUpdateHook;
 import com.github.onsdigital.zebedee.content.page.base.PageType;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
@@ -23,6 +23,7 @@ import javax.ws.rs.POST;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
@@ -32,6 +33,8 @@ public class Page {
 
     private ZebedeeCmsService zebedeeCmsService;
     private PageUpdateHook pageCreationHook;
+
+    private static final URI websiteURI = URI.create(Configuration.getBabbageUrl());
 
     /**
      * Default constructor used instantiates dependencies itself.
@@ -45,7 +48,7 @@ public class Page {
                 Configuration.getDatasetAPIAuthToken());
 
         APIDatasetLandingPageCreationHook datasetLandingPageCreationHook =
-                new APIDatasetLandingPageCreationHook(datasetAPIClient);
+                new APIDatasetLandingPageCreationHook(datasetAPIClient, websiteURI);
 
         Map<PageType, PageUpdateHook> creationHooks = new HashMap<>();
         creationHooks.put(PageType.api_dataset_landing_page, datasetLandingPageCreationHook);

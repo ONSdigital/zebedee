@@ -4,8 +4,11 @@ import com.github.onsdigital.zebedee.content.page.statistics.dataset.ApiDatasetL
 import dp.api.dataset.DatasetClient;
 import dp.api.dataset.exception.DatasetAPIException;
 import dp.api.dataset.model.Dataset;
+import org.apache.http.client.utils.URIBuilder;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 /**
  * A PageUpdateHook implementation for when an ApiDatasetLandingPage is created.
@@ -13,13 +16,16 @@ import java.io.IOException;
 public class APIDatasetLandingPageCreationHook implements PageUpdateHook<ApiDatasetLandingPage> {
 
     private DatasetClient datasetAPIClient;
+    private URI websiteUri;
 
     /**
      * Create a new instance using the given dataset client.
      * @param datasetAPIClient
+     * @param websiteUri
      */
-    public APIDatasetLandingPageCreationHook(DatasetClient datasetAPIClient) {
+    public APIDatasetLandingPageCreationHook(DatasetClient datasetAPIClient, URI websiteUri) {
         this.datasetAPIClient = datasetAPIClient;
+        this.websiteUri = websiteUri;
     }
 
     /**
@@ -35,8 +41,15 @@ public class APIDatasetLandingPageCreationHook implements PageUpdateHook<ApiData
         dataset.setId(page.getapiDatasetId());
 
         try {
+
+            URI datasetUri = new URIBuilder(websiteUri)
+                    .setPath(uri)
+                    .build();
+
+            dataset.setUri(datasetUri.toString());
+
             datasetAPIClient.createDataset(page.getapiDatasetId(), dataset);
-        } catch (DatasetAPIException e) {
+        } catch (DatasetAPIException | URISyntaxException e) {
             throw new RuntimeException(e);
         }
     }

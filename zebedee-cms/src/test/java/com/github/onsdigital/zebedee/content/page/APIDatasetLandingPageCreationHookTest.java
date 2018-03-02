@@ -6,9 +6,12 @@ import dp.api.dataset.exception.DatasetAPIException;
 import dp.api.dataset.exception.UnexpectedResponseException;
 import dp.api.dataset.model.Dataset;
 import org.apache.http.HttpStatus;
+import org.junit.Assert;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 
 import java.io.IOException;
+import java.net.URI;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
@@ -20,6 +23,9 @@ import static org.mockito.Mockito.when;
 
 public class APIDatasetLandingPageCreationHookTest {
 
+    private URI websiteUri = URI.create("http://localhost:8080");
+    private String uri = "some/uri";
+
     @Test
     public void testDatasetLandingPageCreationHook_onPageUpdated() throws IOException, DatasetAPIException {
 
@@ -30,19 +36,24 @@ public class APIDatasetLandingPageCreationHookTest {
         DatasetClient mockDatasetClient = mock(DatasetClient.class);
         when(mockDatasetClient.createDataset(anyString(), any(Dataset.class))).thenReturn(dataset);
 
-        APIDatasetLandingPageCreationHook creationHook = new APIDatasetLandingPageCreationHook(mockDatasetClient);
+        APIDatasetLandingPageCreationHook creationHook = new APIDatasetLandingPageCreationHook(mockDatasetClient, websiteUri);
 
         ApiDatasetLandingPage page = new ApiDatasetLandingPage();
         page.setapiDatasetId(datasetId);
 
         // When onPageUpdated is called
-        creationHook.onPageUpdated(page, "some/uri");
+        creationHook.onPageUpdated(page, uri);
+
+        ArgumentCaptor<Dataset> datasetCaptor = ArgumentCaptor.forClass(Dataset.class);
 
         // Then the dataset client is called to create the dataset
-        verify(mockDatasetClient, times(1)).createDataset(anyString(), any(Dataset.class));
+        verify(mockDatasetClient, times(1)).createDataset(anyString(), datasetCaptor.capture());
         verify(mockDatasetClient, only()).createDataset(anyString(), any(Dataset.class));
-    }
 
+        // Then the dataset given to the dataset API client has the expected values set
+        String expectedDatasetUri = websiteUri.resolve(uri).toString();
+        Assert.assertEquals(expectedDatasetUri, datasetCaptor.getValue().getUri());
+    }
 
     @Test(expected = RuntimeException.class)
     public void testDatasetLandingPageCreationHook_onPageUpdated_exception() throws IOException, DatasetAPIException {
@@ -52,7 +63,7 @@ public class APIDatasetLandingPageCreationHookTest {
         when(mockDatasetClient.createDataset(anyString(), any(Dataset.class)))
                 .thenThrow(new UnexpectedResponseException("broken", HttpStatus.SC_FORBIDDEN));
 
-        APIDatasetLandingPageCreationHook creationHook = new APIDatasetLandingPageCreationHook(mockDatasetClient);
+        APIDatasetLandingPageCreationHook creationHook = new APIDatasetLandingPageCreationHook(mockDatasetClient, websiteUri);
         ApiDatasetLandingPage page = new ApiDatasetLandingPage();
 
         // When onPageUpdated is called

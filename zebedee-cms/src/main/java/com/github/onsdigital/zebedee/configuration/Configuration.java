@@ -10,6 +10,7 @@ import java.util.ArrayList;
 public class Configuration {
 
     private static final String DEFAULT_WEBSITE_URL = "http://localhost:8080";
+    private static final String DEFAULT_PUBLIC_WEBSITE_URL = "http://localhost:8080";
     private static final String DEFAULT_FLORENCE_URL = "http://localhost:8081";
     private static final String DEFAULT_BRIAN_URL = "http://localhost:8083";
     private static final String DEFAULT_TRAIN_URL = "http://localhost:8084";
@@ -66,6 +67,10 @@ public class Configuration {
         } catch (Exception e) {
             return DEFAULT_SECONDS_TO_CACHE_AFTER_SCHEDULED_PUBLISH;
         }
+    }
+
+    public static String getPublicWebsiteUrl() {
+        return StringUtils.defaultIfBlank(getValue("PUBLIC_WEBSITE_URL"), DEFAULT_PUBLIC_WEBSITE_URL);
     }
 
     public static String getBabbageUrl() {

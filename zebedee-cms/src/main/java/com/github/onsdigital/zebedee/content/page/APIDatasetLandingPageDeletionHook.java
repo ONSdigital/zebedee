@@ -3,27 +3,22 @@ package com.github.onsdigital.zebedee.content.page;
 import com.github.onsdigital.zebedee.content.page.statistics.dataset.ApiDatasetLandingPage;
 import dp.api.dataset.DatasetClient;
 import dp.api.dataset.exception.DatasetAPIException;
-import dp.api.dataset.model.Dataset;
 
 import java.io.IOException;
-import java.net.URI;
 
 /**
- * A PageUpdateHook implementation for when an ApiDatasetLandingPage is created.
+ * A PageUpdateHook implementation for when an ApiDatasetLandingPage is deleted.
  */
-public class APIDatasetLandingPageCreationHook implements PageUpdateHook<ApiDatasetLandingPage> {
+public class APIDatasetLandingPageDeletionHook implements PageUpdateHook<ApiDatasetLandingPage> {
 
     private DatasetClient datasetAPIClient;
-    private URI websiteUri;
 
     /**
      * Create a new instance using the given dataset client.
      * @param datasetAPIClient
-     * @param websiteUri
      */
-    public APIDatasetLandingPageCreationHook(DatasetClient datasetAPIClient, URI websiteUri) {
+    public APIDatasetLandingPageDeletionHook(DatasetClient datasetAPIClient) {
         this.datasetAPIClient = datasetAPIClient;
-        this.websiteUri = websiteUri;
     }
 
     /**
@@ -35,14 +30,8 @@ public class APIDatasetLandingPageCreationHook implements PageUpdateHook<ApiData
     @Override
     public void onPageUpdated(ApiDatasetLandingPage page, String uri) throws IOException {
 
-        Dataset dataset = new Dataset();
-        dataset.setId(page.getapiDatasetId());
-
-        URI datasetUri = websiteUri.resolve(uri);
-        dataset.setUri(datasetUri.toString());
-
         try {
-            datasetAPIClient.createDataset(page.getapiDatasetId(), dataset);
+            datasetAPIClient.deleteDataset(page.getapiDatasetId());
         } catch (DatasetAPIException e) {
             throw new RuntimeException(e);
         }

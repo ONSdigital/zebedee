@@ -16,6 +16,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.file.Paths;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -88,6 +89,19 @@ public class PageTest extends ZebedeeAPIBaseTestCase {
 
         // Then the page update hook is called
         assertTrue(pageDeletionHook.wasOnPageUpdatedCalled());
+    }
+
+    @Test
+    public void testTrimZebedeeSuffix() {
+
+        // Given a uri
+        String expectedUri = "/some/uri";
+
+        // When trimZebedeeFileSuffix is called with a URI containing the suffix
+        String uri = Page.trimZebedeeFileSuffix(expectedUri + Page.zebedeeFileSuffix);
+
+        // Then the returned URI does not have the suffix
+        assertEquals(expectedUri, uri);
     }
 
     @Override

@@ -42,7 +42,8 @@ public class Page {
     private PageUpdateHook pageCreationHook;
     private PageUpdateHook pageDeletionHook;
 
-    private static final URI websiteURI = URI.create(Configuration.getBabbageUrl());
+    static final String zebedeeFileSuffix = "/data.json";
+    static final URI websiteURI = URI.create(Configuration.getBabbageUrl());
 
     /**
      * Default constructor used instantiates dependencies itself.
@@ -114,6 +115,7 @@ public class Page {
             Session session = zebedeeCmsService.getSession(request);
             com.github.onsdigital.zebedee.model.Collection collection = zebedeeCmsService.getCollection(request);
             String uri = request.getParameter("uri");
+            uri = trimZebedeeFileSuffix(uri);
 
             byte[] bytes = IOUtils.toByteArray(requestBody);
             com.github.onsdigital.zebedee.content.page.base.Page page;
@@ -130,7 +132,7 @@ public class Page {
             try (ByteArrayInputStream inputStream = new ByteArrayInputStream(bytes)) {
                 zebedeeCmsService.getZebedee().getCollections().createContent(
                         collection,
-                        uri,
+                        uri + zebedeeFileSuffix,
                         session,
                         request,
                         inputStream,
@@ -145,7 +147,6 @@ public class Page {
                     .content(uri)
                     .user(session.getEmail())
                     .log();
-
         }
     }
 
@@ -169,6 +170,7 @@ public class Page {
 
         Collection collection = zebedeeCmsService.getCollection(request);
         String uri = request.getParameter("uri");
+        uri = trimZebedeeFileSuffix(uri);
 
         CollectionReader collectionReader = zebedeeCmsService.getZebedeeCollectionReader(collection, session);
         com.github.onsdigital.zebedee.content.page.base.Page page = collectionReader.getContent(uri);
@@ -176,7 +178,11 @@ public class Page {
         if (pageDeletionHook != null)
             pageDeletionHook.onPageUpdated(page, uri);
 
-        boolean result = zebedeeCmsService.getZebedee().getCollections().deleteContent(collection, uri, session);
+        boolean result = zebedeeCmsService.getZebedee().getCollections().deleteContent(
+                collection,
+                uri + zebedeeFileSuffix,
+                session);
+
         if (result) {
             Audit.Event.CONTENT_DELETED
                     .parameters()
@@ -188,5 +194,13 @@ public class Page {
         }
 
         return result;
+    }
+
+    static String trimZebedeeFileSuffix(String uri) {
+
+        if (uri.endsWith(zebedeeFileSuffix))
+            return uri.substring(0, uri.length() - zebedeeFileSuffix.length());
+
+        return uri;
     }
 }

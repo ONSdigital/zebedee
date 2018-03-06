@@ -4,6 +4,7 @@ import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.content.page.MockPageUpdateHook;
 import com.github.onsdigital.zebedee.content.page.statistics.dataset.ApiDatasetLandingPage;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
+import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.model.Collections;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
@@ -17,6 +18,7 @@ import java.io.IOException;
 import java.nio.file.Paths;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -90,6 +92,35 @@ public class PageTest extends ZebedeeAPIBaseTestCase {
         // Then the page update hook is called
         assertTrue(pageDeletionHook.wasOnPageUpdatedCalled());
     }
+
+
+    @Test
+    public void testPage_deletePage_doesNotExist() throws ZebedeeException, IOException {
+
+        // Given a dataset landing page that does not already exist
+        ZebedeeCmsService zebedeeCmsService = mock(ZebedeeCmsService.class);
+        CollectionReader collectionReader = mock(CollectionReader.class);
+        com.github.onsdigital.zebedee.model.Collection collection =
+                mock(com.github.onsdigital.zebedee.model.Collection.class);
+
+        String uri = "/";
+
+        when(mockRequest.getParameter("uri")).thenReturn(uri);
+        when(collection.getPath()).thenReturn(Paths.get(uri));
+        when(collectionReader.getContent(uri)).thenThrow(new NotFoundException("page not found"));
+        when(zebedeeCmsService.getSession(mockRequest)).thenReturn(session);
+        when(zebedeeCmsService.getCollection(mockRequest)).thenReturn(collection);
+        when(zebedeeCmsService.getZebedeeCollectionReader(collection, session)).thenReturn(collectionReader);
+
+        Page page = new Page(zebedeeCmsService, pageCreationHook, pageDeletionHook);
+
+        // When delete is called
+        page.deletePage(mockRequest, mockResponse);
+
+        // Then the page update hook is called, and no exceptions are thrown
+        assertFalse(pageDeletionHook.wasOnPageUpdatedCalled());
+    }
+
 
     @Test
     public void testTrimZebedeeSuffix() {

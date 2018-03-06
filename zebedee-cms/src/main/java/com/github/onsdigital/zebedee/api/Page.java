@@ -171,7 +171,14 @@ public class Page {
         uri = trimZebedeeFileSuffix(uri);
 
         CollectionReader collectionReader = zebedeeCmsService.getZebedeeCollectionReader(collection, session);
-        com.github.onsdigital.zebedee.content.page.base.Page page = collectionReader.getContent(uri);
+
+        com.github.onsdigital.zebedee.content.page.base.Page page;
+
+        try {
+            page = collectionReader.getContent(uri);
+        } catch (NotFoundException ex) {
+            return true; // idempotent
+        }
 
         if (pageDeletionHook != null)
             pageDeletionHook.onPageUpdated(page, uri);

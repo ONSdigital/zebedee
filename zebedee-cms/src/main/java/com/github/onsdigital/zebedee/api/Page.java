@@ -37,9 +37,9 @@ import java.util.Map;
 @Api
 public class Page {
 
-    private ZebedeeCmsService zebedeeCmsService;
-    private PageUpdateHook pageCreationHook;
-    private PageUpdateHook pageDeletionHook;
+    private final ZebedeeCmsService zebedeeCmsService;
+    private final PageUpdateHook pageCreationHook;
+    private final PageUpdateHook pageDeletionHook;
 
     static final String zebedeeFileSuffix = "/data.json";
 
@@ -54,28 +54,31 @@ public class Page {
                 Configuration.getDatasetAPIURL(),
                 Configuration.getDatasetAPIAuthToken());
 
-        initialisePageCreationHook(datasetAPIClient);
-        initialisePageDeletionHooks(datasetAPIClient);
+        Map<PageType, PageUpdateHook> creationHooks = initialisePageCreationHooks(datasetAPIClient);
+        Map<PageType, PageUpdateHook> deletionHooks = initialisePageDeletionHooks(datasetAPIClient);
+
+        pageDeletionHook = new PageTypeUpdateHook(deletionHooks);
+        pageCreationHook = new PageTypeUpdateHook(creationHooks);
     }
 
-    private void initialisePageDeletionHooks(DatasetAPIClient datasetAPIClient) {
+    private Map<PageType, PageUpdateHook> initialisePageDeletionHooks(DatasetAPIClient datasetAPIClient) {
         APIDatasetLandingPageDeletionHook datasetLandingPageDeletionHook =
                 new APIDatasetLandingPageDeletionHook(datasetAPIClient);
 
         Map<PageType, PageUpdateHook> deletionHooks = new HashMap<>();
         deletionHooks.put(PageType.api_dataset_landing_page, datasetLandingPageDeletionHook);
 
-        pageDeletionHook = new PageTypeUpdateHook(deletionHooks);
+        return deletionHooks;
     }
 
-    private void initialisePageCreationHook(DatasetAPIClient datasetAPIClient) {
+    private Map<PageType, PageUpdateHook> initialisePageCreationHooks(DatasetAPIClient datasetAPIClient) {
         APIDatasetLandingPageCreationHook datasetLandingPageCreationHook =
                 new APIDatasetLandingPageCreationHook(datasetAPIClient);
 
         Map<PageType, PageUpdateHook> creationHooks = new HashMap<>();
         creationHooks.put(PageType.api_dataset_landing_page, datasetLandingPageCreationHook);
 
-        pageCreationHook = new PageTypeUpdateHook(creationHooks);
+        return creationHooks;
     }
 
     /**
@@ -96,7 +99,6 @@ public class Page {
      *
      * @param request  This should contain a X-Florence-Token header for the current session
      * @param response Returns true or false according to whether the URI was deleted.
-     * @return
      * @throws IOException           If an error occurs in processing data, typically to the filesystem, but also on the HTTP connection.
      * @throws BadRequestException   If the request cannot be completed because of a problem with request parameters
      * @throws NotFoundException     If the requested URI does not exist in the collection.
@@ -153,7 +155,6 @@ public class Page {
      *
      * @param request  This should contain a X-Florence-Token header for the current session
      * @param response Returns true or false according to whether the URI was deleted.
-     * @return
      * @throws IOException           If an error occurs in processing data, typically to the filesystem, but also on the HTTP connection.
      * @throws BadRequestException   If the request cannot be completed because of a problem with request parameters
      * @throws NotFoundException     If the requested URI does not exist in the collection.

@@ -30,7 +30,6 @@ import javax.ws.rs.POST;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
@@ -43,7 +42,6 @@ public class Page {
     private PageUpdateHook pageDeletionHook;
 
     static final String zebedeeFileSuffix = "/data.json";
-    static final URI websiteURI = URI.create(Configuration.getBabbageUrl());
 
     /**
      * Default constructor used instantiates dependencies itself.
@@ -72,7 +70,7 @@ public class Page {
 
     private void initialisePageCreationHook(DatasetAPIClient datasetAPIClient) {
         APIDatasetLandingPageCreationHook datasetLandingPageCreationHook =
-                new APIDatasetLandingPageCreationHook(datasetAPIClient, websiteURI);
+                new APIDatasetLandingPageCreationHook(datasetAPIClient);
 
         Map<PageType, PageUpdateHook> creationHooks = new HashMap<>();
         creationHooks.put(PageType.api_dataset_landing_page, datasetLandingPageCreationHook);

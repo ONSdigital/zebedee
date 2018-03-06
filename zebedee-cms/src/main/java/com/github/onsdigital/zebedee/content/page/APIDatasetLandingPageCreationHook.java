@@ -4,9 +4,10 @@ import com.github.onsdigital.zebedee.content.page.statistics.dataset.ApiDatasetL
 import dp.api.dataset.DatasetClient;
 import dp.api.dataset.exception.DatasetAPIException;
 import dp.api.dataset.model.Dataset;
+import dp.api.dataset.model.DatasetLinks;
+import dp.api.dataset.model.Link;
 
 import java.io.IOException;
-import java.net.URI;
 
 /**
  * A PageUpdateHook implementation for when an ApiDatasetLandingPage is created.
@@ -14,22 +15,21 @@ import java.net.URI;
 public class APIDatasetLandingPageCreationHook implements PageUpdateHook<ApiDatasetLandingPage> {
 
     private DatasetClient datasetAPIClient;
-    private URI websiteUri;
 
     /**
      * Create a new instance using the given dataset client.
+     *
      * @param datasetAPIClient
-     * @param websiteUri
      */
-    public APIDatasetLandingPageCreationHook(DatasetClient datasetAPIClient, URI websiteUri) {
+    public APIDatasetLandingPageCreationHook(DatasetClient datasetAPIClient) {
         this.datasetAPIClient = datasetAPIClient;
-        this.websiteUri = websiteUri;
     }
 
     /**
      * The method that gets run when a ApiDatasetLandingPage is updated
+     *
      * @param page - the page that has been updated
-     * @param uri - the URI of the updated page.
+     * @param uri  - the URI of the updated page.
      * @throws IOException
      */
     @Override
@@ -38,8 +38,13 @@ public class APIDatasetLandingPageCreationHook implements PageUpdateHook<ApiData
         Dataset dataset = new Dataset();
         dataset.setId(page.getapiDatasetId());
 
-        URI datasetUri = websiteUri.resolve(uri);
-        dataset.setUri(datasetUri.toString());
+        Link taxonomyLink = new Link();
+        taxonomyLink.setHref(uri);
+
+        DatasetLinks datasetLinks = new DatasetLinks();
+        datasetLinks.setTaxonomy(taxonomyLink);
+
+        dataset.setLinks(datasetLinks);
 
         try {
             datasetAPIClient.createDataset(page.getapiDatasetId(), dataset);

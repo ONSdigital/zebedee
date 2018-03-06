@@ -11,7 +11,6 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 
 import java.io.IOException;
-import java.net.URI;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
@@ -23,7 +22,6 @@ import static org.mockito.Mockito.when;
 
 public class APIDatasetLandingPageCreationHookTest {
 
-    private URI websiteUri = URI.create("http://localhost:8080");
     private String uri = "some/uri";
 
     @Test
@@ -36,7 +34,7 @@ public class APIDatasetLandingPageCreationHookTest {
         DatasetClient mockDatasetClient = mock(DatasetClient.class);
         when(mockDatasetClient.createDataset(anyString(), any(Dataset.class))).thenReturn(dataset);
 
-        APIDatasetLandingPageCreationHook creationHook = new APIDatasetLandingPageCreationHook(mockDatasetClient, websiteUri);
+        APIDatasetLandingPageCreationHook creationHook = new APIDatasetLandingPageCreationHook(mockDatasetClient);
 
         ApiDatasetLandingPage page = new ApiDatasetLandingPage();
         page.setapiDatasetId(datasetId);
@@ -51,8 +49,7 @@ public class APIDatasetLandingPageCreationHookTest {
         verify(mockDatasetClient, only()).createDataset(anyString(), any(Dataset.class));
 
         // Then the dataset given to the dataset API client has the expected values set
-        String expectedDatasetUri = websiteUri.resolve(uri).toString();
-        Assert.assertEquals(expectedDatasetUri, datasetCaptor.getValue().getUri());
+        Assert.assertEquals(uri, datasetCaptor.getValue().getLinks().getTaxonomy().getHref());
     }
 
     @Test(expected = RuntimeException.class)
@@ -63,7 +60,7 @@ public class APIDatasetLandingPageCreationHookTest {
         when(mockDatasetClient.createDataset(anyString(), any(Dataset.class)))
                 .thenThrow(new UnexpectedResponseException("broken", HttpStatus.SC_FORBIDDEN));
 
-        APIDatasetLandingPageCreationHook creationHook = new APIDatasetLandingPageCreationHook(mockDatasetClient, websiteUri);
+        APIDatasetLandingPageCreationHook creationHook = new APIDatasetLandingPageCreationHook(mockDatasetClient);
         ApiDatasetLandingPage page = new ApiDatasetLandingPage();
 
         // When onPageUpdated is called

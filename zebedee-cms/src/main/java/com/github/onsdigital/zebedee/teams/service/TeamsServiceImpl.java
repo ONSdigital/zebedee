@@ -1,6 +1,10 @@
 package com.github.onsdigital.zebedee.teams.service;
 
-import com.github.onsdigital.zebedee.exceptions.*;
+import com.github.onsdigital.zebedee.exceptions.BadRequestException;
+import com.github.onsdigital.zebedee.exceptions.ConflictException;
+import com.github.onsdigital.zebedee.exceptions.ForbiddenException;
+import com.github.onsdigital.zebedee.exceptions.NotFoundException;
+import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.service.ServiceSupplier;
 import com.github.onsdigital.zebedee.session.model.Session;
@@ -71,6 +75,13 @@ public class TeamsServiceImpl implements TeamsService {
         return listTeams()
                 .parallelStream()
                 .filter(t -> teamIds.contains(t.getId()))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Team> resolveTeamDetails(Set<Integer> teamIds) throws IOException {
+        return resolveTeams(teamIds).stream()
+                .map(team -> new Team().setId(team.getId()).setName(team.getName()))
                 .collect(Collectors.toList());
     }
 

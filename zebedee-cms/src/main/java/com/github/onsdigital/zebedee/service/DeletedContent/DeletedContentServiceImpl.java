@@ -42,8 +42,8 @@ public class DeletedContentServiceImpl implements DeletedContentService {
 
         // Create a new deleted content event.
         DeletedContentEvent deletedContentEvent = new DeletedContentEvent(
-                collection.description.id,
-                collection.description.name,
+                collection.getDescription().getId(),
+                collection.getDescription().getName(),
                 dateDeleted,
                 deletedPage.getUri().toString(),
                 deletedPage.getDescription().getTitle(),

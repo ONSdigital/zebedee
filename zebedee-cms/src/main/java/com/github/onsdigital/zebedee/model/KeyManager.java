@@ -14,7 +14,6 @@ import org.apache.commons.lang3.StringUtils;
 import javax.crypto.SecretKey;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
@@ -24,7 +23,6 @@ import java.util.stream.Collectors;
 
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logWarn;
-import static com.github.onsdigital.zebedee.model.csdb.CsdbImporter.APPLICATION_KEY_ID;
 
 /**
  * Created by thomasridd on 18/11/15.
@@ -54,6 +52,7 @@ public class KeyManager {
         SecretKey key = zebedee.getKeyringCache()
                 .get(session)
                 .get(collection.getDescription().getId());
+
 
         List<User> keyRecipients = nullSafeList(zebedee
                 .getPermissionsService()
@@ -268,27 +267,9 @@ public class KeyManager {
      * @throws BadRequestException
      * @throws IOException
      */
-    public static void transferKeyring(Keyring targetKeyring, Keyring sourceKeyring, CollectionOwner collectionOwner)
+    public static void transferKeyring(Keyring targetKeyring, Keyring sourceKeyring)
             throws NotFoundException, BadRequestException, IOException {
-        Set<String> collectionIds = new HashSet<>();
-
-        sourceKeyring.list().stream().forEach(collectionId -> {
-            if (StringUtils.equals(collectionId, APPLICATION_KEY_ID)) {
-                // csdb-import is a special case always add this.
-                collectionIds.add(collectionId);
-            } else {
-                Collection collection = getCollection(collectionId);
-                if (collection != null && collection.getDescription().getCollectionOwner() != null
-                        && collection.getDescription().getCollectionOwner().equals(collectionOwner)) {
-                    collectionIds.add(collectionId);
-                } else {
-                    if (CollectionOwner.PUBLISHING_SUPPORT.equals(collectionOwner)) {
-                        collectionIds.add(collectionId);
-                    }
-                }
-            }
-        });
-        transferKeyring(targetKeyring, sourceKeyring, collectionIds);
+        transferKeyring(targetKeyring, sourceKeyring, sourceKeyring.list());
     }
 
     private static boolean userShouldHaveKey(Zebedee z, User user, Collection collection) throws IOException {

@@ -15,9 +15,9 @@ public abstract class Scheduler {
             try {
                 logInfo("Attempting collection schedule publish")
                         .collectionName(collection)
-                        .addParameter("collectionType", collection.description.type)
+                        .addParameter("collectionType", collection.getDescription().getType())
                         .log();
-                if (collection.description.type == CollectionType.scheduled) {
+                if (collection.getDescription().getType() == CollectionType.scheduled) {
                     schedule(collection, zebedee);
                 }
             } catch (Exception e) {

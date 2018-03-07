@@ -6,7 +6,6 @@ import com.github.onsdigital.zebedee.content.page.base.PageType;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
-import com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder;
 import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.reader.ZebedeeReader;
 import com.github.onsdigital.zebedee.reader.data.filter.DataFilter;
@@ -26,7 +25,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logDebug;
 import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logTrace;
 import static com.github.onsdigital.zebedee.util.URIUtils.getLastSegment;
 import static com.github.onsdigital.zebedee.util.URIUtils.removeLastSegment;

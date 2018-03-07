@@ -4,7 +4,6 @@ import com.github.onsdigital.zebedee.content.page.visualisation.Visualisation;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.UnexpectedErrorException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
-import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.model.CollectionWriter;
 import com.github.onsdigital.zebedee.model.ContentWriter;
 import com.github.onsdigital.zebedee.model.SimpleZebedeeResponse;
@@ -13,6 +12,7 @@ import com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDaoFactory
 import com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.Resource;
+import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.util.ZebedeeCmsService;
 import org.junit.Before;
 import org.junit.Test;
@@ -194,7 +194,7 @@ public class DataVisualisationZipTest {
 
             verify(zebedeeCmsServiceMock, never()).getSession(mockRequest);
             verify(zebedeeCmsServiceMock, never()).getCollection(mockRequest);
-            verify(mockCollection, never()).deleteDataVisContent(any(), any());
+            verify(mockCollection, never()).deleteContentDirectory(any(), any());
             throw br;
         }
     }
@@ -223,7 +223,7 @@ public class DataVisualisationZipTest {
         } catch (UnexpectedErrorException ex) {
             verify(mockRequest, times(1)).getParameter(ZIP_PATH_KEY);
             verify(zebedeeCmsServiceMock, times(1)).getCollection(mockRequest);
-            verify(mockCollection, never()).deleteDataVisContent(session, Paths.get(ZIP_PATH));
+            verify(mockCollection, never()).deleteContentDirectory(session.getEmail(), ZIP_PATH);
             throw ex;
         }
     }

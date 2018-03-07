@@ -122,7 +122,7 @@ public class SlackNotification {
             }
         }
 
-        String message = "Collection " + publishedCollection.name +
+        String message = "Collection " + publishedCollection.getName() +
                 " was published at " + format.format(publishedCollection.publishStartDate) +
                 " with " + result.transaction.uriInfos.size() + " files " +
                 " in " + timeTaken + " seconds. Example Uri: http://www.ons.gov.uk" + exampleUri;

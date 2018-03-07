@@ -15,7 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.PrintWriter;
 
-import static com.github.onsdigital.zebedee.api.Identity.GET_SESSION_ERROR;
+import static com.github.onsdigital.zebedee.api.Identity.INTERNAL_SERVER_ERROR;
 import static com.github.onsdigital.zebedee.api.Identity.SESSION_NOT_FOUND;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -64,7 +64,7 @@ public class IdentityTest {
 
         verify(zebedeeCmsServiceMock, times(1)).getSession(mockRequest);
         verify(mockResponse, times(1)).getWriter();
-        verify(printWriterMock, times(1)).write(new UserIdentity(session).toJSON());
+        verify(printWriterMock, times(1)).write(new UserIdentity(session, null).toJSON());
         verify(mockResponse, times(1)).setStatus(HttpStatus.SC_OK);
     }
 
@@ -94,7 +94,7 @@ public class IdentityTest {
 
         verify(zebedeeCmsServiceMock, times(1)).getSession(mockRequest);
         verify(mockResponse, times(1)).getWriter();
-        verify(printWriterMock, times(1)).write(GET_SESSION_ERROR.toJSON());
+        verify(printWriterMock, times(1)).write(INTERNAL_SERVER_ERROR.toJSON());
         verify(mockResponse, times(1)).setStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR);
     }
 }

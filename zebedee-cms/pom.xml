@@ -171,7 +171,7 @@
         <dependency>
             <groupId>com.github.ONSdigital</groupId>
             <artifactId>dp-dataset-api-java-client</artifactId>
-            <version>feature~initial-implementation-SNAPSHOT</version>
+            <version>master-SNAPSHOT</version>
         </dependency>
 
     </dependencies>

@@ -9,6 +9,8 @@ import dp.api.dataset.model.Link;
 
 import java.io.IOException;
 
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
+
 /**
  * A PageUpdateHook implementation for when an ApiDatasetLandingPage is created.
  */
@@ -49,6 +51,7 @@ public class APIDatasetLandingPageCreationHook implements PageUpdateHook<ApiData
         try {
             datasetAPIClient.createDataset(page.getapiDatasetId(), dataset);
         } catch (DatasetAPIException e) {
+            logError(e, "failed to create dataset in the dataset api");
             throw new RuntimeException(e);
         }
     }

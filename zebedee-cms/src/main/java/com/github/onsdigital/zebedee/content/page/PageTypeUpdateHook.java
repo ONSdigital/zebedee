@@ -11,7 +11,7 @@ import java.util.Map;
  */
 public class PageTypeUpdateHook implements PageUpdateHook<Page> {
 
-    Map<PageType, PageUpdateHook> pageUpdateHooks;
+    private final Map<PageType, PageUpdateHook> pageUpdateHooks;
 
     /**
      * Create a new instance of PageTypeUpdateHook

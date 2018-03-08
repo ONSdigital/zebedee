@@ -348,7 +348,7 @@ public class Collections {
     }
 
     /**
-     * Publish the files
+     * Manual Publish the files in a collection
      *
      * @param collection       the collection to publish
      * @param session          a session with editor priviledges
@@ -390,7 +390,7 @@ public class Collections {
 
         ZebedeeCollectionReader collectionReader = new ZebedeeCollectionReader(zebedeeSupplier.get(), collection, session);
         long publishStart = System.currentTimeMillis();
-        boolean publishComplete = Publisher.Publish(collection, session.getEmail(), collectionReader);
+        boolean publishComplete = Publisher.ManualPublish(collection, session.getEmail(), collectionReader);
 
         if (publishComplete) {
             long onPublishCompleteStart = System.currentTimeMillis();

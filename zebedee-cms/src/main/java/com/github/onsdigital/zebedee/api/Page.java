@@ -118,7 +118,7 @@ public class Page {
 
             String uri = request.getParameter("uri");
             if (StringUtils.isEmpty(uri)) {
-                logError(new BadRequestException("uri is empty"));
+                logError(new BadRequestException("uri is empty")).log();
                 response.setStatus(HttpStatus.SC_BAD_REQUEST);
                 return;
             }
@@ -198,7 +198,7 @@ public class Page {
                     .log();
 
         } catch (IOException e) {
-            logError(e, "exception reading request body on create page endpoint");
+            logError(e, "exception reading request body on create page endpoint").log();
             response.setStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR);
         }
     }
@@ -219,7 +219,7 @@ public class Page {
 
         String uri = request.getParameter("uri");
         if (StringUtils.isEmpty(uri)) {
-            logError(new BadRequestException("uri is empty"));
+            logError(new BadRequestException("uri is empty")).log();
             response.setStatus(HttpStatus.SC_BAD_REQUEST);
             return;
         }

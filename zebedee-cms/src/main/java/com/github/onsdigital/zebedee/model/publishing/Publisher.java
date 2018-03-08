@@ -134,8 +134,8 @@ public class Publisher {
         String encryptionPassword = Random.password(100);
         try {
 
-            Map<String, String> hostToTransactionIdMap = DoPrePublish(collection, encryptionPassword);
-            publishComplete = DoPublish(collection, collectionReader, encryptionPassword, email, hostToTransactionIdMap);
+            DoPrePublish(collection, encryptionPassword);
+            publishComplete = DoPublish(collection, collectionReader, encryptionPassword, email);
 
         } catch (IOException e) {
             logError(e, "Exception publishing collection").collectionName(collection).log();
@@ -151,16 +151,14 @@ public class Publisher {
      * @return
      * @throws IOException
      */
-    public static Map<String, String> DoPrePublish(Collection collection, String encryptionPassword) throws IOException {
+    public static void DoPrePublish(Collection collection, String encryptionPassword) throws IOException {
 
         try {
             // This creates the transaction on the train.
-            Map<String, String> hostToTransactionIdMap = Publisher.BeginPublish(collection, encryptionPassword);
+            BeginPublish(collection, encryptionPassword);
 
             // send versioned files manifest, allowing files to be copied from the website into the transaction.
-            Publisher.SendManifest(collection, encryptionPassword);
-
-            return hostToTransactionIdMap;
+            SendManifest(collection, encryptionPassword);
 
         } catch (IOException e) {
 
@@ -181,25 +179,25 @@ public class Publisher {
     public static boolean DoPublish(Collection collection,
                                     CollectionReader collectionReader,
                                     String encryptionPassword,
-                                    String userEmail,
-                                    Map<String, String> hostToTransactionIdMap) throws IOException {
+                                    String userEmail) throws IOException {
         boolean published = false;
 
         try {
             collection.description.publishStartDate = new Date();
-            Publisher.SendFilteredCollectionFiles(collection, collectionReader, encryptionPassword);
-            published = Publisher.CommitPublish(collection, userEmail, encryptionPassword);
-            collection.description.publishEndDate = new Date();
+            SendFilteredCollectionFiles(collection, collectionReader, encryptionPassword);
+            published = CommitPublish(collection, userEmail, encryptionPassword);
 
         } catch (IOException e) {
             SlackNotification.alarm(String.format("Exception publishing collection: %s: %s", collection.description.name, e.getMessage()));
             logError(e, "exception publishing collection").collectionName(collection).log();
 
             // If an error was caught, attempt to roll back the transaction:
-            if (hostToTransactionIdMap != null && hostToTransactionIdMap.size() > 0) {
+            Map<String, String> publishTransactionIds = collection.description.publishTransactionIds;
+            if (publishTransactionIds != null && publishTransactionIds.size() > 0) {
                 logInfo("attempting rollback of collection publishing transaction").collectionName(collection).log();
-                rollbackPublish(hostToTransactionIdMap, encryptionPassword);
+                rollbackPublish(publishTransactionIds, encryptionPassword);
             }
+
         } finally {
             // Save any updates to the collection
             collection.save();
@@ -221,7 +219,7 @@ public class Publisher {
         // Pass the function to filter files into the publish method.
         Function<String, Boolean> versionedUriFilter = uri -> VersionedContentItem.isVersionedUri(uri);
         Function<String, Boolean> timeseriesUriFilter = uri -> uri.contains("/timeseries/");
-        Publisher.SendCollectionFiles(collection, collectionReader, encryptionPassword, versionedUriFilter, timeseriesUriFilter);
+        SendCollectionFiles(collection, collectionReader, encryptionPassword, versionedUriFilter, timeseriesUriFilter);
     }
 
     private static void SendManifest(Collection collection, String encryptionPassword) throws IOException {
@@ -274,7 +272,7 @@ public class Publisher {
      * @return
      * @throws IOException
      */
-    private static Map<String, String> BeginPublish(Collection collection, String encryptionPassword) throws IOException {
+    private static void BeginPublish(Collection collection, String encryptionPassword) throws IOException {
 
         long start = System.currentTimeMillis();
 
@@ -285,8 +283,6 @@ public class Publisher {
         collection.save();
 
         logInfo("PRE-PUBLISH: BeginPublish complete").timeTaken(System.currentTimeMillis() - start).log();
-
-        return hostToTransactionId;
     }
 
     private static boolean CommitPublish(Collection collection, String email, String encryptionPassword) throws IOException {

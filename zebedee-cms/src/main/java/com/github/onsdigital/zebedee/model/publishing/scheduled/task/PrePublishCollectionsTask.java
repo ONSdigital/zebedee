@@ -137,15 +137,14 @@ public class PrePublishCollectionsTask extends ScheduledTask {
                         String encryptionPassword = Random.password(100);
 
                         // Do pre-publish steps ahead of the publish time
-                        Map<String, String> hostToTransactionIdMap = Publisher.DoPrePublish(collection, encryptionPassword);
+                        Publisher.DoPrePublish(collection, encryptionPassword);
 
                         SecretKey key = zebedee.getKeyringCache().schedulerCache.get(collection.description.id);
                         ZebedeeCollectionReader collectionReader = new ZebedeeCollectionReader(collection, key);
                         PublishCollectionTask publishCollectionTask = new PublishCollectionTask(
                                 collection,
                                 collectionReader,
-                                encryptionPassword,
-                                hostToTransactionIdMap);
+                                encryptionPassword);
 
                         logInfo("PRE-PUBLISH: Adding publish task").collectionName(collection).log();
                         collectionPublishTasks.add(publishCollectionTask);

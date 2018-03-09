@@ -182,10 +182,44 @@ public class Publisher {
                                     String userEmail) throws IOException {
         boolean published = false;
 
+        boolean filesPublished = publishFiles(
+                collection,
+                collectionReader,
+                encryptionPassword,
+                userEmail);
+
+//        try {
+//
+//            if (filesPublished) {
+//
+//                // publish datasets
+//                for (CollectionDataset collectionDataset : collection.description.getDatasets()) {
+//                    collectionDataset.getId();
+//                }
+//                // published = publishDatasets(collection)
+//            }
+//
+//            collection.description.publishEndDate = new Date();
+//
+//        } catch (IOException e) {
+//            SlackNotification.alarm(String.format("Exception setting API dataset to published : %s: %s", collection.description.name, e.getMessage()));
+//            logError(e, "exception publishing datasets").collectionName(collection).log();
+//        } finally {
+//            // Save any updates to the collection
+//            collection.save();
+//        }
+
+        return published;
+    }
+
+    private static boolean publishFiles(Collection collection, CollectionReader collectionReader, String encryptionPassword, String userEmail) throws IOException {
+
+        boolean filesPublished = false;
+
         try {
             collection.description.publishStartDate = new Date();
             SendFilteredCollectionFiles(collection, collectionReader, encryptionPassword);
-            published = CommitPublish(collection, userEmail, encryptionPassword);
+            filesPublished = CommitPublish(collection, userEmail, encryptionPassword);
 
         } catch (IOException e) {
             SlackNotification.alarm(String.format("Exception publishing collection: %s: %s", collection.description.name, e.getMessage()));
@@ -202,8 +236,7 @@ public class Publisher {
             // Save any updates to the collection
             collection.save();
         }
-
-        return published;
+        return filesPublished;
     }
 
     /**

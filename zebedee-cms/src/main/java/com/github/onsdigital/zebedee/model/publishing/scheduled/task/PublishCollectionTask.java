@@ -18,18 +18,23 @@ public class PublishCollectionTask implements Callable<Boolean> {
     private Collection collection;
     private ZebedeeCollectionReader collectionReader;
     private String encryptionPassword;
+    private Publisher publisher;
 
     /**
      * Create a new task for a collection to be published.
-     *
-     * @param collection         - The collection to publish.
+     *  @param collection         - The collection to publish.
      * @param collectionReader   - The collection reader to read collection content.
      * @param encryptionPassword
+     * @param publisher
      */
-    public PublishCollectionTask(Collection collection, ZebedeeCollectionReader collectionReader, String encryptionPassword) {
+    public PublishCollectionTask(Collection collection,
+                                 ZebedeeCollectionReader collectionReader,
+                                 String encryptionPassword,
+                                 Publisher publisher) {
         this.collection = collection;
         this.collectionReader = collectionReader;
         this.encryptionPassword = encryptionPassword;
+        this.publisher = publisher;
     }
 
     /**
@@ -42,7 +47,7 @@ public class PublishCollectionTask implements Callable<Boolean> {
 
         logInfo("PUBLISH: Running collection publish task").collectionName(collection).log();
 
-        return Publisher.DoPublish(collection,
+        return publisher.DoPublish(collection,
                 collectionReader,
                 encryptionPassword,
                 publisherSystemEmail);

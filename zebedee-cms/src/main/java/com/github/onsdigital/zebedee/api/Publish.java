@@ -14,7 +14,6 @@ import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
 import com.github.onsdigital.zebedee.model.publishing.PostPublisher;
 import com.github.onsdigital.zebedee.model.publishing.PublishNotification;
-import com.github.onsdigital.zebedee.model.publishing.Publisher;
 import com.github.onsdigital.zebedee.persistence.model.CollectionHistoryEvent;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.util.ZebedeeCmsService;
@@ -134,7 +133,7 @@ public class Publish {
 
         ZebedeeCollectionReader collectionReader = new ZebedeeCollectionReader(zebedeeCmsService.getZebedee(), collection, session);
         long publishStart = System.currentTimeMillis();
-        boolean publishComplete = Publisher.ManualPublish(collection, session.getEmail(), collectionReader);
+        boolean publishComplete = zebedeeCmsService.getPublisher().DoFullPublish(collection, session.getEmail(), collectionReader);
 
         if (publishComplete) {
             long onPublishCompleteStart = System.currentTimeMillis();

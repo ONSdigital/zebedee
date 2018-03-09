@@ -15,6 +15,7 @@ import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.Resource;
+import com.github.onsdigital.zebedee.service.DatasetService;
 import com.github.onsdigital.zebedee.util.Http;
 import com.github.onsdigital.zebedee.util.SlackNotification;
 import org.apache.commons.lang3.StringUtils;
@@ -46,6 +47,8 @@ public class Publisher {
     private static final List<Host> theTrainHosts;
     private static final ExecutorService pool = Executors.newFixedThreadPool(20);
 
+    private final DatasetService datasetService;
+
     static {
         String[] theTrainUrls = Configuration.getTheTrainUrls();
         theTrainHosts = new ArrayList<>();
@@ -55,11 +58,15 @@ public class Publisher {
         Runtime.getRuntime().addShutdownHook(new ShutDownPublisherThread(pool));
     }
 
+    public Publisher(DatasetService datasetService) {
+        this.datasetService = datasetService;
+    }
+
     /**
-     * A manual publish does all publish steps at once, compared to a scheduled publish which does some steps ahead of
-     * the scheduled publish time.
+     * A full publish does all publish steps at once, compared to a scheduled publish which does the pre-publish steps
+     * ahead of the scheduled publish time.
      */
-    public static boolean ManualPublish(Collection collection, String email, CollectionReader collectionReader) throws IOException {
+    public boolean DoFullPublish(Collection collection, String email, CollectionReader collectionReader) throws IOException {
         boolean publishComplete = false;
 
         // First get the in-memory (within-JVM) lock.
@@ -98,7 +105,7 @@ public class Publisher {
                         return false;
                     }
 
-                    publishComplete = DoFullPublish(collection, email, collectionReader);
+                    publishComplete = FullPublish(collection, email, collectionReader);
 
                     logInfo("Collection publish process finished").collectionName(collection)
                             .timeTaken((System.currentTimeMillis() - publishStart)).log();
@@ -121,37 +128,9 @@ public class Publisher {
     }
 
     /**
-     * aggregate the pre-publish and publish steps into one function.
-     *
-     * @param collection The collection to be published.
-     * @param email      An identifier for the publishing user.
-     * @return If publishing succeeded, true.
-     * @throws IOException If a general error occurs.
-     */
-    private static boolean DoFullPublish(Collection collection, String email, CollectionReader collectionReader) throws IOException {
-
-        boolean publishComplete = false;
-        String encryptionPassword = Random.password(100);
-        try {
-
-            DoPrePublish(collection, encryptionPassword);
-            publishComplete = DoPublish(collection, collectionReader, encryptionPassword, email);
-
-        } catch (IOException e) {
-            logError(e, "Exception publishing collection").collectionName(collection).log();
-        }
-
-        return publishComplete;
-    }
-
-    /**
      * Do the pre-publish steps for a collection. Start a transaction with the train and send the manifest file.
-     * @param collection
-     * @param encryptionPassword
-     * @return
-     * @throws IOException
      */
-    public static void DoPrePublish(Collection collection, String encryptionPassword) throws IOException {
+    public void DoPrePublish(Collection collection, String encryptionPassword) throws IOException {
 
         try {
             // This creates the transaction on the train.
@@ -176,10 +155,10 @@ public class Publisher {
     /**
      * Do the steps to publish the collection, given that the pre-publish is complete.
      */
-    public static boolean DoPublish(Collection collection,
-                                    CollectionReader collectionReader,
-                                    String encryptionPassword,
-                                    String userEmail) throws IOException {
+    public boolean DoPublish(Collection collection,
+                             CollectionReader collectionReader,
+                             String encryptionPassword,
+                             String userEmail) throws IOException {
         boolean published = false;
 
         boolean filesPublished = publishFiles(
@@ -192,11 +171,10 @@ public class Publisher {
 //
 //            if (filesPublished) {
 //
-//                // publish datasets
 //                for (CollectionDataset collectionDataset : collection.description.getDatasets()) {
 //                    collectionDataset.getId();
 //                }
-//                // published = publishDatasets(collection)
+//
 //            }
 //
 //            collection.description.publishEndDate = new Date();
@@ -210,6 +188,30 @@ public class Publisher {
 //        }
 
         return published;
+    }
+
+    /**
+     * aggregate the pre-publish and publish steps into one function.
+     *
+     * @param collection The collection to be published.
+     * @param email      An identifier for the publishing user.
+     * @return If publishing succeeded, true.
+     * @throws IOException If a general error occurs.
+     */
+    private boolean FullPublish(Collection collection, String email, CollectionReader collectionReader) {
+
+        boolean publishComplete = false;
+        String encryptionPassword = Random.password(100);
+        try {
+
+            DoPrePublish(collection, encryptionPassword);
+            publishComplete = DoPublish(collection, collectionReader, encryptionPassword, email);
+
+        } catch (IOException e) {
+            logError(e, "Exception publishing collection").collectionName(collection).log();
+        }
+
+        return publishComplete;
     }
 
     private static boolean publishFiles(Collection collection, CollectionReader collectionReader, String encryptionPassword, String userEmail) throws IOException {
@@ -240,14 +242,14 @@ public class Publisher {
     }
 
     /**
-     * ManualPublish collection files with required filters applied.
+     * DoFullPublish collection files with required filters applied.
      *
      * @param collection
      * @param collectionReader
      * @param encryptionPassword
      * @throws IOException
      */
-    public static void SendFilteredCollectionFiles(Collection collection, CollectionReader collectionReader, String encryptionPassword) throws IOException {
+    private static void SendFilteredCollectionFiles(Collection collection, CollectionReader collectionReader, String encryptionPassword) throws IOException {
         // We do not want to send versioned files. They have already been taken care of via the manifest.
         // Pass the function to filter files into the publish method.
         Function<String, Boolean> versionedUriFilter = uri -> VersionedContentItem.isVersionedUri(uri);
@@ -353,7 +355,7 @@ public class Publisher {
         long start = System.currentTimeMillis();
 
         logInfo("PublishFiles start").collectionName(collection).log();
-        // ManualPublish each item of content:
+        // DoFullPublish each item of content:
         for (String uri : collection.reviewed.uris()) {
             if (!shouldBeFiltered(filters, uri)) {
                 logInfo("Start PublishFile").collectionId(collection).addParameter("uri", uri).log();

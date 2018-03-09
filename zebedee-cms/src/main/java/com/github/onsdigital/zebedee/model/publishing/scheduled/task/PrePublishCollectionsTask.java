@@ -33,17 +33,22 @@ public class PrePublishCollectionsTask extends ScheduledTask {
     private final Set<String> collectionIds; // The list of collections ID's used in the task.
     private final Zebedee zebedee;
     private final Date publishDate; // the date of the actual publish, NOT the prepublish date associated with this task.
-    private PublishScheduler publishScheduler;
+    private final PublishScheduler publishScheduler;
+    private final Publisher publisher;
 
     /**
      * Create a new instance of the PrePublishCollectionsTask.
-     *
-     * @param zebedee     The instance of Zebedee this task will run under.
+     *  @param zebedee     The instance of Zebedee this task will run under.
      * @param publishDate The date the actual publish is scheduled for.
+     * @param publisher
      */
-    public PrePublishCollectionsTask(Zebedee zebedee, Date publishDate, PublishScheduler publishScheduler) {
+    public PrePublishCollectionsTask(Zebedee zebedee,
+                                     Date publishDate,
+                                     PublishScheduler publishScheduler,
+                                     Publisher publisher) {
         this.publishDate = publishDate;
         this.publishScheduler = publishScheduler;
+        this.publisher = publisher;
         this.collectionIds = new HashSet<>();
         this.zebedee = zebedee;
     }
@@ -137,14 +142,14 @@ public class PrePublishCollectionsTask extends ScheduledTask {
                         String encryptionPassword = Random.password(100);
 
                         // Do pre-publish steps ahead of the publish time
-                        Publisher.DoPrePublish(collection, encryptionPassword);
+                        publisher.DoPrePublish(collection, encryptionPassword);
 
                         SecretKey key = zebedee.getKeyringCache().schedulerCache.get(collection.description.id);
                         ZebedeeCollectionReader collectionReader = new ZebedeeCollectionReader(collection, key);
                         PublishCollectionTask publishCollectionTask = new PublishCollectionTask(
                                 collection,
                                 collectionReader,
-                                encryptionPassword);
+                                encryptionPassword, publisher);
 
                         logInfo("PRE-PUBLISH: Adding publish task").collectionName(collection).log();
                         collectionPublishTasks.add(publishCollectionTask);

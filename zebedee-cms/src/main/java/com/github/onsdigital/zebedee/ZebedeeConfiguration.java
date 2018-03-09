@@ -5,8 +5,6 @@ import com.github.onsdigital.zebedee.model.Collections;
 import com.github.onsdigital.zebedee.model.Content;
 import com.github.onsdigital.zebedee.model.KeyringCache;
 import com.github.onsdigital.zebedee.model.RedirectTablePartialMatch;
-import com.github.onsdigital.zebedee.teams.service.TeamsService;
-import com.github.onsdigital.zebedee.teams.service.TeamsServiceImpl;
 import com.github.onsdigital.zebedee.model.encryption.ApplicationKeys;
 import com.github.onsdigital.zebedee.model.publishing.PublishedCollections;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
@@ -15,6 +13,8 @@ import com.github.onsdigital.zebedee.permissions.store.PermissionsStore;
 import com.github.onsdigital.zebedee.permissions.store.PermissionsStoreFileSystemImpl;
 import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
 import com.github.onsdigital.zebedee.session.service.SessionsService;
+import com.github.onsdigital.zebedee.teams.service.TeamsService;
+import com.github.onsdigital.zebedee.teams.service.TeamsServiceImpl;
 import com.github.onsdigital.zebedee.teams.store.TeamsStoreFileSystemImpl;
 import com.github.onsdigital.zebedee.user.service.UsersService;
 import com.github.onsdigital.zebedee.user.service.UsersServiceImpl;
@@ -58,7 +58,6 @@ public class ZebedeeConfiguration {
     private Path applicationKeysPath;
     private Path redirectPath;
     private boolean useVerificationAgent;
-    private VerificationAgent verificationAgent;
     private ApplicationKeys applicationKeys;
     private PublishedCollections publishedCollections;
     private Collections collections;
@@ -150,12 +149,6 @@ public class ZebedeeConfiguration {
         logDebug(LOG_PREFIX + "ZebedeeConfiguration creation complete.").log();
     }
 
-
-    public ZebedeeConfiguration enableVerificationAgent(boolean enabled) {
-        this.useVerificationAgent = enabled;
-        return this;
-    }
-
     public boolean isUseVerificationAgent() {
         return useVerificationAgent;
     }
@@ -166,38 +159,6 @@ public class ZebedeeConfiguration {
 
     public Path getPublishedContentPath() {
         return publishedContentPath;
-    }
-
-    public Path getPublishedCollectionsPath() {
-        return publishedCollectionsPath;
-    }
-
-    public Path getCollectionsPath() {
-        return collectionsPath;
-    }
-
-    public Path getUsersPath() {
-        return usersPath;
-    }
-
-    public Path getSessionsPath() {
-        return sessionsPath;
-    }
-
-    public Path getPermissionsPath() {
-        return permissionsPath;
-    }
-
-    public Path getTeamsPath() {
-        return teamsPath;
-    }
-
-    public Path getApplicationKeysPath() {
-        return applicationKeysPath;
-    }
-
-    public Path getRedirectPath() {
-        return redirectPath;
     }
 
     public Content getPublished() {
@@ -221,7 +182,6 @@ public class ZebedeeConfiguration {
         }
         return content;
     }
-
 
     public DataIndex getDataIndex() {
         return this.dataIndex;
@@ -261,13 +221,5 @@ public class ZebedeeConfiguration {
 
     public VerificationAgent getVerificationAgent(boolean verificationIsEnabled, Zebedee z) {
         return isUseVerificationAgent() && verificationIsEnabled ? new VerificationAgent(z) : null;
-    }
-
-    public PermissionsStore getPermissionsStore(Path accessMappingPath) {
-        return new PermissionsStoreFileSystemImpl(accessMappingPath);
-    }
-
-    public void setUsersService(UsersService usersService) {
-        this.usersService = usersService;
     }
 }

@@ -8,6 +8,7 @@ import com.github.onsdigital.zebedee.service.DatasetService;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.util.ZebedeeCmsService;
 import org.apache.http.HttpStatus;
+import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Matchers;
 
@@ -25,18 +26,27 @@ import static org.mockito.Mockito.when;
 
 public class CollectionsTest {
 
-    private ZebedeeCmsService mockZebedee = mock(ZebedeeCmsService.class);
+    private ZebedeeCmsService mockZebedeeCmsService = mock(ZebedeeCmsService.class);
     private DatasetService mockDatasetService = mock(DatasetService.class);
     private ServletInputStream mockServletInputStream = mock(ServletInputStream.class);
+
+    private com.github.onsdigital.zebedee.model.Collection mockCollection =
+            mock(com.github.onsdigital.zebedee.model.Collection.class);
 
     private HttpServletRequest request = mock(HttpServletRequest.class);
     private HttpServletResponse response = mock(HttpServletResponse.class);
 
-    private Collections collections = new Collections(mockZebedee, mockDatasetService);
+    private Collections collections = new Collections(mockZebedeeCmsService, mockDatasetService);
     private String collectionID = "123";
     private String datasetID = "345";
     private String edition = "2014";
     private String version = "1";
+
+    @Before
+    public void setUp() throws Exception {
+        when(mockZebedeeCmsService.getCollection(collectionID)).thenReturn(mockCollection);
+        when(mockCollection.getId()).thenReturn(collectionID);
+    }
 
     @Test
     public void TestPutDataset_EmptyJSON() throws Exception {
@@ -54,7 +64,7 @@ public class CollectionsTest {
         collections.put(request, response);
 
         // The dataset service is called with the values extracted from the request URL.
-        verify(mockDatasetService, times(1)).updateDatasetInCollection(collectionID, datasetID, null);
+        verify(mockDatasetService, times(1)).updateDatasetInCollection(mockCollection, datasetID, null);
     }
 
     @Test
@@ -73,7 +83,7 @@ public class CollectionsTest {
         collections.put(request, response);
 
         // The dataset service is called with the values extracted from the request URL.
-        verify(mockDatasetService, times(1)).updateDatasetInCollection(collectionID, datasetID, new CollectionDataset());
+        verify(mockDatasetService, times(1)).updateDatasetInCollection(mockCollection, datasetID, new CollectionDataset());
     }
 
     @Test
@@ -94,7 +104,7 @@ public class CollectionsTest {
 
         // The dataset service is called with the values extracted from the request URL.
         verify(mockDatasetService, times(1)).updateDatasetVersionInCollection(
-                collectionID, datasetID, edition, version, new CollectionDatasetVersion());
+                mockCollection, datasetID, edition, version, new CollectionDatasetVersion());
     }
 
     @Test
@@ -111,6 +121,36 @@ public class CollectionsTest {
 
         // a HTTP 403 is set on the response
         verify(response).setStatus(HttpStatus.SC_FORBIDDEN);
+    }
+
+    @Test
+    public void TestPut_CollectionNotFound() throws Exception {
+
+        // Given a collection ID that does not exist
+        when(mockZebedeeCmsService.getCollection(collectionID)).thenReturn(null);
+
+        String url = String.format("/collections/%s/datasets/%s", collectionID, datasetID);
+        when(request.getPathInfo()).thenReturn(url);
+        shouldAuthorise(request, true);
+
+        // When the delete method is called
+        collections.put(request, response);
+
+        // The expected response code is set on the response
+        verify(response, times(1)).setStatus(HttpStatus.SC_NOT_FOUND);
+    }
+
+    @Test
+    public void TestPutDataset_SessionNotFound() throws Exception {
+
+        // Given a session that does not exist
+        when(mockZebedeeCmsService.getSession(request)).thenReturn(null);
+
+        // When the put method is called
+        collections.put(request, response);
+
+        // The dataset service is called with the values extracted from the request URL.
+        verify(response, times(1)).setStatus(HttpStatus.SC_FORBIDDEN);
     }
 
     @Test
@@ -191,7 +231,7 @@ public class CollectionsTest {
         collections.delete(request, response);
 
         // The dataset service is called with the values extracted from the request URL.
-        verify(mockDatasetService, times(1)).removeDatasetFromCollection(collectionID, datasetID);
+        verify(mockDatasetService, times(1)).removeDatasetFromCollection(mockCollection, datasetID);
     }
 
     @Test
@@ -209,34 +249,63 @@ public class CollectionsTest {
 
         // The dataset service is called with the values extracted from the request URL.
         verify(mockDatasetService, times(1)).removeDatasetVersionFromCollection(
-                collectionID, datasetID, edition, version);
+                mockCollection, datasetID, edition, version);
     }
 
     @Test
     public void TestDelete_Forbidden() throws Exception {
 
-        // Given a PUT request with a valid URL
+        // Given a delete request with a valid URL
         String url = String.format("/collections/%s/datasets/%s", collectionID, datasetID);
-
         when(request.getPathInfo()).thenReturn(url);
 
         shouldAuthorise(request, false);
 
-        // When the put method is called
+        // When the delete method is called
         collections.delete(request, response);
 
         // a HTTP 403 is set on the response
         verify(response).setStatus(HttpStatus.SC_FORBIDDEN);
     }
 
+    @Test
+    public void TestDelete_SessionNotFound() throws Exception {
+
+        // Given a session that does not exist
+        when(mockZebedeeCmsService.getSession(request)).thenReturn(null);
+
+        // When the delete method is called
+        collections.delete(request, response);
+
+        // The expected response code is set on the response
+        verify(response, times(1)).setStatus(HttpStatus.SC_FORBIDDEN);
+    }
+
+    @Test
+    public void TestDelete_CollectionNotFound() throws Exception {
+
+        // Given a collection ID that does not exist
+        when(mockZebedeeCmsService.getCollection(collectionID)).thenReturn(null);
+
+        String url = String.format("/collections/%s/datasets/%s", collectionID, datasetID);
+        when(request.getPathInfo()).thenReturn(url);
+        shouldAuthorise(request, true);
+
+        // When the delete method is called
+        collections.delete(request, response);
+
+        // The expected response code is set on the response
+        verify(response, times(1)).setStatus(HttpStatus.SC_NOT_FOUND);
+    }
+
     // mock the authorisation for the given request to authorise the request is the authorise param is true.
     private void shouldAuthorise(HttpServletRequest request, boolean authorise) throws ZebedeeException, IOException {
 
         Session session = mock(Session.class);
-        when(mockZebedee.getSession(request)).thenReturn(session);
+        when(mockZebedeeCmsService.getSession(request)).thenReturn(session);
 
         PermissionsService permissionsService = mock(PermissionsService.class);
-        when(mockZebedee.getPermissions()).thenReturn(permissionsService);
+        when(mockZebedeeCmsService.getPermissions()).thenReturn(permissionsService);
 
         when(permissionsService.canEdit(session)).thenReturn(authorise);
     }

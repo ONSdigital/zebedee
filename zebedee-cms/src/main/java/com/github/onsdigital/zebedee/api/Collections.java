@@ -48,9 +48,7 @@ public class Collections {
      */
     public Collections() {
         zebedeeCmsService = ZebedeeCmsService.getInstance();
-        datasetService = new ZebedeeDatasetService(
-                DatasetAPIClient.getInstance(),
-                zebedeeCmsService.getInstance());
+        datasetService = new ZebedeeDatasetService(DatasetAPIClient.getInstance());
     }
 
     /**
@@ -115,7 +113,7 @@ public class Collections {
     public void put(HttpServletRequest request, HttpServletResponse response) throws ZebedeeException, IOException, DatasetAPIException {
 
         Session session = zebedeeCmsService.getSession(request);
-        if (!zebedeeCmsService.getPermissions().canEdit(session)) {
+        if (session == null || !zebedeeCmsService.getPermissions().canEdit(session)) {
             logInfo("Forbidden request made to the collection endpoint").log();
             response.setStatus(HttpStatus.SC_FORBIDDEN);
             return;
@@ -129,11 +127,18 @@ public class Collections {
         String collectionID = pathSegments.get(1);
         String datasetID = pathSegments.get(3);
 
+        Collection collection = zebedeeCmsService.getCollection(collectionID);
+        if (collection == null) {
+            logInfo("Collection not found").collectionId(collectionID).log();
+            response.setStatus(HttpStatus.SC_NOT_FOUND);
+            return;
+        }
+
         try {
             switch (pathSegments.size()) {
                 case 4: // /collections/{collection_id}/datasets/{dataset_id}
 
-                    updateDatasetInCollection(collectionID, datasetID, request);
+                    updateDatasetInCollection(collection, datasetID, request);
                     break;
 
                 case 8: // /collections/{collection_id}/datasets/{dataset_id}/editions/{}/versions/{}
@@ -141,7 +146,7 @@ public class Collections {
                     String edition = pathSegments.get(5);
                     String version = pathSegments.get(7);
 
-                    updateDatasetVersionInCollection(collectionID, datasetID, edition, version, request);
+                    updateDatasetVersionInCollection(collection, datasetID, edition, version, request);
                     break;
 
                 default:
@@ -165,7 +170,7 @@ public class Collections {
     public void delete(HttpServletRequest request, HttpServletResponse response) throws ZebedeeException, IOException, DatasetAPIException {
 
         Session session = zebedeeCmsService.getSession(request);
-        if (!zebedeeCmsService.getPermissions().canEdit(session)) {
+        if (session == null || !zebedeeCmsService.getPermissions().canEdit(session)) {
             logInfo("Forbidden request made to the collection endpoint").log();
             response.setStatus(HttpStatus.SC_FORBIDDEN);
             return;
@@ -179,14 +184,21 @@ public class Collections {
         String collectionID = pathSegments.get(1);
         String datasetID = pathSegments.get(3);
 
+        Collection collection = zebedeeCmsService.getCollection(collectionID);
+        if (collection == null) {
+            logInfo("Collection not found").collectionId(collectionID).log();
+            response.setStatus(HttpStatus.SC_NOT_FOUND);
+            return;
+        }
+
         switch (pathSegments.size()) {
             case 4: // /collections/{collection_id}/datasets/{dataset_id}
-                removeDatasetFromCollection(collectionID, datasetID);
+                removeDatasetFromCollection(collection, datasetID);
                 break;
             case 8: // /collections/{collection_id}/datasets/{dataset_id}/editions/{}/versions/{}
                 String edition = pathSegments.get(5);
                 String version = pathSegments.get(7);
-                removeDatasetVersionFromCollection(collectionID, datasetID, edition, version);
+                removeDatasetVersionFromCollection(collection, datasetID, edition, version);
                 break;
             default:
                 response.setStatus(HttpStatus.SC_NOT_FOUND);
@@ -194,9 +206,9 @@ public class Collections {
         }
     }
 
-    private void updateDatasetVersionInCollection(String collectionID, String datasetID, String edition, String version, HttpServletRequest request) throws ZebedeeException, IOException, DatasetAPIException {
+    private void updateDatasetVersionInCollection(Collection collection, String datasetID, String edition, String version, HttpServletRequest request) throws ZebedeeException, IOException, DatasetAPIException {
         logInfo("PUT called on /collections/{}/datasets/{}/editions/{}/versions/{} endpoint")
-                .addParameter("collectionID", collectionID)
+                .addParameter("collectionID", collection.getId())
                 .addParameter("datasetID", datasetID)
                 .addParameter("edition", edition)
                 .addParameter("version", version)
@@ -205,47 +217,47 @@ public class Collections {
         try (InputStream body = request.getInputStream()){
 
             CollectionDatasetVersion datasetVersion = ContentUtil.deserialise(body, CollectionDatasetVersion.class);
-            datasetService.updateDatasetVersionInCollection(collectionID, datasetID, edition, version, datasetVersion);
+            datasetService.updateDatasetVersionInCollection(collection, datasetID, edition, version, datasetVersion);
 
         } catch (JsonSyntaxException ex) {
             throw new BadRequestException(ex.getMessage());
         }
     }
 
-    private void updateDatasetInCollection(String collectionID, String datasetID, HttpServletRequest request) throws ZebedeeException, IOException, DatasetAPIException {
+    private void updateDatasetInCollection(Collection collection, String datasetID, HttpServletRequest request) throws ZebedeeException, IOException, DatasetAPIException {
         logInfo("PUT called on /collections/{}/datasets/{} endpoint")
-                .addParameter("collectionID", collectionID)
+                .addParameter("collectionID", collection.getId())
                 .addParameter("datasetID", datasetID)
                 .log();
         try (InputStream body = request.getInputStream()){
 
             CollectionDataset dataset = ContentUtil.deserialise(body, CollectionDataset.class);
-            datasetService.updateDatasetInCollection(collectionID, datasetID, dataset);
+            datasetService.updateDatasetInCollection(collection, datasetID, dataset);
 
         } catch (JsonSyntaxException ex) {
             throw new BadRequestException(ex.getMessage());
         }
     }
 
-    private void removeDatasetVersionFromCollection(String collectionID, String datasetID, String edition, String version) throws ZebedeeException, IOException, DatasetAPIException {
+    private void removeDatasetVersionFromCollection(Collection collection, String datasetID, String edition, String version) throws ZebedeeException, IOException, DatasetAPIException {
         logInfo("DELETE called on /collections/{collection_id}/datasets/{}/editions/{}/versions/{} endpoint")
-                .addParameter("collectionID", collectionID)
+                .addParameter("collectionID", collection.getId())
                 .addParameter("datasetID", datasetID)
                 .addParameter("edition", edition)
                 .addParameter("version", version)
                 .log();
 
-        datasetService.removeDatasetVersionFromCollection(collectionID, datasetID, edition, version);
+        datasetService.removeDatasetVersionFromCollection(collection, datasetID, edition, version);
     }
 
-    private void removeDatasetFromCollection(String collectionID, String datasetID) throws ZebedeeException, IOException, DatasetAPIException {
+    private void removeDatasetFromCollection(Collection collection, String datasetID) throws ZebedeeException, IOException, DatasetAPIException {
 
         logInfo("DELETE called on /collections/{collection_id}/datasets/{} endpoint")
-                .addParameter("collectionID", collectionID)
+                .addParameter("collectionID", collection.getId())
                 .addParameter("datasetID", datasetID)
                 .log();
 
-        datasetService.removeDatasetFromCollection(collectionID, datasetID);
+        datasetService.removeDatasetFromCollection(collection, datasetID);
     }
 
     private boolean isValidPath(HttpServletResponse response, Path path, List<String> segments) {

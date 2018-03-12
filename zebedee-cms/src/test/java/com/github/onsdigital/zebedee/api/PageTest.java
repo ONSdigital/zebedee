@@ -27,7 +27,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -324,7 +323,7 @@ public class PageTest extends ZebedeeAPIBaseTestCase {
         page.deletePage(mockRequest, mockResponse);
 
         // Then no exceptions are thrown and no response status set, allowing the call to return as normal
-        verify(mockResponse, times(0)).setStatus(anyInt());
+        verify(mockResponse, times(1)).setStatus(HttpStatus.SC_OK);
     }
 
     @Test

@@ -51,7 +51,7 @@ public class APIDatasetLandingPageCreationHook implements PageUpdateHook<ApiData
         try {
             datasetAPIClient.createDataset(page.getapiDatasetId(), dataset);
         } catch (DatasetAPIException e) {
-            logError(e, "failed to create dataset in the dataset api");
+            logError(e, "failed to create dataset in the dataset api").log();
             throw new RuntimeException(e);
         }
     }

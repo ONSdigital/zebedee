@@ -35,7 +35,7 @@ public class APIDatasetLandingPageDeletionHook implements PageUpdateHook<ApiData
         try {
             datasetAPIClient.deleteDataset(page.getapiDatasetId());
         } catch (DatasetAPIException e) {
-            logError(e, "failed to delete dataset in the dataset api");
+            logError(e, "failed to delete dataset in the dataset api").log();
             throw new RuntimeException(e);
         }
     }

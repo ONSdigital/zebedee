@@ -37,6 +37,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
 
 @Api
 public class Page {
@@ -259,6 +260,8 @@ public class Page {
         try {
             page = collectionReader.getContent(uri);
         } catch (NotFoundException ex) {
+            logInfo("page is already deleted").path(uri).collectionName(collection).log();
+            response.setStatus(HttpStatus.SC_OK);
             return; // idempotent
         } catch (ZebedeeException e) {
             handleZebdeeException("exception when getting collection content", e, response, uri, session, collection);

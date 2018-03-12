@@ -50,6 +50,8 @@ public class Collections {
      */
     public Collections() throws URISyntaxException {
 
+        zebedeeCmsService = ZebedeeCmsService.getInstance();
+
         DatasetAPIClient datasetAPIClient = new DatasetAPIClient(
                 Configuration.getDatasetAPIURL(),
                 Configuration.getDatasetAPIAuthToken());
@@ -80,13 +82,13 @@ public class Collections {
     public CollectionDescriptions get(HttpServletRequest request, HttpServletResponse response)
             throws ZebedeeException {
         try {
-            Session session = Root.zebedee.getSessionsService().get(request);
+            Session session = zebedeeCmsService.getSession(request);
             CollectionDescriptions result = new CollectionDescriptions();
-            List<Collection> collections = Root.zebedee.getCollections().list();
+            List<Collection> collections = zebedeeCmsService.getZebedee().getCollections().list();
             CollectionOwner collectionOwner = zebedeeCmsService.getPublisherType(session.getEmail());
 
             for (Collection collection : collections) {
-                if (Root.zebedee.getPermissionsService().canView(session, collection.description)
+                if (zebedeeCmsService.getPermissions().canView(session, collection.description)
                         && (collection.description.collectionOwner.equals(collectionOwner))) {
 
                     CollectionDescription description = new CollectionDescription();

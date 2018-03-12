@@ -1,12 +1,10 @@
 package com.github.onsdigital.zebedee.service;
 
 import com.github.onsdigital.zebedee.exceptions.ConflictException;
-import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.CollectionDataset;
 import com.github.onsdigital.zebedee.json.CollectionDatasetVersion;
 import com.github.onsdigital.zebedee.model.Collection;
-import com.github.onsdigital.zebedee.util.ZebedeeCmsService;
 import dp.api.dataset.DatasetClient;
 import dp.api.dataset.exception.DatasetAPIException;
 import dp.api.dataset.model.Dataset;
@@ -25,23 +23,16 @@ import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
 public class ZebedeeDatasetService implements DatasetService {
 
     private DatasetClient datasetClient;
-    private ZebedeeCmsService zebedeeCms;
 
-    public ZebedeeDatasetService(DatasetClient datasetClient, ZebedeeCmsService zebedeeCms) {
+    public ZebedeeDatasetService(DatasetClient datasetClient) {
         this.datasetClient = datasetClient;
-        this.zebedeeCms = zebedeeCms;
     }
 
     /**
      * Add the dataset for the given datasetID to the collection for the collectionID.
      */
     @Override
-    public CollectionDataset updateDatasetInCollection(String collectionID, String datasetID, CollectionDataset updatedDataset) throws ZebedeeException, IOException, DatasetAPIException {
-
-        Collection collection = zebedeeCms.getCollection(collectionID);
-        if (collection == null) {
-            logInfo("Collection not found").collectionId(collectionID).logAndThrow(NotFoundException.class);
-        }
+    public CollectionDataset updateDatasetInCollection(Collection collection, String datasetID, CollectionDataset updatedDataset) throws ZebedeeException, IOException, DatasetAPIException {
 
         CollectionDataset collectionDataset;
 
@@ -67,7 +58,7 @@ public class ZebedeeDatasetService implements DatasetService {
                 collectionDataset.setUri(dataset.getLinks().getSelf().getHref());
             } else {
                 logInfo("The dataset URL has not been set on the dataset response.")
-                        .addParameter("collectionID", collectionID)
+                        .addParameter("collectionID", collection.getId())
                         .addParameter("datasetID", datasetID)
                         .log();
 
@@ -77,15 +68,15 @@ public class ZebedeeDatasetService implements DatasetService {
             if (State.CREATED.equals(dataset.getState())) {
                 // the dataset has just been added to the collection, so update collection ID on the dataset
                 Dataset datasetUpdate = new Dataset();
-                datasetUpdate.setCollection_id(collectionID);
+                datasetUpdate.setCollection_id(collection.getId());
                 datasetUpdate.setState(State.ASSOCIATED);
                 datasetClient.updateDataset(datasetID, datasetUpdate);
             }
 
             if (dataset.getState().equals(State.ASSOCIATED)
-                    && !dataset.getCollection_id().equals(collectionID)) {
+                    && !dataset.getCollection_id().equals(collection.getId())) {
                 throw new ConflictException("cannot add dataset " + datasetID
-                        + " to collection " + collectionID
+                        + " to collection " + collection.getId()
                         + " it is already in collection " + dataset.getCollection_id());
             }
 
@@ -101,12 +92,7 @@ public class ZebedeeDatasetService implements DatasetService {
      * Add the dataset version to the collection for the collectionID.
      */
     @Override
-    public CollectionDatasetVersion updateDatasetVersionInCollection(String collectionID, String datasetID, String edition, String version, CollectionDatasetVersion updatedVersion) throws ZebedeeException, IOException, DatasetAPIException {
-
-        Collection collection = zebedeeCms.getCollection(collectionID);
-        if (collection == null) {
-            logInfo("Collection not found").collectionId(collectionID).logAndThrow(NotFoundException.class);
-        }
+    public CollectionDatasetVersion updateDatasetVersionInCollection(Collection collection, String datasetID, String edition, String version, CollectionDatasetVersion updatedVersion) throws ZebedeeException, IOException, DatasetAPIException {
 
         CollectionDatasetVersion collectionDatasetVersion;
 
@@ -133,15 +119,15 @@ public class ZebedeeDatasetService implements DatasetService {
         if (State.EDITION_CONFIRMED.equals(datasetVersion.getState())) {
             // the dataset version has just been added to the collection, so update collection ID and set state
             DatasetVersion versionUpdate = new DatasetVersion();
-            versionUpdate.setCollection_id(collectionID);
+            versionUpdate.setCollection_id(collection.getId());
             versionUpdate.setState(State.ASSOCIATED);
             datasetClient.updateDatasetVersion(datasetID, edition, version, versionUpdate);
         }
 
         if (State.ASSOCIATED.equals(datasetVersion.getState())
-                && !datasetVersion.getCollection_id().equals(collectionID)) {
+                && !datasetVersion.getCollection_id().equals(collection.getId())) {
             throw new ConflictException("cannot add dataset " + datasetID
-                    + " to collection " + collectionID
+                    + " to collection " + collection.getId()
                     + " it is already in collection " + dataset.getCollection_id());
         }
 
@@ -149,7 +135,7 @@ public class ZebedeeDatasetService implements DatasetService {
             collectionDatasetVersion.setUri(datasetVersion.getLinks().getSelf().getHref());
         } else {
             logInfo("The dataset version URL has not been set on the dataset version response.")
-                    .addParameter("collectionID", collectionID)
+                    .addParameter("collectionID", collection.getId())
                     .addParameter("datasetID", datasetID)
                     .log();
 
@@ -167,12 +153,7 @@ public class ZebedeeDatasetService implements DatasetService {
      * Remove the instance for the given datasetID from the collection for the collectionID.
      */
     @Override
-    public void removeDatasetFromCollection(String collectionID, String datasetID) throws ZebedeeException, IOException, DatasetAPIException {
-
-        Collection collection = zebedeeCms.getCollection(collectionID);
-        if (collection == null) {
-            logInfo("Collection not found").collectionId(collectionID).logAndThrow(NotFoundException.class);
-        }
+    public void removeDatasetFromCollection(Collection collection, String datasetID) throws IOException, DatasetAPIException {
 
         // if its not in the collection then just return.
         Optional<CollectionDataset> existingDataset = collection.getDescription().getDataset(datasetID);
@@ -193,12 +174,7 @@ public class ZebedeeDatasetService implements DatasetService {
      * Remove the instance for the given datasetID from the collection for the collectionID.
      */
     @Override
-    public void removeDatasetVersionFromCollection(String collectionID, String datasetID, String edition, String version) throws ZebedeeException, IOException, DatasetAPIException {
-
-        Collection collection = zebedeeCms.getCollection(collectionID);
-        if (collection == null) {
-            logInfo("Collection not found").collectionId(collectionID).logAndThrow(NotFoundException.class);
-        }
+    public void removeDatasetVersionFromCollection(Collection collection, String datasetID, String edition, String version) throws IOException, DatasetAPIException {
 
         // if its not in the collection then return.
         Optional<CollectionDatasetVersion> existingDataset =

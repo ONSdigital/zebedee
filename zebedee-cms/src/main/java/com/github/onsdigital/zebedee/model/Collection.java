@@ -1243,5 +1243,9 @@ public class Collection {
 
         }).collect(Collectors.toList());
     }
+
+    public String getId() {
+        return this.description.getId();
+    }
 }
 

@@ -268,7 +268,7 @@ public class Page {
             return;
         } catch (IOException e) {
             logError(e, "exception when attempting to get collection content")
-                    .collectionId(collection.getDescription().id)
+                    .collectionId(collection)
                     .user(session.getEmail())
                     .path(uri).log();
             response.setStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR);

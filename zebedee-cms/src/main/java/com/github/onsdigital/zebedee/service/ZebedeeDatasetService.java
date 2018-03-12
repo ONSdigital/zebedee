@@ -29,6 +29,33 @@ public class ZebedeeDatasetService implements DatasetService {
     }
 
     /**
+     * Publish the datasets / versions contained in the given collection.
+     */
+    @Override
+    public void publishDatasetsInCollection(Collection collection) throws IOException, DatasetAPIException {
+
+        for (CollectionDatasetVersion datasetVersion : collection.getDescription().getDatasetVersions()) {
+
+            DatasetVersion versionUpdate = new DatasetVersion();
+            versionUpdate.setState(State.PUBLISHED);
+
+            datasetClient.updateDatasetVersion(
+                    datasetVersion.getId(),
+                    datasetVersion.getEdition(),
+                    datasetVersion.getVersion(),
+                    versionUpdate);
+        }
+
+        for (CollectionDataset dataset : collection.getDescription().getDatasets()) {
+
+            Dataset datasetUpdate = new Dataset();
+            datasetUpdate.setState(State.PUBLISHED);
+
+            datasetClient.updateDataset(dataset.getId(), datasetUpdate);
+        }
+    }
+
+    /**
      * Add the dataset for the given datasetID to the collection for the collectionID.
      */
     @Override

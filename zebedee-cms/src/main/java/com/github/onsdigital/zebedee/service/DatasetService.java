@@ -14,6 +14,11 @@ import java.io.IOException;
 public interface DatasetService {
 
     /**
+     * Publish the datasets / versions contained in the given collection.
+     */
+    void publishDatasetsInCollection(Collection collection) throws IOException, DatasetAPIException;
+
+    /**
      * Update a dataset for the given ID to the collection for the given collectionID.
      */
     CollectionDataset updateDatasetInCollection(Collection collection, String datasetID, CollectionDataset updatedDataset) throws ZebedeeException, IOException, DatasetAPIException;

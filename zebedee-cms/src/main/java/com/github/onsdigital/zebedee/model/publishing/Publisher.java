@@ -167,27 +167,27 @@ public class Publisher {
                 encryptionPassword,
                 userEmail);
 
-//        try {
-//
-//            if (filesPublished) {
-//
-//                for (CollectionDataset collectionDataset : collection.description.getDatasets()) {
-//                    collectionDataset.getId();
-//                }
-//
-//            }
-//
-//            collection.description.publishEndDate = new Date();
-//
-//        } catch (IOException e) {
-//            SlackNotification.alarm(String.format("Exception setting API dataset to published : %s: %s", collection.description.name, e.getMessage()));
-//            logError(e, "exception publishing datasets").collectionName(collection).log();
-//        } finally {
-//            // Save any updates to the collection
-//            collection.save();
-//        }
+        if (filesPublished) {
+            publishDatasets(collection);
+        }
 
         return published;
+    }
+
+    private void publishDatasets(Collection collection) throws IOException {
+
+        try {
+            datasetService.publishDatasetsInCollection(collection);
+            collection.description.publishEndDate = new Date();
+
+        } catch (Exception e) {
+            SlackNotification.alarm(String.format("Exception setting API dataset to published : %s: %s", collection.description.name, e.getMessage()));
+            logError(e, "exception publishing datasets").collectionName(collection).log();
+
+        } finally {
+            // Save any updates to the collection
+            collection.save();
+        }
     }
 
     /**

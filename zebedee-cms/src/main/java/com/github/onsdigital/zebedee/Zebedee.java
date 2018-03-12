@@ -14,6 +14,7 @@ import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
 import com.github.onsdigital.zebedee.model.encryption.ApplicationKeys;
 import com.github.onsdigital.zebedee.model.publishing.PublishedCollections;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
+import com.github.onsdigital.zebedee.service.DatasetService;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.session.service.SessionsService;
 import com.github.onsdigital.zebedee.teams.service.TeamsService;
@@ -61,6 +62,7 @@ public class Zebedee {
     private final TeamsService teamsService;
     private final SessionsService sessionsService;
     private final DataIndex dataIndex;
+    private final DatasetService datasetService;
 
     /**
      * Create a new instance of Zebedee setting.
@@ -81,6 +83,7 @@ public class Zebedee {
         this.teamsService = configuration.getTeamsService();
         this.usersService = configuration.getUsersService();
         this.verificationAgent = configuration.getVerificationAgent(isVerificationEnabled(), this);
+        this.datasetService = configuration.getDatasetService();
     }
 
     /**
@@ -299,5 +302,9 @@ public class Zebedee {
 
     public UsersService getUsersService() {
         return usersService;
+    }
+
+    public DatasetService getDatasetService() {
+        return datasetService;
     }
 }

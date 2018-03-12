@@ -18,13 +18,8 @@ import com.github.onsdigital.zebedee.model.publishing.Publisher;
 import com.github.onsdigital.zebedee.model.publishing.scheduled.PublishScheduler;
 import com.github.onsdigital.zebedee.model.publishing.scheduled.Scheduler;
 import com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration;
-import com.github.onsdigital.zebedee.service.DatasetService;
-import com.github.onsdigital.zebedee.service.ZebedeeDatasetService;
 import com.github.onsdigital.zebedee.user.model.User;
 import com.github.onsdigital.zebedee.util.SlackNotification;
-import com.github.onsdigital.zebedee.util.ZebedeeCmsService;
-import dp.api.dataset.DatasetAPIClient;
-import dp.api.dataset.DatasetClient;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -32,7 +27,6 @@ import javax.crypto.SecretKey;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.URISyntaxException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -124,20 +118,7 @@ public class Root {
         //Setting zebedee root as system property for zebedee reader module, since zebedee root is not set as environment variable on develop environment
         System.setProperty(ZEBEDEE_ROOT, root.toString());
 
-        DatasetClient datasetClient;
-        try {
-            datasetClient= new DatasetAPIClient(
-                    Configuration.getDatasetAPIURL(),
-                    Configuration.getDatasetAPIAuthToken());
-        } catch (URISyntaxException e) {
-            logError(e, "faild to initialise dataset API client");
-            throw new RuntimeException(e);
-        }
-
-        // todo: move datasetClient / datasetService into zebedeeConfiguration once it doesn't depend on zebdeeCmsService
-        DatasetService datasetService = new ZebedeeDatasetService(datasetClient, ZebedeeCmsService.getInstance());
-
-        publisher = new Publisher(datasetService);
+        publisher = new Publisher(zebedee.getDatasetService());
         scheduler = new PublishScheduler(publisher);
 
         SlackNotification.alarm("Zebedee has just started. Ensure an administrator has logged in.");

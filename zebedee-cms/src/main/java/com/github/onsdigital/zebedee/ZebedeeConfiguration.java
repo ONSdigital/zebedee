@@ -1,5 +1,6 @@
 package com.github.onsdigital.zebedee;
 
+import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.data.processing.DataIndex;
 import com.github.onsdigital.zebedee.model.Collections;
 import com.github.onsdigital.zebedee.model.Content;
@@ -12,6 +13,8 @@ import com.github.onsdigital.zebedee.permissions.service.PermissionsServiceImpl;
 import com.github.onsdigital.zebedee.permissions.store.PermissionsStore;
 import com.github.onsdigital.zebedee.permissions.store.PermissionsStoreFileSystemImpl;
 import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
+import com.github.onsdigital.zebedee.service.DatasetService;
+import com.github.onsdigital.zebedee.service.ZebedeeDatasetService;
 import com.github.onsdigital.zebedee.session.service.SessionsService;
 import com.github.onsdigital.zebedee.teams.service.TeamsService;
 import com.github.onsdigital.zebedee.teams.service.TeamsServiceImpl;
@@ -20,8 +23,11 @@ import com.github.onsdigital.zebedee.user.service.UsersService;
 import com.github.onsdigital.zebedee.user.service.UsersServiceImpl;
 import com.github.onsdigital.zebedee.user.store.UserStoreFileSystemImpl;
 import com.github.onsdigital.zebedee.verification.VerificationAgent;
+import dp.api.dataset.DatasetAPIClient;
+import dp.api.dataset.DatasetClient;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -69,6 +75,7 @@ public class ZebedeeConfiguration {
     private SessionsService sessionsService;
     private DataIndex dataIndex;
     private PermissionsStore permissionsStore;
+    private DatasetService datasetService;
 
     private static Path createDir(Path root, String dirName) throws IOException {
         Path dir = root.resolve(dirName);
@@ -146,6 +153,19 @@ public class ZebedeeConfiguration {
                 keyringCache)
         ;
 
+        DatasetClient datasetClient;
+        try {
+            datasetClient= new DatasetAPIClient(
+                    Configuration.getDatasetAPIURL(),
+                    Configuration.getDatasetAPIAuthToken());
+        } catch (URISyntaxException e) {
+            logError(e, "failed to initialise dataset api client - invalid URI");
+            throw new RuntimeException(e);
+        }
+
+        datasetService = new ZebedeeDatasetService(datasetClient);
+
+
         logDebug(LOG_PREFIX + "ZebedeeConfiguration creation complete.").log();
     }
 
@@ -221,5 +241,9 @@ public class ZebedeeConfiguration {
 
     public VerificationAgent getVerificationAgent(boolean verificationIsEnabled, Zebedee z) {
         return isUseVerificationAgent() && verificationIsEnabled ? new VerificationAgent(z) : null;
+    }
+
+    public DatasetService getDatasetService() {
+        return datasetService;
     }
 }

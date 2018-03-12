@@ -1,10 +1,10 @@
 package com.github.onsdigital.zebedee.service;
 
-import com.github.onsdigital.zebedee.dataset.api.exception.DatasetAPIException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.CollectionDataset;
 import com.github.onsdigital.zebedee.json.CollectionDatasetVersion;
 import com.github.onsdigital.zebedee.model.Collection;
+import dp.api.dataset.exception.DatasetAPIException;
 
 import java.io.IOException;
 

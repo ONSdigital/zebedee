@@ -1,17 +1,18 @@
 package com.github.onsdigital.zebedee.service;
 
-import com.github.onsdigital.zebedee.dataset.api.DatasetClient;
-import com.github.onsdigital.zebedee.dataset.api.model.Dataset;
-import com.github.onsdigital.zebedee.dataset.api.model.DatasetLinks;
-import com.github.onsdigital.zebedee.dataset.api.model.DatasetVersion;
-import com.github.onsdigital.zebedee.dataset.api.model.Link;
-import com.github.onsdigital.zebedee.dataset.api.model.State;
+
 import com.github.onsdigital.zebedee.exceptions.ConflictException;
 import com.github.onsdigital.zebedee.json.CollectionDataset;
 import com.github.onsdigital.zebedee.json.CollectionDatasetVersion;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.ContentStatus;
 import com.github.onsdigital.zebedee.model.Collection;
+import dp.api.dataset.DatasetClient;
+import dp.api.dataset.model.Dataset;
+import dp.api.dataset.model.DatasetLinks;
+import dp.api.dataset.model.DatasetVersion;
+import dp.api.dataset.model.Link;
+import dp.api.dataset.model.State;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

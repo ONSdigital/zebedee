@@ -1,18 +1,18 @@
 package com.github.onsdigital.zebedee.service;
 
-import com.github.onsdigital.zebedee.dataset.api.DatasetClient;
-import com.github.onsdigital.zebedee.dataset.api.exception.DatasetAPIException;
-import com.github.onsdigital.zebedee.dataset.api.exception.UnexpectedResponseException;
-import com.github.onsdigital.zebedee.dataset.api.model.Dataset;
-import com.github.onsdigital.zebedee.dataset.api.model.DatasetVersion;
-import com.github.onsdigital.zebedee.dataset.api.model.State;
 import com.github.onsdigital.zebedee.exceptions.ConflictException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.CollectionDataset;
 import com.github.onsdigital.zebedee.json.CollectionDatasetVersion;
 import com.github.onsdigital.zebedee.model.Collection;
+import dp.api.dataset.DatasetClient;
+import dp.api.dataset.exception.DatasetAPIException;
+import dp.api.dataset.model.Dataset;
+import dp.api.dataset.model.DatasetVersion;
+import dp.api.dataset.model.State;
 
 import java.io.IOException;
+import java.io.InvalidObjectException;
 import java.util.Optional;
 
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
@@ -62,7 +62,7 @@ public class ZebedeeDatasetService implements DatasetService {
                         .addParameter("datasetID", datasetID)
                         .log();
 
-                throw new UnexpectedResponseException("The dataset URL has not been set on the dataset response.");
+                throw new InvalidObjectException("The dataset URL has not been set on the dataset response.");
             }
 
             if (State.CREATED.equals(dataset.getState())) {
@@ -139,7 +139,7 @@ public class ZebedeeDatasetService implements DatasetService {
                     .addParameter("datasetID", datasetID)
                     .log();
 
-            throw new UnexpectedResponseException("The dataset version URL has not been set on the dataset version response.");
+            throw new InvalidObjectException("The dataset version URL has not been set on the dataset version response.");
         }
 
         collectionDatasetVersion.setTitle(dataset.getTitle());

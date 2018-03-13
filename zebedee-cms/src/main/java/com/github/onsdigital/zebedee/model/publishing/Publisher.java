@@ -38,6 +38,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.locks.Lock;
 import java.util.function.Function;
 
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logDebug;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
 
@@ -159,6 +160,7 @@ public class Publisher {
                              CollectionReader collectionReader,
                              String encryptionPassword,
                              String userEmail) throws IOException {
+
         boolean published = false;
 
         boolean filesPublished = publishFiles(
@@ -168,17 +170,21 @@ public class Publisher {
                 userEmail);
 
         if (filesPublished) {
-            publishDatasets(collection);
+            published = publishDatasets(collection);
         }
 
         return published;
     }
 
-    private void publishDatasets(Collection collection) throws IOException {
+    private boolean publishDatasets(Collection collection) throws IOException {
+
+        boolean datasetsPublished = false;
 
         try {
+            logDebug("publishing api datasets for collection").collectionName(collection).log();
             datasetService.publishDatasetsInCollection(collection);
             collection.description.publishEndDate = new Date();
+            datasetsPublished = true;
 
         } catch (Exception e) {
             SlackNotification.alarm(String.format("Exception setting API dataset to published : %s: %s", collection.description.name, e.getMessage()));
@@ -188,6 +194,8 @@ public class Publisher {
             // Save any updates to the collection
             collection.save();
         }
+
+        return datasetsPublished;
     }
 
     /**

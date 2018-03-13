@@ -23,11 +23,17 @@
         <!--</encoder>-->
     <!--</appender>-->
 
-    <!--<appender name="PRETTY_JSON" class="ch.qos.logback.core.ConsoleAppender">-->
-        <!--<encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">-->
-            <!--<layout class="com.github.onsdigital.logging.layouts.PrettyJsonLayout" />-->
-        <!--</encoder>-->
-    <!--</appender>-->
+    <appender name="PRETTY_JSON" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+            <layout class="com.github.onsdigital.logging.layouts.PrettyJsonLayout" />
+        </encoder>
+    </appender>
+
+    <logger name="dp-dataset-api-java-client" level="debug" additivity="false">
+        <!--<appender-ref ref="JSON"/>-->
+        <!--<appender-ref ref="PRETTY_JSON"/>-->
+        <appender-ref ref="PLAIN_TEXT"/>
+    </logger>
 
     <logger name="com.github.onsdigital.zebedee" level="debug" additivity="false">
         <!--<appender-ref ref="JSON"/>-->

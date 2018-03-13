@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.util.Optional;
 
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logDebug;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
 
 /**
@@ -36,6 +37,13 @@ public class ZebedeeDatasetService implements DatasetService {
 
         for (CollectionDatasetVersion datasetVersion : collection.getDescription().getDatasetVersions()) {
 
+            logDebug("setting dataset api version state to published")
+                    .collectionName(collection)
+                    .addParameter("dataset_id", datasetVersion.getId())
+                    .addParameter("edition", datasetVersion.getEdition())
+                    .addParameter("version", datasetVersion.getVersion())
+                    .log();
+
             DatasetVersion versionUpdate = new DatasetVersion();
             versionUpdate.setState(State.PUBLISHED);
 
@@ -47,6 +55,11 @@ public class ZebedeeDatasetService implements DatasetService {
         }
 
         for (CollectionDataset dataset : collection.getDescription().getDatasets()) {
+
+            logDebug("setting api dataset state to published")
+                    .collectionName(collection)
+                    .addParameter("dataset_id", dataset.getId())
+                    .log();
 
             Dataset datasetUpdate = new Dataset();
             datasetUpdate.setState(State.PUBLISHED);

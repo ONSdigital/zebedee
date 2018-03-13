@@ -50,6 +50,8 @@ public class Collections {
      */
     public Collections() throws URISyntaxException {
 
+        zebedeeCmsService = ZebedeeCmsService.getInstance();
+
         DatasetAPIClient datasetAPIClient = new DatasetAPIClient(
                 Configuration.getDatasetAPIURL(),
                 Configuration.getDatasetAPIAuthToken());

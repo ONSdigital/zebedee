@@ -10,7 +10,7 @@ export RESTOLINO_STATIC="src/main/resources/files"
 export RESTOLINO_CLASSES="zebedee-cms/target/classes"
 export PACKAGE_PREFIX=com.github.onsdigital.zebedee
 export audit_db_enabled=false
-export DP_LOGGING_FORMAT=json
+export DP_LOGGING_FORMAT=text
 export DP_COLOURED_LOGGING=true
 
 # Development: reloadable

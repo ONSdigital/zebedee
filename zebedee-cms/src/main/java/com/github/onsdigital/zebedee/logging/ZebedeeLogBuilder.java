@@ -11,6 +11,8 @@ import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.UnexpectedErrorException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.model.Collection;
+import com.github.onsdigital.zebedee.session.model.Session;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 
@@ -43,6 +45,7 @@ public class ZebedeeLogBuilder extends LogMessageBuilder {
     private static final String PATH = "path";
     private static final String ROW = "row";
     private static final String CELL = "cell";
+    private static final String SESSION_ID = "sessionID";
     private static final String BLOCKING_PATH = "blockingPath";
     private static final String BLOCKING_COLLECTION = "blockingCollection";
     private static final String TARGET_PATH = "targetPath";
@@ -188,6 +191,25 @@ public class ZebedeeLogBuilder extends LogMessageBuilder {
     public ZebedeeLogBuilder cell(Cell cell) {
         if (cell != null) {
             addParameter(CELL, cell.getColumnIndex());
+        }
+        return this;
+    }
+
+    public ZebedeeLogBuilder sessionID(String sessionID) {
+        if (!StringUtils.isEmpty(sessionID)) {
+            addParameter(SESSION_ID, sessionID);
+        }
+        return this;
+    }
+
+    public ZebedeeLogBuilder session(Session session) {
+        if (session != null) {
+            if (!StringUtils.isEmpty(session.getId())) {
+                addParameter(SESSION_ID, session.getId());
+            }
+            if (!StringUtils.isEmpty(session.getEmail())) {
+                addParameter(USER, session.getEmail());
+            }
         }
         return this;
     }

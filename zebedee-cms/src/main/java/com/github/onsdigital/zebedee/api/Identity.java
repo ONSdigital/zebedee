@@ -43,8 +43,8 @@ public class Identity {
 
         try {
             UserIdentity identity = getAuthorisationService().identifyUser(sessionID);
-            logInfo("user identity confirmed")
-                    .addParameter("sessionID", sessionID)
+            logInfo("authenticated user identity confirmed")
+                    .sessionID(sessionID)
                     .user(identity.getEmail())
                     .log();
             writeResponse(response, identity, SC_OK);

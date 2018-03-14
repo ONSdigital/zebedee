@@ -7,7 +7,7 @@ package com.github.onsdigital.zebedee.authorisation;
 public interface AuthorisationService {
 
     /**
-     * Get the {@link UserIdentity} from the specifed sessionID.
+     * Get the {@link UserIdentity} for the user the specifed sessionID belongs to.
      *
      * @param sessionID the sessionID to get the user identity from
      * @return the users Identity if the sessionID is valid, the user exists and is authenticated.

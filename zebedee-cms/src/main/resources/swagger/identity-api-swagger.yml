@@ -1,0 +1,45 @@
+swagger: '2.0'
+info:
+  version: '1.0'
+  title: Zebedee CMD Identity API
+paths:
+  /identity:
+    get:
+      summary: Identify a user from their Florence authentication token
+      parameters:
+        - in: header
+          name: X-Florence-Token
+          type: string
+          required: true
+          description: The user's Florence auth token
+      responses:
+        200:
+          description: "The identity of the authenticated user"
+          schema:
+            $ref: "#/definitions/UserIdentity"
+        401:
+          description: "user not authenticated"
+          schema:
+            $ref: "#/definitions/Error"
+        '404':
+          description: "user does not exist"
+          schema:
+            $ref: "#/definitions/Error"
+        '500':
+          description: "internal server error"
+          schema:
+            $ref: "#/definitions/Error"
+definitions:
+  UserIdentity:
+    description: "The identity of the authenticated user"
+    type: object
+    properties:
+      email:
+        example: "tyroin@lannister.com"
+        type: string
+  Error:
+    description: "internal server error"
+    type: object
+    properties:
+      message:
+        type: string

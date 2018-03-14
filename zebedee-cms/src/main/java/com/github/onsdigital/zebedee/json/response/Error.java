@@ -1,15 +1,16 @@
-package com.github.onsdigital.zebedee.authorisation;
+package com.github.onsdigital.zebedee.json.response;
 
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
+import com.github.onsdigital.zebedee.json.JSONable;
 
 /**
  * Created by dave on 07/03/2018.
  */
-public class IdentityError implements JSONable {
+public class Error implements JSONable {
 
     private String message;
 
-    public IdentityError(String message) {
+    public Error(String message) {
         this.message = message;
     }
 

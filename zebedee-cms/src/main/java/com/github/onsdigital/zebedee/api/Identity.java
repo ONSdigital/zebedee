@@ -24,51 +24,51 @@ import static org.apache.http.HttpStatus.SC_UNAUTHORIZED;
 @Api
 public class Identity {
 
-    private static final String JSON_CONTENT_TYPE = "application/json";
-    private static final String CHAR_ENCODING = "UTF-8";
+	private static final String JSON_CONTENT_TYPE = "application/json";
+	private static final String CHAR_ENCODING = "UTF-8";
 
-    private AuthorisationService authorisationService;
+	private AuthorisationService authorisationService;
 
-    @GET
-    public void identifyUser(HttpServletRequest request, HttpServletResponse response) throws IOException,
-            UserIdentityException {
-        String sessionID = RequestUtils.getSessionId(request);
+	@GET
+	public void identifyUser(HttpServletRequest request, HttpServletResponse response) throws IOException,
+			UserIdentityException {
+		String sessionID = RequestUtils.getSessionId(request);
 
-        if (StringUtils.isEmpty(sessionID)) {
-            Error responseBody = new Error("user not authenticated");
-            logWarn(responseBody.getMessage()).log();
-            writeResponse(response, responseBody, SC_UNAUTHORIZED);
-            return;
-        }
+		if (StringUtils.isEmpty(sessionID)) {
+			Error responseBody = new Error("user not authenticated");
+			logWarn(responseBody.getMessage()).log();
+			writeResponse(response, responseBody, SC_UNAUTHORIZED);
+			return;
+		}
 
-        try {
-            UserIdentity identity = getAuthorisationService().identifyUser(sessionID);
-            logInfo("authenticated user identity confirmed")
-                    .sessionID(sessionID)
-                    .user(identity.getEmail())
-                    .log();
-            writeResponse(response, identity, SC_OK);
-        } catch (UserIdentityException e) {
-            writeResponse(response, new Error(e.getMessage()), e.getResponseCode());
-        }
-    }
+		try {
+			UserIdentity identity = getAuthorisationService().identifyUser(sessionID);
+			logInfo("authenticated user identity confirmed")
+					.sessionID(sessionID)
+					.user(identity.getEmail())
+					.log();
+			writeResponse(response, identity, SC_OK);
+		} catch (UserIdentityException e) {
+			writeResponse(response, new Error(e.getMessage()), e.getResponseCode());
+		}
+	}
 
-    private void writeResponse(HttpServletResponse response, JSONable body, int status) throws IOException {
-        try {
-            response.setStatus(status);
-            response.setContentType(JSON_CONTENT_TYPE);
-            response.setCharacterEncoding(CHAR_ENCODING);
-            response.getWriter().write(body.toJSON());
-        } catch (IOException e) {
-            logError(e, "error while attempting to write userIdentity to HTTP response").log();
-            throw e;
-        }
-    }
+	private void writeResponse(HttpServletResponse response, JSONable body, int status) throws IOException {
+		try {
+			response.setStatus(status);
+			response.setContentType(JSON_CONTENT_TYPE);
+			response.setCharacterEncoding(CHAR_ENCODING);
+			response.getWriter().write(body.toJSON());
+		} catch (IOException e) {
+			logError(e, "error while attempting to write userIdentity to HTTP response").log();
+			throw e;
+		}
+	}
 
-    private AuthorisationService getAuthorisationService() {
-        if (authorisationService == null) {
-            this.authorisationService = new AuthorisationServiceImpl();
-        }
-        return authorisationService;
-    }
+	private AuthorisationService getAuthorisationService() {
+		if (authorisationService == null) {
+			this.authorisationService = new AuthorisationServiceImpl();
+		}
+		return authorisationService;
+	}
 }

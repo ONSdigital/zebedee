@@ -26,6 +26,8 @@ import javax.ws.rs.POST;
 import java.io.IOException;
 
 import static com.github.onsdigital.zebedee.configuration.Configuration.getUnauthorizedMessage;
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logDebug;
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_MANUAL_PUBLISHED_FAILURE;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_MANUAL_PUBLISHED_SUCCESS;
@@ -89,17 +91,8 @@ public class Publish {
 
     /**
      * Manual Publish the files in a collection
-     *
-     * @param collection       the collection to publish
-     * @param session          a session with editor priviledges
-     * @param skipVerification
-     * @return success
-     * @throws IOException
-     * @throws UnauthorizedException
-     * @throws BadRequestException
-     * @throws ConflictException     - If there
      */
-    public boolean publish(Collection collection,
+    private boolean publish(Collection collection,
                            Session session,
                            boolean breakBeforePublish,
                            boolean skipVerification)
@@ -117,7 +110,7 @@ public class Publish {
         }
 
         // Check approval status
-        if (collection.description.approvalStatus != ApprovalStatus.COMPLETE) {
+        if (collection.getDescription().approvalStatus != ApprovalStatus.COMPLETE) {
             throw new ConflictException("This collection cannot be published because it is not approved");
         }
 
@@ -129,7 +122,12 @@ public class Publish {
         logInfo("Going ahead with publish").log();
 
         Keyring keyring = zebedeeCmsService.getZebedee().getKeyringCache().get(session);
-        if (keyring == null) throw new UnauthorizedException("No keyring is available for " + session.getEmail());
+
+        if (keyring == null) {
+            UnauthorizedException ex = new UnauthorizedException("no keyring is available for " + session.getEmail());
+            logError(ex).user(session.getEmail()).log();
+            throw ex;
+        }
 
         ZebedeeCollectionReader collectionReader = new ZebedeeCollectionReader(zebedeeCmsService.getZebedee(), collection, session);
         long publishStart = System.currentTimeMillis();
@@ -150,6 +148,8 @@ public class Publish {
                     .collectionName(collection)
                     .timeTaken((System.currentTimeMillis() - publishStart))
                     .log();
+        } else {
+            logDebug("publish is not complete. skipping post publish").collectionName(collection).log();
         }
 
         return publishComplete;

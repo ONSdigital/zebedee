@@ -72,7 +72,7 @@ public class Publisher {
 
         // First get the in-memory (within-JVM) lock.
         // This will block attempts to write to the collection during the publishing process
-        logInfo("Attempting to lock collection before publish.").addParameter("collectionId", collection.description.id).log();
+        logInfo("Attempting to lock collection before publish.").addParameter("collectionId", collection.getDescription().id).log();
         Lock writeLock = collection.getWriteLock();
         writeLock.lock();
 
@@ -80,7 +80,7 @@ public class Publisher {
 
         try {
             // First check the state of the collection
-            if (collection.description.publishComplete) {
+            if (collection.getDescription().publishComplete) {
                 logInfo("Collection has already been published. Halting publish").collectionId(collection).log();
                 return publishComplete;
             }
@@ -101,7 +101,7 @@ public class Publisher {
                     logInfo("Starting collection publish process").collectionName(collection).log();
 
 
-                    if (collection.description.approvalStatus != ApprovalStatus.COMPLETE) {
+                    if (collection.getDescription().approvalStatus != ApprovalStatus.COMPLETE) {
                         logInfo("Collection cannot be published as it has not been approved").collectionName(collection).log();
                         return false;
                     }
@@ -143,8 +143,8 @@ public class Publisher {
         } catch (IOException e) {
 
             // slack / log a context specific message but still throw exception to fail publish
-            SlackNotification.alarm(String.format("Exception on the pre-publish of collection: %s: %s", collection.description.name, e.getMessage()));
-            logError(e, "exception on the pre-publish of collection").collectionName(collection);
+            SlackNotification.alarm(String.format("Exception on the pre-publish of collection: %s: %s", collection.getDescription().name, e.getMessage()));
+            logError(e, "exception on the pre-publish of collection").collectionName(collection).log();
             throw e;
 
         } finally {
@@ -183,11 +183,11 @@ public class Publisher {
         try {
             logDebug("publishing api datasets for collection").collectionName(collection).log();
             datasetService.publishDatasetsInCollection(collection);
-            collection.description.publishEndDate = new Date();
+            collection.getDescription().publishEndDate = new Date();
             datasetsPublished = true;
 
         } catch (Exception e) {
-            SlackNotification.alarm(String.format("Exception setting API dataset to published : %s: %s", collection.description.name, e.getMessage()));
+            SlackNotification.alarm(String.format("Exception setting API dataset to published : %s: %s", collection.getDescription().name, e.getMessage()));
             logError(e, "exception publishing datasets").collectionName(collection).log();
 
         } finally {
@@ -227,18 +227,21 @@ public class Publisher {
         boolean filesPublished = false;
 
         try {
-            collection.description.publishStartDate = new Date();
+            collection.getDescription().publishStartDate = new Date();
             SendFilteredCollectionFiles(collection, collectionReader, encryptionPassword);
             filesPublished = CommitPublish(collection, userEmail, encryptionPassword);
 
         } catch (IOException e) {
-            SlackNotification.alarm(String.format("Exception publishing collection: %s: %s", collection.description.name, e.getMessage()));
+            SlackNotification.alarm(String.format("Exception publishing collection: %s: %s", collection.getDescription().name, e.getMessage()));
             logError(e, "exception publishing collection").collectionName(collection).log();
 
             // If an error was caught, attempt to roll back the transaction:
-            Map<String, String> publishTransactionIds = collection.description.publishTransactionIds;
+            Map<String, String> publishTransactionIds = collection.getDescription().publishTransactionIds;
             if (publishTransactionIds != null && publishTransactionIds.size() > 0) {
-                logInfo("attempting rollback of collection publishing transaction").collectionName(collection).log();
+                logInfo("attempting rollback of collection publishing transaction")
+                        .collectionName(collection)
+                        .addParameter("transaction_ids", publishTransactionIds)
+                        .log();
                 rollbackPublish(publishTransactionIds, encryptionPassword);
             }
 
@@ -272,7 +275,7 @@ public class Publisher {
         long start = System.currentTimeMillis();
         List<Future<IOException>> futures = new ArrayList<>();
 
-        for (Map.Entry<String, String> entry : collection.description.publishTransactionIds.entrySet()) {
+        for (Map.Entry<String, String> entry : collection.getDescription().publishTransactionIds.entrySet()) {
             Host theTrainHost = new Host(entry.getKey());
             String transactionId = entry.getValue();
 
@@ -322,7 +325,7 @@ public class Publisher {
         logInfo("PRE-PUBLISH: Begin transaction").collectionName(collection).log();
 
         Map<String, String> hostToTransactionId = beginPublish(theTrainHosts, encryptionPassword);
-        collection.description.publishTransactionIds = hostToTransactionId;
+        collection.getDescription().publishTransactionIds = hostToTransactionId;
         collection.save();
 
         logInfo("PRE-PUBLISH: BeginPublish complete").timeTaken(System.currentTimeMillis() - start).log();
@@ -333,18 +336,18 @@ public class Publisher {
         boolean publishComplete = false;
         long start = System.currentTimeMillis();
 
-        logInfo("CommitPublish collectiom start").collectionName(collection).log();
+        logInfo("CommitPublish collection start").collectionName(collection).log();
         // If all has gone well so far, commit the publishing transaction:
         boolean success = true;
-        for (Result result : commitPublish(collection.description.publishTransactionIds, encryptionPassword)) {
+        for (Result result : commitPublish(collection.getDescription().publishTransactionIds, encryptionPassword)) {
             success &= !result.error;
-            collection.description.AddPublishResult(result);
+            collection.getDescription().AddPublishResult(result);
         }
 
         if (success) {
             Date publishedDate = new Date();
-            collection.description.addEvent(new Event(publishedDate, EventType.PUBLISHED, email));
-            collection.description.publishComplete = true;
+            collection.getDescription().addEvent(new Event(publishedDate, EventType.PUBLISHED, email));
+            collection.getDescription().publishComplete = true;
             publishComplete = true;
         }
 
@@ -418,7 +421,7 @@ public class Publisher {
                 publishUri = StringUtils.removeEnd(uri, "-to-publish.zip");
             }
 
-            for (Map.Entry<String, String> entry : collection.description.publishTransactionIds.entrySet()) {
+            for (Map.Entry<String, String> entry : collection.getDescription().publishTransactionIds.entrySet()) {
                 Host theTrainHost = new Host(entry.getKey());
                 String transactionId = entry.getValue();
                 results.add(publishFile(theTrainHost, transactionId, encryptionPassword, uri, publishUri, zipped, source, reader, pool));

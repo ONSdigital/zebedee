@@ -16,7 +16,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
 
+import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static org.apache.http.HttpStatus.SC_FORBIDDEN;
 import static org.apache.http.HttpStatus.SC_OK;
 import static org.apache.http.HttpStatus.SC_UNAUTHORIZED;
@@ -27,8 +29,6 @@ import static org.mockito.Mockito.when;
 
 public class IdentityTest {
 
-	private static final String JSON_CONTENT_TYPE = "application/json";
-	private static final String CHAR_ENCODING = "UTF-8";
 	private static final String AUTH_TOKEN = "666";
 	private static final String AUTH_TOKEN_HEADER = "X-Florence-Token";
 
@@ -124,8 +124,8 @@ public class IdentityTest {
 		} catch (IOException e) {
 			verify(authorisationService, times(1)).identifyUser(AUTH_TOKEN);
 			verify(mockResponse, times(1)).getWriter();
-			verify(mockResponse, times(1)).setCharacterEncoding(CHAR_ENCODING);
-			verify(mockResponse, times(1)).setContentType(JSON_CONTENT_TYPE);
+			verify(mockResponse, times(1)).setCharacterEncoding(StandardCharsets.UTF_8.name());
+			verify(mockResponse, times(1)).setContentType(APPLICATION_JSON);
 			verifyZeroInteractions(printWriterMock);
 			throw e;
 		}
@@ -133,8 +133,8 @@ public class IdentityTest {
 
 	private void verifyResponseInteractions(JSONable body, int statusCode) throws IOException {
 		verify(mockResponse, times(1)).getWriter();
-		verify(mockResponse, times(1)).setCharacterEncoding(CHAR_ENCODING);
-		verify(mockResponse, times(1)).setContentType(JSON_CONTENT_TYPE);
+		verify(mockResponse, times(1)).setCharacterEncoding(StandardCharsets.UTF_8.name());
+		verify(mockResponse, times(1)).setContentType(APPLICATION_JSON);
 		verify(printWriterMock, times(1)).write(body.toJSON());
 		verify(mockResponse, times(1)).setStatus(statusCode);
 	}

@@ -13,19 +13,19 @@ import org.apache.commons.lang3.StringUtils;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
+import javax.ws.rs.core.MediaType;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logWarn;
+import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static org.apache.http.HttpStatus.SC_OK;
 import static org.apache.http.HttpStatus.SC_UNAUTHORIZED;
 
 @Api
 public class Identity {
-
-	private static final String JSON_CONTENT_TYPE = "application/json";
-	private static final String CHAR_ENCODING = "UTF-8";
 
 	private AuthorisationService authorisationService;
 
@@ -49,6 +49,7 @@ public class Identity {
 					.log();
 			writeResponse(response, identity, SC_OK);
 		} catch (UserIdentityException e) {
+			logError(e, "identify user failure, returning error response").log();
 			writeResponse(response, new Error(e.getMessage()), e.getResponseCode());
 		}
 	}
@@ -56,8 +57,8 @@ public class Identity {
 	private void writeResponse(HttpServletResponse response, JSONable body, int status) throws IOException {
 		try {
 			response.setStatus(status);
-			response.setContentType(JSON_CONTENT_TYPE);
-			response.setCharacterEncoding(CHAR_ENCODING);
+			response.setContentType(APPLICATION_JSON);
+			response.setCharacterEncoding(StandardCharsets.UTF_8.name());
 			response.getWriter().write(body.toJSON());
 		} catch (IOException e) {
 			logError(e, "error while attempting to write userIdentity to HTTP response").log();

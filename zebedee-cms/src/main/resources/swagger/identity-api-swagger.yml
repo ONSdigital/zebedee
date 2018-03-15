@@ -2,44 +2,84 @@ swagger: '2.0'
 info:
   version: '1.0'
   title: Zebedee CMD Identity API
+parameters:
+  authHeader:
+    in: header
+    name: Authorization
+    type: string
+    required: true
+    description: "A string containing the bearer's token. This needs to contain the <bearer> <token>"
+  florence:
+    in: header
+    name: X-Florence-Token
+    type: string
+    required: false
+    description: "The user's Florence auth token"
+  newService:
+    name: newService
+    in: body
+    schema:
+      $ref: '#/definitions/Service'
 paths:
   /identity:
     get:
-      summary: Identify a user from their Florence authentication token
+      summary: "Identify a entity from their auth token"
+      description: "If no florence token is provided, the identity object will contain the callers id instead."
       parameters:
-        - in: header
-          name: X-Florence-Token
-          type: string
-          required: true
-          description: The user's Florence auth token
+      - $ref: '#/parameters/authHeader'
+      - $ref: '#/parameters/florence'
       responses:
         200:
           description: "The identity of the authenticated user"
           schema:
-            $ref: "#/definitions/UserIdentity"
+            $ref: "#/definitions/Identity"
         401:
           description: "user not authenticated"
           schema:
             $ref: "#/definitions/Error"
-        '404':
-          description: "user does not exist"
-          schema:
-            $ref: "#/definitions/Error"
-        '500':
+        500:
           description: "internal server error"
           schema:
             $ref: "#/definitions/Error"
+  /service:
+      post:
+        summary: "Create a new service account"
+        description: "Create a service which can authenticated against /identity. Only the name is required. Once created a token will re returned from the response. Only a admin can call this endpoint"
+        parameters:
+        - $ref: "#/parameters/newService"
+        responses:
+          200:
+            description: "A new service was created"
+            schema:
+              $ref: "#/definitions/Service"
+          400:
+            description: "bad request"
+          500:
+            description: "internal server error"
 definitions:
-  UserIdentity:
-    description: "The identity of the authenticated user"
+  Identity:
+    description: "The identity of the authenticated user or service"
     type: object
     properties:
-      email:
+      identifier:
         example: "tyroin@lannister.com"
         type: string
   Error:
     description: "internal server error"
+    type: array
+    items:
+      type: object
+      properties:
+        message:
+          type: string
+  Service:
+    description: "A service account"
     type: object
     properties:
-      message:
+      name:
+        description: "The name of the service"
         type: string
+      token:
+        decription: "The token to identify the service"
+        type: string
+        readOnly: true

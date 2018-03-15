@@ -121,12 +121,13 @@ public class Collections {
     public void put(HttpServletRequest request, HttpServletResponse response) throws ZebedeeException, IOException, DatasetAPIException {
 
         Session session = zebedeeCmsService.getSession(request);
-        String user = session.getEmail();
         if (session == null || !zebedeeCmsService.getPermissions().canEdit(session)) {
             logInfo("Forbidden request made to the collection endpoint").log();
             response.setStatus(HttpStatus.SC_FORBIDDEN);
             return;
         }
+
+        String user = session.getEmail();
 
         Path path = Path.newInstance(request);
         List<String> pathSegments = path.segments();

@@ -1,9 +1,6 @@
 package com.github.onsdigital.zebedee.service;
 
-import com.github.onsdigital.zebedee.exceptions.ConflictException;
-import com.github.onsdigital.zebedee.exceptions.ForbiddenException;
-import com.github.onsdigital.zebedee.exceptions.NotFoundException;
-import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
+import com.github.onsdigital.zebedee.exceptions.*;
 import com.github.onsdigital.zebedee.json.CollectionDataset;
 import com.github.onsdigital.zebedee.json.CollectionDatasetVersion;
 import com.github.onsdigital.zebedee.json.ContentStatus;
@@ -33,9 +30,14 @@ public class ZebedeeDatasetService implements DatasetService {
         this.datasetClient = datasetClient;
     }
 
-    private ContentStatus updatedStateInCollection(ContentStatus currentState, ContentStatus newState, String lastEditedBy, String user) throws ForbiddenException {
+    private ContentStatus updatedStateInCollection(ContentStatus currentState, ContentStatus newState, String lastEditedBy, String user) throws ForbiddenException, BadRequestException {
+        if (currentState == null && newState.equals(ContentStatus.Reviewed)) {
+            throw new BadRequestException("Cannot be reviewed without being submitted for review first");
+        }
+
+        // Updating from scratch to 'in progress' or 'complete' state so don't need to perform following checks
         if (currentState == null) {
-            currentState = ContentStatus.InProgress;
+            return newState;
         }
 
         // The same user can't review edits they've submitted for review

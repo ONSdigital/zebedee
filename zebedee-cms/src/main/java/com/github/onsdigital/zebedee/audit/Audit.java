@@ -209,7 +209,7 @@ public class Audit {
          * The collection affected.
          */
         public ParameterBuilder collection(Collection collection) {
-            parameters.add("Collection: " + collection.path);
+            parameters.add("Collection: " + collection.getPath());
             return this;
         }
 

@@ -3,13 +3,7 @@ package com.github.onsdigital.zebedee.filters;
 import com.github.davidcarboni.restolino.framework.Filter;
 import com.github.davidcarboni.restolino.helpers.Path;
 import com.github.davidcarboni.restolino.json.Serialiser;
-import com.github.onsdigital.zebedee.api.ClickEventLog;
-import com.github.onsdigital.zebedee.api.CsdbKey;
-import com.github.onsdigital.zebedee.api.CsdbNotify;
-import com.github.onsdigital.zebedee.api.Login;
-import com.github.onsdigital.zebedee.api.Password;
-import com.github.onsdigital.zebedee.api.Ping;
-import com.github.onsdigital.zebedee.api.Root;
+import com.github.onsdigital.zebedee.api.*;
 import com.github.onsdigital.zebedee.search.api.endpoint.ReIndex;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.google.common.collect.ImmutableList;
@@ -33,6 +27,8 @@ public class AuthenticationFilter implements Filter {
 			.add(ReIndex.class)
 			.add(Ping.class)
 			.add(ClickEventLog.class)
+			.add(Identity.class)
+			.add(Service.class)
 			.build();
 
 	/**

@@ -5,10 +5,13 @@ import com.github.onsdigital.zebedee.authorisation.UserIdentity;
 import com.github.onsdigital.zebedee.authorisation.UserIdentityException;
 import com.github.onsdigital.zebedee.json.JSONable;
 import com.github.onsdigital.zebedee.json.response.Error;
+import com.github.onsdigital.zebedee.model.ServiceAccount;
+import com.github.onsdigital.zebedee.service.ServiceStore;
 import com.github.onsdigital.zebedee.session.model.Session;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -29,8 +32,10 @@ import static org.mockito.Mockito.when;
 
 public class IdentityTest {
 
-	private static final String AUTH_TOKEN = "666";
-	private static final String AUTH_TOKEN_HEADER = "X-Florence-Token";
+	private static final String FLORENCE_TOKEN = "666";
+	private static final String FLORENCE_TOKEN_HEADER = "X-Florence-Token";
+	private static final String AUTH_TOKEN = "bearer 123";
+	private static final String SERVICE_NAME = "dp-dataset-api";
 
 	@Mock
 	private HttpServletRequest mockRequest;
@@ -44,6 +49,9 @@ public class IdentityTest {
 	@Mock
 	private AuthorisationService authorisationService;
 
+	@Mock
+	private ServiceStore serviceStore;
+
 	private Identity api;
 
 	@Before
@@ -53,6 +61,8 @@ public class IdentityTest {
 		MockitoAnnotations.initMocks(this);
 
 		ReflectionTestUtils.setField(api, "authorisationService", authorisationService);
+
+		ReflectionTestUtils.setField(api, "serviceStore", serviceStore);
 	}
 
 	@Test
@@ -63,56 +73,96 @@ public class IdentityTest {
 		api.identifyUser(mockRequest, mockResponse);
 
 		verifyZeroInteractions(authorisationService);
-		verifyResponseInteractions(new Error("user not authenticated"), SC_UNAUTHORIZED);
+		verifyResponseInteractions(new Error("service not authenticated"), SC_UNAUTHORIZED);
 	}
 
 	@Test
 	public void shouldReturnExpectedErrorStatusIfIdentifyUserFails() throws Exception {
-		when(mockRequest.getHeader(AUTH_TOKEN_HEADER))
-				.thenReturn(AUTH_TOKEN);
-		when(authorisationService.identifyUser(AUTH_TOKEN))
+		when(mockRequest.getHeader(FLORENCE_TOKEN_HEADER))
+				.thenReturn(FLORENCE_TOKEN);
+		when(authorisationService.identifyUser(FLORENCE_TOKEN))
 				.thenThrow(new UserIdentityException("bang!", SC_FORBIDDEN));
 		when(mockResponse.getWriter())
 				.thenReturn(printWriterMock);
+		when(serviceStore.get(Mockito.any())).thenReturn(new ServiceAccount(SERVICE_NAME));
+		when(mockRequest.getHeader(Identity.AUTHORIZATION_HEADER)).thenReturn(AUTH_TOKEN);
 
 		api.identifyUser(mockRequest, mockResponse);
 
-		verify(authorisationService, times(1)).identifyUser(AUTH_TOKEN);
+		verify(authorisationService, times(1)).identifyUser(FLORENCE_TOKEN);
 		verifyResponseInteractions(new Error("bang!"), SC_FORBIDDEN);
 	}
 
 	@Test
-	public void shouldReturnIdentityAndOKResponseForSuccess() throws Exception {
+	public void shouldReturnIdentityUserAndOKResponseForSuccess() throws Exception {
 		Session session = new Session();
 		session.setEmail("dartagnan@strangerThings.com");
-		session.setId(AUTH_TOKEN);
+		session.setId(FLORENCE_TOKEN);
+
+
 
 		UserIdentity identity = new UserIdentity(session);
 
-		when(mockRequest.getHeader(AUTH_TOKEN_HEADER))
-				.thenReturn(AUTH_TOKEN);
-		when(authorisationService.identifyUser(AUTH_TOKEN))
+		when(serviceStore.get(Mockito.any())).thenReturn(new ServiceAccount(SERVICE_NAME));
+		when(mockRequest.getHeader(Identity.AUTHORIZATION_HEADER)).thenReturn(AUTH_TOKEN);
+		when(mockRequest.getHeader(FLORENCE_TOKEN_HEADER)).thenReturn(FLORENCE_TOKEN);
+		when(authorisationService.identifyUser(FLORENCE_TOKEN))
 				.thenReturn(identity);
 		when(mockResponse.getWriter())
 				.thenReturn(printWriterMock);
 
 		api.identifyUser(mockRequest, mockResponse);
 
-		verify(authorisationService, times(1)).identifyUser(AUTH_TOKEN);
+		verify(serviceStore, times(1)).get("123");
+		verify(authorisationService, times(1)).identifyUser(FLORENCE_TOKEN);
 		verifyResponseInteractions(identity, SC_OK);
 	}
 
-	@Test(expected = IOException.class)
+	@Test
+	public void shouldReturnIdentityServiceAndOKResponseForSuccess() throws Exception {
+		final ServiceAccount serviceAccount = new ServiceAccount(SERVICE_NAME);
+		UserIdentity identity = new UserIdentity(serviceAccount.getId());
+		when(serviceStore.get(Mockito.any())).thenReturn(serviceAccount);
+		when(mockRequest.getHeader(Identity.AUTHORIZATION_HEADER)).thenReturn(AUTH_TOKEN);
+		when(mockResponse.getWriter())
+				.thenReturn(printWriterMock);
+
+		api.identifyUser(mockRequest, mockResponse);
+
+		verify(serviceStore, times(1)).get("123");
+		verify(authorisationService, times(0)).identifyUser(FLORENCE_TOKEN);
+		verifyResponseInteractions(identity, SC_OK);
+	}
+
+	@Test
+	public void shouldReturnErrorAndUnathorizedResponseForNoHeader() throws Exception {
+		final ServiceAccount serviceAccount = new ServiceAccount(SERVICE_NAME);
+		UserIdentity identity = new UserIdentity(serviceAccount.getId());
+		when(serviceStore.get(Mockito.any())).thenReturn(serviceAccount);
+		when(mockRequest.getHeader(Identity.AUTHORIZATION_HEADER)).thenReturn(AUTH_TOKEN);
+		when(mockResponse.getWriter())
+				.thenReturn(printWriterMock);
+
+		api.identifyUser(mockRequest, mockResponse);
+
+		verify(serviceStore, times(1)).get("123");
+		verify(authorisationService, times(0)).identifyUser(FLORENCE_TOKEN);
+		verifyResponseInteractions(identity, SC_OK);
+	}
+
+		@Test(expected = IOException.class)
 	public void shouldThrowIOExIfFailsToWriteResponse() throws Exception {
 		Session session = new Session();
 		session.setEmail("dartagnan@strangerThings.com");
-		session.setId(AUTH_TOKEN);
+		session.setId(FLORENCE_TOKEN);
 
 		UserIdentity identity = new UserIdentity(session);
 
-		when(mockRequest.getHeader(AUTH_TOKEN_HEADER))
-				.thenReturn(AUTH_TOKEN);
-		when(authorisationService.identifyUser(AUTH_TOKEN))
+		when(serviceStore.get(Mockito.any())).thenReturn(new ServiceAccount(SERVICE_NAME));
+		when(mockRequest.getHeader(Identity.AUTHORIZATION_HEADER)).thenReturn(AUTH_TOKEN);
+		when(mockRequest.getHeader(FLORENCE_TOKEN_HEADER))
+				.thenReturn(FLORENCE_TOKEN);
+		when(authorisationService.identifyUser(FLORENCE_TOKEN))
 				.thenReturn(identity);
 		when(mockResponse.getWriter())
 				.thenReturn(printWriterMock);
@@ -122,7 +172,7 @@ public class IdentityTest {
 		try {
 			api.identifyUser(mockRequest, mockResponse);
 		} catch (IOException e) {
-			verify(authorisationService, times(1)).identifyUser(AUTH_TOKEN);
+			verify(authorisationService, times(1)).identifyUser(FLORENCE_TOKEN);
 			verify(mockResponse, times(1)).getWriter();
 			verify(mockResponse, times(1)).setCharacterEncoding(StandardCharsets.UTF_8.name());
 			verify(mockResponse, times(1)).setContentType(APPLICATION_JSON);

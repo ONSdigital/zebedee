@@ -10,20 +10,20 @@ import static java.util.Objects.requireNonNull;
 
 public class UserIdentity implements JSONable {
 
-    private String email;
+    private String identifier;
 
     public UserIdentity(Session session) {
         requireNonNull(session);
-        this.email = session.getEmail();
+        this.identifier = session.getEmail();
     }
 
     public UserIdentity(String email) {
         requireNonNull(email);
-        this.email = email;
+        this.identifier = email;
     }
 
-    public String getEmail() {
-        return email;
+    public String getIdentifier() {
+        return identifier;
     }
 
     @Override
@@ -40,14 +40,14 @@ public class UserIdentity implements JSONable {
         UserIdentity identity = (UserIdentity) o;
 
         return new EqualsBuilder()
-                .append(getEmail(), identity.getEmail())
+                .append(getIdentifier(), identity.getIdentifier())
                 .isEquals();
     }
 
     @Override
     public int hashCode() {
         return new HashCodeBuilder(17, 37)
-                .append(getEmail())
+                .append(getIdentifier())
                 .toHashCode();
     }
 }

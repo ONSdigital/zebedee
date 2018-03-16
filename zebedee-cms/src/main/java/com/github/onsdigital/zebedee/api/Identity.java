@@ -7,13 +7,14 @@ import com.github.onsdigital.zebedee.authorisation.UserIdentity;
 import com.github.onsdigital.zebedee.authorisation.UserIdentityException;
 import com.github.onsdigital.zebedee.json.JSONable;
 import com.github.onsdigital.zebedee.json.response.Error;
+import com.github.onsdigital.zebedee.model.ServiceAccount;
 import com.github.onsdigital.zebedee.reader.util.RequestUtils;
+import com.github.onsdigital.zebedee.service.ServiceStore;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
-import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
@@ -28,9 +29,30 @@ import static org.apache.http.HttpStatus.SC_UNAUTHORIZED;
 public class Identity {
 
 	private AuthorisationService authorisationService;
+    private ServiceStore serviceStore;
 
-	@GET
+    static final String AUTHORIZATION_HEADER = "Authorization";
+
+    @GET
 	public void identifyUser(HttpServletRequest request, HttpServletResponse response) throws IOException,
+			UserIdentityException {
+
+		if (request.getHeader(AUTHORIZATION_HEADER) != null) {
+			ServiceAccount serviceAccount = findService(request);
+			if (serviceAccount != null) {
+				if (request.getHeader(RequestUtils.TOKEN_HEADER) != null) {
+					findUser(request, response);
+					return;
+				} else {
+					writeResponse(response, new UserIdentity(serviceAccount.getId()), SC_OK);
+				    return;
+				}
+			}
+		}
+		writeResponse(response, new Error("service not authenticated"), SC_UNAUTHORIZED);
+	}
+
+	private void findUser(HttpServletRequest request, HttpServletResponse response) throws IOException,
 			UserIdentityException {
 		String sessionID = RequestUtils.getSessionId(request);
 
@@ -45,13 +67,35 @@ public class Identity {
 			UserIdentity identity = getAuthorisationService().identifyUser(sessionID);
 			logInfo("authenticated user identity confirmed")
 					.sessionID(sessionID)
-					.user(identity.getEmail())
+					.user(identity.getIdentifier())
 					.log();
 			writeResponse(response, identity, SC_OK);
 		} catch (UserIdentityException e) {
 			logError(e, "identify user failure, returning error response").log();
 			writeResponse(response, new Error(e.getMessage()), e.getResponseCode());
 		}
+	}
+
+	private ServiceAccount findService(HttpServletRequest request) throws IOException {
+        final ServiceStore serviceStore = getServiceStoreImpl();
+		String authorizationHeader = request.getHeader("Authorization");
+		if (authorizationHeader != null) {
+			authorizationHeader = authorizationHeader.toLowerCase();
+			if (authorizationHeader.toLowerCase().startsWith("bearer ")) {
+				String[] cred = authorizationHeader.split("bearer ");
+				String token = cred[1];
+				final ServiceAccount service = serviceStore.get(token);
+				if (service != null) {
+					logInfo("authenticated service account confirmed")
+							.user(service.getId())
+							.log();
+					return service;
+				} else {
+					return null;
+				}
+			}
+		}
+		return null;
 	}
 
 	private void writeResponse(HttpServletResponse response, JSONable body, int status) throws IOException {
@@ -72,4 +116,12 @@ public class Identity {
 		}
 		return authorisationService;
 	}
+
+	private ServiceStore getServiceStoreImpl() {
+        if (serviceStore == null) {
+            this.serviceStore = Root.zebedee.getServiceStore();
+        }
+        return serviceStore;
+    }
+
 }

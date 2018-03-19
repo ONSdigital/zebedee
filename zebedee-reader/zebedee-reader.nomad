@@ -37,6 +37,8 @@ job "zebedee-reader" {
 
         args = [
           "java",
+          "-server",
+          "-Xms{{WEB_RESOURCE_HEAP_MEM}}m",
           "-Xmx{{WEB_RESOURCE_HEAP_MEM}}m",
           "-cp target/dependency/*:target/classes/",
           "-Drestolino.classes=target/classes",

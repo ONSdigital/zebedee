@@ -16,6 +16,8 @@ public class ServiceStoreImpl implements ServiceStore {
 
     private final JSONSerialiser<ServiceAccount> jsonSerialise;
 
+    private final static String JSON_EXTENSION = ".json";
+
     public ServiceStoreImpl(Path rootLocation) {
         this.rootLocation = rootLocation;
         this.jsonSerialise = new JSONSerialiser<>(ServiceAccount.class);
@@ -26,7 +28,6 @@ public class ServiceStoreImpl implements ServiceStore {
         ServiceAccount service = null;
         final Path path = getPath(id);
         if (Files.exists(getPath(id))) {
-            System.out.println(path.toString());
             try (InputStream input = Files.newInputStream(path)) {
                 service = jsonSerialise.deserialiseQuietly(input, path);
             }
@@ -35,17 +36,18 @@ public class ServiceStoreImpl implements ServiceStore {
     }
 
     @Override
-    public void store(String token, InputStream service) throws IOException {
-        final Path path = rootLocation.resolve(token + ".json");
+    public ServiceAccount store(String token, InputStream service) throws IOException {
+        final Path path = rootLocation.resolve(token + JSON_EXTENSION);
         ServiceAccount object = jsonSerialise.deserialiseQuietly(service, path);
         jsonSerialise.serialise(path, object);
+        return object;
     }
 
     private Path getPath(String id) {
         Path result = null;
         if (StringUtils.isNotBlank(id)) {
             String sessionFileName = PathUtils.toFilename(id);
-            sessionFileName += ".json";
+            sessionFileName += JSON_EXTENSION;
             result = rootLocation.resolve(sessionFileName);
         }
         return result;

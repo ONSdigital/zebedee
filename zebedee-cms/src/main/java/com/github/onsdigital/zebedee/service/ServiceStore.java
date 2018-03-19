@@ -9,5 +9,5 @@ public interface ServiceStore {
 
      ServiceAccount get(String id) throws IOException;
 
-     void store(String token, InputStream service) throws IOException;
+     ServiceAccount store(String token, InputStream service) throws IOException;
 }

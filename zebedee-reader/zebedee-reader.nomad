@@ -13,7 +13,7 @@ job "zebedee-reader" {
     healthy_deadline = "2m"
     max_parallel     = 1
     auto_revert      = true
-    stagger          = "90s"
+    stagger          = "150s"
   }
 
   group "web" {

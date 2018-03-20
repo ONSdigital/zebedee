@@ -15,6 +15,7 @@ import dp.api.dataset.model.State;
 
 import java.io.IOException;
 import java.io.InvalidObjectException;
+import java.util.Objects;
 import java.util.Optional;
 
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
@@ -31,12 +32,15 @@ public class ZebedeeDatasetService implements DatasetService {
     }
 
     private ContentStatus updatedStateInCollection(ContentStatus currentState, ContentStatus newState, String lastEditedBy, String user) throws ForbiddenException, BadRequestException {
+
+        Objects.requireNonNull(newState);
+
         if (currentState == null && newState.equals(ContentStatus.Reviewed)) {
             throw new BadRequestException("Cannot be reviewed without being submitted for review first");
         }
 
         // Updating from scratch to 'in progress' or 'complete' state so don't need to perform following checks
-        if (currentState == null) {
+        if (currentState == null && (newState.equals(ContentStatus.InProgress) || newState.equals(ContentStatus.Reviewed))) {
             return newState;
         }
 

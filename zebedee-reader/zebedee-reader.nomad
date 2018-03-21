@@ -25,7 +25,8 @@ job "zebedee-reader" {
 
     constraint {
       attribute = "${node.class}"
-      value     = "web"
+      operator  = "regexp"
+      value     = "web.*"
     }
 
     task "zebedee-reader" {

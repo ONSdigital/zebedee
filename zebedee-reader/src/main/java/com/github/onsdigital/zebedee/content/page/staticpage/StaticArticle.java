@@ -27,6 +27,7 @@ public class StaticArticle extends Page {
     private List<FigureSection> tables = new ArrayList<>();
     private List<FigureSection> images = new ArrayList<>();
     private List<FigureSection> equations = new ArrayList<>();
+    private List<FigureSection> maps = new ArrayList<>();
 
     private List<Alert> alerts;
 
@@ -121,5 +122,13 @@ public class StaticArticle extends Page {
 
     public void setLinks(List<Link> links) {
         this.links = links;
+    }
+
+    public List<FigureSection> getMaps() {
+        return maps;
+    }
+
+    public void setMaps(List<FigureSection> maps) {
+        this.maps = maps;
     }
 }

@@ -44,6 +44,10 @@ public class ZebedeeDatasetService implements DatasetService {
             return newState;
         }
 
+        if (lastEditedBy == null) {
+          return null;
+        }
+
         // The same user can't review edits they've submitted for review
         if (!currentState.equals(ContentStatus.Reviewed) && newState.equals(ContentStatus.Reviewed) && lastEditedBy.equalsIgnoreCase(user)) {
             throw new ForbiddenException("User " + user + "doesn't have permission to review a dataset they completed");

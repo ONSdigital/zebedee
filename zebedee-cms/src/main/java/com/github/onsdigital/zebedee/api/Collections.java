@@ -222,6 +222,7 @@ public class Collections {
                 .addParameter("datasetID", datasetID)
                 .addParameter("edition", edition)
                 .addParameter("version", version)
+                .user(user)
                 .log();
 
         try (InputStream body = request.getInputStream()) {
@@ -238,6 +239,7 @@ public class Collections {
         logInfo("PUT called on /collections/{}/datasets/{} endpoint")
                 .addParameter("collectionID", collection.getId())
                 .addParameter("datasetID", datasetID)
+                .user(user)
                 .log();
         try (InputStream body = request.getInputStream()) {
 

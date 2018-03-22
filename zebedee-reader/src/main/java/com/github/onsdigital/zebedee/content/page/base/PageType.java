@@ -40,6 +40,7 @@ public enum PageType {
     reference_tables("Reference tables"),
     chart("Chart page"),
     table("Table page"),
+    map("Map page"),
     image("Image page"),
     visualisation("Visualisation page"),
     equation("Equation page");

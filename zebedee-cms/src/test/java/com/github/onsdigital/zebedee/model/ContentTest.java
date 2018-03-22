@@ -15,7 +15,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
-import static com.github.onsdigital.zebedee.model.Content.isVisibleForCollectionOwner;
+import static com.github.onsdigital.zebedee.model.Content.isVisible;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.*;
 
@@ -124,7 +124,7 @@ public class ContentTest {
         Content content = new Content(basePath, basePath);
 
         // When the nestedDetails method is called
-        ContentDetail root = content.nestedDetails(CollectionOwner.PUBLISHING_SUPPORT);
+        ContentDetail root = content.nestedDetails();
 
         // Then the result has child nodes defined.
         assertNotNull(root);
@@ -140,7 +140,7 @@ public class ContentTest {
         Content content = new Content(basePath, basePath);
 
         // When the nestedDetails method is called
-        ContentDetail root = content.nestedDetails(CollectionOwner.PUBLISHING_SUPPORT);
+        ContentDetail root = content.nestedDetails();
 
         // Then the result has child nodes ordered alphabetically
         assertNotNull(root);
@@ -159,7 +159,7 @@ public class ContentTest {
         Content content = new Content(basePath, basePath);
 
         // When the nestedDetails method is called
-        ContentDetail root = content.nestedDetails(CollectionOwner.PUBLISHING_SUPPORT);
+        ContentDetail root = content.nestedDetails();
 
         // Then a directory with no data.json file will still be evaluated but only the name returned without the URI.
         ContentDetail bulletinDirectoryDetails = root.children.get(0).children.get(0);
@@ -236,7 +236,7 @@ public class ContentTest {
         p = p.resolve("timeseries");
         p.toFile().mkdir();
 
-        assertThat(isVisibleForCollectionOwner(CollectionOwner.PUBLISHING_SUPPORT, p), is(false));
+        assertThat(isVisible(p), is(false));
     }
 
     @Test
@@ -247,7 +247,7 @@ public class ContentTest {
         zebedeeURI = zebedeeURI.resolve("nested");
         zebedeeURI.toFile().mkdir();
 
-        assertThat(isVisibleForCollectionOwner(CollectionOwner.PUBLISHING_SUPPORT, zebedeeURI), is(false));
+        assertThat(isVisible(zebedeeURI), is(false));
     }
 
     @Test
@@ -256,7 +256,7 @@ public class ContentTest {
         p = p.resolve("datasets");
         p.toFile().mkdir();
 
-        assertThat(isVisibleForCollectionOwner(CollectionOwner.PUBLISHING_SUPPORT, p), is(true));
+        assertThat(isVisible(p), is(true));
     }
 
 
@@ -266,7 +266,7 @@ public class ContentTest {
         p = p.resolve("thisisnotatimeseriesdir");
         p.toFile().mkdir();
 
-        boolean result = isVisibleForCollectionOwner(CollectionOwner.PUBLISHING_SUPPORT, p);
+        boolean result = isVisible(p);
         assertThat(result, is(true));
     }
 }

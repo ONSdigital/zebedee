@@ -14,7 +14,11 @@ import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.ApprovalStatus;
 import com.github.onsdigital.zebedee.json.EventType;
-import com.github.onsdigital.zebedee.model.*;
+import com.github.onsdigital.zebedee.model.Collection;
+import com.github.onsdigital.zebedee.model.CollectionWriter;
+import com.github.onsdigital.zebedee.model.Collections;
+import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
+import com.github.onsdigital.zebedee.model.ZebedeeCollectionWriter;
 import com.github.onsdigital.zebedee.model.approval.ApproveTask;
 import com.github.onsdigital.zebedee.model.approval.tasks.timeseries.TimeSeriesCompressionTask;
 import com.github.onsdigital.zebedee.model.publishing.PublishNotification;
@@ -72,7 +76,7 @@ public class CsdbImporter {
             InputStream csdbData
     ) throws IOException, BadRequestException, UnauthorizedException, NotFoundException {
         for (Collection collection : collections.list()) {
-            SecretKey collectionKey = keyCache.get(collection.description.id);
+            SecretKey collectionKey = keyCache.get(collection.getDescription().getId());
             CollectionReader collectionReader = new ZebedeeCollectionReader(collection, collectionKey);
             Path csdbFileUri = getCsdbPathFromCollection(csdbIdentifier, collectionReader);
             if (csdbFileUri != null) {
@@ -194,14 +198,14 @@ public class CsdbImporter {
             if (collection != null) {
 
                 logInfo("Found collection found for CSDB identifier")
-                        .addParameter("collectionName", collection.description.name)
+                        .addParameter("collectionName", collection.getDescription().getName())
                         .addParameter("CSDBIdentifier", csdbIdentifier).log();
 
                 if (collection.description.approvalStatus == ApprovalStatus.COMPLETE) {
                     preProcessCollection(collection);
                 } else {
                     logInfo("Collection for CSDB identifier is not approved")
-                            .addParameter("collectionName", collection.description.name)
+                            .addParameter("collectionName", collection.getDescription().getName())
                             .addParameter("CSDBIdentifier", csdbIdentifier).log();
                 }
             } else {
@@ -223,7 +227,7 @@ public class CsdbImporter {
      * @throws ZebedeeException
      */
     public void preProcessCollection(Collection collection) throws IOException, ZebedeeException, URISyntaxException {
-        SecretKey collectionKey = Root.zebedee.getKeyringCache().schedulerCache.get(collection.description.id);
+        SecretKey collectionKey = Root.zebedee.getKeyringCache().schedulerCache.get(collection.getDescription().getId());
         CollectionReader collectionReader = new ZebedeeCollectionReader(collection, collectionKey);
         CollectionWriter collectionWriter = new ZebedeeCollectionWriter(collection, collectionKey);
         ContentReader publishedReader = new FileSystemContentReader(Root.zebedee.getPublished().path);

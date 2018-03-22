@@ -38,11 +38,12 @@ public class CollectionContentWriter extends ContentWriter {
         if (collection.description.isEncrypted) {
             return EncryptionUtils.encryptionOutputStream(path, key);
         } else {
-            String logMessage = String.format("Writing unencrypted content in collection %s for URI %s", collection.description.name, uri);
+            String logMessage = String.format("Writing unencrypted content in collection %s for URI %s",
+                    collection.getDescription().getName(), uri);
             SlackNotification.send(logMessage);
             logInfo("Writing unencrypted content in collection")
                     .addParameter("uri", uri)
-                    .collectionName(collection.description.name)
+                    .collectionName(collection.getDescription().getName())
                     .log();
 
             return FileUtils.openOutputStream(path.toFile());

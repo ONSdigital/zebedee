@@ -64,7 +64,7 @@ public class PageTest extends ZebedeeAPIBaseTestCase {
         when(zebedeeCmsService.getCollection(mockRequest)).thenReturn(collection);
 
         CollectionDescription collectionDescription = new CollectionDescription();
-        collectionDescription.id = "123";
+        collectionDescription.setId("123");
         when(collection.getDescription()).thenReturn(collectionDescription);
     }
 

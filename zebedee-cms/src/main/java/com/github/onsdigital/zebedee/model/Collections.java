@@ -60,6 +60,7 @@ import java.util.stream.Collectors;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getUnauthorizedMessage;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
+import static com.github.onsdigital.zebedee.model.Content.isDataVisualisationFile;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_APPROVED;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_COMPLETED_ERROR;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_CONTENT_DELETED;
@@ -68,7 +69,6 @@ import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLL
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_DELETED;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_ITEM_COMPLETED;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_UNLOCKED;
-import static com.github.onsdigital.zebedee.persistence.CollectionEventType.DATA_VISUALISATION_COLLECTION_CONTENT_DELETED;
 import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData.contentMoved;
 import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData.contentRenamed;
 
@@ -670,17 +670,16 @@ public class Collections {
         boolean deleted;
         CollectionEventType eventType;
 
-        if (collection.getDescription().getCollectionOwner().equals(CollectionOwner.DATA_VISUALISATION)) {
+        if (isDataVisualisationFile(path)) {
             deleted = collection.deleteDataVisContent(session, Paths.get(uri));
-            eventType = DATA_VISUALISATION_COLLECTION_CONTENT_DELETED;
+        } else if (Files.isDirectory(path)) {
+            deleted = collection.deleteContentDirectory(session.getEmail(), uri);
         } else {
-            if (Files.isDirectory(path)) {
-                deleted = collection.deleteContentDirectory(session.getEmail(), uri);
-            } else {
-                deleted = collection.deleteFile(uri);
-            }
-            eventType = COLLECTION_CONTENT_DELETED;
+            deleted = collection.deleteFile(uri);
         }
+
+        eventType = COLLECTION_CONTENT_DELETED;
+
         collection.save();
         if (deleted) {
             removeEmptyCollectionDirectories(path);
@@ -845,8 +844,7 @@ public class Collections {
 
             if (StringUtils.isNotBlank(id)) {
                 for (Collection collection : this) {
-                    if (StringUtils.equalsIgnoreCase(collection.description.id,
-                            id)) {
+                    if (StringUtils.equalsIgnoreCase(collection.getDescription().getId(), id)) {
                         result = collection;
                         break;
                     }

@@ -19,6 +19,7 @@ public class ProductPage extends TaxonomyNode {
     private List<Link> relatedArticles;
     private List<Link> relatedMethodology;
     private List<Link> relatedMethodologyArticle;
+    private List<Link> highlightedContent;
 
     @Override
     public PageType getType() {
@@ -49,7 +50,6 @@ public class ProductPage extends TaxonomyNode {
         this.statsBulletins = statsBulletins;
     }
 
-
     public List<Link> getRelatedArticles() {
         return relatedArticles;
     }
@@ -72,5 +72,13 @@ public class ProductPage extends TaxonomyNode {
 
     public void setRelatedMethodologyArticle(List<Link> relatedMethodologyArticle) {
         this.relatedMethodologyArticle = relatedMethodologyArticle;
+    }
+
+    public List<Link> getHighlightedContent() {
+        return highlightedContent;
+    }
+
+    public void setHighlightedContent(List<Link> highlightedContent) {
+        this.highlightedContent = highlightedContent;
     }
 }

@@ -171,7 +171,8 @@ public class ApproveTask implements Callable<Boolean> {
                 logError(e, "Exception saving collection after approval exception").collectionName(collection).log();
             }
 
-            SlackNotification.alarm(String.format("Exception approving collection %s : %s", collection.description.name, e.getMessage()));
+            SlackNotification.alarm(String.format("Exception approving collection %s : %s",
+                    collection.getDescription().getName(), e.getMessage()));
             return false;
         }
     }
@@ -183,7 +184,8 @@ public class ApproveTask implements Callable<Boolean> {
         if (!verified) {
             String message = "Failed verification of time series zip files";
             logInfo(message).collectionName(collection).log();
-            SlackNotification.alarm(message + " in collection " + collection.description.name + ". Unlock the collection and re-approve to try again.");
+            SlackNotification.alarm(message + " in collection " + collection.getDescription().getName() + ". Unlock the " +
+                    "collection and re-approve to try again.");
         }
     }
 

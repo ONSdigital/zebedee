@@ -10,6 +10,7 @@ import java.net.URI;
 public class FigureSection extends Content {
     private String title;
     private String filename;
+    private String version;
     private URI uri;
 
     public String getTitle() {
@@ -34,5 +35,13 @@ public class FigureSection extends Content {
 
     public void setUri(URI uri) {
         this.uri = uri;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
     }
 }

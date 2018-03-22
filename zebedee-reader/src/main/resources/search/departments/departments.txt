@@ -21,7 +21,7 @@ hmrc => HM Revenue & Customs => https://www.gov.uk/government/statistics?keyword
 
 ho => The Home Office => https://www.gov.uk/government/statistics?keywords=&topics%5B%5D=all&departments%5B%5D=home-office => HO,arrests,asylum,immigration,firearm,crime,visa,police,terrorism,detention
 
-dclg => The Department for Communities & Local Government => https://www.gov.uk/government/statistics?keywords=&topics%5B%5D=all&departments%5B%5D=department-for-communities-and-local-government => DCLG,revenue expenditure,local authority,council tax,homelessness,social housing,help to buy
+mhclg => Ministry of Housing, Communities and Local Government => https://www.gov.uk/government/statistics?keywords=&topics%5B%5D=all&departments%5B%5D=ministry-of-housing-communities-and-local-government => DCLG,MHCLG,revenue expenditure,local authority,council tax,homelessness,social housing,help to buy
 
 dcms => The Department for Culture, Media & Sports => https://www.gov.uk/government/statistics?keywords=&topics%5B%5D=all&departments%5B%5D=department-for-culture-media-sport => DCMS, charitable giving
 
@@ -46,37 +46,3 @@ sg => The Scottish Government => http://www.scotland.gov.uk/Topics/Statistics =>
 nie => The Northern Ireland Executive => http://www.northernireland.gov.uk/ => NIE,Northern Ireland,Irish
 
 fc => The Forestry Commission => http://www.forestry.gov.uk/ =>FC,woodland,timber,forestry,nursery
-
-eutrade => Our visual site => https://visual.ons.gov.uk/trading-places-uk-goods-trade-with-eu-partners/ => EU, EU trade, Europe trade, European trade
-
-volunteering => Our visual site => https://visual.ons.gov.uk/billion-pound-loss-in-volunteering-effort-in-the-last-3-years/ => Volunteering, volunteer, charity, charity work
-
-basketofgoods => Our visual site => https://www.ons.gov.uk/visualisations/dvc399/shorthand/index.html => Basket of goods
-
-housing => Our visual site => https://visual.ons.gov.uk/prospective-homeowners-struggling-to-get-onto-the-property-ladder/ => Housing, home ownership, pricing, property
-
-economicdashboard => Our visual site => https://visual.ons.gov.uk/dashboard/ => Brexit, indicators, economic indicators, economy
-
-householdspending => Our visual site => https://visual.ons.gov.uk/london-household-spending-outstrips-the-rest-of-the-uk/ => Family spending, spending, household spending, household expenditure, household goods, regional spending
-
-genderpaygap => Our visual site => https://visual.ons.gov.uk/find-out-the-gender-pay-gap-for-your-job/ => Gender pay gap, pay, earnings, gender equality
-
-migration => Our visual site => https://visual.ons.gov.uk/tag/migration/ => Migration, population, Historical migration, migration timeseries, migrants, international migration
-
-unpaidwork => Our visual site => https://visual.ons.gov.uk/the-value-of-your-unpaid-work/ => Unpaid work
-
-gdp => Our visual site => https://visual.ons.gov.uk/tag/gdp/ => GDP, What is GDP?, GDP time series, Historical GDP
-
-babynames => Our visual site => https://visual.ons.gov.uk/baby-names-since-1904-how-has-yours-performed/ => Baby names, baby girls, baby boys, girls names, boys names, popular names
-
-deaths => Our visual site => https://visual.ons.gov.uk/does-our-sex-affect-what-we-die-from/ => Causes of death, reason for death
-
-livingwage => Our visual site => https://visual.ons.gov.uk/how-will-the-national-living-wage-affect-employees-and-businesses-in-the-uk/ => National living wage, living wage, wages
-
-pregnancy => Our visual site => https://visual.ons.gov.uk/teenage-pregnancies-perception-versus-reality/ => Teenage pregnancy, pregnancy, conceptions
-
-healthcarespending => Our visual site => https://visual.ons.gov.uk/how-does-uk-healthcare-spending-compare-internationally/ => Healthcare spending
-
-wellbeingdashboard => Our visual site => https://www.ons.gov.uk/visualisations/dvc364/dashboard/index.html => Well-being, wellbeing, well being dashboard
-
-strikes => Our visual site => https://visual.ons.gov.uk/the-history-of-strikes-in-britain/ => History of strikes, industrial action, strikes

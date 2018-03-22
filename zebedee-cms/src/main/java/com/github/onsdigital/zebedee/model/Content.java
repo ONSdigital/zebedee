@@ -17,6 +17,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
@@ -24,9 +25,13 @@ import static com.github.onsdigital.zebedee.model.PathUtils.findByCriteria;
 
 public class Content {
 
+
     public static final String REDIRECT = "redirect.txt";
     public static final String DATA_VIS_DIR = "visualisations";
     public static final String TIME_SERIES_KEYWORD = "timeseries";
+
+    private static final Predicate<Path> IS_DATA_VIZ_FILE = (p) -> p != null && p.toFile().isDirectory() &&
+            DATA_VIS_DIR.equals(p.getFileName().toString());
 
     public final Path path;
     public final Path dataVisualisationsPath;
@@ -37,8 +42,7 @@ public class Content {
     public Content(Path path) {
         this.path = path;
         if (!Files.exists(path)) {
-            throw new IllegalArgumentException("Path does not exist: "
-                    + path.toAbsolutePath());
+            throw new IllegalArgumentException("Path does not exist: " + path.toAbsolutePath());
         }
 
         this.dataVisualisationsPath = this.path.resolve(DATA_VIS_DIR);
@@ -65,11 +69,6 @@ public class Content {
         });
     }
 
-    private static boolean isDataVisualisation(Path p) {
-        // should be under visualisations but stop at the content directory.
-        return p.getFileName().toString().equals(DATA_VIS_DIR) || p.getParent().getFileName().toString().equals(DATA_VIS_DIR);
-    }
-
     private static boolean isNotPreviousVersions(Path p) {
         return !VersionedContentItem.isVersionedUri(p.toString());
     }
@@ -84,7 +83,6 @@ public class Content {
                         result.add(entry);
                         return result;
                     }
-
                     result.addAll(listTimeSeriesDirectories(entry));
                 }
             }
@@ -230,11 +228,11 @@ public class Content {
      * @return
      * @throws IOException
      */
-    public ContentDetail nestedDetails(CollectionOwner collectionOwner) throws IOException {
-        return nestedDetails(path, collectionOwner);
+    public ContentDetail nestedDetails() throws IOException {
+        return nestedDetails(path);
     }
 
-    private ContentDetail nestedDetails(Path contentPath, CollectionOwner collectionOwner) throws IOException {
+    private ContentDetail nestedDetails(Path contentPath) throws IOException {
         ContentDetail detail = details(contentPath.resolve("data.json"));
 
         // if the folder is empty put in an empty node with just a name.
@@ -250,8 +248,8 @@ public class Content {
         // todo: remove timeseries filter once we are caching the browse tree.
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(contentPath)) {
             for (Path entry : stream) {
-                if (isVisibleForCollectionOwner(collectionOwner, entry)) {
-                    ContentDetail child = nestedDetails(entry, collectionOwner);
+                if (isVisible(entry)) {
+                    ContentDetail child = nestedDetails(entry);
                     if (child != null) {
                         detail.children.add(child);
                     }
@@ -412,19 +410,19 @@ public class Content {
         return false;
     }
 
-    static boolean isVisibleForCollectionOwner(CollectionOwner collectionOwner, Path entry) {
-        if (collectionOwner.equals(CollectionOwner.DATA_VISUALISATION)) {
-            return Files.isDirectory(entry)
-                    && isDataVisualisation(entry)
-                    && !isTimeseries(entry)
-                    && isNotPreviousVersions(entry);
-        } else {
-            // PUBLISHING SUPPORT
-            return Files.isDirectory(entry)
-                    && !isTimeseries(entry)
-                    && isNotPreviousVersions(entry)
-                    && !isDataVisualisation(entry);
+    static boolean isVisible(Path entry) {
+        return Files.isDirectory(entry)
+                && !isTimeseries(entry)
+                && isNotPreviousVersions(entry)
+                && !isDataVisSubDir(entry);
+    }
+
+    private static boolean isDataVisSubDir(Path path) {
+        if (!path.toString().contains(DATA_VIS_DIR)) {
+            return false;
         }
+        return !DATA_VIS_DIR.equals(path.getFileName().toString().toLowerCase())
+                && !DATA_VIS_DIR.equals(path.getParent().getFileName().toString().toLowerCase());
     }
 
     public Path getPublishedContentPath() {
@@ -433,5 +431,9 @@ public class Content {
             publishedContentPath = ZebedeeCmsService.getInstance().getZebedee().getPublishedContentPath();
 
         return publishedContentPath;
+    }
+
+    public static boolean isDataVisualisationFile(Path path) {
+        return findByCriteria(path, IS_DATA_VIZ_FILE);
     }
 }

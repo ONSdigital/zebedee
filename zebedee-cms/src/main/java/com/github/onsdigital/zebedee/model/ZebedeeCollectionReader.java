@@ -33,7 +33,7 @@ public class ZebedeeCollectionReader extends CollectionReader {
         Keyring keyring = zebedee.getKeyringCache().get(session);
         if (keyring == null) throw new UnauthorizedException("No keyring is available for " + session.getEmail());
 
-        SecretKey key = keyring.get(collection.description.id);
+        SecretKey key = keyring.get(collection.getDescription().getId());
         init(collection, key);
     }
 

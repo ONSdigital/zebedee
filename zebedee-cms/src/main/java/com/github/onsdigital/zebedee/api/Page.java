@@ -163,7 +163,7 @@ public class Page {
                     pageCreationHook.onPageUpdated(page, uri);
                 } catch (IOException | RuntimeException e) {
                     logError(e, "exception when calling page creation hook")
-                            .collectionId(collection.getDescription().id)
+                            .collectionId(collection.getDescription().getId())
                             .user(session.getEmail())
                             .path(uri).log();
                     response.setStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR);
@@ -185,7 +185,7 @@ public class Page {
                 handleZebdeeException("failed to create content", e, response, uri, session, collection);
             } catch (IOException | FileUploadException e) {
                 logError(e, "exception when calling collections.createContent")
-                        .collectionId(collection.getDescription().id)
+                        .collectionId(collection.getDescription().getId())
                         .user(session.getEmail())
                         .path(uri).log();
                 response.setStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR);
@@ -284,7 +284,7 @@ public class Page {
                 pageDeletionHook.onPageUpdated(page, uri);
             } catch (IOException | RuntimeException e) {
                 logError(e, "exception when calling page deletion hook")
-                        .collectionId(collection.getDescription().id)
+                        .collectionId(collection.getDescription().getId())
                         .user(session.getEmail())
                         .path(uri).log();
                 response.setStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR);
@@ -299,7 +299,7 @@ public class Page {
                     session);
         } catch (IOException e) {
             logError(e, "exception when deleting content")
-                    .collectionId(collection.getDescription().id)
+                    .collectionId(collection.getDescription().getId())
                     .user(session.getEmail())
                     .path(uri).log();
             response.setStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR);
@@ -330,7 +330,7 @@ public class Page {
             Collection collection) {
 
         logError(e, message)
-                .collectionId(collection.getDescription().id)
+                .collectionId(collection.getDescription().getId())
                 .user(session.getEmail())
                 .path(uri).log();
         response.setStatus(e.statusCode);

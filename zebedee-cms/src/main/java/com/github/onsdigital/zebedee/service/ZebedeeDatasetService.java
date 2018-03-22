@@ -18,6 +18,7 @@ import java.io.InvalidObjectException;
 import java.util.Objects;
 import java.util.Optional;
 
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
 
 /**
@@ -36,34 +37,76 @@ public class ZebedeeDatasetService implements DatasetService {
         Objects.requireNonNull(newState);
 
         if (currentState == null && newState.equals(ContentStatus.Reviewed)) {
+            logInfo("Attempt to review a dataset that hasn't been submitted for review")
+                .addParameter("last edited by", lastEditedBy)
+                .user(user)
+                .log();
+
             throw new BadRequestException("Cannot be reviewed without being submitted for review first");
         }
 
         // Updating from scratch to 'in progress' or 'complete' state so don't need to perform following checks
-        if (currentState == null && (newState.equals(ContentStatus.InProgress) || newState.equals(ContentStatus.Reviewed))) {
+        if (currentState == null && (newState.equals(ContentStatus.InProgress) || newState.equals(ContentStatus.Complete))) {
+            logInfo("Updating dataset state for first time")
+                .user(user)
+                .addParameter("last edited by", lastEditedBy)
+                .addParameter("current state", currentState)
+                .addParameter("new state", newState)
+                .log();
+
             return newState;
         }
 
         // The same user can't review edits they've submitted for review
         if (!currentState.equals(ContentStatus.Reviewed) && newState.equals(ContentStatus.Reviewed) && lastEditedBy.equalsIgnoreCase(user)) {
+            logInfo("User attempting to review their own dataset")
+                .user(user)
+                .addParameter("last edited by", lastEditedBy)
+                .addParameter("current state", currentState)
+                .addParameter("new state", newState)
+                .log();
             throw new ForbiddenException("User " + user + "doesn't have permission to review a dataset they completed");
         }
 
         // Any further updates made by the user who submitted the dataset should keep the dataset in the awaiting review state
         if (currentState.equals(ContentStatus.Complete) && lastEditedBy.equalsIgnoreCase(user)) {
+            logInfo("User making more updates to a dataset whilst it is awaiting review")
+                .user(user)
+                .addParameter("last edited by", lastEditedBy)
+                .addParameter("current state", currentState)
+                .addParameter("new state", newState)
+                .log();
             return ContentStatus.Complete;
         }
 
         // Any updates to a dataset awaiting review by a different user means it moves back to an in progress state
         if (currentState.equals(ContentStatus.Complete) && !newState.equals(ContentStatus.Reviewed) && !lastEditedBy.equalsIgnoreCase(user)) {
+            logInfo("A different user making updates to a dataset whilst it is awaiting review")
+                .user(user)
+                .addParameter("last edited by", lastEditedBy)
+                .addParameter("current state", currentState)
+                .addParameter("new state", newState)
+                .log();
             return ContentStatus.InProgress;
         }
 
         // Once reviewed any updates can be made to a dataset without the state changing
         if (currentState.equals(ContentStatus.Reviewed)) {
+            logInfo("Making updates to a review dataset")
+                .user(user)
+                .addParameter("last edited by", lastEditedBy)
+                .addParameter("current state", currentState)
+                .addParameter("new state", newState)
+                .log();
             return ContentStatus.Reviewed;
         }
 
+        logInfo("Updating dataset state")
+            .user(user)
+            .addParameter("last edited by", lastEditedBy)
+            .addParameter("current state", currentState)
+            .addParameter("new state", newState)
+            .log();
         return newState;
     }
 

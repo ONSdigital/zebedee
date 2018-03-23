@@ -28,7 +28,6 @@ public class AuthenticationFilter implements Filter {
 			.add(Ping.class)
 			.add(ClickEventLog.class)
 			.add(Identity.class)
-			.add(Service.class)
 			.build();
 
 	/**

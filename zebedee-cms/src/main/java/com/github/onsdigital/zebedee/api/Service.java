@@ -2,10 +2,14 @@ package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.cryptolite.Random;
 import com.github.davidcarboni.restolino.framework.Api;
+import com.github.onsdigital.zebedee.authorisation.UserIdentity;
+import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
+import com.github.onsdigital.zebedee.json.JSONable;
 import com.github.onsdigital.zebedee.json.PermissionDefinition;
 import com.github.onsdigital.zebedee.model.ServiceAccount;
+import com.github.onsdigital.zebedee.model.ServiceAccountWithToken;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.service.ServiceStore;
 import com.github.onsdigital.zebedee.service.ServiceStoreImpl;
@@ -20,6 +24,9 @@ import java.io.IOException;
 import java.util.function.Supplier;
 
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
+import static com.github.onsdigital.zebedee.util.JsonUtils.writeResponse;
+import static org.apache.http.HttpStatus.SC_CREATED;
+import static org.apache.http.HttpStatus.SC_OK;
 
 @Api
 public class Service {
@@ -33,19 +40,17 @@ public class Service {
     private PermissionsService permissionsService;
 
     @POST
-    public ServiceAccountWithToken createService(HttpServletRequest request, HttpServletResponse response) throws IOException, NotFoundException, UnauthorizedException {
+    public void createService(HttpServletRequest request, HttpServletResponse response) throws IOException, NotFoundException, UnauthorizedException {
         final Session session = getSessionsService().get(request);
-        PermissionDefinition permissionDefinition = getPermissionsService().userPermissions(session.getEmail(), session);
-        if (BooleanUtils.isTrue(permissionDefinition.admin)) {
+        if (session != null && getPermissionsService().isAdministrator(session)) {
             final ServiceStore serviceStoreImpl = getServiceStore();
             final String token = randomIdGenerator.get();
             ServiceAccount service = serviceStoreImpl.store(token, request.getInputStream());
             logInfo("new service account created").addParameter("id", service.getId()).log();
-            response.setStatus(HttpServletResponse.SC_CREATED);
-            return new ServiceAccountWithToken(token, service.getId());
+            writeResponse(response, new ServiceAccountWithToken(token, service.getId()), SC_CREATED);
+
         }
         response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-        return null;
     }
 
     private ServiceStore getServiceStore() {
@@ -67,19 +72,5 @@ public class Service {
             permissionsService = Root.zebedee.getPermissionsService();
         }
         return permissionsService;
-    }
-
-    private class ServiceAccountWithToken  extends ServiceAccount{
-
-        private final String token;
-
-        ServiceAccountWithToken(String id, String token) {
-            super(id);
-            this.token = token;
-        }
-
-        public String getToken() {
-            return token;
-        }
     }
 }

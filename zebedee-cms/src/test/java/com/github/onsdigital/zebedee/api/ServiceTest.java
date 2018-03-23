@@ -19,6 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.times;
@@ -44,6 +45,9 @@ public class ServiceTest {
     @Mock
     private SessionsService sessionsService;
 
+    @Mock
+    private PrintWriter printWriterMock;
+
     @Before
     public void setUp() throws Exception {
         api = new Service();
@@ -60,15 +64,14 @@ public class ServiceTest {
         Session session = new Session();
         session.setEmail("other@ons.gov.uk");
         session.setId("123");
-        PermissionDefinition permissionDefinition = new PermissionDefinition();
-        permissionDefinition.admin = true;
 
         when(sessionsService.get(mockRequest)).thenReturn(session);
-        when(permissionsService.userPermissions(session.getEmail(), session)).thenReturn(permissionDefinition);
+        when(permissionsService.isAdministrator(session)).thenReturn(true);
         when(serviceStore.store(Mockito.anyString(), any())).thenReturn(new ServiceAccount("123"));
+        when(mockResponse.getWriter()).thenReturn(printWriterMock);
         api.createService(mockRequest, mockResponse);
         verify(sessionsService, times(1)).get(mockRequest);
-        verify(permissionsService, times(1)).userPermissions(session.getEmail(), session);
+        verify(permissionsService, times(1)).isAdministrator(session);
         verify(serviceStore, times(1)).store(Mockito.anyString(),any());
         verify(mockResponse).setStatus(HttpServletResponse.SC_CREATED);
     }
@@ -78,15 +81,13 @@ public class ServiceTest {
         Session session = new Session();
         session.setEmail("other@ons.gov.uk");
         session.setId("123");
-        PermissionDefinition permissionDefinition = new PermissionDefinition();
-        permissionDefinition.admin = false;
 
         when(sessionsService.get(mockRequest)).thenReturn(session);
-        when(permissionsService.userPermissions(session.getEmail(), session)).thenReturn(permissionDefinition);
+        when(permissionsService.isAdministrator(session)).thenReturn(false);
         when(serviceStore.store(Mockito.anyString(), any())).thenReturn(new ServiceAccount("123"));
         api.createService(mockRequest, mockResponse);
         verify(sessionsService, times(1)).get(mockRequest);
-        verify(permissionsService, times(1)).userPermissions(session.getEmail(), session);
+        verify(permissionsService, times(1)).isAdministrator(session);
         verify(serviceStore, times(0)).store(Mockito.anyString(),any());
         verify(mockResponse).setStatus(HttpServletResponse.SC_FORBIDDEN);
     }

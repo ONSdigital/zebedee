@@ -20,11 +20,23 @@ parameters:
     in: body
     schema:
       $ref: '#/definitions/Service'
+securityDefinitions:
+  ServiceKey:
+    type: apiKey
+    in: header
+    name: Authorization
+  FlorenceKey:
+    type: apiKey
+    in: header
+    name: X-Florence-Token
 paths:
   /identity:
     get:
       summary: "Identify a entity from their auth token"
       description: "If no florence token is provided, the identity object will contain the callers id instead."
+      security:
+        - ServiceKey: []
+        - FlorenceKey: []
       parameters:
       - $ref: '#/parameters/authHeader'
       - $ref: '#/parameters/florence'
@@ -45,6 +57,8 @@ paths:
       post:
         summary: "Create a new service account"
         description: "Create a service which can authenticated against /identity. Only the name is required. Once created a token will re returned from the response. Only a admin can call this endpoint"
+        security:
+        - FlorenceKey: []
         parameters:
         - $ref: "#/parameters/newService"
         responses:
@@ -80,6 +94,6 @@ definitions:
         description: "The name of the service"
         type: string
       token:
-        decription: "The token to identify the service"
+        description: "The token to identify the service"
         type: string
         readOnly: true

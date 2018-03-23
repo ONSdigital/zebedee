@@ -7,6 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -38,9 +39,14 @@ public class ServiceStoreImpl implements ServiceStore {
     @Override
     public ServiceAccount store(String token, InputStream service) throws IOException {
         final Path path = rootLocation.resolve(token + JSON_EXTENSION);
-        ServiceAccount object = jsonSerialise.deserialiseQuietly(service, path);
-        jsonSerialise.serialise(path, object);
-        return object;
+        if (!Files.exists(path)) {
+            ServiceAccount object = jsonSerialise.deserialiseQuietly(service, path);
+            jsonSerialise.serialise(path, object);
+            return object;
+        }
+
+        throw new FileAlreadyExistsException("The service token already exists : " + path);
+
     }
 
     private Path getPath(String id) {

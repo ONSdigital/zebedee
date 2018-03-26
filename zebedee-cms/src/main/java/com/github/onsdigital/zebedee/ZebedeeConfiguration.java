@@ -195,7 +195,9 @@ public class ZebedeeConfiguration {
         return redirectPath;
     }
 
-    public Path getServicePath() { return servicePath;}
+    public Path getServicePath() {
+        return servicePath;
+    }
 
     public Content getPublished() {
         return this.published;

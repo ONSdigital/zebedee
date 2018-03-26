@@ -14,7 +14,6 @@ public class UserIdentityException extends ZebedeeException {
         return super.statusCode;
     }
 
-
     @Override
     public boolean equals(Object obj) {
         return EqualsBuilder.reflectionEquals(this, obj);

@@ -10,6 +10,8 @@ import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.Collections;
 import com.github.onsdigital.zebedee.model.Content;
 import com.github.onsdigital.zebedee.model.KeyringCache;
+import com.github.onsdigital.zebedee.service.ServiceStore;
+import com.github.onsdigital.zebedee.service.ServiceStoreImpl;
 import com.github.onsdigital.zebedee.teams.service.TeamsService;
 import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
 import com.github.onsdigital.zebedee.model.encryption.ApplicationKeys;
@@ -47,6 +49,7 @@ public class Zebedee {
     public static final String TEAMS = "teams";
     public static final String LAUNCHPAD = "launchpad";
     public static final String APPLICATION_KEYS = "application-keys";
+    public static final String SERVICES = "services";
 
     private static final String[] ZEBEDEE_DIRS = new String[]{PUBLISHED, COLLECTIONS, USERS, SESSIONS, PERMISSIONS,
             TEAMS, LAUNCHPAD, PUBLISHED_COLLECTIONS, APPLICATION_KEYS};
@@ -74,6 +77,9 @@ public class Zebedee {
     private final TeamsService teamsService;
     private final SessionsService sessionsService;
     private final DataIndex dataIndex;
+    private final ServiceStoreImpl serviceStoreImpl;
+
+
 
     /**
      * Create a new instance of Zebedee setting.
@@ -102,6 +108,7 @@ public class Zebedee {
         this.teamsService = configuration.getTeamsService();
         this.usersService = configuration.getUsersService();
         this.verificationAgent = configuration.getVerificationAgent(isVerificationEnabled(), this);
+        this.serviceStoreImpl = configuration.getServiceStore();
     }
 
     /**
@@ -320,5 +327,9 @@ public class Zebedee {
 
     public UsersService getUsersService() {
         return usersService;
+    }
+
+    public ServiceStore getServiceStore() {
+        return serviceStoreImpl;
     }
 }

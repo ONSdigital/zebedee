@@ -51,6 +51,15 @@ public class Zebedee {
     public static final String APPLICATION_KEYS = "application-keys";
     public static final String SERVICES = "services";
 
+    private final Path publishedCollectionsPath;
+    private final Path collectionsPath;
+    private final Path usersPath;
+    private final Path sessionsPath;
+    private final Path permissionsPath;
+    private final Path teamsPath;
+    private final Path applicationKeysPath;
+    private final Path redirectPath;
+
     private final VerificationAgent verificationAgent;
     private final ApplicationKeys applicationKeys;
     private final PublishedCollections publishedCollections;
@@ -89,6 +98,15 @@ public class Zebedee {
         this.verificationAgent = configuration.getVerificationAgent(isVerificationEnabled(), this);
         this.datasetService = configuration.getDatasetService();
         this.serviceStoreImpl = configuration.getServiceStore();
+
+        this.collectionsPath = configuration.getCollectionsPath();
+        this.publishedCollectionsPath = configuration.getPublishedCollectionsPath();
+        this.usersPath = configuration.getUsersPath();
+        this.sessionsPath = configuration.getSessionsPath();
+        this.permissionsPath = configuration.getPermissionsPath();
+        this.teamsPath = configuration.getTeamsPath();
+        this.applicationKeysPath = configuration.getApplicationKeysPath();
+        this.redirectPath = configuration.getRedirectPath();
     }
 
     /**

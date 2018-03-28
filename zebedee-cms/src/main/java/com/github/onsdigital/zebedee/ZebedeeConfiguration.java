@@ -185,6 +185,42 @@ public class ZebedeeConfiguration {
         return publishedContentPath;
     }
 
+    public Path getPublishedCollectionsPath() {
+        return publishedCollectionsPath;
+    }
+
+    public Path getCollectionsPath() {
+        return collectionsPath;
+    }
+
+    public Path getUsersPath() {
+        return usersPath;
+    }
+
+    public Path getSessionsPath() {
+        return sessionsPath;
+    }
+
+    public Path getPermissionsPath() {
+        return permissionsPath;
+    }
+
+    public Path getTeamsPath() {
+        return teamsPath;
+    }
+
+    public Path getApplicationKeysPath() {
+        return applicationKeysPath;
+    }
+
+    public Path getRedirectPath() {
+        return redirectPath;
+    }
+
+    public Path getServicePath() {
+        return servicePath;
+    }
+
     public Content getPublished() {
         return this.published;
     }

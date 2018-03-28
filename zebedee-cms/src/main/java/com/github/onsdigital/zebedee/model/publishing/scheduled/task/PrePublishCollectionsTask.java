@@ -14,7 +14,13 @@ import com.github.onsdigital.zebedee.model.publishing.scheduled.PublishScheduler
 
 import javax.crypto.SecretKey;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -99,11 +105,11 @@ public class PrePublishCollectionsTask extends ScheduledTask {
             try {
                 Collection collection = zebedee.getCollections().getCollection(collectionId);
 
-                if (collection.description.approvalStatus != ApprovalStatus.COMPLETE) {
+                if (collection.getDescription().getApprovalStatus() != ApprovalStatus.COMPLETE) {
                     logInfo("Scheduled collection has not been approved - switching to manual").log();
 
                     // Switch to manual
-                    collection.description.type = CollectionType.manual;
+                    collection.getDescription().setType(CollectionType.manual);
                     // TODO Alarm message
                     collection.save();
 
@@ -144,7 +150,7 @@ public class PrePublishCollectionsTask extends ScheduledTask {
                         // Do pre-publish steps ahead of the publish time
                         publisher.DoPrePublish(collection, encryptionPassword);
 
-                        SecretKey key = zebedee.getKeyringCache().schedulerCache.get(collection.description.id);
+                        SecretKey key = zebedee.getKeyringCache().schedulerCache.get(collection.getDescription().getId());
                         ZebedeeCollectionReader collectionReader = new ZebedeeCollectionReader(collection, key);
                         PublishCollectionTask publishCollectionTask = new PublishCollectionTask(
                                 collection,
@@ -201,7 +207,7 @@ public class PrePublishCollectionsTask extends ScheduledTask {
      * @param collection
      */
     public void addCollection(Collection collection) {
-        collectionIds.add(collection.description.id);
+        collectionIds.add(collection.getDescription().getId());
     }
 
     /**
@@ -210,7 +216,7 @@ public class PrePublishCollectionsTask extends ScheduledTask {
      * @param collection
      */
     public void removeCollection(Collection collection) {
-        collectionIds.remove(collection.description.id);
+        collectionIds.remove(collection.getDescription().getId());
     }
 
     /**

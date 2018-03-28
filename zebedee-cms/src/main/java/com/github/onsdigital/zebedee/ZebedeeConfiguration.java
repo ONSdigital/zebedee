@@ -14,6 +14,7 @@ import com.github.onsdigital.zebedee.permissions.store.PermissionsStore;
 import com.github.onsdigital.zebedee.permissions.store.PermissionsStoreFileSystemImpl;
 import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
 import com.github.onsdigital.zebedee.service.DatasetService;
+import com.github.onsdigital.zebedee.service.ServiceStoreImpl;
 import com.github.onsdigital.zebedee.service.ZebedeeDatasetService;
 import com.github.onsdigital.zebedee.session.service.SessionsService;
 import com.github.onsdigital.zebedee.teams.service.TeamsService;
@@ -36,6 +37,7 @@ import static com.github.onsdigital.zebedee.Zebedee.COLLECTIONS;
 import static com.github.onsdigital.zebedee.Zebedee.PERMISSIONS;
 import static com.github.onsdigital.zebedee.Zebedee.PUBLISHED;
 import static com.github.onsdigital.zebedee.Zebedee.PUBLISHED_COLLECTIONS;
+import static com.github.onsdigital.zebedee.Zebedee.SERVICES;
 import static com.github.onsdigital.zebedee.Zebedee.SESSIONS;
 import static com.github.onsdigital.zebedee.Zebedee.TEAMS;
 import static com.github.onsdigital.zebedee.Zebedee.USERS;
@@ -63,6 +65,7 @@ public class ZebedeeConfiguration {
     private Path teamsPath;
     private Path applicationKeysPath;
     private Path redirectPath;
+    private Path servicePath;
     private boolean useVerificationAgent;
     private ApplicationKeys applicationKeys;
     private PublishedCollections publishedCollections;
@@ -118,6 +121,7 @@ public class ZebedeeConfiguration {
         this.teamsPath = createDir(zebedeePath, TEAMS);
         this.applicationKeysPath = createDir(zebedeePath, APPLICATION_KEYS);
         this.redirectPath = this.publishedContentPath.resolve(Content.REDIRECT);
+        this.servicePath = createDir(zebedeePath, SERVICES);
 
         if (!Files.exists(redirectPath)) {
             Files.createFile(redirectPath);
@@ -155,7 +159,7 @@ public class ZebedeeConfiguration {
 
         DatasetClient datasetClient;
         try {
-            datasetClient= new DatasetAPIClient(
+            datasetClient = new DatasetAPIClient(
                     Configuration.getDatasetAPIURL(),
                     Configuration.getDatasetAPIAuthToken());
         } catch (URISyntaxException e) {
@@ -245,5 +249,9 @@ public class ZebedeeConfiguration {
 
     public DatasetService getDatasetService() {
         return datasetService;
+    }
+
+    public ServiceStoreImpl getServiceStore() {
+        return new ServiceStoreImpl(servicePath);
     }
 }

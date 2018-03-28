@@ -27,8 +27,11 @@
         <appender-ref ref="DP_LOGGER"/>
     </logger>
 
+    <!-- silence Restolino -->
+    <logger name="com.github.davidcarboni.restolino" level="debug" additivity="false"/>
+
     <root level="info">
-        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="DP_LOGGER"/>
     </root>
 
 </configuration>

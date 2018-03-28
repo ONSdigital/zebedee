@@ -15,6 +15,8 @@ import com.github.onsdigital.zebedee.model.encryption.ApplicationKeys;
 import com.github.onsdigital.zebedee.model.publishing.PublishedCollections;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.service.DatasetService;
+import com.github.onsdigital.zebedee.service.ServiceStore;
+import com.github.onsdigital.zebedee.service.ServiceStoreImpl;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.session.service.SessionsService;
 import com.github.onsdigital.zebedee.teams.service.TeamsService;
@@ -47,6 +49,7 @@ public class Zebedee {
     public static final String TEAMS = "teams";
     public static final String LAUNCHPAD = "launchpad";
     public static final String APPLICATION_KEYS = "application-keys";
+    public static final String SERVICES = "services";
 
     private final VerificationAgent verificationAgent;
     private final ApplicationKeys applicationKeys;
@@ -63,6 +66,7 @@ public class Zebedee {
     private final SessionsService sessionsService;
     private final DataIndex dataIndex;
     private final DatasetService datasetService;
+    private final ServiceStoreImpl serviceStoreImpl;
 
     /**
      * Create a new instance of Zebedee setting.
@@ -84,6 +88,7 @@ public class Zebedee {
         this.usersService = configuration.getUsersService();
         this.verificationAgent = configuration.getVerificationAgent(isVerificationEnabled(), this);
         this.datasetService = configuration.getDatasetService();
+        this.serviceStoreImpl = configuration.getServiceStore();
     }
 
     /**
@@ -114,7 +119,8 @@ public class Zebedee {
     public Optional<Collection> checkForCollectionBlockingChange(Collection workingCollection, String uri) throws IOException {
         return collections.list()
                 .stream()
-                .filter(c -> c.isInCollection(uri) && !workingCollection.getDescription().id.equals(c.getDescription().id))
+                .filter(c -> c.isInCollection(uri) && !workingCollection.getDescription().getId()
+                        .equals(c.getDescription().getId()))
                 .findFirst();
     }
 
@@ -143,7 +149,7 @@ public class Zebedee {
             String title = new ZebedeeCollectionReader(this, blockingCollection.get(), session)
                     .getContent(uri).getDescription().getTitle();
 
-            if (workingCollection.description.id.equals(blockingCollection.get().description.id)) {
+            if (workingCollection.getDescription().getId().equals(blockingCollection.get().getDescription().getId())) {
                 throw beingEditedByThisCollectionError(title);
             }
             throw beingEditedByAnotherCollectionError(blockingCollection.get(), title);
@@ -306,5 +312,9 @@ public class Zebedee {
 
     public DatasetService getDatasetService() {
         return datasetService;
+    }
+
+    public ServiceStore getServiceStore() {
+        return serviceStoreImpl;
     }
 }

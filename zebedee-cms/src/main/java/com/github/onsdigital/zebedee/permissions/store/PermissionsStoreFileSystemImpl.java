@@ -10,6 +10,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -21,7 +24,11 @@ import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logDebug;
  */
 public class PermissionsStoreFileSystemImpl implements PermissionsStore {
 
-    private static final String PERMISSIONS_FILE = "accessMapping.json";
+    static final String PERMISSIONS_FILE = "accessMapping.json";
+    static final String DATA_VIS_KEY = "dataVisualisationPublishers";
+    static final String PUBLISHERS_KEY = "digitalPublishingTeam";
+    static final String ADMINS_KEY = "administrators";
+    static final String COLLECTIONS_KEY = "collections";
 
     private Path accessMappingPath;
     private Path accessMappingFilePath;
@@ -43,6 +50,46 @@ public class PermissionsStoreFileSystemImpl implements PermissionsStore {
             jsonPath.toFile().createNewFile();
             try (OutputStream output = Files.newOutputStream(jsonPath)) {
                 Serialiser.serialise(output, new AccessMapping());
+            }
+        } else {
+            migrateDataVisUsers(jsonPath);
+        }
+    }
+
+    /**
+     * Temporary legacy migration. Transfer deprecated Data Visualisation Publisher users to Digital Publishing team.
+     * Can be reomved once all users have been safely migrated.
+     */
+    private static void migrateDataVisUsers(Path p) throws IOException {
+        Map<String, Object> accessMapping = Serialiser.deserialise(p, Map.class);
+        if (accessMapping.containsKey(DATA_VIS_KEY)) {
+
+            List<String> dataVisualisationPublishers = (List<String>) accessMapping.get(DATA_VIS_KEY);
+            if (dataVisualisationPublishers != null && !dataVisualisationPublishers.isEmpty()) {
+
+                logDebug("Migrating users from Data Visualisation team to Digital Publishing team.").log();
+
+                List<String> digitalPublishingTeam = (List<String>) accessMapping.get(PUBLISHERS_KEY);
+                List<String> administrators = (List<String>) accessMapping.get(ADMINS_KEY);
+                Map<String, Set<Integer>> collections = (Map<String, Set<Integer>>) accessMapping.get(COLLECTIONS_KEY);
+
+                AccessMapping updated = new AccessMapping();
+                updated.getDigitalPublishingTeam().addAll(digitalPublishingTeam);
+
+                dataVisualisationPublishers.stream()
+                        .forEach(dataVisUser -> {
+                            logDebug("Migrating user")
+                                    .user(dataVisUser)
+                                    .log();
+                            updated.getDigitalPublishingTeam().add(dataVisUser);
+                        });
+
+                updated.getAdministrators().addAll(administrators);
+                updated.setCollections(collections);
+
+                try (OutputStream output = Files.newOutputStream(p)) {
+                    Serialiser.serialise(output, updated);
+                }
             }
         }
     }
@@ -81,9 +128,6 @@ public class PermissionsStoreFileSystemImpl implements PermissionsStore {
             if (result.getCollections() == null) {
                 result.setCollections(new HashMap<>());
             }
-            if (result.getDataVisualisationPublishers() == null) {
-                result.setDataVisualisationPublishers(new HashSet<>());
-            }
 
         } else {
 
@@ -92,7 +136,6 @@ public class PermissionsStoreFileSystemImpl implements PermissionsStore {
             result.setAdministrators(new HashSet<>());
             result.setDigitalPublishingTeam(new HashSet<>());
             result.setCollections(new HashMap<>());
-            result.setDataVisualisationPublishers(new HashSet<>());
             saveAccessMapping(result);
         }
 

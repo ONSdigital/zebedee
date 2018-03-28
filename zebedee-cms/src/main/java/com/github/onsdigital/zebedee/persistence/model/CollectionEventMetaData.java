@@ -151,11 +151,11 @@ public class CollectionEventMetaData {
     public static CollectionEventMetaData[] typeChanged(CollectionDescription updatedCollectionDescription) {
         List<CollectionEventMetaData> list = new ArrayList<>();
 
-        if (updatedCollectionDescription != null && updatedCollectionDescription.type != null) {
-            CollectionType previousType = updatedCollectionDescription.type.equals(CollectionType.manual)
+        if (updatedCollectionDescription != null && updatedCollectionDescription.getType() != null) {
+            CollectionType previousType = updatedCollectionDescription.getType().equals(CollectionType.manual)
                     ? CollectionType.scheduled : CollectionType.manual;
 
-            CollectionType updatedType = updatedCollectionDescription.type;
+            CollectionType updatedType = updatedCollectionDescription.getType();
 
             list.add(new CollectionEventMetaData(PREVIOUS_TYPE, previousType.name()));
             list.add(new CollectionEventMetaData(UPDATED_TYPE, updatedType.name()));
@@ -186,16 +186,12 @@ public class CollectionEventMetaData {
             return null;
         }
 
-        if (description.type != null) {
-            list.add(new CollectionEventMetaData(PUBLISH_TYPE, description.type.toString()));
+        if (description.getType() != null) {
+            list.add(new CollectionEventMetaData(PUBLISH_TYPE, description.getType().toString()));
 
-            if (description.type.equals(CollectionType.scheduled)) {
-                list.add(new CollectionEventMetaData(PUBLISH_DATE, description.publishDate.toString()));
+            if (description.getType().equals(CollectionType.scheduled)) {
+                list.add(new CollectionEventMetaData(PUBLISH_DATE, description.getPublishDate().toString()));
             }
-        }
-
-        if (description.collectionOwner != null) {
-            list.add(new CollectionEventMetaData(COLLECTION_OWNER, description.getCollectionOwner().getDisplayText()));
         }
         return toArray(list);
     }

@@ -72,7 +72,9 @@ public class Publisher {
 
         // First get the in-memory (within-JVM) lock.
         // This will block attempts to write to the collection during the publishing process
-        logInfo("Attempting to lock collection before publish.").addParameter("collectionId", collection.getDescription().id).log();
+        logInfo("Attempting to lock collection before publish.")
+                .addParameter("collectionId", collection.getDescription().getId())
+                .log();
         Lock writeLock = collection.getWriteLock();
         writeLock.lock();
 
@@ -143,7 +145,8 @@ public class Publisher {
         } catch (IOException e) {
 
             // slack / log a context specific message but still throw exception to fail publish
-            SlackNotification.alarm(String.format("Exception on the pre-publish of collection: %s: %s", collection.getDescription().name, e.getMessage()));
+            SlackNotification.alarm(String.format("Exception on the pre-publish of collection: %s: %s",
+                    collection.getDescription().getName(), e.getMessage()));
             logError(e, "exception on the pre-publish of collection").collectionName(collection).log();
             throw e;
 
@@ -187,7 +190,7 @@ public class Publisher {
             datasetsPublished = true;
 
         } catch (Exception e) {
-            SlackNotification.alarm(String.format("Exception setting API dataset to published : %s: %s", collection.getDescription().name, e.getMessage()));
+            SlackNotification.alarm(String.format("Exception setting API dataset to published : %s: %s", collection.getDescription().getName(), e.getMessage()));
             logError(e, "exception publishing datasets").collectionName(collection).log();
 
         } finally {
@@ -216,6 +219,10 @@ public class Publisher {
             publishComplete = DoPublish(collection, collectionReader, encryptionPassword, email);
 
         } catch (IOException e) {
+
+            SlackNotification.alarm(String.format("Exception publishing collection: %s: %s",
+                    collection.getDescription().getName(), e.getMessage()));
+
             logError(e, "Exception publishing collection").collectionName(collection).log();
         }
 
@@ -232,7 +239,7 @@ public class Publisher {
             filesPublished = CommitPublish(collection, userEmail, encryptionPassword);
 
         } catch (IOException e) {
-            SlackNotification.alarm(String.format("Exception publishing collection: %s: %s", collection.getDescription().name, e.getMessage()));
+            SlackNotification.alarm(String.format("Exception publishing collection: %s: %s", collection.getDescription().getName(), e.getMessage()));
             logError(e, "exception publishing collection").collectionName(collection).log();
 
             // If an error was caught, attempt to roll back the transaction:

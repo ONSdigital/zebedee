@@ -193,7 +193,7 @@ public class Root {
             logInfo("Attempting to cancel collection publish.")
                     .collectionName(collection)
                     .collectionId(collection)
-                    .addParameter("type", collection.description.type)
+                    .addParameter("type", collection.getDescription().getType())
                     .log();
             scheduler.cancel(collection);
         } catch (Exception e) {

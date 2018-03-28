@@ -40,10 +40,11 @@ public class PublishNotification {
     public PublishNotification(Collection collection, List<String> urisToUpdate, List<ContentDetail> urisToDelete) {
 
         // Delay the clearing of the cache after publish to minimise load on the server while publishing.
-        Date clearCacheDate = new DateTime(collection.description.publishDate)
+        Date clearCacheDate = new DateTime(collection.getDescription().getPublishDate())
                 .plusSeconds(Configuration.getSecondsToCacheAfterScheduledPublish()).toDate();
 
-        this.payload = new NotificationPayload(collection.description.id, urisToUpdate, urisToDelete, clearCacheDate);
+        this.payload = new NotificationPayload(collection.getDescription().getId(), urisToUpdate, urisToDelete,
+                clearCacheDate);
     }
 
     public PublishNotification(Collection collection) {
@@ -111,6 +112,7 @@ public class PublishNotification {
 
     /**
      * return true if this PublishNotification has the given URI to update.
+     *
      * @param uri - the URI to check.
      * @return - true if the URI is in the list of URI's to update
      */

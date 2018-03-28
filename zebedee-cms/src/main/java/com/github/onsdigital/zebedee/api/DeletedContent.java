@@ -64,7 +64,8 @@ public class DeletedContent {
 
         deletedContentService.retrieveDeletedContent(deletedContentId, collectionWriter.getInProgress());
 
-        return "Restored deleted content with ID " + deletedContentId + " to collection " + collection.getDescription().name;
+        return "Restored deleted content with ID " + deletedContentId + " to collection "
+                + collection.getDescription().getName();
     }
 
     private Session getSession(HttpServletRequest request, String message) throws ZebedeeException, IOException {

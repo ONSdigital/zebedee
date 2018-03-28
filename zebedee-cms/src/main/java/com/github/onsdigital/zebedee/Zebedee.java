@@ -14,6 +14,7 @@ import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
 import com.github.onsdigital.zebedee.model.encryption.ApplicationKeys;
 import com.github.onsdigital.zebedee.model.publishing.PublishedCollections;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
+import com.github.onsdigital.zebedee.service.DatasetService;
 import com.github.onsdigital.zebedee.service.ServiceStore;
 import com.github.onsdigital.zebedee.service.ServiceStoreImpl;
 import com.github.onsdigital.zebedee.session.model.Session;
@@ -50,9 +51,6 @@ public class Zebedee {
     public static final String APPLICATION_KEYS = "application-keys";
     public static final String SERVICES = "services";
 
-    private static final String[] ZEBEDEE_DIRS = new String[]{PUBLISHED, COLLECTIONS, USERS, SESSIONS, PERMISSIONS,
-            TEAMS, LAUNCHPAD, PUBLISHED_COLLECTIONS, APPLICATION_KEYS};
-
     private final Path publishedCollectionsPath;
     private final Path collectionsPath;
     private final Path usersPath;
@@ -76,8 +74,8 @@ public class Zebedee {
     private final TeamsService teamsService;
     private final SessionsService sessionsService;
     private final DataIndex dataIndex;
+    private final DatasetService datasetService;
     private final ServiceStoreImpl serviceStoreImpl;
-
 
     /**
      * Create a new instance of Zebedee setting.
@@ -87,15 +85,6 @@ public class Zebedee {
     public Zebedee(ZebedeeConfiguration configuration) {
         this.path = configuration.getZebedeePath();
         this.publishedContentPath = configuration.getPublishedContentPath();
-        this.collectionsPath = configuration.getCollectionsPath();
-        this.publishedCollectionsPath = configuration.getPublishedCollectionsPath();
-        this.usersPath = configuration.getUsersPath();
-        this.sessionsPath = configuration.getSessionsPath();
-        this.permissionsPath = configuration.getPermissionsPath();
-        this.teamsPath = configuration.getTeamsPath();
-        this.applicationKeysPath = configuration.getApplicationKeysPath();
-        this.redirectPath = configuration.getRedirectPath();
-
         this.sessionsService = configuration.getSessionsService();
         this.keyringCache = configuration.getKeyringCache();
         this.permissionsService = configuration.getPermissionsService();
@@ -107,7 +96,17 @@ public class Zebedee {
         this.teamsService = configuration.getTeamsService();
         this.usersService = configuration.getUsersService();
         this.verificationAgent = configuration.getVerificationAgent(isVerificationEnabled(), this);
+        this.datasetService = configuration.getDatasetService();
         this.serviceStoreImpl = configuration.getServiceStore();
+
+        this.collectionsPath = configuration.getCollectionsPath();
+        this.publishedCollectionsPath = configuration.getPublishedCollectionsPath();
+        this.usersPath = configuration.getUsersPath();
+        this.sessionsPath = configuration.getSessionsPath();
+        this.permissionsPath = configuration.getPermissionsPath();
+        this.teamsPath = configuration.getTeamsPath();
+        this.applicationKeysPath = configuration.getApplicationKeysPath();
+        this.redirectPath = configuration.getRedirectPath();
     }
 
     /**
@@ -327,6 +326,10 @@ public class Zebedee {
 
     public UsersService getUsersService() {
         return usersService;
+    }
+
+    public DatasetService getDatasetService() {
+        return datasetService;
     }
 
     public ServiceStore getServiceStore() {

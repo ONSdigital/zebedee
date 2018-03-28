@@ -39,17 +39,22 @@ public class PrePublishCollectionsTask extends ScheduledTask {
     private final Set<String> collectionIds; // The list of collections ID's used in the task.
     private final Zebedee zebedee;
     private final Date publishDate; // the date of the actual publish, NOT the prepublish date associated with this task.
-    private PublishScheduler publishScheduler;
+    private final PublishScheduler publishScheduler;
+    private final Publisher publisher;
 
     /**
      * Create a new instance of the PrePublishCollectionsTask.
-     *
-     * @param zebedee     The instance of Zebedee this task will run under.
+     *  @param zebedee     The instance of Zebedee this task will run under.
      * @param publishDate The date the actual publish is scheduled for.
+     * @param publisher
      */
-    public PrePublishCollectionsTask(Zebedee zebedee, Date publishDate, PublishScheduler publishScheduler) {
+    public PrePublishCollectionsTask(Zebedee zebedee,
+                                     Date publishDate,
+                                     PublishScheduler publishScheduler,
+                                     Publisher publisher) {
         this.publishDate = publishDate;
         this.publishScheduler = publishScheduler;
+        this.publisher = publisher;
         this.collectionIds = new HashSet<>();
         this.zebedee = zebedee;
     }
@@ -142,15 +147,15 @@ public class PrePublishCollectionsTask extends ScheduledTask {
 
                         String encryptionPassword = Random.password(100);
 
-                        // begin the publish ahead of time. This creates the transaction on the train.
-                        Map<String, String> hostToTransactionIdMap = Publisher.BeginPublish(collection, encryptionPassword);
-
-                        // send versioned files manifest ahead of time. allowing files to be copied from the website into the transaction.
-                        Publisher.SendManifest(collection, encryptionPassword);
+                        // Do pre-publish steps ahead of the publish time
+                        publisher.DoPrePublish(collection, encryptionPassword);
 
                         SecretKey key = zebedee.getKeyringCache().schedulerCache.get(collection.getDescription().getId());
                         ZebedeeCollectionReader collectionReader = new ZebedeeCollectionReader(collection, key);
-                        PublishCollectionTask publishCollectionTask = new PublishCollectionTask(collection, collectionReader, encryptionPassword, hostToTransactionIdMap);
+                        PublishCollectionTask publishCollectionTask = new PublishCollectionTask(
+                                collection,
+                                collectionReader,
+                                encryptionPassword, publisher);
 
                         logInfo("PRE-PUBLISH: Adding publish task").collectionName(collection).log();
                         collectionPublishTasks.add(publishCollectionTask);

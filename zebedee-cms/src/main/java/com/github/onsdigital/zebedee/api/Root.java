@@ -8,16 +8,17 @@ import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
-import com.github.onsdigital.zebedee.user.model.User;
 import com.github.onsdigital.zebedee.json.serialiser.IsoDateSerializer;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.Collections;
 import com.github.onsdigital.zebedee.model.Content;
 import com.github.onsdigital.zebedee.model.KeyManager;
 import com.github.onsdigital.zebedee.model.csdb.CsdbImporter;
+import com.github.onsdigital.zebedee.model.publishing.Publisher;
 import com.github.onsdigital.zebedee.model.publishing.scheduled.PublishScheduler;
 import com.github.onsdigital.zebedee.model.publishing.scheduled.Scheduler;
 import com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration;
+import com.github.onsdigital.zebedee.user.model.User;
 import com.github.onsdigital.zebedee.util.SlackNotification;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -50,7 +51,9 @@ public class Root {
     public static Map<String, String> env = System.getenv();
     public static Zebedee zebedee;
     static Path root;
-    private static Scheduler scheduler = new PublishScheduler();
+
+    public static Publisher publisher;
+    public static Scheduler scheduler;
 
     /**
      * Recursively lists all files within this {@link Content}.
@@ -114,6 +117,9 @@ public class Root {
 
         //Setting zebedee root as system property for zebedee reader module, since zebedee root is not set as environment variable on develop environment
         System.setProperty(ZEBEDEE_ROOT, root.toString());
+
+        publisher = new Publisher(zebedee.getDatasetService());
+        scheduler = new PublishScheduler(publisher);
 
         SlackNotification.alarm("Zebedee has just started. Ensure an administrator has logged in.");
 

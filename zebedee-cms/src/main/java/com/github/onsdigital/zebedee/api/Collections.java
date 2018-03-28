@@ -81,7 +81,7 @@ public class Collections {
     public CollectionDescriptions get(HttpServletRequest request, HttpServletResponse response)
             throws ZebedeeException {
         try {
-            Session session = Root.zebedee.getSessionsService().get(request);
+            Session session = zebedeeCmsService.getSession(request);
             CollectionDescriptions result = new CollectionDescriptions();
             List<Collection> collections = Root.zebedee.getCollections().list();
 

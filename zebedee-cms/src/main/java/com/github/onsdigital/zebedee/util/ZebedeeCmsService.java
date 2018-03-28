@@ -13,6 +13,7 @@ import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.CollectionWriter;
 import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
 import com.github.onsdigital.zebedee.model.ZebedeeCollectionWriter;
+import com.github.onsdigital.zebedee.model.publishing.Publisher;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
@@ -111,5 +112,9 @@ public class ZebedeeCmsService {
 
     public Zebedee getZebedee() {
         return Root.zebedee;
+    }
+
+    public Publisher getPublisher() {
+        return Root.publisher;
     }
 }

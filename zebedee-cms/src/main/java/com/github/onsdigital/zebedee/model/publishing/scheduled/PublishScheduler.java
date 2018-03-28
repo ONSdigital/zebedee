@@ -4,6 +4,7 @@ import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.json.CollectionBase;
 import com.github.onsdigital.zebedee.model.Collection;
+import com.github.onsdigital.zebedee.model.publishing.Publisher;
 import com.github.onsdigital.zebedee.model.publishing.scheduled.task.PostPublishCollectionTask;
 import com.github.onsdigital.zebedee.model.publishing.scheduled.task.PrePublishCollectionsTask;
 import com.github.onsdigital.zebedee.model.publishing.scheduled.task.PublishCollectionTask;
@@ -29,6 +30,12 @@ public class PublishScheduler extends Scheduler {
 
     private final Map<Date, PrePublishCollectionsTask> prePublishTasks = new HashMap<>();
     private final Map<Date, PublishCollectionsTask> publishTasks = new HashMap<>();
+
+    private final Publisher publisher;
+
+    public PublishScheduler(Publisher publisher) {
+        this.publisher = publisher;
+    }
 
     @Override
     protected void schedule(Collection collection, Zebedee zebedee) {
@@ -66,7 +73,7 @@ public class PublishScheduler extends Scheduler {
         if (prePublishTasks.containsKey(publishStartDate)) {
             task = prePublishTasks.get(publishStartDate);
         } else {
-            task = new PrePublishCollectionsTask(zebedee, publishStartDate, this);
+            task = new PrePublishCollectionsTask(zebedee, publishStartDate, this, publisher);
             task.schedule(prePublishStartDate);
             prePublishTasks.put(publishStartDate, task);
         }
@@ -91,40 +98,6 @@ public class PublishScheduler extends Scheduler {
         } else {
             logInfo("Not scheduling publish, scheduling is not enabled").log();
         }
-    }
-
-    /**
-     * Remove the publish task once complete.
-     *
-     * @param date
-     * @return
-     */
-    public boolean removeCompletedPublish(Date date) {
-        // Verify its done
-        PublishCollectionsTask task = publishTasks.get(date);
-        if (!task.isComplete()) {
-            return false;
-        }
-
-        publishTasks.remove(date);
-        return true;
-    }
-
-    /**
-     * Remove the publish task once complete.
-     *
-     * @param date
-     * @return
-     */
-    public boolean removeCompletedPrePublish(Date date) {
-        // Verify its done
-        PrePublishCollectionsTask task = prePublishTasks.get(date);
-        if (!task.isComplete()) {
-            return false;
-        }
-
-        prePublishTasks.remove(date);
-        return true;
     }
 
     public List<ScheduledPublishTaskData> getPrePublishTaskData(Zebedee zebedee) {

@@ -1,13 +1,11 @@
 package com.github.onsdigital.zebedee;
 
+import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.data.processing.DataIndex;
 import com.github.onsdigital.zebedee.model.Collections;
 import com.github.onsdigital.zebedee.model.Content;
 import com.github.onsdigital.zebedee.model.KeyringCache;
 import com.github.onsdigital.zebedee.model.RedirectTablePartialMatch;
-import com.github.onsdigital.zebedee.service.ServiceStoreImpl;
-import com.github.onsdigital.zebedee.teams.service.TeamsService;
-import com.github.onsdigital.zebedee.teams.service.TeamsServiceImpl;
 import com.github.onsdigital.zebedee.model.encryption.ApplicationKeys;
 import com.github.onsdigital.zebedee.model.publishing.PublishedCollections;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
@@ -15,18 +13,35 @@ import com.github.onsdigital.zebedee.permissions.service.PermissionsServiceImpl;
 import com.github.onsdigital.zebedee.permissions.store.PermissionsStore;
 import com.github.onsdigital.zebedee.permissions.store.PermissionsStoreFileSystemImpl;
 import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
+import com.github.onsdigital.zebedee.service.DatasetService;
+import com.github.onsdigital.zebedee.service.ServiceStoreImpl;
+import com.github.onsdigital.zebedee.service.ZebedeeDatasetService;
 import com.github.onsdigital.zebedee.session.service.SessionsService;
+import com.github.onsdigital.zebedee.teams.service.TeamsService;
+import com.github.onsdigital.zebedee.teams.service.TeamsServiceImpl;
 import com.github.onsdigital.zebedee.teams.store.TeamsStoreFileSystemImpl;
 import com.github.onsdigital.zebedee.user.service.UsersService;
 import com.github.onsdigital.zebedee.user.service.UsersServiceImpl;
 import com.github.onsdigital.zebedee.user.store.UserStoreFileSystemImpl;
 import com.github.onsdigital.zebedee.verification.VerificationAgent;
+import dp.api.dataset.DatasetAPIClient;
+import dp.api.dataset.DatasetClient;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import static com.github.onsdigital.zebedee.Zebedee.*;
+import static com.github.onsdigital.zebedee.Zebedee.APPLICATION_KEYS;
+import static com.github.onsdigital.zebedee.Zebedee.COLLECTIONS;
+import static com.github.onsdigital.zebedee.Zebedee.PERMISSIONS;
+import static com.github.onsdigital.zebedee.Zebedee.PUBLISHED;
+import static com.github.onsdigital.zebedee.Zebedee.PUBLISHED_COLLECTIONS;
+import static com.github.onsdigital.zebedee.Zebedee.SERVICES;
+import static com.github.onsdigital.zebedee.Zebedee.SESSIONS;
+import static com.github.onsdigital.zebedee.Zebedee.TEAMS;
+import static com.github.onsdigital.zebedee.Zebedee.USERS;
+import static com.github.onsdigital.zebedee.Zebedee.ZEBEDEE;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logDebug;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
 import static com.github.onsdigital.zebedee.permissions.store.PermissionsStoreFileSystemImpl.initialisePermissions;
@@ -52,7 +67,6 @@ public class ZebedeeConfiguration {
     private Path redirectPath;
     private Path servicePath;
     private boolean useVerificationAgent;
-    private VerificationAgent verificationAgent;
     private ApplicationKeys applicationKeys;
     private PublishedCollections publishedCollections;
     private Collections collections;
@@ -64,6 +78,7 @@ public class ZebedeeConfiguration {
     private SessionsService sessionsService;
     private DataIndex dataIndex;
     private PermissionsStore permissionsStore;
+    private DatasetService datasetService;
 
     private static Path createDir(Path root, String dirName) throws IOException {
         Path dir = root.resolve(dirName);
@@ -142,13 +157,20 @@ public class ZebedeeConfiguration {
                 keyringCache)
         ;
 
+        DatasetClient datasetClient;
+        try {
+            datasetClient = new DatasetAPIClient(
+                    Configuration.getDatasetAPIURL(),
+                    Configuration.getDatasetAPIAuthToken());
+        } catch (URISyntaxException e) {
+            logError(e, "failed to initialise dataset api client - invalid URI").log();
+            throw new RuntimeException(e);
+        }
+
+        datasetService = new ZebedeeDatasetService(datasetClient);
+
+
         logDebug(LOG_PREFIX + "ZebedeeConfiguration creation complete.").log();
-    }
-
-
-    public ZebedeeConfiguration enableVerificationAgent(boolean enabled) {
-        this.useVerificationAgent = enabled;
-        return this;
     }
 
     public boolean isUseVerificationAgent() {
@@ -221,7 +243,6 @@ public class ZebedeeConfiguration {
         return content;
     }
 
-
     public DataIndex getDataIndex() {
         return this.dataIndex;
     }
@@ -262,12 +283,8 @@ public class ZebedeeConfiguration {
         return isUseVerificationAgent() && verificationIsEnabled ? new VerificationAgent(z) : null;
     }
 
-    public PermissionsStore getPermissionsStore(Path accessMappingPath) {
-        return new PermissionsStoreFileSystemImpl(accessMappingPath);
-    }
-
-    public void setUsersService(UsersService usersService) {
-        this.usersService = usersService;
+    public DatasetService getDatasetService() {
+        return datasetService;
     }
 
     public ServiceStoreImpl getServiceStore() {

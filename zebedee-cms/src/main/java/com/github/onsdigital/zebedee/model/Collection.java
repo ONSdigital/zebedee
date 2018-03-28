@@ -26,6 +26,7 @@ import com.github.onsdigital.zebedee.json.Events;
 import com.github.onsdigital.zebedee.model.approval.tasks.ReleasePopulator;
 import com.github.onsdigital.zebedee.model.content.item.ContentItemVersion;
 import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
+import com.github.onsdigital.zebedee.model.publishing.Publisher;
 import com.github.onsdigital.zebedee.model.publishing.scheduled.Scheduler;
 import com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDao;
 import com.github.onsdigital.zebedee.persistence.model.CollectionHistoryEvent;
@@ -466,7 +467,7 @@ public class Collection {
     }
 
     /**
-     * This methods is used by {@link com.github.onsdigital.zebedee.model.publishing.Publisher Publisher}
+     * This methods is used by {@link Publisher Publisher}
      * to acquire a write lock on a collection during publishing.
      *
      * @return The collection write lock.

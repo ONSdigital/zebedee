@@ -35,12 +35,14 @@ public class CollectionsTest {
 
     private HttpServletRequest request = mock(HttpServletRequest.class);
     private HttpServletResponse response = mock(HttpServletResponse.class);
+    private Session session = mock(Session.class);
 
     private Collections collections = new Collections(mockZebedeeCmsService, mockDatasetService);
     private String collectionID = "123";
     private String datasetID = "345";
     private String edition = "2014";
     private String version = "1";
+    private String user = "test@email.com";
 
     @Before
     public void setUp() throws Exception {
@@ -54,6 +56,7 @@ public class CollectionsTest {
         // Given a PUT request with a bad json input
         String url = String.format("/collections/%s/datasets/%s", collectionID, datasetID);
         when(request.getPathInfo()).thenReturn(url);
+        when(session.getEmail()).thenReturn(user);
 
         String json = "";
         mockRequestBody(json);
@@ -64,7 +67,7 @@ public class CollectionsTest {
         collections.put(request, response);
 
         // The dataset service is called with the values extracted from the request URL.
-        verify(mockDatasetService, times(1)).updateDatasetInCollection(mockCollection, datasetID, null);
+        verify(mockDatasetService, times(1)).updateDatasetInCollection(mockCollection, datasetID, null, user);
     }
 
     @Test
@@ -73,6 +76,7 @@ public class CollectionsTest {
         // Given a PUT request with a valid URL for a dataset
         String url = String.format("/collections/%s/datasets/%s", collectionID, datasetID);
         when(request.getPathInfo()).thenReturn(url);
+        when(session.getEmail()).thenReturn(user);
 
         String json = "{ \"state\": \"inProgress\"}";
         mockRequestBody(json);
@@ -83,7 +87,7 @@ public class CollectionsTest {
         collections.put(request, response);
 
         // The dataset service is called with the values extracted from the request URL.
-        verify(mockDatasetService, times(1)).updateDatasetInCollection(mockCollection, datasetID, new CollectionDataset());
+        verify(mockDatasetService, times(1)).updateDatasetInCollection(mockCollection, datasetID, new CollectionDataset(), user);
     }
 
     @Test
@@ -93,6 +97,7 @@ public class CollectionsTest {
         String url = String.format("/collections/%s/datasets/%s/editions/%s/versions/%s",
                 collectionID, datasetID, edition, version);
         when(request.getPathInfo()).thenReturn(url);
+        when(session.getEmail()).thenReturn(user);
 
         String json = "{ \"state\": \"inProgress\"}";
         mockRequestBody(json);
@@ -104,7 +109,7 @@ public class CollectionsTest {
 
         // The dataset service is called with the values extracted from the request URL.
         verify(mockDatasetService, times(1)).updateDatasetVersionInCollection(
-                mockCollection, datasetID, edition, version, new CollectionDatasetVersion());
+                mockCollection, datasetID, edition, version, new CollectionDatasetVersion(), user);
     }
 
     @Test
@@ -142,7 +147,6 @@ public class CollectionsTest {
 
     @Test
     public void TestPutDataset_SessionNotFound() throws Exception {
-
         // Given a session that does not exist
         when(mockZebedeeCmsService.getSession(request)).thenReturn(null);
 
@@ -301,7 +305,6 @@ public class CollectionsTest {
     // mock the authorisation for the given request to authorise the request is the authorise param is true.
     private void shouldAuthorise(HttpServletRequest request, boolean authorise) throws ZebedeeException, IOException {
 
-        Session session = mock(Session.class);
         when(mockZebedeeCmsService.getSession(request)).thenReturn(session);
 
         PermissionsService permissionsService = mock(PermissionsService.class);

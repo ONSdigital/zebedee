@@ -123,6 +123,8 @@ public class Collections {
             return;
         }
 
+        String user = session.getEmail();
+
         Path path = Path.newInstance(request);
         List<String> pathSegments = path.segments();
 
@@ -142,7 +144,7 @@ public class Collections {
             switch (pathSegments.size()) {
                 case 4: // /collections/{collection_id}/datasets/{dataset_id}
 
-                    updateDatasetInCollection(collection, datasetID, request);
+                    updateDatasetInCollection(collection, datasetID, request, user);
                     break;
 
                 case 8: // /collections/{collection_id}/datasets/{dataset_id}/editions/{}/versions/{}
@@ -150,7 +152,7 @@ public class Collections {
                     String edition = pathSegments.get(5);
                     String version = pathSegments.get(7);
 
-                    updateDatasetVersionInCollection(collection, datasetID, edition, version, request);
+                    updateDatasetVersionInCollection(collection, datasetID, edition, version, request, user);
                     break;
 
                 default:
@@ -210,33 +212,35 @@ public class Collections {
         }
     }
 
-    private void updateDatasetVersionInCollection(Collection collection, String datasetID, String edition, String version, HttpServletRequest request) throws ZebedeeException, IOException, DatasetAPIException {
+    private void updateDatasetVersionInCollection(Collection collection, String datasetID, String edition, String version, HttpServletRequest request, String user) throws ZebedeeException, IOException, DatasetAPIException {
         logInfo("PUT called on /collections/{}/datasets/{}/editions/{}/versions/{} endpoint")
                 .addParameter("collectionID", collection.getId())
                 .addParameter("datasetID", datasetID)
                 .addParameter("edition", edition)
                 .addParameter("version", version)
+                .user(user)
                 .log();
 
         try (InputStream body = request.getInputStream()) {
 
             CollectionDatasetVersion datasetVersion = ContentUtil.deserialise(body, CollectionDatasetVersion.class);
-            datasetService.updateDatasetVersionInCollection(collection, datasetID, edition, version, datasetVersion);
+            datasetService.updateDatasetVersionInCollection(collection, datasetID, edition, version, datasetVersion, user);
 
         } catch (JsonSyntaxException ex) {
             throw new BadRequestException(ex.getMessage());
         }
     }
 
-    private void updateDatasetInCollection(Collection collection, String datasetID, HttpServletRequest request) throws ZebedeeException, IOException, DatasetAPIException {
+    private void updateDatasetInCollection(Collection collection, String datasetID, HttpServletRequest request, String user) throws ZebedeeException, IOException, DatasetAPIException {
         logInfo("PUT called on /collections/{}/datasets/{} endpoint")
                 .addParameter("collectionID", collection.getId())
                 .addParameter("datasetID", datasetID)
+                .user(user)
                 .log();
         try (InputStream body = request.getInputStream()) {
 
             CollectionDataset dataset = ContentUtil.deserialise(body, CollectionDataset.class);
-            datasetService.updateDatasetInCollection(collection, datasetID, dataset);
+            datasetService.updateDatasetInCollection(collection, datasetID, dataset, user);
 
         } catch (JsonSyntaxException ex) {
             throw new BadRequestException(ex.getMessage());

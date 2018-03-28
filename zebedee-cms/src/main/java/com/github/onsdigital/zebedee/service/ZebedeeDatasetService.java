@@ -1,10 +1,12 @@
 package com.github.onsdigital.zebedee.service;
 
-import com.github.onsdigital.zebedee.exceptions.ConflictException;
-import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
+import com.github.onsdigital.zebedee.exceptions.*;
 import com.github.onsdigital.zebedee.json.CollectionDataset;
 import com.github.onsdigital.zebedee.json.CollectionDatasetVersion;
+import com.github.onsdigital.zebedee.json.ContentStatus;
 import com.github.onsdigital.zebedee.model.Collection;
+import com.github.onsdigital.zebedee.model.Content;
+import com.github.onsdigital.zebedee.util.ZebedeeCmsService;
 import dp.api.dataset.DatasetClient;
 import dp.api.dataset.exception.DatasetAPIException;
 import dp.api.dataset.model.Dataset;
@@ -13,8 +15,10 @@ import dp.api.dataset.model.State;
 
 import java.io.IOException;
 import java.io.InvalidObjectException;
+import java.util.Objects;
 import java.util.Optional;
 
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
 
 /**
@@ -28,11 +32,89 @@ public class ZebedeeDatasetService implements DatasetService {
         this.datasetClient = datasetClient;
     }
 
+    private ContentStatus updatedStateInCollection(ContentStatus currentState, ContentStatus newState, String lastEditedBy, String user) throws ForbiddenException, BadRequestException {
+
+        Objects.requireNonNull(newState);
+
+        if (currentState == null && newState.equals(ContentStatus.Reviewed)) {
+            logInfo("Attempt to review a dataset that hasn't been submitted for review")
+                .addParameter("last edited by", lastEditedBy)
+                .user(user)
+                .log();
+
+            throw new BadRequestException("Cannot be reviewed without being submitted for review first");
+        }
+
+        // Updating from scratch to 'in progress' or 'complete' state so don't need to perform following checks
+        if (currentState == null && (newState.equals(ContentStatus.InProgress) || newState.equals(ContentStatus.Complete))) {
+            logInfo("Updating dataset state for first time")
+                .user(user)
+                .addParameter("last edited by", lastEditedBy)
+                .addParameter("current state", currentState)
+                .addParameter("new state", newState)
+                .log();
+
+            return newState;
+        }
+
+        // The same user can't review edits they've submitted for review
+        if (!currentState.equals(ContentStatus.Reviewed) && newState.equals(ContentStatus.Reviewed) && lastEditedBy.equalsIgnoreCase(user)) {
+            logInfo("User attempting to review their own dataset")
+                .user(user)
+                .addParameter("last edited by", lastEditedBy)
+                .addParameter("current state", currentState)
+                .addParameter("new state", newState)
+                .log();
+            throw new ForbiddenException("User " + user + "doesn't have permission to review a dataset they completed");
+        }
+
+        // Any further updates made by the user who submitted the dataset should keep the dataset in the awaiting review state
+        if (currentState.equals(ContentStatus.Complete) && lastEditedBy.equalsIgnoreCase(user)) {
+            logInfo("User making more updates to a dataset whilst it is awaiting review")
+                .user(user)
+                .addParameter("last edited by", lastEditedBy)
+                .addParameter("current state", currentState)
+                .addParameter("new state", newState)
+                .log();
+            return ContentStatus.Complete;
+        }
+
+        // Any updates to a dataset awaiting review by a different user means it moves back to an in progress state
+        if (currentState.equals(ContentStatus.Complete) && !newState.equals(ContentStatus.Reviewed) && !lastEditedBy.equalsIgnoreCase(user)) {
+            logInfo("A different user making updates to a dataset whilst it is awaiting review")
+                .user(user)
+                .addParameter("last edited by", lastEditedBy)
+                .addParameter("current state", currentState)
+                .addParameter("new state", newState)
+                .log();
+            return ContentStatus.InProgress;
+        }
+
+        // Once reviewed any updates can be made to a dataset without the state changing
+        if (currentState.equals(ContentStatus.Reviewed)) {
+            logInfo("Making updates to a review dataset")
+                .user(user)
+                .addParameter("last edited by", lastEditedBy)
+                .addParameter("current state", currentState)
+                .addParameter("new state", newState)
+                .log();
+            return ContentStatus.Reviewed;
+        }
+
+        logInfo("Updating dataset state")
+            .user(user)
+            .addParameter("last edited by", lastEditedBy)
+            .addParameter("current state", currentState)
+            .addParameter("new state", newState)
+            .log();
+        return newState;
+    }
+
     /**
      * Add the dataset for the given datasetID to the collection for the collectionID.
      */
     @Override
-    public CollectionDataset updateDatasetInCollection(Collection collection, String datasetID, CollectionDataset updatedDataset) throws ZebedeeException, IOException, DatasetAPIException {
+    public CollectionDataset updateDatasetInCollection(Collection collection, String datasetID, CollectionDataset updatedDataset, String user) throws ZebedeeException, IOException, DatasetAPIException {
 
         CollectionDataset collectionDataset;
 
@@ -45,8 +127,12 @@ public class ZebedeeDatasetService implements DatasetService {
         }
 
         if (updatedDataset != null && updatedDataset.getState() != null) {
-            collectionDataset.setState(updatedDataset.getState());
+            collectionDataset.setState(updatedStateInCollection(collectionDataset.getState(), updatedDataset.getState(), collectionDataset.getLastEditedBy(), user));
+        } else {
+            collectionDataset.setState(ContentStatus.InProgress);
         }
+
+        collectionDataset.setLastEditedBy(user);
 
         Dataset dataset = datasetClient.getDataset(datasetID);
 
@@ -92,7 +178,7 @@ public class ZebedeeDatasetService implements DatasetService {
      * Add the dataset version to the collection for the collectionID.
      */
     @Override
-    public CollectionDatasetVersion updateDatasetVersionInCollection(Collection collection, String datasetID, String edition, String version, CollectionDatasetVersion updatedVersion) throws ZebedeeException, IOException, DatasetAPIException {
+    public CollectionDatasetVersion updateDatasetVersionInCollection(Collection collection, String datasetID, String edition, String version, CollectionDatasetVersion updatedVersion, String user) throws ZebedeeException, IOException, DatasetAPIException {
 
         CollectionDatasetVersion collectionDatasetVersion;
 
@@ -110,8 +196,12 @@ public class ZebedeeDatasetService implements DatasetService {
         }
 
         if (updatedVersion != null && updatedVersion.getState() != null) {
-            collectionDatasetVersion.setState(updatedVersion.getState());
+            collectionDatasetVersion.setState(updatedStateInCollection(collectionDatasetVersion.getState(), updatedVersion.getState(), collectionDatasetVersion.getLastEditedBy(), user));
+        } else {
+            collectionDatasetVersion.setState(ContentStatus.InProgress);
         }
+
+        collectionDatasetVersion.setLastEditedBy(user);
 
         Dataset dataset = datasetClient.getDataset(datasetID);
         DatasetVersion datasetVersion = datasetClient.getDatasetVersion(datasetID, edition, version);

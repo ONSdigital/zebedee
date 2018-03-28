@@ -9,6 +9,7 @@ public class CollectionDataset {
     private String title;
     private ContentStatus state;
     private String uri;
+    private String lastEditedBy;
 
     public String getId() {
         return id;
@@ -40,6 +41,14 @@ public class CollectionDataset {
 
     public void setUri(String uri) {
         this.uri = uri;
+    }
+
+    public void setLastEditedBy(String user) {
+        this.lastEditedBy = user;
+    }
+
+    public String getLastEditedBy() {
+        return lastEditedBy;
     }
 
     @Override

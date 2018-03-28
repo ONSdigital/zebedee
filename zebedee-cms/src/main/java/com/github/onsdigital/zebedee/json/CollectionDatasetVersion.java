@@ -11,6 +11,7 @@ public class CollectionDatasetVersion {
     private String version;
     private String uri;
     private ContentStatus state;
+    private String lastEditedBy;
 
     public String getId() {
         return id;
@@ -58,6 +59,14 @@ public class CollectionDatasetVersion {
 
     public void setUri(String uri) {
         this.uri = uri;
+    }
+
+    public void setLastEditedBy(String user) {
+        this.lastEditedBy = user;
+    }
+
+    public String getLastEditedBy() {
+        return lastEditedBy;
     }
 
     @Override

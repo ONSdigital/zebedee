@@ -634,6 +634,7 @@ public class Collections {
 
             return new ByteArrayInputStream(bytes);
         } catch (Exception e) {
+            logError(e, "error while attempting to valid json inputstream").log();
             throw new BadRequestException("Validation of page content failed. Please try again");
         }
     }
@@ -645,17 +646,30 @@ public class Collections {
 
         // Collection (null check before authorisation check)
         if (collection == null) {
-            throw new BadRequestException("Please specify a collection");
+            ZebedeeException ex = new BadRequestException("Please specify a collection");
+            logError(ex, "could not delete content as collection was null").log();
+            throw ex;
         }
 
         // Authorisation
         if (session == null || !permissionsService.canEdit(session.getEmail())) {
-            throw new UnauthorizedException(getUnauthorizedMessage(session));
+            ZebedeeException ex = new UnauthorizedException(getUnauthorizedMessage(session));
+            logError(ex, "could not delete content as user not authorised")
+                    .path(uri)
+                    .collectionName(collection)
+                    .user(session.getEmail())
+                    .log();
+            throw ex;
         }
 
         // Requested path
         if (StringUtils.isBlank(uri)) {
-            throw new BadRequestException("Please provide a URI");
+            ZebedeeException ex = new BadRequestException("Please provide a URI");
+            logError(ex, "could not delete content as uri is empty")
+                    .user(session.getEmail())
+                    .collectionName(collection)
+                    .log();
+            throw ex;
         }
 
         // Find the file if it exists
@@ -663,8 +677,13 @@ public class Collections {
 
         // Check the user has access to the given file
         if (path == null || !collection.isInCollection(uri)) {
-            throw new NotFoundException(
-                    "This URI cannot be found in the collection");
+            ZebedeeException ex = new NotFoundException("This URI cannot be found in the collection");
+            logError(ex, "could not delete content as uri is empty")
+                    .user(session.getEmail())
+                    .path(uri)
+                    .collectionName(collection)
+                    .log();
+            throw ex;
         }
 
         // Go ahead

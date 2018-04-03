@@ -16,7 +16,9 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
 import java.io.IOException;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.*;
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logWarn;
 import static com.github.onsdigital.zebedee.util.JsonUtils.writeResponse;
 import static org.apache.http.HttpStatus.SC_OK;
 import static org.apache.http.HttpStatus.SC_UNAUTHORIZED;
@@ -30,26 +32,25 @@ public class Identity {
     static final String AUTHORIZATION_HEADER = "Authorization";
 
     @GET
-    public void identifyUser(HttpServletRequest request, HttpServletResponse response) throws IOException,
-            UserIdentityException {
+    public void identifyUser(HttpServletRequest request, HttpServletResponse response) throws IOException {
+
+        if (request.getHeader(RequestUtils.TOKEN_HEADER) != null) {
+            findUser(request, response);
+            return;
+        }
 
         if (StringUtils.isNotBlank(request.getHeader(AUTHORIZATION_HEADER))) {
             ServiceAccount serviceAccount = findService(request);
             if (serviceAccount != null) {
-                if (request.getHeader(RequestUtils.TOKEN_HEADER) != null) {
-                    findUser(request, response);
-                    return;
-                } else {
-                    writeResponse(response, new UserIdentity(serviceAccount.getId()), SC_OK);
-                    return;
-                }
+
+                writeResponse(response, new UserIdentity(serviceAccount.getId()), SC_OK);
+                return;
             }
         }
         writeResponse(response, new Error("service not authenticated"), SC_UNAUTHORIZED);
     }
 
-    private void findUser(HttpServletRequest request, HttpServletResponse response) throws IOException,
-            UserIdentityException {
+    private void findUser(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String sessionID = RequestUtils.getSessionId(request);
 
         if (StringUtils.isEmpty(sessionID)) {
@@ -75,7 +76,7 @@ public class Identity {
     private ServiceAccount findService(HttpServletRequest request) throws IOException {
         final ServiceStore serviceStore = getServiceStoreImpl();
         String authorizationHeader = request.getHeader(AUTHORIZATION_HEADER);
-        if ( StringUtils.isNotEmpty(authorizationHeader)) {
+        if (StringUtils.isNotEmpty(authorizationHeader)) {
             authorizationHeader = authorizationHeader.toLowerCase();
             if (authorizationHeader.toLowerCase().startsWith("bearer ")) {
                 String[] cred = authorizationHeader.split("bearer ");

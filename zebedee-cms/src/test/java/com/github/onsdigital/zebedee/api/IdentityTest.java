@@ -113,7 +113,7 @@ public class IdentityTest {
 
 		api.identifyUser(mockRequest, mockResponse);
 
-		verify(serviceStore, times(1)).get("123");
+		verify(serviceStore, times(0)).get("123");
 		verify(authorisationService, times(1)).identifyUser(FLORENCE_TOKEN);
 		verifyResponseInteractions(identity, SC_OK);
 	}

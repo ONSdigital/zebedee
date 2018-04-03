@@ -10,13 +10,16 @@ import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.Collections;
 import com.github.onsdigital.zebedee.model.Content;
 import com.github.onsdigital.zebedee.model.KeyringCache;
-import com.github.onsdigital.zebedee.teams.service.TeamsService;
 import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
 import com.github.onsdigital.zebedee.model.encryption.ApplicationKeys;
 import com.github.onsdigital.zebedee.model.publishing.PublishedCollections;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
+import com.github.onsdigital.zebedee.service.DatasetService;
+import com.github.onsdigital.zebedee.service.ServiceStore;
+import com.github.onsdigital.zebedee.service.ServiceStoreImpl;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.session.service.SessionsService;
+import com.github.onsdigital.zebedee.teams.service.TeamsService;
 import com.github.onsdigital.zebedee.user.model.User;
 import com.github.onsdigital.zebedee.user.service.UsersService;
 import com.github.onsdigital.zebedee.verification.VerificationAgent;
@@ -33,7 +36,6 @@ import static com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDenie
 import static com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedException.beingEditedByThisCollectionError;
 import static com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedException.markedDeleteInAnotherCollectionError;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logDebug;
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
 
 public class Zebedee {
 
@@ -47,9 +49,7 @@ public class Zebedee {
     public static final String TEAMS = "teams";
     public static final String LAUNCHPAD = "launchpad";
     public static final String APPLICATION_KEYS = "application-keys";
-
-    private static final String[] ZEBEDEE_DIRS = new String[]{PUBLISHED, COLLECTIONS, USERS, SESSIONS, PERMISSIONS,
-            TEAMS, LAUNCHPAD, PUBLISHED_COLLECTIONS, APPLICATION_KEYS};
+    public static final String SERVICES = "services";
 
     private final Path publishedCollectionsPath;
     private final Path collectionsPath;
@@ -74,23 +74,17 @@ public class Zebedee {
     private final TeamsService teamsService;
     private final SessionsService sessionsService;
     private final DataIndex dataIndex;
+    private final DatasetService datasetService;
+    private final ServiceStoreImpl serviceStoreImpl;
 
     /**
      * Create a new instance of Zebedee setting.
+     *
      * @param configuration {@link ZebedeeConfiguration} contains the set up to use for this instance.
      */
     public Zebedee(ZebedeeConfiguration configuration) {
         this.path = configuration.getZebedeePath();
         this.publishedContentPath = configuration.getPublishedContentPath();
-        this.collectionsPath = configuration.getCollectionsPath();
-        this.publishedCollectionsPath = configuration.getPublishedCollectionsPath();
-        this.usersPath = configuration.getUsersPath();
-        this.sessionsPath = configuration.getSessionsPath();
-        this.permissionsPath = configuration.getPermissionsPath();
-        this.teamsPath = configuration.getTeamsPath();
-        this.applicationKeysPath = configuration.getApplicationKeysPath();
-        this.redirectPath = configuration.getRedirectPath();
-
         this.sessionsService = configuration.getSessionsService();
         this.keyringCache = configuration.getKeyringCache();
         this.permissionsService = configuration.getPermissionsService();
@@ -102,6 +96,17 @@ public class Zebedee {
         this.teamsService = configuration.getTeamsService();
         this.usersService = configuration.getUsersService();
         this.verificationAgent = configuration.getVerificationAgent(isVerificationEnabled(), this);
+        this.datasetService = configuration.getDatasetService();
+        this.serviceStoreImpl = configuration.getServiceStore();
+
+        this.collectionsPath = configuration.getCollectionsPath();
+        this.publishedCollectionsPath = configuration.getPublishedCollectionsPath();
+        this.usersPath = configuration.getUsersPath();
+        this.sessionsPath = configuration.getSessionsPath();
+        this.permissionsPath = configuration.getPermissionsPath();
+        this.teamsPath = configuration.getTeamsPath();
+        this.applicationKeysPath = configuration.getApplicationKeysPath();
+        this.redirectPath = configuration.getRedirectPath();
     }
 
     /**
@@ -132,7 +137,8 @@ public class Zebedee {
     public Optional<Collection> checkForCollectionBlockingChange(Collection workingCollection, String uri) throws IOException {
         return collections.list()
                 .stream()
-                .filter(c -> c.isInCollection(uri) && !workingCollection.getDescription().id.equals(c.getDescription().id))
+                .filter(c -> c.isInCollection(uri) && !workingCollection.getDescription().getId()
+                        .equals(c.getDescription().getId()))
                 .findFirst();
     }
 
@@ -161,7 +167,7 @@ public class Zebedee {
             String title = new ZebedeeCollectionReader(this, blockingCollection.get(), session)
                     .getContent(uri).getDescription().getTitle();
 
-            if (workingCollection.description.id.equals(blockingCollection.get().description.id)) {
+            if (workingCollection.getDescription().getId().equals(blockingCollection.get().getDescription().getId())) {
                 throw beingEditedByThisCollectionError(title);
             }
             throw beingEditedByAnotherCollectionError(blockingCollection.get(), title);
@@ -320,5 +326,13 @@ public class Zebedee {
 
     public UsersService getUsersService() {
         return usersService;
+    }
+
+    public DatasetService getDatasetService() {
+        return datasetService;
+    }
+
+    public ServiceStore getServiceStore() {
+        return serviceStoreImpl;
     }
 }

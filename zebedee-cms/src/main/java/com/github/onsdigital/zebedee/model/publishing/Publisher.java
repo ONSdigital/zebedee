@@ -15,6 +15,7 @@ import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.Resource;
+import com.github.onsdigital.zebedee.service.DatasetService;
 import com.github.onsdigital.zebedee.util.Http;
 import com.github.onsdigital.zebedee.util.SlackNotification;
 import org.apache.commons.lang3.StringUtils;
@@ -37,6 +38,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.locks.Lock;
 import java.util.function.Function;
 
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logDebug;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
 
@@ -45,6 +47,8 @@ public class Publisher {
 
     private static final List<Host> theTrainHosts;
     private static final ExecutorService pool = Executors.newFixedThreadPool(20);
+
+    private final DatasetService datasetService;
 
     static {
         String[] theTrainUrls = Configuration.getTheTrainUrls();
@@ -55,12 +59,22 @@ public class Publisher {
         Runtime.getRuntime().addShutdownHook(new ShutDownPublisherThread(pool));
     }
 
-    public static boolean Publish(Collection collection, String email, CollectionReader collectionReader) throws IOException {
+    public Publisher(DatasetService datasetService) {
+        this.datasetService = datasetService;
+    }
+
+    /**
+     * A full publish does all publish steps at once, compared to a scheduled publish which does the pre-publish steps
+     * ahead of the scheduled publish time.
+     */
+    public boolean DoFullPublish(Collection collection, String email, CollectionReader collectionReader) throws IOException {
         boolean publishComplete = false;
 
         // First get the in-memory (within-JVM) lock.
         // This will block attempts to write to the collection during the publishing process
-        logInfo("Attempting to lock collection before publish.").addParameter("collectionId", collection.description.id).log();
+        logInfo("Attempting to lock collection before publish.")
+                .addParameter("collectionId", collection.getDescription().getId())
+                .log();
         Lock writeLock = collection.getWriteLock();
         writeLock.lock();
 
@@ -68,7 +82,7 @@ public class Publisher {
 
         try {
             // First check the state of the collection
-            if (collection.description.publishComplete) {
+            if (collection.getDescription().publishComplete) {
                 logInfo("Collection has already been published. Halting publish").collectionId(collection).log();
                 return publishComplete;
             }
@@ -89,14 +103,14 @@ public class Publisher {
                     logInfo("Starting collection publish process").collectionName(collection).log();
 
 
-                    if (collection.description.approvalStatus != ApprovalStatus.COMPLETE) {
+                    if (collection.getDescription().approvalStatus != ApprovalStatus.COMPLETE) {
                         logInfo("Collection cannot be published as it has not been approved").collectionName(collection).log();
                         return false;
                     }
 
-                    publishComplete = PublishFilesToWebsite(collection, email, collectionReader);
+                    publishComplete = FullPublish(collection, email, collectionReader);
 
-                    logInfo("Collectiom publish process finished").collectionName(collection)
+                    logInfo("Collection publish process finished").collectionName(collection)
                             .timeTaken((System.currentTimeMillis() - publishStart)).log();
 
                 } else {
@@ -117,68 +131,158 @@ public class Publisher {
     }
 
     /**
-     * Submit all files in the collection to the train destination - the website.
-     *
-     * @param collection The collection to be published.
-     * @param email      An identifier for the publishing user.
-     * @return If publishing succeeded, true.
-     * @throws IOException If a general error occurs.
+     * Do the pre-publish steps for a collection. Start a transaction with the train and send the manifest file.
      */
-    public static boolean PublishFilesToWebsite(Collection collection, String email, CollectionReader collectionReader) throws IOException {
+    public void DoPrePublish(Collection collection, String encryptionPassword) throws IOException {
 
-        boolean publishComplete = false;
-        String encryptionPassword = Random.password(100);
         try {
-            collection.description.publishStartDate = new Date();
+            // This creates the transaction on the train.
             BeginPublish(collection, encryptionPassword);
+
+            // send versioned files manifest, allowing files to be copied from the website into the transaction.
             SendManifest(collection, encryptionPassword);
-            PublishFilteredCollectionFiles(collection, collectionReader, encryptionPassword);
-            publishComplete = CommitPublish(collection, email, encryptionPassword);
-            collection.description.publishEndDate = new Date();
 
         } catch (IOException e) {
 
-            SlackNotification.alarm(String.format("Exception publishing collection: %s: %s", collection.description.name, e.getMessage()));
-            logError(e, "Exception publishing collection").collectionName(collection).log();
-            // If an error was caught, attempt to roll back the transaction:
-            Map<String, String> transactionIds = collection.description.publishTransactionIds;
-            if (transactionIds != null && transactionIds.size() > 0) {
-                logInfo("Attempting rollback of collection publishing transaction").collectionName(collection).log();
-                rollbackPublish(collection.description.publishTransactionIds, encryptionPassword);
-            }
+            // slack / log a context specific message but still throw exception to fail publish
+            SlackNotification.alarm(String.format("Exception on the pre-publish of collection: %s: %s",
+                    collection.getDescription().getName(), e.getMessage()));
+            logError(e, "exception on the pre-publish of collection").collectionName(collection).log();
+            throw e;
+
+        } finally {
+            // Save any updates to the collection
+            collection.save();
+        }
+    }
+
+    /**
+     * Do the steps to publish the collection, given that the pre-publish is complete.
+     */
+    public boolean DoPublish(Collection collection,
+                             CollectionReader collectionReader,
+                             String encryptionPassword,
+                             String userEmail) throws IOException {
+
+        boolean published = false;
+
+        boolean filesPublished = publishFiles(
+                collection,
+                collectionReader,
+                encryptionPassword,
+                userEmail);
+
+        if (filesPublished) {
+            published = publishDatasets(collection);
+        }
+
+        return published;
+    }
+
+    private boolean publishDatasets(Collection collection) throws IOException {
+
+        boolean datasetsPublished = false;
+
+        try {
+            logDebug("publishing api datasets for collection").collectionName(collection).log();
+            datasetService.publishDatasetsInCollection(collection);
+            collection.getDescription().publishEndDate = new Date();
+            datasetsPublished = true;
+
+        } catch (Exception e) {
+            SlackNotification.alarm(String.format("Exception setting API dataset to published : %s: %s", collection.getDescription().getName(), e.getMessage()));
+            logError(e, "exception publishing datasets").collectionName(collection).log();
 
         } finally {
             // Save any updates to the collection
             collection.save();
         }
 
-        return publishComplete;
+        return datasetsPublished;
     }
 
     /**
-     * Publish collection files with required filters applied.
+     * aggregate the pre-publish and publish steps into one function.
+     *
+     * @param collection The collection to be published.
+     * @param email      An identifier for the publishing user.
+     * @return If publishing succeeded, true.
+     * @throws IOException If a general error occurs.
+     */
+    private boolean FullPublish(Collection collection, String email, CollectionReader collectionReader) {
+
+        boolean publishComplete = false;
+        String encryptionPassword = Random.password(100);
+        try {
+
+            DoPrePublish(collection, encryptionPassword);
+            publishComplete = DoPublish(collection, collectionReader, encryptionPassword, email);
+
+        } catch (IOException e) {
+
+            SlackNotification.alarm(String.format("Exception publishing collection: %s: %s",
+                    collection.getDescription().getName(), e.getMessage()));
+
+            logError(e, "Exception publishing collection").collectionName(collection).log();
+        }
+
+        return publishComplete;
+    }
+
+    private static boolean publishFiles(Collection collection, CollectionReader collectionReader, String encryptionPassword, String userEmail) throws IOException {
+
+        boolean filesPublished = false;
+
+        try {
+            collection.getDescription().publishStartDate = new Date();
+            SendFilteredCollectionFiles(collection, collectionReader, encryptionPassword);
+            filesPublished = CommitPublish(collection, userEmail, encryptionPassword);
+
+        } catch (IOException e) {
+            SlackNotification.alarm(String.format("Exception publishing collection: %s: %s", collection.getDescription().getName(), e.getMessage()));
+            logError(e, "exception publishing collection").collectionName(collection).log();
+
+            // If an error was caught, attempt to roll back the transaction:
+            Map<String, String> publishTransactionIds = collection.getDescription().publishTransactionIds;
+            if (publishTransactionIds != null && publishTransactionIds.size() > 0) {
+                logInfo("attempting rollback of collection publishing transaction")
+                        .collectionName(collection)
+                        .addParameter("transaction_ids", publishTransactionIds)
+                        .log();
+                rollbackPublish(publishTransactionIds, encryptionPassword);
+            }
+
+        } finally {
+            // Save any updates to the collection
+            collection.save();
+        }
+        return filesPublished;
+    }
+
+    /**
+     * DoFullPublish collection files with required filters applied.
      *
      * @param collection
      * @param collectionReader
      * @param encryptionPassword
      * @throws IOException
      */
-    public static void PublishFilteredCollectionFiles(Collection collection, CollectionReader collectionReader, String encryptionPassword) throws IOException {
+    private static void SendFilteredCollectionFiles(Collection collection, CollectionReader collectionReader, String encryptionPassword) throws IOException {
         // We do not want to send versioned files. They have already been taken care of via the manifest.
         // Pass the function to filter files into the publish method.
         Function<String, Boolean> versionedUriFilter = uri -> VersionedContentItem.isVersionedUri(uri);
         Function<String, Boolean> timeseriesUriFilter = uri -> uri.contains("/timeseries/");
-        Publisher.PublishCollectionFiles(collection, collectionReader, encryptionPassword, versionedUriFilter, timeseriesUriFilter);
+        SendCollectionFiles(collection, collectionReader, encryptionPassword, versionedUriFilter, timeseriesUriFilter);
     }
 
-    public static void SendManifest(Collection collection, String encryptionPassword) throws IOException {
+    private static void SendManifest(Collection collection, String encryptionPassword) throws IOException {
 
         Manifest manifest = Manifest.get(collection);
 
         long start = System.currentTimeMillis();
         List<Future<IOException>> futures = new ArrayList<>();
 
-        for (Map.Entry<String, String> entry : collection.description.publishTransactionIds.entrySet()) {
+        for (Map.Entry<String, String> entry : collection.getDescription().publishTransactionIds.entrySet()) {
             Host theTrainHost = new Host(entry.getKey());
             String transactionId = entry.getValue();
 
@@ -221,39 +325,36 @@ public class Publisher {
      * @return
      * @throws IOException
      */
-    public static Map<String, String> BeginPublish(Collection collection, String encryptionPassword) throws IOException {
+    private static void BeginPublish(Collection collection, String encryptionPassword) throws IOException {
 
         long start = System.currentTimeMillis();
 
         logInfo("PRE-PUBLISH: Begin transaction").collectionName(collection).log();
 
         Map<String, String> hostToTransactionId = beginPublish(theTrainHosts, encryptionPassword);
-        collection.description.publishTransactionIds = hostToTransactionId;
-
+        collection.getDescription().publishTransactionIds = hostToTransactionId;
         collection.save();
 
         logInfo("PRE-PUBLISH: BeginPublish complete").timeTaken(System.currentTimeMillis() - start).log();
-
-        return hostToTransactionId;
     }
 
-    public static boolean CommitPublish(Collection collection, String email, String encryptionPassword) throws IOException {
+    private static boolean CommitPublish(Collection collection, String email, String encryptionPassword) throws IOException {
 
         boolean publishComplete = false;
         long start = System.currentTimeMillis();
 
-        logInfo("CommitPublish collectiom start").collectionName(collection).log();
+        logInfo("CommitPublish collection start").collectionName(collection).log();
         // If all has gone well so far, commit the publishing transaction:
         boolean success = true;
-        for (Result result : commitPublish(collection.description.publishTransactionIds, encryptionPassword)) {
+        for (Result result : commitPublish(collection.getDescription().publishTransactionIds, encryptionPassword)) {
             success &= !result.error;
-            collection.description.AddPublishResult(result);
+            collection.getDescription().AddPublishResult(result);
         }
 
         if (success) {
             Date publishedDate = new Date();
-            collection.description.addEvent(new Event(publishedDate, EventType.PUBLISHED, email));
-            collection.description.publishComplete = true;
+            collection.getDescription().addEvent(new Event(publishedDate, EventType.PUBLISHED, email));
+            collection.getDescription().publishComplete = true;
             publishComplete = true;
         }
 
@@ -261,7 +362,7 @@ public class Publisher {
         return publishComplete;
     }
 
-    public static void PublishCollectionFiles(
+    private static void SendCollectionFiles(
             Collection collection,
             CollectionReader collectionReader,
             String encryptionPassword,
@@ -272,7 +373,7 @@ public class Publisher {
         long start = System.currentTimeMillis();
 
         logInfo("PublishFiles start").collectionName(collection).log();
-        // Publish each item of content:
+        // DoFullPublish each item of content:
         for (String uri : collection.reviewed.uris()) {
             if (!shouldBeFiltered(filters, uri)) {
                 logInfo("Start PublishFile").collectionId(collection).addParameter("uri", uri).log();
@@ -327,7 +428,7 @@ public class Publisher {
                 publishUri = StringUtils.removeEnd(uri, "-to-publish.zip");
             }
 
-            for (Map.Entry<String, String> entry : collection.description.publishTransactionIds.entrySet()) {
+            for (Map.Entry<String, String> entry : collection.getDescription().publishTransactionIds.entrySet()) {
                 Host theTrainHost = new Host(entry.getKey());
                 String transactionId = entry.getValue();
                 results.add(publishFile(theTrainHost, transactionId, encryptionPassword, uri, publishUri, zipped, source, reader, pool));
@@ -435,7 +536,7 @@ public class Publisher {
      * @return The {@link Result} returned by The Train
      * @throws IOException If any errors are encountered in making the request or reported in the {@link Result}.
      */
-    static List<Result> commitPublish(Map<String, String> transactionIds, String encryptionPassword) throws IOException {
+    private static List<Result> commitPublish(Map<String, String> transactionIds, String encryptionPassword) throws IOException {
         List<Result> results = new ArrayList<>();
 
         List<Future<IOException>> futures = new ArrayList<>();
@@ -477,7 +578,7 @@ public class Publisher {
      * @param transactionIds     The {@link Host}s and transactions we are attempting to publish to.
      * @param encryptionPassword The password used to encrypt files during publishing.
      */
-    public static void rollbackPublish(Map<String, String> transactionIds, String encryptionPassword) {
+    private static void rollbackPublish(Map<String, String> transactionIds, String encryptionPassword) {
         for (Map.Entry<String, String> entry : transactionIds.entrySet()) {
             Host host = new Host(entry.getKey());
             String transactionId = entry.getValue();
@@ -489,7 +590,7 @@ public class Publisher {
         }
     }
 
-    static Result endPublish(Host host, String endpointName, String transactionId, String encryptionPassword) throws IOException {
+    private static Result endPublish(Host host, String endpointName, String transactionId, String encryptionPassword) throws IOException {
         Result result;
         try (Http http = new Http()) {
             Endpoint endpoint = new Endpoint(host, endpointName)
@@ -502,7 +603,7 @@ public class Publisher {
         return result;
     }
 
-    static void checkResponse(Response<Result> response) throws IOException {
+    private static void checkResponse(Response<Result> response) throws IOException {
 
         if (response.statusLine.getStatusCode() != 200) {
             int code = response.statusLine.getStatusCode();

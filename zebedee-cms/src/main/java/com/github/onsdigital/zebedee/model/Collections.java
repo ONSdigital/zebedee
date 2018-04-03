@@ -15,12 +15,9 @@ import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.ApprovalStatus;
 import com.github.onsdigital.zebedee.json.Event;
 import com.github.onsdigital.zebedee.json.EventType;
-import com.github.onsdigital.zebedee.json.Keyring;
 import com.github.onsdigital.zebedee.model.approval.ApprovalQueue;
 import com.github.onsdigital.zebedee.model.approval.ApproveTask;
-import com.github.onsdigital.zebedee.model.publishing.PostPublisher;
 import com.github.onsdigital.zebedee.model.publishing.PublishNotification;
-import com.github.onsdigital.zebedee.model.publishing.Publisher;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.persistence.CollectionEventType;
 import com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDao;
@@ -60,6 +57,7 @@ import java.util.stream.Collectors;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getUnauthorizedMessage;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
+import static com.github.onsdigital.zebedee.model.Content.isDataVisualisationFile;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_APPROVED;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_COMPLETED_ERROR;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_CONTENT_DELETED;
@@ -68,7 +66,6 @@ import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLL
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_DELETED;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_ITEM_COMPLETED;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_UNLOCKED;
-import static com.github.onsdigital.zebedee.persistence.CollectionEventType.DATA_VISUALISATION_COLLECTION_CONTENT_DELETED;
 import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData.contentMoved;
 import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData.contentRenamed;
 
@@ -347,71 +344,6 @@ public class Collections {
         return collection.save();
     }
 
-    /**
-     * Publish the files
-     *
-     * @param collection       the collection to publish
-     * @param session          a session with editor priviledges
-     * @param skipVerification
-     * @return success
-     * @throws IOException
-     * @throws UnauthorizedException
-     * @throws BadRequestException
-     * @throws ConflictException     - If there
-     */
-    public boolean publish(Collection collection, Session session, boolean breakBeforePublish, boolean skipVerification)
-            throws IOException, UnauthorizedException, BadRequestException,
-            ConflictException, NotFoundException {
-
-        // Collection exists
-        if (collection == null) {
-            throw new BadRequestException("Please provide a valid collection.");
-        }
-
-        // User has permission
-        if (session == null || !permissionsService.canEdit(session.getEmail())) {
-            throw new UnauthorizedException(getUnauthorizedMessage(session));
-        }
-
-        // Check approval status
-        if (collection.description.approvalStatus != ApprovalStatus.COMPLETE) {
-            throw new ConflictException("This collection cannot be published because it is not approved");
-        }
-
-        // Break before transfer allows us to run tests on the prepublish-hook without messing up the content
-        if (breakBeforePublish) {
-            logInfo("Breaking before publish").log();
-            return true;
-        }
-        logInfo("Going ahead with publish").log();
-
-        Keyring keyring = zebedeeSupplier.get().getKeyringCache().get(session);
-        if (keyring == null) throw new UnauthorizedException("No keyring is available for " + session.getEmail());
-
-        ZebedeeCollectionReader collectionReader = new ZebedeeCollectionReader(zebedeeSupplier.get(), collection, session);
-        long publishStart = System.currentTimeMillis();
-        boolean publishComplete = Publisher.Publish(collection, session.getEmail(), collectionReader);
-
-        if (publishComplete) {
-            long onPublishCompleteStart = System.currentTimeMillis();
-
-            new PublishNotification(collection).sendNotification(EventType.PUBLISHED);
-
-            PostPublisher.postPublish(zebedeeSupplier.get(), collection, skipVerification, collectionReader);
-
-            logInfo("Collection postPublish process finished")
-                    .collectionName(collection)
-                    .timeTaken((System.currentTimeMillis() - onPublishCompleteStart))
-                    .log();
-            logInfo("Collection publish complete.")
-                    .collectionName(collection)
-                    .timeTaken((System.currentTimeMillis() - publishStart))
-                    .log();
-        }
-
-        return publishComplete;
-    }
-
     public DirectoryListing listDirectory(
             Collection collection, String uri,
             Session session
@@ -670,17 +602,16 @@ public class Collections {
         boolean deleted;
         CollectionEventType eventType;
 
-        if (collection.getDescription().getCollectionOwner().equals(CollectionOwner.DATA_VISUALISATION)) {
+        if (isDataVisualisationFile(path)) {
             deleted = collection.deleteDataVisContent(session, Paths.get(uri));
-            eventType = DATA_VISUALISATION_COLLECTION_CONTENT_DELETED;
+        } else if (Files.isDirectory(path)) {
+            deleted = collection.deleteContentDirectory(session.getEmail(), uri);
         } else {
-            if (Files.isDirectory(path)) {
-                deleted = collection.deleteContentDirectory(session.getEmail(), uri);
-            } else {
-                deleted = collection.deleteFile(uri);
-            }
-            eventType = COLLECTION_CONTENT_DELETED;
+            deleted = collection.deleteFile(uri);
         }
+
+        eventType = COLLECTION_CONTENT_DELETED;
+
         collection.save();
         if (deleted) {
             removeEmptyCollectionDirectories(path);
@@ -845,8 +776,7 @@ public class Collections {
 
             if (StringUtils.isNotBlank(id)) {
                 for (Collection collection : this) {
-                    if (StringUtils.equalsIgnoreCase(collection.description.id,
-                            id)) {
+                    if (StringUtils.equalsIgnoreCase(collection.getDescription().getId(), id)) {
                         result = collection;
                         break;
                     }

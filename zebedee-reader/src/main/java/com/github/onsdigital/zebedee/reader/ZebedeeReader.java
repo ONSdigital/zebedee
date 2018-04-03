@@ -4,6 +4,7 @@ import com.github.onsdigital.zebedee.content.base.Content;
 import com.github.onsdigital.zebedee.content.dynamic.browse.ContentNode;
 import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
+import com.github.onsdigital.zebedee.exceptions.ResourceDirectoryNotFileException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
@@ -13,10 +14,12 @@ import com.github.onsdigital.zebedee.reader.data.language.ContentLanguage;
 
 import java.io.IOException;
 import java.net.URI;
-import java.net.URLDecoder;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logInfo;
 import static com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration.getConfiguration;
 
 /**
@@ -25,6 +28,11 @@ import static com.github.onsdigital.zebedee.reader.configuration.ReaderConfigura
  * Service to read published content and contents going through process in collections
  */
 public class ZebedeeReader {
+
+    private static final String VISUALISATION_DIR_MSG = "Requested resource is a visualisation directory. Attempting to find index.html";
+    private static final String VISUALISATIONS_PATH = "/visualisations/";
+    private static final String INDEX_HTML = "index.html";
+
     /**
      * If Zebedee Reader is running standalone, no reader factory registered, thus no collection reads are allowed
      */
@@ -124,8 +132,12 @@ public class ZebedeeReader {
         try {
             return publishedContentReader.getResource(path);
         } catch (BadRequestException e) {
-            if(path.startsWith("/visualisations/")) {
-                return publishedContentReader.getResource(path + "/index.html");
+            Path res = Paths.get(path);
+            if (e instanceof ResourceDirectoryNotFileException && res.startsWith(VISUALISATIONS_PATH)) {
+                logInfo(VISUALISATION_DIR_MSG)
+                        .uri(path)
+                        .log();
+                return publishedContentReader.getResource(res.resolve(INDEX_HTML).toString());
             }
             throw e;
         }

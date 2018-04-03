@@ -10,10 +10,10 @@ import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.UnexpectedErrorException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.model.Collection;
-import com.github.onsdigital.zebedee.model.CollectionOwner;
 import com.github.onsdigital.zebedee.model.CollectionWriter;
 import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
 import com.github.onsdigital.zebedee.model.ZebedeeCollectionWriter;
+import com.github.onsdigital.zebedee.model.publishing.Publisher;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
@@ -102,15 +102,6 @@ public class ZebedeeCmsService {
         return null;
     }
 
-    public CollectionOwner getPublisherType(String email) throws ZebedeeException {
-        try {
-            return Root.zebedee.getPermissionsService().getUserCollectionGroup(email);
-        } catch (IOException e) {
-            logError(e, "Error while trying to determined user collectionOwner.").user(email).logAndThrow(UnexpectedErrorException.class);
-        }
-        return null;
-    }
-
     public PermissionsService getPermissions() {
         return Root.zebedee.getPermissionsService();
     }
@@ -121,5 +112,9 @@ public class ZebedeeCmsService {
 
     public Zebedee getZebedee() {
         return Root.zebedee;
+    }
+
+    public Publisher getPublisher() {
+        return Root.publisher;
     }
 }

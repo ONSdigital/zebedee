@@ -111,7 +111,9 @@ public class Page {
      * @throws ConflictException     If the URI is being edited in another collection
      */
     @POST
-    public void createPage(HttpServletRequest request, HttpServletResponse response) {
+    public com.github.onsdigital.zebedee.content.page.base.Page createPage(HttpServletRequest request, HttpServletResponse response) {
+
+        com.github.onsdigital.zebedee.content.page.base.Page page = null;
 
         // We have to get the request InputStream before reading any request parameters
         // otherwise the call to get a request parameter will actually consume the body:
@@ -121,7 +123,7 @@ public class Page {
             if (StringUtils.isEmpty(uri)) {
                 logError(new BadRequestException("uri is empty")).log();
                 response.setStatus(HttpStatus.SC_BAD_REQUEST);
-                return;
+                return page;
             }
             uri = trimZebedeeFileSuffix(uri);
 
@@ -132,7 +134,7 @@ public class Page {
                 logError(e, "failed to get session")
                         .path(uri).log();
                 response.setStatus(e.statusCode);
-                return;
+                return page;
             }
 
             Collection collection;
@@ -143,18 +145,17 @@ public class Page {
                         .user(session.getEmail())
                         .path(uri).log();
                 response.setStatus(e.statusCode);
-                return;
+                return page;
             }
 
             byte[] bytes = IOUtils.toByteArray(requestBody);
-            com.github.onsdigital.zebedee.content.page.base.Page page;
 
             try (ByteArrayInputStream pageInputStream = new ByteArrayInputStream(bytes)) {
                 page = ContentUtil.deserialiseContent(pageInputStream);
             } catch (Exception e) {
                 response.setStatus(HttpStatus.SC_BAD_REQUEST);
                 logError(e, "failed to deserialise page from the request body").log();
-                return;
+                return page;
             }
 
             if (pageCreationHook != null) {
@@ -162,11 +163,11 @@ public class Page {
                     pageCreationHook.onPageUpdated(page, uri);
                 } catch (IOException | RuntimeException e) {
                     logError(e, "exception when calling page creation hook")
-                            .collectionId(collection.getDescription().id)
+                            .collectionId(collection.getDescription().getId())
                             .user(session.getEmail())
                             .path(uri).log();
                     response.setStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR);
-                    return;
+                    return page;
                 }
             }
 
@@ -184,7 +185,7 @@ public class Page {
                 handleZebdeeException("failed to create content", e, response, uri, session, collection);
             } catch (IOException | FileUploadException e) {
                 logError(e, "exception when calling collections.createContent")
-                        .collectionId(collection.getDescription().id)
+                        .collectionId(collection.getDescription().getId())
                         .user(session.getEmail())
                         .path(uri).log();
                 response.setStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR);
@@ -202,6 +203,9 @@ public class Page {
             logError(e, "exception reading request body on create page endpoint").log();
             response.setStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR);
         }
+
+        response.setStatus(HttpStatus.SC_CREATED);
+        return page;
     }
 
     /**
@@ -261,7 +265,7 @@ public class Page {
             page = collectionReader.getContent(uri);
         } catch (NotFoundException ex) {
             logInfo("page is already deleted").path(uri).collectionName(collection).log();
-            response.setStatus(HttpStatus.SC_OK);
+            response.setStatus(HttpStatus.SC_NO_CONTENT);
             return; // idempotent
         } catch (ZebedeeException e) {
             handleZebdeeException("exception when getting collection content", e, response, uri, session, collection);
@@ -280,7 +284,7 @@ public class Page {
                 pageDeletionHook.onPageUpdated(page, uri);
             } catch (IOException | RuntimeException e) {
                 logError(e, "exception when calling page deletion hook")
-                        .collectionId(collection.getDescription().id)
+                        .collectionId(collection.getDescription().getId())
                         .user(session.getEmail())
                         .path(uri).log();
                 response.setStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR);
@@ -295,7 +299,7 @@ public class Page {
                     session);
         } catch (IOException e) {
             logError(e, "exception when deleting content")
-                    .collectionId(collection.getDescription().id)
+                    .collectionId(collection.getDescription().getId())
                     .user(session.getEmail())
                     .path(uri).log();
             response.setStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR);
@@ -313,6 +317,8 @@ public class Page {
                 .user(session.getEmail())
                 .log();
 
+        response.setStatus(HttpStatus.SC_NO_CONTENT);
+        return;
     }
 
     private void handleZebdeeException(
@@ -324,7 +330,7 @@ public class Page {
             Collection collection) {
 
         logError(e, message)
-                .collectionId(collection.getDescription().id)
+                .collectionId(collection.getDescription().getId())
                 .user(session.getEmail())
                 .path(uri).log();
         response.setStatus(e.statusCode);

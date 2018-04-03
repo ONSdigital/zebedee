@@ -78,7 +78,7 @@ public class DataBuilder {
     public Collection createCollection(String name) throws IOException, ZebedeeException {
         // Create the description:
         CollectionDescription description = new CollectionDescription();
-        description.name = name;
+        description.setName(name);
 
         return Collection.create(description, zebedee, publisher);
     }

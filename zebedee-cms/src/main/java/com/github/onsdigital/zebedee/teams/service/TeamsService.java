@@ -29,6 +29,12 @@ public interface TeamsService {
     List<Team> resolveTeams(Set<Integer> teamIds) throws IOException;
 
     /**
+     * Return a list of {@link Team} matching the IDS provided containing only the team name & ID.
+     * @param teamIds the ID of the {@link Team}s to get
+     */
+    List<Team> resolveTeamDetails(Set<Integer> teamIds) throws IOException;
+
+    /**
      * Find a team by name.
      *
      * @param teamName the name of the team to search for.

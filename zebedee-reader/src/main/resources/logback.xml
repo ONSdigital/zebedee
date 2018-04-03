@@ -9,40 +9,29 @@
         </encoder>
     </appender>
 
-    <!-- Use this appender if you want the log output in plain/standard log format. -->
-    <appender name="PLAIN_TEXT" class="ch.qos.logback.core.ConsoleAppender">
+    <appender name="DP_LOGGER" class="ch.qos.logback.core.ConsoleAppender">
         <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
-            <layout class="com.github.onsdigital.logging.layouts.TextLayout" />
+            <layout class="com.github.onsdigital.logging.layouts.ConfigurableLayout" />
         </encoder>
     </appender>
 
-    <!-- Use this appender if you want the log output in json -->
-    <!--<appender name="JSON" class="ch.qos.logback.core.ConsoleAppender">-->
-        <!--<encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">-->
-            <!--<layout class="com.github.onsdigital.logging.layouts.JsonLayout" />-->
-        <!--</encoder>-->
-    <!--</appender>-->
-
-    <!--<appender name="PRETTY_JSON" class="ch.qos.logback.core.ConsoleAppender">-->
-        <!--<encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">-->
-            <!--<layout class="com.github.onsdigital.logging.layouts.PrettyJsonLayout" />-->
-        <!--</encoder>-->
-    <!--</appender>-->
+    <logger name="dp-dataset-api-java-client" level="debug" additivity="false">
+        <appender-ref ref="DP_LOGGER"/>
+    </logger>
 
     <logger name="com.github.onsdigital.zebedee" level="debug" additivity="false">
-        <!--<appender-ref ref="JSON"/>-->
-        <!--<appender-ref ref="PRETTY_JSON"/>-->
-        <appender-ref ref="PLAIN_TEXT"/>
+        <appender-ref ref="DP_LOGGER"/>
     </logger>
 
     <logger name="com.github.onsdigital.zebedee-reader" level="debug" additivity="false">
-        <!--<appender-ref ref="JSON"/>-->
-        <!--<appender-ref ref="PRETTY_JSON"/>-->
-        <appender-ref ref="PLAIN_TEXT"/>
+        <appender-ref ref="DP_LOGGER"/>
     </logger>
 
+    <!-- silence Restolino -->
+    <logger name="com.github.davidcarboni.restolino" level="debug" additivity="false"/>
+
     <root level="info">
-        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="DP_LOGGER"/>
     </root>
 
 </configuration>

@@ -64,7 +64,7 @@ public class PageTest extends ZebedeeAPIBaseTestCase {
         when(zebedeeCmsService.getCollection(mockRequest)).thenReturn(collection);
 
         CollectionDescription collectionDescription = new CollectionDescription();
-        collectionDescription.id = "123";
+        collectionDescription.setId("123");
         when(collection.getDescription()).thenReturn(collectionDescription);
     }
 
@@ -86,6 +86,7 @@ public class PageTest extends ZebedeeAPIBaseTestCase {
 
         // Then collections.createContent is called
         verify(collections, times(1)).createContent(any(),any(),any(),any(),any(),any(),anyBoolean());
+        verify(mockResponse, times(1)).setStatus(HttpStatus.SC_CREATED);
     }
 
     @Test
@@ -235,6 +236,7 @@ public class PageTest extends ZebedeeAPIBaseTestCase {
 
         // Then collections.createContent is called
         verify(collections, times(1)).deleteContent(any(),any(),any());
+        verify(mockResponse, times(1)).setStatus(HttpStatus.SC_NO_CONTENT);
     }
 
     @Test
@@ -323,7 +325,7 @@ public class PageTest extends ZebedeeAPIBaseTestCase {
         page.deletePage(mockRequest, mockResponse);
 
         // Then no exceptions are thrown and no response status set, allowing the call to return as normal
-        verify(mockResponse, times(1)).setStatus(HttpStatus.SC_OK);
+        verify(mockResponse, times(1)).setStatus(HttpStatus.SC_NO_CONTENT);
     }
 
     @Test

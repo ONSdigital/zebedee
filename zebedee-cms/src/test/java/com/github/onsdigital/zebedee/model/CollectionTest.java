@@ -69,7 +69,8 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
 
         publisherSession = zebedee.openSession(builder.publisher1Credentials);
         publisher1Email = builder.publisher1.getEmail();
-        collectionWriter = new FakeCollectionWriter(zebedee.getCollections().path.toString(), collection.description.id);
+        collectionWriter = new FakeCollectionWriter(zebedee.getCollections().path.toString(),
+                collection.description.getId());
     }
 
     @Test
@@ -79,8 +80,8 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         // The content doesn't exist at any level:
         String name = "Population Release";
         CollectionDescription collectionDescription = new CollectionDescription(name);
-        collectionDescription.type = CollectionType.scheduled;
-        collectionDescription.publishDate = new Date();
+        collectionDescription.setType(CollectionType.scheduled);
+        collectionDescription.setPublishDate(new Date());
         String filename = PathUtils.toFilename(name);
 
         // When
@@ -93,7 +94,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         Path releasePath = rootPath.resolve(filename);
         Path jsonPath = rootPath.resolve(filename + ".json");
 
-        assertTrue(StringUtils.isNotEmpty(collectionDescription.id));
+        assertTrue(StringUtils.isNotEmpty(collectionDescription.getId()));
 
         assertTrue(Files.exists(releasePath));
         assertTrue(Files.exists(jsonPath));
@@ -107,8 +108,8 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         }
 
         assertNotNull(createdCollectionDescription);
-        assertEquals(collectionDescription.name, createdCollectionDescription.name);
-        assertEquals(collectionDescription.publishDate, createdCollectionDescription.publishDate);
+        assertEquals(collectionDescription.getName(), createdCollectionDescription.getName());
+        assertEquals(collectionDescription.getPublishDate(), createdCollectionDescription.getPublishDate());
         assertEquals(ApprovalStatus.NOT_STARTED, createdCollectionDescription.approvalStatus);
     }
 
@@ -118,8 +119,8 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         // Given an existing collection
         String name = "Population Release";
         CollectionDescription collectionDescription = new CollectionDescription(name);
-        collectionDescription.type = CollectionType.manual;
-        collectionDescription.publishDate = new Date();
+        collectionDescription.setType(CollectionType.manual);
+        collectionDescription.setPublishDate(new Date());
         String newName = "Economy Release";
         String filename = PathUtils.toFilename(newName);
 
@@ -149,10 +150,10 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         }
 
         assertNotNull(renamedCollectionDescription);
-        assertEquals(collectionDescription.id, renamedCollectionDescription.id);
-        assertEquals(newName, renamedCollectionDescription.name);
-        assertEquals(collectionDescription.publishDate, renamedCollectionDescription.publishDate);
-        assertEquals(collectionDescription.type, renamedCollectionDescription.type);
+        assertEquals(collectionDescription.getId(), renamedCollectionDescription.getId());
+        assertEquals(newName, renamedCollectionDescription.getName());
+        assertEquals(collectionDescription.getPublishDate(), renamedCollectionDescription.getPublishDate());
+        assertEquals(collectionDescription.getType(), renamedCollectionDescription.getType());
     }
 
     @Test
@@ -161,17 +162,17 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         // Given an existing collection
         String name = "Population Release";
         CollectionDescription collectionDescription = new CollectionDescription(name);
-        collectionDescription.type = CollectionType.manual;
-        collectionDescription.publishDate = new Date();
-        collectionDescription.teams = new ArrayList<>();
+        collectionDescription.setType(CollectionType.manual);
+        collectionDescription.setPublishDate(new Date());
+        collectionDescription.setTeams(new ArrayList<>());
         Collection collection = Collection.create(collectionDescription, zebedee, publisherSession);
 
         // When the collection is updated
         String newName = "Economy Release";
         String filename = PathUtils.toFilename(newName);
         CollectionDescription updatedDescription = new CollectionDescription(newName);
-        updatedDescription.type = CollectionType.scheduled;
-        updatedDescription.publishDate = new DateTime(collectionDescription.publishDate).plusHours(1).toDate();
+        updatedDescription.setType(CollectionType.scheduled);
+        updatedDescription.setPublishDate(new DateTime(collectionDescription.getPublishDate()).plusHours(1).toDate());
         Collection.update(collection, updatedDescription, zebedee, new DummyScheduler(), publisherSession);
 
         // Then the properties of the description passed to update have been updated.
@@ -191,10 +192,10 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         }
 
         assertNotNull(updatedCollectionDescription);
-        assertEquals(collectionDescription.id, updatedCollectionDescription.id);
-        assertEquals(newName, updatedCollectionDescription.name);
-        assertEquals(updatedDescription.type, updatedCollectionDescription.type);
-        assertEquals(updatedDescription.publishDate, updatedCollectionDescription.publishDate);
+        assertEquals(collectionDescription.getId(), updatedCollectionDescription.getId());
+        assertEquals(newName, updatedCollectionDescription.getName());
+        assertEquals(updatedDescription.getType(), updatedCollectionDescription.getType());
+        assertEquals(updatedDescription.getPublishDate(), updatedCollectionDescription.getPublishDate());
         assertTrue(updatedCollectionDescription.events.hasEventForType(EventType.CREATED));
     }
 
@@ -204,16 +205,16 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         // Given an existing collection
         String name = "population release";
         CollectionDescription collectionDescription = new CollectionDescription(name);
-        collectionDescription.type = CollectionType.manual;
-        collectionDescription.publishDate = new Date();
+        collectionDescription.setType(CollectionType.manual);
+        collectionDescription.setPublishDate(new Date());
         Collection collection = Collection.create(collectionDescription, zebedee, publisherSession);
 
         // When the collection is updated
         String newName = "Population Release";
         String filename = PathUtils.toFilename(newName);
         CollectionDescription updatedDescription = new CollectionDescription(newName);
-        updatedDescription.type = CollectionType.manual;
-        updatedDescription.publishDate = new Date();
+        updatedDescription.setType(CollectionType.manual);
+        updatedDescription.setPublishDate(new Date());
         Collection.update(collection, updatedDescription, zebedee, new DummyScheduler(), publisherSession);
 
         // Then the properties of the description passed to update have been updated.
@@ -230,9 +231,9 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         }
 
         assertNotNull(updatedCollectionDescription);
-        assertEquals(collectionDescription.id, updatedCollectionDescription.id);
-        assertEquals(newName, updatedCollectionDescription.name);
-        assertEquals(updatedDescription.type, updatedCollectionDescription.type);
+        assertEquals(collectionDescription.getId(), updatedCollectionDescription.getId());
+        assertEquals(newName, updatedCollectionDescription.getName());
+        assertEquals(updatedDescription.getType(), updatedCollectionDescription.getType());
         assertTrue(updatedCollectionDescription.events.hasEventForType(EventType.CREATED));
     }
 
@@ -242,9 +243,9 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         // Given an existing collection that has been scheduled
         String name = "Population Release";
         CollectionDescription collectionDescription = new CollectionDescription(name);
-        collectionDescription.publishDate = DateTime.now().plusSeconds(2).toDate();
-        collectionDescription.type = CollectionType.scheduled;
-        collectionDescription.teams = new ArrayList<>();
+        collectionDescription.setPublishDate(DateTime.now().plusSeconds(2).toDate());
+        collectionDescription.setType(CollectionType.scheduled);
+        collectionDescription.setTeams(new ArrayList<>());
         Collection collection = Collection.create(collectionDescription, zebedee, publisherSession);
 
         DummyScheduler scheduler = new DummyScheduler();
@@ -253,8 +254,8 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         // When the collection is updated with a new release time
         String newName = "Economy Release";
         CollectionDescription updatedDescription = new CollectionDescription(newName);
-        updatedDescription.type = CollectionType.scheduled;
-        updatedDescription.publishDate = DateTime.now().plusSeconds(10).toDate();
+        updatedDescription.setType(CollectionType.scheduled);
+        updatedDescription.setPublishDate(DateTime.now().plusSeconds(10).toDate());
         Collection updated = Collection.update(collection, updatedDescription, zebedee, scheduler, publisherSession);
 
         assertTrue(scheduler.taskExistsForCollection(updated));
@@ -281,8 +282,8 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         // A folder that isn't a valid release:
         String name = "Population Release";
         CollectionDescription collectionDescription = new CollectionDescription(name);
-        collectionDescription.type = CollectionType.scheduled;
-        collectionDescription.publishDate = new Date();
+        collectionDescription.setType(CollectionType.scheduled);
+        collectionDescription.setPublishDate(new Date());
 
         Collection.create(collectionDescription, zebedee, publisherSession);
 
@@ -1105,10 +1106,10 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         Release release = createRelease(uri, new DateTime().plusWeeks(4).toDate());
 
         CollectionDescription description = new CollectionDescription();
-        description.id = Random.id();
-        description.name = description.id;
+        description.setId(Random.id());
+        description.setName(description.getId());
 
-        collection.description.releaseUri = uri;
+        collection.description.setReleaseUri(uri);
         collection.associateWithRelease(publisher1Email, release, collectionWriter);
 
         String releaseJsonUri = uri + "/data.json";
@@ -1121,8 +1122,11 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
 
 
         // When we attempt to populate the release from the collection.
-        FakeCollectionReader collectionReader = new FakeCollectionReader(zebedee.getCollections().path.toString(), collection.description.id);
-        FakeCollectionWriter collectionWriter = new FakeCollectionWriter(zebedee.getCollections().path.toString(), collection.description.id);
+
+        FakeCollectionReader collectionReader = new FakeCollectionReader(zebedee.getCollections().path.toString(),
+                collection.description.getId());
+        FakeCollectionWriter collectionWriter = new FakeCollectionWriter(zebedee.getCollections().path.toString(),
+                collection.description.getId());
         Iterable<ContentDetail> collectionContent = ContentDetailUtil.resolveDetails(collection.reviewed, collectionReader.getReviewed());
 
         Release result = collection.populateRelease(
@@ -1145,15 +1149,15 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
 
         // When a new collection is created with the release uri given
         CollectionDescription collectionDescription = new CollectionDescription(Random.id());
-        collectionDescription.releaseUri = release.getUri().toString();
-        collectionDescription.type = CollectionType.scheduled;
+        collectionDescription.setReleaseUri(release.getUri().toString());
+        collectionDescription.setType(CollectionType.scheduled);
 
         Collection collection = Collection.create(collectionDescription, zebedee, publisherSession);
 
         // The release page is in progress within the collection and the collection publish date has been
         // taken from the release page date.
         assertTrue(collection.isInProgress(uri));
-        assertEquals(collection.description.publishDate, release.getDescription().getReleaseDate());
+        assertEquals(collection.description.getPublishDate(), release.getDescription().getReleaseDate());
     }
 
     @Test(expected = BadRequestException.class)
@@ -1165,7 +1169,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
 
         // When a new collection is created with the release uri given
         CollectionDescription collectionDescription = new CollectionDescription(Random.id());
-        collectionDescription.releaseUri = release.getUri().toString();
+        collectionDescription.setReleaseUri(release.getUri().toString());
 
         Collection.create(collectionDescription, zebedee, publisherSession);
 
@@ -1180,15 +1184,15 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         String uri = String.format("/releases/%s", Random.id());
         Release release = createRelease(uri, new DateTime().plusWeeks(4).toDate());
         CollectionDescription collectionDescription = new CollectionDescription(Random.id());
-        collectionDescription.releaseUri = release.getUri().toString();
-        collectionDescription.type = CollectionType.scheduled;
+        collectionDescription.setReleaseUri(release.getUri().toString());
+        collectionDescription.setType(CollectionType.scheduled);
 
         Collection.create(collectionDescription, zebedee, publisherSession);
 
 
         // When a new collection is created with the release uri given
         collectionDescription = new CollectionDescription(Random.id());
-        collectionDescription.releaseUri = release.getUri().toString();
+        collectionDescription.setReleaseUri(release.getUri().toString());
 
         Collection.create(collectionDescription, zebedee, publisherSession);
 
@@ -1543,12 +1547,12 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
     public static Collection CreateCollection(Path destination, String collectionName) throws CollectionNotFoundException, IOException {
 
         CollectionDescription collection = new CollectionDescription(collectionName);
-        collection.type = CollectionType.manual;
+        collection.setType(CollectionType.manual);
         collection.isEncrypted = false;
-        collection.name = collectionName;
+        collection.setName(collectionName);
 
         String filename = PathUtils.toFilename(collectionName);
-        collection.id = filename + "-" + Random.id();
+        collection.setId(filename + "-" + Random.id());
         Collection.CreateCollectionFolders(filename, destination);
 
         // Create the description:

@@ -6,7 +6,6 @@ import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.PendingDelete;
-import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.json.publishing.PublishedCollection;
 import com.github.onsdigital.zebedee.json.publishing.request.FileCopy;
 import com.github.onsdigital.zebedee.json.publishing.request.Manifest;
@@ -22,6 +21,7 @@ import com.github.onsdigital.zebedee.search.indexing.Indexer;
 import com.github.onsdigital.zebedee.service.DeletedContent.DeletedContentService;
 import com.github.onsdigital.zebedee.service.DeletedContent.DeletedContentServiceFactory;
 import com.github.onsdigital.zebedee.service.content.navigation.ContentTreeNavigator;
+import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.util.ContentTree;
 import com.github.onsdigital.zebedee.util.SlackNotification;
 import com.github.onsdigital.zebedee.util.URIUtils;
@@ -39,11 +39,17 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.TimeZone;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.*;
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logDebug;
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_POST_PUBLISHED_CONFIRMATION;
 import static com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDaoFactory.getCollectionHistoryDao;
 
@@ -110,7 +116,6 @@ public class PostPublisher {
     }
 
 
-
     /**
      * Returns a session object with the email as the class name of {@link Publisher} - required by the history event
      * logging.
@@ -138,7 +143,7 @@ public class PostPublisher {
         try {
             long publishTimeMs = Math.round(publishedCollection.publishEndDate.getTime() - publishedCollection.publishStartDate.getTime());
 
-            Date publishDate = publishedCollection.publishDate;
+            Date publishDate = publishedCollection.getPublishDate();
 
             if (publishDate == null)
                 publishDate = publishedCollection.publishStartDate;
@@ -147,14 +152,14 @@ public class PostPublisher {
                 publishDate = new Date();
 
             MetricsService.getInstance().captureCollectionPublishMetrics(
-                    publishedCollection.id,
+                    publishedCollection.getId(),
                     publishTimeMs,
                     publishedCollection.publishResults.get(0).transaction.uriInfos.size(),
-                    publishedCollection.type.toString(),
+                    publishedCollection.getType().toString(),
                     publishDate);
         } catch (Exception exception) {
             logError(exception, "An error occurred saving publish metrics")
-                    .collectionName(publishedCollection.name).collectionId(publishedCollection.id).log();
+                    .collectionName(publishedCollection.getName()).collectionId(publishedCollection.getId()).log();
         }
     }
 
@@ -299,7 +304,6 @@ public class PostPublisher {
     }
 
 
-
     private static void reindexPublishingSearch(Collection collection) throws IOException {
 
         logInfo("Reindexing search").collectionName(collection).log();
@@ -379,7 +383,7 @@ public class PostPublisher {
     public static Path moveCollectionToArchive(Zebedee zebedee, Collection collection, CollectionReader collectionReader) throws IOException, ZebedeeException {
 
         logInfo("Moving collection files to archive for collection").collectionName(collection).log();
-        String filename = PathUtils.toFilename(collection.description.name);
+        String filename = PathUtils.toFilename(collection.getDescription().getName());
         Path collectionJsonSource = zebedee.getCollections().path.resolve(filename + ".json");
         Path collectionFilesSource = collection.reviewed.path;
         Path logPath = zebedee.getPublishedCollections().path;

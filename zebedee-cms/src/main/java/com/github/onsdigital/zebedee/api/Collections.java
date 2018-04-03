@@ -13,7 +13,6 @@ import com.github.onsdigital.zebedee.json.CollectionDatasetVersion;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.CollectionDescriptions;
 import com.github.onsdigital.zebedee.model.Collection;
-import com.github.onsdigital.zebedee.model.CollectionOwner;
 import com.github.onsdigital.zebedee.service.DatasetService;
 import com.github.onsdigital.zebedee.service.ZebedeeDatasetService;
 import com.github.onsdigital.zebedee.session.model.Session;
@@ -82,28 +81,25 @@ public class Collections {
     public CollectionDescriptions get(HttpServletRequest request, HttpServletResponse response)
             throws ZebedeeException {
         try {
-            Session session = Root.zebedee.getSessionsService().get(request);
+            Session session = zebedeeCmsService.getSession(request);
             CollectionDescriptions result = new CollectionDescriptions();
             List<Collection> collections = Root.zebedee.getCollections().list();
-            CollectionOwner collectionOwner = zebedeeCmsService.getPublisherType(session.getEmail());
 
             for (Collection collection : collections) {
-                if (Root.zebedee.getPermissionsService().canView(session, collection.description)
-                        && (collection.description.collectionOwner.equals(collectionOwner))) {
-
-                    CollectionDescription description = new CollectionDescription();
-                    description.id = collection.description.id;
-                    description.name = collection.description.name;
-                    description.publishDate = collection.description.publishDate;
-                    description.approvalStatus = collection.description.approvalStatus;
-                    description.type = collection.description.type;
-                    description.teams = collection.description.teams;
-                    result.add(description);
+                if (Root.zebedee.getPermissionsService().canView(session, collection.getDescription())) {
+                    CollectionDescription newDesc = new CollectionDescription();
+                    newDesc.setId(collection.getDescription().getId());
+                    newDesc.setName(collection.getDescription().getName());
+                    newDesc.setPublishDate(collection.getDescription().getPublishDate());
+                    newDesc.setApprovalStatus(collection.getDescription().getApprovalStatus());
+                    newDesc.setType(collection.getDescription().getType());
+                    newDesc.setTeams(collection.getDescription().getTeams());
+                    result.add(newDesc);
                 }
             }
 
             // sort the collections alphabetically by name.
-            java.util.Collections.sort(result, Comparator.comparing(o -> o.name));
+            java.util.Collections.sort(result, Comparator.comparing(o -> o.getName()));
 
             return result;
         } catch (IOException e) {
@@ -127,6 +123,8 @@ public class Collections {
             return;
         }
 
+        String user = session.getEmail();
+
         Path path = Path.newInstance(request);
         List<String> pathSegments = path.segments();
 
@@ -146,7 +144,7 @@ public class Collections {
             switch (pathSegments.size()) {
                 case 4: // /collections/{collection_id}/datasets/{dataset_id}
 
-                    updateDatasetInCollection(collection, datasetID, request);
+                    updateDatasetInCollection(collection, datasetID, request, user);
                     break;
 
                 case 8: // /collections/{collection_id}/datasets/{dataset_id}/editions/{}/versions/{}
@@ -154,7 +152,7 @@ public class Collections {
                     String edition = pathSegments.get(5);
                     String version = pathSegments.get(7);
 
-                    updateDatasetVersionInCollection(collection, datasetID, edition, version, request);
+                    updateDatasetVersionInCollection(collection, datasetID, edition, version, request, user);
                     break;
 
                 default:
@@ -214,33 +212,35 @@ public class Collections {
         }
     }
 
-    private void updateDatasetVersionInCollection(Collection collection, String datasetID, String edition, String version, HttpServletRequest request) throws ZebedeeException, IOException, DatasetAPIException {
+    private void updateDatasetVersionInCollection(Collection collection, String datasetID, String edition, String version, HttpServletRequest request, String user) throws ZebedeeException, IOException, DatasetAPIException {
         logInfo("PUT called on /collections/{}/datasets/{}/editions/{}/versions/{} endpoint")
                 .addParameter("collectionID", collection.getId())
                 .addParameter("datasetID", datasetID)
                 .addParameter("edition", edition)
                 .addParameter("version", version)
+                .user(user)
                 .log();
 
         try (InputStream body = request.getInputStream()) {
 
             CollectionDatasetVersion datasetVersion = ContentUtil.deserialise(body, CollectionDatasetVersion.class);
-            datasetService.updateDatasetVersionInCollection(collection, datasetID, edition, version, datasetVersion);
+            datasetService.updateDatasetVersionInCollection(collection, datasetID, edition, version, datasetVersion, user);
 
         } catch (JsonSyntaxException ex) {
             throw new BadRequestException(ex.getMessage());
         }
     }
 
-    private void updateDatasetInCollection(Collection collection, String datasetID, HttpServletRequest request) throws ZebedeeException, IOException, DatasetAPIException {
+    private void updateDatasetInCollection(Collection collection, String datasetID, HttpServletRequest request, String user) throws ZebedeeException, IOException, DatasetAPIException {
         logInfo("PUT called on /collections/{}/datasets/{} endpoint")
                 .addParameter("collectionID", collection.getId())
                 .addParameter("datasetID", datasetID)
+                .user(user)
                 .log();
         try (InputStream body = request.getInputStream()) {
 
             CollectionDataset dataset = ContentUtil.deserialise(body, CollectionDataset.class);
-            datasetService.updateDatasetInCollection(collection, datasetID, dataset);
+            datasetService.updateDatasetInCollection(collection, datasetID, dataset, user);
 
         } catch (JsonSyntaxException ex) {
             throw new BadRequestException(ex.getMessage());

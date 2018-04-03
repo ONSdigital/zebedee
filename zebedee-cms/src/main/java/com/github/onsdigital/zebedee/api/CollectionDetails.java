@@ -9,7 +9,6 @@ import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.service.ContentDeleteService;
 import com.github.onsdigital.zebedee.session.model.Session;
-import com.github.onsdigital.zebedee.teams.model.Team;
 import com.github.onsdigital.zebedee.util.ContentDetailUtil;
 import org.eclipse.jetty.http.HttpStatus;
 
@@ -17,7 +16,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
 import java.io.IOException;
-import java.util.List;
 import java.util.Set;
 
 @Api
@@ -56,13 +54,14 @@ public class CollectionDetails {
         CollectionReader collectionReader = new ZebedeeCollectionReader(Root.zebedee, collection, session);
 
         CollectionDetail result = new CollectionDetail();
-        result.id = collection.getDescription().id;
-        result.name = collection.getDescription().name;
-        result.type = collection.getDescription().type;
-        result.publishDate = collection.getDescription().publishDate;
-        result.teams = collection.getDescription().teams;
-        result.releaseUri = collection.getDescription().releaseUri;
-        result.collectionOwner = collection.getDescription().collectionOwner;
+
+        result.setId(collection.getDescription().getId());
+        result.setName(collection.getDescription().getName());
+        result.setType(collection.getDescription().getType());
+        result.setPublishDate(collection.getDescription().getPublishDate());
+        result.setTeams(collection.getDescription().getTeams());
+        result.setReleaseUri(collection.getDescription().getReleaseUri());
+
         result.pendingDeletes = contentDeleteService.getDeleteItemsByCollection(collection);
 
         result.inProgress = ContentDetailUtil.resolveDetails(collection.inProgress, collectionReader.getInProgress());
@@ -77,9 +76,9 @@ public class CollectionDetails {
         addEventsForDetails(result.complete, collection);
         addEventsForDetails(result.reviewed, collection);
 
-        Set<Integer> teamIds = Root.zebedee.getPermissionsService().listViewerTeams(collection.getDescription(), session);
-        List<Team> teams = Root.zebedee.getTeamsService().resolveTeams(teamIds);
-        teams.forEach(team -> collection.getDescription().teams.add(team.getName()));
+        Set<Integer> teamIds = Root.zebedee.getPermissionsService().listViewerTeams(collection.description, session);
+        result.teamsDetails = Root.zebedee.getTeamsService().resolveTeamDetails(teamIds);
+        result.teamsDetails.forEach(team -> collection.getDescription().getTeams().add(team.getName()));
 
         result.datasets = collection.getDescription().getDatasets();
         result.datasetVersions = collection.getDescription().getDatasetVersions();

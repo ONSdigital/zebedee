@@ -16,8 +16,6 @@ import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import java.io.IOException;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
-
 /**
  * Created by david on 12/03/2015.
  */
@@ -46,61 +44,49 @@ public class Permission {
         Session session = Root.zebedee.getSessionsService().get(request);
 
         // Administrator
-        if (BooleanUtils.isTrue(permissionDefinition.admin)) {
-            Root.zebedee.getPermissionsService().addAdministrator(permissionDefinition.email, session);
+        if (BooleanUtils.isTrue(permissionDefinition.isAdmin())) {
+            Root.zebedee.getPermissionsService().addAdministrator(permissionDefinition.getEmail(), session);
             // Admins must be publishers so update the permissions accordingly
-            permissionDefinition.editor = true;
+            permissionDefinition.isEditor(true);
             Audit.Event.ADMIN_PERMISSION_ADDED
                     .parameters()
                     .host(request)
-                    .actionedByEffecting(session.getEmail(), permissionDefinition.email)
+                    .actionedByEffecting(session.getEmail(), permissionDefinition.getEmail())
                     .log();
-        } else if (BooleanUtils.isFalse(permissionDefinition.admin)) {
-            Root.zebedee.getPermissionsService().removeAdministrator(permissionDefinition.email, session);
+        } else if (BooleanUtils.isFalse(permissionDefinition.isAdmin())) {
+            Root.zebedee.getPermissionsService().removeAdministrator(permissionDefinition.getEmail(), session);
             Audit.Event.ADMIN_PERMISSION_REMOVED
                     .parameters()
                     .host(request)
-                    .actionedByEffecting(session.getEmail(), permissionDefinition.email)
+                    .actionedByEffecting(session.getEmail(), permissionDefinition.getEmail())
                     .log();
-        }
-
-        if (BooleanUtils.isTrue(permissionDefinition.dataVisPublisher)) {
-            Root.zebedee.getPermissionsService().addDataVisualisationPublisher(permissionDefinition.email, session);
-            logInfo("Data Vis Publisher permission added to user.")
-                    .user(permissionDefinition.email)
-                    .addParameter("by", session.getEmail()).log();
-        } else if (BooleanUtils.isFalse(permissionDefinition.dataVisPublisher)) {
-            Root.zebedee.getPermissionsService().removeDataVisualisationPublisher(permissionDefinition.email, session);
-            logInfo("Data Vis Publisher permission removed from user.")
-                    .user(permissionDefinition.email)
-                    .addParameter("by", session.getEmail()).log();
         }
 
         // Digital publishing
-        if (BooleanUtils.isTrue(permissionDefinition.editor)) {
-            Root.zebedee.getPermissionsService().addEditor(permissionDefinition.email, session);
+        if (BooleanUtils.isTrue(permissionDefinition.isEditor())) {
+            Root.zebedee.getPermissionsService().addEditor(permissionDefinition.getEmail(), session);
             Audit.Event.PUBLISHER_PERMISSION_ADDED
                     .parameters()
                     .host(request)
-                    .actionedByEffecting(session.getEmail(), permissionDefinition.email)
+                    .actionedByEffecting(session.getEmail(), permissionDefinition.getEmail())
                     .log();
-        } else if (BooleanUtils.isFalse(permissionDefinition.editor)) {
-            Root.zebedee.getPermissionsService().removeEditor(permissionDefinition.email, session);
+        } else if (BooleanUtils.isFalse(permissionDefinition.isEditor())) {
+            Root.zebedee.getPermissionsService().removeEditor(permissionDefinition.getEmail(), session);
             Audit.Event.PUBLISHER_PERMISSION_REMOVED
                     .parameters()
                     .host(request)
-                    .actionedByEffecting(session.getEmail(), permissionDefinition.email)
+                    .actionedByEffecting(session.getEmail(), permissionDefinition.getEmail())
                     .log();
         }
 
-        return "Permissions updated for " + permissionDefinition.email;
+        return "Permissions updated for " + permissionDefinition.getEmail();
     }
 
     /**
      * Grants the specified permissions.
      *
-     * @param request              Should be of the form {@code /permission?email=florence@example.com}
-     * @param response             A permissions object for that user
+     * @param request  Should be of the form {@code /permission?email=florence@example.com}
+     * @param response A permissions object for that user
      * @return
      * @throws IOException           If an error occurs accessing data.
      * @throws UnauthorizedException If the user is not an administrator.

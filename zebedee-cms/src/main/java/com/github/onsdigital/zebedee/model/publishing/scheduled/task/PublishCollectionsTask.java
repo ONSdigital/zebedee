@@ -1,7 +1,6 @@
 package com.github.onsdigital.zebedee.model.publishing.scheduled.task;
 
 import com.github.onsdigital.zebedee.model.Collection;
-import com.github.onsdigital.zebedee.util.mertics.service.MetricsService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,8 +16,6 @@ import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
  * Once finished with the publish for each collection it will call the post publish process for each collection.
  */
 public class PublishCollectionsTask extends ScheduledTask {
-
-    private static MetricsService metricsService = MetricsService.getInstance();
 
     private final ExecutorService executorService; // Thread pool to publish each collection concurrently.
     private List<PublishCollectionTask> publishCollectionTasks; // A task object for each collection to publish.

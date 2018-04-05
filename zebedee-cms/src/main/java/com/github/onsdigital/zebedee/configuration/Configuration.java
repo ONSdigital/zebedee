@@ -91,7 +91,8 @@ public class Configuration {
     }
 
     public static String getServiceAuthToken() {
-        return StringUtils.defaultIfBlank(getValue("SERVICE_AUTH_TOKEN"), SERVICE_AUTH_TOKEN);
+        String serviceAuthToken = StringUtils.defaultIfBlank(getValue("SERVICE_AUTH_TOKEN"), SERVICE_AUTH_TOKEN);
+        return "Bearer " + serviceAuthToken;
     }
 
     public static String[] getTheTrainUrls() {

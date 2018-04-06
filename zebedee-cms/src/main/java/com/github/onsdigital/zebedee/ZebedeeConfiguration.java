@@ -161,7 +161,8 @@ public class ZebedeeConfiguration {
         try {
             datasetClient = new DatasetAPIClient(
                     Configuration.getDatasetAPIURL(),
-                    Configuration.getDatasetAPIAuthToken());
+                    Configuration.getDatasetAPIAuthToken(),
+                    Configuration.getServiceAuthToken());
         } catch (URISyntaxException e) {
             logError(e, "failed to initialise dataset api client - invalid URI").log();
             throw new RuntimeException(e);

@@ -20,6 +20,7 @@ import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.util.ZebedeeCmsService;
 import dp.api.dataset.DatasetAPIClient;
+import dp.api.dataset.DatasetClient;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -55,9 +56,10 @@ public class Page {
 
         zebedeeCmsService = ZebedeeCmsService.getInstance();
 
-        DatasetAPIClient datasetAPIClient = new DatasetAPIClient(
+        DatasetClient datasetAPIClient = new DatasetAPIClient(
                 Configuration.getDatasetAPIURL(),
-                Configuration.getDatasetAPIAuthToken());
+                Configuration.getDatasetAPIAuthToken(),
+                Configuration.getServiceAuthToken());
 
         Map<PageType, PageUpdateHook> creationHooks = initialisePageCreationHooks(datasetAPIClient);
         Map<PageType, PageUpdateHook> deletionHooks = initialisePageDeletionHooks(datasetAPIClient);
@@ -66,7 +68,7 @@ public class Page {
         pageCreationHook = new PageTypeUpdateHook(creationHooks);
     }
 
-    private Map<PageType, PageUpdateHook> initialisePageDeletionHooks(DatasetAPIClient datasetAPIClient) {
+    private Map<PageType, PageUpdateHook> initialisePageDeletionHooks(DatasetClient datasetAPIClient) {
         APIDatasetLandingPageDeletionHook datasetLandingPageDeletionHook =
                 new APIDatasetLandingPageDeletionHook(datasetAPIClient);
 
@@ -76,7 +78,7 @@ public class Page {
         return deletionHooks;
     }
 
-    private Map<PageType, PageUpdateHook> initialisePageCreationHooks(DatasetAPIClient datasetAPIClient) {
+    private Map<PageType, PageUpdateHook> initialisePageCreationHooks(DatasetClient datasetAPIClient) {
         APIDatasetLandingPageCreationHook datasetLandingPageCreationHook =
                 new APIDatasetLandingPageCreationHook(datasetAPIClient);
 

@@ -53,7 +53,8 @@ public class Collections {
 
         DatasetAPIClient datasetAPIClient = new DatasetAPIClient(
                 Configuration.getDatasetAPIURL(),
-                Configuration.getDatasetAPIAuthToken());
+                Configuration.getDatasetAPIAuthToken(),
+                Configuration.getServiceAuthToken());
 
         datasetService = new ZebedeeDatasetService(datasetAPIClient);
     }

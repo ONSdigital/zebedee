@@ -50,16 +50,16 @@ public class PublishCollectionTask implements Callable<Boolean> {
         try {
             collection.description.publishStartDate = new Date();
 
-            Publisher.PublishFilteredCollectionFiles(collection, collectionReader, encryptionPassword);
+            Publisher.publishFilteredCollectionFiles(collection, collectionReader, encryptionPassword);
 
-            published = Publisher.CommitPublish(collection, publisherSystemEmail, encryptionPassword);
+            published = Publisher.commitPublish(collection, publisherSystemEmail, encryptionPassword);
             collection.description.publishEndDate = new Date();
         } catch (IOException e) {
             logError(e, "Exception publishing collection").collectionName(collection).log();
             // If an error was caught, attempt to roll back the transaction:
             if (collection.description.publishTransactionIds != null) {
                 logInfo("Attempting rollback of publishing transaction").collectionName(collection).log();
-                Publisher.rollbackPublish(hostToTransactionIdMap, encryptionPassword);
+                Publisher.rollbackPublish(collection, encryptionPassword);
             }
         } finally {
             // Save any updates to the collection

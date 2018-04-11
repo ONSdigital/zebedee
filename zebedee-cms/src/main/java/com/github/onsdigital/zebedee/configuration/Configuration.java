@@ -88,7 +88,7 @@ public class Configuration {
     }
 
     public static List<Host> getWebsiteHosts() {
-        return Arrays.asList(StringUtils.split(defaultIfBlank(getValue("website_url"), DEFAULT_TRAIN_URL), ","))
+        return Arrays.asList(StringUtils.split(defaultIfBlank(getValue("website_url"), DEFAULT_WEBSITE_URL), ","))
                 .stream()
                 .map(url -> new Host(url))
                 .collect(Collectors.toList());

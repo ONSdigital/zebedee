@@ -21,6 +21,8 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.URL;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.nio.file.Path;
@@ -165,6 +167,7 @@ public class Publisher {
             logError(e, "PUBLISH: Exception publishing collection")
                     .collectionName(collection)
                     .collectionId(collection)
+                    .hostToTransactionID(collection.getDescription().publishTransactionIds)
                     .log();
 
             // If an error was caught, attempt to roll back the transaction:
@@ -208,7 +211,7 @@ public class Publisher {
                                 .setParameter(ENCRYPTION_PASSWORD_PARAM, encryptionPassword);
 
                         Response<Result> response = http.post(begin, Result.class);
-                        checkResponse(response);
+                        checkResponse(response, null, begin, collection.getDescription().getId());
                         hostToTransactionIDMap.put(host.toString(), response.body.transaction.id);
                     } catch (IOException e) {
                         logError(e, "PUBLISH: error while attempting to create new publishing transactionn for collection")
@@ -251,7 +254,6 @@ public class Publisher {
         Function<String, Boolean> timeseriesUriFilter = uri -> uri.contains("/timeseries/");
 
         Function<String, Boolean>[] filters = new Function[]{versionedUriFilter, timeseriesUriFilter};
-        //Publisher.PublishCollectionFiles(collection, collectionReader, encryptionPassword, versionedUriFilter,timeseriesUriFilter);
 
         List<Future<IOException>> results = new ArrayList<>();
         long start = System.currentTimeMillis();
@@ -325,7 +327,7 @@ public class Publisher {
                             .log();
 
                     Response<Result> response = http.post(publish, dataStream, source.getFileName().toString(), Result.class);
-                    checkResponse(response);
+                    checkResponse(response, transactionId, publish, collectionID);
                 }
             } catch (IOException e) {
                 logError(e, "PUBLISH: error while sending publish file request to train host")
@@ -358,7 +360,7 @@ public class Publisher {
                             .setParameter(ENCRYPTION_PASSWORD_PARAM, encryptionPassword);
 
                     Response<Result> response = http.postJson(publish, manifest, Result.class);
-                    checkResponse(response);
+                    checkResponse(response, transactionId, publish, collection.getDescription().getId());
 
                 } catch (IOException e) {
                     logError(e, "PUBLISH: unexpected error while attempting to send publish manifest to train host")
@@ -457,7 +459,7 @@ public class Publisher {
                                 .setParameter(ENCRYPTION_PASSWORD_PARAM, encryptionPassword);
 
                         Response<Result> response = http.post(endpoint, Result.class);
-                        checkResponse(response);
+                        checkResponse(response, transactionId, endpoint, null);
                         results.add(response.body);
                     }
                 } catch (IOException e) {
@@ -503,7 +505,7 @@ public class Publisher {
                         .log();
 
                 Response<Result> response = http.post(endpoint, Result.class);
-                checkResponse(response);
+                checkResponse(response, transactionId, endpoint, null);
 
             } catch (IOException e) {
                 logError(e, "PUBLISH: error rolling back publish transaction")
@@ -515,13 +517,19 @@ public class Publisher {
         }
     }
 
-    static void checkResponse(Response<Result> response) throws IOException {
+    static void checkResponse(Response<Result> response, String TransactionID, Endpoint endpoint, String collectionID) throws
+            IOException {
         if (response.statusLine.getStatusCode() != 200) {
             int code = response.statusLine.getStatusCode();
             String reason = response.statusLine.getReasonPhrase();
             String message = response.body != null ? response.body.message : "";
 
+            URI uri = endpoint.url();
             logWarn("PUBLISH: request was unsuccessful")
+                    .transactionID(TransactionID)
+                    .collectionId(collectionID)
+                    .addParameter("trainHost", uri.getScheme() + "://" + uri.getHost() + ":" + uri.getPort())
+                    .addParameter("endpoint", endpoint.url().getPath())
                     .addParameter("statusCode", code)
                     .addParameter("reason", reason)
                     .addParameter("message", message)

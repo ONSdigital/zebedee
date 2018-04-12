@@ -76,6 +76,10 @@ public class ZebedeeLogBuilder extends LogMessageBuilder {
         return new ZebedeeLogBuilder(t, ZEBEDEE_EXCEPTION);
     }
 
+    public static ZebedeeLogBuilder logError(String description) {
+        return new ZebedeeLogBuilder(description, Level.ERROR);
+    }
+
     public static ZebedeeLogBuilder logError(Throwable t, String errorContext) {
         return new ZebedeeLogBuilder(t, ZEBEDEE_EXCEPTION + " " + errorContext);
     }

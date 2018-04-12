@@ -4,7 +4,6 @@ import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
 import com.github.onsdigital.zebedee.model.publishing.Publisher;
 
-import java.io.IOException;
 import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -45,27 +44,49 @@ public class PublishCollectionTask implements Callable<Boolean> {
      */
     @Override
     public Boolean call() throws Exception {
-        logInfo("PUBLISH: Running collection publish task").collectionName(collection).log();
-
         try {
-            collection.description.publishStartDate = new Date();
+            logInfo("PUBLISH: Running collection publish task").collectionId(collection).log();
+            collection.getDescription().publishStartDate = new Date();
 
             Publisher.publishFilteredCollectionFiles(collection, collectionReader, encryptionPassword);
 
             published = Publisher.commitPublish(collection, publisherSystemEmail, encryptionPassword);
-            collection.description.publishEndDate = new Date();
-        } catch (IOException e) {
-            logError(e, "Exception publishing collection").collectionName(collection).log();
+            collection.getDescription().publishEndDate = new Date();
+        } catch (Exception e) {
             // If an error was caught, attempt to roll back the transaction:
-            if (collection.description.publishTransactionIds != null) {
-                logInfo("Attempting rollback of publishing transaction").collectionName(collection).log();
+            if (collection.getDescription().publishTransactionIds != null &&
+                    !collection.getDescription().publishTransactionIds.isEmpty()) {
+                logError(e, "PUBLISH: FAILURE: exception while attempting to publish scheduled collection. " +
+                        "Publishing transaction IDS exist for collection, attempting to rollback")
+                        .collectionId(collection)
+                        .hostToTransactionID(collection.getDescription().publishTransactionIds)
+                        .log();
+
                 Publisher.rollbackPublish(collection, encryptionPassword);
+
+            } else {
+                logError(e, "PUBLISH: FAILURE: no publishing transaction IDS found for collection, no rollback " +
+                        "attempt will be made")
+                        .collectionId(collection)
+                        .hostToTransactionID(collection.getDescription().publishTransactionIds)
+                        .log();
             }
         } finally {
-            // Save any updates to the collection
-            collection.save();
+            try {
+                // Save any updates to the collection
+                logInfo("PUBLISH: persiting changes to collection to disk")
+                        .collectionId(collection)
+                        .hostToTransactionID(collection.getDescription().publishTransactionIds)
+                        .log();
+                collection.save();
+            } catch (Exception e) {
+                logError(e, "PUBLISH: error while attempting to persist collection to disk")
+                        .collectionId(collection)
+                        .hostToTransactionID(collection.getDescription().publishTransactionIds)
+                        .log();
+                throw e;
+            }
         }
-
         return published;
     }
 

@@ -22,7 +22,6 @@ import org.apache.commons.lang3.StringUtils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.net.URL;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.nio.file.Path;
@@ -103,7 +102,7 @@ public class Publisher {
 
                     if (collection.getDescription().approvalStatus != ApprovalStatus.COMPLETE) {
                         logInfo("PUBLISH: collection cannot be published as it has not been approved")
-                                .collectionName(collection)
+                                .collectionId(collection)
                                 .log();
                         return false;
                     }
@@ -111,7 +110,6 @@ public class Publisher {
                     publishComplete = publishFilesToWebsite(collection, email, collectionReader);
 
                     logInfo("PUBLISH: collection publish process completed")
-                            .collectionName(collection)
                             .collectionId(collection)
                             .timeTaken((System.currentTimeMillis() - publishStart))
                             .log();
@@ -125,6 +123,7 @@ public class Publisher {
             } finally {
                 // Save any updates to the collection
                 logInfo("PUBLISH: saving changes to collection")
+                        .addParameter("publishComplete", publishComplete)
                         .collectionId(collection)
                         .log();
                 collection.save();
@@ -160,31 +159,45 @@ public class Publisher {
             publishComplete = commitPublish(collection, email, encryptionPassword);
             collection.getDescription().publishEndDate = new Date();
 
-        } catch (IOException e) {
+        } catch (Exception e) {
             SlackNotification.alarm(String.format("Exception publishing collection: %s: %s",
                     collection.getDescription().getName(), e.getMessage()));
-
-            logError(e, "PUBLISH: Exception publishing collection")
-                    .collectionName(collection)
-                    .collectionId(collection)
-                    .hostToTransactionID(collection.getDescription().publishTransactionIds)
-                    .log();
 
             // If an error was caught, attempt to roll back the transaction:
             Map<String, String> transactionIds = collection.getDescription().publishTransactionIds;
             if (transactionIds != null && transactionIds.size() > 0) {
-                logInfo("PUBLISH: attempting rollback of collection publishing transaction")
-                        .collectionName(collection)
+
+                logError(e, "PUBLISH: error while attempting to publish, transaction IDs found for collection " +
+                        "attempting to rollback")
                         .collectionId(collection)
                         .hostToTransactionID(collection.getDescription().publishTransactionIds)
                         .log();
 
                 rollbackPublish(collection, encryptionPassword);
+            } else {
+                logError(e, "PUBLISH: error while attempting to publish, no transaction IDs found for collection " +
+                        "no rollback will be attempted")
+                        .collectionId(collection)
+                        .hostToTransactionID(collection.getDescription().publishTransactionIds)
+                        .log();
             }
 
         } finally {
             // Save any updates to the collection
-            collection.save();
+            try {
+                logInfo("PUBLISH: persisting collection changes to disk")
+                        .collectionId(collection)
+                        .addParameter("publishComplete", publishComplete)
+                        .hostToTransactionID(collection.getDescription().publishTransactionIds)
+                        .log();
+                collection.save();
+            } catch (Exception e) {
+                logError(e, "PUBLISH: error while attempting to persist collection changes to disk")
+                        .collectionId(collection)
+                        .addParameter("publishComplete", publishComplete)
+                        .hostToTransactionID(collection.getDescription().publishTransactionIds)
+                        .log();
+            }
         }
 
         return publishComplete;
@@ -202,7 +215,7 @@ public class Publisher {
                 results.add(pool.submit(() -> {
                     IOException result = null;
                     try {
-                        logInfo("PRE-PUBLISH: creating new publishing transaction for collection")
+                        logInfo("PUBLISH: creating publishing transaction for collection")
                                 .trainHost(host)
                                 .collectionId(collection)
                                 .log();
@@ -214,10 +227,20 @@ public class Publisher {
                         checkResponse(response, null, begin, collection.getDescription().getId());
                         hostToTransactionIDMap.put(host.toString(), response.body.transaction.id);
                     } catch (IOException e) {
-                        logError(e, "PUBLISH: error while attempting to create new publishing transactionn for collection")
+                        logError(e, "PUBLISH: error while attempting to create new transactions for collection")
                                 .trainHost(host)
                                 .collectionId(collection)
                                 .log();
+
+                        if (collection.getDescription().publishTransactionIds != null
+                                && !collection.getDescription().publishTransactionIds.isEmpty()) {
+                            logWarn("PUBLISH: clearing existing transactionIDs from collection")
+                                    .collectionId(collection)
+                                    .hostToTransactionID(collection.getDescription().publishTransactionIds)
+                                    .log();
+
+                            collection.getDescription().publishTransactionIds.clear();
+                        }
                         result = e;
                     }
                     return result;
@@ -230,7 +253,7 @@ public class Publisher {
         collection.getDescription().publishTransactionIds = hostToTransactionIDMap;
         collection.save();
 
-        logInfo("PRE-PUBLISH: successfully created new publishing transactions for collection")
+        logInfo("PRE-PUBLISH: successfully created publishing transactions for collection")
                 .collectionId(collection)
                 .hostToTransactionID(hostToTransactionIDMap)
                 .timeTaken(System.currentTimeMillis() - start)
@@ -358,6 +381,11 @@ public class Publisher {
                     Endpoint publish = new Endpoint(theTrainHost, SEND_MANIFEST_ENDPOINT)
                             .setParameter(TRANSACTION_ID_PARAM, transactionId)
                             .setParameter(ENCRYPTION_PASSWORD_PARAM, encryptionPassword);
+
+                    logInfo("PUBLISH: sending publish manifest to train host")
+                            .trainHost(theTrainHost)
+                            .collectionId(collection)
+                            .log();
 
                     Response<Result> response = http.postJson(publish, manifest, Result.class);
                     checkResponse(response, transactionId, publish, collection.getDescription().getId());
@@ -498,19 +526,22 @@ public class Publisher {
                         .setParameter(TRANSACTION_ID_PARAM, transactionId)
                         .setParameter(ENCRYPTION_PASSWORD_PARAM, encryptionPassword);
 
-                logInfo("PUBLISH: sending rollback transaction request for collection")
+                logWarn("PUBLISH: sending rollback transaction request for collection")
                         .collectionId(collection)
-                        .collectionName(collection)
                         .hostToTransactionID(collection.getDescription().publishTransactionIds)
                         .log();
 
                 Response<Result> response = http.post(endpoint, Result.class);
                 checkResponse(response, transactionId, endpoint, null);
 
+                logInfo("PUBLISH: publish rollback request was successful")
+                        .collectionId(collection)
+                        .hostToTransactionID(collection.getDescription().publishTransactionIds)
+                        .log();
+
             } catch (IOException e) {
                 logError(e, "PUBLISH: error rolling back publish transaction")
                         .collectionId(collection)
-                        .collectionName(collection)
                         .transactionID(transactionId)
                         .log();
             }
@@ -525,7 +556,7 @@ public class Publisher {
             String message = response.body != null ? response.body.message : "";
 
             URI uri = endpoint.url();
-            logWarn("PUBLISH: request was unsuccessful")
+            logError("PUBLISH: request was unsuccessful")
                     .transactionID(TransactionID)
                     .collectionId(collectionID)
                     .addParameter("trainHost", uri.getScheme() + "://" + uri.getHost() + ":" + uri.getPort())

@@ -6,10 +6,12 @@ import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.Credentials;
+import com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.user.model.User;
 import com.github.onsdigital.zebedee.service.ServiceSupplier;
 import com.github.onsdigital.zebedee.user.service.UsersService;
+import org.eclipse.jetty.http.HttpStatus;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -21,6 +23,8 @@ import java.io.IOException;
  */
 @Api
 public class Password {
+
+    private static final String EMAIL_VERIFICATION_REQUIRED_MSG = "Email verification required";
 
     /**
      * Wrap static method calls to obtain service in function makes testing easier - class member can be
@@ -51,6 +55,30 @@ public class Password {
         // If the user is not logged in, but they are attempting to change their password, authenticate using the old password
         if (session == null && credentials != null) {
             User user = usersServiceSupplier.getService().getUserByEmail(credentials.email);
+
+            if(user.getVerificationRequired() != null && user.getVerificationRequired()) {
+                if (user.verify(credentials.oldPassword)) {
+                    usersServiceSupplier.getService().createPassword(credentials);
+                    Audit.Event.PASSWORD_CHANGED_SUCCESS
+                            .parameters()
+                            .host(request)
+                            .user(credentials.email)
+                            .log();
+                    return "Password updated for " + credentials.email;
+                }
+
+                response.setStatus(HttpStatus.FORBIDDEN_403);
+                Audit.Event.EMAIL_VERIFICATION_REQUIRED.parameters().host(request).user(credentials.email).log();
+                ZebedeeLogBuilder.logInfo(EMAIL_VERIFICATION_REQUIRED_MSG).user(credentials.email).log();
+                Audit.Event.PASSWORD_CHANGED_FAILURE
+                        .parameters()
+                        .host(request)
+                        .user(credentials.email)
+                        .log();
+                return "Email verification required";
+            }
+
+
             if (user.authenticate(credentials.oldPassword)) {
                 Credentials oldPasswordCredentials = new Credentials();
                 oldPasswordCredentials.email = credentials.email;

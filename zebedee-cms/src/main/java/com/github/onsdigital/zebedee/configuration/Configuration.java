@@ -18,6 +18,11 @@ public class Configuration {
     private static final String INFLUXDB_URL = "http://influxdb:8086";
     private static final String AUDIT_DB_ENABLED_ENV_VAR = "audit_db_enabled";
     private static final String MATHJAX_SERVICE_URL = "http://localhost:8888";
+    private static final String SMTP_SERVER_HOST = "localhost";
+    private static final String SMTP_SERVER_PORT = "1025";
+    private static final String SMTP_SERVER_USERNAME = "";
+    private static final String SMTP_SERVER_PASSWORD = "";
+    private static final String SMTP_SERVER_SENDER = "florence@onsdigital.co.uk";
 
     private static final int VERIFY_RETRTY_DELAY = 5000; //milliseconds
     private static final int VERIFY_RETRTY_COUNT = 10;
@@ -43,6 +48,27 @@ public class Configuration {
     public static String getInfluxDBHost() {
         return StringUtils.defaultIfBlank(getValue("influxdb_url"), INFLUXDB_URL);
     }
+
+    public static String getSMTPServerHost() {
+        return StringUtils.defaultIfBlank(getValue("SMTP_SERVER_HOST"), SMTP_SERVER_HOST);
+    }
+
+    public static Integer getSMTPServerPort() {
+        return Integer.parseInt(StringUtils.defaultIfBlank(getValue("SMTP_SERVER_PORT"), SMTP_SERVER_PORT));
+    }
+
+    public static String getSMTPServerUsername() {
+        return StringUtils.defaultIfBlank(getValue("SMTP_SERVER_USERNAME"), SMTP_SERVER_USERNAME);
+    }
+
+    public static String getSMTPServerPassword() {
+        return StringUtils.defaultIfBlank(getValue("SMTP_SERVER_PASSWORD"), SMTP_SERVER_PASSWORD);
+    }
+
+    public static String getSMTPServerSender() {
+        return StringUtils.defaultIfBlank(getValue("SMTP_SERVER_SENDER"), SMTP_SERVER_SENDER);
+    }
+
 
     /**
      * how many seconds before the actual publish time should we run the preprocess.

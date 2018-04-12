@@ -13,17 +13,20 @@ import com.github.onsdigital.zebedee.model.Collections;
 import com.github.onsdigital.zebedee.model.KeyringCache;
 import com.github.onsdigital.zebedee.model.encryption.ApplicationKeys;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
+import com.github.onsdigital.zebedee.service.SMTPService;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.user.model.User;
 import com.github.onsdigital.zebedee.user.model.UserList;
 import com.github.onsdigital.zebedee.user.store.UserStore;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.mail.EmailException;
 
 import javax.crypto.SecretKey;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
@@ -142,7 +145,7 @@ public class UsersServiceImpl implements UsersService {
 
     @Override
     public void createSystemUser(User user, String password) throws IOException, UnauthorizedException,
-            NotFoundException, BadRequestException {
+            NotFoundException, BadRequestException, EmailException {
         if (permissionsService.hasAdministrator()) {
             logDebug(SYSTEM_USER_ALREADY_EXISTS_MSG).log();
             return;
@@ -162,7 +165,7 @@ public class UsersServiceImpl implements UsersService {
 
     @Override
     public void createPublisher(User user, String password, Session session) throws IOException,
-            UnauthorizedException, ConflictException, BadRequestException, NotFoundException {
+            UnauthorizedException, ConflictException, BadRequestException, NotFoundException, EmailException {
         create(session, user);
         Credentials credentials = new Credentials();
         credentials.setEmail(user.getEmail());
@@ -173,7 +176,7 @@ public class UsersServiceImpl implements UsersService {
 
     @Override
     public User create(Session session, User user) throws UnauthorizedException, IOException, ConflictException,
-            BadRequestException {
+            BadRequestException, EmailException {
         if (!permissionsService.isAdministrator(session)) {
             throw new UnauthorizedException(CREATE_USER_AUTH_ERROR_MSG);
         }
@@ -192,7 +195,6 @@ public class UsersServiceImpl implements UsersService {
     @Override
     public boolean setPassword(Session session, Credentials credentials) throws IOException, UnauthorizedException,
             BadRequestException, NotFoundException {
-        boolean isSuccess = false;
 
         if (session == null) {
             new UnauthorizedException("Cannot set password as user is not authenticated.");
@@ -208,44 +210,19 @@ public class UsersServiceImpl implements UsersService {
         try {
             User user = userStore.get(credentials.getEmail());
 
-            if (!permissionsService.isAdministrator(session) && !user.authenticate(credentials.getOldPassword())) {
+            if (!user.authenticate(credentials.getOldPassword())) {
                 throw new UnauthorizedException("Authentication failed with old password.");
             }
 
-            boolean settingOwnPwd = credentials.getEmail().equalsIgnoreCase(session.getEmail())
-                    && StringUtils.isNotBlank(credentials.password);
-
-            if (settingOwnPwd) {
-                isSuccess = changePassword(user, credentials.getOldPassword(), credentials.getPassword());
-            } else {
-                // Only an admin can update another users password.
-                if (permissionsService.isAdministrator(session.getEmail()) || !permissionsService.hasAdministrator()) {
-
-                    // Administrator reset, or system setup Grab current keyring (null if this is system setup)
-                    Keyring originalKeyring = null;
-                    if (user.keyring() != null) {
-                        originalKeyring = user.keyring().clone();
-                    }
-
-                    user = resetPassword(user, credentials.getPassword(), session.getEmail());
-                    // Restore the user keyring (or not if this is system setup)
-                    if (originalKeyring != null) {
-                        keyManangerUtil.transferKeyring(user.keyring(), keyringCache.get(session), originalKeyring.list());
-                    }
-                    userStore.save(user);
-                    isSuccess = true;
-                } else {
-                    // Set password unsuccessful.
-                    logInfo("Set password unsuccessful, only admin users can set another users password.")
-                            .addParameter("callingUser", session.getEmail())
-                            .addParameter("targetedUser", credentials.email)
-                            .log();
-                }
+            if (credentials.getEmail().equalsIgnoreCase(session.getEmail())
+                    && StringUtils.isNotBlank(credentials.password)) {
+                return changePassword(user, credentials.getOldPassword(), credentials.getPassword());
             }
-            return isSuccess;
         } finally {
             lock.unlock();
         }
+
+        return false;
     }
 
     @Override
@@ -308,7 +285,8 @@ public class UsersServiceImpl implements UsersService {
 
     @Override
     public User update(Session session, User user, User updatedUser) throws IOException, UnauthorizedException,
-            NotFoundException, BadRequestException {
+            NotFoundException, BadRequestException, EmailException {
+
         if (!permissionsService.isAdministrator(session.getEmail())) {
             throw new UnauthorizedException("Administrator permissionsServiceImpl required");
         }
@@ -316,7 +294,22 @@ public class UsersServiceImpl implements UsersService {
         if (!userStore.exists(user.getEmail())) {
             throw new NotFoundException("User " + user.getEmail() + " could not be found");
         }
-        return update(user, updatedUser, session.getEmail());
+
+        // TODO bcrypt this code
+        String code = UUID.randomUUID().toString();
+
+        if (updatedUser.getOwnerEmail() != user.getOwnerEmail()) {
+            updatedUser.setVerificationHash(code);
+            updatedUser.setVerificationRequired(true);
+        }
+
+        User updated = update(user, updatedUser, session.getEmail());
+
+        if (updatedUser.getVerificationRequired()) {
+            SMTPService.SendVerificationEmail(user.getName(), user.getOwnerEmail(), user.getEmail(), code);
+        }
+
+        return updated;
     }
 
     @Override
@@ -395,13 +388,19 @@ public class UsersServiceImpl implements UsersService {
         }
     }
 
-    User create(User user, String lastAdmin) throws IOException {
+    User create(User user, String lastAdmin) throws IOException, EmailException {
         User result = null;
         lock.lock();
         try {
             if (valid(user) && !userStore.exists(user.getEmail())) {
-                result = userFactory.newUserWithDefaultSettings(user.getEmail(), user.getName(), lastAdmin);
+                // TODO bcrypt this code
+                String code = UUID.randomUUID().toString();
+                result = userFactory.newUserWithDefaultSettings(user.getEmail(), user.getOwnerEmail(), user.getName(), lastAdmin, code);
                 userStore.save(result);
+
+                if (user.getOwnerEmail() != null && user.getOwnerEmail().contains("@")) {
+                    SMTPService.SendVerificationEmail(user.getName(), user.getOwnerEmail(), user.getEmail(), code);
+                }
             }
             return result;
         } finally {
@@ -467,6 +466,24 @@ public class UsersServiceImpl implements UsersService {
         return user != null && StringUtils.isNoneBlank(user.getEmail(), user.getName());
     }
 
+
+    public boolean createPassword(Credentials credentials) throws IOException, UnauthorizedException, BadRequestException, NotFoundException {
+
+        // Check the request
+        if (credentials == null || !userStore.exists(credentials.email)) {
+            throw new BadRequestException("Please provide credentials (email, password[, oldPassword])");
+        }
+
+        User user = userStore.get(credentials.email);
+
+        // Ensure the old password is correct
+        if (!user.verify(credentials.oldPassword)) {
+            throw new UnauthorizedException("Verification failed with code");
+        }
+
+        return changePassword(user, credentials.oldPassword, credentials.password);
+    }
+
     private boolean changePassword(User user, String oldPassword, String newPassword) throws IOException {
         lock.lock();
         try {
@@ -522,13 +539,18 @@ public class UsersServiceImpl implements UsersService {
          * </ul>
          *
          * @param email     the email address to set for the new user.
+         * @param ownerEmail the email address to verify for the new user.
          * @param name      the name to set for the new user.
          * @param lastAdmin email / name of the last admin user to change / update this user.
+         * @param verificationHash email verification code.
          * @return a new {@link User} with the properties set as described above.
          */
-        public User newUserWithDefaultSettings(String email, String name, String lastAdmin) {
+        public User newUserWithDefaultSettings(String email, String ownerEmail, String name, String lastAdmin, String verificationHash) {
             User user = new User();
             user.setEmail(email);
+            user.setOwnerEmail(ownerEmail);
+            user.setVerificationHash(verificationHash);
+            user.setVerificationRequired(true);
             user.setName(name);
             user.setInactive(true);
             user.setTemporaryPassword(true);

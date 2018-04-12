@@ -14,6 +14,7 @@ public class UserSanitised {
 
     protected String name;
     protected String email;
+    protected String ownerEmail;
 
     /**
      * This field is {@link Boolean} rather than <code>boolean</code> so that it can be <code>null</code> in an update message.
@@ -72,6 +73,14 @@ public class UserSanitised {
         this.adminOptions = adminOptions;
     }
 
+    public String getOwnerEmail() {
+        return ownerEmail;
+    }
+
+    public void setOwnerEmail(String ownerEmail) {
+        this.ownerEmail = ownerEmail;
+    }
+
     @Override
     public String toString() {
         return name + ", " + email + (BooleanUtils.isTrue(inactive) ? " (inactive)" : "");
@@ -88,6 +97,7 @@ public class UserSanitised {
         return new EqualsBuilder()
                 .append(name, that.name)
                 .append(email, that.email)
+                .append(ownerEmail, that.ownerEmail)
                 .append(inactive, that.inactive)
                 .append(lastAdmin, that.lastAdmin)
                 .isEquals();
@@ -98,6 +108,7 @@ public class UserSanitised {
         return new HashCodeBuilder(17, 37)
                 .append(name)
                 .append(email)
+                .append(ownerEmail)
                 .append(inactive)
                 .append(lastAdmin)
                 .toHashCode();

@@ -21,6 +21,7 @@ import com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration;
 import com.github.onsdigital.zebedee.util.SlackNotification;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.mail.EmailException;
 
 import javax.crypto.SecretKey;
 import java.io.IOException;
@@ -107,7 +108,7 @@ public class Root {
                 Path taxonomy = Paths.get(".").resolve(Configuration.getContentDirectory());
                 List<Path> content = listContent(taxonomy);
                 copyContent(content, taxonomy);
-            } catch (IOException | UnauthorizedException | BadRequestException | NotFoundException e) {
+            } catch (IOException | UnauthorizedException | BadRequestException | NotFoundException | EmailException e) {
                 throw new RuntimeException("Error initialising Zebedee ", e);
             }
         }
@@ -230,13 +231,13 @@ public class Root {
     }
 
     private static Zebedee initialiseZebedee(Path root) throws IOException, NotFoundException, BadRequestException,
-            UnauthorizedException {
+            UnauthorizedException, EmailException {
         zebedee = new Zebedee(new ZebedeeConfiguration(root, true));
         createSystemUser();
         return zebedee;
     }
 
-    private static void createSystemUser() throws NotFoundException, BadRequestException, UnauthorizedException, IOException {
+    private static void createSystemUser() throws NotFoundException, BadRequestException, UnauthorizedException, IOException, EmailException {
         User user = new User();
         user.setEmail(DEFAULT_SYS_USER_EMAIL);
         user.setName(DEFAULT_SYS_USER_NAME);

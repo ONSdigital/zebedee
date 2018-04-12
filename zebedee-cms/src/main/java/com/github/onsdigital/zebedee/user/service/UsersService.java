@@ -8,6 +8,7 @@ import com.github.onsdigital.zebedee.json.Credentials;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.user.model.User;
 import com.github.onsdigital.zebedee.user.model.UserList;
+import org.apache.commons.mail.EmailException;
 
 import javax.crypto.SecretKey;
 import java.io.IOException;
@@ -23,7 +24,7 @@ public interface UsersService {
     String REMOVING_STALE_KEY_LOG_MSG = "Removing stale collection key from user.";
     String SYSTEM_USER_ALREADY_EXISTS_MSG = "A system user already exists, no futher action required.";
     String CREATE_USER_AUTH_ERROR_MSG = "This account is not permitted to create users.";
-    String USER_DETAILS_INVALID_MSG = "Name & email are required fields for User.";
+    String USER_DETAILS_INVALID_MSG = "Name, email and owner email are required fields for User.";
     String USER_IS_NULL_MSG = "User was null";
 
     /**
@@ -95,8 +96,9 @@ public interface UsersService {
      * @throws UnauthorizedException unexpected problem creating user.
      * @throws NotFoundException     unexpected problem creating user.
      * @throws BadRequestException   unexpected problem creating user.
+     * @throws EmailException        unexpected problem creating user.
      */
-    void createSystemUser(User user, String password) throws IOException, UnauthorizedException, NotFoundException, BadRequestException;
+    void createSystemUser(User user, String password) throws IOException, UnauthorizedException, NotFoundException, BadRequestException, EmailException;
 
     /**
      * Create a new publisher user.
@@ -109,9 +111,10 @@ public interface UsersService {
      * @throws ConflictException     unexpected problem creating user.
      * @throws BadRequestException   unexpected problem creating user.
      * @throws NotFoundException     unexpected problem creating user.
+     * @throws EmailException        unexpected problem creating user.
      */
     void createPublisher(User user, String password, Session session) throws IOException,
-            UnauthorizedException, ConflictException, BadRequestException, NotFoundException;
+            UnauthorizedException, ConflictException, BadRequestException, NotFoundException, EmailException;
 
     /**
      * Create a new user.
@@ -123,9 +126,12 @@ public interface UsersService {
      * @throws IOException           unexpected problem creating user.
      * @throws ConflictException     unexpected problem creating user.
      * @throws BadRequestException   unexpected problem creating user.
+     * @throws EmailException        unexpected problem creating user.
      */
     User create(Session session, User user) throws UnauthorizedException, IOException, ConflictException,
-            BadRequestException;
+            BadRequestException, EmailException;
+
+    boolean createPassword(Credentials credentials) throws IOException, UnauthorizedException, BadRequestException, NotFoundException;
 
     /**
      * Set a user password.
@@ -159,9 +165,10 @@ public interface UsersService {
      * @throws UnauthorizedException unexpected problem updating the user.
      * @throws NotFoundException     unexpected problem updating the user.
      * @throws BadRequestException   unexpected problem updating the user.
+     * @throws EmailException        unexpected problem updating the user.
      */
     User update(Session session, User user, User updatedUser) throws IOException, UnauthorizedException,
-            NotFoundException, BadRequestException;
+            NotFoundException, BadRequestException, EmailException;
 
     /**
      * Delete a {@link User}.

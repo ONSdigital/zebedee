@@ -3,6 +3,7 @@ package com.github.onsdigital.zebedee.model.publishing.scheduled.task;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
 import com.github.onsdigital.zebedee.model.publishing.Publisher;
+import com.github.onsdigital.zebedee.util.SlackNotification;
 
 import java.util.Date;
 import java.util.Map;
@@ -10,6 +11,7 @@ import java.util.concurrent.Callable;
 
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logWarn;
 
 /**
  * A wrapper around the publish process of a single collection, allowing it to be executed on its own thread.
@@ -72,22 +74,30 @@ public class PublishCollectionTask implements Callable<Boolean> {
                         .log();
             }
         } finally {
-            try {
-                // Save any updates to the collection
-                logInfo("PUBLISH: persiting changes to collection to disk")
+            if (!published) {
+                logWarn("Exception publishing scheduled collection")
                         .collectionId(collection)
-                        .hostToTransactionID(collection.getDescription().publishTransactionIds)
+                        .collectionName(collection)
                         .log();
-                collection.save();
-            } catch (Exception e) {
-                logError(e, "PUBLISH: error while attempting to persist collection to disk")
-                        .collectionId(collection)
-                        .hostToTransactionID(collection.getDescription().publishTransactionIds)
-                        .log();
-                throw e;
+
+                SlackNotification.scheduledPublishFailire(collection);
+                try {
+                    // Save any updates to the collection
+                    logInfo("PUBLISH: persiting changes to collection to disk")
+                            .collectionId(collection)
+                            .hostToTransactionID(collection.getDescription().publishTransactionIds)
+                            .log();
+                    collection.save();
+                } catch (Exception e) {
+                    logError(e, "PUBLISH: error while attempting to persist collection to disk")
+                            .collectionId(collection)
+                            .hostToTransactionID(collection.getDescription().publishTransactionIds)
+                            .log();
+                    throw e;
+                }
             }
+            return published;
         }
-        return published;
     }
 
     /**

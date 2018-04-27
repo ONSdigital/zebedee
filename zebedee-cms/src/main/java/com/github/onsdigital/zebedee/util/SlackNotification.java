@@ -7,6 +7,7 @@ import com.github.davidcarboni.httpino.Response;
 import com.github.onsdigital.zebedee.json.publishing.PublishedCollection;
 import com.github.onsdigital.zebedee.json.publishing.Result;
 import com.github.onsdigital.zebedee.json.publishing.UriInfo;
+import com.github.onsdigital.zebedee.model.Collection;
 import com.google.gson.JsonObject;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang3.time.FastDateFormat;
@@ -35,6 +36,30 @@ public class SlackNotification {
     private static final ExecutorService pool = Executors.newFixedThreadPool(1);
 
     private static FastDateFormat format = FastDateFormat.getInstance("HH:mm", TimeZone.getTimeZone("Europe/London"));
+
+    public static void scheduledPublishFailire(Collection c) {
+        if (c == null || c.getDescription() == null) {
+            // not enough info to be able to notify anything useful.
+            return;
+        }
+        StringBuilder msg = new StringBuilder("WARNING! scheduled collection failed to publish:\n")
+                .append("Collection ID: " + c.getDescription().getId())
+                .append("\n")
+                .append("Collection name: " + c.getDescription().getName());
+
+        if (c.getDescription().approvalStatus != null) {
+            msg.append("\nApproval status: " + c.getDescription().approvalStatus.toString());
+        }
+
+        if (c.getDescription().publishTransactionIds != null
+                && !c.getDescription().publishTransactionIds.isEmpty()) {
+
+            msg.append("\nTransaction IDs:");
+            c.getDescription().publishTransactionIds.entrySet()
+                    .stream().forEach(e -> msg.append("\n - " + e.getValue()));
+        }
+        alarm(msg.toString());
+    }
 
     public static void alarm(String message) {
         String slackUsername = "Alarm";
@@ -98,6 +123,7 @@ public class SlackNotification {
 
     /**
      * Send a slack message containing collection publication information
+     *
      * @param publishedCollection
      */
     public static void publishNotification(PublishedCollection publishedCollection) {

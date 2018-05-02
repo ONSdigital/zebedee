@@ -136,8 +136,13 @@ public class SlackNotification {
     }
 
     private static String publicationMessage(PublishedCollection publishedCollection) throws ParseException {
-        Result result = publishedCollection.publishResults.get(0);
+        if (publishedCollection.publishResults != null && !publishedCollection.publishResults.isEmpty()) {
+            // TODO need to investigate why this sometimes throws a NPE
+            return "Collection " + publishedCollection.getName() + " was published at "
+                    + format.format(publishedCollection.publishStartDate);
+        }
 
+        Result result = publishedCollection.publishResults.get(0);
         String timeTaken = String.format("%.2f", (publishedCollection.publishEndDate.getTime() - publishedCollection.publishStartDate.getTime()) / 1000.0);
 
         String exampleUri = "";

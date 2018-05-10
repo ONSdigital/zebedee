@@ -209,46 +209,43 @@ public class Publisher {
         Map<String, String> hostToTransactionIDMap = new ConcurrentHashMap<>();
         List<Future<IOException>> results = new ArrayList<>();
 
-        try (Http http = new Http()) {
+        for (Host host : theTrainHosts) {
+            results.add(pool.submit(() -> {
+                IOException result = null;
+                try (Http http = new Http()) {
+                    logInfo("PUBLISH: creating publishing transaction for collection")
+                            .trainHost(host)
+                            .collectionId(collection)
+                            .log();
 
-            for (Host host : theTrainHosts) {
-                results.add(pool.submit(() -> {
-                    IOException result = null;
-                    try {
-                        logInfo("PUBLISH: creating publishing transaction for collection")
-                                .trainHost(host)
+                    Endpoint begin = new Endpoint(host, BEGIN_ENDPOINT)
+                            .setParameter(ENCRYPTION_PASSWORD_PARAM, encryptionPassword);
+
+                    Response<Result> response = http.post(begin, Result.class);
+                    checkResponse(response, null, begin, collection.getDescription().getId());
+                    hostToTransactionIDMap.put(host.toString(), response.body.transaction.id);
+                } catch (IOException e) {
+                    logError(e, "PUBLISH: error while attempting to create new transactions for collection")
+                            .trainHost(host)
+                            .collectionId(collection)
+                            .log();
+
+                    if (collection.getDescription().publishTransactionIds != null
+                            && !collection.getDescription().publishTransactionIds.isEmpty()) {
+                        logWarn("PUBLISH: clearing existing transactionIDs from collection")
                                 .collectionId(collection)
+                                .hostToTransactionID(collection.getDescription().publishTransactionIds)
                                 .log();
 
-                        Endpoint begin = new Endpoint(host, BEGIN_ENDPOINT)
-                                .setParameter(ENCRYPTION_PASSWORD_PARAM, encryptionPassword);
-
-                        Response<Result> response = http.post(begin, Result.class);
-                        checkResponse(response, null, begin, collection.getDescription().getId());
-                        hostToTransactionIDMap.put(host.toString(), response.body.transaction.id);
-                    } catch (IOException e) {
-                        logError(e, "PUBLISH: error while attempting to create new transactions for collection")
-                                .trainHost(host)
-                                .collectionId(collection)
-                                .log();
-
-                        if (collection.getDescription().publishTransactionIds != null
-                                && !collection.getDescription().publishTransactionIds.isEmpty()) {
-                            logWarn("PUBLISH: clearing existing transactionIDs from collection")
-                                    .collectionId(collection)
-                                    .hostToTransactionID(collection.getDescription().publishTransactionIds)
-                                    .log();
-
-                            collection.getDescription().publishTransactionIds.clear();
-                        }
-                        result = e;
+                        collection.getDescription().publishTransactionIds.clear();
                     }
-                    return result;
-                }));
-            }
-            checkFutureResults(results, "error creating publishing transaction");
+                    result = e;
+                }
+                return result;
+            }));
         }
 
+        checkFutureResults(results, "error creating publishing transaction");
         collection.getDescription().publishTransactionIds = hostToTransactionIDMap;
         collection.save();
 

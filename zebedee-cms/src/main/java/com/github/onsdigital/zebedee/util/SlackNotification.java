@@ -136,7 +136,7 @@ public class SlackNotification {
     }
 
     private static String publicationMessage(PublishedCollection publishedCollection) throws ParseException {
-        if (publishedCollection.publishResults != null && !publishedCollection.publishResults.isEmpty()) {
+        if (publishedCollection.publishResults == null || publishedCollection.publishResults.isEmpty()) {
             // TODO need to investigate why this sometimes throws a NPE
             return "Collection " + publishedCollection.getName() + " was published at "
                     + format.format(publishedCollection.publishStartDate);

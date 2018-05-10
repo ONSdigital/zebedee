@@ -246,9 +246,8 @@ public class Publisher {
                     return result;
                 }));
             }
+            checkFutureResults(results, "error creating publishing transaction");
         }
-
-        checkFutureResults(results, "error creating publishing transaction");
 
         collection.getDescription().publishTransactionIds = hostToTransactionIDMap;
         collection.save();

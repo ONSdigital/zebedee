@@ -41,6 +41,7 @@ public class PublishCollectionTask implements Callable<Boolean> {
 
     /**
      * Publish the collection.
+     *
      * @return
      * @throws Exception
      */
@@ -74,6 +75,20 @@ public class PublishCollectionTask implements Callable<Boolean> {
                         .log();
             }
         } finally {
+            try {
+                // Save any updates to the collection
+                logInfo("PUBLISH: persiting changes to collection to disk")
+                        .collectionId(collection)
+                        .hostToTransactionID(collection.getDescription().publishTransactionIds)
+                        .log();
+                collection.save();
+            } catch (Exception e) {
+                logError(e, "PUBLISH: error while attempting to persist collection to disk")
+                        .collectionId(collection)
+                        .hostToTransactionID(collection.getDescription().publishTransactionIds)
+                        .log();
+                throw e;
+            }
             if (!published) {
                 logWarn("Exception publishing scheduled collection")
                         .collectionId(collection)
@@ -81,20 +96,6 @@ public class PublishCollectionTask implements Callable<Boolean> {
                         .log();
 
                 SlackNotification.scheduledPublishFailire(collection);
-                try {
-                    // Save any updates to the collection
-                    logInfo("PUBLISH: persiting changes to collection to disk")
-                            .collectionId(collection)
-                            .hostToTransactionID(collection.getDescription().publishTransactionIds)
-                            .log();
-                    collection.save();
-                } catch (Exception e) {
-                    logError(e, "PUBLISH: error while attempting to persist collection to disk")
-                            .collectionId(collection)
-                            .hostToTransactionID(collection.getDescription().publishTransactionIds)
-                            .log();
-                    throw e;
-                }
             }
             return published;
         }
@@ -102,6 +103,7 @@ public class PublishCollectionTask implements Callable<Boolean> {
 
     /**
      * Return true if the publish was a success.
+     *
      * @return
      */
     public boolean isPublished() {
@@ -110,6 +112,7 @@ public class PublishCollectionTask implements Callable<Boolean> {
 
     /**
      * Get the collection associated with this task.
+     *
      * @return
      */
     public Collection getCollection() {
@@ -118,6 +121,7 @@ public class PublishCollectionTask implements Callable<Boolean> {
 
     /**
      * Get the collection reader associated with this task.
+     *
      * @return
      */
     public ZebedeeCollectionReader getCollectionReader() {

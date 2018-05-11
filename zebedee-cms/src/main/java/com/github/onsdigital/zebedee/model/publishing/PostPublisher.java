@@ -80,7 +80,7 @@ public class PostPublisher {
         try {
             PublishedCollection publishedCollection = getPublishedCollection(collection);
 
-            SlackNotification.publishNotification(publishedCollection);
+            SlackNotification.publishNotification(publishedCollection, collection.getDescription().publishComplete);
 
             getCollectionHistoryDao().saveCollectionHistoryEvent(collection, getPublisherClassSession(),
                     COLLECTION_POST_PUBLISHED_CONFIRMATION);

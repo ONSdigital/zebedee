@@ -20,6 +20,7 @@ import java.util.concurrent.Future;
 
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logDebug;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logWarn;
 
 /**
  * Sends messages to slack.
@@ -115,49 +116,50 @@ public class SlackNotification {
         });
     }
 
-    public static void main(String[] args) {
-        String timeTaken = String.format("%.3f", (77 / 1000.0));
-        logDebug("timeTaken = " + timeTaken).log();
-    }
-
 
     /**
      * Send a slack message containing collection publication information
      *
      * @param publishedCollection
      */
-    public static void publishNotification(PublishedCollection publishedCollection) {
+    public static void publishNotification(PublishedCollection publishedCollection, boolean publishComplete) {
+        if (publishedCollection == null) {
+            logWarn("failed to send publish slack notification as published collection was null").log();
+            return;
+        }
+
+        // default to unsuccessful message.
+        String slackMessage = "Collection " + publishedCollection.getName() + " did not publish";
+
+        if (publishComplete) {
+            Result result = publishedCollection.publishResults.get(0);
+            StringBuilder msg = new StringBuilder("Published collection: " + publishedCollection.getName());
+
+
+            if (publishedCollection.publishStartDate != null && publishedCollection.publishEndDate != null) {
+                msg.append(" publish time : " + format.format(publishedCollection.publishStartDate));
+
+                String timeTaken = String.format("%.2f", (publishedCollection.publishEndDate.getTime() - publishedCollection.publishStartDate.getTime()) / 1000.0);
+                msg.append(" time taken: " + timeTaken + " ");
+            }
+
+            result.transaction.uriInfos
+                    .stream()
+                    .filter(info -> info.uri.endsWith("data.json"))
+                    .findFirst()
+                    .ifPresent(urlInfo -> {
+                        msg.append("Example Uri: http://www.ons.gov.uk")
+                                .append(urlInfo.uri.substring(0, urlInfo.uri.length() - ("data" + ".json").length()));
+                    });
+            slackMessage = msg.toString();
+        }
+
         try {
-            String slackMessage = publicationMessage(publishedCollection);
             sendPublishNotification(slackMessage);
         } catch (Exception e) {
-            logError(e, "Slack publish notification error").log();
+            logError(e, "Slack publish notification error")
+                    .collectionName(publishedCollection.getName())
+                    .log();
         }
-    }
-
-    private static String publicationMessage(PublishedCollection publishedCollection) throws ParseException {
-        if (publishedCollection.publishResults == null || publishedCollection.publishResults.isEmpty()) {
-            // TODO need to investigate why this sometimes throws a NPE
-            return "Collection " + publishedCollection.getName() + " was published at "
-                    + format.format(publishedCollection.publishStartDate);
-        }
-
-        Result result = publishedCollection.publishResults.get(0);
-        String timeTaken = String.format("%.2f", (publishedCollection.publishEndDate.getTime() - publishedCollection.publishStartDate.getTime()) / 1000.0);
-
-        String exampleUri = "";
-        for (UriInfo info : result.transaction.uriInfos) {
-            if (info.uri.endsWith("data.json")) {
-                exampleUri = info.uri.substring(0, info.uri.length() - "data.json".length());
-                break;
-            }
-        }
-
-        String message = "Collection " + publishedCollection.getName() +
-                " was published at " + format.format(publishedCollection.publishStartDate) +
-                " with " + result.transaction.uriInfos.size() + " files " +
-                " in " + timeTaken + " seconds. Example Uri: http://www.ons.gov.uk" + exampleUri;
-
-        return message;
     }
 }

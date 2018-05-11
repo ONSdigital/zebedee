@@ -35,6 +35,7 @@ public class SlackNotification {
     private static final String slackBaseUri = "https://slack.com/api/chat.postMessage";
     private static final Host slackHost = new Host(slackBaseUri);
     private static final ExecutorService pool = Executors.newFixedThreadPool(1);
+    private static final String DATA_JSON = "data.json";
 
     private static FastDateFormat format = FastDateFormat.getInstance("HH:mm", TimeZone.getTimeZone("Europe/London"));
 
@@ -139,17 +140,19 @@ public class SlackNotification {
             if (publishedCollection.publishStartDate != null && publishedCollection.publishEndDate != null) {
                 msg.append(" publish time : " + format.format(publishedCollection.publishStartDate));
 
-                String timeTaken = String.format("%.2f", (publishedCollection.publishEndDate.getTime() - publishedCollection.publishStartDate.getTime()) / 1000.0);
+                String timeTaken = String.format("%.2f", (publishedCollection.publishEndDate.getTime()
+                        - publishedCollection.publishStartDate.getTime()) / 1000.0);
+
                 msg.append(" time taken: " + timeTaken + " ");
             }
 
             result.transaction.uriInfos
                     .stream()
-                    .filter(info -> info.uri.endsWith("data.json"))
+                    .filter(info -> info.uri.endsWith(DATA_JSON))
                     .findFirst()
                     .ifPresent(urlInfo -> {
                         msg.append("Example Uri: http://www.ons.gov.uk")
-                                .append(urlInfo.uri.substring(0, urlInfo.uri.length() - ("data" + ".json").length()));
+                                .append(urlInfo.uri.substring(0, urlInfo.uri.length() - (DATA_JSON).length()));
                     });
             slackMessage = msg.toString();
         }

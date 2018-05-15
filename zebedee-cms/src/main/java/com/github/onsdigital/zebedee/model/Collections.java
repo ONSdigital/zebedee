@@ -384,7 +384,6 @@ public class Collections {
             logInfo("Breaking before publish").log();
             return true;
         }
-        logInfo("Going ahead with publish").log();
 
         Keyring keyring = zebedeeSupplier.get().getKeyringCache().get(session);
         if (keyring == null) throw new UnauthorizedException("No keyring is available for " + session.getEmail());
@@ -400,12 +399,14 @@ public class Collections {
 
             PostPublisher.postPublish(zebedeeSupplier.get(), collection, skipVerification, collectionReader);
 
-            logInfo("Collection postPublish process finished")
+            logInfo("collection post publish process completed")
                     .collectionName(collection)
+                    .collectionId(collection)
                     .timeTaken((System.currentTimeMillis() - onPublishCompleteStart))
                     .log();
-            logInfo("Collection publish complete.")
+            logInfo("collection publish complete")
                     .collectionName(collection)
+                    .collectionId(collection)
                     .timeTaken((System.currentTimeMillis() - publishStart))
                     .log();
         }

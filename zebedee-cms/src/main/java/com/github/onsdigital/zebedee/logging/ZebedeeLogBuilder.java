@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee.logging;
 
 import ch.qos.logback.classic.Level;
+import com.github.davidcarboni.httpino.Host;
 import com.github.onsdigital.logging.builder.LogMessageBuilder;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.CollectionEventHistoryException;
@@ -11,13 +12,20 @@ import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.UnexpectedErrorException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.model.Collection;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.Map;
 import java.util.function.BiFunction;
+import java.util.stream.Collectors;
+
+import static org.apache.commons.lang3.builder.ToStringStyle.NO_CLASS_NAME_STYLE;
 
 /**
  * Created by dave on 5/5/16.
@@ -47,6 +55,10 @@ public class ZebedeeLogBuilder extends LogMessageBuilder {
     private static final String BLOCKING_COLLECTION = "blockingCollection";
     private static final String TARGET_PATH = "targetPath";
     private static final String TARGET_COLLECTION = "targetCollection";
+    private static final String TRAIN_HOST = "trainHost";
+    private static final String TRAIN_HOSTS = "trainHosts";
+    private static final String TRANSACTION_ID = "transactionID";
+    private static final String TRANSACTION_IDS = "transactionIDS";
 
     private ZebedeeLogBuilder(String description) {
         super(description);
@@ -62,6 +74,10 @@ public class ZebedeeLogBuilder extends LogMessageBuilder {
 
     public static ZebedeeLogBuilder logError(Throwable t) {
         return new ZebedeeLogBuilder(t, ZEBEDEE_EXCEPTION);
+    }
+
+    public static ZebedeeLogBuilder logError(String description) {
+        return new ZebedeeLogBuilder(description, Level.ERROR);
     }
 
     public static ZebedeeLogBuilder logError(Throwable t, String errorContext) {
@@ -192,6 +208,29 @@ public class ZebedeeLogBuilder extends LogMessageBuilder {
         return this;
     }
 
+    public ZebedeeLogBuilder trainHost(Host trainHost) {
+        if (trainHost != null && StringUtils.isNotEmpty(trainHost.toString())) {
+            addParameter(TRAIN_HOST, trainHost.toString());
+        }
+        return this;
+    }
+
+    public ZebedeeLogBuilder transactionID(String transactionID) {
+        if (StringUtils.isNotEmpty(transactionID)) {
+            addParameter(TRANSACTION_ID, transactionID);
+        }
+        return this;
+    }
+
+    public ZebedeeLogBuilder hostToTransactionID(Map<String, String> mapping) {
+        if (mapping != null && !mapping.isEmpty()) {
+            addParameter(TRAIN_HOSTS, mapping.entrySet()
+                    .stream().map(e -> new TrainHost(e.getKey(), e.getValue()))
+                    .collect(Collectors.toList()));
+        }
+        return this;
+    }
+
     public ZebedeeLogBuilder saveOrEditConflict(Collection targetCollection, Collection blockingCollection, String targetURI) throws IOException {
         if (targetCollection != null) {
             String name = targetCollection.getDescription().getName();
@@ -215,6 +254,32 @@ public class ZebedeeLogBuilder extends LogMessageBuilder {
     @Override
     public String getLoggerName() {
         return LOG_NAME;
+    }
+
+    private static class TrainHost {
+        private String host;
+        private String transactionID;
+
+        public String getHost() {
+            return host;
+        }
+
+        public String getTransactionID() {
+            return transactionID;
+        }
+
+        TrainHost(String host, String transactionID) {
+            this.host = host;
+            this.transactionID = transactionID;
+        }
+
+        @Override
+        public String toString() {
+            return new ToStringBuilder(this, NO_CLASS_NAME_STYLE)
+                    .append("host", host)
+                    .append(TRANSACTION_ID, transactionID)
+                    .toString();
+        }
     }
 
 }

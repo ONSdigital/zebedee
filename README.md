@@ -6,6 +6,7 @@ It provides the ability to create and approve collections of change and preview 
 
 Pre-release content is encrypted until published and only shared with permitted users
 
+
 David
 
 

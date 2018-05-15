@@ -80,7 +80,7 @@ public class PostPublisher {
         try {
             PublishedCollection publishedCollection = getPublishedCollection(collection);
 
-            SlackNotification.publishNotification(publishedCollection);
+            SlackNotification.publishNotification(publishedCollection, collection.getDescription().publishComplete);
 
             getCollectionHistoryDao().saveCollectionHistoryEvent(collection, getPublisherClassSession(),
                     COLLECTION_POST_PUBLISHED_CONFIRMATION);
@@ -364,7 +364,10 @@ public class PostPublisher {
 
     public static void copyFilesToMaster(Zebedee zebedee, Collection collection, CollectionReader collectionReader)
             throws IOException, ZebedeeException {
-        logInfo("Moving files from collection into master").collectionName(collection).log();
+        logInfo("Moving files from collection into master")
+                .collectionId(collection)
+                .collectionName(collection)
+                .log();
         // Move each item of content:
         for (String uri : collection.reviewed.uris()) {
             if (!VersionedContentItem.isVersionedUri(uri)
@@ -381,8 +384,11 @@ public class PostPublisher {
     }
 
     public static Path moveCollectionToArchive(Zebedee zebedee, Collection collection, CollectionReader collectionReader) throws IOException, ZebedeeException {
+        logInfo("moving collection files to archive for collection")
+                .collectionId(collection)
+                .collectionName(collection)
+                .log();
 
-        logInfo("Moving collection files to archive for collection").collectionName(collection).log();
         String filename = PathUtils.toFilename(collection.getDescription().getName());
         Path collectionJsonSource = zebedee.getCollections().path.resolve(filename + ".json");
         Path collectionFilesSource = collection.reviewed.path;
@@ -397,18 +403,24 @@ public class PostPublisher {
         Path collectionFilesDestination = logPath.resolve(directoryName);
         Path collectionJsonDestination = logPath.resolve(directoryName + ".json");
 
-        logInfo("Moving collection json").addParameter("from", collectionJsonSource.toString())
-                .addParameter("to", collectionJsonDestination.toString()).log();
+        logInfo("moving collection json")
+                .addParameter("from", collectionJsonSource.toString())
+                .addParameter("to", collectionJsonDestination.toString())
+                .log();
         Files.copy(collectionJsonSource, collectionJsonDestination);
 
         Path manifestDestination = collectionFilesDestination.resolve(Manifest.filename);
-        logInfo("Moving manifest json").addParameter("from", Manifest.getManifestPath(collection).toString())
-                .addParameter("to", manifestDestination.toString()).log();
+        logInfo("moving manifest json")
+                .addParameter("from", Manifest.getManifestPath(collection).toString())
+                .addParameter("to", manifestDestination.toString())
+                .log();
 
         FileUtils.copyFile(Manifest.getManifestPath(collection).toFile(), manifestDestination.toFile());
 
-        logInfo("Moving collection files").addParameter("from", collectionFilesSource.toString())
-                .addParameter("to", collectionFilesDestination.toString()).log();
+        logInfo("moving collection files")
+                .addParameter("from", collectionFilesSource.toString())
+                .addParameter("to", collectionFilesDestination.toString())
+                .log();
         for (String uri : collection.reviewed.uris()) {
             try (
                     Resource resource = collectionReader.getResource(uri);

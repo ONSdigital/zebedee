@@ -216,6 +216,22 @@ public class ZebedeeLogBuilder extends LogMessageBuilder {
         return this;
     }
 
+    public ZebedeeLogBuilder saveOrEditConflict(Collection targetCollection, Collection blockingCollection,
+                                                String targetURI) throws IOException {
+        if (targetCollection != null) {
+            String name = targetCollection.getDescription().getName();
+            addParameter(TARGET_PATH, COLLECTION_CONTENT_PATH.apply(name, targetURI));
+            addParameter(TARGET_COLLECTION, name);
+        }
+        if (blockingCollection != null) {
+            String name = blockingCollection.getDescription().getName();
+
+            addParameter(BLOCKING_PATH, COLLECTION_CONTENT_PATH.apply(name, targetURI));
+            addParameter(BLOCKING_COLLECTION, name);
+        }
+        return this;
+    }
+
     public ZebedeeLogBuilder session(Session session) {
         if (session != null) {
             if (!StringUtils.isEmpty(session.getId())) {
@@ -251,21 +267,6 @@ public class ZebedeeLogBuilder extends LogMessageBuilder {
         return this;
     }
 
-    public ZebedeeLogBuilder saveOrEditConflict(Collection targetCollection, Collection
-            blockingCollection, String targetURI) throws IOException {
-        if (targetCollection != null) {
-            String name = targetCollection.getDescription().getName();
-            addParameter(TARGET_PATH, COLLECTION_CONTENT_PATH.apply(name, targetURI));
-            addParameter(TARGET_COLLECTION, name);
-        }
-        if (blockingCollection != null) {
-            String name = blockingCollection.getDescription().getName();
-
-            addParameter(BLOCKING_PATH, COLLECTION_CONTENT_PATH.apply(name, targetURI));
-            addParameter(BLOCKING_COLLECTION, name);
-        }
-        return this;
-    }
 
     @Override
     public ZebedeeLogBuilder addParameter(String key, Object value) {

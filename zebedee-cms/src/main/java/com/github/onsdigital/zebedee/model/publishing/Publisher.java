@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -37,7 +38,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.locks.Lock;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logDebug;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logWarn;
@@ -461,43 +464,74 @@ public class Publisher {
      * @throws IOException If any errors are encountered in making the request or reported in the {@link Result}.
      */
     static List<Result> commitPublish(Map<String, String> transactionIds, String encryptionPassword) throws IOException {
-        List<Result> results = new ArrayList<>();
+        List<Callable<Result>> commitTasks = transactionIds.entrySet()
+                .stream()
+                .map(entry -> {
+                    Host host = new Host(entry.getKey());
+                    String transactionId = entry.getValue();
 
-        List<Future<IOException>> futures = new ArrayList<>();
-
-        for (Map.Entry<String, String> entry : transactionIds.entrySet()) {
-            Host host = new Host(entry.getKey());
-            String transactionId = entry.getValue();
-
-            futures.add(pool.submit(() -> {
-                IOException result = null;
-                try {
-                    logInfo("PUBLISH: sending commit transaction request to train host")
+                    logDebug("creating commit publish transaction tasks")
                             .transactionID(transactionId)
                             .trainHost(host)
                             .log();
 
-                    try (Http http = new Http()) {
-                        Endpoint endpoint = new Endpoint(host, COMMIT_ENDPOINT)
-                                .setParameter(TRANSACTION_ID_PARAM, transactionId)
-                                .setParameter(ENCRYPTION_PASSWORD_PARAM, encryptionPassword);
+                    Callable<Result> task = () -> {
+                        try {
+                            logInfo("PUBLISH: sending commit transaction request to train host")
+                                    .transactionID(transactionId)
+                                    .trainHost(host)
+                                    .log();
 
-                        Response<Result> response = http.post(endpoint, Result.class);
-                        checkResponse(response, transactionId, endpoint, null);
-                        results.add(response.body);
-                    }
-                } catch (IOException e) {
-                    logError(e, "PUBLISH: error while sending commit transaction request to trian host")
-                            .trainHost(host)
-                            .transactionID(transactionId)
-                            .log();
-                    result = e;
-                }
-                return result;
-            }));
+                            try (Http http = new Http()) {
+                                Endpoint endpoint = new Endpoint(host, COMMIT_ENDPOINT)
+                                        .setParameter(TRANSACTION_ID_PARAM, transactionId)
+                                        .setParameter(ENCRYPTION_PASSWORD_PARAM, encryptionPassword);
+
+                                Response<Result> response = http.post(endpoint, Result.class);
+                                checkResponse(response, transactionId, endpoint, null);
+                                return response.body;
+                            }
+                        } catch (Exception e) {
+                            logError(e, "PUBLISH: error while sending commit transaction request to trian host")
+                                    .trainHost(host)
+                                    .transactionID(transactionId)
+                                    .log();
+                            throw new IOException(e);
+                        }
+                    };
+                    return task;
+                }).collect(Collectors.toList());
+
+        logDebug("submitting commit publish tasks").addParameter("count", commitTasks.size()).log();
+
+        List<Future<Result>> futures = new ArrayList<>();
+        try {
+            futures = pool.invokeAll(commitTasks);
+        } catch (Exception e) {
+            logError(e, "error invoking commit tasks").log();
+            throw new IOException(e);
         }
 
-        checkFutureResults(futures, "error in commit publish");
+        logDebug("checking commit publish tasks results").log();
+
+        List<Result> results = new ArrayList<>();
+        for (Future<Result> resultFuture : futures) {
+            try {
+                Result r = resultFuture.get();
+                if (r == null) {
+                    throw new IOException("commit publish result was null");
+                }
+                logInfo("adding commit publish result future to list of results")
+                        .transactionID(r.transaction.id)
+                        .addParameter("isError", r.error)
+                        .log();
+
+                results.add(r);
+            } catch (Exception e) {
+                logError(e, "commit tranaction future throw unexpected exception").log();
+                throw new IOException(e);
+            }
+        }
 
         logInfo("PUBLISH: successfully committed publishing transaction")
                 .hostToTransactionID(transactionIds)

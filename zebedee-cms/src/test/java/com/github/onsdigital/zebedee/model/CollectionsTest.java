@@ -998,8 +998,8 @@ public class CollectionsTest {
             verify(publishedContentMock, times(1)).exists(uri);
             verify(zebedeeMock, times(1)).checkForCollectionBlockingChange(collectionMock, uri);
             verify(collectionMock, times(1)).getDescription();
-            verify(blocker, times(1)).getDescription();
-            verify(collectionDescriptionMock, times(2)).getName();
+            verify(blocker, times(2)).getDescription();
+            verify(collectionDescriptionMock, times(3)).getName();
             verifyNoMoreInteractions(zebedeeMock);
             verifyZeroInteractions(collectionReaderWriterFactoryMock, collectionWriterMock, collectionMock);
             throw e;

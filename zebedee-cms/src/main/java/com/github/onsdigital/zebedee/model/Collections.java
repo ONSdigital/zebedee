@@ -578,7 +578,7 @@ public class Collections {
             if (!collection.create(session.getEmail(), uri)) {
                 // file may be being edited in a different collection
                 Optional<Collection> otherCollection = zebedeeSupplier.get().checkForCollectionBlockingChange(uri);
-                if(otherCollection.isPresent()) {
+                if(otherCollection != null && otherCollection.isPresent()) {
                     throw new ConflictException(
                             "This URI is being edited in another collection", otherCollection.get().getDescription().getName());
                 }
@@ -591,7 +591,7 @@ public class Collections {
             if (!result) {
                 // file may be being edited in a different collection
                 Optional<Collection> otherCollection = zebedeeSupplier.get().checkForCollectionBlockingChange(uri);
-                if(otherCollection.isPresent()) {
+                if(otherCollection != null && otherCollection.isPresent()) {
                     throw new ConflictException(
                             "This URI is being edited in another collection", otherCollection.get().getDescription().getName());
                 }

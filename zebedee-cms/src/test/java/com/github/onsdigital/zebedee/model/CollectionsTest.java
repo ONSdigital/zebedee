@@ -985,6 +985,8 @@ public class CollectionsTest {
                 .thenReturn(false);
         when(zebedeeMock.checkForCollectionBlockingChange(collectionMock, uri))
                 .thenReturn(Optional.of(blocker));
+        when(zebedeeMock.checkForCollectionBlockingChange(uri))
+                .thenReturn(Optional.of(blocker));
         when(blocker.getDescription())
                 .thenReturn(collectionDescriptionMock);
         when(collectionDescriptionMock.getName())

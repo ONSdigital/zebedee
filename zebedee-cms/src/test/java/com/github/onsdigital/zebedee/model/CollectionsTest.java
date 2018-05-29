@@ -835,6 +835,8 @@ public class CollectionsTest {
                 .thenReturn(null);
         when(collectionMock.edit(TEST_EMAIL, uri.toString(), collectionWriterMock, false))
                 .thenReturn(false);
+        when(zebedeeMock.checkForCollectionBlockingChange(uri.toString()))
+                .thenReturn(Optional.empty());
         try {
             collections.writeContent(collectionMock, uri.toString(), sessionMock, requestMock, mock(InputStream.class), false,
                     CollectionEventType.COLLECTION_PAGE_SAVED, false);
@@ -865,6 +867,8 @@ public class CollectionsTest {
                 .thenReturn(uri);
         when(collectionMock.edit(TEST_EMAIL, uri.toString(), collectionWriterMock, false))
                 .thenReturn(false);
+        when(zebedeeMock.checkForCollectionBlockingChange(uri.toString()))
+                .thenReturn(Optional.empty());
         try {
             collections.writeContent(collectionMock, uri.toString(), sessionMock, requestMock, mock(InputStream.class), false,
                     CollectionEventType.COLLECTION_PAGE_SAVED, false);

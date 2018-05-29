@@ -2,7 +2,6 @@
 
 source ./export-default-env-vars.sh
 
-export content_dir=/Users/iankent/dev/src/github.com/ONSdigital/zebedee/content
 export JAVA_OPTS=" -Xmx1024m -Xdebug -Xrunjdwp:transport=dt_socket,address=8002,server=y,suspend=n"
 export PORT="${PORT:-8082}"
 

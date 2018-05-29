@@ -231,6 +231,11 @@ public class Collection {
             release = getPublishedRelease(collectionDescription.getReleaseUri(), zebedee);
 
             if (zebedee.isBeingEdited(release.getUri().toString() + "/data.json") > 0) {
+                Optional<Collection> otherCollection = zebedee.checkForCollectionBlockingChange(release.getUri().toString() + "/data.json");
+                if(otherCollection.isPresent()) {
+                    throw new ConflictException(
+                            "Cannot use this release. It is being edited as part of another collection.", otherCollection.get().getDescription().getName());
+                }
                 throw new ConflictException(
                         "Cannot use this release. It is being edited as part of another collection.");
             }
@@ -239,6 +244,11 @@ public class Collection {
             try {
                 zebedee.checkAllCollectionsForDeleteMarker(release.getUri().toString());
             } catch (DeleteContentRequestDeniedException ex) {
+                Optional<Collection> otherCollection = zebedee.checkForCollectionBlockingChange(release.getUri().toString() + "/data.json");
+                if(otherCollection.isPresent()) {
+                    throw new ConflictException(
+                            "Cannot use this release. It is being deleted as part of another collection.", otherCollection.get().getDescription().getName());
+                }
                 throw new ConflictException(
                         "Cannot use this release. It is being deleted as part of another collection.");
             }

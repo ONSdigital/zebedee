@@ -140,17 +140,15 @@ public class PrePublishCollectionsTask extends ScheduledTask {
                     try {
                         logInfo("PRE-PUBLISH: creating collection publish task").collectionName(collection).log();
 
-                        String encryptionPassword = Random.password(100);
-
                         // begin the publish ahead of time. This creates the transaction on the train.
-                        Map<String, String> hostToTransactionIdMap = Publisher.createPublishingTransactions(collection, encryptionPassword);
+                        Map<String, String> hostToTransactionIdMap = Publisher.createPublishingTransactions(collection);
 
                         // send versioned files manifest ahead of time. allowing files to be copied from the website into the transaction.
-                        Publisher.sendManifest(collection, encryptionPassword);
+                        Publisher.sendManifest(collection);
 
                         SecretKey key = zebedee.getKeyringCache().schedulerCache.get(collection.getDescription().getId());
                         ZebedeeCollectionReader collectionReader = new ZebedeeCollectionReader(collection, key);
-                        PublishCollectionTask publishCollectionTask = new PublishCollectionTask(collection, collectionReader, encryptionPassword, hostToTransactionIdMap);
+                        PublishCollectionTask publishCollectionTask = new PublishCollectionTask(collection, collectionReader, hostToTransactionIdMap);
 
                         logInfo("PRE-PUBLISH: Adding publish task").collectionName(collection).log();
                         collectionPublishTasks.add(publishCollectionTask);

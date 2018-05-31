@@ -22,7 +22,6 @@ public class PublishCollectionTask implements Callable<Boolean> {
     protected boolean published;
     private Collection collection;
     private ZebedeeCollectionReader collectionReader;
-    private String encryptionPassword;
     private Map<String, String> hostToTransactionIdMap;
 
     /**
@@ -30,12 +29,10 @@ public class PublishCollectionTask implements Callable<Boolean> {
      *
      * @param collection         - The collection to publish.
      * @param collectionReader   - The collection reader to read collection content.
-     * @param encryptionPassword
      */
-    public PublishCollectionTask(Collection collection, ZebedeeCollectionReader collectionReader, String encryptionPassword, Map<String, String> hostToTransactionIdMap) {
+    public PublishCollectionTask(Collection collection, ZebedeeCollectionReader collectionReader, Map<String, String> hostToTransactionIdMap) {
         this.collection = collection;
         this.collectionReader = collectionReader;
-        this.encryptionPassword = encryptionPassword;
         this.hostToTransactionIdMap = hostToTransactionIdMap;
     }
 
@@ -51,9 +48,9 @@ public class PublishCollectionTask implements Callable<Boolean> {
             logInfo("PUBLISH: Running collection publish task").collectionId(collection).log();
             collection.getDescription().publishStartDate = new Date();
 
-            Publisher.publishFilteredCollectionFiles(collection, collectionReader, encryptionPassword);
+            Publisher.publishFilteredCollectionFiles(collection, collectionReader);
 
-            published = Publisher.commitPublish(collection, publisherSystemEmail, encryptionPassword);
+            published = Publisher.commitPublish(collection, publisherSystemEmail);
             collection.getDescription().publishEndDate = new Date();
         } catch (Exception e) {
             // If an error was caught, attempt to roll back the transaction:
@@ -65,7 +62,7 @@ public class PublishCollectionTask implements Callable<Boolean> {
                         .hostToTransactionID(collection.getDescription().publishTransactionIds)
                         .log();
 
-                Publisher.rollbackPublish(collection, encryptionPassword);
+                Publisher.rollbackPublish(collection);
 
             } else {
                 logError(e, "PUBLISH: FAILURE: no publishing transaction IDS found for collection, no rollback " +

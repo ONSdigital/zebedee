@@ -528,13 +528,13 @@ public class Collections {
                     .saveOrEditConflict(collection, blocker, uri)
                     .user(session.getEmail())
                     .log();
-            throw new ConflictException("This URI exists in another collection.");
+            throw new ConflictException("This URI exists in another collection", blocker.getDescription().getName());
         }
 
         try {
             zebedeeSupplier.get().checkAllCollectionsForDeleteMarker(uri);
         } catch (DeleteContentRequestDeniedException ex) {
-            throw new ConflictException("This URI already exists");
+            throw new ConflictException("This URI is marked for deletion in another collection", ex.getCollectionName());
         }
 
         writeContent(collection, uri, session, request, requestBody, false, eventType, validateJson);
@@ -577,6 +577,11 @@ public class Collections {
             // create the file
             if (!collection.create(session.getEmail(), uri)) {
                 // file may be being edited in a different collection
+                Optional<Collection> otherCollection = zebedeeSupplier.get().checkForCollectionBlockingChange(uri);
+                if(otherCollection.isPresent()) {
+                    throw new ConflictException(
+                            "This URI is being edited in another collection", otherCollection.get().getDescription().getName());
+                }
                 throw new ConflictException(
                         "It could be this URI is being edited in another collection");
             }
@@ -585,6 +590,11 @@ public class Collections {
             boolean result = collection.edit(session.getEmail(), uri, collectionWriter, recursive);
             if (!result) {
                 // file may be being edited in a different collection
+                Optional<Collection> otherCollection = zebedeeSupplier.get().checkForCollectionBlockingChange(uri);
+                if(otherCollection.isPresent()) {
+                    throw new ConflictException(
+                            "This URI is being edited in another collection", otherCollection.get().getDescription().getName());
+                }
                 throw new ConflictException(
                         "It could be this URI is being edited in another collection");
             }

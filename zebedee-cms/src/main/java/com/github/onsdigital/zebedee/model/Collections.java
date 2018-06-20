@@ -15,9 +15,12 @@ import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.ApprovalStatus;
 import com.github.onsdigital.zebedee.json.Event;
 import com.github.onsdigital.zebedee.json.EventType;
+import com.github.onsdigital.zebedee.json.Keyring;
 import com.github.onsdigital.zebedee.model.approval.ApprovalQueue;
 import com.github.onsdigital.zebedee.model.approval.ApproveTask;
+import com.github.onsdigital.zebedee.model.publishing.PostPublisher;
 import com.github.onsdigital.zebedee.model.publishing.PublishNotification;
+import com.github.onsdigital.zebedee.model.publishing.Publisher;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.persistence.CollectionEventType;
 import com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDao;
@@ -285,8 +288,9 @@ public class Collections {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
-        // Check everything is reviewed
-        if (!collection.isAllContentReviewed()) {
+        // Everything is completed
+        if (!collection.inProgressUris().isEmpty()
+                || !collection.completeUris().isEmpty()) {
             throw new ConflictException(
                     "This collection can't be approved because it's not empty");
         }
@@ -342,6 +346,72 @@ public class Collections {
 
         publishingNotificationConsumer.accept(collection, EventType.UNLOCKED);
         return collection.save();
+    }
+
+    /**
+     * Publish the files
+     *
+     * @param collection       the collection to publish
+     * @param session          a session with editor priviledges
+     * @param skipVerification
+     * @return success
+     * @throws IOException
+     * @throws UnauthorizedException
+     * @throws BadRequestException
+     * @throws ConflictException     - If there
+     */
+    public boolean publish(Collection collection, Session session, boolean breakBeforePublish, boolean skipVerification)
+            throws IOException, UnauthorizedException, BadRequestException,
+            ConflictException, NotFoundException {
+
+        // Collection exists
+        if (collection == null) {
+            throw new BadRequestException("Please provide a valid collection.");
+        }
+
+        // User has permission
+        if (session == null || !permissionsService.canEdit(session.getEmail())) {
+            throw new UnauthorizedException(getUnauthorizedMessage(session));
+        }
+
+        // Check approval status
+        if (collection.description.approvalStatus != ApprovalStatus.COMPLETE) {
+            throw new ConflictException("This collection cannot be published because it is not approved");
+        }
+
+        // Break before transfer allows us to run tests on the prepublish-hook without messing up the content
+        if (breakBeforePublish) {
+            logInfo("Breaking before publish").log();
+            return true;
+        }
+
+        Keyring keyring = zebedeeSupplier.get().getKeyringCache().get(session);
+        if (keyring == null) throw new UnauthorizedException("No keyring is available for " + session.getEmail());
+
+        ZebedeeCollectionReader collectionReader = new ZebedeeCollectionReader(zebedeeSupplier.get(), collection, session);
+        long publishStart = System.currentTimeMillis();
+        boolean publishComplete = Publisher.Publish(collection, session.getEmail(), collectionReader);
+
+        if (publishComplete) {
+            long onPublishCompleteStart = System.currentTimeMillis();
+
+            new PublishNotification(collection).sendNotification(EventType.PUBLISHED);
+
+            PostPublisher.postPublish(zebedeeSupplier.get(), collection, skipVerification, collectionReader);
+
+            logInfo("collection post publish process completed")
+                    .collectionName(collection)
+                    .collectionId(collection)
+                    .timeTaken((System.currentTimeMillis() - onPublishCompleteStart))
+                    .log();
+            logInfo("collection publish complete")
+                    .collectionName(collection)
+                    .collectionId(collection)
+                    .timeTaken((System.currentTimeMillis() - publishStart))
+                    .log();
+        }
+
+        return publishComplete;
     }
 
     public DirectoryListing listDirectory(

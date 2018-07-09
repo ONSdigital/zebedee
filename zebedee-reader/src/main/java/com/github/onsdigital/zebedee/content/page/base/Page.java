@@ -1,10 +1,16 @@
 package com.github.onsdigital.zebedee.content.page.base;
 
+import cc.fasttext.Vector;
 import com.github.onsdigital.zebedee.content.base.Content;
 import com.github.onsdigital.zebedee.content.partial.Link;
+import com.github.onsdigital.zebedee.search.fastText.FastTextHelper;
+import com.google.common.collect.Sets;
 
+import java.io.IOException;
 import java.net.URI;
-import java.util.List;
+import java.util.*;
+
+import static com.github.onsdigital.zebedee.search.fastText.FastTextHelper.convertArrayToBase64;
 
 /**
  * Created by bren on 10/06/15.
@@ -49,5 +55,66 @@ public abstract class Page extends Content {
 
     public void setTopics(List<Link> topics) {
         this.topics = topics;
+    }
+
+    public String getPageSentence() {
+        StringBuilder sb = new StringBuilder();
+
+        if (null != this.getDescription() && null != this.getDescription().getTitle()) {
+            String title = this.getDescription().getTitle();
+            String[] tokens = title.replaceAll("[^a-zA-Z ]", "").toLowerCase().split("\\s+");
+            Set<String> tokenSet = Sets.newLinkedHashSet(Arrays.asList(tokens));
+            for (String token : tokenSet) {
+                token = token.toLowerCase();
+                if (sb.length() > 0) {
+                    sb.append(" ");
+                }
+                sb.append(token);
+            }
+        }
+
+        return sb.toString();
+    }
+
+    public double[] getEmbeddingVector() {
+        String sentence = this.getPageSentence();
+
+        int dim = FastTextHelper.getInstance().getDimensions();
+
+        double[] sentenceVector = new double[dim];
+
+        if (null != sentence && !sentence.isEmpty()) {
+            Vector vector = FastTextHelper.getInstance().getFastText().getSentenceVector(sentence);
+            sentenceVector = FastTextHelper.toDoubleArray(vector);
+        }
+
+        return sentenceVector;
+    }
+
+    public String getEncodedEmbeddingVector() {
+        return convertArrayToBase64(this.getEmbeddingVector());
+    }
+
+    public Map<String, Float> getLabels(int k) {
+        String sentence = this.getPageSentence();
+
+        if (null != sentence && !sentence.isEmpty()) {
+            return FastTextHelper.getInstance().getFastText().predictLine(sentence, k);
+        }
+        return new HashMap<>();
+    }
+
+    public List<String> generateKeywords(int k, float threshold) {
+        Map<String, Float> labels = this.getLabels(k);
+
+        List<String> filteredLabels = new ArrayList<>();
+        for (String key : labels.keySet()) {
+            if (labels.get(key) >= threshold) {
+                String formattedKey = key.replace(FastTextHelper.PREFIX, "").replace("_", " ");
+                filteredLabels.add(formattedKey);
+            }
+        }
+
+        return filteredLabels;
     }
 }

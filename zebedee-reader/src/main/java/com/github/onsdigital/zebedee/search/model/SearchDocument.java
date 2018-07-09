@@ -15,6 +15,7 @@ public class SearchDocument {
     private PageDescription description;
     private List<URI> topics;
     private List<String> searchBoost;
+    private String embedding_vector;
 
 
     public PageDescription getDescription() {
@@ -55,5 +56,13 @@ public class SearchDocument {
 
     public void setSearchBoost(List<String> searchBoost) {
         this.searchBoost = searchBoost;
+    }
+
+    public String getEmbedding_vector() {
+        return embedding_vector;
+    }
+
+    public void setEmbedding_vector(String embedding_vector) {
+        this.embedding_vector = embedding_vector;
     }
 }

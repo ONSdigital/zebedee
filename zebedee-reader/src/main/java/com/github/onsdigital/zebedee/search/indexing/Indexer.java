@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee.search.indexing;
 
 import com.github.onsdigital.zebedee.content.page.base.Page;
+import com.github.onsdigital.zebedee.content.page.base.PageDescription;
 import com.github.onsdigital.zebedee.content.page.base.PageType;
 import com.github.onsdigital.zebedee.content.partial.Link;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
@@ -8,6 +9,7 @@ import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.reader.ZebedeeReader;
 import com.github.onsdigital.zebedee.search.client.ElasticSearchClient;
+import com.github.onsdigital.zebedee.search.fastText.FastTextHelper;
 import com.github.onsdigital.zebedee.search.model.SearchDocument;
 import com.github.onsdigital.zebedee.util.URIUtils;
 import org.apache.commons.io.IOUtils;
@@ -115,6 +117,10 @@ public class Indexer {
         long start = System.currentTimeMillis();
         elasticSearchLog("Triggering re-indexing")
                 .addParameter("index", indexName)
+                .log();
+        elasticSearchLog("Using model")
+                .addParameter("filename", FastTextHelper.Configuration.getFastTextModelFilename())
+                .addParameter("dimensions", FastTextHelper.getInstance().getDimensions())
                 .log();
         indexDocuments(indexName);
         elasticSearchLog("Re-indexing completed")
@@ -250,9 +256,8 @@ public class Indexer {
      *
      * @param indexName
      * @param documents
-     * @throws IOException
      */
-    private void index(String indexName, List<Document> documents) throws IOException {
+    private void index(String indexName, List<Document> documents) {
         try (BulkProcessor bulkProcessor = getBulkProcessor()) {
             for (Document document : documents) {
                 try {
@@ -275,12 +280,16 @@ public class Indexer {
 
     private IndexRequestBuilder prepareIndexRequest(String indexName, Document document) throws ZebedeeException, IOException {
         Page page = getPage(document.getUri());
+
+        IndexRequestBuilder indexRequestBuilder = null;
         if (page != null && page.getType() != null) {
-            IndexRequestBuilder indexRequestBuilder = searchUtils.prepareIndex(indexName, page.getType().name(), page.getUri().toString());
-            indexRequestBuilder.setSource(serialise(toSearchDocument(page, document.getSearchTerms())));
-            return indexRequestBuilder;
+            SearchDocument searchDocument = toSearchDocument(page, document.getSearchTerms());
+            if (null != searchDocument.getEmbedding_vector() && !searchDocument.getEmbedding_vector().isEmpty()) {
+                indexRequestBuilder = searchUtils.prepareIndex(indexName, page.getType().name(), page.getUri().toString());
+                indexRequestBuilder.setSource(serialise(searchDocument));
+            }
         }
-        return null;
+        return indexRequestBuilder;
     }
 
     private void indexSingleContent(String indexName, Page page) throws IOException {
@@ -288,13 +297,34 @@ public class Indexer {
         searchUtils.createDocument(indexName, page.getType().toString(), page.getUri().toString(), serialise(toSearchDocument(page, terms)));
     }
 
-    private SearchDocument toSearchDocument(Page page, List<String> searchTerms) {
+    private SearchDocument toSearchDocument(Page page, List<String> searchTerms) throws IOException {
         SearchDocument indexDocument = new SearchDocument();
         indexDocument.setUri(page.getUri());
-        indexDocument.setDescription(page.getDescription());
+//        indexDocument.setDescription(page.getDescription());
         indexDocument.setTopics(getTopics(page.getTopics()));
         indexDocument.setType(page.getType());
         indexDocument.setSearchBoost(searchTerms);
+
+        PageDescription pageDescription = page.getDescription();
+        if (null == pageDescription.getKeywords() || pageDescription.getKeywords().isEmpty()) {
+            try {
+                // Generate keywords
+                List<String> generatedKeywords = page.generateKeywords(10, 0.5f);
+                pageDescription.setKeywords(generatedKeywords);
+            } catch (Exception e) {
+                System.out.println("Caught exception generating keywords");
+                e.printStackTrace();
+            }
+         }
+        indexDocument.setDescription(pageDescription);
+
+        String embeddingVector = page.getEncodedEmbeddingVector();
+
+        if (null == embeddingVector || embeddingVector.isEmpty()) {
+            System.out.println(String.format("Empty embedding vector for page %s:%s", page, embeddingVector));
+            throw new IOException(String.format("Empty embedding vector for page %s:%s", page, embeddingVector));
+        }
+        indexDocument.setEmbedding_vector(embeddingVector);
         return indexDocument;
     }
 
@@ -310,7 +340,7 @@ public class Indexer {
         return uriList;
     }
 
-    private Settings getSettings() throws IOException {
+    private Settings getSettings() {
         Settings.Builder settingsBuilder = Settings.builder().
                 loadFromStream("index-config.yml", Indexer.class.getResourceAsStream("/search/index-config.yml"));
         elasticSearchLog("Index settings").addParameter("settings", settingsBuilder.internalMap());

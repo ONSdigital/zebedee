@@ -81,6 +81,10 @@
         "norms": {
           "enabled": false
         }
+      },
+      "embedding_vector": {
+        "type": "binary",
+        "doc_values": true
       }
     }
   },

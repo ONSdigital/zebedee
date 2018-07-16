@@ -310,7 +310,7 @@ public class Indexer {
         if (null == pageDescription.getKeywords() || pageDescription.getKeywords().isEmpty()) {
             try {
                 // Generate keywords
-                List<String> generatedKeywords = page.generateKeywords(10, 0.5f);
+                List<String> generatedKeywords = page.generateKeywords(10, 0.3f);
 
                 elasticSearchLog("Generated keywords for page")
                         .addParameter("title", pageDescription.getTitle())

@@ -31,6 +31,7 @@ import java.io.InputStreamReader;
 import java.net.URI;
 import java.nio.file.NoSuchFileException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -310,6 +311,11 @@ public class Indexer {
             try {
                 // Generate keywords
                 List<String> generatedKeywords = page.generateKeywords(10, 0.5f);
+
+                elasticSearchLog("Generated keywords for page")
+                        .addParameter("title", pageDescription.getTitle())
+                        .addParameter("uri", page.getUri().toString())
+                        .addParameter("keywords", Arrays.toString(generatedKeywords.toArray()));
                 pageDescription.setKeywords(generatedKeywords);
             } catch (Exception e) {
                 System.out.println("Caught exception generating keywords");

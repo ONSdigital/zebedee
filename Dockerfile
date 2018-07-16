@@ -4,6 +4,9 @@ FROM onsdigital/java-component
 WORKDIR /usr/src
 ADD ./zebedee-cms/target/dependency /usr/src/target/dependency
 ADD ./zebedee-cms/target/classes /usr/src/target/classes
+ADD ./supervised_models /usr/src/supervised_models
+
+ENV SUPERVISED_MODELS_DIRECTORY=/usr/src/supervised_models
 
 # Temporary: expose Elasticsearch
 EXPOSE 9200

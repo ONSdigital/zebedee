@@ -6,7 +6,6 @@ import com.github.onsdigital.zebedee.content.partial.Link;
 import com.github.onsdigital.zebedee.search.fastText.FastTextHelper;
 import com.google.common.collect.Sets;
 
-import java.io.IOException;
 import java.net.URI;
 import java.util.*;
 

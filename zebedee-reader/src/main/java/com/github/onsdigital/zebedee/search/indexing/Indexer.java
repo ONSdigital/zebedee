@@ -315,7 +315,8 @@ public class Indexer {
                 elasticSearchLog("Generated keywords for page")
                         .addParameter("title", pageDescription.getTitle())
                         .addParameter("uri", page.getUri().toString())
-                        .addParameter("keywords", Arrays.toString(generatedKeywords.toArray()));
+                        .addParameter("keywords", Arrays.toString(generatedKeywords.toArray()))
+                        .log();
                 pageDescription.setKeywords(generatedKeywords);
             } catch (Exception e) {
                 System.out.println("Caught exception generating keywords");

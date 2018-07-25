@@ -1,7 +1,6 @@
 package com.github.onsdigital.zebedee.content.page;
 
 import com.github.onsdigital.zebedee.content.page.statistics.dataset.ApiDatasetLandingPage;
-import com.google.gson.Gson;
 import dp.api.dataset.DatasetClient;
 import dp.api.dataset.exception.DatasetAPIException;
 import dp.api.dataset.model.Dataset;

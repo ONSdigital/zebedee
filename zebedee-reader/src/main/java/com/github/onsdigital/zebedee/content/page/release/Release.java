@@ -15,7 +15,7 @@ import java.util.List;
 /**
  * Created by bren on 04/06/15.
  */
-public class Release extends Page{
+public class Release extends Page {
 
     private List<String> markdown;
     private List<Link> relatedDocuments;

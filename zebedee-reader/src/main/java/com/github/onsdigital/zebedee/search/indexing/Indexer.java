@@ -12,6 +12,7 @@ import com.github.onsdigital.zebedee.search.client.ElasticSearchClient;
 import com.github.onsdigital.zebedee.search.fastText.FastTextHelper;
 import com.github.onsdigital.zebedee.search.model.SearchDocument;
 import com.github.onsdigital.zebedee.util.URIUtils;
+import com.google.common.collect.Sets;
 import org.apache.commons.io.IOUtils;
 import org.elasticsearch.action.bulk.BulkItemResponse;
 import org.elasticsearch.action.bulk.BulkProcessor;
@@ -30,9 +31,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.nio.file.NoSuchFileException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -307,22 +306,28 @@ public class Indexer {
         indexDocument.setSearchBoost(searchTerms);
 
         PageDescription pageDescription = page.getDescription();
-        if (null == pageDescription.getKeywords() || pageDescription.getKeywords().isEmpty()) {
-            try {
-                // Generate keywords
-                List<String> generatedKeywords = page.generateKeywords(10, 0.3f);
+        try {
+            // Generate keywords
+            List<String> generatedKeywords = page.generateKeywords(10, 0.1f);
+
+            if (null != generatedKeywords) {
 
                 elasticSearchLog("Generated keywords for page")
                         .addParameter("title", pageDescription.getTitle())
                         .addParameter("uri", page.getUri().toString())
                         .addParameter("keywords", Arrays.toString(generatedKeywords.toArray()))
                         .log();
-                pageDescription.setKeywords(generatedKeywords);
-            } catch (Exception e) {
-                System.out.println("Caught exception generating keywords");
-                e.printStackTrace();
+
+                if (null != pageDescription.getKeywords() && !pageDescription.getKeywords().isEmpty()) {
+                    generatedKeywords.addAll(pageDescription.getKeywords());
+                }
+                Set<String> set = Sets.newLinkedHashSet(generatedKeywords);
+                pageDescription.setKeywords(new LinkedList<>(new LinkedList<>(set)));
             }
-         }
+        } catch (Exception e) {
+            System.out.println("Caught exception generating keywords");
+            e.printStackTrace();
+        }
         indexDocument.setDescription(pageDescription);
 
         String embeddingVector = page.getEncodedEmbeddingVector();

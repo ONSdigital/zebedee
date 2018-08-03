@@ -83,12 +83,4 @@ public class FastTextHelper {
             return String.format("%s/%s", fastTextModelDirectory, fastTextModelName);
         }
     }
-
-    public static void main(String[] args) {
-        FastText fastText = FastTextHelper.getInstance().getFastText();
-
-        System.out.println(fastText.predictLine("homicide", 10));
-    }
-
-
 }

@@ -57,23 +57,16 @@ public abstract class Page extends Content {
     }
 
     public String getPageSentence() {
-        StringBuilder sb = new StringBuilder();
-
         if (null != this.getDescription() && null != this.getDescription().getTitle()) {
             String title = this.getDescription().getTitle();
-            String[] tokens = title.replaceAll("[^a-zA-Z ]", "").toLowerCase().split("\\s+");
-            Set<String> tokenSet = Sets.newLinkedHashSet(Arrays.asList(tokens));
-            for (String token : tokenSet) {
-                token = token.toLowerCase();
-                if (sb.length() > 0) {
-                    sb.append(" ");
-                }
-                sb.append(token);
-            }
-        }
+            title = title.replaceAll("[^a-zA-Z ]", "").toLowerCase().replaceAll("\\s+", " ");
 
-        return sb.toString();
+            return title;
+        }
+        return null;
     }
+
+//    public abstract String getPageSentence();
 
     public double[] getEmbeddingVector() {
         String sentence = this.getPageSentence();

@@ -43,6 +43,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -64,7 +65,6 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logDebug;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_CONTENT_REVIEWED;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_CREATED;
@@ -232,7 +232,7 @@ public class Collection {
 
             if (zebedee.isBeingEdited(release.getUri().toString() + "/data.json") > 0) {
                 Optional<Collection> otherCollection = zebedee.checkForCollectionBlockingChange(release.getUri().toString() + "/data.json");
-                if(otherCollection.isPresent()) {
+                if (otherCollection.isPresent()) {
                     throw new ConflictException(
                             "Cannot use this release. It is being edited as part of another collection.", otherCollection.get().getDescription().getName());
                 }
@@ -245,7 +245,7 @@ public class Collection {
                 zebedee.checkAllCollectionsForDeleteMarker(release.getUri().toString());
             } catch (DeleteContentRequestDeniedException ex) {
                 Optional<Collection> otherCollection = zebedee.checkForCollectionBlockingChange(release.getUri().toString() + "/data.json");
-                if(otherCollection.isPresent()) {
+                if (otherCollection.isPresent()) {
                     throw new ConflictException(
                             "Cannot use this release. It is being deleted as part of another collection.", otherCollection.get().getDescription().getName());
                 }
@@ -272,29 +272,102 @@ public class Collection {
      * @throws IOException
      */
     public static Collection rename(CollectionDescription collectionDescription, String newName, Zebedee zebedee)
-            throws IOException, CollectionNotFoundException {
+            throws IOException, CollectionNotFoundException, BadRequestException {
+        try {
+            validateRename(collectionDescription, newName, zebedee);
 
-        String filename = PathUtils.toFilename(collectionDescription.getName());
-        String newFilename = PathUtils.toFilename(newName);
+            Path collectionsRoot = zebedee.getCollections().path;
+            String currentFilename = PathUtils.toFilename(collectionDescription.getName());
+            String newFilename = PathUtils.toFilename(newName);
+            Path currentDir = collectionsRoot.resolve(currentFilename);
+            Path newDir = collectionsRoot.resolve(newFilename);
+            Path oldJSONPath = collectionsRoot.resolve(currentFilename + ".json");
+            Path newJSONPath = collectionsRoot.resolve(newFilename + ".json");
 
-        Path collection = zebedee.getCollections().path.resolve(filename);
-        Path newCollection = zebedee.getCollections().path.resolve(newFilename);
+            renameCollectionDirectory(currentDir, newDir);
+            renameCollectionJSON(oldJSONPath, newJSONPath);
 
-        new File(collection.toUri()).renameTo(new File(newCollection.toUri()));
+            collectionDescription.setName(newName);
+            updateCollectionJSONName(collectionDescription, newJSONPath);
 
-        // Create the description:
-        Path newPath = zebedee.getCollections().path.resolve(newFilename
-                + ".json");
+            return new Collection(zebedee.getCollections().path.resolve(newFilename), zebedee);
+        } catch (FileNotFoundException e) {
+            throw new BadRequestException(e.getMessage());
+        }
+    }
 
-        collectionDescription.setName(newName);
+    /**
+     * Check if the requested new name is available to use.
+     *
+     * @param collectionDescription the collection description of the collection to rename.
+     * @param newName               the new name to check.
+     * @param zebedee               the zebedee instance.
+     * @throws IOException
+     * @throws BadRequestException
+     */
+    static void validateRename(CollectionDescription collectionDescription, String newName, Zebedee zebedee)
+            throws IOException, BadRequestException {
+        if (!zebedee.getCollections().isNameAvailable(collectionDescription, newName)) {
+            logInfo("cannot rename collection: collection already exists with the requested name:")
+                    .collectionName(newName)
+                    .log();
+            throw new BadRequestException("cannot rename collection: collection already exists with the requested name: " + newName);
+        }
+    }
 
-        try (OutputStream output = Files.newOutputStream(newPath)) {
-            Serialiser.serialise(output, collectionDescription);
+
+    /**
+     * Rename the specified collection directory
+     *
+     * @param src  the full Path of the existing collection top level directory.
+     * @param dest the full Path to the new collection top level directory.
+     * @return true if the rename was successful, false if uncusccessful.
+     * @throws FileNotFoundException if the src Path does not exist.
+     */
+    static boolean renameCollectionDirectory(Path src, Path dest) throws FileNotFoundException {
+        if (src == null) {
+            throw new IllegalArgumentException("rename collection directory failed: requires non null src directory");
+        }
+        if (dest == null) {
+            throw new IllegalArgumentException("rename collection directory failed: requires non null dest directory");
+        }
+        if (!Files.exists(src)) {
+            throw new FileNotFoundException("rename collection directory failed: src directory not found");
+        }
+        return new File(src.toString()).renameTo(new File(dest.toString()));
+    }
+
+    /**
+     * Rename a collection json file.
+     *
+     * @param src  the path to the existing json file to rename.
+     * @param dest the path to rename the json file to.
+     * @return true is successful, false otherwise
+     * @throws BadRequestException if the src or target values are null or the src file does not exist.
+     */
+    static boolean renameCollectionJSON(Path src, Path dest) throws BadRequestException {
+        if (src == null) {
+            throw new IllegalArgumentException("rename collection JSON failed: requires non null src path");
+        }
+        if (dest == null) {
+            throw new IllegalArgumentException("rename collection JSON failed: requires non null dest path");
         }
 
-        Files.delete(zebedee.getCollections().path.resolve(filename + ".json"));
+        if (!src.toFile().exists()) {
+            throw new IllegalArgumentException("rename collection JSON failed: src does not exist");
+        }
 
-        return new Collection(zebedee.getCollections().path.resolve(newFilename), zebedee);
+        if (src.toString().equals(dest)) {
+            logInfo("rename collection JSON: target name is same as src no action required");
+            return false;
+        }
+        return src.toFile().renameTo(new File(dest.toString()));
+    }
+
+    static void updateCollectionJSONName(CollectionDescription updated, Path newPath) throws IOException {
+        try (OutputStream output = Files.newOutputStream(newPath)) {
+            Serialiser.serialise(output, updated);
+        }
     }
 
     private static Release getPublishedRelease(String uri, Zebedee zebedee) throws IOException, ZebedeeException {

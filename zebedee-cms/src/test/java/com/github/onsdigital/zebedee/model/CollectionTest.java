@@ -8,8 +8,17 @@ import com.github.onsdigital.zebedee.content.page.base.PageDescription;
 import com.github.onsdigital.zebedee.content.page.base.PageType;
 import com.github.onsdigital.zebedee.content.page.release.Release;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
-import com.github.onsdigital.zebedee.exceptions.*;
-import com.github.onsdigital.zebedee.json.*;
+import com.github.onsdigital.zebedee.exceptions.BadRequestException;
+import com.github.onsdigital.zebedee.exceptions.CollectionNotFoundException;
+import com.github.onsdigital.zebedee.exceptions.ConflictException;
+import com.github.onsdigital.zebedee.exceptions.NotFoundException;
+import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
+import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
+import com.github.onsdigital.zebedee.json.ApprovalStatus;
+import com.github.onsdigital.zebedee.json.CollectionDescription;
+import com.github.onsdigital.zebedee.json.CollectionType;
+import com.github.onsdigital.zebedee.json.ContentDetail;
+import com.github.onsdigital.zebedee.json.EventType;
 import com.github.onsdigital.zebedee.model.content.item.ContentItemVersion;
 import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
 import com.github.onsdigital.zebedee.model.publishing.scheduled.DummyScheduler;
@@ -20,6 +29,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.junit.Test;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -34,7 +44,14 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import static org.junit.Assert.*;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+
 
 public class CollectionTest extends ZebedeeTestBaseFixture {
 
@@ -96,6 +113,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
 
     @Test
     public void shouldRenameCollection() throws Exception {
+        builder.deleteAllCollections();
 
         // Given an existing collection
         String name = "Population Release";
@@ -109,7 +127,14 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
 
         Collection.create(collectionDescription, zebedee, publisherSession);
 
+        System.out.println("\nbefore:");
+        Files.list(builder.zebedeeRootPath.resolve(Zebedee.COLLECTIONS)).forEach(p -> System.out.println(p.getFileName()));
+
         Collection.rename(collectionDescription, newName, zebedee);
+
+
+        System.out.println("\nafter:");
+        Files.list(builder.zebedeeRootPath.resolve(Zebedee.COLLECTIONS)).forEach(p -> System.out.println(p.getFileName()));
 
         // Then the collection is renamed.
         Path rootPath = builder.zebedeeRootPath.resolve(Zebedee.COLLECTIONS);
@@ -137,6 +162,36 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         assertEquals(collectionDescription.getType(), renamedCollectionDescription.getType());
     }
 
+
+    @Test(expected = BadRequestException.class)
+    public void shouldNotRenameIfCollectionAlreadyExists() throws Exception {
+        Path collectionsDir = zebedee.getPath().resolve(Zebedee.COLLECTIONS);
+        Path col1 = null;
+        Path col2 = null;
+        String nameAAA = "CollectionA";
+        String nameBBB = "CollectionB";
+
+        try {
+            builder.deleteAllCollections();
+            col1 = builder.createCollection(nameAAA, builder.zebedeeRootPath);
+            col2 = builder.createCollection(nameBBB, builder.zebedeeRootPath);
+
+            // check collections exist.
+            CollectionDescription collectionA = zebedee.getCollections().getCollectionByName(nameAAA).getDescription();
+            assertNotNull(collectionA);
+            assertNotNull(zebedee.getCollections().getCollectionByName(nameBBB));
+
+            // when ...
+            Collection.rename(collectionA, nameBBB, zebedee);
+
+        } catch (BadRequestException e) {
+            assertThat(e.getMessage(), equalTo("cannot rename collection: collection already exists with the requested name: CollectionB"));
+
+            assertNotNull(zebedee.getCollections().getCollectionByName(nameAAA));
+            assertNotNull(zebedee.getCollections().getCollectionByName(nameBBB));
+            throw e;
+        }
+    }
 
     @Test
     public void shouldUpdateCollection() throws Exception {
@@ -635,7 +690,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
     }
 
     @Test(expected = UnauthorizedException.class)
-    public void shouldNotReviewAsPublisher() throws IOException, ZebedeeException{
+    public void shouldNotReviewAsPublisher() throws IOException, ZebedeeException {
 
         // Given
         // The content exists, has been edited and complete by publisher1:
@@ -771,7 +826,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
     }
 
     @Test(expected = BadRequestException.class)
-    public void shouldNotReviewIfAlreadyReviewed() throws IOException, ZebedeeException{
+    public void shouldNotReviewIfAlreadyReviewed() throws IOException, ZebedeeException {
 
         // Given
         // The content already exists:
@@ -1350,7 +1405,71 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         assertTrue(collection.description.eventsByUri.get(uri).hasEventForType(EventType.MOVED));
     }
 
-    public static Collection CreateCollection(Path destination, String collectionName) throws CollectionNotFoundException, IOException {
+    @Test(expected = FileNotFoundException.class)
+    public void renameCollectionDirectoryDirNotExists() throws Exception {
+        Collection.renameCollectionDirectory(Paths.get("aaaa"), Paths.get("bbb"));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void renameCollectionDirectorySrcNull() throws Exception {
+        try {
+            Collection.renameCollectionDirectory(null, null);
+        } catch (IllegalArgumentException e) {
+            assertThat(e.getMessage(), equalTo("rename collection directory requires non null src directory"));
+            throw e;
+        }
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void renameCollectionDirectoryDestNull() throws Exception {
+        try {
+            Collection.renameCollectionDirectory(Paths.get("bob"), null);
+        } catch (IllegalArgumentException e) {
+            assertThat(e.getMessage(), equalTo("rename collection directory requires non null dest directory"));
+            throw e;
+        }
+    }
+
+    @Test (expected = IllegalArgumentException.class)
+    public void renameCollectionJSONSrcNull() throws Exception {
+        try {
+            Collection.renameCollectionJSON(null, null);
+        } catch (IllegalArgumentException e) {
+            assertThat(e.getMessage(), equalTo("rename collection JSON failed: requires non null src path"));
+            throw e;
+        }
+    }
+
+    @Test (expected = IllegalArgumentException.class)
+    public void renameCollectionJSONDestNull() throws Exception {
+        try {
+            Collection.renameCollectionJSON(Paths.get("abcd"), null);
+        } catch (IllegalArgumentException e) {
+            assertThat(e.getMessage(), equalTo("rename collection JSON failed: requires non null dest path"));
+            throw e;
+        }
+    }
+
+    @Test (expected = IllegalArgumentException.class)
+    public void renameCollectionJSONSrcNotExist() throws Exception {
+        try {
+            Collection.renameCollectionJSON(Paths.get("abc"), Paths.get("def"));
+        } catch (IllegalArgumentException e) {
+            assertThat(e.getMessage(), equalTo("rename collection JSON failed: src does not exist"));
+            throw e;
+        }
+    }
+
+    public void renameCollectionJSONSrcNotExist() throws Exception {
+        try {
+            Collection.renameCollectionJSON(Paths.get("abc"), Paths.get("def"));
+        } catch (IllegalArgumentException e) {
+            assertThat(e.getMessage(), equalTo("rename collection JSON failed: src does not exist"));
+            throw e;
+        }
+
+
+        public static Collection CreateCollection(Path destination, String collectionName) throws CollectionNotFoundException, IOException {
 
         CollectionDescription collection = new CollectionDescription(collectionName);
         collection.setType(CollectionType.manual);

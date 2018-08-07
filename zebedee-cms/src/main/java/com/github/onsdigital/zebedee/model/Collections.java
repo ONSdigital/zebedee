@@ -13,6 +13,7 @@ import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.ApprovalStatus;
+import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.Event;
 import com.github.onsdigital.zebedee.json.EventType;
 import com.github.onsdigital.zebedee.json.Keyring;
@@ -233,6 +234,14 @@ public class Collections {
         }
 
         return result;
+    }
+
+    public boolean isNameAvailable(CollectionDescription target, String newName) throws IOException {
+        return !this.list().stream()
+                .filter(c -> !StringUtils.equals(c.getDescription().getId(), target.getId()))
+                .filter(c -> StringUtils.equals(c.path.getFileName().toString(), newName) || StringUtils.equals(c.getDescription().getName(), newName))
+                .findFirst()
+                .isPresent();
     }
 
     public Map<String, Collection> mapByID() throws IOException {
@@ -901,8 +910,10 @@ public class Collections {
          * @return If {@link #getCollection(String)} returns non-null, true.
          */
         public boolean hasCollection(String name) {
-            return getCollectionByName(name) != null;
+            return this.stream()
+                    .filter(c -> StringUtils.equals(c.path.getFileName().toString(), name) || StringUtils.equals(c.getDescription().getName(), name))
+                    .findFirst()
+                    .isPresent();
         }
-
     }
 }

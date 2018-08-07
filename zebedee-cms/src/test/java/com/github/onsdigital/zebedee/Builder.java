@@ -7,7 +7,8 @@ import com.github.onsdigital.zebedee.content.page.base.PageDescription;
 import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeries;
 import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeriesValue;
 import com.github.onsdigital.zebedee.exceptions.CollectionNotFoundException;
-import com.github.onsdigital.zebedee.json.*;
+import com.github.onsdigital.zebedee.json.CollectionDescription;
+import com.github.onsdigital.zebedee.json.Credentials;
 import com.github.onsdigital.zebedee.json.serialiser.IsoDateSerializer;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.PathUtils;
@@ -18,12 +19,19 @@ import com.github.onsdigital.zebedee.user.model.User;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.math3.distribution.NormalDistribution;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logDebug;
 
@@ -82,6 +90,8 @@ public class Builder {
 
         // Create the structure:
         parent = Files.createTempDirectory(Random.id());
+        parent.toFile().deleteOnExit();
+
         zebedeeRootPath = createZebedee(parent);
 
         // Create the collections:
@@ -482,7 +492,7 @@ public class Builder {
      * @return The root {@link com.github.onsdigital.zebedee.model.Collection} path.
      * @throws IOException If a filesystem error occurs.
      */
-    private Path createCollection(String name, Path root) throws IOException {
+    public Path createCollection(String name, Path root) throws IOException {
 
         String filename = PathUtils.toFilename(name);
         Path collections = root.resolve(Zebedee.COLLECTIONS);
@@ -659,5 +669,22 @@ public class Builder {
 
     public Zebedee getZebedee() {
         return zebedee;
+    }
+
+    /**
+     * Clean up the collections directory
+     */
+    public void deleteAllCollections() throws Exception {
+        List<File> collectionFiles = Files.list(zebedeeRootPath.resolve(Zebedee.COLLECTIONS))
+                .map(p -> p.toFile())
+                .collect(Collectors.toList());
+
+        for (File f : collectionFiles) {
+            if (f.isDirectory()) {
+                FileUtils.deleteDirectory(f);
+            } else {
+                f.delete();
+            }
+        }
     }
 }

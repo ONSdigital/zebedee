@@ -51,7 +51,8 @@ For my local dev environment I use docker to run the postgres database
         $ docker run -it --rm --link some-postgres:postgres postgres psql -h postgres -U postgres
 
     Or if using Docker Compose script:
-        $ docker run -it --rm --link dpcompose_postgres_1:postgres --net dpcompose_default postgres psql -h postgres -U postgres
+$ docker run -it --rm --link dp-compose_postgres_1:postgres --net dpcompose_default postgres psql -h postgres -U
+postgres
 
     You will need to create a database:
         $ CREATE DATABASE audit;

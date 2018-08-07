@@ -9,7 +9,8 @@ export PORT="${PORT:-8082}"
 export RESTOLINO_STATIC="src/main/resources/files"
 export RESTOLINO_CLASSES="zebedee-cms/target/classes"
 export PACKAGE_PREFIX=com.github.onsdigital.zebedee
-export audit_db_enabled=false
+export audit_db_enabled=true
+export store_deleted_content=true
 export DP_LOGGING_FORMAT=pretty_json
 export DP_COLOURED_LOGGING=true
 export enable_splunk_reporting=false
@@ -20,6 +21,7 @@ java $JAVA_OPTS \
  -Dlogback.configurationFile=zebedee-cms/target/classes/logback.xml \
  -Ddb_audit_url=$db_audit_url \
  -Daudit_db_enabled=$audit_db_enabled \
+ -Dstore_deleted_content=$store_deleted_content \
  -Ddb_audit_username=$db_audit_username \
  -Ddb_audit_password=$db_audit_password \
  -Drestolino.files=$RESTOLINO_STATIC \

@@ -1487,12 +1487,12 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
                 .getCollectionByName(builder.COLLECTION_ONE_NAME);
 
         // rename the collection
-        Collection.rename(c1.getDescription(), "IhaveBeenRenamed", builder.getZebedee());
+        Collection.rename(c1.getDescription(), "ihavebeenrenamed", builder.getZebedee());
 
         Path collectionsPath = builder.getZebedee().getPath().resolve("collections");
 
         assertThat(Files.list(collectionsPath).count(), equalTo(4l));
-        assertNotNull(builder.getZebedee().getCollections().getCollectionByName("IhaveBeenRenamed"));
+        assertNotNull(builder.getZebedee().getCollections().getCollectionByName("ihavebeenrenamed"));
         assertTrue(Files.notExists(collectionsPath.resolve(builder.COLLECTION_ONE_NAME)));
         assertTrue(Files.notExists(collectionsPath.resolve(builder.COLLECTION_ONE_NAME + ".json")));
     }

@@ -54,7 +54,7 @@ public class PublishTask implements Runnable {
 
                 // and save
                 String filename = PathUtils.toFilename(collection.getDescription().getName()) + ".json";
-                Path collectionPath = zebedee.getCollections().path.resolve(filename);
+                Path collectionPath = zebedee.getCollections().getPath().resolve(filename);
                 try (OutputStream output = Files.newOutputStream(collectionPath)) {
                     Serialiser.serialise(output, collection.description);
                 }

@@ -51,6 +51,9 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.when;
 
 
 public class CollectionTest extends ZebedeeTestBaseFixture {
@@ -67,7 +70,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
 
         publisherSession = zebedee.openSession(builder.publisher1Credentials);
         publisher1Email = builder.publisher1.getEmail();
-        collectionWriter = new FakeCollectionWriter(zebedee.getCollections().path.toString(),
+        collectionWriter = new FakeCollectionWriter(zebedee.getCollections().getPath().toString(),
                 collection.description.getId());
     }
 
@@ -111,7 +114,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         assertEquals(ApprovalStatus.NOT_STARTED, createdCollectionDescription.approvalStatus);
     }
 
-    @Test
+    /*@Test
     public void shouldRenameCollection() throws Exception {
         builder.deleteAllCollections();
 
@@ -160,39 +163,40 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         assertEquals(newName, renamedCollectionDescription.getName());
         assertEquals(collectionDescription.getPublishDate(), renamedCollectionDescription.getPublishDate());
         assertEquals(collectionDescription.getType(), renamedCollectionDescription.getType());
-    }
+    }*/
 
 
-    @Test(expected = BadRequestException.class)
-    public void shouldNotRenameIfCollectionAlreadyExists() throws Exception {
-        Path collectionsDir = zebedee.getPath().resolve(Zebedee.COLLECTIONS);
-        Path col1 = null;
-        Path col2 = null;
-        String nameAAA = "CollectionA";
-        String nameBBB = "CollectionB";
+    /*    @Test(expected = BadRequestException.class)
+        public void shouldNotRenameIfCollectionAlreadyExists() throws Exception {
+            Path collectionsDir = zebedee.getPath().resolve(Zebedee.COLLECTIONS);
+            Path col1 = null;
+            Path col2 = null;
+            String nameAAA = "CollectionA";
+            String nameBBB = "CollectionB";
 
-        try {
-            builder.deleteAllCollections();
-            col1 = builder.createCollection(nameAAA, builder.zebedeeRootPath);
-            col2 = builder.createCollection(nameBBB, builder.zebedeeRootPath);
+            try {
+                builder.deleteAllCollections();
+                col1 = builder.createCollection(nameAAA, builder.zebedeeRootPath);
+                col2 = builder.createCollection(nameBBB, builder.zebedeeRootPath);
 
-            // check collections exist.
-            CollectionDescription collectionA = zebedee.getCollections().getCollectionByName(nameAAA).getDescription();
-            assertNotNull(collectionA);
-            assertNotNull(zebedee.getCollections().getCollectionByName(nameBBB));
+                // check collections exist.
+                CollectionDescription collectionA = zebedee.getCollections().getCollectionByName(nameAAA).getDescription();
+                assertNotNull(collectionA);
+                assertNotNull(zebedee.getCollections().getCollectionByName(nameBBB));
 
-            // when ...
-            Collection.rename(collectionA, nameBBB, zebedee);
+                // when ...
+                Collection.rename(collectionA, nameBBB, zebedee);
 
-        } catch (BadRequestException e) {
-            assertThat(e.getMessage(), equalTo("cannot rename collection: collection already exists with the requested name: CollectionB"));
+            } catch (BadRequestException e) {
+                assertThat(e.getMessage(), equalTo("cannot rename collection: collection already exists with the requested name: CollectionB"));
 
-            assertNotNull(zebedee.getCollections().getCollectionByName(nameAAA));
-            assertNotNull(zebedee.getCollections().getCollectionByName(nameBBB));
-            throw e;
+                assertNotNull(zebedee.getCollections().getCollectionByName(nameAAA));
+                assertNotNull(zebedee.getCollections().getCollectionByName(nameBBB));
+                throw e;
+            }
         }
-    }
 
+       */
     @Test
     public void shouldUpdateCollection() throws Exception {
 
@@ -1159,9 +1163,9 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
 
 
         // When we attempt to populate the release from the collection.
-        FakeCollectionReader collectionReader = new FakeCollectionReader(zebedee.getCollections().path.toString(),
+        FakeCollectionReader collectionReader = new FakeCollectionReader(zebedee.getCollections().getPath().toString(),
                 collection.description.getId());
-        FakeCollectionWriter collectionWriter = new FakeCollectionWriter(zebedee.getCollections().path.toString(),
+        FakeCollectionWriter collectionWriter = new FakeCollectionWriter(zebedee.getCollections().getPath().toString(),
                 collection.description.getId());
         List<ContentDetail> collectionContent = ContentDetailUtil.resolveDetails(collection.reviewed, collectionReader.getReviewed());
 
@@ -1415,7 +1419,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         try {
             Collection.renameCollectionDirectory(null, null);
         } catch (IllegalArgumentException e) {
-            assertThat(e.getMessage(), equalTo("rename collection directory requires non null src directory"));
+            assertThat(e.getMessage(), equalTo("rename collection directory failed: requires non null src directory"));
             throw e;
         }
     }
@@ -1425,12 +1429,15 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         try {
             Collection.renameCollectionDirectory(Paths.get("bob"), null);
         } catch (IllegalArgumentException e) {
-            assertThat(e.getMessage(), equalTo("rename collection directory requires non null dest directory"));
+            assertThat(e.getMessage(), equalTo("rename collection directory failed: requires non null dest directory"));
             throw e;
         }
     }
 
-    @Test (expected = IllegalArgumentException.class)
+    /**
+     * Test rename collection JSON where no src path is provided.
+     */
+    @Test(expected = IllegalArgumentException.class)
     public void renameCollectionJSONSrcNull() throws Exception {
         try {
             Collection.renameCollectionJSON(null, null);
@@ -1440,7 +1447,10 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         }
     }
 
-    @Test (expected = IllegalArgumentException.class)
+    /**
+     * Test rename collection where no dest path is provided.
+     */
+    @Test(expected = IllegalArgumentException.class)
     public void renameCollectionJSONDestNull() throws Exception {
         try {
             Collection.renameCollectionJSON(Paths.get("abcd"), null);
@@ -1450,7 +1460,10 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         }
     }
 
-    @Test (expected = IllegalArgumentException.class)
+    /**
+     * Test rename collection JSON where the src file does not exist.
+     */
+    @Test(expected = IllegalArgumentException.class)
     public void renameCollectionJSONSrcNotExist() throws Exception {
         try {
             Collection.renameCollectionJSON(Paths.get("abc"), Paths.get("def"));
@@ -1460,16 +1473,157 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         }
     }
 
-    public void renameCollectionJSONSrcNotExist() throws Exception {
+    /**
+     * Test rename collection JSON where the new name is the same as the current name.
+     */
+    @Test
+    public void renameCollectionJSONNoChange() throws Exception {
+        Path root = Files.createTempDirectory("collections");
+        root.toFile().deleteOnExit();
+        Path p = Files.createFile(root.resolve("abc"));
+
+        assertFalse(Collection.renameCollectionJSON(p, p));
+    }
+
+    @Test(expected = BadRequestException.class)
+    public void validateRenameNameNotAvailable() throws Exception {
+        Zebedee zebMock = mock(Zebedee.class);
+        Collections colMock = mock(Collections.class);
+
+        CollectionDescription desc = new CollectionDescription();
+        desc.setName("test");
+
+        String newName = "test2";
+
+        when(zebMock.getCollections()).thenReturn(colMock);
+        when(colMock.isNameAvailable(desc, newName)).thenReturn(false);
+
         try {
-            Collection.renameCollectionJSON(Paths.get("abc"), Paths.get("def"));
-        } catch (IllegalArgumentException e) {
-            assertThat(e.getMessage(), equalTo("rename collection JSON failed: src does not exist"));
+            Collection.validateRename(desc, newName, zebMock);
+        } catch (BadRequestException e) {
+            assertThat(e.getMessage(), equalTo("rename collection failed: collection already exists with the name: test2"));
             throw e;
         }
+    }
 
+    @Test(expected = IOException.class)
+    public void validateRenameNameIOEx() throws Exception {
+        Zebedee zebMock = mock(Zebedee.class);
+        Collections colMock = mock(Collections.class);
 
-        public static Collection CreateCollection(Path destination, String collectionName) throws CollectionNotFoundException, IOException {
+        CollectionDescription desc = new CollectionDescription();
+        desc.setName("test");
+
+        String newName = "test2";
+
+        when(zebMock.getCollections()).thenReturn(colMock);
+        when(colMock.isNameAvailable(desc, newName)).thenThrow(new IOException("bork!"));
+        Collection.validateRename(desc, newName, zebMock);
+    }
+
+    @Test(expected = BadRequestException.class)
+    public void validateRenameNameCollectionDescNull() throws Exception {
+        Zebedee zebMock = mock(Zebedee.class);
+
+        try {
+            Collection.validateRename(null, null, zebMock);
+        } catch (BadRequestException e) {
+            verifyZeroInteractions(zebMock);
+            assertThat(e.getMessage(), equalTo("rename collection failed: src collectionDescription was null"));
+            throw e;
+        }
+    }
+
+    @Test(expected = BadRequestException.class)
+    public void validateRenameNameDestNull() throws Exception {
+        Zebedee zebMock = mock(Zebedee.class);
+
+        try {
+            Collection.validateRename(new CollectionDescription(), null, zebMock);
+        } catch (BadRequestException e) {
+            verifyZeroInteractions(zebMock);
+            assertThat(e.getMessage(), equalTo("rename collection failed: requires non null new name"));
+            throw e;
+        }
+    }
+
+    @Test
+    public void validateRenameNameSuccess() throws Exception {
+        Zebedee zebMock = mock(Zebedee.class);
+        Collections colMock = mock(Collections.class);
+
+        CollectionDescription desc = new CollectionDescription();
+        desc.setName("test");
+
+        String newName = "test2";
+
+        when(zebMock.getCollections()).thenReturn(colMock);
+        when(colMock.isNameAvailable(desc, newName)).thenReturn(true);
+
+        Collection.validateRename(desc, newName, zebMock);
+    }
+
+    @Test
+    public void renameSuccess() throws Exception {
+        Collection c1 = builder.getZebedee()
+                .getCollections()
+                .getCollectionByName(builder.COLLECTION_ONE_NAME);
+
+        // rename the collection
+        Collection.rename(c1.getDescription(), "IhaveBeenRenamed", builder.getZebedee());
+
+        Path collectionsPath = builder.getZebedee().getPath().resolve("collections");
+
+        assertThat(Files.list(collectionsPath).count(), equalTo(4l));
+        assertNotNull(builder.getZebedee().getCollections().getCollectionByName("IhaveBeenRenamed"));
+        assertTrue(Files.notExists(collectionsPath.resolve(builder.COLLECTION_ONE_NAME)));
+        assertTrue(Files.notExists(collectionsPath.resolve(builder.COLLECTION_ONE_NAME + ".json")));
+    }
+
+    @Test(expected = BadRequestException.class)
+    public void renameNewNameUnavailable() throws Exception {
+        Collection c1 = builder.getZebedee()
+                .getCollections()
+                .getCollectionByName(builder.COLLECTION_ONE_NAME);
+
+        try {
+            Collection.rename(c1.getDescription(), builder.COLLECTION_TWO_NAME, builder.getZebedee());
+        } catch (BadRequestException e) {
+            assertThat(e.getMessage(), equalTo("rename collection failed: collection already exists with the name: "
+                    + builder.COLLECTION_TWO_NAME));
+
+            Path collectionsPath = builder.getZebedee().getPath().resolve("collections");
+
+            assertThat(Files.list(collectionsPath).count(), equalTo(4l));
+            assertTrue(Files.exists(collectionsPath.resolve(builder.COLLECTION_ONE_NAME)));
+            assertTrue(Files.exists(collectionsPath.resolve(builder.COLLECTION_ONE_NAME + ".json")));
+            throw e;
+        }
+    }
+
+    @Test(expected = BadRequestException.class)
+    public void renameCollectionNotExist() throws Exception {
+        Collection c1 = builder.getZebedee()
+                .getCollections()
+                .getCollectionByName(builder.COLLECTION_ONE_NAME);
+
+        CollectionDescription madeUp = new CollectionDescription();
+        madeUp.setName("iammadeup");
+
+        try {
+            Collection.rename(madeUp, "someName", builder.getZebedee());
+        } catch (BadRequestException e) {
+            assertThat(e.getMessage(), equalTo("rename collection directory failed: src directory not found"));
+
+            Path collectionsPath = builder.getZebedee().getPath().resolve("collections");
+            assertThat(Files.list(collectionsPath).count(), equalTo(4l));
+            assertTrue(Files.notExists(collectionsPath.resolve("iammadeup")));
+            assertTrue(Files.notExists(collectionsPath.resolve("iammadeup.json")));
+            throw e;
+        }
+    }
+
+    public static Collection CreateCollection(Path destination, String collectionName) throws CollectionNotFoundException, IOException {
 
         CollectionDescription collection = new CollectionDescription(collectionName);
         collection.setType(CollectionType.manual);

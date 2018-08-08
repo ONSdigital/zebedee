@@ -65,6 +65,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_CONTENT_REVIEWED;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_CREATED;
@@ -177,7 +178,7 @@ public class Collection {
         collectionDescription.setId(filename + "-" + Random.id());
 
         // Create the folders:
-        Path rootCollectionsPath = zebedee.getCollections().path;
+        Path rootCollectionsPath = zebedee.getCollections().getPath();
 
         CreateCollectionFolders(filename, rootCollectionsPath);
 
@@ -276,23 +277,27 @@ public class Collection {
         try {
             validateRename(collectionDescription, newName, zebedee);
 
-            Path collectionsRoot = zebedee.getCollections().path;
+            Path collectionsRoot = zebedee.getCollections().getPath();
             String currentFilename = PathUtils.toFilename(collectionDescription.getName());
             String newFilename = PathUtils.toFilename(newName);
             Path currentDir = collectionsRoot.resolve(currentFilename);
             Path newDir = collectionsRoot.resolve(newFilename);
+
+            renameCollectionDirectory(currentDir, newDir);
+
             Path oldJSONPath = collectionsRoot.resolve(currentFilename + ".json");
             Path newJSONPath = collectionsRoot.resolve(newFilename + ".json");
 
-            renameCollectionDirectory(currentDir, newDir);
             renameCollectionJSON(oldJSONPath, newJSONPath);
 
             collectionDescription.setName(newName);
             updateCollectionJSONName(collectionDescription, newJSONPath);
 
-            return new Collection(zebedee.getCollections().path.resolve(newFilename), zebedee);
+            return new Collection(zebedee.getCollections().getPath().resolve(newFilename), zebedee);
         } catch (FileNotFoundException e) {
             throw new BadRequestException(e.getMessage());
+        } catch (IllegalArgumentException iEx) {
+            throw new BadRequestException(iEx.getMessage());
         }
     }
 
@@ -307,11 +312,17 @@ public class Collection {
      */
     static void validateRename(CollectionDescription collectionDescription, String newName, Zebedee zebedee)
             throws IOException, BadRequestException {
+        if (collectionDescription == null) {
+            throw new BadRequestException("rename collection failed: src collectionDescription was null");
+        }
+        if (StringUtils.isEmpty(newName)) {
+            throw new BadRequestException("rename collection failed: requires non null new name");
+        }
         if (!zebedee.getCollections().isNameAvailable(collectionDescription, newName)) {
-            logInfo("cannot rename collection: collection already exists with the requested name:")
+            logInfo("rename collection failed: collection already exists with requested name")
                     .collectionName(newName)
                     .log();
-            throw new BadRequestException("cannot rename collection: collection already exists with the requested name: " + newName);
+            throw new BadRequestException("rename collection failed: collection already exists with the name: " + newName);
         }
     }
 
@@ -357,8 +368,8 @@ public class Collection {
             throw new IllegalArgumentException("rename collection JSON failed: src does not exist");
         }
 
-        if (src.toString().equals(dest)) {
-            logInfo("rename collection JSON: target name is same as src no action required");
+        if (src.equals(dest)) {
+            logInfo("rename collection JSON: dest and src the same no action required");
             return false;
         }
         return src.toFile().renameTo(new File(dest.toString()));
@@ -367,6 +378,13 @@ public class Collection {
     static void updateCollectionJSONName(CollectionDescription updated, Path newPath) throws IOException {
         try (OutputStream output = Files.newOutputStream(newPath)) {
             Serialiser.serialise(output, updated);
+        } catch (IOException e) {
+            logError(e, "error while attempting to write collection json to disk")
+                    .collectionName(updated.getName())
+                    .collectionId(updated.getId())
+                    .path(newPath.toString())
+                    .log();
+            throw e;
         }
     }
 

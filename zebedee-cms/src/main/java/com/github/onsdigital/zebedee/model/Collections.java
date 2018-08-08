@@ -75,7 +75,7 @@ import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMet
 
 public class Collections {
 
-    public final Path path;
+    private final Path path;
     private PermissionsService permissionsService;
     private Content published;
     private Supplier<Zebedee> zebedeeSupplier = () -> Root.zebedee;
@@ -158,6 +158,10 @@ public class Collections {
             return true;
 
         return Arrays.asList(files).isEmpty();
+    }
+
+    public Path getPath() {
+        return path;
     }
 
     /**

@@ -390,7 +390,7 @@ public class PostPublisher {
                 .log();
 
         String filename = PathUtils.toFilename(collection.getDescription().getName());
-        Path collectionJsonSource = zebedee.getCollections().path.resolve(filename + ".json");
+        Path collectionJsonSource = zebedee.getCollections().getPath().resolve(filename + ".json");
         Path collectionFilesSource = collection.reviewed.path;
         Path logPath = zebedee.getPublishedCollections().path;
 

@@ -29,6 +29,13 @@ job "zebedee" {
       value     = "publishing.*"
     }
 
+    restart {
+      attempts = 3
+      delay    = "15s"
+      interval = "1m"
+      mode     = "delay"
+    }
+
     task "zebedee" {
       driver = "docker"
 

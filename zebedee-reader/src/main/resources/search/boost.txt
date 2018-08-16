@@ -40,5 +40,5 @@
 /employmentandlabourmarket/peopleinwork/employmentandemployeetypes/bulletins/regionallabourmarket/*=>regional labour, regional unemployment, regional employment
 /employmentandlabourmarket/peopleinwork/labourproductivity/bulletins/labourproductivity/*=>productivity
 /aboutus/whatwedo/statistics/requestingstatistics=>adhoc, ad-hoc, ad hoc, user requested data
-/economy/grossdomesticproductgdp/bulletins/*=>gdp
+/economy/grossdomesticproductgdp/bulletins/gdpmonthlyestimateuk/*=>gdp
 /aboutus/whatwedo/programmesandprojects/onlinehouseholdstudy=>takepart, take part

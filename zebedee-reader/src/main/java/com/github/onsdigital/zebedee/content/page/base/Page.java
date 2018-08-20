@@ -4,10 +4,13 @@ import cc.fasttext.Vector;
 import com.github.onsdigital.zebedee.content.base.Content;
 import com.github.onsdigital.zebedee.content.partial.Link;
 import com.github.onsdigital.zebedee.search.fastText.FastTextHelper;
-import com.google.common.collect.Sets;
 
+import java.io.IOException;
 import java.net.URI;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static com.github.onsdigital.zebedee.search.fastText.FastTextHelper.convertArrayToBase64;
 
@@ -68,7 +71,7 @@ public abstract class Page extends Content {
 
 //    public abstract String getPageSentence();
 
-    public double[] getEmbeddingVector() {
+    public double[] getEmbeddingVector() throws IOException {
         String sentence = this.getPageSentence();
 
         int dim = FastTextHelper.getInstance().getDimensions();
@@ -83,11 +86,11 @@ public abstract class Page extends Content {
         return sentenceVector;
     }
 
-    public String getEncodedEmbeddingVector() {
+    public String getEncodedEmbeddingVector() throws IOException {
         return convertArrayToBase64(this.getEmbeddingVector());
     }
 
-    public Map<String, Float> getLabels(int k) {
+    public Map<String, Float> getLabels(int k) throws IOException {
         String sentence = this.getPageSentence();
 
         if (null != sentence && !sentence.isEmpty()) {
@@ -96,7 +99,7 @@ public abstract class Page extends Content {
         return new HashMap<>();
     }
 
-    public List<String> generateKeywords(int k, float threshold) {
+    public List<String> generateKeywords(int k, float threshold) throws IOException {
         Map<String, Float> labels = this.getLabels(k);
 
         List<String> filteredLabels = new ArrayList<>();

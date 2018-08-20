@@ -20,15 +20,12 @@ public class FastTextHelper {
 
     public static final String PREFIX = "__label__";
 
-    static {
-        try {
-            INSTANCE = new FastTextHelper();
-        } catch (IOException e) {
-            e.printStackTrace();
+    public static FastTextHelper getInstance() throws IOException {
+        if (INSTANCE == null) {
+            synchronized (FastTextHelper.class) {
+                INSTANCE = new FastTextHelper();
+            }
         }
-    }
-
-    public static FastTextHelper getInstance() {
         return INSTANCE;
     }
 

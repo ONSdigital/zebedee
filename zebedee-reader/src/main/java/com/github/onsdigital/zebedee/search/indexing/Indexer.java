@@ -300,43 +300,47 @@ public class Indexer {
     private SearchDocument toSearchDocument(Page page, List<String> searchTerms) throws IOException {
         SearchDocument indexDocument = new SearchDocument();
         indexDocument.setUri(page.getUri());
-//        indexDocument.setDescription(page.getDescription());
         indexDocument.setTopics(getTopics(page.getTopics()));
         indexDocument.setType(page.getType());
         indexDocument.setSearchBoost(searchTerms);
 
         PageDescription pageDescription = page.getDescription();
-        try {
-            // Generate keywords
-            List<String> generatedKeywords = page.generateKeywords(10, 0.1f);
 
-            if (null != generatedKeywords) {
+        if (FastTextHelper.Configuration.INDEX_EMBEDDING_VECTORS) {
+            try {
+                // Generate keywords
+                List<String> generatedKeywords = page.generateKeywords(10, 0.1f);
 
-                elasticSearchLog("Generated keywords for page")
-                        .addParameter("title", pageDescription.getTitle())
-                        .addParameter("uri", page.getUri().toString())
-                        .addParameter("keywords", Arrays.toString(generatedKeywords.toArray()))
-                        .log();
+                if (null != generatedKeywords) {
 
-                if (null != pageDescription.getKeywords() && !pageDescription.getKeywords().isEmpty()) {
-                    generatedKeywords.addAll(pageDescription.getKeywords());
+                    elasticSearchLog("Generated keywords for page")
+                            .addParameter("title", pageDescription.getTitle())
+                            .addParameter("uri", page.getUri().toString())
+                            .addParameter("keywords", Arrays.toString(generatedKeywords.toArray()))
+                            .log();
+
+                    if (null != pageDescription.getKeywords() && !pageDescription.getKeywords().isEmpty()) {
+                        generatedKeywords.addAll(pageDescription.getKeywords());
+                    }
+                    Set<String> set = Sets.newLinkedHashSet(generatedKeywords);
+                    pageDescription.setKeywords(new LinkedList<>(new LinkedList<>(set)));
                 }
-                Set<String> set = Sets.newLinkedHashSet(generatedKeywords);
-                pageDescription.setKeywords(new LinkedList<>(new LinkedList<>(set)));
+            } catch (Exception e) {
+                System.out.println("Caught exception generating keywords");
+                e.printStackTrace();
             }
-        } catch (Exception e) {
-            System.out.println("Caught exception generating keywords");
-            e.printStackTrace();
+
+            // Index word embedding vector
+            String embeddingVector = page.getEncodedEmbeddingVector();
+
+            if (null == embeddingVector || embeddingVector.isEmpty()) {
+                System.out.println(String.format("Empty embedding vector for page %s:%s", page, embeddingVector));
+                throw new IOException(String.format("Empty embedding vector for page %s:%s", page, embeddingVector));
+            }
+            indexDocument.setEmbedding_vector(embeddingVector);
         }
         indexDocument.setDescription(pageDescription);
 
-        String embeddingVector = page.getEncodedEmbeddingVector();
-
-        if (null == embeddingVector || embeddingVector.isEmpty()) {
-            System.out.println(String.format("Empty embedding vector for page %s:%s", page, embeddingVector));
-            throw new IOException(String.format("Empty embedding vector for page %s:%s", page, embeddingVector));
-        }
-        indexDocument.setEmbedding_vector(embeddingVector);
         return indexDocument;
     }
 

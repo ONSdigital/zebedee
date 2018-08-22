@@ -60,13 +60,17 @@ public abstract class Page extends Content {
     }
 
     public String getPageSentence() {
-        if (null != this.getDescription() && null != this.getDescription().getTitle()) {
-            String title = this.getDescription().getTitle();
-            title = title.replaceAll("[^a-zA-Z ]", "").toLowerCase().replaceAll("\\s+", " ");
-
-            return title;
+        String sentence = null;
+        if (null != this.getDescription() && null != this.getDescription().getSummary()) {
+            sentence = this.getDescription().getSummary();
+        } else if (null != this.getDescription() && null != this.getDescription().getTitle()) {
+            sentence = this.getDescription().getTitle();
         }
-        return null;
+
+        if (null != sentence) {
+            sentence = sentence.replaceAll("[^a-zA-Z ]", "").toLowerCase().replaceAll("\\s+", " ");
+        }
+        return sentence;
     }
 
 //    public abstract String getPageSentence();

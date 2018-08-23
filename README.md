@@ -14,3 +14,7 @@ David
 zebedee_root    /Users/thomasridd/Documents/onswebsite
 brian_url   http://localhost:8083/
 use_beta_publisher   false
+
+23/08/2018:
+To enable indexing of word embedding vectors, set the ENV VAR:
+```INDEX_EMBEDDING_VECTORS=true```

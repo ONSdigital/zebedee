@@ -74,8 +74,8 @@ public class FastTextHelper {
 
     public static class Configuration {
         public static boolean INDEX_EMBEDDING_VECTORS = Boolean.parseBoolean(getVariableValue("INDEX_EMBEDDING_VECTORS"));
-        private static String fastTextModelDirectory = defaultIfBlank(getVariableValue("SUPERVISED_MODELS_DIRECTORY"), "./supervised_models");
-        private static String fastTextModelName = defaultIfBlank(getVariableValue("SUPERVISED_MODEL_NAME"), "ons_supervised.bin");
+        private static String fastTextModelDirectory = defaultIfBlank(getVariableValue("SUPERVISED_MODEL_DIR"), "./supervised_models");
+        private static String fastTextModelName = defaultIfBlank(getVariableValue("ONS_SUPERVISED_MODEL_NAME"), "ons_supervised.bin");
 
         public static String getFastTextModelFilename() {
             return String.format("%s/%s", fastTextModelDirectory, fastTextModelName);

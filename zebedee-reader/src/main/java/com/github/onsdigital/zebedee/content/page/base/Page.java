@@ -109,7 +109,7 @@ public abstract class Page extends Content {
         List<String> filteredLabels = new ArrayList<>();
         for (String key : labels.keySet()) {
             if (labels.get(key) >= threshold) {
-                String formattedKey = key.replace(FastTextHelper.PREFIX, "").replace("_", " ");
+                String formattedKey = key.replace(FastTextHelper.PREFIX, "").replace("_", " ").trim();
                 filteredLabels.add(formattedKey);
             }
         }

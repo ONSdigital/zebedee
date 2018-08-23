@@ -309,7 +309,7 @@ public class Indexer {
         if (FastTextHelper.Configuration.INDEX_EMBEDDING_VECTORS) {
             try {
                 // Generate keywords
-                List<String> generatedKeywords = page.generateKeywords(10, 0.1f);
+                List<String> generatedKeywords = page.generateKeywords(10, 0.3f);
 
                 if (null != generatedKeywords) {
 

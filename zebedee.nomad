@@ -29,6 +29,13 @@ job "zebedee" {
       value     = "publishing.*"
     }
 
+    restart {
+      attempts = 3
+      delay    = "15s"
+      interval = "1m"
+      mode     = "delay"
+    }
+
     task "zebedee" {
       driver = "docker"
 
@@ -37,7 +44,9 @@ job "zebedee" {
       }
 
       config {
-        command = "${NOMAD_TASK_DIR}/start-task"
+        command     = "${NOMAD_TASK_DIR}/start-task"
+        image       = "{{ECR_URL}}:concourse-{{REVISION}}"
+        userns_mode = "host"
 
         args = [
           "java",
@@ -49,8 +58,6 @@ job "zebedee" {
           "-Drestolino.packageprefix=com.github.onsdigital.zebedee.api",
           "com.github.davidcarboni.restolino.Main",
         ]
-
-        image = "{{ECR_URL}}:concourse-{{REVISION}}"
 
         port_map {
           http = 8080

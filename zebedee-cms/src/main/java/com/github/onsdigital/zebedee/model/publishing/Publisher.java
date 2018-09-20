@@ -1,6 +1,5 @@
 package com.github.onsdigital.zebedee.model.publishing;
 
-import com.github.davidcarboni.cryptolite.Random;
 import com.github.davidcarboni.httpino.Endpoint;
 import com.github.davidcarboni.httpino.Host;
 import com.github.davidcarboni.httpino.Response;
@@ -59,7 +58,6 @@ public class Publisher {
     private static final String ROLLBACK_ENDPOINT = "rollback";
 
     // parameters
-    private static final String ENCRYPTION_PASSWORD_PARAM = "encryptionPassword";
     private static final String TRANSACTION_ID_PARAM = "transactionId";
     private static final String URI_PARAM = "uri";
     private static final String ZIP_PARAM = "zip";
@@ -151,15 +149,14 @@ public class Publisher {
      */
     public static boolean publishFilesToWebsite(Collection collection, String email, CollectionReader collectionReader) throws IOException {
         boolean publishComplete = false;
-        String encryptionPassword = Random.password(100);
 
         try {
             collection.getDescription().publishStartDate = new Date();
-            createPublishingTransactions(collection, encryptionPassword);
-            sendManifest(collection, encryptionPassword);
-            publishFilteredCollectionFiles(collection, collectionReader, encryptionPassword);
+            createPublishingTransactions(collection);
+            sendManifest(collection);
+            publishFilteredCollectionFiles(collection, collectionReader);
 
-            publishComplete = commitPublish(collection, email, encryptionPassword);
+            publishComplete = commitPublish(collection, email);
             collection.getDescription().publishEndDate = new Date();
 
         } catch (Exception e) {
@@ -176,7 +173,7 @@ public class Publisher {
                         .hostToTransactionID(collection.getDescription().publishTransactionIds)
                         .log();
 
-                rollbackPublish(collection, encryptionPassword);
+                rollbackPublish(collection);
             } else {
                 logError(e, "PUBLISH: error while attempting to publish, no transaction IDs found for collection " +
                         "no rollback will be attempted")
@@ -206,7 +203,7 @@ public class Publisher {
         return publishComplete;
     }
 
-    public static Map<String, String> createPublishingTransactions(Collection collection, String encryptionPassword)
+    public static Map<String, String> createPublishingTransactions(Collection collection)
             throws IOException {
         long start = System.currentTimeMillis();
         Map<String, String> hostToTransactionIDMap = new ConcurrentHashMap<>();
@@ -221,8 +218,7 @@ public class Publisher {
                             .collectionId(collection)
                             .log();
 
-                    Endpoint begin = new Endpoint(host, BEGIN_ENDPOINT)
-                            .setParameter(ENCRYPTION_PASSWORD_PARAM, encryptionPassword);
+                    Endpoint begin = new Endpoint(host, BEGIN_ENDPOINT);
 
                     Response<Result> response = http.post(begin, Result.class);
                     checkResponse(response, null, begin, collection.getDescription().getId());
@@ -266,10 +262,9 @@ public class Publisher {
      *
      * @param collection
      * @param collectionReader
-     * @param encryptionPassword
      * @throws IOException
      */
-    public static void publishFilteredCollectionFiles(Collection collection, CollectionReader collectionReader, String encryptionPassword) throws IOException {
+    public static void publishFilteredCollectionFiles(Collection collection, CollectionReader collectionReader) throws IOException {
         // We do not want to send versioned files. They have already been taken care of via the manifest.
         // Pass the function to filter files into the publish method.
         Function<String, Boolean> versionedUriFilter = uri -> VersionedContentItem.isVersionedUri(uri);
@@ -302,7 +297,7 @@ public class Publisher {
                         String transactionId = entry.getValue();
 
                         results.add(publishFile(collection.getDescription().getId(), theTrainHost,
-                                transactionId, encryptionPassword, uri, publishUri, zipped, source, collectionReader));
+                                transactionId, uri, publishUri, zipped, source, collectionReader));
                     }
                 }
             }
@@ -321,7 +316,6 @@ public class Publisher {
             final String collectionID,
             final Host host,
             final String transactionId,
-            final String encryptionPassword,
             final String uri,
             final String publishUri,
             final boolean zipped,
@@ -333,7 +327,6 @@ public class Publisher {
             try (Http http = new Http()) {
                 Endpoint publish = new Endpoint(host, PUBLISH_ENDPOINT)
                         .setParameter(TRANSACTION_ID_PARAM, transactionId)
-                        .setParameter(ENCRYPTION_PASSWORD_PARAM, encryptionPassword)
                         .setParameter(ZIP_PARAM, Boolean.toString(zipped))
                         .setParameter(URI_PARAM, publishUri);
                 try (
@@ -365,7 +358,7 @@ public class Publisher {
         });
     }
 
-    public static void sendManifest(Collection collection, String encryptionPassword) throws IOException {
+    public static void sendManifest(Collection collection) throws IOException {
         Manifest manifest = Manifest.get(collection);
         List<Future<IOException>> futures = new ArrayList<>();
         long start = System.currentTimeMillis();
@@ -378,8 +371,7 @@ public class Publisher {
                 IOException result = null;
                 try (Http http = new Http()) {
                     Endpoint publish = new Endpoint(theTrainHost, SEND_MANIFEST_ENDPOINT)
-                            .setParameter(TRANSACTION_ID_PARAM, transactionId)
-                            .setParameter(ENCRYPTION_PASSWORD_PARAM, encryptionPassword);
+                            .setParameter(TRANSACTION_ID_PARAM, transactionId);
 
                     logInfo("PUBLISH: sending publish manifest to train host")
                             .trainHost(theTrainHost)
@@ -410,12 +402,12 @@ public class Publisher {
                 .log();
     }
 
-    public static boolean commitPublish(Collection collection, String email, String encryptionPassword) throws IOException {
+    public static boolean commitPublish(Collection collection, String email) throws IOException {
         long start = System.currentTimeMillis();
 
         // If all has gone well so far, commit the publishing transaction:
         boolean isSuccess = true;
-        for (Result result : commitPublish(collection.getDescription().publishTransactionIds, encryptionPassword)) {
+        for (Result result : commitPublish(collection.getDescription().publishTransactionIds)) {
             isSuccess &= !result.error;
             collection.getDescription().AddPublishResult(result);
         }
@@ -459,11 +451,10 @@ public class Publisher {
      * Commits a publishing transaction.
      *
      * @param transactionIds     The {@link Host}s and transactions to publish to.
-     * @param encryptionPassword The password used to encrypt files during publishing.
      * @return The {@link Result} returned by The Train
      * @throws IOException If any errors are encountered in making the request or reported in the {@link Result}.
      */
-    static List<Result> commitPublish(Map<String, String> transactionIds, String encryptionPassword) throws IOException {
+    static List<Result> commitPublish(Map<String, String> transactionIds) throws IOException {
         List<Callable<Result>> commitTasks = transactionIds.entrySet()
                 .stream()
                 .map(entry -> {
@@ -484,8 +475,7 @@ public class Publisher {
 
                             try (Http http = new Http()) {
                                 Endpoint endpoint = new Endpoint(host, COMMIT_ENDPOINT)
-                                        .setParameter(TRANSACTION_ID_PARAM, transactionId)
-                                        .setParameter(ENCRYPTION_PASSWORD_PARAM, encryptionPassword);
+                                        .setParameter(TRANSACTION_ID_PARAM, transactionId);
 
                                 Response<Result> response = http.post(endpoint, Result.class);
                                 checkResponse(response, transactionId, endpoint, null);
@@ -543,18 +533,16 @@ public class Publisher {
     /**
      * Rolls back a publishing transaction, suppressing any {@link IOException} and printing it out to the console instead.
      *
-     * @param transactionIds     The {@link Host}s and transactions we are attempting to publish to.
-     * @param encryptionPassword The password used to encrypt files during publishing.
+     * @param collection the collection to roll back
      */
-    public static void rollbackPublish(Collection collection, String encryptionPassword) {
+    public static void rollbackPublish(Collection collection) {
         for (Map.Entry<String, String> entry : collection.getDescription().publishTransactionIds.entrySet()) {
             Host host = new Host(entry.getKey());
             String transactionId = entry.getValue();
 
             try (Http http = new Http()) {
                 Endpoint endpoint = new Endpoint(host, ROLLBACK_ENDPOINT)
-                        .setParameter(TRANSACTION_ID_PARAM, transactionId)
-                        .setParameter(ENCRYPTION_PASSWORD_PARAM, encryptionPassword);
+                        .setParameter(TRANSACTION_ID_PARAM, transactionId);
 
                 logWarn("PUBLISH: sending rollback transaction request for collection")
                         .collectionId(collection)

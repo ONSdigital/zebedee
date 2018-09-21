@@ -25,8 +25,7 @@ job "zebedee" {
 
     constraint {
       attribute = "${node.class}"
-      operator  = "regexp"
-      value     = "publishing.*"
+      value     = "publishing-mount"
     }
 
     restart {

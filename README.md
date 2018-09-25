@@ -1,4 +1,10 @@
 # Zebedee
+***
+**NOTE: We are currently in the process of deprecating this service due to:**
+*- Performance limitations*
+*- Maintainability issues*
+*- Inability to scalability effectively*
+***
 
 Zebedee is the CMS used by the ONS website and the internal website publishing system. It is a JSON API and does not 
 have a user interface. It comes in 2 flavours:
@@ -19,30 +25,40 @@ access it.
 - Maven
 - Docker
 
-Zebedee is an API and does not have a UI. The easiest and quickest way to use it is is via Florence. Clone and set up:
+Zebedee is JSON API and does not have a user interface. The quickest and easiest way to use it is to set up a local copy
+of the "publishing" stack. Clone and set up the following projects following the README instructions in each repo:
 - [Florence][2]
 - [Babbage][1]
 - [Sixteens][5]
 - [dp-compose][6] 
 
 ### Getting started
+***
+_If you encounter any issues or notice anything missing from this guide please update/add any missing/helpful
+ information and open a PR._
+
+_Much appreciated._
+_The Dev team_
+***
+_NOTE_: The following set guide will set up Zebedee in **"CMS"** mode as this is typically how the devlopers will run 
+the stack locally. 
+
+Getting the code
 
 ```
 git clone git@github.com:ONSdigital/zebedee.git
 ```
 
-_NOTE_: The following set guide will set up Zebedee in **"CMS"** mode as this is typically how the devlopers will run 
-the stack locally. 
 
 ### Database... 
 Zebedee isn't backed by a database instead it uses a file system to store json files on disk ***. As a result it 
 requires a specific directory structure in order to function correctly.
 
-To save yourself some pain you can use the [dp-zebedee-utils/content][3] tool to create the required directory 
-structure and populate the CMS with some "default content" - follow the steps in the [README][3] before going any further.
-
 *** _We know this is a terrible idea - but in our defence this is a legacy hangover and we are actively working 
 towards deprecating it._
+
+To save yourself some pain you can use the [dp-zebedee-utils/content][3] tool to create the required directory 
+structure and populate the CMS with some "default content" - follow the steps in the [README][3] before going any further.
  
 Once the script has run successfully copy the generated script from `dp-zebedee-utils/content/generated/run-cms.sh` into
 the root dir of your Zebedee project. This bash script compiles and runs Zebedee setting typical dev default 
@@ -78,12 +94,8 @@ password: Doug4l
 - On the home screen create a new collection.
 - Click `Create/edit` on the Collection Details screen.
 
-If everything is working correctly you should now see the the ONS website displayed in the right hand pane. 
-Congratulations you now have Zebedee working.
-
-If not remain calm and make the internaional distress signal to attract the attention of someone from the dev team to 
-assist you.
-![alt text](https://media.giphy.com/media/zLBQYkwGGQdJC/giphy.gif)
+If everything is working correctly you should now see the the ONS website displayed in the right hand pane. If not ask 
+someone from the dev team to help  troubleshoot.
 
 
 [1]: https://github.com/ONSdigital/babbage
@@ -92,4 +104,3 @@ assist you.
 [4]: http://localhost:8081/florence/login
 [5]: https://github.com/ONSdigital/sixteens
 [6]: https://github.com/ONSdigital/dp-compose
-[7]: https://media.giphy.com/media/zLBQYkwGGQdJC/giphy.gif

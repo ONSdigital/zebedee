@@ -80,7 +80,6 @@ public class SlackNotification {
             .expireAfterWrite(10, TimeUnit.MINUTES)
             .build();
 
-    @SafeVarargs
     public static void alarm(String alarm, PostMessageField... args) {
         PostMessage pm = new PostMessage(slackUsername, slackAlarmChannel, PostMessage.Emoji.HeavyExclamationMark);
         PostMessageAttachment attch = new PostMessageAttachment(alarm, "Alarm", PostMessageAttachment.Color.Danger);
@@ -89,17 +88,77 @@ public class SlackNotification {
         postSlackMessage(pm, null, true);
     }
 
-    private static Future<Exception> postSlackMessage(PostMessage message) {
-        return postSlackMessage(message, null, false);
-    }
+    private static void addCollectionAttachment(PostMessageAttachment attch, Collection collection) {
+        attch.fields.add(new PostMessageField("Collection", "<" + Configuration.getFlorenceUrl() + "/florence/collections/" + collection.getDescription().getId() + "|" + collection.getDescription().getName()+ ">", true));
 
-    private static Future<Exception> postSlackMessage(PostMessage message, String collectionID, boolean forceNewMessage) {
-        if(slackToken == null || slackToken.length() == 0) {
-            logDebug("postSlackMessage slackToken is null").log();
-            return null;
+        if(collection.getDescription().getPublishDate() == null) {
+            attch.fields.add(new PostMessageField("Publish date", "Manual", true));
+        } else {
+            attch.fields.add(new PostMessageField("Publish date", slackFieldFormatVague.format(collection.getDescription().getPublishDate()), true));
         }
 
-        return pool.submit(() -> {
+        if (collection.getDescription().approvalStatus != null) {
+            attch.fields.add(new PostMessageField("Approval status", collection.getDescription().approvalStatus.toString(), true));
+        }
+
+        if (collection.getDescription().publishTransactionIds != null
+                && !collection.getDescription().publishTransactionIds.isEmpty()) {
+            attch.fields.add(new PostMessageField("Transaction IDs", StringUtils.join(collection.getDescription().publishTransactionIds.values(), "\n"), true));
+        }
+    }
+
+    private static void addCollectionAttachment(PostMessageAttachment attch, CollectionBase collection) {
+        attch.fields.add(new PostMessageField("Collection", "<" + Configuration.getFlorenceUrl() + "/florence/collections/" + collection.getId() + "|" + collection.getName() + ">", true));
+
+        if(collection.getPublishDate() == null) {
+            attch.fields.add(new PostMessageField("Publish date", "Manual", true));
+        } else {
+            attch.fields.add(new PostMessageField("Publish date", slackFieldFormatVague.format(collection.getPublishDate()), true));
+        }
+
+        if(collection.getClass() == PublishedCollection.class) {
+            PublishedCollection publishedCollection = (PublishedCollection)collection;
+
+            if (publishedCollection.publishStartDate != null && publishedCollection.publishEndDate != null) {
+                String timeTaken = String.format("%.2f", (publishedCollection.publishEndDate.getTime()
+                        - publishedCollection.publishStartDate.getTime()) / 1000.0);
+
+                attch.fields.add(new PostMessageField("Duration", timeTaken + " seconds", true));
+                attch.fields.add(new PostMessageField("Publish start date", slackFieldFormatAccurate.format(publishedCollection.publishStartDate), true));
+                attch.fields.add(new PostMessageField("Publish end date", slackFieldFormatAccurate.format(publishedCollection.publishEndDate), true));
+            } else if (publishedCollection.publishStartDate != null) {
+                // publishing in progress?
+                attch.fields.add(new PostMessageField("Publish start date", slackFieldFormatAccurate.format(publishedCollection.publishStartDate), true));
+            } else if (publishedCollection.publishEndDate != null) {
+                // definitely unexpected
+                attch.fields.add(new PostMessageField("Publish end date", slackFieldFormatAccurate.format(publishedCollection.publishEndDate), true));
+            }
+
+            if(publishedCollection.publishResults != null && publishedCollection.publishResults.size() > 0) {
+                // FIXME consider reporting on all transactions not just the first one
+                Result result = publishedCollection.publishResults.get(0);
+
+                attch.fields.add(new PostMessageField("Files published", String.format("%d", result.transaction.uriInfos.size()), true));
+
+                result.transaction.uriInfos
+                        .stream()
+                        .filter(info -> info.uri.endsWith(DATA_JSON))
+                        .findFirst()
+                        .ifPresent(urlInfo -> {
+                            attch.fields.add(new PostMessageField("Example page", "https://www.ons.gov.uk" + urlInfo.uri.substring(0, urlInfo.uri.length() - (DATA_JSON).length()), false));
+                        });
+            }
+
+        }
+    }
+
+    private static void postSlackMessage(PostMessage message, String collectionID, boolean forceNewMessage) {
+        if(slackToken == null || slackToken.length() == 0) {
+            logDebug("postSlackMessage slackToken is null").log();
+            return;
+        }
+
+        pool.submit(() -> {
             Exception result = null;
             Response<JsonObject> response;
             try (Http http = new Http()) {
@@ -149,7 +208,6 @@ public class SlackNotification {
         });
     }
 
-    @SafeVarargs
     public static void collectionAlarm(Collection c, String alarm, PostMessageField... args) {
         if (c == null) {
             // not enough info to be able to notify anything useful.
@@ -164,15 +222,13 @@ public class SlackNotification {
         PostMessage pm = new PostMessage(slackUsername, slackDefaultChannel, PostMessage.Emoji.HeavyExclamationMark);
         PostMessageAttachment attch = new PostMessageAttachment(alarm, "Alarm", PostMessageAttachment.Color.Danger);
         pm.attachments.add(attch);
-
-        attch.fields.add(new PostMessageField("Collection", "<" + Configuration.getFlorenceUrl() + "/florence/collections/" + c.getDescription().getId() + "|" + c.getDescription().getName()+ ">", true));
+        addCollectionAttachment(attch, c);
         attch.fields.addAll(Arrays.asList(args));
 
         // always force a new message for a scheduled collection failure so it's obvious
         postSlackMessage(pm, c.getDescription().getId(), true);
     }
 
-    @SafeVarargs
     public static void collectionWarning(Collection c, String warning, PostMessageField... args) {
         if (c == null) {
             // not enough info to be able to notify anything useful.
@@ -185,11 +241,9 @@ public class SlackNotification {
         }
 
         PostMessage pm = new PostMessage(slackUsername, slackDefaultChannel, PostMessage.Emoji.HeavyExclamationMark);
-
         PostMessageAttachment attch = new PostMessageAttachment("", warning, PostMessageAttachment.Color.Warning);
         pm.attachments.add(attch);
-
-        attch.fields.add(new PostMessageField("Collection", "<" + Configuration.getFlorenceUrl() + "/florence/collections/" + c.getDescription().getId() + "|" + c.getDescription().getName()+ ">", true));
+        addCollectionAttachment(attch, c);
         attch.fields.addAll(Arrays.asList(args));
 
         // always force a new message for a scheduled collection failure so it's obvious
@@ -207,18 +261,7 @@ public class SlackNotification {
             return;
         }
 
-        ArrayList<PostMessageField> args = new ArrayList<>();
-
-        if (c.getDescription().approvalStatus != null) {
-            args.add(new PostMessageField("Approval status", c.getDescription().approvalStatus.toString(), true));
-        }
-
-        if (c.getDescription().publishTransactionIds != null
-                && !c.getDescription().publishTransactionIds.isEmpty()) {
-            args.add(new PostMessageField("Transaction IDs", StringUtils.join(c.getDescription().publishTransactionIds.values(), "\n"), true));
-        }
-
-        collectionAlarm(c, "Scheduled collection failed to publish", args.toArray(new PostMessageField[0]));
+        collectionAlarm(c, "Scheduled collection failed to publish");
     }
 
     /**
@@ -233,16 +276,9 @@ public class SlackNotification {
         }
 
         PostMessage pm = new PostMessage(slackUsername, slackPublishChannel, PostMessage.Emoji.ChartWithUpwardsTrend, "Unknown publish stage or status");
-
         PostMessageAttachment attch = new PostMessageAttachment("", "", PostMessageAttachment.Color.Good);
         pm.attachments.add(attch);
-
-        attch.fields.add(new PostMessageField("Collection", "<" + Configuration.getFlorenceUrl() + "/florence/collections/" + collection.getId() + "|" + collection.getName() + ">", true));
-        if(collection.getPublishDate() == null) {
-            attch.fields.add(new PostMessageField("Publish date", "Manual", true));
-        } else {
-            attch.fields.add(new PostMessageField("Publish date", slackFieldFormatVague.format(collection.getPublishDate()), true));
-        }
+        addCollectionAttachment(attch, collection);
 
         boolean forceNewMessage = false;
 
@@ -303,41 +339,6 @@ public class SlackNotification {
                         break;
                 }
                 break;
-        }
-
-        if(collection.getClass() == PublishedCollection.class) {
-            PublishedCollection publishedCollection = (PublishedCollection)collection;
-
-            if (publishedCollection.publishStartDate != null && publishedCollection.publishEndDate != null) {
-                String timeTaken = String.format("%.2f", (publishedCollection.publishEndDate.getTime()
-                        - publishedCollection.publishStartDate.getTime()) / 1000.0);
-
-                attch.fields.add(new PostMessageField("Duration", timeTaken + " seconds", true));
-                attch.fields.add(new PostMessageField("Publish start date", slackFieldFormatAccurate.format(publishedCollection.publishStartDate), true));
-                attch.fields.add(new PostMessageField("Publish end date", slackFieldFormatAccurate.format(publishedCollection.publishEndDate), true));
-            } else if (publishedCollection.publishStartDate != null) {
-                // publishing in progress?
-                attch.fields.add(new PostMessageField("Publish start date", slackFieldFormatAccurate.format(publishedCollection.publishStartDate), true));
-            } else if (publishedCollection.publishEndDate != null) {
-                // definitely unexpected
-                attch.fields.add(new PostMessageField("Publish end date", slackFieldFormatAccurate.format(publishedCollection.publishEndDate), true));
-            }
-
-            if(publishedCollection.publishResults != null && publishedCollection.publishResults.size() > 0) {
-                // FIXME consider reporting on all transactions not just the first one
-                Result result = publishedCollection.publishResults.get(0);
-
-                attch.fields.add(new PostMessageField("Files published", String.format("%d", result.transaction.uriInfos.size()), true));
-
-                result.transaction.uriInfos
-                        .stream()
-                        .filter(info -> info.uri.endsWith(DATA_JSON))
-                        .findFirst()
-                        .ifPresent(urlInfo -> {
-                            attch.fields.add(new PostMessageField("Example page", "https://www.ons.gov.uk" + urlInfo.uri.substring(0, urlInfo.uri.length() - (DATA_JSON).length()), false));
-                        });
-            }
-
         }
 
         postSlackMessage(pm, collection.getId(), forceNewMessage);

@@ -1,5 +1,5 @@
 # Zebedee
-***
+
 **NOTE: We are currently in the process of deprecating this service due to:**
  - _Performance limitations_
  - _Maintainability issues_

@@ -8,4 +8,5 @@ public class PostMessage {
     public String icon_emoji;
     public String text;
     public List<PostMessageAttachment> attachments;
+    public String ts;
 }

@@ -16,6 +16,7 @@ import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.util.Http;
 import com.github.onsdigital.zebedee.util.SlackNotification;
+import com.github.onsdigital.zebedee.util.slack.PostMessageField;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
@@ -25,10 +26,7 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
@@ -171,8 +169,10 @@ public class Publisher {
             collection.getDescription().publishEndDate = new Date();
 
         } catch (Exception e) {
-            SlackNotification.alarm(String.format("Exception publishing collection: %s: %s",
-                    collection.getDescription().getName(), e.getMessage()));
+            SlackNotification.collectionAlarm(collection,
+                    "Exception publishing collection",
+                    new PostMessageField("error", e.getMessage(), false)
+            );
 
             // If an error was caught, attempt to roll back the transaction:
             Map<String, String> transactionIds = collection.getDescription().publishTransactionIds;

@@ -26,10 +26,12 @@ import com.github.onsdigital.zebedee.service.content.navigation.ContentTreeNavig
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.util.ContentDetailUtil;
 import com.github.onsdigital.zebedee.util.SlackNotification;
+import com.github.onsdigital.zebedee.util.slack.PostMessageField;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -164,8 +166,11 @@ public class ApproveTask implements Callable<Boolean> {
                 logError(e, "Exception saving collection after approval exception").collectionName(collection).log();
             }
 
-            SlackNotification.alarm(String.format("Exception approving collection %s : %s",
-                    collection.getDescription().getName(), e.getMessage()));
+            SlackNotification.collectionAlarm(collection,
+                    "Exception approving collection",
+                    new PostMessageField("error", e.getMessage(), false)
+            );
+
             return false;
         }
     }
@@ -175,10 +180,11 @@ public class ApproveTask implements Callable<Boolean> {
         boolean verified = timeSeriesCompressionTask.compressTimeseries(collection, collectionReader, collectionWriter);
 
         if (!verified) {
-            String message = "Failed verification of time series zip files";
-            logInfo(message).collectionName(collection).log();
-            SlackNotification.alarm(message + " in collection " + collection.getDescription().getName() + ". Unlock the " +
-                    "collection and re-approve to try again.");
+            SlackNotification.collectionAlarm(collection,
+                    "Failed verification of time series zip files",
+                    new PostMessageField("advice", "Unlock the collection and re-approve to try again", false)
+            );
+            logInfo("Failed verification of time series zip files").collectionName(collection).log();
         }
     }
 

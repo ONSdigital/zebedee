@@ -168,7 +168,7 @@ public class ApproveTask implements Callable<Boolean> {
 
             SlackNotification.collectionAlarm(collection,
                     "Exception approving collection",
-                    new PostMessageField("error", e.getMessage(), false)
+                    new PostMessageField("Error", e.getMessage(), false)
             );
 
             return false;
@@ -182,7 +182,7 @@ public class ApproveTask implements Callable<Boolean> {
         if (!verified) {
             SlackNotification.collectionAlarm(collection,
                     "Failed verification of time series zip files",
-                    new PostMessageField("advice", "Unlock the collection and re-approve to try again", false)
+                    new PostMessageField("Advice", "Unlock the collection and re-approve to try again", false)
             );
             logInfo("Failed verification of time series zip files").collectionName(collection).log();
         }

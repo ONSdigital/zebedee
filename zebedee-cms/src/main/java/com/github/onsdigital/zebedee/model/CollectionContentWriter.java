@@ -42,7 +42,7 @@ public class CollectionContentWriter extends ContentWriter {
         } else {
             SlackNotification.collectionWarning(collection,
                     "Writing unencrypted content in collection",
-                    new PostMessageField("uri", uri, false)
+                    new PostMessageField("URI", uri, false)
             );
             logInfo("Writing unencrypted content in collection")
                     .addParameter("uri", uri)

@@ -171,7 +171,7 @@ public class Publisher {
         } catch (Exception e) {
             SlackNotification.collectionAlarm(collection,
                     "Exception publishing collection",
-                    new PostMessageField("error", e.getMessage(), false)
+                    new PostMessageField("Error", e.getMessage(), false)
             );
 
             // If an error was caught, attempt to roll back the transaction:

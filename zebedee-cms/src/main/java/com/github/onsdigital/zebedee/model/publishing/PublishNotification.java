@@ -92,9 +92,9 @@ public class PublishNotification {
                     // but the NotificationPayload only has the collection ID
                     SlackNotification.alarm(
                             "Failed sending publish notifications to website",
-                            new PostMessageField("eventName", eventName, true),
-                            new PostMessageField("host", host.toString(), true),
-                            new PostMessageField("collectionID", payload.collectionId, true)
+                            new PostMessageField("Event", eventName, true),
+                            new PostMessageField("Host", host.toString(), true),
+                            new PostMessageField("Collection ID", payload.collectionId, true)
                     );
                 }
             }

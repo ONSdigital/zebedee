@@ -1,4 +1,4 @@
-package com.github.onsdigital.zebedee.util;
+package com.github.onsdigital.zebedee.util.slack;
 
 import com.google.gson.annotations.SerializedName;
 

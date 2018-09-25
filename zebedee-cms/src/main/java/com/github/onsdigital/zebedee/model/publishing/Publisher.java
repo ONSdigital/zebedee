@@ -68,6 +68,9 @@ public class Publisher {
     }
 
     public static boolean Publish(Collection collection, String email, CollectionReader collectionReader) throws IOException {
+        // FIXME using PostPublisher.getPublishedCollection feels a bit hacky
+        SlackNotification.publishNotification(PostPublisher.getPublishedCollection(collection),SlackNotification.CollectionStage.Publish, SlackNotification.StageStatus.Started);
+
         boolean publishComplete = false;
 
         // First get the in-memory (within-JVM) lock.
@@ -135,6 +138,14 @@ public class Publisher {
             logInfo("PUBLISH: collection lock released")
                     .collectionId(collection)
                     .log();
+        }
+
+        if(publishComplete) {
+            // FIXME using PostPublisher.getPublishedCollection feels a bit hacky
+            SlackNotification.publishNotification(PostPublisher.getPublishedCollection(collection),SlackNotification.CollectionStage.Publish, SlackNotification.StageStatus.Completed);
+        } else {
+            // FIXME using PostPublisher.getPublishedCollection feels a bit hacky
+            SlackNotification.publishNotification(PostPublisher.getPublishedCollection(collection),SlackNotification.CollectionStage.Publish, SlackNotification.StageStatus.Failed);
         }
         return publishComplete;
     }

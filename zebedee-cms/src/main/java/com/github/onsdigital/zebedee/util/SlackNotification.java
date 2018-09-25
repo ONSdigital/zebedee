@@ -5,6 +5,7 @@ import com.github.davidcarboni.httpino.Host;
 import com.github.davidcarboni.httpino.Http;
 import com.github.davidcarboni.httpino.Response;
 import com.github.onsdigital.zebedee.configuration.Configuration;
+import com.github.onsdigital.zebedee.content.page.statistics.document.figure.chart.Chart;
 import com.github.onsdigital.zebedee.json.CollectionBase;
 import com.github.onsdigital.zebedee.json.publishing.PublishedCollection;
 import com.github.onsdigital.zebedee.json.publishing.Result;
@@ -16,14 +17,17 @@ import com.github.onsdigital.zebedee.util.slack.PostMessageField;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.gson.JsonObject;
+import jdk.nashorn.internal.runtime.regexp.joni.Warnings;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.FastDateFormat;
 import org.apache.http.message.BasicNameValuePair;
 
+import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
 import java.util.AbstractMap;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.TimeZone;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -58,10 +62,14 @@ public class SlackNotification {
 
     private static final String slackPostMessageURI = "https://slack.com/api/chat.postMessage";
     private static final String slackUpdateMessageURI = "https://slack.com/api/chat.update";
+
+    private static final String slackUsername = "Zebedee";
+
     // 1 thread will delay slack messages, but multiple threads might cause us to use
     // postMessage instead of update if a collection moves through each stage/status
     // faster than we get and cache the response message timestamp and channel ID
     private static final ExecutorService pool = Executors.newFixedThreadPool(1);
+
     private static final String DATA_JSON = "data.json";
 
     private static SimpleDateFormat slackFieldFormatAccurate = new SimpleDateFormat("EEE dd MMM yyyy 'at' HH:mm:ss.SSSS");
@@ -74,24 +82,10 @@ public class SlackNotification {
 
     @SafeVarargs
     public static void alarm(String alarm, PostMessageField... args) {
-        PostMessage pm = new PostMessage();
-        pm.icon_emoji = ":heavy_exclamation_mark:";
-        pm.username = "Zebedee";
-        pm.channel = slackAlarmChannel;
-        pm.attachments = new ArrayList<>();
-
-        PostMessageAttachment attch = new PostMessageAttachment();
-        attch.title = "Alarm";
-        attch.text = alarm;
-        attch.color = "danger";
+        PostMessage pm = new PostMessage(slackUsername, slackAlarmChannel, PostMessage.Emoji.HeavyExclamationMark);
+        PostMessageAttachment attch = new PostMessageAttachment(alarm, "Alarm", PostMessageAttachment.Color.Danger);
         pm.attachments.add(attch);
-
-        attch.fields = new ArrayList<>();
-
-        for(PostMessageField f : args) {
-            attch.fields.add(f);
-        }
-
+        attch.fields.addAll(Arrays.asList(args));
         postSlackMessage(pm, null, true);
     }
 
@@ -167,24 +161,12 @@ public class SlackNotification {
             return;
         }
 
-        PostMessage pm = new PostMessage();
-        pm.icon_emoji = ":heavy_exclamation_mark:";
-        pm.username = "Zebedee";
-        pm.channel = slackDefaultChannel;
-        pm.attachments = new ArrayList<>();
-
-        PostMessageAttachment attch = new PostMessageAttachment();
-        attch.title = "Alarm";
-        attch.text = alarm;
-        attch.color = "danger";
+        PostMessage pm = new PostMessage(slackUsername, slackDefaultChannel, PostMessage.Emoji.HeavyExclamationMark);
+        PostMessageAttachment attch = new PostMessageAttachment(alarm, "Alarm", PostMessageAttachment.Color.Danger);
         pm.attachments.add(attch);
 
-        attch.fields = new ArrayList<>();
         attch.fields.add(new PostMessageField("Collection", "<" + Configuration.getFlorenceUrl() + "/florence/collections/" + c.getDescription().getId() + "|" + c.getDescription().getName()+ ">", true));
-
-        for(PostMessageField f : args) {
-            attch.fields.add(f);
-        }
+        attch.fields.addAll(Arrays.asList(args));
 
         // always force a new message for a scheduled collection failure so it's obvious
         postSlackMessage(pm, c.getDescription().getId(), true);
@@ -202,23 +184,13 @@ public class SlackNotification {
             return;
         }
 
-        PostMessage pm = new PostMessage();
-        pm.icon_emoji = ":heavy_exclamation_mark:";
-        pm.username = "Zebedee";
-        pm.channel = slackDefaultChannel;
-        pm.attachments = new ArrayList<>();
+        PostMessage pm = new PostMessage(slackUsername, slackDefaultChannel, PostMessage.Emoji.HeavyExclamationMark);
 
-        PostMessageAttachment attch = new PostMessageAttachment();
-        attch.title = warning;
-        attch.color = "warning";
+        PostMessageAttachment attch = new PostMessageAttachment("", warning, PostMessageAttachment.Color.Warning);
         pm.attachments.add(attch);
 
-        attch.fields = new ArrayList<>();
         attch.fields.add(new PostMessageField("Collection", "<" + Configuration.getFlorenceUrl() + "/florence/collections/" + c.getDescription().getId() + "|" + c.getDescription().getName()+ ">", true));
-
-        for(PostMessageField f : args) {
-            attch.fields.add(f);
-        }
+        attch.fields.addAll(Arrays.asList(args));
 
         // always force a new message for a scheduled collection failure so it's obvious
         postSlackMessage(pm, c.getDescription().getId(), true);
@@ -260,19 +232,12 @@ public class SlackNotification {
             return;
         }
 
-        PostMessage pm = new PostMessage();
-        pm.channel = slackPublishChannel;
-        pm.icon_emoji = ":chart_with_upwards_trend:";
-        pm.username = "Zebedee";
-        pm.attachments = new ArrayList<>();
-        pm.text = "Unknown publish stage or status";
+        PostMessage pm = new PostMessage(slackUsername, slackPublishChannel, PostMessage.Emoji.ChartWithUpwardsTrend, "Unknown publish stage or status");
 
-        PostMessageAttachment attch = new PostMessageAttachment();
-        attch.color = "good";
-        attch.fields = new ArrayList<>();
+        PostMessageAttachment attch = new PostMessageAttachment("", "", PostMessageAttachment.Color.Good);
         pm.attachments.add(attch);
 
-        attch.fields.add(new PostMessageField("Collection", Configuration.getFlorenceUrl() + "/florence/collections/" + collection.getId() + "|" + collection.getName() + ">", true));
+        attch.fields.add(new PostMessageField("Collection", "<" + Configuration.getFlorenceUrl() + "/florence/collections/" + collection.getId() + "|" + collection.getName() + ">", true));
         if(collection.getPublishDate() == null) {
             attch.fields.add(new PostMessageField("Publish date", "Manual", true));
         } else {
@@ -362,14 +327,7 @@ public class SlackNotification {
                 // FIXME consider reporting on all transactions not just the first one
                 Result result = publishedCollection.publishResults.get(0);
 
-                int fileCount = 0;
-                int fileSize = 0;
-
-                for (UriInfo i : result.transaction.uriInfos) {
-                    fileCount++;
-                    fileSize += i.size;
-                }
-                attch.fields.add(new PostMessageField("Files published", String.format("%d (%s)", fileCount, FileUtils.byteCountToDisplaySize(fileSize)), true));
+                attch.fields.add(new PostMessageField("Files published", String.format("%d", result.transaction.uriInfos.size()), true));
 
                 result.transaction.uriInfos
                         .stream()

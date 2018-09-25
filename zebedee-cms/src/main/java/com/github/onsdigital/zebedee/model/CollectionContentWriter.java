@@ -11,7 +11,6 @@ import javax.crypto.SecretKey;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Path;
-import java.util.AbstractMap;
 
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
 

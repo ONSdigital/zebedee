@@ -14,8 +14,6 @@ import com.github.onsdigital.zebedee.util.slack.PostMessageField;
 import org.joda.time.DateTime;
 
 import java.text.SimpleDateFormat;
-import java.util.AbstractMap;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 

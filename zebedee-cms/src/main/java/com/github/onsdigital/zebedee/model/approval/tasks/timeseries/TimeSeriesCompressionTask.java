@@ -8,7 +8,6 @@ import com.github.onsdigital.zebedee.util.SlackNotification;
 import com.github.onsdigital.zebedee.util.slack.PostMessageField;
 
 import java.io.IOException;
-import java.util.AbstractMap;
 import java.util.List;
 
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;

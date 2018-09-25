@@ -31,7 +31,6 @@ import com.github.onsdigital.zebedee.util.slack.PostMessageField;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
-import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;

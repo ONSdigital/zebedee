@@ -1,9 +1,9 @@
 # Zebedee
 ***
 **NOTE: We are currently in the process of deprecating this service due to:**
-*- Performance limitations*
-*- Maintainability issues*
-*- Inability to scalability effectively*
+ - _Performance limitations_
+ - _Maintainability issues_
+ - _Inability to scalability effectively_
 ***
 
 Zebedee is the CMS used by the ONS website and the internal website publishing system. It is a JSON API and does not 
@@ -54,8 +54,10 @@ git clone git@github.com:ONSdigital/zebedee.git
 Zebedee isn't backed by a database instead it uses a file system to store json files on disk ***. As a result it 
 requires a specific directory structure in order to function correctly.
 
+***
 *** _We know this is a terrible idea - but in our defence this is a legacy hangover and we are actively working 
 towards deprecating it._
+***
 
 To save yourself some pain you can use the [dp-zebedee-utils/content][3] tool to create the required directory 
 structure and populate the CMS with some "default content" - follow the steps in the [README][3] before going any further.

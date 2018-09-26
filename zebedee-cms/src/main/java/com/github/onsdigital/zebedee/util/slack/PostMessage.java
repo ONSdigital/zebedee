@@ -30,8 +30,7 @@ public class PostMessage {
         this.username = username;
         this.channel = channel;
         this.text = text;
-
-
+        
         if(emoji == null) emoji = Emoji.ChartWithUpwardsTrend;
         switch(emoji) {
             case HeavyExclamationMark:

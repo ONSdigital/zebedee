@@ -98,7 +98,7 @@ password: Doug4l
 - Click `Create/edit` on the Collection Details screen.
 
 If everything is working correctly you should now see the the ONS website displayed in the right hand pane. 
-_Congratulattions_ :tada:! Advanced to GO collect £200 :dollar:
+_Congratulations_ :tada:! Advanced to GO collect £200 :dollar:
 
 Otherwise :violin: kindly ask someone from the dev team to help troubleshoot.
 

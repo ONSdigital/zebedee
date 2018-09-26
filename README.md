@@ -3,7 +3,8 @@
 **NOTE: We are currently in the process of deprecating this service due to:**
  - _Performance limitations_
  - _Maintainability issues_
- - _Inability to scalability effectively_
+ - _Inability to scale effectively_
+ - _Limitations of the underlying HTTP framework_ 
 ***
 
 Zebedee is the CMS used by the ONS website and the internal website publishing system. It is a JSON API and does not 
@@ -25,8 +26,9 @@ access it.
 - Maven
 - Docker
 
-Zebedee is JSON API and does not have a user interface. The quickest and easiest way to use it is to set up a local copy
-of the "publishing" stack. Clone and set up the following projects following the README instructions in each repo:
+As mentioned Zebedee is JSON API and does not have a user interface. The quickest and easiest way to use it is to set 
+up a local copy of the "publishing" stack. Clone and set up the following projects following the README instructions 
+in each repo:
 - [Florence][2]
 - [Babbage][1]
 - [Sixteens][5]
@@ -49,7 +51,6 @@ Getting the code
 git clone git@github.com:ONSdigital/zebedee.git
 ```
 
-
 ### Database... 
 Zebedee isn't backed by a database instead it uses a file system to store json files on disk ***. As a result it 
 requires a specific directory structure in order to function correctly.
@@ -70,7 +71,7 @@ You may be required to make the bash script an executable before you can run it.
 
 ````bash
 sudo chmod +x run-cms.sh
-<Enter you password when prompted>
+<Enter your password when prompted>
 ````  
 
 ### Running the publishing stack

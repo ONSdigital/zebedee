@@ -24,16 +24,19 @@ public class PostMessageAttachment {
         this();
         this.text = text;
         this.title = title;
-        this.fields = new ArrayList<>();
         switch(color) {
             case Good:
                 this.color = "good";
+                break;
             case Danger:
                 this.color = "danger";
+                break;
             case Warning:
                 this.color = "warning";
+                break;
             default:
                 this.color = "danger";
+                break;
         }
     }
 }

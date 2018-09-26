@@ -17,6 +17,7 @@ public class PostMessage {
     public String ts;
 
     public PostMessage() {
+        this.attachments = new ArrayList<>();
     }
 
     public PostMessage(String username, String channel, Emoji emoji) {
@@ -24,10 +25,14 @@ public class PostMessage {
     }
 
     public PostMessage(String username, String channel, Emoji emoji, String text) {
+        this();
+
         this.username = username;
         this.channel = channel;
         this.text = text;
-        this.attachments = new ArrayList<>();
+
+
+        if(emoji == null) emoji = Emoji.ChartWithUpwardsTrend;
         switch(emoji) {
             case HeavyExclamationMark:
                 this.icon_emoji = ":heavy_exclamation_mark:";

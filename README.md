@@ -26,8 +26,8 @@ access it.
 - Maven
 - Docker
 
-As mentioned Zebedee is JSON API and does not have a user interface. The quickest and easiest way to use it is to set 
-up a local copy of the "publishing" stack. Clone and set up the following projects following the README instructions 
+As mentioned Zebedee is a JSON API,  and does not have a user interface. The quickest and easiest way to use it is to 
+set up a local copy of the "publishing" stack. Clone and set up the following projects following the README instructions 
 in each repo:
 - [Florence][2]
 - [Babbage][1]

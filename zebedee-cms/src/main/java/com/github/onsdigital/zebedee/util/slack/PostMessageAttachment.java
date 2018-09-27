@@ -34,6 +34,7 @@ public class PostMessageAttachment {
         this.fields = new ArrayList<>();
         this.text = text;
         this.title = title;
+        if(color == null) color = Color.GOOD;
         this.color = color.getColor();
     }
 

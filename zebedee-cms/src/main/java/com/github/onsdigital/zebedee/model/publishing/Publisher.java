@@ -67,7 +67,7 @@ public class Publisher {
 
     public static boolean Publish(Collection collection, String email, CollectionReader collectionReader) throws IOException {
         // FIXME using PostPublisher.getPublishedCollection feels a bit hacky
-        SlackNotification.publishNotification(PostPublisher.getPublishedCollection(collection),SlackNotification.CollectionStage.Publish, SlackNotification.StageStatus.Started);
+        SlackNotification.publishNotification(PostPublisher.getPublishedCollection(collection),SlackNotification.CollectionStage.PUBLISH, SlackNotification.StageStatus.STARTED);
 
         boolean publishComplete = false;
 
@@ -140,10 +140,10 @@ public class Publisher {
 
         if(publishComplete) {
             // FIXME using PostPublisher.getPublishedCollection feels a bit hacky
-            SlackNotification.publishNotification(PostPublisher.getPublishedCollection(collection),SlackNotification.CollectionStage.Publish, SlackNotification.StageStatus.Completed);
+            SlackNotification.publishNotification(PostPublisher.getPublishedCollection(collection),SlackNotification.CollectionStage.PUBLISH, SlackNotification.StageStatus.COMPLETED);
         } else {
             // FIXME using PostPublisher.getPublishedCollection feels a bit hacky
-            SlackNotification.publishNotification(PostPublisher.getPublishedCollection(collection),SlackNotification.CollectionStage.Publish, SlackNotification.StageStatus.Failed);
+            SlackNotification.publishNotification(PostPublisher.getPublishedCollection(collection),SlackNotification.CollectionStage.PUBLISH, SlackNotification.StageStatus.FAILED);
         }
         return publishComplete;
     }

@@ -11,31 +11,31 @@ public class PostMessageAttachmentTest {
     public void postMessageAttachmentFieldsNotNull() {
         PostMessageAttachment pma = new PostMessageAttachment();
         assertNotNull(pma);
-        assertNotNull(pma.fields);
+        assertNotNull(pma.getFields());
     }
 
     @Test
     public void postMessageAttachmentStoresTextAndTitle() {
-        PostMessageAttachment pma = new PostMessageAttachment("text", "title", PostMessageAttachment.Color.Danger);
+        PostMessageAttachment pma = new PostMessageAttachment("text", "title", PostMessageAttachment.Color.DANGER);
         assertNotNull(pma);
-        assertNotNull(pma.fields);
-        assertEquals(pma.title, "title");
-        assertEquals(pma.text, "text");
+        assertNotNull(pma.getFields());
+        assertEquals(pma.getTitle(), "title");
+        assertEquals(pma.getText(), "text");
     }
 
     @Test
     public void postMessageAttachmentColorMapping() {
-        PostMessageAttachment pma = new PostMessageAttachment("text", "title", PostMessageAttachment.Color.Danger);
+        PostMessageAttachment pma = new PostMessageAttachment("text", "title", PostMessageAttachment.Color.DANGER);
         assertNotNull(pma);
-        assertEquals(pma.color, "danger");
+        assertEquals(pma.getColor(), "danger");
 
-        pma = new PostMessageAttachment("text", "title", PostMessageAttachment.Color.Good);
+        pma = new PostMessageAttachment("text", "title", PostMessageAttachment.Color.GOOD);
         assertNotNull(pma);
-        assertEquals(pma.color, "good");
+        assertEquals(pma.getColor(), "good");
 
-        pma = new PostMessageAttachment("text", "title", PostMessageAttachment.Color.Warning);
+        pma = new PostMessageAttachment("text", "title", PostMessageAttachment.Color.WARNING);
         assertNotNull(pma);
-        assertEquals(pma.color, "warning");
+        assertEquals(pma.getColor(), "warning");
     }
 
 }

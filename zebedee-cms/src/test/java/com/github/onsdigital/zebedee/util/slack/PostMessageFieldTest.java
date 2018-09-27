@@ -11,15 +11,15 @@ public class PostMessageFieldTest {
     public void postMessageFieldStoresTitleValueAndIsShort() {
         PostMessageField pmf = new PostMessageField("title", "value");
         assertNotNull(pmf);
-        assertEquals(pmf.value, "value");
-        assertEquals(pmf.title, "title");
-        assertEquals(pmf.isShort, false);
+        assertEquals(pmf.getValue(), "value");
+        assertEquals(pmf.getTitle(), "title");
+        assertEquals(pmf.isShort(), false);
 
         pmf = new PostMessageField("title", "value", true);
         assertNotNull(pmf);
-        assertEquals(pmf.value, "value");
-        assertEquals(pmf.title, "title");
-        assertEquals(pmf.isShort, true);
+        assertEquals(pmf.getValue(), "value");
+        assertEquals(pmf.getTitle(), "title");
+        assertEquals(pmf.isShort(), true);
     }
 
 }

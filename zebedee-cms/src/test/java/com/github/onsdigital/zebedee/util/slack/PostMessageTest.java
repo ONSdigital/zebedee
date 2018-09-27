@@ -9,65 +9,65 @@ public class PostMessageTest {
 
     @Test
     public void postMessageAttachmentsNotNull() {
-        PostMessage pm = new PostMessage("username", "channel", PostMessage.Emoji.ChartWithUpwardsTrend);
+        PostMessage pm = new PostMessage("username", "channel", PostMessage.Emoji.CHART_WITH_UPWARDS_TREND);
         assertNotNull(pm);
-        assertNotNull(pm.attachments);
+        assertNotNull(pm.getAttachments());
 
-        pm = new PostMessage("username", "channel", PostMessage.Emoji.ChartWithUpwardsTrend, "");
+        pm = new PostMessage("username", "channel", PostMessage.Emoji.CHART_WITH_UPWARDS_TREND, "");
         assertNotNull(pm);
-        assertNotNull(pm.attachments);
+        assertNotNull(pm.getAttachments());
 
         pm = new PostMessage();
         assertNotNull(pm);
-        assertNotNull(pm.attachments);
+        assertNotNull(pm.getAttachments());
     }
 
     @Test
     public void postMessageEmojiMapping() {
-        PostMessage pm = new PostMessage("username", "channel", PostMessage.Emoji.ChartWithUpwardsTrend);
+        PostMessage pm = new PostMessage("username", "channel", PostMessage.Emoji.CHART_WITH_UPWARDS_TREND);
         assertNotNull(pm);
-        assertEquals(pm.icon_emoji, ":chart_with_upwards_trend:");
+        assertEquals(pm.getEmoji(), ":chart_with_upwards_trend:");
 
-        pm = new PostMessage("username", "channel", PostMessage.Emoji.HeavyExclamationMark);
+        pm = new PostMessage("username", "channel", PostMessage.Emoji.HEAVY_EXCLAMATION_MARK);
         assertNotNull(pm);
-        assertEquals(pm.icon_emoji, ":heavy_exclamation_mark:");
+        assertEquals(pm.getEmoji(), ":heavy_exclamation_mark:");
 
         pm = new PostMessage("username", "channel", null);
         assertNotNull(pm);
-        assertEquals(pm.icon_emoji, ":chart_with_upwards_trend:");
+        assertEquals(pm.getEmoji(), ":chart_with_upwards_trend:");
     }
 
     @Test
     public void postMessageStoresUsername() {
-        PostMessage pm = new PostMessage("username", "channel", PostMessage.Emoji.ChartWithUpwardsTrend);
+        PostMessage pm = new PostMessage("username", "channel", PostMessage.Emoji.CHART_WITH_UPWARDS_TREND);
         assertNotNull(pm);
-        assertEquals(pm.username, "username");
+        assertEquals(pm.getUsername(), "username");
 
-        pm = new PostMessage("username", "channel", PostMessage.Emoji.ChartWithUpwardsTrend, "text");
+        pm = new PostMessage("username", "channel", PostMessage.Emoji.CHART_WITH_UPWARDS_TREND, "text");
         assertNotNull(pm);
-        assertEquals(pm.username, "username");
+        assertEquals(pm.getUsername(), "username");
     }
 
     @Test
     public void postMessageStoresChannel() {
-        PostMessage pm = new PostMessage("username", "channel", PostMessage.Emoji.ChartWithUpwardsTrend);
+        PostMessage pm = new PostMessage("username", "channel", PostMessage.Emoji.CHART_WITH_UPWARDS_TREND);
         assertNotNull(pm);
-        assertEquals(pm.channel, "channel");
+        assertEquals(pm.getChannel(), "channel");
 
-        pm = new PostMessage("username", "channel", PostMessage.Emoji.ChartWithUpwardsTrend, "text");
+        pm = new PostMessage("username", "channel", PostMessage.Emoji.CHART_WITH_UPWARDS_TREND, "text");
         assertNotNull(pm);
-        assertEquals(pm.channel, "channel");
+        assertEquals(pm.getChannel(), "channel");
     }
 
     @Test
     public void postMessageStoresText() {
-        PostMessage pm = new PostMessage("username", "channel", PostMessage.Emoji.ChartWithUpwardsTrend);
+        PostMessage pm = new PostMessage("username", "channel", PostMessage.Emoji.CHART_WITH_UPWARDS_TREND);
         assertNotNull(pm);
-        assertEquals(pm.text, "");
+        assertEquals(pm.getText(), "");
 
-        pm = new PostMessage("username", "channel", PostMessage.Emoji.ChartWithUpwardsTrend, "text");
+        pm = new PostMessage("username", "channel", PostMessage.Emoji.CHART_WITH_UPWARDS_TREND, "text");
         assertNotNull(pm);
-        assertEquals(pm.text, "text");
+        assertEquals(pm.getText(), "text");
     }
 
 }

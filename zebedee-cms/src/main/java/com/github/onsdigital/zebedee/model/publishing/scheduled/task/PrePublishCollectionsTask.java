@@ -1,6 +1,5 @@
 package com.github.onsdigital.zebedee.model.publishing.scheduled.task;
 
-import com.github.davidcarboni.cryptolite.Random;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
@@ -143,7 +142,7 @@ public class PrePublishCollectionsTask extends ScheduledTask {
                         logInfo("PRE-PUBLISH: creating collection publish task").collectionName(collection).log();
 
                         // FIXME using PostPublisher.getPublishedCollection feels a bit hacky
-                        SlackNotification.publishNotification(PostPublisher.getPublishedCollection(collection),SlackNotification.CollectionStage.PrePublish, SlackNotification.StageStatus.Started);
+                        SlackNotification.publishNotification(PostPublisher.getPublishedCollection(collection),SlackNotification.CollectionStage.PRE_PUBLISH, SlackNotification.StageStatus.STARTED);
 
                         // begin the publish ahead of time. This creates the transaction on the train.
                         Map<String, String> hostToTransactionIdMap = Publisher.createPublishingTransactions(collection);
@@ -159,13 +158,13 @@ public class PrePublishCollectionsTask extends ScheduledTask {
                         collectionPublishTasks.add(publishCollectionTask);
 
                         // FIXME using PostPublisher.getPublishedCollection feels a bit hacky
-                        SlackNotification.publishNotification(PostPublisher.getPublishedCollection(collection), SlackNotification.CollectionStage.PrePublish, SlackNotification.StageStatus.Completed);
+                        SlackNotification.publishNotification(PostPublisher.getPublishedCollection(collection), SlackNotification.CollectionStage.PRE_PUBLISH, SlackNotification.StageStatus.COMPLETED);
 
                         return true;
                     } catch (BadRequestException | IOException | UnauthorizedException | NotFoundException e) {
                         // FIXME using PostPublisher.getPublishedCollection feels a bit hacky
                         // TODO pass through the error?
-                        SlackNotification.publishNotification(PostPublisher.getPublishedCollection(collection), SlackNotification.CollectionStage.PrePublish,SlackNotification.StageStatus.Failed);
+                        SlackNotification.publishNotification(PostPublisher.getPublishedCollection(collection), SlackNotification.CollectionStage.PRE_PUBLISH,SlackNotification.StageStatus.FAILED);
 
                         logError(e).log();
                         return false;

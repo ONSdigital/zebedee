@@ -81,7 +81,7 @@ public class PostPublisher {
             PublishedCollection publishedCollection = getPublishedCollection(collection);
 
             // FIXME using PostPublisher.getPublishedCollection feels a bit hacky
-            SlackNotification.publishNotification(publishedCollection,SlackNotification.CollectionStage.PostPublish, SlackNotification.StageStatus.Started);
+            SlackNotification.publishNotification(publishedCollection,SlackNotification.CollectionStage.POST_PUBLISH, SlackNotification.StageStatus.STARTED);
 
             getCollectionHistoryDao().saveCollectionHistoryEvent(collection, getPublisherClassSession(),
                     COLLECTION_POST_PUBLISHED_CONFIRMATION);
@@ -108,14 +108,14 @@ public class PostPublisher {
             ContentTree.dropCache();
 
             // FIXME using PostPublisher.getPublishedCollection feels a bit hacky
-            SlackNotification.publishNotification(publishedCollection,SlackNotification.CollectionStage.PostPublish, SlackNotification.StageStatus.Completed);
+            SlackNotification.publishNotification(publishedCollection,SlackNotification.CollectionStage.POST_PUBLISH, SlackNotification.StageStatus.COMPLETED);
 
             return true;
         } catch (Exception exception) {
             logError(exception, "An error occurred during the publish cleanup")
                     .collectionName(collection).collectionId(collection).log();
             // FIXME using PostPublisher.getPublishedCollection feels a bit hacky
-            SlackNotification.publishNotification(getPublishedCollection(collection),SlackNotification.CollectionStage.PostPublish, SlackNotification.StageStatus.Failed);
+            SlackNotification.publishNotification(getPublishedCollection(collection),SlackNotification.CollectionStage.POST_PUBLISH, SlackNotification.StageStatus.FAILED);
         }
 
         return false;

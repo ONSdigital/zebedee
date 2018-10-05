@@ -92,7 +92,7 @@ public class PublishCollectionTask implements Callable<Boolean> {
                         .collectionName(collection)
                         .log();
 
-                SlackNotification.scheduledPublishFailire(collection);
+                SlackNotification.scheduledPublishFailure(collection);
             }
             return published;
         }

@@ -12,6 +12,7 @@ export PACKAGE_PREFIX=com.github.onsdigital.zebedee
 export audit_db_enabled=false
 export DP_LOGGING_FORMAT=pretty_json
 export DP_COLOURED_LOGGING=true
+export enable_splunk_reporting=false
 
 # Development: reloadable
 mvn clean package dependency:copy-dependencies -Dmaven.test.skip=true && \
@@ -28,9 +29,4 @@ java $JAVA_OPTS \
  -DSTART_EMBEDDED_SERVER=N \
  -cp "zebedee-cms/target/classes:zebedee-cms/target/dependency/*" \
  com.github.davidcarboni.restolino.Main
-
-#mvn package && \
-#java $JAVA_OPTS \
-# -Drestolino.packageprefix=$PACKAGE_PREFIX \
-# -jar zebedee-cms/target/*-jar-with-dependencies.jar
 

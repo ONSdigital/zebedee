@@ -27,8 +27,9 @@
         <appender-ref ref="DP_LOGGER"/>
     </logger>
 
-    <!-- silence Restolino -->
-    <logger name="com.github.davidcarboni.restolino" level="debug" additivity="false"/>
+    <logger name="com.github.davidcarboni.restolino" level="warn" additivity="false">
+        <appender-ref ref="DP_LOGGER"/>
+    </logger>
 
     <root level="info">
         <appender-ref ref="DP_LOGGER"/>

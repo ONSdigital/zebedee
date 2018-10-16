@@ -29,6 +29,13 @@ job "zebedee-reader" {
       value     = "web.*"
     }
 
+    restart {
+      attempts = 3
+      delay    = "15s"
+      interval = "1m"
+      mode     = "delay"
+    }
+
     task "zebedee-reader" {
       driver = "docker"
 

@@ -386,11 +386,13 @@ public class Collections {
         }
 
         Keyring keyring = zebedeeSupplier.get().getKeyringCache().get(session);
-        if (keyring == null) throw new UnauthorizedException("No keyring is available for " + session.getEmail());
+        if (keyring == null) {
+            throw new UnauthorizedException("No keyring is available for " + session.getEmail());
+        }
 
         ZebedeeCollectionReader collectionReader = new ZebedeeCollectionReader(zebedeeSupplier.get(), collection, session);
         long publishStart = System.currentTimeMillis();
-        boolean publishComplete = Publisher.Publish(collection, session.getEmail(), collectionReader);
+        boolean publishComplete = Publisher.publish(collection, session.getEmail(), collectionReader);
 
         if (publishComplete) {
             long onPublishCompleteStart = System.currentTimeMillis();

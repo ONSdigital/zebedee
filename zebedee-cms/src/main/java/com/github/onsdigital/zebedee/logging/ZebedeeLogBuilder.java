@@ -266,6 +266,11 @@ public class ZebedeeLogBuilder extends LogMessageBuilder {
         return this;
     }
 
+    public ZebedeeLogBuilder publishingAction() {
+        addParameter("publishing", true);
+        return this;
+    }
+
     @Override
     public ZebedeeLogBuilder addParameter(String key, Object value) {
         return (ZebedeeLogBuilder) super.addParameter(key, value != null ? value : "");

@@ -10,6 +10,7 @@ import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.UnexpectedErrorException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
+import com.github.onsdigital.zebedee.service.DatasetService;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.CollectionWriter;
@@ -111,5 +112,9 @@ public class ZebedeeCmsService {
 
     public Zebedee getZebedee() {
         return Root.zebedee;
+    }
+
+    public DatasetService getDatasetService() {
+        return Root.zebedee.getDatasetService();
     }
 }

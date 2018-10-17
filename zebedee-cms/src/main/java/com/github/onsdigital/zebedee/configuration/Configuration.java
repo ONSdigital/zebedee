@@ -8,6 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.apache.commons.lang.StringUtils.defaultIfBlank;
@@ -53,6 +54,10 @@ public class Configuration {
 
     public static String getInfluxDBHost() {
         return StringUtils.defaultIfBlank(getValue("influxdb_url"), INFLUXDB_URL);
+    }
+
+    public static boolean isEnableDatasetImport() {
+        return Boolean.valueOf(getValue("ENABLE_DATASET_IMPORT"));
     }
 
     /**

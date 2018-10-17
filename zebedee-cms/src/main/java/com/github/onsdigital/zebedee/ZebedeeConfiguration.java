@@ -154,8 +154,7 @@ public class ZebedeeConfiguration {
                 collections,
                 permissionsService,
                 applicationKeys,
-                keyringCache)
-        ;
+                keyringCache);
 
         DatasetClient datasetClient;
         try {

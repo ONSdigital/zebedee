@@ -2,15 +2,19 @@ package com.github.onsdigital.zebedee.configuration;
 
 import com.github.davidcarboni.httpino.Host;
 import com.github.onsdigital.zebedee.session.model.Session;
+import dp.api.dataset.DatasetAPIClient;
+import dp.api.dataset.DatasetClient;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
 import static org.apache.commons.lang.StringUtils.defaultIfBlank;
 
 
@@ -58,6 +62,20 @@ public class Configuration {
 
     public static boolean isEnableDatasetImport() {
         return Boolean.valueOf(getValue("ENABLE_DATASET_IMPORT"));
+    }
+
+    public static DatasetAPIClient getDatasetAPIClient() throws URISyntaxException {
+        if (isEnableDatasetImport()) {
+            logInfo("feature EnableDatasetImport enabled, creating Page hooks")
+                    .addParameter("hooks", "pageDeletionHook, pageCreationHook")
+                    .log();
+
+            return new DatasetAPIClient(
+                    Configuration.getDatasetAPIURL(),
+                    Configuration.getDatasetAPIAuthToken(),
+                    Configuration.getServiceAuthToken());
+        }
+        return null;
     }
 
     /**

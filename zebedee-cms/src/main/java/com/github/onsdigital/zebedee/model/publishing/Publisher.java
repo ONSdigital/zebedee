@@ -100,6 +100,7 @@ public class Publisher {
 
         boolean publishComplete = commitPublish(collection, email);
 
+        // FIXME CMD feature
         if (Configuration.isEnableDatasetImport()) {
             publishComplete &= publishDatasets(collection);
         }
@@ -714,8 +715,12 @@ public class Publisher {
     }
 
     private static boolean publishDatasets(Collection collection) throws IOException {
+        logDebug("publishing api datasets for collection")
+                .collectionName(collection)
+                .publishingAction()
+                .log();
+
         boolean datasetsPublished = false;
-        logDebug("publishing api datasets for collection").collectionName(collection).publishingAction().log();
         try {
             datasetServiceSupplier.getService().publishDatasetsInCollection(collection);
             datasetsPublished = true;

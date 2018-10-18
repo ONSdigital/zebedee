@@ -288,9 +288,8 @@ public class Collections {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
-        // Everything is completed
-        if (!collection.inProgressUris().isEmpty()
-                || !collection.completeUris().isEmpty()) {
+        // Check everything is reviewed
+        if (!collection.isAllContentReviewed()) {
             throw new ConflictException(
                     "This collection can't be approved because it's not empty");
         }

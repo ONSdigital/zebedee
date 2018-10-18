@@ -5,6 +5,7 @@ import com.github.davidcarboni.cryptolite.Random;
 import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.KeyManangerUtil;
 import com.github.onsdigital.zebedee.Zebedee;
+import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.content.page.base.PageType;
 import com.github.onsdigital.zebedee.content.page.release.Release;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
@@ -1214,17 +1215,23 @@ public class Collection {
      * Return true if this collection has had all of its content reviewed.
      */
     public boolean isAllContentReviewed() throws IOException {
+        // FIXME CMD feature flag
+        if (Configuration.isEnableDatasetImport()) {
+            boolean allDatasetsReviewed = description.getDatasets()
+                    .stream()
+                    .allMatch(ds -> ds.getState().equals(ContentStatus.Reviewed));
 
-        boolean allDatasetsReviewed = description.getDatasets().stream()
-                .allMatch(ds -> ds.getState().equals(ContentStatus.Reviewed));
+            boolean allDatasetVersionsReviewed = description.getDatasetVersions()
+                    .stream()
+                    .allMatch(ds -> ds.getState().equals(ContentStatus.Reviewed));
 
-        boolean allDatasetVersionsReviewed = description.getDatasetVersions().stream()
-                .allMatch(ds -> ds.getState().equals(ContentStatus.Reviewed));
+            return (inProgressUris().isEmpty()
+                    && completeUris().isEmpty()
+                    && allDatasetsReviewed
+                    && allDatasetVersionsReviewed);
+        }
 
-        return (inProgressUris().isEmpty()
-                && completeUris().isEmpty()
-                && allDatasetsReviewed
-                && allDatasetVersionsReviewed);
+        return inProgressUris().isEmpty() && completeUris().isEmpty();
     }
 
     /**

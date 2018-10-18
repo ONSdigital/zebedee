@@ -1422,37 +1422,52 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
     @Test
     public void isAllContentReviewed_shouldReturnFalseWhenDatasetNotReviewed() throws IOException, ZebedeeException {
 
-        // Given a collection with a dataset that has not been set to reviewed.
-        Path collectionPath = Files.createTempDirectory(Random.id()); // create a temp directory to generate content into
-        Collection collection = CollectionTest.CreateCollection(collectionPath,"isAllContentReviewed");
+        try {
+            // Should only valid Dataset version reviewed if feature flag ENABLE_DATASET_IMPORT is enabled
+            System.setProperty("ENABLE_DATASET_IMPORT", "true");
+            // Given a collection with a dataset that has not been set to reviewed.
+            Path collectionPath = Files.createTempDirectory(Random.id()); // create a temp directory to generate content into
+            Collection collection = CollectionTest.CreateCollection(collectionPath, "isAllContentReviewed");
 
-        CollectionDataset dataset = new CollectionDataset();
-        dataset.setState(ContentStatus.Complete);
-        collection.getDescription().addDataset(dataset);
+            CollectionDataset dataset = new CollectionDataset();
+            dataset.setState(ContentStatus.Complete);
+            collection.getDescription().addDataset(dataset);
 
-        // When isAllContentReviewed() is called
-        boolean allContentReviewed = collection.isAllContentReviewed();
+            // When isAllContentReviewed() is called
+            boolean allContentReviewed = collection.isAllContentReviewed();
 
-        // Then the result is false
-        assertFalse(allContentReviewed);
+            // Then the result is false
+            assertFalse(allContentReviewed);
+        } finally {
+            // Should only valid Dataset version reviewed if feature flag ENABLE_DATASET_IMPORT is enabled
+            System.clearProperty("ENABLE_DATASET_IMPORT");
+        }
     }
 
     @Test
     public void isAllContentReviewed_shouldReturnFalseWhenDatasetVersionNotReviewed() throws IOException, ZebedeeException {
+        try {
+            // FIXME CMD feature flag
+            // Should only valid Dataset version reviewed if feature flag ENABLE_DATASET_IMPORT is enabled
+            System.setProperty("ENABLE_DATASET_IMPORT", "true");
 
-        // Given a collection with a dataset version that has not been set to reviewed.
-        Path collectionPath = Files.createTempDirectory(Random.id()); // create a temp directory to generate content into
-        Collection collection = CollectionTest.CreateCollection(collectionPath,"isAllContentReviewed");
+            // Given a collection with a dataset version that has not been set to reviewed.
+            Path collectionPath = Files.createTempDirectory(Random.id()); // create a temp directory to generate content into
+            Collection collection = CollectionTest.CreateCollection(collectionPath, "isAllContentReviewed");
 
-        CollectionDatasetVersion datasetVersion = new CollectionDatasetVersion();
-        datasetVersion.setState(ContentStatus.Complete);
-        collection.getDescription().addDatasetVersion(datasetVersion);
+            CollectionDatasetVersion datasetVersion = new CollectionDatasetVersion();
+            datasetVersion.setState(ContentStatus.Complete);
+            collection.getDescription().addDatasetVersion(datasetVersion);
 
-        // When isAllContentReviewed() is called
-        boolean allContentReviewed = collection.isAllContentReviewed();
+            // When isAllContentReviewed() is called
+            boolean allContentReviewed = collection.isAllContentReviewed();
 
-        // Then the result is false
-        assertFalse(allContentReviewed);
+            // Then the result is false
+            assertFalse(allContentReviewed);
+        } finally {
+            // Should only valid Dataset version reviewed if feature flag ENABLE_DATASET_IMPORT is enabled
+            System.clearProperty("ENABLE_DATASET_IMPORT");
+        }
     }
 
     @Test

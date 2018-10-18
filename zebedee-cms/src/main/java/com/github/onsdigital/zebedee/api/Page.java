@@ -55,8 +55,7 @@ public class Page {
      * Default constructor used instantiates dependencies itself.
      */
     public Page() throws URISyntaxException {
-
-        zebedeeCmsService = ZebedeeCmsService.getInstance();
+        this.zebedeeCmsService = ZebedeeCmsService.getInstance();
 
         if (isEnableDatasetImport()) {
             logInfo("feature EnableDatasetImport enabled, creating Page hooks")
@@ -72,12 +71,12 @@ public class Page {
             Map<PageType, PageUpdateHook> deletionHooks = initialisePageDeletionHooks(datasetAPIClient);
 
 
-            pageDeletionHook = Optional.of(new PageTypeUpdateHook(deletionHooks));
-            pageCreationHook = Optional.of(new PageTypeUpdateHook(creationHooks));
+            this.pageDeletionHook = Optional.of(new PageTypeUpdateHook(deletionHooks));
+            this.pageCreationHook = Optional.of(new PageTypeUpdateHook(creationHooks));
         } else {
             logInfo("feature EnableDatasetImport disabled, Page hooks will not be created").log();
-            pageCreationHook = Optional.empty();
-            pageDeletionHook = Optional.empty();
+            this.pageCreationHook = Optional.empty();
+            this.pageDeletionHook = Optional.empty();
         }
     }
 

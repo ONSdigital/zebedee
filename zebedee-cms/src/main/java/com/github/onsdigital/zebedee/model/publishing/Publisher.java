@@ -43,6 +43,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logDebug;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
@@ -96,24 +97,27 @@ public class Publisher {
      */
     public static boolean executePublish(Collection collection, CollectionReader collectionReader, String email)
             throws IOException {
+        boolean success = false;
+
         publishFilteredCollectionFiles(collection, collectionReader);
 
-        boolean publishComplete = commitPublish(collection, email);
+        // TODO - feels like we should check/return here if unsuccessful?
+        success = commitPublish(collection, email);
 
         // FIXME CMD feature
-        if (Configuration.isEnableDatasetImport()) {
-            publishComplete &= publishDatasets(collection);
+        if (cmsFeatureFlags().isEnableDatasetImport()) {
+            success &= publishDatasets(collection);
         }
 
         logInfo("collection publish time")
                 .addParameter("milliseconds", collection.getPublishTimeMilliseconds())
-                .addParameter("publishComplete", publishComplete)
+                .addParameter("publishComplete", success)
                 .publishingAction()
                 .collectionId(collection)
                 .collectionName(collection)
                 .log();
 
-        return publishComplete;
+        return success;
     }
 
     /**
@@ -234,8 +238,12 @@ public class Publisher {
         boolean publishComplete = false;
 
         try {
+            collection.getDescription().publishStartDate = new Date();
+
             executePrePublish(collection);
             publishComplete = executePublish(collection, collectionReader, email);
+
+            collection.getDescription().publishEndDate = new Date();
         } catch (Exception e) {
             PostMessageField msg = new PostMessageField("Error", e.getMessage(), false);
             collectionAlarm(collection, "Exception publishAction collection", msg);

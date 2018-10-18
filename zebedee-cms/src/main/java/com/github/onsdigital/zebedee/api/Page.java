@@ -38,7 +38,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import static com.github.onsdigital.zebedee.configuration.Configuration.isEnableDatasetImport;
+import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
 
@@ -57,7 +57,7 @@ public class Page {
     public Page() throws URISyntaxException {
         this.zebedeeCmsService = ZebedeeCmsService.getInstance();
 
-        if (isEnableDatasetImport()) {
+        if (cmsFeatureFlags().isEnableDatasetImport()) {
             logInfo("feature EnableDatasetImport enabled, creating Page hooks")
                     .addParameter("hooks", "pageDeletionHook, pageCreationHook")
                     .log();

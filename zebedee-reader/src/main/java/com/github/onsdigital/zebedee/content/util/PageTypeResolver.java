@@ -1,5 +1,6 @@
 package com.github.onsdigital.zebedee.content.util;
 
+import com.github.onsdigital.zebedee.ReaderFeatureFlags;
 import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.content.page.base.PageType;
 import com.google.gson.JsonDeserializationContext;
@@ -16,8 +17,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import static com.github.onsdigital.zebedee.ReaderFeatureFlags.readerFeatureFlags;
+import static com.github.onsdigital.zebedee.content.page.base.PageType.api_dataset;
+import static com.github.onsdigital.zebedee.content.page.base.PageType.api_dataset_landing_page;
 import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logDebug;
 import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logError;
+import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logWarn;
 
 /**
  * Created by bren on 09/06/15.
@@ -73,8 +78,18 @@ class PageTypeResolver implements JsonDeserializer<Page> {
 
         try {
             PageType contentType = PageType.valueOf(type);
+
+            // FIXME CMD feature
+            if (!readerFeatureFlags().isEnableDatasetImport()
+                    && (contentType.equals(api_dataset) || contentType.equals(api_dataset_landing_page))) {
+                logWarn("PageType invalid feature EnableDatasetImport disabled. Enable this feature by updating the Zebedee configuration")
+                        .addParameter("pageType", contentType.getDisplayName())
+                        .log();
+                throw new JsonParseException("Invalid page type");
+            }
+
             Class<Page> pageClass = contentClasses.get(contentType);
-            if(pageClass == null) {
+            if (pageClass == null) {
                 throw new RuntimeException("Could find content object for " + type);
             }
             Page content = context.deserialize(json, pageClass);

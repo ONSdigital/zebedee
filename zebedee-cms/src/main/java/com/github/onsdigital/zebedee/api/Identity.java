@@ -16,10 +16,12 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
 import java.io.IOException;
 
+import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logWarn;
 import static com.github.onsdigital.zebedee.util.JsonUtils.writeResponse;
+import static org.apache.http.HttpStatus.SC_NOT_FOUND;
 import static org.apache.http.HttpStatus.SC_OK;
 import static org.apache.http.HttpStatus.SC_UNAUTHORIZED;
 
@@ -33,21 +35,28 @@ public class Identity {
 
     @GET
     public void identifyUser(HttpServletRequest request, HttpServletResponse response) throws IOException {
-
-        if (request.getHeader(RequestUtils.TOKEN_HEADER) != null) {
-            findUser(request, response);
-            return;
-        }
-
-        if (StringUtils.isNotBlank(request.getHeader(AUTHORIZATION_HEADER))) {
-            ServiceAccount serviceAccount = findService(request);
-            if (serviceAccount != null) {
-
-                writeResponse(response, new UserIdentity(serviceAccount.getId()), SC_OK);
+        // FIXME CMD feature
+        if (cmsFeatureFlags().isEnableDatasetImport()) {
+            if (request.getHeader(RequestUtils.TOKEN_HEADER) != null) {
+                findUser(request, response);
                 return;
             }
+
+            if (StringUtils.isNotBlank(request.getHeader(AUTHORIZATION_HEADER))) {
+                ServiceAccount serviceAccount = findService(request);
+                if (serviceAccount != null) {
+
+                    writeResponse(response, new UserIdentity(serviceAccount.getId()), SC_OK);
+                    return;
+                }
+            }
+            writeResponse(response, new Error("service not authenticated"), SC_UNAUTHORIZED);
+        } else {
+            logWarn("Identity endpoint is not supported as feature EnableDatasetImport is disabled")
+                    .addParameter("responseStatus", SC_NOT_FOUND)
+                    .log();
+            writeResponse(response, new Error("Not found"), SC_NOT_FOUND);
         }
-        writeResponse(response, new Error("service not authenticated"), SC_UNAUTHORIZED);
     }
 
     private void findUser(HttpServletRequest request, HttpServletResponse response) throws IOException {

@@ -2,6 +2,7 @@ package com.github.onsdigital.zebedee;
 
 import com.github.davidcarboni.restolino.framework.Startup;
 import com.github.onsdigital.zebedee.api.Root;
+import com.github.onsdigital.zebedee.configuration.CMSFeatureFlags;
 import com.github.onsdigital.zebedee.model.ZebedeeCollectionReaderFactory;
 import com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDaoFactory;
 import com.github.onsdigital.zebedee.reader.ZebedeeReader;
@@ -18,5 +19,8 @@ public class Init implements Startup {
         ZebedeeReader.setCollectionReaderFactory(new ZebedeeCollectionReaderFactory(Root.zebedee));
         CollectionHistoryDaoFactory.initialise();
         logDebug("Zebedee Start up").log();
+
+        // load the feature flags config.
+        CMSFeatureFlags.cmsFeatureFlags();
     }
 }

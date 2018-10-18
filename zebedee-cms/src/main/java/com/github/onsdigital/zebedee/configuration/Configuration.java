@@ -60,24 +60,6 @@ public class Configuration {
         return StringUtils.defaultIfBlank(getValue("influxdb_url"), INFLUXDB_URL);
     }
 
-    public static boolean isEnableDatasetImport() {
-        return Boolean.valueOf(getValue("ENABLE_DATASET_IMPORT"));
-    }
-
-    public static DatasetAPIClient getDatasetAPIClient() throws URISyntaxException {
-        if (isEnableDatasetImport()) {
-            logInfo("feature EnableDatasetImport enabled, creating Page hooks")
-                    .addParameter("hooks", "pageDeletionHook, pageCreationHook")
-                    .log();
-
-            return new DatasetAPIClient(
-                    Configuration.getDatasetAPIURL(),
-                    Configuration.getDatasetAPIAuthToken(),
-                    Configuration.getServiceAuthToken());
-        }
-        return null;
-    }
-
     /**
      * how many seconds before the actual publish time should we run the preprocess.
      */

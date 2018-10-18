@@ -74,6 +74,7 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
 
+import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_CONTENT_REVIEWED;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_CREATED;
@@ -1216,7 +1217,7 @@ public class Collection {
      */
     public boolean isAllContentReviewed() throws IOException {
         // FIXME CMD feature flag
-        if (Configuration.isEnableDatasetImport()) {
+        if (cmsFeatureFlags().isEnableDatasetImport()) {
             boolean allDatasetsReviewed = description.getDatasets()
                     .stream()
                     .allMatch(ds -> ds.getState().equals(ContentStatus.Reviewed));

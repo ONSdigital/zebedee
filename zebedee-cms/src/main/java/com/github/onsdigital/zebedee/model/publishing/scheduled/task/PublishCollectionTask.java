@@ -1,5 +1,6 @@
 package com.github.onsdigital.zebedee.model.publishing.scheduled.task;
 
+import com.github.onsdigital.zebedee.configuration.CMSFeatureFlags;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
 import com.github.onsdigital.zebedee.model.publishing.Publisher;
@@ -9,6 +10,7 @@ import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
+import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logWarn;
@@ -48,9 +50,8 @@ public class PublishCollectionTask implements Callable<Boolean> {
             logInfo("PUBLISH: Running collection publish task").collectionId(collection).log();
             collection.getDescription().publishStartDate = new Date();
 
-            Publisher.publishFilteredCollectionFiles(collection, collectionReader);
+            published = Publisher.executePublish(collection, collectionReader, publisherSystemEmail);
 
-            published = Publisher.commitPublish(collection, publisherSystemEmail);
             collection.getDescription().publishEndDate = new Date();
         } catch (Exception e) {
             // If an error was caught, attempt to roll back the transaction:

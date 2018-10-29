@@ -30,33 +30,50 @@ public class Identity {
 
     private AuthorisationService authorisationService;
     private ServiceStore serviceStore;
+    private boolean datasetImportEnabled = false;
 
     static final String AUTHORIZATION_HEADER = "Authorization";
+    static final Error NOT_FOUND_ERROR = new Error("Not found");
+
+    /**
+     * Construct the default Identity api endpoint.
+     */
+    public Identity() {
+        this(cmsFeatureFlags().isEnableDatasetImport());
+    }
+
+    /**
+     * Construct and Identity api endpoint explicitly enabling/disabling the datasetImportEnabled feature.
+     */
+    public Identity(boolean datasetImportEnabled) {
+        this.datasetImportEnabled = datasetImportEnabled;
+    }
 
     @GET
     public void identifyUser(HttpServletRequest request, HttpServletResponse response) throws IOException {
         // FIXME CMD feature
-        if (cmsFeatureFlags().isEnableDatasetImport()) {
-            if (request.getHeader(RequestUtils.TOKEN_HEADER) != null) {
-                findUser(request, response);
-                return;
-            }
-
-            if (StringUtils.isNotBlank(request.getHeader(AUTHORIZATION_HEADER))) {
-                ServiceAccount serviceAccount = findService(request);
-                if (serviceAccount != null) {
-
-                    writeResponse(response, new UserIdentity(serviceAccount.getId()), SC_OK);
-                    return;
-                }
-            }
-            writeResponse(response, new Error("service not authenticated"), SC_UNAUTHORIZED);
-        } else {
+        if (!datasetImportEnabled) {
             logWarn("Identity endpoint is not supported as feature EnableDatasetImport is disabled")
                     .addParameter("responseStatus", SC_NOT_FOUND)
                     .log();
-            writeResponse(response, new Error("Not found"), SC_NOT_FOUND);
+            writeResponse(response, NOT_FOUND_ERROR, SC_NOT_FOUND);
+            return;
         }
+
+        if (request.getHeader(RequestUtils.TOKEN_HEADER) != null) {
+            findUser(request, response);
+            return;
+        }
+
+        if (StringUtils.isNotBlank(request.getHeader(AUTHORIZATION_HEADER))) {
+            ServiceAccount serviceAccount = findService(request);
+            if (serviceAccount != null) {
+
+                writeResponse(response, new UserIdentity(serviceAccount.getId()), SC_OK);
+                return;
+            }
+        }
+        writeResponse(response, new Error("service not authenticated"), SC_UNAUTHORIZED);
     }
 
     private void findUser(HttpServletRequest request, HttpServletResponse response) throws IOException {

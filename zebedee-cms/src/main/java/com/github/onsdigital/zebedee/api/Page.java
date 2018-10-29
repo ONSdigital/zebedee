@@ -2,7 +2,6 @@ package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
 import com.github.onsdigital.zebedee.audit.Audit;
-import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.content.page.APIDatasetLandingPageCreationHook;
 import com.github.onsdigital.zebedee.content.page.APIDatasetLandingPageDeletionHook;
 import com.github.onsdigital.zebedee.content.page.PageTypeUpdateHook;
@@ -19,7 +18,6 @@ import com.github.onsdigital.zebedee.persistence.CollectionEventType;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.util.ZebedeeCmsService;
-import dp.api.dataset.DatasetAPIClient;
 import dp.api.dataset.DatasetClient;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.io.IOUtils;
@@ -48,6 +46,7 @@ public class Page {
     private final ZebedeeCmsService zebedeeCmsService;
     private final Optional<PageUpdateHook> pageCreationHook;
     private final Optional<PageUpdateHook> pageDeletionHook;
+    private final boolean datasetImportEnabled;
 
     static final String zebedeeFileSuffix = "/data.json";
 
@@ -55,21 +54,25 @@ public class Page {
      * Default constructor used instantiates dependencies itself.
      */
     public Page() throws URISyntaxException {
+        this(cmsFeatureFlags().isEnableDatasetImport());
+    }
+
+    /**
+     * Constructor allowing you to specifying if the dataset import feature should be enabled.
+     */
+    public Page(boolean datasetImportEnabled) throws URISyntaxException {
+        this.datasetImportEnabled = datasetImportEnabled;
         this.zebedeeCmsService = ZebedeeCmsService.getInstance();
 
-        if (cmsFeatureFlags().isEnableDatasetImport()) {
+        if (datasetImportEnabled) {
             logInfo("feature EnableDatasetImport enabled, creating Page hooks")
                     .addParameter("hooks", "pageDeletionHook, pageCreationHook")
                     .log();
 
-            DatasetClient datasetAPIClient = new DatasetAPIClient(
-                    Configuration.getDatasetAPIURL(),
-                    Configuration.getDatasetAPIAuthToken(),
-                    Configuration.getServiceAuthToken());
+            DatasetClient datasetAPIClient = zebedeeCmsService.getDatasetClient();
 
             Map<PageType, PageUpdateHook> creationHooks = initialisePageCreationHooks(datasetAPIClient);
             Map<PageType, PageUpdateHook> deletionHooks = initialisePageDeletionHooks(datasetAPIClient);
-
 
             this.pageDeletionHook = Optional.of(new PageTypeUpdateHook(deletionHooks));
             this.pageCreationHook = Optional.of(new PageTypeUpdateHook(creationHooks));
@@ -78,6 +81,21 @@ public class Page {
             this.pageCreationHook = Optional.empty();
             this.pageDeletionHook = Optional.empty();
         }
+    }
+
+    /**
+     * Constructor allowing dependencies to be injected.
+     *
+     * @param zebedeeCmsService
+     * @param pageCreationHook
+     * @param pageDeletionHook
+     */
+    Page(ZebedeeCmsService zebedeeCmsService, PageUpdateHook pageCreationHook, PageUpdateHook pageDeletionHook,
+         boolean datasetImportEnabled) {
+        this.datasetImportEnabled = datasetImportEnabled;
+        this.zebedeeCmsService = zebedeeCmsService;
+        this.pageCreationHook = Optional.ofNullable(pageCreationHook);
+        this.pageDeletionHook = Optional.ofNullable(pageDeletionHook);
     }
 
     private Map<PageType, PageUpdateHook> initialisePageDeletionHooks(DatasetClient datasetAPIClient) {
@@ -98,19 +116,6 @@ public class Page {
         creationHooks.put(PageType.api_dataset_landing_page, datasetLandingPageCreationHook);
 
         return creationHooks;
-    }
-
-    /**
-     * Constructor allowing dependencies to be injected.
-     *
-     * @param zebedeeCmsService
-     * @param pageCreationHook
-     * @param pageDeletionHook
-     */
-    public Page(ZebedeeCmsService zebedeeCmsService, PageUpdateHook pageCreationHook, PageUpdateHook pageDeletionHook) {
-        this.zebedeeCmsService = zebedeeCmsService;
-        this.pageCreationHook = Optional.ofNullable(pageCreationHook);
-        this.pageDeletionHook = Optional.ofNullable(pageDeletionHook);
     }
 
     /**

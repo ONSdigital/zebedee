@@ -3,27 +3,30 @@ package com.github.onsdigital.zebedee.util;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.api.Collections;
 import com.github.onsdigital.zebedee.api.Root;
+import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
-import com.github.onsdigital.zebedee.exceptions.UnexpectedErrorException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
-import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
-import com.github.onsdigital.zebedee.service.DatasetService;
-import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.CollectionWriter;
 import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
 import com.github.onsdigital.zebedee.model.ZebedeeCollectionWriter;
+import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
+import com.github.onsdigital.zebedee.service.DatasetService;
+import com.github.onsdigital.zebedee.session.model.Session;
+import dp.api.dataset.DatasetAPIClient;
+import dp.api.dataset.DatasetClient;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URISyntaxException;
 
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
 
@@ -116,5 +119,12 @@ public class ZebedeeCmsService {
 
     public DatasetService getDatasetService() {
         return Root.zebedee.getDatasetService();
+    }
+
+    public DatasetClient getDatasetClient() throws URISyntaxException {
+        return new DatasetAPIClient(
+                Configuration.getDatasetAPIURL(),
+                Configuration.getDatasetAPIAuthToken(),
+                Configuration.getServiceAuthToken());
     }
 }

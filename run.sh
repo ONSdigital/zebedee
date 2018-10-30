@@ -4,7 +4,6 @@ source ./export-default-env-vars.sh
 
 export JAVA_OPTS=" -Xmx1204m -Xdebug -Xrunjdwp:transport=dt_socket,address=8002,server=y,suspend=n"
 export PORT="${PORT:-8082}"
-export zebedee_root=/Users/dave/Desktop/zebedee-data/content
 
 
 # Restolino configuration

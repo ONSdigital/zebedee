@@ -8,6 +8,7 @@ import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
+import com.github.onsdigital.zebedee.exceptions.UnexpectedErrorException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.CollectionWriter;
@@ -41,7 +42,8 @@ public class ZebedeeCmsService {
 
     private static final String COLLECTION_WRI_ERROR_MSG = "Could not obtain collection writer for requested collection";
     private static final String COLLECTION_READ_ERROR_MSG = "Could not obtain collection reader for requested collection";
-    private static final String COLLECTION_NOT_FOUND_MSG = "Could not find requested collection.";
+    private static final String COLLECTION_NOT_FOUND_MSG = "Could not find requested collection";
+    private static final String GET_COLLECTIONS_ERROR = "Could not get Zebedee collections";
     private static final String SESSION_NOT_FOUND_MSG = "Could not get session from request";
 
     private static final ZebedeeCmsService instance = new ZebedeeCmsService();
@@ -85,6 +87,15 @@ public class ZebedeeCmsService {
                     .logAndThrow(BadRequestException.class);
         }
         return null;
+    }
+
+    public com.github.onsdigital.zebedee.model.Collections getCollections() throws ZebedeeException {
+        try {
+            return Root.zebedee.getCollections();
+        } catch (Exception e) {
+            logError(e, GET_COLLECTIONS_ERROR);
+            throw new UnexpectedErrorException(e.getMessage(), 500);
+        }
     }
 
     public Collection getCollection(HttpServletRequest request) throws ZebedeeException {

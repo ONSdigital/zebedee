@@ -17,6 +17,7 @@ import javax.ws.rs.GET;
 import java.io.IOException;
 import java.util.List;
 
+import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logWarn;
 import static com.github.onsdigital.zebedee.reader.util.ReaderRequestUtils.extractFilter;
 import static com.github.onsdigital.zebedee.reader.util.ReaderRequestUtils.getRequestedLanguage;
 import static com.github.onsdigital.zebedee.reader.util.ReaderResponseResponseUtils.sendResponse;
@@ -62,10 +63,14 @@ public class Generator {
         // Check format string
         String format = request.getParameter(FORMAT_PARAM);
         if (StringUtils.isEmpty(format)) {
+            logWarn("generator endpoint format parameter is required but was empty").log();
             throw new BadRequestException(UNDEFINED_FORMAT_MSG);
         }
 
         if (!SUPPORTED_FORMATS.contains(format.toLowerCase())) {
+            logWarn("generator endpoint requested format is not supported")
+                    .addParameter("format", format)
+                    .log();
             throw new BadRequestException(UNSUPPORTED_FORMAT_MSG);
         }
 

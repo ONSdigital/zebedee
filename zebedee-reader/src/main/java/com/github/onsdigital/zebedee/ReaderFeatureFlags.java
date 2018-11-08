@@ -9,9 +9,6 @@ import java.util.Set;
 import static com.github.onsdigital.zebedee.content.page.base.PageType.api_dataset;
 import static com.github.onsdigital.zebedee.content.page.base.PageType.api_dataset_landing_page;
 import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logInfo;
-import static java.lang.System.getProperty;
-import static java.lang.System.getenv;
-import static org.apache.commons.lang3.StringUtils.defaultIfBlank;
 
 public class ReaderFeatureFlags {
 
@@ -27,8 +24,10 @@ public class ReaderFeatureFlags {
      * use {@link #readerFeatureFlags()} to obtain an instance of it.
      */
     private ReaderFeatureFlags() {
-        this.enableDatasetImport = Boolean.valueOf(
-                defaultIfBlank(getProperty(ENABLE_DATASET_IMPORT), getenv(ENABLE_DATASET_IMPORT)));
+/*        this.enableDatasetImport = Boolean.valueOf(
+                defaultIfBlank(getProperty(ENABLE_DATASET_IMPORT), getenv(ENABLE_DATASET_IMPORT)));*/
+
+        this.enableDatasetImport = true;
 
         if (enableDatasetImport) {
             this.datasetPageTypes = new HashSet<>(Arrays.asList(api_dataset, api_dataset_landing_page));
@@ -42,8 +41,7 @@ public class ReaderFeatureFlags {
     }
 
     public boolean isEnableDatasetImport() {
-        return Boolean.valueOf(defaultIfBlank(
-                getProperty(ENABLE_DATASET_IMPORT), getenv(ENABLE_DATASET_IMPORT)));
+        return enableDatasetImport;
     }
 
     public Set<PageType> datasetImportPageTypes() {
@@ -58,6 +56,7 @@ public class ReaderFeatureFlags {
     }
 
     public static ReaderFeatureFlags readerFeatureFlags() {
+        logInfo("attempting to load reader feature flags").log();
         if (instance == null) {
             synchronized (ReaderFeatureFlags.class) {
                 if (instance == null) {

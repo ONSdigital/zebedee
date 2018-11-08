@@ -23,14 +23,17 @@ public class ZebedeeReaderLogBuilder extends LogMessageBuilder {
 
     private ZebedeeReaderLogBuilder(String description) {
         super(description);
+        setNamespace("zebedee-reader");
     }
 
     private ZebedeeReaderLogBuilder(String description, Level level) {
         super(description, level);
+        setNamespace("zebedee-reader");
     }
 
     private ZebedeeReaderLogBuilder(Throwable t, String description) {
         super(t, description);
+        setNamespace("zebedee-reader");
     }
 
     public static ZebedeeReaderLogBuilder logError(Throwable t) {

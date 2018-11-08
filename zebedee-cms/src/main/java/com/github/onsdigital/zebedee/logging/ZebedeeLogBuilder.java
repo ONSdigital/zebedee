@@ -63,14 +63,17 @@ public class ZebedeeLogBuilder extends LogMessageBuilder {
 
     private ZebedeeLogBuilder(String description) {
         super(description);
+        setNamespace("zebedee-cms");
     }
 
     private ZebedeeLogBuilder(Throwable t, String description) {
         super(t, description);
+        setNamespace("zebedee-cms");
     }
 
     private ZebedeeLogBuilder(String description, Level level) {
         super(description, level);
+        setNamespace("zebedee-cms");
     }
 
     public static ZebedeeLogBuilder logError(Throwable t) {

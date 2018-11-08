@@ -14,7 +14,7 @@ export audit_db_enabled=false
 export DP_LOGGING_FORMAT=pretty_json
 export DP_COLOURED_LOGGING=true
 export enable_splunk_reporting=false
-export ENABLE_DATASET_IMPORT=true
+#export ENABLE_DATASET_IMPORT=true
 
 # Development: reloadable
 mvn clean package dependency:copy-dependencies -Dmaven.test.skip=true && \

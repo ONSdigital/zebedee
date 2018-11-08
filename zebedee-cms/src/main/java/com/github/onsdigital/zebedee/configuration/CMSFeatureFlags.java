@@ -1,6 +1,5 @@
 package com.github.onsdigital.zebedee.configuration;
 
-import static com.github.onsdigital.zebedee.configuration.Configuration.getValue;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
 
 /**
@@ -21,7 +20,8 @@ public class CMSFeatureFlags {
      * Construct a new feature flags instance.
      */
     private CMSFeatureFlags() {
-        this.isDatasetImportEnabled = Boolean.valueOf(getValue(ENABLE_DATASET_IMPORT));
+        //this.isDatasetImportEnabled = Boolean.valueOf(getValue(ENABLE_DATASET_IMPORT));
+        this.isDatasetImportEnabled = true;
 
         logInfo("CMS feature flags configurations")
                 .addParameter(ENABLE_DATASET_IMPORT, isDatasetImportEnabled)
@@ -39,6 +39,7 @@ public class CMSFeatureFlags {
      * Getter method for singleton instance (Lazy loaded).
      */
     public static CMSFeatureFlags cmsFeatureFlags() {
+        logInfo("attempting to load CMS feature flags").log();
         if (instance == null) {
             synchronized (CMSFeatureFlags.class) {
                 if (instance == null) {

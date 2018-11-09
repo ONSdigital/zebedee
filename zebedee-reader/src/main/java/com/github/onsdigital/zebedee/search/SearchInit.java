@@ -22,6 +22,7 @@ import static com.github.onsdigital.zebedee.search.configuration.SearchConfigura
 public class SearchInit implements Startup {
     @Override
     public void init() {
+        logInfo("running SearchInit").log();
         try {
             ElasticSearchClient.init();
         } catch (IOException e) {

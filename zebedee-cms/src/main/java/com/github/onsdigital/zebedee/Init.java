@@ -18,6 +18,9 @@ public class Init implements Startup {
     public void init() {
         logInfo("inside CMS INIT").log();
 
+        logInfo("loading CMS feature flags").log();
+        CMSFeatureFlags.cmsFeatureFlags();
+
         logInfo("Root.init()").log();
         Root.init();
 
@@ -27,8 +30,5 @@ public class Init implements Startup {
         logInfo("CollectionHistoryDaoFactory.initialise();").log();
         CollectionHistoryDaoFactory.initialise();
         logDebug("Zebedee Start up").log();
-
-        // load the feature flags config.
-        CMSFeatureFlags.cmsFeatureFlags();
     }
 }

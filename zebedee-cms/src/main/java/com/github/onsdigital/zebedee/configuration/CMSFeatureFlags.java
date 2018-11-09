@@ -1,6 +1,9 @@
 package com.github.onsdigital.zebedee.configuration;
 
+import org.apache.commons.lang3.StringUtils;
+
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logWarn;
 
 /**
  * Feature flags for Zebedee CMS.
@@ -20,8 +23,7 @@ public class CMSFeatureFlags {
      * Construct a new feature flags instance.
      */
     private CMSFeatureFlags() {
-        //this.isDatasetImportEnabled = Boolean.valueOf(getValue(ENABLE_DATASET_IMPORT));
-        this.isDatasetImportEnabled = true;
+        this.isDatasetImportEnabled = Boolean.valueOf(getConfigValue(ENABLE_DATASET_IMPORT));
 
         logInfo("CMS feature flags configurations")
                 .addParameter(ENABLE_DATASET_IMPORT, isDatasetImportEnabled)
@@ -33,6 +35,28 @@ public class CMSFeatureFlags {
      */
     public boolean isEnableDatasetImport() {
         return this.isDatasetImportEnabled;
+    }
+
+    public static String getConfigValue(String name) {
+        String value = System.getProperty(name);
+        if (StringUtils.isNoneEmpty(value)) {
+            logInfo("applying CMS feature flag config value from system.properties")
+                    .addParameter(name, value)
+                    .log();
+            return value;
+        }
+
+        value = System.getenv(name);
+        if (StringUtils.isNoneEmpty(value)) {
+            logInfo("applying CMS feature flag config value from system.env")
+                    .addParameter(name, value)
+                    .log();
+            return value;
+        }
+        logWarn("CMS config value not found in system.properties or system.env default will be applied")
+                .addParameter("name", name)
+                .log();
+        return "";
     }
 
     /**

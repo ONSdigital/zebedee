@@ -63,8 +63,8 @@ public class CMSFeatureFlags {
      * Getter method for singleton instance (Lazy loaded).
      */
     public static CMSFeatureFlags cmsFeatureFlags() {
-        logInfo("attempting to load CMS feature flags").log();
         if (instance == null) {
+            logInfo("loading CMS feature flag configuration").log();
             synchronized (CMSFeatureFlags.class) {
                 if (instance == null) {
                     instance = new CMSFeatureFlags();

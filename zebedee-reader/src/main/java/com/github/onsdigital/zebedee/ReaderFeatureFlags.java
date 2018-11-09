@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee;
 
 import com.github.onsdigital.zebedee.content.page.base.PageType;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -9,6 +10,7 @@ import java.util.Set;
 import static com.github.onsdigital.zebedee.content.page.base.PageType.api_dataset;
 import static com.github.onsdigital.zebedee.content.page.base.PageType.api_dataset_landing_page;
 import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logInfo;
+import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logWarn;
 
 public class ReaderFeatureFlags {
 
@@ -24,10 +26,7 @@ public class ReaderFeatureFlags {
      * use {@link #readerFeatureFlags()} to obtain an instance of it.
      */
     private ReaderFeatureFlags() {
-/*        this.enableDatasetImport = Boolean.valueOf(
-                defaultIfBlank(getProperty(ENABLE_DATASET_IMPORT), getenv(ENABLE_DATASET_IMPORT)));*/
-
-        this.enableDatasetImport = true;
+        this.enableDatasetImport = Boolean.valueOf(getConfigValue(ENABLE_DATASET_IMPORT));
 
         if (enableDatasetImport) {
             this.datasetPageTypes = new HashSet<>(Arrays.asList(api_dataset, api_dataset_landing_page));
@@ -55,9 +54,32 @@ public class ReaderFeatureFlags {
         return datasetImportPageTypes().contains(pageType);
     }
 
+
+    public static String getConfigValue(String name) {
+        String value = System.getProperty(name);
+        if (StringUtils.isNoneEmpty(value)) {
+            logInfo("applying Reader feature flag config value from system.properties")
+                    .addParameter(name, value)
+                    .log();
+            return value;
+        }
+
+        value = System.getenv(name);
+        if (StringUtils.isNoneEmpty(value)) {
+            logInfo("applying Reader feature flag config value from system.env")
+                    .addParameter(name, value)
+                    .log();
+            return value;
+        }
+        logWarn("Reader config value not found in system.properties or system.env default will be applied")
+                .addParameter("name", name)
+                .log();
+        return "";
+    }
+
     public static ReaderFeatureFlags readerFeatureFlags() {
-        logInfo("attempting to load reader feature flags").log();
         if (instance == null) {
+            logInfo("attempting to load reader feature flags").log();
             synchronized (ReaderFeatureFlags.class) {
                 if (instance == null) {
                     instance = new ReaderFeatureFlags();

@@ -15,12 +15,14 @@ import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 import static com.github.onsdigital.zebedee.ReaderFeatureFlags.readerFeatureFlags;
 import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logDebug;
 import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logError;
 import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logInfo;
+import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logTrace;
 import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logWarn;
 
 /**
@@ -29,6 +31,7 @@ import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logW
 class PageTypeResolver implements JsonDeserializer<Page> {
 
     private static Map<PageType, Class> contentClasses = new HashMap<PageType, Class>();
+    private static Function<Map.Entry<PageType, Class>, String> contentTypeNameFunc = (e) -> e.getKey().getDisplayName();
     private static PageTypeResolver instance = null;
 
     private boolean datasetImportEnabled;
@@ -83,6 +86,11 @@ class PageTypeResolver implements JsonDeserializer<Page> {
                     Predicate<PageType> isDatasetImportPageType = (p) -> readerFeatureFlags().datasetImportPageTypes().contains(p);
 
                     registerContentTypes();
+
+                    logInfo("registered content types")
+                            .parameter("contentTypes", contentClasses.entrySet().stream(), contentTypeNameFunc)
+                            .log();
+
                     instance = new PageTypeResolver(isDatasetImportEnabled, isDatasetImportPageType);
                 }
             }
@@ -91,7 +99,6 @@ class PageTypeResolver implements JsonDeserializer<Page> {
     }
 
     private static void registerContentTypes() {
-        logDebug("Resolving page types").log();
         try {
 
             ConfigurationBuilder configurationBuilder = new ConfigurationBuilder().addUrls(
@@ -103,13 +110,12 @@ class PageTypeResolver implements JsonDeserializer<Page> {
                 String className = contentClass.getSimpleName();
                 boolean _abstract = Modifier.isAbstract(contentClass.getModifiers());
                 if (_abstract) {
-                    logDebug("Skipping registering abstract content").addParameter("type", className).log();
+                    logTrace("Skipping registering abstract content").addParameter("type", className).log();
                     continue;
                 }
 
                 try {
                     Page contentInstance = contentClass.newInstance();
-                    logDebug("Registering content type").addParameter("pageType", contentInstance.getType()).log();
                     contentClasses.put(contentInstance.getType(), contentClass);
                 } catch (InstantiationException e) {
                     logError(e, "Failed to instantiate content type").addParameter("pageType", className).log();

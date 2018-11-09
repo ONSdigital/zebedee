@@ -4,6 +4,9 @@ import ch.qos.logback.classic.Level;
 import com.github.onsdigital.logging.builder.LogMessageBuilder;
 
 import java.nio.file.Path;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Created by dave on 5/5/16.
@@ -104,6 +107,12 @@ public class ZebedeeReaderLogBuilder extends LogMessageBuilder {
         addParameter(COLLECTION_ID, collectionId != null ? collectionId : "");
         return this;
     }
+
+    public <T, R> ZebedeeReaderLogBuilder parameter(String key, Stream<T> s, Function<T, R> func) {
+        addParameter(key, s.map(item -> func.apply(item)).collect(Collectors.toList()));
+        return this;
+    }
+
 
     @Override
     public ZebedeeReaderLogBuilder addParameter(String key, Object value) {

@@ -20,7 +20,7 @@
         <appender-ref ref="DP_LOGGER"/>
     </logger>
 
-    <logger name="com.github.onsdigital.zebedee-reader" level="debug" additivity="false">
+    <logger name="com.github.onsdigital.zebedee-reader" level="trace" additivity="false">
         <appender-ref ref="DP_LOGGER"/>
     </logger>
 

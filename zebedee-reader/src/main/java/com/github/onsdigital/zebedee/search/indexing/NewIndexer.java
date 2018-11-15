@@ -1,9 +1,11 @@
 package com.github.onsdigital.zebedee.search.indexing;
 
+import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.search.indexing.content.NodeClientIndexer;
 import com.github.onsdigital.zebedee.search.indexing.content.ZebedeeContentIndexer;
 import org.elasticsearch.action.index.IndexResponse;
 
+import java.io.IOException;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -49,6 +51,14 @@ public class NewIndexer {
             }
         }
         throw new IndexInProgressException();
+    }
+
+    /**
+     * Reindex all pages under a given uri
+     * @param uri
+     */
+    public void reindexByUri(String uri) throws ZebedeeException, IOException {
+        this.contentIndexer.indexByUri(uri);
     }
 
     private void indexContent() {

@@ -53,4 +53,15 @@ public enum PageType {
     public String getDisplayName() {
         return displayName;
     }
+
+    public boolean isPeriodic() {
+        switch (this) {
+            case bulletin:
+            case article:
+            case compendium_landing_page:
+                return true;
+            default:
+                return false;
+        }
+    }
 }

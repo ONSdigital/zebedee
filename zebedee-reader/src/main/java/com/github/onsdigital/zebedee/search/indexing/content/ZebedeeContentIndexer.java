@@ -11,7 +11,6 @@ import org.elasticsearch.common.settings.Settings;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
@@ -19,9 +18,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.elasticSearchLog;
-import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logError;
-import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logInfo;
+import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.*;
 
 public abstract class ZebedeeContentIndexer {
 
@@ -40,17 +37,25 @@ public abstract class ZebedeeContentIndexer {
 
     public abstract void indexOnsContent();
 
-    public abstract void indexByUri(URI uri);
+    public abstract void indexByUri(String uri);
+
+    protected Page loadPageByUri(String uri) throws ZebedeeException, IOException {
+        return this.zebedeeReader.getPublishedContent(uri);
+    }
+
+    protected List<Page> loadPages() throws IOException {
+        return this.loadPages(null);
+    }
 
     /**
      * Load pages from disk
      * @return
      */
-    protected List<Page> loadPages() throws IOException {
-        return this.fileScanner.scan().stream()
+    protected List<Page> loadPages(String uri) throws IOException {
+        return this.fileScanner.scan(uri).stream()
                 .map(document -> {
                     try {
-                        return this.zebedeeReader.getPublishedContent(document.getUri());
+                        return this.loadPageByUri(document.getUri());
                     } catch (ZebedeeException | IOException e) {
                         logError(e)
                                 .addMessage("Failed getting published content for uri")

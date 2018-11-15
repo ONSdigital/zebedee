@@ -2,10 +2,16 @@ package com.github.onsdigital.zebedee.content.page.base;
 
 import com.github.onsdigital.zebedee.content.base.Content;
 import com.github.onsdigital.zebedee.content.partial.Link;
+import com.github.onsdigital.zebedee.search.fastText.FastTextHelper;
+import com.github.onsdigital.zebedee.search.model.SearchDocument;
+import com.google.common.collect.Sets;
 
+import java.io.IOException;
 import java.net.URI;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
+
+import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.elasticSearchLog;
 
 /**
  * Created by bren on 10/06/15.
@@ -98,5 +104,48 @@ public abstract class Page extends Content {
             sentence = sentence.replaceAll("[^a-zA-Z ]", "").toLowerCase().replaceAll("\\s+", " ");
         }
         return sentence;
+    }
+
+    public SearchDocument toSearchDocument() {
+        SearchDocument indexDocument = new SearchDocument();
+        indexDocument.setUri(this.getUri());
+        indexDocument.setTopics(getTopics(this.getTopics()));
+        indexDocument.setType(this.getType());
+        indexDocument.setSearchBoost(this.getSearchTerms());
+
+        PageDescription pageDescription = this.getDescription();
+
+        if (FastTextHelper.Configuration.INDEX_EMBEDDING_VECTORS) {
+            // Get fastText generated keywords
+            List<String> generatedKeywords = this.getGeneratedKeywords();
+
+            // Combine with original keywords
+            if (null != generatedKeywords && !generatedKeywords.isEmpty()) {
+
+                if (null != pageDescription.getKeywords() && !pageDescription.getKeywords().isEmpty()) {
+                    generatedKeywords.addAll(pageDescription.getKeywords());
+                }
+                Set<String> set = Sets.newLinkedHashSet(generatedKeywords);
+                pageDescription.setKeywords(new LinkedList<>(new LinkedList<>(set)));
+            }
+
+            // Index word embedding vector
+            indexDocument.setEmbedding_vector(this.getEncodedEmbeddingVector());
+        }
+        indexDocument.setDescription(pageDescription);
+
+        return indexDocument;
+    }
+
+    private static ArrayList<URI> getTopics(List<Link> topics) {
+        if (topics == null) {
+            return null;
+        }
+        ArrayList<URI> uriList = new ArrayList<>();
+        for (Link topic : topics) {
+            uriList.add(topic.getUri());
+        }
+
+        return uriList;
     }
 }

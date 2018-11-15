@@ -30,6 +30,7 @@ import static com.github.onsdigital.zebedee.search.configuration.SearchConfigura
 /**
  * Created by bren on 02/09/15.
  */
+@Deprecated
 class ElasticSearchUtils {
     private Client client;
     private String DEFAULT_TYPE = "_default_";

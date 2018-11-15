@@ -311,7 +311,7 @@ public class Indexer {
                 // Generate keywords
                 List<String> generatedKeywords = page.generateKeywords(10, 0.3f);
 
-                if (null != generatedKeywords) {
+                if (null != generatedKeywords && !generatedKeywords.isEmpty()) {
 
                     elasticSearchLog("Generated keywords for page")
                             .addParameter("title", pageDescription.getTitle())

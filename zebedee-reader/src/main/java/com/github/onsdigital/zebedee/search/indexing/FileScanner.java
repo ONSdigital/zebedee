@@ -13,6 +13,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logError;
 import static com.github.onsdigital.zebedee.search.indexing.SearchBoostTermsResolver.getSearchTermResolver;
 import static com.github.onsdigital.zebedee.util.PathUtils.toRelativeUri;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
@@ -56,8 +57,13 @@ public class FileScanner {
             throws IOException {
 
         if (fileNames == null || dir == null) {
-            throw new IllegalArgumentException(
+            IllegalArgumentException e = new IllegalArgumentException(
                     "List of fileNames and Path dir cannot be null");
+            logError(e)
+                    .addMessage("List of fileNames and Path dir cannot be null")
+                    .addParameter("filenames", fileNames)
+                    .addParameter("directory", dir)
+                    .log();
         }
 
         if (searchTerms == null) {

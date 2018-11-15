@@ -3,6 +3,7 @@ package com.github.onsdigital.zebedee.search.indexing.content;
 import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.reader.ZebedeeReader;
+import com.github.onsdigital.zebedee.search.configuration.SearchConfiguration;
 import com.github.onsdigital.zebedee.search.fastText.FastTextClient;
 import com.github.onsdigital.zebedee.search.fastText.FastTextHelper;
 import com.github.onsdigital.zebedee.search.indexing.*;
@@ -15,6 +16,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.elasticSearchLog;
+import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logError;
 
 public class NodeClientIndexer extends ZebedeeContentIndexer {
 
@@ -30,6 +32,21 @@ public class NodeClientIndexer extends ZebedeeContentIndexer {
 
     @Override
     public void indexDepartments() {
+        // Reset the index
+        if (this.indexClient.indexExists(Index.DEPARTMENTS.getIndex())) {
+            this.indexClient.deleteIndex(Index.DEPARTMENTS.getIndex());
+        }
+
+        try {
+            this.indexClient.createIndex(Index.DEPARTMENTS.getIndex(), ZebedeeContentIndexer.getDepartmentsSettings(), ZebedeeContentIndexer.getDepartmentsMapping());
+        } catch (IOException e) {
+            logError(e)
+                    .addMessage("Failed re-indexing content")
+                    .addParameter(IndexClient.Parameters.INDEX.getParameter(), Index.DEPARTMENTS.getIndex())
+                    .log();
+            throw new IndexingException("Failed re-indexing content", e);
+        }
+
         // Load the departments
         try {
             List<Department> departmentList = super.loadDepartments();
@@ -41,24 +58,65 @@ public class NodeClientIndexer extends ZebedeeContentIndexer {
 
         } catch (IOException e) {
             // TODO - better logging
-            e.printStackTrace();
+            logError(e)
+                    .addMessage("Error while indexing departments")
+                    .addParameter(IndexClient.Parameters.INDEX.getParameter(), Index.DEPARTMENTS.getIndex())
+                    .log();
         }
     }
 
     @Override
-    public void indexOnsContent(String indexName) {
+    public void indexOnsContent() {
         long start = System.currentTimeMillis();
+
+        // Get the search alias
+        String searchAlias = SearchConfiguration.getSearchAlias();
+
+        // Check if the index alias is available
+        boolean aliasIsAvailable = this.indexClient.indexExists(searchAlias);
+
+        // Get the old index from the current alias
+        String oldIndex = this.indexClient.getIndexForAlias(searchAlias);
+
+        // Generate new index name
+        String newIndex = this.generateIndexName();
+
         elasticSearchLog("Triggering re-indexing")
-                .addParameter("index", indexName)
+                .addParameter("index", newIndex)
                 .log();
         try {
-            this.indexContent(indexName);
+            // Create the new index
+            this.indexClient.createIndex(newIndex, ZebedeeContentIndexer.getSettings(), ZebedeeContentIndexer.getDefaultMapping());
+
+            // Process the possible scenarious
+            if (aliasIsAvailable && oldIndex == null) {
+                //In this case it is an index rather than an alias. This normally is not possible with index structure set up.
+                //This is a transition code due to elastic search index structure change, making deployment to environments with old structure possible without down time
+                this.indexClient.deleteIndex(searchAlias);
+            }
+
+            if (oldIndex == null) {
+                this.indexClient.addIndexAlias(newIndex, searchAlias);
+                this.indexContent(newIndex);
+            } else {
+                this.indexContent(newIndex);
+                this.indexClient.swapIndexAlias(oldIndex, newIndex, searchAlias);
+                this.indexClient.deleteIndex(oldIndex);
+            }
             elasticSearchLog("Re-indexing completed")
                     .addParameter("totalTime(ms)", (System.currentTimeMillis() - start))
                     .log();
         } catch (IOException e) {
-            throw new IndexingException("Failed re-indexing", e);
+            logError(e)
+                    .addMessage("Failed re-indexing content")
+                    .addParameter(IndexClient.Parameters.INDEX.getParameter(), newIndex)
+                    .log();
+            throw new IndexingException("Failed re-indexing content", e);
         }
+    }
+
+    private String generateIndexName() {
+        return SearchConfiguration.getSearchAlias() + System.currentTimeMillis();
     }
 
     private void indexContent(String indexName) throws IOException {
@@ -67,7 +125,10 @@ public class NodeClientIndexer extends ZebedeeContentIndexer {
                     try {
                         return this.zebedeeReader.getPublishedContent(document.getUri());
                     } catch (ZebedeeException | IOException e) {
-                        e.printStackTrace();
+                        logError(e)
+                                .addMessage("Failed getting published content for uri")
+                                .addParameter("uri", document.getUri())
+                                .log();
                         return null;
                     }
                 })
@@ -79,7 +140,10 @@ public class NodeClientIndexer extends ZebedeeContentIndexer {
             try {
                 pages = FastTextClient.getInstance().generateEmbeddingVectors(pages, 1000);
             } catch (Exception e) {
-                elasticSearchLog("Error generating embedding vectors").log();
+                logError(e)
+                        .addMessage("Failed re-indexing content")
+                        .addParameter(IndexClient.Parameters.INDEX.getParameter(), indexName)
+                        .log();
                 throw new IndexingException("Failed re-indexing", e);
             }
         }
@@ -89,7 +153,7 @@ public class NodeClientIndexer extends ZebedeeContentIndexer {
             pages.stream()
                     .map(Page::toSearchDocument)
                     .forEach(page -> {
-                        IndexRequestBuilder requestBuilder = this.indexClient.createIndexRequest(
+                        IndexRequestBuilder requestBuilder = this.indexClient.createDocumentIndexRequest(
                                 indexName,
                                 page.getType().name(),
                                 page.getUri().toString(),

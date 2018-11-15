@@ -182,12 +182,10 @@ public class IndexClient {
      * @param document
      * @return
      */
-    public IndexRequestBuilder createIndexRequest(String index, String type, String id, Object document) {
-        IndexRequestBuilder requestBuilder = this.client
+    public IndexRequestBuilder createDocumentIndexRequest(String index, String type, String id, Object document) {
+        return this.client
                 .prepareIndex(index, type, id)
                 .setSource(ContentUtil.serialise(document));
-
-        return requestBuilder;
     }
 
     /**
@@ -202,7 +200,7 @@ public class IndexClient {
      * @return
      */
     public IndexResponse createDocument(String index, String type, String id, Object document) {
-        return this.createIndexRequest(index, type, id, document).get();
+        return this.createDocumentIndexRequest(index, type, id, document).get();
     }
 
     /**
@@ -268,7 +266,7 @@ public class IndexClient {
     }
 
     public BulkProcessor getBulkProcessor() {
-        BulkProcessor bulkProcessor = BulkProcessor.builder(
+        return BulkProcessor.builder(
                 this.client,
                 new BulkProcessor.Listener() {
                     @Override
@@ -314,15 +312,13 @@ public class IndexClient {
                 .setBulkSize(new ByteSizeValue(100, ByteSizeUnit.MB))
                 .setConcurrentRequests(4)
                 .build();
-
-        return bulkProcessor;
     }
 
     private static class Configuration {
         public static final String DEFAULT_TYPE = "_default_";
     }
 
-    private enum Parameters {
+    public enum Parameters {
         INDEX("index"),
         ALIAS("alias");
 
@@ -330,6 +326,10 @@ public class IndexClient {
 
         Parameters(String parameter) {
             this.parameter = parameter;
+        }
+
+        public String getParameter() {
+            return parameter;
         }
     }
 

@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.elasticSearchLog;
+import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logInfo;
 
 public abstract class ZebedeeContentIndexer {
 
@@ -34,12 +35,16 @@ public abstract class ZebedeeContentIndexer {
                     .map(line -> {
                         String[] split = line.split(" *=> *");
                         if (split.length != 4) {
-                            elasticSearchLog("Skipping invalid external department").addParameter("line", line).log();
+                            logInfo("Skipping invalid external department")
+                                    .addParameter("line", line)
+                                    .log();
                             return null;
                         }
                         String[] terms = split[3].split(" *, *");
                         if (terms.length == 0) {
-                            elasticSearchLog("Skipping invalid external department").addParameter("line", line).log();
+                            logInfo("Skipping invalid external department")
+                                    .addParameter("line", line)
+                                    .log();
                             return null;
                         }
 
@@ -54,7 +59,7 @@ public abstract class ZebedeeContentIndexer {
 
     public abstract void indexDepartments();
 
-    public abstract void indexOnsContent(String indexName);
+    public abstract void indexOnsContent();
 
     /**
      * Loads the index-config.yml file from disk

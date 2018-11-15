@@ -24,6 +24,7 @@ public class Configuration {
     private static final String INFLUXDB_URL = "http://influxdb:8086";
     private static final String AUDIT_DB_ENABLED_ENV_VAR = "audit_db_enabled";
     private static final String MATHJAX_SERVICE_URL = "http://localhost:8888";
+    private static final String DEFAULT_SLACK_USERNAME = "Zebedee";
 
     private static final int VERIFY_RETRTY_DELAY = 5000; //milliseconds
     private static final int VERIFY_RETRTY_COUNT = 10;
@@ -74,6 +75,14 @@ public class Configuration {
 
     public static String getBabbageUrl() {
         return StringUtils.defaultIfBlank(getValue("BABBAGE_URL"), DEFAULT_WEBSITE_URL);
+    }
+
+    public static String getFlorenceUrl() {
+        return StringUtils.defaultIfBlank(getValue("FLORENCE_URL"), DEFAULT_FLORENCE_URL);
+    }
+
+    public static String getSlackUsername() {
+        return StringUtils.defaultIfBlank(getValue("SLACK_USERNAME"), DEFAULT_SLACK_USERNAME);
     }
 
     public static String getMathjaxServiceUrl() {

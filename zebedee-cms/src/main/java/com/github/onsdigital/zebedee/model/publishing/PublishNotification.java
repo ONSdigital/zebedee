@@ -10,10 +10,10 @@ import com.github.onsdigital.zebedee.json.ContentDetail;
 import com.github.onsdigital.zebedee.json.EventType;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.util.SlackNotification;
+import com.github.onsdigital.zebedee.util.slack.PostMessageField;
 import org.joda.time.DateTime;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -80,8 +80,20 @@ public class PublishNotification {
                             .collectionId(payload.collectionId)
                             .addParameter("websiteHost", host.toString())
                             .addParameter("eventType", eventType).log();
-                    SlackNotification.alarm("Failed sending publish notification to website for " + eventType + " " +
-                            "host:" + host.toString() + " collectionID" + payload.collectionId);
+                    String eventName = "";
+                    try {
+                        eventName = getEndPointName(eventType);
+                    } catch (BadRequestException ex) {
+                        eventName = "unknown: " + eventType.toString();
+                    }
+                    // FIXME it might be better to use collectionAlarm rather than alarm
+                    // but the NotificationPayload only has the collection ID
+                    SlackNotification.alarm(
+                            "Failed sending publish notifications to website",
+                            new PostMessageField("Event", eventName, true),
+                            new PostMessageField("Host", host.toString(), true),
+                            new PostMessageField("Collection ID", payload.collectionId, true)
+                    );
                 }
             }
         }

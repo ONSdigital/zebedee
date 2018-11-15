@@ -89,7 +89,7 @@ public class PublishTask implements Runnable {
                             .collectionId(collection)
                             .log();
 
-                    SlackNotification.scheduledPublishFailire(collection);
+                    SlackNotification.scheduledPublishFailure(collection);
                 }
             }
         } catch (Exception e) {
@@ -98,7 +98,7 @@ public class PublishTask implements Runnable {
                     .collectionName(collection)
                     .log();
 
-            SlackNotification.scheduledPublishFailire(collection);
+            SlackNotification.scheduledPublishFailure(collection);
         }
     }
 }

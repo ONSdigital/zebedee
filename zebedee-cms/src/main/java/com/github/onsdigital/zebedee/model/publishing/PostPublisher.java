@@ -17,6 +17,8 @@ import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
 import com.github.onsdigital.zebedee.reader.Resource;
+import com.github.onsdigital.zebedee.search.configuration.SearchConfiguration;
+import com.github.onsdigital.zebedee.search.indexing.IndexClient;
 import com.github.onsdigital.zebedee.search.indexing.Indexer;
 import com.github.onsdigital.zebedee.service.DeletedContent.DeletedContentService;
 import com.github.onsdigital.zebedee.service.DeletedContent.DeletedContentServiceFactory;
@@ -331,7 +333,7 @@ public class PostPublisher {
                     logDebug("Deleting index from publishing search ").addParameter("uri", node.uri).log();
                     pool.submit(() -> {
                         try {
-                            Indexer.getInstance().deleteContentIndex(node.type, node.uri);
+                            IndexClient.getInstance().deleteDocument(SearchConfiguration.getSearchAlias(), node.type, node.uri);
                         } catch (Exception e) {
                             logError(e, "Exception reloading search index:").log();
                         }
@@ -361,7 +363,7 @@ public class PostPublisher {
     private static void reIndexPublishingSearch(final String uri) throws IOException {
         pool.submit(() -> {
             try {
-                Indexer.getInstance().reloadContent(uri);
+                Indexer.getInstance().reindexByUri(uri);
             } catch (Exception e) {
                 logError(e, "Exception reloading search index:").log();
             }

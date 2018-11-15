@@ -2,6 +2,7 @@ package com.github.onsdigital.zebedee.search;
 
 import com.github.davidcarboni.restolino.framework.Startup;
 import com.github.onsdigital.zebedee.search.client.ElasticSearchClient;
+import com.github.onsdigital.zebedee.search.indexing.IndexClient;
 import com.github.onsdigital.zebedee.search.indexing.Indexer;
 import com.github.onsdigital.zebedee.search.indexing.SearchBoostTermsResolver;
 import org.elasticsearch.client.transport.NoNodeAvailableException;
@@ -43,12 +44,12 @@ public class SearchInit implements Startup {
 
                         String searchAlias = getSearchAlias();
 
-                        if (Indexer.getInstance().isIndexAvailable(searchAlias)) {
+                        if (IndexClient.getInstance().indexExists(searchAlias)) {
                             logInfo("It looks like the search index already exists. Not attempting to reindex.").log();
                         } else {
                             logInfo("Search index for the website not found. Creating and populating index...").log();
                             long startSearchReindex = System.currentTimeMillis();
-                            Indexer.getInstance().reload();
+                            Indexer.getInstance().reindex();
                             long endSearchReindex = System.currentTimeMillis();
                             logInfo("Time taken indexing search: " + ((endSearchReindex - startSearchReindex))).log();
                         }

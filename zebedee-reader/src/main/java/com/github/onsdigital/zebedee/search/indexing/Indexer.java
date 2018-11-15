@@ -1,614 +1,87 @@
 package com.github.onsdigital.zebedee.search.indexing;
 
-import com.github.onsdigital.zebedee.content.page.base.Page;
-import com.github.onsdigital.zebedee.content.page.base.PageDescription;
-import com.github.onsdigital.zebedee.content.page.base.PageType;
-import com.github.onsdigital.zebedee.content.partial.Link;
-import com.github.onsdigital.zebedee.content.util.ContentUtil;
-import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
-import com.github.onsdigital.zebedee.reader.ZebedeeReader;
-import com.github.onsdigital.zebedee.search.client.ElasticSearchClient;
-import com.github.onsdigital.zebedee.search.fastText.FastTextExecutorService;
-import com.github.onsdigital.zebedee.search.fastText.FastTextHelper;
-import com.github.onsdigital.zebedee.search.fastText.requests.BatchSentenceVectorRequest;
-import com.github.onsdigital.zebedee.search.fastText.requests.InfoRequest;
-import com.github.onsdigital.zebedee.search.fastText.response.BatchSentenceVectorResponse;
-import com.github.onsdigital.zebedee.search.fastText.response.InfoResponse;
-import com.github.onsdigital.zebedee.search.fastText.response.SentenceVectorResponse;
-import com.github.onsdigital.zebedee.search.model.SearchDocument;
-import com.github.onsdigital.zebedee.util.URIUtils;
-import com.google.common.collect.Sets;
-import org.apache.commons.io.IOUtils;
-import org.elasticsearch.action.bulk.BulkItemResponse;
-import org.elasticsearch.action.bulk.BulkProcessor;
-import org.elasticsearch.action.bulk.BulkRequest;
-import org.elasticsearch.action.bulk.BulkResponse;
-import org.elasticsearch.action.index.IndexRequestBuilder;
+import com.github.onsdigital.zebedee.search.indexing.content.NodeClientIndexer;
+import com.github.onsdigital.zebedee.search.indexing.content.ZebedeeContentIndexer;
 import org.elasticsearch.action.index.IndexResponse;
-import org.elasticsearch.client.Client;
-import org.elasticsearch.common.settings.Settings;
-import org.elasticsearch.common.unit.ByteSizeUnit;
-import org.elasticsearch.common.unit.ByteSizeValue;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URI;
-import java.nio.file.NoSuchFileException;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.stream.Collectors;
 
-import static com.github.onsdigital.zebedee.content.util.ContentUtil.serialise;
-import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.elasticSearchLog;
-import static com.github.onsdigital.zebedee.search.configuration.SearchConfiguration.getSearchAlias;
-import static org.apache.commons.lang3.StringUtils.isEmpty;
-import static org.apache.commons.lang3.StringUtils.startsWith;
+import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logError;
 
 public class Indexer {
-    private final static String DEPARTMENTS_INDEX = "departments";
-    private final static String DEPARTMENT_TYPE = "departments";
-    private final static String DEPARTMENTS_PATH = "/search/departments/departments.txt";
-    private static Indexer instance = new Indexer();
-    private final Lock LOCK = new ReentrantLock();
-    private final Client client = ElasticSearchClient.getClient();
-    private ElasticSearchUtils searchUtils = new ElasticSearchUtils(client);
-    private ZebedeeReader zebedeeReader = new ZebedeeReader();
 
-    private Indexer() {
-    }
+    private static Indexer INSTANCE;
 
     public static Indexer getInstance() {
-        return instance;
+        if (INSTANCE == null) {
+            synchronized (Indexer.class) {
+                INSTANCE = new Indexer();
+            }
+        }
+        return INSTANCE;
     }
 
-    public static void main(String[] args) throws IOException, InterruptedException, ExecutionException, ZebedeeException {
-//        try {
-//            Indexer.getInstance().reload();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-        FileScanner fileScanner = new FileScanner();
-        List<Document> documents = fileScanner.scan();
+    private final IndexClient indexClient;
+    private final ZebedeeContentIndexer contentIndexer;
+    private final Lock lock;
 
-        System.out.println(String.format("Got %d documents", documents.size()));
-        System.out.println("Preparing pages...");
-
-        List<Page> pages = Indexer.getInstance().preparePages(documents);
-        System.out.println(String.format("Got %d pages", pages.size()));
-
-        Page firstPage = pages.get(0);
-        System.out.println(firstPage.getEncodedEmbeddingVector());
+    private Indexer() {
+        this.indexClient = IndexClient.getInstance();
+        this.contentIndexer = new NodeClientIndexer();
+        this.lock = new ReentrantLock();
     }
 
     /**
-     * Initializes search index and aliases, it should be run on application start.
+     * Triggers a complete reindex of Elasticsearch
      */
-    public void reload() throws IOException {
-        if (LOCK.tryLock()) {
+    public void reindex() {
+        if (this.lock.tryLock()) {
             try {
-                lockGlobal();//lock in cluster
-                String searchAlias = getSearchAlias();
-                boolean aliasAvailable = isIndexAvailable(searchAlias);
-                String oldIndex = searchUtils.getAliasIndex(searchAlias);
-                String newIndex = generateIndexName();
-                elasticSearchLog("Creating index").addParameter("newIndex", newIndex).log();
-                searchUtils.createIndex(newIndex, getSettings(), getDefaultMapping());
+                // Lock in cluster
+                this.lockGlobal();
 
-                if (aliasAvailable && oldIndex == null) {
-                    //In this case it is an index rather than an alias. This normally is not possible with index structure set up.
-                    //This is a transition code due to elastic search index structure change, making deployment to environments with old structure possible without down time
-                    searchUtils.deleteIndex(searchAlias);
-                    searchUtils.addAlias(newIndex, searchAlias);
-                    doLoad(newIndex);
-                } else if (oldIndex == null) {
-                    searchUtils.addAlias(newIndex, searchAlias);
-                    doLoad(newIndex);
-                } else {
-                    doLoad(newIndex);
-                    searchUtils.swapIndex(oldIndex, newIndex, searchAlias);
-                    elasticSearchLog("Deleting old index").addParameter("oldIndex", oldIndex).log();
-                    searchUtils.deleteIndex(oldIndex);
-                }
+                this.indexContent();
+
             } finally {
-                LOCK.unlock();
-                unlockGlobal();
-            }
-        } else {
-            throw new IndexInProgressException();
-        }
-    }
-
-    public boolean isIndexAvailable(String indexName) {
-        return searchUtils.isIndexAvailable(indexName);
-    }
-
-    private void doLoad(String indexName) throws IOException {
-        loadDepartments();
-        loadContent(indexName);
-    }
-
-    private void loadContent(String indexName) throws IOException {
-        long start = System.currentTimeMillis();
-        elasticSearchLog("Triggering re-indexing")
-                .addParameter("index", indexName)
-                .log();
-        try {
-            indexDocuments(indexName);
-        } catch (InterruptedException | ExecutionException | ZebedeeException e) {
-            throw new IndexingException("Failed re-indexing content", e);
-        }
-        elasticSearchLog("Re-indexing completed")
-                .addParameter("totalTime(ms)", (System.currentTimeMillis() - start))
-                .log();
-    }
-
-    private void loadDepartments() throws IOException {
-
-        if (isIndexAvailable(DEPARTMENTS_INDEX)) {
-            searchUtils.deleteIndex(DEPARTMENTS_INDEX);
-        }
-
-        searchUtils.createIndex(DEPARTMENTS_INDEX, getDepartmentsSetting(), DEPARTMENT_TYPE, getDepartmentsMapping());
-
-        elasticSearchLog("Indexing departments").log();
-        long start = System.currentTimeMillis();
-        try (
-                InputStream resourceStream = SearchBoostTermsResolver.class.getResourceAsStream(DEPARTMENTS_PATH);
-                InputStreamReader inputStreamReader = new InputStreamReader(resourceStream);
-                BufferedReader br = new BufferedReader(inputStreamReader)
-        ) {
-            for (String line; (line = br.readLine()) != null; ) {
-                processDepartment(line);
+                this.lock.unlock();
+                this.indexClient.deleteGlobalLockDocument();
             }
         }
-        elasticSearchLog("Indexing departments complete")
-                .addParameter("totalTime(ms)", (System.currentTimeMillis() - start))
-                .log();
-    }
-
-    private void processDepartment(String line) {
-        if (isEmpty(line) || startsWith(line, "#")) {
-            return; // skip comments
-        }
-
-        String[] split = line.split(" *=> *");
-        if (split.length != 4) {
-            elasticSearchLog("Skipping invalid external department").addParameter("line", line).log();
-            return;
-        }
-        String[] terms = split[3].split(" *, *");
-        if (terms == null || terms.length == 0) {
-            return;
-        }
-
-        Department department = new Department(split[0], split[1], split[2], terms);
-        searchUtils.createDocument(DEPARTMENTS_INDEX, DEPARTMENT_TYPE, split[0], ContentUtil.serialise(department));
+        throw new IndexInProgressException();
     }
 
     /**
-     * Reads content with given uri and indexes for search
-     *
+     * Reindex all pages under a given uri
      * @param uri
      */
-
-    public void reloadContent(String uri) throws IOException {
-        try {
-            elasticSearchLog("Triggering reindex").addParameter("uri", uri).log();
-            long start = System.currentTimeMillis();
-            Page page = getPage(uri);
-            if (page == null) {
-                throw new NotFoundException("Content not found for re-indexing, uri: " + uri);
-            }
-            if (isPeriodic(page.getType())) {
-                //TODO: optimize resolving latest flag, only update elastic search for existing releases rather than reindexing
-                //Load old releases as well to get latest flag re-calculated
-                FileScanner fileScanner = new FileScanner();
-                List<Document> documents = fileScanner.scan(URIUtils.removeLastSegment(uri));
-                List<Page> pages = preparePages(documents);
-                index(getSearchAlias(), pages);
-            } else {
-                indexSingleContent(getSearchAlias(), page);
-            }
-            long end = System.currentTimeMillis();
-            elasticSearchLog("Reindexing complete")
-                    .addParameter("uri", uri)
-                    .addParameter("totalTime(ms)", (start - end))
-                    .log();
-        } catch (ZebedeeException e) {
-            throw new IndexingException("Failed re-indexing content with uri: " + uri, e);
-        } catch (NoSuchFileException e) {
-            throw new IndexingException("Content not found for re-indexing, uri: " + uri, e);
-        } catch (InterruptedException | ExecutionException e) {
-            throw new IndexingException("Error resolving pages for uri: " + uri, e);
-        }
+    public void reindexByUri(String uri) {
+        this.contentIndexer.indexByUri(uri);
     }
 
-
-    public void deleteContentIndex(String pageType, String uri) {
-        elasticSearchLog("Triggering delete index on publishing search index").addParameter("uri", uri).log();
-        long start = System.currentTimeMillis();
-        searchUtils.deleteDocument(getSearchAlias(), pageType, uri);
-        long end = System.currentTimeMillis();
-        elasticSearchLog("Delete index complete")
-                .addParameter("uri", uri)
-                .addParameter("totalTime(ms)", (start - end))
-                .log();
-    }
-
-    private String generateIndexName() {
-        return getSearchAlias() + System.currentTimeMillis();
+    private void indexContent() {
+        this.contentIndexer.indexDepartments();
+        this.contentIndexer.indexOnsContent();
     }
 
     /**
-     * Resolves search terms for a single document
+     * Acquires a global index lock
      */
-    private List<String> resolveSearchTerms(String uri) throws IOException {
-        if (uri == null) {
-            return null;
-        }
-
-        SearchBoostTermsResolver resolver = SearchBoostTermsResolver.getSearchTermResolver();
-        List<String> terms = new ArrayList<>();
-        addTerms(terms, resolver.getTerms(uri));
-
-        String[] segments = uri.split("/");
-        for (String segment : segments) {
-            String documentUri = "/" + segment;
-            addTerms(terms, resolver.getTermsForPrefix(documentUri));
-        }
-        return terms;
-    }
-
-    private void addTerms(List<String> termsList, List<String> terms) {
-        if (terms == null) {
-            return;
-        }
-        termsList.addAll(terms);
-    }
-
-    private void indexDocuments(String indexName) throws IOException, InterruptedException, ExecutionException, ZebedeeException {
-        FileScanner fileScanner = new FileScanner();
-        List<Document> documents = fileScanner.scan();
-
-        List<Page> pages = preparePages(documents);
-        index(indexName, pages);
-    }
-
-    private Map<String, Future<BatchSentenceVectorResponse>> submitVectorQueries(Map<String, String> queries, FastTextExecutorService executorService) {
-        Map<String, Future<BatchSentenceVectorResponse>> futureMap = new HashMap<>();
-
-        String requestId = UUID.randomUUID().toString();
-        BatchSentenceVectorRequest request = new BatchSentenceVectorRequest(requestId, queries);
-
-        Future<BatchSentenceVectorResponse> future = executorService.submit(request);
-        // Add to futureMap
-        futureMap.put(requestId, future);
-
-        return futureMap;
-    }
-
-    private List<Page> preparePages(List<Document> documents) throws ZebedeeException, IOException, ExecutionException, InterruptedException {
-        return preparePages(documents, 1000);
-    }
-
-    private String getEmptyEmbeddingVector(FastTextExecutorService executorService) throws IOException, InterruptedException, ExecutionException {
-        String requestId = UUID.randomUUID().toString();
-        InfoRequest infoRequest = new InfoRequest(requestId);
-        Future<InfoResponse> responseFuture = executorService.submit(infoRequest);
-
-        InfoResponse response = responseFuture.get();
-        int dimensions = response.getDimensions();
-        double[] vector = new double[dimensions];
-
-        return FastTextHelper.convertArrayToBase64(vector);
-    }
-
-    /**
-     * Resolves pages from document uris and computes embedding vectors and keywords
-     * @return
-     */
-    private List<Page> preparePages(List<Document> documents, int batchThreshold) throws ZebedeeException, IOException, ExecutionException, InterruptedException {
-        // Submit batch requests to dp-fasttext
-        Map<String, String> queries = new HashMap<>();
-        Map<String, Page> pageMap = new HashMap<>();
-
-        Map<String, Future<BatchSentenceVectorResponse>> futureMap = new ConcurrentHashMap<>();
-
-        try (FastTextExecutorService executorService = new FastTextExecutorService()) {
-            // First, get empty vector
-            String emptyVector = getEmptyEmbeddingVector(executorService);
-
-            for (Document document : documents) {
-                String uri = document.getUri();
-                Page page = getPage(uri);
-
-                if (null != page) {
-
-                    // Set empty vector
-                    page.setEncodedEmbeddingVector(emptyVector);
-
-                    page.setSearchTerms(document.getSearchTerms());
-
-                    if (page.getType() != PageType.timeseries) {
-                        // Add to requests map
-                        String sentence = page.getPageSentence();
-                        if (null != sentence && sentence.length() > 5) {
-                            queries.put(uri, sentence);
-                        }
-
-                        if (queries.size() >= batchThreshold) {
-                            // Submit the request
-                            futureMap.putAll(this.submitVectorQueries(queries, executorService));
-
-                            // Reset queries map
-                            queries = new HashMap<>();
-                        }
-                    }
-                }
-                // Add to uri-page map
-                pageMap.put(uri, page);
-            }
-
-            if (!queries.isEmpty()) {
-                // Submit remaining queries
-                futureMap.putAll(this.submitVectorQueries(queries, executorService));
-                queries.clear();
-            }
-        }
-
-        // Trigger get on all requests
-        for (String requestId : futureMap.keySet()) {
-            futureMap.get(requestId).get();
-        }
-
-        int passes = 0;
-        while (!futureMap.isEmpty()) {
-            // Process futures
-            for (String requestId : futureMap.keySet()) {
-                Future<BatchSentenceVectorResponse> future = futureMap.get(requestId);
-                if (future.isDone()) {
-                    System.out.println(String.format("Processing request: %s", requestId));
-                    futureMap.remove(requestId);
-                    BatchSentenceVectorResponse response = future.get();
-
-                    // Loop through keys and set page vectors
-                    Map<String, SentenceVectorResponse> results = response.getResults();
-                    for (String uri : results.keySet()) {
-                        SentenceVectorResponse sentenceVectorResponse = results.get(uri);
-                        String encodedVector = sentenceVectorResponse.getVector();
-                        Map<String, Float> generatedKeywordsMap = sentenceVectorResponse.getKeywords();
-
-                        List<String> generatedKeywords = generatedKeywordsMap.entrySet().stream()
-                                .filter(x -> x.getValue() >= 0.5f)
-                                .map(Map.Entry::getKey)
-                                .collect(Collectors.toList());
-
-                        // Set on page
-                        pageMap.get(uri).setEncodedEmbeddingVector(encodedVector);
-                        pageMap.get(uri).setGeneratedKeywords(generatedKeywords);
-                    }
-                }
-            }
-            passes++;
-            System.out.println(String.format("Pass %d", passes));
-            Thread.sleep(5);
-            if (passes >= 5) {
-                throw new IOException("Took too many passes to process requests");
-            }
-        }
-
-        // Return pages from map
-        return new ArrayList<>(pageMap.values());
-    }
-
-    /**
-     * Recursively indexes contents and their child contents
-     *
-     * @param indexName
-     * @param pages
-     */
-    private void index(String indexName, List<Page> pages) {
-        try (BulkProcessor bulkProcessor = getBulkProcessor()) {
-            for (Page page : pages) {
-                try {
-                    IndexRequestBuilder indexRequestBuilder = prepareIndexRequest(indexName, page);
-                    if (indexRequestBuilder == null) {
-                        continue;
-                    }
-                    bulkProcessor.add(indexRequestBuilder.request());
-                } catch (Exception e) {
-                    System.err.println("!!!!!!!!!Failed preparing index for " + page.getUri().toString() + " skipping...");
-                    e.printStackTrace();
-                }
-            }
-        }
-    }
-
-    private Page getPage(String uri) throws ZebedeeException, IOException {
-        return zebedeeReader.getPublishedContent(uri);
-    }
-
-    private IndexRequestBuilder prepareIndexRequest(String indexName, Page page) throws ZebedeeException, IOException {
-        IndexRequestBuilder indexRequestBuilder = null;
-        if (page != null && page.getType() != null) {
-            SearchDocument searchDocument = toSearchDocument(page);
-            if (null != searchDocument.getEmbedding_vector() && !searchDocument.getEmbedding_vector().isEmpty()) {
-                indexRequestBuilder = searchUtils.prepareIndex(indexName, page.getType().name(), page.getUri().toString());
-                indexRequestBuilder.setSource(serialise(searchDocument));
-            }
-        }
-        return indexRequestBuilder;
-    }
-
-    private void indexSingleContent(String indexName, Page page) throws IOException {
-        List<String> terms = resolveSearchTerms(page.getUri().toString());
-        searchUtils.createDocument(indexName, page.getType().toString(), page.getUri().toString(), serialise(toSearchDocument(page)));
-    }
-
-    private SearchDocument toSearchDocument(Page page) throws IOException {
-        SearchDocument indexDocument = new SearchDocument();
-        indexDocument.setUri(page.getUri());
-        indexDocument.setTopics(getTopics(page.getTopics()));
-        indexDocument.setType(page.getType());
-        indexDocument.setSearchBoost(page.getSearchTerms());
-
-        PageDescription pageDescription = page.getDescription();
-
-        if (FastTextHelper.Configuration.INDEX_EMBEDDING_VECTORS) {
-            try {
-                // Generate keywords
-                List<String> generatedKeywords = page.getGeneratedKeywords();
-
-                if (null != generatedKeywords && !generatedKeywords.isEmpty()) {
-
-                    elasticSearchLog("Generated keywords for page")
-                            .addParameter("title", pageDescription.getTitle())
-                            .addParameter("uri", page.getUri().toString())
-                            .addParameter("keywords", Arrays.toString(generatedKeywords.toArray()))
-                            .log();
-
-                    if (null != pageDescription.getKeywords() && !pageDescription.getKeywords().isEmpty()) {
-                        generatedKeywords.addAll(pageDescription.getKeywords());
-                    }
-                    Set<String> set = Sets.newLinkedHashSet(generatedKeywords);
-                    pageDescription.setKeywords(new LinkedList<>(new LinkedList<>(set)));
-                }
-            } catch (Exception e) {
-                System.out.println("Caught exception generating keywords");
-                e.printStackTrace();
-            }
-
-            // Index word embedding vector
-            String embeddingVector = page.getEncodedEmbeddingVector();
-
-            if (null == embeddingVector || embeddingVector.isEmpty()) {
-                System.out.println(String.format("Empty embedding vector for page %s:%s", page, embeddingVector));
-                throw new IOException(String.format("Empty embedding vector for page %s:%s", page, embeddingVector));
-            }
-            indexDocument.setEmbedding_vector(embeddingVector);
-        }
-        indexDocument.setDescription(pageDescription);
-
-        return indexDocument;
-    }
-
-    private ArrayList<URI> getTopics(List<Link> topics) {
-        if (topics == null) {
-            return null;
-        }
-        ArrayList<URI> uriList = new ArrayList<>();
-        for (Link topic : topics) {
-            uriList.add(topic.getUri());
-        }
-
-        return uriList;
-    }
-
-    private Settings getSettings() {
-        Settings.Builder settingsBuilder = Settings.builder().
-                loadFromStream("index-config.yml", Indexer.class.getResourceAsStream("/search/index-config.yml"));
-        elasticSearchLog("Index settings").addParameter("settings", settingsBuilder.internalMap());
-        return settingsBuilder.build();
-    }
-
-    private Settings getDepartmentsSetting() {
-        Settings.Builder settingsBuilder = Settings.builder().
-                loadFromStream("departments-index-config.yml", Indexer.class.getResourceAsStream("/search/departments/departments-index-config.yml"));
-        return settingsBuilder.build();
-    }
-
-    private String getDefaultMapping() throws IOException {
-        InputStream mappingSourceStream = Indexer.class.getResourceAsStream("/search/default-mapping.json");
-        String mappingSource = IOUtils.toString(mappingSourceStream);
-        elasticSearchLog("defaultMapping").addParameter("mappingSource", mappingSource).log();
-        return mappingSource;
-    }
-
-    private String getDepartmentsMapping() throws IOException {
-        InputStream mappingSourceStream = Indexer.class.getResourceAsStream("/search/departments/departments-mapping.json");
-        String mappingSource = IOUtils.toString(mappingSourceStream);
-        elasticSearchLog("departmentsMapping").addParameter("mappingSource", mappingSource).log();
-        return mappingSource;
-    }
-
-    //acquires global lock
     private void lockGlobal() {
-        IndexResponse lockResponse = searchUtils.createDocument("fs", "lock", "global", "{}");
+        IndexResponse lockResponse = this.indexClient.createGlobalLockDocument();
         if (!lockResponse.isCreated()) {
-            throw new IndexInProgressException();
+            IndexInProgressException indexInProgressException = new IndexInProgressException();
+            logError(indexInProgressException).log();
+            throw indexInProgressException;
         }
     }
 
-    private void unlockGlobal() {
-        searchUtils.deleteDocument("fs", "lock", "global");
+
+    public static void main(String[] args) {
+        // Main method to trigger reindex
+        Indexer.getInstance().reindex();
     }
 
-    private boolean isPeriodic(PageType type) {
-        switch (type) {
-            case bulletin:
-            case article:
-            case compendium_landing_page:
-                return true;
-            default:
-                return false;
-        }
-    }
-
-    private BulkProcessor getBulkProcessor() {
-        BulkProcessor bulkProcessor = BulkProcessor.builder(
-                client,
-                new BulkProcessor.Listener() {
-                    @Override
-                    public void beforeBulk(
-                            long executionId,
-                            BulkRequest request
-                    ) {
-                        elasticSearchLog("Bulk Indexing documents").addParameter("quantity", request.numberOfActions()).log();
-                    }
-
-                    @Override
-                    public void afterBulk(
-                            long executionId,
-                            BulkRequest request,
-                            BulkResponse response
-                    ) {
-                        if (response.hasFailures()) {
-                            BulkItemResponse[] items = response.getItems();
-                            for (BulkItemResponse item : items) {
-                                if (item.isFailed()) {
-                                    elasticSearchLog("Indexing failure")
-                                            .addParameter("uri", item.getFailure().getId())
-                                            .addParameter("detailMessage", item.getFailureMessage())
-                                            .log();
-                                }
-                            }
-                        }
-                    }
-
-                    @Override
-                    public void afterBulk(
-                            long executionId,
-                            BulkRequest request,
-                            Throwable failure
-                    ) {
-                        elasticSearchLog("Bulk index failure")
-                                .addParameter("detailedMessagee", failure.getMessage())
-                                .log();
-                        failure.printStackTrace();
-                    }
-                })
-                .setBulkActions(10000)
-                .setBulkSize(new ByteSizeValue(100, ByteSizeUnit.MB))
-                .setConcurrentRequests(4)
-                .build();
-
-        return bulkProcessor;
-    }
 }

@@ -3,6 +3,8 @@ package com.github.onsdigital.zebedee.search.api.endpoint;
 import com.github.davidcarboni.cryptolite.Password;
 import com.github.davidcarboni.cryptolite.Random;
 import com.github.davidcarboni.restolino.framework.Api;
+import com.github.onsdigital.zebedee.search.configuration.SearchConfiguration;
+import com.github.onsdigital.zebedee.search.indexing.IndexClient;
 import com.github.onsdigital.zebedee.search.indexing.IndexInProgressException;
 import com.github.onsdigital.zebedee.search.indexing.Indexer;
 import com.github.onsdigital.zebedee.search.indexing.IndexingException;
@@ -34,13 +36,13 @@ public class ReIndex {
             if (Password.verify(key, REINDEX_KEY_HASH)) {
                 boolean reindexAll = "1".equals(request.getParameter("all"));
                 if (reindexAll) {
-                    Indexer.getInstance().reload();
+                    Indexer.getInstance().reindex();
                 } else {
                     String uri = request.getParameter("uri");
                     if (StringUtils.isEmpty(uri)) {
                         return "Please specify uri of the content to reindex";
                     } else {
-                        Indexer.getInstance().reloadContent(uri);
+                        Indexer.getInstance().reindexByUri(uri);
                     }
                 }
                 response.setStatus(HttpStatus.OK_200);
@@ -71,7 +73,7 @@ public class ReIndex {
                 if (StringUtils.isEmpty(uri)) {
                     return "Please specify uri of the content to delete";
                 } else {
-                    Indexer.getInstance().deleteContentIndex(pageType, uri);
+                    IndexClient.getInstance().deleteDocument(SearchConfiguration.getSearchAlias(), pageType, uri);
                 }
 
                 response.setStatus(HttpStatus.OK_200);

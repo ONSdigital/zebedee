@@ -9,7 +9,13 @@ import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.reader.ZebedeeReader;
 import com.github.onsdigital.zebedee.search.client.ElasticSearchClient;
+import com.github.onsdigital.zebedee.search.fastText.FastTextExecutorService;
 import com.github.onsdigital.zebedee.search.fastText.FastTextHelper;
+import com.github.onsdigital.zebedee.search.fastText.requests.BatchSentenceVectorRequest;
+import com.github.onsdigital.zebedee.search.fastText.requests.InfoRequest;
+import com.github.onsdigital.zebedee.search.fastText.response.BatchSentenceVectorResponse;
+import com.github.onsdigital.zebedee.search.fastText.response.InfoResponse;
+import com.github.onsdigital.zebedee.search.fastText.response.SentenceVectorResponse;
 import com.github.onsdigital.zebedee.search.model.SearchDocument;
 import com.github.onsdigital.zebedee.util.URIUtils;
 import com.google.common.collect.Sets;
@@ -32,8 +38,12 @@ import java.io.InputStreamReader;
 import java.net.URI;
 import java.nio.file.NoSuchFileException;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.stream.Collectors;
 
 import static com.github.onsdigital.zebedee.content.util.ContentUtil.serialise;
 import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.elasticSearchLog;
@@ -58,12 +68,23 @@ public class Indexer {
         return instance;
     }
 
-    public static void main(String[] args) {
-        try {
-            Indexer.getInstance().reload();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public static void main(String[] args) throws IOException, InterruptedException, ExecutionException, ZebedeeException {
+//        try {
+//            Indexer.getInstance().reload();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+        FileScanner fileScanner = new FileScanner();
+        List<Document> documents = fileScanner.scan();
+
+        System.out.println(String.format("Got %d documents", documents.size()));
+        System.out.println("Preparing pages...");
+
+        List<Page> pages = Indexer.getInstance().preparePages(documents);
+        System.out.println(String.format("Got %d pages", pages.size()));
+
+        Page firstPage = pages.get(0);
+        System.out.println(firstPage.getEncodedEmbeddingVector());
     }
 
     /**
@@ -118,11 +139,11 @@ public class Indexer {
         elasticSearchLog("Triggering re-indexing")
                 .addParameter("index", indexName)
                 .log();
-        elasticSearchLog("Using model")
-                .addParameter("filename", FastTextHelper.Configuration.getFastTextModelFilename())
-                .addParameter("dimensions", FastTextHelper.getInstance().getDimensions())
-                .log();
-        indexDocuments(indexName);
+        try {
+            indexDocuments(indexName);
+        } catch (InterruptedException | ExecutionException | ZebedeeException e) {
+            throw new IndexingException("Failed re-indexing content", e);
+        }
         elasticSearchLog("Re-indexing completed")
                 .addParameter("totalTime(ms)", (System.currentTimeMillis() - start))
                 .log();
@@ -188,7 +209,10 @@ public class Indexer {
             if (isPeriodic(page.getType())) {
                 //TODO: optimize resolving latest flag, only update elastic search for existing releases rather than reindexing
                 //Load old releases as well to get latest flag re-calculated
-                index(getSearchAlias(), new FileScanner().scan(URIUtils.removeLastSegment(uri)));
+                FileScanner fileScanner = new FileScanner();
+                List<Document> documents = fileScanner.scan(URIUtils.removeLastSegment(uri));
+                List<Page> pages = preparePages(documents);
+                index(getSearchAlias(), pages);
             } else {
                 indexSingleContent(getSearchAlias(), page);
             }
@@ -198,9 +222,11 @@ public class Indexer {
                     .addParameter("totalTime(ms)", (start - end))
                     .log();
         } catch (ZebedeeException e) {
-            throw new IndexingException("Failed re-indexint content with uri: " + uri, e);
+            throw new IndexingException("Failed re-indexing content with uri: " + uri, e);
         } catch (NoSuchFileException e) {
-            throw new IndexingException("Content not found for re-indexing, uri: " + uri);
+            throw new IndexingException("Content not found for re-indexing, uri: " + uri, e);
+        } catch (InterruptedException | ExecutionException e) {
+            throw new IndexingException("Error resolving pages for uri: " + uri, e);
         }
     }
 
@@ -247,27 +273,158 @@ public class Indexer {
         termsList.addAll(terms);
     }
 
-    private void indexDocuments(String indexName) throws IOException {
-        index(indexName, new FileScanner().scan());
+    private void indexDocuments(String indexName) throws IOException, InterruptedException, ExecutionException, ZebedeeException {
+        FileScanner fileScanner = new FileScanner();
+        List<Document> documents = fileScanner.scan();
+
+        List<Page> pages = preparePages(documents);
+        index(indexName, pages);
+    }
+
+    private Map<String, Future<BatchSentenceVectorResponse>> submitVectorQueries(Map<String, String> queries, FastTextExecutorService executorService) {
+        Map<String, Future<BatchSentenceVectorResponse>> futureMap = new HashMap<>();
+
+        String requestId = UUID.randomUUID().toString();
+        BatchSentenceVectorRequest request = new BatchSentenceVectorRequest(requestId, queries);
+
+        Future<BatchSentenceVectorResponse> future = executorService.submit(request);
+        // Add to futureMap
+        futureMap.put(requestId, future);
+
+        return futureMap;
+    }
+
+    private List<Page> preparePages(List<Document> documents) throws ZebedeeException, IOException, ExecutionException, InterruptedException {
+        return preparePages(documents, 1000);
+    }
+
+    private String getEmptyEmbeddingVector(FastTextExecutorService executorService) throws IOException, InterruptedException, ExecutionException {
+        String requestId = UUID.randomUUID().toString();
+        InfoRequest infoRequest = new InfoRequest(requestId);
+        Future<InfoResponse> responseFuture = executorService.submit(infoRequest);
+
+        InfoResponse response = responseFuture.get();
+        int dimensions = response.getDimensions();
+        double[] vector = new double[dimensions];
+
+        return FastTextHelper.convertArrayToBase64(vector);
+    }
+
+    /**
+     * Resolves pages from document uris and computes embedding vectors and keywords
+     * @return
+     */
+    private List<Page> preparePages(List<Document> documents, int batchThreshold) throws ZebedeeException, IOException, ExecutionException, InterruptedException {
+        // Submit batch requests to dp-fasttext
+        Map<String, String> queries = new HashMap<>();
+        Map<String, Page> pageMap = new HashMap<>();
+
+        Map<String, Future<BatchSentenceVectorResponse>> futureMap = new ConcurrentHashMap<>();
+
+        try (FastTextExecutorService executorService = new FastTextExecutorService()) {
+            // First, get empty vector
+            String emptyVector = getEmptyEmbeddingVector(executorService);
+
+            for (Document document : documents) {
+                String uri = document.getUri();
+                Page page = getPage(uri);
+
+                if (null != page) {
+
+                    // Set empty vector
+                    page.setEncodedEmbeddingVector(emptyVector);
+
+                    page.setSearchTerms(document.getSearchTerms());
+
+                    if (page.getType() != PageType.timeseries) {
+                        // Add to requests map
+                        String sentence = page.getPageSentence();
+                        if (null != sentence && sentence.length() > 5) {
+                            queries.put(uri, sentence);
+                        }
+
+                        if (queries.size() >= batchThreshold) {
+                            // Submit the request
+                            futureMap.putAll(this.submitVectorQueries(queries, executorService));
+
+                            // Reset queries map
+                            queries = new HashMap<>();
+                        }
+                    }
+                }
+                // Add to uri-page map
+                pageMap.put(uri, page);
+            }
+
+            if (!queries.isEmpty()) {
+                // Submit remaining queries
+                futureMap.putAll(this.submitVectorQueries(queries, executorService));
+                queries.clear();
+            }
+        }
+
+        // Trigger get on all requests
+        for (String requestId : futureMap.keySet()) {
+            futureMap.get(requestId).get();
+        }
+
+        int passes = 0;
+        while (!futureMap.isEmpty()) {
+            // Process futures
+            for (String requestId : futureMap.keySet()) {
+                Future<BatchSentenceVectorResponse> future = futureMap.get(requestId);
+                if (future.isDone()) {
+                    System.out.println(String.format("Processing request: %s", requestId));
+                    futureMap.remove(requestId);
+                    BatchSentenceVectorResponse response = future.get();
+
+                    // Loop through keys and set page vectors
+                    Map<String, SentenceVectorResponse> results = response.getResults();
+                    for (String uri : results.keySet()) {
+                        SentenceVectorResponse sentenceVectorResponse = results.get(uri);
+                        String encodedVector = sentenceVectorResponse.getVector();
+                        Map<String, Float> generatedKeywordsMap = sentenceVectorResponse.getKeywords();
+
+                        List<String> generatedKeywords = generatedKeywordsMap.entrySet().stream()
+                                .filter(x -> x.getValue() >= 0.5f)
+                                .map(Map.Entry::getKey)
+                                .collect(Collectors.toList());
+
+                        // Set on page
+                        pageMap.get(uri).setEncodedEmbeddingVector(encodedVector);
+                        pageMap.get(uri).setGeneratedKeywords(generatedKeywords);
+                    }
+                }
+            }
+            passes++;
+            System.out.println(String.format("Pass %d", passes));
+            Thread.sleep(5);
+            if (passes >= 5) {
+                throw new IOException("Took too many passes to process requests");
+            }
+        }
+
+        // Return pages from map
+        return new ArrayList<>(pageMap.values());
     }
 
     /**
      * Recursively indexes contents and their child contents
      *
      * @param indexName
-     * @param documents
+     * @param pages
      */
-    private void index(String indexName, List<Document> documents) {
+    private void index(String indexName, List<Page> pages) {
         try (BulkProcessor bulkProcessor = getBulkProcessor()) {
-            for (Document document : documents) {
+            for (Page page : pages) {
                 try {
-                    IndexRequestBuilder indexRequestBuilder = prepareIndexRequest(indexName, document);
+                    IndexRequestBuilder indexRequestBuilder = prepareIndexRequest(indexName, page);
                     if (indexRequestBuilder == null) {
                         continue;
                     }
                     bulkProcessor.add(indexRequestBuilder.request());
                 } catch (Exception e) {
-                    System.err.println("!!!!!!!!!Failed preparing index for " + document.getUri() + " skipping...");
+                    System.err.println("!!!!!!!!!Failed preparing index for " + page.getUri().toString() + " skipping...");
                     e.printStackTrace();
                 }
             }
@@ -278,12 +435,10 @@ public class Indexer {
         return zebedeeReader.getPublishedContent(uri);
     }
 
-    private IndexRequestBuilder prepareIndexRequest(String indexName, Document document) throws ZebedeeException, IOException {
-        Page page = getPage(document.getUri());
-
+    private IndexRequestBuilder prepareIndexRequest(String indexName, Page page) throws ZebedeeException, IOException {
         IndexRequestBuilder indexRequestBuilder = null;
         if (page != null && page.getType() != null) {
-            SearchDocument searchDocument = toSearchDocument(page, document.getSearchTerms());
+            SearchDocument searchDocument = toSearchDocument(page);
             if (null != searchDocument.getEmbedding_vector() && !searchDocument.getEmbedding_vector().isEmpty()) {
                 indexRequestBuilder = searchUtils.prepareIndex(indexName, page.getType().name(), page.getUri().toString());
                 indexRequestBuilder.setSource(serialise(searchDocument));
@@ -294,22 +449,22 @@ public class Indexer {
 
     private void indexSingleContent(String indexName, Page page) throws IOException {
         List<String> terms = resolveSearchTerms(page.getUri().toString());
-        searchUtils.createDocument(indexName, page.getType().toString(), page.getUri().toString(), serialise(toSearchDocument(page, terms)));
+        searchUtils.createDocument(indexName, page.getType().toString(), page.getUri().toString(), serialise(toSearchDocument(page)));
     }
 
-    private SearchDocument toSearchDocument(Page page, List<String> searchTerms) throws IOException {
+    private SearchDocument toSearchDocument(Page page) throws IOException {
         SearchDocument indexDocument = new SearchDocument();
         indexDocument.setUri(page.getUri());
         indexDocument.setTopics(getTopics(page.getTopics()));
         indexDocument.setType(page.getType());
-        indexDocument.setSearchBoost(searchTerms);
+        indexDocument.setSearchBoost(page.getSearchTerms());
 
         PageDescription pageDescription = page.getDescription();
 
         if (FastTextHelper.Configuration.INDEX_EMBEDDING_VECTORS) {
             try {
                 // Generate keywords
-                List<String> generatedKeywords = page.generateKeywords(10, 0.3f);
+                List<String> generatedKeywords = page.getGeneratedKeywords();
 
                 if (null != generatedKeywords && !generatedKeywords.isEmpty()) {
 

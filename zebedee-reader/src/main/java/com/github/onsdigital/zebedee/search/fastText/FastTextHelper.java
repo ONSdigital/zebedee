@@ -1,45 +1,12 @@
 package com.github.onsdigital.zebedee.search.fastText;
 
-import cc.fasttext.FastText;
-import cc.fasttext.Vector;
-
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.DoubleBuffer;
 import java.util.Base64;
-import java.util.List;
 
 import static com.github.onsdigital.zebedee.util.VariableUtils.getVariableValue;
-import static org.apache.commons.lang3.StringUtils.defaultIfBlank;
 
 public class FastTextHelper {
-
-    private final FastText fastText;
-
-    private static FastTextHelper INSTANCE;
-
-    public static final String PREFIX = "__label__";
-
-    public static FastTextHelper getInstance() throws IOException {
-        if (INSTANCE == null) {
-            synchronized (FastTextHelper.class) {
-                INSTANCE = new FastTextHelper();
-            }
-        }
-        return INSTANCE;
-    }
-
-    private FastTextHelper() throws IOException {
-        fastText = FastText.load(Configuration.getFastTextModelFilename());
-    }
-
-    public FastText getFastText() {
-        return fastText;
-    }
-
-    public int getDimensions() {
-        return getFastText().getArgs().dim();
-    }
 
     public static final String convertArrayToBase64(double[] array) {
         final int capacity = 8 * array.length;
@@ -61,24 +28,7 @@ public class FastTextHelper {
         return dims;
     }
 
-    public static double[] toDoubleArray(Vector vector) {
-        List<Float> floatList = vector.getData();
-        double[] vec = new double[floatList.size()];
-
-        for (int i = 0; i < vec.length; i++) {
-            vec[i] = (double) floatList.get(i);
-        }
-
-        return vec;
-    }
-
     public static class Configuration {
         public static boolean INDEX_EMBEDDING_VECTORS = Boolean.parseBoolean(getVariableValue("INDEX_EMBEDDING_VECTORS"));
-        private static String fastTextModelDirectory = defaultIfBlank(getVariableValue("SUPERVISED_MODEL_DIR"), "./supervised_models");
-        private static String fastTextModelName = defaultIfBlank(getVariableValue("ONS_SUPERVISED_MODEL_NAME"), "ons_supervised.bin");
-
-        public static String getFastTextModelFilename() {
-            return String.format("%s/%s", fastTextModelDirectory, fastTextModelName);
-        }
     }
 }

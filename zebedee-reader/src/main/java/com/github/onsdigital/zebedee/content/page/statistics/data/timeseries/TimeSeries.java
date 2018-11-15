@@ -143,9 +143,10 @@ public class TimeSeries extends StatisticalData implements Comparable<TimeSeries
         return null;
     }
 
+    @Override
     public String getPageSentence() {
         // Do nothing for timeseries
-        return null;
+        return "";
     }
 
 }

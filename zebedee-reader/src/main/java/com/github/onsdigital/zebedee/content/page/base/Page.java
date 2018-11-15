@@ -1,18 +1,11 @@
 package com.github.onsdigital.zebedee.content.page.base;
 
-import cc.fasttext.Vector;
 import com.github.onsdigital.zebedee.content.base.Content;
 import com.github.onsdigital.zebedee.content.partial.Link;
-import com.github.onsdigital.zebedee.search.fastText.FastTextHelper;
 
-import java.io.IOException;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
-import static com.github.onsdigital.zebedee.search.fastText.FastTextHelper.convertArrayToBase64;
+import java.util.stream.Collectors;
 
 /**
  * Created by bren on 10/06/15.
@@ -28,6 +21,12 @@ public abstract class Page extends Content {
     private PageDescription description;
 
     private List<Link> topics;
+
+    private List<String> generatedKeywords;
+
+    private String encodedEmbeddingVector;
+
+    private List<String> searchTerms;
 
     public Page() {
         this.type = getType();
@@ -59,6 +58,34 @@ public abstract class Page extends Content {
         this.topics = topics;
     }
 
+    public List<String> getGeneratedKeywords() {
+        return generatedKeywords;
+    }
+
+    public void setGeneratedKeywords(List<String> generatedKeywords) {
+        // Remove underscores from keywords
+        List<String> keywords = generatedKeywords.stream()
+                .map(x -> x.replace("_", " "))
+                .collect(Collectors.toList());
+        this.generatedKeywords = keywords;
+    }
+
+    public String getEncodedEmbeddingVector() {
+        return encodedEmbeddingVector;
+    }
+
+    public void setEncodedEmbeddingVector(String encodedEmbeddingVector) {
+        this.encodedEmbeddingVector = encodedEmbeddingVector;
+    }
+
+    public List<String> getSearchTerms() {
+        return searchTerms;
+    }
+
+    public void setSearchTerms(List<String> searchTerms) {
+        this.searchTerms = searchTerms;
+    }
+
     public String getPageSentence() {
         String sentence = null;
         if (null != this.getDescription() && null != this.getDescription().getSummary()) {
@@ -71,49 +98,5 @@ public abstract class Page extends Content {
             sentence = sentence.replaceAll("[^a-zA-Z ]", "").toLowerCase().replaceAll("\\s+", " ");
         }
         return sentence;
-    }
-
-//    public abstract String getPageSentence();
-
-    public double[] getEmbeddingVector() throws IOException {
-        String sentence = this.getPageSentence();
-
-        int dim = FastTextHelper.getInstance().getDimensions();
-
-        double[] sentenceVector = new double[dim];
-
-        if (null != sentence && !sentence.isEmpty()) {
-            Vector vector = FastTextHelper.getInstance().getFastText().getSentenceVector(sentence);
-            sentenceVector = FastTextHelper.toDoubleArray(vector);
-        }
-
-        return sentenceVector;
-    }
-
-    public String getEncodedEmbeddingVector() throws IOException {
-        return convertArrayToBase64(this.getEmbeddingVector());
-    }
-
-    public Map<String, Float> getLabels(int k) throws IOException {
-        String sentence = this.getPageSentence();
-
-        if (null != sentence && !sentence.isEmpty()) {
-            return FastTextHelper.getInstance().getFastText().predictLine(sentence, k);
-        }
-        return new HashMap<>();
-    }
-
-    public List<String> generateKeywords(int k, float threshold) throws IOException {
-        Map<String, Float> labels = this.getLabels(k);
-
-        List<String> filteredLabels = new ArrayList<>();
-        for (String key : labels.keySet()) {
-            if (labels.get(key) >= threshold) {
-                String formattedKey = key.replace(FastTextHelper.PREFIX, "").replace("_", " ").trim();
-                filteredLabels.add(formattedKey);
-            }
-        }
-
-        return filteredLabels;
     }
 }

@@ -1,19 +1,19 @@
 package com.github.onsdigital.zebedee.search.indexing.content;
 
 import com.github.onsdigital.zebedee.content.page.base.Page;
-import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
-import com.github.onsdigital.zebedee.reader.ZebedeeReader;
 import com.github.onsdigital.zebedee.search.configuration.SearchConfiguration;
 import com.github.onsdigital.zebedee.search.fastText.FastTextClient;
 import com.github.onsdigital.zebedee.search.fastText.FastTextHelper;
-import com.github.onsdigital.zebedee.search.indexing.*;
+import com.github.onsdigital.zebedee.search.indexing.Department;
+import com.github.onsdigital.zebedee.search.indexing.Index;
+import com.github.onsdigital.zebedee.search.indexing.IndexClient;
+import com.github.onsdigital.zebedee.search.indexing.IndexingException;
 import org.elasticsearch.action.bulk.BulkProcessor;
 import org.elasticsearch.action.index.IndexRequestBuilder;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.elasticSearchLog;
 import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logError;
@@ -21,13 +21,10 @@ import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logE
 public class NodeClientIndexer extends ZebedeeContentIndexer {
 
     private final IndexClient indexClient;
-    private final FileScanner fileScanner;
-    private final ZebedeeReader zebedeeReader;
 
     public NodeClientIndexer() {
-         this.indexClient = IndexClient.getInstance();
-         this.fileScanner = new FileScanner();
-         this.zebedeeReader = new ZebedeeReader();
+        super();
+        this.indexClient = IndexClient.getInstance();
     }
 
     @Override
@@ -115,25 +112,17 @@ public class NodeClientIndexer extends ZebedeeContentIndexer {
         }
     }
 
+    @Override
+    public void indexByUri(URI uri) {
+
+    }
+
     private String generateIndexName() {
         return SearchConfiguration.getSearchAlias() + System.currentTimeMillis();
     }
 
     private void indexContent(String indexName) throws IOException {
-        List<Page> pages = this.fileScanner.scan().stream()
-                .map(document -> {
-                    try {
-                        return this.zebedeeReader.getPublishedContent(document.getUri());
-                    } catch (ZebedeeException | IOException e) {
-                        logError(e)
-                                .addMessage("Failed getting published content for uri")
-                                .addParameter("uri", document.getUri())
-                                .log();
-                        return null;
-                    }
-                })
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
+        List<Page> pages = super.loadPages();
 
         if (FastTextHelper.Configuration.INDEX_EMBEDDING_VECTORS) {
             // Set embedding vectors

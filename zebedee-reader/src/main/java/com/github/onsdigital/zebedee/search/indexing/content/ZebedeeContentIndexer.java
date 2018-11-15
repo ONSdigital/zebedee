@@ -1,12 +1,17 @@
 package com.github.onsdigital.zebedee.search.indexing.content;
 
+import com.github.onsdigital.zebedee.content.page.base.Page;
+import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
+import com.github.onsdigital.zebedee.reader.ZebedeeReader;
 import com.github.onsdigital.zebedee.search.indexing.Department;
+import com.github.onsdigital.zebedee.search.indexing.FileScanner;
 import com.github.onsdigital.zebedee.search.indexing.Indexer;
 import org.apache.commons.io.IOUtils;
 import org.elasticsearch.common.settings.Settings;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
@@ -15,12 +20,48 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.elasticSearchLog;
+import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logError;
 import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logInfo;
 
 public abstract class ZebedeeContentIndexer {
 
-    protected static final String DEPARTMENT_TYPE = "departments";
+    static final String DEPARTMENT_TYPE = "departments";
     private final static String DEPARTMENTS_FILE = "/search/departments/departments.txt";
+
+    private final FileScanner fileScanner;
+    private final ZebedeeReader zebedeeReader;
+
+    public ZebedeeContentIndexer() {
+        this.fileScanner = new FileScanner();
+        this.zebedeeReader = new ZebedeeReader();
+    }
+
+    public abstract void indexDepartments();
+
+    public abstract void indexOnsContent();
+
+    public abstract void indexByUri(URI uri);
+
+    /**
+     * Load pages from disk
+     * @return
+     */
+    protected List<Page> loadPages() throws IOException {
+        return this.fileScanner.scan().stream()
+                .map(document -> {
+                    try {
+                        return this.zebedeeReader.getPublishedContent(document.getUri());
+                    } catch (ZebedeeException | IOException e) {
+                        logError(e)
+                                .addMessage("Failed getting published content for uri")
+                                .addParameter("uri", document.getUri())
+                                .log();
+                        return null;
+                    }
+                })
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+    }
 
     /**
      * Loads the departments file
@@ -56,10 +97,6 @@ public abstract class ZebedeeContentIndexer {
 
         return departments;
     }
-
-    public abstract void indexDepartments();
-
-    public abstract void indexOnsContent();
 
     /**
      * Loads the index-config.yml file from disk

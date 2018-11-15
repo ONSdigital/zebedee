@@ -16,6 +16,15 @@ import static org.apache.commons.lang3.StringUtils.defaultIfBlank;
  */
 public class Configuration {
 
+    public static class FastTextConfiguration {
+
+        private static final String DP_FASTTEXT_HOST_KEY = "DP_FASTTEST_HOST";
+        private static final String DEFAULT_DP_FASTTEXT_HOST = "localhost:5100";
+
+        public static final String DP_FASTTEXT_HOST = defaultIfBlank(getProperty(DP_FASTTEXT_HOST_KEY),
+                defaultIfBlank(getenv(DP_FASTTEXT_HOST_KEY), DEFAULT_DP_FASTTEXT_HOST));
+    }
+
     /**
      * Provides methods for accessing Splunk configuration.
      */

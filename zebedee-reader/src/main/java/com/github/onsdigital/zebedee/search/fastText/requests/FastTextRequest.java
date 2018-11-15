@@ -1,5 +1,6 @@
 package com.github.onsdigital.zebedee.search.fastText.requests;
 
+import com.github.onsdigital.zebedee.Configuration;
 import com.github.onsdigital.zebedee.search.fastText.FastTextClient;
 import com.github.onsdigital.zebedee.search.fastText.exceptions.FastTextServerError;
 import com.github.onsdigital.zebedee.search.fastText.headers.JsonContentTypeHeader;
@@ -23,8 +24,8 @@ import java.util.concurrent.Callable;
 
 public abstract class FastTextRequest<T> implements Callable<T> {
 
-    protected static final String HOST = "localhost:5100";
-    protected static final ObjectMapper MAPPER = new ObjectMapper();
+    protected static final String HOST = Configuration.FastTextConfiguration.DP_FASTTEXT_HOST;
+    static final ObjectMapper MAPPER = new ObjectMapper();
 
     private static final JsonContentTypeHeader JSON_CONTENT_TYPE_HEADER = new JsonContentTypeHeader();
 

@@ -40,6 +40,9 @@ public class FastTextExecutorService implements AutoCloseable {
         this.executorService.shutdown();
     }
 
+    /**
+     * TODO - Fix me
+     */
     private static class Configuration {
         private static final int DEFAULT_POOL_SIZE = 8;
         private static final String THREAD_POOL_SIZE_KEY = "DP_FASTTEXT_THREAD_POOL_SIZE";

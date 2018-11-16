@@ -1,11 +1,9 @@
 package com.github.onsdigital.zebedee.search.indexing;
 
-import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.search.indexing.content.NodeClientIndexer;
 import com.github.onsdigital.zebedee.search.indexing.content.ZebedeeContentIndexer;
 import org.elasticsearch.action.index.IndexResponse;
 
-import java.io.IOException;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 

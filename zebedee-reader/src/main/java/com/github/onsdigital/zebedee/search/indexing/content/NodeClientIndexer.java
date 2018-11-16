@@ -144,7 +144,16 @@ public class NodeClientIndexer extends ZebedeeContentIndexer {
      */
     private void indexContent(String indexName) throws IOException {
         List<Page> pages = super.loadPages();
+        this.indexPages(indexName, pages);
+    }
 
+    /**
+     * Add pages to bulk processor for indexing
+     * @param indexName
+     * @param pages
+     */
+    private void indexPages(String indexName, List<Page> pages) {
+        // Set embedding vectors
         if (FastTextHelper.Configuration.INDEX_EMBEDDING_VECTORS) {
             // Set embedding vectors
             try {
@@ -157,15 +166,7 @@ public class NodeClientIndexer extends ZebedeeContentIndexer {
                 throw new IndexingException("Failed re-indexing", e);
             }
         }
-        this.indexPages(indexName, pages);
-    }
 
-    /**
-     * Add pages to bulk processor for indexing
-     * @param indexName
-     * @param pages
-     */
-    private void indexPages(String indexName, List<Page> pages) {
         // Index the pages
         try (BulkProcessor bulkProcessor = this.indexClient.getBulkProcessor()) {
             pages.stream()

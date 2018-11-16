@@ -165,7 +165,7 @@ public class IndexClient {
      * @param alias
      */
     public void swapIndexAlias(String oldIndex, String newIndex, String alias) {
-        IndicesAliasesResponse response = this.addIndexAlias(newIndex, alias);
+        this.addIndexAlias(newIndex, alias);
         if (oldIndex != null) {
             this.removeIndexAlias(oldIndex, alias);
         }

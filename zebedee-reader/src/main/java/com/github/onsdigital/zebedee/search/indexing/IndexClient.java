@@ -29,6 +29,7 @@ import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.unit.ByteSizeUnit;
 import org.elasticsearch.common.unit.ByteSizeValue;
 
+import java.io.IOException;
 import java.util.List;
 
 import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.elasticSearchLog;
@@ -52,22 +53,18 @@ public class IndexClient {
     private final Client client;
 
     private IndexClient() {
+        try {
+            if (ElasticSearchClient.getClient() == null) {
+                ElasticSearchClient.init();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         this.client = ElasticSearchClient.getClient();
     }
 
     private IndicesAdminClient getIndexClient() {
         return this.client.admin().indices();
-    }
-
-    /**
-     * Build and execute a request to create a new index
-     * @param index
-     * @param settings
-     * @param mappingSource
-     * @return
-     */
-    public CreateIndexResponse createIndex(String index, Settings settings, String mappingSource) {
-        return this.createIndex(index, settings, Configuration.DEFAULT_TYPE, mappingSource);
     }
 
     /**
@@ -81,12 +78,10 @@ public class IndexClient {
     public CreateIndexResponse createIndex(String index, Settings settings, String type, String mappingSource) {
         elasticSearchLog("Creating index").addParameter(Parameters.INDEX.parameter, index).log();
 
-        String documentType = type == null ? Configuration.DEFAULT_TYPE : type;
-
         CreateIndexRequestBuilder requestBuilder = this.getIndexClient()
                 .prepareCreate(index)
                 .setSettings(settings)
-                .addMapping(documentType, mappingSource);
+                .addMapping(type, mappingSource);
 
         return requestBuilder.get();
     }
@@ -183,9 +178,10 @@ public class IndexClient {
      * @return
      */
     public IndexRequestBuilder createDocumentIndexRequest(String index, String type, String id, Object document) {
+        String payload = document instanceof String ? (String) document : ContentUtil.serialise(document);
         return this.client
                 .prepareIndex(index, type, id)
-                .setSource(ContentUtil.serialise(document));
+                .setSource(payload);
     }
 
     /**
@@ -312,10 +308,6 @@ public class IndexClient {
                 .setBulkSize(new ByteSizeValue(100, ByteSizeUnit.MB))
                 .setConcurrentRequests(4)
                 .build();
-    }
-
-    private static class Configuration {
-        public static final String DEFAULT_TYPE = "_default_";
     }
 
     public enum Parameters {

@@ -78,14 +78,14 @@ public class ElasticSearchClient {
         }
     }
 
-    private static void connect() throws IOException {
+    private static void connect() {
         if (client == null) {
             initTransportClient();
 //            initNodeClient();
         }
     }
 
-    protected static void initTransportClient() throws IOException {
+    protected static void initTransportClient() {
         Settings.Builder builder = Settings.builder();
 
         if (!StringUtils.isBlank(getElasticSearchCluster()))

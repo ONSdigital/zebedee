@@ -1,8 +1,6 @@
 package com.github.onsdigital.zebedee.search.indexing.content;
 
 import com.github.onsdigital.zebedee.content.page.base.Page;
-import com.github.onsdigital.zebedee.content.page.base.PageType;
-import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.search.configuration.SearchConfiguration;
 import com.github.onsdigital.zebedee.search.fastText.FastTextClient;
@@ -11,10 +9,13 @@ import com.github.onsdigital.zebedee.search.indexing.*;
 import com.github.onsdigital.zebedee.util.URIUtils;
 import org.elasticsearch.action.bulk.BulkProcessor;
 import org.elasticsearch.action.index.IndexRequestBuilder;
+import org.elasticsearch.action.index.IndexResponse;
 
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.elasticSearchLog;
 import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logError;
@@ -22,10 +23,31 @@ import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logE
 public class NodeClientIndexer extends ZebedeeContentIndexer {
 
     private final IndexClient indexClient;
+    private final Lock lock;
 
     public NodeClientIndexer() {
         super();
         this.indexClient = IndexClient.getInstance();
+        this.lock = new ReentrantLock();
+    }
+
+    @Override
+    public void reindex() {
+        // Acquire index lock
+        if (this.lock.tryLock()) {
+            try {
+                // Lock in cluster
+                this.lockGlobal();
+
+                // Trigger reindex
+                super.reindex();
+            } finally {
+                this.lock.unlock();
+                this.indexClient.deleteGlobalLockDocument();
+            }
+        } else {
+            throw new IndexInProgressException();
+        }
     }
 
     /**
@@ -39,14 +61,15 @@ public class NodeClientIndexer extends ZebedeeContentIndexer {
         }
 
         try {
-            this.indexClient.createIndex(Index.DEPARTMENTS.getIndex(), ZebedeeContentIndexer.getDepartmentsSettings(), ZebedeeContentIndexer.getDepartmentsMapping());
+            this.indexClient.createIndex(Index.DEPARTMENTS.getIndex(), ZebedeeContentIndexer.getDepartmentsSettings(),
+                    Type.DEPARTMENTS.getType(), ZebedeeContentIndexer.getDepartmentsMapping());
 
             List<Department> departmentList = super.loadDepartments();
 
             // Index
             departmentList
                     .forEach(department -> this.indexClient.createDocument(Index.DEPARTMENTS.getIndex(),
-                            DEPARTMENT_TYPE, department.getCode(), department));
+                            Type.DEPARTMENTS.getType(), department.getCode(), department));
 
         } catch (IOException e) {
             String message = "Error while indexing departments";
@@ -75,27 +98,29 @@ public class NodeClientIndexer extends ZebedeeContentIndexer {
         String oldIndex = this.indexClient.getIndexForAlias(searchAlias);
 
         // Generate new index name
-        String newIndex = this.generateIndexName();
+        String newIndex = super.getOnsIndexName();
+
+        // Process the possible scenarios
+        if (aliasIsAvailable && oldIndex == null) {
+            //In this case it is an index rather than an alias. This normally is not possible with index structure set up.
+            //This is a transition code due to elastic search index structure change, making deployment to environments with old structure possible without down time
+            this.indexClient.deleteIndex(searchAlias);
+        }
 
         elasticSearchLog("Triggering re-indexing")
                 .addParameter("index", newIndex)
                 .log();
         try {
             // Create the new index
-            this.indexClient.createIndex(newIndex, ZebedeeContentIndexer.getSettings(), ZebedeeContentIndexer.getDefaultMapping());
+            this.indexClient.createIndex(newIndex, ZebedeeContentIndexer.getSettings(), Type.DEFAULT.getType(), ZebedeeContentIndexer.getDefaultMapping());
 
-            // Process the possible scenarious
-            if (aliasIsAvailable && oldIndex == null) {
-                //In this case it is an index rather than an alias. This normally is not possible with index structure set up.
-                //This is a transition code due to elastic search index structure change, making deployment to environments with old structure possible without down time
-                this.indexClient.deleteIndex(searchAlias);
-            }
+            List<Page> pages = super.loadPages();
 
             if (oldIndex == null) {
                 this.indexClient.addIndexAlias(newIndex, searchAlias);
-                this.indexContent(newIndex);
+                this.indexPages(newIndex, pages);
             } else {
-                this.indexContent(newIndex);
+                this.indexPages(newIndex, pages);
                 this.indexClient.swapIndexAlias(oldIndex, newIndex, searchAlias);
                 this.indexClient.deleteIndex(oldIndex);
             }
@@ -138,16 +163,6 @@ public class NodeClientIndexer extends ZebedeeContentIndexer {
     }
 
     /**
-     * Indexes ALL pages under the given index
-     * @param indexName
-     * @throws IOException
-     */
-    private void indexContent(String indexName) throws IOException {
-        List<Page> pages = super.loadPages();
-        this.indexPages(indexName, pages);
-    }
-
-    /**
      * Add pages to bulk processor for indexing
      * @param indexName
      * @param pages
@@ -184,10 +199,14 @@ public class NodeClientIndexer extends ZebedeeContentIndexer {
     }
 
     /**
-     * Generates a new index name with time stamp
-     * @return
+     * Acquires a global index lock
      */
-    private String generateIndexName() {
-        return SearchConfiguration.getSearchAlias() + System.currentTimeMillis();
+    private void lockGlobal() {
+        IndexResponse lockResponse = this.indexClient.createGlobalLockDocument();
+        if (!lockResponse.isCreated()) {
+            IndexInProgressException indexInProgressException = new IndexInProgressException();
+            logError(indexInProgressException).log();
+            throw indexInProgressException;
+        }
     }
 }

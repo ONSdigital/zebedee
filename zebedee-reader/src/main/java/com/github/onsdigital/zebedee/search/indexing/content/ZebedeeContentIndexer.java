@@ -3,15 +3,17 @@ package com.github.onsdigital.zebedee.search.indexing.content;
 import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.reader.ZebedeeReader;
-import com.github.onsdigital.zebedee.search.indexing.Department;
-import com.github.onsdigital.zebedee.search.indexing.FileScanner;
-import com.github.onsdigital.zebedee.search.indexing.Indexer;
+import com.github.onsdigital.zebedee.search.configuration.SearchConfiguration;
+import com.github.onsdigital.zebedee.search.indexing.*;
 import org.apache.commons.io.IOUtils;
 import org.elasticsearch.common.settings.Settings;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URISyntaxException;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Objects;
@@ -22,7 +24,6 @@ import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.*;
 
 public abstract class ZebedeeContentIndexer {
 
-    static final String DEPARTMENT_TYPE = "departments";
     private final static String DEPARTMENTS_FILE = "/search/departments/departments.txt";
 
     private final FileScanner fileScanner;
@@ -33,17 +34,27 @@ public abstract class ZebedeeContentIndexer {
         this.zebedeeReader = new ZebedeeReader();
     }
 
+    public void reindex() {
+        this.indexDepartments();
+        this.indexOnsContent();
+    }
+
     public abstract void indexDepartments();
 
     public abstract void indexOnsContent();
 
     public abstract void indexByUri(String uri);
 
-    protected Page loadPageByUri(String uri) throws ZebedeeException, IOException {
-        return this.zebedeeReader.getPublishedContent(uri);
+    protected final Page loadPageByUri(String uri) throws ZebedeeException, IOException {
+        Page page = this.zebedeeReader.getPublishedContent(uri);
+        if (null != page) {
+            List<String> terms = resolveSearchTerms(uri);
+            page.setSearchTerms(terms);
+        }
+        return page;
     }
 
-    protected List<Page> loadPages() throws IOException {
+    protected final List<Page> loadPages() throws IOException {
         return this.loadPages(null);
     }
 
@@ -51,7 +62,7 @@ public abstract class ZebedeeContentIndexer {
      * Load pages from disk
      * @return
      */
-    protected List<Page> loadPages(String uri) throws IOException {
+    protected final List<Page> loadPages(String uri) throws IOException {
         return this.fileScanner.scan(uri).stream()
                 .map(document -> {
                     try {
@@ -72,11 +83,23 @@ public abstract class ZebedeeContentIndexer {
      * Loads the departments file
      * @return
      */
-    protected List<Department> loadDepartments() throws IOException {
+    protected final List<Department> loadDepartments() throws IOException {
         List<Department> departments;
 
         // Use a stream and filter on non-null departments
-        try (Stream<String> stream = Files.lines(Paths.get(DEPARTMENTS_FILE))) {
+        Path path = null;
+        try {
+            path = Paths.get(this.getClass().getResource(DEPARTMENTS_FILE).toURI());
+        } catch (URISyntaxException e) {
+            String message = "Failed to load departments file";
+            logError(e)
+                    .addMessage(message)
+                    .addParameter("filename", DEPARTMENTS_FILE)
+                    .log();
+            throw new IndexingException(message, e);
+        }
+
+        try (Stream<String> stream = Files.lines(path, Charset.defaultCharset())) {
             departments = stream
                     .map(line -> {
                         String[] split = line.split(" *=> *");
@@ -98,9 +121,40 @@ public abstract class ZebedeeContentIndexer {
                     })
                     .filter(Objects::nonNull)
                     .collect(Collectors.toList());
+
+            return departments;
+        }
+    }
+
+    /**
+     * Generates a new index name with time stamp
+     * @return
+     */
+    protected String getOnsIndexName() {
+        return SearchConfiguration.getSearchAlias() + System.currentTimeMillis();
+    }
+
+    private static List<String> resolveSearchTerms(String uri) {
+        if (null == uri) {
+            return null;
         }
 
-        return departments;
+        logDebug("Resolving terms for uri")
+                .addParameter("uri", uri)
+                .log();
+
+        SearchBoostTermsResolver resolver = SearchBoostTermsResolver.getSearchTermResolver();
+        List<String> terms = resolver.getTerms(uri);
+
+        String[] segments = uri.split("/");
+        for (String segment : segments) {
+            String documentUri = "/" + segment;
+            List<String> prefixTerms = resolver.getTermsForPrefix(documentUri);
+            if (null != prefixTerms) {
+                terms.addAll(prefixTerms);
+            }
+        }
+        return terms;
     }
 
     /**

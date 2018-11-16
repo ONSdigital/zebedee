@@ -20,6 +20,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
+import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logDebug;
+
 public class FastTextClient implements AutoCloseable {
 
     private static FastTextClient INSTANCE;
@@ -98,14 +100,17 @@ public class FastTextClient implements AutoCloseable {
                 if (queries.size() == batchThreshold) {
                     // Submit
                     futureMap.putAll(this.submitVectorQueries(queries, executorService));
-                    queries.clear();
+                    queries = new HashMap<>();
                 }
             }
         }
 
         // Collect results
         for (String requestId : futureMap.keySet()) {
-            System.out.println(String.format("Processing request %s", requestId));
+            logDebug("Processing dp-fasttext request")
+                    .addParameter("context", requestId)
+                    .log();
+
             Future<BatchSentenceVectorResponse> future = futureMap.get(requestId);
             BatchSentenceVectorResponse response = future.get();
 

@@ -28,6 +28,9 @@ public class FastTextHelper {
         return dims;
     }
 
+    /**
+     * TODO - Fix me
+     */
     public static class Configuration {
         public static boolean INDEX_EMBEDDING_VECTORS = Boolean.parseBoolean(getVariableValue("INDEX_EMBEDDING_VECTORS"));
     }

@@ -21,10 +21,13 @@ import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logDebug;
+import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logError;
 
 public class FastTextClient implements AutoCloseable {
 
     private static FastTextClient INSTANCE;
+
+    private static final float CONFIDENCE_THRESHOLD = 0.5f;
 
     private final CloseableHttpClient httpClient;
     private final PoolingHttpClientConnectionManager connectionManager;
@@ -64,15 +67,10 @@ public class FastTextClient implements AutoCloseable {
     }
 
     /**
-     * Sets the embedding vector field for a list of pages
-     * @param pages
-     * @param batchThreshold
+     * Builds queries for dp-fasttext
+     * @return
      */
-    public List<Page> generateEmbeddingVectors(List<Page> pages, int batchThreshold) throws Exception {
-        // Init a map of uri to page
-        Map<String, Page> pageMap = pages.stream()
-                .collect(Collectors.toMap(x -> x.getUri().toString(), x -> x));
-
+    private Map<String, Future<BatchSentenceVectorResponse>> buildQueries(List<Page> pages, int batchThreshold) throws Exception {
         // Init map to hold batch queries
         Map<String, String> queries = new HashMap<>();
 
@@ -85,7 +83,7 @@ public class FastTextClient implements AutoCloseable {
         String emptyEncodedVector = FastTextHelper.convertArrayToBase64(emptyVector);
 
         // Build and submit queries
-        try (FastTextExecutorService executorService = new FastTextExecutorService()) {
+        try (FastTextExecutorService executorService = FastTextExecutorService.getInstance()) {
             // Loop over pages
             for (Page page : pages) {
                 String pageSentence = page.getPageSentence();
@@ -103,7 +101,26 @@ public class FastTextClient implements AutoCloseable {
                     queries = new HashMap<>();
                 }
             }
+            // Submit remaining queries
+            if (!queries.isEmpty()) {
+                futureMap.putAll(this.submitVectorQueries(queries, executorService));
+            }
         }
+
+        return futureMap;
+    }
+
+    /**
+     * Sets the embedding vector field for a list of pages
+     * @param pages
+     * @param batchThreshold
+     */
+    public List<Page> generateEmbeddingVectors(List<Page> pages, int batchThreshold) throws Exception {
+        // Init a map of uri to page
+        Map<String, Page> pageMap = pages.stream()
+                .collect(Collectors.toMap(x -> x.getUri().toString(), x -> x));
+
+        Map<String, Future<BatchSentenceVectorResponse>> futureMap = this.buildQueries(pages, batchThreshold);
 
         // Collect results
         for (String requestId : futureMap.keySet()) {
@@ -122,7 +139,7 @@ public class FastTextClient implements AutoCloseable {
                 Map<String, Float> generatedKeywordsMap = sentenceVectorResponse.getKeywords();
 
                 List<String> generatedKeywords = generatedKeywordsMap.entrySet().stream()
-                        .filter(x -> x.getValue() >= 0.5f)
+                        .filter(x -> x.getValue() >= CONFIDENCE_THRESHOLD)
                         .map(Map.Entry::getKey)
                         .collect(Collectors.toList());
 
@@ -183,7 +200,9 @@ public class FastTextClient implements AutoCloseable {
                     close();
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                logError(e)
+                        .addMessage("Caught exception closing HTTP client")
+                        .log();
             }
         }
     }

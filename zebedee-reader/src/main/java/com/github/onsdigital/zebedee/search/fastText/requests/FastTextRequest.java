@@ -22,6 +22,9 @@ import java.net.URISyntaxException;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
+import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logError;
+import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logInfo;
+
 public abstract class FastTextRequest<T> implements Callable<T> {
 
     protected static final String HOST = Configuration.FastTextConfiguration.DP_FASTTEXT_HOST;
@@ -79,13 +82,26 @@ public abstract class FastTextRequest<T> implements Callable<T> {
 
     @Override
     public T call() throws Exception {
-        try (CloseableHttpResponse response = FastTextClient.getInstance().execute(this.getRequestBase())) {
+        HttpRequestBase requestBase = this.getRequestBase();
+
+        logInfo("Executing fastText request")
+                .addParameter("method", requestBase.getMethod())
+                .addParameter("requestId", this.requestIdHeader.getRequestId())
+                .addParameter("uri", requestBase.getURI().toString())
+                .log();
+
+        try (CloseableHttpResponse response = FastTextClient.getInstance().execute(requestBase)) {
             String jsonResponse = EntityUtils.toString(response.getEntity());
             int code = response.getStatusLine().getStatusCode();
 
             if (code != HttpStatus.SC_OK) {
-                System.out.println("External search service returned non 200 response");
-                throw new FastTextServerError(jsonResponse, code, this.getRequestId());
+                FastTextServerError e = new FastTextServerError(jsonResponse, code, this.getRequestId());
+                logError(e)
+                        .addMessage("dp-fasttext returned non-200 response")
+                        .addParameter("status", code)
+                        .log();
+                throw e;
+
             }
 
             // Either typeReference or returnClass are guaranteed to not be null

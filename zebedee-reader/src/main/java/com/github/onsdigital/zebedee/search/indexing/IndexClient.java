@@ -44,7 +44,9 @@ public class IndexClient {
     public static IndexClient getInstance() {
         if (INSTANCE == null) {
             synchronized (IndexClient.class) {
-                INSTANCE = new IndexClient();
+                if (INSTANCE == null) {
+                    INSTANCE = new IndexClient();
+                }
             }
         }
         return INSTANCE;

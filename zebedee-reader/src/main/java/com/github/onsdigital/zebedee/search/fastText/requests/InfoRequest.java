@@ -10,7 +10,7 @@ import java.util.UUID;
 
 public class InfoRequest extends FastTextRequest<InfoResponse> {
 
-    private static final String PATH = "/supervised/";
+    private static final String PATH = "/supervised/info";
 
     public InfoRequest(String requestId) {
         super(requestId, InfoResponse.class);

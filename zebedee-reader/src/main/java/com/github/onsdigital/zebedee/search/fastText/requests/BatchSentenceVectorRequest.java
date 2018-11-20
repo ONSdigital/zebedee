@@ -12,7 +12,7 @@ import java.util.Map;
 
 public class BatchSentenceVectorRequest extends FastTextRequest<BatchSentenceVectorResponse> {
 
-    private static final String PATH = "/supervised/sentence/vector/batch";
+    private static final String PATH = "/supervised/vector/batch";
 
     private final Map<String, String> batchQueries;
 

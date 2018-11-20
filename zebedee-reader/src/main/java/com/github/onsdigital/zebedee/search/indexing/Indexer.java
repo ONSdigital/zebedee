@@ -1,6 +1,6 @@
 package com.github.onsdigital.zebedee.search.indexing;
 
-import com.github.onsdigital.zebedee.search.indexing.content.NodeClientIndexer;
+import com.github.onsdigital.zebedee.search.indexing.content.TransportClientIndexer;
 import com.github.onsdigital.zebedee.search.indexing.content.ZebedeeContentIndexer;
 
 /**
@@ -22,7 +22,7 @@ public class Indexer {
     private final ZebedeeContentIndexer contentIndexer;
 
     private Indexer() {
-        this.contentIndexer = new NodeClientIndexer();
+        this.contentIndexer = new TransportClientIndexer();
     }
 
     /**

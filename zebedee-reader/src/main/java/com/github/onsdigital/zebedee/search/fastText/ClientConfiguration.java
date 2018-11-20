@@ -5,22 +5,16 @@ package com.github.onsdigital.zebedee.search.fastText;
  */
 public class ClientConfiguration {
 
-    private Integer maxTotalConnection;
+    private int maxTotalConnection;
     private boolean disableRedirectHandling;
 
-    public ClientConfiguration() {
-    }
-
-    public void setMaxTotalConnection(int maxConnection) {
-        this.maxTotalConnection = maxConnection;
-    }
-
-    public Integer getMaxTotalConnection() {
-        return maxTotalConnection;
-    }
-
-    public void setDisableRedirectHandling(boolean disableRedirectHandling) {
+    public ClientConfiguration(int maxTotalConnection, boolean disableRedirectHandling) {
+        this.maxTotalConnection = maxTotalConnection;
         this.disableRedirectHandling = disableRedirectHandling;
+    }
+
+    public int getMaxTotalConnection() {
+        return maxTotalConnection;
     }
 
     public boolean isDisableRedirectHandling() {

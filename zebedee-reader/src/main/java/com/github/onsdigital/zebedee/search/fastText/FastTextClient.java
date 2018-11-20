@@ -170,11 +170,9 @@ public class FastTextClient implements AutoCloseable {
     }
 
     private void configure(HttpClientBuilder customClientBuilder, ClientConfiguration configuration) {
-        Integer connectionNumber = configuration.getMaxTotalConnection();
-        if (connectionNumber != null) {
-            connectionManager.setMaxTotal(connectionNumber);
-            connectionManager.setDefaultMaxPerRoute(connectionNumber);
-        }
+        int connectionNumber = configuration.getMaxTotalConnection();
+        this.connectionManager.setMaxTotal(connectionNumber);
+        this.connectionManager.setDefaultMaxPerRoute(connectionNumber);
         if (configuration.isDisableRedirectHandling()) {
             customClientBuilder.disableRedirectHandling();
         }
@@ -186,10 +184,7 @@ public class FastTextClient implements AutoCloseable {
     }
 
     private static ClientConfiguration createConfiguration() {
-        ClientConfiguration configuration = new ClientConfiguration();
-        configuration.setMaxTotalConnection(8);
-        configuration.setDisableRedirectHandling(true);
-        return configuration;
+        return new ClientConfiguration(8, true);
     }
 
     private class ShutdownHook extends Thread {

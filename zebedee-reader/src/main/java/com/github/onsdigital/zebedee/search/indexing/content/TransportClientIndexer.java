@@ -20,12 +20,12 @@ import java.util.concurrent.locks.ReentrantLock;
 import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.elasticSearchLog;
 import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logError;
 
-public class NodeClientIndexer extends ZebedeeContentIndexer {
+public class TransportClientIndexer extends ZebedeeContentIndexer {
 
     private final IndexClient indexClient;
     private final Lock lock;
 
-    public NodeClientIndexer() {
+    public TransportClientIndexer() {
         super();
         this.indexClient = IndexClient.getInstance();
         this.lock = new ReentrantLock();

@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.util.List;
 
 import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.elasticSearchLog;
+import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logError;
 
 /**
  * Created by David Sullivan on 15/11/18
@@ -60,7 +61,10 @@ public class IndexClient {
                 ElasticSearchClient.init();
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            logError(e)
+                    .addMessage("Caught exception initialising Elasticsearch client")
+                    .log();
+            throw new RuntimeException(e);
         }
         this.client = ElasticSearchClient.getClient();
     }

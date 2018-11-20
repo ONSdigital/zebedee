@@ -6,7 +6,6 @@ import org.apache.http.client.utils.URIBuilder;
 import org.eclipse.jetty.http.HttpScheme;
 
 import java.net.URISyntaxException;
-import java.util.UUID;
 
 public class InfoRequest extends FastTextRequest<InfoResponse> {
 
@@ -27,12 +26,5 @@ public class InfoRequest extends FastTextRequest<InfoResponse> {
     @Override
     public HttpRequestBase getRequestBase() throws URISyntaxException {
         return super.get();
-    }
-
-    public static void main(String[] args) throws Exception {
-        InfoRequest request = new InfoRequest(UUID.randomUUID().toString());
-        InfoResponse response = request.call();
-
-        System.out.println(MAPPER.writeValueAsString(response));
     }
 }

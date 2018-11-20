@@ -81,7 +81,6 @@ public class ElasticSearchClient {
     private static void connect() {
         if (client == null) {
             initTransportClient();
-//            initNodeClient();
         }
     }
 

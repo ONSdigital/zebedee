@@ -4,7 +4,10 @@ import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.reader.ZebedeeReader;
 import com.github.onsdigital.zebedee.search.configuration.SearchConfiguration;
-import com.github.onsdigital.zebedee.search.indexing.*;
+import com.github.onsdigital.zebedee.search.indexing.Department;
+import com.github.onsdigital.zebedee.search.indexing.FileScanner;
+import com.github.onsdigital.zebedee.search.indexing.IndexingException;
+import com.github.onsdigital.zebedee.search.indexing.SearchBoostTermsResolver;
 import org.apache.commons.io.IOUtils;
 import org.elasticsearch.common.settings.Settings;
 
@@ -162,7 +165,7 @@ public abstract class ZebedeeContentIndexer {
      * @return
      */
     public static Settings getSettings() throws IOException {
-        try (InputStream inputStream = Indexer.class.getResourceAsStream("/search/index-config.yml")) {
+        try (InputStream inputStream = ZebedeeContentIndexer.class.getResourceAsStream("/search/index-config.yml")) {
             Settings.Builder settingsBuilder = Settings.builder().
                     loadFromStream("index-config.yml", inputStream);
             elasticSearchLog("Index settings").addParameter("settings", settingsBuilder.internalMap());
@@ -175,7 +178,7 @@ public abstract class ZebedeeContentIndexer {
      * @return
      */
     public static Settings getDepartmentsSettings() throws IOException {
-        try (InputStream inputStream = Indexer.class.getResourceAsStream("/search/departments/departments-index-config.yml")) {
+        try (InputStream inputStream = ZebedeeContentIndexer.class.getResourceAsStream("/search/departments/departments-index-config.yml")) {
             Settings.Builder settingsBuilder = Settings.builder().
                     loadFromStream("departments-index-config.yml", inputStream);
             return settingsBuilder.build();
@@ -187,7 +190,7 @@ public abstract class ZebedeeContentIndexer {
      * @return
      */
     public static String getDefaultMapping() throws IOException {
-        try (InputStream mappingSourceStream = Indexer.class.getResourceAsStream("/search/default-mapping.json")) {
+        try (InputStream mappingSourceStream = ZebedeeContentIndexer.class.getResourceAsStream("/search/default-mapping.json")) {
             String mappingSource = IOUtils.toString(mappingSourceStream);
             elasticSearchLog("defaultMapping").addParameter("mappingSource", mappingSource).log();
             return mappingSource;
@@ -199,7 +202,7 @@ public abstract class ZebedeeContentIndexer {
      * @return
      */
     public static String getDepartmentsMapping() throws IOException {
-        try (InputStream mappingSourceStream = Indexer.class.getResourceAsStream("/search/departments/departments-mapping.json")) {
+        try (InputStream mappingSourceStream = ZebedeeContentIndexer.class.getResourceAsStream("/search/departments/departments-mapping.json")) {
             String mappingSource = IOUtils.toString(mappingSourceStream);
             elasticSearchLog("departmentsMapping").addParameter("mappingSource", mappingSource).log();
             return mappingSource;

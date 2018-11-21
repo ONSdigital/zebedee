@@ -161,21 +161,25 @@ public abstract class ZebedeeContentIndexer {
      * Loads the index-config.yml file from disk
      * @return
      */
-    public static Settings getSettings() {
-        Settings.Builder settingsBuilder = Settings.builder().
-                loadFromStream("index-config.yml", Indexer.class.getResourceAsStream("/search/index-config.yml"));
-        elasticSearchLog("Index settings").addParameter("settings", settingsBuilder.internalMap());
-        return settingsBuilder.build();
+    public static Settings getSettings() throws IOException {
+        try (InputStream inputStream = Indexer.class.getResourceAsStream("/search/index-config.yml")) {
+            Settings.Builder settingsBuilder = Settings.builder().
+                    loadFromStream("index-config.yml", inputStream);
+            elasticSearchLog("Index settings").addParameter("settings", settingsBuilder.internalMap());
+            return settingsBuilder.build();
+        }
     }
 
     /**
      * Loads settings for departments index from departments-index-config.yml file
      * @return
      */
-    public static Settings getDepartmentsSettings() {
-        Settings.Builder settingsBuilder = Settings.builder().
-                loadFromStream("departments-index-config.yml", Indexer.class.getResourceAsStream("/search/departments/departments-index-config.yml"));
-        return settingsBuilder.build();
+    public static Settings getDepartmentsSettings() throws IOException {
+        try (InputStream inputStream = Indexer.class.getResourceAsStream("/search/departments/departments-index-config.yml")) {
+            Settings.Builder settingsBuilder = Settings.builder().
+                    loadFromStream("departments-index-config.yml", inputStream);
+            return settingsBuilder.build();
+        }
     }
 
     /**
@@ -183,10 +187,11 @@ public abstract class ZebedeeContentIndexer {
      * @return
      */
     public static String getDefaultMapping() throws IOException {
-        InputStream mappingSourceStream = Indexer.class.getResourceAsStream("/search/default-mapping.json");
-        String mappingSource = IOUtils.toString(mappingSourceStream);
-        elasticSearchLog("defaultMapping").addParameter("mappingSource", mappingSource).log();
-        return mappingSource;
+        try (InputStream mappingSourceStream = Indexer.class.getResourceAsStream("/search/default-mapping.json")) {
+            String mappingSource = IOUtils.toString(mappingSourceStream);
+            elasticSearchLog("defaultMapping").addParameter("mappingSource", mappingSource).log();
+            return mappingSource;
+        }
     }
 
     /**
@@ -194,10 +199,11 @@ public abstract class ZebedeeContentIndexer {
      * @return
      */
     public static String getDepartmentsMapping() throws IOException {
-        InputStream mappingSourceStream = Indexer.class.getResourceAsStream("/search/departments/departments-mapping.json");
-        String mappingSource = IOUtils.toString(mappingSourceStream);
-        elasticSearchLog("departmentsMapping").addParameter("mappingSource", mappingSource).log();
-        return mappingSource;
+        try (InputStream mappingSourceStream = Indexer.class.getResourceAsStream("/search/departments/departments-mapping.json")) {
+            String mappingSource = IOUtils.toString(mappingSourceStream);
+            elasticSearchLog("departmentsMapping").addParameter("mappingSource", mappingSource).log();
+            return mappingSource;
+        }
     }
 
 }

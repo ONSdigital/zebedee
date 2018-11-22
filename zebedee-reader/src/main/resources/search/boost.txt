@@ -26,6 +26,7 @@
 /economy/inflationandpriceindices/timeseries/chaw/mm23=>rpi
 /economy/inflationandpriceindices/timeseries/czbh/mm23=>rpi
 /businessindustryandtrade/retailindustry/bulletins/retailsales/*=>retail
+/employmentandlabourmarket/peopleinwork/earningsandworkinghours/bulletins/annualsurveyofhoursandearnings/*=>earnings,ashe
 /employmentandlabourmarket/peopleinwork/employmentandemployeetypes/bulletins/uklabourmarket/*=>average earnings index,Labour Force Survey,unemployment,labour market statistics,employment,Claimant Count,average weekly earnings
 /employmentandlabourmarket/peopleinwork/employmentandemployeetypes/datasets/summaryoflabourmarketstatistics=>unemployment,employment
 /employmentandlabourmarket/peopleinwork/earningsandworkinghours/datasets/averageweeklyearningsearn01=>average earnings index

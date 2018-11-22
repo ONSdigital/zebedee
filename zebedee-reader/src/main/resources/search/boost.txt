@@ -43,3 +43,4 @@
 /aboutus/whatwedo/statistics/requestingstatistics=>adhoc, ad-hoc, ad hoc, user requested data
 /economy/grossdomesticproductgdp/bulletins/gdpmonthlyestimateuk/*=>gdp
 /aboutus/whatwedo/programmesandprojects/onlinehouseholdstudy=>takepart, take part
+/methodology/classificationsandstandards/economicstatisticsclassifications/introductiontoeconomicstatisticsclassifications=>public sector classification guide

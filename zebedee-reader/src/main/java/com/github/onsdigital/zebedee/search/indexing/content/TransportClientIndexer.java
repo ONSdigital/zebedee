@@ -22,6 +22,8 @@ import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logE
 
 public class TransportClientIndexer extends ZebedeeContentIndexer {
 
+    private static final String SEARCH_ALIAS = SearchConfiguration.getSearchAlias();
+
     private final IndexClient indexClient;
     private final Lock lock;
 
@@ -88,14 +90,11 @@ public class TransportClientIndexer extends ZebedeeContentIndexer {
     public void indexOnsContent() {
         long start = System.currentTimeMillis();
 
-        // Get the search alias
-        String searchAlias = SearchConfiguration.getSearchAlias();
-
         // Check if the index alias is available
-        boolean aliasIsAvailable = this.indexClient.indexExists(searchAlias);
+        boolean aliasIsAvailable = this.indexClient.indexExists(SEARCH_ALIAS);
 
         // Get the old index from the current alias
-        String oldIndex = this.indexClient.getIndexForAlias(searchAlias);
+        String oldIndex = this.indexClient.getIndexForAlias(SEARCH_ALIAS);
 
         // Generate new index name
         String newIndex = super.getOnsIndexName();
@@ -104,7 +103,7 @@ public class TransportClientIndexer extends ZebedeeContentIndexer {
         if (aliasIsAvailable && oldIndex == null) {
             //In this case it is an index rather than an alias. This normally is not possible with index structure set up.
             //This is a transition code due to elastic search index structure change, making deployment to environments with old structure possible without down time
-            this.indexClient.deleteIndex(searchAlias);
+            this.indexClient.deleteIndex(SEARCH_ALIAS);
         }
 
         elasticSearchLog("Triggering re-indexing")
@@ -117,11 +116,11 @@ public class TransportClientIndexer extends ZebedeeContentIndexer {
             List<Page> pages = super.loadPages();
 
             if (oldIndex == null) {
-                this.indexClient.addIndexAlias(newIndex, searchAlias);
+                this.indexClient.addIndexAlias(newIndex, SEARCH_ALIAS);
                 this.indexPages(newIndex, pages);
             } else {
                 this.indexPages(newIndex, pages);
-                this.indexClient.swapIndexAlias(oldIndex, newIndex, searchAlias);
+                this.indexClient.swapIndexAlias(oldIndex, newIndex, SEARCH_ALIAS);
                 this.indexClient.deleteIndex(oldIndex);
             }
             elasticSearchLog("Re-indexing completed")
@@ -159,7 +158,7 @@ public class TransportClientIndexer extends ZebedeeContentIndexer {
         }
 
         // Do the index
-        this.indexPages(SearchConfiguration.getSearchAlias(), pages);
+        this.indexPages(SEARCH_ALIAS, pages);
     }
 
     /**

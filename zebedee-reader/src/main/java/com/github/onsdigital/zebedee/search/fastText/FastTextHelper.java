@@ -8,8 +8,10 @@ import static com.github.onsdigital.zebedee.util.VariableUtils.getVariableValue;
 
 public class FastTextHelper {
 
+    private static final int DOUBLE_SIZE_IN_BYTES = 8;
+
     public static final String convertArrayToBase64(double[] array) {
-        final int capacity = 8 * array.length;
+        final int capacity = DOUBLE_SIZE_IN_BYTES * array.length;
         final ByteBuffer bb = ByteBuffer.allocate(capacity);
         for (int i = 0; i < array.length; i++) {
             bb.putDouble(array[i]);
@@ -32,6 +34,8 @@ public class FastTextHelper {
      * TODO - Fix me
      */
     public static class Configuration {
-        public static boolean INDEX_EMBEDDING_VECTORS = Boolean.parseBoolean(getVariableValue("INDEX_EMBEDDING_VECTORS"));
+        private static final String INDEX_EMBEDDING_VECTORS_KEY = "INDEX_EMBEDDING_VECTORS";
+
+        public static boolean INDEX_EMBEDDING_VECTORS = Boolean.parseBoolean(getVariableValue(INDEX_EMBEDDING_VECTORS_KEY));
     }
 }

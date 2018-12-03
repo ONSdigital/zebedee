@@ -36,6 +36,7 @@
 /economy/economicoutputandproductivity/output/bulletins/indexofproduction/*=>iop, index of production, industrial production
 /peoplepopulationandcommunity/populationandmigration/populationestimates/datasets/populationestimatesforukenglandandwalesscotlandandnorthernireland=>population
 /peoplepopulationandcommunity/populationandmigration/populationestimates/bulletins/keystatisticsandquickstatisticsforlocalauthoritiesintheunitedkingdom/2013-10-11=>ethnicity
+/peoplepopulationandcommunity/populationandmigration/internationalmigration/bulletins/migrationstatisticsquarterlyreport/*=>migration, msqr
 /peoplepopulationandcommunity/populationandmigration/internationalmigration/*=>immigration,emigration
 /peoplepopulationandcommunity/birthsdeathsandmarriages/deaths/bulletins/childhoodinfantandperinatalmortalityinenglandandwales/*=>child mortality
 /employmentandlabourmarket/peopleinwork/employmentandemployeetypes/bulletins/regionallabourmarket/*=>regional labour, regional unemployment, regional employment

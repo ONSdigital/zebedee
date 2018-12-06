@@ -804,6 +804,8 @@ public class CollectionsTest {
                 .thenReturn(null);
         when(collectionMock.edit(TEST_EMAIL, uri.toString(), collectionWriterMock, false))
                 .thenReturn(false);
+        when(zebedeeMock.checkForCollectionBlockingChange(uri.toString()))
+                .thenReturn(Optional.empty());
         try {
             collections.writeContent(collectionMock, uri.toString(), sessionMock, requestMock, mock(InputStream.class), false,
                     CollectionEventType.COLLECTION_PAGE_SAVED, false);
@@ -834,6 +836,8 @@ public class CollectionsTest {
                 .thenReturn(uri);
         when(collectionMock.edit(TEST_EMAIL, uri.toString(), collectionWriterMock, false))
                 .thenReturn(false);
+        when(zebedeeMock.checkForCollectionBlockingChange(uri.toString()))
+                .thenReturn(Optional.empty());
         try {
             collections.writeContent(collectionMock, uri.toString(), sessionMock, requestMock, mock(InputStream.class), false,
                     CollectionEventType.COLLECTION_PAGE_SAVED, false);
@@ -985,6 +989,8 @@ public class CollectionsTest {
                 .thenReturn(false);
         when(zebedeeMock.checkForCollectionBlockingChange(collectionMock, uri))
                 .thenReturn(Optional.of(blocker));
+        when(zebedeeMock.checkForCollectionBlockingChange(uri))
+                .thenReturn(Optional.of(blocker));
         when(blocker.getDescription())
                 .thenReturn(collectionDescriptionMock);
         when(collectionDescriptionMock.getName())
@@ -996,8 +1002,8 @@ public class CollectionsTest {
             verify(publishedContentMock, times(1)).exists(uri);
             verify(zebedeeMock, times(1)).checkForCollectionBlockingChange(collectionMock, uri);
             verify(collectionMock, times(1)).getDescription();
-            verify(blocker, times(1)).getDescription();
-            verify(collectionDescriptionMock, times(2)).getName();
+            verify(blocker, times(2)).getDescription();
+            verify(collectionDescriptionMock, times(3)).getName();
             verifyNoMoreInteractions(zebedeeMock);
             verifyZeroInteractions(collectionReaderWriterFactoryMock, collectionWriterMock, collectionMock);
             throw e;

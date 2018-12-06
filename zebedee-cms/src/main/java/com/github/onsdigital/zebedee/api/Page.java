@@ -2,7 +2,6 @@ package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
 import com.github.onsdigital.zebedee.audit.Audit;
-import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.content.page.APIDatasetLandingPageCreationHook;
 import com.github.onsdigital.zebedee.content.page.APIDatasetLandingPageDeletionHook;
 import com.github.onsdigital.zebedee.content.page.PageTypeUpdateHook;
@@ -19,7 +18,6 @@ import com.github.onsdigital.zebedee.persistence.CollectionEventType;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.util.ZebedeeCmsService;
-import dp.api.dataset.DatasetAPIClient;
 import dp.api.dataset.DatasetClient;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.io.IOUtils;
@@ -36,7 +34,9 @@ import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
+import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
 
@@ -44,8 +44,9 @@ import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
 public class Page {
 
     private final ZebedeeCmsService zebedeeCmsService;
-    private final PageUpdateHook pageCreationHook;
-    private final PageUpdateHook pageDeletionHook;
+    private final Optional<PageUpdateHook> pageCreationHook;
+    private final Optional<PageUpdateHook> pageDeletionHook;
+    private final boolean datasetImportEnabled;
 
     static final String zebedeeFileSuffix = "/data.json";
 
@@ -53,19 +54,48 @@ public class Page {
      * Default constructor used instantiates dependencies itself.
      */
     public Page() throws URISyntaxException {
+        this(cmsFeatureFlags().isEnableDatasetImport());
+    }
 
-        zebedeeCmsService = ZebedeeCmsService.getInstance();
+    /**
+     * Constructor allowing you to specifying if the dataset import feature should be enabled.
+     */
+    public Page(boolean datasetImportEnabled) throws URISyntaxException {
+        this.datasetImportEnabled = datasetImportEnabled;
+        this.zebedeeCmsService = ZebedeeCmsService.getInstance();
 
-        DatasetClient datasetAPIClient = new DatasetAPIClient(
-                Configuration.getDatasetAPIURL(),
-                Configuration.getDatasetAPIAuthToken(),
-                Configuration.getServiceAuthToken());
+        if (datasetImportEnabled) {
+            logInfo("feature EnableDatasetImport enabled, creating Page hooks")
+                    .addParameter("hooks", "pageDeletionHook, pageCreationHook")
+                    .log();
 
-        Map<PageType, PageUpdateHook> creationHooks = initialisePageCreationHooks(datasetAPIClient);
-        Map<PageType, PageUpdateHook> deletionHooks = initialisePageDeletionHooks(datasetAPIClient);
+            DatasetClient datasetAPIClient = zebedeeCmsService.getDatasetClient();
 
-        pageDeletionHook = new PageTypeUpdateHook(deletionHooks);
-        pageCreationHook = new PageTypeUpdateHook(creationHooks);
+            Map<PageType, PageUpdateHook> creationHooks = initialisePageCreationHooks(datasetAPIClient);
+            Map<PageType, PageUpdateHook> deletionHooks = initialisePageDeletionHooks(datasetAPIClient);
+
+            this.pageDeletionHook = Optional.of(new PageTypeUpdateHook(deletionHooks));
+            this.pageCreationHook = Optional.of(new PageTypeUpdateHook(creationHooks));
+        } else {
+            logInfo("feature EnableDatasetImport disabled, Page hooks will not be created").log();
+            this.pageCreationHook = Optional.empty();
+            this.pageDeletionHook = Optional.empty();
+        }
+    }
+
+    /**
+     * Constructor allowing dependencies to be injected.
+     *
+     * @param zebedeeCmsService
+     * @param pageCreationHook
+     * @param pageDeletionHook
+     */
+    Page(ZebedeeCmsService zebedeeCmsService, PageUpdateHook pageCreationHook, PageUpdateHook pageDeletionHook,
+         boolean datasetImportEnabled) {
+        this.datasetImportEnabled = datasetImportEnabled;
+        this.zebedeeCmsService = zebedeeCmsService;
+        this.pageCreationHook = Optional.ofNullable(pageCreationHook);
+        this.pageDeletionHook = Optional.ofNullable(pageDeletionHook);
     }
 
     private Map<PageType, PageUpdateHook> initialisePageDeletionHooks(DatasetClient datasetAPIClient) {
@@ -89,19 +119,6 @@ public class Page {
     }
 
     /**
-     * Constructor allowing dependencies to be injected.
-     *
-     * @param zebedeeCmsService
-     * @param pageCreationHook
-     * @param pageDeletionHook
-     */
-    public Page(ZebedeeCmsService zebedeeCmsService, PageUpdateHook pageCreationHook, PageUpdateHook pageDeletionHook) {
-        this.zebedeeCmsService = zebedeeCmsService;
-        this.pageCreationHook = pageCreationHook;
-        this.pageDeletionHook = pageDeletionHook;
-    }
-
-    /**
      * create a new page from the endpoint <code>/Content/[CollectionName]/?uri=[uri]</code>
      *
      * @param request  This should contain a X-Florence-Token header for the current session
@@ -114,97 +131,91 @@ public class Page {
      */
     @POST
     public com.github.onsdigital.zebedee.content.page.base.Page createPage(HttpServletRequest request, HttpServletResponse response) {
-
         com.github.onsdigital.zebedee.content.page.base.Page page = null;
+
+        String uri = request.getParameter("uri");
+        if (StringUtils.isEmpty(uri)) {
+            logError(new BadRequestException("uri is empty")).log();
+            response.setStatus(HttpStatus.SC_BAD_REQUEST);
+            return null;
+        }
+        uri = trimZebedeeFileSuffix(uri);
+
+        Session session;
+        try {
+            session = zebedeeCmsService.getSession(request);
+        } catch (ZebedeeException e) {
+            logError(e, "failed to get session")
+                    .path(uri).log();
+            response.setStatus(e.statusCode);
+            return null;
+        }
+
+        Collection collection;
+        try {
+            collection = zebedeeCmsService.getCollection(request);
+        } catch (ZebedeeException e) {
+            logError(e, "failed to get collection")
+                    .user(session.getEmail())
+                    .path(uri).log();
+            response.setStatus(e.statusCode);
+            return null;
+        }
 
         // We have to get the request InputStream before reading any request parameters
         // otherwise the call to get a request parameter will actually consume the body:
+        byte[] requestBodyBytes = null;
         try (InputStream requestBody = request.getInputStream()) {
+            requestBodyBytes = IOUtils.toByteArray(requestBody);
+        } catch (Exception e) {
+            response.setStatus(HttpStatus.SC_BAD_REQUEST);
+            logError(e, "failed to deserialise page from the request body").log();
+            return null;
+        }
 
-            String uri = request.getParameter("uri");
-            if (StringUtils.isEmpty(uri)) {
-                logError(new BadRequestException("uri is empty")).log();
-                response.setStatus(HttpStatus.SC_BAD_REQUEST);
-                return page;
-            }
-            uri = trimZebedeeFileSuffix(uri);
+        try (ByteArrayInputStream pageInputStream = new ByteArrayInputStream(requestBodyBytes)) {
+            page = ContentUtil.deserialiseContent(pageInputStream);
+        } catch (Exception e) {
+            response.setStatus(HttpStatus.SC_BAD_REQUEST);
+            logError(e, "failed to deserialise page from the request body").log();
+            return null;
+        }
 
-            Session session;
-            try {
-                session = zebedeeCmsService.getSession(request);
-            } catch (ZebedeeException e) {
-                logError(e, "failed to get session")
-                        .path(uri).log();
-                response.setStatus(e.statusCode);
-                return page;
-            }
-
-            Collection collection;
-            try {
-                collection = zebedeeCmsService.getCollection(request);
-            } catch (ZebedeeException e) {
-                logError(e, "failed to get collection")
-                        .user(session.getEmail())
-                        .path(uri).log();
-                response.setStatus(e.statusCode);
-                return page;
-            }
-
-            byte[] bytes = IOUtils.toByteArray(requestBody);
-
-            try (ByteArrayInputStream pageInputStream = new ByteArrayInputStream(bytes)) {
-                page = ContentUtil.deserialiseContent(pageInputStream);
-            } catch (Exception e) {
-                response.setStatus(HttpStatus.SC_BAD_REQUEST);
-                logError(e, "failed to deserialise page from the request body").log();
-                return page;
-            }
-
-            if (pageCreationHook != null) {
-                try {
-                    pageCreationHook.onPageUpdated(page, uri);
-                } catch (IOException | RuntimeException e) {
-                    logError(e, "exception when calling page creation hook")
-                            .collectionId(collection.getDescription().getId())
-                            .user(session.getEmail())
-                            .path(uri).log();
-                    response.setStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR);
-                    return page;
-                }
-            }
-
-            try (ByteArrayInputStream inputStream = new ByteArrayInputStream(bytes)) {
-                zebedeeCmsService.getZebedee().getCollections().createContent(
-                        collection,
-                        uri + zebedeeFileSuffix,
-                        session,
-                        request,
-                        inputStream,
-                        CollectionEventType.COLLECTION_PAGE_SAVED,
-                        false);
-
-            } catch (ZebedeeException e) {
-                handleZebdeeException("failed to create content", e, response, uri, session, collection);
-            } catch (IOException | FileUploadException e) {
-                logError(e, "exception when calling collections.createContent")
-                        .collectionId(collection.getDescription().getId())
-                        .user(session.getEmail())
-                        .path(uri).log();
+        if (pageCreationHook.isPresent()) {
+            boolean success = execCreationHook(page, uri, collection, session);
+            if (!success) {
                 response.setStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR);
+                return null;
             }
+        }
 
-            Audit.Event.CONTENT_SAVED
-                    .parameters()
-                    .host(request)
-                    .collection(collection)
-                    .content(uri)
+        try (ByteArrayInputStream inputStream = new ByteArrayInputStream(requestBodyBytes)) {
+            zebedeeCmsService.getZebedee().getCollections().createContent(
+                    collection,
+                    uri + zebedeeFileSuffix,
+                    session,
+                    request,
+                    inputStream,
+                    CollectionEventType.COLLECTION_PAGE_SAVED,
+                    false);
+
+        } catch (ZebedeeException e) {
+            handleZebdeeException("failed to create content", e, response, uri, session, collection);
+        } catch (IOException | FileUploadException e) {
+            logError(e, "exception when calling collections.createContent")
+                    .collectionId(collection.getDescription().getId())
                     .user(session.getEmail())
-                    .log();
-
-        } catch (IOException e) {
-            logError(e, "exception reading request body on create page endpoint").log();
+                    .path(uri).log();
             response.setStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR);
         }
+
+        Audit.Event.CONTENT_SAVED
+                .parameters()
+                .host(request)
+                .collection(collection)
+                .content(uri)
+                .user(session.getEmail())
+                .log();
 
         response.setStatus(HttpStatus.SC_CREATED);
         return page;
@@ -281,14 +292,9 @@ public class Page {
             return;
         }
 
-        if (pageDeletionHook != null) {
-            try {
-                pageDeletionHook.onPageUpdated(page, uri);
-            } catch (IOException | RuntimeException e) {
-                logError(e, "exception when calling page deletion hook")
-                        .collectionId(collection.getDescription().getId())
-                        .user(session.getEmail())
-                        .path(uri).log();
+        if (pageDeletionHook.isPresent()) {
+            boolean success = execDeletionHook(page, uri, collection, session);
+            if (!success) {
                 response.setStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR);
                 return;
             }
@@ -336,6 +342,44 @@ public class Page {
                 .user(session.getEmail())
                 .path(uri).log();
         response.setStatus(e.statusCode);
+    }
+
+    private boolean execCreationHook(com.github.onsdigital.zebedee.content.page.base.Page page, String uri,
+                                     Collection collection, Session session) {
+        logInfo("executing PageCreationHook")
+                .path(uri)
+                .collectionName(collection)
+                .user(session.getEmail())
+                .log();
+        try {
+            pageCreationHook.get().onPageUpdated(page, uri);
+            return true;
+        } catch (IOException | RuntimeException e) {
+            logError(e, "exception when calling page creation hook")
+                    .collectionId(collection.getDescription().getId())
+                    .user(session.getEmail())
+                    .path(uri).log();
+            return false;
+        }
+    }
+
+    private boolean execDeletionHook(com.github.onsdigital.zebedee.content.page.base.Page page, String uri,
+                                     Collection collection, Session session) {
+        logInfo("executing PageDeletionHook")
+                .path(uri)
+                .collectionName(collection)
+                .user(session.getEmail())
+                .log();
+        try {
+            pageDeletionHook.get().onPageUpdated(page, uri);
+            return true;
+        } catch (IOException | RuntimeException e) {
+            logError(e, "exception when calling page deletion hook")
+                    .collectionId(collection.getDescription().getId())
+                    .user(session.getEmail())
+                    .path(uri).log();
+            return false;
+        }
     }
 
     static String trimZebedeeFileSuffix(String uri) {

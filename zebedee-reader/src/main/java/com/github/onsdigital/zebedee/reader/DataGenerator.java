@@ -40,6 +40,7 @@ import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
 import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logDebug;
+import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logTrace;
 import static java.util.Arrays.asList;
 import static org.apache.commons.io.FilenameUtils.getExtension;
 import static org.apache.poi.ss.usermodel.Cell.CELL_TYPE_NUMERIC;
@@ -201,6 +202,13 @@ public class DataGenerator {
         ) {
             Sheet sheet = wb.createSheet(SHEET_NAME);
             int rowIndex = 0;
+
+            /**
+             * There is a hard limit of 4000 styles per workbook. So we only generate unique styles we need instead
+             * of a new style per cell and risk hitting that limit.
+             **/
+            Map<String, CellStyle> stylesMap = new HashMap<>();
+
             for (List<String> gridRow : grid) {
 
                 Row r = sheet.createRow(rowIndex++);
@@ -215,9 +223,19 @@ public class DataGenerator {
                             // not a float. Example '55.0' will be displayed as '55'.
                             // To combat this we create a custom data format for each string value to force it to
                             // display the decimal places even if they are all zero.
-                            CellStyle style = wb.createCellStyle();
-                            style.setDataFormat(wb.createDataFormat().getFormat(getDataFormat(cellValueStr)));
-                            cell.setCellStyle(style);
+
+                            String cellFormat = getDataFormat(cellValueStr);
+                            if (!stylesMap.containsKey(cellFormat)) {
+                                CellStyle newStyle = wb.createCellStyle();
+                                newStyle.setDataFormat(wb.createDataFormat().getFormat(cellFormat));
+                                stylesMap.put(cellFormat, newStyle);
+
+                                logTrace("created new cell style for workbook")
+                                        .addParameter("count", stylesMap.size())
+                                        .log();
+                            }
+
+                            cell.setCellStyle(stylesMap.get(cellFormat));
                         }
                         cell.setCellType(CELL_TYPE_NUMERIC);
                         cell.setCellValue(Double.parseDouble(cellValueStr));

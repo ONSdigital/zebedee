@@ -15,9 +15,12 @@ import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.ApprovalStatus;
 import com.github.onsdigital.zebedee.json.Event;
 import com.github.onsdigital.zebedee.json.EventType;
+import com.github.onsdigital.zebedee.json.Keyring;
 import com.github.onsdigital.zebedee.model.approval.ApprovalQueue;
 import com.github.onsdigital.zebedee.model.approval.ApproveTask;
+import com.github.onsdigital.zebedee.model.publishing.PostPublisher;
 import com.github.onsdigital.zebedee.model.publishing.PublishNotification;
+import com.github.onsdigital.zebedee.model.publishing.Publisher;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.persistence.CollectionEventType;
 import com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDao;
@@ -344,6 +347,74 @@ public class Collections {
         return collection.save();
     }
 
+    /**
+     * Publish the files
+     *
+     * @param collection       the collection to publish
+     * @param session          a session with editor priviledges
+     * @param skipVerification
+     * @return success
+     * @throws IOException
+     * @throws UnauthorizedException
+     * @throws BadRequestException
+     * @throws ConflictException     - If there
+     */
+    public boolean publish(Collection collection, Session session, boolean breakBeforePublish, boolean skipVerification)
+            throws IOException, UnauthorizedException, BadRequestException,
+            ConflictException, NotFoundException {
+
+        // Collection exists
+        if (collection == null) {
+            throw new BadRequestException("Please provide a valid collection.");
+        }
+
+        // User has permission
+        if (session == null || !permissionsService.canEdit(session.getEmail())) {
+            throw new UnauthorizedException(getUnauthorizedMessage(session));
+        }
+
+        // Check approval status
+        if (collection.description.approvalStatus != ApprovalStatus.COMPLETE) {
+            throw new ConflictException("This collection cannot be published because it is not approved");
+        }
+
+        // Break before transfer allows us to run tests on the prepublish-hook without messing up the content
+        if (breakBeforePublish) {
+            logInfo("Breaking before publish").log();
+            return true;
+        }
+
+        Keyring keyring = zebedeeSupplier.get().getKeyringCache().get(session);
+        if (keyring == null) {
+            throw new UnauthorizedException("No keyring is available for " + session.getEmail());
+        }
+
+        ZebedeeCollectionReader collectionReader = new ZebedeeCollectionReader(zebedeeSupplier.get(), collection, session);
+        long publishStart = System.currentTimeMillis();
+        boolean publishComplete = Publisher.publish(collection, session.getEmail(), collectionReader);
+
+        if (publishComplete) {
+            long onPublishCompleteStart = System.currentTimeMillis();
+
+            new PublishNotification(collection).sendNotification(EventType.PUBLISHED);
+
+            PostPublisher.postPublish(zebedeeSupplier.get(), collection, skipVerification, collectionReader);
+
+            logInfo("collection post publish process completed")
+                    .collectionName(collection)
+                    .collectionId(collection)
+                    .timeTaken((System.currentTimeMillis() - onPublishCompleteStart))
+                    .log();
+            logInfo("collection publish complete")
+                    .collectionName(collection)
+                    .collectionId(collection)
+                    .timeTaken((System.currentTimeMillis() - publishStart))
+                    .log();
+        }
+
+        return publishComplete;
+    }
+
     public DirectoryListing listDirectory(
             Collection collection, String uri,
             Session session
@@ -458,13 +529,13 @@ public class Collections {
                     .saveOrEditConflict(collection, blocker, uri)
                     .user(session.getEmail())
                     .log();
-            throw new ConflictException("This URI exists in another collection.");
+            throw new ConflictException("This URI exists in another collection", blocker.getDescription().getName());
         }
 
         try {
             zebedeeSupplier.get().checkAllCollectionsForDeleteMarker(uri);
         } catch (DeleteContentRequestDeniedException ex) {
-            throw new ConflictException("This URI already exists");
+            throw new ConflictException("This URI is marked for deletion in another collection", ex.getCollectionName());
         }
 
         writeContent(collection, uri, session, request, requestBody, false, eventType, validateJson);
@@ -507,6 +578,11 @@ public class Collections {
             // create the file
             if (!collection.create(session.getEmail(), uri)) {
                 // file may be being edited in a different collection
+                Optional<Collection> otherCollection = zebedeeSupplier.get().checkForCollectionBlockingChange(uri);
+                if(otherCollection.isPresent()) {
+                    throw new ConflictException(
+                            "This URI is being edited in another collection", otherCollection.get().getDescription().getName());
+                }
                 throw new ConflictException(
                         "It could be this URI is being edited in another collection");
             }
@@ -515,6 +591,11 @@ public class Collections {
             boolean result = collection.edit(session.getEmail(), uri, collectionWriter, recursive);
             if (!result) {
                 // file may be being edited in a different collection
+                Optional<Collection> otherCollection = zebedeeSupplier.get().checkForCollectionBlockingChange(uri);
+                if(otherCollection.isPresent()) {
+                    throw new ConflictException(
+                            "This URI is being edited in another collection", otherCollection.get().getDescription().getName());
+                }
                 throw new ConflictException(
                         "It could be this URI is being edited in another collection");
             }

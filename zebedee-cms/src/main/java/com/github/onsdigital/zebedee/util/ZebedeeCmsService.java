@@ -3,6 +3,7 @@ package com.github.onsdigital.zebedee.util;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.api.Collections;
 import com.github.onsdigital.zebedee.api.Root;
+import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
@@ -13,17 +14,20 @@ import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.CollectionWriter;
 import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
 import com.github.onsdigital.zebedee.model.ZebedeeCollectionWriter;
-import com.github.onsdigital.zebedee.model.publishing.Publisher;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
+import com.github.onsdigital.zebedee.service.DatasetService;
 import com.github.onsdigital.zebedee.session.model.Session;
+import dp.api.dataset.DatasetAPIClient;
+import dp.api.dataset.DatasetClient;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URISyntaxException;
 
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
 
@@ -38,7 +42,8 @@ public class ZebedeeCmsService {
 
     private static final String COLLECTION_WRI_ERROR_MSG = "Could not obtain collection writer for requested collection";
     private static final String COLLECTION_READ_ERROR_MSG = "Could not obtain collection reader for requested collection";
-    private static final String COLLECTION_NOT_FOUND_MSG = "Could not find requested collection.";
+    private static final String COLLECTION_NOT_FOUND_MSG = "Could not find requested collection";
+    private static final String GET_COLLECTIONS_ERROR = "Could not get Zebedee collections";
     private static final String SESSION_NOT_FOUND_MSG = "Could not get session from request";
 
     private static final ZebedeeCmsService instance = new ZebedeeCmsService();
@@ -84,6 +89,15 @@ public class ZebedeeCmsService {
         return null;
     }
 
+    public com.github.onsdigital.zebedee.model.Collections getCollections() throws ZebedeeException {
+        try {
+            return Root.zebedee.getCollections();
+        } catch (Exception e) {
+            logError(e, GET_COLLECTIONS_ERROR);
+            throw new UnexpectedErrorException(e.getMessage(), 500);
+        }
+    }
+
     public Collection getCollection(HttpServletRequest request) throws ZebedeeException {
         try {
             return Collections.getCollection(request);
@@ -114,7 +128,14 @@ public class ZebedeeCmsService {
         return Root.zebedee;
     }
 
-    public Publisher getPublisher() {
-        return Root.publisher;
+    public DatasetService getDatasetService() {
+        return Root.zebedee.getDatasetService();
+    }
+
+    public DatasetClient getDatasetClient() throws URISyntaxException {
+        return new DatasetAPIClient(
+                Configuration.getDatasetAPIURL(),
+                Configuration.getDatasetAPIAuthToken(),
+                Configuration.getServiceAuthToken());
     }
 }

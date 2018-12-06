@@ -25,8 +25,14 @@ job "zebedee" {
 
     constraint {
       attribute = "${node.class}"
-      operator  = "regexp"
-      value     = "publishing.*"
+      value     = "publishing-mount"
+    }
+
+    restart {
+      attempts = 3
+      delay    = "15s"
+      interval = "1m"
+      mode     = "delay"
     }
 
     task "zebedee" {

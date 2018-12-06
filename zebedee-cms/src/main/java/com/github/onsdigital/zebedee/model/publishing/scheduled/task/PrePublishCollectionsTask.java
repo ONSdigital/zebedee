@@ -1,6 +1,5 @@
 package com.github.onsdigital.zebedee.model.publishing.scheduled.task;
 
-import com.github.davidcarboni.cryptolite.Random;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
@@ -9,8 +8,10 @@ import com.github.onsdigital.zebedee.json.ApprovalStatus;
 import com.github.onsdigital.zebedee.json.CollectionType;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
+import com.github.onsdigital.zebedee.model.publishing.PostPublisher;
 import com.github.onsdigital.zebedee.model.publishing.Publisher;
 import com.github.onsdigital.zebedee.model.publishing.scheduled.PublishScheduler;
+import com.github.onsdigital.zebedee.util.SlackNotification;
 
 import javax.crypto.SecretKey;
 import java.io.IOException;
@@ -39,22 +40,17 @@ public class PrePublishCollectionsTask extends ScheduledTask {
     private final Set<String> collectionIds; // The list of collections ID's used in the task.
     private final Zebedee zebedee;
     private final Date publishDate; // the date of the actual publish, NOT the prepublish date associated with this task.
-    private final PublishScheduler publishScheduler;
-    private final Publisher publisher;
+    private PublishScheduler publishScheduler;
 
     /**
      * Create a new instance of the PrePublishCollectionsTask.
-     *  @param zebedee     The instance of Zebedee this task will run under.
+     *
+     * @param zebedee     The instance of Zebedee this task will run under.
      * @param publishDate The date the actual publish is scheduled for.
-     * @param publisher
      */
-    public PrePublishCollectionsTask(Zebedee zebedee,
-                                     Date publishDate,
-                                     PublishScheduler publishScheduler,
-                                     Publisher publisher) {
+    public PrePublishCollectionsTask(Zebedee zebedee, Date publishDate, PublishScheduler publishScheduler) {
         this.publishDate = publishDate;
         this.publishScheduler = publishScheduler;
-        this.publisher = publisher;
         this.collectionIds = new HashSet<>();
         this.zebedee = zebedee;
     }
@@ -145,22 +141,31 @@ public class PrePublishCollectionsTask extends ScheduledTask {
                     try {
                         logInfo("PRE-PUBLISH: creating collection publish task").collectionName(collection).log();
 
-                        String encryptionPassword = Random.password(100);
+                        // FIXME using PostPublisher.getPublishedCollection feels a bit hacky
+                        SlackNotification.publishNotification(PostPublisher.getPublishedCollection(collection),SlackNotification.CollectionStage.PRE_PUBLISH, SlackNotification.StageStatus.STARTED);
 
-                        // Do pre-publish steps ahead of the publish time
-                        publisher.DoPrePublish(collection, encryptionPassword);
+                        // begin the publish ahead of time. This creates the transaction on the train.
+                        Map<String, String> hostToTransactionIdMap = Publisher.createPublishingTransactions(collection);
+
+                        // send versioned files manifest ahead of time. allowing files to be copied from the website into the transaction.
+                        Publisher.sendManifest(collection);
 
                         SecretKey key = zebedee.getKeyringCache().schedulerCache.get(collection.getDescription().getId());
                         ZebedeeCollectionReader collectionReader = new ZebedeeCollectionReader(collection, key);
-                        PublishCollectionTask publishCollectionTask = new PublishCollectionTask(
-                                collection,
-                                collectionReader,
-                                encryptionPassword, publisher);
+                        PublishCollectionTask publishCollectionTask = new PublishCollectionTask(collection, collectionReader, hostToTransactionIdMap);
 
                         logInfo("PRE-PUBLISH: Adding publish task").collectionName(collection).log();
                         collectionPublishTasks.add(publishCollectionTask);
+
+                        // FIXME using PostPublisher.getPublishedCollection feels a bit hacky
+                        SlackNotification.publishNotification(PostPublisher.getPublishedCollection(collection), SlackNotification.CollectionStage.PRE_PUBLISH, SlackNotification.StageStatus.COMPLETED);
+
                         return true;
                     } catch (BadRequestException | IOException | UnauthorizedException | NotFoundException e) {
+                        // FIXME using PostPublisher.getPublishedCollection feels a bit hacky
+                        // TODO pass through the error?
+                        SlackNotification.publishNotification(PostPublisher.getPublishedCollection(collection), SlackNotification.CollectionStage.PRE_PUBLISH,SlackNotification.StageStatus.FAILED);
+
                         logError(e).log();
                         return false;
                     }

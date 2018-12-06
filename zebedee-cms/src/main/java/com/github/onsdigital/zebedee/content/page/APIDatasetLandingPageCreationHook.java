@@ -10,6 +10,7 @@ import dp.api.dataset.model.Link;
 import java.io.IOException;
 
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
 
 /**
  * A PageUpdateHook implementation for when an ApiDatasetLandingPage is created.
@@ -36,9 +37,9 @@ public class APIDatasetLandingPageCreationHook implements PageUpdateHook<ApiData
      */
     @Override
     public void onPageUpdated(ApiDatasetLandingPage page, String uri) throws IOException {
-
         Dataset dataset = new Dataset();
         dataset.setId(page.getapiDatasetId());
+        dataset.setTitle(page.getDescription().getTitle());
 
         Link taxonomyLink = new Link();
         taxonomyLink.setHref(uri);
@@ -49,9 +50,18 @@ public class APIDatasetLandingPageCreationHook implements PageUpdateHook<ApiData
         dataset.setLinks(datasetLinks);
 
         try {
+            logInfo("creating dataset in the dataset api")
+                    .addParameter("id", dataset.getId())
+                    .addParameter("title", dataset.getTitle())
+                    .addParameter("pageURI", uri)
+                    .log();
             datasetAPIClient.createDataset(page.getapiDatasetId(), dataset);
         } catch (DatasetAPIException e) {
-            logError(e, "failed to create dataset in the dataset api").log();
+            logError(e, "failed to create dataset in the dataset api")
+                    .addParameter("id", dataset.getId())
+                    .addParameter("title", dataset.getTitle())
+                    .addParameter("pageURI", uri)
+                    .log();
             throw new RuntimeException(e);
         }
     }

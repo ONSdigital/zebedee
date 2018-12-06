@@ -29,7 +29,9 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static com.github.onsdigital.zebedee.configuration.Configuration.isVerificationEnabled;
 import static com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedException.beingEditedByAnotherCollectionError;
@@ -139,6 +141,13 @@ public class Zebedee {
                 .stream()
                 .filter(c -> c.isInCollection(uri) && !workingCollection.getDescription().getId()
                         .equals(c.getDescription().getId()))
+                .findFirst();
+    }
+
+    public Optional<Collection> checkForCollectionBlockingChange(String uri) throws IOException {
+        return collections.list()
+                .stream()
+                .filter(c -> c.isInCollection(uri))
                 .findFirst();
     }
 

@@ -5,6 +5,7 @@ import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.CollectionWriter;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.util.SlackNotification;
+import com.github.onsdigital.zebedee.util.slack.PostMessageField;
 
 import java.io.IOException;
 import java.util.List;
@@ -86,10 +87,12 @@ public class TimeSeriesCompressionTask {
                 collectionWriter.getRoot());
 
         for (TimeseriesCompressionResult failedZipFile : failedZipFiles) {
-            String message = "Failed verification of time series zip file: " + failedZipFile.zipPath;
-            logInfo(message).collectionName(collection).addParameter("attempt", attempt).log();
-            SlackNotification.send(message + " in collection " + collection.getDescription().getName()
-                    + " on attempt number " + attempt);
+            SlackNotification.collectionWarning(collection,
+                    "Failed verification of time series zip file",
+                    new PostMessageField("Attempt", Integer.toString(attempt, 10), true),
+                    new PostMessageField("Zip path", failedZipFile.zipPath.toString(), false)
+            );
+            logInfo("Failed verification of time series zip file").collectionName(collection).addParameter("attempt", attempt).addParameter("zipPath", failedZipFile.zipPath.toString()).log();
         }
         return failedZipFiles;
     }

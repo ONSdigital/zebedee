@@ -5,6 +5,7 @@ import com.github.davidcarboni.cryptolite.Random;
 import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.KeyManangerUtil;
 import com.github.onsdigital.zebedee.Zebedee;
+import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.content.page.base.PageType;
 import com.github.onsdigital.zebedee.content.page.release.Release;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
@@ -53,6 +54,9 @@ import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -70,7 +74,7 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logDebug;
+import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_CONTENT_REVIEWED;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_CREATED;
@@ -237,6 +241,11 @@ public class Collection {
             release = getPublishedRelease(collectionDescription.getReleaseUri(), zebedee);
 
             if (zebedee.isBeingEdited(release.getUri().toString() + "/data.json") > 0) {
+                Optional<Collection> otherCollection = zebedee.checkForCollectionBlockingChange(release.getUri().toString() + "/data.json");
+                if (otherCollection.isPresent()) {
+                    throw new ConflictException(
+                            "Cannot use this release. It is being edited as part of another collection.", otherCollection.get().getDescription().getName());
+                }
                 throw new ConflictException(
                         "Cannot use this release. It is being edited as part of another collection.");
             }
@@ -245,6 +254,11 @@ public class Collection {
             try {
                 zebedee.checkAllCollectionsForDeleteMarker(release.getUri().toString());
             } catch (DeleteContentRequestDeniedException ex) {
+                Optional<Collection> otherCollection = zebedee.checkForCollectionBlockingChange(release.getUri().toString() + "/data.json");
+                if (otherCollection.isPresent()) {
+                    throw new ConflictException(
+                            "Cannot use this release. It is being deleted as part of another collection.", otherCollection.get().getDescription().getName());
+                }
                 throw new ConflictException(
                         "Cannot use this release. It is being deleted as part of another collection.");
             }
@@ -1202,17 +1216,23 @@ public class Collection {
      * Return true if this collection has had all of its content reviewed.
      */
     public boolean isAllContentReviewed() throws IOException {
+        // FIXME CMD feature flag
+        if (cmsFeatureFlags().isEnableDatasetImport()) {
+            boolean allDatasetsReviewed = description.getDatasets()
+                    .stream()
+                    .allMatch(ds -> ds.getState().equals(ContentStatus.Reviewed));
 
-        boolean allDatasetsReviewed = description.getDatasets().stream()
-                .allMatch(ds -> ds.getState().equals(ContentStatus.Reviewed));
+            boolean allDatasetVersionsReviewed = description.getDatasetVersions()
+                    .stream()
+                    .allMatch(ds -> ds.getState().equals(ContentStatus.Reviewed));
 
-        boolean allDatasetVersionsReviewed = description.getDatasetVersions().stream()
-                .allMatch(ds -> ds.getState().equals(ContentStatus.Reviewed));
+            return (inProgressUris().isEmpty()
+                    && completeUris().isEmpty()
+                    && allDatasetsReviewed
+                    && allDatasetVersionsReviewed);
+        }
 
-        return (inProgressUris().isEmpty()
-                && completeUris().isEmpty()
-                && allDatasetsReviewed
-                && allDatasetVersionsReviewed);
+        return inProgressUris().isEmpty() && completeUris().isEmpty();
     }
 
     /**
@@ -1223,7 +1243,7 @@ public class Collection {
         return description.getDatasets().stream().map(ds -> {
 
             String url = URI.create(ds.getUri()).getPath();
-            return new ContentDetail(ds.getTitle(), url  , PageType.api_dataset_landing_page.toString());
+            return new ContentDetail(ds.getTitle(), url, PageType.api_dataset_landing_page.toString());
 
         }).collect(Collectors.toList());
     }
@@ -1249,6 +1269,16 @@ public class Collection {
 
     public String getId() {
         return this.description.getId();
+    }
+
+    public long getPublishTimeMilliseconds() {
+        if (getDescription().publishStartDate != null && getDescription().publishEndDate != null) {
+            LocalDateTime start = LocalDateTime.ofInstant(getDescription().publishStartDate.toInstant(), ZoneId.systemDefault());
+            LocalDateTime end = LocalDateTime.ofInstant(getDescription().publishEndDate.toInstant(), ZoneId.systemDefault());
+
+            return Duration.between(start, end).toMillis();
+        }
+        return 0;
     }
 }
 

@@ -1,5 +1,6 @@
 package com.github.onsdigital.zebedee.content.page;
 
+import com.github.onsdigital.zebedee.content.page.base.PageDescription;
 import com.github.onsdigital.zebedee.content.page.statistics.dataset.ApiDatasetLandingPage;
 import dp.api.dataset.DatasetClient;
 import dp.api.dataset.exception.DatasetAPIException;
@@ -38,6 +39,9 @@ public class APIDatasetLandingPageCreationHookTest {
 
         ApiDatasetLandingPage page = new ApiDatasetLandingPage();
         page.setapiDatasetId(datasetId);
+        PageDescription pageDesc = new PageDescription();
+        pageDesc.setTitle("666 The number of the Beast");
+        page.setDescription(pageDesc);
 
         // When onPageUpdated is called
         creationHook.onPageUpdated(page, uri);
@@ -50,6 +54,7 @@ public class APIDatasetLandingPageCreationHookTest {
 
         // Then the dataset given to the dataset API client has the expected values set
         Assert.assertEquals(uri, datasetCaptor.getValue().getLinks().getTaxonomy().getHref());
+        Assert.assertEquals(pageDesc.getTitle(), datasetCaptor.getValue().getTitle());
     }
 
     @Test(expected = RuntimeException.class)

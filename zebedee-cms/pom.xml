@@ -169,9 +169,15 @@
         </dependency>
 
         <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>26.0-jre</version>
+        </dependency>
+
+        <dependency>
             <groupId>com.github.ONSdigital</groupId>
             <artifactId>dp-dataset-api-java-client</artifactId>
-            <version>master-3fa08eee8e-1</version>
+            <version>master-SNAPSHOT</version>
         </dependency>
 
     </dependencies>

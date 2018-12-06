@@ -16,7 +16,7 @@ public class DummyPublishCollectionTask extends PublishCollectionTask {
     private Date end;
 
     public DummyPublishCollectionTask(Collection collection, int durationMillis) {
-        super(collection, null, "", null);
+        super(collection, null, null);
         this.duration = durationMillis;
     }
 

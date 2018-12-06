@@ -3,11 +3,6 @@ job "zebedee" {
   region      = "eu"
   type        = "service"
 
-  constraint {
-    attribute = "${meta.has_disk}"
-    value     = true
-  }
-
   update {
     min_healthy_time = "30s"
     healthy_deadline = "2m"

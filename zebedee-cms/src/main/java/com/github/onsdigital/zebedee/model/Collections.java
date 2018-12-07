@@ -280,40 +280,40 @@ public class Collections {
 
         // Collection exists
         if (collection == null) {
-            logError("approve collection: collection null check failed").collectionId(collection).user(session.getEmail()).log();
+            logError("approve collection: collection null check failed").log();
             throw new BadRequestException("Please provide a valid collection.");
         }
-        logInfo("approve collection: collection null check passed").collectionId(collection).user(session.getEmail()).log();
+        logInfo("approve collection: collection null check passed").collectionId(collection).log();
 
         // User has permission
         if (session == null || !permissionsService.canEdit(session.getEmail())) {
-            logError("approve collection: user permission check failed").collectionId(collection).user(session.getEmail()).log();
+            logError("approve collection: user permission check failed").collectionId(collection).log();
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
-        logInfo("approve collection: user permission check successful").collectionId(collection).user(session.getEmail()).log();
+        logInfo("approve collection: user permission check successful").collectionId(collection).log();
 
         // Everything is completed
         if (!collection.inProgressUris().isEmpty() || !collection.completeUris().isEmpty()) {
-            logError("approve collection: can approve check failure").collectionId(collection).user(session.getEmail())
+            logError("approve collection: can approve check failure").collectionId(collection)
                     .addParameter("inProgressEmpty", collection.inProgressUris().isEmpty())
                     .addParameter("completeEmpty", collection.completeUris().isEmpty())
                     .log();
             throw new ConflictException(
                     "This collection can't be approved because it's not empty");
         }
-        logInfo("approve collection: can approve check successful").collectionId(collection).user(session.getEmail()).log();
+        logInfo("approve collection: can approve check successful").collectionId(collection).log();
 
         CollectionReader collectionReader = collectionReaderWriterFactory.getReader(zebedeeSupplier.get(), collection, session);
         CollectionWriter collectionWriter = collectionReaderWriterFactory.getWriter(zebedeeSupplier.get(), collection, session);
         ContentReader publishedReader = contentReaderFactory.apply(this.published.path);
 
 
-        logInfo("approve collection: setting collection status to approved").collectionId(collection).user(session.getEmail()).log();
+        logInfo("approve collection: setting collection status to approved").collectionId(collection).log();
         collection.getDescription().setApprovalStatus(ApprovalStatus.IN_PROGRESS);
-        logInfo("approve collection: saving collection").collectionId(collection).user(session.getEmail()).log();
+        logInfo("approve collection: saving collection").collectionId(collection).log();
         collection.save();
 
-        logInfo("approve collection: adding approval take to queue").collectionId(collection).user(session.getEmail()).log();
+        logInfo("approve collection: adding approval take to queue").collectionId(collection).log();
 
         Future<Boolean> future = null;
         try {
@@ -321,15 +321,15 @@ public class Collections {
                     new ApproveTask(collection, session, collectionReader, collectionWriter, publishedReader,
                             zebedeeSupplier.get().getDataIndex()));
         } catch (Exception e) {
-            logError(e, "approve collection: submit collection approval task failure").collectionId(collection).user(session.getEmail()).log();
+            logError(e, "approve collection: submit collection approval task failure").collectionId(collection).log();
         }
 
-        logInfo("approve collection: saving collection history event").collectionId(collection).user(session.getEmail()).log();
+        logInfo("approve collection: saving collection history event").collectionId(collection).log();
         collectionHistoryDaoSupplier.get().saveCollectionHistoryEvent(collection, session, COLLECTION_APPROVED);
-        logInfo("approve collection: collection history event saved successfully").collectionId(collection).user(session.getEmail()).log();
+        logInfo("approve collection: collection history event saved successfully").collectionId(collection).log();
 
 
-        logInfo("approve collection: API approve step compeleted successfully").collectionId(collection).user(session.getEmail()).log();
+        logInfo("approve collection: API approve step compeleted successfully").collectionId(collection).log();
         return future;
     }
 

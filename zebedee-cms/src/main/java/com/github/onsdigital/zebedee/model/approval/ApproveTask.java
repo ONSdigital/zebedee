@@ -138,25 +138,46 @@ public class ApproveTask implements Callable<Boolean> {
 
         try {
 
+            logInfo("approve task :resolveDetails").collectionId(collection).user(session.getEmail()).log();
             List<ContentDetail> collectionContent = ContentDetailUtil.resolveDetails(collection.reviewed, collectionReader.getReviewed());
+            logInfo("approve task :resolveDetails succssful").collectionId(collection).user(session.getEmail()).log();
 
+            logInfo("approve task :populateReleasePage").collectionId(collection).user(session.getEmail()).log();
             populateReleasePage(collectionContent);
+            logInfo("approve task :populateReleasePage success").collectionId(collection).user(session.getEmail()).log();
+
+            logInfo("approve task :generateTimeseries").collectionId(collection).user(session.getEmail()).log();
             generateTimeseries(collection, publishedReader, collectionReader, collectionWriter, dataIndex);
+            logInfo("approve task :generateTimeseries success").collectionId(collection).user(session.getEmail()).log();
+
+            logInfo("approve task :generatePdfFiles").collectionId(collection).user(session.getEmail()).log();
             generatePdfFiles(collectionContent);
+            logInfo("approve task :generatePdfFiles success").collectionId(collection).user(session.getEmail()).log();
 
+            logInfo("approve task :createPublishNotification").collectionId(collection).user(session.getEmail()).log();
             PublishNotification publishNotification = createPublishNotification(collectionReader, collection);
+            logInfo("approve task :createPublishNotification success").collectionId(collection).user(session.getEmail()).log();
 
+            logInfo("approve task :compressZipFiles").collectionId(collection).user(session.getEmail()).log();
             compressZipFiles(collection, collectionReader, collectionWriter);
+            logInfo("approve task :compressZipFiles success").collectionId(collection).user(session.getEmail()).log();
+
+            logInfo("approve task :approveCollection").collectionId(collection).user(session.getEmail()).log();
             approveCollection();
+            logInfo("approve task :approveCollection success").collectionId(collection).user(session.getEmail()).log();
 
             // Send a notification to the website with the publish date for caching.
-            publishNotification.sendNotification(EventType.APPROVED);
 
+            logInfo("approve task :sendNotification").collectionId(collection).user(session.getEmail()).log();
+            publishNotification.sendNotification(EventType.APPROVED);
+            logInfo("approve task :sendNotification success").collectionId(collection).user(session.getEmail()).log();
+
+
+            logInfo("approve task :completed successfully").collectionId(collection).user(session.getEmail()).log();
             return true;
 
-        } catch (IOException | ZebedeeException | URISyntaxException e) {
-
-            logError(e, "Exception approving collection").collectionName(collection).log();
+        } catch (Exception e) {
+            logError(e, "Exception approving collection").collectionName(collection).user(session.getEmail()).log();
 
             collection.description.approvalStatus = ApprovalStatus.ERROR;
             try {
@@ -169,9 +190,9 @@ public class ApproveTask implements Callable<Boolean> {
                     "Exception approving collection",
                     new PostMessageField("Error", e.getMessage(), false)
             );
-
             return false;
         }
+
     }
 
     private void compressZipFiles(Collection collection, CollectionReader collectionReader, CollectionWriter collectionWriter) throws ZebedeeException, IOException {

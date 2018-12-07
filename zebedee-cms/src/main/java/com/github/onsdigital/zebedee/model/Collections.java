@@ -280,33 +280,56 @@ public class Collections {
 
         // Collection exists
         if (collection == null) {
+            logError("approve collection: collection null check failed").collectionId(collection).user(session.getEmail()).log();
             throw new BadRequestException("Please provide a valid collection.");
         }
+        logInfo("approve collection: collection null check passed").collectionId(collection).user(session.getEmail()).log();
 
         // User has permission
         if (session == null || !permissionsService.canEdit(session.getEmail())) {
+            logError("approve collection: user permission check failed").collectionId(collection).user(session.getEmail()).log();
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
+        logInfo("approve collection: user permission check successful").collectionId(collection).user(session.getEmail()).log();
 
         // Everything is completed
-        if (!collection.inProgressUris().isEmpty()
-                || !collection.completeUris().isEmpty()) {
+        if (!collection.inProgressUris().isEmpty() || !collection.completeUris().isEmpty()) {
+            logError("approve collection: can approve check failure").collectionId(collection).user(session.getEmail())
+                    .addParameter("inProgressEmpty", collection.inProgressUris().isEmpty())
+                    .addParameter("completeEmpty", collection.completeUris().isEmpty())
+                    .log();
             throw new ConflictException(
                     "This collection can't be approved because it's not empty");
         }
+        logInfo("approve collection: can approve check successful").collectionId(collection).user(session.getEmail()).log();
 
         CollectionReader collectionReader = collectionReaderWriterFactory.getReader(zebedeeSupplier.get(), collection, session);
         CollectionWriter collectionWriter = collectionReaderWriterFactory.getWriter(zebedeeSupplier.get(), collection, session);
         ContentReader publishedReader = contentReaderFactory.apply(this.published.path);
 
+
+        logInfo("approve collection: setting collection status to approved").collectionId(collection).user(session.getEmail()).log();
         collection.getDescription().setApprovalStatus(ApprovalStatus.IN_PROGRESS);
+        logInfo("approve collection: saving collection").collectionId(collection).user(session.getEmail()).log();
         collection.save();
 
-        Future<Boolean> future = addTaskToQueue.apply(
-                new ApproveTask(collection, session, collectionReader, collectionWriter, publishedReader,
-                        zebedeeSupplier.get().getDataIndex()));
+        logInfo("approve collection: adding approval take to queue").collectionId(collection).user(session.getEmail()).log();
 
+        Future<Boolean> future = null;
+        try {
+            future = addTaskToQueue.apply(
+                    new ApproveTask(collection, session, collectionReader, collectionWriter, publishedReader,
+                            zebedeeSupplier.get().getDataIndex()));
+        } catch (Exception e) {
+            logError(e, "approve collection: submit collection approval task failure").collectionId(collection).user(session.getEmail()).log();
+        }
+
+        logInfo("approve collection: saving collection history event").collectionId(collection).user(session.getEmail()).log();
         collectionHistoryDaoSupplier.get().saveCollectionHistoryEvent(collection, session, COLLECTION_APPROVED);
+        logInfo("approve collection: collection history event saved successfully").collectionId(collection).user(session.getEmail()).log();
+
+
+        logInfo("approve collection: API approve step compeleted successfully").collectionId(collection).user(session.getEmail()).log();
         return future;
     }
 
@@ -578,7 +601,7 @@ public class Collections {
             if (!collection.create(session.getEmail(), uri)) {
                 // file may be being edited in a different collection
                 Optional<Collection> otherCollection = zebedeeSupplier.get().checkForCollectionBlockingChange(uri);
-                if(otherCollection.isPresent()) {
+                if (otherCollection.isPresent()) {
                     throw new ConflictException(
                             "This URI is being edited in another collection", otherCollection.get().getDescription().getName());
                 }
@@ -591,7 +614,7 @@ public class Collections {
             if (!result) {
                 // file may be being edited in a different collection
                 Optional<Collection> otherCollection = zebedeeSupplier.get().checkForCollectionBlockingChange(uri);
-                if(otherCollection.isPresent()) {
+                if (otherCollection.isPresent()) {
                     throw new ConflictException(
                             "This URI is being edited in another collection", otherCollection.get().getDescription().getName());
                 }

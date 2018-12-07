@@ -281,7 +281,7 @@ public class CollectionsTest {
                     .canEdit(TEST_EMAIL);
             verify(sessionMock, times(1))
                     .getEmail();
-            verifyZeroInteractions(collectionMock, publishedContentMock, zebedeeMock);
+            verifyZeroInteractions(publishedContentMock, zebedeeMock);
             throw e;
         }
     }
@@ -536,7 +536,7 @@ public class CollectionsTest {
         } catch (ConflictException e) {
             verify(permissionsServiceMock, times(1)).canEdit(TEST_EMAIL);
             verify(sessionMock, times(1)).getEmail();
-            verify(collectionMock, times(1)).inProgressUris();
+            verify(collectionMock, times(2)).inProgressUris();
             verify(collectionReaderWriterFactoryMock, never()).getReader(any(), any(), any());
             verify(collectionReaderWriterFactoryMock, never()).getWriter(any(), any(), any());
             verify(collectionHistoryDaoMock, never()).saveCollectionHistoryEvent(any(CollectionHistoryEvent.class));
@@ -561,8 +561,8 @@ public class CollectionsTest {
         } catch (ConflictException e) {
             verify(permissionsServiceMock, times(1)).canEdit(TEST_EMAIL);
             verify(sessionMock, times(1)).getEmail();
-            verify(collectionMock, times(1)).inProgressUris();
-            verify(collectionMock, times(1)).completeUris();
+            verify(collectionMock, times(2)).inProgressUris();
+            verify(collectionMock, times(2)).completeUris();
             verify(collectionReaderWriterFactoryMock, never()).getReader(any(), any(), any());
             verify(collectionReaderWriterFactoryMock, never()).getWriter(any(), any(), any());
             throw e;

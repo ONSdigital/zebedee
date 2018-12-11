@@ -44,6 +44,7 @@ public class Approve {
                 .user(session.getEmail())
                 .log();
         Root.zebedee.getCollections().approve(collection, session);
+        logInfo("approved task submitted successfully").collectionId(collection).user(session.getEmail()).log();
 
         Audit.Event.COLLECTION_APPROVED
                 .parameters()

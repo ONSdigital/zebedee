@@ -38,4 +38,17 @@ public class Event {
         this.email = email;
         this.note = note;
     }
+
+    public Event(Date date, EventType type, String email, Throwable t) {
+        this.date = date;
+        this.type = type;
+        this.email = email;
+        if (t != null) {
+            this.note = "exception message: " + t.getMessage();
+        }
+    }
+
+    public Event(EventType type, String email, Throwable t) {
+        this(new Date(), type, email, t);
+    }
 }

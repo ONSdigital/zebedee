@@ -13,22 +13,23 @@ import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.CollectionType;
 import com.github.onsdigital.zebedee.json.Event;
 import com.github.onsdigital.zebedee.json.EventType;
-import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
-import com.github.onsdigital.zebedee.session.model.Session;
-import com.github.onsdigital.zebedee.user.model.User;
 import com.github.onsdigital.zebedee.model.approval.ApproveTask;
 import com.github.onsdigital.zebedee.model.publishing.PublishNotification;
+import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.persistence.CollectionEventType;
 import com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDao;
 import com.github.onsdigital.zebedee.persistence.model.CollectionHistoryEvent;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
+import com.github.onsdigital.zebedee.session.model.Session;
+import com.github.onsdigital.zebedee.user.model.User;
 import com.github.onsdigital.zebedee.user.service.UsersService;
 import org.apache.commons.fileupload.FileUploadException;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -56,6 +57,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -524,19 +526,27 @@ public class CollectionsTest {
         List<String> inProgressURIS = new ArrayList();
         inProgressURIS.add("data.json");
 
+        CollectionDescription description = mock(CollectionDescription.class);
+        ArgumentCaptor<Event> eventCaptor = ArgumentCaptor.forClass(Event.class);
+
         when(permissionsServiceMock.canEdit(TEST_EMAIL))
                 .thenReturn(true);
         when(collectionMock.inProgressUris())
                 .thenReturn(inProgressURIS);
         when(collectionMock.completeUris())
                 .thenReturn(new ArrayList<String>());
+        when(collectionMock.getDescription())
+                .thenReturn(description);
+
+        doNothing().when(description).addEvent(eventCaptor.capture());
 
         try {
             collections.approve(collectionMock, sessionMock);
         } catch (ConflictException e) {
             verify(permissionsServiceMock, times(1)).canEdit(TEST_EMAIL);
-            verify(sessionMock, times(1)).getEmail();
+            verify(sessionMock, times(2)).getEmail();
             verify(collectionMock, times(2)).inProgressUris();
+            assertThat(eventCaptor.getValue().type, equalTo(EventType.APPROVE_SUBMITTED));
             verify(collectionReaderWriterFactoryMock, never()).getReader(any(), any(), any());
             verify(collectionReaderWriterFactoryMock, never()).getWriter(any(), any(), any());
             verify(collectionHistoryDaoMock, never()).saveCollectionHistoryEvent(any(CollectionHistoryEvent.class));
@@ -549,20 +559,28 @@ public class CollectionsTest {
         List<String> completeURIS = new ArrayList();
         completeURIS.add("data.json");
 
+        CollectionDescription description = mock(CollectionDescription.class);
+        ArgumentCaptor<Event> eventCaptor = ArgumentCaptor.forClass(Event.class);
+
         when(permissionsServiceMock.canEdit(TEST_EMAIL))
                 .thenReturn(true);
         when(collectionMock.inProgressUris())
                 .thenReturn(new ArrayList<String>());
         when(collectionMock.completeUris())
                 .thenReturn(completeURIS);
+        when(collectionMock.getDescription())
+                .thenReturn(description);
+
+        doNothing().when(description).addEvent(eventCaptor.capture());
 
         try {
             collections.approve(collectionMock, sessionMock);
         } catch (ConflictException e) {
             verify(permissionsServiceMock, times(1)).canEdit(TEST_EMAIL);
-            verify(sessionMock, times(1)).getEmail();
+            verify(sessionMock, times(2)).getEmail();
             verify(collectionMock, times(2)).inProgressUris();
             verify(collectionMock, times(2)).completeUris();
+            assertThat(eventCaptor.getValue().type, equalTo(EventType.APPROVE_SUBMITTED));
             verify(collectionReaderWriterFactoryMock, never()).getReader(any(), any(), any());
             verify(collectionReaderWriterFactoryMock, never()).getWriter(any(), any(), any());
             throw e;

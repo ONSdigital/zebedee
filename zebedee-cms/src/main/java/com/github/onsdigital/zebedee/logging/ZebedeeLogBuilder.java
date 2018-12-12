@@ -155,6 +155,9 @@ public class ZebedeeLogBuilder extends LogMessageBuilder {
     }
 
     public ZebedeeLogBuilder collectionId(Collection collection) {
+        if (collection == null || collection.getDescription() == null) {
+            return this;
+        }
         addParameter(COLLECTION_ID, collection.getDescription().getId());
         return this;
     }

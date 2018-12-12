@@ -11,6 +11,7 @@ import com.github.onsdigital.zebedee.json.ContentDetail;
 import com.github.onsdigital.zebedee.json.Event;
 import com.github.onsdigital.zebedee.json.EventType;
 import com.github.onsdigital.zebedee.json.PendingDelete;
+import com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.CollectionWriter;
 import com.github.onsdigital.zebedee.model.approval.tasks.CollectionPdfGenerator;
@@ -27,6 +28,7 @@ import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.util.ContentDetailUtil;
 import com.github.onsdigital.zebedee.util.SlackNotification;
 import com.github.onsdigital.zebedee.util.slack.PostMessageField;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,15 +41,6 @@ import java.util.concurrent.Callable;
 import static com.github.onsdigital.zebedee.json.EventType.APPROVAL_FAILED;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
-import static com.github.onsdigital.zebedee.model.approval.ApprovalManifest.Step.COMPLETED;
-import static com.github.onsdigital.zebedee.model.approval.ApprovalManifest.Step.COMPRESS_ZIP_FILES;
-import static com.github.onsdigital.zebedee.model.approval.ApprovalManifest.Step.CREATE_PUBLISH_NOTIFICATION;
-import static com.github.onsdigital.zebedee.model.approval.ApprovalManifest.Step.GENERATE_PDFS;
-import static com.github.onsdigital.zebedee.model.approval.ApprovalManifest.Step.GENERATE_TIME_SERIES;
-import static com.github.onsdigital.zebedee.model.approval.ApprovalManifest.Step.POPULATE_RELEASE_PAGE;
-import static com.github.onsdigital.zebedee.model.approval.ApprovalManifest.Step.RESOLVE_DETAILS;
-import static com.github.onsdigital.zebedee.model.approval.ApprovalManifest.Step.SEND_PUBLISH_NOTIFICATION;
-import static com.github.onsdigital.zebedee.model.approval.ApprovalManifest.Step.SET_APPROVAL_STATE;
 
 /**
  * Callable implementation for the approval process.
@@ -60,93 +53,126 @@ public class ApproveTask implements Callable<Boolean> {
     private final CollectionWriter collectionWriter;
     private final ContentReader publishedReader;
     private final DataIndex dataIndex;
+    private final ContentDetailResolver contentDetailResolver;
 
-    public ApproveTask(
-            Collection collection,
-            Session session,
-            CollectionReader collectionReader,
-            CollectionWriter collectionWriter,
-            ContentReader publishedReader,
-            DataIndex dataIndex
-    ) {
+    /**
+     * @param collection
+     * @param session
+     * @param collectionReader
+     * @param collectionWriter
+     * @param publishedReader
+     * @param dataIndex
+     */
+    public ApproveTask(Collection collection, Session session, CollectionReader collectionReader,
+                       CollectionWriter collectionWriter, ContentReader publishedReader, DataIndex dataIndex) {
+        this(collection, session, collectionReader, collectionWriter, publishedReader, dataIndex,
+                getDefaultContentDetailResolver());
+    }
+
+    /**
+     * @param collection
+     * @param session
+     * @param collectionReader
+     * @param collectionWriter
+     * @param publishedReader
+     * @param dataIndex
+     * @param contentDetailResolver
+     */
+    ApproveTask(Collection collection, Session session, CollectionReader collectionReader,
+                CollectionWriter collectionWriter, ContentReader publishedReader, DataIndex dataIndex,
+                ContentDetailResolver contentDetailResolver) {
         this.collection = collection;
         this.session = session;
         this.collectionReader = collectionReader;
         this.collectionWriter = collectionWriter;
         this.publishedReader = publishedReader;
         this.dataIndex = dataIndex;
+        this.contentDetailResolver = contentDetailResolver;
     }
 
     @Override
     public Boolean call() {
-        ApprovalManifest manifest = null;
+        ApprovalEventLog eventLog = null;
         try {
-            manifest = new ApprovalManifest(collection.getDescription().getId(), session.getEmail());
-            return doApproval(manifest);
+            return doApproval();
         } catch (Exception e) {
-            logError(e, "unrecoverable error while attempting to approve collection")
-                    .collectionId(collection)
-                    .addParameter("approver", session.getEmail())
-                    .addParameter("approvalManifest", manifest != null ? manifest : null)
-                    .log();
+            ZebedeeLogBuilder errorLog = logError(e, "unrecoverable error while attempting to approve collection")
+                    .collectionId(collection);
+
+            if (session != null && StringUtils.isNotEmpty(session.getEmail())) {
+                errorLog.addParameter("approver", session.getEmail());
+            }
+
+            if (eventLog != null) {
+                errorLog.addParameter("approvalManifest", eventLog);
+            }
+            errorLog.log();
             return false;
         }
     }
 
-    private boolean doApproval(ApprovalManifest manifest) throws Exception {
+    private boolean doApproval() throws Exception {
+        ApprovalEventLog eventLog = null;
         try {
+            validate();
+            eventLog = new ApprovalEventLog(collection.getDescription().getId(), session.getEmail());
+
             logInfo("running collection approval task")
                     .collectionId(collection)
                     .user(session.getEmail())
                     .log();
 
-            List<ContentDetail> collectionContent = ContentDetailUtil.resolveDetails(collection.reviewed, collectionReader.getReviewed());
-            manifest.log(RESOLVE_DETAILS);
+            List<ContentDetail> collectionContent = contentDetailResolver.resolve(collection.reviewed,
+                    collectionReader.getReviewed());
+            eventLog.resolvedDetails();
 
             populateReleasePage(collectionContent);
-            manifest.log(POPULATE_RELEASE_PAGE);
+            eventLog.populatedResleasePage();
 
             generateTimeseries(collection, publishedReader, collectionReader, collectionWriter, dataIndex);
-            manifest.log(GENERATE_TIME_SERIES);
+            eventLog.generatedTimeSeries();
 
             generatePdfFiles(collectionContent);
-            manifest.log(GENERATE_PDFS);
+            eventLog.generatedPDFs();
 
             PublishNotification publishNotification = createPublishNotification(collectionReader, collection);
-            manifest.log(CREATE_PUBLISH_NOTIFICATION);
+            eventLog.createdPublishNotificaion();
 
             compressZipFiles(collection, collectionReader, collectionWriter);
-            manifest.log(COMPRESS_ZIP_FILES);
+            eventLog.compressedZipFiles();
 
             approveCollection();
-            manifest.log(SET_APPROVAL_STATE);
+            eventLog.approvalStateSet();
 
             // Send a notification to the website with the publish date for caching.
             publishNotification.sendNotification(EventType.APPROVED);
-            manifest.log(SEND_PUBLISH_NOTIFICATION);
+            eventLog.sentPublishNotification();
 
-            manifest.log(COMPLETED);
+            eventLog.approvalCompleted();
             return true;
 
         } catch (Exception e) {
-            logError(e, "Exception approving collection")
-                    .collectionName(collection)
-                    .user(session.getEmail())
-                    .addParameter("approvalEvents", manifest.logDetails())
-                    .log();
+            ZebedeeLogBuilder errorLog = logError(e,
+                    "error approving collection reverting collection approval status to ERROR").collectionId(collection);
+            if (session != null && StringUtils.isNotEmpty(session.getEmail())) {
+                errorLog.user(session.getEmail());
+            }
+            if (eventLog != null) {
+                errorLog.addParameter("approvalEvents", eventLog != null ? eventLog.logDetails() : null);
+            }
+            errorLog.log();
 
             collection.getDescription().setApprovalStatus(ApprovalStatus.ERROR);
             collection.getDescription().addEvent(new Event(APPROVAL_FAILED, session.getEmail(), e));
             try {
                 collection.save();
             } catch (Exception e1) {
-                logError(e, "Exception saving collection after approval exception").collectionId(collection).log();
+                logError(e, "error writing collection to disk after approval exception, you may be required to manually " +
+                        "set the collection status to error").collectionId(collection).log();
             }
 
-            SlackNotification.collectionAlarm(collection,
-                    "Exception approving collection",
-                    new PostMessageField("Error", e.getMessage(), false)
-            );
+            SlackNotification.collectionAlarm(collection, "Exception approving collection",
+                    new PostMessageField("Error", e.getMessage(), false));
             return false;
         }
     }
@@ -255,5 +281,24 @@ public class ApproveTask implements Callable<Boolean> {
     public void generatePdfFiles(List<ContentDetail> collectionContent) {
         CollectionPdfGenerator pdfGenerator = new CollectionPdfGenerator(new BabbagePdfService(session, collection));
         pdfGenerator.generatePdfsInCollection(collectionWriter, collectionContent);
+    }
+
+    private static ContentDetailResolver getDefaultContentDetailResolver() {
+        return (content, reader) -> ContentDetailUtil.resolveDetails(content, reader);
+    }
+
+    private void validate() {
+        if (collection == null) {
+            throw new IllegalArgumentException("approval task unsuccesful collection required but was null");
+        }
+        if (collection.getDescription() == null) {
+            throw new IllegalArgumentException("approval task unsuccesful collection.description required but was null");
+        }
+        if (session == null) {
+            throw new IllegalArgumentException("approval task unsuccesful as session required but was null");
+        }
+        if (StringUtils.isEmpty(session.getEmail())) {
+            throw new IllegalArgumentException("approval task unsuccesful as session.email required but was null/empty");
+        }
     }
 }

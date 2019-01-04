@@ -19,6 +19,8 @@ import com.github.onsdigital.zebedee.model.approval.tasks.ReleasePopulator;
 import com.github.onsdigital.zebedee.model.approval.tasks.timeseries.TimeSeriesCompressionTask;
 import com.github.onsdigital.zebedee.model.content.CompoundContentReader;
 import com.github.onsdigital.zebedee.model.publishing.PublishNotification;
+import com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDao;
+import com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDaoFactory;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.Resource;
@@ -37,6 +39,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.function.Supplier;
 
 import static com.github.onsdigital.zebedee.json.EventType.APPROVAL_FAILED;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
@@ -114,6 +117,8 @@ public class ApproveTask implements Callable<Boolean> {
     private boolean doApproval() throws Exception {
         ApprovalEventLog eventLog = null;
         try {
+            if (true) throw new RuntimeException("BAD STUFF HAPPENED");
+
             validate();
             eventLog = new ApprovalEventLog(collection.getDescription().getId(), session.getEmail());
 

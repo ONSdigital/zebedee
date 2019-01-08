@@ -20,7 +20,8 @@ job "zebedee-reader" {
 
     constraint {
       attribute = "${node.class}"
-      value     = "web-mount"
+      operator  = "regexp"
+      value     = "web.*"
     }
 
     restart {

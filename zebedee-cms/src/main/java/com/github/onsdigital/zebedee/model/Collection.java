@@ -64,7 +64,6 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logDebug;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_CONTENT_REVIEWED;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_CREATED;
@@ -84,6 +83,7 @@ public class Collection {
     public static final String REVIEWED = "reviewed";
     public static final String COMPLETE = "complete";
     public static final String IN_PROGRESS = "inprogress";
+    public static final String DATA_JSON = "data.json";
 
     private static ConcurrentMap<Path, ReadWriteLock> collectionLocks = new ConcurrentHashMap<>();
     private static KeyManangerUtil keyManagerUtil = new KeyManangerUtil();
@@ -660,8 +660,8 @@ public class Collection {
                     FileUtils.moveDirectory(source.getParent().toFile(), destination.getParent().toFile());
                 } else {
                     PathUtils.moveFilesInDirectory(source, destination);
-                    zebedee.getCollections().removeEmptyCollectionDirectories(source);
                 }
+                zebedee.getCollections().removeEmptyCollectionDirectories(source);
             } else {
                 try (InputStream inputStream = new FileInputStream(source.toFile())) {
                     collectionWriter.getInProgress().write(inputStream, uri);
@@ -772,6 +772,7 @@ public class Collection {
             if (recursive) {
                 FileUtils.deleteDirectory(destination.getParent().toFile());
                 FileUtils.moveDirectory(source.getParent().toFile(), destination.getParent().toFile());
+                zebedee.getCollections().removeEmptyCollectionDirectories(source.getParent());
             } else {
                 PathUtils.moveFilesInDirectory(source, destination);
                 zebedee.getCollections().removeEmptyCollectionDirectories(source);
@@ -940,24 +941,41 @@ public class Collection {
             return false;
         }
 
-        String contentUri = contentPath.toString();
+        String visualisationZipUri = contentPath.toString();
+        String dataJsonUri = resolveDataVizDataJsonURI(contentPath);
         boolean hasDeleted = false;
 
         for (Content collectionDir : new Content[]{inProgress, complete, reviewed}) {
-            if (collectionDir.exists(contentUri)) {
-                FileUtils.deleteDirectory(Paths.get(collectionDir.getPath().toString() + contentUri).toFile());
+            if (collectionDir.exists(visualisationZipUri)) {
+                FileUtils.deleteDirectory(Paths.get(collectionDir.getPath().toString() + visualisationZipUri).toFile());
                 hasDeleted = true;
+            }
+
+            if (dataJsonUri != null && collectionDir.exists(dataJsonUri)) {
+                hasDeleted &= collectionDir.delete(dataJsonUri);
             }
         }
 
         if (hasDeleted) {
-            addEvent(contentUri, new Event(new Date(), EventType.DELETED, session.getEmail()));
+            addEvent(visualisationZipUri, new Event(new Date(), EventType.DELETED, session.getEmail()));
             collectionHistoryDaoServiceSupplier.getService().saveCollectionHistoryEvent(new CollectionHistoryEvent(this, session,
-                    DATA_VISUALISATION_COLLECTION_CONTENT_DELETED, contentUri));
+                    DATA_VISUALISATION_COLLECTION_CONTENT_DELETED, visualisationZipUri));
         }
         save();
         return hasDeleted;
     }
+
+    private String resolveDataVizDataJsonURI(Path contentPath) {
+        if (contentPath == null) {
+            return null;
+        }
+
+        if (contentPath.getParent() == null || StringUtils.isEmpty(contentPath.getParent().toString())) {
+            return null;
+        }
+        return contentPath.getParent().resolve(DATA_JSON).toString();
+    }
+
 
     /**
      * When we delete content, we don't want to just delete the whole directory it lives in as it may have nested content.

@@ -18,13 +18,13 @@ public class MDCFilter implements Filter {
     @Override
     public boolean filter(HttpServletRequest req, HttpServletResponse res) {
 
-      String requestID = MDC.get(RequestLogUtil.REQUEST_ID_KEY);
-      if (requestID == null) {
-          requestID = RandomStringUtils.randomAlphabetic(16);
-          MDC.put(RequestLogUtil.REQUEST_ID_KEY, requestID);
+        String requestID = MDC.get(RequestLogUtil.REQUEST_ID_KEY);
+        if (requestID == null) {
+            requestID = RandomStringUtils.randomAlphabetic(16);
+            MDC.put(RequestLogUtil.REQUEST_ID_KEY, requestID);
         }
 
-      RequestLogUtil.extractDiagnosticContext(req);
-      return true;
+        RequestLogUtil.extractDiagnosticContext(req);
+        return true;
     }
 }

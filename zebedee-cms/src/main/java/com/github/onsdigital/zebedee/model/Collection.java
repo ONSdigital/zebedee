@@ -64,6 +64,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logDebug;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_CONTENT_REVIEWED;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_CREATED;
@@ -232,7 +233,7 @@ public class Collection {
 
             if (zebedee.isBeingEdited(release.getUri().toString() + "/data.json") > 0) {
                 Optional<Collection> otherCollection = zebedee.checkForCollectionBlockingChange(release.getUri().toString() + "/data.json");
-                if(otherCollection.isPresent()) {
+                if (otherCollection.isPresent()) {
                     throw new ConflictException(
                             "Cannot use this release. It is being edited as part of another collection.", otherCollection.get().getDescription().getName());
                 }
@@ -245,7 +246,7 @@ public class Collection {
                 zebedee.checkAllCollectionsForDeleteMarker(release.getUri().toString());
             } catch (DeleteContentRequestDeniedException ex) {
                 Optional<Collection> otherCollection = zebedee.checkForCollectionBlockingChange(release.getUri().toString() + "/data.json");
-                if(otherCollection.isPresent()) {
+                if (otherCollection.isPresent()) {
                     throw new ConflictException(
                             "Cannot use this release. It is being deleted as part of another collection.", otherCollection.get().getDescription().getName());
                 }
@@ -947,14 +948,17 @@ public class Collection {
 
         for (Content collectionDir : new Content[]{inProgress, complete, reviewed}) {
             if (collectionDir.exists(visualisationZipUri)) {
+                logDebug("removing data viz zip from collection directory")
+                        .addParameter("zip", visualisationZipUri)
+                        .user(session.getEmail())
+                        .collectionId(this.description.getId())
+                        .log();
                 FileUtils.deleteDirectory(Paths.get(collectionDir.getPath().toString() + visualisationZipUri).toFile());
                 hasDeleted = true;
             }
-
-            if (dataJsonUri != null && collectionDir.exists(dataJsonUri)) {
-                hasDeleted &= collectionDir.delete(dataJsonUri);
-            }
         }
+
+        resetDataVizDataJson(dataJsonUri);
 
         if (hasDeleted) {
             addEvent(visualisationZipUri, new Event(new Date(), EventType.DELETED, session.getEmail()));
@@ -976,6 +980,28 @@ public class Collection {
         return contentPath.getParent().resolve(DATA_JSON).toString();
     }
 
+    /**
+     * When we delete a data viz zip from the collection move the page data.json back to 'inprogress'.
+     */
+    private void resetDataVizDataJson(String dataJsonUri) throws IOException {
+        if (isInProgress(dataJsonUri)) return;
+
+        Path src = null;
+        if (isComplete(dataJsonUri)) {
+            src = complete.toPath(dataJsonUri);
+        } else if (isReviewed(dataJsonUri)) {
+            src = reviewed.toPath(dataJsonUri);
+        }
+        if (src != null) {
+            Path dest = this.inProgress.toPath(dataJsonUri);
+
+            if (src.toFile().exists()) {
+                Files.createDirectories(dest.getParent());
+                Files.move(src, dest);
+                zebedee.getCollections().removeEmptyCollectionDirectories(src.getParent());
+            }
+        }
+    }
 
     /**
      * When we delete content, we don't want to just delete the whole directory it lives in as it may have nested content.

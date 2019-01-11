@@ -13,6 +13,7 @@ import com.github.onsdigital.zebedee.exceptions.UnexpectedErrorException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.model.Collection;
+import com.github.onsdigital.zebedee.session.model.Session;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.poi.ss.usermodel.Cell;
@@ -150,6 +151,13 @@ public class ZebedeeLogBuilder extends LogMessageBuilder {
 
     public ZebedeeLogBuilder user(String email) {
         addParameter(USER, email);
+        return this;
+    }
+
+    public ZebedeeLogBuilder user(Session session) {
+        if (session != null) {
+            param(USER, session.getEmail());
+        }
         return this;
     }
 

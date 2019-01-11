@@ -60,6 +60,8 @@ import java.util.stream.Collectors;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getUnauthorizedMessage;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logTrace;
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logWarn;
 import static com.github.onsdigital.zebedee.model.Content.isDataVisualisationFile;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_APPROVED;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_COMPLETED_ERROR;
@@ -497,25 +499,39 @@ public class Collections {
 
     public void delete(Collection collection, Session session)
             throws IOException, ZebedeeException {
-
-        // Collection exists
         if (collection == null) {
+            logError("delete collection unsuccessful: collection required but was null")
+                    .user(session)
+                    .log();
             throw new BadRequestException("Please specify a valid collection");
         }
 
-        // User has permission
-        if (!permissionsService.canEdit(session)) {
+        boolean canEdit = permissionsService.canEdit(session);
+        if (!canEdit) {
+            logWarn("delete collection unsuccessful: user denied canEdit permission")
+                    .user(session)
+                    .collectionId(collection)
+                    .log();
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
-        // Collection is empty
+        logTrace("delete collection: user granted canEdit permission")
+                .user(session).collectionId(collection).log();
+
         if (!collection.isEmpty()) {
+            logWarn("delete collection unsuccessful: the collection is not empty")
+                    .user(session)
+                    .collectionId(collection)
+                    .log();
             throw new BadRequestException("The collection is not empty.");
         }
 
-        // Go ahead
         collection.delete();
         collectionHistoryDaoSupplier.get().saveCollectionHistoryEvent(collection, session, COLLECTION_DELETED);
+        logInfo("delete collection successful")
+                .user(session)
+                .collectionId(collection)
+                .log();
     }
 
     /**

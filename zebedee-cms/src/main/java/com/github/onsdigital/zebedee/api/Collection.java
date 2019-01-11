@@ -21,10 +21,15 @@ import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import java.io.IOException;
 
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logDebug;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logTrace;
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logWarn;
 
 @Api
 public class Collection {
+
+    static final String COLLECTION_NAME = "collectionName";
 
     /**
      * Retrieves a CollectionDescription object at the endpoint /Collection/[CollectionName]
@@ -39,9 +44,11 @@ public class Collection {
     @GET
     public CollectionDescription get(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ZebedeeException {
+        logInfo("get collection endpoint: request received").log();
+
         Session session = Root.zebedee.getSessionsService().get(request);
         if (session == null) {
-            logInfo("get collection request unsuccessful: valid session for user was not found").log();
+            logInfo("get collection endpoint: request unsuccessful valid session for user was not found").log();
             throw new UnauthorizedException("You are not authorised to view collections.");
         }
 
@@ -50,16 +57,21 @@ public class Collection {
 
         // Check whether we found the collection:
         if (collection == null) {
-            logInfo("get collection request unsuccessful: collection not found").user(session.getEmail()).log();
+            logInfo("get collection endpoint: request unsuccessful collection not found").user(session.getEmail()).log();
             throw new NotFoundException("The collection you are trying to get was not found.");
         }
 
-        if (!Root.zebedee.getPermissionsService().canView(session.getEmail(), collection.getDescription())) {
-            logInfo("get collection request unsuccessful: user does not have the required permission to view collections")
-                    .user(session.getEmail()).collectionId(collection).log();
-
+        boolean canView = Root.zebedee.getPermissionsService().canView(session.getEmail(), collection.getDescription());
+        if (!canView) {
+            logWarn("get collection endpoint: request unsuccessful user denied canView permission")
+                    .user(session.getEmail())
+                    .collectionId(collection)
+                    .log();
             throw new UnauthorizedException("You are not authorised to view collections.");
         }
+        logTrace("get collection endpoint: user granted canView permission")
+                .collectionId(collection)
+                .log();
 
         // Collate the result:
         CollectionDescription result = new CollectionDescription();
@@ -76,7 +88,7 @@ public class Collection {
         result.isEncrypted = collection.getDescription().isEncrypted;
         result.setReleaseUri(collection.getDescription().getReleaseUri());
 
-        logInfo("get collection request compeleted successfully")
+        logInfo("get collection endpoint: request compeleted successfully")
                 .collectionId(collection)
                 .user(session.getEmail())
                 .log();
@@ -102,25 +114,47 @@ public class Collection {
     public CollectionDescription create(HttpServletRequest request,
                                         HttpServletResponse response,
                                         CollectionDescription collectionDescription) throws IOException, ZebedeeException {
+        logInfo("create collection endpoint: request received").log();
+
+        Session session = Root.zebedee.getSessionsService().get(request);
+        if (session == null) {
+            logWarn("create collection request unsuccessful: no valid session found").log();
+            throw new UnauthorizedException("You are not authorised to create collections.");
+        }
 
         if (StringUtils.isBlank(collectionDescription.getName())) {
+            logWarn("create collection request unsuccessful: collection name is blank").log();
             response.setStatus(HttpStatus.BAD_REQUEST_400);
             return null;
         }
 
-        Session session = Root.zebedee.getSessionsService().get(request);
-        if (!Root.zebedee.getPermissionsService().canEdit(session.getEmail())) {
+        boolean canEdit = Root.zebedee.getPermissionsService().canEdit(session.getEmail());
+        if (!canEdit) {
+            logWarn("create collection request unsuccessful: user denied canEdit permission")
+                    .user(session.getEmail())
+                    .log();
             throw new UnauthorizedException("You are not authorised to create collections.");
         }
 
+        logDebug("create collection endpoint: user granted canEdit permission")
+                .user(session.getEmail())
+                .log();
+
         Keyring keyring = Root.zebedee.getKeyringCache().get(session);
         if (keyring == null) {
+            logWarn("create collection request unsuccessful: Keyring is not initialised")
+                    .user(session.getEmail())
+                    .log();
             throw new UnauthorizedException("Keyring is not initialised.");
         }
 
         collectionDescription.setName(StringUtils.trim(collectionDescription.getName()));
         if (Root.zebedee.getCollections().list().hasCollection(
                 collectionDescription.getName())) {
+            logWarn("create collection request unsuccessful: a collection already exists with this name")
+                    .user(session.getEmail())
+                    .param(COLLECTION_NAME, collectionDescription.getName())
+                    .log();
             throw new ConflictException("Could not create collection. A collection with this name already exists.");
         }
 
@@ -128,6 +162,10 @@ public class Collection {
                 collectionDescription, Root.zebedee, session);
 
         if (collection.getDescription().getType().equals(CollectionType.scheduled)) {
+            logInfo("create collection endpoint: adding scheduled collection to publishing queue")
+                    .user(session.getEmail())
+                    .collectionId(collection)
+                    .log();
             Root.schedulePublish(collection);
         }
 
@@ -138,6 +176,10 @@ public class Collection {
                 .actionedBy(session.getEmail())
                 .log();
 
+        logInfo("create collection endpoint: request completed successfully")
+                .user(session.getEmail())
+                .collectionId(collection)
+                .log();
         return collection.getDescription();
     }
 

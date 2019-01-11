@@ -11,10 +11,10 @@ import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.UnexpectedErrorException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
+import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.model.Collection;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 
@@ -82,6 +82,10 @@ public class ZebedeeLogBuilder extends LogMessageBuilder {
 
     public static ZebedeeLogBuilder logError(Throwable t, String errorContext) {
         return new ZebedeeLogBuilder(t, ZEBEDEE_EXCEPTION + " " + errorContext);
+    }
+
+    public static ZebedeeLogBuilder logTrace(String message) {
+        return new ZebedeeLogBuilder(message, Level.TRACE);
     }
 
     /**
@@ -164,6 +168,13 @@ public class ZebedeeLogBuilder extends LogMessageBuilder {
         return this;
     }
 
+    public ZebedeeLogBuilder collectionId(CollectionDescription desc) {
+        if (desc != null && StringUtils.isNotEmpty(desc.getId())) {
+            addParameter(COLLECTION_ID, desc.getId());
+        }
+        return this;
+    }
+
     public ZebedeeLogBuilder table(String tableName) {
         addParameter(TABLE, tableName);
         return this;
@@ -232,6 +243,13 @@ public class ZebedeeLogBuilder extends LogMessageBuilder {
 
             addParameter(BLOCKING_PATH, COLLECTION_CONTENT_PATH.apply(name, targetURI));
             addParameter(BLOCKING_COLLECTION, name);
+        }
+        return this;
+    }
+
+    public ZebedeeLogBuilder param(String key, Object value) {
+        if (StringUtils.isNotEmpty(key) && value != null) {
+            addParameter(key, value.toString());
         }
         return this;
     }

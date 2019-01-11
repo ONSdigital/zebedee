@@ -17,7 +17,7 @@ import java.io.IOException;
  */
 public interface UsersService {
 
-    String BLACK_EMAIL_MSG = "User email cannot be blank";
+    String BLANK_EMAIL_MSG = "User email cannot be blank";
     String UNKNOWN_USER_MSG = "User for email {0} not found";
     String USER_ALREADY_EXISTS_MSG = "User for email {0} already exists";
     String REMOVING_STALE_KEY_LOG_MSG = "Removing stale collection key from user.";

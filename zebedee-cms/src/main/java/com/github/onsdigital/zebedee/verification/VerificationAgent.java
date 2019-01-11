@@ -53,7 +53,7 @@ public class VerificationAgent {
     }
 
     public void submitForVerification(PublishedCollection publishedCollection, Path jsonPath, CollectionReader reader) {
-        logInfo("Submitting collection for external verification").collectionName(publishedCollection.getName()).log();
+        logInfo("Submitting collection for external verification").collectionId(publishedCollection.getId()).log();
         List<Result> publishResults = publishedCollection.publishResults;
         for (Result publishResult : publishResults) {
             Set<UriInfo> uriInfos = publishResult.transaction.uriInfos;
@@ -175,7 +175,7 @@ public class VerificationAgent {
             zebedee.getPublishedCollections().save(publishedCollection, jsonPath);
         } catch (IOException e) {
             logError(e, "Saving published collection failed")
-                    .collectionName(publishedCollection.getName()).log();
+                    .collectionId(publishedCollection.getId()).log();
         }
     }
 }

@@ -185,7 +185,6 @@ public class Root {
     public static void cancelPublish(Collection collection) {
         try {
             logInfo("Attempting to cancel collection publish.")
-                    .collectionName(collection)
                     .collectionId(collection)
                     .addParameter("type", collection.getDescription().getType())
                     .log();

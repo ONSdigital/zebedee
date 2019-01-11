@@ -177,13 +177,13 @@ public class ApproveTask implements Callable<Boolean> {
             return true;
 
         } catch (Exception e) {
-            logError(e, "Exception approving collection").collectionName(collection).user(session.getEmail()).log();
+            logError(e, "Exception approving collection").collectionId(collection).user(session.getEmail()).log();
 
             collection.description.approvalStatus = ApprovalStatus.ERROR;
             try {
                 collection.save();
             } catch (IOException e1) {
-                logError(e, "Exception saving collection after approval exception").collectionName(collection).log();
+                logError(e, "Exception saving collection after approval exception").collectionId(collection).log();
             }
 
             SlackNotification.collectionAlarm(collection,
@@ -204,7 +204,7 @@ public class ApproveTask implements Callable<Boolean> {
                     "Failed verification of time series zip files",
                     new PostMessageField("Advice", "Unlock the collection and re-approve to try again", false)
             );
-            logInfo("Failed verification of time series zip files").collectionName(collection).log();
+            logInfo("Failed verification of time series zip files").collectionId(collection).log();
         }
     }
 

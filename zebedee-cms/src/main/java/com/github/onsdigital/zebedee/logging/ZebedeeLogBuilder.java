@@ -164,16 +164,6 @@ public class ZebedeeLogBuilder extends LogMessageBuilder {
         return this;
     }
 
-    public ZebedeeLogBuilder collectionName(Collection collection) {
-        addParameter(COLLECTION_NAME, collection.getDescription().getName());
-        return this;
-    }
-
-    public ZebedeeLogBuilder collectionName(String name) {
-        addParameter(COLLECTION_NAME, name);
-        return this;
-    }
-
     public ZebedeeLogBuilder table(String tableName) {
         addParameter(TABLE, tableName);
         return this;

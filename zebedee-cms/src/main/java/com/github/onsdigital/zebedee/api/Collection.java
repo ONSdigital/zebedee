@@ -119,19 +119,19 @@ public class Collection {
 
         Session session = Root.zebedee.getSessionsService().get(request);
         if (session == null) {
-            logWarn("create collection request unsuccessful: no valid session found").log();
+            logWarn("create collection endpoint: request unsuccessful no valid session found").log();
             throw new UnauthorizedException("You are not authorised to create collections.");
         }
 
         if (StringUtils.isBlank(collectionDescription.getName())) {
-            logWarn("create collection request unsuccessful: collection name is blank").log();
+            logWarn("create collection endpoint: request unsuccessful collection name is blank").log();
             response.setStatus(HttpStatus.BAD_REQUEST_400);
             return null;
         }
 
         boolean canEdit = Root.zebedee.getPermissionsService().canEdit(session.getEmail());
         if (!canEdit) {
-            logWarn("create collection request unsuccessful: user denied canEdit permission")
+            logWarn("create collection endpoint: request unsuccessful:user denied canEdit permission")
                     .user(session)
                     .log();
             throw new UnauthorizedException("You are not authorised to create collections.");
@@ -143,7 +143,7 @@ public class Collection {
 
         Keyring keyring = Root.zebedee.getKeyringCache().get(session);
         if (keyring == null) {
-            logWarn("create collection request unsuccessful: Keyring is not initialised")
+            logWarn("create collection endpoint: request unsuccessful Keyring is not initialised")
                     .user(session)
                     .log();
             throw new UnauthorizedException("Keyring is not initialised.");
@@ -152,7 +152,7 @@ public class Collection {
         collectionDescription.setName(StringUtils.trim(collectionDescription.getName()));
         if (Root.zebedee.getCollections().list().hasCollection(
                 collectionDescription.getName())) {
-            logWarn("create collection request unsuccessful: a collection already exists with this name")
+            logWarn("create collection endpoint: request unsuccessful a collection already exists with this name")
                     .user(session)
                     .param(COLLECTION_NAME, collectionDescription.getName())
                     .log();

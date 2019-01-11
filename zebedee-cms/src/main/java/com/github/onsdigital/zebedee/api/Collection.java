@@ -190,13 +190,36 @@ public class Collection {
             HttpServletResponse response,
             CollectionDescription collectionDescription
     ) throws IOException, ZebedeeException {
+        logInfo("update collection endpoint: request received").log();
+
+        com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request);
+        if (collection == null) {
+            logWarn("update collection endpoint: request unsuccessful collection not found").log();
+            throw new NotFoundException("The collection you are trying to update was not found.");
+        }
 
         Session session = Root.zebedee.getSessionsService().get(request);
-        if (!Root.zebedee.getPermissionsService().canEdit(session.getEmail())) {
+        if (session == null) {
+            logWarn("update collection endpoint: request unsuccessful no valid session found")
+                    .collectionId(collection)
+                    .log();
             throw new UnauthorizedException("You are not authorised to update collections.");
         }
 
-        com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request);
+        boolean canEdit = Root.zebedee.getPermissionsService().canEdit(session.getEmail());
+        if (!canEdit) {
+            logWarn("update collection endpoint: request unsuccessful user denied canEdit permission")
+                    .user(session)
+                    .collectionId(collection)
+                    .log();
+            throw new UnauthorizedException("You are not authorised to update collections.");
+        }
+
+        logTrace("update collection endpoint: user granted canEdit permission")
+                .user(session)
+                .collectionId(collection)
+                .log();
+
         com.github.onsdigital.zebedee.model.Collection updatedCollection = collection.update(
                 collection,
                 collectionDescription,
@@ -211,9 +234,12 @@ public class Collection {
                 .actionedBy(session.getEmail())
                 .log();
 
+        logInfo("update collection endpoint: request completed successfully")
+                .user(session)
+                .collectionId(collection)
+                .log();
         return updatedCollection.getDescription();
     }
-
 
     /**
      * Deletes the collection details at the endpoint /Collection/[CollectionName]

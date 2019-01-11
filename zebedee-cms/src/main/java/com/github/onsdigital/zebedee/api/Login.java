@@ -78,13 +78,15 @@ public class Login {
             return "Password change required";
         } else {
             Audit.Event.LOGIN_SUCCESS.parameters().host(request).user(credentials.getEmail()).log();
-            logInfo("login endpoint: request completed successfully")
-                    .user(credentials.getEmail())
-                    .log();
             response.setStatus(HttpStatus.OK_200);
         }
 
-        return Root.zebedee.openSession(credentials).getId();
+        String sessionId = Root.zebedee.openSession(credentials).getId();
+
+        logInfo("login endpoint: request completed successfully")
+                .user(credentials.getEmail())
+                .log();
+        return sessionId;
     }
 
 }

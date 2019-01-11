@@ -21,6 +21,8 @@ import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import java.io.IOException;
 
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
+
 @Api
 public class Collection {
 
@@ -37,18 +39,26 @@ public class Collection {
     @GET
     public CollectionDescription get(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ZebedeeException {
+        Session session = Root.zebedee.getSessionsService().get(request);
+        if (session == null) {
+            logInfo("get collection request unsuccessful: valid session for user was not found").log();
+            throw new UnauthorizedException("You are not authorised to view collections.");
+        }
 
         com.github.onsdigital.zebedee.model.Collection collection = Collections
                 .getCollection(request);
 
         // Check whether we found the collection:
         if (collection == null) {
-            throw new NotFoundException("The collection you are trying to delete was not found.");
+            logInfo("get collection request unsuccessful: collection not found").user(session.getEmail()).log();
+            throw new NotFoundException("The collection you are trying to get was not found.");
         }
-        // Check whether we have access
-        Session session = Root.zebedee.getSessionsService().get(request);
+
         if (!Root.zebedee.getPermissionsService().canView(session.getEmail(), collection.getDescription())) {
-            throw new UnauthorizedException("You are not authorised to delete collections.");
+            logInfo("get collection request unsuccessful: user does not have the required permission to view collections")
+                    .user(session.getEmail()).collectionId(collection).log();
+
+            throw new UnauthorizedException("You are not authorised to view collections.");
         }
 
         // Collate the result:
@@ -65,6 +75,11 @@ public class Collection {
         result.setTeams(collection.getDescription().getTeams());
         result.isEncrypted = collection.getDescription().isEncrypted;
         result.setReleaseUri(collection.getDescription().getReleaseUri());
+
+        logInfo("get collection request compeleted successfully")
+                .collectionId(collection)
+                .user(session.getEmail())
+                .log();
         return result;
     }
 

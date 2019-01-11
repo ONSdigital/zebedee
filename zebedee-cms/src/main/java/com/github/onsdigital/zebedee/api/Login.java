@@ -49,7 +49,7 @@ public class Login {
     public String authenticate(HttpServletRequest request, HttpServletResponse response, Credentials credentials) throws IOException, NotFoundException, BadRequestException {
 
         if (credentials == null || StringUtils.isBlank(credentials.getEmail())) {
-            logInfo("login request unsuccessful - no credentials provided").log();
+            logInfo("login request unsuccessful: no credentials provided").log();
             response.setStatus(HttpStatus.BAD_REQUEST_400);
             return "Please provide credentials (email, password).";
         }
@@ -60,7 +60,7 @@ public class Login {
         if (!result) {
             response.setStatus(HttpStatus.UNAUTHORIZED_401);
             Audit.Event.LOGIN_AUTHENTICATION_FAILURE.parameters().host(request).user(credentials.getEmail()).log();
-            logInfo("login request unsuccessful - credentials were not authenticated successfully").user(user.getEmail()).log();
+            logInfo("login request unsuccessful: credentials were not authenticated successfully").user(user.getEmail()).log();
             return "Authentication failed.";
         }
 
@@ -70,7 +70,7 @@ public class Login {
         usersServiceSupplier.getService().removeStaleCollectionKeys(user.getEmail());
 
         if (BooleanUtils.isTrue(user.getTemporaryPassword())) {
-            logInfo("login request unsuccessful - password change is required").user(user.getEmail()).log();
+            logInfo("login request unsuccessful: password change is required").user(user.getEmail()).log();
             response.setStatus(HttpStatus.EXPECTATION_FAILED_417);
             Audit.Event.LOGIN_PASSWORD_CHANGE_REQUIRED.parameters().host(request).user(credentials.getEmail()).log();
             return "Password change required";

@@ -328,7 +328,8 @@ public class CollectionsTest {
             collections.delete(collectionMock, sessionMock);
         } catch (UnauthorizedException e) {
             verify(permissionsServiceMock, times(1)).canEdit(sessionMock);
-            verifyZeroInteractions(collectionMock);
+            verify(collectionMock, times(1)).getDescription();
+            verify(collectionDescriptionMock, times(1)).getId();
             throw e;
         }
     }

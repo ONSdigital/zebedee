@@ -45,7 +45,7 @@ public class CollectionContentWriter extends ContentWriter {
             );
             logInfo("Writing unencrypted content in collection")
                     .addParameter("uri", uri)
-                    .collectionName(collection.getDescription().getName())
+                    .collectionId(collection)
                     .log();
 
             return FileUtils.openOutputStream(path.toFile());

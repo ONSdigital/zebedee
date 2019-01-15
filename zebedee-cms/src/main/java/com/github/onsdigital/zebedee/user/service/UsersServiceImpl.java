@@ -118,10 +118,11 @@ public class UsersServiceImpl implements UsersService {
         lock.lock();
         try {
             if (StringUtils.isBlank(email)) {
-                throw new BadRequestException(BLACK_EMAIL_MSG);
+                throw new BadRequestException(BLANK_EMAIL_MSG);
             }
 
             if (!userStore.exists(email)) {
+                logInfo("no user exists with the specified email").user(email).log();
                 throw new NotFoundException(format(UNKNOWN_USER_MSG, email));
             }
             return userStore.get(email);

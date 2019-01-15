@@ -11,10 +11,11 @@ import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.UnexpectedErrorException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
+import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.model.Collection;
+import com.github.onsdigital.zebedee.session.model.Session;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 
@@ -84,6 +85,10 @@ public class ZebedeeLogBuilder extends LogMessageBuilder {
         return new ZebedeeLogBuilder(t, ZEBEDEE_EXCEPTION + " " + errorContext);
     }
 
+    public static ZebedeeLogBuilder logTrace(String message) {
+        return new ZebedeeLogBuilder(message, Level.TRACE);
+    }
+
     /**
      * Log a debug level message.
      */
@@ -149,6 +154,13 @@ public class ZebedeeLogBuilder extends LogMessageBuilder {
         return this;
     }
 
+    public ZebedeeLogBuilder user(Session session) {
+        if (session != null) {
+            param(USER, session.getEmail());
+        }
+        return this;
+    }
+
     public ZebedeeLogBuilder collectionPath(Collection collection) {
         addParameter(COLLECTION, collection.path.toString());
         return this;
@@ -167,13 +179,10 @@ public class ZebedeeLogBuilder extends LogMessageBuilder {
         return this;
     }
 
-    public ZebedeeLogBuilder collectionName(Collection collection) {
-        addParameter(COLLECTION_NAME, collection.getDescription().getName());
-        return this;
-    }
-
-    public ZebedeeLogBuilder collectionName(String name) {
-        addParameter(COLLECTION_NAME, name);
+    public ZebedeeLogBuilder collectionId(CollectionDescription desc) {
+        if (desc != null && StringUtils.isNotEmpty(desc.getId())) {
+            addParameter(COLLECTION_ID, desc.getId());
+        }
         return this;
     }
 
@@ -245,6 +254,13 @@ public class ZebedeeLogBuilder extends LogMessageBuilder {
 
             addParameter(BLOCKING_PATH, COLLECTION_CONTENT_PATH.apply(name, targetURI));
             addParameter(BLOCKING_COLLECTION, name);
+        }
+        return this;
+    }
+
+    public ZebedeeLogBuilder param(String key, Object value) {
+        if (StringUtils.isNotEmpty(key) && value != null) {
+            addParameter(key, value.toString());
         }
         return this;
     }

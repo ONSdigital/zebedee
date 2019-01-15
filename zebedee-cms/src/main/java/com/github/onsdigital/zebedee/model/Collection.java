@@ -436,7 +436,7 @@ public class Collection {
         ) {
             Release release = (Release) ContentUtil.deserialiseContent(dataStream);
             logInfo("Release identified for collection")
-                    .collectionName(this.getDescription().getName())
+                    .collectionId(this)
                     .addParameter("title", release.getDescription().getTitle())
                     .log();
 
@@ -645,7 +645,7 @@ public class Collection {
         if (!permission) {
             logInfo("Content was not saved as user does not have EDIT permission")
                     .path(uri)
-                    .collectionName(this)
+                    .collectionId(this)
                     .user(email)
                     .log();
         }

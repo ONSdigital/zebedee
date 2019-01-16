@@ -48,7 +48,7 @@ public class TimeSeriesCompressionTask {
      * @throws IOException
      */
     public boolean compressTimeseries(Collection collection, CollectionReader collectionReader, CollectionWriter collectionWriter) throws ZebedeeException, IOException {
-        logInfo("Compressing time series directories").collectionName(collection).log();
+        logInfo("Compressing time series directories").collectionId(collection).log();
         int attempt = 1;
         List<TimeseriesCompressionResult> failedZipFiles = null; // populated on a failed attempt
 
@@ -57,7 +57,7 @@ public class TimeSeriesCompressionTask {
 
             failedZipFiles = verifyZipFiles(collection, collectionReader, collectionWriter, attempt, zipFiles);
             if (failedZipFiles.size() == 0) {
-                logInfo("Verified time series zip files").collectionName(collection).addParameter("attempt", attempt).log();
+                logInfo("Verified time series zip files").collectionId(collection).addParameter("attempt", attempt).log();
                 return true;
             }
 
@@ -79,7 +79,8 @@ public class TimeSeriesCompressionTask {
 
     private List<TimeseriesCompressionResult> verifyZipFiles(Collection collection, CollectionReader collectionReader, CollectionWriter collectionWriter, int attempt, List<TimeseriesCompressionResult> zipFiles) throws IOException {
         List<TimeseriesCompressionResult> failedZipFiles;
-        logInfo("Verifying " + zipFiles.size() + " time series zip files").collectionName(collection).addParameter("attempt", attempt).log();
+        logInfo("Verifying " + zipFiles.size() + " time series zip files").collectionId(collection).addParameter("attempt",
+                attempt).log();
         failedZipFiles = zipFileVerifier.verifyZipFiles(
                 zipFiles,
                 collectionReader.getReviewed(),
@@ -92,7 +93,10 @@ public class TimeSeriesCompressionTask {
                     new PostMessageField("Attempt", Integer.toString(attempt, 10), true),
                     new PostMessageField("Zip path", failedZipFile.zipPath.toString(), false)
             );
-            logInfo("Failed verification of time series zip file").collectionName(collection).addParameter("attempt", attempt).addParameter("zipPath", failedZipFile.zipPath.toString()).log();
+            logInfo("Failed verification of time series zip file").collectionId(collection)
+                    .addParameter("attempt", attempt)
+                    .addParameter("zipPath", failedZipFile.zipPath.toString())
+                    .log();
         }
         return failedZipFiles;
     }

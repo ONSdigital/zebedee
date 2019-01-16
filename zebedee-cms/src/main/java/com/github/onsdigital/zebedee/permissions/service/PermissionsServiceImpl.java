@@ -378,12 +378,26 @@ public class PermissionsServiceImpl implements PermissionsService {
      */
     @Override
     public boolean canView(String email, CollectionDescription collectionDescription) throws IOException {
-
+        boolean canView = false;
         try {
             return canView(usersServiceSupplier.getService().getUserByEmail(email), collectionDescription);
-        } catch (NotFoundException | BadRequestException e) {
-            return false;
+        } catch (NotFoundException nf) {
+            logError(nf, "canView permission denied - user not found")
+                    .collectionId(collectionDescription.getId())
+                    .user(email)
+                    .log();
+        } catch (BadRequestException br) {
+            logError(br, "canView permission request denied - user details invalid")
+                    .collectionId(collectionDescription.getId())
+                    .user(email)
+                    .log();
+        } catch (Exception e) {
+            logError(e, "canView permission request denied: unexpected error")
+                    .collectionId(collectionDescription)
+                    .user(email)
+                    .log();
         }
+        return false;
     }
 
     /**

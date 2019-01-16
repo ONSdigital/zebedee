@@ -122,13 +122,13 @@ public class ReleasePopulator {
                                        List<ContentDetail> collectionContent) throws IOException {
         if (collection.isRelease()) {
             logInfo("Release identified for collection, populating the page links")
-                    .collectionName(collection)
+                    .collectionId(collection)
                     .log();
             try {
                 collection.populateRelease(collectionReader, collectionWriter, collectionContent);
             } catch (ZebedeeException e) {
                 logError(e, "Failed to populate release page for collection")
-                        .collectionName(collection)
+                        .collectionId(collection)
                         .log();
             }
         }

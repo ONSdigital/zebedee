@@ -1,17 +1,28 @@
 package com.github.onsdigital.zebedee.persistence.model;
 
-import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.persistence.CollectionEventType;
+import com.github.onsdigital.zebedee.session.model.Session;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * Entity object for a Collection event history.
@@ -41,7 +52,7 @@ public class CollectionHistoryEvent {
     private String user;
 
     @Column(name = "event_type")
-    private CollectionEventType eventType;
+    private int eventType;
 
     @Column(name = "uri")
     private String uri;
@@ -54,6 +65,7 @@ public class CollectionHistoryEvent {
 
     public CollectionHistoryEvent() {
         this.eventDate = new Date();
+        this.eventType = CollectionEventType.UNSPECIFIED.getId();
     }
 
     public CollectionHistoryEvent(Collection collection, Session session, CollectionEventType collectionEventType,
@@ -110,7 +122,7 @@ public class CollectionHistoryEvent {
     }
 
     public CollectionEventType getEventType() {
-        return eventType;
+        return CollectionEventType.getById(this.eventType);
     }
 
     public String getUri() {
@@ -144,7 +156,11 @@ public class CollectionHistoryEvent {
     }
 
     public CollectionHistoryEvent eventType(CollectionEventType eventType) {
-        this.eventType = eventType;
+        if (eventType == null) {
+            this.eventType = CollectionEventType.UNSPECIFIED.getId();
+        } else {
+            this.eventType = requireNonNull(eventType).getId();
+        }
         return this;
     }
 

@@ -74,18 +74,15 @@ public class PublishTask implements Runnable {
                     PostPublisher.postPublish(zebedee, collection, skipVerification, collectionReader);
 
                     logInfo("Collection postPublish process finished")
-                            .collectionName(collection)
                             .collectionId(collectionId)
                             .timeTaken((System.currentTimeMillis() - onPublishCompleteStart))
                             .log();
                     logInfo("Collection publish complete")
-                            .collectionName(collection)
                             .collectionId(collectionId)
                             .timeTaken((System.currentTimeMillis() - publishStart))
                             .log();
                 } else {
                     logWarn("scheduled collection publish did not complete successfully")
-                            .collectionName(collection)
                             .collectionId(collection)
                             .log();
 
@@ -95,7 +92,6 @@ public class PublishTask implements Runnable {
         } catch (Exception e) {
             logError(e, "Exception publishing scheduled collection")
                     .collectionId(collection)
-                    .collectionName(collection)
                     .log();
 
             SlackNotification.scheduledPublishFailure(collection);

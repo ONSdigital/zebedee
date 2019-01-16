@@ -89,7 +89,6 @@ public class PublishCollectionTask implements Callable<Boolean> {
             if (!published) {
                 logWarn("Exception publishing scheduled collection")
                         .collectionId(collection)
-                        .collectionName(collection)
                         .log();
 
                 SlackNotification.scheduledPublishFailure(collection);

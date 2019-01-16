@@ -283,14 +283,14 @@ public class Collections {
             logError("approve collection: collection null check failed").log();
             throw new BadRequestException("Please provide a valid collection.");
         }
-        logInfo("approve collection: collection null check passed").collectionId(collection).log();
 
         // User has permission
         if (session == null || !permissionsService.canEdit(session.getEmail())) {
             logError("approve collection: user permission check failed").collectionId(collection).log();
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
-        logInfo("approve collection: user permission check successful").collectionId(collection).log();
+
+        collection.getDescription().addEvent(new Event(new Date(), EventType.APPROVE_SUBMITTED, session.getEmail()));
 
         // Everything is completed
         if (!collection.inProgressUris().isEmpty() || !collection.completeUris().isEmpty()) {
@@ -301,7 +301,6 @@ public class Collections {
             throw new ConflictException(
                     "This collection can't be approved because it's not empty");
         }
-        logInfo("approve collection: can approve check successful").collectionId(collection).log();
 
         CollectionReader collectionReader = collectionReaderWriterFactory.getReader(zebedeeSupplier.get(), collection, session);
         CollectionWriter collectionWriter = collectionReaderWriterFactory.getWriter(zebedeeSupplier.get(), collection, session);
@@ -326,8 +325,6 @@ public class Collections {
 
         logInfo("approve collection: saving collection history event").collectionId(collection).log();
         collectionHistoryDaoSupplier.get().saveCollectionHistoryEvent(collection, session, COLLECTION_APPROVED);
-        logInfo("approve collection: collection history event saved successfully").collectionId(collection).log();
-
 
         logInfo("approve collection: API approve step compeleted successfully").collectionId(collection).log();
         return future;
@@ -423,12 +420,10 @@ public class Collections {
             PostPublisher.postPublish(zebedeeSupplier.get(), collection, skipVerification, collectionReader);
 
             logInfo("collection post publish process completed")
-                    .collectionName(collection)
                     .collectionId(collection)
                     .timeTaken((System.currentTimeMillis() - onPublishCompleteStart))
                     .log();
             logInfo("collection publish complete")
-                    .collectionName(collection)
                     .collectionId(collection)
                     .timeTaken((System.currentTimeMillis() - publishStart))
                     .log();
@@ -573,7 +568,7 @@ public class Collections {
         CollectionWriter collectionWriter = collectionReaderWriterFactory.getWriter(zebedeeSupplier.get(), collection, session);
 
         logInfo("Attempting to write content.")
-                .collectionName(collection)
+                .collectionId(collection)
                 .path(uri)
                 .user(session.getEmail())
                 .log();
@@ -624,7 +619,7 @@ public class Collections {
         }
 
         collection.save();
-        logInfo("content save successful.").collectionName(collection).path(uri).user(session.getEmail()).log();
+        logInfo("content save successful.").collectionId(collection).path(uri).user(session.getEmail()).log();
 
         path = collection.getInProgressPath(uri);
         if (!Files.exists(path)) {

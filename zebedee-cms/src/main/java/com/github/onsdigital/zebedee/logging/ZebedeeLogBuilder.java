@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Map;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static org.apache.commons.lang3.builder.ToStringStyle.NO_CLASS_NAME_STYLE;
@@ -254,6 +255,13 @@ public class ZebedeeLogBuilder extends LogMessageBuilder {
 
             addParameter(BLOCKING_PATH, COLLECTION_CONTENT_PATH.apply(name, targetURI));
             addParameter(BLOCKING_COLLECTION, name);
+        }
+        return this;
+    }
+
+    public <T> ZebedeeLogBuilder list(String key, java.util.Collection<T> list, Function<T, String> f) {
+        if (StringUtils.isNotEmpty(key) && list != null && f != null) {
+            param(key, list.stream().map(item -> f.apply(item)).collect(Collectors.toList()).toString());
         }
         return this;
     }

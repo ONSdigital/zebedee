@@ -259,8 +259,6 @@ public class Zebedee {
             return null;
         }
 
-        logInfo("attempting to open session for user").user(credentials.getEmail()).log();
-
         // Get the user
         User user = usersService.getUserByEmail(credentials.email);
 
@@ -277,8 +275,6 @@ public class Zebedee {
             logError(e, "error attempting to create session for user").user(user.getEmail()).log();
             throw new IOException(e);
         }
-
-        logInfo("user session opened sucessfully").user(user.getEmail()).log();
 
         // Unlock and cache keyring
         user.keyring().unlock(credentials.password);

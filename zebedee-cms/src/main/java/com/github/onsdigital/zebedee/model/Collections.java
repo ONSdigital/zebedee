@@ -420,12 +420,10 @@ public class Collections {
             PostPublisher.postPublish(zebedeeSupplier.get(), collection, skipVerification, collectionReader);
 
             logInfo("collection post publish process completed")
-                    .collectionName(collection)
                     .collectionId(collection)
                     .timeTaken((System.currentTimeMillis() - onPublishCompleteStart))
                     .log();
             logInfo("collection publish complete")
-                    .collectionName(collection)
                     .collectionId(collection)
                     .timeTaken((System.currentTimeMillis() - publishStart))
                     .log();
@@ -570,7 +568,7 @@ public class Collections {
         CollectionWriter collectionWriter = collectionReaderWriterFactory.getWriter(zebedeeSupplier.get(), collection, session);
 
         logInfo("Attempting to write content.")
-                .collectionName(collection)
+                .collectionId(collection)
                 .path(uri)
                 .user(session.getEmail())
                 .log();
@@ -621,7 +619,7 @@ public class Collections {
         }
 
         collection.save();
-        logInfo("content save successful.").collectionName(collection).path(uri).user(session.getEmail()).log();
+        logInfo("content save successful.").collectionId(collection).path(uri).user(session.getEmail()).log();
 
         path = collection.getInProgressPath(uri);
         if (!Files.exists(path)) {

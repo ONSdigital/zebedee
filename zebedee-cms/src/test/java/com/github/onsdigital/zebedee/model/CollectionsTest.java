@@ -394,8 +394,7 @@ public class CollectionsTest {
         } catch (BadRequestException e) {
             verify(collectionReaderWriterFactoryMock, times(1)).getWriter(zebedeeMock, collectionMock, sessionMock);
             verify(sessionMock, times(1)).getEmail();
-            verify(collectionMock, times(2)).getDescription();
-            verify(collectionDescriptionMock, times(1)).getName();
+            verify(collectionMock, times(3)).getDescription();
             verifyZeroInteractions(permissionsServiceMock);
             verify(collectionMock, never()).find(anyString());
             verify(collectionMock, never()).create(anyString(), anyString());

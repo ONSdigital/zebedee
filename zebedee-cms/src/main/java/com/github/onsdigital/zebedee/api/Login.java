@@ -81,7 +81,10 @@ public class Login {
             response.setStatus(HttpStatus.OK_200);
         }
 
+
+        logInfo("login endpoint: attempting to open session for user").user(credentials.getEmail()).log();
         String sessionId = Root.zebedee.openSession(credentials).getId();
+        logInfo("login endpoint: user session opened sucessfully").user(user.getEmail()).log();
 
         logInfo("login endpoint: request completed successfully")
                 .user(credentials.getEmail())

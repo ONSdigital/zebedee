@@ -70,7 +70,7 @@ public class Collection {
                     .log();
             throw new UnauthorizedException("You are not authorised to view collections.");
         }
-        logTrace("get collection endpoint: user granted canView permission")
+        logInfo("get collection endpoint: user granted canView permission")
                 .collectionId(collection)
                 .log();
 

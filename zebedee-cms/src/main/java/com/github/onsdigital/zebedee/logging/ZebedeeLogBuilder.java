@@ -268,7 +268,7 @@ public class ZebedeeLogBuilder extends LogMessageBuilder {
 
     public ZebedeeLogBuilder param(String key, Object value) {
         if (StringUtils.isNotEmpty(key) && value != null) {
-            addParameter(key, value.toString());
+            addParameter(key, value);
         }
         return this;
     }

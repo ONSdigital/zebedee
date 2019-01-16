@@ -149,6 +149,11 @@ public class ApproveTask implements Callable<Boolean> {
             eventLog.sentPublishNotification();
 
             eventLog.approvalCompleted();
+            logInfo("approve task: collection approve task completed successfully")
+                    .user(session)
+                    .collectionId(collection)
+                    .param("approvalEvents", eventLog.logDetails())
+                    .log();
             return true;
 
         } catch (Exception e) {

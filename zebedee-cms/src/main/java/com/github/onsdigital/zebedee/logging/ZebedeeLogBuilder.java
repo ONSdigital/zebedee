@@ -11,6 +11,7 @@ import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.UnexpectedErrorException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
+import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.session.model.Session;
 import org.apache.commons.lang3.StringUtils;
@@ -23,6 +24,7 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Map;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static org.apache.commons.lang3.builder.ToStringStyle.NO_CLASS_NAME_STYLE;
@@ -86,6 +88,10 @@ public class ZebedeeLogBuilder extends LogMessageBuilder {
 
     public static ZebedeeLogBuilder logError(Throwable t, String errorContext) {
         return new ZebedeeLogBuilder(t, ZEBEDEE_EXCEPTION + " " + errorContext);
+    }
+
+    public static ZebedeeLogBuilder logTrace(String message) {
+        return new ZebedeeLogBuilder(message, Level.TRACE);
     }
 
     /**
@@ -153,12 +159,22 @@ public class ZebedeeLogBuilder extends LogMessageBuilder {
         return this;
     }
 
+    public ZebedeeLogBuilder user(Session session) {
+        if (session != null) {
+            addParameter(USER, session.getEmail());
+        }
+        return this;
+    }
+
     public ZebedeeLogBuilder collectionPath(Collection collection) {
         addParameter(COLLECTION, collection.path.toString());
         return this;
     }
 
     public ZebedeeLogBuilder collectionId(Collection collection) {
+        if (collection == null || collection.getDescription() == null) {
+            return this;
+        }
         addParameter(COLLECTION_ID, collection.getDescription().getId());
         return this;
     }
@@ -168,13 +184,10 @@ public class ZebedeeLogBuilder extends LogMessageBuilder {
         return this;
     }
 
-    public ZebedeeLogBuilder collectionName(Collection collection) {
-        addParameter(COLLECTION_NAME, collection.getDescription().getName());
-        return this;
-    }
-
-    public ZebedeeLogBuilder collectionName(String name) {
-        addParameter(COLLECTION_NAME, name);
+    public ZebedeeLogBuilder collectionId(CollectionDescription desc) {
+        if (desc != null && StringUtils.isNotEmpty(desc.getId())) {
+            addParameter(COLLECTION_ID, desc.getId());
+        }
         return this;
     }
 
@@ -271,6 +284,20 @@ public class ZebedeeLogBuilder extends LogMessageBuilder {
 
     public ZebedeeLogBuilder publishingAction() {
         addParameter("publishing", true);
+        return this;
+    }
+
+    public <T> ZebedeeLogBuilder list(String key, java.util.Collection<T> list, Function<T, String> f) {
+        if (StringUtils.isNotEmpty(key) && list != null && f != null) {
+            param(key, list.stream().map(item -> f.apply(item)).collect(Collectors.toList()).toString());
+        }
+        return this;
+    }
+
+    public ZebedeeLogBuilder param(String key, Object value) {
+        if (StringUtils.isNotEmpty(key) && value != null) {
+            addParameter(key, value);
+        }
         return this;
     }
 

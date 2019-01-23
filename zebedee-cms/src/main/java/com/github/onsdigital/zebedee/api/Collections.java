@@ -6,6 +6,7 @@ import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
+import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.UnexpectedErrorException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.CollectionDataset;
@@ -37,6 +38,7 @@ import java.util.List;
 
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logWarn;
 
 @Api
 public class Collections {
@@ -74,8 +76,15 @@ public class Collections {
     @GET
     public CollectionDescriptions get(HttpServletRequest request, HttpServletResponse response)
             throws ZebedeeException {
+        logInfo("get collections endpoint: request received").log();
+        Session session = null;
         try {
-            Session session = zebedeeCmsService.getSession(request);
+            session = Root.zebedee.getSessionsService().get(request);
+            if (session == null) {
+                logWarn("get collections endpoint: valid user session not found").log();
+                throw new UnauthorizedException("You are not authorized to perform get collections requests");
+            }
+
             CollectionDescriptions result = new CollectionDescriptions();
             List<Collection> collections = Root.zebedee.getCollections().list();
 
@@ -95,9 +104,15 @@ public class Collections {
             // sort the collections alphabetically by name.
             java.util.Collections.sort(result, Comparator.comparing(o -> o.getName()));
 
+            logInfo("get collections endpoint: request successful user granted canView permission for collections")
+                    .list("collections", result, (c) -> c.getId())
+                    .user(session)
+                    .log();
+
             return result;
         } catch (IOException e) {
-            logError(e, "Unexpected error while attempting to get collections")
+            logError(e, "get collections endpoint: unexpected error while attempting to get collections")
+                    .user(session)
                     .logAndThrow(UnexpectedErrorException.class);
         }
         return null;

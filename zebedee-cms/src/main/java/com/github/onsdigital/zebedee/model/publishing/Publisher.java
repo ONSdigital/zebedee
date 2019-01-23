@@ -114,7 +114,6 @@ public class Publisher {
                 .addParameter("publishComplete", success)
                 .publishingAction()
                 .collectionId(collection)
-                .collectionName(collection)
                 .log();
 
         return success;
@@ -724,7 +723,7 @@ public class Publisher {
 
     private static boolean publishDatasets(Collection collection) throws IOException {
         logDebug("publishing api datasets for collection")
-                .collectionName(collection)
+                .collectionId(collection)
                 .publishingAction()
                 .log();
 
@@ -735,7 +734,7 @@ public class Publisher {
         } catch (Exception e) {
             logError(e, "Exception updating API dataset to state published")
                     .publishingAction()
-                    .collectionName(collection)
+                    .collectionId(collection)
                     .collectionId(collection)
                     .log();
 

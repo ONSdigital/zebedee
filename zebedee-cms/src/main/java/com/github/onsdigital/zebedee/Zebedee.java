@@ -29,15 +29,14 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 import static com.github.onsdigital.zebedee.configuration.Configuration.isVerificationEnabled;
 import static com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedException.beingEditedByAnotherCollectionError;
 import static com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedException.beingEditedByThisCollectionError;
 import static com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedException.markedDeleteInAnotherCollectionError;
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logDebug;
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
 
 public class Zebedee {
 
@@ -261,7 +260,7 @@ public class Zebedee {
      */
     public Session openSession(Credentials credentials) throws IOException, NotFoundException, BadRequestException {
         if (credentials == null) {
-            logDebug("Null session due to credentials being null").log();
+            logError("provided credentials are null no session will be opened").log();
             return null;
         }
 
@@ -269,12 +268,18 @@ public class Zebedee {
         User user = usersService.getUserByEmail(credentials.email);
 
         if (user == null) {
-            logDebug("Null session due to users.get returning null").log();
+            logInfo("user not found no session will be created").user(user.getEmail()).log();
             return null;
         }
 
         // Create a session
-        Session session = sessionsService.create(user);
+        Session session = null;
+        try {
+            session = sessionsService.create(user);
+        } catch (Exception e) {
+            logError(e, "error attempting to create session for user").user(user.getEmail()).log();
+            throw new IOException(e);
+        }
 
         // Unlock and cache keyring
         user.keyring().unlock(credentials.password);

@@ -277,7 +277,7 @@ public class Page {
         try {
             page = collectionReader.getContent(uri);
         } catch (NotFoundException ex) {
-            logInfo("page is already deleted").path(uri).collectionName(collection).log();
+            logInfo("page is already deleted").path(uri).collectionId(collection).log();
             response.setStatus(HttpStatus.SC_NO_CONTENT);
             return; // idempotent
         } catch (ZebedeeException e) {
@@ -348,7 +348,7 @@ public class Page {
                                      Collection collection, Session session) {
         logInfo("executing PageCreationHook")
                 .path(uri)
-                .collectionName(collection)
+                .collectionId(collection)
                 .user(session.getEmail())
                 .log();
         try {
@@ -367,7 +367,7 @@ public class Page {
                                      Collection collection, Session session) {
         logInfo("executing PageDeletionHook")
                 .path(uri)
-                .collectionName(collection)
+                .collectionId(collection)
                 .user(session.getEmail())
                 .log();
         try {

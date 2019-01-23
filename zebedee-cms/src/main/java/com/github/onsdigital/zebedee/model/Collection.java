@@ -76,6 +76,7 @@ import java.util.stream.Collectors;
 
 import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logDebug;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_CONTENT_REVIEWED;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_CREATED;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_NAME_CHANGED;
@@ -94,6 +95,7 @@ public class Collection {
     public static final String REVIEWED = "reviewed";
     public static final String COMPLETE = "complete";
     public static final String IN_PROGRESS = "inprogress";
+    public static final String DATA_JSON = "data.json";
 
     private static ConcurrentMap<Path, ReadWriteLock> collectionLocks = new ConcurrentHashMap<>();
     private static KeyManangerUtil keyManagerUtil = new KeyManangerUtil();
@@ -440,7 +442,7 @@ public class Collection {
         ) {
             Release release = (Release) ContentUtil.deserialiseContent(dataStream);
             logInfo("Release identified for collection")
-                    .collectionName(this.getDescription().getName())
+                    .collectionId(this)
                     .addParameter("title", release.getDescription().getTitle())
                     .log();
 
@@ -649,7 +651,7 @@ public class Collection {
         if (!permission) {
             logInfo("Content was not saved as user does not have EDIT permission")
                     .path(uri)
-                    .collectionName(this)
+                    .collectionId(this)
                     .user(email)
                     .log();
         }
@@ -664,8 +666,8 @@ public class Collection {
                     FileUtils.moveDirectory(source.getParent().toFile(), destination.getParent().toFile());
                 } else {
                     PathUtils.moveFilesInDirectory(source, destination);
-                    zebedee.getCollections().removeEmptyCollectionDirectories(source);
                 }
+                zebedee.getCollections().removeEmptyCollectionDirectories(source);
             } else {
                 try (InputStream inputStream = new FileInputStream(source.toFile())) {
                     collectionWriter.getInProgress().write(inputStream, uri);
@@ -776,6 +778,7 @@ public class Collection {
             if (recursive) {
                 FileUtils.deleteDirectory(destination.getParent().toFile());
                 FileUtils.moveDirectory(source.getParent().toFile(), destination.getParent().toFile());
+                zebedee.getCollections().removeEmptyCollectionDirectories(source.getParent());
             } else {
                 PathUtils.moveFilesInDirectory(source, destination);
                 zebedee.getCollections().removeEmptyCollectionDirectories(source);
@@ -948,23 +951,65 @@ public class Collection {
             return false;
         }
 
-        String contentUri = contentPath.toString();
+        String visualisationZipUri = contentPath.toString();
+        String dataJsonUri = resolveDataVizDataJsonURI(contentPath);
         boolean hasDeleted = false;
 
         for (Content collectionDir : new Content[]{inProgress, complete, reviewed}) {
-            if (collectionDir.exists(contentUri)) {
-                FileUtils.deleteDirectory(Paths.get(collectionDir.getPath().toString() + contentUri).toFile());
+            if (collectionDir.exists(visualisationZipUri)) {
+                logDebug("removing data viz zip from collection directory")
+                        .addParameter("zip", visualisationZipUri)
+                        .user(session.getEmail())
+                        .collectionId(this.description.getId())
+                        .log();
+                FileUtils.deleteDirectory(Paths.get(collectionDir.getPath().toString() + visualisationZipUri).toFile());
                 hasDeleted = true;
             }
         }
 
+        resetDataVizDataJson(dataJsonUri);
+
         if (hasDeleted) {
-            addEvent(contentUri, new Event(new Date(), EventType.DELETED, session.getEmail()));
+            addEvent(visualisationZipUri, new Event(new Date(), EventType.DELETED, session.getEmail()));
             collectionHistoryDaoServiceSupplier.getService().saveCollectionHistoryEvent(new CollectionHistoryEvent(this, session,
-                    DATA_VISUALISATION_COLLECTION_CONTENT_DELETED, contentUri));
+                    DATA_VISUALISATION_COLLECTION_CONTENT_DELETED, visualisationZipUri));
         }
         save();
         return hasDeleted;
+    }
+
+    private String resolveDataVizDataJsonURI(Path contentPath) {
+        if (contentPath == null) {
+            return null;
+        }
+
+        if (contentPath.getParent() == null || StringUtils.isEmpty(contentPath.getParent().toString())) {
+            return null;
+        }
+        return contentPath.getParent().resolve(DATA_JSON).toString();
+    }
+
+    /**
+     * When we delete a data viz zip from the collection move the page data.json back to 'inprogress'.
+     */
+    private void resetDataVizDataJson(String dataJsonUri) throws IOException {
+        if (isInProgress(dataJsonUri)) return;
+
+        Path src = null;
+        if (isComplete(dataJsonUri)) {
+            src = complete.toPath(dataJsonUri);
+        } else if (isReviewed(dataJsonUri)) {
+            src = reviewed.toPath(dataJsonUri);
+        }
+        if (src != null) {
+            Path dest = this.inProgress.toPath(dataJsonUri);
+
+            if (src.toFile().exists()) {
+                Files.createDirectories(dest.getParent());
+                Files.move(src, dest);
+                zebedee.getCollections().removeEmptyCollectionDirectories(src.getParent());
+            }
+        }
     }
 
     /**

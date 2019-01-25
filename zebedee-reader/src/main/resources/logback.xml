@@ -9,14 +9,25 @@
         </encoder>
     </appender>
 
-    <appender name="DP_LOGGER" class="ch.qos.logback.core.ConsoleAppender">
-        <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
-            <layout class="com.github.onsdigital.logging.layouts.ConfigurableLayout" />
+    <appender name="JSON_STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>
+                %msg%n
+            </pattern>
         </encoder>
     </appender>
 
+<!--    <appender name="DP_LOGGER" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+            <layout class="com.github.onsdigital.logging.layouts.ConfigurableLayout"/>
+        </encoder>
+    </appender>-->
 
-    <logger name="com.github.onsdigital.zebedee" level="debug" additivity="false">
+    <logger name="com.github.onsdigital.zebedee.cms" level="debug" additivity="false">
+        <appender-ref ref="JSON_STDOUT"/>
+    </logger>
+
+<!--    <logger name="com.github.onsdigital.zebedee" level="debug" additivity="false">
         <appender-ref ref="DP_LOGGER"/>
     </logger>
 
@@ -26,10 +37,10 @@
 
     <logger name="com.github.davidcarboni.restolino" level="warn" additivity="false">
         <appender-ref ref="DP_LOGGER"/>
-    </logger>
+    </logger>-->
 
     <root level="info">
-        <appender-ref ref="DP_LOGGER"/>
+        <appender-ref ref="STDOUT"/>
     </root>
 
 </configuration>

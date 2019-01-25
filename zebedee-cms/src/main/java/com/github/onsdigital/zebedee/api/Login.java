@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
+import com.github.onsdigital.zebedee.api.wrapper.HandlerFunc;
 import com.github.onsdigital.zebedee.audit.Audit;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
@@ -32,6 +33,20 @@ public class Login {
      */
     private ServiceSupplier<UsersService> usersServiceSupplier = () -> Root.zebedee.getUsersService();
 
+    private HandlerWrapper<Credentials, String> authHandlerWrapper;
+
+
+    public Login() {
+        HandlerFunc<Credentials, String> authHandlerFunc = (req, resp, creds) -> login(req, resp, creds);
+        this.authHandlerWrapper = new HandlerWrapper<>(authHandlerFunc);
+    }
+
+    @POST
+    public String authenticate(HttpServletRequest request, HttpServletResponse response, Credentials credentials)
+            throws IOException, NotFoundException, BadRequestException {
+        return this.authHandlerWrapper.handle(request, response, credentials);
+    }
+
     /**
      * Authenticates with Zebedee.
      *
@@ -45,8 +60,8 @@ public class Login {
      * @return A session ID to be passed in the {@value SessionsService#TOKEN_HEADER} header.
      * @throws IOException
      */
-    @POST
-    public String authenticate(HttpServletRequest request, HttpServletResponse response, Credentials credentials) throws IOException, NotFoundException, BadRequestException {
+
+    public String login(HttpServletRequest request, HttpServletResponse response, Credentials credentials) throws IOException, NotFoundException, BadRequestException {
         logInfo("login endpoint: request received").log();
         if (credentials == null || StringUtils.isBlank(credentials.getEmail())) {
             logInfo("login endpoint: request unsuccessful no credentials provided").log();
@@ -91,5 +106,4 @@ public class Login {
                 .log();
         return sessionId;
     }
-
 }

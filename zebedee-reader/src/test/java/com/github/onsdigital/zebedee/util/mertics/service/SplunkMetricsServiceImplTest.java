@@ -7,7 +7,7 @@ import com.github.onsdigital.zebedee.util.mertics.client.SplunkRequest;
 import com.github.onsdigital.zebedee.util.mertics.events.MetricsType;
 import com.github.onsdigital.zebedee.util.mertics.events.SplunkEvent;
 import com.google.common.collect.ImmutableMap;
-import org.codehaus.jackson.map.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;

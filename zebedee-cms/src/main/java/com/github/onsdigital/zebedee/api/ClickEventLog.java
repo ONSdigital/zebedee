@@ -4,7 +4,7 @@ import com.github.davidcarboni.restolino.framework.Api;
 import com.github.onsdigital.zebedee.logging.click.event.ClickEventLogFactory;
 import com.github.onsdigital.zebedee.model.ClickEvent;
 import org.apache.commons.io.IOUtils;
-import org.codehaus.jackson.map.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

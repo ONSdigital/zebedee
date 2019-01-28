@@ -5,6 +5,7 @@ import com.github.onsdigital.zebedee.api.wrapper.HandlerFunc;
 import com.github.onsdigital.zebedee.audit.Audit;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
+import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.Credentials;
 import com.github.onsdigital.zebedee.service.ServiceSupplier;
 import com.github.onsdigital.zebedee.session.service.SessionsService;
@@ -43,7 +44,7 @@ public class Login {
 
     @POST
     public String authenticate(HttpServletRequest request, HttpServletResponse response, Credentials credentials)
-            throws IOException, NotFoundException, BadRequestException {
+            throws IOException, ZebedeeException {
         return this.authHandlerWrapper.handle(request, response, credentials);
     }
 
@@ -63,6 +64,9 @@ public class Login {
 
     public String login(HttpServletRequest request, HttpServletResponse response, Credentials credentials) throws IOException, NotFoundException, BadRequestException {
         logInfo("login endpoint: request received").log();
+
+        if (true) throw new RuntimeException("FUCK!");
+
         if (credentials == null || StringUtils.isBlank(credentials.getEmail())) {
             logInfo("login endpoint: request unsuccessful no credentials provided").log();
             response.setStatus(HttpStatus.BAD_REQUEST_400);

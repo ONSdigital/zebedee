@@ -2,7 +2,6 @@ package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
 import com.github.davidcarboni.restolino.helpers.Path;
-import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
@@ -15,11 +14,9 @@ import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.CollectionDescriptions;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.service.DatasetService;
-import com.github.onsdigital.zebedee.service.ZebedeeDatasetService;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.util.ZebedeeCmsService;
 import com.google.gson.JsonSyntaxException;
-import dp.api.dataset.DatasetAPIClient;
 import dp.api.dataset.exception.DatasetAPIException;
 import dp.api.dataset.exception.DatasetNotFoundException;
 import dp.api.dataset.exception.UnexpectedResponseException;
@@ -35,35 +32,37 @@ import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Set;
 
+import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logWarn;
+import static org.apache.http.HttpStatus.SC_NOT_FOUND;
 
 @Api
 public class Collections {
 
     private ZebedeeCmsService zebedeeCmsService;
     private DatasetService datasetService;
+    private final boolean datasetImportEnabled;
 
     /**
      * Default constructor used instantiates dependencies itself.
      */
     public Collections() throws URISyntaxException {
-        zebedeeCmsService = ZebedeeCmsService.getInstance();
-        datasetService = zebedeeCmsService.getDatasetService();
+        this.zebedeeCmsService = ZebedeeCmsService.getInstance();
+        this.datasetService = zebedeeCmsService.getDatasetService();
+        this.datasetImportEnabled = cmsFeatureFlags().isEnableDatasetImport();
     }
 
     /**
      * Constructor allowing dependencies to be injected.
-     *
-     * @param zebedeeCmsService
-     * @param datasetService
      */
-    public Collections(ZebedeeCmsService zebedeeCmsService, DatasetService datasetService) {
+    public Collections(ZebedeeCmsService zebedeeCmsService, DatasetService datasetService,
+                       boolean datasetImportEnabled) {
         this.zebedeeCmsService = zebedeeCmsService;
         this.datasetService = datasetService;
+        this.datasetImportEnabled = datasetImportEnabled;
     }
 
     /**
@@ -130,6 +129,13 @@ public class Collections {
      */
     @PUT
     public void put(HttpServletRequest request, HttpServletResponse response) throws ZebedeeException, IOException, DatasetAPIException {
+        if (!datasetImportEnabled) {
+            logWarn("collections PUT endpoint is not supported as feature EnableDatasetImport is disabled")
+                    .addParameter("responseStatus", SC_NOT_FOUND)
+                    .log();
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            return;
+        }
 
         Session session = zebedeeCmsService.getSession(request);
         if (session == null || !zebedeeCmsService.getPermissions().canEdit(session)) {
@@ -189,6 +195,13 @@ public class Collections {
      */
     @DELETE
     public void delete(HttpServletRequest request, HttpServletResponse response) throws ZebedeeException, IOException, DatasetAPIException {
+        if (!datasetImportEnabled) {
+            logWarn("collections DELETE endpoint is not supported as feature EnableDatasetImport is disabled")
+                    .addParameter("responseStatus", SC_NOT_FOUND)
+                    .log();
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            return;
+        }
 
         Session session = zebedeeCmsService.getSession(request);
         if (session == null || !zebedeeCmsService.getPermissions().canEdit(session)) {

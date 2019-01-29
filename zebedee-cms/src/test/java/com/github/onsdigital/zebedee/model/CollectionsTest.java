@@ -543,7 +543,7 @@ public class CollectionsTest {
             collections.approve(collectionMock, sessionMock);
         } catch (ConflictException e) {
             verify(permissionsServiceMock, times(1)).canEdit(TEST_EMAIL);
-            verify(sessionMock, times(2)).getEmail();
+            verify(sessionMock, times(3)).getEmail();
             verify(collectionMock, times(1)).inProgressUris();
             assertThat(eventCaptor.getValue().type, equalTo(EventType.APPROVE_SUBMITTED));
             verify(collectionReaderWriterFactoryMock, never()).getReader(any(), any(), any());
@@ -578,7 +578,7 @@ public class CollectionsTest {
             collections.approve(collectionMock, sessionMock);
         } catch (ConflictException e) {
             verify(permissionsServiceMock, times(1)).canEdit(TEST_EMAIL);
-            verify(sessionMock, times(2)).getEmail();
+            verify(sessionMock, times(3)).getEmail();
             verify(collectionMock, times(1)).inProgressUris();
             verify(collectionMock, times(1)).completeUris();
             assertThat(eventCaptor.getValue().type, equalTo(EventType.APPROVE_SUBMITTED));

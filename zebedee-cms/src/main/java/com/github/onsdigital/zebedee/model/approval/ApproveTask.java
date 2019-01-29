@@ -36,10 +36,10 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
+import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
 import static com.github.onsdigital.zebedee.json.EventType.APPROVAL_FAILED;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
@@ -128,9 +128,13 @@ public class ApproveTask implements Callable<Boolean> {
                     collectionReader.getReviewed());
             eventLog.resolvedDetails();
 
-            collectionContent.addAll(collection.getDatasetDetails());
-            collectionContent.addAll(collection.getDatasetVersionDetails());
-            // TODO eventLog
+            if (cmsFeatureFlags().isEnableDatasetImport()) {
+                collectionContent.addAll(collection.getDatasetDetails());
+                eventLog.addDatasetDetails();
+
+                collectionContent.addAll(collection.getDatasetVersionDetails());
+                eventLog.addDatasetVersionDetails();
+            }
 
             populateReleasePage(collectionContent);
             eventLog.populatedResleasePage();

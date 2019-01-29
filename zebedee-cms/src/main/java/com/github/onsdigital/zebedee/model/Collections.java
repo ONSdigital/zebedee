@@ -293,7 +293,9 @@ public class Collections {
         collection.getDescription().addEvent(new Event(new Date(), EventType.APPROVE_SUBMITTED, session.getEmail()));
 
         // Everything is completed
-        if (!collection.inProgressUris().isEmpty() || !collection.completeUris().isEmpty()) {
+        if (!collection.isAllContentReviewed()) {
+            collection.getDescription().addEvent(new Event(new Date(), EventType.APPROVE_SUBMITTED, session.getEmail()));
+
             logError("approve collection: can approve check failure").collectionId(collection)
                     .addParameter("inProgressEmpty", collection.inProgressUris().isEmpty())
                     .addParameter("completeEmpty", collection.completeUris().isEmpty())
@@ -406,11 +408,13 @@ public class Collections {
         }
 
         Keyring keyring = zebedeeSupplier.get().getKeyringCache().get(session);
-        if (keyring == null) throw new UnauthorizedException("No keyring is available for " + session.getEmail());
+        if (keyring == null) {
+            throw new UnauthorizedException("No keyring is available for " + session.getEmail());
+        }
 
         ZebedeeCollectionReader collectionReader = new ZebedeeCollectionReader(zebedeeSupplier.get(), collection, session);
         long publishStart = System.currentTimeMillis();
-        boolean publishComplete = Publisher.Publish(collection, session.getEmail(), collectionReader);
+        boolean publishComplete = Publisher.publish(collection, session.getEmail(), collectionReader);
 
         if (publishComplete) {
             long onPublishCompleteStart = System.currentTimeMillis();

@@ -544,7 +544,7 @@ public class CollectionsTest {
         } catch (ConflictException e) {
             verify(permissionsServiceMock, times(1)).canEdit(TEST_EMAIL);
             verify(sessionMock, times(2)).getEmail();
-            verify(collectionMock, times(2)).inProgressUris();
+            verify(collectionMock, times(1)).inProgressUris();
             assertThat(eventCaptor.getValue().type, equalTo(EventType.APPROVE_SUBMITTED));
             verify(collectionReaderWriterFactoryMock, never()).getReader(any(), any(), any());
             verify(collectionReaderWriterFactoryMock, never()).getWriter(any(), any(), any());
@@ -563,6 +563,8 @@ public class CollectionsTest {
 
         when(permissionsServiceMock.canEdit(TEST_EMAIL))
                 .thenReturn(true);
+        when(collectionMock.isAllContentReviewed())
+                .thenReturn(false);
         when(collectionMock.inProgressUris())
                 .thenReturn(new ArrayList<String>());
         when(collectionMock.completeUris())
@@ -577,8 +579,8 @@ public class CollectionsTest {
         } catch (ConflictException e) {
             verify(permissionsServiceMock, times(1)).canEdit(TEST_EMAIL);
             verify(sessionMock, times(2)).getEmail();
-            verify(collectionMock, times(2)).inProgressUris();
-            verify(collectionMock, times(2)).completeUris();
+            verify(collectionMock, times(1)).inProgressUris();
+            verify(collectionMock, times(1)).completeUris();
             assertThat(eventCaptor.getValue().type, equalTo(EventType.APPROVE_SUBMITTED));
             verify(collectionReaderWriterFactoryMock, never()).getReader(any(), any(), any());
             verify(collectionReaderWriterFactoryMock, never()).getWriter(any(), any(), any());
@@ -597,10 +599,8 @@ public class CollectionsTest {
 
         when(permissionsServiceMock.canEdit(TEST_EMAIL))
                 .thenReturn(true);
-        when(collectionMock.inProgressUris())
-                .thenReturn(new ArrayList<String>());
-        when(collectionMock.completeUris())
-                .thenReturn(new ArrayList<String>());
+        when(collectionMock.isAllContentReviewed())
+                .thenReturn(true);
         when(collectionReaderWriterFactoryMock.getReader(zebedeeMock, collectionMock, sessionMock))
                 .thenReturn(collectionReaderMock);
         when(collectionReaderWriterFactoryMock.getWriter(zebedeeMock, collectionMock, sessionMock))
@@ -609,8 +609,7 @@ public class CollectionsTest {
         assertThat(futureMock, equalTo(collections.approve(collectionMock, sessionMock)));
 
         verify(permissionsServiceMock, times(1)).canEdit(TEST_EMAIL);
-        verify(collectionMock, times(1)).inProgressUris();
-        verify(collectionMock, times(1)).completeUris();
+        verify(collectionMock, times(1)).isAllContentReviewed();
         verify(collectionReaderWriterFactoryMock, times(1)).getReader(zebedeeMock, collectionMock, sessionMock);
         verify(collectionReaderWriterFactoryMock, times(1)).getWriter(zebedeeMock, collectionMock, sessionMock);
         verify(collectionHistoryDaoMock, times(1)).saveCollectionHistoryEvent(any(), any(), any());

@@ -9,7 +9,6 @@ import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.service.ContentDeleteService;
 import com.github.onsdigital.zebedee.session.model.Session;
-import com.github.onsdigital.zebedee.teams.model.Team;
 import com.github.onsdigital.zebedee.util.ContentDetailUtil;
 import org.eclipse.jetty.http.HttpStatus;
 
@@ -17,9 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
 import java.io.IOException;
-import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Api
 public class CollectionDetails {
@@ -49,7 +46,7 @@ public class CollectionDetails {
         }
 
         Session session = Root.zebedee.getSessionsService().get(request);
-        if (!Root.zebedee.getPermissionsService().canView(session.getEmail(), collection.description)) {
+        if (!Root.zebedee.getPermissionsService().canView(session.getEmail(), collection.getDescription())) {
             response.setStatus(HttpStatus.UNAUTHORIZED_401);
             return null;
         }
@@ -57,6 +54,7 @@ public class CollectionDetails {
         CollectionReader collectionReader = new ZebedeeCollectionReader(Root.zebedee, collection, session);
 
         CollectionDetail result = new CollectionDetail();
+
         result.setId(collection.getDescription().getId());
         result.setName(collection.getDescription().getName());
         result.setType(collection.getDescription().getType());
@@ -70,23 +68,26 @@ public class CollectionDetails {
         result.complete = ContentDetailUtil.resolveDetails(collection.complete, collectionReader.getComplete());
         result.reviewed = ContentDetailUtil.resolveDetails(collection.reviewed, collectionReader.getReviewed());
 
-        result.approvalStatus = collection.description.approvalStatus;
-        result.events = collection.description.events;
-        result.timeseriesImportFiles = collection.description.timeseriesImportFiles;
+        result.approvalStatus = collection.getDescription().approvalStatus;
+        result.events = collection.getDescription().events;
+        result.timeseriesImportFiles = collection.getDescription().timeseriesImportFiles;
 
-        addEventsForDetails(result.inProgress, result, collection);
-        addEventsForDetails(result.complete, result, collection);
-        addEventsForDetails(result.reviewed, result, collection);
+        addEventsForDetails(result.inProgress, collection);
+        addEventsForDetails(result.complete, collection);
+        addEventsForDetails(result.reviewed, collection);
 
         Set<Integer> teamIds = Root.zebedee.getPermissionsService().listViewerTeams(collection.description, session);
         result.teamsDetails = Root.zebedee.getTeamsService().resolveTeamDetails(teamIds);
+        result.teamsDetails.forEach(team -> collection.getDescription().getTeams().add(team.getName()));
+
+        result.datasets = collection.getDescription().getDatasets();
+        result.datasetVersions = collection.getDescription().getDatasetVersions();
+
         return result;
     }
 
-
     private void addEventsForDetails(
-            List<ContentDetail> detailsToAddEventsFor,
-            CollectionDetail result,
+            Iterable<ContentDetail> detailsToAddEventsFor,
             com.github.onsdigital.zebedee.model.Collection collection
     ) {
 
@@ -97,8 +98,8 @@ public class CollectionDetails {
             } else {
                 language = "_" + contentDetail.description.language;
             }
-            if (collection.description.eventsByUri != null) {
-                Events eventsForFile = collection.description.eventsByUri.get(contentDetail.uri + "/data" + language + ".json");
+            if (collection.getDescription().eventsByUri != null) {
+                Events eventsForFile = collection.getDescription().eventsByUri.get(contentDetail.uri + "/data" + language + ".json");
                 contentDetail.events = eventsForFile;
             } else {
                 contentDetail.events = new Events();

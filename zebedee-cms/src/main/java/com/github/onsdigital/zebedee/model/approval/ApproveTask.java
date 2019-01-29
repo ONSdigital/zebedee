@@ -37,7 +37,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.stream.Collectors;
 
+import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
 import static com.github.onsdigital.zebedee.json.EventType.APPROVAL_FAILED;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
@@ -126,6 +128,14 @@ public class ApproveTask implements Callable<Boolean> {
                     collectionReader.getReviewed());
             eventLog.resolvedDetails();
 
+            if (cmsFeatureFlags().isEnableDatasetImport()) {
+                collectionContent.addAll(collection.getDatasetDetails());
+                eventLog.addDatasetDetails();
+
+                collectionContent.addAll(collection.getDatasetVersionDetails());
+                eventLog.addDatasetVersionDetails();
+            }
+
             populateReleasePage(collectionContent);
             eventLog.populatedResleasePage();
 
@@ -135,7 +145,8 @@ public class ApproveTask implements Callable<Boolean> {
             generatePdfFiles(collectionContent);
             eventLog.generatedPDFs();
 
-            PublishNotification publishNotification = createPublishNotification(collectionReader, collection);
+            List<String> uriList = collectionContent.stream().map(c -> c.uri).collect(Collectors.toList());
+            PublishNotification publishNotification = createPublishNotification(uriList, collection);
             eventLog.createdPublishNotificaion();
 
             compressZipFiles(collection, collectionReader, collectionWriter);
@@ -152,7 +163,7 @@ public class ApproveTask implements Callable<Boolean> {
             logInfo("approve task: collection approve task completed successfully")
                     .user(session)
                     .collectionId(collection)
-                    .param("approvalEvents", eventLog.logDetails())
+                    .addParameter("approvalEvents", eventLog.logDetails())
                     .log();
             return true;
 
@@ -184,7 +195,6 @@ public class ApproveTask implements Callable<Boolean> {
             return false;
         }
     }
-
 
     public static void generateTimeseries(
             Collection collection,
@@ -233,8 +243,9 @@ public class ApproveTask implements Callable<Boolean> {
         return updateCommands;
     }
 
-    public static PublishNotification createPublishNotification(CollectionReader collectionReader, Collection collection) {
-        List<String> uriList = collectionReader.getReviewed().listUris();
+    public static PublishNotification createPublishNotification(
+            List<String> uriList,
+            Collection collection) {
 
         // only provide relevent uri's
         //  - remove versioned uris
@@ -281,18 +292,18 @@ public class ApproveTask implements Callable<Boolean> {
         collection.save();
     }
 
-    public void populateReleasePage(List<ContentDetail> collectionContent) throws IOException {
+    public void populateReleasePage(Iterable<ContentDetail> collectionContent) throws IOException {
         // If the collection is associated with a release then populate the release page.
         ReleasePopulator.populateQuietly(collection, collectionReader, collectionWriter, collectionContent);
     }
 
-    public void generatePdfFiles(List<ContentDetail> collectionContent) {
+    public void generatePdfFiles(Iterable<ContentDetail> collectionContent) {
         CollectionPdfGenerator pdfGenerator = new CollectionPdfGenerator(new BabbagePdfService(session, collection));
         pdfGenerator.generatePdfsInCollection(collectionWriter, collectionContent);
     }
 
     private static ContentDetailResolver getDefaultContentDetailResolver() {
-        return (content, reader) -> ContentDetailUtil.resolveDetails(content, reader);
+        return (content, reader) -> new ArrayList<>(ContentDetailUtil.resolveDetails(content, reader));
     }
 
     private void validate() {

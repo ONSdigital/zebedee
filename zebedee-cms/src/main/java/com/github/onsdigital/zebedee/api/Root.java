@@ -8,7 +8,6 @@ import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
-import com.github.onsdigital.zebedee.user.model.User;
 import com.github.onsdigital.zebedee.json.serialiser.IsoDateSerializer;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.Collections;
@@ -18,6 +17,7 @@ import com.github.onsdigital.zebedee.model.csdb.CsdbImporter;
 import com.github.onsdigital.zebedee.model.publishing.scheduled.PublishScheduler;
 import com.github.onsdigital.zebedee.model.publishing.scheduled.Scheduler;
 import com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration;
+import com.github.onsdigital.zebedee.user.model.User;
 import com.github.onsdigital.zebedee.util.SlackNotification;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -184,14 +184,15 @@ public class Root {
 
     public static void cancelPublish(Collection collection) {
         try {
-            logInfo("Attempting to cancel collection publish.")
-                    .collectionName(collection)
+            logInfo("cancelling scheduled collection publish")
                     .collectionId(collection)
-                    .addParameter("type", collection.description.type)
+                    .addParameter("type", collection.getDescription().getType())
                     .log();
             scheduler.cancel(collection);
         } catch (Exception e) {
-            logError(e, "Exception caught trying to cancel scheduled publish of collection").log();
+            logError(e, "error cancelling scheduled publish of collection")
+                    .collectionId(collection)
+                    .log();
         }
     }
 

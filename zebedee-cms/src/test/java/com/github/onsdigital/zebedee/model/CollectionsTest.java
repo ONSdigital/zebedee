@@ -166,8 +166,8 @@ public class CollectionsTest {
     @Test
     public void shouldFindCollection() throws Exception {
         CollectionDescription desc = new CollectionDescription();
-        desc.name = "test";
-        desc.type = CollectionType.manual;
+        desc.setName("test");
+        desc.setType(CollectionType.manual);
 
         when(zebedeeMock.getCollections())
                 .thenReturn(collections);
@@ -179,11 +179,11 @@ public class CollectionsTest {
                 .thenReturn(collectionWriterMock);
 
         Collection created = Collection.create(desc, zebedeeMock, sessionMock);
-        Collection found = collections.getCollection(created.getDescription().id);
+        Collection found = collections.getCollection(created.getDescription().getId());
 
-        assertThat(created.getDescription().id, equalTo(found.getDescription().id));
-        assertThat(created.getDescription().name, equalTo(found.getDescription().name));
-        assertThat(created.getDescription().type, equalTo(found.getDescription().type));
+        assertThat(created.getDescription().getId(), equalTo(found.getDescription().getId()));
+        assertThat(created.getDescription().getName(), equalTo(found.getDescription().getName()));
+        assertThat(created.getDescription().getType(), equalTo(found.getDescription().getType()));
     }
 
     @Test
@@ -281,7 +281,7 @@ public class CollectionsTest {
                     .canEdit(TEST_EMAIL);
             verify(sessionMock, times(1))
                     .getEmail();
-            verifyZeroInteractions(collectionMock, publishedContentMock, zebedeeMock);
+            verifyZeroInteractions(publishedContentMock, zebedeeMock);
             throw e;
         }
     }
@@ -328,7 +328,8 @@ public class CollectionsTest {
             collections.delete(collectionMock, sessionMock);
         } catch (UnauthorizedException e) {
             verify(permissionsServiceMock, times(1)).canEdit(sessionMock);
-            verifyZeroInteractions(collectionMock);
+            verify(collectionMock, times(1)).getDescription();
+            verify(collectionDescriptionMock, times(1)).getId();
             throw e;
         }
     }
@@ -393,7 +394,6 @@ public class CollectionsTest {
             verify(collectionReaderWriterFactoryMock, times(1)).getWriter(zebedeeMock, collectionMock, sessionMock);
             verify(sessionMock, times(1)).getEmail();
             verify(collectionMock, times(2)).getDescription();
-            verify(collectionDescriptionMock, times(1)).getName();
             verifyZeroInteractions(permissionsServiceMock);
             verify(collectionMock, never()).find(anyString());
             verify(collectionMock, never()).create(anyString(), anyString());
@@ -536,7 +536,7 @@ public class CollectionsTest {
         } catch (ConflictException e) {
             verify(permissionsServiceMock, times(1)).canEdit(TEST_EMAIL);
             verify(sessionMock, times(1)).getEmail();
-            verify(collectionMock, times(1)).inProgressUris();
+            verify(collectionMock, times(2)).inProgressUris();
             verify(collectionReaderWriterFactoryMock, never()).getReader(any(), any(), any());
             verify(collectionReaderWriterFactoryMock, never()).getWriter(any(), any(), any());
             verify(collectionHistoryDaoMock, never()).saveCollectionHistoryEvent(any(CollectionHistoryEvent.class));
@@ -561,8 +561,8 @@ public class CollectionsTest {
         } catch (ConflictException e) {
             verify(permissionsServiceMock, times(1)).canEdit(TEST_EMAIL);
             verify(sessionMock, times(1)).getEmail();
-            verify(collectionMock, times(1)).inProgressUris();
-            verify(collectionMock, times(1)).completeUris();
+            verify(collectionMock, times(2)).inProgressUris();
+            verify(collectionMock, times(2)).completeUris();
             verify(collectionReaderWriterFactoryMock, never()).getReader(any(), any(), any());
             verify(collectionReaderWriterFactoryMock, never()).getWriter(any(), any(), any());
             throw e;
@@ -835,6 +835,8 @@ public class CollectionsTest {
                 .thenReturn(null);
         when(collectionMock.edit(TEST_EMAIL, uri.toString(), collectionWriterMock, false))
                 .thenReturn(false);
+        when(zebedeeMock.checkForCollectionBlockingChange(uri.toString()))
+                .thenReturn(Optional.empty());
         try {
             collections.writeContent(collectionMock, uri.toString(), sessionMock, requestMock, mock(InputStream.class), false,
                     CollectionEventType.COLLECTION_PAGE_SAVED, false);
@@ -865,6 +867,8 @@ public class CollectionsTest {
                 .thenReturn(uri);
         when(collectionMock.edit(TEST_EMAIL, uri.toString(), collectionWriterMock, false))
                 .thenReturn(false);
+        when(zebedeeMock.checkForCollectionBlockingChange(uri.toString()))
+                .thenReturn(Optional.empty());
         try {
             collections.writeContent(collectionMock, uri.toString(), sessionMock, requestMock, mock(InputStream.class), false,
                     CollectionEventType.COLLECTION_PAGE_SAVED, false);
@@ -927,7 +931,7 @@ public class CollectionsTest {
             verify(collectionMock, times(1)).find(uri);
             verify(collectionMock, never()).isInCollection(anyString());
             verify(collectionMock, never()).getDescription();
-            verify(collectionMock, never()).deleteDataVisContent(any(), any());
+            /*verify(collectionMock, never()).deleteDataVisContent(any(), any());*/
             verify(collectionMock, never()).deleteContentDirectory(anyString(), anyString());
             verify(collectionMock, never()).deleteFile(anyString());
             verify(collectionMock, never()).save();
@@ -945,8 +949,6 @@ public class CollectionsTest {
                 .thenReturn(uri);
         when(collectionMock.isInCollection(uri.toString()))
                 .thenReturn(true);
-        when(collectionDescriptionMock.getCollectionOwner())
-                .thenReturn(CollectionOwner.PUBLISHING_SUPPORT);
         when(collectionMock.deleteFile(uri.toString()))
                 .thenReturn(true);
 
@@ -956,8 +958,8 @@ public class CollectionsTest {
         verify(permissionsServiceMock, times(1)).canEdit(TEST_EMAIL);
         verify(collectionMock, times(1)).find(uri.toString());
         verify(collectionMock, times(1)).isInCollection(uri.toString());
-        verify(collectionMock, times(3)).getDescription();
-        verify(collectionMock, never()).deleteDataVisContent(any(), any());
+        verify(collectionMock, times(2)).getDescription();
+        verify(collectionMock, never()).deleteContentDirectory(any(), any());
         verify(collectionMock, never()).deleteContentDirectory(anyString(), anyString());
         verify(collectionMock, times(1)).deleteFile(uri.toString());
         verify(collectionMock, times(1)).save();
@@ -977,8 +979,6 @@ public class CollectionsTest {
                 .thenReturn(uri);
         when(collectionMock.isInCollection(uri.toString()))
                 .thenReturn(true);
-        when(collectionDescriptionMock.getCollectionOwner())
-                .thenReturn(CollectionOwner.PUBLISHING_SUPPORT);
         when(collectionMock.deleteContentDirectory(TEST_EMAIL, uri.toString()))
                 .thenReturn(true);
 
@@ -988,8 +988,8 @@ public class CollectionsTest {
         verify(permissionsServiceMock, times(1)).canEdit(TEST_EMAIL);
         verify(collectionMock, times(1)).find(uri.toString());
         verify(collectionMock, times(1)).isInCollection(uri.toString());
-        verify(collectionMock, times(3)).getDescription();
-        verify(collectionMock, never()).deleteDataVisContent(any(), any());
+        verify(collectionMock, times(2)).getDescription();
+        /*verify(collectionMock, never()).deleteContentDirectory(any(), any());*/
         verify(collectionMock, times(1)).deleteContentDirectory(TEST_EMAIL, uri.toString());
         verify(collectionMock, never()).deleteFile(uri.toString());
         verify(collectionMock, times(1)).save();
@@ -1020,6 +1020,8 @@ public class CollectionsTest {
                 .thenReturn(false);
         when(zebedeeMock.checkForCollectionBlockingChange(collectionMock, uri))
                 .thenReturn(Optional.of(blocker));
+        when(zebedeeMock.checkForCollectionBlockingChange(uri))
+                .thenReturn(Optional.of(blocker));
         when(blocker.getDescription())
                 .thenReturn(collectionDescriptionMock);
         when(collectionDescriptionMock.getName())
@@ -1031,8 +1033,8 @@ public class CollectionsTest {
             verify(publishedContentMock, times(1)).exists(uri);
             verify(zebedeeMock, times(1)).checkForCollectionBlockingChange(collectionMock, uri);
             verify(collectionMock, times(1)).getDescription();
-            verify(blocker, times(1)).getDescription();
-            verify(collectionDescriptionMock, times(2)).getName();
+            verify(blocker, times(2)).getDescription();
+            verify(collectionDescriptionMock, times(3)).getName();
             verifyNoMoreInteractions(zebedeeMock);
             verifyZeroInteractions(collectionReaderWriterFactoryMock, collectionWriterMock, collectionMock);
             throw e;

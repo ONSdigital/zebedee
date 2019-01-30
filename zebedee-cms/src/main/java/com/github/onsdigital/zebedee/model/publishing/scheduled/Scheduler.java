@@ -14,20 +14,20 @@ public abstract class Scheduler {
         if (Configuration.isSchedulingEnabled()) {
             try {
                 logInfo("Attempting collection schedule publish")
-                        .collectionName(collection)
-                        .addParameter("collectionType", collection.description.type)
+                        .collectionId(collection)
+                        .addParameter("collectionType", collection.getDescription().getType())
                         .log();
-                if (collection.description.type == CollectionType.scheduled) {
+                if (collection.getDescription().getType() == CollectionType.scheduled) {
                     schedule(collection, zebedee);
                 }
             } catch (Exception e) {
                 logError(e, "Exception caught trying to schedule existing collection")
-                        .collectionName(collection)
+                        .collectionId(collection)
                         .log();
             }
         } else {
             logInfo("Not scheduling collection, scheduling is not enabled")
-                    .collectionName(collection)
+                    .collectionId(collection)
                     .log();
         }
     }

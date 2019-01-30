@@ -3,14 +3,12 @@ job "zebedee-reader" {
   region      = "eu"
   type        = "service"
 
-  constraint {
-    attribute = "${meta.has_disk}"
-    value     = true
-  }
-
   update {
-    stagger      = "90s"
-    max_parallel = 1
+    min_healthy_time = "30s"
+    healthy_deadline = "2m"
+    max_parallel     = 1
+    auto_revert      = true
+    stagger          = "150s"
   }
 
   group "web" {
@@ -22,7 +20,14 @@ job "zebedee-reader" {
 
     constraint {
       attribute = "${node.class}"
-      value     = "web"
+      value     = "web-mount"
+    }
+
+    restart {
+      attempts = 3
+      delay    = "15s"
+      interval = "1m"
+      mode     = "delay"
     }
 
     task "zebedee-reader" {
@@ -37,7 +42,9 @@ job "zebedee-reader" {
 
         args = [
           "java",
-          "-Xmx2048m",
+          "-server",
+          "-Xms{{WEB_RESOURCE_HEAP_MEM}}m",
+          "-Xmx{{WEB_RESOURCE_HEAP_MEM}}m",
           "-cp target/dependency/*:target/classes/",
           "-Drestolino.classes=target/classes",
           "-Drestolino.packageprefix=com.github.onsdigital.zebedee.reader.api",

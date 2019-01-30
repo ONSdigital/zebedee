@@ -10,13 +10,13 @@ import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.Collections;
 import com.github.onsdigital.zebedee.model.Content;
 import com.github.onsdigital.zebedee.model.KeyringCache;
-import com.github.onsdigital.zebedee.teams.service.TeamsService;
 import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
 import com.github.onsdigital.zebedee.model.encryption.ApplicationKeys;
 import com.github.onsdigital.zebedee.model.publishing.PublishedCollections;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.session.service.SessionsService;
+import com.github.onsdigital.zebedee.teams.service.TeamsService;
 import com.github.onsdigital.zebedee.user.model.User;
 import com.github.onsdigital.zebedee.user.service.UsersService;
 import com.github.onsdigital.zebedee.verification.VerificationAgent;
@@ -32,8 +32,8 @@ import static com.github.onsdigital.zebedee.configuration.Configuration.isVerifi
 import static com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedException.beingEditedByAnotherCollectionError;
 import static com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedException.beingEditedByThisCollectionError;
 import static com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedException.markedDeleteInAnotherCollectionError;
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logDebug;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
 
 public class Zebedee {
 
@@ -77,6 +77,7 @@ public class Zebedee {
 
     /**
      * Create a new instance of Zebedee setting.
+     *
      * @param configuration {@link ZebedeeConfiguration} contains the set up to use for this instance.
      */
     public Zebedee(ZebedeeConfiguration configuration) {
@@ -132,7 +133,15 @@ public class Zebedee {
     public Optional<Collection> checkForCollectionBlockingChange(Collection workingCollection, String uri) throws IOException {
         return collections.list()
                 .stream()
-                .filter(c -> c.isInCollection(uri) && !workingCollection.getDescription().id.equals(c.getDescription().id))
+                .filter(c -> c.isInCollection(uri) && !workingCollection.getDescription().getId()
+                        .equals(c.getDescription().getId()))
+                .findFirst();
+    }
+
+    public Optional<Collection> checkForCollectionBlockingChange(String uri) throws IOException {
+        return collections.list()
+                .stream()
+                .filter(c -> c.isInCollection(uri))
                 .findFirst();
     }
 
@@ -161,7 +170,7 @@ public class Zebedee {
             String title = new ZebedeeCollectionReader(this, blockingCollection.get(), session)
                     .getContent(uri).getDescription().getTitle();
 
-            if (workingCollection.description.id.equals(blockingCollection.get().description.id)) {
+            if (workingCollection.getDescription().getId().equals(blockingCollection.get().getDescription().getId())) {
                 throw beingEditedByThisCollectionError(title);
             }
             throw beingEditedByAnotherCollectionError(blockingCollection.get(), title);
@@ -246,20 +255,30 @@ public class Zebedee {
      */
     public Session openSession(Credentials credentials) throws IOException, NotFoundException, BadRequestException {
         if (credentials == null) {
-            logDebug("Null session due to credentials being null").log();
+            logError("provided credentials are null no session will be opened").log();
             return null;
         }
+
+        logInfo("attempting to open session for user").user(credentials.getEmail()).log();
 
         // Get the user
         User user = usersService.getUserByEmail(credentials.email);
 
         if (user == null) {
-            logDebug("Null session due to users.get returning null").log();
+            logInfo("user not found no session will be created").user(user.getEmail()).log();
             return null;
         }
 
         // Create a session
-        Session session = sessionsService.create(user);
+        Session session = null;
+        try {
+            session = sessionsService.create(user);
+        } catch (Exception e) {
+            logError(e, "error attempting to create session for user").user(user.getEmail()).log();
+            throw new IOException(e);
+        }
+
+        logInfo("user session opened sucessfully").user(user.getEmail()).log();
 
         // Unlock and cache keyring
         user.keyring().unlock(credentials.password);

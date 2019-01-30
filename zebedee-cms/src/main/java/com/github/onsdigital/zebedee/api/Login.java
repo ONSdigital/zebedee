@@ -5,11 +5,10 @@ import com.github.onsdigital.zebedee.audit.Audit;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.json.Credentials;
-import com.github.onsdigital.zebedee.user.model.User;
-import com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder;
 import com.github.onsdigital.zebedee.service.ServiceSupplier;
-import com.github.onsdigital.zebedee.user.service.UsersService;
 import com.github.onsdigital.zebedee.session.service.SessionsService;
+import com.github.onsdigital.zebedee.user.model.User;
+import com.github.onsdigital.zebedee.user.service.UsersService;
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.http.HttpStatus;
@@ -19,15 +18,13 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.POST;
 import java.io.IOException;
 
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
+
 /**
  * API for processing login requests.
  */
 @Api
 public class Login {
-
-    private static final String LOGIN_SUCCESS_MSG = "Florence login success";
-    private static final String LOGIN_AUTH_FAILURE_MSG = "Login authentication failure";
-    private static final String PASSWORD_CHANGE_REQUIRED_MSG = "Florence password change required";
 
     /**
      * Wrap static method calls to obtain service in function makes testing easier - class member can be
@@ -50,39 +47,46 @@ public class Login {
      */
     @POST
     public String authenticate(HttpServletRequest request, HttpServletResponse response, Credentials credentials) throws IOException, NotFoundException, BadRequestException {
-
-        if (credentials == null || StringUtils.isBlank(credentials.email)) {
+        logInfo("login endpoint: request received").log();
+        if (credentials == null || StringUtils.isBlank(credentials.getEmail())) {
+            logInfo("login endpoint: request unsuccessful no credentials provided").log();
             response.setStatus(HttpStatus.BAD_REQUEST_400);
             return "Please provide credentials (email, password).";
         }
 
-        User user = usersServiceSupplier.getService().getUserByEmail(credentials.email);
+        User user = usersServiceSupplier.getService().getUserByEmail(credentials.getEmail());
         boolean result = user.authenticate(credentials.password);
 
         if (!result) {
             response.setStatus(HttpStatus.UNAUTHORIZED_401);
-            Audit.Event.LOGIN_AUTHENTICATION_FAILURE.parameters().host(request).user(credentials.email).log();
-            ZebedeeLogBuilder.logInfo(LOGIN_AUTH_FAILURE_MSG).user(credentials.email).log();
+            Audit.Event.LOGIN_AUTHENTICATION_FAILURE.parameters().host(request).user(credentials.getEmail()).log();
+            logInfo("login endpoint: request unsuccessful credentials were not authenticated successfully").user(user.getEmail()).log();
             return "Authentication failed.";
         }
 
         // Temponary whilst encryption is being put in place.
         // This can be removed once all users have keyrings.
-        usersServiceSupplier.getService().migrateToEncryption(user, credentials.password);
+        usersServiceSupplier.getService().migrateToEncryption(user, credentials.getPassword());
         usersServiceSupplier.getService().removeStaleCollectionKeys(user.getEmail());
 
         if (BooleanUtils.isTrue(user.getTemporaryPassword())) {
+            logInfo("login endpoint: request unsuccessful user is required to change their password")
+                    .user(user.getEmail())
+                    .log();
             response.setStatus(HttpStatus.EXPECTATION_FAILED_417);
-            Audit.Event.LOGIN_PASSWORD_CHANGE_REQUIRED.parameters().host(request).user(credentials.email).log();
-            ZebedeeLogBuilder.logInfo(PASSWORD_CHANGE_REQUIRED_MSG).user(credentials.email).log();
+            Audit.Event.LOGIN_PASSWORD_CHANGE_REQUIRED.parameters().host(request).user(credentials.getEmail()).log();
             return "Password change required";
         } else {
-            Audit.Event.LOGIN_SUCCESS.parameters().host(request).user(credentials.email).log();
-            ZebedeeLogBuilder.logInfo(LOGIN_SUCCESS_MSG).user(credentials.email).log();
+            Audit.Event.LOGIN_SUCCESS.parameters().host(request).user(credentials.getEmail()).log();
             response.setStatus(HttpStatus.OK_200);
         }
 
-        return Root.zebedee.openSession(credentials).getId();
+        String sessionId = Root.zebedee.openSession(credentials).getId();
+
+        logInfo("login endpoint: request completed successfully")
+                .user(credentials.getEmail())
+                .log();
+        return sessionId;
     }
 
 }

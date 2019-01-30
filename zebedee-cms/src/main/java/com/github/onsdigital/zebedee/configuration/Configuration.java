@@ -1,10 +1,16 @@
 package com.github.onsdigital.zebedee.configuration;
 
+import com.github.davidcarboni.httpino.Host;
 import com.github.onsdigital.zebedee.session.model.Session;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static org.apache.commons.lang.StringUtils.defaultIfBlank;
 
 
 public class Configuration {
@@ -18,6 +24,7 @@ public class Configuration {
     private static final String INFLUXDB_URL = "http://influxdb:8086";
     private static final String AUDIT_DB_ENABLED_ENV_VAR = "audit_db_enabled";
     private static final String MATHJAX_SERVICE_URL = "http://localhost:8888";
+    private static final String DEFAULT_SLACK_USERNAME = "Zebedee";
 
     private static final int VERIFY_RETRTY_DELAY = 5000; //milliseconds
     private static final int VERIFY_RETRTY_COUNT = 10;
@@ -70,16 +77,30 @@ public class Configuration {
         return StringUtils.defaultIfBlank(getValue("BABBAGE_URL"), DEFAULT_WEBSITE_URL);
     }
 
+    public static String getFlorenceUrl() {
+        return StringUtils.defaultIfBlank(getValue("FLORENCE_URL"), DEFAULT_FLORENCE_URL);
+    }
+
+    public static String getSlackUsername() {
+        return StringUtils.defaultIfBlank(getValue("SLACK_USERNAME"), DEFAULT_SLACK_USERNAME);
+    }
+
     public static String getMathjaxServiceUrl() {
         return StringUtils.defaultIfBlank(getValue("MATHJAX_SERVICE_URL"), MATHJAX_SERVICE_URL);
     }
 
-    public static String[] getTheTrainUrls() {
-        return StringUtils.split(StringUtils.defaultIfBlank(getValue("publish_url"), DEFAULT_TRAIN_URL), ",");
+    public static List<Host> getTheTrainHosts() {
+        return Arrays.asList(StringUtils.split(defaultIfBlank(getValue("publish_url"), DEFAULT_TRAIN_URL), ","))
+                .stream()
+                .map(url -> new Host(url))
+                .collect(Collectors.toList());
     }
 
-    public static String[] getWebsiteUrls() {
-        return StringUtils.split(StringUtils.defaultIfBlank(getValue("website_url"), DEFAULT_WEBSITE_URL), ",");
+    public static List<Host> getWebsiteHosts() {
+        return Arrays.asList(StringUtils.split(defaultIfBlank(getValue("website_url"), DEFAULT_WEBSITE_URL), ","))
+                .stream()
+                .map(url -> new Host(url))
+                .collect(Collectors.toList());
     }
 
     public static String getBrianUrl() {
@@ -117,9 +138,11 @@ public class Configuration {
     public static String getAuditDBURL() {
         return StringUtils.defaultIfBlank(getValue("db_audit_url"), "");
     }
+
     public static String getAuditDBUsername() {
         return StringUtils.defaultIfBlank(getValue("db_audit_username"), "");
     }
+
     public static String getAuditDBPassword() {
         return StringUtils.defaultIfBlank(getValue("db_audit_password"), "");
     }
@@ -148,8 +171,8 @@ public class Configuration {
         return session == null ? "Please log in" : "You do not have the right permission: " + session;
     }
 
-    public static class UserList   {
-        ArrayList<UserObject>   users;
+    public static class UserList {
+        ArrayList<UserObject> users;
     }
 
     public static class UserObject {

@@ -31,6 +31,8 @@ public class DeleteContentRequestDeniedException extends ZebedeeException {
     private static final String PAGE_TYPE_CANNOT_BE_DELETED
             = "Delete not allowed for {0}.";
 
+    protected String collectionName;
+
     /**
      * Delete not allowed for this page type.
      */
@@ -54,7 +56,7 @@ public class DeleteContentRequestDeniedException extends ZebedeeException {
     public static DeleteContentRequestDeniedException beingEditedByAnotherCollectionError(
             Collection collection, String pageTitle) {
         return new DeleteContentRequestDeniedException(BEING_EDITED_BY_ANOTHER_COLLECTION,
-                HttpStatus.SC_BAD_REQUEST, pageTitle, collection.description.name);
+                HttpStatus.SC_BAD_REQUEST, pageTitle, collection.getDescription().getName());
     }
 
     /**
@@ -63,7 +65,7 @@ public class DeleteContentRequestDeniedException extends ZebedeeException {
     public static DeleteContentRequestDeniedException alreadyMarkedDeleteInCurrentCollectionError(
             Collection collection, String uri) {
         return new DeleteContentRequestDeniedException(ALREADY_MARKED_BY_THIS_COLLECTION,
-                HttpStatus.SC_BAD_REQUEST, collection.description.name);
+                HttpStatus.SC_BAD_REQUEST, collection.getDescription().getName());
     }
 
     /**
@@ -71,8 +73,10 @@ public class DeleteContentRequestDeniedException extends ZebedeeException {
      */
     public static DeleteContentRequestDeniedException markedDeleteInAnotherCollectionError(
             Collection collection, String uri) {
-        return new DeleteContentRequestDeniedException(MARKED_BY_ANOTHER_COLLECTION,
-                HttpStatus.SC_BAD_REQUEST, uri, collection.description.name);
+        DeleteContentRequestDeniedException e = new DeleteContentRequestDeniedException(MARKED_BY_ANOTHER_COLLECTION,
+                HttpStatus.SC_BAD_REQUEST, uri, collection.getDescription().getName());
+        e.collectionName = collection.getDescription().getName();
+        return e;
     }
 
     private static String buildDetailedMessage(String reason, Object... args) {
@@ -84,5 +88,9 @@ public class DeleteContentRequestDeniedException extends ZebedeeException {
 
     private DeleteContentRequestDeniedException(String message, int status, Object... args) {
         super(buildDetailedMessage(message, args), status);
+    }
+
+    public String getCollectionName() {
+        return collectionName;
     }
 }

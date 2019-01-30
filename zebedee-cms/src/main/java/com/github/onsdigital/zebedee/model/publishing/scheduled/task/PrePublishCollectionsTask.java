@@ -1,6 +1,5 @@
 package com.github.onsdigital.zebedee.model.publishing.scheduled.task;
 
-import com.github.davidcarboni.cryptolite.Random;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
@@ -9,12 +8,20 @@ import com.github.onsdigital.zebedee.json.ApprovalStatus;
 import com.github.onsdigital.zebedee.json.CollectionType;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
+import com.github.onsdigital.zebedee.model.publishing.PostPublisher;
 import com.github.onsdigital.zebedee.model.publishing.Publisher;
 import com.github.onsdigital.zebedee.model.publishing.scheduled.PublishScheduler;
+import com.github.onsdigital.zebedee.util.SlackNotification;
 
 import javax.crypto.SecretKey;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -94,11 +101,11 @@ public class PrePublishCollectionsTask extends ScheduledTask {
             try {
                 Collection collection = zebedee.getCollections().getCollection(collectionId);
 
-                if (collection.description.approvalStatus != ApprovalStatus.COMPLETE) {
+                if (collection.getDescription().getApprovalStatus() != ApprovalStatus.COMPLETE) {
                     logInfo("Scheduled collection has not been approved - switching to manual").log();
 
                     // Switch to manual
-                    collection.description.type = CollectionType.manual;
+                    collection.getDescription().setType(CollectionType.manual);
                     // TODO Alarm message
                     collection.save();
 
@@ -132,24 +139,33 @@ public class PrePublishCollectionsTask extends ScheduledTask {
             for (Collection collection : collections) {
                 futures.add(pool.submit(() -> {
                     try {
-                        logInfo("PRE-PUBLISH: creating collection publish task").collectionName(collection).log();
+                        logInfo("PRE-PUBLISH: creating collection publish task").collectionId(collection).log();
 
-                        String encryptionPassword = Random.password(100);
+                        // FIXME using PostPublisher.getPublishedCollection feels a bit hacky
+                        SlackNotification.publishNotification(PostPublisher.getPublishedCollection(collection),SlackNotification.CollectionStage.PRE_PUBLISH, SlackNotification.StageStatus.STARTED);
 
                         // begin the publish ahead of time. This creates the transaction on the train.
-                        Map<String, String> hostToTransactionIdMap = Publisher.BeginPublish(collection, encryptionPassword);
+                        Map<String, String> hostToTransactionIdMap = Publisher.createPublishingTransactions(collection);
 
                         // send versioned files manifest ahead of time. allowing files to be copied from the website into the transaction.
-                        Publisher.SendManifest(collection, encryptionPassword);
+                        Publisher.sendManifest(collection);
 
-                        SecretKey key = zebedee.getKeyringCache().schedulerCache.get(collection.description.id);
+                        SecretKey key = zebedee.getKeyringCache().schedulerCache.get(collection.getDescription().getId());
                         ZebedeeCollectionReader collectionReader = new ZebedeeCollectionReader(collection, key);
-                        PublishCollectionTask publishCollectionTask = new PublishCollectionTask(collection, collectionReader, encryptionPassword, hostToTransactionIdMap);
+                        PublishCollectionTask publishCollectionTask = new PublishCollectionTask(collection, collectionReader, hostToTransactionIdMap);
 
-                        logInfo("PRE-PUBLISH: Adding publish task").collectionName(collection).log();
+                        logInfo("PRE-PUBLISH: Adding publish task").collectionId(collection).log();
                         collectionPublishTasks.add(publishCollectionTask);
+
+                        // FIXME using PostPublisher.getPublishedCollection feels a bit hacky
+                        SlackNotification.publishNotification(PostPublisher.getPublishedCollection(collection), SlackNotification.CollectionStage.PRE_PUBLISH, SlackNotification.StageStatus.COMPLETED);
+
                         return true;
                     } catch (BadRequestException | IOException | UnauthorizedException | NotFoundException e) {
+                        // FIXME using PostPublisher.getPublishedCollection feels a bit hacky
+                        // TODO pass through the error?
+                        SlackNotification.publishNotification(PostPublisher.getPublishedCollection(collection), SlackNotification.CollectionStage.PRE_PUBLISH,SlackNotification.StageStatus.FAILED);
+
                         logError(e).log();
                         return false;
                     }
@@ -182,7 +198,7 @@ public class PrePublishCollectionsTask extends ScheduledTask {
         List<PostPublishCollectionTask> postPublishCollectionTasks = new ArrayList<>(collectionPublishTasks.size());
 
         collectionPublishTasks.forEach(publishTask -> {
-            logInfo("PRE-PUBLISH: creating collection post-publish task").collectionName(publishTask.getCollection()).log();
+            logInfo("PRE-PUBLISH: creating collection post-publish task").collectionId(publishTask.getCollection()).log();
             PostPublishCollectionTask postPublishCollectionTask = new PostPublishCollectionTask(zebedee, publishTask);
             postPublishCollectionTasks.add(postPublishCollectionTask);
         });
@@ -196,7 +212,7 @@ public class PrePublishCollectionsTask extends ScheduledTask {
      * @param collection
      */
     public void addCollection(Collection collection) {
-        collectionIds.add(collection.description.id);
+        collectionIds.add(collection.getDescription().getId());
     }
 
     /**
@@ -205,7 +221,7 @@ public class PrePublishCollectionsTask extends ScheduledTask {
      * @param collection
      */
     public void removeCollection(Collection collection) {
-        collectionIds.remove(collection.description.id);
+        collectionIds.remove(collection.getDescription().getId());
     }
 
     /**

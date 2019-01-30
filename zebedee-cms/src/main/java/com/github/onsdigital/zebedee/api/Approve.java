@@ -11,6 +11,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.POST;
 import java.io.IOException;
 
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
+
 /**
  * Created by kanemorgan on 01/04/2015.
  */
@@ -37,6 +39,10 @@ public class Approve {
         com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request);
         Session session = Root.zebedee.getSessionsService().get(request);
 
+        logInfo("calling approve on Root.zebedee.getCollections")
+                .collectionId(collection)
+                .user(session.getEmail())
+                .log();
         Root.zebedee.getCollections().approve(collection, session);
 
         Audit.Event.COLLECTION_APPROVED

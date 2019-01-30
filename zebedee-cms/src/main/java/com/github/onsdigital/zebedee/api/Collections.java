@@ -2,13 +2,12 @@ package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
 import com.github.davidcarboni.restolino.helpers.Path;
-import com.github.onsdigital.zebedee.model.CollectionOwner;
 import com.github.onsdigital.zebedee.exceptions.UnexpectedErrorException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.CollectionDescriptions;
-import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.model.Collection;
+import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.util.ZebedeeCmsService;
 
 import javax.servlet.http.HttpServletRequest;
@@ -64,20 +63,17 @@ public class Collections {
             Session session = Root.zebedee.getSessionsService().get(request);
             CollectionDescriptions result = new CollectionDescriptions();
             List<Collection> collections = Root.zebedee.getCollections().list();
-            CollectionOwner collectionOwner = zebedeeCmsService.getPublisherType(session.getEmail());
 
             for (Collection collection : collections) {
-                if (Root.zebedee.getPermissionsService().canView(session, collection.description)
-                        && (collection.description.collectionOwner.equals(collectionOwner))) {
-
-                    CollectionDescription description = new CollectionDescription();
-                    description.id = collection.description.id;
-                    description.name = collection.description.name;
-                    description.publishDate = collection.description.publishDate;
-                    description.approvalStatus = collection.description.approvalStatus;
-                    description.type = collection.description.type;
-                    description.teams = collection.description.teams;
-                    result.add(description);
+                if (Root.zebedee.getPermissionsService().canView(session, collection.getDescription())) {
+                    CollectionDescription newDesc = new CollectionDescription();
+                    newDesc.setId(collection.getDescription().getId());
+                    newDesc.setName(collection.getDescription().getName());
+                    newDesc.setPublishDate(collection.getDescription().getPublishDate());
+                    newDesc.setApprovalStatus(collection.getDescription().getApprovalStatus());
+                    newDesc.setType(collection.getDescription().getType());
+                    newDesc.setTeams(collection.getDescription().getTeams());
+                    result.add(newDesc);
                 }
             }
 
@@ -85,7 +81,7 @@ public class Collections {
             java.util.Collections.sort(result, new Comparator<CollectionDescription>() {
                 @Override
                 public int compare(CollectionDescription o1, CollectionDescription o2) {
-                    return o1.name.compareTo(o2.name);
+                    return o1.getName().compareTo(o2.getName());
                 }
             });
 

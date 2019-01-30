@@ -48,9 +48,9 @@ public class DataPublicationFinderTestBaseFixture extends ZebedeeTestBaseFixture
         generator = new DataPagesGenerator();
 
         CollectionDescription collectionDescription = new CollectionDescription();
-        collectionDescription.name = "DataPublicationFinder";
-        collectionDescription.type = CollectionType.scheduled;
-        collectionDescription.publishDate = new Date();
+        collectionDescription.setName("DataPublicationFinder");
+        collectionDescription.setType(CollectionType.scheduled);
+        collectionDescription.setPublishDate(new Date());
         collection = Collection.create(collectionDescription, zebedee, publisher);
 
         publishedReader = new FileSystemContentReader(zebedee.getPublished().path);

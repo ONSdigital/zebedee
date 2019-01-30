@@ -11,7 +11,6 @@ import com.github.onsdigital.zebedee.json.ContentDetail;
 import com.github.onsdigital.zebedee.json.Event;
 import com.github.onsdigital.zebedee.json.EventType;
 import com.github.onsdigital.zebedee.json.PendingDelete;
-import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.CollectionWriter;
 import com.github.onsdigital.zebedee.model.approval.tasks.CollectionPdfGenerator;
@@ -24,8 +23,10 @@ import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.service.BabbagePdfService;
 import com.github.onsdigital.zebedee.service.content.navigation.ContentTreeNavigator;
+import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.util.ContentDetailUtil;
 import com.github.onsdigital.zebedee.util.SlackNotification;
+import com.github.onsdigital.zebedee.util.slack.PostMessageField;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -137,36 +138,61 @@ public class ApproveTask implements Callable<Boolean> {
 
         try {
 
+            logInfo("approve task :resolveDetails").collectionId(collection).user(session.getEmail()).log();
             List<ContentDetail> collectionContent = ContentDetailUtil.resolveDetails(collection.reviewed, collectionReader.getReviewed());
+            logInfo("approve task :resolveDetails succssful").collectionId(collection).user(session.getEmail()).log();
 
+            logInfo("approve task :populateReleasePage").collectionId(collection).user(session.getEmail()).log();
             populateReleasePage(collectionContent);
+            logInfo("approve task :populateReleasePage success").collectionId(collection).user(session.getEmail()).log();
+
+            logInfo("approve task :generateTimeseries").collectionId(collection).user(session.getEmail()).log();
             generateTimeseries(collection, publishedReader, collectionReader, collectionWriter, dataIndex);
+            logInfo("approve task :generateTimeseries success").collectionId(collection).user(session.getEmail()).log();
+
+            logInfo("approve task :generatePdfFiles").collectionId(collection).user(session.getEmail()).log();
             generatePdfFiles(collectionContent);
+            logInfo("approve task :generatePdfFiles success").collectionId(collection).user(session.getEmail()).log();
 
+            logInfo("approve task :createPublishNotification").collectionId(collection).user(session.getEmail()).log();
             PublishNotification publishNotification = createPublishNotification(collectionReader, collection);
+            logInfo("approve task :createPublishNotification success").collectionId(collection).user(session.getEmail()).log();
 
+            logInfo("approve task :compressZipFiles").collectionId(collection).user(session.getEmail()).log();
             compressZipFiles(collection, collectionReader, collectionWriter);
+            logInfo("approve task :compressZipFiles success").collectionId(collection).user(session.getEmail()).log();
+
+            logInfo("approve task :approveCollection").collectionId(collection).user(session.getEmail()).log();
             approveCollection();
+            logInfo("approve task :approveCollection success").collectionId(collection).user(session.getEmail()).log();
 
             // Send a notification to the website with the publish date for caching.
-            publishNotification.sendNotification(EventType.APPROVED);
 
+            logInfo("approve task :sendNotification").collectionId(collection).user(session.getEmail()).log();
+            publishNotification.sendNotification(EventType.APPROVED);
+            logInfo("approve task :sendNotification success").collectionId(collection).user(session.getEmail()).log();
+
+
+            logInfo("approve task :completed successfully").collectionId(collection).user(session.getEmail()).log();
             return true;
 
-        } catch (IOException | ZebedeeException | URISyntaxException e) {
-
-            logError(e, "Exception approving collection").collectionName(collection).log();
+        } catch (Exception e) {
+            logError(e, "Exception approving collection").collectionId(collection).user(session.getEmail()).log();
 
             collection.description.approvalStatus = ApprovalStatus.ERROR;
             try {
                 collection.save();
             } catch (IOException e1) {
-                logError(e, "Exception saving collection after approval exception").collectionName(collection).log();
+                logError(e, "Exception saving collection after approval exception").collectionId(collection).log();
             }
 
-            SlackNotification.alarm(String.format("Exception approving collection %s : %s", collection.description.name, e.getMessage()));
+            SlackNotification.collectionAlarm(collection,
+                    "Exception approving collection",
+                    new PostMessageField("Error", e.getMessage(), false)
+            );
             return false;
         }
+
     }
 
     private void compressZipFiles(Collection collection, CollectionReader collectionReader, CollectionWriter collectionWriter) throws ZebedeeException, IOException {
@@ -174,9 +200,11 @@ public class ApproveTask implements Callable<Boolean> {
         boolean verified = timeSeriesCompressionTask.compressTimeseries(collection, collectionReader, collectionWriter);
 
         if (!verified) {
-            String message = "Failed verification of time series zip files";
-            logInfo(message).collectionName(collection).log();
-            SlackNotification.alarm(message + " in collection " + collection.description.name + ". Unlock the collection and re-approve to try again.");
+            SlackNotification.collectionAlarm(collection,
+                    "Failed verification of time series zip files",
+                    new PostMessageField("Advice", "Unlock the collection and re-approve to try again", false)
+            );
+            logInfo("Failed verification of time series zip files").collectionId(collection).log();
         }
     }
 

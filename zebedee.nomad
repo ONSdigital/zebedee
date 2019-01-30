@@ -3,14 +3,12 @@ job "zebedee" {
   region      = "eu"
   type        = "service"
 
-  constraint {
-    attribute = "${meta.has_disk}"
-    value     = true
-  }
-
   update {
-    stagger      = "90s"
-    max_parallel = 1
+    min_healthy_time = "30s"
+    healthy_deadline = "2m"
+    max_parallel     = 1
+    auto_revert      = true
+    stagger          = "150s"
   }
 
   group "publishing" {
@@ -22,7 +20,14 @@ job "zebedee" {
 
     constraint {
       attribute = "${node.class}"
-      value     = "publishing"
+      value     = "publishing-mount"
+    }
+
+    restart {
+      attempts = 3
+      delay    = "15s"
+      interval = "1m"
+      mode     = "delay"
     }
 
     task "zebedee" {
@@ -33,18 +38,20 @@ job "zebedee" {
       }
 
       config {
-        command = "${NOMAD_TASK_DIR}/start-task"
+        command     = "${NOMAD_TASK_DIR}/start-task"
+        image       = "{{ECR_URL}}:concourse-{{REVISION}}"
+        userns_mode = "host"
 
         args = [
           "java",
-          "-Xmx2048m",
+          "-server",
+          "-Xms{{PUBLISHING_RESOURCE_HEAP_MEM}}m",
+          "-Xmx{{PUBLISHING_RESOURCE_HEAP_MEM}}m",
           "-cp target/dependency/*:target/classes/",
           "-Drestolino.classes=target/classes",
           "-Drestolino.packageprefix=com.github.onsdigital.zebedee.api",
           "com.github.davidcarboni.restolino.Main",
         ]
-
-        image = "{{ECR_URL}}:concourse-{{REVISION}}"
 
         port_map {
           http = 8080

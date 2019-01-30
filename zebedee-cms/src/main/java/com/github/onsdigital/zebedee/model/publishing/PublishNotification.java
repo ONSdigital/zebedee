@@ -10,10 +10,10 @@ import com.github.onsdigital.zebedee.json.ContentDetail;
 import com.github.onsdigital.zebedee.json.EventType;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.util.SlackNotification;
+import com.github.onsdigital.zebedee.util.slack.PostMessageField;
 import org.joda.time.DateTime;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -27,23 +27,21 @@ import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
 public class PublishNotification {
 
     private static final List<Host> websiteHosts;
+    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
     private NotificationPayload payload;
 
     static {
-        String[] websiteUrls = Configuration.getWebsiteUrls();
-        websiteHosts = new ArrayList<>();
-        for (String websiteUrl : websiteUrls) {
-            websiteHosts.add(new Host(websiteUrl));
-        }
+        websiteHosts = Configuration.getWebsiteHosts();
     }
 
     public PublishNotification(Collection collection, List<String> urisToUpdate, List<ContentDetail> urisToDelete) {
 
         // Delay the clearing of the cache after publish to minimise load on the server while publishing.
-        Date clearCacheDate = new DateTime(collection.description.publishDate)
+        Date clearCacheDate = new DateTime(collection.getDescription().getPublishDate())
                 .plusSeconds(Configuration.getSecondsToCacheAfterScheduledPublish()).toDate();
 
-        this.payload = new NotificationPayload(collection.description.id, urisToUpdate, urisToDelete, clearCacheDate);
+        this.payload = new NotificationPayload(collection.getDescription().getId(), urisToUpdate, urisToDelete,
+                clearCacheDate);
     }
 
     public PublishNotification(Collection collection) {
@@ -51,27 +49,51 @@ public class PublishNotification {
     }
 
     public void sendNotification(EventType eventType) {
-        logInfo("Sending publish notification to website").addParameter("eventType", eventType.name()).log();
+        Host host = null;
         try (Http http = new Http()) {
-            for (Host host : websiteHosts) {
+            for (Host h : websiteHosts) {
+                host = h;
+                logInfo("sending publish notification to website host")
+                        .collectionId(payload.collectionId)
+                        .addParameter("websiteHost", host.toString())
+                        .addParameter("eventType", eventType.name())
+                        .log();
                 try {
                     Endpoint endpoint = new Endpoint(host, getEndPointName(eventType));
                     Response<WebsiteResponse> response = http.postJson(endpoint, payload, WebsiteResponse.class);
                     String responseMessage = response.body == null ? response.statusLine.getReasonPhrase() : response.body.getMessage();
                     if (response.statusLine.getStatusCode() > 302) {
                         logInfo("Error response from website for publish notification")
+                                .addParameter("websiteHost", host.toString())
                                 .addParameter("responseMessage", responseMessage)
                                 .addParameter("collectionId", payload.collectionId)
                                 .log();
                     } else {
                         logInfo("Response from website for publish notification")
+                                .addParameter("websiteHost", host.toString())
                                 .addParameter("responseMessage", responseMessage)
                                 .addParameter("collectionId", payload.collectionId)
                                 .log();
                     }
                 } catch (Exception e) {
-                    logError(e, "Failed sending publish notification to website").addParameter("eventType", eventType).log();
-                    SlackNotification.alarm("Failed sending publish notification to website for " + eventType + " host:" + host.toString());
+                    logError(e, "failed sending publish notification to website")
+                            .collectionId(payload.collectionId)
+                            .addParameter("websiteHost", host.toString())
+                            .addParameter("eventType", eventType).log();
+                    String eventName = "";
+                    try {
+                        eventName = getEndPointName(eventType);
+                    } catch (BadRequestException ex) {
+                        eventName = "unknown: " + eventType.toString();
+                    }
+                    // FIXME it might be better to use collectionAlarm rather than alarm
+                    // but the NotificationPayload only has the collection ID
+                    SlackNotification.alarm(
+                            "Failed sending publish notifications to website",
+                            new PostMessageField("Event", eventName, true),
+                            new PostMessageField("Host", host.toString(), true),
+                            new PostMessageField("Collection ID", payload.collectionId, true)
+                    );
                 }
             }
         }
@@ -99,7 +121,7 @@ public class PublishNotification {
         if (date == null) {
             return null;
         }
-        return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").format(date);
+        return DATE_FORMAT.format(date);
     }
 
     public boolean hasUriToDelete(String uriToDelete) {
@@ -111,6 +133,7 @@ public class PublishNotification {
 
     /**
      * return true if this PublishNotification has the given URI to update.
+     *
      * @param uri - the URI to check.
      * @return - true if the URI is in the list of URI's to update
      */

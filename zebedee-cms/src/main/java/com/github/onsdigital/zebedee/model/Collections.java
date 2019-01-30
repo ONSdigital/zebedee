@@ -16,14 +16,12 @@ import com.github.onsdigital.zebedee.json.ApprovalStatus;
 import com.github.onsdigital.zebedee.json.Event;
 import com.github.onsdigital.zebedee.json.EventType;
 import com.github.onsdigital.zebedee.json.Keyring;
-import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
-import com.github.onsdigital.zebedee.permissions.service.PermissionsServiceImpl;
-import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.model.approval.ApprovalQueue;
 import com.github.onsdigital.zebedee.model.approval.ApproveTask;
 import com.github.onsdigital.zebedee.model.publishing.PostPublisher;
 import com.github.onsdigital.zebedee.model.publishing.PublishNotification;
 import com.github.onsdigital.zebedee.model.publishing.Publisher;
+import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.persistence.CollectionEventType;
 import com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDao;
 import com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDaoFactory;
@@ -31,6 +29,7 @@ import com.github.onsdigital.zebedee.persistence.model.CollectionHistoryEvent;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
+import com.github.onsdigital.zebedee.session.model.Session;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.ProgressListener;
@@ -61,6 +60,9 @@ import java.util.stream.Collectors;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getUnauthorizedMessage;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logTrace;
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logWarn;
+import static com.github.onsdigital.zebedee.model.Content.isDataVisualisationFile;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_APPROVED;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_COMPLETED_ERROR;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_CONTENT_DELETED;
@@ -69,10 +71,8 @@ import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLL
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_DELETED;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_ITEM_COMPLETED;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_UNLOCKED;
-import static com.github.onsdigital.zebedee.persistence.CollectionEventType.DATA_VISUALISATION_COLLECTION_CONTENT_DELETED;
 import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData.contentMoved;
 import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData.contentRenamed;
-import static java.util.Objects.requireNonNull;
 
 public class Collections {
 
@@ -282,33 +282,56 @@ public class Collections {
 
         // Collection exists
         if (collection == null) {
+            logError("approve collection: collection null check failed").log();
             throw new BadRequestException("Please provide a valid collection.");
         }
+        logInfo("approve collection: collection null check passed").collectionId(collection).log();
 
         // User has permission
         if (session == null || !permissionsService.canEdit(session.getEmail())) {
+            logError("approve collection: user permission check failed").collectionId(collection).log();
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
+        logInfo("approve collection: user permission check successful").collectionId(collection).log();
 
         // Everything is completed
-        if (!collection.inProgressUris().isEmpty()
-                || !collection.completeUris().isEmpty()) {
+        if (!collection.inProgressUris().isEmpty() || !collection.completeUris().isEmpty()) {
+            logError("approve collection: can approve check failure").collectionId(collection)
+                    .addParameter("inProgressEmpty", collection.inProgressUris().isEmpty())
+                    .addParameter("completeEmpty", collection.completeUris().isEmpty())
+                    .log();
             throw new ConflictException(
                     "This collection can't be approved because it's not empty");
         }
+        logInfo("approve collection: can approve check successful").collectionId(collection).log();
 
         CollectionReader collectionReader = collectionReaderWriterFactory.getReader(zebedeeSupplier.get(), collection, session);
         CollectionWriter collectionWriter = collectionReaderWriterFactory.getWriter(zebedeeSupplier.get(), collection, session);
         ContentReader publishedReader = contentReaderFactory.apply(this.published.path);
 
+
+        logInfo("approve collection: setting collection status to approved").collectionId(collection).log();
         collection.getDescription().setApprovalStatus(ApprovalStatus.IN_PROGRESS);
+        logInfo("approve collection: saving collection").collectionId(collection).log();
         collection.save();
 
-        Future<Boolean> future = addTaskToQueue.apply(
-                new ApproveTask(collection, session, collectionReader, collectionWriter, publishedReader,
-                        zebedeeSupplier.get().getDataIndex()));
+        logInfo("approve collection: adding approval take to queue").collectionId(collection).log();
 
+        Future<Boolean> future = null;
+        try {
+            future = addTaskToQueue.apply(
+                    new ApproveTask(collection, session, collectionReader, collectionWriter, publishedReader,
+                            zebedeeSupplier.get().getDataIndex()));
+        } catch (Exception e) {
+            logError(e, "approve collection: submit collection approval task failure").collectionId(collection).log();
+        }
+
+        logInfo("approve collection: saving collection history event").collectionId(collection).log();
         collectionHistoryDaoSupplier.get().saveCollectionHistoryEvent(collection, session, COLLECTION_APPROVED);
+        logInfo("approve collection: collection history event saved successfully").collectionId(collection).log();
+
+
+        logInfo("approve collection: API approve step compeleted successfully").collectionId(collection).log();
         return future;
     }
 
@@ -386,7 +409,6 @@ public class Collections {
             logInfo("Breaking before publish").log();
             return true;
         }
-        logInfo("Going ahead with publish").log();
 
         Keyring keyring = zebedeeSupplier.get().getKeyringCache().get(session);
         if (keyring == null) throw new UnauthorizedException("No keyring is available for " + session.getEmail());
@@ -402,12 +424,12 @@ public class Collections {
 
             PostPublisher.postPublish(zebedeeSupplier.get(), collection, skipVerification, collectionReader);
 
-            logInfo("Collection postPublish process finished")
-                    .collectionName(collection)
+            logInfo("collection post publish process completed")
+                    .collectionId(collection)
                     .timeTaken((System.currentTimeMillis() - onPublishCompleteStart))
                     .log();
-            logInfo("Collection publish complete.")
-                    .collectionName(collection)
+            logInfo("collection publish complete")
+                    .collectionId(collection)
                     .timeTaken((System.currentTimeMillis() - publishStart))
                     .log();
         }
@@ -477,25 +499,39 @@ public class Collections {
 
     public void delete(Collection collection, Session session)
             throws IOException, ZebedeeException {
-
-        // Collection exists
         if (collection == null) {
+            logError("delete collection unsuccessful: collection required but was null")
+                    .user(session)
+                    .log();
             throw new BadRequestException("Please specify a valid collection");
         }
 
-        // User has permission
-        if (!permissionsService.canEdit(session)) {
+        boolean canEdit = permissionsService.canEdit(session);
+        if (!canEdit) {
+            logWarn("delete collection unsuccessful: user denied canEdit permission")
+                    .user(session)
+                    .collectionId(collection)
+                    .log();
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
-        // Collection is empty
+        logTrace("delete collection: user granted canEdit permission")
+                .user(session).collectionId(collection).log();
+
         if (!collection.isEmpty()) {
+            logWarn("delete collection unsuccessful: the collection is not empty")
+                    .user(session)
+                    .collectionId(collection)
+                    .log();
             throw new BadRequestException("The collection is not empty.");
         }
 
-        // Go ahead
         collection.delete();
         collectionHistoryDaoSupplier.get().saveCollectionHistoryEvent(collection, session, COLLECTION_DELETED);
+        logInfo("delete collection successful")
+                .user(session)
+                .collectionId(collection)
+                .log();
     }
 
     /**
@@ -529,13 +565,13 @@ public class Collections {
                     .saveOrEditConflict(collection, blocker, uri)
                     .user(session.getEmail())
                     .log();
-            throw new ConflictException("This URI exists in another collection.");
+            throw new ConflictException("This URI exists in another collection", blocker.getDescription().getName());
         }
 
         try {
             zebedeeSupplier.get().checkAllCollectionsForDeleteMarker(uri);
         } catch (DeleteContentRequestDeniedException ex) {
-            throw new ConflictException("This URI already exists");
+            throw new ConflictException("This URI is marked for deletion in another collection", ex.getCollectionName());
         }
 
         writeContent(collection, uri, session, request, requestBody, false, eventType, validateJson);
@@ -551,7 +587,7 @@ public class Collections {
         CollectionWriter collectionWriter = collectionReaderWriterFactory.getWriter(zebedeeSupplier.get(), collection, session);
 
         logInfo("Attempting to write content.")
-                .collectionName(collection)
+                .collectionId(collection)
                 .path(uri)
                 .user(session.getEmail())
                 .log();
@@ -578,6 +614,11 @@ public class Collections {
             // create the file
             if (!collection.create(session.getEmail(), uri)) {
                 // file may be being edited in a different collection
+                Optional<Collection> otherCollection = zebedeeSupplier.get().checkForCollectionBlockingChange(uri);
+                if (otherCollection.isPresent()) {
+                    throw new ConflictException(
+                            "This URI is being edited in another collection", otherCollection.get().getDescription().getName());
+                }
                 throw new ConflictException(
                         "It could be this URI is being edited in another collection");
             }
@@ -586,13 +627,18 @@ public class Collections {
             boolean result = collection.edit(session.getEmail(), uri, collectionWriter, recursive);
             if (!result) {
                 // file may be being edited in a different collection
+                Optional<Collection> otherCollection = zebedeeSupplier.get().checkForCollectionBlockingChange(uri);
+                if (otherCollection.isPresent()) {
+                    throw new ConflictException(
+                            "This URI is being edited in another collection", otherCollection.get().getDescription().getName());
+                }
                 throw new ConflictException(
                         "It could be this URI is being edited in another collection");
             }
         }
 
         collection.save();
-        logInfo("content save successful.").collectionName(collection).path(uri).user(session.getEmail()).log();
+        logInfo("content save successful.").collectionId(collection).path(uri).user(session.getEmail()).log();
 
         path = collection.getInProgressPath(uri);
         if (!Files.exists(path)) {
@@ -673,17 +719,16 @@ public class Collections {
         boolean deleted;
         CollectionEventType eventType;
 
-        if (collection.getDescription().getCollectionOwner().equals(CollectionOwner.DATA_VISUALISATION)) {
+        if (isDataVisualisationFile(path)) {
             deleted = collection.deleteDataVisContent(session, Paths.get(uri));
-            eventType = DATA_VISUALISATION_COLLECTION_CONTENT_DELETED;
+        } else if (Files.isDirectory(path)) {
+            deleted = collection.deleteContentDirectory(session.getEmail(), uri);
         } else {
-            if (Files.isDirectory(path)) {
-                deleted = collection.deleteContentDirectory(session.getEmail(), uri);
-            } else {
-                deleted = collection.deleteFile(uri);
-            }
-            eventType = COLLECTION_CONTENT_DELETED;
+            deleted = collection.deleteFile(uri);
         }
+
+        eventType = COLLECTION_CONTENT_DELETED;
+
         collection.save();
         if (deleted) {
             removeEmptyCollectionDirectories(path);
@@ -848,8 +893,7 @@ public class Collections {
 
             if (StringUtils.isNotBlank(id)) {
                 for (Collection collection : this) {
-                    if (StringUtils.equalsIgnoreCase(collection.description.id,
-                            id)) {
+                    if (StringUtils.equalsIgnoreCase(collection.getDescription().getId(), id)) {
                         result = collection;
                         break;
                     }

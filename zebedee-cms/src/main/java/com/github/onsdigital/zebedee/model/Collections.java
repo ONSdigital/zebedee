@@ -60,8 +60,6 @@ import java.util.stream.Collectors;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getUnauthorizedMessage;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logTrace;
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logWarn;
 import static com.github.onsdigital.zebedee.model.Content.isDataVisualisationFile;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_APPROVED;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_COMPLETED_ERROR;
@@ -285,17 +283,19 @@ public class Collections {
             logError("approve collection: collection null check failed").log();
             throw new BadRequestException("Please provide a valid collection.");
         }
-        logInfo("approve collection: collection null check passed").collectionId(collection).log();
 
         // User has permission
         if (session == null || !permissionsService.canEdit(session.getEmail())) {
             logError("approve collection: user permission check failed").collectionId(collection).log();
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
-        logInfo("approve collection: user permission check successful").collectionId(collection).log();
+
+        collection.getDescription().addEvent(new Event(new Date(), EventType.APPROVE_SUBMITTED, session.getEmail()));
 
         // Everything is completed
-        if (!collection.inProgressUris().isEmpty() || !collection.completeUris().isEmpty()) {
+        if (!collection.isAllContentReviewed()) {
+            collection.getDescription().addEvent(new Event(new Date(), EventType.APPROVE_SUBMITTED, session.getEmail()));
+
             logError("approve collection: can approve check failure").collectionId(collection)
                     .addParameter("inProgressEmpty", collection.inProgressUris().isEmpty())
                     .addParameter("completeEmpty", collection.completeUris().isEmpty())
@@ -303,7 +303,6 @@ public class Collections {
             throw new ConflictException(
                     "This collection can't be approved because it's not empty");
         }
-        logInfo("approve collection: can approve check successful").collectionId(collection).log();
 
         CollectionReader collectionReader = collectionReaderWriterFactory.getReader(zebedeeSupplier.get(), collection, session);
         CollectionWriter collectionWriter = collectionReaderWriterFactory.getWriter(zebedeeSupplier.get(), collection, session);
@@ -328,8 +327,6 @@ public class Collections {
 
         logInfo("approve collection: saving collection history event").collectionId(collection).log();
         collectionHistoryDaoSupplier.get().saveCollectionHistoryEvent(collection, session, COLLECTION_APPROVED);
-        logInfo("approve collection: collection history event saved successfully").collectionId(collection).log();
-
 
         logInfo("approve collection: API approve step compeleted successfully").collectionId(collection).log();
         return future;
@@ -411,11 +408,13 @@ public class Collections {
         }
 
         Keyring keyring = zebedeeSupplier.get().getKeyringCache().get(session);
-        if (keyring == null) throw new UnauthorizedException("No keyring is available for " + session.getEmail());
+        if (keyring == null) {
+            throw new UnauthorizedException("No keyring is available for " + session.getEmail());
+        }
 
         ZebedeeCollectionReader collectionReader = new ZebedeeCollectionReader(zebedeeSupplier.get(), collection, session);
         long publishStart = System.currentTimeMillis();
-        boolean publishComplete = Publisher.Publish(collection, session.getEmail(), collectionReader);
+        boolean publishComplete = Publisher.publish(collection, session.getEmail(), collectionReader);
 
         if (publishComplete) {
             long onPublishCompleteStart = System.currentTimeMillis();
@@ -499,39 +498,25 @@ public class Collections {
 
     public void delete(Collection collection, Session session)
             throws IOException, ZebedeeException {
+
+        // Collection exists
         if (collection == null) {
-            logError("delete collection unsuccessful: collection required but was null")
-                    .user(session)
-                    .log();
             throw new BadRequestException("Please specify a valid collection");
         }
 
-        boolean canEdit = permissionsService.canEdit(session);
-        if (!canEdit) {
-            logWarn("delete collection unsuccessful: user denied canEdit permission")
-                    .user(session)
-                    .collectionId(collection)
-                    .log();
+        // User has permission
+        if (!permissionsService.canEdit(session)) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
-        logTrace("delete collection: user granted canEdit permission")
-                .user(session).collectionId(collection).log();
-
+        // Collection is empty
         if (!collection.isEmpty()) {
-            logWarn("delete collection unsuccessful: the collection is not empty")
-                    .user(session)
-                    .collectionId(collection)
-                    .log();
             throw new BadRequestException("The collection is not empty.");
         }
 
+        // Go ahead
         collection.delete();
         collectionHistoryDaoSupplier.get().saveCollectionHistoryEvent(collection, session, COLLECTION_DELETED);
-        logInfo("delete collection successful")
-                .user(session)
-                .collectionId(collection)
-                .log();
     }
 
     /**

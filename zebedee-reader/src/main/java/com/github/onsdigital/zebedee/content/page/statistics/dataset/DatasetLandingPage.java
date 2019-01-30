@@ -21,6 +21,8 @@ public class DatasetLandingPage extends Statistics {
     private List<Link> datasets;
     private Boolean timeseries;
     private List<Link> links;
+    // Temporary JSON field for now
+    private String metaCmd;
 
     @Override
     public PageType getType() {
@@ -90,4 +92,13 @@ public class DatasetLandingPage extends Statistics {
     public void setLinks(List<Link> links) {
         this.links = links;
     }
+
+    public String getMetaCmd() {
+        return metaCmd;
+    }
+
+    public void setMetaCmd(String metaCmd) {
+        this.metaCmd = metaCmd;
+    }
+
 }

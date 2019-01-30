@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Map;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static org.apache.commons.lang3.builder.ToStringStyle.NO_CLASS_NAME_STYLE;
@@ -52,6 +53,7 @@ public class ZebedeeLogBuilder extends LogMessageBuilder {
     private static final String PATH = "path";
     private static final String ROW = "row";
     private static final String CELL = "cell";
+    private static final String SESSION_ID = "sessionID";
     private static final String BLOCKING_PATH = "blockingPath";
     private static final String BLOCKING_COLLECTION = "blockingCollection";
     private static final String TARGET_PATH = "targetPath";
@@ -63,14 +65,17 @@ public class ZebedeeLogBuilder extends LogMessageBuilder {
 
     private ZebedeeLogBuilder(String description) {
         super(description);
+        setNamespace("zebedee-cms");
     }
 
     private ZebedeeLogBuilder(Throwable t, String description) {
         super(t, description);
+        setNamespace("zebedee-cms");
     }
 
     private ZebedeeLogBuilder(String description, Level level) {
         super(description, level);
+        setNamespace("zebedee-cms");
     }
 
     public static ZebedeeLogBuilder logError(Throwable t) {
@@ -167,6 +172,9 @@ public class ZebedeeLogBuilder extends LogMessageBuilder {
     }
 
     public ZebedeeLogBuilder collectionId(Collection collection) {
+        if (collection == null || collection.getDescription() == null) {
+            return this;
+        }
         addParameter(COLLECTION_ID, collection.getDescription().getId());
         return this;
     }
@@ -217,9 +225,28 @@ public class ZebedeeLogBuilder extends LogMessageBuilder {
         return this;
     }
 
+    public ZebedeeLogBuilder sessionID(String sessionID) {
+        if (!StringUtils.isEmpty(sessionID)) {
+            addParameter(SESSION_ID, sessionID);
+        }
+        return this;
+    }
+
     public ZebedeeLogBuilder trainHost(Host trainHost) {
         if (trainHost != null && StringUtils.isNotEmpty(trainHost.toString())) {
             addParameter(TRAIN_HOST, trainHost.toString());
+        }
+        return this;
+    }
+
+    public ZebedeeLogBuilder session(Session session) {
+        if (session != null) {
+            if (!StringUtils.isEmpty(session.getId())) {
+                addParameter(SESSION_ID, session.getId());
+            }
+            if (!StringUtils.isEmpty(session.getEmail())) {
+                addParameter(USER, session.getEmail());
+            }
         }
         return this;
     }
@@ -255,9 +282,21 @@ public class ZebedeeLogBuilder extends LogMessageBuilder {
         return this;
     }
 
+    public ZebedeeLogBuilder publishingAction() {
+        addParameter("publishing", true);
+        return this;
+    }
+
+    public <T> ZebedeeLogBuilder list(String key, java.util.Collection<T> list, Function<T, String> f) {
+        if (StringUtils.isNotEmpty(key) && list != null && f != null) {
+            param(key, list.stream().map(item -> f.apply(item)).collect(Collectors.toList()).toString());
+        }
+        return this;
+    }
+
     public ZebedeeLogBuilder param(String key, Object value) {
         if (StringUtils.isNotEmpty(key) && value != null) {
-            addParameter(key, value.toString());
+            addParameter(key, value);
         }
         return this;
     }

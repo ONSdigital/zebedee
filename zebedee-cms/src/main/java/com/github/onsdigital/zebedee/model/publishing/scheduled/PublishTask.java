@@ -66,7 +66,7 @@ public class PublishTask implements Runnable {
 
                 ZebedeeCollectionReader collectionReader = new ZebedeeCollectionReader(collection, zebedee.getKeyringCache().schedulerCache.get(collectionId));
                 long publishStart = System.currentTimeMillis();
-                publishComplete = Publisher.Publish(collection, "System", collectionReader);
+                publishComplete = Publisher.publish(collection, "System", collectionReader);
 
                 if (publishComplete) {
                     long onPublishCompleteStart = System.currentTimeMillis();

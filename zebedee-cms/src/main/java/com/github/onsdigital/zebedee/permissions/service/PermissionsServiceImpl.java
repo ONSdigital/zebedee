@@ -29,11 +29,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
 
 import static com.github.onsdigital.zebedee.configuration.Configuration.getUnauthorizedMessage;
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logDebug;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logTrace;
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logWarn;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_VIEWER_TEAM_ADDED;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_VIEWER_TEAM_REMOVED;
 import static com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDaoFactory.getCollectionHistoryDao;
@@ -384,16 +380,7 @@ public class PermissionsServiceImpl implements PermissionsService {
     public boolean canView(String email, CollectionDescription collectionDescription) throws IOException {
         boolean canView = false;
         try {
-            canView = canView(usersServiceSupplier.getService().getUserByEmail(email), collectionDescription);
-
-            if (canView) {
-                logTrace("user granted canView permission").user(email).collectionId(collectionDescription.getId()).log();
-                return canView;
-            }
-
-            logWarn("user denied canView permission").user(email).collectionId(collectionDescription.getId()).log();
-            return canView;
-
+            return canView(usersServiceSupplier.getService().getUserByEmail(email), collectionDescription);
         } catch (NotFoundException nf) {
             logError(nf, "canView permission denied - user not found")
                     .collectionId(collectionDescription.getId())
@@ -402,6 +389,11 @@ public class PermissionsServiceImpl implements PermissionsService {
         } catch (BadRequestException br) {
             logError(br, "canView permission request denied - user details invalid")
                     .collectionId(collectionDescription.getId())
+                    .user(email)
+                    .log();
+        } catch (Exception e) {
+            logError(e, "canView permission request denied: unexpected error")
+                    .collectionId(collectionDescription)
                     .user(email)
                     .log();
         }

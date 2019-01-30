@@ -234,7 +234,10 @@ public class CsdbImporter {
         DataIndex dataIndex = Root.zebedee.getDataIndex();
 
         ApproveTask.generateTimeseries(collection, publishedReader, collectionReader, collectionWriter, dataIndex);
-        PublishNotification publishNotification = ApproveTask.createPublishNotification(collectionReader, collection);
+
+        List<String> uriList = collectionReader.getReviewed().listUris();
+        PublishNotification publishNotification = ApproveTask.createPublishNotification(uriList, collection);
+
         compressZipFiles(collection, collectionReader, collectionWriter);
 
         // Send a notification to the website with the publish date for caching.

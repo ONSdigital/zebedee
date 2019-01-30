@@ -5,6 +5,8 @@ import com.github.davidcarboni.cryptolite.Random;
 import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.KeyManangerUtil;
 import com.github.onsdigital.zebedee.Zebedee;
+import com.github.onsdigital.zebedee.configuration.Configuration;
+import com.github.onsdigital.zebedee.content.page.base.PageType;
 import com.github.onsdigital.zebedee.content.page.release.Release;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
@@ -18,12 +20,14 @@ import com.github.onsdigital.zebedee.json.ApprovalStatus;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.CollectionType;
 import com.github.onsdigital.zebedee.json.ContentDetail;
+import com.github.onsdigital.zebedee.json.ContentStatus;
 import com.github.onsdigital.zebedee.json.Event;
 import com.github.onsdigital.zebedee.json.EventType;
 import com.github.onsdigital.zebedee.json.Events;
 import com.github.onsdigital.zebedee.model.approval.tasks.ReleasePopulator;
 import com.github.onsdigital.zebedee.model.content.item.ContentItemVersion;
 import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
+import com.github.onsdigital.zebedee.model.publishing.Publisher;
 import com.github.onsdigital.zebedee.model.publishing.scheduled.Scheduler;
 import com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDao;
 import com.github.onsdigital.zebedee.persistence.model.CollectionHistoryEvent;
@@ -46,10 +50,15 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -63,9 +72,11 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.stream.Collectors;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logDebug;
+import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logDebug;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_CONTENT_REVIEWED;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_CREATED;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_NAME_CHANGED;
@@ -84,6 +95,7 @@ public class Collection {
     public static final String REVIEWED = "reviewed";
     public static final String COMPLETE = "complete";
     public static final String IN_PROGRESS = "inprogress";
+    public static final String DATA_JSON = "data.json";
 
     private static ConcurrentMap<Path, ReadWriteLock> collectionLocks = new ConcurrentHashMap<>();
     private static KeyManangerUtil keyManagerUtil = new KeyManangerUtil();
@@ -232,7 +244,7 @@ public class Collection {
 
             if (zebedee.isBeingEdited(release.getUri().toString() + "/data.json") > 0) {
                 Optional<Collection> otherCollection = zebedee.checkForCollectionBlockingChange(release.getUri().toString() + "/data.json");
-                if(otherCollection.isPresent()) {
+                if (otherCollection.isPresent()) {
                     throw new ConflictException(
                             "Cannot use this release. It is being edited as part of another collection.", otherCollection.get().getDescription().getName());
                 }
@@ -245,7 +257,7 @@ public class Collection {
                 zebedee.checkAllCollectionsForDeleteMarker(release.getUri().toString());
             } catch (DeleteContentRequestDeniedException ex) {
                 Optional<Collection> otherCollection = zebedee.checkForCollectionBlockingChange(release.getUri().toString() + "/data.json");
-                if(otherCollection.isPresent()) {
+                if (otherCollection.isPresent()) {
                     throw new ConflictException(
                             "Cannot use this release. It is being deleted as part of another collection.", otherCollection.get().getDescription().getName());
                 }
@@ -417,13 +429,7 @@ public class Collection {
         return this.description;
     }
 
-    private Release getReleaseFromCollection(String uri) throws IOException, ZebedeeException {
-        Path collectionReleasePath = this.find(uri);
-        Release release = (Release) ContentUtil.deserialiseContent(FileUtils.openInputStream(collectionReleasePath.toFile()));
-        return release;
-    }
-
-    public Release populateRelease(CollectionReader reader, CollectionWriter collectionWriter, List<ContentDetail> collectionContent) throws IOException, ZebedeeException {
+    public Release populateRelease(CollectionReader reader, CollectionWriter collectionWriter, Iterable<ContentDetail> collectionContent) throws IOException, ZebedeeException {
 
         if (StringUtils.isEmpty(this.getDescription().getReleaseUri())) {
             throw new BadRequestException("This collection is not associated with a release.");
@@ -477,7 +483,7 @@ public class Collection {
     }
 
     /**
-     * This methods is used by {@link com.github.onsdigital.zebedee.model.publishing.Publisher Publisher}
+     * This methods is used by {@link Publisher Publisher}
      * to acquire a write lock on a collection during publishing.
      *
      * @return The collection write lock.
@@ -660,8 +666,8 @@ public class Collection {
                     FileUtils.moveDirectory(source.getParent().toFile(), destination.getParent().toFile());
                 } else {
                     PathUtils.moveFilesInDirectory(source, destination);
-                    zebedee.getCollections().removeEmptyCollectionDirectories(source);
                 }
+                zebedee.getCollections().removeEmptyCollectionDirectories(source);
             } else {
                 try (InputStream inputStream = new FileInputStream(source.toFile())) {
                     collectionWriter.getInProgress().write(inputStream, uri);
@@ -772,6 +778,7 @@ public class Collection {
             if (recursive) {
                 FileUtils.deleteDirectory(destination.getParent().toFile());
                 FileUtils.moveDirectory(source.getParent().toFile(), destination.getParent().toFile());
+                zebedee.getCollections().removeEmptyCollectionDirectories(source.getParent());
             } else {
                 PathUtils.moveFilesInDirectory(source, destination);
                 zebedee.getCollections().removeEmptyCollectionDirectories(source);
@@ -838,6 +845,10 @@ public class Collection {
      */
     public Path getInProgressPath(String uri) {
         return inProgress.toPath(uri);
+    }
+
+    public Path getPath() {
+        return path;
     }
 
     public List<String> inProgressUris() throws IOException {
@@ -940,23 +951,65 @@ public class Collection {
             return false;
         }
 
-        String contentUri = contentPath.toString();
+        String visualisationZipUri = contentPath.toString();
+        String dataJsonUri = resolveDataVizDataJsonURI(contentPath);
         boolean hasDeleted = false;
 
         for (Content collectionDir : new Content[]{inProgress, complete, reviewed}) {
-            if (collectionDir.exists(contentUri)) {
-                FileUtils.deleteDirectory(Paths.get(collectionDir.getPath().toString() + contentUri).toFile());
+            if (collectionDir.exists(visualisationZipUri)) {
+                logDebug("removing data viz zip from collection directory")
+                        .addParameter("zip", visualisationZipUri)
+                        .user(session.getEmail())
+                        .collectionId(this.description.getId())
+                        .log();
+                FileUtils.deleteDirectory(Paths.get(collectionDir.getPath().toString() + visualisationZipUri).toFile());
                 hasDeleted = true;
             }
         }
 
+        resetDataVizDataJson(dataJsonUri);
+
         if (hasDeleted) {
-            addEvent(contentUri, new Event(new Date(), EventType.DELETED, session.getEmail()));
+            addEvent(visualisationZipUri, new Event(new Date(), EventType.DELETED, session.getEmail()));
             collectionHistoryDaoServiceSupplier.getService().saveCollectionHistoryEvent(new CollectionHistoryEvent(this, session,
-                    DATA_VISUALISATION_COLLECTION_CONTENT_DELETED, contentUri));
+                    DATA_VISUALISATION_COLLECTION_CONTENT_DELETED, visualisationZipUri));
         }
         save();
         return hasDeleted;
+    }
+
+    private String resolveDataVizDataJsonURI(Path contentPath) {
+        if (contentPath == null) {
+            return null;
+        }
+
+        if (contentPath.getParent() == null || StringUtils.isEmpty(contentPath.getParent().toString())) {
+            return null;
+        }
+        return contentPath.getParent().resolve(DATA_JSON).toString();
+    }
+
+    /**
+     * When we delete a data viz zip from the collection move the page data.json back to 'inprogress'.
+     */
+    private void resetDataVizDataJson(String dataJsonUri) throws IOException {
+        if (isInProgress(dataJsonUri)) return;
+
+        Path src = null;
+        if (isComplete(dataJsonUri)) {
+            src = complete.toPath(dataJsonUri);
+        } else if (isReviewed(dataJsonUri)) {
+            src = reviewed.toPath(dataJsonUri);
+        }
+        if (src != null) {
+            Path dest = this.inProgress.toPath(dataJsonUri);
+
+            if (src.toFile().exists()) {
+                Files.createDirectories(dest.getParent());
+                Files.move(src, dest);
+                zebedee.getCollections().removeEmptyCollectionDirectories(src.getParent());
+            }
+        }
     }
 
     /**
@@ -1201,6 +1254,76 @@ public class Collection {
 
     public Content getInProgress() {
         return inProgress;
+    }
+
+
+    /**
+     * Return true if this collection has had all of its content reviewed.
+     */
+    public boolean isAllContentReviewed() throws IOException {
+        // FIXME CMD feature flag
+        if (cmsFeatureFlags().isEnableDatasetImport()) {
+            boolean allDatasetsReviewed = description.getDatasets()
+                    .stream()
+                    .allMatch(ds -> ds.getState().equals(ContentStatus.Reviewed));
+
+            boolean allDatasetVersionsReviewed = description.getDatasetVersions()
+                    .stream()
+                    .allMatch(ds -> ds.getState().equals(ContentStatus.Reviewed));
+
+            return (inProgressUris().isEmpty()
+                    && completeUris().isEmpty()
+                    && allDatasetsReviewed
+                    && allDatasetVersionsReviewed);
+        }
+
+        return inProgressUris().isEmpty() && completeUris().isEmpty();
+    }
+
+    /**
+     * Return a list of ContentDetail items for each data set in the collection.
+     */
+    public List<ContentDetail> getDatasetDetails() {
+
+        return description.getDatasets().stream().map(ds -> {
+
+            String url = URI.create(ds.getUri()).getPath();
+            return new ContentDetail(ds.getTitle(), url, PageType.api_dataset_landing_page.toString());
+
+        }).collect(Collectors.toList());
+    }
+
+    /**
+     * Return a list of ContentDetail. One for each data set version in the collection,
+     * and also one for each of the parent data sets for those versions
+     */
+    public List<ContentDetail> getDatasetVersionDetails() {
+
+        return description.getDatasetVersions().stream().flatMap(ds -> {
+
+            String datasetURL = "/datasets/" + ds.getId();
+            String versionURL = datasetURL + "/editions/" + ds.getEdition() + "/versions/" + ds.getVersion();
+
+            ContentDetail versionDetail = new ContentDetail(ds.getTitle(), versionURL, PageType.api_dataset.toString());
+            ContentDetail datasetDetail = new ContentDetail(ds.getTitle(), datasetURL, PageType.api_dataset_landing_page.toString());
+
+            return (new ArrayList<>(Arrays.asList(versionDetail, datasetDetail))).stream();
+
+        }).collect(Collectors.toList());
+    }
+
+    public String getId() {
+        return this.description.getId();
+    }
+
+    public long getPublishTimeMilliseconds() {
+        if (getDescription().publishStartDate != null && getDescription().publishEndDate != null) {
+            LocalDateTime start = LocalDateTime.ofInstant(getDescription().publishStartDate.toInstant(), ZoneId.systemDefault());
+            LocalDateTime end = LocalDateTime.ofInstant(getDescription().publishEndDate.toInstant(), ZoneId.systemDefault());
+
+            return Duration.between(start, end).toMillis();
+        }
+        return 0;
     }
 }
 

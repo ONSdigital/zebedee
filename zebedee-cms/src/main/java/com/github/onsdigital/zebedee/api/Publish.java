@@ -9,6 +9,7 @@ import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.persistence.model.CollectionHistoryEvent;
+import com.github.onsdigital.zebedee.util.ZebedeeCmsService;
 import org.apache.commons.lang3.BooleanUtils;
 import org.eclipse.jetty.http.HttpStatus;
 
@@ -24,6 +25,12 @@ import static com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDao
 
 @Api
 public class Publish {
+
+    private ZebedeeCmsService zebedeeCmsService;
+
+    public Publish() {
+        zebedeeCmsService = ZebedeeCmsService.getInstance();
+    }
 
     /**
      * @param request  the file request
@@ -46,7 +53,7 @@ public class Publish {
             throws IOException, ZebedeeException {
 
         com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request);
-        Session session = Root.zebedee.getSessionsService().get(request);
+        Session session = zebedeeCmsService.getSession(request);
 
         getCollectionHistoryDao().saveCollectionHistoryEvent(collection, session, COLLECTION_MANUAL_PUBLISHED_TRIGGERED);
 
@@ -57,7 +64,7 @@ public class Publish {
         boolean doSkipVerification = BooleanUtils.toBoolean(skipVerification);
 
         try {
-            boolean result = Root.zebedee.getCollections().publish(collection, session, doBreakBeforeFileTransfer,
+            boolean result = zebedeeCmsService.getCollections().publish(collection, session, doBreakBeforeFileTransfer,
                     doSkipVerification);
             logPublishResult(request, collection, session, result, null);
             return result;

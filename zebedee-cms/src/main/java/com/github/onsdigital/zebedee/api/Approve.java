@@ -2,6 +2,7 @@ package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
 import com.github.onsdigital.zebedee.audit.Audit;
+import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.session.model.Session;
@@ -12,9 +13,9 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.POST;
 import java.io.IOException;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logWarn;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.warn;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
 
 /**
  * Created by kanemorgan on 01/04/2015.
@@ -38,31 +39,27 @@ public class Approve {
      */
     @POST
     public boolean approveCollection(HttpServletRequest request, HttpServletResponse response) throws IOException, ZebedeeException {
-        logInfo("approve endpoint: request received").log();
+        info().log("approve endpoint: request received");
 
         Session session = Root.zebedee.getSessionsService().get(request);
         if (session == null) {
-            logWarn("approve request: request unsuccessful valid user session not found").log();
+            warn().log("approve request: request unsuccessful valid user session not found");
             throw new UnauthorizedException("You are not authorized to approve collections");
         }
 
         com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request);
         if (collection == null) {
-            logWarn("approve endpoint: request unsuccessful collection not found")
-                    .log();
+            warn().log("approve request: request unsuccessful valid user session not found");
+            throw new NotFoundException("The collection you are trying to approve was not found.");
         }
 
-        logInfo("approve endpoint: submitting approve request")
-                .collectionId(collection)
-                .user(session.getEmail())
-                .log();
+        String collectionId = Collections.getCollectionId(request);
+        info().data("collectionId", collectionId).data("user", session).log("approve endpoint: submitting approve request");
+
         try {
             Root.zebedee.getCollections().approve(collection, session);
         } catch (Exception e) {
-            logError(e, "approve endpoint: request unsuccessful error while approving collection")
-                    .collectionId(collection)
-                    .user(session)
-                    .log();
+            error().data("collectionId", collectionId).data("user", session).log("approve endpoint: request unsuccessful error while approving collection");
             throw e;
         }
 
@@ -73,7 +70,7 @@ public class Approve {
                 .actionedBy(session.getEmail())
                 .log();
 
-        logInfo("approve endpoint: request completed successfully").collectionId(collection).user(session.getEmail()).log();
+        info().data("user", session).log("approve endpoint: request completed successfully");
         return true;
     }
 }

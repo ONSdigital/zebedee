@@ -2,7 +2,7 @@ package com.github.onsdigital.zebedee;
 
 import com.github.davidcarboni.restolino.framework.Startup;
 import com.github.onsdigital.logging.v2.DPLogger;
-import com.github.onsdigital.logging.v2.LoggerConfig;
+import com.github.onsdigital.logging.v2.config.LoggerConfig;
 import com.github.onsdigital.logging.v2.serializer.JacksonEventSerialiser;
 import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.model.ZebedeeCollectionReaderFactory;
@@ -21,13 +21,11 @@ public class Init implements Startup {
     @Override
     public void init() {
         Logger logger = LoggerFactory.getLogger("com.github.onsdigital.zebedee.cms");
-        DPLogger.init(new LoggerConfig(logger, new JacksonEventSerialiser()));
+        DPLogger.init(new LoggerConfig(logger, new JacksonEventSerialiser(), "zebedee.data"));
 
         Root.init();
         ZebedeeReader.setCollectionReaderFactory(new ZebedeeCollectionReaderFactory(Root.zebedee));
         CollectionHistoryDaoFactory.initialise();
         logDebug("Zebedee Start up").log();
-
-        info().log("new world logger! reporting in");
     }
 }

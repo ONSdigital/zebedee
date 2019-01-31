@@ -54,12 +54,12 @@ public class Approve {
         }
 
         String collectionId = Collections.getCollectionId(request);
-        info().data("collectionId", collectionId).data("user", session).log("approve endpoint: submitting approve request");
+        info().data("collectionId", collectionId).data("user", session.getEmail()).log("approve endpoint: submitting approve request");
 
         try {
             Root.zebedee.getCollections().approve(collection, session);
         } catch (Exception e) {
-            error().data("collectionId", collectionId).data("user", session).log("approve endpoint: request unsuccessful error while approving collection");
+            error().data("collectionId", collectionId).data("user", session.getEmail()).log("approve endpoint: request unsuccessful error while approving collection");
             throw e;
         }
 
@@ -70,7 +70,7 @@ public class Approve {
                 .actionedBy(session.getEmail())
                 .log();
 
-        info().data("user", session).log("approve endpoint: request completed successfully");
+        info().data("user", session.getEmail()).log("approve endpoint: request completed successfully");
         return true;
     }
 }

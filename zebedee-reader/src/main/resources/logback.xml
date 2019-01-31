@@ -47,4 +47,12 @@
         <appender-ref ref="DP_LOGGER"/>
     </root>
 
+    <root level="warn">
+        <appender-ref ref="DP_LOGGER"/>
+    </root>
+
+    <root level="error">
+        <appender-ref ref="DP_LOGGER"/>
+    </root>
+
 </configuration>

@@ -8,8 +8,20 @@ import com.github.onsdigital.zebedee.content.page.base.PageDescription;
 import com.github.onsdigital.zebedee.content.page.base.PageType;
 import com.github.onsdigital.zebedee.content.page.release.Release;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
-import com.github.onsdigital.zebedee.exceptions.*;
-import com.github.onsdigital.zebedee.json.*;
+import com.github.onsdigital.zebedee.exceptions.BadRequestException;
+import com.github.onsdigital.zebedee.exceptions.CollectionNotFoundException;
+import com.github.onsdigital.zebedee.exceptions.ConflictException;
+import com.github.onsdigital.zebedee.exceptions.NotFoundException;
+import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
+import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
+import com.github.onsdigital.zebedee.json.ApprovalStatus;
+import com.github.onsdigital.zebedee.json.CollectionDataset;
+import com.github.onsdigital.zebedee.json.CollectionDatasetVersion;
+import com.github.onsdigital.zebedee.json.CollectionDescription;
+import com.github.onsdigital.zebedee.json.CollectionType;
+import com.github.onsdigital.zebedee.json.ContentDetail;
+import com.github.onsdigital.zebedee.json.ContentStatus;
+import com.github.onsdigital.zebedee.json.EventType;
 import com.github.onsdigital.zebedee.model.content.item.ContentItemVersion;
 import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
 import com.github.onsdigital.zebedee.model.publishing.scheduled.DummyScheduler;
@@ -30,11 +42,18 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.spy;
 
 public class CollectionTest extends ZebedeeTestBaseFixture {
 
@@ -136,7 +155,6 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         assertEquals(collectionDescription.getPublishDate(), renamedCollectionDescription.getPublishDate());
         assertEquals(collectionDescription.getType(), renamedCollectionDescription.getType());
     }
-
 
     @Test
     public void shouldUpdateCollection() throws Exception {
@@ -1104,11 +1122,12 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
 
 
         // When we attempt to populate the release from the collection.
+
         FakeCollectionReader collectionReader = new FakeCollectionReader(zebedee.getCollections().path.toString(),
                 collection.description.getId());
         FakeCollectionWriter collectionWriter = new FakeCollectionWriter(zebedee.getCollections().path.toString(),
                 collection.description.getId());
-        List<ContentDetail> collectionContent = ContentDetailUtil.resolveDetails(collection.reviewed, collectionReader.getReviewed());
+        Iterable<ContentDetail> collectionContent = ContentDetailUtil.resolveDetails(collection.reviewed, collectionReader.getReviewed());
 
         Release result = collection.populateRelease(
                 collectionReader,
@@ -1350,6 +1369,196 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         assertTrue(collection.description.eventsByUri.get(uri).hasEventForType(EventType.MOVED));
     }
 
+    @Test
+    public void isAllContentReviewed_shouldReturnTrueWhenEmpty() throws IOException, ZebedeeException {
+
+        // Given an empty collection
+        Path collectionPath = Files.createTempDirectory(Random.id()); // create a temp directory to generate content into
+        Collection collection = CollectionTest.CreateCollection(collectionPath, "isAllContentReviewed");
+
+        // When isAllContentReviewed() is called
+        boolean allContentReviewed = collection.isAllContentReviewed();
+
+        // Then the result is true
+        assertTrue(allContentReviewed);
+    }
+
+    @Test
+    public void isAllContentReviewed_shouldReturnFalseWhenFileInProgress() throws IOException, ZebedeeException {
+
+        // Given a collection with a file in progress
+        Path collectionPath = Files.createTempDirectory(Random.id()); // create a temp directory to generate content into
+        Collection collection = spy(
+                CollectionTest.CreateCollection(collectionPath,"isAllContentReviewed"));
+
+        ArrayList<String> uriList = new ArrayList<>(Arrays.asList("/some/uri"));
+        doReturn(uriList).when(collection).inProgressUris();
+
+        // When isAllContentReviewed() is called
+        boolean allContentReviewed = collection.isAllContentReviewed();
+
+        // Then the result is false
+        assertFalse(allContentReviewed);
+    }
+
+    @Test
+    public void isAllContentReviewed_shouldReturnFalseWhenFileComplete() throws IOException, ZebedeeException {
+
+        // Given a collection with a file in complete
+        Path collectionPath = Files.createTempDirectory(Random.id()); // create a temp directory to generate content into
+        Collection collection = spy(
+                CollectionTest.CreateCollection(collectionPath,"isAllContentReviewed"));
+
+        ArrayList<String> uriList = new ArrayList<>(Arrays.asList("/some/uri"));
+        doReturn(uriList).when(collection).completeUris();
+
+        // When isAllContentReviewed() is called
+        boolean allContentReviewed = collection.isAllContentReviewed();
+
+        // Then the result is false
+        assertFalse(allContentReviewed);
+    }
+
+    @Test
+    public void isAllContentReviewed_shouldReturnFalseWhenDatasetNotReviewed() throws IOException, ZebedeeException {
+
+        try {
+            // Should only valid Dataset version reviewed if feature flag ENABLE_DATASET_IMPORT is enabled
+            System.setProperty("ENABLE_DATASET_IMPORT", "true");
+            // Given a collection with a dataset that has not been set to reviewed.
+            Path collectionPath = Files.createTempDirectory(Random.id()); // create a temp directory to generate content into
+            Collection collection = CollectionTest.CreateCollection(collectionPath, "isAllContentReviewed");
+
+            CollectionDataset dataset = new CollectionDataset();
+            dataset.setState(ContentStatus.Complete);
+            collection.getDescription().addDataset(dataset);
+
+            // When isAllContentReviewed() is called
+            boolean allContentReviewed = collection.isAllContentReviewed();
+
+            // Then the result is false
+            assertFalse(allContentReviewed);
+        } finally {
+            // Should only valid Dataset version reviewed if feature flag ENABLE_DATASET_IMPORT is enabled
+            System.clearProperty("ENABLE_DATASET_IMPORT");
+        }
+    }
+
+    @Test
+    public void isAllContentReviewed_shouldReturnFalseWhenDatasetVersionNotReviewed() throws IOException, ZebedeeException {
+        try {
+            // FIXME CMD feature flag
+            // Should only valid Dataset version reviewed if feature flag ENABLE_DATASET_IMPORT is enabled
+            System.setProperty("ENABLE_DATASET_IMPORT", "true");
+
+            // Given a collection with a dataset version that has not been set to reviewed.
+            Path collectionPath = Files.createTempDirectory(Random.id()); // create a temp directory to generate content into
+            Collection collection = CollectionTest.CreateCollection(collectionPath, "isAllContentReviewed");
+
+            CollectionDatasetVersion datasetVersion = new CollectionDatasetVersion();
+            datasetVersion.setState(ContentStatus.Complete);
+            collection.getDescription().addDatasetVersion(datasetVersion);
+
+            // When isAllContentReviewed() is called
+            boolean allContentReviewed = collection.isAllContentReviewed();
+
+            // Then the result is false
+            assertFalse(allContentReviewed);
+        } finally {
+            // Should only valid Dataset version reviewed if feature flag ENABLE_DATASET_IMPORT is enabled
+            System.clearProperty("ENABLE_DATASET_IMPORT");
+        }
+    }
+
+    @Test
+    public void isAllContentReviewed_shouldReturnTrueWhenDatasetIsReviewed() throws IOException, ZebedeeException {
+
+        // Given a collection with a dataset that has been set to reviewed.
+        Path collectionPath = Files.createTempDirectory(Random.id()); // create a temp directory to generate content into
+        Collection collection = CollectionTest.CreateCollection(collectionPath,"isAllContentReviewed");
+
+        CollectionDataset dataset = new CollectionDataset();
+        dataset.setState(ContentStatus.Reviewed);
+        collection.getDescription().addDataset(dataset);
+
+        // When isAllContentReviewed() is called
+        boolean allContentReviewed = collection.isAllContentReviewed();
+
+        // Then the result is true
+        assertTrue(allContentReviewed);
+    }
+
+    @Test
+    public void isAllContentReviewed_shouldReturnTrueWhenDatasetVersionISReviewed() throws IOException, ZebedeeException {
+
+        // Given a collection with a dataset version that has been set to reviewed.
+        Path collectionPath = Files.createTempDirectory(Random.id()); // create a temp directory to generate content into
+        Collection collection = CollectionTest.CreateCollection(collectionPath,"isAllContentReviewed");
+
+        CollectionDatasetVersion datasetVersion = new CollectionDatasetVersion();
+        datasetVersion.setState(ContentStatus.Reviewed);
+        collection.getDescription().addDatasetVersion(datasetVersion);
+
+        // When isAllContentReviewed() is called
+        boolean allContentReviewed = collection.isAllContentReviewed();
+
+        // Then the result is true
+        assertTrue(allContentReviewed);
+    }
+
+    @Test
+    public void getDatasetDetails() throws IOException, ZebedeeException {
+
+        // Given a collection with a dataset.
+        Path collectionPath = Files.createTempDirectory(Random.id()); // create a temp directory to generate content into
+        Collection collection = CollectionTest.CreateCollection(collectionPath,"isAllContentReviewed");
+
+        CollectionDataset dataset = new CollectionDataset();
+        dataset.setUri("http://localhost:1234/datasets/123");
+        dataset.setTitle("dataset wut");
+        collection.getDescription().addDataset(dataset);
+
+        // When getDatasetDetails() is called
+        List<ContentDetail> datasetContent = collection.getDatasetDetails();
+
+        // Then the expected values have been set
+        ContentDetail datasetDetail = datasetContent.get(0);
+
+        assertEquals("/datasets/123", datasetDetail.uri);
+        assertEquals(PageType.api_dataset_landing_page.toString(), datasetDetail.type);
+        assertEquals(dataset.getTitle(), datasetDetail.description.title);
+    }
+
+    @Test
+    public void getDatasetVersionDetails() throws IOException, ZebedeeException {
+
+        // Given a collection with a dataset version.
+        Path collectionPath = Files.createTempDirectory(Random.id()); // create a temp directory to generate content into
+        Collection collection = CollectionTest.CreateCollection(collectionPath,"isAllContentReviewed");
+
+        CollectionDatasetVersion datasetVersion = new CollectionDatasetVersion();
+        datasetVersion.setId("123");
+        datasetVersion.setEdition("2015");
+        datasetVersion.setVersion("1");
+        datasetVersion.setTitle("dataset version wut");
+        collection.getDescription().addDatasetVersion(datasetVersion);
+
+        // When getDatasetDetails() is called
+        List<ContentDetail> datasetContent = collection.getDatasetVersionDetails();
+
+        // Then the expected values have been set
+        ContentDetail versionDetail = datasetContent.get(0);
+        assertEquals( "/datasets/123/editions/2015/versions/1", versionDetail.uri);
+        assertEquals(PageType.api_dataset.toString(), versionDetail.type);
+        assertEquals(datasetVersion.getTitle(), versionDetail.description.title);
+
+        // Then an entry for the parent dataset is also added
+        ContentDetail datasetDetail = datasetContent.get(1);
+        assertEquals("/datasets/123", datasetDetail.uri);
+        assertEquals(PageType.api_dataset_landing_page.toString(), datasetDetail.type);
+        assertEquals(datasetVersion.getTitle(), datasetDetail.description.title);
+    }
+
     public static Collection CreateCollection(Path destination, String collectionName) throws CollectionNotFoundException, IOException {
 
         CollectionDescription collection = new CollectionDescription(collectionName);
@@ -1360,8 +1569,6 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         String filename = PathUtils.toFilename(collectionName);
         collection.setId(filename + "-" + Random.id());
         Collection.CreateCollectionFolders(filename, destination);
-
-        //collection.AddEvent(new Event(new Date(), EventType.CREATED, "admin"));
 
         // Create the description:
         Path collectionDescriptionPath = destination.resolve(filename + ".json");

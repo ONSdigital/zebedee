@@ -6,6 +6,10 @@ public enum ApprovalEventType {
 
     RESOLVED_DETAILS("resolvedDetails"),
 
+    ADD_DATASET_DETAILS("addDatasetDetails"),
+
+    ADD_DATASET_VERSION_DETAILS("addDatasetDetails"),
+
     POPULATED_RELEASE_PAGE("populatedReleasePage"),
 
     GENERATED_TIME_SERIES("generatedTimeSeries"),

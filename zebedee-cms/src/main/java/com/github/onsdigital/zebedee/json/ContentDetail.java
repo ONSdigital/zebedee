@@ -167,7 +167,7 @@ public class ContentDetail {
      * @param toOverlay
      * @return
      */
-    public ContentDetail overlayDetails(List<ContentDetail> toOverlay) {
+    public ContentDetail overlayDetails(Iterable<ContentDetail> toOverlay) {
 
         for (ContentDetail contentDetail : toOverlay) {
             if (!this.containsDescendant(contentDetail)) {

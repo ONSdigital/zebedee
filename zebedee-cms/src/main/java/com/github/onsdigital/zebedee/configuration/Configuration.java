@@ -2,20 +2,26 @@ package com.github.onsdigital.zebedee.configuration;
 
 import com.github.davidcarboni.httpino.Host;
 import com.github.onsdigital.zebedee.session.model.Session;
+import dp.api.dataset.DatasetAPIClient;
+import dp.api.dataset.DatasetClient;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
 import static org.apache.commons.lang.StringUtils.defaultIfBlank;
 
 
 public class Configuration {
 
     private static final String DEFAULT_WEBSITE_URL = "http://localhost:8080";
+    private static final String DEFAULT_PUBLIC_WEBSITE_URL = "http://localhost:8080";
     private static final String DEFAULT_FLORENCE_URL = "http://localhost:8081";
     private static final String DEFAULT_BRIAN_URL = "http://localhost:8083";
     private static final String DEFAULT_TRAIN_URL = "http://localhost:8084";
@@ -24,6 +30,9 @@ public class Configuration {
     private static final String INFLUXDB_URL = "http://influxdb:8086";
     private static final String AUDIT_DB_ENABLED_ENV_VAR = "audit_db_enabled";
     private static final String MATHJAX_SERVICE_URL = "http://localhost:8888";
+    private static final String DATASET_API_URL = "http://localhost:22000";
+    private static final String DATASET_API_AUTH_TOKEN = "FD0108EA-825D-411C-9B1D-41EF7727F465";
+    private static final String SERVICE_AUTH_TOKEN = "15C0E4EE-777F-4C61-8CDB-2898CEB34657";
     private static final String DEFAULT_SLACK_USERNAME = "Zebedee";
 
     private static final int VERIFY_RETRTY_DELAY = 5000; //milliseconds
@@ -73,6 +82,10 @@ public class Configuration {
         }
     }
 
+    public static String getPublicWebsiteUrl() {
+        return StringUtils.defaultIfBlank(getValue("PUBLIC_WEBSITE_URL"), DEFAULT_PUBLIC_WEBSITE_URL);
+    }
+
     public static String getBabbageUrl() {
         return StringUtils.defaultIfBlank(getValue("BABBAGE_URL"), DEFAULT_WEBSITE_URL);
     }
@@ -87,6 +100,23 @@ public class Configuration {
 
     public static String getMathjaxServiceUrl() {
         return StringUtils.defaultIfBlank(getValue("MATHJAX_SERVICE_URL"), MATHJAX_SERVICE_URL);
+    }
+
+    public static String getDatasetAPIURL() {
+        return StringUtils.defaultIfBlank(getValue("DATASET_API_URL"), DATASET_API_URL);
+    }
+
+    public static String getDatasetAPIAuthToken() {
+        return StringUtils.defaultIfBlank(getValue("DATASET_API_AUTH_TOKEN"), DATASET_API_AUTH_TOKEN);
+    }
+
+    public static String getServiceAuthToken() {
+        String serviceAuthToken = StringUtils.defaultIfBlank(getValue("SERVICE_AUTH_TOKEN"), SERVICE_AUTH_TOKEN);
+        return "Bearer " + serviceAuthToken;
+    }
+
+    public static String[] getTheTrainUrls() {
+        return StringUtils.split(StringUtils.defaultIfBlank(getValue("publish_url"), DEFAULT_TRAIN_URL), ",");
     }
 
     public static List<Host> getTheTrainHosts() {

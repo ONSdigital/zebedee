@@ -1,5 +1,10 @@
 package com.github.onsdigital.zebedee.api;
 
+import com.github.onsdigital.logging.v2.DPLogger;
+import com.github.onsdigital.logging.v2.config.LoggerConfig;
+import com.github.onsdigital.logging.v2.serializer.EventSerialiser;
+import com.github.onsdigital.logging.v2.serializer.JacksonEventSerialiser;
+import com.github.onsdigital.zebedee.LoggingTestHelper;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.CollectionDataset;
 import com.github.onsdigital.zebedee.json.CollectionDatasetVersion;
@@ -9,8 +14,11 @@ import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.util.ZebedeeCmsService;
 import org.apache.http.HttpStatus;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Matchers;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
@@ -44,6 +52,11 @@ public class CollectionsTest {
     private String edition = "2014";
     private String version = "1";
     private String user = "test@email.com";
+
+    @BeforeClass
+    public static void setUpLogger() {
+        LoggingTestHelper.initDPLogger(CollectionsTest.class);
+    }
 
     @Before
     public void setUp() throws Exception {

@@ -1,6 +1,5 @@
 package com.github.onsdigital.zebedee.util.mertics.events;
 
-import com.github.davidcarboni.restolino.framework.HttpMethod;
 import com.google.common.collect.ImmutableMap;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
@@ -34,7 +33,7 @@ public class SplunkEventTest {
     private static final String API = "/U";
     private static final String URI_PARAM = "uri";
     private static final String BABBAGE_URI = "/businessindustryandtrade/itandinternetindustry/bulletins";
-    private static final String METHOD = HttpMethod.GET.toString();
+    private static final String METHOD = "GET";
 
     @Mock
     private HttpServletRequest requestMock;

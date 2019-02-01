@@ -1,4 +1,4 @@
-package com.github.onsdigital.zebedee.filters;
+package com.github.onsdigital.zebedee.filters.pre;
 
 import com.github.onsdigital.zebedee.reader.util.RequestUtils;
 

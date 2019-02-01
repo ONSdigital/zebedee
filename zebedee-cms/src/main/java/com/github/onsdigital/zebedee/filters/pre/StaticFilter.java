@@ -1,6 +1,6 @@
-package com.github.onsdigital.zebedee.filters;
+package com.github.onsdigital.zebedee.filters.pre;
 
-import com.github.davidcarboni.restolino.framework.Filter;
+import com.github.davidcarboni.restolino.framework.PreFilter;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -10,8 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * Captures requests with a file extension as they do not get routed to the API.
  */
-public class StaticFilter implements Filter
-{
+public class StaticFilter implements PreFilter {
 
     @Override
     public boolean filter(HttpServletRequest req, HttpServletResponse res) {
@@ -32,10 +31,9 @@ public class StaticFilter implements Filter
      * A request is considered to be a static content request if there is a file
      * extension present.
      *
-     * @param req
-     *            The request.
+     * @param req The request.
      * @return If the result of {@link org.apache.commons.io.FilenameUtils#getExtension(String)} is
-     *         not blank, true.
+     * not blank, true.
      */
     private boolean isStaticContentRequest(HttpServletRequest req) {
         String requestURI = req.getRequestURI();

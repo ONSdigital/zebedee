@@ -1,6 +1,5 @@
 package com.github.onsdigital.zebedee.util.mertics.service;
 
-import com.github.davidcarboni.restolino.framework.HttpMethod;
 import com.github.onsdigital.zebedee.util.mertics.AbstractMetricsTest;
 import com.github.onsdigital.zebedee.util.mertics.client.SplunkClient;
 import com.github.onsdigital.zebedee.util.mertics.client.SplunkRequest;
@@ -61,7 +60,7 @@ public class SplunkMetricsServiceImplTest extends AbstractMetricsTest {
 
     @Test
     public void shouldRecordRequestTime() throws Exception {
-        when(requestMock.getMethod()).thenReturn(HttpMethod.POST.toString());
+        when(requestMock.getMethod()).thenReturn("POST");
         when(requestMock.getRequestURI()).thenReturn("/data");
         when(requestMock.getParameter("uri")).thenReturn("/");
 
@@ -92,7 +91,7 @@ public class SplunkMetricsServiceImplTest extends AbstractMetricsTest {
 
     @Test
     public void shouldRecordError() {
-        when(requestMock.getMethod()).thenReturn(HttpMethod.POST.toString());
+        when(requestMock.getMethod()).thenReturn("POST");
         when(requestMock.getRequestURI()).thenReturn("/data");
         when(requestMock.getParameter("uri")).thenReturn("/");
 

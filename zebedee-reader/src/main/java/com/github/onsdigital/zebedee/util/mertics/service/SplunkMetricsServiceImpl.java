@@ -1,6 +1,5 @@
 package com.github.onsdigital.zebedee.util.mertics.service;
 
-import com.github.davidcarboni.restolino.framework.HttpMethod;
 import com.github.onsdigital.zebedee.util.mertics.client.SplunkClient;
 import com.github.onsdigital.zebedee.util.mertics.client.SplunkRequest;
 import com.github.onsdigital.zebedee.util.mertics.events.MetricsType;
@@ -85,7 +84,7 @@ public class SplunkMetricsServiceImpl extends MetricsService {
 
     public void sendRequest(SplunkEvent splunkEvent) {
         try {
-            splunkClient.send(httpEventCollectorURI, new SplunkRequest(HttpMethod.POST.name(), splunkEvent.toJson()));
+            splunkClient.send(httpEventCollectorURI, new SplunkRequest("POST", splunkEvent.toJson()));
         } catch (IOException ex) {
             logError(ex).log();
         }

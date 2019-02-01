@@ -37,7 +37,7 @@
 
         <!--Restolino-->
         <dependency>
-            <groupId>com.github.davidcarboni</groupId>
+            <groupId>com.github.ONSdigital</groupId>
             <artifactId>restolino</artifactId>
         </dependency>
         <dependency>

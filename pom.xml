@@ -32,6 +32,21 @@
     </properties>
 
     <repositories>
+        <!-- Adding maven central repo explicitly to perent jitpack.io resolve artifacts that are already on Github. Otherwise handlebars-java fails -->
+        <repository>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <id>central</id>
+            <name>Central Repository</name>
+            <url>http://repo.maven.apache.org/maven2</url>
+        </repository>
+        <!--Jitpack io allows us include projects and libraries available on github but not built and published to maven central-->
+        <!-- It is used for including internal project modules. See more on https://jitpack.io/-->
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
         <repository>
             <id>splunk-artifactory</id>
             <name>Splunk Releases</name>
@@ -103,11 +118,10 @@
     <dependencyManagement>
         <dependencies>
 
-            <!-- Main -->
             <dependency>
-                <groupId>com.github.davidcarboni</groupId>
+                <groupId>com.github.ONSdigital</groupId>
                 <artifactId>restolino</artifactId>
-                <version>0.1.14</version>
+                <version>master-SNAPSHOT</version>
             </dependency>
 
             <!-- Cryptography -->

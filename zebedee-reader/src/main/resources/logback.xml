@@ -17,7 +17,7 @@
         </encoder>
     </appender>
 
-    <logger name="com.github.onsdigital.zebedee.cms" level="debug" additivity="false">
+    <logger name="com.github.onsdigital.zebedee.cms" level="info" additivity="false">
         <appender-ref ref="JSON_STDOUT"/>
     </logger>
 

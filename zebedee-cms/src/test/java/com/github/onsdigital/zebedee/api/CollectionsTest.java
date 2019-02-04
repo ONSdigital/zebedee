@@ -1,9 +1,5 @@
 package com.github.onsdigital.zebedee.api;
 
-import com.github.onsdigital.logging.v2.DPLogger;
-import com.github.onsdigital.logging.v2.config.LoggerConfig;
-import com.github.onsdigital.logging.v2.serializer.EventSerialiser;
-import com.github.onsdigital.logging.v2.serializer.JacksonEventSerialiser;
 import com.github.onsdigital.zebedee.LoggingTestHelper;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.CollectionDataset;
@@ -17,8 +13,6 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Matchers;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;

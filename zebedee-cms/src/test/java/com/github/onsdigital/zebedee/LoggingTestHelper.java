@@ -1,12 +1,12 @@
 package com.github.onsdigital.zebedee;
 
 import com.github.onsdigital.logging.v2.DPLogger;
-import com.github.onsdigital.logging.v2.config.LoggerConfig;
-import com.github.onsdigital.logging.v2.serializer.EventSerialiser;
-import org.slf4j.Logger;
+import com.github.onsdigital.logging.v2.config.Config;
+import com.github.onsdigital.logging.v2.config.Builder;
+import com.github.onsdigital.logging.v2.serializer.JacksonLogSerialiser;
+import org.slf4j.LoggerFactory;
 
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 public class LoggingTestHelper {
 
@@ -14,12 +14,14 @@ public class LoggingTestHelper {
     }
 
     public static void initDPLogger(Class c) {
-        Logger loggerMock = mock(Logger.class);
-        when(loggerMock.getName()).thenReturn(c.getName());
+        DPLogger loggerMock = mock(DPLogger.class);
 
-        EventSerialiser eventSerialiserMock = mock(EventSerialiser.class);
+        Config config = new Builder()
+                .logger(LoggerFactory.getLogger("com.zebedee.app"))
+                .serialiser(new JacksonLogSerialiser())
+                .dataNamespace("zebedee.data")
+                .create();
 
-        LoggerConfig loggerConfigMock = new LoggerConfig(loggerMock, eventSerialiserMock, c.getName());
-        DPLogger.init(loggerConfigMock);
+        DPLogger.init(config);
     }
 }

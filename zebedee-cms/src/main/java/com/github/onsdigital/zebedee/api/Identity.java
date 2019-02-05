@@ -92,7 +92,7 @@ public class Identity {
                     .log("authenticated user identity confirmed");
             writeResponse(response, identity, SC_OK);
         } catch (UserIdentityException e) {
-            error().logException(e, "identify endpoint: identify user failure, returning error response");
+            error().logException(e, "identity endpoint: identify user failure, returning error response");
             writeResponse(response, new Error(e.getMessage()), e.getResponseCode());
         }
     }

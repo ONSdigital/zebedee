@@ -110,8 +110,7 @@ public class Collections {
 
             return result;
         } catch (IOException e) {
-            error().data("user", session)
-                    .logAndThrow(e, "get collections endpoint: unexpected error while attempting to get collections");
+            error().data("user", session.getEmail()).logException(e,"get collections endpoint: unexpected error while attempting to get collections");
         }
         return null;
     }

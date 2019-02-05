@@ -28,6 +28,7 @@ public class CollectionHistory {
 
     private static CollectionHistoryDao collectionHistoryDao = getCollectionHistoryDao();
     private static ZebedeeCmsService zebedeeCmsService = ZebedeeCmsService.getInstance();
+    private static final String CHECK_PERMISSIONS_ERROR = "collection history endpoint: Unexpected error while trying to access permissions";
 
     /**
      * Get the collection event history for the specified collection.
@@ -60,7 +61,8 @@ public class CollectionHistory {
                 throw new UnauthorizedException("You are not authorised to create collections.");
             }
         } catch (IOException io) {
-            error().data("user", session).logAndThrow (io, "Unexpected error while trying to access permissions");
+            error().data("user", session).logException(io, CHECK_PERMISSIONS_ERROR);
+            throw new UnexpectedErrorException(CHECK_PERMISSIONS_ERROR, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
     }
 }

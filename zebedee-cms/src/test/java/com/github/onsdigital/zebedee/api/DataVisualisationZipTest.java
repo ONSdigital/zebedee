@@ -100,7 +100,7 @@ public class DataVisualisationZipTest {
 
     @BeforeClass
     public static void setUpLogger() {
-        LoggingTestHelper.initDPLogger(CollectionsTest.class);
+        LoggingTestHelper.initDPLogger(DataVisualisationZipTest.class);
     }
 
     @Before

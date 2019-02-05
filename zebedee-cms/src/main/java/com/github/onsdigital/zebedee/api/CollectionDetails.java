@@ -115,7 +115,7 @@ public class CollectionDetails {
         String collectionId = Collections.getCollectionId(request);
 
         if (datasetImportEnabled) {
-            info().data("collectionId", collectionId).data("user", session)
+            info().data("collectionId", collectionId).data("user", session.getEmail())
                 .log("CollectionDetails GET endpoint: datasetImportEnabled including dataset and dataset version " +
                         "details to response");
 

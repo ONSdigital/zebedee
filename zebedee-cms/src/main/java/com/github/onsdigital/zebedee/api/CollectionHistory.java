@@ -61,7 +61,7 @@ public class CollectionHistory {
                 throw new UnauthorizedException("You are not authorised to create collections.");
             }
         } catch (IOException io) {
-            error().data("user", session).logException(io, CHECK_PERMISSIONS_ERROR);
+            error().data("user", session.getEmail()).logException(io, CHECK_PERMISSIONS_ERROR);
             throw new UnexpectedErrorException(CHECK_PERMISSIONS_ERROR, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
     }

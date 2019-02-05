@@ -21,7 +21,7 @@ import javax.ws.rs.GET;
 import java.io.IOException;
 import java.util.Set;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 
 @Api
 public class CollectionDetails {
@@ -112,9 +112,13 @@ public class CollectionDetails {
         result.teamsDetails = zebedeeCmsService.getZebedee().getTeamsService().resolveTeamDetails(teamIds);
         result.teamsDetails.forEach(team -> collection.getDescription().getTeams().add(team.getName()));
 
+        String collectionId = Collections.getCollectionId(request);
+
         if (datasetImportEnabled) {
-            logInfo("CollectionDetails GET endpoint: datasetImportEnabled including dataset and dataset version " +
-                    "details to response").collectionId(collection).user(session).log();
+            info().data("collectionId", collectionId).data("user", session.getEmail())
+                .log("CollectionDetails GET endpoint: datasetImportEnabled including dataset and dataset version " +
+                        "details to response");
+
             result.datasets = collection.getDescription().getDatasets();
             result.datasetVersions = collection.getDescription().getDatasetVersions();
         }

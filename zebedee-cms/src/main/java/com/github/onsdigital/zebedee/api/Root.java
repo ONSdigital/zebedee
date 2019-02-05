@@ -35,9 +35,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logDebug;
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 
 public class Root {
 
@@ -74,7 +73,7 @@ public class Root {
 
     public static void init() {
 
-        logDebug("zebedee init").log();
+        info().log("zebedee root: zebedee init");
 
         // Set ISO date formatting in Gson to match Javascript Date.toISODate()
         Serialiser.getBuilder().registerTypeAdapter(Date.class, new IsoDateSerializer());
@@ -100,7 +99,7 @@ public class Root {
                 // Create a Zebedee folder:
                 root = Files.createTempDirectory("generated");
                 zebedee = initialiseZebedee(root);
-                logDebug("zebedee root created").addParameter("uri", root.toString()).log();
+                info().data("url", root.toString()).log("zebedee root: zebedee root created");
                 ReaderConfiguration.init(root.toString());
 
                 // Initialise content folders from bundle
@@ -108,7 +107,7 @@ public class Root {
                 List<Path> content = listContent(taxonomy);
                 copyContent(content, taxonomy);
             } catch (IOException | UnauthorizedException | BadRequestException | NotFoundException e) {
-                throw new RuntimeException("Error initialising Zebedee ", e);
+                throw new RuntimeException("zebedee root: Error initialising Zebedee ", e);
             }
         }
 
@@ -130,14 +129,14 @@ public class Root {
         // if there is no key previously stored for CSDB import, generate a new one.
         if (!zebedee.getApplicationKeys().containsKey(CsdbImporter.APPLICATION_KEY_ID)) {
             // create new key pair
-            logDebug("No key pair found for CSDB import. Generating and saving a new key.").log();
+            info().log("zebedee root: No key pair found for CSDB import. Generating and saving a new key.");
             try {
                 SecretKey secretKey = zebedee.getApplicationKeys().generateNewKey(CsdbImporter.APPLICATION_KEY_ID);
 
                 // distribute private key to all users.
                 KeyManager.distributeApplicationKey(zebedee, CsdbImporter.APPLICATION_KEY_ID, secretKey);
             } catch (IOException e) {
-                logError(e, "Failed to generate and save new application key for CSDB import.").log();
+                error().logException(e, "zebedee root: failed to generate and save new application key for CSDB import.");
             }
         }
     }
@@ -148,7 +147,7 @@ public class Root {
                 zebedee.getUsersService().removeStaleCollectionKeys(user.getEmail());
             }
         } catch (IOException | NotFoundException | BadRequestException e) {
-            logError(e).log();
+            error().logException(e, "zebedee root: failed on cleanupStaleCollectionKeys");
         }
     }
 
@@ -163,13 +162,13 @@ public class Root {
     private static void loadExistingCollectionsIntoScheduler() {
         if (Configuration.isSchedulingEnabled()) {
 
-            logInfo("Adding existing collections to the scheduler.").log();
+            info().log("zebedee root: adding existing collections to the scheduler.");
 
             Collections.CollectionList collections;
             try {
                 collections = zebedee.getCollections().list();
             } catch (IOException e) {
-                logError(e, "Failed to load collections list to schedule publishes").log();
+                error().logException(e, "zebedee root: failed to load collections list to schedule publishes");
                 return;
             }
 
@@ -177,22 +176,18 @@ public class Root {
                 schedulePublish(collection);
             }
         } else {
-            logInfo("Scheduled publishing is disabled - not reading collections").log();
+            info().log("zebedee root: scheduled publishing is disabled - not reading collections");
         }
     }
 
 
     public static void cancelPublish(Collection collection) {
         try {
-            logInfo("cancelling scheduled collection publish")
-                    .collectionId(collection)
-                    .addParameter("type", collection.getDescription().getType())
-                    .log();
+            info().data("collectionId", collection).data("type", collection.getDescription().getType())
+                    .log("zebedee root: cancelling scheduled collection publish");
             scheduler.cancel(collection);
         } catch (Exception e) {
-            logError(e, "error cancelling scheduled publish of collection")
-                    .collectionId(collection)
-                    .log();
+            error().data("collectionId", collection).logException(e, "zebedee root: error cancelling scheduled publish of collection");
         }
     }
 
@@ -219,7 +214,7 @@ public class Root {
                 IOUtils.copy(input, output);
             }
         }
-        logDebug("Zebedee root").addParameter("uri", root.toAbsolutePath()).log();
+        info().data("uri", root.toAbsolutePath()).log("Zebedee root: absolute path");
     }
 
     public static void schedulePublish(Collection collection) {

@@ -1,6 +1,8 @@
 package com.github.onsdigital.zebedee.api;
 
+import com.github.onsdigital.zebedee.LoggingTestHelper;
 import com.github.onsdigital.zebedee.session.model.Session;
+import org.junit.BeforeClass;
 import org.junit.Before;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -27,6 +29,11 @@ public abstract class ZebedeeAPIBaseTestCase {
     protected HttpServletResponse mockResponse;
 
     protected Session session;
+
+    @BeforeClass
+    public static void setUpLogger() {
+        LoggingTestHelper.initDPLogger(DataVisualisationZipTest.class);
+    }
 
     @Before
     public void setUp() throws Exception {

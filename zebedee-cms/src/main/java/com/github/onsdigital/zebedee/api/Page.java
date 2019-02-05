@@ -134,7 +134,7 @@ public class Page {
 
         String uri = request.getParameter("uri");
         if (StringUtils.isEmpty(uri)) {
-            error().logException(new BadRequestException("uri is empty");
+            error().logException(new BadRequestException("uri is empty"), "page get endpoint: uri is empty");
             response.setStatus(HttpStatus.SC_BAD_REQUEST);
             return null;
         }
@@ -144,7 +144,7 @@ public class Page {
         try {
             session = zebedeeCmsService.getSession(request);
         } catch (ZebedeeException e) {
-            error().data("path", uri).logException(e, "failed to get session");
+            error().data("path", uri).logException(e, "page get endpoint: failed to get session");
             response.setStatus(e.statusCode);
             return null;
         }
@@ -154,7 +154,7 @@ public class Page {
             collection = zebedeeCmsService.getCollection(request);
         } catch (ZebedeeException e) {
             error().data("user", session.getEmail()).data("uri", uri)
-                    .logException(e, "failed to get collection");
+                    .logException(e, "page get endpoint: failed to get collection");
             response.setStatus(e.statusCode);
             return null;
         }
@@ -166,7 +166,7 @@ public class Page {
             requestBodyBytes = IOUtils.toByteArray(requestBody);
         } catch (Exception e) {
             response.setStatus(HttpStatus.SC_BAD_REQUEST);
-            error().logException(e, "failed to deserialise page from the request body");
+            error().logException(e, "page get endpoint: failed to deserialise page from the request body");
             return null;
         }
 
@@ -174,7 +174,7 @@ public class Page {
             page = ContentUtil.deserialiseContent(pageInputStream);
         } catch (Exception e) {
             response.setStatus(HttpStatus.SC_BAD_REQUEST);
-            error().logException(e, "failed to deserialise page from the request body");
+            error().logException(e, "page get endpoint: failed to deserialise page from the request body");
             return null;
         }
 
@@ -197,12 +197,12 @@ public class Page {
                     false);
 
         } catch (ZebedeeException e) {
-            handleZebdeeException("failed to create content", e, response, uri, session, collection);
+            handleZebdeeException("page get endpoint: failed to create content", e, response, uri, session, collection);
         } catch (IOException | FileUploadException e) {
             error().data("collectionId", collection.getDescription().getId())
                     .data("user", session.getEmail())
                     .data("path", uri)
-                    .logException(e, "exception when calling collections.createContent");
+                    .logException(e, "page get endpoint: exception when calling collections.createContent");
             response.setStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR);
         }
 

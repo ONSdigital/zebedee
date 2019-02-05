@@ -153,7 +153,7 @@ public class Page {
         try {
             collection = zebedeeCmsService.getCollection(request);
         } catch (ZebedeeException e) {
-            error().data("user", session.getEmail()).data("uri", uri)
+            error().data("user", session.getEmail()).data("path", uri)
                     .logException(e, "page get endpoint: failed to get collection");
             response.setStatus(e.statusCode);
             return null;

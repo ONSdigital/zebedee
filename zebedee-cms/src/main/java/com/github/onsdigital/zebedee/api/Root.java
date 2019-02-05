@@ -107,7 +107,7 @@ public class Root {
                 List<Path> content = listContent(taxonomy);
                 copyContent(content, taxonomy);
             } catch (IOException | UnauthorizedException | BadRequestException | NotFoundException e) {
-                throw new RuntimeException("zebedee root: Error initialising Zebedee ", e);
+                throw new RuntimeException("Error initialising Zebedee ", e);
             }
         }
 

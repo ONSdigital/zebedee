@@ -46,6 +46,7 @@ public class Collections {
     private ZebedeeCmsService zebedeeCmsService;
     private DatasetService datasetService;
     private final boolean datasetImportEnabled;
+    private static final String GET_COLLECTIONS_ERROR = "get collections endpoint: unexpected error while attempting to get collections";
 
     /**
      * Default constructor used instantiates dependencies itself.
@@ -110,9 +111,9 @@ public class Collections {
 
             return result;
         } catch (IOException e) {
-            error().data("user", session.getEmail()).logException(e,"get collections endpoint: unexpected error while attempting to get collections");
+            error().data("user", session.getEmail()).logException(e,GET_COLLECTIONS_ERROR);
+            throw new UnexpectedErrorException(GET_COLLECTIONS_ERROR, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
-        return null;
     }
 
     /**

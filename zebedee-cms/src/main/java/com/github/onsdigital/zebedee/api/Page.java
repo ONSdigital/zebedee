@@ -66,7 +66,7 @@ public class Page {
 
         if (datasetImportEnabled) {
             info().data("hooks", "pageDeletionHook, pageCreationHook")
-                    .log("feature EnableDatasetImport enabled, creating Page hooks");
+                    .log("page endpoint: feature EnableDatasetImport enabled, creating Page hooks");
 
             DatasetClient datasetAPIClient = zebedeeCmsService.getDatasetClient();
 
@@ -76,7 +76,7 @@ public class Page {
             this.pageDeletionHook = Optional.of(new PageTypeUpdateHook(deletionHooks));
             this.pageCreationHook = Optional.of(new PageTypeUpdateHook(creationHooks));
         } else {
-            info().log("feature EnableDatasetImport disabled, Page hooks will not be created");
+            info().log("page endpoint: feature EnableDatasetImport disabled, Page hooks will not be created");
             this.pageCreationHook = Optional.empty();
             this.pageDeletionHook = Optional.empty();
         }

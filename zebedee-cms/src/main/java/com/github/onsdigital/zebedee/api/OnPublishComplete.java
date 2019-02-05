@@ -28,14 +28,14 @@ public class OnPublishComplete {
      */
     public static void main(String[] args) {
         String key = Random.password(64);
-        info().data("key", key).log("Key added to environment");
+        info().data("key", key).log("onPublishComplete endpoint: Key added to environment");
         info().data("keyhash", Password.hash(key)).log("Key hash (for REINDEX_KEY_HASH)");
     }
 
     @POST
     public Object onPublishComplete(@Context HttpServletRequest request, @Context HttpServletResponse response) throws IOException {
 
-        info().log("Clearing browser tree cache");
+        info().log("onPublishComplete post endpoint: clearing browser tree cache");
         ContentTree.dropCache();
         response.setStatus(HttpStatus.OK_200);
         return "OnPublishComplete handler finished";

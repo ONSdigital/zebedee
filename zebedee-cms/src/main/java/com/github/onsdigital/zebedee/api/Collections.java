@@ -147,7 +147,7 @@ public class Collections {
 
         Collection collection = zebedeeCmsService.getCollection(collectionID);
         if (collection == null) {
-            info().log("Collection not found");
+            info().data("collectionId", collectionID).log("Collection not found");
             response.setStatus(HttpStatus.SC_NOT_FOUND);
             return;
         }
@@ -232,8 +232,8 @@ public class Collections {
 
     private void updateDatasetVersionInCollection(Collection collection, String datasetID, String edition, String version, HttpServletRequest request, String user) throws ZebedeeException, IOException, DatasetAPIException {
 
-        info().data("collectionID", collection.getId())
-                .data("datasetID", datasetID)
+        info().data("collectionId", collection.getId())
+                .data("datasetId", datasetID)
                 .data("edition", edition)
                 .data("version", version)
                 .data("user", user)
@@ -251,8 +251,8 @@ public class Collections {
 
     private void updateDatasetInCollection(Collection collection, String datasetID, HttpServletRequest request, String user) throws ZebedeeException, IOException, DatasetAPIException {
 
-        info().data("collectionID", collection.getId())
-                .data("datasetID", datasetID)
+        info().data("collectionId", collection.getId())
+                .data("datasetId", datasetID)
                 .data("user", user)
                 .log("PUT called on /collections/{}/datasets/{} endpoint");
 
@@ -267,8 +267,8 @@ public class Collections {
     }
 
     private void removeDatasetVersionFromCollection(Collection collection, String datasetID, String edition, String version) throws ZebedeeException, IOException, DatasetAPIException {
-        info().data("collectionID", collection.getId())
-                .data("datasetID", datasetID)
+        info().data("collectionId", collection.getId())
+                .data("datasetId", datasetID)
                 .data("edition", edition)
                 .data("version", version)
                 .log("DELETE called on /collections/{collection_id}/datasets/{}/editions/{}/versions/{} endpoint");
@@ -278,8 +278,8 @@ public class Collections {
 
     private void removeDatasetFromCollection(Collection collection, String datasetID) throws ZebedeeException, IOException, DatasetAPIException {
 
-        info().data("collectionID", collection.getId())
-                .data("datasetID", datasetID)
+        info().data("collectionId", collection.getId())
+                .data("datasetId", datasetID)
                 .log("DELETE called on /collections/{collection_id}/datasets/{} endpoint");
 
         datasetService.removeDatasetFromCollection(collection, datasetID);

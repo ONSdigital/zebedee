@@ -75,8 +75,6 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
 
 import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logDebug;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_CONTENT_REVIEWED;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_CREATED;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_NAME_CHANGED;
@@ -89,6 +87,8 @@ import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMet
 import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData.renamed;
 import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData.reschedule;
 import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData.typeChanged;
+
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 
 public class Collection {
 
@@ -957,11 +957,9 @@ public class Collection {
 
         for (Content collectionDir : new Content[]{inProgress, complete, reviewed}) {
             if (collectionDir.exists(visualisationZipUri)) {
-                logDebug("removing data viz zip from collection directory")
-                        .addParameter("zip", visualisationZipUri)
-                        .user(session.getEmail())
-                        .collectionId(this.description.getId())
-                        .log();
+                info().data("zip", visualisationZipUri).data("user", session.getEmail()).data("collectionId", this.description.getId())
+                        .log("removing data viz zip from collection directory");
+
                 FileUtils.deleteDirectory(Paths.get(collectionDir.getPath().toString() + visualisationZipUri).toFile());
                 hasDeleted = true;
             }

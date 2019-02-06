@@ -9,6 +9,14 @@
         </encoder>
     </appender>
 
+    <appender name="JSONIFIED" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+            <layout class="com.github.onsdigital.logging.v2.layout.ThirdPartyEventLayout">
+                <Pattern>%msg</Pattern>
+            </layout>
+        </encoder>
+    </appender>
+
     <appender name="JSON_STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
             <pattern>
@@ -44,7 +52,7 @@
     </logger>
 
     <root level="info">
-        <appender-ref ref="DP_LOGGER"/>
+        <appender-ref ref="JSONIFIED"/>
     </root>
 
 </configuration>

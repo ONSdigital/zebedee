@@ -19,8 +19,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
 import static com.github.onsdigital.zebedee.model.PathUtils.findByCriteria;
 
 public class Content {
@@ -274,7 +274,7 @@ public class Content {
                 });
             }
         } catch (IllegalArgumentException e) {
-            logError(e, "Failed to sort content detail items").addParameter("path", contentPath.toString()).log();
+            error().data("path", contentPath.toString()).logException(e, "Failed to sort content detail items");
         }
 
         return detail;
@@ -295,14 +295,12 @@ public class Content {
                 if (result != null) {
                     result.uri = PathUtils.toUri(this.path.relativize(path.getParent()));
                 } else {
-                    logInfo("Failed to deserialise content details")
-                            .addParameter("path", PathUtils.toUri(this.path.relativize(path.getParent())))
-                            .log();
+                    info().data("path", PathUtils.toUri(this.path.relativize(path.getParent())))
+                            .log("Failed to deserialise content details");
                 }
             } catch (JsonSyntaxException exception) {
-                logInfo("Failed to deserialise content details")
-                        .addParameter("path", PathUtils.toUri(this.path.relativize(path.getParent())))
-                        .log();
+                info().data("path", PathUtils.toUri(this.path.relativize(path.getParent())))
+                        .log("Failed to deserialise content details");
             }
         }
         return result;

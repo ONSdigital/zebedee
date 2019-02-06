@@ -41,8 +41,8 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
 
 /**
  * Handles a notification when a new CSDB file is available to zebedee.
@@ -125,8 +125,8 @@ public class CsdbImporter {
                         }
                     }
                 } catch (ZebedeeException e) {
-                    logError(e, "Error while getting CSDB path from collection")
-                            .addParameter("CSDBIdentifier", csdbIdentifier).log();
+                    error().data("CSDBIdentifier", csdbIdentifier)
+                            .logException(e, "Error while getting CSDB path from collection");
                 }
             }
         }
@@ -189,7 +189,7 @@ public class CsdbImporter {
     }
 
     private void processCsdb(PrivateKey privateCsdbImportKey, String csdbIdentifier, DylanClient dylan, Collections collections, Map<String, SecretKey> keyCache) {
-        logInfo("Processing CSDB notification").addParameter("CSDBIdentifier", csdbIdentifier).log();
+        info().data("CSDBIdentifier", csdbIdentifier).log("Processing CSDB notification");
 
         Collection collection;
         try (InputStream csdbData = getDylanData(privateCsdbImportKey, csdbIdentifier, dylan)) {
@@ -197,24 +197,23 @@ public class CsdbImporter {
 
             if (collection != null) {
 
-                logInfo("Found collection found for CSDB identifier")
-                        .addParameter("collectionName", collection.getDescription().getName())
-                        .addParameter("CSDBIdentifier", csdbIdentifier).log();
+                info().data("collectionName", collection.getDescription().getName())
+                        .data("CSDBIdentifier", csdbIdentifier)
+                        .log("Found collection found for CSDB identifier");
 
                 if (collection.description.approvalStatus == ApprovalStatus.COMPLETE) {
                     preProcessCollection(collection);
                 } else {
-                    logInfo("Collection for CSDB identifier is not approved")
-                            .addParameter("collectionName", collection.getDescription().getName())
-                            .addParameter("CSDBIdentifier", csdbIdentifier).log();
+                    info().data("collectionName", collection.getDescription().getName())
+                            .data("CSDBIdentifier", csdbIdentifier)
+                            .log("Collection for CSDB identifier is not approved");
                 }
             } else {
-                logInfo("No collection found for CSDB identifier")
-                        .addParameter("CSDBIdentifier", csdbIdentifier).log();
+                info().data("CSDBIdentifier", csdbIdentifier).log("No collection found for CSDB identifier");
             }
         } catch (ZebedeeException | IOException | URISyntaxException e) {
-            logError(e, "Error while processing CSDB file notification")
-                    .addParameter("CSDBIdentifier", csdbIdentifier).log();
+            error().data("CSDBIdentifier", csdbIdentifier)
+                    .logException(e, "Error while processing CSDB file notification");
         }
     }
 

@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
 
 /**
  * Generates a PDF for each page in a collection that needs one.
@@ -48,7 +48,7 @@ public class CollectionPdfGenerator {
                 try {
                     pdfService.generatePdf(collectionWriter.getReviewed(), contentDetail.uri);
                 } catch (IOException e) {
-                    logError(e, "Error while generating collection PDF").addParameter("uri", pdfUri).log();
+                    error().data("uri", pdfUri).logException(e, "Error while generating collection PDF");
                 }
             }
         }

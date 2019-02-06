@@ -69,7 +69,7 @@ public class Service {
             final ServiceStore serviceStoreImpl = getServiceStore();
             final String token = randomIdGenerator.get();
             ServiceAccount service = serviceStoreImpl.store(token, request.getInputStream());
-            info().data("id", service.getId()).log("new service account created");
+            info().data("id", service.getId()).log("service post endpoint: new service account created");
             writeResponse(response, new ServiceAccountWithToken(service.getId(), token), SC_CREATED);
             return;
         }

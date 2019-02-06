@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.HashMap;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
 
 /**
  * RedirectTable sits at the content level.
@@ -59,7 +59,7 @@ public class RedirectTableChained {
         try {
             load(path);
         } catch (IOException e) {
-            logError(e, "Could not load redirect").addParameter("path", path.toString()).log();
+            error().data("path", path.toString()).logException(e, "Could not load redirect");
         }
     }
 

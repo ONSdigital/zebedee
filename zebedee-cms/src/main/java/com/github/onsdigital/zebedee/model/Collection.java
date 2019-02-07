@@ -1,10 +1,12 @@
 package com.github.onsdigital.zebedee.model;
 
+
 import com.github.davidcarboni.cryptolite.Keys;
 import com.github.davidcarboni.cryptolite.Random;
 import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.KeyManangerUtil;
 import com.github.onsdigital.zebedee.Zebedee;
+import com.github.onsdigital.zebedee.logging.v2LoggingHelpers;
 import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.content.page.base.PageType;
 import com.github.onsdigital.zebedee.content.page.release.Release;
@@ -441,10 +443,8 @@ public class Collection {
                 InputStream dataStream = resource.getData()
         ) {
             Release release = (Release) ContentUtil.deserialiseContent(dataStream);
-            logInfo("Release identified for collection")
-                    .collectionId(this)
-                    .addParameter("title", release.getDescription().getTitle())
-                    .log();
+            info().data("collectionId", this).data("title", release.getDescription().getTitle())
+                    .log("Release identified for collection");
 
             if (release == null) {
                 throw new BadRequestException("This collection is not associated with a release.");
@@ -636,10 +636,8 @@ public class Collection {
         if (blockingCollection.isPresent()) {
             Collection collection = blockingCollection.get();
 
-            logInfo("Content was not saved as it currently in another collection.")
-                    .saveOrEditConflict(this, collection, uri)
-                    .user(email)
-                    .log();
+            info().data("saveOrEditConflict", v2LoggingHelpers.GenerateCollectionSaveConflictMap(this, collection, uri))
+                    .data("user", email).log("Content was not saved as it currently in another collection.");
 
             // return false as the content is blocked by another collection.
             return result;
@@ -649,11 +647,8 @@ public class Collection {
         // Does the user have permission to edit?
         boolean permission = zebedee.getPermissionsService().canEdit(email, description);
         if (!permission) {
-            logInfo("Content was not saved as user does not have EDIT permission")
-                    .path(uri)
-                    .collectionId(this)
-                    .user(email)
-                    .log();
+            info().data("path", uri).data("collectionId", this).data("user", email)
+                    .log("Content was not saved as user does not have EDIT permission");
         }
 
         if (source != null && permission) {

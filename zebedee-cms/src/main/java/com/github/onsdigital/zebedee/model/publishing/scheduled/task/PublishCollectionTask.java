@@ -11,9 +11,9 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 
 import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logWarn;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.warn;
 
 /**
  * A wrapper around the publish process of a single collection, allowing it to be executed on its own thread.
@@ -47,7 +47,7 @@ public class PublishCollectionTask implements Callable<Boolean> {
     @Override
     public Boolean call() throws Exception {
         try {
-            logInfo("PUBLISH: Running collection publish task").collectionId(collection).log();
+            info().data("collectionId", collection).log("PUBLISH: Running collection publish task");
             collection.getDescription().publishStartDate = new Date();
 
             published = Publisher.executePublish(collection, collectionReader, publisherSystemEmail);
@@ -57,40 +57,29 @@ public class PublishCollectionTask implements Callable<Boolean> {
             // If an error was caught, attempt to roll back the transaction:
             if (collection.getDescription().publishTransactionIds != null &&
                     !collection.getDescription().publishTransactionIds.isEmpty()) {
-                logError(e, "PUBLISH: FAILURE: exception while attempting to publish scheduled collection. " +
-                        "Publishing transaction IDS exist for collection, attempting to rollback")
-                        .collectionId(collection)
-                        .hostToTransactionID(collection.getDescription().publishTransactionIds)
-                        .log();
+                error().data("collectionId", collection).data("hostToTransactionId", collection.getDescription().publishTransactionIds)
+                        .logException(e, "PUBLISH: FAILURE: exception while attempting to publish scheduled collection. " +
+                        "Publishing transaction IDS exist for collection, attempting to rollback");
 
                 Publisher.rollbackPublish(collection);
 
             } else {
-                logError(e, "PUBLISH: FAILURE: no publishing transaction IDS found for collection, no rollback " +
-                        "attempt will be made")
-                        .collectionId(collection)
-                        .hostToTransactionID(collection.getDescription().publishTransactionIds)
-                        .log();
+                error().data("collectionId", collection).data("hostToTransactionId", collection.getDescription().publishTransactionIds)
+                        .logException(e, "PUBLISH: FAILURE: no publishing transaction IDS found for collection, no rollback attempt will be made");
             }
         } finally {
             try {
                 // Save any updates to the collection
-                logInfo("PUBLISH: persiting changes to collection to disk")
-                        .collectionId(collection)
-                        .hostToTransactionID(collection.getDescription().publishTransactionIds)
-                        .log();
+                info().data("collectionId", collection).data("hostToTransactionId", collection.getDescription().publishTransactionIds)
+                        .log("PUBLISH: persiting changes to collection to disk");
                 collection.save();
             } catch (Exception e) {
-                logError(e, "PUBLISH: error while attempting to persist collection to disk")
-                        .collectionId(collection)
-                        .hostToTransactionID(collection.getDescription().publishTransactionIds)
-                        .log();
+                error().data("collectionId", collection).data("hostToTransactionId", collection.getDescription().publishTransactionIds)
+                        .logException(e, "PUBLISH: error while attempting to persist collection to disk");
                 throw e;
             }
             if (!published) {
-                logWarn("Exception publishing scheduled collection")
-                        .collectionId(collection)
-                        .log();
+                warn().data("collectionId", collection).log("Exception publishing scheduled collection");
 
                 SlackNotification.scheduledPublishFailure(collection);
             }

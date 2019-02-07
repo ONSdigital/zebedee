@@ -8,8 +8,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
 
 /**
  * A scheduled task to run the publish process for multiple collections scheduled for the same time.
@@ -41,7 +41,7 @@ public class PublishCollectionsTask extends ScheduledTask {
      */
     @Override
     public void run() {
-        logInfo("PUBLISH: Starting publish process.").log();
+        info().log("PUBLISH: Starting publish process.");
         long publishStart = System.currentTimeMillis();
 
         publishCollections();
@@ -50,14 +50,14 @@ public class PublishCollectionsTask extends ScheduledTask {
         // all tasks should be completed now so cleanup the executorService.
         executorService.shutdown();
 
-        logInfo("POST-PUBLISH: Publish complete").timeTaken((System.currentTimeMillis() - publishStart)).log();
+        info().data("timeTaken", (System.currentTimeMillis() - publishStart)).log("POST-PUBLISH: Publish complete");
     }
 
     /**
      * Run the publish task for each collection and wait for them all to complete before doing anything else.
      */
     protected void publishCollections() {
-        logInfo("PUBLISH: publishing collections").addParameter("collectionsSize", publishCollectionTasks.size()).log();
+        info().data("collectionsSize", publishCollectionTasks.size()).log("PUBLISH: publishing collections");
         long start = System.currentTimeMillis();
 
         // run concurrently if there is more than one collection to publish
@@ -67,7 +67,7 @@ public class PublishCollectionsTask extends ScheduledTask {
             try {
                 executorService.invokeAll(publishCollectionTasks, 15, TimeUnit.MINUTES);
             } catch (InterruptedException e) {
-                logError(e, "Error while publishing collections").log();
+                error().logException(e, "Error while publishing collections");
             }
         } else {
             // Just run the publish in this thread if there is only one.
@@ -75,13 +75,14 @@ public class PublishCollectionsTask extends ScheduledTask {
                 try {
                     task.call();
                 } catch (Exception e) {
-                    logError(e, "Error while publishing collections").log();
+                    error().logException(e, "Error while publishing collections");
                 }
             });
         }
 
-        logInfo("PUBLISH: Finished publishing collections").timeTaken((System.currentTimeMillis() - start))
-                .addParameter("collectionsPublished", publishCollectionTasks.size()).log();
+        info().data("timeTaken", (System.currentTimeMillis() - start))
+                .data("collectionsPublished", publishCollectionTasks.size())
+                .log("PUBLISH: Finished publishing collections");
     }
 
 
@@ -89,7 +90,7 @@ public class PublishCollectionsTask extends ScheduledTask {
      * Once the publish has finished for each collection, run the post-publish process for each collection.
      */
     protected void postPublishCollections() {
-        logInfo("POST-PUBLISH: Running post publish process").log();
+        info().log("POST-PUBLISH: Running post publish process");
         // run concurrently if there is more than one task
         if (postPublishCollectionTasks.size() > 1) {
 
@@ -97,7 +98,7 @@ public class PublishCollectionsTask extends ScheduledTask {
             try {
                 executorService.invokeAll(postPublishCollectionTasks, 15, TimeUnit.MINUTES);
             } catch (InterruptedException e) {
-                logError(e, "Error while post publishing collections").log();
+                error().logException(e, "Error while post publishing collections");
             }
         } else {
             // Just run the task in this thread if there is only one.
@@ -105,11 +106,11 @@ public class PublishCollectionsTask extends ScheduledTask {
                 try {
                     task.call();
                 } catch (Exception e) {
-                    logError(e, "Error while post publishing collections").log();
+                    error().logException(e, "Error while post publishing collections");
                 }
             });
         }
-        logInfo("POST-PUBLISH: Finished post publish process").log();
+        info().log("POST-PUBLISH: Finished post publish process");
     }
 
     /**

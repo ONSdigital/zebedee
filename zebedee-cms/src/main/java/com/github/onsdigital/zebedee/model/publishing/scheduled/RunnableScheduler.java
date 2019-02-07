@@ -34,7 +34,6 @@ public class RunnableScheduler {
     public ScheduledFuture<?> schedule(Runnable task, Date scheduledDate) {
         long nowMs = System.currentTimeMillis();
         long ms = scheduledDate.getTime() - nowMs;
-        info()
         ScheduledFuture<?> future = scheduledExecutorService.schedule(task, ms, TimeUnit.MILLISECONDS);
         info().data("MS_leftTillStart", +ms).log("Pending scheduled task info");
         return future;

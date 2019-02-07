@@ -10,8 +10,9 @@ import com.github.onsdigital.zebedee.model.publishing.PublishNotification;
 import java.io.IOException;
 import java.util.concurrent.Callable;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.warn;
 
 /**
  * The task that runs after a collection is published.
@@ -46,7 +47,7 @@ public class PostPublishCollectionTask implements Callable<Boolean> {
      */
     protected boolean doPostPublish(Collection collection, ZebedeeCollectionReader collectionReader) {
 
-        logInfo("POST-PUBLISH: Running collection post publish process").collectionId(collection).log();
+        info().data("collectionId", collection).log("POST-PUBLISH: Running collection post publish process");
         long onPublishCompleteStart = System.currentTimeMillis();
         boolean skipVerification = false;
         boolean result = false;
@@ -54,11 +55,11 @@ public class PostPublishCollectionTask implements Callable<Boolean> {
         try {
             result = PostPublisher.postPublish(zebedee, collection, skipVerification, collectionReader);
         } catch (IOException e) {
-            logError(e, "Error while Running collection post publish process").collectionId(collection).log();
+            error().data("collectionId", collection).logException(e, "Error while Running collection post publish process");
         }
 
-        logInfo("POST-PUBLISH: collectiom postPublish process complete.")
-                .collectionId(collection).timeTaken((System.currentTimeMillis() - onPublishCompleteStart)).log();
+        info().data("collectionId", collection).data("timeTaken", (System.currentTimeMillis() - onPublishCompleteStart))
+                .log("POST-PUBLISH: collectiom postPublish process complete.");
 
         return result;
     }

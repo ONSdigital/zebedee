@@ -44,16 +44,16 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logDebug;
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logWarn;
 import static com.github.onsdigital.zebedee.model.publishing.PostPublisher.getPublishedCollection;
 import static com.github.onsdigital.zebedee.util.SlackNotification.CollectionStage.PUBLISH;
 import static com.github.onsdigital.zebedee.util.SlackNotification.StageStatus.FAILED;
 import static com.github.onsdigital.zebedee.util.SlackNotification.StageStatus.STARTED;
 import static com.github.onsdigital.zebedee.util.SlackNotification.collectionAlarm;
 import static com.github.onsdigital.zebedee.util.SlackNotification.publishNotification;
+
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.warn;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
 
 
 public class Publisher {
@@ -109,12 +109,11 @@ public class Publisher {
             success &= publishDatasets(collection);
         }
 
-        logInfo("collection publish time")
-                .addParameter("milliseconds", collection.getPublishTimeMilliseconds())
-                .addParameter("publishComplete", success)
-                .publishingAction()
-                .collectionId(collection)
-                .log();
+        info().data("milliseconds", collection.getPublishTimeMilliseconds())
+                .data("publishComplete", success)
+                .data("publishing", true)
+                .data("collectionId", collection)
+                .log("collection publish time");
 
         return success;
     }
@@ -131,9 +130,7 @@ public class Publisher {
 
         // First get the in-memory (within-JVM) lock.
         // This will block attempts to write to the collection during the publishAction process
-        logInfo("attempting to lock collection for publish")
-                .publishingAction()
-                .collectionId(collection).log();
+        info().data("publishing", true).data("collectionId", collection).log("attempting to lock collection for publish");
 
         Lock writeLock = collection.getWriteLock();
         writeLock.lock();
@@ -154,10 +151,7 @@ public class Publisher {
                  FileLock lock = channel.tryLock()) {
 
                 if (lock != null) {
-                    logInfo("collection lock acquired")
-                            .publishingAction()
-                            .collectionId(collection)
-                            .log();
+                    info().data("publishing", true).data("collectionId", collection).log("collection lock acquired");
 
                     if (!isApproved(collection)) {
                         return false;
@@ -165,17 +159,13 @@ public class Publisher {
 
                     publishComplete = publishFilesToWebsite(collection, email, collectionReader);
 
-                    logInfo("collection publish process completed")
-                            .publishingAction()
-                            .collectionId(collection)
-                            .timeTaken((System.currentTimeMillis() - publishStart))
-                            .log();
+                    info().data("publishing", true).data("collectionId", collection)
+                            .data("timeTaken", (System.currentTimeMillis() - publishStart))
+                            .log("collection publish process completed");
 
                 } else {
-                    logInfo("collection is already locked for publishAction, halting publish attempt")
-                            .publishingAction()
-                            .collectionId(collection)
-                            .log();
+                    info().data("publishing", true).data("collectionId", collection)
+                            .log("collection is already locked for publishAction, halting publish attempt");
                 }
 
             } finally {
@@ -184,7 +174,7 @@ public class Publisher {
 
         } finally {
             writeLock.unlock();
-            logInfo("collection lock released").publishingAction().collectionId(collection).log();
+            info().data("collectionId", collection).log("collection lock released");
         }
 
         SlackNotification.StageStatus status = FAILED;
@@ -202,10 +192,8 @@ public class Publisher {
      */
     private static boolean isApproved(Collection collection) {
         if (collection.getDescription().approvalStatus != ApprovalStatus.COMPLETE) {
-            logInfo("collection cannot be published as it has not been approved")
-                    .publishingAction()
-                    .collectionId(collection)
-                    .log();
+            info().data("publishing", true).data("collectionId", collection)
+                    .log("collection cannot be published as it has not been approved");
             return false;
         }
         return true;
@@ -216,10 +204,8 @@ public class Publisher {
      */
     private static boolean isPublished(Collection collection) {
         if (collection.getDescription().publishComplete) {
-            logInfo("collection has already been published, halting publish")
-                    .publishingAction()
-                    .collectionId(collection)
-                    .log();
+            info().data("publishing", true).data("collectionId", collection)
+                    .log("collection has already been published, halting publish");
             return true;
         }
         return false;
@@ -251,21 +237,15 @@ public class Publisher {
             Map<String, String> transactionIds = collection.getDescription().publishTransactionIds;
             if (transactionIds != null && transactionIds.size() > 0) {
 
-                logError(e, "error while attempting to publish, transaction IDs found for collection attempting to " +
-                        "rollback")
-                        .publishingAction()
-                        .collectionId(collection)
-                        .hostToTransactionID(collection.getDescription().publishTransactionIds)
-                        .log();
+                error().data("publishing", true).data("collectionId", collection).data("hostToTransactionID", transactionIds)
+                    .logException(e, "error while attempting to publish, transaction IDs found for collection attempting to rollback");
 
                 rollbackPublish(collection);
             } else {
-                logError(e, "error while attempting to publish, no transaction IDs found for collection " +
-                        "no rollback will be attempted")
-                        .publishingAction()
-                        .collectionId(collection)
-                        .hostToTransactionID(collection.getDescription().publishTransactionIds)
-                        .log();
+
+                error().data("publishing", true).data("collectionId", collection).data("hostToTransactionID", transactionIds)
+                        .logException(e, "error while attempting to publish, no transaction IDs found for collection no rollback will be attempted");
+
             }
 
         } finally {
@@ -285,11 +265,8 @@ public class Publisher {
             results.add(pool.submit(() -> {
                 IOException result = null;
                 try (Http http = new Http()) {
-                    logInfo("creating publish transaction for collection")
-                            .publishingAction()
-                            .trainHost(host)
-                            .collectionId(collection)
-                            .log();
+                    info().data("publishing", true).data("trainHost", host).data("collectionId", collection).
+                            log("creating publish transaction for collection");
 
                     Endpoint begin = new Endpoint(host, BEGIN_ENDPOINT);
 
@@ -297,19 +274,13 @@ public class Publisher {
                     checkResponse(response, null, begin, collection.getDescription().getId());
                     hostToTransactionIDMap.put(host.toString(), response.body.transaction.id);
                 } catch (IOException e) {
-                    logError(e, "error while attempting to create new transactions for collection")
-                            .publishingAction()
-                            .trainHost(host)
-                            .collectionId(collection)
-                            .log();
+                    error().data("publishing", true).data("trainHost", host).data("collectionId", collection).
+                            logException(e, "error while attempting to create new transactions for collection");
 
                     if (collection.getDescription().publishTransactionIds != null
                             && !collection.getDescription().publishTransactionIds.isEmpty()) {
-                        logWarn("clearing existing transactionIDs from collection")
-                                .publishingAction()
-                                .collectionId(collection)
-                                .hostToTransactionID(collection.getDescription().publishTransactionIds)
-                                .log();
+                        warn().data("publishing", true).data("trainHost", host).data("collectionId", collection).
+                                log("clearing existing transactionIDs from collection");
 
                         collection.getDescription().publishTransactionIds.clear();
                     }
@@ -323,12 +294,8 @@ public class Publisher {
         collection.getDescription().publishTransactionIds = hostToTransactionIDMap;
         collection.save();
 
-        logInfo("successfully created publish transactions for collection")
-                .publishingAction()
-                .collectionId(collection)
-                .hostToTransactionID(hostToTransactionIDMap)
-                .timeTaken(System.currentTimeMillis() - start)
-                .log();
+        info().data("publishing", true).data("collectionId", collection).data("hostToTransactionID", hostToTransactionIDMap)
+                .data("timeTaken", System.currentTimeMillis() - start).log("successfully created publish transactions for collection");
 
         return hostToTransactionIDMap;
     }
@@ -381,12 +348,9 @@ public class Publisher {
 
         checkFutureResults(results, "error while attempting to publish file");
 
-        logInfo("successfully sent all publish file requests to the train")
-                .publishingAction()
-                .collectionId(collection)
-                .hostToTransactionID(collection.getDescription().publishTransactionIds)
-                .timeTaken((System.currentTimeMillis() - start))
-                .log();
+        info().data("publishing", true).data("collectionId", collection)
+                .data("hostToTransactionID", collection.getDescription().publishTransactionIds)
+                .data("timeTaken", (System.currentTimeMillis() - start)).log("successfully sent all publish file requests to the train");
     }
 
     private static Future<IOException> publishFile(
@@ -410,27 +374,22 @@ public class Publisher {
                         Resource resource = reader.getResource(uri);
                         InputStream dataStream = resource.getData()
                 ) {
-                    logInfo("sending publish collection file request to train host")
-                            .publishingAction()
-                            .collectionId(collectionID)
-                            .transactionID(transactionId)
-                            .trainHost(host)
-                            .addParameter(URI_PARAM, uri)
-                            .addParameter("isZip", zipped)
-                            .log();
+                    info().data("publishing", true).data("collectionId", collectionID)
+                            .data("transactionId", transactionId)
+                            .data("trainHost", host)
+                            .data(URI_PARAM, uri).data("isZip", zipped)
+                            .log("sending publish collection file request to train host");
 
                     Response<Result> response = http.post(publish, dataStream, source.getFileName().toString(), Result.class);
                     checkResponse(response, transactionId, publish, collectionID);
                 }
             } catch (IOException e) {
-                logError(e, "error while sending publish file request to train host")
-                        .publishingAction()
-                        .collectionId(collectionID)
-                        .transactionID(transactionId)
-                        .trainHost(host)
-                        .addParameter(URI_PARAM, uri)
-                        .addParameter("isZip", zipped)
-                        .log();
+
+                error().data("publishing", true).data("collectionId", collectionID)
+                        .data("transactionId", transactionId)
+                        .data("trainHost", host)
+                        .data(URI_PARAM, uri).data("isZip", zipped)
+                        .logException(e, "error while sending publish file request to train host");
                 result = e;
             }
             return result;
@@ -452,22 +411,17 @@ public class Publisher {
                     Endpoint publish = new Endpoint(theTrainHost, SEND_MANIFEST_ENDPOINT)
                             .setParameter(TRANSACTION_ID_PARAM, transactionId);
 
-                    logInfo("sending publish manifest to train host")
-                            .publishingAction()
-                            .trainHost(theTrainHost)
-                            .collectionId(collection)
-                            .log();
+                    info().data("publishing", true).data("trainHost", theTrainHost).data("collectionId", collection)
+                            .log("sending publish manifest to train host");
 
                     Response<Result> response = http.postJson(publish, manifest, Result.class);
                     checkResponse(response, transactionId, publish, collection.getDescription().getId());
 
                 } catch (IOException e) {
-                    logError(e, "unexpected error while attempting to send publish manifest to train host")
-                            .publishingAction()
-                            .collectionId(collection)
-                            .trainHost(theTrainHost)
-                            .transactionID(transactionId)
-                            .log();
+
+                    error().data("publishing", true).data("collectionId", collection)
+                            .data("trainHost", theTrainHost).data("transactionId", transactionId)
+                            .logException(e, "unexpected error while attempting to send publish manifest to train host");
                     result = e;
                 }
                 return result;
@@ -476,12 +430,10 @@ public class Publisher {
 
         checkFutureResults(futures, "error sending publish manifest");
 
-        logInfo("successfully sent publish manifest for collection to train hosts")
-                .publishingAction()
-                .collectionId(collection)
-                .hostToTransactionID(collection.getDescription().publishTransactionIds)
-                .timeTaken(System.currentTimeMillis() - start)
-                .log();
+        info().data("publishing", true).data("collectionId", collection)
+                .data("hostToTransactionId", collection.getDescription().publishTransactionIds)
+                .data("timeTaken", System.currentTimeMillis() - start)
+                .log("successfully sent publish manifest for collection to train hosts");
     }
 
     public static boolean commitPublish(Collection collection, String email) throws IOException {
@@ -499,19 +451,15 @@ public class Publisher {
             collection.getDescription().addEvent(new Event(publishedDate, EventType.PUBLISHED, email));
             collection.getDescription().publishComplete = true;
 
-            logInfo("commit publish completed successfully")
-                    .publishingAction()
-                    .collectionId(collection)
-                    .timeTaken((System.currentTimeMillis() - start))
-                    .log();
+            info().data("publishing", true).data("collectionId", collection)
+                    .data("timeTaken", System.currentTimeMillis() - start)
+                    .log("commit publish completed successfully");
 
             return true;
         } else {
-            logWarn("commit publish was unsuccessfully")
-                    .publishingAction()
-                    .collectionId(collection)
-                    .timeTaken((System.currentTimeMillis() - start))
-                    .log();
+            warn().data("publishing", true).data("collectionId", collection)
+                    .data("timeTaken", System.currentTimeMillis() - start)
+                    .log("commit publish was unsuccessfully");
             return false;
         }
     }
@@ -545,19 +493,13 @@ public class Publisher {
                     Host host = new Host(entry.getKey());
                     String transactionId = entry.getValue();
 
-                    logDebug("creating commit publish transaction tasks")
-                            .publishingAction()
-                            .transactionID(transactionId)
-                            .trainHost(host)
-                            .log();
+                    info().data("publishing", true).data("transactionId", transactionId).data("trainHost", host)
+                            .log("creating commit publish transaction tasks");
 
                     Callable<Result> task = () -> {
                         try {
-                            logInfo("sending commit transaction request to train host")
-                                    .publishingAction()
-                                    .transactionID(transactionId)
-                                    .trainHost(host)
-                                    .log();
+                            info().data("publishing", true).data("transactionId", transactionId)
+                                    .data("trainHost", host).log("sending commit transaction request to train host");
 
                             try (Http http = new Http()) {
                                 Endpoint endpoint = new Endpoint(host, COMMIT_ENDPOINT)
@@ -568,35 +510,25 @@ public class Publisher {
                                 return response.body;
                             }
                         } catch (Exception e) {
-                            logError(e, "error while sending commit transaction request to trian host")
-                                    .publishingAction()
-                                    .trainHost(host)
-                                    .transactionID(transactionId)
-                                    .log();
+                            error().data("publishing", true).data("trainHost", host).data("transactionId", transactionId)
+                                    .logException(e, "error while sending commit transaction request to trian host");
                             throw new IOException(e);
                         }
                     };
                     return task;
                 }).collect(Collectors.toList());
 
-        logDebug("submitting commit publish tasks")
-                .publishingAction()
-                .addParameter("count", commitTasks.size())
-                .log();
+        info().data("publishing", true).data("count", commitTasks.size()).log("submitting commit publish tasks");
 
         List<Future<Result>> futures = new ArrayList<>();
         try {
             futures = pool.invokeAll(commitTasks);
         } catch (Exception e) {
-            logError(e, "error invoking commit tasks")
-                    .publishingAction()
-                    .log();
+            error().data("publishing", true).logException(e, "error invoking commit tasks");
             throw new IOException(e);
         }
 
-        logDebug("checking commit publish tasks results")
-                .publishingAction()
-                .log();
+        info().data("publishing", true).log("checking commit publish tasks results");
 
         List<Result> results = new ArrayList<>();
         for (Future<Result> resultFuture : futures) {
@@ -605,25 +537,19 @@ public class Publisher {
                 if (r == null) {
                     throw new IOException("commit publish result was null");
                 }
-                logInfo("adding commit publish result future to list of results")
-                        .publishingAction()
-                        .transactionID(r.transaction.id)
-                        .addParameter("isError", r.error)
-                        .log();
+
+                info().data("publishing", true).data("transactionId", r.transaction.id)
+                        .data("transactionId", r.transaction.id)
+                        .log("adding commit publish result future to list of results");
 
                 results.add(r);
             } catch (Exception e) {
-                logError(e, "commit tranaction future throw unexpected exception")
-                        .publishingAction()
-                        .log();
+                error().data("publishing", true).logException(e, "commit tranaction future throw unexpected exception");
                 throw new IOException(e);
             }
         }
 
-        logInfo("successfully committed publishAction transaction")
-                .publishingAction()
-                .hostToTransactionID(transactionIds)
-                .log();
+        info().data("publishing", true).data("hostToTransactionId", transactionIds).log("successfully committed publishAction transaction");
 
         return results;
     }
@@ -642,27 +568,21 @@ public class Publisher {
                 Endpoint endpoint = new Endpoint(host, ROLLBACK_ENDPOINT)
                         .setParameter(TRANSACTION_ID_PARAM, transactionId);
 
-                logWarn("sending rollback transaction request for collection")
-                        .publishingAction()
-                        .collectionId(collection)
-                        .hostToTransactionID(collection.getDescription().publishTransactionIds)
-                        .log();
+                warn().data("publishing", true).data("collectionId", collection)
+                        .data("hostToTransactionId", collection.getDescription().publishTransactionIds)
+                        .log("sending rollback transaction request for collection");
 
                 Response<Result> response = http.post(endpoint, Result.class);
                 checkResponse(response, transactionId, endpoint, null);
 
-                logInfo("publish rollback request was successful")
-                        .publishingAction()
-                        .collectionId(collection)
-                        .hostToTransactionID(collection.getDescription().publishTransactionIds)
-                        .log();
+                info().data("publishing", true).data("collectionId", collection)
+                        .data("hostToTransactionId", collection.getDescription().publishTransactionIds)
+                        .log("publish rollback request was successful");
 
             } catch (IOException e) {
-                logError(e, "error rolling back publish transaction")
-                        .publishingAction()
-                        .collectionId(collection)
-                        .transactionID(transactionId)
-                        .log();
+                error().data("publishing", true).data("collectionId", collection)
+                        .data("transactionId", transactionId)
+                        .logException(e, "error rolling back publish transaction");
             }
         }
     }
@@ -675,18 +595,18 @@ public class Publisher {
             String message = response.body != null ? response.body.message : "";
 
             URI uri = endpoint.url();
-            logError("request was unsuccessful")
-                    .publishingAction()
-                    .transactionID(TransactionID)
-                    .collectionId(collectionID)
-                    .addParameter("trainHost", uri.getScheme() + "://" + uri.getHost() + ":" + uri.getPort())
-                    .addParameter("endpoint", endpoint.url().getPath())
-                    .addParameter("statusCode", code)
-                    .addParameter("reason", reason)
-                    .addParameter("message", message)
-                    .log();
 
-            throw new IOException("Error in request: " + code + " " + reason + " " + message);
+            IOException io = new IOException("Error in request: " + code + " " + reason + " " + message);
+
+            error().data("publishing", true).data("transactionId", TransactionID)
+                    .data("collectionId", collectionID)
+                    .data("trainHost", uri.getScheme() + "://" + uri.getHost() + ":" + uri.getPort())
+                    .data("endpoint", endpoint.url().getPath())
+                    .data("statusCode", code)
+                    .data("reason", reason)
+                    .data("message", message)
+                    .logException(io,"request was unsuccessful");
+            throw io;
 
         } else if (response.body.error == true) {
             throw new IOException("Result error: " + response.body.message);
@@ -722,21 +642,18 @@ public class Publisher {
     }
 
     private static boolean publishDatasets(Collection collection) throws IOException {
-        logDebug("publishing api datasets for collection")
-                .collectionId(collection)
-                .publishingAction()
-                .log();
+
+        info().data("collectionId", collection).data("publishing", true)
+                .log("publishing api datasets for collection");
 
         boolean datasetsPublished = false;
         try {
             datasetServiceSupplier.getService().publishDatasetsInCollection(collection);
             datasetsPublished = true;
         } catch (Exception e) {
-            logError(e, "Exception updating API dataset to state published")
-                    .publishingAction()
-                    .collectionId(collection)
-                    .collectionId(collection)
-                    .log();
+
+            error().data("collectionId", collection).data("publishing", true)
+                    .logException(e, "Exception updating API dataset to state published");
 
             PostMessageField msg = new PostMessageField("Error", e.getMessage(), false);
             collectionAlarm(collection, "Exception updating API dataset to state published", msg);
@@ -749,21 +666,18 @@ public class Publisher {
 
     private static void saveCollection(Collection collection, boolean publishComplete) {
         // Save any updates to the collection
-        logInfo("persisting collection changes to disk")
-                .publishingAction()
-                .collectionId(collection)
-                .addParameter("publishComplete", publishComplete)
-                .hostToTransactionID(collection.getDescription().publishTransactionIds)
-                .log();
+
+        info().data("publishing", true).data("publishComplete", publishComplete).data("collectionId", collection)
+                .data("hostToTransactionId", collection.getDescription().publishTransactionIds)
+                .log("persisting collection changes to disk");
+
         try {
             collection.save();
         } catch (Exception e) {
-            logError(e, "error while attempting to persist collection changes to disk")
-                    .publishingAction()
-                    .collectionId(collection)
-                    .addParameter("publishComplete", publishComplete)
-                    .hostToTransactionID(collection.getDescription().publishTransactionIds)
-                    .log();
+
+            error().data("publishing", true).data("collectionId", collection).data("publishComplete", publishComplete)
+                    .data("hostToTransactionId", collection.getDescription().publishTransactionIds)
+                    .logException(e, "error while attempting to persist collection changes to disk");
         }
     }
 

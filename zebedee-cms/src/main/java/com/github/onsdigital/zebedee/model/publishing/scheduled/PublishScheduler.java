@@ -19,8 +19,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
 
 /**
  * Public interface to schedule publishes in Zebedee
@@ -32,14 +32,14 @@ public class PublishScheduler extends Scheduler {
 
     @Override
     protected void schedule(Collection collection, Zebedee zebedee) {
-        logInfo("Scheduling collection using optimised publisher").collectionId(collection).log();
+        info().data("collectionId", collection).log("Scheduling collection using optimised publisher");
         Date publishStartDate = collection.getDescription().getPublishDate();
         int getPreProcessSecondsBeforePublish = Configuration.getPreProcessSecondsBeforePublish();
         Date prePublishStartDate = new DateTime(publishStartDate).minusSeconds(getPreProcessSecondsBeforePublish).toDate();
 
-        logInfo("Scheduling collection prepublish").collectionId(collection)
-                .addParameter("prePublishStartDate", prePublishStartDate)
-                .addParameter("publishStartDate", publishStartDate).log();
+        info().data("collectionId", collection).data("prePublishStartDate", prePublishStartDate)
+                .data("publishStartDate", publishStartDate)
+                .log("Scheduling collection prepublish");
         schedulePrePublish(collection, zebedee, prePublishStartDate, publishStartDate);
     }
 
@@ -86,10 +86,10 @@ public class PublishScheduler extends Scheduler {
                 PublishCollectionsTask publishTask = new PublishCollectionsTask(collectionPublishTasks, postPublishCollectionTasks);
                 publishTask.schedule(publishDate);
             } catch (Exception e) {
-                logError(e, "Exception caught trying to schedule").log();
+                error().logException(e, "Exception caught trying to schedule"):
             }
         } else {
-            logInfo("Not scheduling publish, scheduling is not enabled").log();
+            info().log("Not scheduling publish, scheduling is not enabled");
         }
     }
 

@@ -91,7 +91,7 @@
             <groupId>com.github.ONSdigital</groupId>
             <artifactId>dp-logging</artifactId>
             <!--<version>master-SNAPSHOT</version>-->
-            <version>master-SNAPSHOT</version>
+            <version>feature~serialiser-tests-SNAPSHOT</version>
         </dependency>
 
     </dependencies>

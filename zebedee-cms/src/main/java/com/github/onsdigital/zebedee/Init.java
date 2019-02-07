@@ -21,12 +21,16 @@ import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
 public class Init implements Startup {
     @Override
     public void init() {
-        Config config = new Builder()
-                .logger(LoggerFactory.getLogger("com.zebedee.app"))
-                .serialiser(new JacksonLogSerialiser())
-                .dataNamespace("zebedee.data")
-                .create();
-        DPLogger.init(config);
+        try {
+            Config config = new Builder()
+                    .logger(LoggerFactory.getLogger("com.zebedee.app"))
+                    .serialiser(new JacksonLogSerialiser())
+                    .dataNamespace("zebedee.data")
+                    .create();
+            DPLogger.init(config);
+        } catch (Exception e) {
+            // TOOD
+        }
 
         logInfo("inside CMS INIT").log();
 

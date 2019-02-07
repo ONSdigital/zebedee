@@ -1,15 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
 
-    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-        <encoder>
-            <pattern>
-                %d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n
-            </pattern>
-        </encoder>
-    </appender>
-
-    <appender name="JSON_STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    <!-- Format our app log events in our JSON format -->
+    <appender name="DP_LOGGER_V2" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
             <pattern>
                 %msg%n
@@ -17,8 +10,21 @@
         </encoder>
     </appender>
 
+    <!-- Log third party messages in our JSON format -->
+    <appender name="THIRD_PARTY_LOGGER" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+            <layout class="com.github.onsdigital.logging.v2.layout.ThirdPartyEventLayout">
+                <Pattern>%n%msg</Pattern>
+            </layout>
+        </encoder>
+    </appender>
+
     <logger name="com.github.onsdigital.zebedee.cms" level="debug" additivity="false">
-        <appender-ref ref="JSON_STDOUT"/>
+        <appender-ref ref="DP_LOGGER_V2"/>
+    </logger>
+
+    <logger name="com.github.onsdigital.zebedee.reader" level="debug" additivity="false">
+        <appender-ref ref="DP_LOGGER_V2"/>
     </logger>
 
     <appender name="DP_LOGGER" class="ch.qos.logback.core.ConsoleAppender">
@@ -39,12 +45,12 @@
         <appender-ref ref="DP_LOGGER"/>
     </logger>
 
-    <logger name="com.github.davidcarboni.restolino" level="warn" additivity="false">
-        <appender-ref ref="DP_LOGGER"/>
+    <logger name="com.github.davidcarboni.restolino" level="debug" additivity="false">
+        <appender-ref ref="THIRD_PARTY_LOGGER"/>
     </logger>
 
     <root level="info">
-        <appender-ref ref="DP_LOGGER"/>
+        <appender-ref ref="THIRD_PARTY_LOGGER"/>
     </root>
 
 </configuration>

@@ -12,13 +12,16 @@ public class LoggingTestHelper {
     }
 
     public static void initDPLogger(Class c) {
+        try {
+            Config loggerConfigMock = new Builder()
+                    .logger(LoggerFactory.getLogger("com.zebedee.app"))
+                    .serialiser(new JacksonLogSerialiser())
+                    .dataNamespace("zebedee.data")
+                    .create();
 
-        Config loggerConfigMock = new Builder()
-                .logger(LoggerFactory.getLogger("com.zebedee.app"))
-                .serialiser(new JacksonLogSerialiser())
-                .dataNamespace("zebedee.data")
-                .create();
-
-        DPLogger.init(loggerConfigMock);
+            DPLogger.init(loggerConfigMock);
+        } catch (Exception ex) {
+            // TODO
+        }
     }
 }

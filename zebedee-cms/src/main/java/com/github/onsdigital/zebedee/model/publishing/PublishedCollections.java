@@ -33,8 +33,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
 
 /**
  * Represents the store of published collections for adding to and searching.
@@ -68,17 +68,17 @@ public class PublishedCollections {
             boolean exists = client.admin().indices().prepareExists(index).execute().actionGet().isExists();
 
             if (!exists) {
-                logInfo("Creating search index for published collections.").log();
+                info().log("Creating search index for published collections.");
                 CreateIndexRequestBuilder indexBuilder = client.admin().indices()
                         .prepareCreate(index);
 
-                logInfo("Adding mapping for published collections index").log();
+                info().log("Adding mapping for published collections index");
                 //indexBuilder.addMapping(mapping, getMappingProperties(mapping));
                 indexBuilder.execute().actionGet();
 
                 indexExistingResults(client);
 
-                logInfo("Finished indexing existing published collections").log();
+                info().log("Finished indexing existing published collections");
             }
 
             initialised = true;
@@ -92,7 +92,7 @@ public class PublishedCollections {
      */
     public void index(Client client, PublishedCollection publishedCollection) throws IOException {
 
-        logInfo("Indexing collection").addParameter("collectionName", publishedCollection.getName()).log();
+        info().data("collectionName", publishedCollection.getName()).log("Indexing collection");
 
         IndexRequestBuilder indexRequest = client.prepareIndex(index, type);
         indexRequest.setSource(Serialiser.serialise(publishedCollection));
@@ -104,7 +104,7 @@ public class PublishedCollections {
     public PublishedCollectionSearchResult search(Client client) throws IOException {
         tryInit(client);
 
-        logInfo("Searching published collections").log();
+        info().log("Searching published collections");
 
         PublishedCollectionSearchResult results = new PublishedCollectionSearchResult();
 
@@ -122,9 +122,9 @@ public class PublishedCollections {
             SearchResponse response = requestBuilder.execute()
                     .actionGet();
 
-            logInfo("Search published collections")
-                    .addParameter("found", response.getHits().getTotalHits())
-                    .addParameter("returned", response.getHits().getHits().length).log();
+            info().data("found", response.getHits().getTotalHits())
+                    .data("returned", response.getHits().getHits().length)
+                    .log("Search published collections");
 
             for (SearchHit searchHit : response.getHits()) {
 
@@ -144,7 +144,7 @@ public class PublishedCollections {
                 }
             }
         } catch (SearchPhaseExecutionException | ParseException e) {
-            logError(e, "Search published collections failed").log();
+            error().logException(e, "Search published collections failed");
         }
 
         return results;
@@ -158,7 +158,7 @@ public class PublishedCollections {
     public PublishedCollectionSearchResult search(Client client, String collectionId) throws IOException {
         tryInit(client);
 
-        logInfo("Searching for published collection").addParameter("collectionId", collectionId).log();
+        info().data("collectionId", collectionId).log("Searching for published collection");
 
         PublishedCollection result = new PublishedCollection();
 
@@ -179,15 +179,15 @@ public class PublishedCollections {
             SearchResponse response = requestBuilder.execute()
                     .actionGet();
 
-            logInfo("Search published collections")
-                    .addParameter("found", response.getHits().getTotalHits())
-                    .addParameter("returned", response.getHits().getHits().length).log();
+            info().data("found", response.getHits().getTotalHits())
+                    .data("returned", response.getHits().getHits().length)
+                    .log("Search published collections");
 
             for (SearchHit searchHit : response.getHits()) {
                 result = Serialiser.deserialise(searchHit.sourceAsString(), PublishedCollection.class);
             }
         } catch (SearchPhaseExecutionException e) {
-            logError(e, "Search published collections failed").log();
+            error().logException(e, "Search published collections failed");
         }
 
         PublishedCollectionSearchResult results = new PublishedCollectionSearchResult();
@@ -201,7 +201,7 @@ public class PublishedCollections {
      */
     private void indexExistingResults(Client client) throws IOException {
 
-        logInfo("Loading existing published collections from file").log();
+        info().log("Loading existing published collections from file");
         List<PublishedCollection> publishedCollections = readFromFile();
 
         for (PublishedCollection publishedCollection : publishedCollections) {
@@ -221,14 +221,12 @@ public class PublishedCollections {
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(path, "*.json")) {
             for (Path filePath : stream) {
                 if (!Files.isDirectory(filePath)) {
-                    logInfo("Attempting to read published collection").addParameter("path", filePath.toString())
-                            .log();
+                    info().data("path", filePath.toString()).log("Attempting to read published collection");
                     try (InputStream input = Files.newInputStream(filePath)) {
                         publishedCollections.add(Serialiser.deserialise(input,
                                 PublishedCollection.class));
                     } catch (IOException e) {
-                        logError(e, "Failed to read published collection")
-                                .addParameter("path", filePath.toString()).log();
+                        error().data("path", filePath.toString()).logException(e, "Failed to read published collection");
                     }
                 }
             }
@@ -246,8 +244,8 @@ public class PublishedCollections {
             index(ElasticSearchClient.getClient(), publishedCollection);
             return publishedCollection;
         } catch (IOException e) {
-            logError(e, "Failed to read published collection")
-                    .addParameter("path", collectionJsonPath.toString()).log();
+            error().data("path", collectionJsonPath.toString())
+                    .logException(e, "Failed to read published collection");
             return null;
         }
     }

@@ -6,8 +6,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logDebug;
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 
 /**
  * Schedule a task to run at the given date.
@@ -35,8 +34,9 @@ public class RunnableScheduler {
     public ScheduledFuture<?> schedule(Runnable task, Date scheduledDate) {
         long nowMs = System.currentTimeMillis();
         long ms = scheduledDate.getTime() - nowMs;
+        info()
         ScheduledFuture<?> future = scheduledExecutorService.schedule(task, ms, TimeUnit.MILLISECONDS);
-        logInfo("Pending scheduled task info").addParameter("MS_leftTillStart", +ms).log();
+        info().data("MS_leftTillStart", +ms).log("Pending scheduled task info");
         return future;
     }
 
@@ -44,7 +44,7 @@ public class RunnableScheduler {
      * Shutdown the scheduler to ensure resources are disposed of.
      */
     public void shutdown() {
-        logDebug("Shutdown called on Scheduler.").log();
+        info().log("Shutdown called on Scheduler.");
         scheduledExecutorService.shutdown();
     }
 }

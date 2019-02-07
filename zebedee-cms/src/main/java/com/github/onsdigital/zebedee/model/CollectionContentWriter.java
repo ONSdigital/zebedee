@@ -49,15 +49,3 @@ public class CollectionContentWriter extends ContentWriter {
         }
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-

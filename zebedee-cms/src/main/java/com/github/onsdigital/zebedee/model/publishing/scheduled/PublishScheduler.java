@@ -86,7 +86,7 @@ public class PublishScheduler extends Scheduler {
                 PublishCollectionsTask publishTask = new PublishCollectionsTask(collectionPublishTasks, postPublishCollectionTasks);
                 publishTask.schedule(publishDate);
             } catch (Exception e) {
-                error().logException(e, "Exception caught trying to schedule"):
+                error().logException(e, "Exception caught trying to schedule");
             }
         } else {
             info().log("Not scheduling publish, scheduling is not enabled");

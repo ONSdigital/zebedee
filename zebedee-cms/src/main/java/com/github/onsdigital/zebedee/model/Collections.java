@@ -545,11 +545,6 @@ public class Collections {
             info().data("saveOrEditConflict", ).data("user", session.getEmail())
                     .log("Cannot create content as it existings in another collection.");
 
-
-            logInfo("Cannot create content as it existings in another collection.")
-                    .saveOrEditConflict(collection, blocker, uri)
-                    .user(session.getEmail())
-                    .log();
             throw new ConflictException("This URI exists in another collection", blocker.getDescription().getName());
         }
 
@@ -571,11 +566,7 @@ public class Collections {
 
         CollectionWriter collectionWriter = collectionReaderWriterFactory.getWriter(zebedeeSupplier.get(), collection, session);
 
-        logInfo("Attempting to write content.")
-                .collectionId(collection)
-                .path(uri)
-                .user(session.getEmail())
-                .log();
+        info().data("collectionId", collection).data("path", uri).data("user", session.getEmail()).log("Attempting to write content.");
 
         if (collection.getDescription().getApprovalStatus() == ApprovalStatus.COMPLETE) {
             throw new BadRequestException("This collection has been approved and cannot be saved to.");

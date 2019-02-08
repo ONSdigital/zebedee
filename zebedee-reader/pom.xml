@@ -90,8 +90,7 @@
         <dependency>
             <groupId>com.github.ONSdigital</groupId>
             <artifactId>dp-logging</artifactId>
-            <!--<version>master-SNAPSHOT</version>-->
-            <version>master-SNAPSHOT</version>
+            <version>master-60d8cbfea9-1</version>
         </dependency>
 
     </dependencies>

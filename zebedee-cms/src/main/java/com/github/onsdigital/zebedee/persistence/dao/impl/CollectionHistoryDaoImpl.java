@@ -16,7 +16,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.function.Function;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
 
 /**
  * Implementation of the {@link CollectionHistoryDao} interface. Provides methods for saving {@link CollectionHistoryEvent}'s
@@ -60,8 +60,8 @@ public class CollectionHistoryDaoImpl implements CollectionHistoryDao {
                 session.save(event);
                 session.getTransaction().commit();
             } catch (Exception ex) {
-                logError(ex, "Unexpected error while attempting to save collection audit event")
-                        .addParameter("event", event.toString()).throwUnchecked(ex);
+                error().data("event", event.toString()).logException(ex, "Unexpected error while attempting to save collection audit event");
+                throw new RuntimeException(ex);
             }
         });
     }

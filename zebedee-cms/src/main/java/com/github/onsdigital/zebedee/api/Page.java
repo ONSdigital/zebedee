@@ -37,8 +37,8 @@ import java.util.Map;
 import java.util.Optional;
 
 import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 
 @Api
 public class Page {
@@ -65,9 +65,8 @@ public class Page {
         this.zebedeeCmsService = ZebedeeCmsService.getInstance();
 
         if (datasetImportEnabled) {
-            logInfo("feature EnableDatasetImport enabled, creating Page hooks")
-                    .addParameter("hooks", "pageDeletionHook, pageCreationHook")
-                    .log();
+            info().data("hooks", "pageDeletionHook, pageCreationHook")
+                    .log("page endpoint: feature EnableDatasetImport enabled, creating Page hooks");
 
             DatasetClient datasetAPIClient = zebedeeCmsService.getDatasetClient();
 
@@ -77,7 +76,7 @@ public class Page {
             this.pageDeletionHook = Optional.of(new PageTypeUpdateHook(deletionHooks));
             this.pageCreationHook = Optional.of(new PageTypeUpdateHook(creationHooks));
         } else {
-            logInfo("feature EnableDatasetImport disabled, Page hooks will not be created").log();
+            info().log("page endpoint: feature EnableDatasetImport disabled, Page hooks will not be created");
             this.pageCreationHook = Optional.empty();
             this.pageDeletionHook = Optional.empty();
         }
@@ -135,7 +134,7 @@ public class Page {
 
         String uri = request.getParameter("uri");
         if (StringUtils.isEmpty(uri)) {
-            logError(new BadRequestException("uri is empty")).log();
+            error().logException(new BadRequestException("uri is empty"), "page get endpoint: uri is empty");
             response.setStatus(HttpStatus.SC_BAD_REQUEST);
             return null;
         }
@@ -145,8 +144,7 @@ public class Page {
         try {
             session = zebedeeCmsService.getSession(request);
         } catch (ZebedeeException e) {
-            logError(e, "failed to get session")
-                    .path(uri).log();
+            error().data("path", uri).logException(e, "page get endpoint: failed to get session");
             response.setStatus(e.statusCode);
             return null;
         }
@@ -155,9 +153,8 @@ public class Page {
         try {
             collection = zebedeeCmsService.getCollection(request);
         } catch (ZebedeeException e) {
-            logError(e, "failed to get collection")
-                    .user(session.getEmail())
-                    .path(uri).log();
+            error().data("user", session.getEmail()).data("path", uri)
+                    .logException(e, "page get endpoint: failed to get collection");
             response.setStatus(e.statusCode);
             return null;
         }
@@ -169,7 +166,7 @@ public class Page {
             requestBodyBytes = IOUtils.toByteArray(requestBody);
         } catch (Exception e) {
             response.setStatus(HttpStatus.SC_BAD_REQUEST);
-            logError(e, "failed to deserialise page from the request body").log();
+            error().logException(e, "page get endpoint: failed to deserialise page from the request body");
             return null;
         }
 
@@ -177,7 +174,7 @@ public class Page {
             page = ContentUtil.deserialiseContent(pageInputStream);
         } catch (Exception e) {
             response.setStatus(HttpStatus.SC_BAD_REQUEST);
-            logError(e, "failed to deserialise page from the request body").log();
+            error().logException(e, "page get endpoint: failed to deserialise page from the request body");
             return null;
         }
 
@@ -200,12 +197,12 @@ public class Page {
                     false);
 
         } catch (ZebedeeException e) {
-            handleZebdeeException("failed to create content", e, response, uri, session, collection);
+            handleZebdeeException("page get endpoint: failed to create content", e, response, uri, session, collection);
         } catch (IOException | FileUploadException e) {
-            logError(e, "exception when calling collections.createContent")
-                    .collectionId(collection.getDescription().getId())
-                    .user(session.getEmail())
-                    .path(uri).log();
+            error().data("collectionId", collection.getDescription().getId())
+                    .data("user", session.getEmail())
+                    .data("path", uri)
+                    .logException(e, "page get endpoint: exception when calling collections.createContent");
             response.setStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR);
         }
 
@@ -237,7 +234,7 @@ public class Page {
 
         String uri = request.getParameter("uri");
         if (StringUtils.isEmpty(uri)) {
-            logError(new BadRequestException("uri is empty")).log();
+            error().logException(new BadRequestException("uri is empty"),"page delete endpoint: uri is empty");
             response.setStatus(HttpStatus.SC_BAD_REQUEST);
             return;
         }
@@ -247,8 +244,7 @@ public class Page {
         try {
             session = zebedeeCmsService.getSession(request);
         } catch (ZebedeeException e) {
-            logError(e, "failed to get session")
-                    .path(uri).log();
+            error().data("path", uri).logException(e, "page delete endpoint: failed to get session");
             response.setStatus(e.statusCode);
             return;
         }
@@ -257,9 +253,8 @@ public class Page {
         try {
             collection = zebedeeCmsService.getCollection(request);
         } catch (ZebedeeException e) {
-            logError(e, "failed to get collection")
-                    .user(session.getEmail())
-                    .path(uri).log();
+            error().data("user", session.getEmail())
+                    .data("path", uri).logException(e, "page delete endpoint: failed to get collection");
             response.setStatus(e.statusCode);
             return;
         }
@@ -268,7 +263,7 @@ public class Page {
         try {
             collectionReader = zebedeeCmsService.getZebedeeCollectionReader(collection, session);
         } catch (ZebedeeException e) {
-            handleZebdeeException("failed to get collection reader", e, response, uri, session, collection);
+            handleZebdeeException("page delete endpoint: failed to get collection reader", e, response, uri, session, collection);
             return;
         }
 
@@ -277,17 +272,16 @@ public class Page {
         try {
             page = collectionReader.getContent(uri);
         } catch (NotFoundException ex) {
-            logInfo("page is already deleted").path(uri).collectionId(collection).log();
+            info().data("path", uri).data("collectionId", collection)
+                    .log("page delete endpoint: page is already deleted");
             response.setStatus(HttpStatus.SC_NO_CONTENT);
             return; // idempotent
         } catch (ZebedeeException e) {
-            handleZebdeeException("exception when getting collection content", e, response, uri, session, collection);
+            handleZebdeeException("page delete endpoint: exception when getting collection content", e, response, uri, session, collection);
             return;
         } catch (IOException e) {
-            logError(e, "exception when attempting to get collection content")
-                    .collectionId(collection)
-                    .user(session.getEmail())
-                    .path(uri).log();
+            error().data("collectionID", collection).data("user", session.getEmail()).data("path", uri)
+                    .logException(e, "page delete endpoint: exception when attempting to get collection content");
             response.setStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR);
             return;
         }
@@ -306,14 +300,14 @@ public class Page {
                     uri + zebedeeFileSuffix,
                     session);
         } catch (IOException e) {
-            logError(e, "exception when deleting content")
-                    .collectionId(collection.getDescription().getId())
-                    .user(session.getEmail())
-                    .path(uri).log();
+            error().data("collectionId", collection.getDescription().getId())
+                    .data("user", session.getEmail())
+                    .data("path", uri)
+                    .logException(e, "page delete endpoint: exception when deleting content");
             response.setStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR);
             return;
         } catch (ZebedeeException e) {
-            handleZebdeeException("exception when deleting content", e, response, uri, session, collection);
+            handleZebdeeException("page delete endpoint: exception when deleting content", e, response, uri, session, collection);
             return;
         }
 
@@ -337,47 +331,41 @@ public class Page {
             Session session,
             Collection collection) {
 
-        logError(e, message)
-                .collectionId(collection.getDescription().getId())
-                .user(session.getEmail())
-                .path(uri).log();
+        error().data("collectionId", collection.getDescription().getId())
+                .data("user", session.getEmail())
+                .data("path", uri)
+                .logException(e, message);
         response.setStatus(e.statusCode);
     }
 
     private boolean execCreationHook(com.github.onsdigital.zebedee.content.page.base.Page page, String uri,
                                      Collection collection, Session session) {
-        logInfo("executing PageCreationHook")
-                .path(uri)
-                .collectionId(collection)
-                .user(session.getEmail())
-                .log();
+        info().data("path", uri).data("collectionId", collection).data("user", session.getEmail())
+                .log("page delete endpoint: executing PageCreationHook");
         try {
             pageCreationHook.get().onPageUpdated(page, uri);
             return true;
         } catch (IOException | RuntimeException e) {
-            logError(e, "exception when calling page creation hook")
-                    .collectionId(collection.getDescription().getId())
-                    .user(session.getEmail())
-                    .path(uri).log();
+            error().data("collectionId", collection.getDescription().getId())
+                    .data("user", session.getEmail())
+                    .data("path", uri)
+                    .logException(e, "page delete endpoint: exception when calling page creation hook");
             return false;
         }
     }
 
     private boolean execDeletionHook(com.github.onsdigital.zebedee.content.page.base.Page page, String uri,
                                      Collection collection, Session session) {
-        logInfo("executing PageDeletionHook")
-                .path(uri)
-                .collectionId(collection)
-                .user(session.getEmail())
-                .log();
+        info().data("path", uri).data("collectionId", collection).data("user", session.getEmail())
+                .log("page delete endpoint: executing PageDeletionHook");
         try {
             pageDeletionHook.get().onPageUpdated(page, uri);
             return true;
         } catch (IOException | RuntimeException e) {
-            logError(e, "exception when calling page deletion hook")
-                    .collectionId(collection.getDescription().getId())
-                    .user(session.getEmail())
-                    .path(uri).log();
+            error().data("collectionId", collection.getDescription().getId())
+                    .data("user", session.getEmail())
+                    .data("path", uri)
+                    .logException(e, "page delete endpoint: exception when calling page deletion hook");
             return false;
         }
     }

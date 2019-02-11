@@ -19,8 +19,8 @@ import java.io.IOException;
 import java.util.function.Supplier;
 
 import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logWarn;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.warn;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 import static com.github.onsdigital.zebedee.util.JsonUtils.writeResponse;
 import static org.apache.http.HttpStatus.SC_CREATED;
 import static org.apache.http.HttpStatus.SC_NOT_FOUND;
@@ -57,21 +57,19 @@ public class Service {
             NotFoundException, UnauthorizedException {
         // FIXME CMD feature.
         if (!datasetImportEnabled) {
-            logWarn("Service endpoint is not supported as feature EnableDatasetImport is disabled")
-                    .addParameter("responseStatus", SC_NOT_FOUND)
-                    .log();
+            warn().data("responseStatus", SC_NOT_FOUND).log("service post endpoint: endpoint is not supported as feature EnableDatasetImport is disabled");
             writeResponse(response, NOT_FOUND_ERR, SC_NOT_FOUND);
             return;
         }
 
-        logInfo("feature EnableDatasetImport is enabled").log();
+        info().log("feature EnableDatasetImport is enabled");
 
         final Session session = getSessionsService().get(request);
         if (session != null && getPermissionsService().isAdministrator(session)) {
             final ServiceStore serviceStoreImpl = getServiceStore();
             final String token = randomIdGenerator.get();
             ServiceAccount service = serviceStoreImpl.store(token, request.getInputStream());
-            logInfo("new service account created").addParameter("id", service.getId()).log();
+            info().data("id", service.getId()).log("service post endpoint: new service account created");
             writeResponse(response, new ServiceAccountWithToken(service.getId(), token), SC_CREATED);
             return;
         }

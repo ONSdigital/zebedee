@@ -18,7 +18,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.POST;
 import java.io.IOException;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 
 /**
  * API for processing login requests.
@@ -47,9 +47,9 @@ public class Login {
      */
     @POST
     public String authenticate(HttpServletRequest request, HttpServletResponse response, Credentials credentials) throws IOException, NotFoundException, BadRequestException {
-        logInfo("login endpoint: request received").log();
+        info().log("login endpoint: request received");
         if (credentials == null || StringUtils.isBlank(credentials.getEmail())) {
-            logInfo("login endpoint: request unsuccessful no credentials provided").log();
+            info().log("login endpoint: request unsuccessful no credentials provided");
             response.setStatus(HttpStatus.BAD_REQUEST_400);
             return "Please provide credentials (email, password).";
         }
@@ -60,7 +60,8 @@ public class Login {
         if (!result) {
             response.setStatus(HttpStatus.UNAUTHORIZED_401);
             Audit.Event.LOGIN_AUTHENTICATION_FAILURE.parameters().host(request).user(credentials.getEmail()).log();
-            logInfo("login endpoint: request unsuccessful credentials were not authenticated successfully").user(user.getEmail()).log();
+            info().data("user", user.getEmail())
+                .log("login endpoint: request unsuccessful credentials were not authenticated successfully");
             return "Authentication failed.";
         }
 
@@ -70,9 +71,8 @@ public class Login {
         usersServiceSupplier.getService().removeStaleCollectionKeys(user.getEmail());
 
         if (BooleanUtils.isTrue(user.getTemporaryPassword())) {
-            logInfo("login endpoint: request unsuccessful user is required to change their password")
-                    .user(user.getEmail())
-                    .log();
+            info().data("user", user.getEmail())
+                    .log("login endpoint: request unsuccessful user is required to change their password");
             response.setStatus(HttpStatus.EXPECTATION_FAILED_417);
             Audit.Event.LOGIN_PASSWORD_CHANGE_REQUIRED.parameters().host(request).user(credentials.getEmail()).log();
             return "Password change required";
@@ -81,14 +81,11 @@ public class Login {
             response.setStatus(HttpStatus.OK_200);
         }
 
-
-        logInfo("login endpoint: attempting to open session for user").user(credentials.getEmail()).log();
+        info().data("user", credentials.getEmail()).log("login endpoint: attempting to open session for user");
         String sessionId = Root.zebedee.openSession(credentials).getId();
-        logInfo("login endpoint: user session opened sucessfully").user(user.getEmail()).log();
+        info().data("user", user.getEmail()).log("login endpoint: user session opened successfully");
 
-        logInfo("login endpoint: request completed successfully")
-                .user(credentials.getEmail())
-                .log();
+        info().data("user", credentials.getEmail()).log("login endpoint: request completed successfully");
         return sessionId;
     }
 

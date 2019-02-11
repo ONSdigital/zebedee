@@ -2,8 +2,8 @@ package com.github.onsdigital.zebedee.configuration;
 
 import org.apache.commons.lang3.StringUtils;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logWarn;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.warn;
 
 /**
  * Feature flags for Zebedee CMS.
@@ -25,9 +25,7 @@ public class CMSFeatureFlags {
     private CMSFeatureFlags() {
         this.isDatasetImportEnabled = Boolean.valueOf(getConfigValue(ENABLE_DATASET_IMPORT));
 
-        logInfo("CMS feature flags configurations")
-                .addParameter(ENABLE_DATASET_IMPORT, isDatasetImportEnabled)
-                .log();
+        info().data(ENABLE_DATASET_IMPORT, isDatasetImportEnabled).log("CMS feature flags configurations");
     }
 
     /**
@@ -40,22 +38,16 @@ public class CMSFeatureFlags {
     public static String getConfigValue(String name) {
         String value = System.getProperty(name);
         if (StringUtils.isNoneEmpty(value)) {
-            logInfo("applying CMS feature flag config value from system.properties")
-                    .addParameter(name, value)
-                    .log();
+            info().data(name, value).log("applying CMS feature flag config value from system.properties");
             return value;
         }
 
         value = System.getenv(name);
         if (StringUtils.isNoneEmpty(value)) {
-            logInfo("applying CMS feature flag config value from system.env")
-                    .addParameter(name, value)
-                    .log();
+            info().data(name, value).log("applying CMS feature flag config value from system.env");
             return value;
         }
-        logWarn("CMS config value not found in system.properties or system.env default will be applied")
-                .addParameter("name", name)
-                .log();
+        warn().data("name", name).log("CMS config value not found in system.properties or system.env default will be applied");
         return "";
     }
 
@@ -64,7 +56,7 @@ public class CMSFeatureFlags {
      */
     public static CMSFeatureFlags cmsFeatureFlags() {
         if (instance == null) {
-            logInfo("loading CMS feature flag configuration").log();
+            info().log("loading CMS feature flag configuration");
             synchronized (CMSFeatureFlags.class) {
                 if (instance == null) {
                     instance = new CMSFeatureFlags();

@@ -9,8 +9,8 @@ import dp.api.dataset.model.Link;
 
 import java.io.IOException;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
 
 /**
  * A PageUpdateHook implementation for when an ApiDatasetLandingPage is created.
@@ -50,18 +50,12 @@ public class APIDatasetLandingPageCreationHook implements PageUpdateHook<ApiData
         dataset.setLinks(datasetLinks);
 
         try {
-            logInfo("creating dataset in the dataset api")
-                    .addParameter("id", dataset.getId())
-                    .addParameter("title", dataset.getTitle())
-                    .addParameter("pageURI", uri)
-                    .log();
+            info().data("id", dataset.getId()).data("title", dataset.getTitle())
+                    .data("pageURI", uri).log("creating dataset in the dataset api");
             datasetAPIClient.createDataset(page.getapiDatasetId(), dataset);
         } catch (DatasetAPIException e) {
-            logError(e, "failed to create dataset in the dataset api")
-                    .addParameter("id", dataset.getId())
-                    .addParameter("title", dataset.getTitle())
-                    .addParameter("pageURI", uri)
-                    .log();
+            error().data("id", dataset.getId()).data("title", dataset.getTitle())
+                    .data("pageURI", uri).logException(e, "failed to create dataset in the dataset api");
             throw new RuntimeException(e);
         }
     }

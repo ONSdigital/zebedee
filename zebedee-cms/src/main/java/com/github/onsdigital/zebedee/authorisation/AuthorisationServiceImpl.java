@@ -9,6 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 
+
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.warn;
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
 import static org.apache.http.HttpStatus.SC_INTERNAL_SERVER_ERROR;

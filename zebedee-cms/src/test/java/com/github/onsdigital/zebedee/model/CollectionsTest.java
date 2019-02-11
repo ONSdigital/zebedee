@@ -13,6 +13,7 @@ import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.CollectionType;
 import com.github.onsdigital.zebedee.json.Event;
 import com.github.onsdigital.zebedee.json.EventType;
+import com.github.onsdigital.zebedee.LoggingTestHelper;
 import com.github.onsdigital.zebedee.model.approval.ApproveTask;
 import com.github.onsdigital.zebedee.model.publishing.PublishNotification;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
@@ -25,6 +26,7 @@ import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.user.model.User;
 import com.github.onsdigital.zebedee.user.service.UsersService;
 import org.apache.commons.fileupload.FileUploadException;
+import org.junit.BeforeClass;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -134,6 +136,11 @@ public class CollectionsTest {
     private Supplier<Zebedee> zebedeeSupplier;
     private BiConsumer<Collection, EventType> publishingNotificationConsumer;
     private Supplier<CollectionHistoryDao> collectionHistoryDaoSupplier;
+
+    @BeforeClass
+    public static void setUpLogger() {
+        LoggingTestHelper.initDPLogger(CollectionsTest.class);
+    }
 
     @Before
     public void setUp() throws IOException {
@@ -394,7 +401,7 @@ public class CollectionsTest {
         } catch (BadRequestException e) {
             verify(collectionReaderWriterFactoryMock, times(1)).getWriter(zebedeeMock, collectionMock, sessionMock);
             verify(sessionMock, times(1)).getEmail();
-            verify(collectionMock, times(3)).getDescription();
+            verify(collectionMock, times(1)).getDescription();
             verifyZeroInteractions(permissionsServiceMock);
             verify(collectionMock, never()).find(anyString());
             verify(collectionMock, never()).create(anyString(), anyString());

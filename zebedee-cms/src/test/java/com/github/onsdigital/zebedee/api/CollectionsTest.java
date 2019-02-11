@@ -49,7 +49,7 @@ public class CollectionsTest {
 
     @BeforeClass
     public static void setUpLogger() {
-        LoggingTestHelper.initDPLogger(CollectionsTest.class);
+        LoggingTestHelper.initDPLogger();
     }
 
     @Before

@@ -47,7 +47,7 @@ public abstract class ZebedeeTestBaseFixture {
 
     @BeforeClass
     public static void setUpLogger() {
-        LoggingTestHelper.initDPLogger(ZebedeeTestBaseFixture.class);
+        LoggingTestHelper.initDPLogger();
     }
 
     @Before

@@ -17,6 +17,7 @@ import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration;
 import com.github.onsdigital.zebedee.reader.data.filter.DataFilter;
 import com.github.onsdigital.zebedee.reader.data.language.ContentLanguage;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -43,6 +44,11 @@ public class ZebedeeReaderTest {
         if (ZebedeeReader.getCollectionReaderFactory() == null) {
             ZebedeeReader.setCollectionReaderFactory(new FakeCollectionReaderFactory(ReaderConfiguration.getConfiguration().getCollectionsFolder()));
         }
+    }
+
+    @Before
+    public void setUp() {
+        LoggingTestHelper.initDPLogger();
     }
 
     @Test

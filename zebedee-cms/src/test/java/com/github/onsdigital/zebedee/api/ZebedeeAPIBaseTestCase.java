@@ -32,7 +32,7 @@ public abstract class ZebedeeAPIBaseTestCase {
 
     @BeforeClass
     public static void setUpLogger() {
-        LoggingTestHelper.initDPLogger(ZebedeeAPIBaseTestCase.class);
+        LoggingTestHelper.initDPLogger();
     }
 
     @Before

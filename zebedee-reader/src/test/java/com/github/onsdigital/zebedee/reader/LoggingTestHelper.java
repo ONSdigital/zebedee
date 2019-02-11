@@ -1,4 +1,4 @@
-package com.github.onsdigital.zebedee;
+package com.github.onsdigital.zebedee.reader;
 
 import com.github.onsdigital.logging.v2.DPLogger;
 import com.github.onsdigital.logging.v2.config.nop.NopConfig;

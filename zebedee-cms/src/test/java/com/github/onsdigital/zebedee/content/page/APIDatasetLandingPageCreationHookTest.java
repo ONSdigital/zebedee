@@ -1,5 +1,6 @@
 package com.github.onsdigital.zebedee.content.page;
 
+import com.github.onsdigital.zebedee.LoggingTestHelper;
 import com.github.onsdigital.zebedee.content.page.base.PageDescription;
 import com.github.onsdigital.zebedee.content.page.statistics.dataset.ApiDatasetLandingPage;
 import dp.api.dataset.DatasetClient;
@@ -8,6 +9,7 @@ import dp.api.dataset.exception.UnexpectedResponseException;
 import dp.api.dataset.model.Dataset;
 import org.apache.http.HttpStatus;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 
@@ -24,6 +26,11 @@ import static org.mockito.Mockito.when;
 public class APIDatasetLandingPageCreationHookTest {
 
     private String uri = "some/uri";
+
+    @Before
+    public void setUp() {
+        LoggingTestHelper.initDPLogger();
+    }
 
     @Test
     public void testDatasetLandingPageCreationHook_onPageUpdated() throws IOException, DatasetAPIException {

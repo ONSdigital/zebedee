@@ -2,15 +2,19 @@ package com.github.onsdigital.zebedee;
 
 import com.github.davidcarboni.restolino.framework.Startup;
 import com.github.onsdigital.logging.v2.DPLogger;
+import com.github.onsdigital.logging.v2.Logger;
+import com.github.onsdigital.logging.v2.LoggerImpl;
 import com.github.onsdigital.logging.v2.LoggingException;
 import com.github.onsdigital.logging.v2.config.Builder;
-import com.github.onsdigital.logging.v2.config.Config;
+import com.github.onsdigital.logging.v2.config.LogConfig;
 import com.github.onsdigital.logging.v2.serializer.JacksonLogSerialiser;
+import com.github.onsdigital.logging.v2.serializer.LogSerialiser;
+import com.github.onsdigital.logging.v2.storage.LogStore;
+import com.github.onsdigital.logging.v2.storage.MDCLogStore;
 import com.github.onsdigital.zebedee.search.client.ElasticSearchClient;
 import com.github.onsdigital.zebedee.search.indexing.Indexer;
 import com.github.onsdigital.zebedee.search.indexing.SearchBoostTermsResolver;
 import org.elasticsearch.client.transport.NoNodeAvailableException;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.concurrent.Callable;
@@ -28,10 +32,14 @@ public class ReaderInit implements Startup {
     @Override
     public void init() {
         try {
-            Config config = new Builder()
+            Logger logger = new LoggerImpl("com.github.onsdigital.zebedee.reader");
+            LogSerialiser serialiser = new JacksonLogSerialiser();
+            LogStore logStore = new MDCLogStore(serialiser);
+            LogConfig config = new Builder()
                     .dataNamespace("zebedee.reader.data")
-                    .logger(LoggerFactory.getLogger("com.github.onsdigital.zebedee.reader"))
-                    .serialiser(new JacksonLogSerialiser(true))
+                    .logger(logger)
+                    .logStore(logStore)
+                    .serialiser(serialiser)
                     .create();
 
             DPLogger.init(config);

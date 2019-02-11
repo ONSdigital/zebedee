@@ -7,10 +7,10 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.warn;
 import static com.github.onsdigital.zebedee.content.page.base.PageType.api_dataset;
 import static com.github.onsdigital.zebedee.content.page.base.PageType.api_dataset_landing_page;
 import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logInfo;
-import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logWarn;
 
 public class ReaderFeatureFlags {
 
@@ -71,9 +71,8 @@ public class ReaderFeatureFlags {
                     .log();
             return value;
         }
-        logWarn("Reader config value not found in system.properties or system.env default will be applied")
-                .addParameter("name", name)
-                .log();
+
+        warn().data("name", name).log("Reader config value not found in system.properties or system.env default will be applied");
         return "";
     }
 

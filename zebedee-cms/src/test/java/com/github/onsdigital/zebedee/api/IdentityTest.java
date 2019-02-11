@@ -60,7 +60,7 @@ public class IdentityTest {
 
     @BeforeClass
     public static void setUpLogger() {
-        LoggingTestHelper.initDPLogger(IdentityTest.class);
+        LoggingTestHelper.initDPLogger();
     }
 
     @Before

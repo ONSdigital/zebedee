@@ -40,6 +40,7 @@ public class CollectionReaderTest {
 
     @Before
     public void createContentReader() throws IOException, NotFoundException {
+        LoggingTestHelper.initDPLogger();
         this.collectionReader = new FakeCollectionReader(ReaderConfiguration.getConfiguration().getCollectionsFolder(), COLLECTION_ID);
     }
 

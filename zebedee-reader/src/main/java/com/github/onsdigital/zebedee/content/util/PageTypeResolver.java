@@ -18,12 +18,11 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.warn;
 import static com.github.onsdigital.zebedee.ReaderFeatureFlags.readerFeatureFlags;
-import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logDebug;
 import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logError;
 import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logInfo;
 import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logTrace;
-import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logWarn;
 
 /**
  * Created by bren on 09/06/15.
@@ -59,9 +58,8 @@ class PageTypeResolver implements JsonDeserializer<Page> {
 
             // FIXME CMD feature
             if (!datasetImportEnabled && isDatasetImportPageType.test(contentType)) {
-                logWarn("PageType invalid feature EnableDatasetImport disabled. Enable this feature by updating the Zebedee configuration")
-                        .addParameter("pageType", contentType.getDisplayName())
-                        .log();
+                warn().data("pageType", contentType.getDisplayName())
+                        .log("PageType invalid feature EnableDatasetImport disabled. Enable this feature by updating the Zebedee configuration");
                 throw new JsonParseException("Invalid page type");
             }
 

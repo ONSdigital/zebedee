@@ -24,7 +24,7 @@ public class RunnableSchedulerTest {
 
     @BeforeClass
     public static void setUpLogger() {
-        LoggingTestHelper.initDPLogger(RunnableSchedulerTest.class);
+        LoggingTestHelper.initDPLogger();
     }
 
     @Before

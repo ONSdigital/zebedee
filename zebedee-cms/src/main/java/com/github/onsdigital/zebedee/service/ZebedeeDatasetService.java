@@ -175,10 +175,9 @@ public class ZebedeeDatasetService implements DatasetService {
             if (dataset.getLinks() != null && dataset.getLinks().getSelf() != null) {
                 collectionDataset.setUri(dataset.getLinks().getSelf().getHref());
             } else {
-                logInfo("The dataset URL has not been set on the dataset response.")
-                        .addParameter("collectionID", collection.getId())
-                        .addParameter("datasetID", datasetID)
-                        .log();
+                info().data("collectionId", collection.getId())
+                        .data("datasetId", datasetID)
+                        .log("The dataset URL has not been set on the dataset response.");
 
                 throw new InvalidObjectException("The dataset URL has not been set on the dataset response.");
             }

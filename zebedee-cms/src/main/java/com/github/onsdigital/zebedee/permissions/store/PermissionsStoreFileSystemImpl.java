@@ -78,9 +78,7 @@ public class PermissionsStoreFileSystemImpl implements PermissionsStore {
 
                 dataVisualisationPublishers.stream()
                         .forEach(dataVisUser -> {
-                            logDebug("Migrating user")
-                                    .user(dataVisUser)
-                                    .log();
+                            info().data("user", dataVisUser).log("Migrating user");
                             updated.getDigitalPublishingTeam().add(dataVisUser);
                         });
 

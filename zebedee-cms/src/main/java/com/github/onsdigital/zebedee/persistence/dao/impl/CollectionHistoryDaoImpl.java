@@ -96,10 +96,9 @@ public class CollectionHistoryDaoImpl implements CollectionHistoryDao {
             return events;
 
         } catch (Exception e) {
-            logError(e, "Unexpected error while attempting to get collection event history")
-                    .collectionId(collectionId)
-                    .logAndThrow(CollectionEventHistoryException.class);
+            error().data("collectionId", collectionId)
+                    .logException(e, "Unexpected error while attempting to get collection event history");
+            throw new CollectionEventHistoryException("Unexpected error while attempting to get collection event history");
         }
-        return null;
     }
 }

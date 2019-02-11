@@ -29,9 +29,9 @@ public class Init implements Startup {
     public void init() {
 
         try {
-            LogSerialiser serialiser = new JacksonLogSerialiser(true);
+            LogSerialiser serialiser = new JacksonLogSerialiser();
             LogStore logStore = new MDCLogStore(serialiser);
-            Logger logger = new LoggerImpl("com.zebedee.app");
+            Logger logger = new LoggerImpl("com.github.onsdigital.zebedee.cms");
 
             LogConfig config = new Builder()
                     .logger(logger)

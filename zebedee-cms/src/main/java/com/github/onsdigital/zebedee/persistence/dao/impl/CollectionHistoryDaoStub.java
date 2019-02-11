@@ -58,8 +58,7 @@ public class CollectionHistoryDaoStub implements CollectionHistoryDao {
 
     @Override
     public List<CollectionHistoryEvent> getCollectionEventHistory(String collectionId) throws ZebedeeException {
-        logInfo("getCollectionEventHistory: AUDIT database is not enabled Events are written to application log " +
-                "only.");
+        info().log("getCollectionEventHistory: AUDIT database is not enabled Events are written to application log only.");
         return emptyList;
     }
 

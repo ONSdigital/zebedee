@@ -19,9 +19,7 @@ import java.io.InvalidObjectException;
 import java.util.Objects;
 import java.util.Optional;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logDebug;
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
-
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 /**
  * Dataset related services
  */
@@ -38,76 +36,72 @@ public class ZebedeeDatasetService implements DatasetService {
         Objects.requireNonNull(newState);
 
         if (currentState == null && newState.equals(ContentStatus.Reviewed)) {
-            logInfo("Attempt to review a dataset that hasn't been submitted for review")
-                    .addParameter("last edited by", lastEditedBy)
-                    .user(user)
-                    .log();
+            info().data("last edited by", lastEditedBy).data("user", user)
+                    .log("Attempt to review a dataset that hasn't been submitted for review");
 
             throw new BadRequestException("Cannot be reviewed without being submitted for review first");
         }
 
         // Updating from scratch to 'in progress' or 'complete' state so don't need to perform following checks
         if (currentState == null && (newState.equals(ContentStatus.InProgress) || newState.equals(ContentStatus.Complete))) {
-            logInfo("Updating dataset state for first time")
-                    .user(user)
-                    .addParameter("last edited by", lastEditedBy)
-                    .addParameter("current state", currentState)
-                    .addParameter("new state", newState)
-                    .log();
+            info().data("user", user)
+                    .data("last edited by", lastEditedBy)
+                    .data("current state", currentState)
+                    .data("new state", newState)
+                    .log("Updating dataset state for first time");
 
             return newState;
         }
 
         // The same user can't review edits they've submitted for review
         if (!currentState.equals(ContentStatus.Reviewed) && newState.equals(ContentStatus.Reviewed) && lastEditedBy.equalsIgnoreCase(user)) {
-            logInfo("User attempting to review their own dataset")
-                    .user(user)
-                    .addParameter("last edited by", lastEditedBy)
-                    .addParameter("current state", currentState)
-                    .addParameter("new state", newState)
-                    .log();
+            info().data("user", user)
+                    .data("last edited by", lastEditedBy)
+                    .data("current state", currentState)
+                    .data("new state", newState)
+                    .log("User attempting to review their own dataset");
+
             throw new ForbiddenException("User " + user + "doesn't have permission to review a dataset they completed");
         }
 
         // Any further updates made by the user who submitted the dataset should keep the dataset in the awaiting review state
         if (currentState.equals(ContentStatus.Complete) && lastEditedBy.equalsIgnoreCase(user)) {
-            logInfo("User making more updates to a dataset whilst it is awaiting review")
-                    .user(user)
-                    .addParameter("last edited by", lastEditedBy)
-                    .addParameter("current state", currentState)
-                    .addParameter("new state", newState)
-                    .log();
+
+            info().data("user", user)
+                    .data("last edited by", lastEditedBy)
+                    .data("current state", currentState)
+                    .data("new state", newState)
+                    .log("User making more updates to a dataset whilst it is awaiting review");
             return ContentStatus.Complete;
         }
 
         // Any updates to a dataset awaiting review by a different user means it moves back to an in progress state
         if (currentState.equals(ContentStatus.Complete) && !newState.equals(ContentStatus.Reviewed) && !lastEditedBy.equalsIgnoreCase(user)) {
-            logInfo("A different user making updates to a dataset whilst it is awaiting review")
-                    .user(user)
-                    .addParameter("last edited by", lastEditedBy)
-                    .addParameter("current state", currentState)
-                    .addParameter("new state", newState)
-                    .log();
+
+            info().data("user", user)
+                    .data("last edited by", lastEditedBy)
+                    .data("current state", currentState)
+                    .data("new state", newState)
+                    .log("A different user making updates to a dataset whilst it is awaiting review");
             return ContentStatus.InProgress;
         }
 
         // Once reviewed any updates can be made to a dataset without the state changing
         if (currentState.equals(ContentStatus.Reviewed)) {
-            logInfo("Making updates to a review dataset")
-                    .user(user)
-                    .addParameter("last edited by", lastEditedBy)
-                    .addParameter("current state", currentState)
-                    .addParameter("new state", newState)
-                    .log();
+
+            info().data("user", user)
+                    .data("last edited by", lastEditedBy)
+                    .data("current state", currentState)
+                    .data("new state", newState)
+                    .log("Making updates to a review dataset");
             return ContentStatus.Reviewed;
         }
 
-        logInfo("Updating dataset state")
-                .user(user)
-                .addParameter("last edited by", lastEditedBy)
-                .addParameter("current state", currentState)
-                .addParameter("new state", newState)
-                .log();
+        info().data("user", user)
+                .data("last edited by", lastEditedBy)
+                .data("current state", currentState)
+                .data("new state", newState)
+                .log("Updating dataset state");
         return newState;
     }
 
@@ -119,12 +113,11 @@ public class ZebedeeDatasetService implements DatasetService {
 
         for (CollectionDatasetVersion datasetVersion : collection.getDescription().getDatasetVersions()) {
 
-            logDebug("setting dataset api version state to published")
-                    .collectionId(collection)
-                    .addParameter("dataset_id", datasetVersion.getId())
-                    .addParameter("edition", datasetVersion.getEdition())
-                    .addParameter("version", datasetVersion.getVersion())
-                    .log();
+            info().data("collectionId", collection)
+                    .data("dataset_id", datasetVersion.getId())
+                    .data("edition", datasetVersion.getEdition())
+                    .data("version", datasetVersion.getVersion())
+                    .log("setting dataset api version state to published");
 
             DatasetVersion versionUpdate = new DatasetVersion();
             versionUpdate.setState(State.PUBLISHED);
@@ -138,10 +131,9 @@ public class ZebedeeDatasetService implements DatasetService {
 
         for (CollectionDataset dataset : collection.getDescription().getDatasets()) {
 
-            logDebug("setting api dataset state to published")
-                    .collectionId(collection)
-                    .addParameter("dataset_id", dataset.getId())
-                    .log();
+            info().data("collectionId", collection)
+                    .data("dataset_id", dataset.getId())
+                    .log("setting api dataset state to published");
 
             Dataset datasetUpdate = new Dataset();
             datasetUpdate.setState(State.PUBLISHED);
@@ -264,10 +256,9 @@ public class ZebedeeDatasetService implements DatasetService {
         if (datasetVersion.getLinks() != null && datasetVersion.getLinks().getSelf() != null) {
             collectionDatasetVersion.setUri(datasetVersion.getLinks().getSelf().getHref());
         } else {
-            logInfo("The dataset version URL has not been set on the dataset version response.")
-                    .addParameter("collectionID", collection.getId())
-                    .addParameter("datasetID", datasetID)
-                    .log();
+            info().data("collectionId", collection.getId())
+                    .data("datasetId", datasetID)
+                    .log("The dataset version URL has not been set on the dataset version response.");
 
             throw new InvalidObjectException("The dataset version URL has not been set on the dataset version response.");
         }

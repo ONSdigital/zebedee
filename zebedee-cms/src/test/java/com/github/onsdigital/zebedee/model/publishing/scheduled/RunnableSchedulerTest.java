@@ -1,6 +1,5 @@
 package com.github.onsdigital.zebedee.model.publishing.scheduled;
 
-import com.github.onsdigital.zebedee.LoggingTestHelper;
 import com.github.onsdigital.zebedee.model.publishing.scheduled.task.DummyExceptionTask;
 import com.github.onsdigital.zebedee.model.publishing.scheduled.task.DummyTask;
 import org.joda.time.DateTime;
@@ -21,11 +20,6 @@ import static junit.framework.TestCase.assertTrue;
 public class RunnableSchedulerTest {
 
     RunnableScheduler runnableScheduler;
-
-    @BeforeClass
-    public static void setUpLogger() {
-        LoggingTestHelper.initDPLogger();
-    }
 
     @Before
     public void setUp() throws Exception {

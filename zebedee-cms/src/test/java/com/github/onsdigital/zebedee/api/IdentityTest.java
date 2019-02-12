@@ -5,7 +5,6 @@ import com.github.onsdigital.zebedee.authorisation.UserIdentity;
 import com.github.onsdigital.zebedee.authorisation.UserIdentityException;
 import com.github.onsdigital.zebedee.json.JSONable;
 import com.github.onsdigital.zebedee.json.response.Error;
-import com.github.onsdigital.zebedee.LoggingTestHelper;
 import com.github.onsdigital.zebedee.model.ServiceAccount;
 import com.github.onsdigital.zebedee.service.ServiceStore;
 import com.github.onsdigital.zebedee.session.model.Session;
@@ -57,11 +56,6 @@ public class IdentityTest {
     private ServiceStore serviceStore;
 
     private Identity api;
-
-    @BeforeClass
-    public static void setUpLogger() {
-        LoggingTestHelper.initDPLogger();
-    }
 
     @Before
     public void setUp() throws Exception {

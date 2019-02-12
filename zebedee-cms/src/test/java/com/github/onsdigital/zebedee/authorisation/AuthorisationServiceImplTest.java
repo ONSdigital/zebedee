@@ -1,6 +1,5 @@
 package com.github.onsdigital.zebedee.authorisation;
 
-import com.github.onsdigital.zebedee.LoggingTestHelper;
 import com.github.onsdigital.zebedee.service.ServiceSupplier;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.session.service.SessionsService;
@@ -45,7 +44,6 @@ public class AuthorisationServiceImplTest {
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
-        LoggingTestHelper.initDPLogger();
 
         notAuthenticatedEx = new UserIdentityException("user not authenticated", SC_UNAUTHORIZED);
         internalServerErrorEx = new UserIdentityException("internal server error", SC_INTERNAL_SERVER_ERROR);

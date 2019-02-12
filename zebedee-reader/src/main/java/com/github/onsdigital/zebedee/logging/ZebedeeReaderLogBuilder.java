@@ -47,20 +47,12 @@ public class ZebedeeReaderLogBuilder extends LogMessageBuilder {
         return new ZebedeeReaderLogBuilder(t, ZEBEDEE_READER_EXCEPTION + ": " + errorContext);
     }
 
-    public static ZebedeeReaderLogBuilder logWarn(String message) {
-        return new ZebedeeReaderLogBuilder(message, Level.WARN);
-    }
-
     public static ZebedeeReaderLogBuilder logDebug(String message) {
         return new ZebedeeReaderLogBuilder(message, Level.DEBUG);
     }
 
     public static ZebedeeReaderLogBuilder logTrace(String message) {
         return new ZebedeeReaderLogBuilder(message, Level.TRACE);
-    }
-
-    public static ZebedeeReaderLogBuilder logInfo(String message) {
-        return new ZebedeeReaderLogBuilder(message, Level.INFO);
     }
 
     public static ZebedeeReaderLogBuilder elasticSearchLog(String message) {

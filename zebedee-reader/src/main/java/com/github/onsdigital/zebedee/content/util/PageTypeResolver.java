@@ -17,13 +17,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import static com.github.onsdigital.zebedee.ReaderFeatureFlags.readerFeatureFlags;
-import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logDebug;
+import static com.github.onsdigital.zebedee.logging.ReaderLogger.info;
+import static com.github.onsdigital.zebedee.logging.ReaderLogger.warn;
 import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logError;
-import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logInfo;
 import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logTrace;
-import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logWarn;
 
 /**
  * Created by bren on 09/06/15.
@@ -59,9 +59,8 @@ class PageTypeResolver implements JsonDeserializer<Page> {
 
             // FIXME CMD feature
             if (!datasetImportEnabled && isDatasetImportPageType.test(contentType)) {
-                logWarn("PageType invalid feature EnableDatasetImport disabled. Enable this feature by updating the Zebedee configuration")
-                        .addParameter("pageType", contentType.getDisplayName())
-                        .log();
+                warn().data("pageType", contentType.getDisplayName())
+                        .log("PageType invalid feature EnableDatasetImport disabled. Enable this feature by updating the Zebedee configuration");
                 throw new JsonParseException("Invalid page type");
             }
 
@@ -81,15 +80,23 @@ class PageTypeResolver implements JsonDeserializer<Page> {
         if (instance == null) {
             synchronized (PageTypeResolver.class) {
                 if (instance == null) {
-                    logInfo("initialising PageTypeResolver instance").log();
+                    info().log("initialising PageTypeResolver instance");
                     boolean isDatasetImportEnabled = readerFeatureFlags().isEnableDatasetImport();
                     Predicate<PageType> isDatasetImportPageType = (p) -> readerFeatureFlags().datasetImportPageTypes().contains(p);
 
                     registerContentTypes();
 
-                    logInfo("registered content types")
-                            .parameter("contentTypes", contentClasses.entrySet().stream(), contentTypeNameFunc)
-                            .log();
+
+                    contentClasses.entrySet()
+                            .stream()
+                            .map((item) -> contentTypeNameFunc.apply(item))
+                            .collect(Collectors.toList());
+
+                    info().data("contentTypes", contentClasses.entrySet()
+                            .stream()
+                            .map((item) -> contentTypeNameFunc.apply(item))
+                            .collect(Collectors.toList()))
+                            .log("registered content types");
 
                     instance = new PageTypeResolver(isDatasetImportEnabled, isDatasetImportPageType);
                 }

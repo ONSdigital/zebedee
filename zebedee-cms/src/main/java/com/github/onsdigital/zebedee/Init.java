@@ -2,7 +2,7 @@ package com.github.onsdigital.zebedee;
 
 import com.github.davidcarboni.restolino.framework.Startup;
 import com.github.onsdigital.logging.v2.DPLogger;
-import com.github.onsdigital.logging.v2.config.nop.NopConfig;
+import com.github.onsdigital.logging.v2.nop.NopConfig;
 import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.configuration.CMSFeatureFlags;
 import com.github.onsdigital.zebedee.model.ZebedeeCollectionReaderFactory;
@@ -19,7 +19,7 @@ public class Init implements Startup {
 
     @Override
     public void init() {
-        DPLogger.init(new NopConfig());
+        //DPLogger.init(new NopConfig());
         logInfo("inside CMS INIT").log();
 
         logInfo("loading CMS feature flags").log();

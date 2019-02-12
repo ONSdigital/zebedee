@@ -13,8 +13,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.function.Consumer;
 
+import static com.github.onsdigital.zebedee.logging.ReaderLogger.warn;
 import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logError;
-import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logWarn;
 
 /**
  * Client encapsulates sending HTTP collection events to Splunk.
@@ -27,11 +27,10 @@ public class SplunkClient {
     private Service splunkService = null;
     private Args serviceArgs = null;
     private Consumer<ResponseMessage> errorResponseHandler = (responseMessage -> {
-        logWarn(UNEXPECTED_RESPONSE_CODE)
-                .expected(200)
-                .actual(responseMessage.getStatus())
-                .addMessage(parseResponse(responseMessage))
-                .log();
+        warn().data("expected", 200)
+                .data("actual", responseMessage.getStatus())
+                .data("message", parseResponse(responseMessage))
+                .log(UNEXPECTED_RESPONSE_CODE);
     });
 
     /**

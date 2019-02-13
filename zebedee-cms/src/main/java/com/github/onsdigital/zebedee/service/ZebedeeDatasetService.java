@@ -46,8 +46,8 @@ public class ZebedeeDatasetService implements DatasetService {
         if (currentState == null && (newState.equals(ContentStatus.InProgress) || newState.equals(ContentStatus.Complete))) {
             info().data("user", user)
                     .data("last edited by", lastEditedBy)
-                    .data("current state", currentState)
-                    .data("new state", newState)
+                    .data("current state", currentState.toString())
+                    .data("new state", newState.toString())
                     .log("Updating dataset state for first time");
 
             return newState;
@@ -57,8 +57,8 @@ public class ZebedeeDatasetService implements DatasetService {
         if (!currentState.equals(ContentStatus.Reviewed) && newState.equals(ContentStatus.Reviewed) && lastEditedBy.equalsIgnoreCase(user)) {
             info().data("user", user)
                     .data("last edited by", lastEditedBy)
-                    .data("current state", currentState)
-                    .data("new state", newState)
+                    .data("current state", currentState.toString())
+                    .data("new state", newState.toString())
                     .log("User attempting to review their own dataset");
 
             throw new ForbiddenException("User " + user + "doesn't have permission to review a dataset they completed");
@@ -69,8 +69,8 @@ public class ZebedeeDatasetService implements DatasetService {
 
             info().data("user", user)
                     .data("last edited by", lastEditedBy)
-                    .data("current state", currentState)
-                    .data("new state", newState)
+                    .data("current state", currentState.toString())
+                    .data("new state", newState.toString())
                     .log("User making more updates to a dataset whilst it is awaiting review");
             return ContentStatus.Complete;
         }
@@ -80,8 +80,8 @@ public class ZebedeeDatasetService implements DatasetService {
 
             info().data("user", user)
                     .data("last edited by", lastEditedBy)
-                    .data("current state", currentState)
-                    .data("new state", newState)
+                    .data("current state", currentState.toString())
+                    .data("new state", newState.toString())
                     .log("A different user making updates to a dataset whilst it is awaiting review");
             return ContentStatus.InProgress;
         }
@@ -91,16 +91,16 @@ public class ZebedeeDatasetService implements DatasetService {
 
             info().data("user", user)
                     .data("last edited by", lastEditedBy)
-                    .data("current state", currentState)
-                    .data("new state", newState)
+                    .data("current state", currentState.toString())
+                    .data("new state", newState.toString())
                     .log("Making updates to a review dataset");
             return ContentStatus.Reviewed;
         }
 
         info().data("user", user)
                 .data("last edited by", lastEditedBy)
-                .data("current state", currentState)
-                .data("new state", newState)
+                .data("current state", currentState.toString())
+                .data("new state", newState.toString())
                 .log("Updating dataset state");
         return newState;
     }
@@ -113,7 +113,7 @@ public class ZebedeeDatasetService implements DatasetService {
 
         for (CollectionDatasetVersion datasetVersion : collection.getDescription().getDatasetVersions()) {
 
-            info().data("collectionId", collection)
+            info().data("collectionId", collection.getDescription().getId())
                     .data("datasetId", datasetVersion.getId())
                     .data("edition", datasetVersion.getEdition())
                     .data("version", datasetVersion.getVersion())
@@ -131,7 +131,7 @@ public class ZebedeeDatasetService implements DatasetService {
 
         for (CollectionDataset dataset : collection.getDescription().getDatasets()) {
 
-            info().data("collectionId", collection)
+            info().data("collectionId", collection.getDescription().getId())
                     .data("datasetId", dataset.getId())
                     .log("setting api dataset state to published");
 
@@ -175,7 +175,7 @@ public class ZebedeeDatasetService implements DatasetService {
             if (dataset.getLinks() != null && dataset.getLinks().getSelf() != null) {
                 collectionDataset.setUri(dataset.getLinks().getSelf().getHref());
             } else {
-                info().data("collectionId", collection.getId())
+                info().data("collectionId", collection.getDescription().getId())
                         .data("datasetId", datasetID)
                         .log("The dataset URL has not been set on the dataset response.");
 
@@ -191,7 +191,7 @@ public class ZebedeeDatasetService implements DatasetService {
             }
 
             if (dataset.getState().equals(State.ASSOCIATED)
-                    && !dataset.getCollection_id().equals(collection.getId())) {
+                    && !dataset.getCollection_id().equals(collection.getDescription().getId())) {
                 throw new ConflictException("cannot add dataset " + datasetID
                         + " to collection " + collection.getId()
                         + " it is already in collection " + dataset.getCollection_id());

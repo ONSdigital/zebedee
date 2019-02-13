@@ -443,7 +443,7 @@ public class Publisher {
 
         checkFutureResults(futures, "error sending publish manifest");
 
-        info().data("publishing", true).data("collectionId", collection)
+        info().data("publishing", true).data("collectionId", collection.getDescription().getId())
                 .data("hostToTransactionId", collection.getDescription().publishTransactionIds)
                 .data("timeTaken", System.currentTimeMillis() - start)
                 .log("successfully sent publish manifest for collection to train hosts");

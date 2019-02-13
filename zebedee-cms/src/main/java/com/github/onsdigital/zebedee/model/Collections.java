@@ -574,7 +574,7 @@ public class Collections {
 
         CollectionWriter collectionWriter = collectionReaderWriterFactory.getWriter(zebedeeSupplier.get(), collection, session);
 
-        info().data("collectionId", collection).data("path", uri).data("user", session.getEmail()).log("Attempting to write content.");
+        info().data("collectionId", collection.getDescription().getId()).data("path", uri).data("user", session.getEmail()).log("Attempting to write content.");
 
         if (collection.getDescription().getApprovalStatus() == ApprovalStatus.COMPLETE) {
             throw new BadRequestException("This collection has been approved and cannot be saved to.");
@@ -622,7 +622,8 @@ public class Collections {
         }
 
         collection.save();
-        info().data("collectionId", collection).data("path", uri).data("user", session.getEmail())
+        info().data("collectionId", collection.getDescription().getId())
+                .data("path", uri).data("user", session.getEmail())
                 .log("content save successful.");
 
         path = collection.getInProgressPath(uri);

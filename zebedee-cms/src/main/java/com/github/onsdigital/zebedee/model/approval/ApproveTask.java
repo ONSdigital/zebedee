@@ -99,7 +99,7 @@ public class ApproveTask implements Callable<Boolean> {
             return doApproval();
         } catch (Exception e) {
 
-            SimpleEvent errorLog = error().data("collectionId", collection);
+            SimpleEvent errorLog = error().data("collectionId", collection.getDescription().getId());
 
             if (session != null && StringUtils.isNotEmpty(session.getEmail())) {
                 errorLog.data("approver", session.getEmail());

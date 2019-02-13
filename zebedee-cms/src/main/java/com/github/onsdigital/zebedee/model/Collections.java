@@ -291,6 +291,7 @@ public class Collections {
         }
 
         collection.getDescription().addEvent(new Event(new Date(), EventType.APPROVE_SUBMITTED, session.getEmail()));
+        String collectionId = collection.getDescription().getId();
 
         // Everything is completed
         if (!collection.isAllContentReviewed()) {
@@ -298,7 +299,7 @@ public class Collections {
 
             error().data("inProgressEmpty", collection.inProgressUris().isEmpty())
                     .data("completeEmpty", collection.completeUris().isEmpty())
-                    .data("collectionId", collection)
+                    .data("collectionId", collectionId)
                     .log("approve collection: can approve check failure");
             throw new ConflictException(
                     "This collection can't be approved because it's not empty");
@@ -308,12 +309,16 @@ public class Collections {
         CollectionWriter collectionWriter = collectionReaderWriterFactory.getWriter(zebedeeSupplier.get(), collection, session);
         ContentReader publishedReader = contentReaderFactory.apply(this.published.path);
 
-        info().data("collectionId", collection).log("approve collection: setting collection status to approved");
+        info().data("collectionId", collectionId)
+                .log("approve collection: setting collection status to approved");
+
         collection.getDescription().setApprovalStatus(ApprovalStatus.IN_PROGRESS);
-        info().data("collectionId", collection).log("approve collection: saving collection");
+
+        info().data("collectionId", collectionId)
+                .log("approve collection: saving collection");
         collection.save();
 
-        info().data("collectionId", collection).log("approve collection: adding approval take to queue");
+        info().data("collectionId", collectionId).log("approve collection: adding approval take to queue");
 
         Future<Boolean> future = null;
         try {
@@ -321,13 +326,13 @@ public class Collections {
                     new ApproveTask(collection, session, collectionReader, collectionWriter, publishedReader,
                             zebedeeSupplier.get().getDataIndex()));
         } catch (Exception e) {
-            error().data("collectionId", collection).logException(e, "approve collection: submit collection approval task failure");
+            error().data("collectionId", collectionId).logException(e, "approve collection: submit collection approval task failure");
         }
 
-        info().data("collectionId", collection).log("approve collection: saving collection history event");
+        info().data("collectionId", collectionId).log("approve collection: saving collection history event");
         collectionHistoryDaoSupplier.get().saveCollectionHistoryEvent(collection, session, COLLECTION_APPROVED);
 
-        info().data("collectionId", collection).log("approve collection: API approve step compeleted successfully");
+        info().data("collectionId", collectionId).log("approve collection: API approve step compeleted successfully");
         return future;
     }
 
@@ -422,11 +427,12 @@ public class Collections {
 
             PostPublisher.postPublish(zebedeeSupplier.get(), collection, skipVerification, collectionReader);
 
-            info().data("collectionId", collection)
+            info().data("collectionId", collection.getDescription().getId())
                     .data("timeTaken", (System.currentTimeMillis() - onPublishCompleteStart))
                     .log("collection post publish process completed");
 
-            info().data("collectionId", collection).data("timeTaken", (System.currentTimeMillis() - publishStart))
+            info().data("collectionId", collection.getDescription().getId())
+                    .data("timeTaken", (System.currentTimeMillis() - publishStart))
                     .log("collection publish complete");
         }
 

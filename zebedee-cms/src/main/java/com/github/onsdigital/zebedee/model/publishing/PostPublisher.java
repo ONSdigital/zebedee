@@ -111,7 +111,7 @@ public class PostPublisher {
 
             return true;
         } catch (Exception exception) {
-            error().data("collectionId", collection).logException(exception, "An error occurred during the publish cleanup");
+            error().data("collectionId", collection.getDescription().getId()).logException(exception, "An error occurred during the publish cleanup");
             // FIXME using PostPublisher.getPublishedCollection feels a bit hacky
             SlackNotification.publishNotification(getPublishedCollection(collection),SlackNotification.CollectionStage.POST_PUBLISH, SlackNotification.StageStatus.FAILED);
         }
@@ -138,7 +138,7 @@ public class PostPublisher {
             archiveContentToBeDeleted(collection, contentReader);
             applyManifestDeletesToMaster(collection, contentReader, contentWriter);
         } catch (Exception e) {
-            error().data("collectionId", collection).logException(e, "An error occurred trying apply the deletes to publishing content ");
+            error().data("collectionId", collection.getDescription().getId()).logException(e, "An error occurred trying apply the deletes to publishing content ");
         }
     }
 
@@ -211,12 +211,12 @@ public class PostPublisher {
                 try {
                     FileUtils.deleteDirectory(target.toFile());
                 } catch (IOException e) {
-                    error().data("collectionId", collection).logException(e, "An error occurred trying to delete directory "
-                            + target.toString());
+                    error().data("collectionId", collection.getDescription().getId())
+                            .logException(e, "An error occurred trying to delete directory " + target.toString());
                 }
             }
         } catch (Exception e) {
-            error().data("collectionId", collection)
+            error().data("collectionId", collection.getDescription().getId())
                     .logException(e, "An error occurred trying apply the publish manifest deletes to publishing content ");
         }
 
@@ -235,7 +235,7 @@ public class PostPublisher {
                 try {
                     FileUtils.deleteDirectory(target.toFile());
                 } catch (IOException e) {
-                    error().data("collectionId", collection)
+                    error().data("collectionId", collection.getDescription().getId())
                             .logException(e, "An error occurred trying to delete directory " + target.toString());
                 }
             }
@@ -247,12 +247,13 @@ public class PostPublisher {
                 ) {
                     contentWriter.write(inputStream, fileCopy.target);
                 } catch (ZebedeeException | IOException e) {
-                    error().data("collectionId", collection).logException(e, "An error occurred trying to copy file from " +
+                    error().data("collectionId", collection.getDescription().getId())
+                            .logException(e, "An error occurred trying to copy file from " +
                             fileCopy.source + " to " + fileCopy.target);
                 }
             }
         } catch (Exception e) {
-            error().data("collectionId", collection).logException(e, "An error occurred trying apply the publish manifest to publishing content ");
+            error().data("collectionId", collection.getDescription().getId()).logException(e, "An error occurred trying apply the publish manifest to publishing content ");
         }
 
     }
@@ -277,7 +278,8 @@ public class PostPublisher {
      * @throws IOException
      */
     private static void unzipTimeseries(Collection collection, CollectionReader collectionReader, Zebedee zebedee) throws IOException, ZebedeeException {
-        info().data("collectionId", collection).log("Unzipping files if required to move to master.");
+        info().data("collectionId", collection.getDescription().getId()).log("Unzipping files if required to move to master.");
+
         for (String uri : collection.reviewed.uris()) {
             Path source = collection.reviewed.get(uri);
             if (source != null) {
@@ -300,7 +302,7 @@ public class PostPublisher {
 
     private static void reindexPublishingSearch(Collection collection) throws IOException {
 
-        info().data("collectionId", collection).log("Reindexing search");
+        info().data("collectionId", collection.getDescription().getId()).log("Reindexing search");
         try {
 
             long start = System.currentTimeMillis();
@@ -327,10 +329,14 @@ public class PostPublisher {
                 });
             }
 
-            info().data("collectionId", collection).data("timeTaken", (System.currentTimeMillis() - start)).log("Redindex search completed");
+            info().data("collectionId", collection.getDescription().getId())
+                    .data("timeTaken", (System.currentTimeMillis() - start))
+                    .log("Redindex search completed");
 
         } catch (Exception exception) {
-            error().data("collectionId", collection).logException(exception, "An error occurred during the search reindex");
+            error().data("collectionId", collection.getDescription().getId())
+                    .logException(exception, "An error occurred during the search reindex");
+
             ExceptionUtils.printRootCauseStackTrace(exception);
         }
     }
@@ -357,7 +363,9 @@ public class PostPublisher {
 
     public static void copyFilesToMaster(Zebedee zebedee, Collection collection, CollectionReader collectionReader)
             throws IOException, ZebedeeException {
-        info().data("collectionId", collection).log("Moving files from collection into master");
+
+        info().data("collectionId", collection.getDescription().getId()).log("Moving files from collection into master");
+
         // Move each item of content:
         for (String uri : collection.reviewed.uris()) {
             if (!VersionedContentItem.isVersionedUri(uri)
@@ -374,7 +382,8 @@ public class PostPublisher {
     }
 
     public static Path moveCollectionToArchive(Zebedee zebedee, Collection collection, CollectionReader collectionReader) throws IOException, ZebedeeException {
-        info().data("collectionId", collection).log("moving collection files to archive for collection");
+        info().data("collectionId", collection.getDescription().getId())
+                .log("moving collection files to archive for collection");
 
         String filename = PathUtils.toFilename(collection.getDescription().getName());
         Path collectionJsonSource = zebedee.getCollections().path.resolve(filename + ".json");

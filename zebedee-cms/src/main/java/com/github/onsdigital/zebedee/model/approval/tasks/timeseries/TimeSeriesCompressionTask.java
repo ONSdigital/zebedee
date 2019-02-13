@@ -48,7 +48,7 @@ public class TimeSeriesCompressionTask {
      * @throws IOException
      */
     public boolean compressTimeseries(Collection collection, CollectionReader collectionReader, CollectionWriter collectionWriter) throws ZebedeeException, IOException {
-        info().data("collectionId", collection).log("Compressing time series directories");
+        info().data("collectionId", collection.getDescription().getId()).log("Compressing time series directories");
         int attempt = 1;
         List<TimeseriesCompressionResult> failedZipFiles = null; // populated on a failed attempt
 
@@ -57,7 +57,7 @@ public class TimeSeriesCompressionTask {
 
             failedZipFiles = verifyZipFiles(collection, collectionReader, collectionWriter, attempt, zipFiles);
             if (failedZipFiles.size() == 0) {
-                info().data("collectionId", collection).log("Verified time series zip files");
+                info().data("collectionId", collection.getDescription().getId()).log("Verified time series zip files");
                 return true;
             }
 
@@ -79,7 +79,7 @@ public class TimeSeriesCompressionTask {
 
     private List<TimeseriesCompressionResult> verifyZipFiles(Collection collection, CollectionReader collectionReader, CollectionWriter collectionWriter, int attempt, List<TimeseriesCompressionResult> zipFiles) throws IOException {
         List<TimeseriesCompressionResult> failedZipFiles;
-        info().data("collectionId", collection).data("attempt",
+        info().data("collectionId", collection.getDescription().getId()).data("attempt",
                 attempt).log("Verifying " + zipFiles.size() + " time series zip files");
         failedZipFiles = zipFileVerifier.verifyZipFiles(
                 zipFiles,

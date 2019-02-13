@@ -13,18 +13,19 @@ public abstract class Scheduler {
     public void schedulePublish(Collection collection, Zebedee zebedee) {
         if (Configuration.isSchedulingEnabled()) {
             try {
-                info().data("collectionId", collection)
+                info().data("collectionId", collection.getDescription().getId())
                         .data("collectionType", collection.getDescription().getType())
                         .log("Attempting collection schedule publish");
                 if (collection.getDescription().getType() == CollectionType.scheduled) {
                     schedule(collection, zebedee);
                 }
             } catch (Exception e) {
-                error().data("collectionId", collection)
+                error().data("collectionId", collection.getDescription().getId())
                         .logException(e, "Exception caught trying to schedule existing collection");
             }
         } else {
-            info().data("collectionId", collection).log("Not scheduling collection, scheduling is not enabled");
+            info().data("collectionId", collection.getDescription().getId())
+                    .log("Not scheduling collection, scheduling is not enabled");
         }
     }
 

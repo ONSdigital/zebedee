@@ -83,7 +83,7 @@ public class PublishTask implements Runnable {
                 }
             }
         } catch (Exception e) {
-            error().data("collectionId", collection).logException(e, "Exception publishing scheduled collection");
+            error().data("collectionId", collectionId).logException(e, "Exception publishing scheduled collection");
 
             SlackNotification.scheduledPublishFailure(collection);
         }

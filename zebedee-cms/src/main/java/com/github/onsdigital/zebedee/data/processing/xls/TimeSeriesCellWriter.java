@@ -111,7 +111,7 @@ public class TimeSeriesCellWriter {
         try {
             requireNonNull(t, message);
         } catch (NullPointerException ex) {
-            error().data("field", t.getClass().getSimpleName()).logAndThrow(ex, "NullPointerException when calling TimeSeriesCellWriter");
+            error().data("field", t.getClass().getSimpleName()).logAndThrow(new RuntimeException(ex), "NullPointerException when calling TimeSeriesCellWriter");
         }
     }
 }

@@ -43,7 +43,7 @@ public class CollectionContentWriter extends ContentWriter {
                     "Writing unencrypted content in collection",
                     new PostMessageField("URI", uri, false)
             );
-            info().data("uri", uri).data("collectionId", collection).log("Writing unencrypted content in collection");
+            info().data("uri", uri).data("collectionId", collection.getDescription().getId()).log("Writing unencrypted content in collection");
 
             return FileUtils.openOutputStream(path.toFile());
         }

@@ -47,7 +47,9 @@ public class PostPublishCollectionTask implements Callable<Boolean> {
      */
     protected boolean doPostPublish(Collection collection, ZebedeeCollectionReader collectionReader) {
 
-        info().data("collectionId", collection).log("POST-PUBLISH: Running collection post publish process");
+        String collectionId = collection.getDescription().getId();
+
+        info().data("collectionId", collectionId).log("POST-PUBLISH: Running collection post publish process");
         long onPublishCompleteStart = System.currentTimeMillis();
         boolean skipVerification = false;
         boolean result = false;
@@ -55,10 +57,10 @@ public class PostPublishCollectionTask implements Callable<Boolean> {
         try {
             result = PostPublisher.postPublish(zebedee, collection, skipVerification, collectionReader);
         } catch (IOException e) {
-            error().data("collectionId", collection).logException(e, "Error while Running collection post publish process");
+            error().data("collectionId", collectionId).logException(e, "Error while Running collection post publish process");
         }
 
-        info().data("collectionId", collection).data("timeTaken", (System.currentTimeMillis() - onPublishCompleteStart))
+        info().data("collectionId", collectionId).data("timeTaken", (System.currentTimeMillis() - onPublishCompleteStart))
                 .log("POST-PUBLISH: collectiom postPublish process complete.");
 
         return result;

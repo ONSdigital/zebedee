@@ -119,7 +119,8 @@ public class ApproveTask implements Callable<Boolean> {
             validate();
             eventLog = new ApprovalEventLog(collection.getDescription().getId(), session.getEmail());
 
-            info().data("collectionId", collection).data("user", session).log("approve task: beginning approval process");
+            info().data("collectionId", collection.getDescription().getId())
+                    .data("user", session).log("approve task: beginning approval process");
 
             List<ContentDetail> collectionContent = contentDetailResolver.resolve(collection.reviewed,
                     collectionReader.getReviewed());
@@ -157,11 +158,12 @@ public class ApproveTask implements Callable<Boolean> {
             eventLog.sentPublishNotification();
 
             eventLog.approvalCompleted();
-            info().data("user", session.getEmail()).data("collectionId", collection).log("approve task: collection approve task completed successfully");
+            info().data("user", session.getEmail()).data("collectionId", collection.getDescription().getId())
+                    .log("approve task: collection approve task completed successfully");
             return true;
 
         } catch (Exception e) {
-            SimpleEvent errorLog = error().data("collectionId", collection);
+            SimpleEvent errorLog = error().data("collectionId", collection.getDescription().getId());
             if (session != null && StringUtils.isNotEmpty(session.getEmail())) {
                 errorLog.data("user", (session.getEmail()));
             }
@@ -175,7 +177,7 @@ public class ApproveTask implements Callable<Boolean> {
             try {
                 collection.save();
             } catch (Exception e1) {
-                error().data("collectionId", collection).data("user", session.getEmail())
+                error().data("collectionId", collection.getDescription().getId()).data("user", session.getEmail())
                         .logException(e, "approve task: error writing collection to disk after approval exception, you may be " +
                                 "required to manually set the collection status to error");
             }
@@ -207,7 +209,7 @@ public class ApproveTask implements Callable<Boolean> {
     public static List<TimeseriesUpdateCommand> ImportUpdateCommandCsvs(Collection collection, ContentReader publishedReader, CollectionReader collectionReader) throws ZebedeeException, IOException {
         List<TimeseriesUpdateCommand> updateCommands = new ArrayList<>();
         if (collection.description.timeseriesImportFiles != null) {
-            info().data("collectionId", collection)
+            info().data("collectionId", collection.getDescription().getId())
                     .log("approve collection: collection contains time series data processing importing CSDB file");
 
             for (String importFile : collection.getDescription().timeseriesImportFiles) {
@@ -221,7 +223,9 @@ public class ApproveTask implements Callable<Boolean> {
                     // read the CSV and update the timeseries titles.
                     TimeseriesUpdateImporter importer = new CsvTimeseriesUpdateImporter(csvInput);
 
-                    info().data("filename", importFile).data("collectionId", collection).log("approve collection: importing csv file");
+                    info().data("filename", importFile).data("collectionId", collection.getDescription().getId())
+                            .log("approve collection: importing csv file");
+
                     updateCommands.addAll(importer.importData());
                 }
             }
@@ -242,7 +246,7 @@ public class ApproveTask implements Callable<Boolean> {
 
         for (PendingDelete pendingDelete : pendingDeletes) {
             ContentTreeNavigator.getInstance().search(pendingDelete.getRoot(), node -> {
-                info().data("collectionId", collection).log("adding uri to delete to the publish notification " + node.uri);
+                info().data("collectionId", collection.getDescription().getId()).log("adding uri to delete to the publish notification " + node.uri);
 
                 if (!contentToDelete.contains(node.uri)) {
                     ContentDetail contentDetailToDelete = new ContentDetail();
@@ -265,7 +269,8 @@ public class ApproveTask implements Callable<Boolean> {
                     "Failed verification of time series zip files",
                     new PostMessageField("Advice", "Unlock the collection and re-approve to try again", false)
             );
-            info().data("collectionId", collection).log("Failed verification of time series zip files");
+            info().data("collectionId", collection.getDescription().getId())
+                    .log("Failed verification of time series zip files");
         }
     }
 
@@ -304,6 +309,6 @@ public class ApproveTask implements Callable<Boolean> {
         if (StringUtils.isEmpty(session.getEmail())) {
             throw new IllegalArgumentException("approval task unsuccesful: as session.email required but was null/empty");
         }
-        info().data("collectionId", collection).log("approval task: validation sucessful");
+        info().data("collectionId", collection.getDescription().getId()).log("approval task: validation sucessful");
     }
 }

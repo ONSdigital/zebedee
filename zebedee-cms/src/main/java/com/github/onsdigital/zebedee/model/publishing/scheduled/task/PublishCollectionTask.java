@@ -46,8 +46,11 @@ public class PublishCollectionTask implements Callable<Boolean> {
      */
     @Override
     public Boolean call() throws Exception {
+
+        String collectionId = collection.getDescription().getId();
+
         try {
-            info().data("collectionId", collection).log("PUBLISH: Running collection publish task");
+            info().data("collectionId", collectionId).log("PUBLISH: Running collection publish task");
             collection.getDescription().publishStartDate = new Date();
 
             published = Publisher.executePublish(collection, collectionReader, publisherSystemEmail);
@@ -57,29 +60,29 @@ public class PublishCollectionTask implements Callable<Boolean> {
             // If an error was caught, attempt to roll back the transaction:
             if (collection.getDescription().publishTransactionIds != null &&
                     !collection.getDescription().publishTransactionIds.isEmpty()) {
-                error().data("collectionId", collection).data("hostToTransactionId", collection.getDescription().publishTransactionIds)
+                error().data("collectionId", collectionId).data("hostToTransactionId", collection.getDescription().publishTransactionIds)
                         .logException(e, "PUBLISH: FAILURE: exception while attempting to publish scheduled collection. " +
                         "Publishing transaction IDS exist for collection, attempting to rollback");
 
                 Publisher.rollbackPublish(collection);
 
             } else {
-                error().data("collectionId", collection).data("hostToTransactionId", collection.getDescription().publishTransactionIds)
+                error().data("collectionId", collectionId).data("hostToTransactionId", collection.getDescription().publishTransactionIds)
                         .logException(e, "PUBLISH: FAILURE: no publishing transaction IDS found for collection, no rollback attempt will be made");
             }
         } finally {
             try {
                 // Save any updates to the collection
-                info().data("collectionId", collection).data("hostToTransactionId", collection.getDescription().publishTransactionIds)
+                info().data("collectionId", collectionId).data("hostToTransactionId", collection.getDescription().publishTransactionIds)
                         .log("PUBLISH: persiting changes to collection to disk");
                 collection.save();
             } catch (Exception e) {
-                error().data("collectionId", collection).data("hostToTransactionId", collection.getDescription().publishTransactionIds)
+                error().data("collectionId", collectionId).data("hostToTransactionId", collection.getDescription().publishTransactionIds)
                         .logException(e, "PUBLISH: error while attempting to persist collection to disk");
                 throw e;
             }
             if (!published) {
-                warn().data("collectionId", collection).log("Exception publishing scheduled collection");
+                warn().data("collectionId", collectionId).log("Exception publishing scheduled collection");
 
                 SlackNotification.scheduledPublishFailure(collection);
             }

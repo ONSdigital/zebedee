@@ -32,12 +32,14 @@ public class PublishScheduler extends Scheduler {
 
     @Override
     protected void schedule(Collection collection, Zebedee zebedee) {
-        info().data("collectionId", collection).log("Scheduling collection using optimised publisher");
+        info().data("collectionId", collection.getDescription().getId())
+                .log("Scheduling collection using optimised publisher");
         Date publishStartDate = collection.getDescription().getPublishDate();
         int getPreProcessSecondsBeforePublish = Configuration.getPreProcessSecondsBeforePublish();
         Date prePublishStartDate = new DateTime(publishStartDate).minusSeconds(getPreProcessSecondsBeforePublish).toDate();
 
-        info().data("collectionId", collection).data("prePublishStartDate", prePublishStartDate)
+        info().data("collectionId", collection.getDescription().getId())
+                .data("prePublishStartDate", prePublishStartDate)
                 .data("publishStartDate", publishStartDate)
                 .log("Scheduling collection prepublish");
         schedulePrePublish(collection, zebedee, prePublishStartDate, publishStartDate);

@@ -97,7 +97,7 @@ public class CollectionHistoryDaoImpl implements CollectionHistoryDao {
 
         } catch (Exception e) {
             error().data("collectionId", collectionId)
-                    .logException(e, "Unexpected error while attempting to get collection event history");
+                    .logException(new RuntimeException(e), "Unexpected error while attempting to get collection event history");
             throw new CollectionEventHistoryException("Unexpected error while attempting to get collection event history");
         }
     }

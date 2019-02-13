@@ -114,7 +114,7 @@ public class ZebedeeDatasetService implements DatasetService {
         for (CollectionDatasetVersion datasetVersion : collection.getDescription().getDatasetVersions()) {
 
             info().data("collectionId", collection)
-                    .data("dataset_id", datasetVersion.getId())
+                    .data("datasetId", datasetVersion.getId())
                     .data("edition", datasetVersion.getEdition())
                     .data("version", datasetVersion.getVersion())
                     .log("setting dataset api version state to published");
@@ -132,7 +132,7 @@ public class ZebedeeDatasetService implements DatasetService {
         for (CollectionDataset dataset : collection.getDescription().getDatasets()) {
 
             info().data("collectionId", collection)
-                    .data("dataset_id", dataset.getId())
+                    .data("datasetId", dataset.getId())
                     .log("setting api dataset state to published");
 
             Dataset datasetUpdate = new Dataset();

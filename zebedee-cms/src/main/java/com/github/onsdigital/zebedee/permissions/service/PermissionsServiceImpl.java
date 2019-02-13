@@ -148,7 +148,7 @@ public class PermissionsServiceImpl implements PermissionsService {
                     || canEdit(user.getEmail())
                     || canView(user.getEmail(), collection.getDescription(), accessMapping, teamsList);
         } catch (IOException e) {
-            error().logException(e, "PermissoionsServiceImpl: unexpected error encountered.");
+            error().logException(e, "PermissionsServiceImpl: unexpected error encountered.");
             throw new RuntimeException(e);
         }
         return result;

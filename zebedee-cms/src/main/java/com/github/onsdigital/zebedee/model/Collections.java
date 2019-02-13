@@ -1,7 +1,6 @@
 package com.github.onsdigital.zebedee.model;
 
 import com.github.davidcarboni.encryptedfileupload.EncryptedFileItemFactory;
-import com.github.onsdigital.zebedee.logging.v2LoggingHelpers;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
@@ -549,9 +548,9 @@ public class Collections {
         Optional<Collection> blockingCollection = zebedeeSupplier.get().checkForCollectionBlockingChange(collection, uri);
         if (blockingCollection.isPresent()) {
             Collection blocker = blockingCollection.get();
-            info().data("saveOrEditConflict", v2LoggingHelpers.GenerateCollectionSaveConflictMap(collection, blocker, uri))
+            info().data("saveOrEditConflict", collection.generateCollectionSaveConflictMap(blocker, uri))
                     .data("user", session.getEmail())
-                    .log("Cannot create content as it existings in another collection.");
+                    .log("Cannot create content as it's existing in another collection.");
 
             throw new ConflictException("This URI exists in another collection", blocker.getDescription().getName());
         }

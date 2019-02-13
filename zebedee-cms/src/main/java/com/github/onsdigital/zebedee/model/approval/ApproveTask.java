@@ -120,7 +120,7 @@ public class ApproveTask implements Callable<Boolean> {
             eventLog = new ApprovalEventLog(collection.getDescription().getId(), session.getEmail());
 
             info().data("collectionId", collection.getDescription().getId())
-                    .data("user", session).log("approve task: beginning approval process");
+                    .data("user", session.getEmail()).log("approve task: beginning approval process");
 
             List<ContentDetail> collectionContent = contentDetailResolver.resolve(collection.reviewed,
                     collectionReader.getReviewed());
@@ -160,6 +160,10 @@ public class ApproveTask implements Callable<Boolean> {
             eventLog.approvalCompleted();
             info().data("user", session.getEmail()).data("collectionId", collection.getDescription().getId())
                     .log("approve task: collection approve task completed successfully");
+
+            if (collection == null) {
+                return false;
+            }
             return true;
 
         } catch (Exception e) {

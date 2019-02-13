@@ -6,8 +6,6 @@ import com.github.davidcarboni.cryptolite.Random;
 import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.KeyManangerUtil;
 import com.github.onsdigital.zebedee.Zebedee;
-import com.github.onsdigital.zebedee.logging.v2LoggingHelpers;
-import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.content.page.base.PageType;
 import com.github.onsdigital.zebedee.content.page.release.Release;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
@@ -74,6 +72,7 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
 import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
@@ -98,6 +97,11 @@ public class Collection {
     public static final String COMPLETE = "complete";
     public static final String IN_PROGRESS = "inprogress";
     public static final String DATA_JSON = "data.json";
+
+    private static final String BLOCKING_PATH = "blockingPath";
+    private static final String BLOCKING_COLLECTION = "blockingCollection";
+    private static final String TARGET_PATH = "targetPath";
+    private static final String TARGET_COLLECTION = "targetCollection";
 
     private static ConcurrentMap<Path, ReadWriteLock> collectionLocks = new ConcurrentHashMap<>();
     private static KeyManangerUtil keyManagerUtil = new KeyManangerUtil();
@@ -636,7 +640,7 @@ public class Collection {
         if (blockingCollection.isPresent()) {
             Collection collection = blockingCollection.get();
 
-            info().data("saveOrEditConflict", v2LoggingHelpers.GenerateCollectionSaveConflictMap(this, collection, uri))
+            info().data("saveOrEditConflict", this.generateCollectionSaveConflictMap(collection, uri))
                     .data("user", email).log("Content was not saved as it currently in another collection.");
 
             // return false as the content is blocked by another collection.
@@ -1317,6 +1321,30 @@ public class Collection {
             return Duration.between(start, end).toMillis();
         }
         return 0;
+    }
+
+    private static BiFunction<String, String, String> COLLECTION_CONTENT_PATH = (collectioName, uri) -> {
+        uri = uri.startsWith("/") ? uri.substring(1) : uri;
+        return Paths.get(collectioName).resolve("inprogress").resolve(uri).toString();
+    };
+
+    public HashMap<String, String> generateCollectionSaveConflictMap(Collection blockingCollection, String targetURI) throws IOException {
+
+        HashMap<String, String> conflictLogMap = new HashMap<String, String>();
+
+        if (this != null) {
+            String name = this.getDescription().getName();
+            conflictLogMap.put(TARGET_PATH, COLLECTION_CONTENT_PATH.apply(name, targetURI));
+            conflictLogMap.put(TARGET_COLLECTION, name);
+        }
+
+        if (blockingCollection != null) {
+            String name = blockingCollection.getDescription().getName();
+            conflictLogMap.put(BLOCKING_PATH, COLLECTION_CONTENT_PATH.apply(name, targetURI));
+            conflictLogMap.put(BLOCKING_COLLECTION, name);
+        }
+
+        return conflictLogMap;
     }
 }
 

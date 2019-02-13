@@ -401,7 +401,7 @@ public class CollectionsTest {
         } catch (BadRequestException e) {
             verify(collectionReaderWriterFactoryMock, times(1)).getWriter(zebedeeMock, collectionMock, sessionMock);
             verify(sessionMock, times(1)).getEmail();
-            verify(collectionMock, times(1)).getDescription();
+            verify(collectionMock, times(3)).getDescription();
             verifyZeroInteractions(permissionsServiceMock);
             verify(collectionMock, never()).find(anyString());
             verify(collectionMock, never()).create(anyString(), anyString());
@@ -1055,7 +1055,7 @@ public class CollectionsTest {
         } catch (ConflictException e) {
             verify(publishedContentMock, times(1)).exists(uri);
             verify(zebedeeMock, times(1)).checkForCollectionBlockingChange(collectionMock, uri);
-            verify(collectionMock, times(1)).getDescription();
+            verify(collectionMock, times(1)).generateCollectionSaveConflictMap(collectionMock, uri);
             verify(blocker, times(2)).getDescription();
             verify(collectionDescriptionMock, times(3)).getName();
             verifyNoMoreInteractions(zebedeeMock);

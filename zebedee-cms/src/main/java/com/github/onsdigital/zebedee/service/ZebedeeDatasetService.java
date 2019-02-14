@@ -191,7 +191,7 @@ public class ZebedeeDatasetService implements DatasetService {
             }
 
             if (dataset.getState().equals(State.ASSOCIATED)
-                    && !dataset.getCollection_id().equals(collection.getDescription().getId())) {
+                    && !dataset.getCollection_id().equals(collection.getId())) {
                 throw new ConflictException("cannot add dataset " + datasetID
                         + " to collection " + collection.getId()
                         + " it is already in collection " + dataset.getCollection_id());

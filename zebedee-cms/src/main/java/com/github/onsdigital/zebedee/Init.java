@@ -19,7 +19,6 @@ public class Init implements Startup {
 
     @Override
     public void init() {
-        //DPLogger.init(new NopConfig());
         logInfo("inside CMS INIT").log();
 
         logInfo("loading CMS feature flags").log();

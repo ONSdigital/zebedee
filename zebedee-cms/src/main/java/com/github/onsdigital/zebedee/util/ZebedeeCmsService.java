@@ -29,7 +29,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
 
 /**
  * Class adds a wrapper around common Zebedee operations with which are implemented as static methods.
@@ -60,9 +60,9 @@ public class ZebedeeCmsService {
         try {
             return Root.zebedee.getSessionsService().get(request);
         } catch (IOException e) {
-            logError(e, SESSION_NOT_FOUND_MSG).logAndThrow(UnauthorizedException.class);
+            error().logException(e, SESSION_NOT_FOUND_MSG);
+            throw new UnauthorizedException(SESSION_NOT_FOUND_MSG);
         }
-        return null;
     }
 
     public ContentReader getPublishedContentReader() {
@@ -73,27 +73,25 @@ public class ZebedeeCmsService {
         try {
             return new ZebedeeCollectionWriter(Root.zebedee, collection, session);
         } catch (IOException e) {
-            logError(e, COLLECTION_WRI_ERROR_MSG).collectionId(collection).user(session.getEmail())
-                    .logAndThrow(BadRequestException.class);
+            error().data("collectionId", collection.getId()).logException(e, COLLECTION_WRI_ERROR_MSG);
+            throw new BadRequestException(COLLECTION_WRI_ERROR_MSG);
         }
-        return null;
     }
 
     public CollectionReader getZebedeeCollectionReader(Collection collection, Session session) throws ZebedeeException {
         try {
             return new ZebedeeCollectionReader(Root.zebedee, collection, session);
         } catch (IOException e) {
-            logError(e, COLLECTION_READ_ERROR_MSG).collectionId(collection).user(session.getEmail())
-                    .logAndThrow(BadRequestException.class);
+            error().data("user", session.getEmail()).logException(e, COLLECTION_READ_ERROR_MSG);
+            throw new BadRequestException(COLLECTION_READ_ERROR_MSG);
         }
-        return null;
     }
 
     public com.github.onsdigital.zebedee.model.Collections getCollections() throws ZebedeeException {
         try {
             return Root.zebedee.getCollections();
         } catch (Exception e) {
-            logError(e, GET_COLLECTIONS_ERROR);
+            error().logException(e, GET_COLLECTIONS_ERROR);
             throw new UnexpectedErrorException(e.getMessage(), 500);
         }
     }
@@ -102,18 +100,18 @@ public class ZebedeeCmsService {
         try {
             return Collections.getCollection(request);
         } catch (IOException e) {
-            logError(e, COLLECTION_NOT_FOUND_MSG).logAndThrow(NotFoundException.class);
+            error().logException(e, COLLECTION_NOT_FOUND_MSG);
+            throw new NotFoundException(COLLECTION_NOT_FOUND_MSG);
         }
-        return null;
     }
 
     public Collection getCollection(String collectionId) throws ZebedeeException {
         try {
             return Root.zebedee.getCollections().getCollection(collectionId);
         } catch (IOException e) {
-            logError(e, COLLECTION_NOT_FOUND_MSG).logAndThrow(NotFoundException.class);
+            error().logException(e, COLLECTION_NOT_FOUND_MSG);
+            throw new NotFoundException(COLLECTION_NOT_FOUND_MSG);
         }
-        return null;
     }
 
     public PermissionsService getPermissions() {

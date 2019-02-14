@@ -46,8 +46,8 @@ public class ZebedeeDatasetService implements DatasetService {
         if (currentState == null && (newState.equals(ContentStatus.InProgress) || newState.equals(ContentStatus.Complete))) {
             info().data("user", user)
                     .data("last edited by", lastEditedBy)
-                    .data("current state", currentState.toString())
-                    .data("new state", newState.toString())
+                    .data("current state", currentState)
+                    .data("new state", newState)
                     .log("Updating dataset state for first time");
 
             return newState;
@@ -57,8 +57,8 @@ public class ZebedeeDatasetService implements DatasetService {
         if (!currentState.equals(ContentStatus.Reviewed) && newState.equals(ContentStatus.Reviewed) && lastEditedBy.equalsIgnoreCase(user)) {
             info().data("user", user)
                     .data("last edited by", lastEditedBy)
-                    .data("current state", currentState.toString())
-                    .data("new state", newState.toString())
+                    .data("current state", currentState)
+                    .data("new state", newState)
                     .log("User attempting to review their own dataset");
 
             throw new ForbiddenException("User " + user + "doesn't have permission to review a dataset they completed");
@@ -69,8 +69,8 @@ public class ZebedeeDatasetService implements DatasetService {
 
             info().data("user", user)
                     .data("last edited by", lastEditedBy)
-                    .data("current state", currentState.toString())
-                    .data("new state", newState.toString())
+                    .data("current state", currentState)
+                    .data("new state", newState)
                     .log("User making more updates to a dataset whilst it is awaiting review");
             return ContentStatus.Complete;
         }
@@ -80,8 +80,8 @@ public class ZebedeeDatasetService implements DatasetService {
 
             info().data("user", user)
                     .data("last edited by", lastEditedBy)
-                    .data("current state", currentState.toString())
-                    .data("new state", newState.toString())
+                    .data("current state", currentState)
+                    .data("new state", newState)
                     .log("A different user making updates to a dataset whilst it is awaiting review");
             return ContentStatus.InProgress;
         }
@@ -91,16 +91,16 @@ public class ZebedeeDatasetService implements DatasetService {
 
             info().data("user", user)
                     .data("last edited by", lastEditedBy)
-                    .data("current state", currentState.toString())
-                    .data("new state", newState.toString())
+                    .data("current state", currentState)
+                    .data("new state", newState)
                     .log("Making updates to a review dataset");
             return ContentStatus.Reviewed;
         }
 
         info().data("user", user)
                 .data("last edited by", lastEditedBy)
-                .data("current state", currentState.toString())
-                .data("new state", newState.toString())
+                .data("current state", currentState)
+                .data("new state", newState)
                 .log("Updating dataset state");
         return newState;
     }

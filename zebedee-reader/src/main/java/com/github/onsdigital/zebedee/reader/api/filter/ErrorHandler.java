@@ -27,7 +27,7 @@ public class ErrorHandler implements ServerError {
         if (t != null && ZebedeeExceptionWithData.class.isAssignableFrom(t.getClass())) {
             ZebedeeExceptionWithData exception = (ZebedeeExceptionWithData) t;
             res.setStatus(exception.statusCode);
-            error().data("exceptionStatusCode", exception.statusCode)
+            error().data("exception_status_code", exception.statusCode)
                     .logException(exception, "Zebedee Reader API error");
             return new ServerResponse(exception.getMessage(), exception.getData());
         }
@@ -35,7 +35,7 @@ public class ErrorHandler implements ServerError {
         if (t != null && ZebedeeException.class.isAssignableFrom(t.getClass())) {
             ZebedeeException exception = (ZebedeeException) t;
             res.setStatus(exception.statusCode);
-            error().data("exceptionStatusCode", exception.statusCode)
+            error().data("exception_status_code", exception.statusCode)
                     .logException(exception, "Zebedee Reader API error");
             return new ServerResponse(exception.getMessage());
         }

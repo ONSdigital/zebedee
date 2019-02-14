@@ -284,7 +284,7 @@ public class DataGenerator {
         try {
             Float.parseFloat(callValue);
         } catch (NumberFormatException e) {
-            info().data("nonNumericValue", callValue)
+            info().data("non_numeric_value", callValue)
                     .log("XLS Cell value could not be parsed to Float, value will be written as String.");
             return CELL_TYPE_STRING;
         }

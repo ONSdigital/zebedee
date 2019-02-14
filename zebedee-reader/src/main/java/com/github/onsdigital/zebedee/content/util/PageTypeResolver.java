@@ -58,7 +58,7 @@ class PageTypeResolver implements JsonDeserializer<Page> {
 
             // FIXME CMD feature
             if (!datasetImportEnabled && isDatasetImportPageType.test(contentType)) {
-                warn().data("pageType", contentType.getDisplayName())
+                warn().data("page_type", contentType.getDisplayName())
                         .log("PageType invalid feature EnableDatasetImport disabled. Enable this feature by updating the Zebedee configuration");
                 throw new JsonParseException("Invalid page type");
             }
@@ -91,7 +91,7 @@ class PageTypeResolver implements JsonDeserializer<Page> {
                             .map((item) -> contentTypeNameFunc.apply(item))
                             .collect(Collectors.toList());
 
-                    info().data("contentTypes", contentClasses.entrySet()
+                    info().data("content_types", contentClasses.entrySet()
                             .stream()
                             .map((item) -> contentTypeNameFunc.apply(item))
                             .collect(Collectors.toList()))
@@ -124,7 +124,7 @@ class PageTypeResolver implements JsonDeserializer<Page> {
                     Page contentInstance = contentClass.newInstance();
                     contentClasses.put(contentInstance.getType(), contentClass);
                 } catch (InstantiationException e) {
-                    error().data("pageType", className).logException(e, "Failed to instantiate content type");
+                    error().data("page_type", className).logException(e, "Failed to instantiate content type");
                 }
             }
         } catch (Exception e) {

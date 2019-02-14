@@ -340,7 +340,7 @@ public class FileSystemContentReader implements ContentReader {
         try {
             return ContentUtil.deserialiseContent(resource.getData());
         } catch (JsonSyntaxException e) {
-            throw error().data("resourceUri", resource.getUri())
+            throw error().data("resource_uri", resource.getUri())
                     .logException(e, "Failed to deserialise resource");
         }
     }

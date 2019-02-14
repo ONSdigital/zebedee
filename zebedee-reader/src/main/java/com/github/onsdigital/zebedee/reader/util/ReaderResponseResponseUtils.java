@@ -60,8 +60,9 @@ public class ReaderResponseResponseUtils {
 
     public static void sendNotFound(NotFoundException exception, HttpServletRequest request, HttpServletResponse response) throws IOException {
         info().data("uri", request.getRequestURI() + "?" + request.getQueryString())
-                .data("statusCode", exception.statusCode)
+                .data("status_code", exception.statusCode)
                 .log(exception.getMessage());
+
         response.setStatus(exception.statusCode);
         IOUtils.copy(new StringReader(exception.getMessage()), response.getOutputStream());
     }

@@ -87,8 +87,8 @@ public class ReaderConfiguration {
      * Prints configuration into console
      */
     public static void dumpConfiguration() {
-        info().data("collectionsDir", collectionsFolder)
-                .data("publishedContentDir", contentDir)
+        info().data("collections_dir", collectionsFolder)
+                .data("published_content_dir", contentDir)
                 .log("Zebedee reader configuration");
     }
 

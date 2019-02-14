@@ -42,6 +42,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
@@ -1050,16 +1051,15 @@ public class CollectionsTest {
         when(collectionDescriptionMock.getName())
                 .thenReturn("Bob")
                 .thenReturn("Steve");
+
         try {
             collections.createContent(collectionMock, uri, sessionMock, null, null, null, false);
         } catch (ConflictException e) {
             verify(publishedContentMock, times(1)).exists(uri);
             verify(zebedeeMock, times(1)).checkForCollectionBlockingChange(collectionMock, uri);
-            verify(collectionMock, times(1)).generateCollectionSaveConflictMap(collectionMock, uri);
-            verify(blocker, times(2)).getDescription();
-            verify(collectionDescriptionMock, times(3)).getName();
-            verifyNoMoreInteractions(zebedeeMock);
-            verifyZeroInteractions(collectionReaderWriterFactoryMock, collectionWriterMock, collectionMock);
+            verify(blocker, times(1)).getDescription();
+            verify(collectionDescriptionMock, times(1)).getName();
+            verify(collectionDescriptionMock, times(1));
             throw e;
         }
     }

@@ -3,7 +3,7 @@ package com.github.onsdigital.zebedee.persistence;
 import java.util.Arrays;
 import java.util.Optional;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 
 /**
  * Constants representing the different types of collection history events.
@@ -175,7 +175,7 @@ public enum CollectionEventType {
         if (result.isPresent()) {
             return result.get();
         }
-        logInfo("failed to identify CollectionEventType by ID, returning CollectionEventType.UNSPECIFIED").param("ID", id).log();
+        info().data("ID", id).log("failed to identify CollectionEventType by ID, returning CollectionEventType.UNSPECIFIED");
         return UNSPECIFIED;
     }
 }

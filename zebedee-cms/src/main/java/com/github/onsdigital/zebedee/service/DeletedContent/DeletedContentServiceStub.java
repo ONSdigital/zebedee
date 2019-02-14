@@ -2,7 +2,6 @@ package com.github.onsdigital.zebedee.service.DeletedContent;
 
 import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
-import com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.ContentWriter;
 import com.github.onsdigital.zebedee.model.content.deleted.DeletedContentEvent;
@@ -13,6 +12,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
+
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 
 /**
  * Handles the storing and retrieving of deleted content.
@@ -33,7 +34,7 @@ public class DeletedContentServiceStub implements DeletedContentService {
      */
     @Override
     public void storeDeletedContent(Page deletedPage, Date dateDeleted, Set<String> files, ContentReader contentReader, Collection collection) throws ZebedeeException, IOException {
-        ZebedeeLogBuilder.logDebug("Using stubbed DeletedContentService. No deleted files will be stored.").log();
+        info().log("Using stubbed DeletedContentService. No deleted files will be stored.");
     }
 
     /**
@@ -42,7 +43,7 @@ public class DeletedContentServiceStub implements DeletedContentService {
      */
     @Override
     public List<DeletedContentEvent> listDeletedContent() {
-        ZebedeeLogBuilder.logDebug("Using stubbed DeletedContentService. No deleted files will be returned.").log();
+        info().log("Using stubbed DeletedContentService. No deleted files will be returned.");
         return emptyEventList;
     }
 
@@ -56,7 +57,7 @@ public class DeletedContentServiceStub implements DeletedContentService {
      */
     @Override
     public DeletedContentEvent retrieveDeletedContent(long deletedContentEventId, ContentWriter contentWriter) throws ZebedeeException, IOException {
-        ZebedeeLogBuilder.logDebug("Using stubbed DeletedContentService. No deleted files will be retrieved.").log();
+        info().log("Using stubbed DeletedContentService. No deleted files will be retrieved.");
         return null;
     }
 }

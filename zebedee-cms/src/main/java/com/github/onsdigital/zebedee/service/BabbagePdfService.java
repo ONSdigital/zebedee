@@ -13,8 +13,8 @@ import org.apache.http.impl.client.HttpClientBuilder;
 
 import java.io.IOException;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 
 /**
  * Render PDF output for a given URI using babbage.
@@ -48,7 +48,7 @@ public class BabbagePdfService implements PdfService {
         String src = Configuration.getBabbageUrl() + trimmedUri + pdfEndpoint;
         String pdfURI = uri + PAGE_PDF_EXT;
 
-        logInfo("Reading PDF").addParameter("src", src).log();
+        info().data("src", src).log("Reading PDF");
 
         try (CloseableHttpClient client = HttpClientBuilder.create().build()) {
             HttpGet httpGet = new HttpGet(src);
@@ -64,7 +64,7 @@ public class BabbagePdfService implements PdfService {
                 }
                 contentWriter.write(response.getEntity().getContent(), pdfURI);
             } catch (BadRequestException e) {
-                logError(e, "Error while generating collection PDF").path(pdfURI).log();
+                error().data("path", pdfURI).logException(e, "Error while generating collection PDF");
             }
         }
     }

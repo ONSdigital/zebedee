@@ -14,8 +14,8 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
 
 /**
  * A hashmap storing an entry for each timeseries - mapping the CDID to the url of the timeseries.
@@ -57,15 +57,15 @@ public class DataIndex {
     public void reindex() {
         indexBuilt = false;
         Runnable build = () -> {
-            logInfo("Start building data index.").log();
+            info().log("Start building data index.");
             long startTime = System.nanoTime();
             try {
                 Files.walkFileTree(contentReader.getRootFolder(), new IndexBuilder(index, contentReader));
             } catch (IOException e) {
-                logError(e, "Failed to build data index").log();
+                error().logException(e, "Failed to build data index");
             }
             long duration = System.nanoTime() - startTime;
-            logInfo("Finished building data index.").addParameter("entries", index.size()).addParameter("duration_ns", duration).log();
+            info().data("entries", index.size()).data("duration_ns", duration).log("Finished building data index.");
             indexBuilt = true;
         };
         pool.submit(build);
@@ -146,7 +146,7 @@ public class DataIndex {
                         this.index.put(timeSeries.getCdid().toLowerCase(), timeseriesLandingPageUri);
                     }
                 } catch (Exception e) {
-                    logError(e, "Error indexing uri").addParameter("uri", uri).log();
+                    error().data("uri", uri).logException(e, "Error indexing uri");
                 }
 
             }

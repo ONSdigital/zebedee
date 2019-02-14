@@ -7,6 +7,7 @@ import com.github.onsdigital.zebedee.json.ContentDetail;
 import com.github.onsdigital.zebedee.json.Event;
 import com.github.onsdigital.zebedee.json.EventType;
 import com.github.onsdigital.zebedee.json.PendingDelete;
+import com.github.onsdigital.zebedee.LoggingTestHelper;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.CollectionTest;
 import com.github.onsdigital.zebedee.model.CollectionWriter;
@@ -17,6 +18,7 @@ import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.session.model.Session;
 import org.junit.After;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -72,6 +74,11 @@ public class ApproveTaskTest {
 
     private ExecutorService executorService;
 
+    @BeforeClass
+    public static void setUpLogger() {
+        LoggingTestHelper.initDPLogger(ApproveTaskTest.class);
+    }
+
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
@@ -105,7 +112,9 @@ public class ApproveTaskTest {
 
     @Test
     public void shouldReturnFalseIfCollecionNull() throws Exception {
-        Future<Boolean> result = executorService.submit(new ApproveTask(null, null, null, null, null, null, contentDetailResolver));
+        when(collection.getId())
+                .thenReturn("1234");
+        Future<Boolean> result = executorService.submit(new ApproveTask(collection, null, null, null, null, null, contentDetailResolver));
         assertFalse(result.get());
     }
 

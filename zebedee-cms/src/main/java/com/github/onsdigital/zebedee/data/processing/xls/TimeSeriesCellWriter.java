@@ -7,7 +7,8 @@ import org.apache.poi.ss.usermodel.Row;
 
 import java.util.regex.Pattern;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
+
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -110,9 +111,7 @@ public class TimeSeriesCellWriter {
         try {
             requireNonNull(t, message);
         } catch (NullPointerException ex) {
-            logError(ex, message)
-                    .addParameter("field", t.getClass().getSimpleName())
-                    .throwUnchecked(ex);
+            error().data("field", t.getClass().getSimpleName()).logAndThrow(new RuntimeException(ex), "NullPointerException when calling TimeSeriesCellWriter");
         }
     }
 }

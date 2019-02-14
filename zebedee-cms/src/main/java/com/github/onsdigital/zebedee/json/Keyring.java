@@ -15,8 +15,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
 
 /**
  * Represents the encryption keys needed for a user account to access collections.
@@ -97,7 +97,7 @@ public class Keyring implements Cloneable {
             result = true;
         } catch (IllegalArgumentException e) {
             // Seems the private key could not be unwrapped, so return false
-            logError(e, "Error unlocking keyring").log();
+            error().logException(e, "Error unlocking keyring");
             result = false;
         }
 
@@ -125,7 +125,7 @@ public class Keyring implements Cloneable {
             result = true;
         } catch (IllegalArgumentException e) {
             // Seems the private key could not be unwrapped, so return false
-            logError(e, "Error changing keyring password").log();
+            error().logException(e, "Error changing keyring password");
             result = false;
         }
 
@@ -154,14 +154,12 @@ public class Keyring implements Cloneable {
                     keys.put(collectionId, result);
             } catch (IllegalArgumentException e) {
                 // Error decrypting key
-                logError(e, "Error recovering encryption key for collection")
-                        .addParameter("collectionId", collectionId).log();
+                error().data("collectionId", collectionId).logException(e, "Error recovering encryption key for collection");
             }
         }
 
         if (result == null) {
-            logInfo("Keyring has not been unlocked, cannot recover encryption key")
-                    .addParameter("collectionId", collectionId).log();
+            info().data("collectionId", collectionId).log("Keyring has not been unlocked, cannot recover encryption key");
         }
 
         return result;

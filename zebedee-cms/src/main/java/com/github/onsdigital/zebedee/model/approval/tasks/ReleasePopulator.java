@@ -13,8 +13,8 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 
 public class ReleasePopulator {
 
@@ -46,10 +46,8 @@ public class ReleasePopulator {
                 || contentDetail.type.equals(PageType.bulletin.toString())
                 || contentDetail.type.equals(PageType.compendium_landing_page.toString())) {
 
-            logInfo("Adding document as a link to release")
-                    .addParameter("contentTitle", contentDetail.description.title)
-                    .addParameter("releaseTitle", release.getDescription().getTitle())
-                    .log();
+            info().data("contentTitle", contentDetail.description.title).data("releaseTitle", release.getDescription().getTitle())
+                    .log("Adding document as a link to release");
 
             addRelatedDocument(release, contentDetail);
         }
@@ -57,20 +55,18 @@ public class ReleasePopulator {
         if (contentDetail.type.equals(PageType.dataset_landing_page.toString())
                 || contentDetail.type.equals(PageType.api_dataset_landing_page.toString())) {
 
-            logInfo("Adding dataset as a link to release")
-                    .addParameter("contentTitle", contentDetail.description.title)
-                    .addParameter("releaseTitle", release.getDescription().getTitle())
-                    .log();
+            info().data("contentTitle", contentDetail.description.title)
+                    .data("releaseTitle", release.getDescription().getTitle())
+                    .log("Adding dataset as a link to release");
 
             addRelatedDataset(release, contentDetail);
         }
 
         if (contentDetail.type.equals(PageType.static_qmi.toString())) {
 
-            logInfo("Adding qmi as a link to release")
-                    .addParameter("contentTitle", contentDetail.description.title)
-                    .addParameter("releaseTitle", release.getDescription().getTitle())
-                    .log();
+            info().data("contentTitle", contentDetail.description.title)
+                    .data("releaseTitle", release.getDescription().getTitle())
+                    .log("Adding qmi as a link to release");
 
             addRelatedQMI(release, contentDetail);
         }
@@ -78,10 +74,9 @@ public class ReleasePopulator {
         if (contentDetail.type.equals(PageType.static_methodology.toString())
                 || contentDetail.type.equals(PageType.static_methodology_download.toString())) {
 
-            logInfo("Adding methodology article as a link to release")
-                    .addParameter("contentTitle", contentDetail.description.title)
-                    .addParameter("releaseTitle", release.getDescription().getTitle())
-                    .log();
+            info().data("contentTitle", contentDetail.description.title)
+                    .data("releaseTitle", release.getDescription().getTitle())
+                    .log("Adding methodology article as a link to release");
 
             addRelatedMethodologyArticle(release, contentDetail);
         }
@@ -131,15 +126,14 @@ public class ReleasePopulator {
                                        CollectionWriter collectionWriter,
                                        Iterable<ContentDetail> collectionContent) throws IOException {
         if (collection.isRelease()) {
-            logInfo("Release identified for collection, populating the page links")
-                    .collectionId(collection)
-                    .log();
+            info().data("collectionId", collection.getDescription().getId())
+                    .log("Release identified for collection, populating the page links");
+
             try {
                 collection.populateRelease(collectionReader, collectionWriter, collectionContent);
             } catch (ZebedeeException e) {
-                logError(e, "Failed to populate release page for collection")
-                        .collectionId(collection)
-                        .log();
+                error().data("collectionId", collection.getDescription().getId())
+                        .logException(e, "Failed to populate release page for collection");
             }
         }
     }

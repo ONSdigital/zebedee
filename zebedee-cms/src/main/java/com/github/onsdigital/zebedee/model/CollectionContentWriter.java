@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Path;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 
 /**
  * Collection specific implementation of ContentWriter that is session / encryption aware.
@@ -43,10 +43,7 @@ public class CollectionContentWriter extends ContentWriter {
                     "Writing unencrypted content in collection",
                     new PostMessageField("URI", uri, false)
             );
-            logInfo("Writing unencrypted content in collection")
-                    .addParameter("uri", uri)
-                    .collectionId(collection)
-                    .log();
+            info().data("uri", uri).data("collectionId", collection.getDescription().getId()).log("Writing unencrypted content in collection");
 
             return FileUtils.openOutputStream(path.toFile());
         }

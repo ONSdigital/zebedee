@@ -112,7 +112,9 @@ public class ApproveTaskTest {
 
     @Test
     public void shouldReturnFalseIfCollecionNull() throws Exception {
-        Future<Boolean> result = executorService.submit(new ApproveTask(null, null, null, null, null, null, contentDetailResolver));
+        when(collection.getId())
+                .thenReturn("1234");
+        Future<Boolean> result = executorService.submit(new ApproveTask(collection, null, null, null, null, null, contentDetailResolver));
         assertFalse(result.get());
     }
 

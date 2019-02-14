@@ -26,8 +26,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static com.github.onsdigital.zebedee.configuration.Configuration.getUnauthorizedMessage;
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logDebug;
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 import static com.github.onsdigital.zebedee.teams.model.Team.teamIDComparator;
 
 /**
@@ -128,7 +127,7 @@ public class TeamsServiceImpl implements TeamsService {
     public void deleteTeam(Team delete, Session session) throws IOException, UnauthorizedException, NotFoundException, BadRequestException, ForbiddenException {
         validateSessionAndPermissions(session);
         if (!teamsStore.deleteTeam(delete)) {
-            logDebug("Team could not be deleted").addParameter("teamName", delete.getName()).log();
+            info().data("teamName", delete.getName()).log("Team could not be deleted");
             throw new IOException("Team " + delete.getName() + " could not be deleted.");
         }
     }
@@ -197,7 +196,7 @@ public class TeamsServiceImpl implements TeamsService {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
         if (!permissionsServiceSupplier.getService().isAdministrator(session.getEmail())) {
-            logInfo(FORBIDDEN_ERR_MSG).log();
+            info().log(FORBIDDEN_ERR_MSG)
             throw new ForbiddenException(FORBIDDEN_ERR_MSG);
         }
     }

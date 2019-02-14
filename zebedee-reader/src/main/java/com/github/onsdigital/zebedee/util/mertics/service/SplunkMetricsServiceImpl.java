@@ -8,16 +8,11 @@ import com.github.onsdigital.zebedee.util.mertics.events.SplunkEvent;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
-import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logError;
+import static com.github.onsdigital.zebedee.logging.ReaderLogger.error;
 import static com.github.onsdigital.zebedee.util.mertics.events.SplunkEvent.INTERCEPT_TIME_KEY;
 
 /**
@@ -87,7 +82,7 @@ public class SplunkMetricsServiceImpl extends MetricsService {
         try {
             splunkClient.send(httpEventCollectorURI, new SplunkRequest(HttpMethod.POST.name(), splunkEvent.toJson()));
         } catch (IOException ex) {
-            logError(ex).log();
+            error().exception(ex).log("error sending splunk request");
         }
     }
 

@@ -1,5 +1,7 @@
 package com.github.onsdigital.zebedee.content.dynamic.timeseries;
 
+import static com.github.onsdigital.zebedee.logging.ReaderLogger.error;
+
 /**
  * Created by bren on 14/08/15.
  * <p>
@@ -17,7 +19,7 @@ public class Point {
         try {
             this.y = Double.parseDouble(y);
         } catch (NumberFormatException e) {
-            System.err.println("Timeseries value is not a number");
+            error().logException(e, "timeseries point value could not be parsed to double");
         }
     }
 

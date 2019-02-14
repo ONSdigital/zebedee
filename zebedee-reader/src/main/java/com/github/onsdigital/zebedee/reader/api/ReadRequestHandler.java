@@ -25,7 +25,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logTrace;
+import static com.github.onsdigital.zebedee.logging.ReaderLogger.info;
 import static com.github.onsdigital.zebedee.util.URIUtils.getLastSegment;
 import static com.github.onsdigital.zebedee.util.URIUtils.removeLastSegment;
 
@@ -66,7 +66,7 @@ public class ReadRequestHandler {
     public Content find(HttpServletRequest request, DataFilter dataFilter, String uri) throws IOException, ZebedeeException {
         String collectionId = getCollectionId(request);
         String lastSegment = getLastSegment(uri);
-        logTrace("finding requested content").uri(uri).collectionId(collectionId).log();
+        info().data("uri", uri).data("collection_id", collectionId).log("finding requested content");
         if (LATEST.equalsIgnoreCase(lastSegment)) {
             return getLatestContent(request, collectionId, dataFilter, removeLastSegment(uri));
         } else {
@@ -82,10 +82,9 @@ public class ReadRequestHandler {
                 String sessionId = RequestUtils.getSessionId(request);
                 return reader.getLatestCollectionContent(collectionId, sessionId, uri, dataFilter);
             } catch (NotFoundException | NoSuchFileException e) {
-                logTrace("Could not find resource in collection. Will try published content")
-                        .addParameter("resourceURI", uri)
-                        .collectionId(collectionId)
-                        .log();
+                info().data("resource_uri", uri)
+                        .data("collection_id", collectionId)
+                        .log("Could not find resource in collection. Will try published content");
             }
         }
 
@@ -98,10 +97,9 @@ public class ReadRequestHandler {
                 String sessionId = RequestUtils.getSessionId(request);
                 return reader.getCollectionContent(collectionId, sessionId, uri, dataFilter);
             } catch (NotFoundException e) {
-                logTrace("Could not find resource in collection. Will try published content")
-                        .addParameter("uri", uri)
-                        .collectionId(collectionId)
-                        .log();
+                info().data("uri", uri)
+                        .data("collection_id", collectionId)
+                        .log("Could not find resource in collection. Will try published content");
             }
         }
 
@@ -124,10 +122,9 @@ public class ReadRequestHandler {
                 String sessionId = RequestUtils.getSessionId(request);
                 return reader.getCollectionResource(collectionId, sessionId, uri);
             } catch (NotFoundException e) {
-                logTrace("Could not find resource under collection, trying published content")
-                        .addParameter("resourceUri", uri)
-                        .collectionId(collectionId)
-                        .log();
+                info().data("resource_uri", uri)
+                        .data("collection_id", collectionId)
+                        .log("Could not find resource under collection, trying published content");
             }
         }
         return reader.getPublishedResource(uri);
@@ -149,10 +146,9 @@ public class ReadRequestHandler {
                 String sessionId = RequestUtils.getSessionId(request);
                 return reader.getCollectionContentLength(collectionId, sessionId, uri);
             } catch (NotFoundException e) {
-                logTrace("Could not find resource in collection. Will try published content")
-                        .addParameter("uri", uri)
-                        .collectionId(collectionId)
-                        .log();
+                info().data("uri", uri)
+                        .data("collection_id", collectionId)
+                        .log("Could not find resource in collection. Will try published content");
             }
         }
         return reader.getPublishedContentLength(uri);

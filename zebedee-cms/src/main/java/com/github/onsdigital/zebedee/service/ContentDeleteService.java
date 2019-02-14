@@ -38,13 +38,13 @@ import static com.github.onsdigital.zebedee.content.page.base.PageType.product_p
 import static com.github.onsdigital.zebedee.content.page.base.PageType.taxonomy_landing_page;
 import static com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedException.alreadyMarkedDeleteInCurrentCollectionError;
 import static com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedException.deleteForbiddenForPageTypeError;
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logDebug;
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.DELETE_MARKED_ADDED;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.DELETE_MARKED_REMOVED;
 import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData.deleteMarkerAdded;
 import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData.deleteMarkerRemoved;
 
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
 // TODO THIS MUST HAVE decent audit / collection history logging.
 
 public class ContentDeleteService {
@@ -124,7 +124,7 @@ public class ContentDeleteService {
                 (node) -> {
                     node.setDeleteMarker(true);
                     deletedUris.add(node.contentPath);
-                    logDebug("Marking node as deleted").path(node.contentPath).log();
+                    info().data("path", node.contentPath).log("Marking node as deleted");
                 }
         );
         collection.description.getPendingDeletes().add(new PendingDelete(marker.getUser(), deleteImpact));
@@ -202,7 +202,8 @@ public class ContentDeleteService {
             Serialiser.serialise(output, collection.description);
         } catch (IOException e) {
             // TODO probably want exception type for this.
-            logError(e, "Error while serialising delete markers...").logAndThrow(BadRequestException.class);
+            error().logException(e, "Error while serialising delete markers...");
+            throw new BadRequestException("Unexpected error while attempting to save manifest.");
         }
     }
 

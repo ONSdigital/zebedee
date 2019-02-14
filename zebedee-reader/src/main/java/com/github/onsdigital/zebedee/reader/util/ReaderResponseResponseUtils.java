@@ -14,7 +14,7 @@ import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.io.StringReader;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logInfo;
+import static com.github.onsdigital.zebedee.logging.ReaderLogger.info;
 
 /**
  * Created by bren on 31/07/15.
@@ -59,10 +59,10 @@ public class ReaderResponseResponseUtils {
 
 
     public static void sendNotFound(NotFoundException exception, HttpServletRequest request, HttpServletResponse response) throws IOException {
-        logInfo(exception.getMessage())
-                .uri(request.getRequestURI() + "?" + request.getQueryString())
-                .addParameter("statusCode", exception.statusCode)
-                .log();
+        info().data("uri", request.getRequestURI() + "?" + request.getQueryString())
+                .data("status_code", exception.statusCode)
+                .log(exception.getMessage());
+
         response.setStatus(exception.statusCode);
         IOUtils.copy(new StringReader(exception.getMessage()), response.getOutputStream());
     }

@@ -13,8 +13,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.function.Consumer;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logError;
-import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logWarn;
+import static com.github.onsdigital.zebedee.logging.ReaderLogger.error;
+import static com.github.onsdigital.zebedee.logging.ReaderLogger.warn;
 
 /**
  * Client encapsulates sending HTTP collection events to Splunk.
@@ -27,11 +27,10 @@ public class SplunkClient {
     private Service splunkService = null;
     private Args serviceArgs = null;
     private Consumer<ResponseMessage> errorResponseHandler = (responseMessage -> {
-        logWarn(UNEXPECTED_RESPONSE_CODE)
-                .expected(200)
-                .actual(responseMessage.getStatus())
-                .addMessage(parseResponse(responseMessage))
-                .log();
+        warn().data("expected", 200)
+                .data("actual", responseMessage.getStatus())
+                .data("message", parseResponse(responseMessage))
+                .log(UNEXPECTED_RESPONSE_CODE);
     });
 
     /**
@@ -64,7 +63,7 @@ public class SplunkClient {
         try {
             IOUtils.copy(responseMessage.getContent(), message);
         } catch (IOException ex) {
-            logError(ex).log();
+            error().exception(ex).log("error parsing splunk response");
         }
         return message.toString();
     }

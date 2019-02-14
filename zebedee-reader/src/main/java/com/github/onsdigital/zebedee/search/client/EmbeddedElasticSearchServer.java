@@ -11,7 +11,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.elasticSearchLog;
+import static com.github.onsdigital.zebedee.logging.ReaderLogger.error;
+import static com.github.onsdigital.zebedee.logging.ReaderLogger.info;
 
 class EmbeddedElasticSearchServer {
 
@@ -28,7 +29,7 @@ class EmbeddedElasticSearchServer {
         this.dataDirectory = Files.createTempDirectory("searchindex");
         Settings.Builder settingsBuilder = Settings.builder().put("cluster.name", clusterName).put("http.enabled", true).put("path.home", dataDirectory)
                 .put("node.data", true);
-        elasticSearchLog("Creating index data").path(this.dataDirectory).log();
+        info().data("data_dir", this.dataDirectory.toString()).log("creating elastic search index data");
 
         if (settings != null) {
             settingsBuilder.put(settings);
@@ -40,7 +41,7 @@ class EmbeddedElasticSearchServer {
             }
         }
 
-        elasticSearchLog("Starting embedded search node").addParameter("settings", settingsBuilder.internalMap()).log();
+        info().data("settings", settingsBuilder.internalMap()).log("starting embedded elastic search node");
         node = NodeBuilder.nodeBuilder().local(false).settings(settingsBuilder.build()).node();
     }
 
@@ -55,10 +56,11 @@ class EmbeddedElasticSearchServer {
 
     private void deleteDataDirectory() {
         try {
-            elasticSearchLog("Deleting data directory").path(dataDirectory).log();
+            info().data("dir", dataDirectory.toString()).log("embedeed elastic search: deleting data directory");
             FileUtils.deleteDirectory(dataDirectory.toFile());
         } catch (IOException e) {
-            throw new RuntimeException("Could not delete data directory of embedded elasticsearch server", e);
+            throw new RuntimeException(error()
+                    .logException(e, "Could not delete data directory of embedded elasticsearch server"));
         }
     }
 }

@@ -16,7 +16,7 @@ import java.util.Set;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logDebug;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 
 /**
  * A File system implementation of {@link PermissionsStore}. Provides functionality for reading / writing
@@ -45,7 +45,7 @@ public class PermissionsStoreFileSystemImpl implements PermissionsStore {
         Path jsonPath = accessMappingPath.resolve(PERMISSIONS_FILE);
 
         if (!Files.exists(jsonPath)) {
-            logDebug("AccessMapping file does not yet exist. Empty one will be created.").log();
+            info().log("AccessMapping file does not yet exist. Empty one will be created.");
 
             jsonPath.toFile().createNewFile();
             try (OutputStream output = Files.newOutputStream(jsonPath)) {
@@ -67,7 +67,7 @@ public class PermissionsStoreFileSystemImpl implements PermissionsStore {
             List<String> dataVisualisationPublishers = (List<String>) accessMapping.get(DATA_VIS_KEY);
             if (dataVisualisationPublishers != null && !dataVisualisationPublishers.isEmpty()) {
 
-                logDebug("Migrating users from Data Visualisation team to Digital Publishing team.").log();
+                info().log("Migrating users from Data Visualisation team to Digital Publishing team.");
 
                 List<String> digitalPublishingTeam = (List<String>) accessMapping.get(PUBLISHERS_KEY);
                 List<String> administrators = (List<String>) accessMapping.get(ADMINS_KEY);
@@ -78,9 +78,7 @@ public class PermissionsStoreFileSystemImpl implements PermissionsStore {
 
                 dataVisualisationPublishers.stream()
                         .forEach(dataVisUser -> {
-                            logDebug("Migrating user")
-                                    .user(dataVisUser)
-                                    .log();
+                            info().data("user", dataVisUser).log("Migrating user");
                             updated.getDigitalPublishingTeam().add(dataVisUser);
                         });
 

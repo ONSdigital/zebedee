@@ -13,11 +13,11 @@ import java.net.InetSocketAddress;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import static com.github.onsdigital.zebedee.logging.ReaderLogger.info;
 import static com.github.onsdigital.zebedee.search.configuration.SearchConfiguration.getElasticSearchCluster;
 import static com.github.onsdigital.zebedee.search.configuration.SearchConfiguration.getElasticSearchServer;
 import static com.github.onsdigital.zebedee.search.configuration.SearchConfiguration.isStartEmbeddedSearch;
 import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
-import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.elasticSearchLog;
 
 /**
  * Starts an {@link EmbeddedElasticSearchServer} when a client requested
@@ -49,19 +49,17 @@ public class ElasticSearchClient {
 
                 // Server
                 start = System.currentTimeMillis();
-                elasticSearchLog("Starting embedded server").log();
+                info().log("starting embedded elastic search server");
                 EmbeddedElasticSearchServer server = new EmbeddedElasticSearchServer();
-                elasticSearchLog("Embedded server started")
-                        .addParameter("startTimeMS", (System.currentTimeMillis() - start))
-                        .log();
+                info().data("duration", (System.currentTimeMillis() - start))
+                        .log("embedded elastic search server start up complete");
 
                 // Client
                 start = System.currentTimeMillis();
-                elasticSearchLog("Creating client").log();
+                info().log("setting up elastic search client");
                 client = server.getClient();
-                elasticSearchLog("Client up")
-                        .addParameter("startTimeMS", (System.currentTimeMillis() - start))
-                        .log();
+                info().data("duration", (System.currentTimeMillis() - start))
+                        .log("elastic searcg client set up completed");
 
                 Runtime.getRuntime().addShutdownHook(new ShutDownNodeThread(client, server));
             }
@@ -70,10 +68,9 @@ public class ElasticSearchClient {
 
     public static void init() throws IOException {
         if (isStartEmbeddedSearch()) {
-            elasticSearchLog("Starting embedded search server").log();
             startEmbeddedServer();
         } else {
-            elasticSearchLog("Not starting search server due to configuration parameters").log();
+            info().log("embedded elastic search not started as it configuration is disabled");
             connect();
         }
     }
@@ -81,7 +78,6 @@ public class ElasticSearchClient {
     private static void connect() throws IOException {
         if (client == null) {
             initTransportClient();
-//            initNodeClient();
         }
     }
 

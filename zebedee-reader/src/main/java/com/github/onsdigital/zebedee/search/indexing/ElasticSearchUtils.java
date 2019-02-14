@@ -24,7 +24,7 @@ import org.elasticsearch.common.settings.Settings;
 import java.io.IOException;
 import java.util.List;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.elasticSearchLog;
+import static com.github.onsdigital.zebedee.logging.ReaderLogger.info;
 import static com.github.onsdigital.zebedee.search.configuration.SearchConfiguration.getSearchAlias;
 
 /**
@@ -63,7 +63,7 @@ class ElasticSearchUtils {
      * @throws IOException
      */
     public CreateIndexResponse createIndex(String index, Settings settings, String type, String mappingSource) throws IOException {
-        elasticSearchLog("Creating index").addParameter("index", index).log();
+        info().data("index", index).log("creating elastic search index");
         CreateIndexRequestBuilder createIndexRequest = getIndicesClient().prepareCreate(index);
         createIndexRequest.setSettings(settings);
         if (type == null) {
@@ -75,7 +75,7 @@ class ElasticSearchUtils {
     }
 
     public DeleteIndexResponse deleteIndex(String index) {
-        elasticSearchLog("Deleting index").addParameter("index", index).log();
+        info().data("index", index).log("deleting elastic search index");
         DeleteIndexRequestBuilder deleteIndexRequest = getIndicesClient().prepareDelete(index);
         return deleteIndexRequest.get();
     }
@@ -86,7 +86,8 @@ class ElasticSearchUtils {
      * @return
      */
     public IndicesAliasesResponse addAlias(String index, String alias) {
-        elasticSearchLog("Adding alias").addParameter("alias", alias).addParameter("index", index).log();
+        info().data("alias", alias).data("index", index)
+                .log("adding alias to elastic search index");
         IndicesAliasesRequestBuilder addAliasRequest = getAliasesBuilder().addAlias(index, alias);
         return addAliasRequest.get();
     }
@@ -97,7 +98,7 @@ class ElasticSearchUtils {
      * @return
      */
     public IndicesAliasesResponse removeAlias(String index, String alias) {
-        elasticSearchLog("Removing alias").addParameter("alias", alias).addParameter("index", index).log();
+        info().data("alias", alias).data("index", index).log("removing elastic search alias from index");
         IndicesAliasesRequestBuilder removeAliasRequest = getAliasesBuilder().removeAlias(index, alias);
         return removeAliasRequest.get();
     }

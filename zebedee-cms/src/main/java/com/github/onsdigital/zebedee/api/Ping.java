@@ -3,16 +3,17 @@ package com.github.onsdigital.zebedee.api;
 import com.github.davidcarboni.restolino.framework.Api;
 import com.github.onsdigital.zebedee.json.PingRequest;
 import com.github.onsdigital.zebedee.json.PingResponse;
-import com.github.onsdigital.zebedee.session.model.Session;
-import com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder;
-import com.github.onsdigital.zebedee.session.service.SessionsService;
 import com.github.onsdigital.zebedee.reader.util.RequestUtils;
+import com.github.onsdigital.zebedee.session.model.Session;
+import com.github.onsdigital.zebedee.session.service.SessionsService;
 import com.github.onsdigital.zebedee.util.mertics.service.MetricsService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.POST;
 import java.io.IOException;
+
+import static com.github.onsdigital.zebedee.logging.ReaderLogger.error;
 
 /**
  * Created by thomasridd on 14/07/15.
@@ -41,9 +42,10 @@ public class Ping {
     }
 
     private void setSessionDetails(HttpServletRequest request, PingResponse pingResponse) {
+        String token = "";
         try {
             SessionsService sessionsService = Root.zebedee.getSessionsService();
-            String token = RequestUtils.getSessionId(request);
+            token = RequestUtils.getSessionId(request);
             if (sessionsService.exists(token)) {
                 Session session = sessionsService.read(token);
                 if (session != null && !sessionsService.expired(session)) {
@@ -52,7 +54,9 @@ public class Ping {
                 }
             }
         } catch (IOException e) {
-            ZebedeeReaderLogBuilder.logError(e).log();
+            error().exception(e)
+                    .data("session_id", token)
+                    .log("error setting session details");
         }
     }
 }

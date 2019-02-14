@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.elasticSearchLog;
+import static com.github.onsdigital.zebedee.logging.ReaderLogger.warn;
 import static java.util.Arrays.asList;
 import static org.apache.commons.lang3.StringUtils.endsWith;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
@@ -68,7 +68,7 @@ public class SearchBoostTermsResolver {
 
         String[] split = line.split(" *=> *");
         if (split.length != 2) {
-            elasticSearchLog("Skipping invalid search boost mapping").addParameter("line", line).log();
+            warn().data("line", line).log("search boost term resolver: skipping invalid mapping line");
         }
         String uri = split[0];
         String[] terms = split[1].split(" *, *");

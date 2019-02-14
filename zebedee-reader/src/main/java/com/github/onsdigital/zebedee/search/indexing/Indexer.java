@@ -34,7 +34,8 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import static com.github.onsdigital.zebedee.content.util.ContentUtil.serialise;
-import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.elasticSearchLog;
+import static com.github.onsdigital.zebedee.logging.ReaderLogger.info;
+import static com.github.onsdigital.zebedee.logging.ReaderLogger.warn;
 import static com.github.onsdigital.zebedee.search.configuration.SearchConfiguration.getSearchAlias;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.startsWith;
@@ -75,7 +76,9 @@ public class Indexer {
                 boolean aliasAvailable = isIndexAvailable(searchAlias);
                 String oldIndex = searchUtils.getAliasIndex(searchAlias);
                 String newIndex = generateIndexName();
-                elasticSearchLog("Creating index").addParameter("newIndex", newIndex).log();
+
+                info().data("new_index", newIndex)
+                        .log("reloading elastic search index");
                 searchUtils.createIndex(newIndex, getSettings(), getDefaultMapping());
 
                 if (aliasAvailable && oldIndex == null) {
@@ -90,7 +93,7 @@ public class Indexer {
                 } else {
                     doLoad(newIndex);
                     searchUtils.swapIndex(oldIndex, newIndex, searchAlias);
-                    elasticSearchLog("Deleting old index").addParameter("oldIndex", oldIndex).log();
+                    info().data("old_index", oldIndex).log("deleting old elastic search index");
                     searchUtils.deleteIndex(oldIndex);
                 }
             } finally {
@@ -113,13 +116,13 @@ public class Indexer {
 
     private void loadContent(String indexName) throws IOException {
         long start = System.currentTimeMillis();
-        elasticSearchLog("Triggering re-indexing")
-                .addParameter("index", indexName)
-                .log();
+        info().data("index", indexName).log("triggering elastic search reindex");
+
         indexDocuments(indexName);
-        elasticSearchLog("Re-indexing completed")
-                .addParameter("totalTime(ms)", (System.currentTimeMillis() - start))
-                .log();
+
+        info().data("index", indexName)
+                .data("duration", (System.currentTimeMillis() - start))
+                .log("elastic search reindex complete");
     }
 
     private void loadDepartments() throws IOException {
@@ -130,7 +133,7 @@ public class Indexer {
 
         searchUtils.createIndex(DEPARTMENTS_INDEX, getDepartmentsSetting(), DEPARTMENT_TYPE, getDepartmentsMapping());
 
-        elasticSearchLog("Indexing departments").log();
+        info().log("elastic search: indexing departments");
         long start = System.currentTimeMillis();
         try (
                 InputStream resourceStream = SearchBoostTermsResolver.class.getResourceAsStream(DEPARTMENTS_PATH);
@@ -141,9 +144,9 @@ public class Indexer {
                 processDepartment(line);
             }
         }
-        elasticSearchLog("Indexing departments complete")
-                .addParameter("totalTime(ms)", (System.currentTimeMillis() - start))
-                .log();
+
+        info().data("duration", (System.currentTimeMillis() - start))
+                .log("elastic search: indexing departments complete");
     }
 
     private void processDepartment(String line) {
@@ -153,7 +156,7 @@ public class Indexer {
 
         String[] split = line.split(" *=> *");
         if (split.length != 4) {
-            elasticSearchLog("Skipping invalid external department").addParameter("line", line).log();
+            warn().data("line", line).log("elastic search indexing departments: skipping invalid external line");
             return;
         }
         String[] terms = split[3].split(" *, *");
@@ -173,7 +176,7 @@ public class Indexer {
 
     public void reloadContent(String uri) throws IOException {
         try {
-            elasticSearchLog("Triggering reindex").addParameter("uri", uri).log();
+            info().data("uri", uri).log("elastic search: triggering reindex for uri");
             long start = System.currentTimeMillis();
             Page page = getPage(uri);
             if (page == null) {
@@ -187,10 +190,7 @@ public class Indexer {
                 indexSingleContent(getSearchAlias(), page);
             }
             long end = System.currentTimeMillis();
-            elasticSearchLog("Reindexing complete")
-                    .addParameter("uri", uri)
-                    .addParameter("totalTime(ms)", (start - end))
-                    .log();
+            info().data("uri", uri).data("duration", (start - end)).log("elastic search: reindex for uri complete");
         } catch (ZebedeeException e) {
             throw new IndexingException("Failed re-indexint content with uri: " + uri, e);
         } catch (NoSuchFileException e) {
@@ -200,14 +200,11 @@ public class Indexer {
 
 
     public void deleteContentIndex(String pageType, String uri) {
-        elasticSearchLog("Triggering delete index on publishing search index").addParameter("uri", uri).log();
+        info().data("uri", uri).log("elastic search: triggering delete index on publishing search index");
         long start = System.currentTimeMillis();
         searchUtils.deleteDocument(getSearchAlias(), pageType, uri);
         long end = System.currentTimeMillis();
-        elasticSearchLog("Delete index complete")
-                .addParameter("uri", uri)
-                .addParameter("totalTime(ms)", (start - end))
-                .log();
+        info().data("uri", uri).data("duration", (start - end)).log("elastic searchL delete index complete");
     }
 
     private String generateIndexName() {
@@ -313,7 +310,8 @@ public class Indexer {
     private Settings getSettings() throws IOException {
         Settings.Builder settingsBuilder = Settings.builder().
                 loadFromStream("index-config.yml", Indexer.class.getResourceAsStream("/search/index-config.yml"));
-        elasticSearchLog("Index settings").addParameter("settings", settingsBuilder.internalMap());
+
+        info().data("settings", settingsBuilder.internalMap()).log("elastic search: index settings");
         return settingsBuilder.build();
     }
 
@@ -326,14 +324,14 @@ public class Indexer {
     private String getDefaultMapping() throws IOException {
         InputStream mappingSourceStream = Indexer.class.getResourceAsStream("/search/default-mapping.json");
         String mappingSource = IOUtils.toString(mappingSourceStream);
-        elasticSearchLog("defaultMapping").addParameter("mappingSource", mappingSource).log();
+        info().data("mapping_source", mappingSource).log("elastic search: default mapping");
         return mappingSource;
     }
 
     private String getDepartmentsMapping() throws IOException {
         InputStream mappingSourceStream = Indexer.class.getResourceAsStream("/search/departments/departments-mapping.json");
         String mappingSource = IOUtils.toString(mappingSourceStream);
-        elasticSearchLog("departmentsMapping").addParameter("mappingSource", mappingSource).log();
+        info().data("mappingSource", mappingSource).log("elastic search: get departments mapping file");
         return mappingSource;
     }
 
@@ -366,41 +364,30 @@ public class Indexer {
                 new BulkProcessor.Listener() {
                     @Override
                     public void beforeBulk(
-                            long executionId,
-                            BulkRequest request
-                    ) {
-                        elasticSearchLog("Bulk Indexing documents").addParameter("quantity", request.numberOfActions()).log();
+                            long executionId, BulkRequest request) {
+                        info().data("quantity", request.numberOfActions())
+                                .log("elastic search bulk processor: bulk indexing  documents");
                     }
 
                     @Override
-                    public void afterBulk(
-                            long executionId,
-                            BulkRequest request,
-                            BulkResponse response
-                    ) {
+                    public void afterBulk(long executionId, BulkRequest request, BulkResponse response) {
                         if (response.hasFailures()) {
                             BulkItemResponse[] items = response.getItems();
                             for (BulkItemResponse item : items) {
                                 if (item.isFailed()) {
-                                    elasticSearchLog("Indexing failure")
-                                            .addParameter("uri", item.getFailure().getId())
-                                            .addParameter("detailMessage", item.getFailureMessage())
-                                            .log();
+                                    info().data("uri", item.getFailure().getId())
+                                            .data("detailed_message", item.getFailureMessage())
+                                            .log("elastic search bulk processor: bulk indexing failure");
                                 }
                             }
                         }
                     }
 
                     @Override
-                    public void afterBulk(
-                            long executionId,
-                            BulkRequest request,
-                            Throwable failure
-                    ) {
-                        elasticSearchLog("Bulk index failure")
-                                .addParameter("detailedMessagee", failure.getMessage())
-                                .log();
-                        failure.printStackTrace();
+                    public void afterBulk(long executionId, BulkRequest request, Throwable failure) {
+                        info().data("detailedMessagee", failure.getMessage())
+                                .exception(failure)
+                                .log("elastic search bulk processor: bulk indexing failure");
                     }
                 })
                 .setBulkActions(10000)

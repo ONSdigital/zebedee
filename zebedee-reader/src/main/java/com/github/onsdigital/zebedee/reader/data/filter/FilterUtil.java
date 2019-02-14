@@ -17,7 +17,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logDebug;
+import static com.github.onsdigital.zebedee.logging.ReaderLogger.info;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 public class FilterUtil {
@@ -122,14 +122,14 @@ public class FilterUtil {
             Date date = timeSeriesValue.toDate();
             // Start adding if no from date has been specified:
             if ((!add && from == null) || date.equals(from) || date.after(from)) {
-                logDebug("applying date range").addParameter("from", date.toString()).log();
+                info().data("from", date.toString()).log("applying date range");
                 add = true;
             }
             if (add) {
                 result.add(timeSeriesValue);
             }
             if (date.equals(to)) {
-                logDebug("applying date range").addParameter("to", date.toString()).log();
+                info().data("to", date.toString()).log("applying date range");
                 break;
             }
         }

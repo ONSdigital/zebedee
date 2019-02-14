@@ -47,10 +47,6 @@ public class ZebedeeReaderLogBuilder extends LogMessageBuilder {
         return new ZebedeeReaderLogBuilder(t, ZEBEDEE_READER_EXCEPTION + ": " + errorContext);
     }
 
-    public static ZebedeeReaderLogBuilder logDebug(String message) {
-        return new ZebedeeReaderLogBuilder(message, Level.DEBUG);
-    }
-
     public static ZebedeeReaderLogBuilder logTrace(String message) {
         return new ZebedeeReaderLogBuilder(message, Level.TRACE);
     }

@@ -4,7 +4,7 @@ import com.github.davidcarboni.cryptolite.Password;
 import com.github.onsdigital.zebedee.json.Keyring;
 import org.apache.commons.lang3.BooleanUtils;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 
 /**
  * Represents a user account. NB this record intentionally does not contain any permission-related information.
@@ -49,10 +49,10 @@ public class User extends UserSanitised {
                 passwordHash = Password.hash(newPassword);
                 result = true;
             } else {
-                logInfo("Unable to change keyring password").log();
+                info().log("Unable to change keyring password");
             }
         } else {
-            logInfo("Could not authenticate with the old password").log();
+            info().log("Could not authenticate with the old password");
         }
 
         return result;

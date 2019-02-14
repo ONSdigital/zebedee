@@ -28,8 +28,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logDebug;
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
 
 /**
  * Created by bren on 22/07/15.
@@ -147,9 +147,9 @@ public class PooledHttpClient {
     }
 
     public void shutdown() throws IOException {
-        logDebug("Shutting down connection pool").addParameter("host", HOST).log();
+        info().data("host", HOST).log("Shutting down connection pool");
         httpClient.close();
-        logDebug("Successfully shut down connection pool").log();
+        info().log("Successfully shut down connection pool");
         monitorThread.shutdown();
     }
 
@@ -205,7 +205,7 @@ public class PooledHttpClient {
             String s = EntityUtils.toString(entity);
             return s;
         } catch (Exception e) {
-            logError(e, "Failed reading content service").log();
+            error().logException(e, "Failed reading content service");
         }
         return null;
     }
@@ -228,7 +228,7 @@ public class PooledHttpClient {
 
         @Override
         public void run() {
-            logDebug("Running connection pool monitor").log();
+            info().log("Running connection pool monitor");
             try {
                 while (!shutdown) {
                     synchronized (this) {
@@ -241,13 +241,13 @@ public class PooledHttpClient {
                     }
                 }
             } catch (InterruptedException ex) {
-                logError(ex, "Connection pool monitor failed").log();
+                error().logException(ex, "Connection pool monitor failed");
                 ex.printStackTrace();
             }
         }
 
         public void shutdown() {
-            logDebug("Shutting down connection pool monitor").log();
+            info().log("Shutting down connection pool monitor");
             shutdown = true;
             synchronized (this) {
                 notifyAll();
@@ -265,7 +265,7 @@ public class PooledHttpClient {
                     shutdown();
                 }
             } catch (IOException e) {
-                logError(e, "Falied shutting down http client").addParameter("host", HOST).log();
+                error().data("host", HOST).logException(e, "Falied shutting down http client");
                 e.printStackTrace();
             }
         }

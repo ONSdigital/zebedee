@@ -196,7 +196,7 @@ public class TeamsServiceImpl implements TeamsService {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
         if (!permissionsServiceSupplier.getService().isAdministrator(session.getEmail())) {
-            info().log(FORBIDDEN_ERR_MSG)
+            info().log(FORBIDDEN_ERR_MSG);
             throw new ForbiddenException(FORBIDDEN_ERR_MSG);
         }
     }

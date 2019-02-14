@@ -9,8 +9,8 @@ import com.github.onsdigital.zebedee.content.page.statistics.document.figure.ima
 import com.github.onsdigital.zebedee.content.page.statistics.document.figure.table.Table;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
-import com.github.onsdigital.zebedee.exceptions.ResourceDirectoryNotFileException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
+import com.github.onsdigital.zebedee.exceptions.ResourceDirectoryNotFileException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.reader.data.language.ContentLanguage;
 import com.github.onsdigital.zebedee.reader.util.ReleaseDateComparator;
@@ -37,7 +37,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logError;
+import static com.github.onsdigital.zebedee.logging.ReaderLogger.error;
 import static com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration.getConfiguration;
 import static com.github.onsdigital.zebedee.util.URIUtils.removeLastSegment;
 import static com.github.onsdigital.zebedee.util.URIUtils.removeLeadingSlash;
@@ -340,9 +340,8 @@ public class FileSystemContentReader implements ContentReader {
         try {
             return ContentUtil.deserialiseContent(resource.getData());
         } catch (JsonSyntaxException e) {
-            logError(e, "Failed to deserialise resource")
-                    .addParameter("resourceUri", resource.getUri()).log();
-            throw e;
+            throw error().data("resourceUri", resource.getUri())
+                    .logException(e, "Failed to deserialise resource");
         }
     }
 
@@ -443,7 +442,7 @@ public class FileSystemContentReader implements ContentReader {
         } catch (NotFoundException e) {
             contentNode = createContentNodeForFolder(path);
         } catch (JsonSyntaxException e) {
-            logError(e, "Warning!!! Invalid json file encountered").addParameter("path", path.toString()).log();
+            error().data("path", path.toString()).logException(e, "Warning!!! Invalid json file encountered");
         }
 
         return contentNode;

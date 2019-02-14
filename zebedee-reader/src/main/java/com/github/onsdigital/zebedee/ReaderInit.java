@@ -20,8 +20,8 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import static com.github.onsdigital.zebedee.logging.ReaderLogger.error;
 import static com.github.onsdigital.zebedee.logging.ReaderLogger.info;
-import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logError;
 import static com.github.onsdigital.zebedee.search.configuration.SearchConfiguration.getSearchAlias;
 
 public class ReaderInit implements Startup {
@@ -30,7 +30,7 @@ public class ReaderInit implements Startup {
 
     @Override
     public void init() {
-        LogSerialiser serialiser = new JacksonLogSerialiser(true);
+        LogSerialiser serialiser = new JacksonLogSerialiser();
         LogStore store = new MDCLogStore(serialiser);
         Logger logger = new LoggerImpl("zebedee");
 
@@ -52,8 +52,8 @@ public class ReaderInit implements Startup {
         try {
             ElasticSearchClient.init();
         } catch (IOException e) {
-            logError(e, "error initalising zedebee reader elasticSearch client").log();
-            throw new RuntimeException("Failed starting elastic search client", e);
+            throw error().logException(new RuntimeException(e),
+                    "error initalising zedebee reader elasticSearch client");
         }
 
         info().log("loading search index");
@@ -84,11 +84,10 @@ public class ReaderInit implements Startup {
 
                 return null;
             } catch (NoNodeAvailableException e) {
-                logError(e, "Failed to communicate with elastic search to index content. Search will not work.").log();
+                error().logException(e, "Failed to communicate with elastic search to index content. Search will not work.");
                 return null;
             } catch (Exception e) {
-                logError(e, "error attempting to load search index").log();
-                throw new RuntimeException("Loading search index failed", e);
+                throw new RuntimeException(error().logException(e, "error attempting to load search index"));
             } finally {
                 EXECUTOR.shutdown();
             }

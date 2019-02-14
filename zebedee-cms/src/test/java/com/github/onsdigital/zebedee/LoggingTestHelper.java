@@ -1,7 +1,7 @@
 package com.github.onsdigital.zebedee;
 
 import com.github.onsdigital.logging.v2.DPLogger;
-import com.github.onsdigital.logging.v2.config.nop.NopConfig;
+import com.github.onsdigital.logging.v2.nop.NopConfig;
 
 public class LoggingTestHelper {
 

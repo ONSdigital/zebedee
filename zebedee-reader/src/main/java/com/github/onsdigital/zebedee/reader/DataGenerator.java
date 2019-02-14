@@ -40,7 +40,6 @@ import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
 import static com.github.onsdigital.zebedee.logging.ReaderLogger.info;
-import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logTrace;
 import static java.util.Arrays.asList;
 import static org.apache.commons.io.FilenameUtils.getExtension;
 import static org.apache.poi.ss.usermodel.Cell.CELL_TYPE_NUMERIC;
@@ -225,10 +224,6 @@ public class DataGenerator {
                                 CellStyle newStyle = wb.createCellStyle();
                                 newStyle.setDataFormat(wb.createDataFormat().getFormat(cellFormat));
                                 stylesMap.put(cellFormat, newStyle);
-
-                                logTrace("created new cell style for workbook")
-                                        .addParameter("count", stylesMap.size())
-                                        .log();
                             }
 
                             cell.setCellStyle(stylesMap.get(cellFormat));

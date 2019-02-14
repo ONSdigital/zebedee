@@ -17,4 +17,8 @@ public class ReaderLogger {
     public static SimpleEvent info() {
         return new SimpleEvent(NAMESPACE, Severity.INFO);
     }
+
+    public static SimpleEvent error() {
+        return new SimpleEvent(NAMESPACE, Severity.ERROR);
+    }
 }

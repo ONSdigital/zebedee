@@ -10,7 +10,7 @@ import com.github.onsdigital.zebedee.util.mertics.service.MetricsService;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logError;
+import static com.github.onsdigital.zebedee.logging.ReaderLogger.error;
 
 /**
  * The error handler catches various exceptions and sets the response status code accordingly.
@@ -27,18 +27,20 @@ public class ErrorHandler implements ServerError {
         if (t != null && ZebedeeExceptionWithData.class.isAssignableFrom(t.getClass())) {
             ZebedeeExceptionWithData exception = (ZebedeeExceptionWithData) t;
             res.setStatus(exception.statusCode);
-            logError(exception, "Zebedee Reader API error").addParameter("exceptionStatusCode", exception.statusCode).log();
+            error().data("exceptionStatusCode", exception.statusCode)
+                    .logException(exception, "Zebedee Reader API error");
             return new ServerResponse(exception.getMessage(), exception.getData());
         }
         // If it's an ZebedeeException subclass, set the status code and message
         if (t != null && ZebedeeException.class.isAssignableFrom(t.getClass())) {
             ZebedeeException exception = (ZebedeeException) t;
             res.setStatus(exception.statusCode);
-            logError(exception, "Zebedee Reader API error").addParameter("exceptionStatusCode", exception.statusCode).log();
+            error().data("exceptionStatusCode", exception.statusCode)
+                    .logException(exception, "Zebedee Reader API error");
             return new ServerResponse(exception.getMessage());
         }
         // Otherwise leave the default 500 response
-        logError(t, "Internal Server Error").log();
+        error().logException(t, "Internal Server Error");
         return new ServerResponse("Internal Server Error");
     }
 }

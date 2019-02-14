@@ -20,10 +20,9 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static com.github.onsdigital.zebedee.ReaderFeatureFlags.readerFeatureFlags;
+import static com.github.onsdigital.zebedee.logging.ReaderLogger.error;
 import static com.github.onsdigital.zebedee.logging.ReaderLogger.info;
 import static com.github.onsdigital.zebedee.logging.ReaderLogger.warn;
-import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logError;
-import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logTrace;
 
 /**
  * Created by bren on 09/06/15.
@@ -117,7 +116,7 @@ class PageTypeResolver implements JsonDeserializer<Page> {
                 String className = contentClass.getSimpleName();
                 boolean _abstract = Modifier.isAbstract(contentClass.getModifiers());
                 if (_abstract) {
-                    logTrace("Skipping registering abstract content").addParameter("type", className).log();
+                    info().data("type", className).log("Skipping registering abstract content");
                     continue;
                 }
 
@@ -125,12 +124,11 @@ class PageTypeResolver implements JsonDeserializer<Page> {
                     Page contentInstance = contentClass.newInstance();
                     contentClasses.put(contentInstance.getType(), contentClass);
                 } catch (InstantiationException e) {
-                    logError(e, "Failed to instantiate content type").addParameter("pageType", className).log();
+                    error().data("pageType", className).logException(e, "Failed to instantiate content type");
                 }
             }
         } catch (Exception e) {
-            logError(e, "Failed initializing content types").log();
-            throw new RuntimeException("Failed initializing request handlers", e);
+            throw new RuntimeException(error().logException(e, "Failed initializing content types"));
         }
     }
 }

@@ -336,8 +336,6 @@ public class PostPublisher {
         } catch (Exception exception) {
             error().data("collectionId", collection.getDescription().getId())
                     .logException(exception, "An error occurred during the search reindex");
-
-            ExceptionUtils.printRootCauseStackTrace(exception);
         }
     }
 

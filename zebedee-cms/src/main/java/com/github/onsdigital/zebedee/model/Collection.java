@@ -1323,10 +1323,11 @@ public class Collection {
         return 0;
     }
 
-    private static BiFunction<String, String, String> COLLECTION_CONTENT_PATH = (collectioName, uri) -> {
+    private static String collectionContentPath(String collectioName, String uri) {
         uri = uri.startsWith("/") ? uri.substring(1) : uri;
         return Paths.get(collectioName).resolve("inprogress").resolve(uri).toString();
-    };
+    }
+
 
     public HashMap<String, String> generateCollectionSaveConflictMap(Collection blockingCollection, String targetURI) throws IOException {
 
@@ -1334,13 +1335,13 @@ public class Collection {
 
         if (this != null) {
             String name = this.getDescription().getName();
-            conflictLogMap.put(TARGET_PATH, COLLECTION_CONTENT_PATH.apply(name, targetURI));
+            conflictLogMap.put(TARGET_PATH, collectionContentPath(name, targetURI));
             conflictLogMap.put(TARGET_COLLECTION, name);
         }
 
         if (blockingCollection != null) {
             String name = blockingCollection.getDescription().getName();
-            conflictLogMap.put(BLOCKING_PATH, COLLECTION_CONTENT_PATH.apply(name, targetURI));
+            conflictLogMap.put(BLOCKING_PATH, collectionContentPath(name, targetURI));
             conflictLogMap.put(BLOCKING_COLLECTION, name);
         }
 

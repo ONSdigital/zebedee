@@ -1,8 +1,6 @@
 package com.github.onsdigital.zebedee;
 
 import com.github.davidcarboni.restolino.framework.Startup;
-import com.github.onsdigital.logging.v2.DPLogger;
-import com.github.onsdigital.logging.v2.nop.NopConfig;
 import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.configuration.CMSFeatureFlags;
 import com.github.onsdigital.zebedee.model.ZebedeeCollectionReaderFactory;

@@ -7,8 +7,7 @@ import com.github.onsdigital.zebedee.model.ZebedeeCollectionReaderFactory;
 import com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDaoFactory;
 import com.github.onsdigital.zebedee.reader.ZebedeeReader;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logDebug;
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 
 /**
  * Created by bren on 31/07/15.
@@ -17,19 +16,19 @@ public class Init implements Startup {
 
     @Override
     public void init() {
-        logInfo("inside CMS INIT").log();
+        info().log("inside CMS INIT");
 
-        logInfo("loading CMS feature flags").log();
+        info().log("loading CMS feature flags");
         CMSFeatureFlags.cmsFeatureFlags();
 
-        logInfo("Root.init()").log();
+        info().log("Root.init()");
         Root.init();
 
-        logInfo("ZebedeeReader.setCollectionReaderFactory").log();
+        info().log("ZebedeeReader.setCollectionReaderFactory");
         ZebedeeReader.setCollectionReaderFactory(new ZebedeeCollectionReaderFactory(Root.zebedee));
 
-        logInfo("CollectionHistoryDaoFactory.initialise();").log();
+        info().log("CollectionHistoryDaoFactory.initialise();");
         CollectionHistoryDaoFactory.initialise();
-        logDebug("Zebedee Start up").log();
+        info().log("Zebedee Start up");
     }
 }

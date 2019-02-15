@@ -4,7 +4,7 @@ import com.github.davidcarboni.cryptolite.Random;
 
 import java.util.concurrent.ScheduledFuture;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logDebug;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 
 /**
  * ScheduledTask implementation that does nothing but track if it has been run.
@@ -20,7 +20,7 @@ public class DummyScheduledTask extends ScheduledTask {
 
     @Override
     public void run() {
-        logDebug("Running dummy task").addParameter("taskId", id).log();
+        info().data("taskId", id).log("Running dummy task");
         runComplete = true;
     }
 

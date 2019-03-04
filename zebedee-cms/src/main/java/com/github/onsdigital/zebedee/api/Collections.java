@@ -2,7 +2,6 @@ package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
 import com.github.davidcarboni.restolino.helpers.Path;
-import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
@@ -15,11 +14,9 @@ import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.CollectionDescriptions;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.service.DatasetService;
-import com.github.onsdigital.zebedee.service.ZebedeeDatasetService;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.util.ZebedeeCmsService;
 import com.google.gson.JsonSyntaxException;
-import dp.api.dataset.DatasetAPIClient;
 import dp.api.dataset.exception.DatasetAPIException;
 import dp.api.dataset.exception.DatasetNotFoundException;
 import dp.api.dataset.exception.UnexpectedResponseException;
@@ -35,34 +32,39 @@ import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logWarn;
+import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.warn;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
+import static org.apache.http.HttpStatus.SC_NOT_FOUND;
 
 @Api
 public class Collections {
 
     private ZebedeeCmsService zebedeeCmsService;
     private DatasetService datasetService;
+    private final boolean datasetImportEnabled;
+    private static final String GET_COLLECTIONS_ERROR = "get collections endpoint: unexpected error while attempting to get collections";
 
     /**
      * Default constructor used instantiates dependencies itself.
      */
     public Collections() throws URISyntaxException {
-        zebedeeCmsService = ZebedeeCmsService.getInstance();
-        datasetService = zebedeeCmsService.getDatasetService();
+        this.zebedeeCmsService = ZebedeeCmsService.getInstance();
+        this.datasetService = zebedeeCmsService.getDatasetService();
+        this.datasetImportEnabled = cmsFeatureFlags().isEnableDatasetImport();
     }
 
     /**
      * Constructor allowing dependencies to be injected.
-     *
-     * @param zebedeeCmsService
-     * @param datasetService
      */
-    public Collections(ZebedeeCmsService zebedeeCmsService, DatasetService datasetService) {
+    public Collections(ZebedeeCmsService zebedeeCmsService, DatasetService datasetService,
+                       boolean datasetImportEnabled) {
         this.zebedeeCmsService = zebedeeCmsService;
         this.datasetService = datasetService;
+        this.datasetImportEnabled = datasetImportEnabled;
     }
 
     /**
@@ -76,12 +78,12 @@ public class Collections {
     @GET
     public CollectionDescriptions get(HttpServletRequest request, HttpServletResponse response)
             throws ZebedeeException {
-        logInfo("get collections endpoint: request received").log();
+        info().log("get collections endpoint: request received");
         Session session = null;
         try {
             session = Root.zebedee.getSessionsService().get(request);
             if (session == null) {
-                logWarn("get collections endpoint: valid user session not found").log();
+                warn().log("get collections endpoint: valid user session not found");
                 throw new UnauthorizedException("You are not authorized to perform get collections requests");
             }
 
@@ -104,18 +106,14 @@ public class Collections {
             // sort the collections alphabetically by name.
             java.util.Collections.sort(result, Comparator.comparing(o -> o.getName()));
 
-            logInfo("get collections endpoint: request successful user granted canView permission for collections")
-                    .list("collections", result, (c) -> c.getId())
-                    .user(session)
-                    .log();
+            List<String> collectionIds = result.stream().map(c -> c.getId()).collect(Collectors.toList());
+            info().data("collections", collectionIds).log("user granted canView permission for collections");
 
             return result;
         } catch (IOException e) {
-            logError(e, "get collections endpoint: unexpected error while attempting to get collections")
-                    .user(session)
-                    .logAndThrow(UnexpectedErrorException.class);
+            error().data("user", session.getEmail()).logException(e,GET_COLLECTIONS_ERROR);
+            throw new UnexpectedErrorException(GET_COLLECTIONS_ERROR, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
-        return null;
     }
 
     /**
@@ -124,10 +122,16 @@ public class Collections {
      */
     @PUT
     public void put(HttpServletRequest request, HttpServletResponse response) throws ZebedeeException, IOException, DatasetAPIException {
+        if (!datasetImportEnabled) {
+            warn().data("responseStatus", SC_NOT_FOUND)
+                    .log("collections PUT endpoint is not supported as feature EnableDatasetImport is disabled");
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            return;
+        }
 
         Session session = zebedeeCmsService.getSession(request);
         if (session == null || !zebedeeCmsService.getPermissions().canEdit(session)) {
-            logInfo("Forbidden request made to the collection endpoint").log();
+            info().log("Forbidden request made to the collection endpoint");
             response.setStatus(HttpStatus.SC_FORBIDDEN);
             return;
         }
@@ -144,7 +148,7 @@ public class Collections {
 
         Collection collection = zebedeeCmsService.getCollection(collectionID);
         if (collection == null) {
-            logInfo("Collection not found").collectionId(collectionID).log();
+            info().data("collectionId", collectionID).log("Collection not found");
             response.setStatus(HttpStatus.SC_NOT_FOUND);
             return;
         }
@@ -183,10 +187,16 @@ public class Collections {
      */
     @DELETE
     public void delete(HttpServletRequest request, HttpServletResponse response) throws ZebedeeException, IOException, DatasetAPIException {
+        if (!datasetImportEnabled) {
+            warn().data("responseStatus", SC_NOT_FOUND)
+                    .log("collections DELETE endpoint is not supported as feature EnableDatasetImport is disabled");
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            return;
+        }
 
         Session session = zebedeeCmsService.getSession(request);
         if (session == null || !zebedeeCmsService.getPermissions().canEdit(session)) {
-            logInfo("Forbidden request made to the collection endpoint").log();
+            info().log("Forbidden request made to the collection endpoint");
             response.setStatus(HttpStatus.SC_FORBIDDEN);
             return;
         }
@@ -201,7 +211,7 @@ public class Collections {
 
         Collection collection = zebedeeCmsService.getCollection(collectionID);
         if (collection == null) {
-            logInfo("Collection not found").collectionId(collectionID).log();
+            info().data("collectionId", collectionID).log("Collection not found");
             response.setStatus(HttpStatus.SC_NOT_FOUND);
             return;
         }
@@ -222,13 +232,13 @@ public class Collections {
     }
 
     private void updateDatasetVersionInCollection(Collection collection, String datasetID, String edition, String version, HttpServletRequest request, String user) throws ZebedeeException, IOException, DatasetAPIException {
-        logInfo("PUT called on /collections/{}/datasets/{}/editions/{}/versions/{} endpoint")
-                .addParameter("collectionID", collection.getId())
-                .addParameter("datasetID", datasetID)
-                .addParameter("edition", edition)
-                .addParameter("version", version)
-                .user(user)
-                .log();
+
+        info().data("collectionId", collection.getId())
+                .data("datasetId", datasetID)
+                .data("edition", edition)
+                .data("version", version)
+                .data("user", user)
+                .log("PUT called on /collections/{}/datasets/{}/editions/{}/versions/{} endpoint");
 
         try (InputStream body = request.getInputStream()) {
 
@@ -241,11 +251,12 @@ public class Collections {
     }
 
     private void updateDatasetInCollection(Collection collection, String datasetID, HttpServletRequest request, String user) throws ZebedeeException, IOException, DatasetAPIException {
-        logInfo("PUT called on /collections/{}/datasets/{} endpoint")
-                .addParameter("collectionID", collection.getId())
-                .addParameter("datasetID", datasetID)
-                .user(user)
-                .log();
+
+        info().data("collectionId", collection.getId())
+                .data("datasetId", datasetID)
+                .data("user", user)
+                .log("PUT called on /collections/{}/datasets/{} endpoint");
+
         try (InputStream body = request.getInputStream()) {
 
             CollectionDataset dataset = ContentUtil.deserialise(body, CollectionDataset.class);
@@ -257,22 +268,20 @@ public class Collections {
     }
 
     private void removeDatasetVersionFromCollection(Collection collection, String datasetID, String edition, String version) throws ZebedeeException, IOException, DatasetAPIException {
-        logInfo("DELETE called on /collections/{collection_id}/datasets/{}/editions/{}/versions/{} endpoint")
-                .addParameter("collectionID", collection.getId())
-                .addParameter("datasetID", datasetID)
-                .addParameter("edition", edition)
-                .addParameter("version", version)
-                .log();
+        info().data("collectionId", collection.getId())
+                .data("datasetId", datasetID)
+                .data("edition", edition)
+                .data("version", version)
+                .log("DELETE called on /collections/{collection_id}/datasets/{}/editions/{}/versions/{} endpoint");
 
         datasetService.removeDatasetVersionFromCollection(collection, datasetID, edition, version);
     }
 
     private void removeDatasetFromCollection(Collection collection, String datasetID) throws ZebedeeException, IOException, DatasetAPIException {
 
-        logInfo("DELETE called on /collections/{collection_id}/datasets/{} endpoint")
-                .addParameter("collectionID", collection.getId())
-                .addParameter("datasetID", datasetID)
-                .log();
+        info().data("collectionId", collection.getId())
+                .data("datasetId", datasetID)
+                .log("DELETE called on /collections/{collection_id}/datasets/{} endpoint");
 
         datasetService.removeDatasetFromCollection(collection, datasetID);
     }
@@ -284,7 +293,7 @@ public class Collections {
         if (segments.size() < 4 ||
                 !segments.get(2).equalsIgnoreCase("datasets")) {
 
-            logInfo("Endpoint for colletions not found").addParameter("path", path).log();
+            info().data("path", path).log("Endpoint for colletions not found");
             response.setStatus(HttpStatus.SC_NOT_FOUND);
             return false;
         }

@@ -16,10 +16,11 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
 import java.io.IOException;
 
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.warn;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
+
 import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logWarn;
 import static com.github.onsdigital.zebedee.util.JsonUtils.writeResponse;
 import static org.apache.http.HttpStatus.SC_NOT_FOUND;
 import static org.apache.http.HttpStatus.SC_OK;
@@ -53,9 +54,8 @@ public class Identity {
     public void identifyUser(HttpServletRequest request, HttpServletResponse response) throws IOException {
         // FIXME CMD feature
         if (!datasetImportEnabled) {
-            logWarn("Identity endpoint is not supported as feature EnableDatasetImport is disabled")
-                    .addParameter("responseStatus", SC_NOT_FOUND)
-                    .log();
+            warn().data("responseStatus", SC_NOT_FOUND)
+                    .log("Identity endpoint is not supported as feature EnableDatasetImport is disabled");
             writeResponse(response, NOT_FOUND_ERROR, SC_NOT_FOUND);
             return;
         }
@@ -81,20 +81,18 @@ public class Identity {
 
         if (StringUtils.isEmpty(sessionID)) {
             Error responseBody = new Error("user not authenticated");
-            logWarn(responseBody.getMessage()).log();
+            warn().log(responseBody.getMessage());
             writeResponse(response, responseBody, SC_UNAUTHORIZED);
             return;
         }
 
         try {
             UserIdentity identity = getAuthorisationService().identifyUser(sessionID);
-            logInfo("authenticated user identity confirmed")
-                    .sessionID(sessionID)
-                    .user(identity.getIdentifier())
-                    .log();
+            info().data("sessionId", sessionID).data("user", identity.getIdentifier())
+                    .log("authenticated user identity confirmed");
             writeResponse(response, identity, SC_OK);
         } catch (UserIdentityException e) {
-            logError(e, "identify user failure, returning error response").log();
+            error().logException(e, "identity endpoint: identify user failure, returning error response");
             writeResponse(response, new Error(e.getMessage()), e.getResponseCode());
         }
     }
@@ -112,9 +110,7 @@ public class Identity {
                 String token = cred[1];
                 final ServiceAccount service = serviceStore.get(token);
                 if (service != null) {
-                    logInfo("authenticated service account confirmed")
-                            .user(service.getId())
-                            .log();
+                    info().data("user", service.getId()).log("authenticated service account confirmed");
                     return service;
                 } else {
                     return null;

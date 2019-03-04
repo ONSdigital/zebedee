@@ -35,8 +35,8 @@ import static com.github.onsdigital.zebedee.configuration.Configuration.isVerifi
 import static com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedException.beingEditedByAnotherCollectionError;
 import static com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedException.beingEditedByThisCollectionError;
 import static com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedException.markedDeleteInAnotherCollectionError;
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
 
 public class Zebedee {
 
@@ -260,7 +260,7 @@ public class Zebedee {
      */
     public Session openSession(Credentials credentials) throws IOException, NotFoundException, BadRequestException {
         if (credentials == null) {
-            logError("provided credentials are null no session will be opened").log();
+            error().log("provided credentials are null no session will be opened");
             return null;
         }
 
@@ -268,7 +268,7 @@ public class Zebedee {
         User user = usersService.getUserByEmail(credentials.email);
 
         if (user == null) {
-            logInfo("user not found no session will be created").user(user.getEmail()).log();
+            info().data("user", user.getEmail()).log("user not found no session will be created");
             return null;
         }
 
@@ -277,7 +277,7 @@ public class Zebedee {
         try {
             session = sessionsService.create(user);
         } catch (Exception e) {
-            logError(e, "error attempting to create session for user").user(user.getEmail()).log();
+            error().data("user", user.getEmail()).logException(e, "error attempting to create session for user");
             throw new IOException(e);
         }
 

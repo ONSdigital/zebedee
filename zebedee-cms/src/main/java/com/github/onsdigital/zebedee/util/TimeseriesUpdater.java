@@ -12,8 +12,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
 
 /**
  * Given as CSV indexed with the timeseries CDID, update each timeseries with the given data.
@@ -25,12 +25,12 @@ public class TimeseriesUpdater {
         // read the CSV and update the timeseries titles.
         TimeseriesUpdateImporter importer = new CsvTimeseriesUpdateImporter(csvInput);
 
-        logInfo("Importing CSV file").log();
+        info().log("Importing CSV file");
         ArrayList<TimeseriesUpdateCommand> updateCommandsImported = importer.importData();
 
         ArrayList<TimeseriesUpdateCommand> updateCommands = filterTimeseriesThatDoNotExist(dataIndex, updateCommandsImported);
 
-        logInfo("Updating timeseries with new metadata").log();
+        info().log("Updating timeseries with new metadata");
         updateTimeseriesMetadata(contentReader, contentWriter, updateCommands);
     }
 
@@ -41,7 +41,7 @@ public class TimeseriesUpdater {
             String uri = dataIndex.getUriForCdid(command.cdid.toLowerCase());
 
             if (uri == null) {
-                logInfo("CDID not found in data index").addParameter("CDID", command.cdid).log();
+                info().data("CDID", command.cdid).log("CDID not found in data index");
                 continue;
             } else {
                 command.uri = uri + "/" + command.dataset.toLowerCase();
@@ -83,7 +83,7 @@ public class TimeseriesUpdater {
                 }
 
             } catch (Exception e) {
-                logError(e, "Failed to read timeseries page").addParameter("uri", command.uri).log();
+                error().data("uri", command.uri).logException(e, "Failed to read timeseries page");
             }
         }
     }

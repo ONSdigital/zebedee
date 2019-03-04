@@ -5,7 +5,7 @@ import com.github.onsdigital.zebedee.model.Collection;
 
 import java.util.Date;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logDebug;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 
 public class DummyPublishCollectionTask extends PublishCollectionTask {
 
@@ -24,12 +24,12 @@ public class DummyPublishCollectionTask extends PublishCollectionTask {
     public Boolean call() throws Exception {
 
         this.start = new Date();
-        logDebug("Running dummy publish task").addParameter("taskId", id).log();
+        info().data("taskId", id).log("Running dummy publish task");
 
         Thread.sleep(duration);
         this.published = true;
 
-        logDebug("Finished dummy publish task").addParameter("taskId", id).log();
+        info().data("taskId", id).log("Finished dummy publish task");
         this.end = new Date();
 
         return true;

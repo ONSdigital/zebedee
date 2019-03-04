@@ -19,7 +19,7 @@ import java.util.TimerTask;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logDebug;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 
 /**
  * Created by david on 12/03/2015.
@@ -168,9 +168,7 @@ public class SessionsService extends TimerTask {
         List<Session> expired = sessionsStore.filterSessions(isExpired);
 
         for (Session s : expired) {
-            logDebug(DELETING_SESSION_MSG)
-                    .addParameter(SESSION_ID_PARAM, s.getId())
-                    .log();
+            info().data(SESSION_ID_PARAM, s.getId()).log(DELETING_SESSION_MSG);
             sessionsStore.delete(sessionPath(s.getId()));
         }
     }

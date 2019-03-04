@@ -1,5 +1,6 @@
 package com.github.onsdigital.zebedee.api;
 
+import com.github.onsdigital.zebedee.LoggingTestHelper;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.CollectionDataset;
 import com.github.onsdigital.zebedee.json.CollectionDatasetVersion;
@@ -9,6 +10,7 @@ import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.util.ZebedeeCmsService;
 import org.apache.http.HttpStatus;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Matchers;
 
@@ -22,6 +24,7 @@ import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 public class CollectionsTest {
@@ -37,17 +40,44 @@ public class CollectionsTest {
     private HttpServletResponse response = mock(HttpServletResponse.class);
     private Session session = mock(Session.class);
 
-    private Collections collections = new Collections(mockZebedeeCmsService, mockDatasetService);
+    private Collections collections = new Collections(mockZebedeeCmsService, mockDatasetService, true);
     private String collectionID = "123";
     private String datasetID = "345";
     private String edition = "2014";
     private String version = "1";
     private String user = "test@email.com";
 
+    @BeforeClass
+    public static void setUpLogger() {
+        LoggingTestHelper.initDPLogger(CollectionsTest.class);
+    }
+
     @Before
     public void setUp() throws Exception {
         when(mockZebedeeCmsService.getCollection(collectionID)).thenReturn(mockCollection);
         when(mockCollection.getId()).thenReturn(collectionID);
+    }
+
+    @Test
+    public void testPutDataset_DatasetImportDisabled() throws Exception {
+        collections = new Collections(mockZebedeeCmsService, mockDatasetService, false);
+
+        // When the put method is called
+        collections.put(request, response);
+
+        verify(response, times(1)).setStatus(HttpServletResponse.SC_NOT_FOUND);
+        verifyZeroInteractions(mockZebedeeCmsService, mockDatasetService);
+    }
+
+    @Test
+    public void testDeleteDataset_DatasetImportDisabled() throws Exception {
+        collections = new Collections(mockZebedeeCmsService, mockDatasetService, false);
+
+        // When the put method is called
+        collections.delete(request, response);
+
+        verify(response, times(1)).setStatus(HttpServletResponse.SC_NOT_FOUND);
+        verifyZeroInteractions(mockZebedeeCmsService, mockDatasetService);
     }
 
     @Test

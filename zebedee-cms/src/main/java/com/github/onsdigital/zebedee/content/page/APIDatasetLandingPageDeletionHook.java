@@ -6,7 +6,7 @@ import dp.api.dataset.exception.DatasetAPIException;
 
 import java.io.IOException;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
 
 /**
  * A PageUpdateHook implementation for when an ApiDatasetLandingPage is deleted.
@@ -35,7 +35,7 @@ public class APIDatasetLandingPageDeletionHook implements PageUpdateHook<ApiData
         try {
             datasetAPIClient.deleteDataset(page.getapiDatasetId());
         } catch (DatasetAPIException e) {
-            logError(e, "failed to delete dataset in the dataset api").log();
+            error().logException(e, "failed to delete dataset in the dataset api");
             throw new RuntimeException(e);
         }
     }

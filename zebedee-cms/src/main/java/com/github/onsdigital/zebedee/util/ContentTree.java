@@ -11,7 +11,7 @@ import com.github.onsdigital.zebedee.service.ServiceSupplier;
 
 import java.io.IOException;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logDebug;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 
 /**
  * Holds a cached instance of the published content tree
@@ -61,7 +61,7 @@ public class ContentTree {
     }
 
     public static void dropCache() {
-        logDebug("Clearing browser tree cache.").log();
+        info().log("Clearing browser tree cache.");
         publishedContentTree = null;
     }
 }

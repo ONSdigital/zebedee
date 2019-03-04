@@ -7,7 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logError;
+import static com.github.onsdigital.zebedee.logging.ReaderLogger.error;
 
 /**
  * Created by dave on 8/8/16.
@@ -23,7 +23,7 @@ public class RequestMetricsFilter implements Filter {
             try {
                 metricsService.captureRequest(request);
             } catch (Exception ex) {
-                logError(ex).log();
+                error().exception(ex).log("metric service capture request threw an error");
             }
         }
         return true;

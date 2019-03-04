@@ -21,8 +21,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logWarn;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.warn;
 
 /**
  * Created by thomasridd on 18/11/15.
@@ -184,10 +184,8 @@ public class KeyManager {
     public static void assignKeyToUser(Zebedee zebedee, User user, String keyIdentifier, SecretKey key) throws IOException {
         // Escape in case user keyring has not been generated
         if (user.keyring() == null) {
-            logWarn("Skipping assigning collection key to user as their keyring has not been initialized.")
-                    .user(user.getEmail())
-                    .collectionId(keyIdentifier)
-                    .log();
+            warn().data("user", user.getEmail()).data("collectionId", keyIdentifier)
+                    .log("Skipping assigning collection key to user as their keyring has not been initialized.");
             return;
         }
 
@@ -281,7 +279,7 @@ public class KeyManager {
         try {
             return collectionsServiceSupplier.getService().getCollection(id);
         } catch (IOException e) {
-            logError(e, "failed to get collection").addParameter("collectionId", id).log();
+            error().data("collectionId", id).logException(e, "failed to get collection");
             throw new RuntimeException("failed to get collection with collectionId " + id, e);
         }
     }

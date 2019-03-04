@@ -161,7 +161,7 @@ public class ZebedeeLogBuilder extends LogMessageBuilder {
 
     public ZebedeeLogBuilder user(Session session) {
         if (session != null) {
-            addParameter(USER, session.getEmail());
+            param(USER, session.getEmail());
         }
         return this;
     }

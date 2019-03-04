@@ -4,8 +4,8 @@ import com.github.onsdigital.zebedee.content.base.Content;
 import com.github.onsdigital.zebedee.content.dynamic.browse.ContentNode;
 import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
-import com.github.onsdigital.zebedee.exceptions.ResourceDirectoryNotFileException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
+import com.github.onsdigital.zebedee.exceptions.ResourceDirectoryNotFileException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.reader.data.filter.DataFilter;
@@ -19,7 +19,7 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logInfo;
+import static com.github.onsdigital.zebedee.logging.ReaderLogger.info;
 import static com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration.getConfiguration;
 
 /**
@@ -134,9 +134,7 @@ public class ZebedeeReader {
         } catch (BadRequestException e) {
             Path res = Paths.get(path);
             if (e instanceof ResourceDirectoryNotFileException && res.startsWith(VISUALISATIONS_PATH)) {
-                logInfo(VISUALISATION_DIR_MSG)
-                        .uri(path)
-                        .log();
+                info().data("uri", path).log(VISUALISATION_DIR_MSG);
                 return publishedContentReader.getResource(res.resolve(INDEX_HTML).toString());
             }
             throw e;

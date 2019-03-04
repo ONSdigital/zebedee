@@ -38,8 +38,8 @@ import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logDebug;
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.DATA_VISUALISATION_ZIP_UNPACKED;
 import static com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDaoFactory.getCollectionHistoryDao;
 import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData.dataVisZipUnpacked;
@@ -122,7 +122,7 @@ public class DataVisualisationZip {
             throw new BadRequestException(NO_ZIP_PATH_ERROR_MSG);
         }
 
-        logDebug(DELETING_ZIP_DEBUG).path(zipPath).log();
+        info().data("zipPath", zipPath).log(DELETING_ZIP_DEBUG);
 
         Session session = zebedeeCmsService.getSession(request);
         com.github.onsdigital.zebedee.model.Collection collection = zebedeeCmsService.getCollection(request);
@@ -130,7 +130,8 @@ public class DataVisualisationZip {
         try {
             collection.deleteDataVisContent(session, Paths.get(zipPath));
         } catch (IOException e) {
-            logError(e, DELETING_ZIP_ERROR_DEBUG).path(zipPath).logAndThrow(UnexpectedErrorException.class);
+            error().data("zipPath", zipPath).logException(e, DELETING_ZIP_ERROR_DEBUG);
+            throw new UnexpectedErrorException(DELETING_ZIP_ERROR_DEBUG, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
 
         return deleteContentSuccessResponse;
@@ -148,7 +149,7 @@ public class DataVisualisationZip {
             throw new BadRequestException(NO_ZIP_PATH_ERROR_MSG);
         }
 
-        logDebug(UNZIP_DEBUG).path(zipPath).log();
+        info().data("zipPath", zipPath).log(DELETING_ZIP_DEBUG);
 
         Session session = zebedeeCmsService.getSession(request);
         com.github.onsdigital.zebedee.model.Collection collection = zebedeeCmsService.getCollection(request);
@@ -163,7 +164,7 @@ public class DataVisualisationZip {
             updatePageJson(collection, collectionReader, publishedContentReader, collectionWriter, Paths.get(zipPath), session);
             return unzipSuccessResponse;
         } catch (IOException e) {
-            logError(e, COLLECTION_RES_ERROR_MSG).path(zipPath).log();
+            error().data("zipPath", zipPath).logException(e, COLLECTION_RES_ERROR_MSG);
             throw new NotFoundException(COLLECTION_RES_ERROR_MSG);
         }
     }
@@ -184,13 +185,13 @@ public class DataVisualisationZip {
                 if (isValidDataVisContentFile.test(zipEntry)) {
                     filePath = zipDir.resolve(zipEntry.getName());
                     contentWriter.write(zipInputStream, filePath.toString());
-                    logDebug(UNZIP_SUCCESS_DEBUG).path(filePath.toString()).log();
+                    info().data("zipPath", zipPath).log(DELETING_ZIP_DEBUG);
                 }
                 zipEntry = zipInputStream.getNextEntry();
             }
 
         } catch (IOException e) {
-            logError(e, UNZIPPING_ERROR_MSG).path(zipPath).log();
+            error().data("zipPath", zipPath).logException(e, UNZIPPING_ERROR_MSG);
             throw new UnexpectedErrorException(UNZIPPING_ERROR_MSG, Response.Status.INTERNAL_SERVER_ERROR.getStatusCode());
         }
     }
@@ -220,10 +221,9 @@ public class DataVisualisationZip {
                     DATA_VISUALISATION_ZIP_UNPACKED, dataVisZipUnpacked(pageJson));
 
         } catch (IOException e) {
-            logError(e, UPDATE_PAGE_JSON_ERROR_MSG)
-                    .user(session.getEmail())
-                    .path(zipPath.toString())
-                    .logAndThrow(UnexpectedErrorException.class);
+            error().data("user", session.getEmail()).data("zipPath", zipPath.toString())
+                    .logException(e, UPDATE_PAGE_JSON_ERROR_MSG);
+            throw new UnexpectedErrorException(UPDATE_PAGE_JSON_ERROR_MSG, Response.Status.INTERNAL_SERVER_ERROR.getStatusCode());
         }
     }
 }

@@ -5,9 +5,11 @@ import com.github.onsdigital.zebedee.util.mertics.client.SplunkClient;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 
-import static com.github.onsdigital.zebedee.Configuration.SplunkConfiguration.*;
-import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logInfo;
-import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logWarn;
+import static com.github.onsdigital.zebedee.Configuration.SplunkConfiguration.getEventsCollectionURI;
+import static com.github.onsdigital.zebedee.Configuration.SplunkConfiguration.getServiceArgs;
+import static com.github.onsdigital.zebedee.Configuration.SplunkConfiguration.isSplunkEnabled;
+import static com.github.onsdigital.zebedee.logging.ReaderLogger.info;
+import static com.github.onsdigital.zebedee.logging.ReaderLogger.warn;
 
 /**
  * Defines API for sevices to capture stats for the metric dashboard.
@@ -22,10 +24,10 @@ public abstract class MetricsService {
     public static MetricsService getInstance() {
         if (service == null) {
             if (isSplunkEnabled()) {
-                logInfo("Splunk MetricsService successfully configured").log();
+                info().log("Splunk MetricsService successfully configured");
                 service = new SplunkMetricsServiceImpl(new SplunkClient(getServiceArgs()), getEventsCollectionURI());
             } else {
-                logWarn("No MetricsService configured enabling DummyMetricsServiceImpl").log();
+                warn().log("No MetricsService configured enabling DummyMetricsServiceImpl");
                 service = new DummyMetricsServiceImpl();
             }
         }

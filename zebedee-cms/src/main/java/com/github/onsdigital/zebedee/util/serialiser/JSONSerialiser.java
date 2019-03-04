@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
 
 /**
  * Created by dave on 04/07/2017.
@@ -29,10 +29,9 @@ public class JSONSerialiser<T> {
         try {
             return Serialiser.deserialise(p, t);
         } catch (Exception e) {
-            logError(e, DESERIALISATION_ERROR_MSG)
-                    .addParameter(DESERIALISE_ERROR_DETAILS_KEY, DESERIALISE_ERROR_DETAILS_MSG)
-                    .path(p.toString())
-                    .log();
+            error().data(DESERIALISE_ERROR_DETAILS_KEY, DESERIALISE_ERROR_DETAILS_MSG)
+                    .data("path", p.toString())
+                    .logException(e, DESERIALISATION_ERROR_MSG);
             return null;
         }
     }
@@ -41,10 +40,9 @@ public class JSONSerialiser<T> {
         try {
             return Serialiser.deserialise(inputStream, t);
         } catch (Exception e) {
-            logError(e, DESERIALISATION_ERROR_MSG)
-                    .addParameter(DESERIALISE_ERROR_DETAILS_KEY, DESERIALISE_ERROR_DETAILS_MSG)
-                    .path(p.toString())
-                    .log();
+            error().data(DESERIALISE_ERROR_DETAILS_KEY, DESERIALISE_ERROR_DETAILS_MSG)
+                    .data("path", p.toString())
+                    .logException(e, DESERIALISATION_ERROR_MSG);
             return null;
         }
     }

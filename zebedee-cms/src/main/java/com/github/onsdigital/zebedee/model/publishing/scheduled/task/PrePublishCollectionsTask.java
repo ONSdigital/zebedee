@@ -27,8 +27,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
 
 /**
  * A scheduled task to run the pre-publish process for a number of collections.
@@ -64,7 +64,7 @@ public class PrePublishCollectionsTask extends ScheduledTask {
     public void run() {
 
         long startTime = System.currentTimeMillis();
-        logInfo("PRE-PUBLISH: Starting Pre-publish process.").log();
+        info().log("PRE-PUBLISH: Starting Pre-publish process.");
 
         // load collections into memory
         Set<Collection> collections = loadCollections(this, zebedee);
@@ -75,12 +75,11 @@ public class PrePublishCollectionsTask extends ScheduledTask {
         // create a post-publish task for each collection
         List<PostPublishCollectionTask> postPublishCollectionTasks = createCollectionPostPublishTasks(collectionPublishTasks, zebedee);
 
-        logInfo("PRE-PUBLISH: Scheduling publish task")
-                .addParameter("publishDate", publishDate).log();
+        info().data("publishDate", publishDate).log("PRE-PUBLISH: Scheduling publish task");
         publishScheduler.schedulePublish(collectionPublishTasks, postPublishCollectionTasks, publishDate);
 
-        logInfo("PRE-PUBLISH: Finished Pre-publish")
-                .addParameter("totalProcessTime", (System.currentTimeMillis() - startTime)).log();
+        info().data("totalProcessTime", (System.currentTimeMillis() - startTime))
+                .log("PRE-PUBLISH: Finished Pre-publish");
     }
 
     /**
@@ -93,16 +92,16 @@ public class PrePublishCollectionsTask extends ScheduledTask {
     public static Set<Collection> loadCollections(PrePublishCollectionsTask task, Zebedee zebedee) {
         Set<Collection> collections = new HashSet<>();
 
-        logInfo("PRE-PUBLISH: Loading collections into memory").log();
+        info().log("PRE-PUBLISH: Loading collections into memory");
 
         task.getCollectionIds().forEach(collectionId -> {
 
-            logInfo("PRE-PUBLISH: Loading collection job").addParameter("collectionId", collectionId).log();
+            info().data("collectionId", collectionId).log("PRE-PUBLISH: Loading collection job");
             try {
                 Collection collection = zebedee.getCollections().getCollection(collectionId);
 
                 if (collection.getDescription().getApprovalStatus() != ApprovalStatus.COMPLETE) {
-                    logInfo("Scheduled collection has not been approved - switching to manual").log();
+                    info().log("Scheduled collection has not been approved - switching to manual");
 
                     // Switch to manual
                     collection.getDescription().setType(CollectionType.manual);
@@ -113,7 +112,7 @@ public class PrePublishCollectionsTask extends ScheduledTask {
                     collections.add(collection);
                 }
             } catch (Exception e) {
-                logError(e, "Exception publishing collection").addParameter("collectionId", collectionId).log();
+                error().data("collectionId", collectionId).logException(e, "Exception publishing collection");
             }
         });
         return collections;
@@ -139,7 +138,9 @@ public class PrePublishCollectionsTask extends ScheduledTask {
             for (Collection collection : collections) {
                 futures.add(pool.submit(() -> {
                     try {
-                        logInfo("PRE-PUBLISH: creating collection publish task").collectionId(collection).log();
+
+                        info().data("collectionId", collection.getDescription().getId())
+                                .log("PRE-PUBLISH: creating collection publish task");
 
                         // FIXME using PostPublisher.getPublishedCollection feels a bit hacky
                         SlackNotification.publishNotification(PostPublisher.getPublishedCollection(collection),SlackNotification.CollectionStage.PRE_PUBLISH, SlackNotification.StageStatus.STARTED);
@@ -154,7 +155,8 @@ public class PrePublishCollectionsTask extends ScheduledTask {
                         ZebedeeCollectionReader collectionReader = new ZebedeeCollectionReader(collection, key);
                         PublishCollectionTask publishCollectionTask = new PublishCollectionTask(collection, collectionReader, hostToTransactionIdMap);
 
-                        logInfo("PRE-PUBLISH: Adding publish task").collectionId(collection).log();
+                        info().data("collectionId", collection.getDescription().getId())
+                                .log("PRE-PUBLISH: Adding publish task");
                         collectionPublishTasks.add(publishCollectionTask);
 
                         // FIXME using PostPublisher.getPublishedCollection feels a bit hacky
@@ -166,7 +168,7 @@ public class PrePublishCollectionsTask extends ScheduledTask {
                         // TODO pass through the error?
                         SlackNotification.publishNotification(PostPublisher.getPublishedCollection(collection), SlackNotification.CollectionStage.PRE_PUBLISH,SlackNotification.StageStatus.FAILED);
 
-                        logError(e).log();
+                        error().logException(e, "PRE-PUBLISH: error when creating collection publish task");
                         return false;
                     }
                 }));
@@ -180,7 +182,7 @@ public class PrePublishCollectionsTask extends ScheduledTask {
             try {
                 future.get().booleanValue();
             } catch (InterruptedException | ExecutionException e) {
-                logError(e).log();
+                error().logException(e, "PRE-PUBLISH: unexpected submission error. An attempeted pre-publish has returned no result.");
             }
         }
 
@@ -198,7 +200,8 @@ public class PrePublishCollectionsTask extends ScheduledTask {
         List<PostPublishCollectionTask> postPublishCollectionTasks = new ArrayList<>(collectionPublishTasks.size());
 
         collectionPublishTasks.forEach(publishTask -> {
-            logInfo("PRE-PUBLISH: creating collection post-publish task").collectionId(publishTask.getCollection()).log();
+            info().data("collectionId", publishTask.getCollection().getDescription().getId())
+                    .log("PRE-PUBLISH: creating collection post-publish task");
             PostPublishCollectionTask postPublishCollectionTask = new PostPublishCollectionTask(zebedee, publishTask);
             postPublishCollectionTasks.add(postPublishCollectionTask);
         });

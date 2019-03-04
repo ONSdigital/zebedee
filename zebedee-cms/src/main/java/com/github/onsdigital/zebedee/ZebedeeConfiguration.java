@@ -42,9 +42,9 @@ import static com.github.onsdigital.zebedee.Zebedee.SESSIONS;
 import static com.github.onsdigital.zebedee.Zebedee.TEAMS;
 import static com.github.onsdigital.zebedee.Zebedee.USERS;
 import static com.github.onsdigital.zebedee.Zebedee.ZEBEDEE;
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logDebug;
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
 import static com.github.onsdigital.zebedee.permissions.store.PermissionsStoreFileSystemImpl.initialisePermissions;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
 
 /**
  * Object encapsulating the set up configuration required by {@link Zebedee}. Set paths to & create relevant
@@ -83,12 +83,10 @@ public class ZebedeeConfiguration {
     private static Path createDir(Path root, String dirName) throws IOException {
         Path dir = root.resolve(dirName);
         if (!Files.exists(dir)) {
-            logDebug(LOG_PREFIX + "Creating required Zebedee directory as it does not exist.")
-                    .path(dirName).log();
+            info().data("path", dirName).log(LOG_PREFIX + "Creating required Zebedee directory as it does not exist.");
             Files.createDirectory(dir);
         } else {
-            logDebug(LOG_PREFIX + "Zebedee directory already exists no action required.")
-                    .path(dir.toString()).log();
+            info().data("path", dir.toString()).log(LOG_PREFIX + "Zebedee directory already exists no action required.");
         }
         return dir;
     }
@@ -101,10 +99,11 @@ public class ZebedeeConfiguration {
      * @throws IOException
      */
     public ZebedeeConfiguration(Path rootPath, boolean enableVerificationAgent) throws IOException {
-        logDebug(LOG_PREFIX + "Creating ZebedeeConfiguration").log();
+
+        info().log(LOG_PREFIX + "Creating ZebedeeConfiguration");
 
         if (Files.exists(rootPath)) {
-            logDebug(LOG_PREFIX + "Setting Zebedee root directory").path(rootPath.toString()).log();
+            info().data("path", rootPath.toString()).log(LOG_PREFIX + "Setting Zebedee root directory");
         } else {
             throw new IllegalArgumentException(LOG_PREFIX + "Zebedee root directory doesn't not exist." + rootPath.toAbsolutePath());
         }
@@ -163,14 +162,13 @@ public class ZebedeeConfiguration {
                     Configuration.getDatasetAPIAuthToken(),
                     Configuration.getServiceAuthToken());
         } catch (URISyntaxException e) {
-            logError(e, "failed to initialise dataset api client - invalid URI").log();
+            error().logException(e, "failed to initialise dataset api client - invalid URI");
             throw new RuntimeException(e);
         }
 
         datasetService = new ZebedeeDatasetService(datasetClient);
 
-
-        logDebug(LOG_PREFIX + "ZebedeeConfiguration creation complete.").log();
+        info().log(LOG_PREFIX + "ZebedeeConfiguration creation complete.");
     }
 
     public boolean isUseVerificationAgent() {
@@ -233,9 +231,8 @@ public class ZebedeeConfiguration {
             try {
                 Files.createFile(redirectPath);
             } catch (IOException e) {
-                logError(e, LOG_PREFIX + "Could not save redirect to requested path")
-                        .addParameter("requestedPath", redirectPath.toString())
-                        .log();
+                error().data("requestedPath", redirectPath.toString())
+                        .logException(e, LOG_PREFIX + "Could not save redirect to requested path");
             }
         } else {
             content.redirect = new RedirectTablePartialMatch(content, redirectPath);

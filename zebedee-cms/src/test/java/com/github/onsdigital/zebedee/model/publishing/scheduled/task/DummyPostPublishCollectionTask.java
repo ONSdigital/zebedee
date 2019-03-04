@@ -4,7 +4,7 @@ import com.github.davidcarboni.cryptolite.Random;
 
 import java.util.Date;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logDebug;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 
 public class DummyPostPublishCollectionTask extends PostPublishCollectionTask {
 
@@ -36,12 +36,13 @@ public class DummyPostPublishCollectionTask extends PostPublishCollectionTask {
     @Override
     public Boolean call() throws Exception {
         this.start = new Date();
-        logDebug("Running dummy post-publish task").addParameter("taskId", id).log();
+
+        info().data("taskId", id).log("Running dummy post-publish task");
 
         Thread.sleep(duration);
         this.done = true;
 
-        logDebug("Finished dummy post-publish task").addParameter("taskId", id).log();
+        info().data("taskId", id).log("Finished dummy post-publish task");
         this.end = new Date();
         return true;
     }

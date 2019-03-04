@@ -17,8 +17,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
 
 /**
  * Created by bren on 16/12/15.
@@ -53,33 +53,30 @@ public class PublishNotification {
         try (Http http = new Http()) {
             for (Host h : websiteHosts) {
                 host = h;
-                logInfo("sending publish notification to website host")
-                        .collectionId(payload.collectionId)
-                        .addParameter("websiteHost", host.toString())
-                        .addParameter("eventType", eventType.name())
-                        .log();
+                info().data("collectionId", payload.collectionId)
+                        .data("websiteHost", host.toString())
+                        .data("eventType", eventType.name())
+                        .log("sending publish notification to website host");
                 try {
                     Endpoint endpoint = new Endpoint(host, getEndPointName(eventType));
                     Response<WebsiteResponse> response = http.postJson(endpoint, payload, WebsiteResponse.class);
                     String responseMessage = response.body == null ? response.statusLine.getReasonPhrase() : response.body.getMessage();
                     if (response.statusLine.getStatusCode() > 302) {
-                        logInfo("Error response from website for publish notification")
-                                .addParameter("websiteHost", host.toString())
-                                .addParameter("responseMessage", responseMessage)
-                                .addParameter("collectionId", payload.collectionId)
-                                .log();
+                        info().data("websiteHost", host.toString())
+                                .data("responseMessage", responseMessage)
+                                .data("collectionId", payload.collectionId)
+                                .log("Error response from website for publish notification");
                     } else {
-                        logInfo("Response from website for publish notification")
-                                .addParameter("websiteHost", host.toString())
-                                .addParameter("responseMessage", responseMessage)
-                                .addParameter("collectionId", payload.collectionId)
-                                .log();
+                        info().data("websiteHost", host.toString())
+                                .data("responseMessage", responseMessage)
+                                .data("collectionId", payload.collectionId)
+                                .log("Response from website for publish notification");
                     }
                 } catch (Exception e) {
-                    logError(e, "failed sending publish notification to website")
-                            .collectionId(payload.collectionId)
-                            .addParameter("websiteHost", host.toString())
-                            .addParameter("eventType", eventType).log();
+                    error().data("collectionId", payload.collectionId)
+                            .data("websiteHost", host.toString())
+                            .data("eventType", eventType)
+                            .logException(e, "failed sending publish notification to website");
                     String eventName = "";
                     try {
                         eventName = getEndPointName(eventType);

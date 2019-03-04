@@ -17,9 +17,9 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logWarn;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.warn;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
 
 public class PublishTask implements Runnable {
 
@@ -37,8 +37,7 @@ public class PublishTask implements Runnable {
      */
     @Override
     public void run() {
-        logInfo("Running scheduled job for collection")
-                .addParameter("collectionId", collectionId).log();
+        info().data("collectionId", collectionId).log("Running scheduled job for collection");
         Collection collection = null;
         boolean publishComplete = false;
 
@@ -46,8 +45,7 @@ public class PublishTask implements Runnable {
             collection = zebedee.getCollections().getCollection(this.collectionId);
 
             if (collection.description.approvalStatus != ApprovalStatus.COMPLETE) {
-                logInfo("Scheduled collection has not been approved - switching to manual")
-                        .addParameter("collectionId", collectionId).log();
+                info().data("collectionId", collectionId).log("Scheduled collection has not been approved - switching to manual");
 
                 // Switch to manual
                 collection.getDescription().setType(CollectionType.manual);
@@ -73,26 +71,19 @@ public class PublishTask implements Runnable {
                     new PublishNotification(collection).sendNotification(EventType.PUBLISHED);
                     PostPublisher.postPublish(zebedee, collection, skipVerification, collectionReader);
 
-                    logInfo("Collection postPublish process finished")
-                            .collectionId(collectionId)
-                            .timeTaken((System.currentTimeMillis() - onPublishCompleteStart))
-                            .log();
-                    logInfo("Collection publish complete")
-                            .collectionId(collectionId)
-                            .timeTaken((System.currentTimeMillis() - publishStart))
-                            .log();
-                } else {
-                    logWarn("scheduled collection publish did not complete successfully")
-                            .collectionId(collection)
-                            .log();
+                    info().data("collectionId", collectionId).data("timeTaken", (System.currentTimeMillis() - onPublishCompleteStart))
+                            .log("Collection postPublish process finished");
 
+                    info().data("collectionId", collectionId).data("timeTaken", (System.currentTimeMillis() - onPublishCompleteStart))
+                            .log("Collection publish complete");
+
+                } else {
+                    warn().data("collectionId", collectionId).log("scheduled collection publish did not complete successfully");
                     SlackNotification.scheduledPublishFailure(collection);
                 }
             }
         } catch (Exception e) {
-            logError(e, "Exception publishing scheduled collection")
-                    .collectionId(collection)
-                    .log();
+            error().data("collectionId", collectionId).logException(e, "Exception publishing scheduled collection");
 
             SlackNotification.scheduledPublishFailure(collection);
         }

@@ -9,7 +9,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
+
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
 public class JsonUtils {
@@ -30,7 +31,7 @@ public class JsonUtils {
             response.setCharacterEncoding(StandardCharsets.UTF_8.name());
             response.getWriter().write(body.toJSON());
         } catch (IOException e) {
-            logError(e, "error while attempting to write userIdentity to HTTP response").log();
+            error().logException(e, "error while attempting to write userIdentity to HTTP response");
             throw e;
         }
     }

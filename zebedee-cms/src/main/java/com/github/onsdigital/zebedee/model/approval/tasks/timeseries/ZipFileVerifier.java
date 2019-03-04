@@ -15,7 +15,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 
 /**
  * Verifies that generated zip files are not corrupt by unzipping them and checking their contents is as expected.
@@ -76,7 +76,7 @@ public class ZipFileVerifier {
             // deserialise file and check its a timeseries?
             String verificationPageUri = Paths.get(unzipped.get(0)).getParent().toString();
             TimeSeries page = (TimeSeries) verificationContentReader.getContent(verificationPageUri);
-            logInfo("Verified " + unzipped.size() + " files in zip file: " + zipData.zipPath).log();
+            info().log("Verified " + unzipped.size() + " files in zip file: " + zipData.zipPath);
             return page != null;
         }
     }

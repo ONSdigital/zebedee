@@ -24,9 +24,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logDebug;
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logWarn;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.warn;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
 
 /**
  * Sends messages to slack.
@@ -144,7 +144,7 @@ public class SlackNotification {
 
     private static void postSlackMessage(PostMessage message, String collectionID, boolean forceNewMessage) {
         if(slackToken == null || slackToken.length() == 0) {
-            logDebug("postSlackMessage slackToken is null").log();
+            info().log("postSlackMessage slackToken is null");
             return;
         }
 
@@ -168,10 +168,9 @@ public class SlackNotification {
                         new BasicNameValuePair("Content-Type", "application/json"));
 
                 if(!response.body.get("ok").getAsBoolean()) {
-                    logDebug("sendSlackMessage")
-                            .addParameter("error", response.body.get("error").getAsString())
-                            .addParameter("responseStatusCode", response.statusLine.getStatusCode())
-                            .log();
+                    info().data("error", response.body.get("error").getAsString())
+                            .data("responseStatusCode", response.statusLine.getStatusCode())
+                            .log("sendSlackMessage");
                     return result;
                 }
 
@@ -185,14 +184,13 @@ public class SlackNotification {
                     collectionSlackMessageTimestamps.put(collectionID, new AbstractMap.SimpleEntry<>(messageTs, channelID));
                 }
 
-                logDebug("sendSlackMessage")
-                        .addParameter("messageTimestamp", messageTs)
-                        .addParameter("updateTimestamp", message.getTs())
-                        .addParameter("responseStatusCode", response.statusLine.getStatusCode())
-                        .log();
+                info().data("messageTimestamp", messageTs)
+                        .data("updateTimestamp", message.getTs())
+                        .data("responseStatusCode", response.statusLine.getStatusCode())
+                        .log("sendSlackMessage");
             } catch (Exception e) {
                 result = e;
-                logError(e, "sendSlackMessage json error.").log();
+                error().logException(e, "sendSlackMessage json error.");
             }
             return result;
         });
@@ -201,11 +199,11 @@ public class SlackNotification {
     public static void collectionAlarm(Collection c, String alarm, PostMessageField... args) {
         if (c == null) {
             // not enough info to be able to notify anything useful.
-            logDebug("collectionAlarm collection is null").log();
+            info().log("collectionAlarm collection is null");
             return;
         } else if (c.getDescription() == null) {
             // not enough info to be able to notify anything useful.
-            logDebug("collectionAlarm collection description is null").log();
+            info().log("collectionAlarm collection description is null");
             return;
         }
 
@@ -222,11 +220,11 @@ public class SlackNotification {
     public static void collectionWarning(Collection c, String warning, PostMessageField... args) {
         if (c == null) {
             // not enough info to be able to notify anything useful.
-            logDebug("collectionWarning collection is null").log();
+            info().log("collectionWarning collection is null");
             return;
         } else if (c.getDescription() == null) {
             // not enough info to be able to notify anything useful.
-            logDebug("collectionWarning collection description is null").log();
+            info().log("collectionWarning collection description is null");
             return;
         }
 
@@ -243,11 +241,11 @@ public class SlackNotification {
     public static void scheduledPublishFailure(Collection c) {
         if (c == null) {
             // not enough info to be able to notify anything useful.
-            logDebug("scheduledPublishFailure collection is null").log();
+            info().log("scheduledPublishFailure collection is null");
             return;
         } else if (c.getDescription() == null) {
             // not enough info to be able to notify anything useful.
-            logDebug("scheduledPublishFailure collection description is null").log();
+            info().log("scheduledPublishFailure collection description is null");
             return;
         }
 
@@ -261,7 +259,7 @@ public class SlackNotification {
      */
     public static void publishNotification(CollectionBase collection, CollectionStage stage, StageStatus status) {
         if (collection == null) {
-            logWarn("failed to send publish slack notification as published collection was null").log();
+            info().log("failed to send publish slack notification as published collection was null");
             return;
         }
 

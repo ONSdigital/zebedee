@@ -27,8 +27,7 @@ import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logDebug;
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 import static java.text.MessageFormat.format;
 
 /**
@@ -122,7 +121,7 @@ public class UsersServiceImpl implements UsersService {
             }
 
             if (!userStore.exists(email)) {
-                logInfo("no user exists with the specified email").user(email).log();
+                info().data("user", email).log("no user exists with the specified email");
                 throw new NotFoundException(format(UNKNOWN_USER_MSG, email));
             }
             return userStore.get(email);
@@ -145,7 +144,7 @@ public class UsersServiceImpl implements UsersService {
     public void createSystemUser(User user, String password) throws IOException, UnauthorizedException,
             NotFoundException, BadRequestException {
         if (permissionsService.hasAdministrator()) {
-            logDebug(SYSTEM_USER_ALREADY_EXISTS_MSG).log();
+            info().log(SYSTEM_USER_ALREADY_EXISTS_MSG);
             return;
         }
 
@@ -237,10 +236,9 @@ public class UsersServiceImpl implements UsersService {
                     isSuccess = true;
                 } else {
                     // Set password unsuccessful.
-                    logInfo("Set password unsuccessful, only admin users can set another users password.")
-                            .addParameter("callingUser", session.getEmail())
-                            .addParameter("targetedUser", credentials.email)
-                            .log();
+                    info().data("callingUser", session.getEmail())
+                            .data("targetedUser", credentials.email)
+                            .log("Set password unsuccessful, only admin users can set another users password.");
                 }
             }
             return isSuccess;
@@ -275,10 +273,9 @@ public class UsersServiceImpl implements UsersService {
                         }).collect(Collectors.toList());
 
                 keysToRemove.stream().forEach(staleKey -> {
-                    logDebug(REMOVING_STALE_KEY_LOG_MSG)
-                            .user(userEmail)
-                            .collectionId(staleKey)
-                            .log();
+                    info().data("user", userEmail)
+                            .data("collectionId", staleKey)
+                            .log(REMOVING_STALE_KEY_LOG_MSG);
                     user.keyring().remove(staleKey);
                 });
 
@@ -364,10 +361,10 @@ public class UsersServiceImpl implements UsersService {
             }
         }
 
-        logDebug("User info")
-                .addParameter("numberOfUsers", users.size())
-                .addParameter("withKeyRing", withKeyring)
-                .addParameter("withoutKeyRing", withoutKeyring).log();
+        info().data("numberOfUsers", users.size())
+                .data("withKeyRing", withKeyring)
+                .data("withoutKeyRing", withoutKeyring)
+                .log("User info");
     }
 
     @Override
@@ -378,9 +375,8 @@ public class UsersServiceImpl implements UsersService {
             if (updated != null) {
 
                 if (updated.keyring() == null) {
-                    logDebug("User keyring not updated as it is currently null.")
-                            .user(updated.getEmail())
-                            .log();
+                    info().data("user", updated.getEmail())
+                            .log("User keyring not updated as it is currently null.");
                     return updated;
                 }
 
@@ -422,7 +418,7 @@ public class UsersServiceImpl implements UsersService {
                 // The keyring has not been generated yet,
                 // so reset the password to the current password
                 // in order to generate a keyring and associated key pair:
-                logDebug("Generating keyring").user(user.getEmail()).log();
+                info().data("user", user.getEmail()).log("Generating keyring");
                 user.resetPassword(password);
                 update(user, user, "Encryption migration");
             }
@@ -447,7 +443,7 @@ public class UsersServiceImpl implements UsersService {
                 if (updatedUser.getAdminOptions() != null) {
                     if (updatedUser.getAdminOptions().rawJson != user.getAdminOptions().rawJson) {
                         user.getAdminOptions().rawJson = updatedUser.getAdminOptions().rawJson;
-                        logDebug("Update").addParameter("User.adminoptions.rawJson", user.getAdminOptions().rawJson);
+                        info().data("User.adminoptions.rawJson", user.getAdminOptions().rawJson).log("Update");
                     }
                 }
 

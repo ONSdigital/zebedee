@@ -6,7 +6,7 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.time.FastDateFormat;
-import org.codehaus.jackson.map.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
@@ -36,6 +36,8 @@ public class SplunkEvent {
 
     private static FastDateFormat publishTimeFormat = FastDateFormat.getInstance("HH:mm", TimeZone.getTimeZone("Europe/London"));
 
+    private static ObjectMapper mapper = new ObjectMapper();
+
     private Map<String, Object> event;
 
     public SplunkEvent(Map<String, Object> fields) {
@@ -43,7 +45,7 @@ public class SplunkEvent {
     }
 
     public String toJson() throws IOException {
-        return new ObjectMapper().writeValueAsString(event);
+        return mapper.writeValueAsString(event);
     }
 
     @Override

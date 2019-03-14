@@ -3,6 +3,7 @@ package com.github.onsdigital.zebedee.model;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.Keyring;
+import com.github.onsdigital.zebedee.LoggingTestHelper;
 import com.github.onsdigital.zebedee.user.model.User;
 import com.github.onsdigital.zebedee.user.model.UserList;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsServiceImpl;
@@ -10,6 +11,7 @@ import com.github.onsdigital.zebedee.service.ServiceSupplier;
 import com.github.onsdigital.zebedee.user.service.UsersService;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.session.service.SessionsService;
+import org.junit.BeforeClass;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -79,6 +81,11 @@ public class KeyManagerTest {
 
     @Mock
     private Map<String, SecretKey> schedulerCache;
+
+    @BeforeClass
+    public static void setUpLogger() {
+        LoggingTestHelper.initDPLogger(KeyManagerTest.class);
+    }
 
     @Before
     public void setUp() throws Exception {

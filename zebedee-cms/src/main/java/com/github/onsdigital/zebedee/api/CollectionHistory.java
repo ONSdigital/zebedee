@@ -16,7 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
 import java.io.IOException;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
 import static com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDaoFactory.getCollectionHistoryDao;
 
 /**
@@ -28,6 +28,7 @@ public class CollectionHistory {
 
     private static CollectionHistoryDao collectionHistoryDao = getCollectionHistoryDao();
     private static ZebedeeCmsService zebedeeCmsService = ZebedeeCmsService.getInstance();
+    private static final String CHECK_PERMISSIONS_ERROR = "collection history endpoint: Unexpected error while trying to access permissions";
 
     /**
      * Get the collection event history for the specified collection.
@@ -60,9 +61,8 @@ public class CollectionHistory {
                 throw new UnauthorizedException("You are not authorised to create collections.");
             }
         } catch (IOException io) {
-            logError(io, "Unexpected error while trying to access permissions")
-                    .user(session.getEmail())
-                    .logAndThrow(UnexpectedErrorException.class);
+            error().data("user", session.getEmail()).logException(io, CHECK_PERMISSIONS_ERROR);
+            throw new UnexpectedErrorException(CHECK_PERMISSIONS_ERROR, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
     }
 }

@@ -14,7 +14,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 
 public class TimeSeriesCompressor {
 
@@ -78,7 +78,7 @@ public class TimeSeriesCompressor {
     }
 
     public int compressFile(ContentReader contentReader, ContentWriter contentWriter, boolean isEncrypted, Path timeSeriesDirectory, String saveUri) throws IOException, ZebedeeException {
-        logInfo("Compressing time series directory").addParameter("directory", timeSeriesDirectory.toString()).log();
+        info().data("directory", timeSeriesDirectory.toString()).log("Compressing time series directory");
         if (!isEncrypted) {
             try (OutputStream outputStream = contentWriter.getOutputStream(saveUri)) {
                 return ZipUtils.zipFolder(timeSeriesDirectory.toFile(), outputStream,

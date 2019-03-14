@@ -1,12 +1,11 @@
 package com.github.onsdigital.zebedee;
 
+import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.data.processing.DataIndex;
 import com.github.onsdigital.zebedee.model.Collections;
 import com.github.onsdigital.zebedee.model.Content;
 import com.github.onsdigital.zebedee.model.KeyringCache;
 import com.github.onsdigital.zebedee.model.RedirectTablePartialMatch;
-import com.github.onsdigital.zebedee.teams.service.TeamsService;
-import com.github.onsdigital.zebedee.teams.service.TeamsServiceImpl;
 import com.github.onsdigital.zebedee.model.encryption.ApplicationKeys;
 import com.github.onsdigital.zebedee.model.publishing.PublishedCollections;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
@@ -14,14 +13,22 @@ import com.github.onsdigital.zebedee.permissions.service.PermissionsServiceImpl;
 import com.github.onsdigital.zebedee.permissions.store.PermissionsStore;
 import com.github.onsdigital.zebedee.permissions.store.PermissionsStoreFileSystemImpl;
 import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
+import com.github.onsdigital.zebedee.service.DatasetService;
+import com.github.onsdigital.zebedee.service.ServiceStoreImpl;
+import com.github.onsdigital.zebedee.service.ZebedeeDatasetService;
 import com.github.onsdigital.zebedee.session.service.SessionsService;
+import com.github.onsdigital.zebedee.teams.service.TeamsService;
+import com.github.onsdigital.zebedee.teams.service.TeamsServiceImpl;
 import com.github.onsdigital.zebedee.teams.store.TeamsStoreFileSystemImpl;
 import com.github.onsdigital.zebedee.user.service.UsersService;
 import com.github.onsdigital.zebedee.user.service.UsersServiceImpl;
 import com.github.onsdigital.zebedee.user.store.UserStoreFileSystemImpl;
 import com.github.onsdigital.zebedee.verification.VerificationAgent;
+import dp.api.dataset.DatasetAPIClient;
+import dp.api.dataset.DatasetClient;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -30,13 +37,14 @@ import static com.github.onsdigital.zebedee.Zebedee.COLLECTIONS;
 import static com.github.onsdigital.zebedee.Zebedee.PERMISSIONS;
 import static com.github.onsdigital.zebedee.Zebedee.PUBLISHED;
 import static com.github.onsdigital.zebedee.Zebedee.PUBLISHED_COLLECTIONS;
+import static com.github.onsdigital.zebedee.Zebedee.SERVICES;
 import static com.github.onsdigital.zebedee.Zebedee.SESSIONS;
 import static com.github.onsdigital.zebedee.Zebedee.TEAMS;
 import static com.github.onsdigital.zebedee.Zebedee.USERS;
 import static com.github.onsdigital.zebedee.Zebedee.ZEBEDEE;
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logDebug;
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
 import static com.github.onsdigital.zebedee.permissions.store.PermissionsStoreFileSystemImpl.initialisePermissions;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
 
 /**
  * Object encapsulating the set up configuration required by {@link Zebedee}. Set paths to & create relevant
@@ -57,8 +65,8 @@ public class ZebedeeConfiguration {
     private Path teamsPath;
     private Path applicationKeysPath;
     private Path redirectPath;
+    private Path servicePath;
     private boolean useVerificationAgent;
-    private VerificationAgent verificationAgent;
     private ApplicationKeys applicationKeys;
     private PublishedCollections publishedCollections;
     private Collections collections;
@@ -70,16 +78,15 @@ public class ZebedeeConfiguration {
     private SessionsService sessionsService;
     private DataIndex dataIndex;
     private PermissionsStore permissionsStore;
+    private DatasetService datasetService;
 
     private static Path createDir(Path root, String dirName) throws IOException {
         Path dir = root.resolve(dirName);
         if (!Files.exists(dir)) {
-            logDebug(LOG_PREFIX + "Creating required Zebedee directory as it does not exist.")
-                    .path(dirName).log();
+            info().data("path", dirName).log(LOG_PREFIX + "Creating required Zebedee directory as it does not exist.");
             Files.createDirectory(dir);
         } else {
-            logDebug(LOG_PREFIX + "Zebedee directory already exists no action required.")
-                    .path(dir.toString()).log();
+            info().data("path", dir.toString()).log(LOG_PREFIX + "Zebedee directory already exists no action required.");
         }
         return dir;
     }
@@ -92,10 +99,11 @@ public class ZebedeeConfiguration {
      * @throws IOException
      */
     public ZebedeeConfiguration(Path rootPath, boolean enableVerificationAgent) throws IOException {
-        logDebug(LOG_PREFIX + "Creating ZebedeeConfiguration").log();
+
+        info().log(LOG_PREFIX + "Creating ZebedeeConfiguration");
 
         if (Files.exists(rootPath)) {
-            logDebug(LOG_PREFIX + "Setting Zebedee root directory").path(rootPath.toString()).log();
+            info().data("path", rootPath.toString()).log(LOG_PREFIX + "Setting Zebedee root directory");
         } else {
             throw new IllegalArgumentException(LOG_PREFIX + "Zebedee root directory doesn't not exist." + rootPath.toAbsolutePath());
         }
@@ -112,6 +120,7 @@ public class ZebedeeConfiguration {
         this.teamsPath = createDir(zebedeePath, TEAMS);
         this.applicationKeysPath = createDir(zebedeePath, APPLICATION_KEYS);
         this.redirectPath = this.publishedContentPath.resolve(Content.REDIRECT);
+        this.servicePath = createDir(zebedeePath, SERVICES);
 
         if (!Files.exists(redirectPath)) {
             Files.createFile(redirectPath);
@@ -144,16 +153,22 @@ public class ZebedeeConfiguration {
                 collections,
                 permissionsService,
                 applicationKeys,
-                keyringCache)
-        ;
+                keyringCache);
 
-        logDebug(LOG_PREFIX + "ZebedeeConfiguration creation complete.").log();
-    }
+        DatasetClient datasetClient;
+        try {
+            datasetClient = new DatasetAPIClient(
+                    Configuration.getDatasetAPIURL(),
+                    Configuration.getDatasetAPIAuthToken(),
+                    Configuration.getServiceAuthToken());
+        } catch (URISyntaxException e) {
+            error().logException(e, "failed to initialise dataset api client - invalid URI");
+            throw new RuntimeException(e);
+        }
 
+        datasetService = new ZebedeeDatasetService(datasetClient);
 
-    public ZebedeeConfiguration enableVerificationAgent(boolean enabled) {
-        this.useVerificationAgent = enabled;
-        return this;
+        info().log(LOG_PREFIX + "ZebedeeConfiguration creation complete.");
     }
 
     public boolean isUseVerificationAgent() {
@@ -200,6 +215,10 @@ public class ZebedeeConfiguration {
         return redirectPath;
     }
 
+    public Path getServicePath() {
+        return servicePath;
+    }
+
     public Content getPublished() {
         return this.published;
     }
@@ -212,16 +231,14 @@ public class ZebedeeConfiguration {
             try {
                 Files.createFile(redirectPath);
             } catch (IOException e) {
-                logError(e, LOG_PREFIX + "Could not save redirect to requested path")
-                        .addParameter("requestedPath", redirectPath.toString())
-                        .log();
+                error().data("requestedPath", redirectPath.toString())
+                        .logException(e, LOG_PREFIX + "Could not save redirect to requested path");
             }
         } else {
             content.redirect = new RedirectTablePartialMatch(content, redirectPath);
         }
         return content;
     }
-
 
     public DataIndex getDataIndex() {
         return this.dataIndex;
@@ -263,11 +280,11 @@ public class ZebedeeConfiguration {
         return isUseVerificationAgent() && verificationIsEnabled ? new VerificationAgent(z) : null;
     }
 
-    public PermissionsStore getPermissionsStore(Path accessMappingPath) {
-        return new PermissionsStoreFileSystemImpl(accessMappingPath);
+    public DatasetService getDatasetService() {
+        return datasetService;
     }
 
-    public void setUsersService(UsersService usersService) {
-        this.usersService = usersService;
+    public ServiceStoreImpl getServiceStore() {
+        return new ServiceStoreImpl(servicePath);
     }
 }

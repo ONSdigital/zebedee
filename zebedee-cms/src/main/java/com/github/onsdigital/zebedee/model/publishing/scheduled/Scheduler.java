@@ -5,30 +5,27 @@ import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.json.CollectionType;
 import com.github.onsdigital.zebedee.model.Collection;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
 
 public abstract class Scheduler {
 
     public void schedulePublish(Collection collection, Zebedee zebedee) {
         if (Configuration.isSchedulingEnabled()) {
             try {
-                logInfo("Attempting collection schedule publish")
-                        .collectionId(collection)
-                        .addParameter("collectionType", collection.getDescription().getType())
-                        .log();
+                info().data("collectionId", collection.getDescription().getId())
+                        .data("collectionType", collection.getDescription().getType())
+                        .log("Attempting collection schedule publish");
                 if (collection.getDescription().getType() == CollectionType.scheduled) {
                     schedule(collection, zebedee);
                 }
             } catch (Exception e) {
-                logError(e, "Exception caught trying to schedule existing collection")
-                        .collectionId(collection)
-                        .log();
+                error().data("collectionId", collection.getDescription().getId())
+                        .logException(e, "Exception caught trying to schedule existing collection");
             }
         } else {
-            logInfo("Not scheduling collection, scheduling is not enabled")
-                    .collectionId(collection)
-                    .log();
+            info().data("collectionId", collection.getDescription().getId())
+                    .log("Not scheduling collection, scheduling is not enabled");
         }
     }
 

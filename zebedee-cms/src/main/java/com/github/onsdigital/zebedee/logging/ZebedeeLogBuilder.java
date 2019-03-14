@@ -53,6 +53,7 @@ public class ZebedeeLogBuilder extends LogMessageBuilder {
     private static final String PATH = "path";
     private static final String ROW = "row";
     private static final String CELL = "cell";
+    private static final String SESSION_ID = "sessionID";
     private static final String BLOCKING_PATH = "blockingPath";
     private static final String BLOCKING_COLLECTION = "blockingCollection";
     private static final String TARGET_PATH = "targetPath";
@@ -64,14 +65,17 @@ public class ZebedeeLogBuilder extends LogMessageBuilder {
 
     private ZebedeeLogBuilder(String description) {
         super(description);
+        setNamespace("zebedee-cms");
     }
 
     private ZebedeeLogBuilder(Throwable t, String description) {
         super(t, description);
+        setNamespace("zebedee-cms");
     }
 
     private ZebedeeLogBuilder(String description, Level level) {
         super(description, level);
+        setNamespace("zebedee-cms");
     }
 
     public static ZebedeeLogBuilder logError(Throwable t) {
@@ -221,9 +225,28 @@ public class ZebedeeLogBuilder extends LogMessageBuilder {
         return this;
     }
 
+    public ZebedeeLogBuilder sessionID(String sessionID) {
+        if (!StringUtils.isEmpty(sessionID)) {
+            addParameter(SESSION_ID, sessionID);
+        }
+        return this;
+    }
+
     public ZebedeeLogBuilder trainHost(Host trainHost) {
         if (trainHost != null && StringUtils.isNotEmpty(trainHost.toString())) {
             addParameter(TRAIN_HOST, trainHost.toString());
+        }
+        return this;
+    }
+
+    public ZebedeeLogBuilder session(Session session) {
+        if (session != null) {
+            if (!StringUtils.isEmpty(session.getId())) {
+                addParameter(SESSION_ID, session.getId());
+            }
+            if (!StringUtils.isEmpty(session.getEmail())) {
+                addParameter(USER, session.getEmail());
+            }
         }
         return this;
     }
@@ -256,6 +279,11 @@ public class ZebedeeLogBuilder extends LogMessageBuilder {
             addParameter(BLOCKING_PATH, COLLECTION_CONTENT_PATH.apply(name, targetURI));
             addParameter(BLOCKING_COLLECTION, name);
         }
+        return this;
+    }
+
+    public ZebedeeLogBuilder publishingAction() {
+        addParameter("publishing", true);
         return this;
     }
 

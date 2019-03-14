@@ -18,8 +18,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
 
 /**
  * The workhorse of the data-publisher
@@ -181,7 +181,7 @@ public class DataProcessor {
      */
     TimeSeries syncTimeSeriesMetadata(TimeSeries inProgress, TimeSeries newSeries) {
         if (inProgress.getDescription() == null || newSeries.getDescription() == null) {
-            logInfo("Error copying metadata in data publisher").log();
+            info().log("Error copying metadata in data publisher");
         }
         inProgress.getDescription().setCdid(newSeries.getDescription().getCdid());
         inProgress.getDescription().setTitle(newSeries.getDescription().getTitle());
@@ -244,10 +244,7 @@ public class DataProcessor {
 
             return initial;
         } catch (IllegalStateException e) {
-            logError(e, "Error with timeseries")
-                    .addParameter("CDID", series.getCdid())
-                    .addParameter("publishUri", timeseriesUri)
-                    .log();
+            error().data("CDID", series.getCdid()).data("publishUri", timeseriesUri).logException(e, "Error with timeseries");
             throw e;
         }
 

@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
+import static com.github.onsdigital.zebedee.model.approval.ApprovalEventType.ADD_DATASET_DETAILS;
+import static com.github.onsdigital.zebedee.model.approval.ApprovalEventType.ADD_DATASET_VERSION_DETAILS;
 import static com.github.onsdigital.zebedee.model.approval.ApprovalEventType.APPROVAL_COMPLETED;
 import static com.github.onsdigital.zebedee.model.approval.ApprovalEventType.APPROVAL_STARTED;
 import static com.github.onsdigital.zebedee.model.approval.ApprovalEventType.APPROVAL_STATE_SET;
@@ -33,11 +35,9 @@ public class ApprovalEventLog {
     public void addEvent(ApprovalEventType event) {
         this.eventLog.add(new ApprovalEvent(event, new Date()));
 
-        logInfo("collection approval step addEvent")
-                .addParameter("step", event.name())
-                .collectionId(collectionID)
-                .addParameter("approver", approverEmail)
-                .log();
+        info().data("step", event.name()).data("collectionId", collectionID)
+                .data("approver", approverEmail)
+                .log("collection approval step addEvent");
     }
 
     public List<ApprovalEvent> logDetails() {
@@ -50,6 +50,14 @@ public class ApprovalEventLog {
 
     public void resolvedDetails() {
         addEvent(RESOLVED_DETAILS);
+    }
+
+    public void addDatasetDetails() {
+        addEvent(ADD_DATASET_DETAILS);
+    }
+
+    public void addDatasetVersionDetails() {
+        addEvent(ADD_DATASET_VERSION_DETAILS);
     }
 
     public void populatedResleasePage() {

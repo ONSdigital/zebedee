@@ -39,8 +39,7 @@ import java.util.TimeZone;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logDebug;
-import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logTrace;
+import static com.github.onsdigital.zebedee.logging.ReaderLogger.info;
 import static java.util.Arrays.asList;
 import static org.apache.commons.io.FilenameUtils.getExtension;
 import static org.apache.poi.ss.usermodel.Cell.CELL_TYPE_NUMERIC;
@@ -107,9 +106,7 @@ public class DataGenerator {
         if (content instanceof Series) {
             return generateSeriesData((Series) content, format);
         }
-        logDebug(UNSUPPORTED_CONTENT_TYPE_MSG)
-                .addParameter("class", content.getClass().getSimpleName())
-                .log();
+        info().data("class", content.getClass().getSimpleName()).log(UNSUPPORTED_CONTENT_TYPE_MSG);
         throw new BadRequestException(UNSUPPORTED_CONTENT_TYPE_MSG);
     }
 
@@ -170,9 +167,7 @@ public class DataGenerator {
             case CSV_EXT:
                 return createResource(fileName, csvToBytes(grid));
             default:
-                logDebug(UNSUPPORTED_FORMAT_MSG)
-                        .addParameter("format", getExtension(fileName))
-                        .log();
+                info().data("format", getExtension(fileName)).log(UNSUPPORTED_FORMAT_MSG);
                 throw new BadRequestException(UNSUPPORTED_FORMAT_MSG);
         }
     }
@@ -229,10 +224,6 @@ public class DataGenerator {
                                 CellStyle newStyle = wb.createCellStyle();
                                 newStyle.setDataFormat(wb.createDataFormat().getFormat(cellFormat));
                                 stylesMap.put(cellFormat, newStyle);
-
-                                logTrace("created new cell style for workbook")
-                                        .addParameter("count", stylesMap.size())
-                                        .log();
                             }
 
                             cell.setCellStyle(stylesMap.get(cellFormat));
@@ -293,9 +284,8 @@ public class DataGenerator {
         try {
             Float.parseFloat(callValue);
         } catch (NumberFormatException e) {
-            logDebug("XLS Cell value could not be parsed to Float, value will be written as String.")
-                    .addParameter("nonNumericValue", callValue)
-                    .log();
+            info().data("non_numeric_value", callValue)
+                    .log("XLS Cell value could not be parsed to Float, value will be written as String.");
             return CELL_TYPE_STRING;
         }
         return CELL_TYPE_NUMERIC;

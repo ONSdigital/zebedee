@@ -15,10 +15,10 @@ import com.github.onsdigital.zebedee.reader.Resource;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
 import static com.github.onsdigital.zebedee.util.URIUtils.removeLastSegment;
 import static org.apache.commons.lang3.StringUtils.removeEnd;
 
@@ -28,9 +28,9 @@ import static org.apache.commons.lang3.StringUtils.removeEnd;
 public class ContentDetailUtil {
 
 
-    public static List<ContentDetail> resolveDetails(Content content, ContentReader reader) throws IOException, ZebedeeException {
+    public static Set<ContentDetail> resolveDetails(Content content, ContentReader reader) throws IOException, ZebedeeException {
 
-        List<ContentDetail> details = new ArrayList<>();
+        Set<ContentDetail> details = new HashSet<>();
 
         for (String uri : content.uris("*data*.json")) {
             if (!VersionedContentItem.isVersionedUri(uri)) {
@@ -44,7 +44,7 @@ public class ContentDetailUtil {
                         page.setUri(resolveUri(pageUri, page));
                         PageDescription description = page.getDescription();
                     } catch (Exception e) {
-                        logError(e, "Failed to deserialise json").addParameter("resourceUri", resource.getUri()).log();
+                        error().data("resourceUri", resource.getUri()).logException(e, "Failed to deserialise json");
                     }
                 }
 

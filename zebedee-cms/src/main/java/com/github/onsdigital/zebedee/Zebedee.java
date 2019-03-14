@@ -14,6 +14,9 @@ import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
 import com.github.onsdigital.zebedee.model.encryption.ApplicationKeys;
 import com.github.onsdigital.zebedee.model.publishing.PublishedCollections;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
+import com.github.onsdigital.zebedee.service.DatasetService;
+import com.github.onsdigital.zebedee.service.ServiceStore;
+import com.github.onsdigital.zebedee.service.ServiceStoreImpl;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.session.service.SessionsService;
 import com.github.onsdigital.zebedee.teams.service.TeamsService;
@@ -32,8 +35,8 @@ import static com.github.onsdigital.zebedee.configuration.Configuration.isVerifi
 import static com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedException.beingEditedByAnotherCollectionError;
 import static com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedException.beingEditedByThisCollectionError;
 import static com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedException.markedDeleteInAnotherCollectionError;
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
 
 public class Zebedee {
 
@@ -47,9 +50,7 @@ public class Zebedee {
     public static final String TEAMS = "teams";
     public static final String LAUNCHPAD = "launchpad";
     public static final String APPLICATION_KEYS = "application-keys";
-
-    private static final String[] ZEBEDEE_DIRS = new String[]{PUBLISHED, COLLECTIONS, USERS, SESSIONS, PERMISSIONS,
-            TEAMS, LAUNCHPAD, PUBLISHED_COLLECTIONS, APPLICATION_KEYS};
+    public static final String SERVICES = "services";
 
     private final Path publishedCollectionsPath;
     private final Path collectionsPath;
@@ -74,6 +75,8 @@ public class Zebedee {
     private final TeamsService teamsService;
     private final SessionsService sessionsService;
     private final DataIndex dataIndex;
+    private final DatasetService datasetService;
+    private final ServiceStoreImpl serviceStoreImpl;
 
     /**
      * Create a new instance of Zebedee setting.
@@ -83,15 +86,6 @@ public class Zebedee {
     public Zebedee(ZebedeeConfiguration configuration) {
         this.path = configuration.getZebedeePath();
         this.publishedContentPath = configuration.getPublishedContentPath();
-        this.collectionsPath = configuration.getCollectionsPath();
-        this.publishedCollectionsPath = configuration.getPublishedCollectionsPath();
-        this.usersPath = configuration.getUsersPath();
-        this.sessionsPath = configuration.getSessionsPath();
-        this.permissionsPath = configuration.getPermissionsPath();
-        this.teamsPath = configuration.getTeamsPath();
-        this.applicationKeysPath = configuration.getApplicationKeysPath();
-        this.redirectPath = configuration.getRedirectPath();
-
         this.sessionsService = configuration.getSessionsService();
         this.keyringCache = configuration.getKeyringCache();
         this.permissionsService = configuration.getPermissionsService();
@@ -103,6 +97,17 @@ public class Zebedee {
         this.teamsService = configuration.getTeamsService();
         this.usersService = configuration.getUsersService();
         this.verificationAgent = configuration.getVerificationAgent(isVerificationEnabled(), this);
+        this.datasetService = configuration.getDatasetService();
+        this.serviceStoreImpl = configuration.getServiceStore();
+
+        this.collectionsPath = configuration.getCollectionsPath();
+        this.publishedCollectionsPath = configuration.getPublishedCollectionsPath();
+        this.usersPath = configuration.getUsersPath();
+        this.sessionsPath = configuration.getSessionsPath();
+        this.permissionsPath = configuration.getPermissionsPath();
+        this.teamsPath = configuration.getTeamsPath();
+        this.applicationKeysPath = configuration.getApplicationKeysPath();
+        this.redirectPath = configuration.getRedirectPath();
     }
 
     /**
@@ -255,7 +260,7 @@ public class Zebedee {
      */
     public Session openSession(Credentials credentials) throws IOException, NotFoundException, BadRequestException {
         if (credentials == null) {
-            logError("provided credentials are null no session will be opened").log();
+            error().log("provided credentials are null no session will be opened");
             return null;
         }
 
@@ -263,7 +268,7 @@ public class Zebedee {
         User user = usersService.getUserByEmail(credentials.email);
 
         if (user == null) {
-            logInfo("user not found no session will be created").user(user.getEmail()).log();
+            info().data("user", user.getEmail()).log("user not found no session will be created");
             return null;
         }
 
@@ -272,7 +277,7 @@ public class Zebedee {
         try {
             session = sessionsService.create(user);
         } catch (Exception e) {
-            logError(e, "error attempting to create session for user").user(user.getEmail()).log();
+            error().data("user", user.getEmail()).logException(e, "error attempting to create session for user");
             throw new IOException(e);
         }
 
@@ -335,5 +340,13 @@ public class Zebedee {
 
     public UsersService getUsersService() {
         return usersService;
+    }
+
+    public DatasetService getDatasetService() {
+        return datasetService;
+    }
+
+    public ServiceStore getServiceStore() {
+        return serviceStoreImpl;
     }
 }

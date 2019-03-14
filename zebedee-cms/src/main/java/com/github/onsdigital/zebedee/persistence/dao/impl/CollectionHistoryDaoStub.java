@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 
 /**
  * Mock implementation of {@link CollectionHistoryDao} for use while actual DB is still being set up and for testing.
@@ -28,17 +28,16 @@ public class CollectionHistoryDaoStub implements CollectionHistoryDao {
 
     @Override
     public Future saveCollectionHistoryEvent(CollectionHistoryEvent event) {
-        logInfo(event.getEventType().name())
-                .addParameter("collectionId", event.getCollectionId())
-                .addParameter("collectionName", event.getCollectionName())
-                .addParameter("eventDate", event.getEventDate())
-                .addParameter("user", event.getUser())
-                .addParameter("eventType", event.getEventType())
-                .addParameter("uri", event.getUri())
-                .addParameter("exceptionText", event.getExceptionText())
-                .addParameter("metaData", event.getCollectionHistoryEventMetaData().stream().collect(Collectors.toMap
+        info().data("collectionId", event.getCollectionId())
+                .data("collectionName", event.getCollectionName())
+                .data("eventDate", event.getEventDate())
+                .data("user", event.getUser())
+                .data("eventType", event.getEventType())
+                .data("uri", event.getUri())
+                .data("exceptionText", event.getExceptionText())
+                .data("metaData", event.getCollectionHistoryEventMetaData().stream().collect(Collectors.toMap
                         (CollectionHistoryEventMetaData::getKey, CollectionHistoryEventMetaData::getValue)))
-                .log();
+                .log(event.getEventType().name());
         return new DummyFuture();
     }
 
@@ -59,8 +58,7 @@ public class CollectionHistoryDaoStub implements CollectionHistoryDao {
 
     @Override
     public List<CollectionHistoryEvent> getCollectionEventHistory(String collectionId) throws ZebedeeException {
-        logInfo("getCollectionEventHistory: AUDIT database is not enabled Events are written to application log " +
-                "only.");
+        info().log("getCollectionEventHistory: AUDIT database is not enabled Events are written to application log only.");
         return emptyList;
     }
 

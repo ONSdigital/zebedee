@@ -14,8 +14,11 @@ import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.Resource;
+import com.github.onsdigital.zebedee.service.DatasetService;
+import com.github.onsdigital.zebedee.service.ServiceSupplier;
 import com.github.onsdigital.zebedee.util.Http;
 import com.github.onsdigital.zebedee.util.SlackNotification;
+import com.github.onsdigital.zebedee.util.ZebedeeCmsService;
 import com.github.onsdigital.zebedee.util.slack.PostMessageField;
 import org.apache.commons.lang3.StringUtils;
 
@@ -26,7 +29,10 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
@@ -37,10 +43,17 @@ import java.util.concurrent.locks.Lock;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logDebug;
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logWarn;
+import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
+import static com.github.onsdigital.zebedee.model.publishing.PostPublisher.getPublishedCollection;
+import static com.github.onsdigital.zebedee.util.SlackNotification.CollectionStage.PUBLISH;
+import static com.github.onsdigital.zebedee.util.SlackNotification.StageStatus.FAILED;
+import static com.github.onsdigital.zebedee.util.SlackNotification.StageStatus.STARTED;
+import static com.github.onsdigital.zebedee.util.SlackNotification.collectionAlarm;
+import static com.github.onsdigital.zebedee.util.SlackNotification.publishNotification;
+
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.warn;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
 
 
 public class Publisher {
@@ -60,100 +73,155 @@ public class Publisher {
     private static final String URI_PARAM = "uri";
     private static final String ZIP_PARAM = "zip";
 
+    private static ServiceSupplier<DatasetService> datasetServiceSupplier;
+
     static {
         theTrainHosts = Configuration.getTheTrainHosts();
         Runtime.getRuntime().addShutdownHook(new ShutDownPublisherThread(pool));
+
+        // lazy loaded approach for getting the datasetService.
+        datasetServiceSupplier = () -> ZebedeeCmsService.getInstance().getDatasetService();
     }
 
-    public static boolean Publish(Collection collection, String email, CollectionReader collectionReader) throws IOException {
+    /**
+     * Execute the prepublish steps.
+     */
+    public static void executePrePublish(Collection collection) throws IOException {
+        collection.getDescription().publishStartDate = new Date();
+        createPublishingTransactions(collection);
+        sendManifest(collection);
+    }
+
+    /**
+     * Execute the publishing steps.
+     */
+    public static boolean executePublish(Collection collection, CollectionReader collectionReader, String email)
+            throws IOException {
+        boolean success = false;
+
+        publishFilteredCollectionFiles(collection, collectionReader);
+
+        // TODO - feels like we should check/return here if unsuccessful?
+        success = commitPublish(collection, email);
+
+        // FIXME CMD feature
+        if (cmsFeatureFlags().isEnableDatasetImport()) {
+            success &= publishDatasets(collection);
+        }
+
+        info().data("milliseconds", collection.getPublishTimeMilliseconds())
+                .data("publishComplete", success)
+                .data("publishing", true)
+                .data("collectionId", collection.getDescription().getId())
+                .log("collection publish time");
+
+        return success;
+    }
+
+    /**
+     * TODO
+     */
+    public static boolean publish(Collection collection, String email, CollectionReader collectionReader) throws
+            IOException {
         // FIXME using PostPublisher.getPublishedCollection feels a bit hacky
-        SlackNotification.publishNotification(PostPublisher.getPublishedCollection(collection),SlackNotification.CollectionStage.PUBLISH, SlackNotification.StageStatus.STARTED);
+        publishNotification(getPublishedCollection(collection), PUBLISH, STARTED);
 
         boolean publishComplete = false;
 
         // First get the in-memory (within-JVM) lock.
-        // This will block attempts to write to the collection during the publishing process
-        logInfo("PUBLISH: attempting to lock collection for publish").collectionId(collection).log();
+        // This will block attempts to write to the collection during the publishAction process
+        info().data("publishing", true).data("collectionId", collection.getDescription().getId())
+                .log("attempting to lock collection for publish");
 
         Lock writeLock = collection.getWriteLock();
         writeLock.lock();
+
+        String collectionId = collection.getDescription().getId();
 
         long publishStart = System.currentTimeMillis();
 
         try {
             // First check the state of the collection
-            if (collection.getDescription().publishComplete) {
-                logInfo("PUBLISH: collection has already been published. Halting publish")
-                        .collectionId(collection)
-                        .log();
-                return publishComplete;
+            if (isPublished(collection)) {
+                return false;
             }
 
-            // Now attempt to get a file (inter-JVM) lock
-            // This prevents Staging and Live attempting to
-            // publish the same collection at the same time.
-            // We specify WRITE so we can get a lock and
-            // CREATE to ensure the file is created if it
-            // doesn't exist.
-            try (FileChannel channel = FileChannel.open(collection.path.resolve(".lock"), StandardOpenOption.WRITE, StandardOpenOption.CREATE);
+            // Now attempt to get a file (inter-JVM) lock. This prevents Staging and Live attempting to publish the
+            // same collection at the same time. We specify WRITE so we can get a lock and CREATE to ensure the file
+            // is created if it doesn't exist.
+            Path collectionLock = collection.path.resolve(".lock");
+
+            try (FileChannel channel = FileChannel.open(collectionLock, StandardOpenOption.WRITE, StandardOpenOption.CREATE);
                  FileLock lock = channel.tryLock()) {
+
                 if (lock != null) {
-                    logInfo("PUBLISH: collection lock acquired").collectionId(collection).log();
+                    info().data("publishing", true).data("collectionId", collectionId)
+                            .log("collection lock acquired");
 
-                    collection.path.resolve("publish.lock");
-
-                    if (collection.getDescription().approvalStatus != ApprovalStatus.COMPLETE) {
-                        logInfo("PUBLISH: collection cannot be published as it has not been approved")
-                                .collectionId(collection)
-                                .log();
+                    if (!isApproved(collection)) {
                         return false;
                     }
 
                     publishComplete = publishFilesToWebsite(collection, email, collectionReader);
 
-                    logInfo("PUBLISH: collection publish process completed")
-                            .collectionId(collection)
-                            .timeTaken((System.currentTimeMillis() - publishStart))
-                            .log();
+                    info().data("publishing", true).data("collectionId", collectionId)
+                            .data("timeTaken", (System.currentTimeMillis() - publishStart))
+                            .log("collection publish process completed");
 
                 } else {
-                    logInfo("PUBLISH: collection is already locked for publishing. Halting publish attempt")
-                            .collectionId(collection)
-                            .log();
+                    info().data("publishing", true).data("collectionId", collectionId)
+                            .log("collection is already locked for publishAction, halting publish attempt");
                 }
 
             } finally {
-                // Save any updates to the collection
-                logInfo("PUBLISH: saving changes to collection")
-                        .addParameter("publishComplete", publishComplete)
-                        .collectionId(collection)
-                        .log();
-                collection.save();
+                saveCollection(collection, publishComplete);
             }
 
         } finally {
             writeLock.unlock();
-            logInfo("PUBLISH: collection lock released")
-                    .collectionId(collection)
-                    .log();
+            info().data("collectionId", collectionId).log("collection lock released");
         }
 
-        if(publishComplete) {
-            // FIXME using PostPublisher.getPublishedCollection feels a bit hacky
-            SlackNotification.publishNotification(PostPublisher.getPublishedCollection(collection),SlackNotification.CollectionStage.PUBLISH, SlackNotification.StageStatus.COMPLETED);
-        } else {
-            // FIXME using PostPublisher.getPublishedCollection feels a bit hacky
-            SlackNotification.publishNotification(PostPublisher.getPublishedCollection(collection),SlackNotification.CollectionStage.PUBLISH, SlackNotification.StageStatus.FAILED);
+        SlackNotification.StageStatus status = FAILED;
+        if (publishComplete) {
+            status = SlackNotification.StageStatus.COMPLETED;
         }
+        // FIXME using PostPublisher.getPublishedCollection feels a bit hacky
+        publishNotification(getPublishedCollection(collection), PUBLISH, status);
+
         return publishComplete;
+    }
+
+    /**
+     * Return true if the collection approval status equals {@link ApprovalStatus#COMPLETE}, return false otherwise.
+     */
+    private static boolean isApproved(Collection collection) {
+        if (collection.getDescription().approvalStatus != ApprovalStatus.COMPLETE) {
+            info().data("publishing", true).data("collectionId", collection.getDescription().getId())
+                    .log("collection cannot be published as it has not been approved");
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Return true if collection is already marked as publish completed, return false otherwise
+     */
+    private static boolean isPublished(Collection collection) {
+        if (collection.getDescription().publishComplete) {
+            info().data("publishing", true).data("collectionId", collection.getDescription().getId())
+                    .log("collection has already been published, halting publish");
+            return true;
+        }
+        return false;
     }
 
     /**
      * Submit all files in the collection to the train destination - the website.
      *
      * @param collection The collection to be published.
-     * @param email      An identifier for the publishing user.
-     * @return If publishing succeeded, true.
+     * @param email      An identifier for the publishAction user.
+     * @return If publishAction succeeded, true.
      * @throws IOException If a general error occurs.
      */
     public static boolean publishFilesToWebsite(Collection collection, String email, CollectionReader collectionReader) throws IOException {
@@ -161,56 +229,36 @@ public class Publisher {
 
         try {
             collection.getDescription().publishStartDate = new Date();
-            createPublishingTransactions(collection);
-            sendManifest(collection);
-            publishFilteredCollectionFiles(collection, collectionReader);
 
-            publishComplete = commitPublish(collection, email);
+            executePrePublish(collection);
+            publishComplete = executePublish(collection, collectionReader, email);
+
             collection.getDescription().publishEndDate = new Date();
-
         } catch (Exception e) {
-            SlackNotification.collectionAlarm(collection,
-                    "Exception publishing collection",
-                    new PostMessageField("Error", e.getMessage(), false)
-            );
+            PostMessageField msg = new PostMessageField("Error", e.getMessage(), false);
+            collectionAlarm(collection, "Exception publishAction collection", msg);
 
             // If an error was caught, attempt to roll back the transaction:
             Map<String, String> transactionIds = collection.getDescription().publishTransactionIds;
             if (transactionIds != null && transactionIds.size() > 0) {
 
-                logError(e, "PUBLISH: error while attempting to publish, transaction IDs found for collection " +
-                        "attempting to rollback")
-                        .collectionId(collection)
-                        .hostToTransactionID(collection.getDescription().publishTransactionIds)
-                        .log();
+                error().data("publishing", true).data("collectionId", collection.getDescription().getId())
+                        .data("hostToTransactionID", transactionIds)
+                        .logException(e, "error while attempting to publish, transaction IDs found for collection attempting to rollback");
 
                 rollbackPublish(collection);
             } else {
-                logError(e, "PUBLISH: error while attempting to publish, no transaction IDs found for collection " +
-                        "no rollback will be attempted")
-                        .collectionId(collection)
-                        .hostToTransactionID(collection.getDescription().publishTransactionIds)
-                        .log();
+
+                error().data("publishing", true).data("collectionId", collection.getDescription().getId())
+                        .data("hostToTransactionID", transactionIds)
+                        .logException(e, "error while attempting to publish, no transaction IDs found for collection no rollback will be attempted");
+
             }
 
         } finally {
             // Save any updates to the collection
-            try {
-                logInfo("PUBLISH: persisting collection changes to disk")
-                        .collectionId(collection)
-                        .addParameter("publishComplete", publishComplete)
-                        .hostToTransactionID(collection.getDescription().publishTransactionIds)
-                        .log();
-                collection.save();
-            } catch (Exception e) {
-                logError(e, "PUBLISH: error while attempting to persist collection changes to disk")
-                        .collectionId(collection)
-                        .addParameter("publishComplete", publishComplete)
-                        .hostToTransactionID(collection.getDescription().publishTransactionIds)
-                        .log();
-            }
+            saveCollection(collection, publishComplete);
         }
-
         return publishComplete;
     }
 
@@ -220,14 +268,14 @@ public class Publisher {
         Map<String, String> hostToTransactionIDMap = new ConcurrentHashMap<>();
         List<Future<IOException>> results = new ArrayList<>();
 
+        String collectionId = collection.getDescription().getId();
+
         for (Host host : theTrainHosts) {
             results.add(pool.submit(() -> {
                 IOException result = null;
                 try (Http http = new Http()) {
-                    logInfo("PUBLISH: creating publishing transaction for collection")
-                            .trainHost(host)
-                            .collectionId(collection)
-                            .log();
+                    info().data("publishing", true).data("trainHost", host).data("collectionId", collectionId).
+                            log("creating publish transaction for collection");
 
                     Endpoint begin = new Endpoint(host, BEGIN_ENDPOINT);
 
@@ -235,17 +283,13 @@ public class Publisher {
                     checkResponse(response, null, begin, collection.getDescription().getId());
                     hostToTransactionIDMap.put(host.toString(), response.body.transaction.id);
                 } catch (IOException e) {
-                    logError(e, "PUBLISH: error while attempting to create new transactions for collection")
-                            .trainHost(host)
-                            .collectionId(collection)
-                            .log();
+                    error().data("publishing", true).data("trainHost", host).data("collectionId", collectionId).
+                            logException(e, "error while attempting to create new transactions for collection");
 
                     if (collection.getDescription().publishTransactionIds != null
                             && !collection.getDescription().publishTransactionIds.isEmpty()) {
-                        logWarn("PUBLISH: clearing existing transactionIDs from collection")
-                                .collectionId(collection)
-                                .hostToTransactionID(collection.getDescription().publishTransactionIds)
-                                .log();
+                        warn().data("publishing", true).data("trainHost", host).data("collectionId", collectionId).
+                                log("clearing existing transactionIDs from collection");
 
                         collection.getDescription().publishTransactionIds.clear();
                     }
@@ -255,15 +299,14 @@ public class Publisher {
             }));
         }
 
-        checkFutureResults(results, "error creating publishing transaction");
+        checkFutureResults(results, "error creating publishAction transaction");
         collection.getDescription().publishTransactionIds = hostToTransactionIDMap;
         collection.save();
 
-        logInfo("PRE-PUBLISH: successfully created publishing transactions for collection")
-                .collectionId(collection)
-                .hostToTransactionID(hostToTransactionIDMap)
-                .timeTaken(System.currentTimeMillis() - start)
-                .log();
+        info().data("publishing", true).data("collectionId", collectionId)
+                .data("hostToTransactionID", hostToTransactionIDMap)
+                .data("timeTaken", System.currentTimeMillis() - start)
+                .log("successfully created publish transactions for collection");
 
         return hostToTransactionIDMap;
     }
@@ -316,11 +359,9 @@ public class Publisher {
 
         checkFutureResults(results, "error while attempting to publish file");
 
-        logInfo("PUBLISH: successfully sent all publish file requests to the train")
-                .collectionId(collection)
-                .hostToTransactionID(collection.getDescription().publishTransactionIds)
-                .timeTaken((System.currentTimeMillis() - start))
-                .log();
+        info().data("publishing", true).data("collectionId", collection.getDescription().getId())
+                .data("hostToTransactionID", collection.getDescription().publishTransactionIds)
+                .data("timeTaken", (System.currentTimeMillis() - start)).log("successfully sent all publish file requests to the train");
     }
 
     private static Future<IOException> publishFile(
@@ -344,25 +385,22 @@ public class Publisher {
                         Resource resource = reader.getResource(uri);
                         InputStream dataStream = resource.getData()
                 ) {
-                    logInfo("PUBLISH: sending publish collection file request to train host")
-                            .collectionId(collectionID)
-                            .transactionID(transactionId)
-                            .trainHost(host)
-                            .addParameter(URI_PARAM, uri)
-                            .addParameter("isZip", zipped)
-                            .log();
+                    info().data("publishing", true).data("collectionId", collectionID)
+                            .data("transactionId", transactionId)
+                            .data("trainHost", host)
+                            .data(URI_PARAM, uri).data("isZip", zipped)
+                            .log("sending publish collection file request to train host");
 
                     Response<Result> response = http.post(publish, dataStream, source.getFileName().toString(), Result.class);
                     checkResponse(response, transactionId, publish, collectionID);
                 }
             } catch (IOException e) {
-                logError(e, "PUBLISH: error while sending publish file request to train host")
-                        .collectionId(collectionID)
-                        .transactionID(transactionId)
-                        .trainHost(host)
-                        .addParameter(URI_PARAM, uri)
-                        .addParameter("isZip", zipped)
-                        .log();
+
+                error().data("publishing", true).data("collectionId", collectionID)
+                        .data("transactionId", transactionId)
+                        .data("trainHost", host)
+                        .data(URI_PARAM, uri).data("isZip", zipped)
+                        .logException(e, "error while sending publish file request to train host");
                 result = e;
             }
             return result;
@@ -374,6 +412,8 @@ public class Publisher {
         List<Future<IOException>> futures = new ArrayList<>();
         long start = System.currentTimeMillis();
 
+        String collectionId = collection.getDescription().getId();
+
         for (Map.Entry<String, String> entry : collection.getDescription().publishTransactionIds.entrySet()) {
             Host theTrainHost = new Host(entry.getKey());
             String transactionId = entry.getValue();
@@ -384,20 +424,17 @@ public class Publisher {
                     Endpoint publish = new Endpoint(theTrainHost, SEND_MANIFEST_ENDPOINT)
                             .setParameter(TRANSACTION_ID_PARAM, transactionId);
 
-                    logInfo("PUBLISH: sending publish manifest to train host")
-                            .trainHost(theTrainHost)
-                            .collectionId(collection)
-                            .log();
+                    info().data("publishing", true).data("trainHost", theTrainHost).data("collectionId", collectionId)
+                            .log("sending publish manifest to train host");
 
                     Response<Result> response = http.postJson(publish, manifest, Result.class);
                     checkResponse(response, transactionId, publish, collection.getDescription().getId());
 
                 } catch (IOException e) {
-                    logError(e, "PUBLISH: unexpected error while attempting to send publish manifest to train host")
-                            .collectionId(collection)
-                            .trainHost(theTrainHost)
-                            .transactionID(transactionId)
-                            .log();
+
+                    error().data("publishing", true).data("collectionId", collectionId)
+                            .data("trainHost", theTrainHost).data("transactionId", transactionId)
+                            .logException(e, "unexpected error while attempting to send publish manifest to train host");
                     result = e;
                 }
                 return result;
@@ -406,17 +443,16 @@ public class Publisher {
 
         checkFutureResults(futures, "error sending publish manifest");
 
-        logInfo("PUBLISH: successfully sent publish manifest for collection to train hosts")
-                .collectionId(collection)
-                .hostToTransactionID(collection.getDescription().publishTransactionIds)
-                .timeTaken(System.currentTimeMillis() - start)
-                .log();
+        info().data("publishing", true).data("collectionId", collection.getDescription().getId())
+                .data("hostToTransactionId", collection.getDescription().publishTransactionIds)
+                .data("timeTaken", System.currentTimeMillis() - start)
+                .log("successfully sent publish manifest for collection to train hosts");
     }
 
     public static boolean commitPublish(Collection collection, String email) throws IOException {
         long start = System.currentTimeMillis();
 
-        // If all has gone well so far, commit the publishing transaction:
+        // If all has gone well so far, commit the publishAction transaction:
         boolean isSuccess = true;
         for (Result result : commitPublish(collection.getDescription().publishTransactionIds)) {
             isSuccess &= !result.error;
@@ -428,17 +464,15 @@ public class Publisher {
             collection.getDescription().addEvent(new Event(publishedDate, EventType.PUBLISHED, email));
             collection.getDescription().publishComplete = true;
 
-            logInfo("PUBLISH: commit publish completed successfully")
-                    .collectionId(collection)
-                    .timeTaken((System.currentTimeMillis() - start))
-                    .log();
+            info().data("publishing", true).data("collectionId", collection.getDescription().getId())
+                    .data("timeTaken", System.currentTimeMillis() - start)
+                    .log("commit publish completed successfully");
 
             return true;
         } else {
-            logWarn("PUBLISH: commit publish was unsuccessfully")
-                    .collectionId(collection)
-                    .timeTaken((System.currentTimeMillis() - start))
-                    .log();
+            warn().data("publishing", true).data("collectionId", collection.getDescription().getId())
+                    .data("timeTaken", System.currentTimeMillis() - start)
+                    .log("commit publish was unsuccessfully");
             return false;
         }
     }
@@ -459,9 +493,9 @@ public class Publisher {
     }
 
     /**
-     * Commits a publishing transaction.
+     * Commits a publishAction transaction.
      *
-     * @param transactionIds     The {@link Host}s and transactions to publish to.
+     * @param transactionIds The {@link Host}s and transactions to publish to.
      * @return The {@link Result} returned by The Train
      * @throws IOException If any errors are encountered in making the request or reported in the {@link Result}.
      */
@@ -472,17 +506,13 @@ public class Publisher {
                     Host host = new Host(entry.getKey());
                     String transactionId = entry.getValue();
 
-                    logDebug("creating commit publish transaction tasks")
-                            .transactionID(transactionId)
-                            .trainHost(host)
-                            .log();
+                    info().data("publishing", true).data("transactionId", transactionId).data("trainHost", host)
+                            .log("creating commit publish transaction tasks");
 
                     Callable<Result> task = () -> {
                         try {
-                            logInfo("PUBLISH: sending commit transaction request to train host")
-                                    .transactionID(transactionId)
-                                    .trainHost(host)
-                                    .log();
+                            info().data("publishing", true).data("transactionId", transactionId)
+                                    .data("trainHost", host).log("sending commit transaction request to train host");
 
                             try (Http http = new Http()) {
                                 Endpoint endpoint = new Endpoint(host, COMMIT_ENDPOINT)
@@ -493,27 +523,25 @@ public class Publisher {
                                 return response.body;
                             }
                         } catch (Exception e) {
-                            logError(e, "PUBLISH: error while sending commit transaction request to trian host")
-                                    .trainHost(host)
-                                    .transactionID(transactionId)
-                                    .log();
+                            error().data("publishing", true).data("trainHost", host).data("transactionId", transactionId)
+                                    .logException(e, "error while sending commit transaction request to train host");
                             throw new IOException(e);
                         }
                     };
                     return task;
                 }).collect(Collectors.toList());
 
-        logDebug("submitting commit publish tasks").addParameter("count", commitTasks.size()).log();
+        info().data("publishing", true).data("count", commitTasks.size()).log("submitting commit publish tasks");
 
         List<Future<Result>> futures = new ArrayList<>();
         try {
             futures = pool.invokeAll(commitTasks);
         } catch (Exception e) {
-            logError(e, "error invoking commit tasks").log();
+            error().data("publishing", true).logException(e, "error invoking commit tasks");
             throw new IOException(e);
         }
 
-        logDebug("checking commit publish tasks results").log();
+        info().data("publishing", true).log("checking commit publish tasks results");
 
         List<Result> results = new ArrayList<>();
         for (Future<Result> resultFuture : futures) {
@@ -522,57 +550,54 @@ public class Publisher {
                 if (r == null) {
                     throw new IOException("commit publish result was null");
                 }
-                logInfo("adding commit publish result future to list of results")
-                        .transactionID(r.transaction.id)
-                        .addParameter("isError", r.error)
-                        .log();
+
+                info().data("publishing", true).data("transactionId", r.transaction.id)
+                        .data("transactionId", r.transaction.id)
+                        .log("adding commit publish result future to list of results");
 
                 results.add(r);
             } catch (Exception e) {
-                logError(e, "commit tranaction future throw unexpected exception").log();
+                error().data("publishing", true).logException(e, "commit tranaction future throw unexpected exception");
                 throw new IOException(e);
             }
         }
 
-        logInfo("PUBLISH: successfully committed publishing transaction")
-                .hostToTransactionID(transactionIds)
-                .log();
+        info().data("publishing", true).data("hostToTransactionId", transactionIds).log("successfully committed publishAction transaction");
 
         return results;
     }
 
     /**
-     * Rolls back a publishing transaction, suppressing any {@link IOException} and printing it out to the console instead.
+     * Rolls back a publishAction transaction, suppressing any {@link IOException} and printing it out to the console instead.
      *
      * @param collection the collection to roll back
      */
     public static void rollbackPublish(Collection collection) {
         for (Map.Entry<String, String> entry : collection.getDescription().publishTransactionIds.entrySet()) {
             Host host = new Host(entry.getKey());
+
             String transactionId = entry.getValue();
+            String collectionId = collection.getDescription().getId();
 
             try (Http http = new Http()) {
                 Endpoint endpoint = new Endpoint(host, ROLLBACK_ENDPOINT)
                         .setParameter(TRANSACTION_ID_PARAM, transactionId);
 
-                logWarn("PUBLISH: sending rollback transaction request for collection")
-                        .collectionId(collection)
-                        .hostToTransactionID(collection.getDescription().publishTransactionIds)
-                        .log();
+                warn().data("publishing", true).data("collectionId", collectionId)
+                        .data("hostToTransactionId", collection.getDescription().publishTransactionIds)
+                        .log("sending rollback transaction request for collection");
 
                 Response<Result> response = http.post(endpoint, Result.class);
                 checkResponse(response, transactionId, endpoint, null);
 
-                logInfo("PUBLISH: publish rollback request was successful")
-                        .collectionId(collection)
-                        .hostToTransactionID(collection.getDescription().publishTransactionIds)
-                        .log();
+                info().data("publishing", true).data("collectionId", collectionId)
+                        .data("hostToTransactionId", collection.getDescription().publishTransactionIds)
+                        .log("publish rollback request was successful");
 
             } catch (IOException e) {
-                logError(e, "PUBLISH: error rolling back publish transaction")
-                        .collectionId(collection)
-                        .transactionID(transactionId)
-                        .log();
+                error().data("publishing", true).data("collectionId", collectionId)
+                        .data("transactionId", transactionId)
+                        .logException(e, "error rolling back publish transaction");
             }
         }
     }
@@ -585,17 +610,18 @@ public class Publisher {
             String message = response.body != null ? response.body.message : "";
 
             URI uri = endpoint.url();
-            logError("PUBLISH: request was unsuccessful")
-                    .transactionID(TransactionID)
-                    .collectionId(collectionID)
-                    .addParameter("trainHost", uri.getScheme() + "://" + uri.getHost() + ":" + uri.getPort())
-                    .addParameter("endpoint", endpoint.url().getPath())
-                    .addParameter("statusCode", code)
-                    .addParameter("reason", reason)
-                    .addParameter("message", message)
-                    .log();
 
-            throw new IOException("Error in request: " + code + " " + reason + " " + message);
+            IOException io = new IOException("Error in request: " + code + " " + reason + " " + message);
+
+            error().data("publishing", true).data("transactionId", TransactionID)
+                    .data("collectionId", collectionID)
+                    .data("trainHost", uri.getScheme() + "://" + uri.getHost() + ":" + uri.getPort())
+                    .data("endpoint", endpoint.url().getPath())
+                    .data("statusCode", code)
+                    .data("reason", reason)
+                    .data("message", message)
+                    .logException(io,"request was unsuccessful");
+            throw io;
 
         } else if (response.body.error == true) {
             throw new IOException("Result error: " + response.body.message);
@@ -627,6 +653,50 @@ public class Publisher {
             } catch (InterruptedException | ExecutionException e) {
                 throw new IOException(errorContext, e);
             }
+        }
+    }
+
+    private static boolean publishDatasets(Collection collection) throws IOException {
+
+        String collectionId = collection.getDescription().getId();
+
+        info().data("collectionId", collectionId).data("publishing", true)
+                .log("publishing api datasets for collection");
+
+        boolean datasetsPublished = false;
+        try {
+            datasetServiceSupplier.getService().publishDatasetsInCollection(collection);
+            datasetsPublished = true;
+        } catch (Exception e) {
+
+            error().data("collectionId", collectionId).data("publishing", true)
+                    .logException(e, "Exception updating API dataset to state published");
+
+            PostMessageField msg = new PostMessageField("Error", e.getMessage(), false);
+            collectionAlarm(collection, "Exception updating API dataset to state published", msg);
+
+        } finally {
+            saveCollection(collection, datasetsPublished);
+        }
+        return datasetsPublished;
+    }
+
+    private static void saveCollection(Collection collection, boolean publishComplete) {
+        // Save any updates to the collection
+
+        String collectionId = collection.getDescription().getId();
+
+        info().data("publishing", true).data("publishComplete", publishComplete).data("collectionId", collectionId)
+                .data("hostToTransactionId", collection.getDescription().publishTransactionIds)
+                .log("persisting collection changes to disk");
+
+        try {
+            collection.save();
+        } catch (Exception e) {
+
+            error().data("publishing", true).data("collectionId", collectionId).data("publishComplete", publishComplete)
+                    .data("hostToTransactionId", collection.getDescription().publishTransactionIds)
+                    .logException(e, "error while attempting to persist collection changes to disk");
         }
     }
 

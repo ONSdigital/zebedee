@@ -2,7 +2,6 @@ package com.github.onsdigital.zebedee.content.util;
 
 import com.github.onsdigital.zebedee.content.base.Content;
 import com.github.onsdigital.zebedee.content.page.base.Page;
-import com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -13,6 +12,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Date;
+
+import static com.github.onsdigital.zebedee.logging.ReaderLogger.error;
 
 /**
  * Created by bren on 06/06/15.
@@ -104,11 +105,10 @@ public class ContentUtil {
     public static Page deserialiseContent(InputStream stream) {
         try (InputStreamReader inputStreamReader = new InputStreamReader(stream)) {
             return createBuilder(ContentConstants.JSON_DATE_PATTERN)
-                    .registerTypeAdapter(Page.class, new PageTypeResolver())
+                    .registerTypeAdapter(Page.class, PageTypeResolver.getInstance())
                     .create().fromJson(inputStreamReader, Page.class);
         } catch (IOException ex) {
-            ZebedeeReaderLogBuilder.logError(ex, "Failed to close inputstream reader.").log();
-            throw new RuntimeException(ex);
+            throw new RuntimeException(error().logException(ex, "Failed to close inputstream reader."));
         }
     }
 
@@ -116,12 +116,12 @@ public class ContentUtil {
     /**
      * Resolves page type and deserializes automatically to that implementation. Use if you do not need to know actual class implementation,
      *
-     * @param stream json stream
+     * @param stream      json stream
      * @param datePattern date pattern to be used when deserialising
      * @return
      */
     public static Page deserialiseContent(InputStream stream, String datePattern) {
-        return createBuilder(datePattern).registerTypeAdapter(Page.class, new PageTypeResolver()).create().fromJson(new InputStreamReader(stream), Page.class);
+        return createBuilder(datePattern).registerTypeAdapter(Page.class, PageTypeResolver.getInstance()).create().fromJson(new InputStreamReader(stream), Page.class);
     }
 
 
@@ -132,7 +132,7 @@ public class ContentUtil {
      * @return
      */
     public static Page deserialiseContent(String json) {
-        return createBuilder(ContentConstants.JSON_DATE_PATTERN).registerTypeAdapter(Page.class, new PageTypeResolver()).create().fromJson(json, Page.class);
+        return createBuilder(ContentConstants.JSON_DATE_PATTERN).registerTypeAdapter(Page.class, PageTypeResolver.getInstance()).create().fromJson(json, Page.class);
     }
 
     /**
@@ -143,7 +143,7 @@ public class ContentUtil {
      * @return
      */
     public static Page deserialiseContent(String json, String datePattern) {
-        return createBuilder(datePattern).registerTypeAdapter(Page.class, new PageTypeResolver()).create().fromJson(json, Page.class);
+        return createBuilder(datePattern).registerTypeAdapter(Page.class, PageTypeResolver.getInstance()).create().fromJson(json, Page.class);
     }
 
     public static String hash(Content content) {
@@ -153,6 +153,7 @@ public class ContentUtil {
     public static String hash(InputStream stream) throws IOException {
         return DigestUtils.sha1Hex(stream);
     }
+
     public static String hash(byte[] bytes) throws IOException {
         return DigestUtils.sha1Hex(bytes);
     }

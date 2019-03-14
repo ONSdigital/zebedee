@@ -1,10 +1,12 @@
 package com.github.onsdigital.zebedee.model;
 
+
 import com.github.davidcarboni.cryptolite.Keys;
 import com.github.davidcarboni.cryptolite.Random;
 import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.KeyManangerUtil;
 import com.github.onsdigital.zebedee.Zebedee;
+import com.github.onsdigital.zebedee.content.page.base.PageType;
 import com.github.onsdigital.zebedee.content.page.release.Release;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
@@ -18,12 +20,14 @@ import com.github.onsdigital.zebedee.json.ApprovalStatus;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.CollectionType;
 import com.github.onsdigital.zebedee.json.ContentDetail;
+import com.github.onsdigital.zebedee.json.ContentStatus;
 import com.github.onsdigital.zebedee.json.Event;
 import com.github.onsdigital.zebedee.json.EventType;
 import com.github.onsdigital.zebedee.json.Events;
 import com.github.onsdigital.zebedee.model.approval.tasks.ReleasePopulator;
 import com.github.onsdigital.zebedee.model.content.item.ContentItemVersion;
 import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
+import com.github.onsdigital.zebedee.model.publishing.Publisher;
 import com.github.onsdigital.zebedee.model.publishing.scheduled.Scheduler;
 import com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDao;
 import com.github.onsdigital.zebedee.persistence.model.CollectionHistoryEvent;
@@ -46,10 +50,15 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -63,9 +72,10 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.function.BiFunction;
+import java.util.stream.Collectors;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logDebug;
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
+import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_CONTENT_REVIEWED;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_CREATED;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_NAME_CHANGED;
@@ -79,12 +89,19 @@ import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMet
 import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData.reschedule;
 import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData.typeChanged;
 
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
+
 public class Collection {
 
     public static final String REVIEWED = "reviewed";
     public static final String COMPLETE = "complete";
     public static final String IN_PROGRESS = "inprogress";
     public static final String DATA_JSON = "data.json";
+
+    private static final String BLOCKING_PATH = "blockingPath";
+    private static final String BLOCKING_COLLECTION = "blockingCollection";
+    private static final String TARGET_PATH = "targetPath";
+    private static final String TARGET_COLLECTION = "targetCollection";
 
     private static ConcurrentMap<Path, ReadWriteLock> collectionLocks = new ConcurrentHashMap<>();
     private static KeyManangerUtil keyManagerUtil = new KeyManangerUtil();
@@ -418,13 +435,7 @@ public class Collection {
         return this.description;
     }
 
-    private Release getReleaseFromCollection(String uri) throws IOException, ZebedeeException {
-        Path collectionReleasePath = this.find(uri);
-        Release release = (Release) ContentUtil.deserialiseContent(FileUtils.openInputStream(collectionReleasePath.toFile()));
-        return release;
-    }
-
-    public Release populateRelease(CollectionReader reader, CollectionWriter collectionWriter, List<ContentDetail> collectionContent) throws IOException, ZebedeeException {
+    public Release populateRelease(CollectionReader reader, CollectionWriter collectionWriter, Iterable<ContentDetail> collectionContent) throws IOException, ZebedeeException {
 
         if (StringUtils.isEmpty(this.getDescription().getReleaseUri())) {
             throw new BadRequestException("This collection is not associated with a release.");
@@ -436,10 +447,8 @@ public class Collection {
                 InputStream dataStream = resource.getData()
         ) {
             Release release = (Release) ContentUtil.deserialiseContent(dataStream);
-            logInfo("Release identified for collection")
-                    .collectionId(this)
-                    .addParameter("title", release.getDescription().getTitle())
-                    .log();
+            info().data("collectionId", this.getDescription().getId()).data("title", release.getDescription().getTitle())
+                    .log("Release identified for collection");
 
             if (release == null) {
                 throw new BadRequestException("This collection is not associated with a release.");
@@ -478,7 +487,7 @@ public class Collection {
     }
 
     /**
-     * This methods is used by {@link com.github.onsdigital.zebedee.model.publishing.Publisher Publisher}
+     * This methods is used by {@link Publisher Publisher}
      * to acquire a write lock on a collection during publishing.
      *
      * @return The collection write lock.
@@ -631,10 +640,8 @@ public class Collection {
         if (blockingCollection.isPresent()) {
             Collection collection = blockingCollection.get();
 
-            logInfo("Content was not saved as it currently in another collection.")
-                    .saveOrEditConflict(this, collection, uri)
-                    .user(email)
-                    .log();
+            info().data("saveOrEditConflict", this.generateCollectionSaveConflictMap(collection, uri))
+                    .data("user", email).log("Content was not saved as it currently in another collection.");
 
             // return false as the content is blocked by another collection.
             return result;
@@ -644,11 +651,8 @@ public class Collection {
         // Does the user have permission to edit?
         boolean permission = zebedee.getPermissionsService().canEdit(email, description);
         if (!permission) {
-            logInfo("Content was not saved as user does not have EDIT permission")
-                    .path(uri)
-                    .collectionId(this)
-                    .user(email)
-                    .log();
+            info().data("path", uri).data("collectionId", this.getDescription().getId()).data("user", email)
+                    .log("Content was not saved as user does not have EDIT permission");
         }
 
         if (source != null && permission) {
@@ -842,6 +846,10 @@ public class Collection {
         return inProgress.toPath(uri);
     }
 
+    public Path getPath() {
+        return path;
+    }
+
     public List<String> inProgressUris() throws IOException {
         return inProgress.uris();
     }
@@ -948,11 +956,9 @@ public class Collection {
 
         for (Content collectionDir : new Content[]{inProgress, complete, reviewed}) {
             if (collectionDir.exists(visualisationZipUri)) {
-                logDebug("removing data viz zip from collection directory")
-                        .addParameter("zip", visualisationZipUri)
-                        .user(session.getEmail())
-                        .collectionId(this.description.getId())
-                        .log();
+                info().data("zip", visualisationZipUri).data("user", session.getEmail()).data("collectionId", this.description.getId())
+                        .log("removing data viz zip from collection directory");
+
                 FileUtils.deleteDirectory(Paths.get(collectionDir.getPath().toString() + visualisationZipUri).toFile());
                 hasDeleted = true;
             }
@@ -1245,6 +1251,101 @@ public class Collection {
 
     public Content getInProgress() {
         return inProgress;
+    }
+
+
+    /**
+     * Return true if this collection has had all of its content reviewed.
+     */
+    public boolean isAllContentReviewed() throws IOException {
+        // FIXME CMD feature flag
+        if (cmsFeatureFlags().isEnableDatasetImport()) {
+            boolean allDatasetsReviewed = description.getDatasets()
+                    .stream()
+                    .allMatch(ds -> ds.getState().equals(ContentStatus.Reviewed));
+
+            boolean allDatasetVersionsReviewed = description.getDatasetVersions()
+                    .stream()
+                    .allMatch(ds -> ds.getState().equals(ContentStatus.Reviewed));
+
+            return (inProgressUris().isEmpty()
+                    && completeUris().isEmpty()
+                    && allDatasetsReviewed
+                    && allDatasetVersionsReviewed);
+        }
+
+        return inProgressUris().isEmpty() && completeUris().isEmpty();
+    }
+
+    /**
+     * Return a list of ContentDetail items for each data set in the collection.
+     */
+    public List<ContentDetail> getDatasetDetails() {
+
+        return description.getDatasets().stream().map(ds -> {
+
+            String url = URI.create(ds.getUri()).getPath();
+            return new ContentDetail(ds.getTitle(), url, PageType.api_dataset_landing_page.toString());
+
+        }).collect(Collectors.toList());
+    }
+
+    /**
+     * Return a list of ContentDetail. One for each data set version in the collection,
+     * and also one for each of the parent data sets for those versions
+     */
+    public List<ContentDetail> getDatasetVersionDetails() {
+
+        return description.getDatasetVersions().stream().flatMap(ds -> {
+
+            String datasetURL = "/datasets/" + ds.getId();
+            String versionURL = datasetURL + "/editions/" + ds.getEdition() + "/versions/" + ds.getVersion();
+
+            ContentDetail versionDetail = new ContentDetail(ds.getTitle(), versionURL, PageType.api_dataset.toString());
+            ContentDetail datasetDetail = new ContentDetail(ds.getTitle(), datasetURL, PageType.api_dataset_landing_page.toString());
+
+            return (new ArrayList<>(Arrays.asList(versionDetail, datasetDetail))).stream();
+
+        }).collect(Collectors.toList());
+    }
+
+    public String getId() {
+        return this.description.getId();
+    }
+
+    public long getPublishTimeMilliseconds() {
+        if (getDescription().publishStartDate != null && getDescription().publishEndDate != null) {
+            LocalDateTime start = LocalDateTime.ofInstant(getDescription().publishStartDate.toInstant(), ZoneId.systemDefault());
+            LocalDateTime end = LocalDateTime.ofInstant(getDescription().publishEndDate.toInstant(), ZoneId.systemDefault());
+
+            return Duration.between(start, end).toMillis();
+        }
+        return 0;
+    }
+
+    private static String collectionContentPath(String collectioName, String uri) {
+        uri = uri.startsWith("/") ? uri.substring(1) : uri;
+        return Paths.get(collectioName).resolve("inprogress").resolve(uri).toString();
+    }
+
+
+    public HashMap<String, String> generateCollectionSaveConflictMap(Collection blockingCollection, String targetURI) throws IOException {
+
+        HashMap<String, String> conflictLogMap = new HashMap<String, String>();
+
+        if (this != null) {
+            String name = this.getDescription().getName();
+            conflictLogMap.put(TARGET_PATH, collectionContentPath(name, targetURI));
+            conflictLogMap.put(TARGET_COLLECTION, name);
+        }
+
+        if (blockingCollection != null) {
+            String name = blockingCollection.getDescription().getName();
+            conflictLogMap.put(BLOCKING_PATH, collectionContentPath(name, targetURI));
+            conflictLogMap.put(BLOCKING_COLLECTION, name);
+        }
+
+        return conflictLogMap;
     }
 }
 

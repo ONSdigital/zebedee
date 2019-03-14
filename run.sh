@@ -2,8 +2,9 @@
 
 source ./export-default-env-vars.sh
 
-export JAVA_OPTS=" -Xmx1024m -Xdebug -Xrunjdwp:transport=dt_socket,address=8002,server=y,suspend=n"
+export JAVA_OPTS=" -Xmx1204m -Xdebug -Xrunjdwp:transport=dt_socket,address=8002,server=y,suspend=n"
 export PORT="${PORT:-8082}"
+
 
 # Restolino configuration
 export RESTOLINO_STATIC="src/main/resources/files"
@@ -13,6 +14,7 @@ export audit_db_enabled=false
 export DP_LOGGING_FORMAT=pretty_json
 export DP_COLOURED_LOGGING=true
 export enable_splunk_reporting=false
+#export ENABLE_DATASET_IMPORT=true
 
 # Development: reloadable
 mvn clean package dependency:copy-dependencies -Dmaven.test.skip=true && \
@@ -29,9 +31,4 @@ java $JAVA_OPTS \
  -DSTART_EMBEDDED_SERVER=N \
  -cp "zebedee-cms/target/classes:zebedee-cms/target/dependency/*" \
  com.github.davidcarboni.restolino.Main
-
-#mvn package && \
-#java $JAVA_OPTS \
-# -Drestolino.packageprefix=$PACKAGE_PREFIX \
-# -jar zebedee-cms/target/*-jar-with-dependencies.jar
 

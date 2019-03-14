@@ -58,8 +58,6 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static com.github.onsdigital.zebedee.configuration.Configuration.getUnauthorizedMessage;
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
 import static com.github.onsdigital.zebedee.model.Content.isDataVisualisationFile;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_APPROVED;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_COMPLETED_ERROR;
@@ -71,6 +69,9 @@ import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLL
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_UNLOCKED;
 import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData.contentMoved;
 import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData.contentRenamed;
+
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
 
 public class Collections {
 
@@ -224,9 +225,7 @@ public class Collections {
                     try {
                         result.add(new Collection(path, zebedeeSupplier.get()));
                     } catch (CollectionNotFoundException e) {
-                        logError(e, "Failed to deserialise collection")
-                                .addParameter("collectionPath", path.toString())
-                                .log();
+                        error().data("collectionPath", path.toString()).logException(e, "Failed to deserialise collection");
                     }
                 }
             }
@@ -280,24 +279,27 @@ public class Collections {
 
         // Collection exists
         if (collection == null) {
-            logError("approve collection: collection null check failed").log();
+            error().log("approve collection: collection null check failed");
             throw new BadRequestException("Please provide a valid collection.");
         }
 
         // User has permission
         if (session == null || !permissionsService.canEdit(session.getEmail())) {
-            logError("approve collection: user permission check failed").collectionId(collection).log();
+            error().log("approve collection: user permission check failed");
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
         collection.getDescription().addEvent(new Event(new Date(), EventType.APPROVE_SUBMITTED, session.getEmail()));
+        String collectionId = collection.getDescription().getId();
 
         // Everything is completed
-        if (!collection.inProgressUris().isEmpty() || !collection.completeUris().isEmpty()) {
-            logError("approve collection: can approve check failure").collectionId(collection)
-                    .addParameter("inProgressEmpty", collection.inProgressUris().isEmpty())
-                    .addParameter("completeEmpty", collection.completeUris().isEmpty())
-                    .log();
+        if (!collection.isAllContentReviewed()) {
+            collection.getDescription().addEvent(new Event(new Date(), EventType.APPROVE_SUBMITTED, session.getEmail()));
+
+            error().data("inProgressEmpty", collection.inProgressUris().isEmpty())
+                    .data("completeEmpty", collection.completeUris().isEmpty())
+                    .data("collectionId", collectionId)
+                    .log("approve collection: can approve check failure");
             throw new ConflictException(
                     "This collection can't be approved because it's not empty");
         }
@@ -306,13 +308,16 @@ public class Collections {
         CollectionWriter collectionWriter = collectionReaderWriterFactory.getWriter(zebedeeSupplier.get(), collection, session);
         ContentReader publishedReader = contentReaderFactory.apply(this.published.path);
 
+        info().data("collectionId", collectionId)
+                .log("approve collection: setting collection status to approved");
 
-        logInfo("approve collection: setting collection status to approved").collectionId(collection).log();
         collection.getDescription().setApprovalStatus(ApprovalStatus.IN_PROGRESS);
-        logInfo("approve collection: saving collection").collectionId(collection).log();
+
+        info().data("collectionId", collectionId)
+                .log("approve collection: saving collection");
         collection.save();
 
-        logInfo("approve collection: adding approval take to queue").collectionId(collection).log();
+        info().data("collectionId", collectionId).log("approve collection: adding approval take to queue");
 
         Future<Boolean> future = null;
         try {
@@ -320,13 +325,13 @@ public class Collections {
                     new ApproveTask(collection, session, collectionReader, collectionWriter, publishedReader,
                             zebedeeSupplier.get().getDataIndex()));
         } catch (Exception e) {
-            logError(e, "approve collection: submit collection approval task failure").collectionId(collection).log();
+            error().data("collectionId", collectionId).logException(e, "approve collection: submit collection approval task failure");
         }
 
-        logInfo("approve collection: saving collection history event").collectionId(collection).log();
+        info().data("collectionId", collectionId).log("approve collection: saving collection history event");
         collectionHistoryDaoSupplier.get().saveCollectionHistoryEvent(collection, session, COLLECTION_APPROVED);
 
-        logInfo("approve collection: API approve step compeleted successfully").collectionId(collection).log();
+        info().data("collectionId", collectionId).log("approve collection: API approve step compeleted successfully");
         return future;
     }
 
@@ -401,16 +406,18 @@ public class Collections {
 
         // Break before transfer allows us to run tests on the prepublish-hook without messing up the content
         if (breakBeforePublish) {
-            logInfo("Breaking before publish").log();
+            info().log("Breaking before publish");
             return true;
         }
 
         Keyring keyring = zebedeeSupplier.get().getKeyringCache().get(session);
-        if (keyring == null) throw new UnauthorizedException("No keyring is available for " + session.getEmail());
+        if (keyring == null) {
+            throw new UnauthorizedException("No keyring is available for " + session.getEmail());
+        }
 
         ZebedeeCollectionReader collectionReader = new ZebedeeCollectionReader(zebedeeSupplier.get(), collection, session);
         long publishStart = System.currentTimeMillis();
-        boolean publishComplete = Publisher.Publish(collection, session.getEmail(), collectionReader);
+        boolean publishComplete = Publisher.publish(collection, session.getEmail(), collectionReader);
 
         if (publishComplete) {
             long onPublishCompleteStart = System.currentTimeMillis();
@@ -419,14 +426,13 @@ public class Collections {
 
             PostPublisher.postPublish(zebedeeSupplier.get(), collection, skipVerification, collectionReader);
 
-            logInfo("collection post publish process completed")
-                    .collectionId(collection)
-                    .timeTaken((System.currentTimeMillis() - onPublishCompleteStart))
-                    .log();
-            logInfo("collection publish complete")
-                    .collectionId(collection)
-                    .timeTaken((System.currentTimeMillis() - publishStart))
-                    .log();
+            info().data("collectionId", collection.getDescription().getId())
+                    .data("timeTaken", (System.currentTimeMillis() - onPublishCompleteStart))
+                    .log("collection post publish process completed");
+
+            info().data("collectionId", collection.getDescription().getId())
+                    .data("timeTaken", (System.currentTimeMillis() - publishStart))
+                    .log("collection publish complete");
         }
 
         return publishComplete;
@@ -542,10 +548,10 @@ public class Collections {
         Optional<Collection> blockingCollection = zebedeeSupplier.get().checkForCollectionBlockingChange(collection, uri);
         if (blockingCollection.isPresent()) {
             Collection blocker = blockingCollection.get();
-            logInfo("Cannot create content as it existings in another collection.")
-                    .saveOrEditConflict(collection, blocker, uri)
-                    .user(session.getEmail())
-                    .log();
+            info().data("saveOrEditConflict", collection.generateCollectionSaveConflictMap(blocker, uri))
+                    .data("user", session.getEmail())
+                    .log("Cannot create content as it's existing in another collection.");
+
             throw new ConflictException("This URI exists in another collection", blocker.getDescription().getName());
         }
 
@@ -567,11 +573,7 @@ public class Collections {
 
         CollectionWriter collectionWriter = collectionReaderWriterFactory.getWriter(zebedeeSupplier.get(), collection, session);
 
-        logInfo("Attempting to write content.")
-                .collectionId(collection)
-                .path(uri)
-                .user(session.getEmail())
-                .log();
+        info().data("collectionId", collection.getDescription().getId()).data("path", uri).data("user", session.getEmail()).log("Attempting to write content.");
 
         if (collection.getDescription().getApprovalStatus() == ApprovalStatus.COMPLETE) {
             throw new BadRequestException("This collection has been approved and cannot be saved to.");
@@ -619,7 +621,9 @@ public class Collections {
         }
 
         collection.save();
-        logInfo("content save successful.").collectionId(collection).path(uri).user(session.getEmail()).log();
+        info().data("collectionId", collection.getDescription().getId())
+                .data("path", uri).data("user", session.getEmail())
+                .log("content save successful.");
 
         path = collection.getInProgressPath(uri);
         if (!Files.exists(path)) {

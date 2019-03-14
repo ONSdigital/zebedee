@@ -25,7 +25,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logDebug;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 
 /**
  * {@link Deprecated} Please do not use this any more.
@@ -252,7 +252,7 @@ public class Builder {
             // Set ISO date formatting in Gson to match Javascript Date.toISODate()
             Serialiser.getBuilder().registerTypeAdapter(Date.class, new IsoDateSerializer());
 
-            logDebug("Generating test users and keys...").log();
+            info().log("Generating test users and keys...");
 
             User jukesie = new User();
             jukesie.setName("Matt Jukes");

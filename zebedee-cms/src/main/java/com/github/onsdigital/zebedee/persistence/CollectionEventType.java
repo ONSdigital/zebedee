@@ -1,9 +1,9 @@
 package com.github.onsdigital.zebedee.persistence;
 
-import com.github.onsdigital.zebedee.persistence.model.CollectionHistoryEvent;
-
 import java.util.Arrays;
 import java.util.Optional;
+
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 
 /**
  * Constants representing the different types of collection history events.
@@ -169,12 +169,13 @@ public enum CollectionEventType {
 
     public static CollectionEventType getById(int id) {
         Optional<CollectionEventType> result = Arrays.asList(CollectionEventType.values())
-                .stream().filter(t -> id == t.ordinal())
+                .stream().filter(t -> id == t.id)
                 .findFirst();
 
         if (result.isPresent()) {
             return result.get();
         }
-        throw new RuntimeException("error getting " + CollectionEventType.class.getSimpleName() + " by Id: " + id);
+        info().data("ID", id).log("failed to identify CollectionEventType by ID, returning CollectionEventType.UNSPECIFIED");
+        return UNSPECIFIED;
     }
 }

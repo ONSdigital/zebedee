@@ -8,9 +8,10 @@ import com.github.onsdigital.zebedee.persistence.dao.impl.CollectionHistoryDaoSt
 
 import static com.github.onsdigital.zebedee.configuration.Configuration.getAuditDBURL;
 import static com.github.onsdigital.zebedee.configuration.Configuration.isAuditDatabaseEnabled;
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logWarn;
+
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.warn;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
 
 /**
  * Factory implementation manages the creation and access to a {@link CollectionHistoryDao} implmentation.
@@ -51,17 +52,17 @@ public class CollectionHistoryDaoFactory {
     public static CollectionHistoryDao getCollectionHistoryDao() {
         if (collectionHistoryDao == null) {
             if (isAuditDatabaseEnabled()) {
-                logInfo(AUDIT_DB_ENABLED_MSG).log();
+                info().log(AUDIT_DB_ENABLED_MSG);
                 try {
                     CollectionHistoryDaoFactory.collectionHistoryDao = new CollectionHistoryDaoImpl
                             (HibernateServiceImpl.getInstance());
-                    logInfo(AUDIT_DB_CONNECTION_SUCCESS_MSG).addParameter("databaseURL", getAuditDBURL()).log();
+                    info().data("databaseURL", getAuditDBURL()).log(AUDIT_DB_CONNECTION_SUCCESS_MSG);
                 } catch (Exception ex) {
-                    logError(ex, ERROR_MSG).log();
+                    error().logException(ex, ERROR_MSG);
                     setStubbedImpl();
                 }
             } else {
-                logWarn(AUDIT_DB_DISABLED_MSG).log();
+                warn().log(AUDIT_DB_DISABLED_MSG);
                 setStubbedImpl();
 
             }
@@ -70,7 +71,7 @@ public class CollectionHistoryDaoFactory {
     }
 
     private static void setStubbedImpl() {
-        logWarn(STUB_DETAILS_MSG).log();
+        warn().log(STUB_DETAILS_MSG);
         CollectionHistoryDaoFactory.collectionHistoryDao = new CollectionHistoryDaoStub();
     }
 

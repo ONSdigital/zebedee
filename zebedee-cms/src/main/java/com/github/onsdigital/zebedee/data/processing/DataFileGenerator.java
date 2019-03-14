@@ -18,7 +18,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logDebug;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 
 /**
  * Builds CSV, XLSX and potentially other files from a set of timeseries
@@ -75,7 +75,7 @@ public class DataFileGenerator {
      * @throws BadRequestException
      */
     DownloadSection writeXLS(DataGrid dataGrid, ContentWriter contentWriter, String xlsPath) throws IOException, BadRequestException {
-        logDebug("Writing XLS file from DataGrid.").path(xlsPath).log();
+        info().data("path", xlsPath).log("Writing XLS file from DataGrid.");
         try (
                 Workbook wb = new SXSSFWorkbook(30);
                 OutputStream stream = contentWriter.getOutputStream(xlsPath)
@@ -93,7 +93,7 @@ public class DataFileGenerator {
             }
             wb.write(stream);
 
-            logDebug("Complete.").path(xlsPath).log();
+            info().data("path", xlsPath).log("Complete.");
             return newDownloadSection("xlsx download", xlsPath);
         }
     }

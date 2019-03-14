@@ -9,12 +9,27 @@
         </encoder>
     </appender>
 
+    <appender name="JSON_STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>
+                %msg%n
+            </pattern>
+        </encoder>
+    </appender>
+
+    <logger name="zebedee" level="debug" additivity="false">
+        <appender-ref ref="JSON_STDOUT"/>
+    </logger>
+
     <appender name="DP_LOGGER" class="ch.qos.logback.core.ConsoleAppender">
         <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
             <layout class="com.github.onsdigital.logging.layouts.ConfigurableLayout" />
         </encoder>
     </appender>
 
+    <logger name="dp-dataset-api-java-client" level="debug" additivity="false">
+        <appender-ref ref="DP_LOGGER"/>
+    </logger>
 
     <logger name="com.github.onsdigital.zebedee" level="debug" additivity="false">
         <appender-ref ref="DP_LOGGER"/>

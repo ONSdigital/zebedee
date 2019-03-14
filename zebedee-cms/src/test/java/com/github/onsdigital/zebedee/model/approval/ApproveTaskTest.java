@@ -7,6 +7,7 @@ import com.github.onsdigital.zebedee.json.ContentDetail;
 import com.github.onsdigital.zebedee.json.Event;
 import com.github.onsdigital.zebedee.json.EventType;
 import com.github.onsdigital.zebedee.json.PendingDelete;
+import com.github.onsdigital.zebedee.LoggingTestHelper;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.CollectionTest;
 import com.github.onsdigital.zebedee.model.CollectionWriter;
@@ -17,6 +18,7 @@ import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.session.model.Session;
 import org.junit.After;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -26,6 +28,7 @@ import org.mockito.MockitoAnnotations;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -71,6 +74,11 @@ public class ApproveTaskTest {
 
     private ExecutorService executorService;
 
+    @BeforeClass
+    public static void setUpLogger() {
+        LoggingTestHelper.initDPLogger(ApproveTaskTest.class);
+    }
+
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
@@ -88,7 +96,6 @@ public class ApproveTaskTest {
     public void createPublishNotificationShouldIncludePendingDeletes() throws Exception {
         // Given a collection that contains pending deletes.
         Path collectionPath = Files.createTempDirectory(Random.id()); // create a temp directory to generate content into
-        CollectionReader collectionReader = new DummyCollectionReader(collectionPath);
         Collection collection = CollectionTest.CreateCollection(collectionPath, "createPublishNotificationShouldIncludePendingDeletes");
         String uriToDelete = "some/uri/to/check";
         ContentDetail contentDetail = new ContentDetail("Title", uriToDelete, "type");
@@ -96,7 +103,7 @@ public class ApproveTaskTest {
         collection.description.getPendingDeletes().add(pendingDelete);
 
         // When the publish notification is created as part of the approval process.
-        PublishNotification publishNotification = ApproveTask.createPublishNotification(collectionReader, collection);
+        PublishNotification publishNotification = ApproveTask.createPublishNotification(new ArrayList<>(), collection);
 
         // Then the publish notification contains the expected directory to delete.
         Assert.assertNotNull(publishNotification);
@@ -105,7 +112,9 @@ public class ApproveTaskTest {
 
     @Test
     public void shouldReturnFalseIfCollecionNull() throws Exception {
-        Future<Boolean> result = executorService.submit(new ApproveTask(null, null, null, null, null, null, contentDetailResolver));
+        when(collection.getId())
+                .thenReturn("1234");
+        Future<Boolean> result = executorService.submit(new ApproveTask(collection, null, null, null, null, null, contentDetailResolver));
         assertFalse(result.get());
     }
 

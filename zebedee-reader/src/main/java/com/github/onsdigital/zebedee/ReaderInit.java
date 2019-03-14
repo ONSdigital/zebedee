@@ -30,7 +30,7 @@ public class ReaderInit implements Startup {
 
     @Override
     public void init() {
-        LogSerialiser serialiser = new JacksonLogSerialiser();
+        LogSerialiser serialiser = new JacksonLogSerialiser(true);
         LogStore store = new MDCLogStore(serialiser);
         Logger logger = new LoggerImpl("zebedee");
 

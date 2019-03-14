@@ -93,6 +93,12 @@
             <version>master-25d3e73a4c-1</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.github.ONSdigital</groupId>
+            <artifactId>dp-dataset-api-java-client</artifactId>
+            <version>feature~spike-SNAPSHOT</version>
+        </dependency>
+
     </dependencies>
 
     <build>

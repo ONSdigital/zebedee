@@ -3,6 +3,7 @@ package com.github.onsdigital.zebedee.reader.util;
 import com.github.onsdigital.zebedee.content.base.Content;
 import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
+import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.util.mertics.service.MetricsService;
@@ -59,6 +60,15 @@ public class ReaderResponseResponseUtils {
 
 
     public static void sendNotFound(NotFoundException exception, HttpServletRequest request, HttpServletResponse response) throws IOException {
+        info().data("uri", request.getRequestURI() + "?" + request.getQueryString())
+                .data("status_code", exception.statusCode)
+                .log(exception.getMessage());
+
+        response.setStatus(exception.statusCode);
+        IOUtils.copy(new StringReader(exception.getMessage()), response.getOutputStream());
+    }
+
+    public static void sendBadRequest(BadRequestException exception, HttpServletRequest request, HttpServletResponse response) throws IOException {
         info().data("uri", request.getRequestURI() + "?" + request.getQueryString())
                 .data("status_code", exception.statusCode)
                 .log(exception.getMessage());

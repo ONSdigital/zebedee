@@ -4,7 +4,6 @@ import com.github.davidcarboni.restolino.framework.Filter;
 import com.github.davidcarboni.restolino.helpers.Path;
 import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.api.*;
-import com.github.onsdigital.zebedee.reader.api.endpoint.DatasetResolver;
 import com.github.onsdigital.zebedee.search.api.endpoint.ReIndex;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.google.common.collect.ImmutableList;

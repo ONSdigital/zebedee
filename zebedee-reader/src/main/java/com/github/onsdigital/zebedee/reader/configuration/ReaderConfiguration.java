@@ -22,6 +22,11 @@ public class ReaderConfiguration {
     private static final String BULLETINS_FOLDER_NAME = "bulletins";
     private static final String ARTICLES_FOLDER_NAME = "articles";
     private static final String COMPENDIUM_FOLDER_NAME = "compendium";
+
+    private static String datasetAPIHost;
+    private static String datasetAPIAuthToken;
+    private static String datasetAPIServiceToken;
+
     private static ReaderConfiguration instance;
     private static String collectionsFolder;
     private static String contentDir;
@@ -66,6 +71,10 @@ public class ReaderConfiguration {
     private static void doInit(String zebedeeRoot) {
         String zebedeeRootDir = defaultIfBlank(zebedeeRoot, getVariableValue(ZEBEDEE_ROOT_ENV));
         String contentDirValue = getVariableValue(CONTENT_DIR_ENV);
+
+        datasetAPIHost = "http://localhost:22000";
+        datasetAPIAuthToken = "FD0108EA-825D-411C-9B1D-41EF7727F465";
+        datasetAPIServiceToken = "Bearer fc4089e2e12937861377629b0cd96cf79298a4c5d329a2ebb96664c88df77b67";
 
         /*Zebedee Root takes precedence over content dir*/
         if (zebedeeRootDir != null) {
@@ -129,4 +138,15 @@ public class ReaderConfiguration {
         return COMPENDIUM_FOLDER_NAME;
     }
 
+    public static String getDatasetAPIHost() {
+        return datasetAPIHost;
+    }
+
+    public static String getDatasetAPIAuthToken() {
+        return datasetAPIAuthToken;
+    }
+
+    public static String getDatasetAPIServiceToken() {
+        return datasetAPIServiceToken;
+    }
 }

@@ -16,4 +16,9 @@ public abstract class ZebedeeException extends Exception {
         super(message);
         this.statusCode = responseCode;
     }
+
+    public ZebedeeException(String message, Throwable cause, int statusCode) {
+        super(message, cause);
+        this.statusCode = statusCode;
+    }
 }

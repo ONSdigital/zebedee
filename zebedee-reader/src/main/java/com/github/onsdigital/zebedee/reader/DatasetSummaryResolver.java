@@ -1,0 +1,118 @@
+package com.github.onsdigital.zebedee.reader;
+
+import com.github.onsdigital.logging.v2.event.SimpleEvent;
+import com.github.onsdigital.zebedee.content.page.statistics.dataset.DatasetLandingPage;
+import com.github.onsdigital.zebedee.content.partial.Link;
+import com.github.onsdigital.zebedee.exceptions.InternalServerError;
+import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
+import com.github.onsdigital.zebedee.reader.api.ReadRequestHandler;
+import com.github.onsdigital.zebedee.reader.api.bean.DatasetSummary;
+import dp.api.dataset.DatasetAPIClient;
+import dp.api.dataset.exception.DatasetAPIException;
+import dp.api.dataset.model.Dataset;
+
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+
+import static com.github.onsdigital.zebedee.ReaderFeatureFlags.readerFeatureFlags;
+import static com.github.onsdigital.zebedee.logging.ReaderLogger.error;
+import static com.github.onsdigital.zebedee.logging.ReaderLogger.info;
+import static com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration.getDatasetAPIAuthToken;
+import static com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration.getDatasetAPIHost;
+import static com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration.getDatasetAPIServiceToken;
+
+public class DatasetSummaryResolver {
+
+    private static final String CMD_DATASET_LINK_PREFIX = "/datasets/";
+    private static final String PAGE_URI = "page_uri";
+    private static final String DATASET_URI = "dataset_uri";
+
+    private DatasetAPIClient datasetAPIClient;
+    private boolean isDatasetImportEnabled;
+
+    /**
+     * @throws ZebedeeException
+     */
+    public DatasetSummaryResolver() throws ZebedeeException {
+        try {
+            this.datasetAPIClient = new DatasetAPIClient(
+                    getDatasetAPIHost(),
+                    getDatasetAPIAuthToken(),
+                    getDatasetAPIServiceToken());
+        } catch (Exception e) {
+            ZebedeeException ex = new InternalServerError("error initalising dataset api client", e);
+            throw error().logException(ex, "error constructing dataset summary resolver");
+        }
+        this.isDatasetImportEnabled = readerFeatureFlags().isEnableDatasetImport();
+    }
+
+    DatasetSummaryResolver(DatasetAPIClient datasetAPIClient, boolean isDatasetImportEnabled) {
+        this.datasetAPIClient = datasetAPIClient;
+        this.isDatasetImportEnabled = isDatasetImportEnabled;
+    }
+
+    public DatasetSummary resolve(String pageURI, Link datasetLink, HttpServletRequest request,
+                                  ReadRequestHandler handler) {
+        SimpleEvent event = info().data(PAGE_URI, pageURI).data(DATASET_URI, datasetLink.getUri().toString());
+
+        if (datasetLink != null && datasetLink.getUri().toString().startsWith(CMD_DATASET_LINK_PREFIX)) {
+            if (isDatasetImportEnabled) {
+                event.log("cmd feature flag enabled resolving dataset summary");
+                return getCMDDatasetSummary(pageURI, datasetLink);
+            }
+            event.log("cmd feature flag disabled dataset summary will be omitted from results");
+            return null;
+        }
+
+        event.log("resolving summary for legacy dataset");
+        return getLegacyDatasetSummary(pageURI, datasetLink, request, handler);
+    }
+
+    /**
+     * Get a dataset summary for a old world legacy dataset.
+     */
+    private DatasetSummary getLegacyDatasetSummary(String pageURI, Link datasetLink, HttpServletRequest request,
+                                                   ReadRequestHandler handler) {
+        String datasetURI = datasetLink.getUri().toString();
+        try {
+            DatasetLandingPage dlp = (DatasetLandingPage) handler.getContent(datasetURI, request);
+            return new DatasetSummary(dlp);
+        } catch (ZebedeeException | IOException e) {
+            error().exception(e)
+                    .data(PAGE_URI, pageURI)
+                    .data(DATASET_URI, datasetURI)
+                    .log("error resolving legacy dataset summary, dataset will be ommitted from the results");
+            return null;
+        }
+    }
+
+    /**
+     * Get a dataset summary for a new world CMD dataset.
+     */
+    private DatasetSummary getCMDDatasetSummary(String pageURI, Link dataset) {
+        DatasetSummary summary = null;
+
+        String uri = dataset.getUri().toString();
+        String[] sections = uri.split("/");
+        if (sections.length < 3) {
+            error().data(PAGE_URI, pageURI)
+                    .data(DATASET_URI, uri)
+                    .log("error parsing cmd dataset uri could not determined dataset ID from uri, dataset will be " +
+                            "ommitted from result");
+            return null;
+        }
+
+        try {
+            String datasetID = sections[2];
+            Dataset d = datasetAPIClient.getDataset(datasetID);
+            return new DatasetSummary(d);
+        } catch (IOException | DatasetAPIException e) {
+            error().exception(e)
+                    .data(PAGE_URI, pageURI)
+                    .data(DATASET_URI, uri)
+                    .log("error getting cmd dataset details dataset API client returned an error, dataset will be " +
+                            "ommitted from the results");
+            return null;
+        }
+    }
+}

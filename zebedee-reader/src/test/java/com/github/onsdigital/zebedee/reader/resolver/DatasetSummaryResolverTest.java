@@ -27,6 +27,7 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 public class DatasetSummaryResolverTest {
@@ -102,6 +103,76 @@ public class DatasetSummaryResolverTest {
     }
 
     @Test
+    public void testResolveLegacyDataset_ReadRequestHandlerException() throws Exception {
+        resolver = new DatasetSummaryResolver(datasetAPIClient, true);
+
+        when(handler.getContent(legacyDatasetLink.getUri().toString(), request))
+                .thenThrow(new InternalServerError("", null));
+
+        DatasetSummary result = resolver.resolve(PAGE_URI, legacyDatasetLink, request, handler);
+
+        assertThat(result, is(nullValue()));
+        verify(handler, times(1)).getContent(legacyDatasetLink.getUri().toString(), request);
+        verifyZeroInteractions(datasetAPIClient);
+    }
+
+    @Test
+    public void testResolveLegacyDataset_Success() throws Exception {
+        resolver = new DatasetSummaryResolver(datasetAPIClient, true);
+
+        when(handler.getContent(legacyDatasetLink.getUri().toString(), request))
+                .thenReturn(datasetLandingPage);
+
+        DatasetSummary result = resolver.resolve(PAGE_URI, legacyDatasetLink, request, handler);
+
+        assertThat(result.getUri(), equalTo(datasetLandingPage.getUri().toString()));
+        assertThat(result.getTitle(), equalTo(datasetLandingPage.getDescription().getTitle()));
+        assertThat(result.getSummary(), equalTo(datasetLandingPage.getDescription().getSummary()));
+        verify(handler, times(1)).getContent(legacyDatasetLink.getUri().toString(), request);
+        verifyZeroInteractions(datasetAPIClient);
+    }
+
+    @Test
+    public void testResolveCMDDataset_DatasetAPIClientException() throws Exception {
+        resolver = new DatasetSummaryResolver(datasetAPIClient, true);
+
+        when(datasetAPIClient.getDataset(CPIH01_ID))
+                .thenThrow(new IOException(""));
+
+        DatasetSummary result = resolver.resolve(PAGE_URI, cmdDatasetLink, request, handler);
+
+        assertThat(result, is(nullValue()));
+        verify(datasetAPIClient, times(1)).getDataset(CPIH01_ID);
+        verifyZeroInteractions(handler);
+    }
+
+    @Test
+    public void testResolveCMDDataset_CMDFeatureDisabled() throws Exception {
+        resolver = new DatasetSummaryResolver(datasetAPIClient, false);
+
+        DatasetSummary result = resolver.resolve(PAGE_URI, cmdDatasetLink, request, handler);
+
+        assertThat(result, is(nullValue()));
+        verifyZeroInteractions(handler, datasetAPIClient);
+    }
+
+    @Test
+    public void testResolveCMDDataset_Success() throws Exception {
+        resolver = new DatasetSummaryResolver(datasetAPIClient, true);
+
+        when(datasetAPIClient.getDataset(CPIH01_ID))
+                .thenReturn(cpihDataset);
+
+        DatasetSummary result = resolver.resolve(PAGE_URI, cmdDatasetLink, request, handler);
+
+        assertThat(result.getSummary(), equalTo(cpihDataset.getDescription()));
+        assertThat(result.getTitle(), equalTo(cpihDataset.getTitle()));
+        assertThat(result.getUri(), equalTo(cpihDataset.getLinks().getSelf().getHref()));
+        verify(datasetAPIClient, times(1)).getDataset(CPIH01_ID);
+        verifyZeroInteractions(handler);
+    }
+
+    @Test
     public void testGetLegacyDatasetSummary_IOException() throws Exception {
         resolver = new DatasetSummaryResolver(null, false);
 
@@ -126,7 +197,7 @@ public class DatasetSummaryResolverTest {
     }
 
     @Test
-    public void testGetLegacyDatasetSummary_success() throws Exception {
+    public void testGetLegacyDatasetSummary_Success() throws Exception {
         resolver = new DatasetSummaryResolver(null, false);
 
         when(handler.getContent(legacyDatasetLink.getUri().toString(), request))
@@ -140,7 +211,7 @@ public class DatasetSummaryResolverTest {
     }
 
     @Test
-    public void testGetCMDDatasetSummary_clientDatasetAPIException() throws Exception {
+    public void testGetCMDDatasetSummary_ClientDatasetAPIException() throws Exception {
         resolver = new DatasetSummaryResolver(datasetAPIClient, true);
 
         when(datasetAPIClient.getDataset(CPIH01_ID))
@@ -152,7 +223,7 @@ public class DatasetSummaryResolverTest {
     }
 
     @Test
-    public void testGetCMDDatasetSummary_clientIOException() throws Exception {
+    public void testGetCMDDatasetSummary_ClientIOException() throws Exception {
         resolver = new DatasetSummaryResolver(datasetAPIClient, true);
 
         when(datasetAPIClient.getDataset(CPIH01_ID))
@@ -164,7 +235,7 @@ public class DatasetSummaryResolverTest {
     }
 
     @Test
-    public void testGetCMDDatasetSummary_invalidLink() throws Exception {
+    public void testGetCMDDatasetSummary_InvalidLink() throws Exception {
         resolver = new DatasetSummaryResolver(datasetAPIClient, true);
 
         when(datasetAPIClient.getDataset(CPIH01_ID))
@@ -176,7 +247,7 @@ public class DatasetSummaryResolverTest {
     }
 
     @Test
-    public void testGetCMDDatasetSummary_success() throws Exception {
+    public void testGetCMDDatasetSummary_Success() throws Exception {
         resolver = new DatasetSummaryResolver(datasetAPIClient, true);
 
         when(datasetAPIClient.getDataset(CPIH01_ID))
@@ -191,7 +262,7 @@ public class DatasetSummaryResolverTest {
     }
 
     @Test
-    public void testGetDatasetID_success() throws Exception {
+    public void testGetDatasetID_Success() throws Exception {
         resolver = new DatasetSummaryResolver(null, false);
 
         String id = resolver.getCMDDatasetID(PAGE_URI, cmdDatasetLink);
@@ -199,7 +270,7 @@ public class DatasetSummaryResolverTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testGetDatasetID_invalidLink() throws Exception {
+    public void testGetDatasetID_InvalidLink() throws Exception {
         resolver = new DatasetSummaryResolver(null, false);
 
         resolver.getCMDDatasetID(PAGE_URI, new Link(new URI("/datasets/")));

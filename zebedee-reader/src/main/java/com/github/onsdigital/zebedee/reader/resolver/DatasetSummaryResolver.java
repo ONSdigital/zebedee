@@ -1,4 +1,4 @@
-package com.github.onsdigital.zebedee.reader;
+package com.github.onsdigital.zebedee.reader.resolver;
 
 import com.github.onsdigital.logging.v2.event.SimpleEvent;
 import com.github.onsdigital.zebedee.content.page.statistics.dataset.DatasetLandingPage;
@@ -89,23 +89,15 @@ public class DatasetSummaryResolver {
     /**
      * Get a dataset summary for a new world CMD dataset.
      */
-    private DatasetSummary getCMDDatasetSummary(String pageURI, Link dataset) {
-        DatasetSummary summary = null;
-
+    DatasetSummary getCMDDatasetSummary(String pageURI, Link dataset) {
         String uri = dataset.getUri().toString();
-        String[] sections = uri.split("/");
-        if (sections.length < 3) {
-            error().data(PAGE_URI, pageURI)
-                    .data(DATASET_URI, uri)
-                    .log("error parsing cmd dataset uri could not determined dataset ID from uri, dataset will be " +
-                            "ommitted from result");
-            return null;
-        }
-
         try {
-            String datasetID = sections[2];
+            String datasetID = getCMDDatasetID(pageURI, dataset);
             Dataset d = datasetAPIClient.getDataset(datasetID);
             return new DatasetSummary(d);
+        } catch (IllegalArgumentException e) {
+            // error already logged
+            return null;
         } catch (IOException | DatasetAPIException e) {
             error().exception(e)
                     .data(PAGE_URI, pageURI)
@@ -114,5 +106,18 @@ public class DatasetSummaryResolver {
                             "ommitted from the results");
             return null;
         }
+    }
+
+    String getCMDDatasetID(String pageURI, Link dataset) throws IllegalArgumentException {
+        String uri = dataset.getUri().toString();
+        String[] sections = uri.split("/");
+        if (sections.length < 3) {
+            error().data(PAGE_URI, pageURI)
+                    .data(DATASET_URI, uri)
+                    .log("error parsing cmd dataset uri could not determined dataset ID from uri, dataset will be " +
+                            "ommitted from result");
+            throw new IllegalArgumentException("unable to  determined dataset ID from uri");
+        }
+        return sections[2];
     }
 }

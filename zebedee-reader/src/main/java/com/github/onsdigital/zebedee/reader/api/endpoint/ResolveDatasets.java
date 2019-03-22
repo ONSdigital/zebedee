@@ -8,7 +8,7 @@ import com.github.onsdigital.zebedee.content.page.taxonomy.ProductPage;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
-import com.github.onsdigital.zebedee.reader.DatasetSummaryResolver;
+import com.github.onsdigital.zebedee.reader.resolver.DatasetSummaryResolver;
 import com.github.onsdigital.zebedee.reader.api.ReadRequestHandler;
 import com.github.onsdigital.zebedee.reader.api.bean.DatasetSummary;
 import com.github.onsdigital.zebedee.reader.data.language.ContentLanguage;

@@ -71,7 +71,7 @@ public class DatasetSummaryResolver {
     /**
      * Get a dataset summary for a old world legacy dataset.
      */
-    private DatasetSummary getLegacyDatasetSummary(String pageURI, Link datasetLink, HttpServletRequest request,
+    DatasetSummary getLegacyDatasetSummary(String pageURI, Link datasetLink, HttpServletRequest request,
                                                    ReadRequestHandler handler) {
         String datasetURI = datasetLink.getUri().toString();
         try {

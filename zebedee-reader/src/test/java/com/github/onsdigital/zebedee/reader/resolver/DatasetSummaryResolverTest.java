@@ -1,6 +1,10 @@
 package com.github.onsdigital.zebedee.reader.resolver;
 
+import com.github.onsdigital.zebedee.content.page.base.PageDescription;
+import com.github.onsdigital.zebedee.content.page.statistics.dataset.DatasetLandingPage;
 import com.github.onsdigital.zebedee.content.partial.Link;
+import com.github.onsdigital.zebedee.exceptions.InternalServerError;
+import com.github.onsdigital.zebedee.reader.api.ReadRequestHandler;
 import com.github.onsdigital.zebedee.reader.api.bean.DatasetSummary;
 import dp.api.dataset.DatasetAPIClient;
 import dp.api.dataset.exception.DatasetAPIException;
@@ -11,6 +15,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.net.URI;
 
@@ -29,19 +34,28 @@ public class DatasetSummaryResolverTest {
     private static final String PAGE_URI = "/economy/economicoutputandproductivity/output";
     private static final String CPIH01_ID = "cpih01";
 
-    private Link datasetLink;
+    private Link cmdDatasetLink;
+    private Link legacyDatasetLink;
 
     @Mock
     private DatasetAPIClient datasetAPIClient;
 
+    @Mock
+    private ReadRequestHandler handler;
+
+    @Mock
+    private HttpServletRequest request;
+
     private DatasetSummaryResolver resolver;
     private Dataset cpihDataset;
+    private DatasetLandingPage datasetLandingPage;
 
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
 
-        this.datasetLink = new Link(new URI("/datasets/" + CPIH01_ID));
+        this.cmdDatasetLink = new Link(new URI("/datasets/" + CPIH01_ID));
+        this.legacyDatasetLink = new Link(new URI("/economy/economicoutputandproductivity/output/datasets/indexofproduction"));
 
         dp.api.dataset.model.Link selfLink = new dp.api.dataset.model.Link();
         selfLink.setHref("/datasets/" + CPIH01_ID);
@@ -62,6 +76,67 @@ public class DatasetSummaryResolverTest {
                         "Death and hatred to mankind\n" +
                         "Poisoning their brainwashed minds\n" +
                         "Oh lord yeah!");
+
+        PageDescription description = new PageDescription();
+        description.setTitle("Raining Blood");
+        description.setSummary(
+                "Trapped in purgatory\n" +
+                        "A lifeless object, alive\n" +
+                        "Awaiting reprisal\n" +
+                        "Death will be their acquiescence\n" +
+                        "The sky is turning red\n" +
+                        "Return to power draws near\n" +
+                        "Fall into me, the sky's crimson tears\n" +
+                        "Abolish the rules made of stone\n" +
+                        "Pierced from below, souls of my treacherous past\n" +
+                        "Betrayed by many, now ornaments dripping above\n" +
+                        "Awaiting the hour of reprisal\n" +
+                        "Your time slips away\n" +
+                        "Raining blood\n" +
+                        "From a lacerated sky\n" +
+                        "Bleeding its horror\n" +
+                        "Creating my structure now I shall reign in blood");
+        datasetLandingPage = new DatasetLandingPage();
+        datasetLandingPage.setDescription(description);
+        datasetLandingPage.setUri(new URI("/economy/economicoutputandproductivity/output/datasets/indexofproduction"));
+    }
+
+    @Test
+    public void testGetLegacyDatasetSummary_IOException() throws Exception {
+        resolver = new DatasetSummaryResolver(null, false);
+
+        when(handler.getContent(legacyDatasetLink.getUri().toString(), request))
+                .thenThrow(new IOException(""));
+
+        DatasetSummary result = resolver.getLegacyDatasetSummary(PAGE_URI, legacyDatasetLink, request, handler);
+        assertThat(result, is(nullValue()));
+        verify(handler, times(1)).getContent(legacyDatasetLink.getUri().toString(), request);
+    }
+
+    @Test
+    public void testGetLegacyDatasetSummary_ZebedeeException() throws Exception {
+        resolver = new DatasetSummaryResolver(null, false);
+
+        when(handler.getContent(legacyDatasetLink.getUri().toString(), request))
+                .thenThrow(new InternalServerError("", null));
+
+        DatasetSummary result = resolver.getLegacyDatasetSummary(PAGE_URI, legacyDatasetLink, request, handler);
+        assertThat(result, is(nullValue()));
+        verify(handler, times(1)).getContent(legacyDatasetLink.getUri().toString(), request);
+    }
+
+    @Test
+    public void testGetLegacyDatasetSummary_success() throws Exception {
+        resolver = new DatasetSummaryResolver(null, false);
+
+        when(handler.getContent(legacyDatasetLink.getUri().toString(), request))
+                .thenReturn(datasetLandingPage);
+
+        DatasetSummary result = resolver.getLegacyDatasetSummary(PAGE_URI, legacyDatasetLink, request, handler);
+        assertThat(result.getUri(), equalTo(datasetLandingPage.getUri().toString()));
+        assertThat(result.getTitle(), equalTo(datasetLandingPage.getDescription().getTitle()));
+        assertThat(result.getSummary(), equalTo(datasetLandingPage.getDescription().getSummary()));
+        verify(handler, times(1)).getContent(legacyDatasetLink.getUri().toString(), request);
     }
 
     @Test
@@ -71,7 +146,7 @@ public class DatasetSummaryResolverTest {
         when(datasetAPIClient.getDataset(CPIH01_ID))
                 .thenThrow(new ClientException(""));
 
-        DatasetSummary result = resolver.getCMDDatasetSummary(PAGE_URI, datasetLink);
+        DatasetSummary result = resolver.getCMDDatasetSummary(PAGE_URI, cmdDatasetLink);
         assertThat(result, is(nullValue()));
         verify(datasetAPIClient, times(1)).getDataset(CPIH01_ID);
     }
@@ -83,7 +158,7 @@ public class DatasetSummaryResolverTest {
         when(datasetAPIClient.getDataset(CPIH01_ID))
                 .thenThrow(new IOException(""));
 
-        DatasetSummary result = resolver.getCMDDatasetSummary(PAGE_URI, datasetLink);
+        DatasetSummary result = resolver.getCMDDatasetSummary(PAGE_URI, cmdDatasetLink);
         assertThat(result, is(nullValue()));
         verify(datasetAPIClient, times(1)).getDataset(CPIH01_ID);
     }
@@ -107,7 +182,7 @@ public class DatasetSummaryResolverTest {
         when(datasetAPIClient.getDataset(CPIH01_ID))
                 .thenReturn(cpihDataset);
 
-        DatasetSummary result = resolver.getCMDDatasetSummary(PAGE_URI, datasetLink);
+        DatasetSummary result = resolver.getCMDDatasetSummary(PAGE_URI, cmdDatasetLink);
 
         assertThat(result.getSummary(), equalTo(cpihDataset.getDescription()));
         assertThat(result.getTitle(), equalTo(cpihDataset.getTitle()));
@@ -119,7 +194,7 @@ public class DatasetSummaryResolverTest {
     public void testGetDatasetID_success() throws Exception {
         resolver = new DatasetSummaryResolver(null, false);
 
-        String id = resolver.getCMDDatasetID(PAGE_URI, datasetLink);
+        String id = resolver.getCMDDatasetID(PAGE_URI, cmdDatasetLink);
         assertThat(id, equalTo(CPIH01_ID));
     }
 

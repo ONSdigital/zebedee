@@ -5,6 +5,9 @@ import dp.api.dataset.model.Dataset;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+
 public class DatasetSummary {
 
     private String title;
@@ -20,10 +23,10 @@ public class DatasetSummary {
         this.uri = dlp.getUri().toString();
     }
 
-    public DatasetSummary(Dataset dataset) {
+    public DatasetSummary(Dataset dataset) throws URISyntaxException {
         this.title = dataset.getTitle();
         this.summary = dataset.getDescription();
-        this.uri = dataset.getLinks().getSelf().getHref();
+        this.uri = new URI(dataset.getLinks().getSelf().getHref()).getPath();
     }
 
     public String getTitle() {

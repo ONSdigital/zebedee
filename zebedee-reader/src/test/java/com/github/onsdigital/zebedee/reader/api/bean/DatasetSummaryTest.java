@@ -45,7 +45,7 @@ public class DatasetSummaryTest {
     }
 
     @Test
-    public void testAPIDatasetToDatasetSummary() {
+    public void testAPIDatasetToDatasetSummary() throws Exception {
         Link link = new Link();
         link.setHref("https://www.metallica.com/");
 
@@ -72,7 +72,8 @@ public class DatasetSummaryTest {
         DatasetSummary summary = new DatasetSummary(dataset);
 
         assertThat(summary.getTitle(), equalTo(dataset.getTitle()));
-        assertThat(summary.getUri(), equalTo(dataset.getLinks().getSelf().getHref()));
+        String path = new URI(dataset.getLinks().getSelf().getHref()).getPath();
+        assertThat(summary.getUri(), equalTo(path));
         assertThat(summary.getSummary(), equalTo(dataset.getDescription()));
     }
 }

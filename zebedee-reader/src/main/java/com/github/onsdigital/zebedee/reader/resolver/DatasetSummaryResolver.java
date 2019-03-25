@@ -13,6 +13,7 @@ import dp.api.dataset.model.Dataset;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.net.URISyntaxException;
 
 import static com.github.onsdigital.zebedee.ReaderFeatureFlags.readerFeatureFlags;
 import static com.github.onsdigital.zebedee.logging.ReaderLogger.error;
@@ -72,7 +73,7 @@ public class DatasetSummaryResolver {
      * Get a dataset summary for a old world legacy dataset.
      */
     DatasetSummary getLegacyDatasetSummary(String pageURI, Link datasetLink, HttpServletRequest request,
-                                                   ReadRequestHandler handler) {
+                                           ReadRequestHandler handler) {
         String datasetURI = datasetLink.getUri().toString();
         try {
             DatasetLandingPage dlp = (DatasetLandingPage) handler.getContent(datasetURI, request);
@@ -98,7 +99,7 @@ public class DatasetSummaryResolver {
         } catch (IllegalArgumentException e) {
             // error already logged
             return null;
-        } catch (IOException | DatasetAPIException e) {
+        } catch (IOException | URISyntaxException | DatasetAPIException e) {
             error().exception(e)
                     .data(PAGE_URI, pageURI)
                     .data(DATASET_URI, uri)

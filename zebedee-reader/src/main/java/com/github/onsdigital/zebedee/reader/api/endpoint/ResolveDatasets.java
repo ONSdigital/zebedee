@@ -77,7 +77,8 @@ public class ResolveDatasets {
         }
     }
 
-    private List<DatasetSummary> resolve(HttpServletRequest request, ReadRequestHandler handler) throws ZebedeeException, IOException {
+    private List<DatasetSummary> resolve(HttpServletRequest request, ReadRequestHandler handler)
+            throws ZebedeeException, IOException {
         ProductPage productPage = getPage(request, handler);
         String uri = productPage.getUri().toString();
 

@@ -8,13 +8,14 @@ import com.github.onsdigital.zebedee.content.page.taxonomy.ProductPage;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
-import com.github.onsdigital.zebedee.reader.resolver.DatasetSummaryResolver;
 import com.github.onsdigital.zebedee.reader.api.ReadRequestHandler;
 import com.github.onsdigital.zebedee.reader.api.bean.DatasetSummary;
 import com.github.onsdigital.zebedee.reader.data.language.ContentLanguage;
+import com.github.onsdigital.zebedee.reader.resolver.DatasetSummaryResolver;
 import com.github.onsdigital.zebedee.reader.util.ReaderResponseWriter;
 import com.github.onsdigital.zebedee.reader.util.ResponseWriter;
 import dp.api.dataset.exception.DatasetAPIException;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -45,7 +46,9 @@ public class ResolveDatasets {
         this.responseWriter = new ReaderResponseWriter();
     }
 
-    ResolveDatasets(ResponseWriter responseWriter, Function<ContentLanguage, ReadRequestHandler> handlerSupplier) {
+    ResolveDatasets(DatasetSummaryResolver datasetSummaryResolver, ResponseWriter responseWriter,
+                    Function<ContentLanguage, ReadRequestHandler> handlerSupplier) {
+        this.datasetSummaryResolver = datasetSummaryResolver;
         this.responseWriter = responseWriter;
         this.handlerSupplier = handlerSupplier;
     }
@@ -57,6 +60,10 @@ public class ResolveDatasets {
             ContentLanguage language = getRequestedLanguage(request);
             ReadRequestHandler handler = handlerSupplier.apply(language);
             String pageURI = request.getParameter(URI);
+
+            if (StringUtils.isEmpty(pageURI)) {
+                throw new BadRequestException("uri parameter is required but was not specified");
+            }
 
             List<DatasetSummary> summaries = resolve(request, handler);
             info().data(PAGE_URI, pageURI).log("resolve dataset summaries request completed successfully");

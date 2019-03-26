@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee.reader.api.endpoint;
 
 import com.github.davidcarboni.restolino.framework.Api;
+import com.github.onsdigital.logging.v2.DPLogger;
 import com.github.onsdigital.zebedee.content.base.Content;
 import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.content.page.base.PageType;
@@ -89,7 +90,7 @@ public class ResolveDatasets {
 
         info().data(PAGE_URI, uri).log("resolving dataset links for product page");
         return productPage.getDatasets()
-                .parallelStream()
+                .stream()
                 .map(link -> datasetSummaryResolver.resolve(uri, link, request, handler))
                 .filter(summary -> summary != null)
                 .collect(Collectors.toList());

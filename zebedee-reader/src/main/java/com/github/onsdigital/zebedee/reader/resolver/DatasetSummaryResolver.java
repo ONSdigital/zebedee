@@ -58,14 +58,15 @@ public class DatasetSummaryResolver {
 
         if (datasetLink != null && datasetLink.getUri().toString().startsWith(CMD_DATASET_LINK_PREFIX)) {
             if (isDatasetImportEnabled) {
-                event.log("cmd feature flag enabled resolving dataset summary");
+                event.log("uri identified as cmd dataset cmd feature flag is enabled resolving summary details");
                 return getCMDDatasetSummary(pageURI, datasetLink);
             }
-            event.log("cmd feature flag disabled dataset summary will be omitted from results");
+            event.log("uri identified as cmd dataset cmd feature flag is disabled summary details will not " +
+                    "be resolved or include in results");
             return null;
         }
 
-        event.log("resolving summary for legacy dataset");
+        event.log("uri identified as legacy dataset resolving summary details");
         return getLegacyDatasetSummary(pageURI, datasetLink, request, handler);
     }
 
@@ -103,8 +104,8 @@ public class DatasetSummaryResolver {
             error().exception(e)
                     .data(PAGE_URI, pageURI)
                     .data(DATASET_URI, uri)
-                    .log("error getting cmd dataset details dataset API client returned an error, dataset will be " +
-                            "ommitted from the results");
+                    .log("error getting cmd dataset details dataset API client returned an error, summary details " +
+                            "will be ommitted from the results");
             return null;
         }
     }
@@ -115,8 +116,8 @@ public class DatasetSummaryResolver {
         if (sections.length < 3) {
             error().data(PAGE_URI, pageURI)
                     .data(DATASET_URI, uri)
-                    .log("error parsing cmd dataset uri could not determined dataset ID from uri, dataset will be " +
-                            "ommitted from result");
+                    .log("error parsing cmd dataset uri could not determined dataset ID from uri, summary details " +
+                            "will be ommitted from result");
             throw new IllegalArgumentException("unable to  determined dataset ID from uri");
         }
         return sections[2];

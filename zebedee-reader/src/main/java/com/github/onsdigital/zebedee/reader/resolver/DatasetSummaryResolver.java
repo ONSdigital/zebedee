@@ -20,7 +20,7 @@ import static com.github.onsdigital.zebedee.logging.ReaderLogger.error;
 import static com.github.onsdigital.zebedee.logging.ReaderLogger.info;
 import static com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration.getDatasetAPIAuthToken;
 import static com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration.getDatasetAPIHost;
-import static com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration.getDatasetAPIServiceToken;
+import static com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration.getServiceAuthToken;
 
 public class DatasetSummaryResolver {
 
@@ -39,7 +39,7 @@ public class DatasetSummaryResolver {
             this.datasetAPIClient = new DatasetAPIClient(
                     getDatasetAPIHost(),
                     getDatasetAPIAuthToken(),
-                    getDatasetAPIServiceToken());
+                    getServiceAuthToken());
         } catch (Exception e) {
             ZebedeeException ex = new InternalServerError("error initalising dataset api client", e);
             throw error().logException(ex, "error constructing dataset summary resolver");

@@ -1,7 +1,10 @@
 package com.github.onsdigital.zebedee.reader.configuration;
 
 import com.github.onsdigital.zebedee.util.URIUtils;
+import org.apache.commons.lang3.StringUtils;
 
+import static com.github.onsdigital.zebedee.ReaderFeatureFlags.readerFeatureFlags;
+import static com.github.onsdigital.zebedee.logging.ReaderLogger.error;
 import static com.github.onsdigital.zebedee.logging.ReaderLogger.info;
 import static com.github.onsdigital.zebedee.util.VariableUtils.getVariableValue;
 import static org.apache.commons.lang3.StringUtils.defaultIfBlank;
@@ -23,9 +26,13 @@ public class ReaderConfiguration {
     private static final String ARTICLES_FOLDER_NAME = "articles";
     private static final String COMPENDIUM_FOLDER_NAME = "compendium";
 
+    private static final String DATASET_API_URL_KEY = "DATASET_API_URL";
+    private static final String DATASET_API_AUTH_TOKEN_KEY = "DATASET_API_AUTH_TOKEN";
+    private static final String SERVICE_AUTH_TOKEN_KEY = "SERVICE_AUTH_TOKEN";
+
     private static String datasetAPIHost;
     private static String datasetAPIAuthToken;
-    private static String datasetAPIServiceToken;
+    private static String serviceAuthToken;
 
     private static ReaderConfiguration instance;
     private static String collectionsFolder;
@@ -72,9 +79,7 @@ public class ReaderConfiguration {
         String zebedeeRootDir = defaultIfBlank(zebedeeRoot, getVariableValue(ZEBEDEE_ROOT_ENV));
         String contentDirValue = getVariableValue(CONTENT_DIR_ENV);
 
-        datasetAPIHost = "http://localhost:22000";
-        datasetAPIAuthToken = "FD0108EA-825D-411C-9B1D-41EF7727F465";
-        datasetAPIServiceToken = "Bearer fc4089e2e12937861377629b0cd96cf79298a4c5d329a2ebb96664c88df77b67";
+        loadCMDConfig();
 
         /*Zebedee Root takes precedence over content dir*/
         if (zebedeeRootDir != null) {
@@ -90,6 +95,28 @@ public class ReaderConfiguration {
 
         dumpConfiguration();
 
+    }
+
+    private static void loadCMDConfig() {
+        if (readerFeatureFlags().isEnableDatasetImport()) {
+            datasetAPIHost = getVariableValue(DATASET_API_URL_KEY);
+            datasetAPIAuthToken = getVariableValue(DATASET_API_AUTH_TOKEN_KEY);
+            serviceAuthToken = getVariableValue(SERVICE_AUTH_TOKEN_KEY);
+
+            String errMsg = "cmd feature flag is enabled but expected configuration value is missing exiting zebedee reader";
+            if (StringUtils.isEmpty(datasetAPIHost)) {
+                error().data(DATASET_API_URL_KEY, "null").log(errMsg);
+                System.exit(1);
+            }
+            if (StringUtils.isEmpty(datasetAPIAuthToken)) {
+                error().data(DATASET_API_AUTH_TOKEN_KEY, "null").log(errMsg);
+                System.exit(1);
+            }
+            if (StringUtils.isEmpty(serviceAuthToken)) {
+                error().data(SERVICE_AUTH_TOKEN_KEY, "null").log(errMsg);
+                System.exit(1);
+            }
+        }
     }
 
     /**
@@ -146,7 +173,7 @@ public class ReaderConfiguration {
         return datasetAPIAuthToken;
     }
 
-    public static String getDatasetAPIServiceToken() {
-        return datasetAPIServiceToken;
+    public static String getServiceAuthToken() {
+        return "Bearer " + serviceAuthToken;
     }
 }

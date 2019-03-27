@@ -43,7 +43,7 @@ public class ResolveDatasets {
 
     public ResolveDatasets() throws ZebedeeException {
         this.handlerSupplier = (lang) -> new ReadRequestHandler(lang);
-        this.datasetSummaryResolver = new DatasetSummaryResolver();
+        this.datasetSummaryResolver = DatasetSummaryResolver.getInstance();
         this.responseWriter = new ReaderResponseWriter();
     }
 

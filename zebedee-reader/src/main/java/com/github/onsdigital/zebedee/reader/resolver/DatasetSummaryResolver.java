@@ -3,10 +3,10 @@ package com.github.onsdigital.zebedee.reader.resolver;
 import com.github.onsdigital.logging.v2.event.SimpleEvent;
 import com.github.onsdigital.zebedee.content.page.statistics.dataset.DatasetLandingPage;
 import com.github.onsdigital.zebedee.content.partial.Link;
-import com.github.onsdigital.zebedee.exceptions.InternalServerError;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.reader.api.ReadRequestHandler;
 import com.github.onsdigital.zebedee.reader.api.bean.DatasetSummary;
+import com.github.onsdigital.zebedee.reader.util.DatasetAPIClientSupplier;
 import dp.api.dataset.DatasetAPIClient;
 import dp.api.dataset.exception.DatasetAPIException;
 import dp.api.dataset.model.Dataset;
@@ -18,9 +18,6 @@ import java.net.URISyntaxException;
 import static com.github.onsdigital.zebedee.ReaderFeatureFlags.readerFeatureFlags;
 import static com.github.onsdigital.zebedee.logging.ReaderLogger.error;
 import static com.github.onsdigital.zebedee.logging.ReaderLogger.info;
-import static com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration.getDatasetAPIAuthToken;
-import static com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration.getDatasetAPIHost;
-import static com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration.getServiceAuthToken;
 
 public class DatasetSummaryResolver {
 
@@ -31,20 +28,27 @@ public class DatasetSummaryResolver {
     private DatasetAPIClient datasetAPIClient;
     private boolean isDatasetImportEnabled;
 
+    private static DatasetSummaryResolver INSTANCE = null;
+
+    public static DatasetSummaryResolver getInstance() throws ZebedeeException {
+        if (INSTANCE == null) {
+            synchronized (DatasetSummaryResolver.class) {
+                if (INSTANCE == null) {
+                    INSTANCE = new DatasetSummaryResolver();
+                }
+            }
+        }
+        return INSTANCE;
+    }
+
     /**
      * @throws ZebedeeException
      */
-    public DatasetSummaryResolver() throws ZebedeeException {
-        try {
-            this.datasetAPIClient = new DatasetAPIClient(
-                    getDatasetAPIHost(),
-                    getDatasetAPIAuthToken(),
-                    getServiceAuthToken());
-        } catch (Exception e) {
-            ZebedeeException ex = new InternalServerError("error initalising dataset api client", e);
-            throw error().logException(ex, "error constructing dataset summary resolver");
-        }
+    DatasetSummaryResolver() throws ZebedeeException {
         this.isDatasetImportEnabled = readerFeatureFlags().isEnableDatasetImport();
+        if (isDatasetImportEnabled) {
+            this.datasetAPIClient = DatasetAPIClientSupplier.get();
+        }
     }
 
     DatasetSummaryResolver(DatasetAPIClient datasetAPIClient, boolean isDatasetImportEnabled) {

@@ -74,6 +74,23 @@ public class ReadRequestHandler {
         }
     }
 
+    public Content getContent(String uri, HttpServletRequest request) throws ZebedeeException, IOException {
+        String sessionId = RequestUtils.getSessionId(request);
+        String collectionId = getCollectionId(request);
+
+        if (collectionId != null) {
+            try {
+                return reader.getCollectionContent(collectionId, sessionId, uri, null);
+            } catch (NotFoundException e) {
+                info().data("uri", uri)
+                        .data("collection_id", collectionId)
+                        .log("Could not find resource in collection. Will try published content");
+            }
+        }
+
+        return reader.getPublishedContent(uri, null);
+    }
+
 
     private Content getLatestContent(HttpServletRequest request, String collectionId, DataFilter dataFilter, String uri) throws IOException, ZebedeeException {
 

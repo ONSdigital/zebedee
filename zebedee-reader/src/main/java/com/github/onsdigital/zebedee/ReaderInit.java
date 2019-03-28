@@ -26,11 +26,12 @@ import static com.github.onsdigital.zebedee.search.configuration.SearchConfigura
 
 public class ReaderInit implements Startup {
 
+    private static final String FORMAT_LOGS_KEY = "FORMAT_LOGGING";
     private static final ExecutorService EXECUTOR = Executors.newSingleThreadExecutor();
 
     @Override
     public void init() {
-        LogSerialiser serialiser = new JacksonLogSerialiser();
+        LogSerialiser serialiser = getLogSerialiser();
         LogStore store = new MDCLogStore(serialiser);
         Logger logger = new LoggerImpl("zebedee");
 
@@ -92,5 +93,10 @@ public class ReaderInit implements Startup {
                 EXECUTOR.shutdown();
             }
         };
+    }
+
+    private LogSerialiser getLogSerialiser() {
+        boolean formatLogging = Boolean.valueOf(System.getenv(FORMAT_LOGS_KEY));
+        return new JacksonLogSerialiser(formatLogging);
     }
 }

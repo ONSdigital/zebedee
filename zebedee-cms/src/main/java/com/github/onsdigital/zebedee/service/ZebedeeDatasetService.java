@@ -20,6 +20,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
+
 /**
  * Dataset related services
  */
@@ -304,11 +305,7 @@ public class ZebedeeDatasetService implements DatasetService {
             return;
         }
 
-        // update the dataset version in the dataset API with a reverted state and blank collection ID.
-        DatasetVersion versionUpdate = new DatasetVersion();
-        versionUpdate.setCollection_id("");
-        versionUpdate.setState(State.CREATED);
-        datasetClient.updateDatasetVersion(datasetID, edition, version, versionUpdate);
+        datasetClient.detachVersion(datasetID, edition, version);
 
         collection.getDescription().removeDatasetVersion(existingDataset.get());
         collection.save();

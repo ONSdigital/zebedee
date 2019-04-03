@@ -72,9 +72,9 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_CONTENT_REVIEWED;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_CREATED;
@@ -88,8 +88,6 @@ import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMet
 import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData.renamed;
 import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData.reschedule;
 import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData.typeChanged;
-
-import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 
 public class Collection {
 
@@ -292,17 +290,21 @@ public class Collection {
     public static Collection rename(CollectionDescription collectionDescription, String newName, Zebedee zebedee)
             throws IOException, CollectionNotFoundException {
 
-        String filename = PathUtils.toFilename(collectionDescription.getName());
-        String newFilename = PathUtils.toFilename(newName);
+        String originalFilename = collectionDescription.getName();
+
+        // collection file name is the collection name stripped of illegal chars.
+        String filename = PathUtils.toFilename(originalFilename);
+
+        // remove any illegal chars (if any) from the new name.
+        String newNameClean = PathUtils.toFilename(newName);
 
         Path collection = zebedee.getCollections().path.resolve(filename);
-        Path newCollection = zebedee.getCollections().path.resolve(newFilename);
+        Path newCollection = zebedee.getCollections().path.resolve(newNameClean);
 
         new File(collection.toUri()).renameTo(new File(newCollection.toUri()));
 
         // Create the description:
-        Path newPath = zebedee.getCollections().path.resolve(newFilename
-                + ".json");
+        Path newPath = zebedee.getCollections().path.resolve(newNameClean + ".json");
 
         collectionDescription.setName(newName);
 
@@ -310,9 +312,22 @@ public class Collection {
             Serialiser.serialise(output, collectionDescription);
         }
 
-        Files.delete(zebedee.getCollections().path.resolve(filename + ".json"));
+        if (!filename.equals(newNameClean)) {
+            info().data("orginal_name", originalFilename)
+                    .data("orginal_name_clean", filename)
+                    .data("new_name", newName)
+                    .data("new_name_clean", newNameClean)
+                    .log("collection name has changed renaming collection json file");
+            Files.delete(zebedee.getCollections().path.resolve(filename + ".json"));
+        } else {
+            info().data("orginal_name", collectionDescription.getName())
+                    .data("orginal_name_clean", filename)
+                    .data("new_name", newName)
+                    .data("new_name_clean", newNameClean)
+                    .log("collection name has not changed collection json file will not be deleted");
+        }
 
-        return new Collection(zebedee.getCollections().path.resolve(newFilename), zebedee);
+        return new Collection(zebedee.getCollections().path.resolve(newNameClean), zebedee);
     }
 
     private static Release getPublishedRelease(String uri, Zebedee zebedee) throws IOException, ZebedeeException {

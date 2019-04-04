@@ -119,7 +119,13 @@ public class Root {
         loadExistingCollectionsIntoScheduler();
         initialiseCsdbImportKeys();
         indexPublishedCollections();
-        cleanupStaleCollectionKeys();
+
+        try {
+            cleanupStaleCollectionKeys();
+        } catch (Exception ex) {
+            error().logException(ex, "error cleaning stale collection keys from users exiting application");
+            System.exit(1);
+        }
     }
 
     /**
@@ -141,15 +147,16 @@ public class Root {
         }
     }
 
-    private static void cleanupStaleCollectionKeys() {
-        try {
-            for (User user : zebedee.getUsersService().list()) {
-                zebedee.getUsersService().removeStaleCollectionKeys(user.getEmail());
-            }
-        } catch (IOException | NotFoundException | BadRequestException e) {
-            error().logException(e, "zebedee root: failed on cleanupStaleCollectionKeys");
+    private static void cleanupStaleCollectionKeys() throws IOException, NotFoundException, BadRequestException {
+        info().log("cms init task: removing stale collection keys from user keyrings");
+        Map<String, Collection> collectionMap = zebedee.getCollections().mapByID();
+        List<String> orphanedCollections = zebedee.getCollections().listOrphaned();
+        for (User user : zebedee.getUsersService().list()) {
+            zebedee.getUsersService()
+                    .removeStaleCollectionKeys(collectionMap, orphanedCollections, user.getEmail());
         }
     }
+
 
     private static void indexPublishedCollections() {
 //        try {

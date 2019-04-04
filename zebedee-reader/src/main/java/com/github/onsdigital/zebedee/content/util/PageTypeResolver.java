@@ -116,7 +116,6 @@ class PageTypeResolver implements JsonDeserializer<Page> {
                 String className = contentClass.getSimpleName();
                 boolean _abstract = Modifier.isAbstract(contentClass.getModifiers());
                 if (_abstract) {
-                    info().data("type", className).log("Skipping registering abstract content");
                     continue;
                 }
 

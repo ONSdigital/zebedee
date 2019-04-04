@@ -49,6 +49,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.Future;
@@ -57,6 +58,9 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.warn;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getUnauthorizedMessage;
 import static com.github.onsdigital.zebedee.model.Content.isDataVisualisationFile;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_APPROVED;
@@ -69,9 +73,6 @@ import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLL
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_UNLOCKED;
 import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData.contentMoved;
 import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData.contentRenamed;
-
-import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
-import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
 
 public class Collections {
 
@@ -232,6 +233,24 @@ public class Collections {
         }
 
         return result;
+    }
+
+    public List<String> listOrphaned() throws IOException {
+        List<String> orphans = new ArrayList<>();
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(path)) {
+            for (Path collectionPath : stream) {
+                if (Files.isDirectory(collectionPath)) {
+                    String collectionDirName = collectionPath.toFile().getName();
+                    if (!path.resolve(collectionDirName + ".json").toFile().exists()) {
+                        orphans.add(collectionDirName);
+                        warn().data("collection_name", collectionDirName)
+                                .log("orphaned collection directory found. It's recommended you " +
+                                        "investiagte this. Collection encryption key will not be removed from user keyrings");
+                    }
+                }
+            }
+        }
+        return orphans;
     }
 
     public Map<String, Collection> mapByID() throws IOException {

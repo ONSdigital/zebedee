@@ -5,6 +5,7 @@ import com.github.onsdigital.logging.v2.DPLogger;
 import com.github.onsdigital.logging.v2.Logger;
 import com.github.onsdigital.logging.v2.LoggerImpl;
 import com.github.onsdigital.logging.v2.LoggingException;
+import com.github.onsdigital.logging.v2.UncheckedLoggingException;
 import com.github.onsdigital.logging.v2.config.Builder;
 import com.github.onsdigital.logging.v2.serializer.JacksonLogSerialiser;
 import com.github.onsdigital.logging.v2.serializer.LogSerialiser;
@@ -31,19 +32,24 @@ public class ReaderInit implements Startup {
 
     @Override
     public void init() {
-        LogSerialiser serialiser = getLogSerialiser();
-        LogStore store = new MDCLogStore(serialiser);
-        Logger logger = new LoggerImpl("zebedee");
-
         try {
-            DPLogger.init(new Builder()
-                    .serialiser(serialiser)
-                    .logStore(store)
-                    .logger(logger)
-                    .create());
-        } catch (LoggingException ex) {
-            System.err.println(ex);
-            System.exit(1);
+            DPLogger.logConfig();
+        } catch (UncheckedLoggingException e) {
+            // no logger is configured so create one.
+            LogSerialiser serialiser = getLogSerialiser();
+            LogStore store = new MDCLogStore(serialiser);
+            Logger logger = new LoggerImpl("zebedee");
+
+            try {
+                DPLogger.init(new Builder()
+                        .serialiser(serialiser)
+                        .logStore(store)
+                        .logger(logger)
+                        .create());
+            } catch (LoggingException ex) {
+                System.err.println(ex);
+                System.exit(1);
+            }
         }
 
         info().log("loading zebedee reader feature flags");

@@ -1,6 +1,15 @@
 package com.github.onsdigital.zebedee;
 
 import com.github.davidcarboni.restolino.framework.Startup;
+import com.github.onsdigital.logging.v2.DPLogger;
+import com.github.onsdigital.logging.v2.Logger;
+import com.github.onsdigital.logging.v2.LoggerImpl;
+import com.github.onsdigital.logging.v2.LoggingException;
+import com.github.onsdigital.logging.v2.config.Builder;
+import com.github.onsdigital.logging.v2.serializer.JacksonLogSerialiser;
+import com.github.onsdigital.logging.v2.serializer.LogSerialiser;
+import com.github.onsdigital.logging.v2.storage.LogStore;
+import com.github.onsdigital.logging.v2.storage.MDCLogStore;
 import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.configuration.CMSFeatureFlags;
 import com.github.onsdigital.zebedee.model.ZebedeeCollectionReaderFactory;
@@ -16,19 +25,28 @@ public class Init implements Startup {
 
     @Override
     public void init() {
-        info().log("inside CMS INIT");
+        LogSerialiser serialiser = new JacksonLogSerialiser(true);
+        LogStore store = new MDCLogStore(serialiser);
+        Logger logger = new LoggerImpl("zebedee");
+
+        try {
+            DPLogger.init(new Builder()
+                    .serialiser(serialiser)
+                    .logStore(store)
+                    .logger(logger)
+                    .create());
+        } catch (LoggingException ex) {
+            System.err.println(ex);
+            System.exit(1);
+        }
 
         info().log("loading CMS feature flags");
         CMSFeatureFlags.cmsFeatureFlags();
 
-        info().log("Root.init()");
         Root.init();
-
-        info().log("ZebedeeReader.setCollectionReaderFactory");
         ZebedeeReader.setCollectionReaderFactory(new ZebedeeCollectionReaderFactory(Root.zebedee));
 
-        info().log("CollectionHistoryDaoFactory.initialise();");
         CollectionHistoryDaoFactory.initialise();
-        info().log("Zebedee Start up");
+        info().log("zebedee cms start up completed");
     }
 }

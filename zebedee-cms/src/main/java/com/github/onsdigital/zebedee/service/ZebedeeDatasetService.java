@@ -306,7 +306,6 @@ public class ZebedeeDatasetService implements DatasetService {
         }
 
         datasetClient.detachVersion(datasetID, edition, version);
-
         collection.getDescription().removeDatasetVersion(existingDataset.get());
         collection.save();
     }

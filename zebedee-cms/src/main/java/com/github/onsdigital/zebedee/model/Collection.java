@@ -63,6 +63,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Scanner;
@@ -74,6 +75,7 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
 
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_CONTENT_REVIEWED;
@@ -278,6 +280,112 @@ public class Collection {
         return release;
     }
 
+    public static Collection rename(CollectionDescription collectionDescription, String newCollectionName, Zebedee zebedee)
+            throws IOException, CollectionNotFoundException {
+        String currentName = collectionDescription.getName();
+        String currentCollectionNameClean = PathUtils.toFilename(currentName);
+        Path currentCollectionPath = getCollectionPath(zebedee, currentCollectionNameClean);
+        Path currentCollectionJsonPath = getCollectionJsonPath(zebedee, currentCollectionNameClean);
+
+        String newCollectionNameClean = PathUtils.toFilename(newCollectionName);
+        Path newCollectionPath = getCollectionPath(zebedee, newCollectionNameClean);
+        Path newCollectionJsonPath = getCollectionJsonPath(zebedee, newCollectionNameClean);
+
+        Map<String, Object> logData = new HashMap() {{
+            put("current_name_raw", currentName);
+            put("current_name_clean", currentCollectionNameClean);
+            put("new_name_raw", newCollectionName);
+            put("new_name_clean", newCollectionNameClean);
+            put("current_collection_json_path", currentCollectionJsonPath.toString());
+            put("new_collection_json_path", newCollectionJsonPath.toString());
+            put("collection_id", collectionDescription.getId());
+        }};
+
+        info().data("details", logData).log("renaming collection");
+
+        renameCollectionJson(collectionDescription.getId(), currentCollectionJsonPath, newCollectionJsonPath, logData);
+
+        collectionDescription.setName(newCollectionName);
+        writeCollectionJson(collectionDescription, newCollectionJsonPath, logData);
+
+        renameCollectionDir(currentCollectionPath, newCollectionPath, logData);
+
+        info().data("details", logData).log("renamed collection completed successfully");
+        return new Collection(newCollectionPath, zebedee);
+    }
+
+    /**
+     * Rename the collection json file.
+     *
+     * @param collectionID          the id of the collection being renamed.
+     * @param currentCollectionJson the current collection json file path
+     * @param newCollectionJson     the renamed collection json file path
+     * @param logData               logging details
+     * @throws IOException problem renaming the collection json file.
+     */
+    private static void renameCollectionJson(String collectionID, Path currentCollectionJson, Path newCollectionJson,
+                                             Map<String, Object> logData) throws IOException {
+        try {
+            currentCollectionJson.toFile().renameTo(newCollectionJson.toFile());
+            info().data("details", logData).log("successfully renamed collection json");
+        } catch (Exception e) {
+            throw error().data("details", logData).logException(new IOException(e),
+                    "error renaming collection json file");
+        }
+
+    }
+
+    /**
+     * Write a collection json file to disk.
+     *
+     * @param description           the collection description.
+     * @param newCollectionJsonPath the renamed collection json path
+     * @param logData               logging details
+     * @throws IOException problem writing file
+     */
+    private static void writeCollectionJson(CollectionDescription description, Path newCollectionJsonPath,
+                                            Map<String, Object> logData) throws IOException {
+        try (OutputStream output = Files.newOutputStream(newCollectionJsonPath)) {
+            Serialiser.serialise(output, description);
+            info().data("details", logData).log("successfully saved updated collection json");
+        } catch (Exception e) {
+            throw error().data("details", logData)
+                    .logException(new IOException("error renaming collection json", e),
+                            "error renaming collection json file");
+        }
+
+    }
+
+    /**
+     * Rename a collection directory.
+     *
+     * @param currentCollectionPath the current collecion path
+     * @param newCollectionPath     the renamed collection path
+     * @param logData               logging details
+     * @throws IOException error renaming collection directory
+     */
+    private static void renameCollectionDir(Path currentCollectionPath, Path newCollectionPath,
+                                            Map<String, Object> logData) throws IOException {
+        try {
+            currentCollectionPath.toFile().renameTo(newCollectionPath.toFile());
+            info().data("details", logData).log("successfully renamed collection directory");
+        } catch (Exception e) {
+            throw error().data("details", logData)
+                    .logException(new IOException("error renaming collection json", e),
+                            "error renaming collection directory");
+        }
+
+    }
+
+    private static Path getCollectionPath(Zebedee zebedee, String name) {
+        return zebedee.getCollections().path.resolve(name);
+    }
+
+    private static Path getCollectionJsonPath(Zebedee zebedee, String name) {
+        return zebedee.getCollections().path.resolve(name + ".json");
+    }
+
+
     /**
      * Renames an existing {@link Collection} in the given {@link Zebedee}.
      *
@@ -287,7 +395,7 @@ public class Collection {
      * @return
      * @throws IOException
      */
-    public static Collection rename(CollectionDescription collectionDescription, String newName, Zebedee zebedee)
+    public static Collection rename_(CollectionDescription collectionDescription, String newName, Zebedee zebedee)
             throws IOException, CollectionNotFoundException {
 
         String originalFilename = collectionDescription.getName();

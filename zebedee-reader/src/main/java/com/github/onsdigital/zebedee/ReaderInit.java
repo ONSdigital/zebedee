@@ -5,7 +5,6 @@ import com.github.onsdigital.logging.v2.DPLogger;
 import com.github.onsdigital.logging.v2.Logger;
 import com.github.onsdigital.logging.v2.LoggerImpl;
 import com.github.onsdigital.logging.v2.LoggingException;
-import com.github.onsdigital.logging.v2.UncheckedLoggingException;
 import com.github.onsdigital.logging.v2.config.Builder;
 import com.github.onsdigital.logging.v2.serializer.JacksonLogSerialiser;
 import com.github.onsdigital.logging.v2.serializer.LogSerialiser;
@@ -33,10 +32,7 @@ public class ReaderInit implements Startup {
 
     @Override
     public void init() {
-        try {
-            DPLogger.logConfig();
-        } catch (UncheckedLoggingException e) {
-            // no logger is configured so create one.
+        if (isDefaultLogger()) {
             LogSerialiser serialiser = getLogSerialiser();
             LogStore store = new MDCLogStore(serialiser);
             Logger logger = new LoggerImpl("zebedee");
@@ -52,7 +48,6 @@ public class ReaderInit implements Startup {
                 System.exit(1);
             }
         }
-
         ReaderConfiguration.get();
 
         info().log("initialising zededee reader elasticSearch client");
@@ -99,6 +94,10 @@ public class ReaderInit implements Startup {
                 EXECUTOR.shutdown();
             }
         };
+    }
+
+    private boolean isDefaultLogger() {
+        return "dp-logger-default".equals(DPLogger.logConfig().getLogger().getName());
     }
 
     private LogSerialiser getLogSerialiser() {

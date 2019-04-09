@@ -139,27 +139,22 @@ public class PageTest extends ZebedeeAPIBaseTestCase {
 
     @Test
     public void testPage_createPage_pageHookException() throws ZebedeeException, IOException {
-        try {
-            System.setProperty("ENABLE_DATASET_IMPORT", "true");
 
-            // Given a mock page hook that throws an exception
-            PageUpdateHook mockPageHook = mock(PageUpdateHook.class);
-            doThrow(new RuntimeException()).when(mockPageHook).onPageUpdated(any(), anyString());
+        // Given a mock page hook that throws an exception
+        PageUpdateHook mockPageHook = mock(PageUpdateHook.class);
+        doThrow(new RuntimeException()).when(mockPageHook).onPageUpdated(any(), anyString());
 
-            when(mockRequest.getParameter("uri")).thenReturn(uri);
-            when(zebedeeCmsService.getSession(mockRequest)).thenReturn(session);
-            when(zebedeeCmsService.getCollection(mockRequest)).thenReturn(collection);
+        when(mockRequest.getParameter("uri")).thenReturn(uri);
+        when(zebedeeCmsService.getSession(mockRequest)).thenReturn(session);
+        when(zebedeeCmsService.getCollection(mockRequest)).thenReturn(collection);
 
-            Page page = new Page(zebedeeCmsService, mockPageHook, pageDeletionHook, true);
+        Page page = new Page(zebedeeCmsService, mockPageHook, pageDeletionHook, true);
 
-            // When createPage is called
-            page.createPage(mockRequest, mockResponse);
+        // When createPage is called
+        page.createPage(mockRequest, mockResponse);
 
-            // Then the http response code is set as expected
-            verify(mockResponse, times(1)).setStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR);
-        } finally {
-            System.clearProperty("ENABLE_DATASET_IMPORT");
-        }
+        // Then the http response code is set as expected
+        verify(mockResponse, times(1)).setStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR);
     }
 
     @Test

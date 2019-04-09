@@ -26,7 +26,7 @@ public class ReaderConfiguration {
     private static ReaderConfiguration INSTANCE = null;
 
     private static final String CMD_CONFIG_MISSING = "cmd feature flag is enabled for zebedee reader but expected " +
-            "configuration value is missing exiting application: ";
+            "configuration value is missing: {0}";
 
     private static final String ENABLE_DATASET_IMPORT = "ENABLE_DATASET_IMPORT";
 
@@ -69,8 +69,7 @@ public class ReaderConfiguration {
                 info().log("loading reader configuration");
                 INSTANCE = new ReaderConfiguration(zebedeeRootDir);
             } catch (UncheckedReaderConfigException ex) {
-                error().logException(ex, "error loading reader application configuration");
-                System.exit(1);
+                throw error().logException(ex, "error loading reader configuration exiting application");
             }
         }
         return INSTANCE;
@@ -84,8 +83,7 @@ public class ReaderConfiguration {
                         info().log("loading reader configuration");
                         INSTANCE = new ReaderConfiguration();
                     } catch (UncheckedReaderConfigException ex) {
-                        error().logException(ex, "error loading reader application configuration");
-                        System.exit(1);
+                        throw error().logException(ex, "error loading reader configuration");
                     }
                 }
             }
@@ -126,13 +124,13 @@ public class ReaderConfiguration {
             this.datasetAPIHost = validateCMDConfig(DATASET_API_URL_KEY);
             this.datasetAPIAuthToken = validateCMDConfig(DATASET_API_AUTH_TOKEN_KEY);
             this.datasetImportPageTypes = new HashSet<>(Arrays.asList(api_dataset, api_dataset_landing_page));
-            info().data(ENABLE_DATASET_IMPORT, true).log("feature flags enabled for zebedee reader");
+            info().data(ENABLE_DATASET_IMPORT, true).log("CMD feature flag enabled for zebedee reader");
         } else {
             this.serviceAuthToken = "";
             this.datasetAPIHost = "";
             this.datasetAPIAuthToken = "";
             this.datasetImportPageTypes = new HashSet<>();
-            info().data(ENABLE_DATASET_IMPORT, false).log("feature flags disabled for zebedee reader");
+            info().data(ENABLE_DATASET_IMPORT, false).log("CMD feature flag disabled for zebedee reader");
         }
     }
 
@@ -143,9 +141,7 @@ public class ReaderConfiguration {
     private String validateCMDConfig(String key) {
         String value = getVariableValue(key);
         if (StringUtils.isEmpty(value)) {
-            throw error()
-                    .data(key, "null")
-                    .logException(new UncheckedReaderConfigException(CMD_CONFIG_MISSING), CMD_CONFIG_MISSING);
+            throw new UncheckedReaderConfigException(format(CMD_CONFIG_MISSING, key));
         }
         return value;
     }

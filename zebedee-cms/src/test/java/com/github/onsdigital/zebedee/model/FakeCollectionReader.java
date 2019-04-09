@@ -17,7 +17,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import static com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration.getConfiguration;
+import static com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration.get;
 
 public class FakeCollectionReader extends CollectionReader {
 
@@ -32,9 +32,9 @@ public class FakeCollectionReader extends CollectionReader {
         }
         this.collections = Paths.get(collectionsFolderPath);
         Path collectionsPath = findCollectionPath(collectionId);
-        inProgress = getContentReader(collectionsPath, getConfiguration().getInProgressFolderName());
-        complete = getContentReader(collectionsPath, getConfiguration().getCompleteFolderName());
-        reviewed = getContentReader(collectionsPath, getConfiguration().getReviewedFolderName());
+        inProgress = getContentReader(collectionsPath, get().getInProgressFolderName());
+        complete = getContentReader(collectionsPath, get().getCompleteFolderName());
+        reviewed = getContentReader(collectionsPath, get().getReviewedFolderName());
     }
 
     private Path findCollectionPath(String collectionId) throws IOException, NotFoundException, CollectionNotFoundException {

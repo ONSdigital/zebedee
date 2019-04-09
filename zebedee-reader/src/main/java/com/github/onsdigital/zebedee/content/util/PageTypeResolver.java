@@ -19,10 +19,10 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import static com.github.onsdigital.zebedee.ReaderFeatureFlags.readerFeatureFlags;
 import static com.github.onsdigital.zebedee.logging.ReaderLogger.error;
 import static com.github.onsdigital.zebedee.logging.ReaderLogger.info;
 import static com.github.onsdigital.zebedee.logging.ReaderLogger.warn;
+import static com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration.get;
 
 /**
  * Created by bren on 09/06/15.
@@ -80,11 +80,10 @@ class PageTypeResolver implements JsonDeserializer<Page> {
             synchronized (PageTypeResolver.class) {
                 if (instance == null) {
                     info().log("initialising PageTypeResolver instance");
-                    boolean isDatasetImportEnabled = readerFeatureFlags().isEnableDatasetImport();
-                    Predicate<PageType> isDatasetImportPageType = (p) -> readerFeatureFlags().datasetImportPageTypes().contains(p);
+                    boolean isDatasetImportEnabled = get().isDatasetImportEnabled();
+                    Predicate<PageType> isDatasetImportPageType = (p) -> get().getDatasetImportPageTypes().contains(p);
 
                     registerContentTypes();
-
 
                     contentClasses.entrySet()
                             .stream()

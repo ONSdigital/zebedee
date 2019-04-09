@@ -332,7 +332,6 @@ public class UsersServiceImpl implements UsersService {
 
     @Override
     public User removeKeyFromKeyring(String email, String keyIdentifier) throws IOException {
-        // TODO MIGHT WANT TO CONSIDER HOW WE MIGHT ROLLBACK IS THE SAVE CALL FAILS.
         lock.lock();
         try {
             User user = userStore.get(email);

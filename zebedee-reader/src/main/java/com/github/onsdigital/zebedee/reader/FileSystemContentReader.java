@@ -38,7 +38,7 @@ import java.util.Map;
 import java.util.TreeSet;
 
 import static com.github.onsdigital.zebedee.logging.ReaderLogger.error;
-import static com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration.getConfiguration;
+import static com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration.get;
 import static com.github.onsdigital.zebedee.util.URIUtils.removeLastSegment;
 import static com.github.onsdigital.zebedee.util.URIUtils.removeLeadingSlash;
 import static java.nio.file.Files.exists;
@@ -376,7 +376,7 @@ public class FileSystemContentReader implements ContentReader {
         assertExists(path);
         assertIsDirectory(path);
         String fileName = path.getFileName().toString();
-        if (getConfiguration().getBulletinsFolderName().equals(fileName) || getConfiguration().getArticlesFolderName().equals(fileName) || getConfiguration().getCompendiumFolderName().equals(fileName)) {
+        if (get().getBulletinsFolderName().equals(fileName) || get().getArticlesFolderName().equals(fileName) || get().getCompendiumFolderName().equals(fileName)) {
             return;
         }
         throw new BadRequestException("Latest uri can not be resolved for this content type");

@@ -45,11 +45,6 @@ public abstract class ZebedeeTestBaseFixture {
     protected Builder builder;
     protected Map<String, User> usersMap;
 
-    @BeforeClass
-    public static void setUpLogger() {
-        LoggingTestHelper.initDPLogger(ZebedeeTestBaseFixture.class);
-    }
-
     @Before
     public void init() throws Exception {
         MockitoAnnotations.initMocks(this);

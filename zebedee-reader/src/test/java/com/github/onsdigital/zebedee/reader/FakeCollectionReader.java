@@ -14,7 +14,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import static com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration.getConfiguration;
+import static com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration.get;
 
 public class FakeCollectionReader extends CollectionReader {
 
@@ -29,9 +29,9 @@ public class FakeCollectionReader extends CollectionReader {
         }
         this.collections = Paths.get(collectionsFolderPath);
         Path collectionsPath = findCollectionPath(collectionId);
-        inProgress = getContentReader(collectionsPath, getConfiguration().getInProgressFolderName());
-        complete = getContentReader(collectionsPath, getConfiguration().getCompleteFolderName());
-        reviewed = getContentReader(collectionsPath, getConfiguration().getReviewedFolderName());
+        inProgress = getContentReader(collectionsPath, get().getInProgressFolderName());
+        complete = getContentReader(collectionsPath, get().getCompleteFolderName());
+        reviewed = getContentReader(collectionsPath, get().getReviewedFolderName());
     }
 
     //TODO: If collection folder names were ids or we saved cookie as collection's name we would not need to search collection, but just read the path

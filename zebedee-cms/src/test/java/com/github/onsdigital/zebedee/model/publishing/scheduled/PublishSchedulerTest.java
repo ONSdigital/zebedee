@@ -3,6 +3,7 @@ package com.github.onsdigital.zebedee.model.publishing.scheduled;
 import com.github.onsdigital.zebedee.Builder;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.ZebedeeTestBaseFixture;
+import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.ApprovalStatus;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
@@ -29,6 +30,10 @@ public class PublishSchedulerTest extends ZebedeeTestBaseFixture {
     public void setUp() throws Exception {
         session = zebedee.openSession(builder.publisher1Credentials);
         scheduler = new PublishScheduler();
+
+
+        System.out.println("====>>> " + Configuration.isAuditDatabaseEnabled());
+
     }
 
     @Test

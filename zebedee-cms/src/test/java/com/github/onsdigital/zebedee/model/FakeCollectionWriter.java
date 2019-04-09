@@ -16,7 +16,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import static com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration.getConfiguration;
+import static com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration.get;
 
 public class FakeCollectionWriter extends CollectionWriter {
 
@@ -29,9 +29,9 @@ public class FakeCollectionWriter extends CollectionWriter {
         }
         this.collections = Paths.get(collectionsFolderPath);
         Path collectionsPath = findCollectionPath(collectionId);
-        inProgress = getContentWriter(collectionsPath, getConfiguration().getInProgressFolderName());
-        complete = getContentWriter(collectionsPath, getConfiguration().getCompleteFolderName());
-        reviewed = getContentWriter(collectionsPath, getConfiguration().getReviewedFolderName());
+        inProgress = getContentWriter(collectionsPath, get().getInProgressFolderName());
+        complete = getContentWriter(collectionsPath, get().getCompleteFolderName());
+        reviewed = getContentWriter(collectionsPath, get().getReviewedFolderName());
     }
 
     private ContentWriter getContentWriter(Path collectionPath, String folderName) {

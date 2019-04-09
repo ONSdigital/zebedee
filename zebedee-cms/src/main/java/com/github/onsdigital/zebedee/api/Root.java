@@ -190,7 +190,8 @@ public class Root {
 
     public static void cancelPublish(Collection collection) {
         try {
-            info().data("collectionId", collection).data("type", collection.getDescription().getType())
+            info().data("collectionId", collection.description.getId())
+                    .data("type", collection.getDescription().getType().name())
                     .log("zebedee root: cancelling scheduled collection publish");
             scheduler.cancel(collection);
         } catch (Exception e) {

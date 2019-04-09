@@ -48,6 +48,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -85,6 +86,7 @@ public class Collections {
     private BiConsumer<Collection, EventType> publishingNotificationConsumer = (c, e) -> new PublishNotification(c).sendNotification(e);
     private Function<Path, ContentReader> contentReaderFactory = FileSystemContentReader::new;
     private Supplier<CollectionHistoryDao> collectionHistoryDaoSupplier = CollectionHistoryDaoFactory::getCollectionHistoryDao;
+    private Comparator<String> strComparator = Comparator.comparing(String::toString);
 
     public Collections(Path path, PermissionsService permissionsService, Content published) {
         this.path = path;
@@ -226,7 +228,8 @@ public class Collections {
                     try {
                         result.add(new Collection(path, zebedeeSupplier.get()));
                     } catch (CollectionNotFoundException e) {
-                        error().data("collectionPath", path.toString()).logException(e, "Failed to deserialise collection");
+                        error().data("collection_path", path.toString())
+                                .logException(e, "failed to deserialise collection");
                     }
                 }
             }
@@ -243,12 +246,15 @@ public class Collections {
                     String collectionDirName = collectionPath.toFile().getName();
                     if (!path.resolve(collectionDirName + ".json").toFile().exists()) {
                         orphans.add(collectionDirName);
-                        warn().data("collection_name", collectionDirName)
-                                .log("orphaned collection directory found. It's recommended you " +
-                                        "investiagte this. Collection encryption key will not be removed from user keyrings");
                     }
                 }
             }
+        }
+        if (!orphans.isEmpty()) {
+            orphans.sort(strComparator);
+            warn().data("orphaned_collections", orphans)
+                    .log("orphaned collections found. It's recommended you investiagte and fix these. Encryption keys " +
+                            "for these collections will not be removed from users");
         }
         return orphans;
     }

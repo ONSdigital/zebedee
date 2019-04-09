@@ -14,7 +14,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 
 import static com.github.onsdigital.zebedee.configuration.Configuration.getUnauthorizedMessage;
-import static com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration.getConfiguration;
+import static com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration.get;
 
 public class ZebedeeCollectionReader extends CollectionReader {
 
@@ -47,9 +47,9 @@ public class ZebedeeCollectionReader extends CollectionReader {
             throw new NotFoundException("Collection not found");
         }
 
-        inProgress = getContentReader(collection, key, collection.path, getConfiguration().getInProgressFolderName());
-        complete = getContentReader(collection, key, collection.path, getConfiguration().getCompleteFolderName());
-        reviewed = getContentReader(collection, key, collection.path, getConfiguration().getReviewedFolderName());
+        inProgress = getContentReader(collection, key, collection.path, get().getInProgressFolderName());
+        complete = getContentReader(collection, key, collection.path, get().getCompleteFolderName());
+        reviewed = getContentReader(collection, key, collection.path, get().getReviewedFolderName());
         root = new CollectionContentReader(collection, key, collection.path);
     }
 

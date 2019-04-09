@@ -24,7 +24,10 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by bren on 31/07/15.
@@ -38,10 +41,10 @@ public class ZebedeeReaderTest {
     //TODO: mime type resolving not working on Mac machines due to java bug in Files.probeContentType, use a lib to resolve mime type based on extension and enable test bits checking mime types
 
     static {
-        ReaderConfiguration.init("target/test-classes/test-content/");
+        ReaderConfiguration cfg = ReaderConfiguration.init("target/test-classes/test-content/");
 
         if (ZebedeeReader.getCollectionReaderFactory() == null) {
-            ZebedeeReader.setCollectionReaderFactory(new FakeCollectionReaderFactory(ReaderConfiguration.getConfiguration().getCollectionsFolder()));
+            ZebedeeReader.setCollectionReaderFactory(new FakeCollectionReaderFactory(cfg.getCollectionsDir()));
         }
     }
 

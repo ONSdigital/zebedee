@@ -1,8 +1,6 @@
 package com.github.onsdigital.zebedee.service;
 
 
-import com.github.onsdigital.zebedee.LoggingTestHelper;
-import com.github.onsdigital.zebedee.api.CollectionsTest;
 import com.github.onsdigital.zebedee.exceptions.ConflictException;
 import com.github.onsdigital.zebedee.json.CollectionDataset;
 import com.github.onsdigital.zebedee.json.CollectionDatasetVersion;
@@ -17,7 +15,6 @@ import dp.api.dataset.model.Link;
 import dp.api.dataset.model.State;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 
@@ -53,11 +50,6 @@ public class ZebedeeDatasetServiceTest {
 
     CollectionDataset collectionDataset = new CollectionDataset();
     CollectionDatasetVersion collectionDatasetVersion = new CollectionDatasetVersion();
-
-    @BeforeClass
-    public static void setUpLogger() {
-        LoggingTestHelper.initDPLogger(ZebedeeDatasetServiceTest.class);
-    }
 
     @Before
     public void setUp() throws Exception {

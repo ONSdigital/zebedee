@@ -12,6 +12,7 @@ import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ResourceDirectoryNotFileException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
+import com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration;
 import com.github.onsdigital.zebedee.reader.data.language.ContentLanguage;
 import com.github.onsdigital.zebedee.reader.util.ReleaseDateComparator;
 import com.github.onsdigital.zebedee.util.PathUtils;
@@ -376,7 +377,8 @@ public class FileSystemContentReader implements ContentReader {
         assertExists(path);
         assertIsDirectory(path);
         String fileName = path.getFileName().toString();
-        if (get().getBulletinsFolderName().equals(fileName) || get().getArticlesFolderName().equals(fileName) || get().getCompendiumFolderName().equals(fileName)) {
+        ReaderConfiguration cfg = ReaderConfiguration.get();
+        if (cfg.getBulletinsFolderName().equals(fileName) || cfg.getArticlesFolderName().equals(fileName) || cfg.getCompendiumFolderName().equals(fileName)) {
             return;
         }
         throw new BadRequestException("Latest uri can not be resolved for this content type");

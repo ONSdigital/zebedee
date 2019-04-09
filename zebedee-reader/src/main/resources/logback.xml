@@ -17,6 +17,10 @@
         </encoder>
     </appender>
 
+    <logger name="dp-logger-default" level="debug" additivity="false">
+        <appender-ref ref="JSON_STDOUT"/>
+    </logger>
+
     <logger name="zebedee" level="debug" additivity="false">
         <appender-ref ref="JSON_STDOUT"/>
     </logger>

@@ -132,6 +132,18 @@ public class ReaderConfiguration {
             this.datasetImportPageTypes = new HashSet<>();
             info().data(ENABLE_DATASET_IMPORT, false).log("CMD feature flag disabled for zebedee reader");
         }
+
+        info().data("zebedee_root_dir", this.zebedeeRootDir)
+                .data("collections_dir", collectionsDir)
+                .data("content_dir", this.contentDir)
+                .data("in_progress_dir", inProgressDirName)
+                .data("complete_dir", completeDirName)
+                .data("reviewed_dir", reviewedDirName)
+                .data("bulletins_dir", bulletinsDirName)
+                .data("articles_dir", articlesDirName)
+                .data("compendium_dir", compendiumDirName)
+                .data("dataset_import_enabled", datasetImportEnabled)
+                .log("zebedee reader configuration");
     }
 
     private ReaderConfiguration() {

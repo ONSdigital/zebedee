@@ -30,10 +30,6 @@ public class PublishSchedulerTest extends ZebedeeTestBaseFixture {
     public void setUp() throws Exception {
         session = zebedee.openSession(builder.publisher1Credentials);
         scheduler = new PublishScheduler();
-
-
-        System.out.println("====>>> " + Configuration.isAuditDatabaseEnabled());
-
     }
 
     @Test

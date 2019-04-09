@@ -309,13 +309,10 @@ public class ZebedeeDatasetServiceTest {
         // When removeDatasetFromCollection is called
         service.removeDatasetVersionFromCollection(mockCollection, datasetID, edition, version);
 
-        // Then the collection is cleared in the version on the dataset API, and it state is reset to created.
-        ArgumentCaptor<DatasetVersion> argumentCaptor = ArgumentCaptor.forClass(DatasetVersion.class);
-        verify(mockDatasetAPI, times(1)).updateDatasetVersion(anyString(), anyString(), anyString(), argumentCaptor.capture());
-        Assert.assertEquals(argumentCaptor.getAllValues().get(0).getCollection_id(), "");
-        Assert.assertEquals(argumentCaptor.getAllValues().get(0).getState(), State.CREATED);
+        // Then the collection is cleared in the version on the dataset API
+        verify(mockDatasetAPI, times(1)).detachVersion(anyString(), anyString(), anyString());
 
-        // Then the collection is prompted to delete the dataset and save.
+        // Then the collection is prompted to remove the reference from that dataset-version from itself and save.
         verify(mockCollectionDescription, times(1)).removeDatasetVersion(datasetVersion);
         verify(mockCollection, times(1)).save();
     }

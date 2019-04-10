@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
 
+    <property scope="context" name="default.logger.name" value="dp-logger-default"/>
+    <property scope="context" name="default.logger.formatted" value="false"/>
+
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
             <pattern>
@@ -9,42 +12,44 @@
         </encoder>
     </appender>
 
-    <appender name="JSON_STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    <!-- Out puts logs following the dp-logging standards format -->
+    <appender name="DP_LOGGER" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>
-                %msg%n
-            </pattern>
+            <pattern>%msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!--
+        This appender wraps the original message in the dp-logging standards format ensuring consistency with our log
+         output and that they play nice with the log aggregator.
+    -->
+    <appender name="THIRD_PARTY" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+            <layout class="com.github.onsdigital.logging.v2.layout.ThirdPartyEventLayout">
+                <Pattern>%n%msg</Pattern>
+            </layout>
         </encoder>
     </appender>
 
     <logger name="zebedee" level="debug" additivity="false">
-        <appender-ref ref="JSON_STDOUT"/>
+        <appender-ref ref="DP_LOGGER"/>
     </logger>
-
-    <appender name="DP_LOGGER" class="ch.qos.logback.core.ConsoleAppender">
-        <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
-            <layout class="com.github.onsdigital.logging.layouts.ConfigurableLayout" />
-        </encoder>
-    </appender>
 
     <logger name="dp-dataset-api-java-client" level="debug" additivity="false">
         <appender-ref ref="DP_LOGGER"/>
     </logger>
 
-    <logger name="com.github.onsdigital.zebedee" level="debug" additivity="false">
+    <logger name="zebedee" level="debug" additivity="false">
         <appender-ref ref="DP_LOGGER"/>
     </logger>
 
-    <logger name="com.github.onsdigital.zebedee-reader" level="debug" additivity="false">
+    <logger name="zebedee-reader" level="debug" additivity="false">
         <appender-ref ref="DP_LOGGER"/>
     </logger>
 
-    <logger name="com.github.davidcarboni.restolino" level="warn" additivity="false">
-        <appender-ref ref="DP_LOGGER"/>
-    </logger>
 
     <root level="info">
-        <appender-ref ref="DP_LOGGER"/>
+        <appender-ref ref="THIRD_PARTY"/>
     </root>
 
 </configuration>

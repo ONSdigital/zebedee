@@ -31,19 +31,21 @@ public class ReaderInit implements Startup {
 
     @Override
     public void init() {
-        LogSerialiser serialiser = getLogSerialiser();
-        LogStore store = new MDCLogStore(serialiser);
-        Logger logger = new LoggerImpl("zebedee");
+        if (initReaderLogger()) {
+            LogSerialiser serialiser = getLogSerialiser();
+            LogStore store = new MDCLogStore(serialiser);
+            Logger logger = new LoggerImpl("zebedee");
 
-        try {
-            DPLogger.init(new Builder()
-                    .serialiser(serialiser)
-                    .logStore(store)
-                    .logger(logger)
-                    .create());
-        } catch (LoggingException ex) {
-            System.err.println(ex);
-            System.exit(1);
+            try {
+                DPLogger.init(new Builder()
+                        .serialiser(serialiser)
+                        .logStore(store)
+                        .logger(logger)
+                        .create());
+            } catch (LoggingException ex) {
+                System.err.println(ex);
+                System.exit(1);
+            }
         }
 
         info().log("loading zebedee reader feature flags");
@@ -93,6 +95,10 @@ public class ReaderInit implements Startup {
                 EXECUTOR.shutdown();
             }
         };
+    }
+
+    private boolean initReaderLogger() {
+        return "dp-logger-default".equals(DPLogger.logConfig().getLogger().getName());
     }
 
     private LogSerialiser getLogSerialiser() {

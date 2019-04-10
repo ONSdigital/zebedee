@@ -10,9 +10,12 @@ export RESTOLINO_CLASSES="zebedee-reader/target/classes"
 export PACKAGE_PREFIX=com.github.onsdigital.zebedee.reader.api
 export CONTENT_DIR="content"
 
+export FORMAT_LOGGING=true
+
 # Development: reloadable
 mvn clean package dependency:copy-dependencies -Dmaven.test.skip=true && \
 java $JAVA_OPTS \
+ -DFORMAT_LOGGING=$FORMAT_LOGGING \
  -Dlogback.configurationFile=zebedee-reader/target/classes/logback.xml \
  -Drestolino.classes=$RESTOLINO_CLASSES \
  -Dcontent_dir=$CONTENT_DIR \

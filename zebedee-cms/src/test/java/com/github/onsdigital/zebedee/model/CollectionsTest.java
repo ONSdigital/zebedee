@@ -13,7 +13,6 @@ import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.CollectionType;
 import com.github.onsdigital.zebedee.json.Event;
 import com.github.onsdigital.zebedee.json.EventType;
-import com.github.onsdigital.zebedee.LoggingTestHelper;
 import com.github.onsdigital.zebedee.model.approval.ApproveTask;
 import com.github.onsdigital.zebedee.model.publishing.PublishNotification;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
@@ -26,7 +25,6 @@ import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.user.model.User;
 import com.github.onsdigital.zebedee.user.service.UsersService;
 import org.apache.commons.fileupload.FileUploadException;
-import org.junit.BeforeClass;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -42,7 +40,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
@@ -65,7 +62,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
@@ -137,11 +133,6 @@ public class CollectionsTest {
     private Supplier<Zebedee> zebedeeSupplier;
     private BiConsumer<Collection, EventType> publishingNotificationConsumer;
     private Supplier<CollectionHistoryDao> collectionHistoryDaoSupplier;
-
-    @BeforeClass
-    public static void setUpLogger() {
-        LoggingTestHelper.initDPLogger(CollectionsTest.class);
-    }
 
     @Before
     public void setUp() throws IOException {

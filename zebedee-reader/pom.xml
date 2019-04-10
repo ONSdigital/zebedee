@@ -90,8 +90,7 @@
         <dependency>
             <groupId>com.github.ONSdigital</groupId>
             <artifactId>dp-logging</artifactId>
-            <version>feature~default-config-SNAPSHOT</version>
-            <!--<version>release~1.1.0</version>-->
+            <version>release~1.2.0</version>
         </dependency>
 
         <dependency>

@@ -23,9 +23,11 @@ import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
  */
 public class Init implements Startup {
 
+    private static final String FORMAT_LOGS_KEY = "FORMAT_LOGGING";
+
     @Override
     public void init() {
-        LogSerialiser serialiser = new JacksonLogSerialiser(true);
+        LogSerialiser serialiser = getLogSerialiser();
         LogStore store = new MDCLogStore(serialiser);
         Logger logger = new LoggerImpl("zebedee");
 
@@ -48,5 +50,10 @@ public class Init implements Startup {
 
         CollectionHistoryDaoFactory.initialise();
         info().log("zebedee cms start up completed");
+    }
+
+    private LogSerialiser getLogSerialiser() {
+        boolean formatLogging = Boolean.valueOf(System.getenv(FORMAT_LOGS_KEY));
+        return new JacksonLogSerialiser(formatLogging);
     }
 }

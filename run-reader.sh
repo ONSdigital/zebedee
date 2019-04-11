@@ -17,9 +17,12 @@ export DATASET_API_URL="http://localhost:22000"
 export DATASET_API_AUTH_TOKEN="FD0108EA-825D-411C-9B1D-41EF7727F465"
 export SERVICE_AUTH_TOKEN="fc4089e2e12937861377629b0cd96cf79298a4c5d329a2ebb96664c88df77b67"
 
+export FORMAT_LOGGING=true
+
 # Development: reloadable
 mvn clean package dependency:copy-dependencies -Dmaven.test.skip=true && \
 java $JAVA_OPTS \
+ -DFORMAT_LOGGING=$FORMAT_LOGGING \
  -Dlogback.configurationFile=zebedee-reader/target/classes/logback.xml \
  -Drestolino.classes=$RESTOLINO_CLASSES \
  -Dcontent_dir=$CONTENT_DIR \

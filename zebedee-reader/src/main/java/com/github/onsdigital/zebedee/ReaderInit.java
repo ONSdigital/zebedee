@@ -1,5 +1,6 @@
 package com.github.onsdigital.zebedee;
 
+import ch.qos.logback.classic.LoggerContext;
 import com.github.davidcarboni.restolino.framework.Startup;
 import com.github.onsdigital.logging.v2.DPLogger;
 import com.github.onsdigital.logging.v2.Logger;
@@ -14,7 +15,9 @@ import com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration;
 import com.github.onsdigital.zebedee.search.client.ElasticSearchClient;
 import com.github.onsdigital.zebedee.search.indexing.Indexer;
 import com.github.onsdigital.zebedee.search.indexing.SearchBoostTermsResolver;
+import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.client.transport.NoNodeAvailableException;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.concurrent.Callable;
@@ -28,14 +31,16 @@ import static com.github.onsdigital.zebedee.search.configuration.SearchConfigura
 public class ReaderInit implements Startup {
 
     private static final String FORMAT_LOGS_KEY = "FORMAT_LOGGING";
+    private static final String DEFAULT_LOGGER_NAME_KEY = "default.logger.name";
+    private static final String READER_LOGGER_NAME = "zebedee";
     private static final ExecutorService EXECUTOR = Executors.newSingleThreadExecutor();
 
     @Override
     public void init() {
-        if (isDefaultLogger()) {
+        if (initReaderLogger()) {
             LogSerialiser serialiser = getLogSerialiser();
             LogStore store = new MDCLogStore(serialiser);
-            Logger logger = new LoggerImpl("zebedee");
+            Logger logger = new LoggerImpl(READER_LOGGER_NAME);
 
             try {
                 DPLogger.init(new Builder()
@@ -96,8 +101,11 @@ public class ReaderInit implements Startup {
         };
     }
 
-    private boolean isDefaultLogger() {
-        return "dp-logger-default".equals(DPLogger.logConfig().getLogger().getName());
+    private boolean initReaderLogger() {
+        LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
+        String defaultName = loggerContext.getProperty(DEFAULT_LOGGER_NAME_KEY);
+        String loggerName = DPLogger.logConfig().getLogger().getName();
+        return StringUtils.equals(defaultName, loggerName);
     }
 
     private LogSerialiser getLogSerialiser() {

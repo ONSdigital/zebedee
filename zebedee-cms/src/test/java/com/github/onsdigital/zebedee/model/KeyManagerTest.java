@@ -290,8 +290,8 @@ public class KeyManagerTest {
         KeyManager.transferKeyring(target, source);
 
         verify(source, times(1)).list();
-        verify(source,times(1)).get(COLLECTION_ID);
-        verify(target,times(1)).put(COLLECTION_ID, secretKey);
+        verify(source, times(1)).get(COLLECTION_ID);
+        verify(target, times(1)).put(COLLECTION_ID, secretKey);
     }
 
     @Test

@@ -1,15 +1,14 @@
 package com.github.onsdigital.zebedee;
 
-import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
-import com.github.onsdigital.zebedee.user.model.User;
-import com.github.onsdigital.zebedee.user.model.UserList;
 import com.github.onsdigital.zebedee.model.Collection;
+import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDao;
 import com.github.onsdigital.zebedee.service.ServiceSupplier;
+import com.github.onsdigital.zebedee.user.model.User;
+import com.github.onsdigital.zebedee.user.model.UserList;
 import com.github.onsdigital.zebedee.user.service.UsersService;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;

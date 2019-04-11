@@ -20,7 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static com.github.onsdigital.zebedee.logging.ReaderLogger.info;
-import static com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration.getConfiguration;
+import static com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration.get;
 
 /**
  * Created by bren on 29/07/15.
@@ -45,7 +45,7 @@ public class ZebedeeReader {
     }
 
     public ZebedeeReader(ContentLanguage language) {
-        publishedContentReader = new FileSystemContentReader(getConfiguration().getContentDir());
+        publishedContentReader = new FileSystemContentReader(get().getContentDir());
         publishedContentReader.setLanguage(language);
         this.language = language;
     }

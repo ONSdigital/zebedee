@@ -2,6 +2,7 @@ package com.github.onsdigital.zebedee.content.util;
 
 import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.content.page.base.PageType;
+import com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
@@ -19,7 +20,6 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import static com.github.onsdigital.zebedee.ReaderFeatureFlags.readerFeatureFlags;
 import static com.github.onsdigital.zebedee.logging.ReaderLogger.error;
 import static com.github.onsdigital.zebedee.logging.ReaderLogger.info;
 import static com.github.onsdigital.zebedee.logging.ReaderLogger.warn;
@@ -80,8 +80,9 @@ class PageTypeResolver implements JsonDeserializer<Page> {
             synchronized (PageTypeResolver.class) {
                 if (instance == null) {
                     info().log("initialising PageTypeResolver instance");
-                    boolean isDatasetImportEnabled = readerFeatureFlags().isEnableDatasetImport();
-                    Predicate<PageType> isDatasetImportPageType = (p) -> readerFeatureFlags().datasetImportPageTypes().contains(p);
+                    boolean isDatasetImportEnabled = ReaderConfiguration.get().isDatasetImportEnabled();
+                    Predicate<PageType> isDatasetImportPageType =
+                            (p) -> ReaderConfiguration.get().getDatasetImportPageTypes().contains(p);
 
                     registerContentTypes();
 

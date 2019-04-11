@@ -11,6 +11,7 @@ import com.github.onsdigital.logging.v2.serializer.JacksonLogSerialiser;
 import com.github.onsdigital.logging.v2.serializer.LogSerialiser;
 import com.github.onsdigital.logging.v2.storage.LogStore;
 import com.github.onsdigital.logging.v2.storage.MDCLogStore;
+import com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration;
 import com.github.onsdigital.zebedee.search.client.ElasticSearchClient;
 import com.github.onsdigital.zebedee.search.indexing.Indexer;
 import com.github.onsdigital.zebedee.search.indexing.SearchBoostTermsResolver;
@@ -54,7 +55,7 @@ public class ReaderInit implements Startup {
         }
 
         info().log("loading zebedee reader feature flags");
-        ReaderFeatureFlags.readerFeatureFlags();
+        ReaderConfiguration.get();
 
         info().log("initialising zededee reader elasticSearch client");
         try {

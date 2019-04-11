@@ -139,8 +139,6 @@ public class PageTest extends ZebedeeAPIBaseTestCase {
 
     @Test
     public void testPage_createPage_pageHookException() throws ZebedeeException, IOException {
-        System.setProperty("ENABLE_DATASET_IMPORT", "true");
-
         // Given a mock page hook that throws an exception
         PageUpdateHook mockPageHook = mock(PageUpdateHook.class);
         doThrow(new RuntimeException()).when(mockPageHook).onPageUpdated(any(), anyString());

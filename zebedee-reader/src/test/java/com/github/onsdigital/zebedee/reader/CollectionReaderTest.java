@@ -16,7 +16,9 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Map;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by bren on 30/07/15.
@@ -29,10 +31,10 @@ public class CollectionReaderTest {
     private final static String COLLECTION_ID = "testcollection-testid";
 
     static {
-        ReaderConfiguration.init("target/test-classes/test-content/");
+        ReaderConfiguration cfg = ReaderConfiguration.init("target/test-classes/test-content/");
 
         if (ZebedeeReader.getCollectionReaderFactory() == null) {
-            ZebedeeReader.setCollectionReaderFactory(new FakeCollectionReaderFactory(ReaderConfiguration.getConfiguration().getCollectionsFolder()));
+            ZebedeeReader.setCollectionReaderFactory(new FakeCollectionReaderFactory(cfg.getCollectionsDir()));
         }
     }
 
@@ -40,7 +42,7 @@ public class CollectionReaderTest {
 
     @Before
     public void createContentReader() throws IOException, NotFoundException {
-        this.collectionReader = new FakeCollectionReader(ReaderConfiguration.getConfiguration().getCollectionsFolder(), COLLECTION_ID);
+        this.collectionReader = new FakeCollectionReader(ReaderConfiguration.get().getCollectionsDir(), COLLECTION_ID);
     }
 
     @Test
@@ -151,10 +153,10 @@ public class CollectionReaderTest {
         ContentNode welshContent = children.get(prifBwyntiau);// no welsh available for this one
 
         assertEquals("Labour disputes", englishContent.getDescription().getTitle());
-        assertEquals("annual article 2014",englishContent.getDescription().getEdition());
+        assertEquals("annual article 2014", englishContent.getDescription().getEdition());
 
         assertEquals("prif bwyntiau", welshContent.getDescription().getTitle());
-        assertEquals("erthygl blynyddol 2015",welshContent.getDescription().getEdition());
+        assertEquals("erthygl blynyddol 2015", welshContent.getDescription().getEdition());
     }
 
     @Test

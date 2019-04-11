@@ -8,6 +8,7 @@ import com.github.onsdigital.zebedee.user.model.User;
 import com.github.onsdigital.zebedee.user.model.UserList;
 import com.github.onsdigital.zebedee.user.service.UsersService;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -47,6 +48,7 @@ public abstract class ZebedeeTestBaseFixture {
     @Before
     public void init() throws Exception {
         MockitoAnnotations.initMocks(this);
+        TestUtils.initReaderConfig();
 
         builder = new Builder();
         zebedee = builder.getZebedee();
@@ -103,5 +105,10 @@ public abstract class ZebedeeTestBaseFixture {
     @After
     public void tearDown() throws Exception {
         builder.delete();
+    }
+
+    @AfterClass
+    public static void cleanUp() {
+        TestUtils.clearReaderConfig();
     }
 }

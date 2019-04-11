@@ -12,7 +12,7 @@ import javax.crypto.SecretKey;
 import java.io.IOException;
 
 import static com.github.onsdigital.zebedee.configuration.Configuration.getUnauthorizedMessage;
-import static com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration.getConfiguration;
+import static com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration.get;
 
 /**
  * Zebedee specific CollectionWriter implementation.
@@ -67,7 +67,7 @@ public class ZebedeeCollectionWriter extends CollectionWriter {
             throw new NotFoundException("Please specify a collection");
         }
 
-        ReaderConfiguration config = getConfiguration();
+        ReaderConfiguration config = get();
 
         inProgress = new CollectionContentWriter(collection, key, collection.path.resolve(config.getInProgressFolderName()));
         complete = new CollectionContentWriter(collection, key, collection.path.resolve(config.getCompleteFolderName()));

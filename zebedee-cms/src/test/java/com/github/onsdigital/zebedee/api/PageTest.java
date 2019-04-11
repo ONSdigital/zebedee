@@ -1,5 +1,6 @@
 package com.github.onsdigital.zebedee.api;
 
+import com.github.onsdigital.zebedee.TestUtils;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.content.page.MockPageUpdateHook;
 import com.github.onsdigital.zebedee.content.page.PageUpdateHook;
@@ -16,6 +17,8 @@ import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.util.ZebedeeCmsService;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.http.HttpStatus;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.springframework.mock.web.DelegatingServletInputStream;
 
@@ -49,6 +52,16 @@ public class PageTest extends ZebedeeAPIBaseTestCase {
     private static final String uri = "/";
     private static final ApiDatasetLandingPage page = new ApiDatasetLandingPage();
     private static final byte[] serialisedPageBytes = ContentUtil.serialise(page).getBytes();
+
+    @BeforeClass
+    public static void setup() {
+        TestUtils.initReaderConfig();
+    }
+
+    @AfterClass
+    public static void tearDown() {
+        TestUtils.clearReaderConfig();
+    }
 
     @Override
     protected void customSetUp() throws Exception {
@@ -139,8 +152,6 @@ public class PageTest extends ZebedeeAPIBaseTestCase {
 
     @Test
     public void testPage_createPage_pageHookException() throws ZebedeeException, IOException {
-        System.setProperty("ENABLE_DATASET_IMPORT", "true");
-
         // Given a mock page hook that throws an exception
         PageUpdateHook mockPageHook = mock(PageUpdateHook.class);
         doThrow(new RuntimeException()).when(mockPageHook).onPageUpdated(any(), anyString());

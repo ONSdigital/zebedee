@@ -27,9 +27,9 @@ public class DatasetAPIClientSupplier {
                 if (INSTANCE == null) {
                     info().log("creating new instance of datasetAPIClient");
                     try {
-                        ReaderConfiguration cgf = ReaderConfiguration.get();
-                        INSTANCE = new DatasetAPIClient(cgf.getDatasetAPIHost(), cgf.getDatasetAPIAuthToken(),
-                                cgf.getServiceAuthToken());
+                        ReaderConfiguration cfg = ReaderConfiguration.get();
+                        INSTANCE = new DatasetAPIClient(cfg.getDatasetAPIHost(), cfg.getDatasetAPIAuthToken(),
+                                cfg.getServiceAuthToken());
                     } catch (Exception e) {
                         ZebedeeException ex = new InternalServerError("error initalising dataset api client", e);
                         throw error().logException(ex, "error instantiating datasetAPIClient instabce");

@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee.data;
 
 import com.github.davidcarboni.cryptolite.Random;
+import com.github.onsdigital.zebedee.TestUtils;
 import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeries;
 import com.github.onsdigital.zebedee.data.importing.TimeseriesUpdateCommand;
 import com.github.onsdigital.zebedee.data.processing.DataIndex;
@@ -12,6 +13,8 @@ import com.github.onsdigital.zebedee.model.DummyCollectionWriter;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -24,6 +27,16 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 
 public class DataPublisherTest {
+
+    @BeforeClass
+    public static void setup() {
+        TestUtils.initReaderConfig();
+    }
+
+    @AfterClass
+    public static void tearDown() {
+        TestUtils.clearReaderConfig();
+    }
 
     @Test
     public void preprocessCollectionShouldApplyUpdateCommands() throws IOException, ZebedeeException, URISyntaxException {

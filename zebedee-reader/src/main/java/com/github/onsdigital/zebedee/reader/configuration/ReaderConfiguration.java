@@ -91,6 +91,13 @@ public class ReaderConfiguration {
         return INSTANCE;
     }
 
+    /**
+     * For unit tests only.
+     */
+    public static void clear() {
+        INSTANCE = null;
+    }
+
     private ReaderConfiguration(String zebedeeRootDir) {
         zebedeeRootDir = defaultIfBlank(zebedeeRootDir, getVariableValue(ZEBEDEE_ROOT_ENV));
         String contentDir = getVariableValue(CONTENT_DIR_ENV);

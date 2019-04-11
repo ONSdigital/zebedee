@@ -15,9 +15,9 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
-import static com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration.get;
 import static com.github.onsdigital.zebedee.logging.ReaderLogger.error;
 import static com.github.onsdigital.zebedee.logging.ReaderLogger.info;
+import static com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration.get;
 
 public class DatasetSummaryResolver {
 

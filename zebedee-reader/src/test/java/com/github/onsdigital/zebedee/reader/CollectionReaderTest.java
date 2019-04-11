@@ -42,8 +42,7 @@ public class CollectionReaderTest {
 
     @Before
     public void createContentReader() throws IOException, NotFoundException {
-        this.collectionReader = new FakeCollectionReader(ReaderConfiguration.init("target/test-classes/test-content/")
-                .getCollectionsDir(), COLLECTION_ID);
+        this.collectionReader = new FakeCollectionReader(ReaderConfiguration.get().getCollectionsDir(), COLLECTION_ID);
     }
 
     @Test

@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee.session.service;
 
 import com.github.davidcarboni.cryptolite.Random;
+import com.github.onsdigital.zebedee.TestUtils;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.json.Credentials;
@@ -10,7 +11,9 @@ import com.github.onsdigital.zebedee.user.service.UsersService;
 import com.github.onsdigital.zebedee.session.store.SessionsStoreImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.joda.time.DateTime;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -70,6 +73,16 @@ public class SessionsServiceTest {
 
     private Path sessionPath() {
         return sessionsPath.resolve(SESSION_ID + JSON_EXT);
+    }
+
+    @BeforeClass
+    public static void setup() {
+        TestUtils.initReaderConfig();
+    }
+
+    @AfterClass
+    public static void tearDown() {
+        TestUtils.clearReaderConfig();
     }
 
     @Before

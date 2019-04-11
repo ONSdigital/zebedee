@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee.model.approval.task.timeseries;
 
 import com.github.davidcarboni.cryptolite.Random;
+import com.github.onsdigital.zebedee.TestUtils;
 import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeries;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
@@ -11,6 +12,8 @@ import com.github.onsdigital.zebedee.model.approval.tasks.timeseries.ZipFileVeri
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
 import org.apache.commons.io.FileUtils;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -24,6 +27,16 @@ public class ZipFileVerifierTest {
 
     private TimeSeriesCompressor timeSeriesCompressor = new TimeSeriesCompressor();
     private ZipFileVerifier zipFileVerifier = new ZipFileVerifier();
+
+    @BeforeClass
+    public static void setup() {
+        TestUtils.initReaderConfig();
+    }
+
+    @AfterClass
+    public static void tearDown() {
+        TestUtils.clearReaderConfig();
+    }
 
     public static void createTimeseriesFile(Path timeseriesRoot) throws IOException {
         String timeseriesId = Random.id();

@@ -2,6 +2,7 @@ package com.github.onsdigital.zebedee.content.util;
 
 import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.content.page.base.PageType;
+import com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
@@ -80,8 +81,9 @@ class PageTypeResolver implements JsonDeserializer<Page> {
             synchronized (PageTypeResolver.class) {
                 if (instance == null) {
                     info().log("initialising PageTypeResolver instance");
-                    boolean isDatasetImportEnabled = get().isDatasetImportEnabled();
-                    Predicate<PageType> isDatasetImportPageType = (p) -> get().getDatasetImportPageTypes().contains(p);
+                    boolean isDatasetImportEnabled = ReaderConfiguration.get().isDatasetImportEnabled();
+                    Predicate<PageType> isDatasetImportPageType =
+                            (p) -> ReaderConfiguration.get().getDatasetImportPageTypes().contains(p);
 
                     registerContentTypes();
 

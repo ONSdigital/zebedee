@@ -1,9 +1,12 @@
 package com.github.onsdigital.zebedee.session.store;
 
+import com.github.onsdigital.zebedee.TestUtils;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.google.gson.Gson;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -30,6 +33,16 @@ public class SessionStoreImplTest {
     private Date startDate;
     private Session session;
     private Path sessionFile;
+
+    @BeforeClass
+    public static void setup() {
+        TestUtils.initReaderConfig();
+    }
+
+    @AfterClass
+    public static void staticTearDown() {
+        TestUtils.clearReaderConfig();
+    }
 
     @Before
     public void setUp() throws Exception {

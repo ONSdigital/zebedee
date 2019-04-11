@@ -91,6 +91,13 @@ public class ReaderConfiguration {
         return INSTANCE;
     }
 
+    /**
+     * For unit tests only.
+     */
+    public static void clear() {
+        INSTANCE = null;
+    }
+
     private ReaderConfiguration(String zebedeeRootDir) {
         zebedeeRootDir = defaultIfBlank(zebedeeRootDir, getVariableValue(ZEBEDEE_ROOT_ENV));
         String contentDir = getVariableValue(CONTENT_DIR_ENV);
@@ -102,7 +109,6 @@ public class ReaderConfiguration {
 
         if (isNotEmpty(zebedeeRootDir)) {
             this.zebedeeRootDir = URIUtils.removeTrailingSlash(zebedeeRootDir);
-
             String zebedeeFolderFormat = "{0}/zebedee/{1}";
             this.collectionsDir = format(zebedeeFolderFormat, this.zebedeeRootDir, COLLECTIONS_FOLDER_NAME);
             this.contentDir = format(zebedeeFolderFormat, this.zebedeeRootDir, PUBLISHED_FOLDER_NAME);

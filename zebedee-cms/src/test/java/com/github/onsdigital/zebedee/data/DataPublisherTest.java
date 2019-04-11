@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee.data;
 
 import com.github.davidcarboni.cryptolite.Random;
+import com.github.onsdigital.zebedee.TestUtils;
 import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeries;
 import com.github.onsdigital.zebedee.data.importing.TimeseriesUpdateCommand;
 import com.github.onsdigital.zebedee.data.processing.DataIndex;
@@ -13,7 +14,9 @@ import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
 import com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -37,6 +40,16 @@ public class DataPublisherTest {
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
+    }
+
+    @BeforeClass
+    public static void setup() {
+        TestUtils.initReaderConfig();
+    }
+
+    @AfterClass
+    public static void tearDown() {
+        TestUtils.clearReaderConfig();
     }
 
     @Test

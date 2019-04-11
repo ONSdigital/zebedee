@@ -32,6 +32,8 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 import static com.github.onsdigital.zebedee.Zebedee.APPLICATION_KEYS;
 import static com.github.onsdigital.zebedee.Zebedee.COLLECTIONS;
 import static com.github.onsdigital.zebedee.Zebedee.PERMISSIONS;
@@ -43,8 +45,6 @@ import static com.github.onsdigital.zebedee.Zebedee.TEAMS;
 import static com.github.onsdigital.zebedee.Zebedee.USERS;
 import static com.github.onsdigital.zebedee.Zebedee.ZEBEDEE;
 import static com.github.onsdigital.zebedee.permissions.store.PermissionsStoreFileSystemImpl.initialisePermissions;
-import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
-import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
 
 /**
  * Object encapsulating the set up configuration required by {@link Zebedee}. Set paths to & create relevant
@@ -83,8 +83,6 @@ public class ZebedeeConfiguration {
         if (!Files.exists(dir)) {
             info().data("path", dirName).log("creating required Zebedee directory as it does not exist.");
             Files.createDirectory(dir);
-        } else {
-            info().data("path", dir.toString()).log("zebedee directory already exists no action required.");
         }
         return dir;
     }
@@ -163,7 +161,20 @@ public class ZebedeeConfiguration {
 
         datasetService = new ZebedeeDatasetService(datasetClient);
 
-        info().log("zebedeeConfiguration creation complete.");
+        info().data("root_path", rootPath.toString())
+                .data("zebedee_path", zebedeePath.toString())
+                .data("published_content_path", publishedContentPath.toString())
+                .data("collections_path", collectionsPath.toString())
+                .data("published_collections_path", publishedCollectionsPath.toString())
+                .data("users_path", usersPath.toString())
+                .data("sessions_path", sessionsPath.toString())
+                .data("permissions_path", permissionsPath.toString())
+                .data("teams_path", teamsPath.toString())
+                .data("application_keys_path", applicationKeysPath.toString())
+                .data("redirect_path", applicationKeysPath.toString())
+                .data("services_path", servicePath.toString())
+                .data("enable_verification_agent", useVerificationAgent)
+                .log("zebedee configuration creation complete");
     }
 
     public boolean isUseVerificationAgent() {

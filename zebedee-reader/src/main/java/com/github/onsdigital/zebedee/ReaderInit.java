@@ -53,6 +53,8 @@ public class ReaderInit implements Startup {
                 System.exit(1);
             }
         }
+
+        info().log("loading zebedee reader configuration");
         ReaderConfiguration.get();
 
         info().log("initialising zededee reader elasticSearch client");

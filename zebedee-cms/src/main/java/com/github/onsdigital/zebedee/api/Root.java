@@ -72,8 +72,7 @@ public class Root {
     }
 
     public static void init() {
-
-        info().log("zebedee root: zebedee init");
+        info().log("initalizing zebedee-cms");
 
         // Set ISO date formatting in Gson to match Javascript Date.toISODate()
         Serialiser.getBuilder().registerTypeAdapter(Date.class, new IsoDateSerializer());
@@ -85,13 +84,20 @@ public class Root {
         String rootDir = env.get(ZEBEDEE_ROOT);
         boolean zebedeeCreated = false;
 
-        if (StringUtils.isNotEmpty(rootDir) && Files.exists(Paths.get(rootDir))) {
+        boolean validZebRoot = StringUtils.isNotEmpty(rootDir) && Files.exists(Paths.get(rootDir));
+
+        if (validZebRoot) {
+            info().data(ZEBEDEE_ROOT, rootDir)
+                    .log("a valid zebedee root dir was found in the environment variables proceeding to initialize zebedee cms");
             root = Paths.get(rootDir);
             try {
                 zebedee = initialiseZebedee(root);
                 zebedeeCreated = true;
+                info().data(ZEBEDEE_ROOT, rootDir).log("successfully initalized zebedeed cms using the specified environment config");
             } catch (Exception e) {
-                e.printStackTrace();
+                error().exception(e)
+                        .data(ZEBEDEE_ROOT, rootDir)
+                        .log("error attempting to initalize zebedee cms from env config settings");
             }
         }
         if (!zebedeeCreated) {
@@ -99,7 +105,7 @@ public class Root {
                 // Create a Zebedee folder:
                 root = Files.createTempDirectory("generated");
                 zebedee = initialiseZebedee(root);
-                info().data("url", root.toString()).log("zebedee root: zebedee root created");
+                info().data(ZEBEDEE_ROOT, root.toString()).log("zebedee root: zebedee root created");
                 ReaderConfiguration.init(root.toString());
 
                 // Initialise content folders from bundle
@@ -107,7 +113,7 @@ public class Root {
                 List<Path> content = listContent(taxonomy);
                 copyContent(content, taxonomy);
             } catch (IOException | UnauthorizedException | BadRequestException | NotFoundException e) {
-                throw new RuntimeException("Error initialising Zebedee ", e);
+                throw new RuntimeException("Error initializing Zebedee ", e);
             }
         }
 
@@ -123,11 +129,12 @@ public class Root {
         try {
             cleanupStaleCollectionKeys();
         } catch (Exception ex) {
+            // TODO should we exit at this point?
             error().logException(ex, "error cleaning stale collection keys from users exiting application");
-            System.exit(1);
         }
-    }
 
+        info().data(ZEBEDEE_ROOT, rootDir).log("zebedee cmd initialization completed successfully");
+    }
     /**
      * If we have not previously generated a key for CSDB import, generate one and distribute it.
      */

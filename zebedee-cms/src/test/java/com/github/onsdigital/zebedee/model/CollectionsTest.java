@@ -50,6 +50,7 @@ import java.util.function.Supplier;
 
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_DELETED;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_UNLOCKED;
+import static junit.framework.TestCase.assertTrue;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -1052,5 +1053,39 @@ public class CollectionsTest {
             verify(collectionDescriptionMock, times(1)).getName();
             throw e;
         }
+    }
+
+    @Test
+    public void shouldReturnEmptyOrphansListIfAllCollectionsValid() throws Exception {
+        collectionsPath.resolve("c1").toFile().mkdir();
+        collectionsPath.resolve("c1.json").toFile().createNewFile();
+
+        collectionsPath.resolve("c2").toFile().mkdir();
+        collectionsPath.resolve("c2.json").toFile().createNewFile();
+
+        collectionsPath.resolve("c3").toFile().mkdir();
+        collectionsPath.resolve("c3.json").toFile().createNewFile();
+
+        assertTrue(collections.listOrphaned().isEmpty());
+    }
+
+    @Test
+    public void shouldReturnExpectedOrphansList() throws Exception {
+        collectionsPath.resolve("c1").toFile().mkdir();
+        collectionsPath.resolve("c1.json").toFile().createNewFile();
+
+        // create 2 collection dirs without the corresoinding json files.
+        collectionsPath.resolve("c2").toFile().mkdir();
+        collectionsPath.resolve("c3").toFile().mkdir();
+
+        List<String> orphans = collections.listOrphaned();
+
+        assertThat("incorrect number of orphans returned", orphans.size(), equalTo(2));
+        assertThat("incorrect number of orphans returned", orphans, equalTo(
+                new ArrayList() {{
+                    add("c2");
+                    add("c3");
+                }})
+        );
     }
 }

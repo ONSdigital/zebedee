@@ -13,21 +13,21 @@ public class DatasetAPIClientSupplier {
     private static DatasetAPIClient INSTANCE = null;
 
     public static DatasetAPIClient get() throws ZebedeeException {
-        if (ReaderConfiguration.get().isDatasetImportEnabled()) {
+        ReaderConfiguration cfg = ReaderConfiguration.get();
+        if (cfg.isDatasetImportEnabled()) {
             info().log("cmd feature flag is enabled returning datasetAPIClient instance");
-            return getInstance();
+            return getInstance(cfg);
         }
         info().log("cmd feature flag is not enabled returning null datasetAPIClient instance");
         return null;
     }
 
-    private static DatasetAPIClient getInstance() throws ZebedeeException {
+    private static DatasetAPIClient getInstance(ReaderConfiguration cfg) throws ZebedeeException {
         if (INSTANCE == null) {
             synchronized (DatasetAPIClientSupplier.class) {
                 if (INSTANCE == null) {
                     info().log("creating new instance of datasetAPIClient");
                     try {
-                        ReaderConfiguration cfg = ReaderConfiguration.get();
                         INSTANCE = new DatasetAPIClient(cfg.getDatasetAPIHost(), cfg.getDatasetAPIAuthToken(),
                                 cfg.getServiceAuthToken());
                     } catch (Exception e) {
@@ -39,6 +39,4 @@ public class DatasetAPIClientSupplier {
         }
         return INSTANCE;
     }
-
-
 }

@@ -5,12 +5,15 @@ import com.github.onsdigital.zebedee.exceptions.ConflictException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.Credentials;
+import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.user.model.User;
 import com.github.onsdigital.zebedee.user.model.UserList;
 
 import javax.crypto.SecretKey;
 import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Interface defining User management functions.
@@ -46,6 +49,18 @@ public interface UsersService {
      * @throws BadRequestException
      */
     void removeStaleCollectionKeys(String userEmail) throws IOException, NotFoundException, BadRequestException;
+
+    /**
+     *
+     * @param collectionMap
+     * @param orphanedCollections
+     * @param userEmail
+     * @throws IOException
+     * @throws NotFoundException
+     * @throws BadRequestException
+     */
+    void removeStaleCollectionKeys(Map<String, Collection> collectionMap, List<String> orphanedCollections,
+                                   String userEmail) throws IOException, NotFoundException, BadRequestException;
 
     /**
      * Add a collection key to a {@link User#keyring}

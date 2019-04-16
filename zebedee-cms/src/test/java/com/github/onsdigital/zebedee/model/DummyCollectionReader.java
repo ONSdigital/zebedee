@@ -6,6 +6,7 @@ import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
+import com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -19,6 +20,13 @@ import static com.github.onsdigital.zebedee.reader.configuration.ReaderConfigura
 public class DummyCollectionReader extends CollectionReader {
 
     private Path collections;
+
+    public DummyCollectionReader(Path collectionsPath, ReaderConfiguration configuration) throws BadRequestException,
+            IOException, UnauthorizedException, NotFoundException {
+        inProgress = getContentReader(collectionsPath, configuration.getInProgressFolderName());
+        complete = getContentReader(collectionsPath, configuration.getCompleteFolderName());
+        reviewed = getContentReader(collectionsPath, configuration.getReviewedFolderName());
+    }
 
     public DummyCollectionReader(Path collectionsPath) throws BadRequestException, IOException, UnauthorizedException, NotFoundException {
         inProgress = getContentReader(collectionsPath, get().getInProgressFolderName());

@@ -285,6 +285,8 @@ public class ZebedeeDatasetService implements DatasetService {
         try {
             datasetClient.deleteDataset(datasetID);
         } catch (Exception e) {
+
+            // ForbiddenException is expected where the dataset has previous published versions.
             if (!e.equals(dp.api.dataset.exception.ForbiddenException.class)) {
                 throw e;
             }

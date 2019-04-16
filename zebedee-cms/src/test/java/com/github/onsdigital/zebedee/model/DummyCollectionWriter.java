@@ -3,6 +3,7 @@ package com.github.onsdigital.zebedee.model;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
+import com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -16,6 +17,13 @@ import static com.github.onsdigital.zebedee.reader.configuration.ReaderConfigura
 public class DummyCollectionWriter extends CollectionWriter {
 
     private Path collections;
+
+    public DummyCollectionWriter(Path collectionsPath, ReaderConfiguration configuration) throws BadRequestException,
+            IOException, UnauthorizedException, NotFoundException {
+        inProgress = getContentWriter(collectionsPath, configuration.getInProgressFolderName());
+        complete = getContentWriter(collectionsPath, configuration.getCompleteFolderName());
+        reviewed = getContentWriter(collectionsPath, configuration.getReviewedFolderName());
+    }
 
     public DummyCollectionWriter(Path collectionsPath) throws BadRequestException, IOException, UnauthorizedException, NotFoundException {
         inProgress = getContentWriter(collectionsPath, get().getInProgressFolderName());

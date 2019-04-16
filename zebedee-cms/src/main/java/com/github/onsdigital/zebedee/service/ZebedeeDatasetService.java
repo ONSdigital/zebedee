@@ -16,9 +16,11 @@ import dp.api.dataset.model.State;
 
 import java.io.IOException;
 import java.io.InvalidObjectException;
+import java.rmi.UnexpectedException;
 import java.util.Objects;
 import java.util.Optional;
 
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 
 /**
@@ -282,17 +284,20 @@ public class ZebedeeDatasetService implements DatasetService {
             return;
         }
 
-        Dataset datasetUpdate = new Dataset();
-        datasetUpdate.setCollection_id("");
-        datasetUpdate.setState(State.CREATED);
-        datasetClient.updateDataset(datasetID, datasetUpdate);
+        try {
+            datasetClient.deleteDataset(datasetID);
+        } catch (Exception e) {
+            if (!e.equals(dp.api.dataset.exception.ForbiddenException.class)) {
+                throw e;
+            }
+        }
 
         collection.getDescription().removeDataset(existingDataset.get());
         collection.save();
     }
 
     /**
-     * Remove the instance for the given datasetID from the collection for the collectionID.
+     * Remove the version for the given edition and datasetID from the collection for the collectionID.
      */
     @Override
     public void removeDatasetVersionFromCollection(Collection collection, String datasetID, String edition, String version) throws IOException, DatasetAPIException {

@@ -16,6 +16,7 @@ public class Article extends StatisticalDocument {
     private List<Link> relatedArticles;
     private List<DownloadSection> pdfTable;
     private Boolean isPrototypeArticle;
+    private Boolean isReleaseDateEnabled;
     private String imageUri;
 
     public String getImageUri() {
@@ -53,5 +54,13 @@ public class Article extends StatisticalDocument {
 
     public void setPrototypeArticle(Boolean prototypeArticle) {
         isPrototypeArticle = prototypeArticle;
+    }
+
+    public Boolean getReleaseDateEnabled() {
+        return isReleaseDateEnabled;
+    }
+
+    public void setReleaseDateEnabled(Boolean releaseDateEnabled) {
+        isReleaseDateEnabled = releaseDateEnabled;
     }
 }

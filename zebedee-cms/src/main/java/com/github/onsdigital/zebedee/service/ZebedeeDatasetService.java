@@ -16,11 +16,9 @@ import dp.api.dataset.model.State;
 
 import java.io.IOException;
 import java.io.InvalidObjectException;
-import java.rmi.UnexpectedException;
 import java.util.Objects;
 import java.util.Optional;
 
-import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 
 /**

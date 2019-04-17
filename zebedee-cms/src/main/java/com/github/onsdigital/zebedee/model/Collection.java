@@ -385,59 +385,6 @@ public class Collection {
         return zebedee.getCollections().path.resolve(name + ".json");
     }
 
-
-    /**
-     * Renames an existing {@link Collection} in the given {@link Zebedee}.
-     *
-     * @param collectionDescription The {@link CollectionDescription} for the {@link Collection} to rename.
-     * @param newName               The new name to apply to the {@link Collection}.
-     * @param zebedee
-     * @return
-     * @throws IOException
-     */
-    public static Collection rename_(CollectionDescription collectionDescription, String newName, Zebedee zebedee)
-            throws IOException, CollectionNotFoundException {
-
-        String originalFilename = collectionDescription.getName();
-
-        // collection file name is the collection name stripped of illegal chars.
-        String filename = PathUtils.toFilename(originalFilename);
-
-        // remove any illegal chars (if any) from the new name.
-        String newNameClean = PathUtils.toFilename(newName);
-
-        Path collection = zebedee.getCollections().path.resolve(filename);
-        Path newCollection = zebedee.getCollections().path.resolve(newNameClean);
-
-        new File(collection.toUri()).renameTo(new File(newCollection.toUri()));
-
-        // Create the description:
-        Path newPath = zebedee.getCollections().path.resolve(newNameClean + ".json");
-
-        collectionDescription.setName(newName);
-
-        try (OutputStream output = Files.newOutputStream(newPath)) {
-            Serialiser.serialise(output, collectionDescription);
-        }
-
-        if (!filename.equals(newNameClean)) {
-            info().data("orginal_name", originalFilename)
-                    .data("orginal_name_clean", filename)
-                    .data("new_name", newName)
-                    .data("new_name_clean", newNameClean)
-                    .log("collection name has changed renaming collection json file");
-            Files.delete(zebedee.getCollections().path.resolve(filename + ".json"));
-        } else {
-            info().data("orginal_name", collectionDescription.getName())
-                    .data("orginal_name_clean", filename)
-                    .data("new_name", newName)
-                    .data("new_name_clean", newNameClean)
-                    .log("collection name has not changed collection json file will not be deleted");
-        }
-
-        return new Collection(zebedee.getCollections().path.resolve(newNameClean), zebedee);
-    }
-
     private static Release getPublishedRelease(String uri, Zebedee zebedee) throws IOException, ZebedeeException {
         Release release = (Release) new ZebedeeReader(zebedee.getPublished().path.toString(), null).getPublishedContent(uri);
         return release;

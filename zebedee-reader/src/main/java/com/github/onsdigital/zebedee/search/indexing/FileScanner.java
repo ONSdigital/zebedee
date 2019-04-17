@@ -25,7 +25,7 @@ public class FileScanner {
     private Path root;
 
     public FileScanner() {
-        root = Paths.get(ReaderConfiguration.getConfiguration().getContentDir());
+        root = Paths.get(ReaderConfiguration.get().getContentDir());
     }
 
     public List<Document> scan() throws IOException {

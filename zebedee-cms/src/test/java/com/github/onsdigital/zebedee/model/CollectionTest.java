@@ -30,6 +30,7 @@ import com.github.onsdigital.zebedee.util.ContentDetailUtil;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -140,6 +141,92 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         assertTrue(Files.exists(releasePath));
         assertTrue(Files.exists(jsonPath));
         assertTrue(!Files.exists(oldJsonPath));
+        assertTrue(Files.exists(releasePath.resolve(Collection.REVIEWED)));
+        assertTrue(Files.exists(releasePath.resolve(Collection.COMPLETE)));
+        assertTrue(Files.exists(releasePath.resolve(Collection.IN_PROGRESS)));
+
+        CollectionDescription renamedCollectionDescription;
+        try (InputStream inputStream = Files.newInputStream(jsonPath)) {
+            renamedCollectionDescription = Serialiser.deserialise(inputStream, CollectionDescription.class);
+        }
+
+        assertNotNull(renamedCollectionDescription);
+        assertEquals(collectionDescription.getId(), renamedCollectionDescription.getId());
+        assertEquals(newName, renamedCollectionDescription.getName());
+        assertEquals(collectionDescription.getPublishDate(), renamedCollectionDescription.getPublishDate());
+        assertEquals(collectionDescription.getType(), renamedCollectionDescription.getType());
+    }
+
+    @Test
+    public void shouldRenameCollectionSpecialChars() throws Exception {
+
+        // Given an existing collection
+        String name = "Collection A $$";
+        CollectionDescription collectionDescription = new CollectionDescription(name);
+        collectionDescription.setType(CollectionType.manual);
+        collectionDescription.setPublishDate(new Date());
+        String newName = "Collection A";
+        String filename = PathUtils.toFilename(newName);
+
+        // When the rename function is called.
+
+        Collection.create(collectionDescription, zebedee, publisherSession);
+
+        Collection.rename(collectionDescription, newName, zebedee);
+
+        // Then the collection is renamed.
+        Path rootPath = builder.zebedeeRootPath.resolve(Zebedee.COLLECTIONS);
+        Path releasePath = rootPath.resolve(filename);
+        Path jsonPath = rootPath.resolve(filename + ".json");
+
+        Path oldJsonPath = rootPath.resolve(PathUtils.toFilename(name) + ".json");
+
+        assertTrue(Files.exists(releasePath));
+        assertTrue(Files.exists(jsonPath));
+        assertTrue(!Files.exists(oldJsonPath));
+        assertTrue(Files.exists(releasePath.resolve(Collection.REVIEWED)));
+        assertTrue(Files.exists(releasePath.resolve(Collection.COMPLETE)));
+        assertTrue(Files.exists(releasePath.resolve(Collection.IN_PROGRESS)));
+
+        CollectionDescription renamedCollectionDescription;
+        try (InputStream inputStream = Files.newInputStream(jsonPath)) {
+            renamedCollectionDescription = Serialiser.deserialise(inputStream, CollectionDescription.class);
+        }
+
+        assertNotNull(renamedCollectionDescription);
+        assertEquals(collectionDescription.getId(), renamedCollectionDescription.getId());
+        assertEquals(newName, renamedCollectionDescription.getName());
+        assertEquals(collectionDescription.getPublishDate(), renamedCollectionDescription.getPublishDate());
+        assertEquals(collectionDescription.getType(), renamedCollectionDescription.getType());
+    }
+
+    @Test
+    public void shouldRenameCollectionSameaName() throws Exception {
+
+        // Given an existing collection
+        String name = "Collection A";
+        CollectionDescription collectionDescription = new CollectionDescription(name);
+        collectionDescription.setType(CollectionType.manual);
+        collectionDescription.setPublishDate(new Date());
+        String newName = "Collection A";
+        String filename = PathUtils.toFilename(newName);
+
+        // When the rename function is called.
+
+        Collection.create(collectionDescription, zebedee, publisherSession);
+
+        Collection.rename(collectionDescription, newName, zebedee);
+
+        // Then the collection is renamed.
+        Path rootPath = builder.zebedeeRootPath.resolve(Zebedee.COLLECTIONS);
+        Path releasePath = rootPath.resolve(filename);
+        Path jsonPath = rootPath.resolve(filename + ".json");
+
+        Path oldJsonPath = rootPath.resolve(PathUtils.toFilename(name) + ".json");
+
+        assertTrue(Files.exists(releasePath));
+        assertTrue(Files.exists(jsonPath));
+        assertTrue(Files.exists(oldJsonPath));
         assertTrue(Files.exists(releasePath.resolve(Collection.REVIEWED)));
         assertTrue(Files.exists(releasePath.resolve(Collection.COMPLETE)));
         assertTrue(Files.exists(releasePath.resolve(Collection.IN_PROGRESS)));

@@ -1,15 +1,15 @@
 package com.github.onsdigital.zebedee;
 
-import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
-import com.github.onsdigital.zebedee.user.model.User;
-import com.github.onsdigital.zebedee.user.model.UserList;
 import com.github.onsdigital.zebedee.model.Collection;
+import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDao;
 import com.github.onsdigital.zebedee.service.ServiceSupplier;
+import com.github.onsdigital.zebedee.user.model.User;
+import com.github.onsdigital.zebedee.user.model.UserList;
 import com.github.onsdigital.zebedee.user.service.UsersService;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
@@ -45,14 +45,10 @@ public abstract class ZebedeeTestBaseFixture {
     protected Builder builder;
     protected Map<String, User> usersMap;
 
-    @BeforeClass
-    public static void setUpLogger() {
-        LoggingTestHelper.initDPLogger(ZebedeeTestBaseFixture.class);
-    }
-
     @Before
     public void init() throws Exception {
         MockitoAnnotations.initMocks(this);
+        TestUtils.initReaderConfig();
 
         builder = new Builder();
         zebedee = builder.getZebedee();
@@ -109,5 +105,10 @@ public abstract class ZebedeeTestBaseFixture {
     @After
     public void tearDown() throws Exception {
         builder.delete();
+    }
+
+    @AfterClass
+    public static void cleanUp() {
+        TestUtils.clearReaderConfig();
     }
 }

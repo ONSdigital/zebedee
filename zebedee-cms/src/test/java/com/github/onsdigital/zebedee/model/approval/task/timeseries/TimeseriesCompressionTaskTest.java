@@ -1,6 +1,5 @@
 package com.github.onsdigital.zebedee.model.approval.task.timeseries;
 
-import com.github.onsdigital.zebedee.LoggingTestHelper;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.model.Collection;
@@ -12,7 +11,6 @@ import com.github.onsdigital.zebedee.model.approval.tasks.timeseries.TimeseriesC
 import com.github.onsdigital.zebedee.model.approval.tasks.timeseries.ZipFileVerifier;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
-import org.junit.BeforeClass;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -38,11 +36,6 @@ public class TimeseriesCompressionTaskTest {
 
     private Path timeSeriesDirectoryPath = Paths.get("some/path/timeseries");
     private Path timeSeriesZipPath = Paths.get("some/path/timeseries-to-publish.zip");
-
-    @BeforeClass
-    public static void setUpLogger() {
-        LoggingTestHelper.initDPLogger(TimeseriesCompressionTaskTest.class);
-    }
 
     @Before
     public void setUp() throws Exception {

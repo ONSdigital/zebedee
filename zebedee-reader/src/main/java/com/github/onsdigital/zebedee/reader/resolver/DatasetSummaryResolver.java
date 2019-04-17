@@ -15,9 +15,9 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
-import static com.github.onsdigital.zebedee.ReaderFeatureFlags.readerFeatureFlags;
 import static com.github.onsdigital.zebedee.logging.ReaderLogger.error;
 import static com.github.onsdigital.zebedee.logging.ReaderLogger.info;
+import static com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration.get;
 
 public class DatasetSummaryResolver {
 
@@ -45,7 +45,7 @@ public class DatasetSummaryResolver {
      * @throws ZebedeeException
      */
     DatasetSummaryResolver() throws ZebedeeException {
-        this.isDatasetImportEnabled = readerFeatureFlags().isEnableDatasetImport();
+        this.isDatasetImportEnabled = get().isDatasetImportEnabled();
         if (isDatasetImportEnabled) {
             this.datasetAPIClient = DatasetAPIClientSupplier.get();
         }

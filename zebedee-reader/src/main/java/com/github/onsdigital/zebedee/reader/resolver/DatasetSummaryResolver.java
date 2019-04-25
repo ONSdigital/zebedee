@@ -6,7 +6,6 @@ import com.github.onsdigital.zebedee.content.partial.Link;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.reader.api.ReadRequestHandler;
 import com.github.onsdigital.zebedee.reader.api.bean.DatasetSummary;
-import com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration;
 import com.github.onsdigital.zebedee.reader.util.DatasetAPIClientSupplier;
 import dp.api.dataset.DatasetAPIClient;
 import dp.api.dataset.exception.DatasetAPIException;
@@ -18,6 +17,7 @@ import java.net.URISyntaxException;
 
 import static com.github.onsdigital.zebedee.logging.ReaderLogger.error;
 import static com.github.onsdigital.zebedee.logging.ReaderLogger.info;
+import static com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration.get;
 
 public class DatasetSummaryResolver {
 
@@ -45,7 +45,7 @@ public class DatasetSummaryResolver {
      * @throws ZebedeeException
      */
     DatasetSummaryResolver() throws ZebedeeException {
-        this.isDatasetImportEnabled = ReaderConfiguration.get().isDatasetImportEnabled();
+        this.isDatasetImportEnabled = get().isDatasetImportEnabled();
         if (isDatasetImportEnabled) {
             this.datasetAPIClient = DatasetAPIClientSupplier.get();
         }

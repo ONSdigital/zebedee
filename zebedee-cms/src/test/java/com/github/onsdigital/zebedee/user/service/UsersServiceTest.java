@@ -23,8 +23,10 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import javax.crypto.SecretKey;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
@@ -700,6 +702,57 @@ public class UsersServiceTest {
         verify(collections, times(1)).mapByID();
         verify(applicationKeys, times(1)).containsKey("12345");
         verify(keyring, times(1)).remove("12345");
+        verify(userStore, times(1)).save(userMock);
+        verify(lockMock, times(3)).lock();
+        verify(lockMock, times(3)).unlock();
+    }
+
+    @Test
+    public void removeStaleCollectionKeys_ShouldNotRemoveOrphanedCollections() throws Exception {
+        Collection collectionMock = mock(Collection.class);
+        Map<String, Collection> mapping = new HashMap<>();
+
+        List<String> orphanedCollections = new ArrayList() {{
+            add("orphan");
+        }};
+
+        Set<String> keyringAsList = new HashSet() {{
+            add("collectionABC");
+            add("orphan");
+        }};
+
+        when(userStore.exists(EMAIL))
+                .thenReturn(true);
+        when(userStore.get(EMAIL))
+                .thenReturn(userMock);
+        when(userMock.keyring())
+                .thenReturn(keyring);
+        when(keyring.list())
+                .thenReturn(keyringAsList);
+        when(collections.mapByID())
+                .thenReturn(mapping);
+        when(collections.listOrphaned())
+                .thenReturn(orphanedCollections);
+        when(applicationKeys.containsKey("collectionABC"))
+                .thenReturn(false);
+        when(userMock.getAdminOptions())
+                .thenReturn(new AdminOptions());
+
+        service.removeStaleCollectionKeys(EMAIL);
+
+        verify(userStore, times(1)).exists(EMAIL);
+        verify(userStore, times(1)).get(EMAIL);
+        verify(userMock, times(3)).keyring();
+        verify(collections, times(1)).mapByID();
+        verify(collections, times(1)).listOrphaned();
+
+        verify(applicationKeys, times(1)).containsKey("collectionABC");
+        verify(keyring, times(1)).remove("collectionABC");
+
+        // important bit - never remove an orphan if it exists
+        verify(applicationKeys, times(1)).containsKey("orphan");
+        verify(keyring, never()).remove("orphan");
+
         verify(userStore, times(1)).save(userMock);
         verify(lockMock, times(3)).lock();
         verify(lockMock, times(3)).unlock();

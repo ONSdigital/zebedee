@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 import static com.github.onsdigital.zebedee.logging.ReaderLogger.error;
 import static com.github.onsdigital.zebedee.logging.ReaderLogger.info;
 import static com.github.onsdigital.zebedee.logging.ReaderLogger.warn;
+import static com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration.get;
 
 /**
  * Created by bren on 09/06/15.
@@ -86,7 +87,6 @@ class PageTypeResolver implements JsonDeserializer<Page> {
 
                     registerContentTypes();
 
-
                     contentClasses.entrySet()
                             .stream()
                             .map((item) -> contentTypeNameFunc.apply(item))
@@ -117,7 +117,6 @@ class PageTypeResolver implements JsonDeserializer<Page> {
                 String className = contentClass.getSimpleName();
                 boolean _abstract = Modifier.isAbstract(contentClass.getModifiers());
                 if (_abstract) {
-                    info().data("type", className).log("Skipping registering abstract content");
                     continue;
                 }
 

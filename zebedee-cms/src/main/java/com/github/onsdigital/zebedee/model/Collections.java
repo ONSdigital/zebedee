@@ -48,7 +48,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.Future;
@@ -57,6 +59,9 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.warn;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getUnauthorizedMessage;
 import static com.github.onsdigital.zebedee.model.Content.isDataVisualisationFile;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_APPROVED;
@@ -70,9 +75,6 @@ import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLL
 import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData.contentMoved;
 import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData.contentRenamed;
 
-import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
-import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
-
 public class Collections {
 
     public final Path path;
@@ -84,6 +86,7 @@ public class Collections {
     private BiConsumer<Collection, EventType> publishingNotificationConsumer = (c, e) -> new PublishNotification(c).sendNotification(e);
     private Function<Path, ContentReader> contentReaderFactory = FileSystemContentReader::new;
     private Supplier<CollectionHistoryDao> collectionHistoryDaoSupplier = CollectionHistoryDaoFactory::getCollectionHistoryDao;
+    private Comparator<String> strComparator = Comparator.comparing(String::toString);
 
     public Collections(Path path, PermissionsService permissionsService, Content published) {
         this.path = path;
@@ -225,13 +228,35 @@ public class Collections {
                     try {
                         result.add(new Collection(path, zebedeeSupplier.get()));
                     } catch (CollectionNotFoundException e) {
-                        error().data("collectionPath", path.toString()).logException(e, "Failed to deserialise collection");
+                        error().data("collection_path", path.toString())
+                                .logException(e, "failed to deserialise collection");
                     }
                 }
             }
         }
 
         return result;
+    }
+
+    public List<String> listOrphaned() throws IOException {
+        List<String> orphans = new ArrayList<>();
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(path)) {
+            for (Path collectionPath : stream) {
+                if (Files.isDirectory(collectionPath)) {
+                    String collectionDirName = collectionPath.toFile().getName();
+                    if (!path.resolve(collectionDirName + ".json").toFile().exists()) {
+                        orphans.add(collectionDirName);
+                    }
+                }
+            }
+        }
+        if (!orphans.isEmpty()) {
+            orphans.sort(strComparator);
+            warn().data("orphaned_collections", orphans)
+                    .log("orphaned collections found. It's recommended you investiagte and fix these. Encryption keys " +
+                            "for these collections will not be removed from users");
+        }
+        return orphans;
     }
 
     public Map<String, Collection> mapByID() throws IOException {

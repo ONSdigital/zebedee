@@ -8,6 +8,7 @@ import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ResourceDirectoryNotFileException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
+import com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration;
 import com.github.onsdigital.zebedee.reader.data.filter.DataFilter;
 import com.github.onsdigital.zebedee.reader.data.filter.FilterUtil;
 import com.github.onsdigital.zebedee.reader.data.language.ContentLanguage;
@@ -45,7 +46,8 @@ public class ZebedeeReader {
     }
 
     public ZebedeeReader(ContentLanguage language) {
-        publishedContentReader = new FileSystemContentReader(get().getContentDir());
+        ReaderConfiguration cfg = ReaderConfiguration.get();
+        publishedContentReader = new FileSystemContentReader(cfg.getContentDir());
         publishedContentReader.setLanguage(language);
         this.language = language;
     }

@@ -261,20 +261,18 @@ public class UsersServiceImpl implements UsersService {
 
             if (user.keyring() != null) {
                 Map<String, Collection> collectionMap = collections.mapByID();
+                List<String> orphanedCollections = collections.listOrphaned();
 
                 List<String> keysToRemove = user.keyring()
                         .list()
                         .stream()
-                        .filter(key -> {
-                            if (applicationKeys.containsKey(key)) {
-                                return false;
-                            }
-                            return !collectionMap.containsKey(key);
-                        }).collect(Collectors.toList());
+                        .filter(key -> isStale(key, collectionMap, orphanedCollections, userEmail))
+                        .collect(Collectors.toList());
+
 
                 keysToRemove.stream().forEach(staleKey -> {
                     info().data("user", userEmail)
-                            .data("collectionId", staleKey)
+                            .data("collection_id", staleKey)
                             .log(REMOVING_STALE_KEY_LOG_MSG);
                     user.keyring().remove(staleKey);
                 });
@@ -288,10 +286,52 @@ public class UsersServiceImpl implements UsersService {
         }
     }
 
+    @Override
+    public void removeStaleCollectionKeys(Map<String, Collection> collectionMap, List<String> orphanedCollections,
+                                          String userEmail) throws IOException, NotFoundException, BadRequestException {
+        lock.lock();
+        try {
+            User user = getUserByEmail(userEmail);
+
+            if (user.keyring() != null) {
+                List<String> keysToRemove = user.keyring()
+                        .list()
+                        .stream()
+                        .filter(key -> isStale(key, collectionMap, orphanedCollections, userEmail))
+                        .collect(Collectors.toList());
+
+
+                keysToRemove.stream().forEach(staleKey -> {
+                    info().data("user", userEmail)
+                            .data("collection_id", staleKey)
+                            .log(REMOVING_STALE_KEY_LOG_MSG);
+                    user.keyring().remove(staleKey);
+                });
+
+                if (!keysToRemove.isEmpty()) {
+                    update(user, user, user.getLastAdmin());
+                }
+            }
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    private boolean isStale(String key, Map<String, Collection> collectionMap, List<String> orphanedCollections,
+                            String userEmail) {
+        if (applicationKeys.containsKey(key)) {
+            return false;
+        }
+
+        String collectionName = key.split("-")[0];
+        if (orphanedCollections.contains(collectionName)) {
+            return false;
+        }
+        return !collectionMap.containsKey(key);
+    }
 
     @Override
     public User removeKeyFromKeyring(String email, String keyIdentifier) throws IOException {
-        // TODO MIGHT WANT TO CONSIDER HOW WE MIGHT ROLLBACK IS THE SAVE CALL FAILS.
         lock.lock();
         try {
             User user = userStore.get(email);

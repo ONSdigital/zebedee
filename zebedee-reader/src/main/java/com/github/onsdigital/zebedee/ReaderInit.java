@@ -54,7 +54,7 @@ public class ReaderInit implements Startup {
             }
         }
 
-        info().log("loading zebedee reader feature flags");
+        info().log("loading zebedee reader configuration");
         ReaderConfiguration.get();
 
         info().log("initialising zededee reader elasticSearch client");

@@ -278,9 +278,7 @@ public class ZebedeeDatasetServiceTest {
         service.removeDatasetFromCollection(mockCollection, datasetID);
 
         ArgumentCaptor<Dataset> argumentCaptor = ArgumentCaptor.forClass(Dataset.class);
-        verify(mockDatasetAPI, times(1)).updateDataset(anyString(), argumentCaptor.capture());
-        Assert.assertEquals(argumentCaptor.getAllValues().get(0).getCollection_id(), "");
-        Assert.assertEquals(argumentCaptor.getAllValues().get(0).getState(), State.CREATED);
+        verify(mockDatasetAPI, times(1)).deleteDataset(anyString());
 
         // Then the collection is prompted to delete the dataset and save.
         verify(mockCollectionDescription, times(1)).removeDataset(collectionDataset);

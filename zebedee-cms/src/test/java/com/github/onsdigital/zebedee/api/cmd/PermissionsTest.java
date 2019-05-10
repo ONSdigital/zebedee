@@ -3,6 +3,7 @@ package com.github.onsdigital.zebedee.api.cmd;
 import com.github.onsdigital.zebedee.authorisation.AuthorisationService;
 import com.github.onsdigital.zebedee.authorisation.DatasetPermissionType;
 import com.github.onsdigital.zebedee.authorisation.DatasetPermissions;
+import com.github.onsdigital.zebedee.json.response.Error;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.util.HttpResponseWriter;
 import org.junit.Before;
@@ -83,7 +84,7 @@ public class PermissionsTest {
 
         api.handle(mockRequest, mockResponse);
 
-        verify(httpResponseWriter, times(1)).writeJSONResponse(eq(mockResponse), isNull(), eq(400));
+        verify(httpResponseWriter, times(1)).writeJSONResponse(mockResponse, new Error("invalid request"), SC_BAD_REQUEST);
     }
 
     /**
@@ -101,7 +102,7 @@ public class PermissionsTest {
 
         verify(mockRequest, times(1)).getHeader(FLORENCE_AUTH_HEATHER);
         verify(mockRequest, times(1)).getParameter(DATASET_ID_PARAM);
-        verify(httpResponseWriter, times(1)).writeJSONResponse(mockResponse, DATASET_ID_MISSING, SC_BAD_REQUEST);
+        verify(httpResponseWriter, times(1)).writeJSONResponse(mockResponse, new Error(DATASET_ID_MISSING), SC_BAD_REQUEST);
         verifyNoMoreInteractions(mockResponse, authorisationService, httpResponseWriter);
     }
 
@@ -123,7 +124,7 @@ public class PermissionsTest {
 
         verify(mockRequest, times(1)).getHeader(FLORENCE_AUTH_HEATHER);
         verify(mockRequest, times(1)).getParameter(DATASET_ID_PARAM);
-        verify(httpResponseWriter, times(1)).writeJSONResponse(mockResponse, COLLECTION_ID_MISSING, SC_BAD_REQUEST);
+        verify(httpResponseWriter, times(1)).writeJSONResponse(mockResponse, new Error(COLLECTION_ID_MISSING), SC_BAD_REQUEST);
         verifyNoMoreInteractions(mockResponse, authorisationService, httpResponseWriter);
     }
 

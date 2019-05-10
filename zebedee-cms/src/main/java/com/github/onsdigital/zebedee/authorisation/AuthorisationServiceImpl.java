@@ -76,4 +76,9 @@ public class AuthorisationServiceImpl implements AuthorisationService {
         DatasetPermissions callerPermissions = permissionsService.getUserDatasetPermissions(session, datasetID);*/
         return null;
     }
+
+    @Override
+    public DatasetPermissions getServicePermissions(String serviceToken) {
+        return null;
+    }
 }

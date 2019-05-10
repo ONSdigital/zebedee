@@ -1,7 +1,6 @@
 package com.github.onsdigital.zebedee.api.cmd;
 
 import com.github.onsdigital.zebedee.authorisation.AuthorisationService;
-import com.github.onsdigital.zebedee.authorisation.DatasetPermissionType;
 import com.github.onsdigital.zebedee.authorisation.DatasetPermissions;
 import com.github.onsdigital.zebedee.json.response.Error;
 import com.github.onsdigital.zebedee.session.model.Session;
@@ -21,6 +20,11 @@ import static com.github.onsdigital.zebedee.api.cmd.Permissions.COLLECTION_ID_PA
 import static com.github.onsdigital.zebedee.api.cmd.Permissions.DATASET_ID_MISSING;
 import static com.github.onsdigital.zebedee.api.cmd.Permissions.DATASET_ID_PARAM;
 import static com.github.onsdigital.zebedee.api.cmd.Permissions.FLORENCE_AUTH_HEATHER;
+import static com.github.onsdigital.zebedee.api.cmd.Permissions.SERVICE_AUTH_HEADER;
+import static com.github.onsdigital.zebedee.authorisation.DatasetPermissionType.CREATE;
+import static com.github.onsdigital.zebedee.authorisation.DatasetPermissionType.DELETE;
+import static com.github.onsdigital.zebedee.authorisation.DatasetPermissionType.READ;
+import static com.github.onsdigital.zebedee.authorisation.DatasetPermissionType.UPDATE;
 import static junit.framework.TestCase.assertTrue;
 import static org.apache.http.HttpStatus.SC_BAD_REQUEST;
 import static org.apache.http.HttpStatus.SC_NOT_FOUND;
@@ -133,8 +137,8 @@ public class PermissionsTest {
      * Expected response: internal server error.
      */
     @Test
-    public void testGetUserPermissionsHttpResponseWriterException() throws IOException {
-        datasetPermissions = new DatasetPermissions(DatasetPermissionType.READ);
+    public void testGetUserPermissionsHttpResponseWriterException() throws Exception {
+        datasetPermissions = new DatasetPermissions(READ);
 
         when(mockRequest.getHeader(FLORENCE_AUTH_HEATHER))
                 .thenReturn("666");
@@ -164,11 +168,11 @@ public class PermissionsTest {
 
     /**
      * Valid request for user dataset permissions.
-     * Expected response: status OK, Body - the user's permissions entity.
+     * Expected response: status OK, Body: the user's permissions entity.
      */
     @Test
-    public void testGetUserPermissionsSuccess() throws IOException {
-        datasetPermissions = new DatasetPermissions(DatasetPermissionType.READ);
+    public void testGetUserPermissionsSuccess() throws Exception {
+        datasetPermissions = new DatasetPermissions(READ);
 
         when(mockRequest.getHeader(FLORENCE_AUTH_HEATHER))
                 .thenReturn("666");
@@ -193,7 +197,38 @@ public class PermissionsTest {
 
         DatasetPermissions actual = permissionsCaptor.getValue();
         assertThat(actual.getPermissions().size(), equalTo(1));
-        assertTrue("expected READ permission but not found", actual.getPermissions().contains(DatasetPermissionType.READ));
+        assertTrue("expected READ permission but not found", actual.getPermissions().contains(READ));
+    }
+
+    /**
+     * Valid request for service dataset permissions.
+     * Expected response: status OK, Body: the service's permissions entity.
+     */
+    @Test
+    public void testGetServicePermissionsSuccess() throws Exception {
+        when(mockRequest.getHeader(SERVICE_AUTH_HEADER))
+                .thenReturn("666");
+
+        datasetPermissions = new DatasetPermissions(CREATE, READ, UPDATE, DELETE);
+
+        when(authorisationService.getServicePermissions("666"))
+                .thenReturn(datasetPermissions);
+
+        ArgumentCaptor<DatasetPermissions> permissionsCaptor = ArgumentCaptor.forClass(DatasetPermissions.class);
+
+        api = new Permissions(true, authorisationService, httpResponseWriter);
+
+        api.handle(mockRequest, mockResponse);
+
+        verify(authorisationService, times(1)).getServicePermissions("666");
+        verify(httpResponseWriter, times(1)).writeJSONResponse(eq(mockResponse), permissionsCaptor.capture(), eq(200));
+
+        DatasetPermissions actual = permissionsCaptor.getValue();
+        assertThat(actual.getPermissions().size(), equalTo(4));
+        assertTrue("expected CREATE permission but not found", actual.getPermissions().contains(CREATE));
+        assertTrue("expected READ permission but not found", actual.getPermissions().contains(READ));
+        assertTrue("expected UPDATE permission but not found", actual.getPermissions().contains(UPDATE));
+        assertTrue("expected DELETE permission but not found", actual.getPermissions().contains(DELETE));
     }
 
 }

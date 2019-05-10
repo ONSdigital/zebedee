@@ -9,7 +9,6 @@ import com.github.onsdigital.zebedee.configuration.CMSFeatureFlags;
 import com.github.onsdigital.zebedee.json.response.Error;
 import com.github.onsdigital.zebedee.util.HttpResponseWriter;
 import com.github.onsdigital.zebedee.util.JsonUtils;
-import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -31,21 +30,22 @@ public class Permissions {
 
     static final String DATASET_ID_PARAM = "dataset_id";
     static final String COLLECTION_ID_PARAM = "collection_id";
-    static final String SERVICE_AUTH_HEADER = "authroization";
+    static final String SERVICE_AUTH_HEADER = "Authorization";
     static final String FLORENCE_AUTH_HEATHER = "X-Florence-Token";
     static final String DATASET_ID_MISSING = "dataset_id param required but not found";
     static final String COLLECTION_ID_MISSING = "collection_id param required but not found";
 
+    private static AuthorisationService authorisationService;
+
     private boolean enabled = false;
     private HttpResponseWriter httpResponseWriter;
-    private AuthorisationService authorisationService;
 
     /**
      * Contruct the permissions endpoint with the default values.
      */
     public Permissions() {
         this(cmsFeatureFlags().isEnableDatasetImport(),
-                new AuthorisationServiceImpl(),
+                getAuthorisationService(),
                 (req, body, status) -> JsonUtils.writeResponse(req, body, status));
     }
 
@@ -67,9 +67,8 @@ public class Permissions {
     @GET
     public void handle(HttpServletRequest request, HttpServletResponse response) throws IOException {
         if (!enabled) {
-            info().data("endpoint", "permissions")
-                    .data("feature_flag", CMSFeatureFlags.ENABLE_DATASET_IMPORT)
-                    .log("api endpoint reqiures CMD feature to be enabled request will not be processed");
+            info().data("feature_flag", CMSFeatureFlags.ENABLE_DATASET_IMPORT)
+                    .log("permissions api endpoint reqiures CMD feature to be enabled request will not be processed");
             writeResponse(response, null, SC_NOT_FOUND);
             return;
         }
@@ -87,7 +86,7 @@ public class Permissions {
     }
 
     private DatasetPermissions getPermissions(HttpServletRequest request, HttpServletResponse response)
-            throws DatasetPermissionsException, IOException {
+            throws DatasetPermissionsException {
 
         String sessionID = request.getHeader(FLORENCE_AUTH_HEATHER);
         String serviceToken = request.getHeader(SERVICE_AUTH_HEADER);
@@ -98,17 +97,16 @@ public class Permissions {
         }
 
         if (isNotEmpty(sessionID)) {
-            info().log("handling permissions request for user");
             return getUserPermissions(request, response, sessionID);
         }
 
-        info().log("handling permissions request for service");
         return getServicePermissions(request, response, serviceToken);
     }
 
     private DatasetPermissions getUserPermissions(HttpServletRequest request, HttpServletResponse response,
                                                   String sessionID)
-            throws IOException, DatasetPermissionsException {
+            throws DatasetPermissionsException {
+        info().log("handling permissions request for user");
 
         String datasetID = request.getParameter(DATASET_ID_PARAM);
         if (isEmpty(datasetID)) {
@@ -128,8 +126,9 @@ public class Permissions {
     }
 
     private DatasetPermissions getServicePermissions(HttpServletRequest request, HttpServletResponse response,
-                                                     String serviceToken) throws IOException {
-        return null;
+                                                     String serviceToken) throws DatasetPermissionsException {
+        info().log("handling permissions request for service");
+        return authorisationService.getServicePermissions(serviceToken);
     }
 
     private void writeResponse(HttpServletResponse response, Object entity, int status) throws IOException {
@@ -139,5 +138,12 @@ public class Permissions {
             error().exception(ex).log("error writing user body to response");
             httpResponseWriter.writeJSONResponse(response, null, SC_INTERNAL_SERVER_ERROR);
         }
+    }
+
+    private static AuthorisationService getAuthorisationService() {
+        if (authorisationService == null) {
+            authorisationService = new AuthorisationServiceImpl();
+        }
+        return authorisationService;
     }
 }

@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee.authorisation;
 
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 public class DatasetPermissions {
@@ -12,7 +13,7 @@ public class DatasetPermissions {
     }
 
     public DatasetPermissions(DatasetPermissionType... grantedPermissions) {
-        this.permissions = new HashSet<>();
+        this.permissions = new LinkedHashSet<>();
         for (DatasetPermissionType p : grantedPermissions) {
             this.permissions.add(p);
         }

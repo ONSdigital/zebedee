@@ -277,5 +277,68 @@ public class AuthorisationServiceImplTest {
         assertThat(s, equalTo(session));
     }
 
+    @Test(expected = DatasetPermissionsException.class)
+    public void testGetCollection_IDNull() throws Exception {
+        AuthorisationServiceImpl serviceImpl = (AuthorisationServiceImpl) service;
+
+        try {
+            serviceImpl.getCollection(null);
+        } catch (DatasetPermissionsException ex) {
+            verify(collections, never()).getCollection(anyString());
+
+            assertThat(ex.statusCode, equalTo(SC_BAD_REQUEST));
+            assertThat(ex.getMessage(), equalTo("collection ID required but was empty"));
+            throw ex;
+        }
+    }
+
+    @Test(expected = DatasetPermissionsException.class)
+    public void testGetCollection_IOException() throws Exception {
+        AuthorisationServiceImpl serviceImpl = (AuthorisationServiceImpl) service;
+
+        when(collections.getCollection("666"))
+                .thenThrow(new IOException());
+
+        try {
+            serviceImpl.getCollection("666");
+        } catch (DatasetPermissionsException ex) {
+            verify(collections, times(1)).getCollection("666");
+
+            assertThat(ex.statusCode, equalTo(SC_INTERNAL_SERVER_ERROR));
+            assertThat(ex.getMessage(), equalTo("internal server error"));
+            throw ex;
+        }
+    }
+
+    @Test(expected = DatasetPermissionsException.class)
+    public void testGetCollection_collectionNotFound() throws Exception {
+        AuthorisationServiceImpl serviceImpl = (AuthorisationServiceImpl) service;
+
+        when(collections.getCollection("666"))
+                .thenReturn(null);
+
+        try {
+            serviceImpl.getCollection("666");
+        } catch (DatasetPermissionsException ex) {
+            verify(collections, times(1)).getCollection("666");
+
+            assertThat(ex.statusCode, equalTo(SC_NOT_FOUND));
+            assertThat(ex.getMessage(), equalTo("collection not found"));
+            throw ex;
+        }
+    }
+
+    @Test
+    public void testGetCollection_success() throws Exception {
+        AuthorisationServiceImpl serviceImpl = (AuthorisationServiceImpl) service;
+
+        when(collections.getCollection("666"))
+                .thenReturn(collection);
+
+        Collection c = serviceImpl.getCollection("666");
+
+        verify(collections, times(1)).getCollection("666");
+        assertThat(c, equalTo(collection));
+    }
 
 }

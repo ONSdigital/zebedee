@@ -261,5 +261,21 @@ public class AuthorisationServiceImplTest {
         }
     }
 
+    @Test
+    public void testGetSession_success() throws Exception {
+        AuthorisationServiceImpl serviceImpl = (AuthorisationServiceImpl) service;
+
+        when(sessionsService.get("666"))
+                .thenReturn(session);
+        when(sessionsService.expired(session))
+                .thenReturn(false);
+
+        Session s = serviceImpl.getSession("666");
+
+        verify(sessionsService, times(1)).get("666");
+        verify(sessionsService, times(1)).expired(session);
+        assertThat(s, equalTo(session));
+    }
+
 
 }

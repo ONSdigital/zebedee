@@ -10,12 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.io.IOException;
 
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
-import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.warn;
-import static com.github.onsdigital.zebedee.authorisation.DatasetPermissionType.CREATE;
-import static com.github.onsdigital.zebedee.authorisation.DatasetPermissionType.DELETE;
-import static com.github.onsdigital.zebedee.authorisation.DatasetPermissionType.READ;
-import static com.github.onsdigital.zebedee.authorisation.DatasetPermissionType.UPDATE;
 import static org.apache.http.HttpStatus.SC_INTERNAL_SERVER_ERROR;
 import static org.apache.http.HttpStatus.SC_NOT_FOUND;
 import static org.apache.http.HttpStatus.SC_UNAUTHORIZED;
@@ -63,13 +58,12 @@ public class AuthorisationServiceImpl implements AuthorisationService {
     }
 
     @Override
-    public DatasetPermissions getUserPermissions(String sessionID, String datasetID, String collectionID)
-            throws DatasetPermissionsException {
-        return new DatasetPermissions();
+    public DatasetPermissions getUserPermissions(String sessionID, String datasetID, String collectionID) throws DatasetPermissionsException {
+        return null;
     }
 
     @Override
     public DatasetPermissions getServicePermissions(String serviceToken) throws DatasetPermissionsException {
-        return new DatasetPermissions();
+        return null;
     }
 }

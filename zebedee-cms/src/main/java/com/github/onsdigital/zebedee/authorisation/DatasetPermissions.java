@@ -14,9 +14,7 @@ public class DatasetPermissions {
 
     public DatasetPermissions(DatasetPermissionType... grantedPermissions) {
         this.permissions = new LinkedHashSet<>();
-        for (DatasetPermissionType p : grantedPermissions) {
-            this.permissions.add(p);
-        }
+        permit(grantedPermissions);
     }
 
     public Set<DatasetPermissionType> getPermissions() {
@@ -30,6 +28,13 @@ public class DatasetPermissions {
 
     public DatasetPermissions grantPermission(DatasetPermissionType permission) {
         this.permissions.add(permission);
+        return this;
+    }
+
+    public DatasetPermissions permit(DatasetPermissionType... permissions) {
+        for (DatasetPermissionType p : permissions) {
+            this.permissions.add(p);
+        }
         return this;
     }
 }

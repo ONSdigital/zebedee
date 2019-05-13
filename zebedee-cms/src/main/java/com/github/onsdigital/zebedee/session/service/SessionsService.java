@@ -2,10 +2,10 @@ package com.github.onsdigital.zebedee.session.service;
 
 import com.github.davidcarboni.cryptolite.Random;
 import com.github.onsdigital.zebedee.model.PathUtils;
-import com.github.onsdigital.zebedee.session.store.SessionsStoreImpl;
-import com.github.onsdigital.zebedee.session.model.Session;
-import com.github.onsdigital.zebedee.user.model.User;
 import com.github.onsdigital.zebedee.reader.util.RequestUtils;
+import com.github.onsdigital.zebedee.session.model.Session;
+import com.github.onsdigital.zebedee.session.store.SessionsStoreImpl;
+import com.github.onsdigital.zebedee.user.model.User;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
@@ -18,6 +18,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 
@@ -43,7 +44,7 @@ public class SessionsService extends TimerTask {
 
         // Run every minute after the first minute:
         timer = new Timer("Florence sessions timer", true);
-        timer.schedule(this, 60 * 1000, 60 * 1000);
+        timer.schedule(this, 10 * 1000, 60 * 1000);
     }
 
     public void setExpiry(int expiryAmount, int expiryUnit) {
@@ -167,8 +168,14 @@ public class SessionsService extends TimerTask {
         Predicate<Session> isExpired = (session) -> expired(session);
         List<Session> expired = sessionsStore.filterSessions(isExpired);
 
+        if (expired == null || expired.isEmpty()) {
+            return;
+        }
+
+        info().data("users", expired.stream()
+                .map(s -> s.getEmail()).collect(Collectors.toList()).toString())
+                .log("deleting expired user sessions");
         for (Session s : expired) {
-            info().data(SESSION_ID_PARAM, s.getId()).log(DELETING_SESSION_MSG);
             sessionsStore.delete(sessionPath(s.getId()));
         }
     }

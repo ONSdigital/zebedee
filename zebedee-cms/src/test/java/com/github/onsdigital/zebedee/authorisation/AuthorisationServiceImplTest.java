@@ -4,6 +4,7 @@ import com.github.onsdigital.zebedee.json.CollectionDataset;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.Collections;
+import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.service.ServiceSupplier;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.session.service.SessionsService;
@@ -43,13 +44,16 @@ public class AuthorisationServiceImplTest {
     private Collections collections;
 
     @Mock
+    private PermissionsService permissionsService;
+
+    @Mock
     private Collection collection;
 
-    private CollectionDescription description;
 
     private ServiceSupplier<SessionsService> sessionServiceSupplier = () -> sessionsService;
     private ServiceSupplier<UsersService> userServiceSupplier = () -> usersService;
     private ServiceSupplier<Collections> collectionsSupplier = () -> collections;
+    private ServiceSupplier<PermissionsService> permissionsServiceSupplier = () -> permissionsService;
 
     private AuthorisationService service;
     private UserIdentityException notAuthenticatedEx;
@@ -74,6 +78,7 @@ public class AuthorisationServiceImplTest {
         ReflectionTestUtils.setField(service, "sessionServiceSupplier", sessionServiceSupplier);
         ReflectionTestUtils.setField(service, "userServiceSupplier", userServiceSupplier);
         ReflectionTestUtils.setField(service, "collectionsSupplier", collectionsSupplier);
+        ReflectionTestUtils.setField(service, "permissionsServiceSupplier", permissionsServiceSupplier);
     }
 
     @Test(expected = UserIdentityException.class)
@@ -358,7 +363,7 @@ public class AuthorisationServiceImplTest {
         serviceImpl.validateCollectionContainsRequestedDataset(collection, "666");
     }
 
-    @Test
+    @Test(expected = DatasetPermissionsException.class)
     public void testValidateCollectionContainsRequestedDataset_datasetNotPresent() throws Exception {
         AuthorisationServiceImpl serviceImpl = (AuthorisationServiceImpl) service;
 
@@ -376,6 +381,95 @@ public class AuthorisationServiceImplTest {
         } catch (DatasetPermissionsException ex) {
             assertThat(ex.getMessage(), equalTo("requested collection does not contain the requested dataset"));
             assertThat(ex.statusCode, equalTo(SC_BAD_REQUEST));
+            throw ex;
+        }
+    }
+
+    @Test
+    public void testIsAdminOrPublisher_adminEditorUser() throws Exception {
+        AuthorisationServiceImpl serviceImpl = (AuthorisationServiceImpl) service;
+
+        when(permissionsService.canEdit(session))
+                .thenReturn(true);
+
+        assertThat(serviceImpl.isAdminOrPublisher(session), equalTo(true));
+
+        verify(permissionsService, times(1)).canEdit(session);
+    }
+
+    @Test
+    public void testIsAdminOrPublisher_viewerUser() throws Exception {
+        AuthorisationServiceImpl serviceImpl = (AuthorisationServiceImpl) service;
+
+        when(permissionsService.canEdit(session))
+                .thenReturn(false);
+
+        assertThat(serviceImpl.isAdminOrPublisher(session), equalTo(false));
+
+        verify(permissionsService, times(1)).canEdit(session);
+    }
+
+    @Test(expected = DatasetPermissionsException.class)
+    public void testIsAdminOrPublisher_IOException() throws Exception {
+        AuthorisationServiceImpl serviceImpl = (AuthorisationServiceImpl) service;
+
+        when(permissionsService.canEdit(session))
+                .thenThrow(new IOException());
+
+        try {
+            serviceImpl.isAdminOrPublisher(session);
+        } catch (DatasetPermissionsException ex) {
+            verify(permissionsService, times(1)).canEdit(session);
+
+            assertThat(ex.getMessage(), equalTo("internal server error"));
+            assertThat(ex.statusCode, equalTo(SC_INTERNAL_SERVER_ERROR));
+            throw ex;
+        }
+    }
+
+    @Test
+    public void testIsCollectionViewer_success() throws Exception {
+        AuthorisationServiceImpl serviceImpl = (AuthorisationServiceImpl) service;
+        CollectionDescription desc = new CollectionDescription();
+
+        when(permissionsService.canView(session, desc))
+                .thenReturn(true);
+
+        boolean canView = serviceImpl.isCollectionViewer(session, desc);
+
+        assertThat(canView, equalTo(true));
+        verify(permissionsService, times(1)).canView(session, desc);
+    }
+
+    @Test
+    public void testIsCollectionViewer_fail() throws Exception {
+        AuthorisationServiceImpl serviceImpl = (AuthorisationServiceImpl) service;
+        CollectionDescription desc = new CollectionDescription();
+
+        when(permissionsService.canView(session, desc))
+                .thenReturn(false);
+
+        boolean canView = serviceImpl.isCollectionViewer(session, desc);
+
+        assertThat(canView, equalTo(false));
+        verify(permissionsService, times(1)).canView(session, desc);
+    }
+
+    @Test(expected = DatasetPermissionsException.class)
+    public void testIsCollectionViewer_IOException() throws Exception {
+        AuthorisationServiceImpl serviceImpl = (AuthorisationServiceImpl) service;
+        CollectionDescription desc = new CollectionDescription();
+
+        when(permissionsService.canView(session, desc))
+                .thenThrow(new IOException());
+
+        try {
+            serviceImpl.isCollectionViewer(session, desc);
+        } catch (DatasetPermissionsException ex) {
+            verify(permissionsService, times(1)).canView(session, desc);
+            assertThat(ex.getMessage(), equalTo("internal server error"));
+            assertThat(ex.statusCode, equalTo(SC_INTERNAL_SERVER_ERROR));
+            throw ex;
         }
     }
 

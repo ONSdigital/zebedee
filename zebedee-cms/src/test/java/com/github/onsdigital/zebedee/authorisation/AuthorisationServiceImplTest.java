@@ -17,6 +17,11 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import java.io.IOException;
 
+import static com.github.onsdigital.zebedee.authorisation.DatasetPermissionType.CREATE;
+import static com.github.onsdigital.zebedee.authorisation.DatasetPermissionType.DELETE;
+import static com.github.onsdigital.zebedee.authorisation.DatasetPermissionType.READ;
+import static com.github.onsdigital.zebedee.authorisation.DatasetPermissionType.UPDATE;
+import static junit.framework.TestCase.assertTrue;
 import static org.apache.http.HttpStatus.SC_BAD_REQUEST;
 import static org.apache.http.HttpStatus.SC_INTERNAL_SERVER_ERROR;
 import static org.apache.http.HttpStatus.SC_NOT_FOUND;
@@ -27,6 +32,7 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
@@ -471,6 +477,74 @@ public class AuthorisationServiceImplTest {
             assertThat(ex.statusCode, equalTo(SC_INTERNAL_SERVER_ERROR));
             throw ex;
         }
+    }
+
+    @Test
+    public void getUserPermissions_adminUser() throws Exception {
+        when(sessionsService.get("666"))
+                .thenReturn(session);
+        when(sessionsService.expired(session))
+                .thenReturn(false);
+        when(collections.getCollection("666"))
+                .thenReturn(collection);
+
+        CollectionDataset collectionDataset = new CollectionDataset();
+        collectionDataset.setId("666");
+        CollectionDescription description = new CollectionDescription();
+        description.addDataset(collectionDataset);
+
+        when(collection.getDescription())
+                .thenReturn(description);
+
+        when(permissionsService.canEdit(session))
+                .thenReturn(true);
+
+        DatasetPermissions permissions = service.getUserPermissions("666", "666", "666");
+
+        assertTrue(permissions.getPermissions().contains(CREATE));
+        assertTrue(permissions.getPermissions().contains(READ));
+        assertTrue(permissions.getPermissions().contains(UPDATE));
+        assertTrue(permissions.getPermissions().contains(DELETE));
+
+        verify(sessionsService, times(1)).get("666");
+        verify(sessionsService, times(1)).expired(session);
+        verify(collections, times(1)).getCollection("666");
+        verify(permissionsService, times(1)).canEdit(session);
+        verifyNoMoreInteractions(sessionsService, collections, permissionsService);
+    }
+
+    @Test
+    public void getUserPermissions_viewer() throws Exception {
+        when(sessionsService.get("666"))
+                .thenReturn(session);
+        when(sessionsService.expired(session))
+                .thenReturn(false);
+        when(collections.getCollection("666"))
+                .thenReturn(collection);
+
+        CollectionDataset collectionDataset = new CollectionDataset();
+        collectionDataset.setId("666");
+        CollectionDescription description = new CollectionDescription();
+        description.addDataset(collectionDataset);
+
+        when(collection.getDescription())
+                .thenReturn(description);
+
+        when(permissionsService.canEdit(session))
+                .thenReturn(false);
+        when(permissionsService.canView(session, description))
+                .thenReturn(true);
+
+        DatasetPermissions permissions = service.getUserPermissions("666", "666", "666");
+
+        assertTrue(permissions.getPermissions().contains(READ));
+
+        verify(sessionsService, times(1)).get("666");
+        verify(sessionsService, times(1)).expired(session);
+        verify(collections, times(1)).getCollection("666");
+        verify(permissionsService, times(1)).canEdit(session);
+        verify(permissionsService, times(1)).canView(session, description);
+        verifyNoMoreInteractions(sessionsService, collections, permissionsService);
     }
 
 }

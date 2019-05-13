@@ -83,25 +83,35 @@ public class AuthorisationServiceImpl implements AuthorisationService {
 
         validateCollectionContainsRequestedDataset(collection, datasetID);
 
-        DatasetPermissions permissions = new DatasetPermissions();
-
-        if (isAdminOrPublisher(session)) {
-            permissions.permit(CREATE, READ, UPDATE, DELETE);
-        } else if (isCollectionViewer(session, collection.getDescription())) {
-            permissions.permit(READ);
-        }
-
-        info().data("user", session.getEmail())
-                .data("collection_id", collectionID)
-                .data("dataset_id", datasetID)
-                .data("permissions", permissions.getPermissions())
-                .log("permitting dataset admit /editor permission");
-        return permissions;
+        return assignPermissions(session, collection.getDescription(), datasetID);
     }
 
     @Override
     public DatasetPermissions getServicePermissions(String serviceToken) throws DatasetPermissionsException {
         return null;
+    }
+
+    DatasetPermissions assignPermissions(Session session, CollectionDescription description, String datasetID)
+            throws DatasetPermissionsException {
+        DatasetPermissions permissions = new DatasetPermissions();
+
+        if (isAdminOrPublisher(session)) {
+            permissions.permit(CREATE, READ, UPDATE, DELETE);
+        } else if (isCollectionViewer(session, description)) {
+            permissions.permit(READ);
+        } else {
+            info().data("collection_id", description.getId())
+                    .data("dataset_id", datasetID)
+                    .data("user", session.getEmail())
+                    .log("user not permitted to access dataset");
+            return permissions;
+        }
+
+        info().data("collection_id", description.getId())
+                .data("dataset_id", datasetID)
+                .data("user", session.getEmail())
+                .log("permitted collection dataset permissions for user");
+        return permissions;
     }
 
     Session getSession(String sessionID) throws DatasetPermissionsException {
@@ -133,7 +143,7 @@ public class AuthorisationServiceImpl implements AuthorisationService {
             return permissionsServiceSupplier.getService().canEdit(session);
         } catch (IOException ex) {
             error().exception(ex)
-                    .data("email", session.getEmail())
+                    .data("user", session.getEmail())
                     .data("permission", "can_edit")
                     .log("error checking user permissions");
             throw new DatasetPermissionsException("internal server error", SC_INTERNAL_SERVER_ERROR);
@@ -145,8 +155,8 @@ public class AuthorisationServiceImpl implements AuthorisationService {
             return permissionsServiceSupplier.getService().canView(session, description);
         } catch (IOException ex) {
             error().exception(ex)
-                    .data("email", session.getEmail())
-                    .data("permission", "can_edit")
+                    .data("user", session.getEmail())
+                    .data("permission", "can_view")
                     .log("error checking user permissions");
             throw new DatasetPermissionsException("internal server error", SC_INTERNAL_SERVER_ERROR);
         }

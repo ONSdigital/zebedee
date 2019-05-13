@@ -55,7 +55,6 @@ public class AuthorisationServiceImplTest {
     @Mock
     private Collection collection;
 
-
     private ServiceSupplier<SessionsService> sessionServiceSupplier = () -> sessionsService;
     private ServiceSupplier<UsersService> userServiceSupplier = () -> usersService;
     private ServiceSupplier<Collections> collectionsSupplier = () -> collections;
@@ -66,6 +65,7 @@ public class AuthorisationServiceImplTest {
     private UserIdentityException internalServerErrorEx;
     private UserIdentityException notFoundEx;
     private Session session;
+    private CollectionDescription desc;
 
     @Before
     public void setUp() throws Exception {
@@ -80,6 +80,9 @@ public class AuthorisationServiceImplTest {
         session = new Session();
         session.setEmail("rickSanchez@CitadelOfRicks.com");
         session.setId(SESSION_ID);
+
+        desc = new CollectionDescription();
+        desc.setId("666");
 
         ReflectionTestUtils.setField(service, "sessionServiceSupplier", sessionServiceSupplier);
         ReflectionTestUtils.setField(service, "userServiceSupplier", userServiceSupplier);
@@ -436,7 +439,6 @@ public class AuthorisationServiceImplTest {
     @Test
     public void testIsCollectionViewer_success() throws Exception {
         AuthorisationServiceImpl serviceImpl = (AuthorisationServiceImpl) service;
-        CollectionDescription desc = new CollectionDescription();
 
         when(permissionsService.canView(session, desc))
                 .thenReturn(true);
@@ -450,7 +452,6 @@ public class AuthorisationServiceImplTest {
     @Test
     public void testIsCollectionViewer_fail() throws Exception {
         AuthorisationServiceImpl serviceImpl = (AuthorisationServiceImpl) service;
-        CollectionDescription desc = new CollectionDescription();
 
         when(permissionsService.canView(session, desc))
                 .thenReturn(false);
@@ -464,7 +465,6 @@ public class AuthorisationServiceImplTest {
     @Test(expected = DatasetPermissionsException.class)
     public void testIsCollectionViewer_IOException() throws Exception {
         AuthorisationServiceImpl serviceImpl = (AuthorisationServiceImpl) service;
-        CollectionDescription desc = new CollectionDescription();
 
         when(permissionsService.canView(session, desc))
                 .thenThrow(new IOException());
@@ -479,6 +479,91 @@ public class AuthorisationServiceImplTest {
         }
     }
 
+    @Test(expected = DatasetPermissionsException.class)
+    public void testAssignPermissions_AdminUserPermissionServiceEx() throws Exception {
+        AuthorisationServiceImpl serviceImpl = (AuthorisationServiceImpl) service;
+
+        when(permissionsService.canEdit(session))
+                .thenThrow(new IOException());
+
+        try {
+            serviceImpl.assignPermissions(session, desc, "666");
+        } catch (DatasetPermissionsException ex) {
+            verify(permissionsService, times(1)).canEdit(session);
+            assertThat(ex.getMessage(), equalTo("internal server error"));
+            assertThat(ex.statusCode, equalTo(SC_INTERNAL_SERVER_ERROR));
+            throw ex;
+        }
+    }
+
+    @Test
+    public void testAssignPermissions_AdminUserSuccess() throws Exception {
+        AuthorisationServiceImpl serviceImpl = (AuthorisationServiceImpl) service;
+
+        when(permissionsService.canEdit(session))
+                .thenReturn(true);
+
+        DatasetPermissions permissions = serviceImpl.assignPermissions(session, desc, "666");
+
+        assertTrue(permissions.getPermissions().contains(CREATE));
+        assertTrue(permissions.getPermissions().contains(READ));
+        assertTrue(permissions.getPermissions().contains(UPDATE));
+        assertTrue(permissions.getPermissions().contains(DELETE));
+        verify(permissionsService, times(1)).canEdit(session);
+    }
+
+    @Test
+    public void testAssignPermissions_ViewerUserSuccess() throws Exception {
+        AuthorisationServiceImpl serviceImpl = (AuthorisationServiceImpl) service;
+
+        when(permissionsService.canEdit(session))
+                .thenReturn(false);
+        when(permissionsService.canView(session, desc))
+                .thenReturn(true);
+
+        DatasetPermissions permissions = serviceImpl.assignPermissions(session, desc, "666");
+
+        assertTrue(permissions.getPermissions().contains(READ));
+        verify(permissionsService, times(1)).canEdit(session);
+        verify(permissionsService, times(1)).canView(session, desc);
+    }
+
+    @Test(expected = DatasetPermissionsException.class)
+    public void testAssignPermissions_ViewerUserPermissionServiceEx() throws Exception {
+        AuthorisationServiceImpl serviceImpl = (AuthorisationServiceImpl) service;
+
+        when(permissionsService.canEdit(session))
+                .thenReturn(false);
+        when(permissionsService.canView(session, desc))
+                .thenThrow(new IOException());
+
+        try {
+            serviceImpl.assignPermissions(session, desc, "666");
+        } catch (DatasetPermissionsException ex) {
+            verify(permissionsService, times(1)).canEdit(session);
+            verify(permissionsService, times(1)).canView(session, desc);
+            assertThat(ex.getMessage(), equalTo("internal server error"));
+            assertThat(ex.statusCode, equalTo(SC_INTERNAL_SERVER_ERROR));
+            throw ex;
+        }
+    }
+
+    @Test
+    public void testAssignPermissions_ViewerUserNotInTeamAssignedToCollection() throws Exception {
+        AuthorisationServiceImpl serviceImpl = (AuthorisationServiceImpl) service;
+
+        when(permissionsService.canEdit(session))
+                .thenReturn(false);
+        when(permissionsService.canView(session, desc))
+                .thenReturn(false);
+
+        DatasetPermissions permissions = serviceImpl.assignPermissions(session, desc, "666");
+
+        assertTrue(permissions.getPermissions().isEmpty());
+        verify(permissionsService, times(1)).canEdit(session);
+        verify(permissionsService, times(1)).canView(session, desc);
+    }
+
     @Test
     public void getUserPermissions_adminUser() throws Exception {
         when(sessionsService.get("666"))
@@ -490,11 +575,10 @@ public class AuthorisationServiceImplTest {
 
         CollectionDataset collectionDataset = new CollectionDataset();
         collectionDataset.setId("666");
-        CollectionDescription description = new CollectionDescription();
-        description.addDataset(collectionDataset);
+        desc.addDataset(collectionDataset);
 
         when(collection.getDescription())
-                .thenReturn(description);
+                .thenReturn(desc);
 
         when(permissionsService.canEdit(session))
                 .thenReturn(true);

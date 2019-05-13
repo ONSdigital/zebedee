@@ -14,4 +14,8 @@ public interface AuthorisationService {
      * @throws UserIdentityException if there is any problem determining the user identity.
      */
     UserIdentity identifyUser(String sessionID) throws UserIdentityException;
+
+    DatasetPermissions getUserPermissions(String sessionID, String datasetID, String collectionID) throws DatasetPermissionsException;
+
+    DatasetPermissions getServicePermissions(String serviceToken)  throws DatasetPermissionsException;
 }

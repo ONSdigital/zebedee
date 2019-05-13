@@ -1,5 +1,6 @@
 package com.github.onsdigital.zebedee.authorisation;
 
+import com.github.onsdigital.zebedee.json.CollectionDataset;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.Collections;
@@ -339,6 +340,43 @@ public class AuthorisationServiceImplTest {
 
         verify(collections, times(1)).getCollection("666");
         assertThat(c, equalTo(collection));
+    }
+
+    @Test
+    public void testValidateCollectionContainsRequestedDataset_datasetPresent() throws Exception {
+        AuthorisationServiceImpl serviceImpl = (AuthorisationServiceImpl) service;
+
+        CollectionDataset ds = new CollectionDataset();
+        ds.setId("666");
+
+        CollectionDescription containingDataset = new CollectionDescription();
+        containingDataset.addDataset(ds);
+
+        when(collection.getDescription())
+                .thenReturn(containingDataset);
+
+        serviceImpl.validateCollectionContainsRequestedDataset(collection, "666");
+    }
+
+    @Test
+    public void testValidateCollectionContainsRequestedDataset_datasetNotPresent() throws Exception {
+        AuthorisationServiceImpl serviceImpl = (AuthorisationServiceImpl) service;
+
+        CollectionDataset ds = new CollectionDataset();
+        ds.setId("666");
+
+        CollectionDescription containingDataset = new CollectionDescription();
+        containingDataset.addDataset(ds);
+
+        when(collection.getDescription())
+                .thenReturn(containingDataset);
+
+        try {
+            serviceImpl.validateCollectionContainsRequestedDataset(collection, "667");
+        } catch (DatasetPermissionsException ex) {
+            assertThat(ex.getMessage(), equalTo("requested collection does not contain the requested dataset"));
+            assertThat(ex.statusCode, equalTo(SC_BAD_REQUEST));
+        }
     }
 
 }

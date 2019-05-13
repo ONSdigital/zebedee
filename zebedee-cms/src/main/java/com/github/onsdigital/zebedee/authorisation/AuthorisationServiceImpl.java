@@ -99,6 +99,11 @@ public class AuthorisationServiceImpl implements AuthorisationService {
         return permissions;
     }
 
+    @Override
+    public DatasetPermissions getServicePermissions(String serviceToken) throws DatasetPermissionsException {
+        return null;
+    }
+
     Session getSession(String sessionID) throws DatasetPermissionsException {
         if (StringUtils.isEmpty(sessionID)) {
             throw new DatasetPermissionsException("session ID required but empty", SC_BAD_REQUEST);
@@ -183,8 +188,4 @@ public class AuthorisationServiceImpl implements AuthorisationService {
         }
     }
 
-    @Override
-    public DatasetPermissions getServicePermissions(String serviceToken) throws DatasetPermissionsException {
-        return null;
-    }
 }

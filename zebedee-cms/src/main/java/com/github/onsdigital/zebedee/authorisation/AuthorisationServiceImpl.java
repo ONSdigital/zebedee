@@ -13,13 +13,13 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 
-import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
-import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
-import static com.github.onsdigital.logging.v2.event.SimpleEvent.warn;
 import static com.github.onsdigital.zebedee.authorisation.DatasetPermissionType.CREATE;
 import static com.github.onsdigital.zebedee.authorisation.DatasetPermissionType.DELETE;
 import static com.github.onsdigital.zebedee.authorisation.DatasetPermissionType.READ;
 import static com.github.onsdigital.zebedee.authorisation.DatasetPermissionType.UPDATE;
+import static com.github.onsdigital.zebedee.logging.CMSLogEvent.error;
+import static com.github.onsdigital.zebedee.logging.CMSLogEvent.info;
+import static com.github.onsdigital.zebedee.logging.CMSLogEvent.warn;
 import static org.apache.http.HttpStatus.SC_BAD_REQUEST;
 import static org.apache.http.HttpStatus.SC_INTERNAL_SERVER_ERROR;
 import static org.apache.http.HttpStatus.SC_NOT_FOUND;
@@ -35,7 +35,6 @@ public class AuthorisationServiceImpl implements AuthorisationService {
     private static final String INTERNAL_ERROR = "internal server error";
     private static final String AUTHENTICATED_ERROR = "user not authenticated";
     private static final String USER_NOT_FOUND = "user does not exist";
-    private static final DatasetPermissions ADMIN_EDITOR_PERMISSIONS = new DatasetPermissions(CREATE, READ, UPDATE, DELETE);
 
     @Override
     public UserIdentity identifyUser(String sessionID) throws UserIdentityException {
@@ -48,23 +47,23 @@ public class AuthorisationServiceImpl implements AuthorisationService {
         try {
             session = sessionServiceSupplier.getService().get(sessionID);
         } catch (IOException e) {
-            error().data("sessionId", sessionID).logException(e, "identify user error, unexpected error while attempting to get user session");
+            error().sessionID(sessionID).logException(e, "identify user error, unexpected error while attempting to get user session");
             throw new UserIdentityException(INTERNAL_ERROR, SC_INTERNAL_SERVER_ERROR);
         }
 
         if (session == null) {
-            warn().data("sessionId", sessionID).log("identify user error, session with specified ID could not be found");
+            warn().sessionID(sessionID).log("identify user error, session with specified ID could not be found");
             throw new UserIdentityException(AUTHENTICATED_ERROR, SC_UNAUTHORIZED);
         }
 
         // The session might exist but ensure the user still exists in the system before confirming their identity
         try {
             if (!userServiceSupplier.getService().exists(session.getEmail())) {
-                warn().data("sessionId", session).log("identify user error, valid user session found but user no longer exists");
+                warn().sessionID(session).log("identify user error, valid user session found but user no longer exists");
                 throw new UserIdentityException(USER_NOT_FOUND, SC_NOT_FOUND);
             }
         } catch (IOException e) {
-            error().data("sessionId", session).logException(e, "identify user error, unexpected error while checking if user exists");
+            error().sessionID(session).logException(e, "identify user error, unexpected error while checking if user exists");
             throw new UserIdentityException(INTERNAL_ERROR, SC_INTERNAL_SERVER_ERROR);
         }
         return new UserIdentity(session);
@@ -100,17 +99,11 @@ public class AuthorisationServiceImpl implements AuthorisationService {
         } else if (isCollectionViewer(session, description)) {
             permissions.permit(READ);
         } else {
-            info().data("collection_id", description.getId())
-                    .data("dataset_id", datasetID)
-                    .data("user", session.getEmail())
-                    .log("user not permitted to access dataset");
+            info().collectionID(description.getId()).datasetID(datasetID).user(session).log("user not permitted to access dataset");
             return permissions;
         }
 
-        info().data("collection_id", description.getId())
-                .data("dataset_id", datasetID)
-                .data("user", session.getEmail())
-                .log("permitted collection dataset permissions for user");
+        info().collectionID(description).datasetID(datasetID).user(session).log("permitted collection dataset permissions for user");
         return permissions;
     }
 
@@ -123,7 +116,7 @@ public class AuthorisationServiceImpl implements AuthorisationService {
         try {
             session = sessionServiceSupplier.getService().get(sessionID);
         } catch (IOException ex) {
-            error().exception(ex).data("session_id", sessionID).log("error getting session");
+            error().exception(ex).sessionID(sessionID).log("error getting session");
             throw new DatasetPermissionsException("internal server error", SC_INTERNAL_SERVER_ERROR);
         }
 
@@ -142,10 +135,7 @@ public class AuthorisationServiceImpl implements AuthorisationService {
         try {
             return permissionsServiceSupplier.getService().canEdit(session);
         } catch (IOException ex) {
-            error().exception(ex)
-                    .data("user", session.getEmail())
-                    .data("permission", "can_edit")
-                    .log("error checking user permissions");
+            error().exception(ex).user(session).data("permission", "can_edit").log("error checking user permissions");
             throw new DatasetPermissionsException("internal server error", SC_INTERNAL_SERVER_ERROR);
         }
     }
@@ -154,10 +144,7 @@ public class AuthorisationServiceImpl implements AuthorisationService {
         try {
             return permissionsServiceSupplier.getService().canView(session, description);
         } catch (IOException ex) {
-            error().exception(ex)
-                    .data("user", session.getEmail())
-                    .data("permission", "can_view")
-                    .log("error checking user permissions");
+            error().exception(ex).user(session).data("permission", "can_view").log("error checking user permissions");
             throw new DatasetPermissionsException("internal server error", SC_INTERNAL_SERVER_ERROR);
         }
     }
@@ -170,11 +157,12 @@ public class AuthorisationServiceImpl implements AuthorisationService {
         try {
             collection = collectionsSupplier.getService().getCollection(id);
         } catch (IOException ex) {
-            error().exception(ex).data("collection_id", id).log("error getting collection");
+            error().exception(ex).collectionID(id).log("error getting collection");
             throw new DatasetPermissionsException("internal server error", SC_INTERNAL_SERVER_ERROR);
         }
 
         if (collection == null) {
+            info().collectionID(id).log("collection not found");
             throw new DatasetPermissionsException("collection not found", SC_NOT_FOUND);
         }
 
@@ -191,9 +179,7 @@ public class AuthorisationServiceImpl implements AuthorisationService {
                 .isPresent();
 
         if (!isPresent) {
-            info().data("collection_id", collection.getDescription().getId())
-                    .data("dataset_id", datasetID)
-                    .log("requested dataset does not exist in the specified collection");
+            info().collectionID(collection).datasetID(datasetID).log("requested dataset does not exist in the specified collection");
             throw new DatasetPermissionsException("requested collection does not contain the requested dataset", SC_BAD_REQUEST);
         }
     }

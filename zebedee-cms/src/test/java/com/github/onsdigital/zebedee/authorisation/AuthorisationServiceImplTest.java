@@ -4,7 +4,9 @@ import com.github.onsdigital.zebedee.json.CollectionDataset;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.Collections;
+import com.github.onsdigital.zebedee.model.ServiceAccount;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
+import com.github.onsdigital.zebedee.service.ServiceStore;
 import com.github.onsdigital.zebedee.service.ServiceSupplier;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.session.service.SessionsService;
@@ -53,12 +55,19 @@ public class AuthorisationServiceImplTest {
     private PermissionsService permissionsService;
 
     @Mock
+    private ServiceStore serviceStore;
+
+    @Mock
     private Collection collection;
+
+    @Mock
+    private ServiceAccount serviceAccount;
 
     private ServiceSupplier<SessionsService> sessionServiceSupplier = () -> sessionsService;
     private ServiceSupplier<UsersService> userServiceSupplier = () -> usersService;
     private ServiceSupplier<Collections> collectionsSupplier = () -> collections;
     private ServiceSupplier<PermissionsService> permissionsServiceSupplier = () -> permissionsService;
+    private ServiceSupplier<ServiceStore> serviceStoreSupplier = () -> serviceStore;
 
     private AuthorisationService service;
     private UserIdentityException notAuthenticatedEx;
@@ -88,6 +97,7 @@ public class AuthorisationServiceImplTest {
         ReflectionTestUtils.setField(service, "userServiceSupplier", userServiceSupplier);
         ReflectionTestUtils.setField(service, "collectionsSupplier", collectionsSupplier);
         ReflectionTestUtils.setField(service, "permissionsServiceSupplier", permissionsServiceSupplier);
+        ReflectionTestUtils.setField(service, "serviceStoreSupplier", serviceStoreSupplier);
     }
 
     @Test(expected = UserIdentityException.class)
@@ -565,7 +575,7 @@ public class AuthorisationServiceImplTest {
     }
 
     @Test
-    public void getUserPermissions_adminUser() throws Exception {
+    public void testGetUserPermissions_adminUser() throws Exception {
         when(sessionsService.get("666"))
                 .thenReturn(session);
         when(sessionsService.expired(session))
@@ -598,7 +608,7 @@ public class AuthorisationServiceImplTest {
     }
 
     @Test
-    public void getUserPermissions_viewer() throws Exception {
+    public void testGetUserPermissions_viewer() throws Exception {
         when(sessionsService.get("666"))
                 .thenReturn(session);
         when(sessionsService.expired(session))
@@ -629,6 +639,100 @@ public class AuthorisationServiceImplTest {
         verify(permissionsService, times(1)).canEdit(session);
         verify(permissionsService, times(1)).canView(session, description);
         verifyNoMoreInteractions(sessionsService, collections, permissionsService);
+    }
+
+    @Test
+    public void testGetServiceAccountSuccess() throws Exception {
+        AuthorisationServiceImpl serviceImpl = (AuthorisationServiceImpl) service;
+
+        when(serviceStore.get("666"))
+                .thenReturn(serviceAccount);
+
+        ServiceAccount account = serviceImpl.getServiceAccount("666");
+
+        assertThat(account, equalTo(serviceAccount));
+        verify(serviceStore, times(1)).get("666");
+    }
+
+    @Test(expected = DatasetPermissionsException.class)
+    public void testGetServiceAccount_IOException() throws Exception {
+        AuthorisationServiceImpl serviceImpl = (AuthorisationServiceImpl) service;
+
+        when(serviceStore.get("666"))
+                .thenThrow(new IOException());
+
+        try {
+            serviceImpl.getServiceAccount("666");
+        } catch (DatasetPermissionsException ex) {
+            verify(serviceStore, times(1)).get("666");
+            assertThat(ex.statusCode, equalTo(SC_INTERNAL_SERVER_ERROR));
+            assertThat(ex.getMessage(), equalTo("internal server error"));
+            throw ex;
+        }
+    }
+
+    @Test(expected = DatasetPermissionsException.class)
+    public void testGetServiceAccount_NotFound() throws Exception {
+        AuthorisationServiceImpl serviceImpl = (AuthorisationServiceImpl) service;
+
+        when(serviceStore.get("666"))
+                .thenReturn(null);
+
+        try {
+            serviceImpl.getServiceAccount("666");
+        } catch (DatasetPermissionsException ex) {
+            verify(serviceStore, times(1)).get("666");
+            assertThat(ex.statusCode, equalTo(SC_UNAUTHORIZED));
+            assertThat(ex.getMessage(), equalTo("permisson denied service account not found"));
+            throw ex;
+        }
+    }
+
+    @Test
+    public void testGetServicePermissionsSuccess() throws Exception {
+        when(serviceStore.get("666"))
+                .thenReturn(serviceAccount);
+        when(serviceAccount.getId())
+                .thenReturn("Über-service");
+
+        DatasetPermissions permissions = service.getServicePermissions("666");
+
+        assertTrue(permissions.getPermissions().contains(CREATE));
+        assertTrue(permissions.getPermissions().contains(READ));
+        assertTrue(permissions.getPermissions().contains(UPDATE));
+        assertTrue(permissions.getPermissions().contains(DELETE));
+
+        verify(serviceStore, times(1)).get("666");
+    }
+
+    @Test(expected = DatasetPermissionsException.class)
+    public void testGetServicePermissions_IOException() throws Exception {
+        when(serviceStore.get("666"))
+                .thenThrow(new IOException());
+
+        try {
+            service.getServicePermissions("666");
+        } catch (DatasetPermissionsException ex) {
+            verify(serviceStore, times(1)).get("666");
+            assertThat(ex.statusCode, equalTo(SC_INTERNAL_SERVER_ERROR));
+            assertThat(ex.getMessage(), equalTo("internal server error"));
+            throw ex;
+        }
+    }
+
+    @Test(expected = DatasetPermissionsException.class)
+    public void testGetServicePermissions_NotFound() throws Exception {
+        when(serviceStore.get("666"))
+                .thenReturn(null);
+
+        try {
+            service.getServicePermissions("666");
+        } catch (DatasetPermissionsException ex) {
+            verify(serviceStore, times(1)).get("666");
+            assertThat(ex.statusCode, equalTo(SC_UNAUTHORIZED));
+            assertThat(ex.getMessage(), equalTo("permisson denied service account not found"));
+            throw ex;
+        }
     }
 
 }

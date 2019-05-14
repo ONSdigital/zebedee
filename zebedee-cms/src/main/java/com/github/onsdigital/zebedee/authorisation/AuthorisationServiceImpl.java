@@ -4,7 +4,9 @@ import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.Collections;
+import com.github.onsdigital.zebedee.model.ServiceAccount;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
+import com.github.onsdigital.zebedee.service.ServiceStore;
 import com.github.onsdigital.zebedee.service.ServiceSupplier;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.session.service.SessionsService;
@@ -31,6 +33,7 @@ public class AuthorisationServiceImpl implements AuthorisationService {
     private ServiceSupplier<UsersService> userServiceSupplier = () -> Root.zebedee.getUsersService();
     private ServiceSupplier<Collections> collectionsSupplier = () -> Root.zebedee.getCollections();
     private ServiceSupplier<PermissionsService> permissionsServiceSupplier = () -> Root.zebedee.getPermissionsService();
+    private ServiceSupplier<ServiceStore> serviceStoreSupplier = () -> Root.zebedee.getServiceStore();
 
     private static final String INTERNAL_ERROR = "internal server error";
     private static final String AUTHENTICATED_ERROR = "user not authenticated";
@@ -87,7 +90,12 @@ public class AuthorisationServiceImpl implements AuthorisationService {
 
     @Override
     public DatasetPermissions getServicePermissions(String serviceToken) throws DatasetPermissionsException {
-        return null;
+        ServiceAccount serviceAccount = getServiceAccount(serviceToken);
+        DatasetPermissions servicePermissions = new DatasetPermissions().permit(CREATE, READ, UPDATE, DELETE);
+        info().serviceAccountID(serviceAccount.getId())
+                .data("permissions", servicePermissions)
+                .log("granting dataset permissions to valid service account");
+        return servicePermissions;
     }
 
     DatasetPermissions assignPermissions(Session session, CollectionDescription description, String datasetID)
@@ -181,6 +189,21 @@ public class AuthorisationServiceImpl implements AuthorisationService {
         if (!isPresent) {
             info().collectionID(collection).datasetID(datasetID).log("requested dataset does not exist in the specified collection");
             throw new DatasetPermissionsException("requested collection does not contain the requested dataset", SC_BAD_REQUEST);
+        }
+    }
+
+    ServiceAccount getServiceAccount(String token) throws DatasetPermissionsException {
+        try {
+            ServiceAccount account = serviceStoreSupplier.getService().get(token);
+            if (account == null) {
+                error().serviceAccountToken(token)
+                        .log("dataset permissons denied service account not found for provide token");
+                throw new DatasetPermissionsException("permisson denied service account not found", SC_UNAUTHORIZED);
+            }
+            return account;
+        } catch (IOException ex) {
+            error().exception(ex).serviceAccountToken(token).log("error getting service account");
+            throw new DatasetPermissionsException("internal server error", SC_INTERNAL_SERVER_ERROR);
         }
     }
 

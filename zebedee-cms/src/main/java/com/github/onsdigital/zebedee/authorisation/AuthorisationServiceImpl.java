@@ -103,7 +103,11 @@ public class AuthorisationServiceImpl implements AuthorisationService {
             return permissions;
         }
 
-        info().collectionID(description).datasetID(datasetID).user(session).log("permitted collection dataset permissions for user");
+        info().collectionID(description)
+                .datasetID(datasetID)
+                .user(session)
+                .data("permissions", permissions)
+                .log("permitted collection dataset permissions for user");
         return permissions;
     }
 
@@ -121,10 +125,12 @@ public class AuthorisationServiceImpl implements AuthorisationService {
         }
 
         if (session == null) {
+            info().sessionID(sessionID).log("session not found");
             throw new DatasetPermissionsException("session not found", SC_UNAUTHORIZED);
         }
 
         if (sessionServiceSupplier.getService().expired(session)) {
+            info().sessionID(sessionID).log("session expired");
             throw new DatasetPermissionsException("session expired", SC_UNAUTHORIZED);
         }
 

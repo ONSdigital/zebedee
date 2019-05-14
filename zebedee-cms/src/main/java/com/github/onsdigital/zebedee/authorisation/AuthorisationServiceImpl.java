@@ -80,6 +80,7 @@ public class AuthorisationServiceImpl implements AuthorisationService {
         Collection collection = getCollection(collectionID);
 
         if (StringUtils.isEmpty(datasetID)) {
+            info().log("user dataset permissions request denied dataset ID required but was empty");
             throw new DatasetPermissionsException("dataset ID required but was empty", SC_BAD_REQUEST);
         }
 
@@ -121,24 +122,25 @@ public class AuthorisationServiceImpl implements AuthorisationService {
 
     Session getSession(String sessionID) throws DatasetPermissionsException {
         if (StringUtils.isEmpty(sessionID)) {
-            throw new DatasetPermissionsException("session ID required but empty", SC_BAD_REQUEST);
+            throw new DatasetPermissionsException("user dataset permissions request denied session ID required but " +
+                    "empty", SC_BAD_REQUEST);
         }
 
         Session session = null;
         try {
             session = sessionServiceSupplier.getService().get(sessionID);
         } catch (IOException ex) {
-            error().exception(ex).sessionID(sessionID).log("error getting session");
+            error().exception(ex).sessionID(sessionID).log("user dataset permissions request failed error getting session");
             throw new DatasetPermissionsException("internal server error", SC_INTERNAL_SERVER_ERROR);
         }
 
         if (session == null) {
-            info().sessionID(sessionID).log("session not found");
+            info().sessionID(sessionID).log("user dataset permissions request denied session not found");
             throw new DatasetPermissionsException("session not found", SC_UNAUTHORIZED);
         }
 
         if (sessionServiceSupplier.getService().expired(session)) {
-            info().sessionID(sessionID).log("session expired");
+            info().sessionID(sessionID).log("user dataset permissions request denied session expired");
             throw new DatasetPermissionsException("session expired", SC_UNAUTHORIZED);
         }
 
@@ -149,7 +151,8 @@ public class AuthorisationServiceImpl implements AuthorisationService {
         try {
             return permissionsServiceSupplier.getService().canEdit(session);
         } catch (IOException ex) {
-            error().exception(ex).user(session).data("permission", "can_edit").log("error checking user permissions");
+            error().exception(ex).user(session).data("permission", "can_edit")
+                    .log("user dataset permissions request denied error checking user permissions");
             throw new DatasetPermissionsException("internal server error", SC_INTERNAL_SERVER_ERROR);
         }
     }
@@ -158,25 +161,30 @@ public class AuthorisationServiceImpl implements AuthorisationService {
         try {
             return permissionsServiceSupplier.getService().canView(session, description);
         } catch (IOException ex) {
-            error().exception(ex).user(session).data("permission", "can_view").log("error checking user permissions");
+            error().exception(ex).user(session).data("permission", "can_view")
+                    .log("user dataset permissions request denied error checking user permissions");
             throw new DatasetPermissionsException("internal server error", SC_INTERNAL_SERVER_ERROR);
         }
     }
 
     Collection getCollection(String id) throws DatasetPermissionsException {
         if (StringUtils.isEmpty(id)) {
+            info().log("user dataset permissions request denied collection ID required but was empty");
             throw new DatasetPermissionsException("collection ID required but was empty", SC_BAD_REQUEST);
         }
         Collection collection = null;
         try {
             collection = collectionsSupplier.getService().getCollection(id);
         } catch (IOException ex) {
-            error().exception(ex).collectionID(id).log("error getting collection");
+            error().exception(ex)
+                    .collectionID(id)
+                    .log("user dataset permissions request denied error getting collection");
             throw new DatasetPermissionsException("internal server error", SC_INTERNAL_SERVER_ERROR);
         }
 
         if (collection == null) {
-            info().collectionID(id).log("collection not found");
+            info().collectionID(id)
+                    .log("user dataset permissions request denied  collection not found");
             throw new DatasetPermissionsException("collection not found", SC_NOT_FOUND);
         }
 
@@ -193,7 +201,9 @@ public class AuthorisationServiceImpl implements AuthorisationService {
                 .isPresent();
 
         if (!isPresent) {
-            info().collectionID(collection).datasetID(datasetID).log("requested dataset does not exist in the specified collection");
+            info().collectionID(collection)
+                    .datasetID(datasetID)
+                    .log("user dataset permissions request denied requested dataset does not exist in the collection");
             throw new DatasetPermissionsException("requested collection does not contain the requested dataset", SC_BAD_REQUEST);
         }
     }
@@ -203,12 +213,14 @@ public class AuthorisationServiceImpl implements AuthorisationService {
             ServiceAccount account = serviceStoreSupplier.getService().get(token);
             if (account == null) {
                 error().serviceAccountToken(token)
-                        .log("dataset permissons denied service account not found for provide token");
+                        .log("service dataset permissons request denied service account not found");
                 throw new DatasetPermissionsException("permisson denied service account not found", SC_UNAUTHORIZED);
             }
             return account;
         } catch (IOException ex) {
-            error().exception(ex).serviceAccountToken(token).log("error getting service account");
+            error().exception(ex)
+                    .serviceAccountToken(token)
+                    .log("service dataset permissons request failed error getting service account");
             throw new DatasetPermissionsException("internal server error", SC_INTERNAL_SERVER_ERROR);
         }
     }

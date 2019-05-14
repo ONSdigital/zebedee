@@ -2,6 +2,7 @@ package com.github.onsdigital.zebedee.api.cmd;
 
 import com.github.onsdigital.zebedee.authorisation.AuthorisationService;
 import com.github.onsdigital.zebedee.authorisation.DatasetPermissions;
+import com.github.onsdigital.zebedee.authorisation.DatasetPermissionsException;
 import com.github.onsdigital.zebedee.json.response.Error;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.util.HttpResponseWriter;
@@ -27,6 +28,7 @@ import static com.github.onsdigital.zebedee.authorisation.DatasetPermissionType.
 import static com.github.onsdigital.zebedee.authorisation.DatasetPermissionType.UPDATE;
 import static junit.framework.TestCase.assertTrue;
 import static org.apache.http.HttpStatus.SC_BAD_REQUEST;
+import static org.apache.http.HttpStatus.SC_INTERNAL_SERVER_ERROR;
 import static org.apache.http.HttpStatus.SC_NOT_FOUND;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -207,7 +209,7 @@ public class PermissionsTest {
     @Test
     public void testGetServicePermissionsSuccess() throws Exception {
         when(mockRequest.getHeader(SERVICE_AUTH_HEADER))
-                .thenReturn("666");
+                .thenReturn("Bearer 666");
 
         datasetPermissions = new DatasetPermissions(CREATE, READ, UPDATE, DELETE);
 
@@ -229,6 +231,68 @@ public class PermissionsTest {
         assertTrue("expected READ permission but not found", actual.getPermissions().contains(READ));
         assertTrue("expected UPDATE permission but not found", actual.getPermissions().contains(UPDATE));
         assertTrue("expected DELETE permission but not found", actual.getPermissions().contains(DELETE));
+    }
+
+    /**
+     * Valid request for service dataset permissions which encounters an unexpected error.
+     * Expected response: status Internal Server Error, Body: "internal server error"
+     */
+    @Test
+    public void testGetServicePermissions_DatasetPermissionsException() throws Exception {
+        when(mockRequest.getHeader(SERVICE_AUTH_HEADER))
+                .thenReturn("666");
+
+        when(authorisationService.getServicePermissions("666"))
+                .thenThrow(new DatasetPermissionsException("internal server error", SC_INTERNAL_SERVER_ERROR));
+
+        ArgumentCaptor<DatasetPermissions> permissionsCaptor = ArgumentCaptor.forClass(DatasetPermissions.class);
+
+        api = new Permissions(true, authorisationService, httpResponseWriter);
+
+        api.handle(mockRequest, mockResponse);
+
+        verify(authorisationService, times(1)).getServicePermissions("666");
+        verify(httpResponseWriter, times(1)).writeJSONResponse(eq(mockResponse), permissionsCaptor.capture(), eq(500));
+
+        assertThat(permissionsCaptor.getValue(), equalTo(new Error("internal server error")));
+    }
+
+    /**
+     * Valid request for user dataset permissions that contains both user and service auth headers. In this case the
+     * the user permissions take precedence over the service.
+     * Expected response: status OK, Body: the user's permissions entity.
+     */
+    @Test
+    public void testGetUserPermissions_userAndServiceHeaders() throws Exception {
+        datasetPermissions = new DatasetPermissions(READ);
+
+        when(mockRequest.getHeader(FLORENCE_AUTH_HEATHER))
+                .thenReturn("666");
+
+        when(mockRequest.getHeader(SERVICE_AUTH_HEADER))
+                .thenReturn("Bearer 999");
+
+        when(mockRequest.getParameter(DATASET_ID_PARAM))
+                .thenReturn("777");
+
+        when(mockRequest.getParameter(COLLECTION_ID_PARAM))
+                .thenReturn("888");
+
+        when(authorisationService.getUserPermissions("666", "777", "888"))
+                .thenReturn(datasetPermissions);
+
+        ArgumentCaptor<DatasetPermissions> permissionsCaptor = ArgumentCaptor.forClass(DatasetPermissions.class);
+
+        api = new Permissions(true, authorisationService, httpResponseWriter);
+
+        api.handle(mockRequest, mockResponse);
+
+        verify(authorisationService, times(1)).getUserPermissions("666", "777", "888");
+        verify(httpResponseWriter, times(1)).writeJSONResponse(eq(mockResponse), permissionsCaptor.capture(), eq(200));
+
+        DatasetPermissions actual = permissionsCaptor.getValue();
+        assertThat(actual.getPermissions().size(), equalTo(1));
+        assertTrue("expected READ permission but not found", actual.getPermissions().contains(READ));
     }
 
 }

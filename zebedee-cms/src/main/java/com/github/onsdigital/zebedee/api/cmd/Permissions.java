@@ -34,6 +34,7 @@ public class Permissions {
     static final String FLORENCE_AUTH_HEATHER = "X-Florence-Token";
     static final String DATASET_ID_MISSING = "dataset_id param required but not found";
     static final String COLLECTION_ID_MISSING = "collection_id param required but not found";
+    static final String BREARER_PREFIX = "Bearer ";
 
     private static AuthorisationService authorisationService;
 
@@ -85,7 +86,7 @@ public class Permissions {
         }
     }
 
-    private DatasetPermissions getPermissions(HttpServletRequest request, HttpServletResponse response)
+    DatasetPermissions getPermissions(HttpServletRequest request, HttpServletResponse response)
             throws DatasetPermissionsException {
 
         String sessionID = request.getHeader(FLORENCE_AUTH_HEATHER);
@@ -103,8 +104,8 @@ public class Permissions {
         return getServicePermissions(request, response, serviceToken);
     }
 
-    private DatasetPermissions getUserPermissions(HttpServletRequest request, HttpServletResponse response,
-                                                  String sessionID)
+    DatasetPermissions getUserPermissions(HttpServletRequest request, HttpServletResponse response,
+                                          String sessionID)
             throws DatasetPermissionsException {
         info().log("handling permissions request for user");
 
@@ -125,13 +126,16 @@ public class Permissions {
         return authorisationService.getUserPermissions(sessionID, datasetID, collectionID);
     }
 
-    private DatasetPermissions getServicePermissions(HttpServletRequest request, HttpServletResponse response,
-                                                     String serviceToken) throws DatasetPermissionsException {
+    DatasetPermissions getServicePermissions(HttpServletRequest request, HttpServletResponse response,
+                                             String serviceToken) throws DatasetPermissionsException {
         info().log("handling permissions request for service");
+        if (serviceToken.startsWith(BREARER_PREFIX)) {
+            serviceToken = serviceToken.replaceFirst(BREARER_PREFIX, "");
+        }
         return authorisationService.getServicePermissions(serviceToken);
     }
 
-    private void writeResponse(HttpServletResponse response, Object entity, int status) throws IOException {
+    void writeResponse(HttpServletResponse response, Object entity, int status) throws IOException {
         try {
             httpResponseWriter.writeJSONResponse(response, entity, status);
         } catch (Exception ex) {

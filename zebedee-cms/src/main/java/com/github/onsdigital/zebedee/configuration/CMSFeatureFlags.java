@@ -10,7 +10,7 @@ import static com.github.onsdigital.logging.v2.event.SimpleEvent.warn;
  */
 public class CMSFeatureFlags {
 
-    private static final String ENABLE_DATASET_IMPORT = "ENABLE_DATASET_IMPORT";
+    public static final String ENABLE_DATASET_IMPORT = "ENABLE_DATASET_IMPORT";
 
     /**
      * Singleton instance

@@ -209,7 +209,7 @@ public class AuthorisationServiceImplTest {
             verify(sessionsService, never()).get(anyString());
 
             assertThat(ex.statusCode, equalTo(SC_BAD_REQUEST));
-            assertThat(ex.getMessage(), equalTo("session ID required but empty"));
+            assertThat(ex.getMessage(), equalTo("user dataset permissions request denied session ID required but empty"));
             throw ex;
         }
     }
@@ -224,7 +224,7 @@ public class AuthorisationServiceImplTest {
             verify(sessionsService, never()).get(anyString());
 
             assertThat(ex.statusCode, equalTo(SC_BAD_REQUEST));
-            assertThat(ex.getMessage(), equalTo("session ID required but empty"));
+            assertThat(ex.getMessage(), equalTo("user dataset permissions request denied session ID required but empty"));
             throw ex;
         }
     }

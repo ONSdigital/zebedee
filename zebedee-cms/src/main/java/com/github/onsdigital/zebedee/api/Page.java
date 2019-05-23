@@ -340,7 +340,7 @@ public class Page {
 
     private boolean execCreationHook(com.github.onsdigital.zebedee.content.page.base.Page page, String uri,
                                      Collection collection, Session session) {
-        info().data("path", uri).data("collectionId", collection).data("user", session.getEmail())
+        info().data("path", uri).data("collectionId", collection.getDescription().getId()).data("user", session.getEmail())
                 .log("page delete endpoint: executing PageCreationHook");
         try {
             pageCreationHook.get().onPageUpdated(page, uri);

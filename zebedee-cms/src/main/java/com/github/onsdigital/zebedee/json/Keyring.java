@@ -159,8 +159,7 @@ public class Keyring implements Cloneable {
         }
 
         if (result == null) {
-            //info().data("collectionId", collectionId).log("Keyring has not been unlocked, cannot recover encryption
-            // key");
+            info().data("collectionId", collectionId).log("Keyring has not been unlocked, cannot recover encryption key");
         }
 
         return result;

@@ -66,7 +66,7 @@ public class ReadRequestHandler {
     public Content find(HttpServletRequest request, DataFilter dataFilter, String uri) throws IOException, ZebedeeException {
         String collectionId = getCollectionId(request);
         String lastSegment = getLastSegment(uri);
-        //info().data("uri", uri).data("collection_id", collectionId).log("finding requested content");
+        info().data("uri", uri).data("collection_id", collectionId).log("finding requested content");
         if (LATEST.equalsIgnoreCase(lastSegment)) {
             return getLatestContent(request, collectionId, dataFilter, removeLastSegment(uri));
         } else {
@@ -82,9 +82,9 @@ public class ReadRequestHandler {
             try {
                 return reader.getCollectionContent(collectionId, sessionId, uri, null);
             } catch (NotFoundException e) {
-/*                info().data("uri", uri)
+                info().data("uri", uri)
                         .data("collection_id", collectionId)
-                        .log("Could not find resource in collection. Will try published content");*/
+                        .log("Could not find resource in collection. Will try published content");
             }
         }
 
@@ -99,9 +99,9 @@ public class ReadRequestHandler {
                 String sessionId = RequestUtils.getSessionId(request);
                 return reader.getLatestCollectionContent(collectionId, sessionId, uri, dataFilter);
             } catch (NotFoundException | NoSuchFileException e) {
-/*                info().data("resource_uri", uri)
+                info().data("resource_uri", uri)
                         .data("collection_id", collectionId)
-                        .log("Could not find resource in collection. Will try published content");*/
+                        .log("Could not find resource in collection. Will try published content");
             }
         }
 
@@ -114,9 +114,9 @@ public class ReadRequestHandler {
                 String sessionId = RequestUtils.getSessionId(request);
                 return reader.getCollectionContent(collectionId, sessionId, uri, dataFilter);
             } catch (NotFoundException e) {
-/*                info().data("uri", uri)
+                info().data("uri", uri)
                         .data("collection_id", collectionId)
-                        .log("Could not find resource in collection. Will try published content");*/
+                        .log("Could not find resource in collection. Will try published content");
             }
         }
 
@@ -139,9 +139,9 @@ public class ReadRequestHandler {
                 String sessionId = RequestUtils.getSessionId(request);
                 return reader.getCollectionResource(collectionId, sessionId, uri);
             } catch (NotFoundException e) {
-/*                info().data("resource_uri", uri)
+                info().data("resource_uri", uri)
                         .data("collection_id", collectionId)
-                        .log("Could not find resource under collection, trying published content");*/
+                        .log("Could not find resource under collection, trying published content");
             }
         }
         return reader.getPublishedResource(uri);
@@ -163,9 +163,9 @@ public class ReadRequestHandler {
                 String sessionId = RequestUtils.getSessionId(request);
                 return reader.getCollectionContentLength(collectionId, sessionId, uri);
             } catch (NotFoundException e) {
-/*                info().data("uri", uri)
+                info().data("uri", uri)
                         .data("collection_id", collectionId)
-                        .log("Could not find resource in collection. Will try published content");*/
+                        .log("Could not find resource in collection. Will try published content");
             }
         }
         return reader.getPublishedContentLength(uri);

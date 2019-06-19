@@ -41,7 +41,7 @@ public class CollectionPdfGeneratorTest {
 
 
     @Test
-    public void shouldGenerateNothingForAnEmptyCollection() throws IOException {
+    public void shouldGenerateNothingForAnEmptyCollection() throws Exception {
         generator.generatePdfsInCollection(mockCollectionWriter, new ArrayList<>());
         verifyZeroInteractions(mockPDFService);
     }

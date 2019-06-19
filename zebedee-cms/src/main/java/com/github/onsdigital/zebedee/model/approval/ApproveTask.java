@@ -292,7 +292,7 @@ public class ApproveTask implements Callable<Boolean> {
 
     public void generatePdfFiles(List<ContentDetail> collectionContent) throws ZebedeeException {
         CollectionPdfGenerator pdfGenerator = new CollectionPdfGenerator(new BabbagePdfService(session, collection));
-        pdfGenerator.generatePdfsInCollection(collectionWriter, collectionContent);
+        pdfGenerator.generatePDFsForCollection(collection, collectionWriter, collectionContent);
     }
 
     private static ContentDetailResolver getDefaultContentDetailResolver() {

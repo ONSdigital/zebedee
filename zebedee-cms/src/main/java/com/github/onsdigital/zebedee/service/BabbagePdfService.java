@@ -1,7 +1,6 @@
 package com.github.onsdigital.zebedee.service;
 
 import com.github.onsdigital.zebedee.configuration.Configuration;
-import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.ContentWriter;
 import com.github.onsdigital.zebedee.session.model.Session;
@@ -15,6 +14,7 @@ import java.io.IOException;
 
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
+import static java.text.MessageFormat.format;
 
 /**
  * Render PDF output for a given URI using babbage.
@@ -64,9 +64,7 @@ public class BabbagePdfService implements PdfService {
                             .data("body", body)
                             .log("generate PDF failure");
 
-                    throw new IOException("Failed to generate PDF for URI " + uri +
-                            ". Response: " + status +
-                            " " + body);
+                    throw new IOException(format("Failed to generate PDF for URI {0}. Response: {1} {2}", uri, status, body));
                 }
                 contentWriter.write(response.getEntity().getContent(), pdfURI);
             } catch (Exception e) {

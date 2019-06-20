@@ -25,6 +25,8 @@ import static com.github.onsdigital.zebedee.content.page.base.PageType.compendiu
 import static com.github.onsdigital.zebedee.content.page.base.PageType.compendium_landing_page;
 import static com.github.onsdigital.zebedee.content.page.base.PageType.static_methodology;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.info;
+import static com.github.onsdigital.zebedee.logging.CMSLogEvent.warn;
+import static java.text.MessageFormat.format;
 
 /**
  * Generates a PDF for each page in a collection that needs one.
@@ -47,17 +49,12 @@ public class CollectionPdfGenerator {
             add(static_methodology);
         }};
 
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> shutdown()));
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> closeExecutorService()));
     }
 
     private PdfService pdfService;
 
     private Predicate<ContentDetail> isPDFPage = (c -> PDF_GENERATING_PAGES.contains(PageType.valueOf(c.type)));
-
-    private static void shutdown() {
-        info().log("shutting down CollectionPdfGenerator.EXECUTOR_SERVICE");
-        EXECUTOR_SERVICE.shutdown();
-    }
 
     /**
      * Create a new instance to use the provided PdfService.
@@ -69,7 +66,31 @@ public class CollectionPdfGenerator {
     }
 
     /**
-     * Generate PDF's for pages that require them.
+     * @param collection
+     * @param collectionWriter
+     * @param collectionContent
+     * @throws ZebedeeException
+     */
+    public void generatePDFsForCollection(Collection collection, CollectionWriter collectionWriter,
+                                          List<ContentDetail> collectionContent) throws ZebedeeException {
+        List<ContentDetail> filtered = filterPDFContent(collectionContent);
+
+        int index = 1;
+        for (ContentDetail detail : filtered) {
+            generatePDFForContent(collection, collectionWriter.getReviewed(), detail.uri);
+
+            warn().collectionID(collection)
+                    .data("uri", detail.uri)
+                    .log(format("successfully generated collection content PDF {0}/{1}", index, filtered.size()));
+            index++;
+        }
+
+        warn().collectionID(collection)
+                .log(format("successfully generated {0}/{0} PDFs for collection content", filtered.size()));
+    }
+
+    /**
+     * Generate PDF's for pages that require them using a thread pool to allow concurrent throughput.
      *
      * @param collection        the collection the task is being invoked for.
      * @param collectionWriter  a CollectionWriter to use to write the generated PDF files back to the the collection
@@ -77,21 +98,22 @@ public class CollectionPdfGenerator {
      * @param collectionContent the entire content of the collection.
      * @throws ZebedeeException PDF generation was unsuccessful.
      */
-    public void generatePDFsForCollection(Collection collection, CollectionWriter collectionWriter,
-                                          List<ContentDetail> collectionContent) throws ZebedeeException {
+    public void generatePDFsForCollectionAsyc(Collection collection, CollectionWriter collectionWriter,
+                                              List<ContentDetail> collectionContent) throws ZebedeeException {
         ContentWriter writer = collectionWriter.getReviewed();
-        List<Callable<Boolean>> tasks = createGeneratePdfTasks(collectionContent, writer, collection);
+        List<Callable<Boolean>> tasks = createGeneratePdfTasks(filterPDFContent(collectionContent), writer, collection);
 
         invokeAllAndCheckResults(tasks, collection);
     }
 
-    private List<Callable<Boolean>> createGeneratePdfTasks(List<ContentDetail> content, ContentWriter writer,
-                                                           Collection collection) {
-        // reduce to only uri that will generate a PDF
-        List<ContentDetail> filtered = content.stream()
+    private List<ContentDetail> filterPDFContent(List<ContentDetail> content) {
+        return content.stream()
                 .filter(isPDFPage)
                 .collect(Collectors.toList());
+    }
 
+    private List<Callable<Boolean>> createGeneratePdfTasks(List<ContentDetail> filtered, ContentWriter writer,
+                                                           Collection collection) {
         // Create a callable for each of the filtered content items.
         List<Callable<Boolean>> tasks = filtered
                 .stream()
@@ -121,18 +143,21 @@ public class CollectionPdfGenerator {
         }
     }
 
-    private Callable<Boolean> newGeneratePDFCallable(ContentWriter writer, Collection collection, String uri) {
-        return () -> {
-            CMSLogEvent e = info().data("uri", uri).collectionID(collection);
-            try {
-                pdfService.generatePdf(writer, uri);
-                e.log("content PDF generated successfully");
-            } catch (Exception ex) {
-                e.exception(ex).log("error generating PDF content");
-                throw ex;
-            }
+    private boolean generatePDFForContent(Collection collection, ContentWriter writer, String uri)
+            throws InternalServerError {
+        CMSLogEvent e = info().data("uri", uri).collectionID(collection);
+        try {
+            pdfService.generatePdf(writer, uri);
+            e.log("content PDF generated successfully");
             return true;
-        };
+        } catch (Exception ex) {
+            e.exception(ex).log("error generating PDF content");
+            throw new InternalServerError("error generating PDF content", ex);
+        }
+    }
+
+    private Callable<Boolean> newGeneratePDFCallable(ContentWriter writer, Collection collection, String uri) {
+        return () -> generatePDFForContent(collection, writer, uri);
     }
 
     private void checkFutures(Collection collection, List<Future<Boolean>> results) throws ZebedeeException {
@@ -145,4 +170,10 @@ public class CollectionPdfGenerator {
             throw new InternalServerError("checking generate PDF future returned an error", ex);
         }
     }
+
+    private static void closeExecutorService() {
+        info().log("shutting down CollectionPdfGenerator.EXECUTOR_SERVICE");
+        EXECUTOR_SERVICE.shutdown();
+    }
+
 }

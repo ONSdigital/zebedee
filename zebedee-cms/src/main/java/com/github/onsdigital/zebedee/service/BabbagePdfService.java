@@ -2,9 +2,9 @@ package com.github.onsdigital.zebedee.service;
 
 import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
-import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.ContentWriter;
+import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.util.URIUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -57,14 +57,21 @@ public class BabbagePdfService implements PdfService {
 
             try (CloseableHttpResponse response = client.execute(httpGet)) {
 
-                if (response.getStatusLine().getStatusCode() != 200) {
+                int status = response.getStatusLine().getStatusCode();
+                if (status != 200) {
+                    String body = response.toString();
+                    error().data("status_code", status)
+                            .data("body", body)
+                            .log("generate PDF failure");
+
                     throw new IOException("Failed to generate PDF for URI " + uri +
-                            ". Response: " + response.getStatusLine().getStatusCode() +
-                            " " + response.toString());
+                            ". Response: " + status +
+                            " " + body);
                 }
                 contentWriter.write(response.getEntity().getContent(), pdfURI);
-            } catch (BadRequestException e) {
+            } catch (Exception e) {
                 error().data("path", pdfURI).logException(e, "Error while generating collection PDF");
+                throw new IOException(e);
             }
         }
     }

@@ -290,9 +290,9 @@ public class ApproveTask implements Callable<Boolean> {
         ReleasePopulator.populateQuietly(collection, collectionReader, collectionWriter, collectionContent);
     }
 
-    public void generatePdfFiles(Iterable<ContentDetail> collectionContent) {
+    public void generatePdfFiles(List<ContentDetail> collectionContent) throws ZebedeeException {
         CollectionPdfGenerator pdfGenerator = new CollectionPdfGenerator(new BabbagePdfService(session, collection));
-        pdfGenerator.generatePdfsInCollection(collectionWriter, collectionContent);
+        pdfGenerator.generatePDFsForCollection(collection, collectionWriter, collectionContent);
     }
 
     private static ContentDetailResolver getDefaultContentDetailResolver() {

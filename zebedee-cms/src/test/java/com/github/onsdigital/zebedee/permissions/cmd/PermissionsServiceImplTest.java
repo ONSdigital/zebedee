@@ -363,9 +363,9 @@ public class PermissionsServiceImplTest {
         when(serviceStore.get(SERVICE_TOKEN))
                 .thenReturn(expected);
 
-        Permissions result = service.getServiceDatasetPermissions(SERVICE_TOKEN);
+        CRUD result = service.getServiceDatasetPermissions(SERVICE_TOKEN);
 
-        assertThat(result, equalTo(Permissions.permitCreateReadUpdateDelete()));
+        assertThat(result, equalTo(CRUD.permitCreateReadUpdateDelete()));
         verify(serviceStore, times(1)).get(SERVICE_TOKEN);
     }
 
@@ -374,9 +374,9 @@ public class PermissionsServiceImplTest {
         when(sessionsService.get(SESSION_ID)).thenReturn(session);
         when(collectionPermissionsService.hasEdit(session)).thenReturn(true);
 
-        Permissions actual = service.getUserDatasetPermissions(SESSION_ID, DATASET_ID, COLLECTION_ID);
+        CRUD actual = service.getUserDatasetPermissions(SESSION_ID, DATASET_ID, COLLECTION_ID);
 
-        assertThat(actual, equalTo(Permissions.permitCreateReadUpdateDelete()));
+        assertThat(actual, equalTo(CRUD.permitCreateReadUpdateDelete()));
         verify(sessionsService, times(1)).get(SESSION_ID);
         verify(sessionsService, times(1)).expired(session);
         verify(collectionPermissionsService, times(1)).hasEdit(session);
@@ -390,9 +390,9 @@ public class PermissionsServiceImplTest {
         when(collectionPermissionsService.hasView(session, description)).thenReturn(true);
         when(description.getDatasets()).thenReturn(datasets);
 
-        Permissions actual = service.getUserDatasetPermissions(SESSION_ID, DATASET_ID, COLLECTION_ID);
+        CRUD actual = service.getUserDatasetPermissions(SESSION_ID, DATASET_ID, COLLECTION_ID);
 
-        assertThat(actual, equalTo(Permissions.permitRead()));
+        assertThat(actual, equalTo(CRUD.permitRead()));
         verify(sessionsService, times(1)).get(SESSION_ID);
         verify(sessionsService, times(1)).expired(session);
         verify(collectionsService, times(1)).getCollection(COLLECTION_ID);
@@ -442,9 +442,9 @@ public class PermissionsServiceImplTest {
         when(collectionPermissionsService.hasView(session, description)).thenReturn(false);
         when(collectionsService.getCollection(COLLECTION_ID)).thenReturn(collection);
 
-        Permissions actual = service.getUserDatasetPermissions(SESSION_ID, DATASET_ID, COLLECTION_ID);
+        CRUD actual = service.getUserDatasetPermissions(SESSION_ID, DATASET_ID, COLLECTION_ID);
 
-        assertThat(actual, equalTo(Permissions.permitNone()));
+        assertThat(actual, equalTo(CRUD.permitNone()));
         verify(sessionsService, times(1)).get(SESSION_ID);
         verify(sessionsService, times(1)).expired(session);
         verify(collectionsService, times(1)).getCollection(COLLECTION_ID);
@@ -460,9 +460,9 @@ public class PermissionsServiceImplTest {
         when(collectionsService.getCollection(COLLECTION_ID)).thenReturn(collection);
         when(description.getDatasets()).thenReturn(new HashSet<>());
 
-        Permissions actual = service.getUserDatasetPermissions(SESSION_ID, DATASET_ID, COLLECTION_ID);
+        CRUD actual = service.getUserDatasetPermissions(SESSION_ID, DATASET_ID, COLLECTION_ID);
 
-        assertThat(actual, equalTo(Permissions.permitNone()));
+        assertThat(actual, equalTo(CRUD.permitNone()));
         verify(sessionsService, times(1)).get(SESSION_ID);
         verify(sessionsService, times(1)).expired(session);
         verify(collectionsService, times(1)).getCollection(COLLECTION_ID);

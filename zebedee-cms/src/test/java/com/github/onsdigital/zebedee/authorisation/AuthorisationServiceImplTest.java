@@ -188,17 +188,4 @@ public class AuthorisationServiceImplTest {
         verify(usersService, times(1)).exists(session.getEmail());
     }
 
-    @Test
-    public void testGetServiceAccountSuccess() throws Exception {
-        AuthorisationServiceImpl serviceImpl = (AuthorisationServiceImpl) service;
-
-        when(serviceStore.get("666"))
-                .thenReturn(serviceAccount);
-
-        //ServiceAccount account = serviceImpl.getServiceAccount("666");
-
-        assertThat(null, equalTo(serviceAccount));
-        verify(serviceStore, times(1)).get("666");
-    }
-
 }

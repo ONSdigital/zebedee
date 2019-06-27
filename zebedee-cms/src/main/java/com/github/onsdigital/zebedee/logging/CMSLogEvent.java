@@ -5,7 +5,7 @@ import com.github.onsdigital.logging.v2.event.BaseEvent;
 import com.github.onsdigital.logging.v2.event.Severity;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.model.Collection;
-import com.github.onsdigital.zebedee.permissions.cmd.Permissions;
+import com.github.onsdigital.zebedee.permissions.cmd.CRUD;
 import com.github.onsdigital.zebedee.session.model.Session;
 import org.apache.commons.lang3.StringUtils;
 
@@ -106,9 +106,9 @@ public class CMSLogEvent extends BaseEvent<CMSLogEvent> {
         return this;
     }
 
-    public CMSLogEvent datasetPermissions(Permissions permissions) {
-        if (permissions != null) {
-            data("dataset_permissions", permissions);
+    public CMSLogEvent datasetPermissions(CRUD CRUD) {
+        if (CRUD != null) {
+            data("dataset_permissions", CRUD);
         }
         return this;
     }

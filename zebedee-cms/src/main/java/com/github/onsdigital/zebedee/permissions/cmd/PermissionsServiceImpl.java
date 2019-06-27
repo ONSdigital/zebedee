@@ -13,9 +13,9 @@ import java.io.IOException;
 
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.error;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.info;
-import static com.github.onsdigital.zebedee.permissions.cmd.Permissions.permitCreateReadUpdateDelete;
-import static com.github.onsdigital.zebedee.permissions.cmd.Permissions.permitNone;
-import static com.github.onsdigital.zebedee.permissions.cmd.Permissions.permitRead;
+import static com.github.onsdigital.zebedee.permissions.cmd.CRUD.permitCreateReadUpdateDelete;
+import static com.github.onsdigital.zebedee.permissions.cmd.CRUD.permitNone;
+import static com.github.onsdigital.zebedee.permissions.cmd.CRUD.permitRead;
 import static org.apache.http.HttpStatus.SC_BAD_REQUEST;
 import static org.apache.http.HttpStatus.SC_INTERNAL_SERVER_ERROR;
 import static org.apache.http.HttpStatus.SC_NOT_FOUND;
@@ -57,7 +57,7 @@ public class PermissionsServiceImpl implements PermissionsService {
     }
 
     @Override
-    public Permissions getUserDatasetPermissions(String sessionID, String datasetID, String collectionID)
+    public CRUD getUserDatasetPermissions(String sessionID, String datasetID, String collectionID)
             throws PermissionsException {
 
         // If the session is valid then the user is with an Admin, Editor or Viewer.
@@ -66,7 +66,7 @@ public class PermissionsServiceImpl implements PermissionsService {
         // If user has collection edit permission then grant full CRUD permissions. We aren't bothered if the
         // collection and dataset combination is valid for this user type.
         if (collectionPermissions.hasEdit(session)) {
-            Permissions crud = permitCreateReadUpdateDelete();
+            CRUD crud = permitCreateReadUpdateDelete();
             info().collectionID(collectionID)
                     .datasetID(datasetID)
                     .email(session)
@@ -107,13 +107,13 @@ public class PermissionsServiceImpl implements PermissionsService {
     }
 
     @Override
-    public Permissions getServiceDatasetPermissions(String serviceToken) throws PermissionsException {
+    public CRUD getServiceDatasetPermissions(String serviceToken) throws PermissionsException {
         ServiceAccount serviceAccount = getServiceAccount(serviceToken);
-        Permissions servicePermissions = permitCreateReadUpdateDelete();
+        CRUD serviceCRUD = permitCreateReadUpdateDelete();
         info().serviceAccountID(serviceAccount.getId())
-                .data("permissions", servicePermissions)
+                .data("permissions", serviceCRUD)
                 .log("granting dataset permissions to valid service account");
-        return servicePermissions;
+        return serviceCRUD;
     }
 
 

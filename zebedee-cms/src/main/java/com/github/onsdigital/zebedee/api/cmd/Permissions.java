@@ -1,11 +1,12 @@
 package com.github.onsdigital.zebedee.api.cmd;
 
 import com.github.davidcarboni.restolino.framework.Api;
-import com.github.onsdigital.zebedee.authorisation.AuthorisationService;
-import com.github.onsdigital.zebedee.authorisation.AuthorisationServiceImpl;
 import com.github.onsdigital.zebedee.configuration.CMSFeatureFlags;
 import com.github.onsdigital.zebedee.json.response.Error;
+import com.github.onsdigital.zebedee.permissions.cmd.CRUD;
 import com.github.onsdigital.zebedee.permissions.cmd.PermissionsException;
+import com.github.onsdigital.zebedee.permissions.cmd.PermissionsService;
+import com.github.onsdigital.zebedee.permissions.cmd.PermissionsServiceImpl;
 import com.github.onsdigital.zebedee.util.HttpResponseWriter;
 import com.github.onsdigital.zebedee.util.JsonUtils;
 
@@ -24,9 +25,6 @@ import static org.apache.http.HttpStatus.SC_INTERNAL_SERVER_ERROR;
 import static org.apache.http.HttpStatus.SC_NOT_FOUND;
 import static org.apache.http.HttpStatus.SC_OK;
 
-//import com.github.onsdigital.zebedee.authorisation.DatasetPermissions;
-//import com.github.onsdigital.zebedee.authorisation.DatasetPermissionsException;
-
 @Api
 public class Permissions {
 
@@ -38,7 +36,7 @@ public class Permissions {
     static final String COLLECTION_ID_MISSING = "collection_id param required but not found";
     static final String BREARER_PREFIX = "Bearer ";
 
-    private static AuthorisationService authorisationService;
+    private static PermissionsService permissionsService;
 
     private boolean enabled = false;
     private HttpResponseWriter httpResponseWriter;
@@ -47,8 +45,7 @@ public class Permissions {
      * Contruct the permissions endpoint with the default values.
      */
     public Permissions() {
-        this(cmsFeatureFlags().isEnableDatasetImport(),
-                getAuthorisationService(),
+        this(cmsFeatureFlags().isEnableDatasetImport(), getPermissionsService(),
                 (req, body, status) -> JsonUtils.writeResponse(req, body, status));
     }
 
@@ -60,10 +57,10 @@ public class Permissions {
      * @param responseWriter       the http reponse writer impl to use.
      */
     public Permissions(boolean enabled,
-                       AuthorisationService authorisationService,
+                       PermissionsService permissionsService,
                        HttpResponseWriter responseWriter) {
         this.enabled = enabled;
-        this.authorisationService = authorisationService;
+        this.permissionsService = permissionsService;
         this.httpResponseWriter = responseWriter;
     }
 
@@ -77,7 +74,7 @@ public class Permissions {
         }
 
         try {
-            Permissions permissions = getPermissions(request, response);
+            CRUD permissions = getPermissions(request, response);
             writeResponse(response, permissions, SC_OK);
         } catch (PermissionsException ex) {
             error().exception(ex).log("error getting dataset permissions");
@@ -88,7 +85,7 @@ public class Permissions {
         }
     }
 
-    Permissions getPermissions(HttpServletRequest request, HttpServletResponse response)
+    CRUD getPermissions(HttpServletRequest request, HttpServletResponse response)
             throws PermissionsException {
 
         String sessionID = request.getHeader(FLORENCE_AUTH_HEATHER);
@@ -100,35 +97,14 @@ public class Permissions {
         }
 
         if (isNotEmpty(sessionID)) {
-            info().log("handling permissions request for user");
+            info().log("handling get permissions request for user");
             String datasetID = request.getParameter(DATASET_ID_PARAM);
             String collectionID = request.getParameter(COLLECTION_ID_PARAM);
-            return null;// authorisationService.getUserPermissions(sessionID, datasetID, collectionID);
+            return permissionsService.getUserDatasetPermissions(sessionID, datasetID, collectionID);
         }
 
-        info().log("handling permissions request for service");
-        if (serviceToken.startsWith(BREARER_PREFIX)) {
-            serviceToken = serviceToken.replaceFirst(BREARER_PREFIX, "");
-        }
-        return null;//authorisationService.getServicePermissions(serviceToken);
-    }
-
-    Permissions getUserPermissions(HttpServletRequest request, HttpServletResponse response,
-                                   String sessionID)
-            throws PermissionsException {
-        info().log("handling permissions request for user");
-        String datasetID = request.getParameter(DATASET_ID_PARAM);
-        String collectionID = request.getParameter(COLLECTION_ID_PARAM);
-        return null;//authorisationService.getUserPermissions(sessionID, datasetID, collectionID);
-    }
-
-    Permissions getServicePermissions(HttpServletRequest request, HttpServletResponse response,
-                                      String serviceToken) throws PermissionsException {
-        info().log("handling permissions request for service");
-        if (serviceToken.startsWith(BREARER_PREFIX)) {
-            serviceToken = serviceToken.replaceFirst(BREARER_PREFIX, "");
-        }
-        return null;//authorisationService.getServicePermissions(serviceToken);
+        info().log("handling get permissions request for service account");
+        return permissionsService.getServiceDatasetPermissions(parseServiceToken(serviceToken));
     }
 
     void writeResponse(HttpServletResponse response, Object entity, int status) throws IOException {
@@ -140,10 +116,17 @@ public class Permissions {
         }
     }
 
-    private static AuthorisationService getAuthorisationService() {
-        if (authorisationService == null) {
-            authorisationService = new AuthorisationServiceImpl();
+    private String parseServiceToken(String serviceToken) {
+        if (serviceToken.startsWith(BREARER_PREFIX)) {
+            serviceToken = serviceToken.replaceFirst(BREARER_PREFIX, "");
         }
-        return authorisationService;
+        return serviceToken;
+    }
+
+    private static PermissionsService getPermissionsService() {
+        if (permissionsService == null) {
+            permissionsService = PermissionsServiceImpl.getInstance();
+        }
+        return permissionsService;
     }
 }

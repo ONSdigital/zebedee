@@ -30,11 +30,11 @@ import static org.mockito.Mockito.when;
 
 public class PermissionsServiceImplTest {
 
-    static final String SESSION_ID = "217"; // The Overlook Hotel room 217...
+    static final String SESSION_ID = "217"; // The Overlook Hotel room ...
     static final String SERVICE_TOKEN = "Union_Aerospace_Corporation"; // DOOM \m/
     static final String DATASET_ID = "Ohhh get schwifty";
+    static final String COLLECTION_ID = "666";
     static Optional<String> SESS = Optional.of(SESSION_ID);
-
 
     @Mock
     private Collections collectionsService;
@@ -234,5 +234,128 @@ public class PermissionsServiceImplTest {
                 .thenReturn(datasets);
 
         assertTrue(service.isDatasetInCollection(collection, DATASET_ID));
+    }
+
+    @Test(expected = PermissionsException.class)
+    public void testGetCollection_idNull() throws Exception {
+        try {
+            service.getCollection(null);
+        } catch (PermissionsException ex) {
+            assertThat(ex.statusCode, equalTo(HttpStatus.SC_BAD_REQUEST));
+            verifyZeroInteractions(collectionsService);
+            throw ex;
+        }
+    }
+
+    @Test(expected = PermissionsException.class)
+    public void testGetCollection_idEmpty() throws Exception {
+        try {
+            service.getCollection("");
+        } catch (PermissionsException ex) {
+            assertThat(ex.statusCode, equalTo(HttpStatus.SC_BAD_REQUEST));
+            verifyZeroInteractions(collectionsService);
+            throw ex;
+        }
+    }
+
+    @Test(expected = PermissionsException.class)
+    public void testGetCollection_IOException() throws Exception {
+        when(collectionsService.getCollection(COLLECTION_ID))
+                .thenThrow(new IOException());
+
+        try {
+            service.getCollection(COLLECTION_ID);
+        } catch (PermissionsException ex) {
+            assertThat(ex.statusCode, equalTo(HttpStatus.SC_INTERNAL_SERVER_ERROR));
+            verify(collectionsService, times(1)).getCollection(COLLECTION_ID);
+            throw ex;
+        }
+    }
+
+    @Test(expected = PermissionsException.class)
+    public void testGetCollection_notFOund() throws Exception {
+        when(collectionsService.getCollection(COLLECTION_ID))
+                .thenReturn(null);
+
+        try {
+            service.getCollection(COLLECTION_ID);
+        } catch (PermissionsException ex) {
+            assertThat(ex.statusCode, equalTo(HttpStatus.SC_NOT_FOUND));
+            verify(collectionsService, times(1)).getCollection(COLLECTION_ID);
+            throw ex;
+        }
+    }
+
+    @Test
+    public void testGetCollection_success() throws Exception {
+        when(collectionsService.getCollection(COLLECTION_ID))
+                .thenReturn(collection);
+
+        Collection actual = service.getCollection(COLLECTION_ID);
+        assertThat(actual, equalTo(collection));
+        verify(collectionsService, times(1)).getCollection(COLLECTION_ID);
+    }
+
+    @Test(expected = PermissionsException.class)
+    public void testGetServiceDatasetPermissions_tokenNull() throws Exception {
+        try {
+            service.getServiceDatasetPermissions(null);
+        } catch (PermissionsException ex) {
+            assertThat(ex.statusCode, equalTo(HttpStatus.SC_BAD_REQUEST));
+            verifyZeroInteractions(serviceStore);
+            throw ex;
+        }
+    }
+
+    @Test(expected = PermissionsException.class)
+    public void testGetServiceDatasetPermissions_tokenEmpty() throws Exception {
+        try {
+            service.getServiceDatasetPermissions(null);
+        } catch (PermissionsException ex) {
+            assertThat(ex.statusCode, equalTo(HttpStatus.SC_BAD_REQUEST));
+            verifyZeroInteractions(serviceStore);
+            throw ex;
+        }
+    }
+
+    @Test(expected = PermissionsException.class)
+    public void testGetServiceDatasetPermissions_notFound() throws Exception {
+        when(serviceStore.get(SERVICE_TOKEN))
+                .thenReturn(null);
+
+        try {
+            service.getServiceDatasetPermissions(SERVICE_TOKEN);
+        } catch (PermissionsException ex) {
+            assertThat(ex.statusCode, equalTo(HttpStatus.SC_UNAUTHORIZED));
+            verify(serviceStore, times(1)).get(SERVICE_TOKEN);
+            throw ex;
+        }
+    }
+
+    @Test(expected = PermissionsException.class)
+    public void testGetServiceDatasetPermissions_IOException() throws Exception {
+        when(serviceStore.get(SERVICE_TOKEN))
+                .thenThrow(new IOException());
+
+        try {
+            service.getServiceDatasetPermissions(SERVICE_TOKEN);
+        } catch (PermissionsException ex) {
+            assertThat(ex.statusCode, equalTo(HttpStatus.SC_INTERNAL_SERVER_ERROR));
+            verify(serviceStore, times(1)).get(SERVICE_TOKEN);
+            throw ex;
+        }
+    }
+
+    @Test
+    public void testGetServiceDatasetPermissions_success() throws Exception {
+        ServiceAccount expected = new ServiceAccount(SERVICE_TOKEN);
+
+        when(serviceStore.get(SERVICE_TOKEN))
+                .thenReturn(expected);
+
+        Permissions result = service.getServiceDatasetPermissions(SERVICE_TOKEN);
+
+        assertThat(result, equalTo(Permissions.permitCreateReadUpdateDelete()));
+        verify(serviceStore, times(1)).get(SERVICE_TOKEN);
     }
 }

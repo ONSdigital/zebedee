@@ -1,5 +1,7 @@
 package com.github.onsdigital.zebedee.permissions.cmd;
 
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -58,5 +60,26 @@ public class Permissions {
             this.permissions.add(p);
         }
         return this;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        Permissions that = (Permissions) o;
+        return this.permissions.equals(that.permissions);
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37)
+                .append(getPermissions())
+                .toHashCode();
     }
 }

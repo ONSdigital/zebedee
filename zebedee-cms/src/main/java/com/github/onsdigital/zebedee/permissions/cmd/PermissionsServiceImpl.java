@@ -150,6 +150,7 @@ public class PermissionsServiceImpl implements PermissionsService {
             info().log("user dataset permissions request denied collection ID required but was empty");
             throw new PermissionsException("collection ID required but was empty", SC_BAD_REQUEST);
         }
+
         Collection collection = null;
         try {
             collection = collectionsService.getCollection(id);

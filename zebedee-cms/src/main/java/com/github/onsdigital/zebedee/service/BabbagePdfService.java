@@ -1,10 +1,9 @@
 package com.github.onsdigital.zebedee.service;
 
 import com.github.onsdigital.zebedee.configuration.Configuration;
-import com.github.onsdigital.zebedee.exceptions.BadRequestException;
-import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.ContentWriter;
+import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.util.URIUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -15,6 +14,7 @@ import java.io.IOException;
 
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
+import static java.text.MessageFormat.format;
 
 /**
  * Render PDF output for a given URI using babbage.
@@ -57,14 +57,19 @@ public class BabbagePdfService implements PdfService {
 
             try (CloseableHttpResponse response = client.execute(httpGet)) {
 
-                if (response.getStatusLine().getStatusCode() != 200) {
-                    throw new IOException("Failed to generate PDF for URI " + uri +
-                            ". Response: " + response.getStatusLine().getStatusCode() +
-                            " " + response.toString());
+                int status = response.getStatusLine().getStatusCode();
+                if (status != 200) {
+                    String body = response.toString();
+                    error().data("status_code", status)
+                            .data("body", body)
+                            .log("generate PDF failure");
+
+                    throw new IOException(format("Failed to generate PDF for URI {0}. Response: {1} {2}", uri, status, body));
                 }
                 contentWriter.write(response.getEntity().getContent(), pdfURI);
-            } catch (BadRequestException e) {
+            } catch (Exception e) {
                 error().data("path", pdfURI).logException(e, "Error while generating collection PDF");
+                throw new IOException(e);
             }
         }
     }

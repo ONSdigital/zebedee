@@ -16,6 +16,7 @@ public class DatasetLandingPage extends Statistics {
     private List<DownloadSection> downloads;
     private MarkdownSection section;
     private List<MarkdownSection> notes;
+    private List<Link> relatedFilterableDatasets;
     private List<Link> relatedDatasets;
     private List<Link> relatedDocuments;
     private List<Link> datasets;
@@ -51,6 +52,14 @@ public class DatasetLandingPage extends Statistics {
 
     public void setSection(MarkdownSection section) {
         this.section = section;
+    }
+
+    public List<Link> getRelatedFilterableDatasets() {
+        return relatedFilterableDatasets;
+    }
+
+    public void setRelatedFilterableDatasets(List<Link> relatedFilterableDatasets) {
+        this.relatedFilterableDatasets = relatedFilterableDatasets;
     }
 
     public List<Link> getRelatedDatasets() {

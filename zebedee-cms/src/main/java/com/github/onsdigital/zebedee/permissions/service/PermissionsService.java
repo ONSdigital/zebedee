@@ -74,10 +74,10 @@ public interface PermissionsService {
     /**
      * Grant a {@link User} admin permissions.
      *
-     * @param email   the email of the user to grant the permission to.
+     * @param email   the email of the user to permit the permission to.
      * @param session the {@link Session} of the user granting the permission.
      * @throws IOException           unexpected error granting the permission.
-     * @throws UnauthorizedException user does not have the required permissions to grant admin permissions.
+     * @throws UnauthorizedException user does not have the required permissions to permit admin permissions.
      */
     void addAdministrator(String email, Session session) throws IOException, UnauthorizedException;
 
@@ -142,7 +142,7 @@ public interface PermissionsService {
     /**
      * Grant editor permission to a user.
      *
-     * @param email   the email of the user to grant the permission to.
+     * @param email   the email of the user to permit the permission to.
      * @param session the {@link Session} of the {@link User} granting the permissison.
      * @throws IOException           unexpected error while granting the permission.
      * @throws UnauthorizedException the user granting the permission is not authorised to do so.
@@ -197,7 +197,7 @@ public interface PermissionsService {
      * Grant view permissions to a {@link Team}.
      *
      * @param collectionDescription the {@link CollectionDescription} of the {@link Collection} in question.
-     * @param team                  the {@link Team} to grant view permission to.
+     * @param team                  the {@link Team} to permit view permission to.
      * @param session               the {@link Session} of the user granting the permission.
      * @throws IOException      unexpected error while checking permissions.
      * @throws ZebedeeException unexpected error while checking permissions.

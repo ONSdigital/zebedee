@@ -5,6 +5,7 @@ import com.github.onsdigital.logging.v2.event.BaseEvent;
 import com.github.onsdigital.logging.v2.event.Severity;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.model.Collection;
+import com.github.onsdigital.zebedee.permissions.cmd.Permissions;
 import com.github.onsdigital.zebedee.session.model.Session;
 import org.apache.commons.lang3.StringUtils;
 
@@ -84,6 +85,13 @@ public class CMSLogEvent extends BaseEvent<CMSLogEvent> {
         return this;
     }
 
+    public CMSLogEvent email(Session s) {
+        if (s != null) {
+            data("email", s.getEmail());
+        }
+        return this;
+    }
+
     public CMSLogEvent serviceAccountID(String serviceAccountID) {
         if (StringUtils.isNotEmpty(serviceAccountID)) {
             data("service_account_id", serviceAccountID);
@@ -94,6 +102,13 @@ public class CMSLogEvent extends BaseEvent<CMSLogEvent> {
     public CMSLogEvent serviceAccountToken(String serviceAccountToken) {
         if (StringUtils.isNotEmpty(serviceAccountToken)) {
             data("service_account_token", serviceAccountToken);
+        }
+        return this;
+    }
+
+    public CMSLogEvent datasetPermissions(Permissions permissions) {
+        if (permissions != null) {
+            data("dataset_permissions", permissions);
         }
         return this;
     }

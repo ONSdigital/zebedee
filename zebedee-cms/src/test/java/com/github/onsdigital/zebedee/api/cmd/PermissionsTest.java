@@ -1,8 +1,7 @@
+/*
 package com.github.onsdigital.zebedee.api.cmd;
 
 import com.github.onsdigital.zebedee.authorisation.AuthorisationService;
-import com.github.onsdigital.zebedee.authorisation.DatasetPermissions;
-import com.github.onsdigital.zebedee.authorisation.DatasetPermissionsException;
 import com.github.onsdigital.zebedee.json.response.Error;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.util.HttpResponseWriter;
@@ -66,10 +65,12 @@ public class PermissionsTest {
         MockitoAnnotations.initMocks(this);
     }
 
-    /**
+    */
+/**
      * CMD feature is disabled.
      * Expected response: Not found.
-     */
+     *//*
+
     @Test
     public void testCMDFeatureDisabled() throws Exception {
         api = new Permissions(false, authorisationService, httpResponseWriter);
@@ -80,10 +81,12 @@ public class PermissionsTest {
         verifyNoMoreInteractions(mockRequest, mockResponse, authorisationService);
     }
 
-    /**
+    */
+/**
      * Request does not contain a Florence auth header or a service auth token.
      * Expected response: Bad Request
-     */
+     *//*
+
     @Test
     public void testGetPermissionNoAuthHeaderOrServiceToken() throws IOException {
         api = new Permissions(true, authorisationService, httpResponseWriter);
@@ -93,10 +96,12 @@ public class PermissionsTest {
         verify(httpResponseWriter, times(1)).writeJSONResponse(mockResponse, new Error("invalid request"), SC_BAD_REQUEST);
     }
 
-    /**
+    */
+/**
      * Request contains Florence auth header but no dataset_id param.
      * Expected response: Bad request.
-     */
+     *//*
+
     @Test
     public void testUserRequestNoDatasetID() throws Exception {
         when(mockRequest.getHeader(FLORENCE_AUTH_HEATHER))
@@ -112,10 +117,12 @@ public class PermissionsTest {
         verifyNoMoreInteractions(mockResponse, authorisationService, httpResponseWriter);
     }
 
-    /**
+    */
+/**
      * Request contains Florence auth header, dataset_id param but no collection_id param.
      * Expected response: Bad request.
-     */
+     *//*
+
     @Test
     public void testUserRequestNoCollectionID() throws Exception {
         when(mockRequest.getHeader(FLORENCE_AUTH_HEATHER))
@@ -134,10 +141,12 @@ public class PermissionsTest {
         verifyNoMoreInteractions(mockResponse, authorisationService, httpResponseWriter);
     }
 
-    /**
+    */
+/**
      * Valid request for user dataset permissions. HttpResponseWriter throws an exception.
      * Expected response: internal server error.
-     */
+     *//*
+
     @Test
     public void testGetUserPermissionsHttpResponseWriterException() throws Exception {
         datasetPermissions = new DatasetPermissions(READ);
@@ -168,10 +177,12 @@ public class PermissionsTest {
         verify(httpResponseWriter, times(1)).writeJSONResponse(eq(mockResponse), isNull(), eq(500));
     }
 
-    /**
+    */
+/**
      * Valid request for user dataset permissions.
      * Expected response: status OK, Body: the user's permissions entity.
-     */
+     *//*
+
     @Test
     public void testGetUserPermissionsSuccess() throws Exception {
         datasetPermissions = new DatasetPermissions(READ);
@@ -202,10 +213,12 @@ public class PermissionsTest {
         assertTrue("expected READ permission but not found", actual.getPermissions().contains(READ));
     }
 
-    /**
+    */
+/**
      * Valid request for service dataset permissions.
      * Expected response: status OK, Body: the service's permissions entity.
-     */
+     *//*
+
     @Test
     public void testGetServicePermissionsSuccess() throws Exception {
         when(mockRequest.getHeader(SERVICE_AUTH_HEADER))
@@ -233,10 +246,12 @@ public class PermissionsTest {
         assertTrue("expected DELETE permission but not found", actual.getPermissions().contains(DELETE));
     }
 
-    /**
+    */
+/**
      * Valid request for service dataset permissions which encounters an unexpected error.
      * Expected response: status Internal Server Error, Body: "internal server error"
-     */
+     *//*
+
     @Test
     public void testGetServicePermissions_DatasetPermissionsException() throws Exception {
         when(mockRequest.getHeader(SERVICE_AUTH_HEADER))
@@ -257,11 +272,13 @@ public class PermissionsTest {
         assertThat(permissionsCaptor.getValue(), equalTo(new Error("internal server error")));
     }
 
-    /**
+    */
+/**
      * Valid request for user dataset permissions that contains both user and service auth headers. In this case the
      * the user permissions take precedence over the service.
      * Expected response: status OK, Body: the user's permissions entity.
-     */
+     *//*
+
     @Test
     public void testGetUserPermissions_userAndServiceHeaders() throws Exception {
         datasetPermissions = new DatasetPermissions(READ);
@@ -296,3 +313,4 @@ public class PermissionsTest {
     }
 
 }
+*/

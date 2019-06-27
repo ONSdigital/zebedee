@@ -3,10 +3,9 @@ package com.github.onsdigital.zebedee.api.cmd;
 import com.github.davidcarboni.restolino.framework.Api;
 import com.github.onsdigital.zebedee.authorisation.AuthorisationService;
 import com.github.onsdigital.zebedee.authorisation.AuthorisationServiceImpl;
-import com.github.onsdigital.zebedee.authorisation.DatasetPermissions;
-import com.github.onsdigital.zebedee.authorisation.DatasetPermissionsException;
 import com.github.onsdigital.zebedee.configuration.CMSFeatureFlags;
 import com.github.onsdigital.zebedee.json.response.Error;
+import com.github.onsdigital.zebedee.permissions.cmd.PermissionsException;
 import com.github.onsdigital.zebedee.util.HttpResponseWriter;
 import com.github.onsdigital.zebedee.util.JsonUtils;
 
@@ -24,6 +23,9 @@ import static org.apache.http.HttpStatus.SC_BAD_REQUEST;
 import static org.apache.http.HttpStatus.SC_INTERNAL_SERVER_ERROR;
 import static org.apache.http.HttpStatus.SC_NOT_FOUND;
 import static org.apache.http.HttpStatus.SC_OK;
+
+//import com.github.onsdigital.zebedee.authorisation.DatasetPermissions;
+//import com.github.onsdigital.zebedee.authorisation.DatasetPermissionsException;
 
 @Api
 public class Permissions {
@@ -75,9 +77,9 @@ public class Permissions {
         }
 
         try {
-            DatasetPermissions permissions = getPermissions(request, response);
+            Permissions permissions = getPermissions(request, response);
             writeResponse(response, permissions, SC_OK);
-        } catch (DatasetPermissionsException ex) {
+        } catch (PermissionsException ex) {
             error().exception(ex).log("error getting dataset permissions");
             writeResponse(response, new Error(ex.getMessage()), ex.statusCode);
         } catch (IOException ex) {
@@ -86,53 +88,47 @@ public class Permissions {
         }
     }
 
-    DatasetPermissions getPermissions(HttpServletRequest request, HttpServletResponse response)
-            throws DatasetPermissionsException {
+    Permissions getPermissions(HttpServletRequest request, HttpServletResponse response)
+            throws PermissionsException {
 
         String sessionID = request.getHeader(FLORENCE_AUTH_HEATHER);
         String serviceToken = request.getHeader(SERVICE_AUTH_HEADER);
 
         if (isEmpty(sessionID) && isEmpty(serviceToken)) {
             info().log("invalid permissions request expected user or service auth token but none found");
-            throw new DatasetPermissionsException("invalid request", SC_BAD_REQUEST);
+            throw new PermissionsException("invalid request", SC_BAD_REQUEST);
         }
 
         if (isNotEmpty(sessionID)) {
-            return getUserPermissions(request, response, sessionID);
+            info().log("handling permissions request for user");
+            String datasetID = request.getParameter(DATASET_ID_PARAM);
+            String collectionID = request.getParameter(COLLECTION_ID_PARAM);
+            return null;// authorisationService.getUserPermissions(sessionID, datasetID, collectionID);
         }
 
-        return getServicePermissions(request, response, serviceToken);
-    }
-
-    DatasetPermissions getUserPermissions(HttpServletRequest request, HttpServletResponse response,
-                                          String sessionID)
-            throws DatasetPermissionsException {
-        info().log("handling permissions request for user");
-
-        String datasetID = request.getParameter(DATASET_ID_PARAM);
-        if (isEmpty(datasetID)) {
-            info().data("param", DATASET_ID_PARAM)
-                    .log("invalid user permissions request mandatory parameter not provided");
-            throw new DatasetPermissionsException(DATASET_ID_MISSING, SC_BAD_REQUEST);
-        }
-
-        String collectionID = request.getParameter(COLLECTION_ID_PARAM);
-        if (isEmpty(collectionID)) {
-            info().data("param", COLLECTION_ID_PARAM)
-                    .log("invalid user permissions request mandatory parameter not provided");
-            throw new DatasetPermissionsException(COLLECTION_ID_MISSING, SC_BAD_REQUEST);
-        }
-
-        return authorisationService.getUserPermissions(sessionID, datasetID, collectionID);
-    }
-
-    DatasetPermissions getServicePermissions(HttpServletRequest request, HttpServletResponse response,
-                                             String serviceToken) throws DatasetPermissionsException {
         info().log("handling permissions request for service");
         if (serviceToken.startsWith(BREARER_PREFIX)) {
             serviceToken = serviceToken.replaceFirst(BREARER_PREFIX, "");
         }
-        return authorisationService.getServicePermissions(serviceToken);
+        return null;//authorisationService.getServicePermissions(serviceToken);
+    }
+
+    Permissions getUserPermissions(HttpServletRequest request, HttpServletResponse response,
+                                   String sessionID)
+            throws PermissionsException {
+        info().log("handling permissions request for user");
+        String datasetID = request.getParameter(DATASET_ID_PARAM);
+        String collectionID = request.getParameter(COLLECTION_ID_PARAM);
+        return null;//authorisationService.getUserPermissions(sessionID, datasetID, collectionID);
+    }
+
+    Permissions getServicePermissions(HttpServletRequest request, HttpServletResponse response,
+                                      String serviceToken) throws PermissionsException {
+        info().log("handling permissions request for service");
+        if (serviceToken.startsWith(BREARER_PREFIX)) {
+            serviceToken = serviceToken.replaceFirst(BREARER_PREFIX, "");
+        }
+        return null;//authorisationService.getServicePermissions(serviceToken);
     }
 
     void writeResponse(HttpServletResponse response, Object entity, int status) throws IOException {

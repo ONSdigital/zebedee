@@ -14,17 +14,4 @@ public interface AuthorisationService {
      * @throws UserIdentityException if there is any problem determining the user identity.
      */
     UserIdentity identifyUser(String sessionID) throws UserIdentityException;
-
-    /**
-     * Get the user's permissions for the specified dataset.
-     *
-     * @param sessionID    the requesting user's session ID.
-     * @param datasetID    the dataset to get the permissions for.
-     * @param collectionID the collection ID the dataset is part of.
-     * @return {@link DatasetPermissions}
-     * @throws DatasetPermissionsException a problem getting the permissions.
-     */
-    DatasetPermissions getUserPermissions(String sessionID, String datasetID, String collectionID) throws DatasetPermissionsException;
-
-    DatasetPermissions getServicePermissions(String serviceToken) throws DatasetPermissionsException;
 }

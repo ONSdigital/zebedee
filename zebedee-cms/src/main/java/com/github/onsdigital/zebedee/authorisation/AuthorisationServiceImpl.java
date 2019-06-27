@@ -1,10 +1,7 @@
 package com.github.onsdigital.zebedee.authorisation;
 
 import com.github.onsdigital.zebedee.api.Root;
-import com.github.onsdigital.zebedee.json.CollectionDescription;
-import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.Collections;
-import com.github.onsdigital.zebedee.model.ServiceAccount;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.service.ServiceStore;
 import com.github.onsdigital.zebedee.service.ServiceSupplier;
@@ -14,15 +11,10 @@ import com.github.onsdigital.zebedee.user.service.UsersService;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
+import java.util.function.Function;
 
-import static com.github.onsdigital.zebedee.authorisation.DatasetPermissionType.CREATE;
-import static com.github.onsdigital.zebedee.authorisation.DatasetPermissionType.DELETE;
-import static com.github.onsdigital.zebedee.authorisation.DatasetPermissionType.READ;
-import static com.github.onsdigital.zebedee.authorisation.DatasetPermissionType.UPDATE;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.error;
-import static com.github.onsdigital.zebedee.logging.CMSLogEvent.info;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.warn;
-import static org.apache.http.HttpStatus.SC_BAD_REQUEST;
 import static org.apache.http.HttpStatus.SC_INTERNAL_SERVER_ERROR;
 import static org.apache.http.HttpStatus.SC_NOT_FOUND;
 import static org.apache.http.HttpStatus.SC_UNAUTHORIZED;
@@ -34,6 +26,9 @@ public class AuthorisationServiceImpl implements AuthorisationService {
     private ServiceSupplier<Collections> collectionsSupplier = () -> Root.zebedee.getCollections();
     private ServiceSupplier<PermissionsService> permissionsServiceSupplier = () -> Root.zebedee.getPermissionsService();
     private ServiceSupplier<ServiceStore> serviceStoreSupplier = () -> Root.zebedee.getServiceStore();
+
+    private Function<String, String> permissionDeniedError =
+            (reason) -> "user dataset permissions request denied: " + reason;
 
     private static final String INTERNAL_ERROR = "internal server error";
     private static final String AUTHENTICATED_ERROR = "user not authenticated";
@@ -71,158 +66,4 @@ public class AuthorisationServiceImpl implements AuthorisationService {
         }
         return new UserIdentity(session);
     }
-
-    @Override
-    public DatasetPermissions getUserPermissions(String sessionID, String datasetID, String collectionID)
-            throws DatasetPermissionsException {
-        Session session = getSession(sessionID);
-
-        Collection collection = getCollection(collectionID);
-
-        if (StringUtils.isEmpty(datasetID)) {
-            info().log("user dataset permissions request denied dataset ID required but was empty");
-            throw new DatasetPermissionsException("dataset ID required but was empty", SC_BAD_REQUEST);
-        }
-
-        validateCollectionContainsRequestedDataset(collection, datasetID);
-
-        return assignPermissions(session, collection.getDescription(), datasetID);
-    }
-
-    @Override
-    public DatasetPermissions getServicePermissions(String serviceToken) throws DatasetPermissionsException {
-        ServiceAccount serviceAccount = getServiceAccount(serviceToken);
-        DatasetPermissions servicePermissions = new DatasetPermissions().permit(CREATE, READ, UPDATE, DELETE);
-        info().serviceAccountID(serviceAccount.getId())
-                .data("permissions", servicePermissions)
-                .log("granting dataset permissions to valid service account");
-        return servicePermissions;
-    }
-
-    DatasetPermissions assignPermissions(Session session, CollectionDescription description, String datasetID)
-            throws DatasetPermissionsException {
-        DatasetPermissions permissions = new DatasetPermissions();
-
-        if (isAdminOrPublisher(session)) {
-            permissions.permit(CREATE, READ, UPDATE, DELETE);
-        } else if (isCollectionViewer(session, description)) {
-            permissions.permit(READ);
-        } else {
-            info().collectionID(description.getId()).datasetID(datasetID).user(session).log("user not permitted to access dataset");
-            return permissions;
-        }
-
-        info().collectionID(description)
-                .datasetID(datasetID)
-                .user(session)
-                .data("permissions", permissions)
-                .log("permitted collection dataset permissions for user");
-        return permissions;
-    }
-
-    Session getSession(String sessionID) throws DatasetPermissionsException {
-        if (StringUtils.isEmpty(sessionID)) {
-            throw new DatasetPermissionsException("user dataset permissions request denied session ID required but " +
-                    "empty", SC_BAD_REQUEST);
-        }
-
-        Session session = null;
-        try {
-            session = sessionServiceSupplier.getService().get(sessionID);
-        } catch (IOException ex) {
-            error().exception(ex).sessionID(sessionID).log("user dataset permissions request failed error getting session");
-            throw new DatasetPermissionsException("internal server error", SC_INTERNAL_SERVER_ERROR);
-        }
-
-        if (session == null) {
-            info().sessionID(sessionID).log("user dataset permissions request denied session not found");
-            throw new DatasetPermissionsException("session not found", SC_UNAUTHORIZED);
-        }
-
-        if (sessionServiceSupplier.getService().expired(session)) {
-            info().sessionID(sessionID).log("user dataset permissions request denied session expired");
-            throw new DatasetPermissionsException("session expired", SC_UNAUTHORIZED);
-        }
-
-        return session;
-    }
-
-    boolean isAdminOrPublisher(Session session) throws DatasetPermissionsException {
-        try {
-            return permissionsServiceSupplier.getService().canEdit(session);
-        } catch (IOException ex) {
-            error().exception(ex).user(session).data("permission", "can_edit")
-                    .log("user dataset permissions request denied error checking user permissions");
-            throw new DatasetPermissionsException("internal server error", SC_INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    boolean isCollectionViewer(Session session, CollectionDescription description) throws DatasetPermissionsException {
-        try {
-            return permissionsServiceSupplier.getService().canView(session, description);
-        } catch (IOException ex) {
-            error().exception(ex).user(session).data("permission", "can_view")
-                    .log("user dataset permissions request denied error checking user permissions");
-            throw new DatasetPermissionsException("internal server error", SC_INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    Collection getCollection(String id) throws DatasetPermissionsException {
-        if (StringUtils.isEmpty(id)) {
-            info().log("user dataset permissions request denied collection ID required but was empty");
-            throw new DatasetPermissionsException("collection ID required but was empty", SC_BAD_REQUEST);
-        }
-        Collection collection = null;
-        try {
-            collection = collectionsSupplier.getService().getCollection(id);
-        } catch (IOException ex) {
-            error().exception(ex)
-                    .collectionID(id)
-                    .log("user dataset permissions request denied error getting collection");
-            throw new DatasetPermissionsException("internal server error", SC_INTERNAL_SERVER_ERROR);
-        }
-
-        if (collection == null) {
-            info().collectionID(id)
-                    .log("user dataset permissions request denied  collection not found");
-            throw new DatasetPermissionsException("collection not found", SC_NOT_FOUND);
-        }
-
-        return collection;
-    }
-
-    void validateCollectionContainsRequestedDataset(Collection collection, String datasetID)
-            throws DatasetPermissionsException {
-        boolean isPresent = collection.getDescription()
-                .getDatasets()
-                .stream()
-                .filter(dataset -> StringUtils.equals(datasetID, dataset.getId()))
-                .findFirst()
-                .isPresent();
-
-        if (!isPresent) {
-            info().collectionID(collection)
-                    .datasetID(datasetID)
-                    .log("user dataset permissions request denied requested dataset does not exist in the collection");
-            throw new DatasetPermissionsException("requested collection does not contain the requested dataset", SC_BAD_REQUEST);
-        }
-    }
-
-    ServiceAccount getServiceAccount(String token) throws DatasetPermissionsException {
-        try {
-            ServiceAccount account = serviceStoreSupplier.getService().get(token);
-            if (account == null) {
-                error().serviceAccountToken(token)
-                        .log("service dataset permissons request denied service account not found");
-                throw new DatasetPermissionsException("permisson denied service account not found", SC_UNAUTHORIZED);
-            }
-            return account;
-        } catch (IOException ex) {
-            error().exception(ex)
-                    .serviceAccountToken(token)
-                    .log("service dataset permissons request failed error getting service account");
-            throw new DatasetPermissionsException("internal server error", SC_INTERNAL_SERVER_ERROR);
-        }
-    }
-
 }

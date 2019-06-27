@@ -169,21 +169,28 @@ public class PermissionsServiceImpl implements PermissionsService {
         return collection;
     }
 
-    ServiceAccount getServiceAccount(String token) throws PermissionsException {
+    ServiceAccount getServiceAccount(String serviceToken) throws PermissionsException {
+        if (StringUtils.isEmpty(serviceToken)) {
+            throw new PermissionsException("service permissions request denied no service token provided", SC_BAD_REQUEST);
+        }
+
+        ServiceAccount account = null;
+
         try {
-            ServiceAccount account = serviceStore.get(token);
-            if (account == null) {
-                error().serviceAccountToken(token)
-                        .log("service dataset permissons request denied service account not found");
-                throw new PermissionsException("permisson denied service account not found", SC_UNAUTHORIZED);
-            }
-            return account;
+            account = serviceStore.get(serviceToken);
         } catch (IOException ex) {
             error().exception(ex)
-                    .serviceAccountToken(token)
+                    .serviceAccountToken(serviceToken)
                     .log("service dataset permissons request failed error getting service account");
             throw new PermissionsException("internal server error", SC_INTERNAL_SERVER_ERROR);
         }
+
+        if (account == null) {
+            error().serviceAccountToken(serviceToken)
+                    .log("service dataset permissons request denied service account not found");
+            throw new PermissionsException("permisson denied service account not found", SC_UNAUTHORIZED);
+        }
+        return account;
     }
 
     boolean isDatasetInCollection(Collection collection, String datasetID)

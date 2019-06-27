@@ -10,7 +10,6 @@ import com.github.onsdigital.zebedee.session.service.SessionsService;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
-import java.util.Optional;
 
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.error;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.info;
@@ -50,7 +49,7 @@ public class PermissionsServiceImpl implements PermissionsService {
     }
 
     PermissionsServiceImpl(SessionsService sessionsService, Collections collectionsService,
-                                  ServiceStore serviceStore, CollectionPermissionsService collectionPermissions) {
+                           ServiceStore serviceStore, CollectionPermissionsService collectionPermissions) {
         this.sessionsService = sessionsService;
         this.collectionsService = collectionsService;
         this.serviceStore = serviceStore;
@@ -62,7 +61,7 @@ public class PermissionsServiceImpl implements PermissionsService {
             throws PermissionsException {
 
         // If the session is valid then the user is with an Admin, Editor or Viewer.
-        Session session = getSession(Optional.ofNullable(sessionID));
+        Session session = getSession(sessionID);
 
         // If user has collection edit permission then grant full CRUD permissions. We aren't bothered if the
         // collection and dataset combination is valid for this user type.
@@ -118,27 +117,27 @@ public class PermissionsServiceImpl implements PermissionsService {
     }
 
 
-    Session getSession(Optional<String> sess) throws PermissionsException {
-        if (!sess.isPresent()) {
+    Session getSession(String sessionID) throws PermissionsException {
+        if (StringUtils.isEmpty(sessionID)) {
             throw new PermissionsException("user dataset permissions request denied session ID required but empty", SC_BAD_REQUEST);
         }
 
         Session session = null;
         try {
-            session = sessionsService.get(sess.get());
+            session = sessionsService.get(sessionID);
         } catch (IOException ex) {
-            error().exception(ex).sessionID(sess.get())
+            error().exception(ex).sessionID(sessionID)
                     .log("user dataset permissions request failed error getting session");
             throw new PermissionsException("internal server error", SC_INTERNAL_SERVER_ERROR);
         }
 
         if (session == null) {
-            info().sessionID(sess.get()).log("user dataset permissions request denied session not found");
+            info().sessionID(sessionID).log("user dataset permissions request denied session not found");
             throw new PermissionsException("session not found", SC_UNAUTHORIZED);
         }
 
         if (sessionsService.expired(session)) {
-            info().sessionID(sess.get()).log("user dataset permissions request denied session expired");
+            info().sessionID(sessionID).log("user dataset permissions request denied session expired");
             throw new PermissionsException("session expired", SC_UNAUTHORIZED);
         }
 

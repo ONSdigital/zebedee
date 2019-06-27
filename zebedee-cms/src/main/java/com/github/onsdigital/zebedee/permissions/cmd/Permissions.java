@@ -26,10 +26,6 @@ public class Permissions {
         return new Permissions();
     }
 
-    public static Permissions premitNone() {
-        return new Permissions();
-    }
-
     private Set<CRUD> permissions;
 
     public Permissions() {

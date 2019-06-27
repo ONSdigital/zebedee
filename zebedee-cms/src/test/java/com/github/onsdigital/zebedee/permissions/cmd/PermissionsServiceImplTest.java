@@ -16,12 +16,13 @@ import org.mockito.MockitoAnnotations;
 
 import java.io.IOException;
 import java.util.HashSet;
-import java.util.Optional;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -30,11 +31,10 @@ import static org.mockito.Mockito.when;
 
 public class PermissionsServiceImplTest {
 
-    static final String SESSION_ID = "217"; // The Overlook Hotel room ...
+    static final String SESSION_ID = "217"; // Overlook Hotel room ...
     static final String SERVICE_TOKEN = "Union_Aerospace_Corporation"; // DOOM \m/
     static final String DATASET_ID = "Ohhh get schwifty";
     static final String COLLECTION_ID = "666";
-    static Optional<String> SESS = Optional.of(SESSION_ID);
 
     @Mock
     private Collections collectionsService;
@@ -58,10 +58,20 @@ public class PermissionsServiceImplTest {
     private CollectionDescription description;
 
     private PermissionsServiceImpl service;
+    private CollectionDataset dataset;
+    private HashSet datasets;
 
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
+
+        dataset = new CollectionDataset();
+        dataset.setId(DATASET_ID);
+        datasets = new HashSet<CollectionDataset>() {{
+            add(dataset);
+        }};
+
+        when(collection.getDescription()).thenReturn(description);
 
         service = new PermissionsServiceImpl(sessionsService, collectionsService, serviceStore,
                 collectionPermissionsService);
@@ -70,7 +80,7 @@ public class PermissionsServiceImplTest {
     @Test(expected = PermissionsException.class)
     public void testGetSession_sessionIDNull() throws Exception {
         try {
-            service.getSession(Optional.empty());
+            service.getSession(null);
         } catch (PermissionsException ex) {
             assertThat(ex.statusCode, equalTo(HttpStatus.SC_BAD_REQUEST));
 
@@ -85,7 +95,7 @@ public class PermissionsServiceImplTest {
                 .thenReturn(null);
 
         try {
-            service.getSession(SESS);
+            service.getSession(SESSION_ID);
         } catch (PermissionsException ex) {
             assertThat(ex.statusCode, equalTo(HttpStatus.SC_UNAUTHORIZED));
 
@@ -101,7 +111,7 @@ public class PermissionsServiceImplTest {
                 .thenThrow(new IOException(""));
 
         try {
-            service.getSession(SESS);
+            service.getSession(SESSION_ID);
         } catch (PermissionsException ex) {
             assertThat(ex.statusCode, equalTo(HttpStatus.SC_INTERNAL_SERVER_ERROR));
 
@@ -120,7 +130,7 @@ public class PermissionsServiceImplTest {
                 .thenReturn(true);
 
         try {
-            service.getSession(SESS);
+            service.getSession(SESSION_ID);
         } catch (PermissionsException ex) {
             assertThat(ex.statusCode, equalTo(HttpStatus.SC_UNAUTHORIZED));
 
@@ -138,7 +148,7 @@ public class PermissionsServiceImplTest {
         when(sessionsService.expired(session))
                 .thenReturn(false);
 
-        Session result = service.getSession(SESS);
+        Session result = service.getSession(SESSION_ID);
         assertThat(result, equalTo(session));
 
         verify(sessionsService, times(1)).get(SESSION_ID);
@@ -357,5 +367,106 @@ public class PermissionsServiceImplTest {
 
         assertThat(result, equalTo(Permissions.permitCreateReadUpdateDelete()));
         verify(serviceStore, times(1)).get(SERVICE_TOKEN);
+    }
+
+    @Test
+    public void testGetUserDatasetPermissions_editorUser() throws Exception {
+        when(sessionsService.get(SESSION_ID)).thenReturn(session);
+        when(collectionPermissionsService.hasEdit(session)).thenReturn(true);
+
+        Permissions actual = service.getUserDatasetPermissions(SESSION_ID, DATASET_ID, COLLECTION_ID);
+
+        assertThat(actual, equalTo(Permissions.permitCreateReadUpdateDelete()));
+        verify(sessionsService, times(1)).get(SESSION_ID);
+        verify(sessionsService, times(1)).expired(session);
+        verify(collectionPermissionsService, times(1)).hasEdit(session);
+    }
+
+    @Test
+    public void testGetUserDatasetPermissions_viewerUserAssignedToCollection() throws Exception {
+        when(sessionsService.get(SESSION_ID)).thenReturn(session);
+        when(collectionsService.getCollection(COLLECTION_ID)).thenReturn(collection);
+        when(collectionPermissionsService.hasEdit(session)).thenReturn(false);
+        when(collectionPermissionsService.hasView(session, description)).thenReturn(true);
+        when(description.getDatasets()).thenReturn(datasets);
+
+        Permissions actual = service.getUserDatasetPermissions(SESSION_ID, DATASET_ID, COLLECTION_ID);
+
+        assertThat(actual, equalTo(Permissions.permitRead()));
+        verify(sessionsService, times(1)).get(SESSION_ID);
+        verify(sessionsService, times(1)).expired(session);
+        verify(collectionsService, times(1)).getCollection(COLLECTION_ID);
+        verify(collectionPermissionsService, times(1)).hasEdit(session);
+        verify(collectionPermissionsService, times(1)).hasView(session, description);
+    }
+
+    @Test(expected = PermissionsException.class)
+    public void testGetUserDatasetPermissions_viewerCollectionIDNull() throws Exception {
+        when(sessionsService.get(SESSION_ID)).thenReturn(session);
+        when(collectionPermissionsService.hasEdit(session)).thenReturn(false);
+
+        try {
+            service.getUserDatasetPermissions(SESSION_ID, null, null);
+        } catch (PermissionsException ex) {
+            assertThat(ex.statusCode, equalTo(HttpStatus.SC_BAD_REQUEST));
+            verify(sessionsService, times(1)).get(SESSION_ID);
+            verify(sessionsService, times(1)).expired(session);
+            verify(collectionsService, never()).getCollection(anyString());
+            verify(collectionPermissionsService, times(1)).hasEdit(session);
+            throw ex;
+        }
+    }
+
+    @Test(expected = PermissionsException.class)
+    public void testGetUserDatasetPermissions_viewerDatasetIDNull() throws Exception {
+        when(sessionsService.get(SESSION_ID)).thenReturn(session);
+        when(collectionPermissionsService.hasEdit(session)).thenReturn(false);
+        when(collectionsService.getCollection(COLLECTION_ID)).thenReturn(collection);
+
+        try {
+            service.getUserDatasetPermissions(SESSION_ID, null, COLLECTION_ID);
+        } catch (PermissionsException ex) {
+            assertThat(ex.statusCode, equalTo(HttpStatus.SC_BAD_REQUEST));
+            verify(sessionsService, times(1)).get(SESSION_ID);
+            verify(sessionsService, times(1)).expired(session);
+            verify(collectionsService, times(1)).getCollection(COLLECTION_ID);
+            verify(collectionPermissionsService, times(1)).hasEdit(session);
+            throw ex;
+        }
+    }
+
+    @Test
+    public void testGetUserDatasetPermissions_viewerCannotViewCollection() throws Exception {
+        when(sessionsService.get(SESSION_ID)).thenReturn(session);
+        when(collectionPermissionsService.hasEdit(session)).thenReturn(false);
+        when(collectionPermissionsService.hasView(session, description)).thenReturn(false);
+        when(collectionsService.getCollection(COLLECTION_ID)).thenReturn(collection);
+
+        Permissions actual = service.getUserDatasetPermissions(SESSION_ID, DATASET_ID, COLLECTION_ID);
+
+        assertThat(actual, equalTo(Permissions.permitNone()));
+        verify(sessionsService, times(1)).get(SESSION_ID);
+        verify(sessionsService, times(1)).expired(session);
+        verify(collectionsService, times(1)).getCollection(COLLECTION_ID);
+        verify(collectionPermissionsService, times(1)).hasEdit(session);
+        verify(collectionPermissionsService, times(1)).hasView(session, description);
+    }
+
+    @Test
+    public void testGetUserDatasetPermissions_viewerDatasetNotInCollection() throws Exception {
+        when(sessionsService.get(SESSION_ID)).thenReturn(session);
+        when(collectionPermissionsService.hasEdit(session)).thenReturn(false);
+        when(collectionPermissionsService.hasView(session, description)).thenReturn(true);
+        when(collectionsService.getCollection(COLLECTION_ID)).thenReturn(collection);
+        when(description.getDatasets()).thenReturn(new HashSet<>());
+
+        Permissions actual = service.getUserDatasetPermissions(SESSION_ID, DATASET_ID, COLLECTION_ID);
+
+        assertThat(actual, equalTo(Permissions.permitNone()));
+        verify(sessionsService, times(1)).get(SESSION_ID);
+        verify(sessionsService, times(1)).expired(session);
+        verify(collectionsService, times(1)).getCollection(COLLECTION_ID);
+        verify(collectionPermissionsService, times(1)).hasEdit(session);
+        verify(collectionPermissionsService, times(1)).hasView(session, description);
     }
 }

@@ -1,5 +1,8 @@
 package com.github.onsdigital.zebedee.permissions.cmd;
 
+import com.github.onsdigital.zebedee.json.CollectionDataset;
+import com.github.onsdigital.zebedee.json.CollectionDescription;
+import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.Collections;
 import com.github.onsdigital.zebedee.model.ServiceAccount;
 import com.github.onsdigital.zebedee.service.ServiceStore;
@@ -12,10 +15,13 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Optional;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -25,10 +31,9 @@ import static org.mockito.Mockito.when;
 public class PermissionsServiceImplTest {
 
     static final String SESSION_ID = "217"; // The Overlook Hotel room 217...
-
-    static Optional<String> SESS = Optional.of(SESSION_ID);
-
     static final String SERVICE_TOKEN = "Union_Aerospace_Corporation"; // DOOM \m/
+    static final String DATASET_ID = "Ohhh get schwifty";
+    static Optional<String> SESS = Optional.of(SESSION_ID);
 
 
     @Mock
@@ -45,6 +50,12 @@ public class PermissionsServiceImplTest {
 
     @Mock
     private Session session;
+
+    @Mock
+    private Collection collection;
+
+    @Mock
+    private CollectionDescription description;
 
     private PermissionsServiceImpl service;
 
@@ -194,5 +205,34 @@ public class PermissionsServiceImplTest {
         ServiceAccount actual = service.getServiceAccount(SERVICE_TOKEN);
         assertThat(actual, equalTo(expected));
         verify(serviceStore, times(1)).get(SERVICE_TOKEN);
+    }
+
+    @Test
+    public void testIsDatasetInCollection_false() throws Exception {
+        when(collection.getDescription())
+                .thenReturn(description);
+
+        when(description.getDatasets())
+                .thenReturn(new HashSet<>());
+
+        assertFalse(service.isDatasetInCollection(collection, DATASET_ID));
+    }
+
+    @Test
+    public void testIsDatasetInCollection_true() throws Exception {
+        CollectionDataset dataset = new CollectionDataset();
+        dataset.setId(DATASET_ID);
+
+        HashSet datasets = new HashSet<CollectionDataset>() {{
+            add(dataset);
+        }};
+
+        when(collection.getDescription())
+                .thenReturn(description);
+
+        when(description.getDatasets())
+                .thenReturn(datasets);
+
+        assertTrue(service.isDatasetInCollection(collection, DATASET_ID));
     }
 }

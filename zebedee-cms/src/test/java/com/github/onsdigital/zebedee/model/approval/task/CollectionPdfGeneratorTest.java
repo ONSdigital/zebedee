@@ -3,6 +3,7 @@ package com.github.onsdigital.zebedee.model.approval.task;
 import com.github.onsdigital.zebedee.content.page.base.PageType;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.ContentDetail;
+import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.CollectionWriter;
 import com.github.onsdigital.zebedee.model.ContentWriter;
 import com.github.onsdigital.zebedee.model.approval.tasks.CollectionPdfGenerator;
@@ -31,6 +32,9 @@ public class CollectionPdfGeneratorTest {
     @Mock
     private ContentWriter mockContentWriter;
 
+    @Mock
+    private Collection collection;
+
     private CollectionPdfGenerator generator;
 
     @Before
@@ -41,8 +45,8 @@ public class CollectionPdfGeneratorTest {
 
 
     @Test
-    public void shouldGenerateNothingForAnEmptyCollection() throws IOException {
-        generator.generatePdfsInCollection(mockCollectionWriter, new ArrayList<>());
+    public void shouldGenerateNothingForAnEmptyCollection() throws Exception {
+        generator.generatePDFsForCollection(collection, mockCollectionWriter, new ArrayList<>());
         verifyZeroInteractions(mockPDFService);
     }
 
@@ -55,7 +59,7 @@ public class CollectionPdfGeneratorTest {
         String uri = "/the/uri";
         collectionContent.add(new ContentDetail("Some article", uri, PageType.article.toString()));
 
-        generator.generatePdfsInCollection(mockCollectionWriter, collectionContent);
+        generator.generatePDFsForCollection(collection, mockCollectionWriter, collectionContent);
 
         verify(mockCollectionWriter, times(1)).getReviewed();
     }

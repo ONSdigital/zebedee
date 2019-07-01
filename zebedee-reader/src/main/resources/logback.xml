@@ -31,19 +31,16 @@
         </encoder>
     </appender>
 
-    <logger name="zebedee" level="debug" additivity="false">
+
+    <logger name="dp-dataset-api-java-client" level="info" additivity="false">
         <appender-ref ref="DP_LOGGER"/>
     </logger>
 
-    <logger name="dp-dataset-api-java-client" level="debug" additivity="false">
+    <logger name="zebedee" level="info" additivity="false">
         <appender-ref ref="DP_LOGGER"/>
     </logger>
 
-    <logger name="zebedee" level="debug" additivity="false">
-        <appender-ref ref="DP_LOGGER"/>
-    </logger>
-
-    <logger name="zebedee-reader" level="debug" additivity="false">
+    <logger name="zebedee-reader" level="info" additivity="false">
         <appender-ref ref="DP_LOGGER"/>
     </logger>
 

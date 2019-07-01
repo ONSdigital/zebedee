@@ -401,7 +401,7 @@ public class PermissionsServiceImpl implements PermissionsService {
      *
      * @param collectionDescription The collection to give the team access to.
      * @param team                  The team to be granted access.
-     * @param session               Only editors can grant a team access to a collection.
+     * @param session               Only editors can permit a team access to a collection.
      * @throws IOException If a filesystem error occurs.
      */
     @Override

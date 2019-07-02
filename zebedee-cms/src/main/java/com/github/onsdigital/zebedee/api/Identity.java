@@ -21,7 +21,7 @@ import static com.github.onsdigital.logging.v2.event.SimpleEvent.warn;
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
 
 import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
-import static com.github.onsdigital.zebedee.util.JsonUtils.writeResponse;
+import static com.github.onsdigital.zebedee.util.JsonUtils.writeResponseEntity;
 import static org.apache.http.HttpStatus.SC_NOT_FOUND;
 import static org.apache.http.HttpStatus.SC_OK;
 import static org.apache.http.HttpStatus.SC_UNAUTHORIZED;
@@ -56,7 +56,7 @@ public class Identity {
         if (!datasetImportEnabled) {
             warn().data("responseStatus", SC_NOT_FOUND)
                     .log("Identity endpoint is not supported as feature EnableDatasetImport is disabled");
-            writeResponse(response, NOT_FOUND_ERROR, SC_NOT_FOUND);
+            writeResponseEntity(response, NOT_FOUND_ERROR, SC_NOT_FOUND);
             return;
         }
 
@@ -69,11 +69,11 @@ public class Identity {
             ServiceAccount serviceAccount = findService(request);
             if (serviceAccount != null) {
 
-                writeResponse(response, new UserIdentity(serviceAccount.getId()), SC_OK);
+                writeResponseEntity(response, new UserIdentity(serviceAccount.getId()), SC_OK);
                 return;
             }
         }
-        writeResponse(response, new Error("service not authenticated"), SC_UNAUTHORIZED);
+        writeResponseEntity(response, new Error("service not authenticated"), SC_UNAUTHORIZED);
     }
 
     private void findUser(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -82,7 +82,7 @@ public class Identity {
         if (StringUtils.isEmpty(sessionID)) {
             Error responseBody = new Error("user not authenticated");
             warn().log(responseBody.getMessage());
-            writeResponse(response, responseBody, SC_UNAUTHORIZED);
+            writeResponseEntity(response, responseBody, SC_UNAUTHORIZED);
             return;
         }
 
@@ -90,10 +90,10 @@ public class Identity {
             UserIdentity identity = getAuthorisationService().identifyUser(sessionID);
             info().data("sessionId", sessionID).data("user", identity.getIdentifier())
                     .log("authenticated user identity confirmed");
-            writeResponse(response, identity, SC_OK);
+            writeResponseEntity(response, identity, SC_OK);
         } catch (UserIdentityException e) {
             error().logException(e, "identity endpoint: identify user failure, returning error response");
-            writeResponse(response, new Error(e.getMessage()), e.getResponseCode());
+            writeResponseEntity(response, new Error(e.getMessage()), e.getResponseCode());
         }
     }
 

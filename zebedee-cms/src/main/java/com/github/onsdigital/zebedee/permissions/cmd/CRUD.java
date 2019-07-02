@@ -1,11 +1,13 @@
 package com.github.onsdigital.zebedee.permissions.cmd;
 
+import com.github.onsdigital.zebedee.model.ServiceAccount;
+import com.github.onsdigital.zebedee.session.model.Session;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.Set;
 
+import static com.github.onsdigital.zebedee.logging.CMSLogEvent.info;
 import static com.github.onsdigital.zebedee.permissions.cmd.PermissionType.CREATE;
 import static com.github.onsdigital.zebedee.permissions.cmd.PermissionType.DELETE;
 import static com.github.onsdigital.zebedee.permissions.cmd.PermissionType.READ;
@@ -18,11 +20,6 @@ public class CRUD {
 
     public CRUD() {
         this.permissions = new HashSet<>();
-    }
-
-    public CRUD(PermissionType... grantedPermissions) {
-        this.permissions = new LinkedHashSet<>();
-        permit(grantedPermissions);
     }
 
     public Set<PermissionType> getPermissions() {
@@ -57,15 +54,27 @@ public class CRUD {
                 .toHashCode();
     }
 
-    public static CRUD permitCreateReadUpdateDelete() {
+    public static CRUD permitServiceAccountCreateReadUpdateDelete(ServiceAccount serviceAccount, String datasetID) {
+        info().serviceAccountID(serviceAccount.getId())
+                .datasetID(datasetID)
+                .log("granting full CRUD permissions to service account");
         return new CRUD().permit(CREATE, READ, UPDATE, DELETE);
     }
 
-    public static CRUD permitRead() {
+    public static CRUD permitUserCreateReadUpdateDelete(String collectionID, String datasetID, Session session) {
+        info().collectionID(collectionID).datasetID(datasetID).email(session)
+                .log("granting full CRUD permissions to user");
+        return new CRUD().permit(CREATE, READ, UPDATE, DELETE);
+    }
+
+    public static CRUD permitUserRead(String collectionID, String datasetID, Session session) {
+        info().collectionID(collectionID).datasetID(datasetID).email(session)
+                .log("granting READ permission to user");
         return new CRUD().permit(READ);
     }
 
-    public static CRUD permitNone() {
+    public static CRUD permitUserNone(String collectionID, String datasetID, Session session, String message) {
+        info().collectionID(collectionID).datasetID(datasetID).email(session).log(message);
         return new CRUD();
     }
 }

@@ -17,6 +17,10 @@ import org.mockito.MockitoAnnotations;
 import java.io.IOException;
 import java.util.HashSet;
 
+import static com.github.onsdigital.zebedee.permissions.cmd.PermissionType.CREATE;
+import static com.github.onsdigital.zebedee.permissions.cmd.PermissionType.DELETE;
+import static com.github.onsdigital.zebedee.permissions.cmd.PermissionType.READ;
+import static com.github.onsdigital.zebedee.permissions.cmd.PermissionType.UPDATE;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertFalse;
@@ -60,6 +64,9 @@ public class PermissionsServiceImplTest {
     private PermissionsServiceImpl service;
     private CollectionDataset dataset;
     private HashSet datasets;
+    private CRUD none;
+    private CRUD fullPermissions;
+    private CRUD readOnly;
 
     @Before
     public void setUp() throws Exception {
@@ -75,6 +82,10 @@ public class PermissionsServiceImplTest {
 
         service = new PermissionsServiceImpl(sessionsService, collectionsService, serviceStore,
                 collectionPermissionsService);
+
+        none = new CRUD();
+        fullPermissions = new CRUD().permit(CREATE, READ, UPDATE, DELETE);
+        readOnly = new CRUD().permit(READ);
     }
 
     @Test(expected = PermissionsException.class)
@@ -225,7 +236,7 @@ public class PermissionsServiceImplTest {
         when(description.getDatasets())
                 .thenReturn(new HashSet<>());
 
-        assertFalse(service.isDatasetInCollection(collection, DATASET_ID));
+        assertFalse(service.isDatasetPartOfCollection(collection, DATASET_ID));
     }
 
     @Test
@@ -243,7 +254,7 @@ public class PermissionsServiceImplTest {
         when(description.getDatasets())
                 .thenReturn(datasets);
 
-        assertTrue(service.isDatasetInCollection(collection, DATASET_ID));
+        assertTrue(service.isDatasetPartOfCollection(collection, DATASET_ID));
     }
 
     @Test(expected = PermissionsException.class)
@@ -309,7 +320,7 @@ public class PermissionsServiceImplTest {
     @Test(expected = PermissionsException.class)
     public void testGetServiceDatasetPermissions_tokenNull() throws Exception {
         try {
-            service.getServiceDatasetPermissions(null);
+            service.getServiceDatasetPermissions(null, null);
         } catch (PermissionsException ex) {
             assertThat(ex.statusCode, equalTo(HttpStatus.SC_BAD_REQUEST));
             verifyZeroInteractions(serviceStore);
@@ -320,7 +331,7 @@ public class PermissionsServiceImplTest {
     @Test(expected = PermissionsException.class)
     public void testGetServiceDatasetPermissions_tokenEmpty() throws Exception {
         try {
-            service.getServiceDatasetPermissions(null);
+            service.getServiceDatasetPermissions(null, null);
         } catch (PermissionsException ex) {
             assertThat(ex.statusCode, equalTo(HttpStatus.SC_BAD_REQUEST));
             verifyZeroInteractions(serviceStore);
@@ -334,7 +345,7 @@ public class PermissionsServiceImplTest {
                 .thenReturn(null);
 
         try {
-            service.getServiceDatasetPermissions(SERVICE_TOKEN);
+            service.getServiceDatasetPermissions(SERVICE_TOKEN, DATASET_ID);
         } catch (PermissionsException ex) {
             assertThat(ex.statusCode, equalTo(HttpStatus.SC_UNAUTHORIZED));
             verify(serviceStore, times(1)).get(SERVICE_TOKEN);
@@ -348,7 +359,7 @@ public class PermissionsServiceImplTest {
                 .thenThrow(new IOException());
 
         try {
-            service.getServiceDatasetPermissions(SERVICE_TOKEN);
+            service.getServiceDatasetPermissions(SERVICE_TOKEN, DATASET_ID);
         } catch (PermissionsException ex) {
             assertThat(ex.statusCode, equalTo(HttpStatus.SC_INTERNAL_SERVER_ERROR));
             verify(serviceStore, times(1)).get(SERVICE_TOKEN);
@@ -363,9 +374,9 @@ public class PermissionsServiceImplTest {
         when(serviceStore.get(SERVICE_TOKEN))
                 .thenReturn(expected);
 
-        CRUD result = service.getServiceDatasetPermissions(SERVICE_TOKEN);
+        CRUD result = service.getServiceDatasetPermissions(SERVICE_TOKEN, DATASET_ID);
 
-        assertThat(result, equalTo(CRUD.permitCreateReadUpdateDelete()));
+        assertThat(result, equalTo(fullPermissions));
         verify(serviceStore, times(1)).get(SERVICE_TOKEN);
     }
 
@@ -376,7 +387,7 @@ public class PermissionsServiceImplTest {
 
         CRUD actual = service.getUserDatasetPermissions(SESSION_ID, DATASET_ID, COLLECTION_ID);
 
-        assertThat(actual, equalTo(CRUD.permitCreateReadUpdateDelete()));
+        assertThat(actual, equalTo(fullPermissions));
         verify(sessionsService, times(1)).get(SESSION_ID);
         verify(sessionsService, times(1)).expired(session);
         verify(collectionPermissionsService, times(1)).hasEdit(session);
@@ -392,7 +403,7 @@ public class PermissionsServiceImplTest {
 
         CRUD actual = service.getUserDatasetPermissions(SESSION_ID, DATASET_ID, COLLECTION_ID);
 
-        assertThat(actual, equalTo(CRUD.permitRead()));
+        assertThat(actual, equalTo(readOnly));
         verify(sessionsService, times(1)).get(SESSION_ID);
         verify(sessionsService, times(1)).expired(session);
         verify(collectionsService, times(1)).getCollection(COLLECTION_ID);
@@ -412,7 +423,6 @@ public class PermissionsServiceImplTest {
             verify(sessionsService, times(1)).get(SESSION_ID);
             verify(sessionsService, times(1)).expired(session);
             verify(collectionsService, never()).getCollection(anyString());
-            verify(collectionPermissionsService, times(1)).hasEdit(session);
             throw ex;
         }
     }
@@ -429,8 +439,7 @@ public class PermissionsServiceImplTest {
             assertThat(ex.statusCode, equalTo(HttpStatus.SC_BAD_REQUEST));
             verify(sessionsService, times(1)).get(SESSION_ID);
             verify(sessionsService, times(1)).expired(session);
-            verify(collectionsService, times(1)).getCollection(COLLECTION_ID);
-            verify(collectionPermissionsService, times(1)).hasEdit(session);
+            verifyNoMoreInteractions(sessionsService, collectionsService, collectionPermissionsService);
             throw ex;
         }
     }
@@ -444,7 +453,7 @@ public class PermissionsServiceImplTest {
 
         CRUD actual = service.getUserDatasetPermissions(SESSION_ID, DATASET_ID, COLLECTION_ID);
 
-        assertThat(actual, equalTo(CRUD.permitNone()));
+        assertThat(actual, equalTo(none));
         verify(sessionsService, times(1)).get(SESSION_ID);
         verify(sessionsService, times(1)).expired(session);
         verify(collectionsService, times(1)).getCollection(COLLECTION_ID);
@@ -462,7 +471,7 @@ public class PermissionsServiceImplTest {
 
         CRUD actual = service.getUserDatasetPermissions(SESSION_ID, DATASET_ID, COLLECTION_ID);
 
-        assertThat(actual, equalTo(CRUD.permitNone()));
+        assertThat(actual, equalTo(none));
         verify(sessionsService, times(1)).get(SESSION_ID);
         verify(sessionsService, times(1)).expired(session);
         verify(collectionsService, times(1)).getCollection(COLLECTION_ID);

@@ -14,10 +14,14 @@ import org.mockito.MockitoAnnotations;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import static com.github.onsdigital.zebedee.api.cmd.Permissions.COLLECTION_ID_PARAM;
-import static com.github.onsdigital.zebedee.api.cmd.Permissions.DATASET_ID_PARAM;
-import static com.github.onsdigital.zebedee.api.cmd.Permissions.FLORENCE_AUTH_HEATHER;
-import static com.github.onsdigital.zebedee.api.cmd.Permissions.SERVICE_AUTH_HEADER;
+import static com.github.onsdigital.zebedee.api.cmd.PermissionsRequestHandler.COLLECTION_ID_PARAM;
+import static com.github.onsdigital.zebedee.api.cmd.PermissionsRequestHandler.DATASET_ID_PARAM;
+import static com.github.onsdigital.zebedee.api.cmd.PermissionsRequestHandler.FLORENCE_AUTH_HEATHER;
+import static com.github.onsdigital.zebedee.api.cmd.PermissionsRequestHandler.SERVICE_AUTH_HEADER;
+import static com.github.onsdigital.zebedee.permissions.cmd.PermissionType.CREATE;
+import static com.github.onsdigital.zebedee.permissions.cmd.PermissionType.DELETE;
+import static com.github.onsdigital.zebedee.permissions.cmd.PermissionType.READ;
+import static com.github.onsdigital.zebedee.permissions.cmd.PermissionType.UPDATE;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.times;
@@ -25,7 +29,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
-public class PermissionsTest {
+public class DatasetPermissionsRequestHandlerTest {
 
     static final String SESSION_ID = "666";
     static final String DATASET_ID = "667";
@@ -46,25 +50,20 @@ public class PermissionsTest {
     @Mock
     private Session session;
 
-    private Permissions api;
+    private DatasetPermissionsRequestHandler handler;
 
     @Mock
     private PermissionsService permissionsService;
 
+    private CRUD fullPermissions;
+    private CRUD readOnly;
+
     @Before
     public void setup() throws Exception {
         MockitoAnnotations.initMocks(this);
-        api = new Permissions(true, permissionsService, httpResponseWriter);
-    }
-
-    @Test
-    public void testHandleFeatureDisabled() throws Exception {
-        api = new Permissions(false, permissionsService, httpResponseWriter);
-
-        api.handle(mockRequest, mockResponse);
-
-        verify(httpResponseWriter, times(1)).writeJSONResponse(mockResponse, null, HttpStatus.SC_NOT_FOUND);
-        verifyZeroInteractions(permissionsService);
+        handler = new DatasetPermissionsRequestHandler(permissionsService);
+        fullPermissions = new CRUD().permit(CREATE, READ, UPDATE, DELETE);
+        readOnly = new CRUD().permit(READ);
     }
 
     @Test(expected = PermissionsException.class)
@@ -73,7 +72,7 @@ public class PermissionsTest {
         when(mockRequest.getHeader(SERVICE_AUTH_HEADER)).thenReturn(null);
 
         try {
-            api.getPermissions(mockRequest, mockResponse);
+            handler.get(mockRequest, mockResponse);
         } catch (PermissionsException ex) {
             assertThat(ex.statusCode, equalTo(HttpStatus.SC_BAD_REQUEST));
             verifyZeroInteractions(permissionsService);
@@ -92,7 +91,7 @@ public class PermissionsTest {
                 .thenThrow(new PermissionsException("", HttpStatus.SC_INTERNAL_SERVER_ERROR));
 
         try {
-            api.getPermissions(mockRequest, mockResponse);
+            handler.get(mockRequest, mockResponse);
         } catch (PermissionsException ex) {
             assertThat(ex.statusCode, equalTo(HttpStatus.SC_INTERNAL_SERVER_ERROR));
             verify(permissionsService, times(1)).getUserDatasetPermissions(SESSION_ID, DATASET_ID, COLLECTION_ID);
@@ -109,11 +108,11 @@ public class PermissionsTest {
         when(mockRequest.getParameter(COLLECTION_ID_PARAM)).thenReturn(COLLECTION_ID);
 
         when(permissionsService.getUserDatasetPermissions(SESSION_ID, DATASET_ID, COLLECTION_ID))
-                .thenReturn(CRUD.permitRead());
+                .thenReturn(readOnly);
 
-        CRUD actual = api.getPermissions(mockRequest, mockResponse);
+        CRUD actual = handler.get(mockRequest, mockResponse);
 
-        assertThat(actual, equalTo(CRUD.permitRead()));
+        assertThat(actual, equalTo(readOnly));
         verify(permissionsService, times(1)).getUserDatasetPermissions(SESSION_ID, DATASET_ID, COLLECTION_ID);
         verifyZeroInteractions(permissionsService);
     }
@@ -125,14 +124,14 @@ public class PermissionsTest {
         when(mockRequest.getParameter(DATASET_ID_PARAM)).thenReturn(DATASET_ID);
         when(mockRequest.getParameter(COLLECTION_ID_PARAM)).thenReturn(COLLECTION_ID);
 
-        when(permissionsService.getServiceDatasetPermissions(SERVICE_TOKEN))
+        when(permissionsService.getServiceDatasetPermissions(SERVICE_TOKEN, DATASET_ID))
                 .thenThrow(new PermissionsException("", HttpStatus.SC_INTERNAL_SERVER_ERROR));
 
         try {
-            api.getPermissions(mockRequest, mockResponse);
+            handler.get(mockRequest, mockResponse);
         } catch (PermissionsException ex) {
             assertThat(ex.statusCode, equalTo(HttpStatus.SC_INTERNAL_SERVER_ERROR));
-            verify(permissionsService, times(1)).getServiceDatasetPermissions(SERVICE_TOKEN);
+            verify(permissionsService, times(1)).getServiceDatasetPermissions(SERVICE_TOKEN, DATASET_ID);
             verifyZeroInteractions(permissionsService);
             throw ex;
         }
@@ -145,13 +144,23 @@ public class PermissionsTest {
         when(mockRequest.getParameter(DATASET_ID_PARAM)).thenReturn(DATASET_ID);
         when(mockRequest.getParameter(COLLECTION_ID_PARAM)).thenReturn(COLLECTION_ID);
 
-        when(permissionsService.getServiceDatasetPermissions(SERVICE_TOKEN))
-                .thenReturn(CRUD.permitCreateReadUpdateDelete());
+        when(permissionsService.getServiceDatasetPermissions(SERVICE_TOKEN, DATASET_ID))
+                .thenReturn(fullPermissions);
 
-        CRUD actual = api.getPermissions(mockRequest, mockResponse);
+        CRUD actual = handler.get(mockRequest, mockResponse);
 
-        assertThat(actual, equalTo(CRUD.permitCreateReadUpdateDelete()));
-        verify(permissionsService, times(1)).getServiceDatasetPermissions(SERVICE_TOKEN);
+        assertThat(actual, equalTo(fullPermissions));
+        verify(permissionsService, times(1)).getServiceDatasetPermissions(SERVICE_TOKEN, DATASET_ID);
         verifyZeroInteractions(permissionsService);
+    }
+
+    @Test
+    public void testParseServiceToken_withPrefix() {
+        assertThat(handler.parseServiceToken("Bearer 666"), equalTo("666"));
+    }
+
+    @Test
+    public void testParseServiceToken_withoutPrefix() {
+        assertThat(handler.parseServiceToken("666"), equalTo("666"));
     }
 }

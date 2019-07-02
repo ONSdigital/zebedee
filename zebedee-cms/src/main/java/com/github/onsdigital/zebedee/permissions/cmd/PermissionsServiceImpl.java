@@ -13,15 +13,31 @@ import java.io.IOException;
 
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.error;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.info;
-import static com.github.onsdigital.zebedee.permissions.cmd.CRUD.permitCreateReadUpdateDelete;
-import static com.github.onsdigital.zebedee.permissions.cmd.CRUD.permitNone;
-import static com.github.onsdigital.zebedee.permissions.cmd.CRUD.permitRead;
+import static com.github.onsdigital.zebedee.permissions.cmd.CRUD.permitServiceAccountCreateReadUpdateDelete;
+import static com.github.onsdigital.zebedee.permissions.cmd.CRUD.permitUserCreateReadUpdateDelete;
+import static com.github.onsdigital.zebedee.permissions.cmd.CRUD.permitUserNone;
+import static com.github.onsdigital.zebedee.permissions.cmd.CRUD.permitUserRead;
+import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.collectionIDNotProvidedException;
+import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.collectionNotFoundException;
+import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.datasetIDNotProvidedException;
+import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.internalServerErrorException;
+import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.serviceAccountNotFoundException;
+import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.sessionExpiredException;
+import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.sessionIDNotProvidedException;
+import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.sessionNotFoundException;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.apache.http.HttpStatus.SC_BAD_REQUEST;
-import static org.apache.http.HttpStatus.SC_INTERNAL_SERVER_ERROR;
-import static org.apache.http.HttpStatus.SC_NOT_FOUND;
-import static org.apache.http.HttpStatus.SC_UNAUTHORIZED;
 
 public class PermissionsServiceImpl implements PermissionsService {
+
+    private static final String DATASET_ID_NOT_PROVIDED = "no permissions granted to user dataset ID required but not" +
+            " provided";
+
+    private static final String DATASET_NOT_IN_COLLECTION = "no permissions granted to viewer user as the requested " +
+            "collection does not contain the requested dataset";
+
+    private static final String NO_COLLECTION_VIEW_PERMISSION = "no permissions granted to viewer user as they do not" +
+            " have view permissions for the requested collection";
 
     public static PermissionsService instance = null;
 
@@ -29,6 +45,138 @@ public class PermissionsServiceImpl implements PermissionsService {
     private Collections collectionsService;
     private ServiceStore serviceStore;
     private CollectionPermissionsService collectionPermissions;
+
+    PermissionsServiceImpl(SessionsService sessionsService, Collections collectionsService,
+                           ServiceStore serviceStore, CollectionPermissionsService collectionPermissions) {
+        this.sessionsService = sessionsService;
+        this.collectionsService = collectionsService;
+        this.serviceStore = serviceStore;
+        this.collectionPermissions = collectionPermissions;
+    }
+
+    @Override
+    public CRUD getUserDatasetPermissions(String sessionID, String datasetID, String collectionID)
+            throws PermissionsException {
+        Session session = getSession(sessionID);
+
+        if (isEmpty(datasetID)) {
+            info().datasetID(datasetID).collectionID(collectionID).email(session).log(DATASET_ID_NOT_PROVIDED);
+            throw datasetIDNotProvidedException();
+        }
+
+        if (collectionPermissions.hasEdit(session)) {
+            return permitUserCreateReadUpdateDelete(collectionID, datasetID, session);
+        }
+
+        Collection collection = getCollection(collectionID);
+
+        if (!collectionPermissions.hasView(session, collection.getDescription())) {
+            return permitUserNone(collectionID, datasetID, session, NO_COLLECTION_VIEW_PERMISSION);
+        }
+
+        if (!isDatasetPartOfCollection(collection, datasetID)) {
+            return permitUserNone(collectionID, datasetID, session, DATASET_NOT_IN_COLLECTION);
+        }
+
+        return permitUserRead(collectionID, datasetID, session);
+    }
+
+    @Override
+    public CRUD getServiceDatasetPermissions(String serviceToken, String datasetID) throws PermissionsException {
+        if (StringUtils.isEmpty(datasetID)) {
+            throw datasetIDNotProvidedException();
+        }
+
+        ServiceAccount serviceAccount = getServiceAccount(serviceToken);
+        return permitServiceAccountCreateReadUpdateDelete(serviceAccount, datasetID);
+    }
+
+
+    Session getSession(String sessionID) throws PermissionsException {
+        if (isEmpty(sessionID)) {
+            throw sessionIDNotProvidedException();
+        }
+
+        Session session = null;
+        try {
+            session = sessionsService.get(sessionID);
+        } catch (IOException ex) {
+            error().exception(ex)
+                    .sessionID(sessionID)
+                    .log("user dataset permissions request failed error getting session");
+            throw internalServerErrorException();
+        }
+
+        if (session == null) {
+            info().sessionID(sessionID).log("user dataset permissions request denied session not found");
+            throw sessionNotFoundException();
+        }
+
+        if (sessionsService.expired(session)) {
+            info().sessionID(sessionID).log("user dataset permissions request denied session expired");
+            throw sessionExpiredException();
+        }
+        return session;
+    }
+
+    Collection getCollection(String id) throws PermissionsException {
+        if (isEmpty(id)) {
+            throw collectionIDNotProvidedException();
+        }
+
+        Collection collection = null;
+        try {
+            collection = collectionsService.getCollection(id);
+        } catch (IOException ex) {
+            error().exception(ex)
+                    .collectionID(id)
+                    .log("user dataset permissions request denied error getting collection");
+            throw internalServerErrorException();
+        }
+
+        if (collection == null) {
+            info().collectionID(id)
+                    .log("user dataset permissions request denied collection not found");
+            throw collectionNotFoundException();
+        }
+
+        return collection;
+    }
+
+    ServiceAccount getServiceAccount(String serviceToken) throws PermissionsException {
+        if (isEmpty(serviceToken)) {
+            throw new PermissionsException("service permissions request denied no service token provided", SC_BAD_REQUEST);
+        }
+
+        ServiceAccount account = null;
+
+        try {
+            account = serviceStore.get(serviceToken);
+        } catch (IOException ex) {
+            error().exception(ex)
+                    .serviceAccountToken(serviceToken)
+                    .log("service dataset permissons request failed error getting service account");
+            throw internalServerErrorException();
+        }
+
+        if (account == null) {
+            error().serviceAccountToken(serviceToken)
+                    .log("service dataset permissons request denied service account not found");
+            throw serviceAccountNotFoundException();
+        }
+        return account;
+    }
+
+    boolean isDatasetPartOfCollection(Collection collection, String datasetID)
+            throws PermissionsException {
+        return collection.getDescription()
+                .getDatasets()
+                .stream()
+                .filter(dataset -> StringUtils.equals(datasetID, dataset.getId()))
+                .findFirst()
+                .isPresent();
+    }
+
 
     public static PermissionsService getInstance() {
         if (instance == null) {
@@ -46,160 +194,5 @@ public class PermissionsServiceImpl implements PermissionsService {
             }
         }
         return instance;
-    }
-
-    PermissionsServiceImpl(SessionsService sessionsService, Collections collectionsService,
-                           ServiceStore serviceStore, CollectionPermissionsService collectionPermissions) {
-        this.sessionsService = sessionsService;
-        this.collectionsService = collectionsService;
-        this.serviceStore = serviceStore;
-        this.collectionPermissions = collectionPermissions;
-    }
-
-    @Override
-    public CRUD getUserDatasetPermissions(String sessionID, String datasetID, String collectionID)
-            throws PermissionsException {
-
-        // If the session is valid then the user is with an Admin, Editor or Viewer.
-        Session session = getSession(sessionID);
-
-        // If user has collection edit permission then grant full CRUD permissions. We aren't bothered if the
-        // collection and dataset combination is valid for this user type.
-        if (collectionPermissions.hasEdit(session)) {
-            CRUD crud = permitCreateReadUpdateDelete();
-            info().collectionID(collectionID)
-                    .datasetID(datasetID)
-                    .email(session)
-                    .datasetPermissions(crud)
-                    .log("granting permissions to admin/editor");
-            return crud;
-        }
-
-        // Otherwise the user is a viewer - check the collection exists
-        Collection collection = getCollection(collectionID);
-
-        if (StringUtils.isEmpty(datasetID)) {
-            info().log("user dataset permissions request denied dataset ID required but was empty");
-            throw new PermissionsException("dataset ID required but was empty", SC_BAD_REQUEST);
-        }
-
-        // check the viewer can view this collection.
-
-        if (!collectionPermissions.hasView(session, collection.getDescription())) {
-            info().collectionID(collectionID)
-                    .datasetID(datasetID)
-                    .email(session)
-                    .log("no permissions granted to viewer user as they not have view permissions for the requested collection");
-            return permitNone();
-        }
-
-        // check the requested dataset is part of the collection.
-        if (!isDatasetInCollection(collection, datasetID)) {
-            info().collectionID(collectionID)
-                    .datasetID(datasetID)
-                    .email(session)
-                    .log("no permissions granted to viewer user as the requested collection does not contain the requested dataset");
-            return permitNone();
-        }
-
-        // grant READ only permission
-        return permitRead();
-    }
-
-    @Override
-    public CRUD getServiceDatasetPermissions(String serviceToken) throws PermissionsException {
-        ServiceAccount serviceAccount = getServiceAccount(serviceToken);
-        CRUD serviceCRUD = permitCreateReadUpdateDelete();
-        info().serviceAccountID(serviceAccount.getId())
-                .data("permissions", serviceCRUD)
-                .log("granting dataset permissions to valid service account");
-        return serviceCRUD;
-    }
-
-
-    Session getSession(String sessionID) throws PermissionsException {
-        if (StringUtils.isEmpty(sessionID)) {
-            throw new PermissionsException("user dataset permissions request denied session ID required but empty", SC_BAD_REQUEST);
-        }
-
-        Session session = null;
-        try {
-            session = sessionsService.get(sessionID);
-        } catch (IOException ex) {
-            error().exception(ex).sessionID(sessionID)
-                    .log("user dataset permissions request failed error getting session");
-            throw new PermissionsException("internal server error", SC_INTERNAL_SERVER_ERROR);
-        }
-
-        if (session == null) {
-            info().sessionID(sessionID).log("user dataset permissions request denied session not found");
-            throw new PermissionsException("session not found", SC_UNAUTHORIZED);
-        }
-
-        if (sessionsService.expired(session)) {
-            info().sessionID(sessionID).log("user dataset permissions request denied session expired");
-            throw new PermissionsException("session expired", SC_UNAUTHORIZED);
-        }
-
-        return session;
-    }
-
-    Collection getCollection(String id) throws PermissionsException {
-        if (StringUtils.isEmpty(id)) {
-            info().log("user dataset permissions request denied collection ID required but was empty");
-            throw new PermissionsException("collection ID required but was empty", SC_BAD_REQUEST);
-        }
-
-        Collection collection = null;
-        try {
-            collection = collectionsService.getCollection(id);
-        } catch (IOException ex) {
-            error().exception(ex)
-                    .collectionID(id)
-                    .log("user dataset permissions request denied error getting collection");
-            throw new PermissionsException("internal server error", SC_INTERNAL_SERVER_ERROR);
-        }
-
-        if (collection == null) {
-            info().collectionID(id)
-                    .log("user dataset permissions request denied  collection not found");
-            throw new PermissionsException("collection not found", SC_NOT_FOUND);
-        }
-
-        return collection;
-    }
-
-    ServiceAccount getServiceAccount(String serviceToken) throws PermissionsException {
-        if (StringUtils.isEmpty(serviceToken)) {
-            throw new PermissionsException("service permissions request denied no service token provided", SC_BAD_REQUEST);
-        }
-
-        ServiceAccount account = null;
-
-        try {
-            account = serviceStore.get(serviceToken);
-        } catch (IOException ex) {
-            error().exception(ex)
-                    .serviceAccountToken(serviceToken)
-                    .log("service dataset permissons request failed error getting service account");
-            throw new PermissionsException("internal server error", SC_INTERNAL_SERVER_ERROR);
-        }
-
-        if (account == null) {
-            error().serviceAccountToken(serviceToken)
-                    .log("service dataset permissons request denied service account not found");
-            throw new PermissionsException("permisson denied service account not found", SC_UNAUTHORIZED);
-        }
-        return account;
-    }
-
-    boolean isDatasetInCollection(Collection collection, String datasetID)
-            throws PermissionsException {
-        return collection.getDescription()
-                .getDatasets()
-                .stream()
-                .filter(dataset -> StringUtils.equals(datasetID, dataset.getId()))
-                .findFirst()
-                .isPresent();
     }
 }

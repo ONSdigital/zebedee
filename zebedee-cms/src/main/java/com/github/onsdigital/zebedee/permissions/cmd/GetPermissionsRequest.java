@@ -6,8 +6,6 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import javax.servlet.http.HttpServletRequest;
 
-import static org.apache.commons.lang3.StringUtils.isNotEmpty;
-
 public class GetPermissionsRequest {
 
     private static final String BEARER_PREFIX = "Bearer ";
@@ -38,14 +36,6 @@ public class GetPermissionsRequest {
         this.collectionID = collectionID;
     }
 
-    public boolean isValidUserRequest() {
-        return isNotEmpty(sessionID) && isNotEmpty(datasetID) && isNotEmpty(collectionID);
-    }
-
-    public boolean isForServiceAccount() {
-        return isNotEmpty(serviceToken) && isNotEmpty(datasetID);
-    }
-
     public String getCollectionID() {
         return collectionID;
     }
@@ -62,7 +52,7 @@ public class GetPermissionsRequest {
         return serviceToken;
     }
 
-    String removeBearerPrefixIfPresent(String serviceToken) {
+    private String removeBearerPrefixIfPresent(String serviceToken) {
         if (StringUtils.isEmpty(serviceToken)) {
             return serviceToken;
         }

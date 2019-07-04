@@ -27,9 +27,6 @@ public class AuthorisationServiceImpl implements AuthorisationService {
     private ServiceSupplier<PermissionsService> permissionsServiceSupplier = () -> Root.zebedee.getPermissionsService();
     private ServiceSupplier<ServiceStore> serviceStoreSupplier = () -> Root.zebedee.getServiceStore();
 
-    private Function<String, String> permissionDeniedError =
-            (reason) -> "user dataset permissions request denied: " + reason;
-
     private static final String INTERNAL_ERROR = "internal server error";
     private static final String AUTHENTICATED_ERROR = "user not authenticated";
     private static final String USER_NOT_FOUND = "user does not exist";

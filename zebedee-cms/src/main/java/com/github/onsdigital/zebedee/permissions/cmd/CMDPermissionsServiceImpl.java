@@ -147,7 +147,7 @@ public class CMDPermissionsServiceImpl implements CMDPermissionsService {
 
     ServiceAccount getServiceAccountByID(String serviceToken) throws PermissionsException {
         if (isEmpty(serviceToken)) {
-            throw new PermissionsException("service permissions request denied no service token provided", SC_BAD_REQUEST);
+            throw serviceTokenNotProvidedException();
         }
 
         ServiceAccount account = null;

@@ -33,9 +33,6 @@ import static org.apache.http.HttpStatus.SC_BAD_REQUEST;
 
 public class CMDPermissionsServiceImpl implements CMDPermissionsService {
 
-    private static final String DATASET_ID_NOT_PROVIDED = "no permissions granted to user dataset ID required but not" +
-            " provided";
-
     private static final String DATASET_NOT_IN_COLLECTION = "no permissions granted to viewer user as the requested " +
             "collection does not contain the requested dataset";
 

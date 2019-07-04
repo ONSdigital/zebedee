@@ -29,7 +29,9 @@ public class CMSFeatureFlags {
         this.isDatasetImportEnabled = Boolean.valueOf(getConfigValue(ENABLE_DATASET_IMPORT));
         this.isCMDAuthEnabled = Boolean.valueOf(getConfigValue(ENABLE_CMD_AUTH));
 
-        info().data(ENABLE_DATASET_IMPORT, isDatasetImportEnabled).log("CMS feature flags configurations");
+        info().data(ENABLE_DATASET_IMPORT, isDatasetImportEnabled)
+                .data(ENABLE_CMD_AUTH, isCMDAuthEnabled)
+                .log("CMS feature flags configurations");
     }
 
     /**
@@ -39,6 +41,12 @@ public class CMSFeatureFlags {
         return this.isDatasetImportEnabled;
     }
 
+    /**
+     * If true enables API endpoints {@link com.github.onsdigital.zebedee.api.cmd.UserDatasetPermissions},
+     * {@link com.github.onsdigital.zebedee.api.cmd.ServiceDatasetPermissions}.
+     *
+     * @return true if configured to be enabled false otherwise.
+     */
     public boolean isCMDAuthEnabled() {
         return isCMDAuthEnabled;
     }

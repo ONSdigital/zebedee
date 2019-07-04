@@ -1,9 +1,11 @@
 package com.github.onsdigital.zebedee.permissions.cmd;
 
 import com.github.onsdigital.zebedee.api.Root;
+import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.Collections;
 import com.github.onsdigital.zebedee.model.ServiceAccount;
+import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.service.ServiceStore;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.session.service.SessionsService;
@@ -13,22 +15,23 @@ import java.io.IOException;
 
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.error;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.info;
+import static com.github.onsdigital.zebedee.permissions.cmd.CRUD.grantUserCreateReadUpdateDelete;
+import static com.github.onsdigital.zebedee.permissions.cmd.CRUD.grantUserNone;
+import static com.github.onsdigital.zebedee.permissions.cmd.CRUD.grantUserRead;
 import static com.github.onsdigital.zebedee.permissions.cmd.CRUD.permitServiceAccountCreateReadUpdateDelete;
-import static com.github.onsdigital.zebedee.permissions.cmd.CRUD.permitUserCreateReadUpdateDelete;
-import static com.github.onsdigital.zebedee.permissions.cmd.CRUD.permitUserNone;
-import static com.github.onsdigital.zebedee.permissions.cmd.CRUD.permitUserRead;
 import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.collectionIDNotProvidedException;
 import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.collectionNotFoundException;
 import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.datasetIDNotProvidedException;
 import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.internalServerErrorException;
 import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.serviceAccountNotFoundException;
+import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.serviceTokenNotProvidedException;
 import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.sessionExpiredException;
 import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.sessionIDNotProvidedException;
 import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.sessionNotFoundException;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.apache.http.HttpStatus.SC_BAD_REQUEST;
 
-public class PermissionsServiceImpl implements PermissionsService {
+public class CMDPermissionsServiceImpl implements CMDPermissionsService {
 
     private static final String DATASET_ID_NOT_PROVIDED = "no permissions granted to user dataset ID required but not" +
             " provided";
@@ -39,15 +42,15 @@ public class PermissionsServiceImpl implements PermissionsService {
     private static final String NO_COLLECTION_VIEW_PERMISSION = "no permissions granted to viewer user as they do not" +
             " have view permissions for the requested collection";
 
-    public static PermissionsService instance = null;
+    public static CMDPermissionsService instance = null;
 
     private SessionsService sessionsService;
     private Collections collectionsService;
     private ServiceStore serviceStore;
-    private CollectionPermissionsService collectionPermissions;
+    private PermissionsService collectionPermissions;
 
-    PermissionsServiceImpl(SessionsService sessionsService, Collections collectionsService,
-                           ServiceStore serviceStore, CollectionPermissionsService collectionPermissions) {
+    CMDPermissionsServiceImpl(SessionsService sessionsService, Collections collectionsService,
+                              ServiceStore serviceStore, PermissionsService collectionPermissions) {
         this.sessionsService = sessionsService;
         this.collectionsService = collectionsService;
         this.serviceStore = serviceStore;
@@ -55,44 +58,43 @@ public class PermissionsServiceImpl implements PermissionsService {
     }
 
     @Override
-    public CRUD getUserDatasetPermissions(String sessionID, String datasetID, String collectionID)
+    public CRUD getUserDatasetPermissions(GetPermissionsRequest request)
             throws PermissionsException {
-        Session session = getSession(sessionID);
+        Session userSession = getSessionByID(request.getSessionID());
 
-        if (isEmpty(datasetID)) {
-            info().datasetID(datasetID).collectionID(collectionID).email(session).log(DATASET_ID_NOT_PROVIDED);
-            throw datasetIDNotProvidedException();
+        if (userHasEditCollectionPermission(userSession)) {
+            return grantUserCreateReadUpdateDelete(request, userSession);
         }
 
-        if (collectionPermissions.hasEdit(session)) {
-            return permitUserCreateReadUpdateDelete(collectionID, datasetID, session);
+        Collection targetCollection = getCollectionByID(request.getCollectionID());
+
+        if (!userHasViewCollectionPermission(userSession, targetCollection.getDescription())) {
+            return grantUserNone(request, userSession, NO_COLLECTION_VIEW_PERMISSION);
         }
 
-        Collection collection = getCollection(collectionID);
-
-        if (!collectionPermissions.hasView(session, collection.getDescription())) {
-            return permitUserNone(collectionID, datasetID, session, NO_COLLECTION_VIEW_PERMISSION);
+        if (!collectionContainsDataset(targetCollection, request.getDatasetID())) {
+            return grantUserNone(request, userSession, DATASET_NOT_IN_COLLECTION);
         }
 
-        if (!isDatasetPartOfCollection(collection, datasetID)) {
-            return permitUserNone(collectionID, datasetID, session, DATASET_NOT_IN_COLLECTION);
-        }
-
-        return permitUserRead(collectionID, datasetID, session);
+        return grantUserRead(request, userSession);
     }
 
     @Override
-    public CRUD getServiceDatasetPermissions(String serviceToken, String datasetID) throws PermissionsException {
-        if (StringUtils.isEmpty(datasetID)) {
+    public CRUD getServiceDatasetPermissions(GetPermissionsRequest request) throws PermissionsException {
+        if (isEmpty(request.getDatasetID())) {
             throw datasetIDNotProvidedException();
         }
 
-        ServiceAccount serviceAccount = getServiceAccount(serviceToken);
-        return permitServiceAccountCreateReadUpdateDelete(serviceAccount, datasetID);
+        if (isEmpty(request.getServiceToken())) {
+            throw serviceTokenNotProvidedException();
+        }
+
+        ServiceAccount serviceAccount = getServiceAccountByID(request.getServiceToken());
+        return permitServiceAccountCreateReadUpdateDelete(request, serviceAccount);
     }
 
 
-    Session getSession(String sessionID) throws PermissionsException {
+    Session getSessionByID(String sessionID) throws PermissionsException {
         if (isEmpty(sessionID)) {
             throw sessionIDNotProvidedException();
         }
@@ -119,7 +121,7 @@ public class PermissionsServiceImpl implements PermissionsService {
         return session;
     }
 
-    Collection getCollection(String id) throws PermissionsException {
+    Collection getCollectionByID(String id) throws PermissionsException {
         if (isEmpty(id)) {
             throw collectionIDNotProvidedException();
         }
@@ -143,7 +145,7 @@ public class PermissionsServiceImpl implements PermissionsService {
         return collection;
     }
 
-    ServiceAccount getServiceAccount(String serviceToken) throws PermissionsException {
+    ServiceAccount getServiceAccountByID(String serviceToken) throws PermissionsException {
         if (isEmpty(serviceToken)) {
             throw new PermissionsException("service permissions request denied no service token provided", SC_BAD_REQUEST);
         }
@@ -167,7 +169,7 @@ public class PermissionsServiceImpl implements PermissionsService {
         return account;
     }
 
-    boolean isDatasetPartOfCollection(Collection collection, String datasetID)
+    boolean collectionContainsDataset(Collection collection, String datasetID)
             throws PermissionsException {
         return collection.getDescription()
                 .getDatasets()
@@ -177,19 +179,42 @@ public class PermissionsServiceImpl implements PermissionsService {
                 .isPresent();
     }
 
+    boolean userHasEditCollectionPermission(Session session) throws PermissionsException {
+        try {
+            return collectionPermissions.canEdit(session);
+        } catch (IOException ex) {
+            error().exception(ex)
+                    .user(session)
+                    .data("permission", "can_edit")
+                    .log("user dataset permissions request denied error checking user permissions");
+            throw internalServerErrorException();
+        }
+    }
 
-    public static PermissionsService getInstance() {
+    boolean userHasViewCollectionPermission(Session session, CollectionDescription description)
+            throws PermissionsException {
+        try {
+            return collectionPermissions.canView(session, description);
+        } catch (IOException ex) {
+            error().exception(ex)
+                    .user(session)
+                    .data("permission", "can_view")
+                    .log("user dataset permissions request denied error checking user permissions");
+            throw internalServerErrorException();
+        }
+    }
+
+    public static CMDPermissionsService getInstance() {
         if (instance == null) {
-            synchronized (PermissionsServiceImpl.class) {
+            synchronized (CMDPermissionsServiceImpl.class) {
                 if (instance == null) {
                     SessionsService sessionsService = Root.zebedee.getSessionsService();
                     ServiceStore serviceStore = Root.zebedee.getServiceStore();
                     Collections collections = Root.zebedee.getCollections();
-                    CollectionPermissionsService collectionPermissionsService =
-                            new CollectionPermissionsServiceImpl(Root.zebedee.getPermissionsService());
+                    PermissionsService permissionsService = Root.zebedee.getPermissionsService();
 
-                    instance = new PermissionsServiceImpl(
-                            sessionsService, collections, serviceStore, collectionPermissionsService);
+                    instance = new CMDPermissionsServiceImpl(sessionsService, collections, serviceStore,
+                            permissionsService);
                 }
             }
         }

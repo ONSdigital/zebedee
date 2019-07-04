@@ -2,10 +2,9 @@ package com.github.onsdigital.zebedee.api.cmd;
 
 import com.github.onsdigital.zebedee.configuration.CMSFeatureFlags;
 import com.github.onsdigital.zebedee.json.response.Error;
+import com.github.onsdigital.zebedee.permissions.cmd.CMDPermissionsService;
 import com.github.onsdigital.zebedee.permissions.cmd.CRUD;
 import com.github.onsdigital.zebedee.permissions.cmd.PermissionsException;
-import com.github.onsdigital.zebedee.permissions.cmd.PermissionsService;
-import com.github.onsdigital.zebedee.permissions.cmd.PermissionsServiceImpl;
 import com.github.onsdigital.zebedee.util.HttpResponseWriter;
 
 import javax.servlet.http.HttpServletRequest;
@@ -29,17 +28,9 @@ public abstract class PermissionsAPIBase {
     public static final String COLLECTION_ID_MISSING = "collection_id param required but not found";
     public static final String BREARER_PREFIX = "Bearer ";
 
-    protected static PermissionsService permissionsService;
-
+    protected CMDPermissionsService permissionsService;
     protected boolean enabled = false;
     protected HttpResponseWriter httpResponseWriter;
-
-    protected static PermissionsService getPermissionsService() {
-        if (permissionsService == null) {
-            permissionsService = PermissionsServiceImpl.getInstance();
-        }
-        return permissionsService;
-    }
 
     /**
      * Construct a new Permissions endpoint.
@@ -48,17 +39,20 @@ public abstract class PermissionsAPIBase {
      * @param authorisationService the authorisation service to use.
      * @param responseWriter       the http reponse writer impl to use.
      */
-    public PermissionsAPIBase(boolean enabled, HttpResponseWriter responseWriter) {
+    public PermissionsAPIBase(boolean enabled, CMDPermissionsService cmdPermissionsService,
+                              HttpResponseWriter responseWriter) {
         this.enabled = enabled;
+        this.permissionsService = cmdPermissionsService;
         this.httpResponseWriter = responseWriter;
     }
 
     @GET
     public void handle(HttpServletRequest request, HttpServletResponse response) throws IOException {
         if (!enabled) {
-            info().data("feature_flag", CMSFeatureFlags.ENABLE_DATASET_IMPORT)
+            info().data("feature_flag", CMSFeatureFlags.ENABLE_CMD_AUTH)
                     .data("requested_uri", request.getRequestURI())
-                    .log("permissions api endpoint reqiures CMD feature to be enabled request will not be processed");
+                    .log("CMD permissions api endpoint reqiures CMD feature to be enabled request will not be " +
+                            "processed");
             writeResponse(response, null, SC_NOT_FOUND);
             return;
         }

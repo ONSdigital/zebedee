@@ -11,6 +11,7 @@ import static com.github.onsdigital.logging.v2.event.SimpleEvent.warn;
 public class CMSFeatureFlags {
 
     public static final String ENABLE_DATASET_IMPORT = "ENABLE_DATASET_IMPORT";
+    public static final String ENABLE_CMD_AUTH = "ENABLE_CMD_AUTH";
 
     /**
      * Singleton instance
@@ -19,11 +20,14 @@ public class CMSFeatureFlags {
 
     private final boolean isDatasetImportEnabled;
 
+    private final boolean isCMDAuthEnabled;
+
     /**
      * Construct a new feature flags instance.
      */
     private CMSFeatureFlags() {
         this.isDatasetImportEnabled = Boolean.valueOf(getConfigValue(ENABLE_DATASET_IMPORT));
+        this.isCMDAuthEnabled = Boolean.valueOf(getConfigValue(ENABLE_CMD_AUTH));
 
         info().data(ENABLE_DATASET_IMPORT, isDatasetImportEnabled).log("CMS feature flags configurations");
     }
@@ -33,6 +37,10 @@ public class CMSFeatureFlags {
      */
     public boolean isEnableDatasetImport() {
         return this.isDatasetImportEnabled;
+    }
+
+    public boolean isCMDAuthEnabled() {
+        return isCMDAuthEnabled;
     }
 
     public static String getConfigValue(String name) {

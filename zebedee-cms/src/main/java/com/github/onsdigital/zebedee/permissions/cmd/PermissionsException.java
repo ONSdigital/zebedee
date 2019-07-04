@@ -40,7 +40,16 @@ public class PermissionsException extends ZebedeeException {
     }
 
     public static PermissionsException serviceAccountNotFoundException() {
-        return new PermissionsException("permisson denied service account not found", SC_UNAUTHORIZED);
+        return new PermissionsException(ERROR_PREFIX + "service account not found", SC_UNAUTHORIZED);
+    }
+
+    public static PermissionsException serviceTokenNotProvidedException() {
+        return new PermissionsException(ERROR_PREFIX + "service token required but none provided", SC_BAD_REQUEST);
+    }
+
+    public static PermissionsException invalidPermissionsRequestException() {
+        return new PermissionsException(ERROR_PREFIX + "cannot process request as required fields missing",
+                SC_BAD_REQUEST);
     }
 
     public PermissionsException(String message, int responseCode) {

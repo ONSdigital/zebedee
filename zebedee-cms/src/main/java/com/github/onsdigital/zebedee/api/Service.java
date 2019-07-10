@@ -21,7 +21,7 @@ import java.util.function.Supplier;
 import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.warn;
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
-import static com.github.onsdigital.zebedee.util.JsonUtils.writeResponse;
+import static com.github.onsdigital.zebedee.util.JsonUtils.writeResponseEntity;
 import static org.apache.http.HttpStatus.SC_CREATED;
 import static org.apache.http.HttpStatus.SC_NOT_FOUND;
 
@@ -58,7 +58,7 @@ public class Service {
         // FIXME CMD feature.
         if (!datasetImportEnabled) {
             warn().data("responseStatus", SC_NOT_FOUND).log("service post endpoint: endpoint is not supported as feature EnableDatasetImport is disabled");
-            writeResponse(response, NOT_FOUND_ERR, SC_NOT_FOUND);
+            writeResponseEntity(response, NOT_FOUND_ERR, SC_NOT_FOUND);
             return;
         }
 
@@ -70,7 +70,7 @@ public class Service {
             final String token = randomIdGenerator.get();
             ServiceAccount service = serviceStoreImpl.store(token, request.getInputStream());
             info().data("id", service.getId()).log("service post endpoint: new service account created");
-            writeResponse(response, new ServiceAccountWithToken(service.getId(), token), SC_CREATED);
+            writeResponseEntity(response, new ServiceAccountWithToken(service.getId(), token), SC_CREATED);
             return;
         }
         response.setStatus(HttpServletResponse.SC_FORBIDDEN);

@@ -26,7 +26,7 @@ public class JsonUtils {
         }
     }
 
-    public static void writeResponse(HttpServletResponse response, JSONable body, int status) throws IOException {
+    public static void writeResponseEntity(HttpServletResponse response, JSONable body, int status) throws IOException {
         try {
             response.setStatus(status);
             response.setContentType(APPLICATION_JSON);
@@ -38,7 +38,7 @@ public class JsonUtils {
         }
     }
 
-    public static void writeResponse(HttpServletResponse response, Object body, int status) throws IOException {
+    public static void writeResponseEntity(HttpServletResponse response, Object body, int status) throws IOException {
         try {
             response.setStatus(status);
             response.setContentType(APPLICATION_JSON);

@@ -1,8 +1,8 @@
-package com.github.onsdigital.zebedee.authorisation;
+package com.github.onsdigital.zebedee.permissions.cmd;
 
 import com.google.gson.annotations.SerializedName;
 
-public enum DatasetPermissionType {
+public enum PermissionType {
 
     @SerializedName("CREATE")
     CREATE,

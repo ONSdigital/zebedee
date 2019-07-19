@@ -53,15 +53,15 @@ public class CRUD {
                 .toHashCode();
     }
 
-    public static CRUD permitServiceAccountCreateReadUpdateDelete(GetPermissionsRequest request,
-                                                                  ServiceAccount serviceAccount) {
+    public static CRUD grantServiceAccountDatasetCreateReadUpdateDelete(GetPermissionsRequest request,
+                                                                        ServiceAccount serviceAccount) {
         info().serviceAccountID(serviceAccount.getId())
                 .datasetID(request.getDatasetID())
                 .log("granting full CRUD permissions to service account");
         return new CRUD().permit(CREATE, READ, UPDATE, DELETE);
     }
 
-    public static CRUD grantUserCreateReadUpdateDelete(GetPermissionsRequest request, Session session) {
+    public static CRUD grantUserDatasetCreateReadUpdateDelete(GetPermissionsRequest request, Session session) {
         info().collectionID(request.getCollectionID())
                 .datasetID(request.getDatasetID())
                 .email(session)
@@ -69,7 +69,7 @@ public class CRUD {
         return new CRUD().permit(CREATE, READ, UPDATE, DELETE);
     }
 
-    public static CRUD grantUserRead(GetPermissionsRequest request, Session session) {
+    public static CRUD grantUserDatasetRead(GetPermissionsRequest request, Session session) {
         info().collectionID(request.getCollectionID())
                 .datasetID(request.getDatasetID())
                 .email(session)
@@ -83,5 +83,10 @@ public class CRUD {
                 .email(session)
                 .log(message);
         return new CRUD();
+    }
+
+    public static CRUD grantUserInstanceCreateReadUpdateDelete(GetPermissionsRequest request, Session session) {
+        info().email(session).log("granting full CRUD instance permissions to user");
+        return new CRUD().permit(CREATE, READ, UPDATE, DELETE);
     }
 }

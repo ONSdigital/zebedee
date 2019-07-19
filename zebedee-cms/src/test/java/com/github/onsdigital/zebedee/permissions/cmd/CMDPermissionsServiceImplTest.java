@@ -18,11 +18,15 @@ import org.mockito.MockitoAnnotations;
 import java.io.IOException;
 import java.util.HashSet;
 
+import static com.github.onsdigital.zebedee.permissions.cmd.CRUD.grantUserInstanceCreateReadUpdateDelete;
+import static com.github.onsdigital.zebedee.permissions.cmd.CRUD.grantUserNone;
 import static com.github.onsdigital.zebedee.permissions.cmd.PermissionType.CREATE;
 import static com.github.onsdigital.zebedee.permissions.cmd.PermissionType.DELETE;
 import static com.github.onsdigital.zebedee.permissions.cmd.PermissionType.READ;
 import static com.github.onsdigital.zebedee.permissions.cmd.PermissionType.UPDATE;
 import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.internalServerErrorException;
+import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.sessionIDNotProvidedException;
+import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.sessionNotFoundException;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertFalse;
@@ -34,6 +38,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
+
 
 public class CMDPermissionsServiceImplTest {
 
@@ -574,6 +579,125 @@ public class CMDPermissionsServiceImplTest {
             PermissionsException expected = internalServerErrorException();
             assertThat(expected.statusCode, equalTo(ex.statusCode));
             assertThat(expected.getMessage(), equalTo(ex.getMessage()));
+            throw ex;
+        }
+    }
+
+    @Test
+    public void testGetUserInstancePermissions_publisherUserSuccess() throws Exception {
+        GetPermissionsRequest request = new GetPermissionsRequest(SESSION_ID, null, null, null);
+
+        when(sessionsService.get(SESSION_ID)).thenReturn(session);
+        when(permissionsService.canEdit(session)).thenReturn(true);
+
+        CRUD expected = grantUserInstanceCreateReadUpdateDelete(request, session);
+        CRUD actual = service.getUserInstancePermissions(request);
+
+        verify(sessionsService, times(1)).get(SESSION_ID);
+        verify(permissionsService, times(1)).canEdit(session);
+        assertThat(actual, equalTo(expected));
+    }
+
+    @Test
+    public void testGetUserInstancePermissions_viewerUserSuccess() throws Exception {
+        GetPermissionsRequest request = new GetPermissionsRequest(SESSION_ID, null, null, null);
+
+        when(sessionsService.get(SESSION_ID)).thenReturn(session);
+        when(permissionsService.canEdit(session)).thenReturn(false);
+
+        CRUD expected = grantUserNone(request, session, "");
+        CRUD actual = service.getUserInstancePermissions(request);
+
+        verify(sessionsService, times(1)).get(SESSION_ID);
+        verify(permissionsService, times(1)).canEdit(session);
+        assertThat(actual, equalTo(expected));
+    }
+
+    @Test(expected = PermissionsException.class)
+    public void testGetUserInstancePermissions_requestIsNull() throws Exception {
+        try {
+            service.getUserInstancePermissions(null);
+        } catch (PermissionsException ex) {
+            assertThat(ex.statusCode, equalTo(HttpStatus.SC_INTERNAL_SERVER_ERROR));
+            verifyZeroInteractions(serviceStore, collectionsService, collectionsService, sessionsService);
+            throw ex;
+        }
+    }
+
+    @Test(expected = PermissionsException.class)
+    public void testGetUserInstancePermissions_sessionIDNull() throws Exception {
+        GetPermissionsRequest request = new GetPermissionsRequest(null, null, null, null);
+
+        try {
+            service.getUserInstancePermissions(request);
+        } catch (PermissionsException ex) {
+            PermissionsException expected = sessionIDNotProvidedException();
+
+            assertThat(ex.getMessage(), equalTo(expected.getMessage()));
+            assertThat(ex.statusCode, equalTo(expected.statusCode));
+            verifyZeroInteractions(serviceStore, collectionsService, collectionsService, sessionsService);
+            throw ex;
+        }
+    }
+
+    @Test(expected = PermissionsException.class)
+    public void testGetUserInstancePermissions_sessionNotFound() throws Exception {
+        GetPermissionsRequest request = new GetPermissionsRequest(SESSION_ID, null, null, null);
+
+        when(sessionsService.get(SESSION_ID))
+                .thenReturn(null);
+
+        try {
+            service.getUserInstancePermissions(request);
+        } catch (PermissionsException ex) {
+            PermissionsException expected = sessionNotFoundException();
+
+            assertThat(ex.getMessage(), equalTo(expected.getMessage()));
+            assertThat(ex.statusCode, equalTo(expected.statusCode));
+
+            verify(sessionsService, times(1)).get(SESSION_ID);
+            verifyZeroInteractions(serviceStore, collectionsService, collectionsService);
+            throw ex;
+        }
+    }
+
+    @Test(expected = PermissionsException.class)
+    public void testGetUserInstancePermissions_getSessionIOEx() throws Exception {
+        GetPermissionsRequest request = new GetPermissionsRequest(SESSION_ID, null, null, null);
+
+        when(sessionsService.get(SESSION_ID)).thenThrow(new IOException());
+
+        try {
+            service.getUserInstancePermissions(request);
+        } catch (PermissionsException ex) {
+            PermissionsException expected = internalServerErrorException();
+
+            assertThat(ex.getMessage(), equalTo(expected.getMessage()));
+            assertThat(ex.statusCode, equalTo(expected.statusCode));
+
+            verify(sessionsService, times(1)).get(SESSION_ID);
+            verifyZeroInteractions(serviceStore, collectionsService, collectionsService);
+            throw ex;
+        }
+    }
+
+    @Test(expected = PermissionsException.class)
+    public void testGetUserInstancePermissions_canEditIOEx() throws Exception {
+        GetPermissionsRequest request = new GetPermissionsRequest(SESSION_ID, null, null, null);
+
+        when(sessionsService.get(SESSION_ID)).thenReturn(session);
+        when(permissionsService.canEdit(session)).thenThrow(new IOException());
+
+        PermissionsException expected = internalServerErrorException();
+        try {
+            CRUD actual = service.getUserInstancePermissions(request);
+        } catch (PermissionsException ex) {
+            verify(sessionsService, times(1)).get(SESSION_ID);
+            verify(permissionsService, times(1)).canEdit(session);
+
+
+            assertThat(ex.statusCode, equalTo(expected.statusCode));
+            assertThat(ex.getMessage(), equalTo(expected.getMessage()));
             throw ex;
         }
     }

@@ -704,6 +704,10 @@ public class CMDPermissionsServiceImplTest {
         }
     }
 
+    /**
+     * Test {@link CMDPermissionsService#getServiceInstancePermissions(GetPermissionsRequest)} for scenrario where a
+     * null {@link GetPermissionsRequest} is provided.
+     */
     @Test(expected = PermissionsException.class)
     public void testGetServiceInstancePermissions_requestNull() throws PermissionsException {
         try {
@@ -719,6 +723,10 @@ public class CMDPermissionsServiceImplTest {
         }
     }
 
+    /**
+     * Test {@link CMDPermissionsService#getServiceInstancePermissions(GetPermissionsRequest)} for scenario where a
+     * null {@link ServiceAccount#id} is provided.
+     */
     @Test(expected = PermissionsException.class)
     public void testGetServiceInstancePermissions_serviceTokenEmpty() throws PermissionsException {
         GetPermissionsRequest request = new GetPermissionsRequest(null, null, null, null);
@@ -736,6 +744,10 @@ public class CMDPermissionsServiceImplTest {
         }
     }
 
+    /**
+     * Test {@link CMDPermissionsService#getServiceInstancePermissions(GetPermissionsRequest)} for scenario where
+     * {@link ServiceStore#get(String)} throws an {@link IOException}.
+     */
     @Test(expected = PermissionsException.class)
     public void testGetServiceInstancePermissions_serviceStoreIOEx() throws Exception {
         GetPermissionsRequest request = new GetPermissionsRequest(null, SERVICE_TOKEN, null, null);
@@ -756,6 +768,10 @@ public class CMDPermissionsServiceImplTest {
         }
     }
 
+    /**
+     * Test {@link CMDPermissionsService#getServiceInstancePermissions(GetPermissionsRequest)} for scenario where the
+     * no {@link ServiceAccount} is found for the provided service account ID.
+     */
     @Test(expected = PermissionsException.class)
     public void testGetServiceInstancePermissions_serviceAccountNotFound() throws Exception {
         GetPermissionsRequest request = new GetPermissionsRequest(null, SERVICE_TOKEN, null, null);
@@ -776,6 +792,10 @@ public class CMDPermissionsServiceImplTest {
         }
     }
 
+    /**
+     * Test {@link CMDPermissionsService#getServiceInstancePermissions(GetPermissionsRequest)} success case. Given a
+     * valid request the service returns {@link CRUD} permissed granted to the {@link ServiceAccount}
+     */
     @Test
     public void testGetServiceInstancePermissions_success() throws Exception {
         GetPermissionsRequest request = new GetPermissionsRequest(null, SERVICE_TOKEN, null, null);

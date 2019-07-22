@@ -55,7 +55,7 @@ public class CRUD {
 
     public static CRUD grantServiceAccountDatasetCreateReadUpdateDelete(GetPermissionsRequest request,
                                                                         ServiceAccount serviceAccount) {
-        info().serviceAccountID(serviceAccount.getId())
+        info().serviceAccountID(serviceAccount.getID())
                 .datasetID(request.getDatasetID())
                 .log("granting full CRUD permissions to service account");
         return new CRUD().permit(CREATE, READ, UPDATE, DELETE);
@@ -92,7 +92,7 @@ public class CRUD {
 
     public static CRUD grantServiceAccountInstanceCreateReadUpdateDelete(GetPermissionsRequest request,
                                                                         ServiceAccount serviceAccount) {
-        info().serviceAccountID(serviceAccount.getId())
+        info().serviceAccountID(serviceAccount.getID())
                 .datasetID(request.getDatasetID())
                 .log("granting full CRUD instance permissions to service account");
         return new CRUD().permit(CREATE, READ, UPDATE, DELETE);

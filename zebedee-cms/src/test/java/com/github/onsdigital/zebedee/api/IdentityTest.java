@@ -121,7 +121,7 @@ public class IdentityTest {
     @Test
     public void shouldReturnIdentityServiceAndOKResponseForSuccess() throws Exception {
         final ServiceAccount serviceAccount = new ServiceAccount(SERVICE_NAME);
-        UserIdentity identity = new UserIdentity(serviceAccount.getId());
+        UserIdentity identity = new UserIdentity(serviceAccount.getID());
         when(serviceStore.get(Mockito.any())).thenReturn(serviceAccount);
         when(mockRequest.getHeader(Identity.AUTHORIZATION_HEADER)).thenReturn(AUTH_TOKEN);
         when(mockResponse.getWriter())
@@ -137,7 +137,7 @@ public class IdentityTest {
     @Test
     public void shouldReturnErrorAndUnathorizedResponseForNoHeader() throws Exception {
         final ServiceAccount serviceAccount = new ServiceAccount(SERVICE_NAME);
-        UserIdentity identity = new UserIdentity(serviceAccount.getId());
+        UserIdentity identity = new UserIdentity(serviceAccount.getID());
         when(serviceStore.get(Mockito.any())).thenReturn(serviceAccount);
         when(mockRequest.getHeader(Identity.AUTHORIZATION_HEADER)).thenReturn(AUTH_TOKEN);
         when(mockResponse.getWriter())

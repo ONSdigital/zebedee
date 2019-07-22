@@ -20,7 +20,7 @@ public interface CMDPermissionsService {
      * </li>
      * </ul>
      *
-     * @param getPermissionsRequest {@link GetPermissionsRequest} specifies the request details - dataset ID,
+     * @param request {@link GetPermissionsRequest} specifies the request details - dataset ID,
      *                              Collection ID, Session ID.
      * @return {@link CRUD} permissions granted to that user. Returns an empty CRUD object for if the user is valid
      * but does
@@ -32,7 +32,7 @@ public interface CMDPermissionsService {
     /**
      * Get dataset permissions granted to a service account.
      *
-     * @param getPermissionsRequest {@link GetPermissionsRequest} specifies the request details - service token and
+     * @param request {@link GetPermissionsRequest} specifies the request details - service token and
      *                              dataset ID.
      * @return {@link CRUD} permissions granted to that service account. Returns an empty CRUD object for if the
      * service account is valid but does not have any permissions.
@@ -45,7 +45,7 @@ public interface CMDPermissionsService {
      * Get a user's instance permissions. <i>Admin</i> and <i>Editor</i> users are granted full <b>CRUD</b>
      * permissions otherwuse no permissions are granted.
      *
-     * @param getPermissionsRequest {@link GetPermissionsRequest} specifies the session ID of the user to get the
+     * @param request {@link GetPermissionsRequest} specifies the session ID of the user to get the
      *                              permissions for.
      * @return {@link CRUD} permissions granted to the user.
      * @throws PermissionsException problem getting the user permissions.
@@ -56,7 +56,7 @@ public interface CMDPermissionsService {
     /**
      * Get a service accounts instance permissions.
      *
-     * @param getPermissionsRequest {@link GetPermissionsRequest} specifies the service account to get the instance
+     * @param request {@link GetPermissionsRequest} specifies the service account to get the instance
      *                              permissions for.
      * @return {@link CRUD} permissions granted to the service account.
      * @throws PermissionsException problem getting the permissions.

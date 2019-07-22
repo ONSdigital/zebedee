@@ -25,6 +25,8 @@ import static com.github.onsdigital.zebedee.permissions.cmd.PermissionType.DELET
 import static com.github.onsdigital.zebedee.permissions.cmd.PermissionType.READ;
 import static com.github.onsdigital.zebedee.permissions.cmd.PermissionType.UPDATE;
 import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.internalServerErrorException;
+import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.serviceAccountNotFoundException;
+import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.serviceTokenNotProvidedException;
 import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.sessionIDNotProvidedException;
 import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.sessionNotFoundException;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -700,5 +702,93 @@ public class CMDPermissionsServiceImplTest {
             assertThat(ex.getMessage(), equalTo(expected.getMessage()));
             throw ex;
         }
+    }
+
+    @Test(expected = PermissionsException.class)
+    public void testGetServiceInstancePermissions_requestNull() throws PermissionsException {
+        try {
+            service.getServiceInstancePermissions(null);
+        } catch (PermissionsException ex) {
+            PermissionsException expected = internalServerErrorException();
+
+            assertThat(ex.getMessage(), equalTo(expected.getMessage()));
+            assertThat(ex.statusCode, equalTo(expected.statusCode));
+
+            verifyZeroInteractions(serviceStore, collectionsService, collectionsService, sessionsService);
+            throw ex;
+        }
+    }
+
+    @Test(expected = PermissionsException.class)
+    public void testGetServiceInstancePermissions_serviceTokenEmpty() throws PermissionsException {
+        GetPermissionsRequest request = new GetPermissionsRequest(null, null, null, null);
+
+        try {
+            service.getServiceInstancePermissions(request);
+        } catch (PermissionsException ex) {
+            PermissionsException expected = serviceTokenNotProvidedException();
+
+            assertThat(ex.getMessage(), equalTo(expected.getMessage()));
+            assertThat(ex.statusCode, equalTo(expected.statusCode));
+
+            verifyZeroInteractions(serviceStore, collectionsService, collectionsService, sessionsService);
+            throw ex;
+        }
+    }
+
+    @Test(expected = PermissionsException.class)
+    public void testGetServiceInstancePermissions_serviceStoreIOEx() throws Exception {
+        GetPermissionsRequest request = new GetPermissionsRequest(null, SERVICE_TOKEN, null, null);
+
+        when(serviceStore.get(SERVICE_TOKEN)).thenThrow(new IOException());
+
+        try {
+            service.getServiceInstancePermissions(request);
+        } catch (PermissionsException ex) {
+            PermissionsException expected = internalServerErrorException();
+
+            assertThat(ex.getMessage(), equalTo(expected.getMessage()));
+            assertThat(ex.statusCode, equalTo(expected.statusCode));
+
+            verify(serviceStore, times(1)).get(SERVICE_TOKEN);
+            verifyZeroInteractions(collectionsService, collectionsService, sessionsService);
+            throw ex;
+        }
+    }
+
+    @Test(expected = PermissionsException.class)
+    public void testGetServiceInstancePermissions_serviceAccountNotFound() throws Exception {
+        GetPermissionsRequest request = new GetPermissionsRequest(null, SERVICE_TOKEN, null, null);
+
+        when(serviceStore.get(SERVICE_TOKEN)).thenReturn(null);
+
+        try {
+            service.getServiceInstancePermissions(request);
+        } catch (PermissionsException ex) {
+            PermissionsException expected = serviceAccountNotFoundException();
+
+            assertThat(ex.getMessage(), equalTo(expected.getMessage()));
+            assertThat(ex.statusCode, equalTo(expected.statusCode));
+
+            verify(serviceStore, times(1)).get(SERVICE_TOKEN);
+            verifyZeroInteractions(collectionsService, collectionsService, sessionsService);
+            throw ex;
+        }
+    }
+
+    @Test
+    public void testGetServiceInstancePermissions_success() throws Exception {
+        GetPermissionsRequest request = new GetPermissionsRequest(null, SERVICE_TOKEN, null, null);
+        ServiceAccount account = new ServiceAccount(SERVICE_TOKEN);
+        CRUD expected = new CRUD().permit(CREATE, READ, UPDATE, DELETE);
+
+        when(serviceStore.get(SERVICE_TOKEN)).thenReturn(account);
+
+        CRUD actual = service.getServiceInstancePermissions(request);
+
+        assertThat(actual, equalTo(expected));
+
+        verify(serviceStore, times(1)).get(SERVICE_TOKEN);
+        verifyZeroInteractions(collectionsService, collectionsService, sessionsService);
     }
 }

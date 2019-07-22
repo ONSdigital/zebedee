@@ -27,7 +27,7 @@ public interface CMDPermissionsService {
      * not have any permissions.
      * @throws PermissionsException problem getting the user permissions.
      */
-    CRUD getUserDatasetPermissions(GetPermissionsRequest getPermissionsRequest) throws PermissionsException;
+    CRUD getUserDatasetPermissions(GetPermissionsRequest request) throws PermissionsException;
 
     /**
      * Get dataset permissions granted to a service account.
@@ -38,7 +38,7 @@ public interface CMDPermissionsService {
      * service account is valid but does not have any permissions.
      * @throws PermissionsException problem getting the service permissions.
      */
-    CRUD getServiceDatasetPermissions(GetPermissionsRequest getPermissionsRequest) throws PermissionsException;
+    CRUD getServiceDatasetPermissions(GetPermissionsRequest request) throws PermissionsException;
 
 
     /**
@@ -50,5 +50,16 @@ public interface CMDPermissionsService {
      * @return {@link CRUD} permissions granted to the user.
      * @throws PermissionsException problem getting the user permissions.
      */
-    CRUD getUserInstancePermissions(GetPermissionsRequest getPermissionsRequest) throws PermissionsException;
+    CRUD getUserInstancePermissions(GetPermissionsRequest request) throws PermissionsException;
+
+
+    /**
+     * Get a service accounts instance permissions.
+     *
+     * @param getPermissionsRequest {@link GetPermissionsRequest} specifies the service account to get the instance
+     *                              permissions for.
+     * @return {@link CRUD} permissions granted to the service account.
+     * @throws PermissionsException problem getting the permissions.
+     */
+    CRUD getServiceInstancePermissions(GetPermissionsRequest request) throws PermissionsException;
 }

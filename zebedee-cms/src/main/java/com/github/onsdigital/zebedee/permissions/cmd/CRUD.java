@@ -89,4 +89,12 @@ public class CRUD {
         info().email(session).log("granting full CRUD instance permissions to user");
         return new CRUD().permit(CREATE, READ, UPDATE, DELETE);
     }
+
+    public static CRUD grantServiceAccountInstanceCreateReadUpdateDelete(GetPermissionsRequest request,
+                                                                        ServiceAccount serviceAccount) {
+        info().serviceAccountID(serviceAccount.getId())
+                .datasetID(request.getDatasetID())
+                .log("granting full CRUD instance permissions to service account");
+        return new CRUD().permit(CREATE, READ, UPDATE, DELETE);
+    }
 }

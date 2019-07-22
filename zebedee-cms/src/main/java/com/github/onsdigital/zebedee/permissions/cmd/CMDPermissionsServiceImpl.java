@@ -16,6 +16,7 @@ import java.io.IOException;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.error;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.info;
 import static com.github.onsdigital.zebedee.permissions.cmd.CRUD.grantServiceAccountDatasetCreateReadUpdateDelete;
+import static com.github.onsdigital.zebedee.permissions.cmd.CRUD.grantServiceAccountInstanceCreateReadUpdateDelete;
 import static com.github.onsdigital.zebedee.permissions.cmd.CRUD.grantUserDatasetCreateReadUpdateDelete;
 import static com.github.onsdigital.zebedee.permissions.cmd.CRUD.grantUserDatasetRead;
 import static com.github.onsdigital.zebedee.permissions.cmd.CRUD.grantUserInstanceCreateReadUpdateDelete;
@@ -94,17 +95,30 @@ public class CMDPermissionsServiceImpl implements CMDPermissionsService {
     }
 
     @Override
-    public CRUD getUserInstancePermissions(GetPermissionsRequest getPermissionsRequest) throws PermissionsException {
-        if (getPermissionsRequest == null) {
+    public CRUD getUserInstancePermissions(GetPermissionsRequest request) throws PermissionsException {
+        if (request == null) {
             throw internalServerErrorException();
         }
 
-        Session session = getSessionByID(getPermissionsRequest.getSessionID());
+        Session session = getSessionByID(request.getSessionID());
 
         if (userHasPublisherPermissions(session)) {
-            return grantUserInstanceCreateReadUpdateDelete(getPermissionsRequest, session);
+            return grantUserInstanceCreateReadUpdateDelete(request, session);
         }
-        return grantUserNone(getPermissionsRequest, session, INSTANCE_PERMISSIONS_DENIED);
+        return grantUserNone(request, session, INSTANCE_PERMISSIONS_DENIED);
+    }
+
+    @Override
+    public CRUD getServiceInstancePermissions(GetPermissionsRequest request) throws PermissionsException {
+        if (request == null) {
+            throw internalServerErrorException();
+        }
+
+        if (isEmpty(request.getServiceToken())) {
+            throw serviceTokenNotProvidedException();
+        }
+        ServiceAccount serviceAccount = getServiceAccountByID(request.getServiceToken());
+        return grantServiceAccountInstanceCreateReadUpdateDelete(request, serviceAccount);
     }
 
 

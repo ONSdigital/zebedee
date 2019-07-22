@@ -12,6 +12,7 @@ import com.github.onsdigital.zebedee.api.Password;
 import com.github.onsdigital.zebedee.api.Ping;
 import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.api.cmd.ServiceDatasetPermissions;
+import com.github.onsdigital.zebedee.api.cmd.ServiceInstancePermissions;
 import com.github.onsdigital.zebedee.api.cmd.UserDatasetPermissions;
 import com.github.onsdigital.zebedee.api.cmd.UserInstancePermissions;
 import com.github.onsdigital.zebedee.search.api.endpoint.ReIndex;
@@ -41,6 +42,7 @@ public class AuthenticationFilter implements Filter {
             .add(UserDatasetPermissions.class)
             .add(UserInstancePermissions.class)
             .add(ServiceDatasetPermissions.class)
+            .add(ServiceInstancePermissions.class)
             .build();
 
     /**

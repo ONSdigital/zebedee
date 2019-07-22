@@ -13,6 +13,7 @@ import com.github.onsdigital.zebedee.api.Ping;
 import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.api.cmd.ServiceDatasetPermissions;
 import com.github.onsdigital.zebedee.api.cmd.UserDatasetPermissions;
+import com.github.onsdigital.zebedee.api.cmd.UserInstancePermissions;
 import com.github.onsdigital.zebedee.search.api.endpoint.ReIndex;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.google.common.collect.ImmutableList;
@@ -38,6 +39,7 @@ public class AuthenticationFilter implements Filter {
             .add(ClickEventLog.class)
             .add(Identity.class)
             .add(UserDatasetPermissions.class)
+            .add(UserInstancePermissions.class)
             .add(ServiceDatasetPermissions.class)
             .build();
 

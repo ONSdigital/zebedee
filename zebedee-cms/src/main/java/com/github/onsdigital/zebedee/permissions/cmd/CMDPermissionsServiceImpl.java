@@ -15,10 +15,11 @@ import java.io.IOException;
 
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.error;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.info;
-import static com.github.onsdigital.zebedee.permissions.cmd.CRUD.grantUserCreateReadUpdateDelete;
+import static com.github.onsdigital.zebedee.permissions.cmd.CRUD.grantServiceAccountDatasetCreateReadUpdateDelete;
+import static com.github.onsdigital.zebedee.permissions.cmd.CRUD.grantUserDatasetCreateReadUpdateDelete;
+import static com.github.onsdigital.zebedee.permissions.cmd.CRUD.grantUserDatasetRead;
+import static com.github.onsdigital.zebedee.permissions.cmd.CRUD.grantUserInstanceCreateReadUpdateDelete;
 import static com.github.onsdigital.zebedee.permissions.cmd.CRUD.grantUserNone;
-import static com.github.onsdigital.zebedee.permissions.cmd.CRUD.grantUserRead;
-import static com.github.onsdigital.zebedee.permissions.cmd.CRUD.permitServiceAccountCreateReadUpdateDelete;
 import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.collectionIDNotProvidedException;
 import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.collectionNotFoundException;
 import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.datasetIDNotProvidedException;
@@ -29,7 +30,6 @@ import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException
 import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.sessionIDNotProvidedException;
 import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.sessionNotFoundException;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
-import static org.apache.http.HttpStatus.SC_BAD_REQUEST;
 
 public class CMDPermissionsServiceImpl implements CMDPermissionsService {
 
@@ -38,6 +38,9 @@ public class CMDPermissionsServiceImpl implements CMDPermissionsService {
 
     private static final String NO_COLLECTION_VIEW_PERMISSION = "no permissions granted to viewer user as they do not" +
             " have view permissions for the requested collection";
+
+    private static final String INSTANCE_PERMISSIONS_DENIED = "no instance permissions granted to user as they do not" +
+            " have admin or publisher collection permissions";
 
     public static CMDPermissionsService instance = null;
 
@@ -60,7 +63,7 @@ public class CMDPermissionsServiceImpl implements CMDPermissionsService {
         Session userSession = getSessionByID(request.getSessionID());
 
         if (userHasEditCollectionPermission(userSession)) {
-            return grantUserCreateReadUpdateDelete(request, userSession);
+            return grantUserDatasetCreateReadUpdateDelete(request, userSession);
         }
 
         Collection targetCollection = getCollectionByID(request.getCollectionID());
@@ -73,7 +76,7 @@ public class CMDPermissionsServiceImpl implements CMDPermissionsService {
             return grantUserNone(request, userSession, DATASET_NOT_IN_COLLECTION);
         }
 
-        return grantUserRead(request, userSession);
+        return grantUserDatasetRead(request, userSession);
     }
 
     @Override
@@ -87,7 +90,21 @@ public class CMDPermissionsServiceImpl implements CMDPermissionsService {
         }
 
         ServiceAccount serviceAccount = getServiceAccountByID(request.getServiceToken());
-        return permitServiceAccountCreateReadUpdateDelete(request, serviceAccount);
+        return grantServiceAccountDatasetCreateReadUpdateDelete(request, serviceAccount);
+    }
+
+    @Override
+    public CRUD getUserInstancePermissions(GetPermissionsRequest getPermissionsRequest) throws PermissionsException {
+        if (getPermissionsRequest == null) {
+            throw internalServerErrorException();
+        }
+
+        Session session = getSessionByID(getPermissionsRequest.getSessionID());
+
+        if (userHasPublisherPermissions(session)) {
+            return grantUserInstanceCreateReadUpdateDelete(getPermissionsRequest, session);
+        }
+        return grantUserNone(getPermissionsRequest, session, INSTANCE_PERMISSIONS_DENIED);
     }
 
 
@@ -186,6 +203,10 @@ public class CMDPermissionsServiceImpl implements CMDPermissionsService {
                     .log("user dataset permissions request denied error checking user permissions");
             throw internalServerErrorException();
         }
+    }
+
+    boolean userHasPublisherPermissions(Session session) throws PermissionsException {
+        return userHasEditCollectionPermission(session);
     }
 
     boolean userHasViewCollectionPermission(Session session, CollectionDescription description)

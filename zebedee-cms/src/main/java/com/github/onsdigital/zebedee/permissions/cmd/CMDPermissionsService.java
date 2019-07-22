@@ -39,4 +39,16 @@ public interface CMDPermissionsService {
      * @throws PermissionsException problem getting the service permissions.
      */
     CRUD getServiceDatasetPermissions(GetPermissionsRequest getPermissionsRequest) throws PermissionsException;
+
+
+    /**
+     * Get a user's instance permissions. <i>Admin</i> and <i>Editor</i> users are granted full <b>CRUD</b>
+     * permissions otherwuse no permissions are granted.
+     *
+     * @param getPermissionsRequest {@link GetPermissionsRequest} specifies the session ID of the user to get the
+     *                              permissions for.
+     * @return {@link CRUD} permissions granted to the user.
+     * @throws PermissionsException problem getting the user permissions.
+     */
+    CRUD getUserInstancePermissions(GetPermissionsRequest getPermissionsRequest) throws PermissionsException;
 }

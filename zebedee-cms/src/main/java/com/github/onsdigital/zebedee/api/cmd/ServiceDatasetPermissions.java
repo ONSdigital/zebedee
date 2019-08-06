@@ -23,7 +23,7 @@ import static org.apache.commons.lang3.StringUtils.isEmpty;
 public class ServiceDatasetPermissions extends PermissionsAPIBase {
 
     public ServiceDatasetPermissions() {
-        super(cmsFeatureFlags().isCMDAuthEnabled(),
+        super(cmsFeatureFlags().isPermissionsAuthEnabled(),
                 CMDPermissionsServiceImpl.getInstance(),
                 (r, b, s) -> writeResponseEntity(r, b, s));
     }

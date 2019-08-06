@@ -49,7 +49,7 @@ public abstract class PermissionsAPIBase {
     @GET
     public void handle(HttpServletRequest request, HttpServletResponse response) throws IOException {
         if (!enabled) {
-            info().data("feature_flag", CMSFeatureFlags.ENABLE_CMD_AUTH)
+            info().data("feature_flag", CMSFeatureFlags.ENABLE_PERMISSIONS_AUTH)
                     .data("requested_uri", request.getRequestURI())
                     .log("CMD permissions api endpoint reqiures CMD feature to be enabled request will not be " +
                             "processed");

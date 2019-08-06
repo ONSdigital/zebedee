@@ -24,7 +24,7 @@ import static org.apache.commons.lang3.StringUtils.isEmpty;
 public class UserDatasetPermissions extends PermissionsAPIBase {
 
     public UserDatasetPermissions() {
-        this(cmsFeatureFlags().isCMDAuthEnabled(),
+        this(cmsFeatureFlags().isPermissionsAuthEnabled(),
                 CMDPermissionsServiceImpl.getInstance(),
                 (r, b, s) -> writeResponseEntity(r, b, s));
     }

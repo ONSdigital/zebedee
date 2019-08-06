@@ -28,7 +28,7 @@ public class UserInstancePermissions extends PermissionsAPIBase {
      * Create a new UserInstancePermissions endpoint using the default costructor parameters.
      */
     public UserInstancePermissions() {
-        super(cmsFeatureFlags().isCMDAuthEnabled(), CMDPermissionsServiceImpl.getInstance(), (r, b, s) -> writeResponseEntity(r, b, s));
+        super(cmsFeatureFlags().isPermissionsAuthEnabled(), CMDPermissionsServiceImpl.getInstance(), (r, b, s) -> writeResponseEntity(r, b, s));
     }
 
     /**

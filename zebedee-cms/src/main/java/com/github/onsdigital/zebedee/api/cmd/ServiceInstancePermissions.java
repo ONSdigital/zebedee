@@ -27,7 +27,7 @@ public class ServiceInstancePermissions extends PermissionsAPIBase {
      * Create a new ServiceInstancePermissions endpoint using the default costructor parameters.
      */
     public ServiceInstancePermissions() {
-        super(cmsFeatureFlags().isCMDAuthEnabled(), CMDPermissionsServiceImpl.getInstance(), (r, b, s) -> writeResponseEntity(r, b, s));
+        super(cmsFeatureFlags().isPermissionsAuthEnabled(), CMDPermissionsServiceImpl.getInstance(), (r, b, s) -> writeResponseEntity(r, b, s));
     }
 
     /**

@@ -13,56 +13,52 @@ import javax.servlet.http.HttpServletResponse;
 
 import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.info;
-import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.collectionIDNotProvidedException;
-import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.datasetIDNotProvidedException;
 import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.internalServerErrorException;
 import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.sessionIDNotProvidedException;
 import static com.github.onsdigital.zebedee.util.JsonUtils.writeResponseEntity;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
+/**
+ * API endpoint for getting a user's CMD instance permissions.
+ */
 @Api
-public class UserDatasetPermissions extends PermissionsAPIBase {
+public class UserInstancePermissions extends PermissionsAPIBase {
 
-    public UserDatasetPermissions() {
-        this(cmsFeatureFlags().isPermissionsAuthEnabled(),
-                CMDPermissionsServiceImpl.getInstance(),
-                (r, b, s) -> writeResponseEntity(r, b, s));
+    /**
+     * Create a new UserInstancePermissions endpoint using the default costructor parameters.
+     */
+    public UserInstancePermissions() {
+        super(cmsFeatureFlags().isPermissionsAuthEnabled(), CMDPermissionsServiceImpl.getInstance(), (r, b, s) -> writeResponseEntity(r, b, s));
     }
 
-    public UserDatasetPermissions(boolean enabled, CMDPermissionsService cmdPermissionsService,
-                                  HttpResponseWriter responseWriter) {
+    /**
+     * Construct a new UserInstancePermissions endpoint.
+     *
+     * @param enabled               true enables the endpoint, false all request valid or invaild will return 404.
+     * @param cmdPermissionsService
+     * @param responseWriter        the http reponse writer impl to use.
+     */
+    public UserInstancePermissions(boolean enabled, CMDPermissionsService cmdPermissionsService, HttpResponseWriter responseWriter) {
         super(enabled, cmdPermissionsService, responseWriter);
     }
 
     @Override
     public CRUD getPermissions(HttpServletRequest request, HttpServletResponse response) throws PermissionsException {
+        info().log("handling get user instance permissions request");
+        validateRequest(request);
         GetPermissionsRequest getPermissionsRequest = new GetPermissionsRequest(request);
-
-        validateGetPermissionsRequest(getPermissionsRequest);
-
-        info().sessionID(getPermissionsRequest.getSessionID())
-                .datasetID(getPermissionsRequest.getDatasetID())
-                .collectionID(getPermissionsRequest.getCollectionID())
-                .log("handling get dataset permissions request for user");
-
-        return permissionsService.getUserDatasetPermissions(getPermissionsRequest);
+        return permissionsService.getUserInstancePermissions(getPermissionsRequest);
     }
 
-    void validateGetPermissionsRequest(GetPermissionsRequest request) throws PermissionsException {
+    void validateRequest(HttpServletRequest request) throws PermissionsException {
         if (request == null) {
             throw internalServerErrorException();
         }
 
-        if (isEmpty(request.getSessionID())) {
+        String sessionID = request.getHeader(FLORENCE_AUTH_HEATHER);
+        if (isEmpty(sessionID)) {
             throw sessionIDNotProvidedException();
         }
-
-        if (isEmpty(request.getDatasetID())) {
-            throw datasetIDNotProvidedException();
-        }
-
-        if (isEmpty(request.getCollectionID())) {
-            throw collectionIDNotProvidedException();
-        }
+        info().sessionID(sessionID).log("handling valid get user instance permissions request");
     }
 }

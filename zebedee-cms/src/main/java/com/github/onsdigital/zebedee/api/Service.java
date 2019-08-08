@@ -69,8 +69,8 @@ public class Service {
             final ServiceStore serviceStoreImpl = getServiceStore();
             final String token = randomIdGenerator.get();
             ServiceAccount service = serviceStoreImpl.store(token, request.getInputStream());
-            info().data("id", service.getId()).log("service post endpoint: new service account created");
-            writeResponseEntity(response, new ServiceAccountWithToken(service.getId(), token), SC_CREATED);
+            info().data("id", service.getID()).log("service post endpoint: new service account created");
+            writeResponseEntity(response, new ServiceAccountWithToken(service.getID(), token), SC_CREATED);
             return;
         }
         response.setStatus(HttpServletResponse.SC_FORBIDDEN);

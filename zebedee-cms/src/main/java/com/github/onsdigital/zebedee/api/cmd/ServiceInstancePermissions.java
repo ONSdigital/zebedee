@@ -13,56 +13,52 @@ import javax.servlet.http.HttpServletResponse;
 
 import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.info;
-import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.datasetIDNotProvidedException;
-import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.internalServerErrorException;
 import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.serviceTokenNotProvidedException;
 import static com.github.onsdigital.zebedee.util.JsonUtils.writeResponseEntity;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
+/**
+ * API endpoint for getting instance permissions for a service account.
+ */
 @Api
-public class ServiceDatasetPermissions extends PermissionsAPIBase {
+public class ServiceInstancePermissions extends PermissionsAPIBase {
 
-    public ServiceDatasetPermissions() {
-        super(cmsFeatureFlags().isPermissionsAuthEnabled(),
-                CMDPermissionsServiceImpl.getInstance(),
-                (r, b, s) -> writeResponseEntity(r, b, s));
+    /**
+     * Create a new ServiceInstancePermissions endpoint using the default costructor parameters.
+     */
+    public ServiceInstancePermissions() {
+        super(cmsFeatureFlags().isPermissionsAuthEnabled(), CMDPermissionsServiceImpl.getInstance(), (r, b, s) -> writeResponseEntity(r, b, s));
     }
 
     /**
-     * Construct a new Permissions endpoint.
+     * Construct a new ServiceInstancePermissions endpoint.
      *
      * @param enabled               true enables the endpoint, false all request valid or invaild will return 404.
      * @param cmdPermissionsService
      * @param responseWriter        the http reponse writer impl to use.
      */
-    public ServiceDatasetPermissions(boolean enabled, CMDPermissionsService cmdPermissionsService, HttpResponseWriter responseWriter) {
+    public ServiceInstancePermissions(boolean enabled, CMDPermissionsService cmdPermissionsService, HttpResponseWriter responseWriter) {
         super(enabled, cmdPermissionsService, responseWriter);
     }
 
     @Override
     public CRUD getPermissions(HttpServletRequest request, HttpServletResponse response) throws PermissionsException {
+        info().log("handling get service instance permissions request");
+        validateRequest(request);
         GetPermissionsRequest getPermissionsRequest = new GetPermissionsRequest(request);
-
-        validateGetPermissionsRequest(getPermissionsRequest);
-
-        info().sessionID(getPermissionsRequest.getServiceToken())
-                .datasetID(getPermissionsRequest.getDatasetID())
-                .log("handling get dataset permissions request for service account");
-
-        return permissionsService.getServiceDatasetPermissions(getPermissionsRequest);
+        return permissionsService.getServiceInstancePermissions(getPermissionsRequest);
     }
 
-    void validateGetPermissionsRequest(GetPermissionsRequest request) throws PermissionsException {
+    void validateRequest(HttpServletRequest request) throws PermissionsException {
         if (request == null) {
-            throw internalServerErrorException();
+            throw PermissionsException.internalServerErrorException();
         }
 
-        if (isEmpty(request.getServiceToken())) {
+        String serviceToken = request.getHeader(SERVICE_AUTH_HEADER);
+        if (isEmpty(serviceToken)) {
             throw serviceTokenNotProvidedException();
         }
 
-        if (isEmpty(request.getDatasetID())) {
-            throw datasetIDNotProvidedException();
-        }
+        info().serviceAccountID(serviceToken).log("handling valid service instance permissions request");
     }
 }

@@ -69,7 +69,7 @@ public class Identity {
             ServiceAccount serviceAccount = findService(request);
             if (serviceAccount != null) {
 
-                writeResponseEntity(response, new UserIdentity(serviceAccount.getId()), SC_OK);
+                writeResponseEntity(response, new UserIdentity(serviceAccount.getID()), SC_OK);
                 return;
             }
         }
@@ -110,7 +110,7 @@ public class Identity {
                 String token = cred[1];
                 final ServiceAccount service = serviceStore.get(token);
                 if (service != null) {
-                    info().data("user", service.getId()).log("authenticated service account confirmed");
+                    info().data("user", service.getID()).log("authenticated service account confirmed");
                     return service;
                 } else {
                     return null;

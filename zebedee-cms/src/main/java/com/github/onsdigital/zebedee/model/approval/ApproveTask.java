@@ -285,7 +285,7 @@ public class ApproveTask implements Callable<Boolean> {
             collection.description.addEvent(new Event(new Date(), EventType.APPROVED, session.getEmail()));
             collection.save();
         } catch (Exception ex) {
-            error().exceptionAll(ex).collectionID(collection).log("error saving collection during approval");
+            error().exception(ex).collectionID(collection).log("error saving collection during approval");
             collection.getDescription().setApprovalStatus(ApprovalStatus.ERROR);
             collection.description.addEvent(new Event(new Date(), EventType.APPROVAL_FAILED, "system"));
             throw new IOException(ex);

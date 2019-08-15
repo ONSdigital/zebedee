@@ -281,13 +281,13 @@ public class ApproveTask implements Callable<Boolean> {
     public void approveCollection() throws IOException {
         // set the approved state on the collection
         try {
-            collection.description.approvalStatus = ApprovalStatus.COMPLETE;
-            collection.description.addEvent(new Event(new Date(), EventType.APPROVED, session.getEmail()));
+            collection.getDescription().setApprovalStatus(ApprovalStatus.COMPLETE);
+            collection.getDescription().addEvent(new Event(new Date(), EventType.APPROVED, session.getEmail()));
             collection.save();
         } catch (Exception ex) {
             error().exception(ex).collectionID(collection).log("error saving collection during approval");
             collection.getDescription().setApprovalStatus(ApprovalStatus.ERROR);
-            collection.description.addEvent(new Event(new Date(), EventType.APPROVAL_FAILED, "system"));
+            collection.getDescription().addEvent(new Event(new Date(), EventType.APPROVAL_FAILED, "system"));
             throw new IOException(ex);
         }
     }

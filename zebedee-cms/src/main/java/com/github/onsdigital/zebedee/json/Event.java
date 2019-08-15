@@ -51,4 +51,20 @@ public class Event {
     public Event(EventType type, String email, Throwable t) {
         this(new Date(), type, email, t);
     }
+
+    public Date getDate() {
+        return date;
+    }
+
+    public EventType getType() {
+        return type;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public String getNote() {
+        return note;
+    }
 }

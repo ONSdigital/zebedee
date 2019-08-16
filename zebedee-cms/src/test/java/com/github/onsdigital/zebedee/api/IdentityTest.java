@@ -199,6 +199,21 @@ public class IdentityTest {
         verifyResponseInteractions(new Error("Not found"), SC_NOT_FOUND);
     }
 
+    @Test
+    public void shouldReturnUnauthorizedIfBearPrefixMissing() throws Exception {
+        when(mockRequest.getHeader(Identity.AUTHORIZATION_HEADER))
+                .thenReturn("123");
+
+        when(mockResponse.getWriter())
+                .thenReturn(printWriterMock);
+
+        api = new Identity(true);
+        api.identifyUser(mockRequest, mockResponse);
+
+        verifyZeroInteractions(serviceStore, authorisationService);
+        verifyResponseInteractions(new Error("service not authenticated"), SC_UNAUTHORIZED);
+    }
+
     private void verifyResponseInteractions(JSONable body, int statusCode) throws IOException {
         verify(mockResponse, times(1)).getWriter();
         verify(mockResponse, times(1)).setCharacterEncoding(StandardCharsets.UTF_8.name());

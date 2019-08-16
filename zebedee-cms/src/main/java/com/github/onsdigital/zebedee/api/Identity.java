@@ -16,10 +16,9 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
 import java.io.IOException;
 
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.warn;
-import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
-
 import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
 import static com.github.onsdigital.zebedee.util.JsonUtils.writeResponseEntity;
 import static org.apache.http.HttpStatus.SC_NOT_FOUND;
@@ -66,9 +65,9 @@ public class Identity {
         }
 
         if (StringUtils.isNotBlank(request.getHeader(AUTHORIZATION_HEADER))) {
+            info().log("checking service identity");
             ServiceAccount serviceAccount = findService(request);
             if (serviceAccount != null) {
-
                 writeResponseEntity(response, new UserIdentity(serviceAccount.getID()), SC_OK);
                 return;
             }
@@ -98,26 +97,42 @@ public class Identity {
     }
 
     private ServiceAccount findService(HttpServletRequest request) throws IOException {
-        final ServiceStore serviceStore = getServiceStoreImpl();
         String authorizationHeader = request.getHeader(AUTHORIZATION_HEADER);
-        if (StringUtils.isNotEmpty(authorizationHeader)) {
-            authorizationHeader = authorizationHeader.toLowerCase();
-            if (authorizationHeader.toLowerCase().startsWith("bearer ")) {
-                String[] cred = authorizationHeader.split("bearer ");
-                if (cred.length != 2) {
-                    return null;
-                }
-                String token = cred[1];
-                final ServiceAccount service = serviceStore.get(token);
-                if (service != null) {
-                    info().data("user", service.getID()).log("authenticated service account confirmed");
-                    return service;
-                } else {
-                    return null;
-                }
-            }
+        if (StringUtils.isEmpty(authorizationHeader)) {
+            warn().log("service auth header is empty returning null");
+            return null;
         }
-        return null;
+
+        authorizationHeader = authorizationHeader.toLowerCase();
+        if (!authorizationHeader.startsWith("bearer ")) {
+            warn().log("authorization header does not begin with the required bearer prefix returning null");
+            return null;
+        }
+
+        String serviceToken = removeBearerPrefix(authorizationHeader);
+        ServiceAccount serviceAccount = null;
+
+        try {
+            serviceAccount = getServiceStore().get(serviceToken);
+        } catch (IOException ex) {
+            error().exception(ex).log("unexpected error getting service account");
+            throw ex;
+        }
+
+        if (serviceAccount == null) {
+            warn().log("service account not found");
+            return null;
+        }
+
+        info().log("identified valid service account");
+        return serviceAccount;
+    }
+
+    private String removeBearerPrefix(String rawHeader) {
+        if (StringUtils.isEmpty(rawHeader))
+            return null;
+
+        return rawHeader.replaceFirst("bearer ", "");
     }
 
     private AuthorisationService getAuthorisationService() {
@@ -127,7 +142,7 @@ public class Identity {
         return authorisationService;
     }
 
-    private ServiceStore getServiceStoreImpl() {
+    private ServiceStore getServiceStore() {
         if (serviceStore == null) {
             this.serviceStore = Root.zebedee.getServiceStore();
         }

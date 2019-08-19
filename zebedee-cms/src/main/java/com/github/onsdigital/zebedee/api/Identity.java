@@ -34,7 +34,6 @@ public class Identity {
 
     static final String AUTHORIZATION_HEADER = "Authorization";
     static final String BEARER_PREFIX_UC = "Bearer";
-    static final String BEARER_PREFIX_LC = "bearer";
     static final Error NOT_FOUND_ERROR = new Error("Not found");
 
     /**
@@ -138,7 +137,7 @@ public class Identity {
         }
 
         if (!value.startsWith(BEARER_PREFIX_UC)) {
-            warn().log("invalud authorization header value not prefixed with Bearer (case sensitive) returning null");
+            warn().log("invalid authorization header value not prefixed with Bearer (case sensitive) returning null");
             return false;
         }
         return true;

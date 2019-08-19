@@ -16,6 +16,7 @@ import com.github.onsdigital.zebedee.reader.CollectionReader;
 import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -28,6 +29,7 @@ import java.security.KeyPair;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+@Ignore
 public class CsdbImporterTest extends ZebedeeTestBaseFixture {
 
     Session publisher;

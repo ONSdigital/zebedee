@@ -26,6 +26,10 @@ import static org.apache.http.HttpStatus.SC_FORBIDDEN;
 import static org.apache.http.HttpStatus.SC_NOT_FOUND;
 import static org.apache.http.HttpStatus.SC_OK;
 import static org.apache.http.HttpStatus.SC_UNAUTHORIZED;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
@@ -35,7 +39,7 @@ public class IdentityTest {
 
     private static final String FLORENCE_TOKEN = "666";
     private static final String FLORENCE_TOKEN_HEADER = "X-Florence-Token";
-    private static final String AUTH_TOKEN = "bearer 123";
+    private static final String AUTH_TOKEN = "Bearer 123";
     private static final String SERVICE_NAME = "dp-dataset-api";
 
     @Mock
@@ -212,6 +216,55 @@ public class IdentityTest {
 
         verifyZeroInteractions(serviceStore, authorisationService);
         verifyResponseInteractions(new Error("service not authenticated"), SC_UNAUTHORIZED);
+    }
+
+    @Test
+    public void testRemoveBearerPrefixNull() {
+        String actual = api.removeBearerPrefix(null);
+        assertThat(actual, is(nullValue()));
+    }
+
+    @Test
+    public void testRemoveBearerPrefix_NoPrefix() {
+        String actual = api.removeBearerPrefix("123");
+        assertThat(actual, equalTo("123"));
+    }
+
+    @Test
+    public void testRemoveBearerPrefix_validHeader() {
+        String actual = api.removeBearerPrefix("Bearer 123");
+        assertThat(actual, equalTo("123"));
+    }
+
+    @Test
+    public void testRemoveBearerPrefix_validHeaderExcessiveSpaces() {
+        String actual = api.removeBearerPrefix("Bearer     123          ");
+        assertThat(actual, equalTo("123"));
+    }
+
+    @Test
+    public void testIsValidAuthorizationHeader_null() {
+        assertThat(api.isValidAuthorizationHeader(null), is(false));
+    }
+
+    @Test
+    public void testIsValidAuthorizationHeader_empty() {
+        assertThat(api.isValidAuthorizationHeader(""), is(false));
+    }
+
+    @Test
+    public void testIsValidAuthorizationHeader_noBearerPrefix() {
+        assertThat(api.isValidAuthorizationHeader("123"), is(false));
+    }
+
+    @Test
+    public void testIsValidAuthorizationHeader_lowerCaseBearerPrefix() {
+        assertThat(api.isValidAuthorizationHeader("bearer 123"), is(false));
+    }
+
+    @Test
+    public void testIsValidAuthorizationHeader_success() {
+        assertThat(api.isValidAuthorizationHeader("Bearer 123"), is(true));
     }
 
     private void verifyResponseInteractions(JSONable body, int statusCode) throws IOException {

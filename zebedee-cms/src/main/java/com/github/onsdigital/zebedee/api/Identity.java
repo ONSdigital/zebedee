@@ -33,6 +33,8 @@ public class Identity {
     private boolean datasetImportEnabled = false;
 
     static final String AUTHORIZATION_HEADER = "Authorization";
+    static final String BEARER_PREFIX_UC = "Bearer";
+    static final String BEARER_PREFIX_LC = "bearer";
     static final Error NOT_FOUND_ERROR = new Error("Not found");
 
     /**
@@ -98,20 +100,13 @@ public class Identity {
 
     private ServiceAccount findService(HttpServletRequest request) throws IOException {
         String authorizationHeader = request.getHeader(AUTHORIZATION_HEADER);
-        if (StringUtils.isEmpty(authorizationHeader)) {
-            warn().log("service auth header is empty returning null");
-            return null;
-        }
-
-        authorizationHeader = authorizationHeader.toLowerCase();
-        if (!authorizationHeader.startsWith("bearer ")) {
-            warn().log("authorization header does not begin with the required bearer prefix returning null");
+        if (!isValidAuthorizationHeader(authorizationHeader)) {
             return null;
         }
 
         String serviceToken = removeBearerPrefix(authorizationHeader);
-        ServiceAccount serviceAccount = null;
 
+        ServiceAccount serviceAccount = null;
         try {
             serviceAccount = getServiceStore().get(serviceToken);
         } catch (IOException ex) {
@@ -120,7 +115,7 @@ public class Identity {
         }
 
         if (serviceAccount == null) {
-            warn().log("service account not found");
+            warn().log("service account not found for service token ");
             return null;
         }
 
@@ -128,11 +123,25 @@ public class Identity {
         return serviceAccount;
     }
 
-    private String removeBearerPrefix(String rawHeader) {
-        if (StringUtils.isEmpty(rawHeader))
+    String removeBearerPrefix(String rawHeader) {
+        if (StringUtils.isEmpty(rawHeader)) {
+            warn().log("cannot remove Bearer prefix from null value");
             return null;
+        }
+        return rawHeader.replaceFirst(BEARER_PREFIX_UC, "").trim();
+    }
 
-        return rawHeader.replaceFirst("bearer ", "");
+    boolean isValidAuthorizationHeader(String value) {
+        if (StringUtils.isEmpty(value)) {
+            warn().log("invalid authorization header value is null or empty");
+            return false;
+        }
+
+        if (!value.startsWith(BEARER_PREFIX_UC)) {
+            warn().log("invalud authorization header value not prefixed with Bearer (case sensitive) returning null");
+            return false;
+        }
+        return true;
     }
 
     private AuthorisationService getAuthorisationService() {

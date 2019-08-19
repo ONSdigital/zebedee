@@ -16,10 +16,9 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
 import java.io.IOException;
 
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.warn;
-import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
-
 import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
 import static com.github.onsdigital.zebedee.util.JsonUtils.writeResponseEntity;
 import static org.apache.http.HttpStatus.SC_NOT_FOUND;
@@ -34,20 +33,23 @@ public class Identity {
     private boolean datasetImportEnabled = false;
 
     static final String AUTHORIZATION_HEADER = "Authorization";
+    static final String BEARER_PREFIX_UC = "Bearer";
     static final Error NOT_FOUND_ERROR = new Error("Not found");
 
     /**
      * Construct the default Identity api endpoint.
      */
     public Identity() {
-        this(cmsFeatureFlags().isEnableDatasetImport());
+        this(cmsFeatureFlags().isEnableDatasetImport(), Root.zebedee.getServiceStore(), new AuthorisationServiceImpl());
     }
 
     /**
      * Construct and Identity api endpoint explicitly enabling/disabling the datasetImportEnabled feature.
      */
-    public Identity(boolean datasetImportEnabled) {
+    public Identity(boolean datasetImportEnabled, ServiceStore serviceStore, AuthorisationService authorisationService) {
         this.datasetImportEnabled = datasetImportEnabled;
+        this.serviceStore = serviceStore;
+        this.authorisationService = authorisationService;
     }
 
     @GET
@@ -87,7 +89,7 @@ public class Identity {
         }
 
         try {
-            UserIdentity identity = getAuthorisationService().identifyUser(sessionID);
+            UserIdentity identity = authorisationService.identifyUser(sessionID);
             info().data("sessionId", sessionID).data("user", identity.getIdentifier())
                     .log("authenticated user identity confirmed");
             writeResponseEntity(response, identity, SC_OK);
@@ -98,40 +100,49 @@ public class Identity {
     }
 
     private ServiceAccount findService(HttpServletRequest request) throws IOException {
-        final ServiceStore serviceStore = getServiceStoreImpl();
         String authorizationHeader = request.getHeader(AUTHORIZATION_HEADER);
-        if (StringUtils.isNotEmpty(authorizationHeader)) {
-            authorizationHeader = authorizationHeader.toLowerCase();
-            if (authorizationHeader.toLowerCase().startsWith("bearer ")) {
-                String[] cred = authorizationHeader.split("bearer ");
-                if (cred.length != 2) {
-                    return null;
-                }
-                String token = cred[1];
-                final ServiceAccount service = serviceStore.get(token);
-                if (service != null) {
-                    info().data("user", service.getID()).log("authenticated service account confirmed");
-                    return service;
-                } else {
-                    return null;
-                }
-            }
+        if (!isValidAuthorizationHeader(authorizationHeader)) {
+            return null;
         }
-        return null;
+
+        String serviceToken = removeBearerPrefix(authorizationHeader);
+
+        ServiceAccount serviceAccount = null;
+        try {
+            serviceAccount = serviceStore.get(serviceToken);
+        } catch (IOException ex) {
+            error().exception(ex).log("unexpected error getting service account");
+            throw ex;
+        }
+
+        if (serviceAccount == null) {
+            warn().log("service account not found for service token ");
+            return null;
+        }
+
+        info().log("identified valid service account");
+        return serviceAccount;
     }
 
-    private AuthorisationService getAuthorisationService() {
-        if (authorisationService == null) {
-            this.authorisationService = new AuthorisationServiceImpl();
+    String removeBearerPrefix(String rawHeader) {
+        if (StringUtils.isEmpty(rawHeader)) {
+            warn().log("cannot remove Bearer prefix from null value");
+            return null;
         }
-        return authorisationService;
+        return rawHeader.replaceFirst(BEARER_PREFIX_UC, "").trim();
     }
 
-    private ServiceStore getServiceStoreImpl() {
-        if (serviceStore == null) {
-            this.serviceStore = Root.zebedee.getServiceStore();
+    boolean isValidAuthorizationHeader(String value) {
+        if (StringUtils.isEmpty(value)) {
+            warn().log("invalid authorization header value is null or empty");
+            return false;
         }
-        return serviceStore;
+
+        if (!value.startsWith(BEARER_PREFIX_UC)) {
+            warn().log("invalid authorization header value not prefixed with Bearer (case sensitive) returning null");
+            return false;
+        }
+        return true;
     }
 
 }

@@ -8,6 +8,7 @@ import com.github.onsdigital.zebedee.content.page.statistics.document.figure.cha
 import com.github.onsdigital.zebedee.content.page.statistics.document.figure.table.Table;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
+import com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration;
 import com.github.onsdigital.zebedee.reader.data.language.ContentLanguage;
 import org.junit.Before;
 import org.junit.Test;
@@ -36,6 +37,7 @@ public class ContentReaderTest {
 
     @Before
     public void createContentReader() {
+        ReaderConfiguration.init("target/test-classes/test-content/zebedee");
         this.contentReader = new FileSystemContentReader("target/test-classes/test-content/zebedee/master");
     }
 

@@ -52,8 +52,7 @@ public class ServiceStoreImpl implements ServiceStore {
     private Path getPath(String id) {
         Path result = null;
         if (StringUtils.isNotBlank(id)) {
-            String sessionFileName = PathUtils.toFilename(id);
-            sessionFileName += JSON_EXTENSION;
+            String sessionFileName = id + JSON_EXTENSION;
             result = rootLocation.resolve(sessionFileName);
         }
         return result;

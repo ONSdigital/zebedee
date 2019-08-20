@@ -100,6 +100,7 @@ public class Identity {
     }
 
     private ServiceAccount findService(HttpServletRequest request) throws IOException {
+        info().log("indentity: handling service identity request");
         String authorizationHeader = request.getHeader(AUTHORIZATION_HEADER);
         if (!isValidAuthorizationHeader(authorizationHeader)) {
             return null;
@@ -110,13 +111,13 @@ public class Identity {
         ServiceAccount serviceAccount = null;
         try {
             serviceAccount = serviceStore.get(serviceToken);
-        } catch (IOException ex) {
+        } catch (Exception ex) {
             error().exception(ex).log("unexpected error getting service account");
-            throw ex;
+            throw new IOException(ex);
         }
 
         if (serviceAccount == null) {
-            warn().log("service account not found for service token ");
+            warn().data("service_token", serviceAccount.getID()).log("service account not found for service token");
             return null;
         }
 
@@ -129,10 +130,13 @@ public class Identity {
             warn().log("cannot remove Bearer prefix from null value");
             return null;
         }
-        return rawHeader.replaceFirst(BEARER_PREFIX_UC, "").trim();
+        String token = rawHeader.replaceFirst(BEARER_PREFIX_UC, "").trim();
+        info().data("service_token", token).log("bearer prefix removed from service auth header");
+        return token;
     }
 
     boolean isValidAuthorizationHeader(String value) {
+        info().data("raw_header", value).log("validating service auth header");
         if (StringUtils.isEmpty(value)) {
             warn().log("invalid authorization header value is null or empty");
             return false;
@@ -142,6 +146,7 @@ public class Identity {
             warn().log("invalid authorization header value not prefixed with Bearer (case sensitive) returning null");
             return false;
         }
+        info().data("raw_header", value).log("service auth header valid");
         return true;
     }
 

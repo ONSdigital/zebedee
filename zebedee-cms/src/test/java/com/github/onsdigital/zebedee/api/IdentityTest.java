@@ -61,7 +61,7 @@ public class IdentityTest {
 
     @Before
     public void setUp() throws Exception {
-        api = new Identity(true); // enable feature by default
+        api = new Identity(true, serviceStore, authorisationService); // enable feature by default
 
         MockitoAnnotations.initMocks(this);
 
@@ -196,7 +196,7 @@ public class IdentityTest {
 
         UserIdentity identity = new UserIdentity(session);
 
-        api = new Identity(false); //disable feature for this test case.
+        api = new Identity(false, serviceStore, authorisationService); //disable feature for this test case.
         api.identifyUser(mockRequest, mockResponse);
 
         verifyZeroInteractions(serviceStore, authorisationService);
@@ -211,7 +211,7 @@ public class IdentityTest {
         when(mockResponse.getWriter())
                 .thenReturn(printWriterMock);
 
-        api = new Identity(true);
+        api = new Identity(true, serviceStore, authorisationService);
         api.identifyUser(mockRequest, mockResponse);
 
         verifyZeroInteractions(serviceStore, authorisationService);
@@ -266,6 +266,7 @@ public class IdentityTest {
     public void testIsValidAuthorizationHeader_success() {
         assertThat(api.isValidAuthorizationHeader("Bearer 123"), is(true));
     }
+
 
     private void verifyResponseInteractions(JSONable body, int statusCode) throws IOException {
         verify(mockResponse, times(1)).getWriter();

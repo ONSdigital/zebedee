@@ -40,14 +40,16 @@ public class Identity {
      * Construct the default Identity api endpoint.
      */
     public Identity() {
-        this(cmsFeatureFlags().isEnableDatasetImport());
+        this(cmsFeatureFlags().isEnableDatasetImport(), Root.zebedee.getServiceStore(), new AuthorisationServiceImpl());
     }
 
     /**
      * Construct and Identity api endpoint explicitly enabling/disabling the datasetImportEnabled feature.
      */
-    public Identity(boolean datasetImportEnabled) {
+    public Identity(boolean datasetImportEnabled, ServiceStore serviceStore, AuthorisationService authorisationService) {
         this.datasetImportEnabled = datasetImportEnabled;
+        this.serviceStore = serviceStore;
+        this.authorisationService = authorisationService;
     }
 
     @GET
@@ -69,6 +71,7 @@ public class Identity {
             info().log("checking service identity");
             ServiceAccount serviceAccount = findService(request);
             if (serviceAccount != null) {
+
                 writeResponseEntity(response, new UserIdentity(serviceAccount.getID()), SC_OK);
                 return;
             }
@@ -87,7 +90,7 @@ public class Identity {
         }
 
         try {
-            UserIdentity identity = getAuthorisationService().identifyUser(sessionID);
+            UserIdentity identity = authorisationService.identifyUser(sessionID);
             info().data("sessionId", sessionID).data("user", identity.getIdentifier())
                     .log("authenticated user identity confirmed");
             writeResponseEntity(response, identity, SC_OK);
@@ -98,6 +101,7 @@ public class Identity {
     }
 
     private ServiceAccount findService(HttpServletRequest request) throws IOException {
+        info().log("indentity: handling service identity request");
         String authorizationHeader = request.getHeader(AUTHORIZATION_HEADER);
         if (!isValidAuthorizationHeader(authorizationHeader)) {
             return null;
@@ -107,14 +111,14 @@ public class Identity {
 
         ServiceAccount serviceAccount = null;
         try {
-            serviceAccount = getServiceStore().get(serviceToken);
-        } catch (IOException ex) {
+            serviceAccount = serviceStore.get(serviceToken);
+        } catch (Exception ex) {
             error().exception(ex).log("unexpected error getting service account");
-            throw ex;
+            throw new IOException(ex);
         }
 
         if (serviceAccount == null) {
-            warn().log("service account not found for service token ");
+            warn().data("service_token", serviceAccount.getID()).log("service account not found for service token");
             return null;
         }
 
@@ -127,10 +131,13 @@ public class Identity {
             warn().log("cannot remove Bearer prefix from null value");
             return null;
         }
-        return rawHeader.replaceFirst(BEARER_PREFIX_UC, "").trim();
+        String token = rawHeader.replaceFirst(BEARER_PREFIX_UC, "").trim();
+        info().data("service_token", token).log("bearer prefix removed from service auth header");
+        return token;
     }
 
     boolean isValidAuthorizationHeader(String value) {
+        info().data("raw_header", value).log("validating service auth header");
         if (StringUtils.isEmpty(value)) {
             warn().log("invalid authorization header value is null or empty");
             return false;
@@ -140,21 +147,8 @@ public class Identity {
             warn().log("invalid authorization header value not prefixed with Bearer (case sensitive) returning null");
             return false;
         }
+        info().data("raw_header", value).log("service auth header valid");
         return true;
-    }
-
-    private AuthorisationService getAuthorisationService() {
-        if (authorisationService == null) {
-            this.authorisationService = new AuthorisationServiceImpl();
-        }
-        return authorisationService;
-    }
-
-    private ServiceStore getServiceStore() {
-        if (serviceStore == null) {
-            this.serviceStore = Root.zebedee.getServiceStore();
-        }
-        return serviceStore;
     }
 
 }

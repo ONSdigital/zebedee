@@ -1,6 +1,6 @@
 package com.github.onsdigital.zebedee.service;
 
-import com.github.onsdigital.zebedee.model.PathUtils;
+import com.github.davidcarboni.cryptolite.Random;
 import com.github.onsdigital.zebedee.model.ServiceAccount;
 import com.github.onsdigital.zebedee.util.serialiser.JSONSerialiser;
 import org.apache.commons.lang3.StringUtils;
@@ -10,8 +10,13 @@ import java.io.InputStream;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.regex.Pattern;
+
+import static com.github.onsdigital.zebedee.logging.CMSLogEvent.warn;
 
 public class ServiceStoreImpl implements ServiceStore {
+
+    private static final Pattern VALID_FILENAME_REGEX = Pattern.compile("^\\w+$");
 
     private final Path rootLocation;
 
@@ -52,9 +57,17 @@ public class ServiceStoreImpl implements ServiceStore {
     private Path getPath(String id) {
         Path result = null;
         if (StringUtils.isNotBlank(id)) {
+            validateToken(id);
             String sessionFileName = id + JSON_EXTENSION;
             result = rootLocation.resolve(sessionFileName);
         }
         return result;
+    }
+
+    private void validateToken(String token) {
+        if (!VALID_FILENAME_REGEX.matcher(token).matches()) {
+            warn().data("token", token).log("invalid service token value");
+            throw new RuntimeException("invalid service token value: tokens must match alphanumeric with underscores");
+        }
     }
 }

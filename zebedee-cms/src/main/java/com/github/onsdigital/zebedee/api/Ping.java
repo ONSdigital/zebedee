@@ -54,9 +54,7 @@ public class Ping {
                 }
             }
         } catch (IOException e) {
-            error().exception(e)
-                    .data("session_id", token)
-                    .log("error setting session details");
+            error().exception(e).log("error setting session details");
         }
     }
 }

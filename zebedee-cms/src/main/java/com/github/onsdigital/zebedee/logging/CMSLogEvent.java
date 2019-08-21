@@ -37,20 +37,6 @@ public class CMSLogEvent extends BaseEvent<CMSLogEvent> {
         return this;
     }
 
-    public CMSLogEvent sessionID(Session session) {
-        if (session != null) {
-            sessionID(session.getId());
-        }
-        return this;
-    }
-
-    public CMSLogEvent sessionID(String sessionID) {
-        if (StringUtils.isNotEmpty(sessionID)) {
-            data("session_id", sessionID);
-        }
-        return this;
-    }
-
     public CMSLogEvent user(String email) {
         if (StringUtils.isNotEmpty(email)) {
             data("user", email);

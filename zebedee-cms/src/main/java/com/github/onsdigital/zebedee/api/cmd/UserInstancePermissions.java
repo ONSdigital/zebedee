@@ -59,6 +59,6 @@ public class UserInstancePermissions extends PermissionsAPIBase {
         if (isEmpty(sessionID)) {
             throw sessionIDNotProvidedException();
         }
-        info().sessionID(sessionID).log("handling valid get user instance permissions request");
+        info().log("handling valid get user instance permissions request");
     }
 }

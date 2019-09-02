@@ -31,12 +31,12 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
 
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 import static com.github.onsdigital.zebedee.configuration.Configuration.isVerificationEnabled;
 import static com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedException.beingEditedByAnotherCollectionError;
 import static com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedException.beingEditedByThisCollectionError;
 import static com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedException.markedDeleteInAnotherCollectionError;
-import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
-import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
 
 public class Zebedee {
 
@@ -60,6 +60,7 @@ public class Zebedee {
     private final Path teamsPath;
     private final Path applicationKeysPath;
     private final Path redirectPath;
+    private final Path servicePath;
 
     private final VerificationAgent verificationAgent;
     private final ApplicationKeys applicationKeys;
@@ -108,6 +109,7 @@ public class Zebedee {
         this.teamsPath = configuration.getTeamsPath();
         this.applicationKeysPath = configuration.getApplicationKeysPath();
         this.redirectPath = configuration.getRedirectPath();
+        this.servicePath = configuration.getServicePath();
     }
 
     /**
@@ -348,5 +350,9 @@ public class Zebedee {
 
     public ServiceStore getServiceStore() {
         return serviceStoreImpl;
+    }
+
+    public Path getServicePath() {
+        return servicePath;
     }
 }

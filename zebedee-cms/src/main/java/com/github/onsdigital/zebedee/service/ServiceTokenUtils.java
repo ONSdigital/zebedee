@@ -5,22 +5,24 @@ import org.apache.commons.lang3.StringUtils;
 import java.nio.file.Path;
 import java.util.regex.Pattern;
 
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.warn;
-import static java.text.MessageFormat.format;
 
 /**
  * Utility class for {@link com.github.onsdigital.zebedee.model.ServiceAccount} token values.
  */
 public class ServiceTokenUtils {
 
-    private static final Pattern VALID_FILENAME_REGEX = Pattern.compile("^[a-zA-Z0-9]+$");
+    /**
+     * A valid service account token must contain >= 16 alphanumeric characters.
+     */
+    static final Pattern VALID_FILENAME_REGEX = Pattern.compile("^[a-zA-Z0-9]{16,}$");
 
+    static final String BEARER_PREFIX_UC = "Bearer";
     static final String JSON_EXTENSION = ".json";
-    static final int MIN_TOKEN_LENGTH = 16;
     static final String EMPTY_TOKEN_ERROR = "invalid service token value: empty";
     static final String INVALID_TOKEN_ERROR = "invalid service token value: tokens must match alphanumeric";
-    static final String TOKEN_LENGTH_INVALID_ERROR = "invalid service token value: tokens must have length >= {0} characters";
-    static final String SERVICE_PATH_EMPTY_ERROR = "service dir path required but was empty or null";
+    static final String AUTH_HEADER_INVALID_ERROR = "invalid service authorization header value is null or empty";
 
     /**
      * ServiceTokenValidator is a utility class containing only static methods.
@@ -35,20 +37,82 @@ public class ServiceTokenUtils {
      * @param token the token string to validate.
      * @throws {@link RuntimeException} if the token is not valid.
      */
-    public static void validateToken(String token) {
-        if (StringUtils.isEmpty(token)) {
-            throw new RuntimeException(EMPTY_TOKEN_ERROR);
+
+    public static boolean isValidServiceToken(String token) {
+        boolean isValid = false;
+
+        if (matches(token)) {
+            isValid = true;
+            info().log("valid service token");
+        } else {
+            warn().log("invalid service token value: service tokens must contain 16 or more alphanumerica only characters");
         }
 
-        if (!VALID_FILENAME_REGEX.matcher(token).matches()) {
-            warn().data("token", token).log(EMPTY_TOKEN_ERROR);
-            throw new RuntimeException(INVALID_TOKEN_ERROR);
-        }
-
-        if (token.length() < MIN_TOKEN_LENGTH) {
-            throw new RuntimeException(format(TOKEN_LENGTH_INVALID_ERROR, MIN_TOKEN_LENGTH));
-        }
+        return isValid;
     }
+
+    /**
+     * Check if a token is a valid service account token. Valid tokens and >= 16 characters and contain only
+     * alphanumeric characters.
+     *
+     * @param token the value to check.
+     * @return true if valid token value false otherwise.
+     */
+    private static boolean matches(String token) {
+        boolean isMatch = false;
+
+        if (StringUtils.isEmpty(token)) {
+            warn().log("invalid service token value: empty or null");
+        } else {
+            isMatch = VALID_FILENAME_REGEX.matcher(token).matches();
+        }
+        return isMatch;
+    }
+
+    /**
+     * Validate if a service authorization header value is valid. A valid service cannot be empty and must start with
+     * the prefix 'Bearer ' (case sensitive).
+     *
+     * @param serviceAuthHeader the value to validate.
+     * @return true if the value is a valid service auth header false otherwise.
+     */
+    public static boolean isValidServiceAuthorizationHeader(String serviceAuthHeader) {
+        boolean isValid = true;
+
+        if (StringUtils.isEmpty(serviceAuthHeader)) {
+            warn().log("invalid service authorization header value is null or empty");
+            isValid = false;
+
+        } else if (!serviceAuthHeader.startsWith(BEARER_PREFIX_UC)) {
+            warn().log("invalid service authorization header value not prefixed with Bearer (case sensitive)");
+            return false;
+
+        } else {
+            info().log("service authorization header valid");
+        }
+
+        return isValid;
+    }
+
+    /**
+     * Removes the Bearer prefix from a service authorization header returning a service account token. Returns the
+     * input value if its empty or does not contain the 'Bearer ' prefix.
+     *
+     * @param rawHeader the service authorization header to process.
+     * @return the service account token if input valid otherwise the input value.
+     */
+    public static String extractServiceAccountTokenFromAuthHeader(String rawHeader) {
+        String serviceToken = rawHeader;
+
+        if (StringUtils.isEmpty(rawHeader)) {
+            warn().log("cannot remove Bearer prefix from null or empty service authorization header value");
+        } else {
+            serviceToken = rawHeader.replaceFirst(BEARER_PREFIX_UC, "").trim();
+            info().log("bearer prefix removed from service auth header");
+        }
+        return serviceToken;
+    }
+
 
     /**
      * Get the {@link Path} to the service account file for the given token.
@@ -56,13 +120,12 @@ public class ServiceTokenUtils {
      * @param servicesPath the {@link Path} of the service root directory.
      * @param token        the service account token.
      * @return a {@link Path} to the service account file.
-     * @throws {@link RuntimeException} if there is a problem for getting the path.
+     * @throws {@link IllegalArgumentException} if the services path is null.
      */
-    public static Path getServiceTokenPath(Path servicesPath, String token) {
+    public static Path getServiceAccountPath(Path servicesPath, String token) {
         if (servicesPath == null) {
-            throw new RuntimeException(SERVICE_PATH_EMPTY_ERROR);
+            throw new IllegalArgumentException("service dir path required but was empty or null");
         }
-        validateToken(token);
         return servicesPath.resolve(getTokenFilename(token));
     }
 

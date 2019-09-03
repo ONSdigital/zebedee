@@ -1,73 +1,79 @@
 package com.github.onsdigital.zebedee.service;
 
-import com.github.davidcarboni.cryptolite.Random;
 import com.github.onsdigital.zebedee.model.ServiceAccount;
 import com.github.onsdigital.zebedee.util.serialiser.JSONSerialiser;
-import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.regex.Pattern;
 
-import static com.github.onsdigital.zebedee.logging.CMSLogEvent.warn;
+import static com.github.onsdigital.zebedee.logging.CMSLogEvent.error;
 
 public class ServiceStoreImpl implements ServiceStore {
 
-    private static final Pattern VALID_FILENAME_REGEX = Pattern.compile("^\\w+$");
-
-    private final Path rootLocation;
+    private final Path serviceRoot;
 
     private final JSONSerialiser<ServiceAccount> jsonSerialise;
 
     private final static String JSON_EXTENSION = ".json";
 
-    public ServiceStoreImpl(Path rootLocation) {
-        this.rootLocation = rootLocation;
+    public ServiceStoreImpl(Path serviceRoot) {
+        this.serviceRoot = serviceRoot;
         this.jsonSerialise = new JSONSerialiser<>(ServiceAccount.class);
     }
 
+    public ServiceStoreImpl(Path serviceRoot, JSONSerialiser<ServiceAccount> jsonSerialise) {
+        this.serviceRoot = serviceRoot;
+        this.jsonSerialise = jsonSerialise;
+    }
+
     @Override
-    public ServiceAccount get(String id) throws IOException {
-        ServiceAccount service = null;
-        final Path path = getPath(id);
-        if (Files.exists(getPath(id))) {
-            try (InputStream input = Files.newInputStream(path)) {
-                service = jsonSerialise.deserialiseQuietly(input, path);
-            }
+    public ServiceAccount get(String token) throws IOException {
+        Path filePath = null;
+        ServiceAccount account = null;
+
+        if (ServiceTokenUtils.isValidServiceToken(token)) {
+            filePath = getServiceAccountPath(token);
+            account = getServiceAccount(filePath);
         }
-        return service;
+        return account;
+    }
+
+    private ServiceAccount getServiceAccount(Path filePath) throws IOException {
+        if (filePath == null || !Files.exists(filePath)) {
+            return null;
+        }
+
+        try (InputStream input = Files.newInputStream(filePath)) {
+            return jsonSerialise.deserialiseQuietly(input, filePath);
+        } catch (Exception ex) {
+            throw new IOException("error deserialising service account json", ex);
+        }
     }
 
     @Override
     public ServiceAccount store(String token, InputStream service) throws IOException {
-        final Path path = rootLocation.resolve(token + JSON_EXTENSION);
-        if (!Files.exists(path)) {
-            ServiceAccount object = jsonSerialise.deserialiseQuietly(service, path);
-            jsonSerialise.serialise(path, object);
-            return object;
+        Path path = getServiceAccountPath(token);
+
+        if (Files.exists(path)) {
+            throw new FileAlreadyExistsException("The service token already exists : " + path);
         }
 
-        throw new FileAlreadyExistsException("The service token already exists : " + path);
-
+        ServiceAccount serviceAccount = jsonSerialise.deserialiseQuietly(service, path);
+        jsonSerialise.serialise(path, serviceAccount);
+        return serviceAccount;
     }
 
-    private Path getPath(String id) {
-        Path result = null;
-        if (StringUtils.isNotBlank(id)) {
-            validateToken(id);
-            String sessionFileName = id + JSON_EXTENSION;
-            result = rootLocation.resolve(sessionFileName);
-        }
-        return result;
-    }
-
-    private void validateToken(String token) {
-        if (!VALID_FILENAME_REGEX.matcher(token).matches()) {
-            warn().data("token", token).log("invalid service token value");
-            throw new RuntimeException("invalid service token value: tokens must match alphanumeric with underscores");
+    private Path getServiceAccountPath(String token) throws IOException {
+        try {
+            return ServiceTokenUtils.getServiceAccountPath(serviceRoot, token);
+        } catch (IllegalArgumentException ex) {
+            throw new IOException("error getting service account path for token", ex);
+        } catch (Exception ex) {
+            error().exception(ex).log("error getting service account file path");
+            throw ex;
         }
     }
 }

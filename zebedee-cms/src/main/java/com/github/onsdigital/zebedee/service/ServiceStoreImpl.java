@@ -10,20 +10,33 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.error;
+import static com.github.onsdigital.zebedee.logging.CMSLogEvent.warn;
 
+/**
+ * File based service account store implementation.
+ */
 public class ServiceStoreImpl implements ServiceStore {
 
     private final Path serviceRoot;
 
     private final JSONSerialiser<ServiceAccount> jsonSerialise;
 
-    private final static String JSON_EXTENSION = ".json";
-
+    /**
+     * Construct a new ServiceStoreImpl instance.
+     *
+     * @param serviceRoot the file path of the service account root directory.
+     */
     public ServiceStoreImpl(Path serviceRoot) {
         this.serviceRoot = serviceRoot;
         this.jsonSerialise = new JSONSerialiser<>(ServiceAccount.class);
     }
 
+    /**
+     * Construct a new ServiceStoreImpl instance.
+     *
+     * @param serviceRoot   the file path of the service account root directory.
+     * @param jsonSerialise the {@link JSONSerialiser} implementation to use.
+     */
     public ServiceStoreImpl(Path serviceRoot, JSONSerialiser<ServiceAccount> jsonSerialise) {
         this.serviceRoot = serviceRoot;
         this.jsonSerialise = jsonSerialise;
@@ -42,15 +55,20 @@ public class ServiceStoreImpl implements ServiceStore {
     }
 
     private ServiceAccount getServiceAccount(Path filePath) throws IOException {
-        if (filePath == null || !Files.exists(filePath)) {
-            return null;
-        }
+        ServiceAccount account = null;
 
-        try (InputStream input = Files.newInputStream(filePath)) {
-            return jsonSerialise.deserialiseQuietly(input, filePath);
-        } catch (Exception ex) {
-            throw new IOException("error deserialising service account json", ex);
+        if (filePath == null) {
+            warn().log("error getting service account file path null");
+        } else if (!Files.exists(filePath)) {
+            warn().log("error getting service account file does not exist");
+        } else {
+            try (InputStream input = Files.newInputStream(filePath)) {
+                account = jsonSerialise.deserialiseQuietly(input, filePath);
+            } catch (Exception ex) {
+                throw new IOException("error deserialising service account json", ex);
+            }
         }
+        return account;
     }
 
     @Override

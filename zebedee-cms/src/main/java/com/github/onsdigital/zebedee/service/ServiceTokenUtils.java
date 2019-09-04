@@ -20,9 +20,6 @@ public class ServiceTokenUtils {
 
     static final String BEARER_PREFIX_UC = "Bearer";
     static final String JSON_EXTENSION = ".json";
-    static final String EMPTY_TOKEN_ERROR = "invalid service token value: empty";
-    static final String INVALID_TOKEN_ERROR = "invalid service token value: tokens must match alphanumeric";
-    static final String AUTH_HEADER_INVALID_ERROR = "invalid service authorization header value is null or empty";
 
     /**
      * ServiceTokenValidator is a utility class containing only static methods.
@@ -32,12 +29,10 @@ public class ServiceTokenUtils {
 
     /**
      * Validate the given token string conatins only alphanumeric characters and has a minimum length of 16 characters.
-     * Throws a {@link RuntimeException} if the token is invalid.
      *
-     * @param token the token string to validate.
-     * @throws {@link RuntimeException} if the token is not valid.
+     * @param token the token value to validate.
+     * @return true if valid false otherwise.
      */
-
     public static boolean isValidServiceToken(String token) {
         boolean isValid = false;
 
@@ -52,8 +47,8 @@ public class ServiceTokenUtils {
     }
 
     /**
-     * Check if a token is a valid service account token. Valid tokens and >= 16 characters and contain only
-     * alphanumeric characters.
+     * Determined if a value is a valid service account token. Valid tokens contain only alphanumeric characters and
+     * must have a length of >= 16 characters.
      *
      * @param token the value to check.
      * @return true if valid token value false otherwise.

@@ -1,249 +1,72 @@
 package com.github.onsdigital.zebedee.session.service;
 
-import com.github.davidcarboni.cryptolite.Random;
-import com.github.onsdigital.zebedee.model.PathUtils;
-import com.github.onsdigital.zebedee.reader.util.RequestUtils;
 import com.github.onsdigital.zebedee.session.model.Session;
-import com.github.onsdigital.zebedee.session.store.SessionsStoreImpl;
 import com.github.onsdigital.zebedee.user.model.User;
-import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.nio.file.Path;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
 
-import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
-
-/**
- * Created by david on 12/03/2015.
- */
-public class SessionsService extends TimerTask {
-
-    private static final String DELETING_SESSION_MSG = "Deleting expired session";
-    private static final String SESSION_ID_PARAM = "sessionId";
-
-    private Supplier<String> randomIdGenerator = () -> Random.id();
-    private SessionsStoreImpl sessionsStore;
-
-    int expiryUnit = Calendar.MINUTE;
-    int expiryAmount = 60;
-    Timer timer;
-    private Path sessionsPath;
-
-    public SessionsService(Path sessionsPath) {
-        this.sessionsPath = sessionsPath;
-        this.sessionsStore = new SessionsStoreImpl(sessionsPath);
-
-        // Run every minute after the first minute:
-        timer = new Timer("Florence sessions timer", true);
-        timer.schedule(this, 60 * 1000, 60 * 1000);
-    }
-
-    public void setExpiry(int expiryAmount, int expiryUnit) {
-        this.expiryAmount = expiryAmount;
-        this.expiryUnit = expiryUnit;
-    }
+public interface SessionsService {
 
     /**
-     * This is the entrypoint for {@link java.util.TimerTask}.
-     */
-    @Override
-    public void run() {
-        try {
-            deleteExpiredSessions();
-        } catch (IOException e) {
-            // Not much we can do.
-            // This could periodically spam the logs
-            // so need to review at some point.
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * Creates a new session.
+     * Create a new {@link Session} for the user.
      *
-     * @param user the user to create a session for
-     * @return A session for the email. If one exists it returns that else it
-     * creates a new one. If the supplied email is blank then null will
-     * be returned.
-     * @throws java.io.IOException If a filesystem error occurs.
+     * @param user the {@link User} the session is being created for.
+     * @return a {@link Session} instance for the user.
+     * @throws IOException problem creating a session.
      */
-    public Session create(User user) throws IOException {
-        Session session = null;
-
-        if (StringUtils.isNotBlank(user.getEmail())) {
-
-            // Check for an existing session:
-            session = find(user.getEmail());
-
-            // Otherwise go ahead and create
-            if (session == null) {
-                session = new Session();
-                session.setId(randomIdGenerator.get());
-                session.setEmail(user.getEmail());
-                sessionsStore.write(session);
-            }
-        }
-
-        return session;
-    }
+    Session create(User user) throws IOException;
 
     /**
-     * Gets the record for an existing session.
+     * Get a {@link Session} from the provided {@link HttpServletRequest}.
      *
-     * @param request The {@link HttpServletRequest}.
-     * @return The requested session, unless the ID is blank or no record exists
-     * for this ID.
-     * @throws java.io.IOException If a filesystem error occurs.
+     * @param request the {@link HttpServletRequest} to get the session for.
+     * @return a {@link Session} instance if once exists returns null otherwise.
+     * @throws IOException for any problem getting a sesison from the request.
      */
-    public Session get(HttpServletRequest request) throws IOException {
-        String token = RequestUtils.getSessionId(request);
-        return get(token);
-    }
+    Session get(HttpServletRequest request) throws IOException;
 
     /**
-     * Gets the record for an existing session.
+     * Get a {@link Session} by it's ID.
      *
-     * @param id The session ID in order to locate the session record.
-     * @return The requested session, unless the ID is blank or no record exists
-     * for this ID.
-     * @throws java.io.IOException If a filesystem error occurs.
+     * @param id the ID of the session to get,
+     * @return the {@link Session} instance if it exists and is not expired.
+     * @throws IOException for any problems getting the session.
      */
-    public Session get(String id) throws IOException {
-        Session result = null;
-
-        // Check the session record exists:
-        if (sessionsStore.exists(id)) {
-            // Deserialise the json:
-            Session session = sessionsStore.read(sessionPath(id));
-            if (!expired(session)) {
-                updateLastAccess(session);
-                result = session;
-            }
-        }
-        return result;
-    }
+    Session get(String id) throws IOException;
 
     /**
-     * Locates a session from the user's email address (user ID).
+     * Find a {@link Session} assocaited with the user email.
      *
-     * @param email The email.
-     * @return An existing session, if found.
-     * @throws IOException If a filesystem error occurs.
+     * @param email the user email address to find.
+     * @return a {@link Session} for the requested email if it exists and is not expired. Return null otherwise.
+     * @throws IOException for any problems getting the session.
      */
-    public Session find(String email) throws IOException {
-        Session session = sessionsStore.find(email);
-        if (!expired(session)) {
-            updateLastAccess(session);
-        }
-        return session;
-    }
+    Session find(String email) throws IOException;
 
     /**
-     * Determines whether a session exists for the given ID.
+     * Check if an active {@link Session} exists with the provided ID.
      *
-     * @param id The ID to check.
-     * @return If the ID is not blank and a corresponding session exists, true.
-     * @throws IOException If a filesystem error occurs.
+     * @param id the session ID to find.
+     * @return true if an active session exists with this ID, false otherwise.
+     * @throws IOException problem checking the session exists.
      */
-    public boolean exists(String id) throws IOException {
-        return sessionsStore.exists(id);
-    }
-
+    boolean exists(String id) throws IOException;
 
     /**
-     * Iterates all sessions and deletes expired ones.
+     * Check if the provided {@link Session} is expired.
      *
-     * @throws IOException If a filesystem error occurs.
+     * @param session the {@link Session} to check.
+     * @return true if expired, false otherwise.
      */
-    public void deleteExpiredSessions() throws IOException {
-        Predicate<Session> isExpired = (session) -> expired(session);
-        List<Session> expired = sessionsStore.filterSessions(isExpired);
-
-        for (Session s : expired) {
-            info().data("user", s.getEmail()).log(DELETING_SESSION_MSG);
-            sessionsStore.delete(sessionPath(s.getId()));
-        }
-    }
+    boolean expired(Session session);
 
     /**
-     * Determines whether the given session has expired.
+     * Get the expiry date of the provided {@link Session}
      *
-     * @param session The session to check.
-     * @return If the session is not null and the last access time is
-     * more than 60 minutes in the past, true.
+     * @param session the  {@link Session} to use.
+     * @return the sessions expiration date time as a {@link Date} instance.
      */
-    public boolean expired(Session session) {
-        boolean result = false;
-
-        if (session != null) {
-            Calendar expiry = Calendar.getInstance();
-            expiry.add(expiryUnit, -expiryAmount);
-            result = session.getLastAccess().before(expiry.getTime());
-        }
-
-        return result;
-    }
-
-
-    /**
-     * Updates the last access time and saves the session to disk.
-     *
-     * @param session The session to update.
-     * @throws IOException If a filesystem error occurs.
-     */
-    public void updateLastAccess(Session session) throws IOException {
-        if (session != null) {
-            session.setLastAccess(new Date());
-            sessionsStore.write(session);
-        }
-    }
-
-    /**
-     * Determines the filesystem path for the given session ID.
-     *
-     * @param id The ID to get a path for.
-     * @return The path, or null if the ID is blank.
-     */
-    private Path sessionPath(String id) {
-        Path result = null;
-
-        if (StringUtils.isNotBlank(id)) {
-            String sessionFileName = PathUtils.toFilename(id);
-            sessionFileName += ".json";
-            result = sessionsPath.resolve(sessionFileName);
-        }
-
-        return result;
-    }
-
-    /**
-     * Reads the session with the given ID from disk.
-     *
-     * @param id The ID to be read.
-     * @return The session, or
-     * @throws IOException
-     */
-    public Session read(String id) throws IOException {
-        return sessionsStore.read(sessionPath(id));
-    }
-
-    public Date getExpiryDate(Session session) {
-        Date expiry = null;
-
-        if (session != null) {
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTime(session.getLastAccess());
-            calendar.add(expiryUnit, expiryAmount);
-            expiry = calendar.getTime();
-        }
-        return expiry;
-    }
+    Date getExpiryDate(Session session);
 }

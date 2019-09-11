@@ -47,7 +47,7 @@ public class Ping {
             SessionsService sessionsService = Root.zebedee.getSessionsService();
             token = RequestUtils.getSessionId(request);
             if (sessionsService.exists(token)) {
-                Session session = sessionsService.read(token);
+                Session session = sessionsService.get(token);
                 if (session != null && !sessionsService.expired(session)) {
                     pingResponse.hasSession = true;
                     pingResponse.sessionExpiryDate = sessionsService.getExpiryDate(session);

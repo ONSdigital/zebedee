@@ -17,7 +17,7 @@ export FORMAT_LOGGING=true
 
 # CMD config (dev local values)
 export ENABLE_DATASET_IMPORT=true
-export ENABLE_CMD_AUTH=true
+export ENABLE_PERMISSIONS_AUTH=true
 
 export DATASET_API_URL="http://localhost:22000"
 export DATASET_API_AUTH_TOKEN="FD0108EA-825D-411C-9B1D-41EF7727F465"

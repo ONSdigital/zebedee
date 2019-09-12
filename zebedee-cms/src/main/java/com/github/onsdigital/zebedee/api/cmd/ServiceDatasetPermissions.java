@@ -45,8 +45,7 @@ public class ServiceDatasetPermissions extends PermissionsAPIBase {
 
         validateGetPermissionsRequest(getPermissionsRequest);
 
-        info().sessionID(getPermissionsRequest.getServiceToken())
-                .datasetID(getPermissionsRequest.getDatasetID())
+        info().datasetID(getPermissionsRequest.getDatasetID())
                 .log("handling get dataset permissions request for service account");
 
         return permissionsService.getServiceDatasetPermissions(getPermissionsRequest);

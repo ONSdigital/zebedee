@@ -9,7 +9,9 @@ import com.github.onsdigital.zebedee.content.page.statistics.document.figure.tab
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.reader.data.language.ContentLanguage;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -18,21 +20,35 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by bren on 30/07/15.
  */
 
 /*Notice that resources must be generated for these tests to pass. Maven test phase runs after resources are generated.
-* If you want to run the tes in your ide make sure
-* -Resources are generated ( maven generate-resources )
-* -Run configuration points to zebedee-reader module root as it is default in maven and most ides (intellij seems to be not doing this)
-* */
+ * If you want to run the tes in your ide make sure
+ * -Resources are generated ( maven generate-resources )
+ * -Run configuration points to zebedee-reader module root as it is default in maven and most ides (intellij seems to be not doing this)
+ * */
 
 public class ContentReaderTest {
 
     private ContentReader contentReader;
+
+    @BeforeClass
+    public static void setUp() {
+        System.setProperty("content_dir", "target/test-classes/test-content/zebedee/master");
+    }
+
+    @AfterClass
+    public static void tearDown() {
+        System.clearProperty("content_dir");
+    }
+
 
     @Before
     public void createContentReader() {

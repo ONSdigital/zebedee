@@ -1,6 +1,5 @@
 package com.github.onsdigital.zebedee.model.approval;
 
-import com.github.onsdigital.logging.v2.event.SimpleEvent;
 import com.github.onsdigital.zebedee.data.DataPublisher;
 import com.github.onsdigital.zebedee.data.importing.CsvTimeseriesUpdateImporter;
 import com.github.onsdigital.zebedee.data.importing.TimeseriesUpdateCommand;
@@ -12,6 +11,7 @@ import com.github.onsdigital.zebedee.json.ContentDetail;
 import com.github.onsdigital.zebedee.json.Event;
 import com.github.onsdigital.zebedee.json.EventType;
 import com.github.onsdigital.zebedee.json.PendingDelete;
+import com.github.onsdigital.zebedee.logging.CMSLogEvent;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.CollectionWriter;
 import com.github.onsdigital.zebedee.model.approval.tasks.CollectionPdfGenerator;
@@ -39,10 +39,10 @@ import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
 import static com.github.onsdigital.zebedee.json.EventType.APPROVAL_FAILED;
-import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
-import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
+import static com.github.onsdigital.zebedee.logging.CMSLogEvent.error;
 
 /**
  * Callable implementation for the approval process.
@@ -99,7 +99,7 @@ public class ApproveTask implements Callable<Boolean> {
             return doApproval();
         } catch (Exception e) {
 
-            SimpleEvent errorLog = error().data("collectionId", collection.getId());
+            CMSLogEvent errorLog = error().data("collectionId", collection.getId());
 
             if (session != null && StringUtils.isNotEmpty(session.getEmail())) {
                 errorLog.data("approver", session.getEmail());
@@ -167,7 +167,7 @@ public class ApproveTask implements Callable<Boolean> {
             return true;
 
         } catch (Exception e) {
-            SimpleEvent errorLog = error().data("collectionId", collection.getDescription().getId());
+            CMSLogEvent errorLog = error().data("collectionId", collection.getDescription().getId());
             if (session != null && StringUtils.isNotEmpty(session.getEmail())) {
                 errorLog.data("user", (session.getEmail()));
             }
@@ -280,9 +280,16 @@ public class ApproveTask implements Callable<Boolean> {
 
     public void approveCollection() throws IOException {
         // set the approved state on the collection
-        collection.description.approvalStatus = ApprovalStatus.COMPLETE;
-        collection.description.addEvent(new Event(new Date(), EventType.APPROVED, session.getEmail()));
-        collection.save();
+        try {
+            collection.getDescription().setApprovalStatus(ApprovalStatus.COMPLETE);
+            collection.getDescription().addEvent(new Event(new Date(), EventType.APPROVED, session.getEmail()));
+            collection.save();
+        } catch (Exception ex) {
+            error().exception(ex).collectionID(collection).log("error saving collection during approval");
+            collection.getDescription().setApprovalStatus(ApprovalStatus.ERROR);
+            collection.getDescription().addEvent(new Event(new Date(), EventType.APPROVAL_FAILED, "system"));
+            throw new IOException(ex);
+        }
     }
 
     public void populateReleasePage(Iterable<ContentDetail> collectionContent) throws IOException {

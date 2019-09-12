@@ -2,6 +2,7 @@ package com.github.onsdigital.zebedee.model.approval;
 
 import com.github.davidcarboni.cryptolite.Random;
 import com.github.onsdigital.zebedee.data.processing.DataIndex;
+import com.github.onsdigital.zebedee.json.ApprovalStatus;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.ContentDetail;
 import com.github.onsdigital.zebedee.json.Event;
@@ -166,5 +167,59 @@ public class ApproveTaskTest {
         assertFalse(result.get());
         assertThat(eventTypeArgumentCaptor.getValue().type, equalTo(EventType.APPROVAL_FAILED));
         verify(contentDetailResolver, times(1)).resolve(any(), any());
+    }
+
+    @Test
+    public void shouldSetCollectionStateToApproved() throws IOException {
+        CollectionDescription description = new CollectionDescription();
+
+        when(collection.getDescription())
+                .thenReturn(description);
+        when(session.getEmail())
+                .thenReturn("test@ons.gov.uk");
+
+        ApproveTask approveTask = new ApproveTask(collection, session, collectionReader, collectionWriter,
+                contentReader, dataIndex, contentDetailResolver);
+
+        approveTask.approveCollection();
+
+        assertThat(description.approvalStatus, equalTo(ApprovalStatus.COMPLETE));
+        assertThat(description.events.size(), equalTo(1));
+
+        Event event = description.events.get(0);
+        assertThat(event.getEmail(), equalTo("test@ons.gov.uk"));
+        assertThat(event.getType(), equalTo(EventType.APPROVED));
+
+        verify(collection, times(2)).getDescription();
+    }
+
+    @Test(expected = IOException.class)
+    public void shouldSetCollectionStateToErrorIfSaveFails() throws IOException {
+        CollectionDescription description = new CollectionDescription();
+
+        when(collection.getDescription())
+                .thenReturn(description);
+        when(session.getEmail())
+                .thenReturn("test@ons.gov.uk");
+        when(collection.save())
+                .thenThrow(new RuntimeException());
+
+        ApproveTask approveTask = new ApproveTask(collection, session, collectionReader, collectionWriter,
+                contentReader, dataIndex, contentDetailResolver);
+
+        approveTask.approveCollection();
+
+        assertThat(description.approvalStatus, equalTo(ApprovalStatus.ERROR));
+        assertThat(description.events.size(), equalTo(2));
+
+        Event event = description.events.get(0);
+        assertThat(event.getEmail(), equalTo("test@ons.gov.uk"));
+        assertThat(event.getType(), equalTo(EventType.APPROVED));
+
+        Event errorEvent = description.events.get(0);
+        assertThat(errorEvent.getEmail(), equalTo("system"));
+        assertThat(errorEvent.getType(), equalTo(EventType.APPROVAL_FAILED));
+
+        verify(collection, times(4)).getDescription();
     }
 }

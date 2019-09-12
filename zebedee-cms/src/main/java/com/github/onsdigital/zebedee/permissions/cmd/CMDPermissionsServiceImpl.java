@@ -131,19 +131,17 @@ public class CMDPermissionsServiceImpl implements CMDPermissionsService {
         try {
             session = sessionsService.get(sessionID);
         } catch (IOException ex) {
-            error().exception(ex)
-                    .sessionID(sessionID)
-                    .log("user dataset permissions request failed error getting session");
+            error().exception(ex).log("user dataset permissions request failed error getting session");
             throw internalServerErrorException();
         }
 
         if (session == null) {
-            info().sessionID(sessionID).log("user dataset permissions request denied session not found");
+            info().log("user dataset permissions request denied session not found");
             throw sessionNotFoundException();
         }
 
         if (sessionsService.expired(session)) {
-            info().sessionID(sessionID).log("user dataset permissions request denied session expired");
+            info().log("user dataset permissions request denied session expired");
             throw sessionExpiredException();
         }
         return session;

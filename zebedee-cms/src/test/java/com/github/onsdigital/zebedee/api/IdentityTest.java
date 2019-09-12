@@ -35,7 +35,7 @@ public class IdentityTest {
 
     private static final String FLORENCE_TOKEN = "666";
     private static final String FLORENCE_TOKEN_HEADER = "X-Florence-Token";
-    private static final String AUTH_TOKEN = "bearer 123";
+    private static final String AUTH_TOKEN = "Bearer d8b90a24c3d247aeaf84731e4e69dd6f";
     private static final String SERVICE_NAME = "dp-dataset-api";
 
     @Mock
@@ -57,7 +57,7 @@ public class IdentityTest {
 
     @Before
     public void setUp() throws Exception {
-        api = new Identity(true); // enable feature by default
+        api = new Identity(true, serviceStore, authorisationService); // enable feature by default
 
         MockitoAnnotations.initMocks(this);
 
@@ -129,7 +129,7 @@ public class IdentityTest {
 
         api.identifyUser(mockRequest, mockResponse);
 
-        verify(serviceStore, times(1)).get("123");
+        verify(serviceStore, times(1)).get("d8b90a24c3d247aeaf84731e4e69dd6f");
         verify(authorisationService, times(0)).identifyUser(FLORENCE_TOKEN);
         verifyResponseInteractions(identity, SC_OK);
     }
@@ -145,7 +145,7 @@ public class IdentityTest {
 
         api.identifyUser(mockRequest, mockResponse);
 
-        verify(serviceStore, times(1)).get("123");
+        verify(serviceStore, times(1)).get("d8b90a24c3d247aeaf84731e4e69dd6f");
         verify(authorisationService, times(0)).identifyUser(FLORENCE_TOKEN);
         verifyResponseInteractions(identity, SC_OK);
     }
@@ -192,11 +192,26 @@ public class IdentityTest {
 
         UserIdentity identity = new UserIdentity(session);
 
-        api = new Identity(false); //disable feature for this test case.
+        api = new Identity(false, serviceStore, authorisationService); //disable feature for this test case.
         api.identifyUser(mockRequest, mockResponse);
 
         verifyZeroInteractions(serviceStore, authorisationService);
         verifyResponseInteractions(new Error("Not found"), SC_NOT_FOUND);
+    }
+
+    @Test
+    public void shouldReturnUnauthorizedIfBearPrefixMissing() throws Exception {
+        when(mockRequest.getHeader(Identity.AUTHORIZATION_HEADER))
+                .thenReturn("123");
+
+        when(mockResponse.getWriter())
+                .thenReturn(printWriterMock);
+
+        api = new Identity(true, serviceStore, authorisationService);
+        api.identifyUser(mockRequest, mockResponse);
+
+        verifyZeroInteractions(serviceStore, authorisationService);
+        verifyResponseInteractions(new Error("service not authenticated"), SC_UNAUTHORIZED);
     }
 
     private void verifyResponseInteractions(JSONable body, int statusCode) throws IOException {

@@ -224,7 +224,7 @@ public class SessionsServiceTest {
         sessionsService.deleteExpiredSessions();
 
         verify(sessionsStore, times(1)).filterSessions(any(Predicate.class));
-        verify(sessionMock, times(2)).getId();
+        verify(sessionMock, times(1)).getId();
         verify(sessionsStore, times(1)).delete(sessionPath());
     }
 

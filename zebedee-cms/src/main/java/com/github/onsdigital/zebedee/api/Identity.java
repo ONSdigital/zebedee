@@ -16,11 +16,13 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
 import java.io.IOException;
 
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.warn;
-import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
-
 import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
+import static com.github.onsdigital.zebedee.service.ServiceTokenUtils.extractServiceAccountTokenFromAuthHeader;
+import static com.github.onsdigital.zebedee.service.ServiceTokenUtils.isValidServiceAuthorizationHeader;
+import static com.github.onsdigital.zebedee.service.ServiceTokenUtils.isValidServiceToken;
 import static com.github.onsdigital.zebedee.util.JsonUtils.writeResponseEntity;
 import static org.apache.http.HttpStatus.SC_NOT_FOUND;
 import static org.apache.http.HttpStatus.SC_OK;
@@ -34,20 +36,23 @@ public class Identity {
     private boolean datasetImportEnabled = false;
 
     static final String AUTHORIZATION_HEADER = "Authorization";
+    static final String BEARER_PREFIX_UC = "Bearer";
     static final Error NOT_FOUND_ERROR = new Error("Not found");
 
     /**
      * Construct the default Identity api endpoint.
      */
     public Identity() {
-        this(cmsFeatureFlags().isEnableDatasetImport());
+        this(cmsFeatureFlags().isEnableDatasetImport(), Root.zebedee.getServiceStore(), new AuthorisationServiceImpl());
     }
 
     /**
      * Construct and Identity api endpoint explicitly enabling/disabling the datasetImportEnabled feature.
      */
-    public Identity(boolean datasetImportEnabled) {
+    public Identity(boolean datasetImportEnabled, ServiceStore serviceStore, AuthorisationService authorisationService) {
         this.datasetImportEnabled = datasetImportEnabled;
+        this.serviceStore = serviceStore;
+        this.authorisationService = authorisationService;
     }
 
     @GET
@@ -66,9 +71,8 @@ public class Identity {
         }
 
         if (StringUtils.isNotBlank(request.getHeader(AUTHORIZATION_HEADER))) {
-            ServiceAccount serviceAccount = findService(request);
+            ServiceAccount serviceAccount = handleServiceAccountRequest(request);
             if (serviceAccount != null) {
-
                 writeResponseEntity(response, new UserIdentity(serviceAccount.getID()), SC_OK);
                 return;
             }
@@ -87,9 +91,8 @@ public class Identity {
         }
 
         try {
-            UserIdentity identity = getAuthorisationService().identifyUser(sessionID);
-            info().data("sessionId", sessionID).data("user", identity.getIdentifier())
-                    .log("authenticated user identity confirmed");
+            UserIdentity identity = authorisationService.identifyUser(sessionID);
+            info().data("user", identity.getIdentifier()).log("authenticated user identity confirmed");
             writeResponseEntity(response, identity, SC_OK);
         } catch (UserIdentityException e) {
             error().logException(e, "identity endpoint: identify user failure, returning error response");
@@ -97,41 +100,35 @@ public class Identity {
         }
     }
 
-    private ServiceAccount findService(HttpServletRequest request) throws IOException {
-        final ServiceStore serviceStore = getServiceStoreImpl();
+    private ServiceAccount handleServiceAccountRequest(HttpServletRequest request) throws IOException {
+        info().log("identity: handling service identity request");
         String authorizationHeader = request.getHeader(AUTHORIZATION_HEADER);
-        if (StringUtils.isNotEmpty(authorizationHeader)) {
-            authorizationHeader = authorizationHeader.toLowerCase();
-            if (authorizationHeader.toLowerCase().startsWith("bearer ")) {
-                String[] cred = authorizationHeader.split("bearer ");
-                if (cred.length != 2) {
-                    return null;
-                }
-                String token = cred[1];
-                final ServiceAccount service = serviceStore.get(token);
-                if (service != null) {
-                    info().data("user", service.getID()).log("authenticated service account confirmed");
-                    return service;
-                } else {
-                    return null;
-                }
+
+        ServiceAccount serviceAccount = null;
+
+        if (isValidServiceAuthorizationHeader(authorizationHeader)) {
+            String serviceToken = extractServiceAccountTokenFromAuthHeader(authorizationHeader);
+
+            if (isValidServiceToken(serviceToken)) {
+                serviceAccount = getServiceAccount(serviceToken);
             }
         }
-        return null;
+        return serviceAccount;
     }
 
-    private AuthorisationService getAuthorisationService() {
-        if (authorisationService == null) {
-            this.authorisationService = new AuthorisationServiceImpl();
+    private ServiceAccount getServiceAccount(String serviceToken) throws IOException {
+        ServiceAccount serviceAccount = null;
+        try {
+            serviceAccount = serviceStore.get(serviceToken);
+            if (serviceAccount == null) {
+                warn().log("service account not found for service token");
+            } else {
+                info().data("service_id", serviceAccount.getID()).log("identified valid service account");
+            }
+        } catch (Exception ex) {
+            error().exception(ex).log("unexpected error getting service account from service store");
+            throw new IOException(ex);
         }
-        return authorisationService;
+        return serviceAccount;
     }
-
-    private ServiceStore getServiceStoreImpl() {
-        if (serviceStore == null) {
-            this.serviceStore = Root.zebedee.getServiceStore();
-        }
-        return serviceStore;
-    }
-
 }

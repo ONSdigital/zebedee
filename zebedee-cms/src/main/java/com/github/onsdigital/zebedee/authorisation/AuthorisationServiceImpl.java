@@ -41,23 +41,23 @@ public class AuthorisationServiceImpl implements AuthorisationService {
         try {
             session = sessionServiceSupplier.getService().get(sessionID);
         } catch (IOException e) {
-            error().sessionID(sessionID).logException(e, "identify user error, unexpected error while attempting to get user session");
+            error().logException(e, "identify user error, unexpected error while attempting to get user session");
             throw new UserIdentityException(INTERNAL_ERROR, SC_INTERNAL_SERVER_ERROR);
         }
 
         if (session == null) {
-            warn().sessionID(sessionID).log("identify user error, session with specified ID could not be found");
+            warn().log("identify user error, session with specified ID could not be found");
             throw new UserIdentityException(AUTHENTICATED_ERROR, SC_UNAUTHORIZED);
         }
 
         // The session might exist but ensure the user still exists in the system before confirming their identity
         try {
             if (!userServiceSupplier.getService().exists(session.getEmail())) {
-                warn().sessionID(session).log("identify user error, valid user session found but user no longer exists");
+                warn().log("identify user error, valid user session found but user no longer exists");
                 throw new UserIdentityException(USER_NOT_FOUND, SC_NOT_FOUND);
             }
         } catch (IOException e) {
-            error().sessionID(session).logException(e, "identify user error, unexpected error while checking if user exists");
+            error().logException(e, "identify user error, unexpected error while checking if user exists");
             throw new UserIdentityException(INTERNAL_ERROR, SC_INTERNAL_SERVER_ERROR);
         }
         return new UserIdentity(session);

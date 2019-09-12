@@ -40,8 +40,7 @@ public class UserDatasetPermissions extends PermissionsAPIBase {
 
         validateGetPermissionsRequest(getPermissionsRequest);
 
-        info().sessionID(getPermissionsRequest.getSessionID())
-                .datasetID(getPermissionsRequest.getDatasetID())
+        info().datasetID(getPermissionsRequest.getDatasetID())
                 .collectionID(getPermissionsRequest.getCollectionID())
                 .log("handling get dataset permissions request for user");
 

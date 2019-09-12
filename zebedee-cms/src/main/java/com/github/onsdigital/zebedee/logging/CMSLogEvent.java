@@ -4,6 +4,7 @@ import com.github.onsdigital.logging.v2.DPLogger;
 import com.github.onsdigital.logging.v2.event.BaseEvent;
 import com.github.onsdigital.logging.v2.event.Severity;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
+import com.github.onsdigital.zebedee.model.ClickEvent;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.permissions.cmd.CRUD;
 import com.github.onsdigital.zebedee.session.model.Session;
@@ -32,20 +33,6 @@ public class CMSLogEvent extends BaseEvent<CMSLogEvent> {
     public CMSLogEvent user(Session session) {
         if (session != null) {
             user(session.getEmail());
-        }
-        return this;
-    }
-
-    public CMSLogEvent sessionID(Session session) {
-        if (session != null) {
-            sessionID(session.getId());
-        }
-        return this;
-    }
-
-    public CMSLogEvent sessionID(String sessionID) {
-        if (StringUtils.isNotEmpty(sessionID)) {
-            data("session_id", sessionID);
         }
         return this;
     }
@@ -109,6 +96,15 @@ public class CMSLogEvent extends BaseEvent<CMSLogEvent> {
     public CMSLogEvent datasetPermissions(CRUD CRUD) {
         if (CRUD != null) {
             data("dataset_permissions", CRUD);
+        }
+        return this;
+    }
+
+    public CMSLogEvent florenceClickEvent(ClickEvent e) {
+        if (null != e) {
+            collectionID(e.getCollection().getId());
+            data("trigger", e.getTrigger());
+            user(e.getUser());
         }
         return this;
     }

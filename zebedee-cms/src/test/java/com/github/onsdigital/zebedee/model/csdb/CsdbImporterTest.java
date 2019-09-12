@@ -3,19 +3,19 @@ package com.github.onsdigital.zebedee.model.csdb;
 import com.github.davidcarboni.ResourceUtils;
 import com.github.davidcarboni.cryptolite.Keys;
 import com.github.onsdigital.zebedee.Builder;
-import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.ZebedeeTestBaseFixture;
 import com.github.onsdigital.zebedee.content.page.statistics.dataset.Dataset;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
-import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.CollectionWriter;
 import com.github.onsdigital.zebedee.model.FakeCollectionReader;
 import com.github.onsdigital.zebedee.model.FakeCollectionWriter;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
+import com.github.onsdigital.zebedee.session.model.Session;
 import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -28,6 +28,11 @@ import java.security.KeyPair;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+// TODO
+// This impl doesn't appear to be used anymore and is out of date. Its no longer possible to uniquely identify a the
+// localtion of a CSDB file by the CSDB ID alone.
+// Ignoring tests until we confirm that this will be removed.
+@Ignore
 public class CsdbImporterTest extends ZebedeeTestBaseFixture {
 
     Session publisher;

@@ -8,7 +8,7 @@ import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.service.ServiceStore;
 import com.github.onsdigital.zebedee.service.ServiceSupplier;
 import com.github.onsdigital.zebedee.session.model.Session;
-import com.github.onsdigital.zebedee.session.service.SessionsService;
+import com.github.onsdigital.zebedee.session.service.Sessions;
 import com.github.onsdigital.zebedee.user.service.UsersService;
 import org.junit.Before;
 import org.junit.Test;
@@ -33,7 +33,7 @@ public class AuthorisationServiceImplTest {
     private static final String SESSION_ID = "666";
 
     @Mock
-    private SessionsService sessionsService;
+    private Sessions sessions;
 
     @Mock
     private UsersService usersService;
@@ -53,7 +53,7 @@ public class AuthorisationServiceImplTest {
     @Mock
     private ServiceAccount serviceAccount;
 
-    private ServiceSupplier<SessionsService> sessionServiceSupplier = () -> sessionsService;
+    private ServiceSupplier<Sessions> sessionsSupplier = () -> sessions;
     private ServiceSupplier<UsersService> userServiceSupplier = () -> usersService;
     private ServiceSupplier<Collections> collectionsSupplier = () -> collections;
     private ServiceSupplier<PermissionsService> permissionsServiceSupplier = () -> permissionsService;
@@ -83,7 +83,7 @@ public class AuthorisationServiceImplTest {
         desc = new CollectionDescription();
         desc.setId("666");
 
-        ReflectionTestUtils.setField(service, "sessionServiceSupplier", sessionServiceSupplier);
+        ReflectionTestUtils.setField(service, "sessionsSupplier", sessionsSupplier);
         ReflectionTestUtils.setField(service, "userServiceSupplier", userServiceSupplier);
         ReflectionTestUtils.setField(service, "collectionsSupplier", collectionsSupplier);
         ReflectionTestUtils.setField(service, "permissionsServiceSupplier", permissionsServiceSupplier);
@@ -96,7 +96,7 @@ public class AuthorisationServiceImplTest {
             service.identifyUser(null);
         } catch (UserIdentityException ex) {
             assertThat(ex, equalTo(notAuthenticatedEx));
-            verifyZeroInteractions(sessionsService, usersService);
+            verifyZeroInteractions(sessions, usersService);
             throw ex;
         }
     }
@@ -107,20 +107,20 @@ public class AuthorisationServiceImplTest {
             service.identifyUser("");
         } catch (UserIdentityException ex) {
             assertThat(ex, equalTo(notAuthenticatedEx));
-            verifyZeroInteractions(sessionsService, usersService);
+            verifyZeroInteractions(sessions, usersService);
             throw ex;
         }
     }
 
     @Test(expected = UserIdentityException.class)
     public void shouldReturnInternalServerErrorIfErrorGettingSession() throws Exception {
-        when(sessionsService.get(SESSION_ID))
+        when(sessions.get(SESSION_ID))
                 .thenThrow(new IOException("error getting session"));
         try {
             service.identifyUser(SESSION_ID);
         } catch (UserIdentityException ex) {
             assertThat(ex, equalTo(internalServerErrorEx));
-            verify(sessionsService, times(1)).get(SESSION_ID);
+            verify(sessions, times(1)).get(SESSION_ID);
             verifyZeroInteractions(usersService);
             throw ex;
         }
@@ -128,13 +128,13 @@ public class AuthorisationServiceImplTest {
 
     @Test(expected = UserIdentityException.class)
     public void shouldReturnNotAuthenicatedIfSessionNotFound() throws Exception {
-        when(sessionsService.get(SESSION_ID))
+        when(sessions.get(SESSION_ID))
                 .thenReturn(null);
         try {
             service.identifyUser(SESSION_ID);
         } catch (UserIdentityException ex) {
             assertThat(ex, equalTo(notAuthenticatedEx));
-            verify(sessionsService, times(1)).get(SESSION_ID);
+            verify(sessions, times(1)).get(SESSION_ID);
             verifyZeroInteractions(usersService);
             throw ex;
         }
@@ -142,7 +142,7 @@ public class AuthorisationServiceImplTest {
 
     @Test(expected = UserIdentityException.class)
     public void shouldReturnNotFoundIfUserDoesNotExist() throws Exception {
-        when(sessionsService.get(SESSION_ID))
+        when(sessions.get(SESSION_ID))
                 .thenReturn(session);
         when(usersService.exists(session.getEmail()))
                 .thenReturn(false);
@@ -150,7 +150,7 @@ public class AuthorisationServiceImplTest {
             service.identifyUser(SESSION_ID);
         } catch (UserIdentityException ex) {
             assertThat(ex, equalTo(notFoundEx));
-            verify(sessionsService, times(1)).get(SESSION_ID);
+            verify(sessions, times(1)).get(SESSION_ID);
             verify(usersService, times(1)).exists(session.getEmail());
             throw ex;
         }
@@ -158,7 +158,7 @@ public class AuthorisationServiceImplTest {
 
     @Test(expected = UserIdentityException.class)
     public void shouldReturnInternalServerErrorIfErrorCheckingUserExistance() throws Exception {
-        when(sessionsService.get(SESSION_ID))
+        when(sessions.get(SESSION_ID))
                 .thenReturn(session);
         when(usersService.exists(session.getEmail()))
                 .thenThrow(new IOException("something terrible happened!"));
@@ -166,7 +166,7 @@ public class AuthorisationServiceImplTest {
             service.identifyUser(SESSION_ID);
         } catch (UserIdentityException ex) {
             assertThat(ex, equalTo(internalServerErrorEx));
-            verify(sessionsService, times(1)).get(SESSION_ID);
+            verify(sessions, times(1)).get(SESSION_ID);
             verify(usersService, times(1)).exists(session.getEmail());
             throw ex;
         }
@@ -174,7 +174,7 @@ public class AuthorisationServiceImplTest {
 
     @Test
     public void shouldReturnUserIdentityIfSessionAndUserExist() throws Exception {
-        when(sessionsService.get(SESSION_ID))
+        when(sessions.get(SESSION_ID))
                 .thenReturn(session);
         when(usersService.exists(session.getEmail()))
                 .thenReturn(true);
@@ -184,7 +184,7 @@ public class AuthorisationServiceImplTest {
         UserIdentity actual = service.identifyUser(SESSION_ID);
 
         assertThat(actual, equalTo(expected));
-        verify(sessionsService, times(1)).get(SESSION_ID);
+        verify(sessions, times(1)).get(SESSION_ID);
         verify(usersService, times(1)).exists(session.getEmail());
     }
 

@@ -24,7 +24,7 @@ import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 /**
  * Created by david on 12/03/2015.
  */
-public class SessionsServiceImpl extends TimerTask implements SessionsService {
+public class SessionsServiceImpl extends TimerTask implements Sessions {
 
     private static final String DELETING_SESSION_MSG = "Deleting expired session";
     private static final String SESSION_ID_PARAM = "sessionId";

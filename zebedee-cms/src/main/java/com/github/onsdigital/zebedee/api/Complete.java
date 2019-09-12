@@ -36,7 +36,7 @@ public class Complete {
 
         // Locate the collection:
         com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request);
-        Session session = Root.zebedee.getSessionsService().get(request);
+        Session session = Root.zebedee.getSessions().get(request);
         String uri = request.getParameter("uri");
 
         Boolean recursive = BooleanUtils.toBoolean(StringUtils.defaultIfBlank(request.getParameter("recursive"), "false"));

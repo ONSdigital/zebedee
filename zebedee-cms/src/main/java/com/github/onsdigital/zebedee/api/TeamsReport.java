@@ -6,7 +6,7 @@ import com.github.onsdigital.zebedee.exceptions.ForbiddenException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.service.ServiceSupplier;
 import com.github.onsdigital.zebedee.session.model.Session;
-import com.github.onsdigital.zebedee.session.service.SessionsService;
+import com.github.onsdigital.zebedee.session.service.Sessions;
 import com.github.onsdigital.zebedee.teams.service.TeamsService;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
@@ -48,7 +48,7 @@ public class TeamsReport {
     static final String SHEET_TITLE = "Teams Summary {0}";
 
     private ServiceSupplier<TeamsService> teamsServiceSupplier = () -> Root.zebedee.getTeamsService();
-    private ServiceSupplier<SessionsService> serviceServiceSupplier = () -> Root.zebedee.getSessionsService();
+    private ServiceSupplier<Sessions> serviceServiceSupplier = () -> Root.zebedee.getSessions();
 
     /**
      * Generate an on the fly Team memmbers report XLS and write to the response as a file download.

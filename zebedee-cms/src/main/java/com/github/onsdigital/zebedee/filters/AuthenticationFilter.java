@@ -74,7 +74,7 @@ public class AuthenticationFilter implements Filter {
         // Check all other requests:
         boolean result = false;
         try {
-            Session session = Root.zebedee.getSessionsService().get(request);
+            Session session = Root.zebedee.getSessions().get(request);
             if (session == null) {
                 forbidden(response);
             } else {

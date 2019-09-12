@@ -7,7 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.Date;
 
-public interface SessionsService {
+public interface Sessions {
 
     /**
      * Create a new {@link Session} for the user.

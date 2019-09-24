@@ -2,11 +2,18 @@ package com.github.onsdigital.zebedee.json.publishing;
 
 import com.github.onsdigital.zebedee.json.CollectionBase;
 import com.github.onsdigital.zebedee.json.CollectionType;
+import com.github.onsdigital.zebedee.json.CollectionDataset;
+import com.github.onsdigital.zebedee.json.CollectionDatasetVersion;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
+
 
 public class PublishedCollection extends CollectionBase {
+
+    private CollectionDataset datasets;
+    private CollectionDatasetVersion datasetVersions;
 
     public PublishedCollection(String id, String name, CollectionType type, Date publishDate) {
         this.id = id;
@@ -30,6 +37,21 @@ public class PublishedCollection extends CollectionBase {
      */
     public List<Result> publishResults;
 
+    public CollectionDataset getDatasets() {
+        return this.datasets;
+    }
+
+    public void setDatasets(CollectionDataset datasets) {
+        this.datasets = datasets;
+    }
+
+    public CollectionDatasetVersion getDatasetVersions() {
+        return this.datasetVersions;
+    }
+
+    public void setDatasetVersions(CollectionDatasetVersion datasetVersions) {
+        this.datasetVersions = datasetVersions;
+    }
 
     public void incrementVerified() {
         synchronized (this) {

@@ -20,6 +20,9 @@ import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.warn;
 import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
+import static com.github.onsdigital.zebedee.service.ServiceTokenUtils.extractServiceAccountTokenFromAuthHeader;
+import static com.github.onsdigital.zebedee.service.ServiceTokenUtils.isValidServiceAuthorizationHeader;
+import static com.github.onsdigital.zebedee.service.ServiceTokenUtils.isValidServiceToken;
 import static com.github.onsdigital.zebedee.util.JsonUtils.writeResponseEntity;
 import static org.apache.http.HttpStatus.SC_NOT_FOUND;
 import static org.apache.http.HttpStatus.SC_OK;
@@ -68,7 +71,7 @@ public class Identity {
         }
 
         if (StringUtils.isNotBlank(request.getHeader(AUTHORIZATION_HEADER))) {
-            ServiceAccount serviceAccount = findService(request);
+            ServiceAccount serviceAccount = handleServiceAccountRequest(request);
             if (serviceAccount != null) {
                 writeResponseEntity(response, new UserIdentity(serviceAccount.getID()), SC_OK);
                 return;
@@ -97,55 +100,35 @@ public class Identity {
         }
     }
 
-    private ServiceAccount findService(HttpServletRequest request) throws IOException {
+    private ServiceAccount handleServiceAccountRequest(HttpServletRequest request) throws IOException {
         info().log("identity: handling service identity request");
         String authorizationHeader = request.getHeader(AUTHORIZATION_HEADER);
-        if (!isValidAuthorizationHeader(authorizationHeader)) {
-            return null;
-        }
-
-        String serviceToken = removeBearerPrefix(authorizationHeader);
 
         ServiceAccount serviceAccount = null;
-        try {
-            serviceAccount = serviceStore.get(serviceToken);
-        } catch (Exception ex) {
-            error().exception(ex).log("unexpected error getting service account");
-            throw new IOException(ex);
-        }
 
-        if (serviceAccount == null) {
-            warn().log("service account not found for service token");
-            return null;
-        }
+        if (isValidServiceAuthorizationHeader(authorizationHeader)) {
+            String serviceToken = extractServiceAccountTokenFromAuthHeader(authorizationHeader);
 
-        info().data("service_id", serviceAccount.getID()).log("identified valid service account");
+            if (isValidServiceToken(serviceToken)) {
+                serviceAccount = getServiceAccount(serviceToken);
+            }
+        }
         return serviceAccount;
     }
 
-    String removeBearerPrefix(String rawHeader) {
-        if (StringUtils.isEmpty(rawHeader)) {
-            warn().log("cannot remove Bearer prefix from null value");
-            return null;
+    private ServiceAccount getServiceAccount(String serviceToken) throws IOException {
+        ServiceAccount serviceAccount = null;
+        try {
+            serviceAccount = serviceStore.get(serviceToken);
+            if (serviceAccount == null) {
+                warn().log("service account not found for service token");
+            } else {
+                info().data("service_id", serviceAccount.getID()).log("identified valid service account");
+            }
+        } catch (Exception ex) {
+            error().exception(ex).log("unexpected error getting service account from service store");
+            throw new IOException(ex);
         }
-        String token = rawHeader.replaceFirst(BEARER_PREFIX_UC, "").trim();
-        info().log("bearer prefix removed from service auth header");
-        return token;
+        return serviceAccount;
     }
-
-    boolean isValidAuthorizationHeader(String value) {
-        info().log("validating service auth header");
-        if (StringUtils.isEmpty(value)) {
-            warn().log("invalid authorization header value is null or empty");
-            return false;
-        }
-
-        if (!value.startsWith(BEARER_PREFIX_UC)) {
-            warn().log("invalid authorization header value not prefixed with Bearer (case sensitive) returning null");
-            return false;
-        }
-        info().log("service auth header valid");
-        return true;
-    }
-
 }

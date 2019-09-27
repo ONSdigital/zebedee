@@ -12,8 +12,8 @@ import java.util.Set;
 
 public class PublishedCollection extends CollectionBase {
 
-    private CollectionDataset datasets;
-    private CollectionDatasetVersion datasetVersions;
+    private CollectionDataset[] datasets;
+    private CollectionDatasetVersion[] datasetVersions;
 
     public PublishedCollection(String id, String name, CollectionType type, Date publishDate) {
         this.id = id;
@@ -37,19 +37,19 @@ public class PublishedCollection extends CollectionBase {
      */
     public List<Result> publishResults;
 
-    public CollectionDataset getDatasets() {
+    public CollectionDataset[] getDatasets() {
         return this.datasets;
     }
 
-    public void setDatasets(CollectionDataset datasets) {
+    public void setDatasets(CollectionDataset[] datasets) {
         this.datasets = datasets;
     }
 
-    public CollectionDatasetVersion getDatasetVersions() {
+    public CollectionDatasetVersion[] getDatasetVersions() {
         return this.datasetVersions;
     }
 
-    public void setDatasetVersions(CollectionDatasetVersion datasetVersions) {
+    public void setDatasetVersions(CollectionDatasetVersion[] datasetVersions) {
         this.datasetVersions = datasetVersions;
     }
 

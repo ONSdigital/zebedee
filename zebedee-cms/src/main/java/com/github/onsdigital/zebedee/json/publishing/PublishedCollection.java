@@ -5,15 +5,14 @@ import com.github.onsdigital.zebedee.json.CollectionType;
 import com.github.onsdigital.zebedee.json.CollectionDataset;
 import com.github.onsdigital.zebedee.json.CollectionDatasetVersion;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
-
 
 public class PublishedCollection extends CollectionBase {
 
-    private CollectionDataset[] datasets;
-    private CollectionDatasetVersion[] datasetVersions;
+    private List<CollectionDataset> datasets = new ArrayList<CollectionDataset>();
+    private List<CollectionDatasetVersion> datasetVersions = new ArrayList<CollectionDatasetVersion>();
 
     public PublishedCollection(String id, String name, CollectionType type, Date publishDate) {
         this.id = id;
@@ -37,19 +36,19 @@ public class PublishedCollection extends CollectionBase {
      */
     public List<Result> publishResults;
 
-    public CollectionDataset[] getDatasets() {
+    public List<CollectionDataset> getDatasets() {
         return this.datasets;
     }
 
-    public void setDatasets(CollectionDataset[] datasets) {
+    public void setDatasets(List<CollectionDataset> datasets) {
         this.datasets = datasets;
     }
 
-    public CollectionDatasetVersion[] getDatasetVersions() {
+    public List<CollectionDatasetVersion> getDatasetVersions() {
         return this.datasetVersions;
     }
 
-    public void setDatasetVersions(CollectionDatasetVersion[] datasetVersions) {
+    public void setDatasetVersions(List<CollectionDatasetVersion> datasetVersions) {
         this.datasetVersions = datasetVersions;
     }
 

@@ -101,7 +101,7 @@ public class CMSLogEvent extends BaseEvent<CMSLogEvent> {
     }
 
     public CMSLogEvent florenceClickEvent(ClickEvent e) {
-        if (null != e) {
+        if (null != e && e.getCollection() != null) {
             collectionID(e.getCollection().getId());
             data("trigger", e.getTrigger());
             user(e.getUser());

@@ -30,6 +30,15 @@ public class Session {
      */
     private Date lastAccess = new Date();
 
+    public Session() {
+    }
+
+    public Session(final String id, final String email, final Date start, final Date lastAccess) {
+        this.id = id;
+        this.email = email;
+        this.start = start;
+        this.lastAccess = lastAccess;
+    }
 
     public String getId() {
         return id;

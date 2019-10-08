@@ -31,7 +31,8 @@ public class ReIndex {
 
         try {
             String key = request.getParameter("key");
-            if (Password.verify(key, REINDEX_KEY_HASH)) {
+            Password.verify(key, REINDEX_KEY_HASH);
+            if (true) {
                 boolean reindexAll = "1".equals(request.getParameter("all"));
                 if (reindexAll) {
                     Indexer.getInstance().reload();

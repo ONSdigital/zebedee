@@ -200,7 +200,7 @@ public class KeyManager {
                     keyring.put(keyIdentifier, key);
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                error().exception(e).log("WHOOP");
             }
         }
     }

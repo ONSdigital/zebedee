@@ -40,6 +40,7 @@ import com.github.onsdigital.zebedee.service.ServiceSupplier;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.teams.model.Team;
 import com.github.onsdigital.zebedee.teams.service.TeamsService;
+import com.github.onsdigital.zebedee.user.model.User;
 import com.google.common.annotations.VisibleForTesting;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -220,8 +221,8 @@ public class Collection {
 
         // Encryption
         // assign a key for the collection to the session user
-        keyManagerUtil.assignKeyToUser(zebedee, zebedee.getUsersService().getUserByEmail(session.getEmail()),
-                collection.getDescription().getId(), Keys.newSecretKey());
+        User user = zebedee.getUsersService().getUserByEmail(session.getEmail());
+        keyManagerUtil.assignKeyToUser(zebedee, user, collection.getDescription().getId(), Keys.newSecretKey());
 
         // get the session user to distribute the key to all
         keyManagerUtil.distributeCollectionKey(zebedee, session, collection, true);

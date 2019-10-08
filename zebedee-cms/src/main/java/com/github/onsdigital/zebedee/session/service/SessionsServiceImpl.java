@@ -202,6 +202,7 @@ public class SessionsServiceImpl extends TimerTask implements Sessions {
     public void updateLastAccess(Session session) throws IOException {
         if (session != null) {
             session.setLastAccess(new Date());
+            info().log("session life extended");
             sessionsStore.write(session);
         }
     }

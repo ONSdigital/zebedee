@@ -6,6 +6,7 @@ import com.github.onsdigital.logging.v2.event.Severity;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.model.ClickEvent;
 import com.github.onsdigital.zebedee.model.Collection;
+import com.github.onsdigital.zebedee.model.ServiceAccount;
 import com.github.onsdigital.zebedee.permissions.cmd.CRUD;
 import com.github.onsdigital.zebedee.session.model.Session;
 import org.apache.commons.lang3.StringUtils;
@@ -79,16 +80,9 @@ public class CMSLogEvent extends BaseEvent<CMSLogEvent> {
         return this;
     }
 
-    public CMSLogEvent serviceAccountID(String serviceAccountID) {
-        if (StringUtils.isNotEmpty(serviceAccountID)) {
-            data("service_account_id", serviceAccountID);
-        }
-        return this;
-    }
-
-    public CMSLogEvent serviceAccountToken(String serviceAccountToken) {
-        if (StringUtils.isNotEmpty(serviceAccountToken)) {
-            data("service_account_token", serviceAccountToken);
+    public CMSLogEvent serviceAccountID(ServiceAccount account) {
+        if (account != null && StringUtils.isNotEmpty(account.getID())) {
+            data("service_account_id", account.getID());
         }
         return this;
     }

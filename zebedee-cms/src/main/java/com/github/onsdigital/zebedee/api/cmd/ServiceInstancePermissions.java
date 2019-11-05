@@ -59,6 +59,6 @@ public class ServiceInstancePermissions extends PermissionsAPIBase {
             throw serviceTokenNotProvidedException();
         }
 
-        info().serviceAccountID(serviceToken).log("handling valid service instance permissions request");
+        info().log("handling valid service instance permissions request");
     }
 }

@@ -181,15 +181,12 @@ public class CMDPermissionsServiceImpl implements CMDPermissionsService {
         try {
             account = serviceStore.get(serviceToken);
         } catch (IOException ex) {
-            error().exception(ex)
-                    .serviceAccountToken(serviceToken)
-                    .log("service dataset permissons request failed error getting service account");
+            error().exception(ex).log("service dataset permissons request failed error getting service account");
             throw internalServerErrorException();
         }
 
         if (account == null) {
-            error().serviceAccountToken(serviceToken)
-                    .log("service dataset permissons request denied service account not found");
+            error().log("service dataset permissons request denied service account not found");
             throw serviceAccountNotFoundException();
         }
         return account;

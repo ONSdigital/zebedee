@@ -65,7 +65,7 @@ public class ModifyTable {
     public void modifyTable(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ZebedeeException, ParserConfigurationException, TransformerException, FileUploadException {
 
-        Session session = Root.zebedee.getSessionsService().get(request);
+        Session session = Root.zebedee.getSessions().get(request);
         com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request);
         CollectionReader collectionReader = new ZebedeeCollectionReader(Root.zebedee, collection, session);
         String currentUri = request.getParameter(CURRENT_URI);
@@ -97,7 +97,7 @@ public class ModifyTable {
     @GET
     public void getTableMetadata(HttpServletRequest request, HttpServletResponse response) throws IOException,
             ZebedeeException {
-        Session session = Root.zebedee.getSessionsService().get(request);
+        Session session = Root.zebedee.getSessions().get(request);
         com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request);
 
         CollectionReader collectionReader = new ZebedeeCollectionReader(Root.zebedee, collection, session);

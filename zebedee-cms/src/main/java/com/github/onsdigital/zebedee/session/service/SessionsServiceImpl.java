@@ -24,7 +24,7 @@ import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 /**
  * Created by david on 12/03/2015.
  */
-public class SessionsService extends TimerTask {
+public class SessionsServiceImpl extends TimerTask implements Sessions {
 
     private static final String DELETING_SESSION_MSG = "Deleting expired session";
     private static final String SESSION_ID_PARAM = "sessionId";
@@ -37,7 +37,7 @@ public class SessionsService extends TimerTask {
     Timer timer;
     private Path sessionsPath;
 
-    public SessionsService(Path sessionsPath) {
+    public SessionsServiceImpl(Path sessionsPath) {
         this.sessionsPath = sessionsPath;
         this.sessionsStore = new SessionsStoreImpl(sessionsPath);
 

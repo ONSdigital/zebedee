@@ -192,7 +192,7 @@ public class KeyManager {
         zebedee.getUsersService().addKeyToKeyring(user.getEmail(), keyIdentifier, key);
 
         // If the user is logged in assign the key to their cached keyring
-        Session session = zebedee.getSessionsService().find(user.getEmail());
+        Session session = zebedee.getSessions().find(user.getEmail());
         if (session != null) {
             Keyring keyring = zebedee.getKeyringCache().get(session);
             try {
@@ -222,7 +222,7 @@ public class KeyManager {
         zebedee.getUsersService().removeKeyFromKeyring(user.getEmail(), keyIdentifier);
 
         // If the user is logged in remove the key from their cached keyring
-        Session session = zebedee.getSessionsService().find(user.getEmail());
+        Session session = zebedee.getSessions().find(user.getEmail());
         if (session != null) {
             Keyring keyring = zebedee.getKeyringCache().get(session);
             try {

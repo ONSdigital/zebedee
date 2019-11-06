@@ -10,7 +10,7 @@ import com.github.onsdigital.zebedee.model.ServiceAccountWithToken;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.service.ServiceStore;
 import com.github.onsdigital.zebedee.session.model.Session;
-import com.github.onsdigital.zebedee.session.service.SessionsService;
+import com.github.onsdigital.zebedee.session.service.Sessions;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -32,7 +32,7 @@ public class Service {
 
     private Supplier<String> randomIdGenerator = () -> Random.id();
     private ServiceStore serviceStore;
-    private SessionsService sessionsService;
+    private Sessions sessions;
     private PermissionsService permissionsService;
     private boolean datasetImportEnabled;
 
@@ -64,7 +64,7 @@ public class Service {
 
         info().log("feature EnableDatasetImport is enabled");
 
-        final Session session = getSessionsService().get(request);
+        final Session session = getSessions().get(request);
         if (session != null && getPermissionsService().isAdministrator(session)) {
             final ServiceStore serviceStoreImpl = getServiceStore();
             final String token = randomIdGenerator.get();
@@ -83,11 +83,11 @@ public class Service {
         return serviceStore;
     }
 
-    private SessionsService getSessionsService() {
-        if (sessionsService == null) {
-            sessionsService = Root.zebedee.getSessionsService();
+    private Sessions getSessions() {
+        if (sessions == null) {
+            sessions = Root.zebedee.getSessions();
         }
-        return sessionsService;
+        return sessions;
     }
 
     private PermissionsService getPermissionsService() {

@@ -58,7 +58,7 @@ public class ZebedeeCmsService {
 
     public Session getSession(HttpServletRequest request) throws ZebedeeException {
         try {
-            return Root.zebedee.getSessionsService().get(request);
+            return Root.zebedee.getSessions().get(request);
         } catch (IOException e) {
             error().logException(e, SESSION_NOT_FOUND_MSG);
             throw new UnauthorizedException(SESSION_NOT_FOUND_MSG);

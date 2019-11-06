@@ -6,7 +6,6 @@ import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.json.Credentials;
 import com.github.onsdigital.zebedee.service.ServiceSupplier;
-import com.github.onsdigital.zebedee.session.service.SessionsService;
 import com.github.onsdigital.zebedee.user.model.User;
 import com.github.onsdigital.zebedee.user.service.UsersService;
 import org.apache.commons.lang.BooleanUtils;
@@ -61,7 +60,7 @@ public class Login {
             response.setStatus(HttpStatus.UNAUTHORIZED_401);
             Audit.Event.LOGIN_AUTHENTICATION_FAILURE.parameters().host(request).user(credentials.getEmail()).log();
             info().data("user", user.getEmail())
-                .log("login endpoint: request unsuccessful credentials were not authenticated successfully");
+                    .log("login endpoint: request unsuccessful credentials were not authenticated successfully");
             return "Authentication failed.";
         }
 

@@ -81,7 +81,7 @@ public class Collections {
         info().log("get collections endpoint: request received");
         Session session = null;
         try {
-            session = Root.zebedee.getSessionsService().get(request);
+            session = Root.zebedee.getSessions().get(request);
             if (session == null) {
                 warn().log("get collections endpoint: valid user session not found");
                 throw new UnauthorizedException("You are not authorized to perform get collections requests");

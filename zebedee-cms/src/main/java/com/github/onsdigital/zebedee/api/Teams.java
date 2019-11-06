@@ -68,7 +68,7 @@ public class Teams {
 
     public boolean createTeam(HttpServletRequest request, HttpServletResponse response) throws IOException, ConflictException, UnauthorizedException, NotFoundException, ForbiddenException {
 
-        Session session = Root.zebedee.getSessionsService().get(request);
+        Session session = Root.zebedee.getSessions().get(request);
         String teamName = getTeamName(request);
 
         Root.zebedee.getTeamsService().createTeam(teamName, session);
@@ -84,7 +84,7 @@ public class Teams {
 
     public boolean addTeamMember(HttpServletRequest request, HttpServletResponse response) throws UnauthorizedException, IOException, NotFoundException, BadRequestException, ForbiddenException {
         Zebedee zebedee = Root.zebedee;
-        Session session = zebedee.getSessionsService().get(request);
+        Session session = zebedee.getSessions().get(request);
 
         String teamName = getTeamName(request);
 
@@ -132,7 +132,7 @@ public class Teams {
         String teamName = getTeamName(request);
 
         Zebedee zebedee = Root.zebedee;
-        Session session = zebedee.getSessionsService().get(request);
+        Session session = zebedee.getSessions().get(request);
         Team team = zebedee.getTeamsService().findTeam(teamName);
         zebedee.getTeamsService().deleteTeam(team, session);
 
@@ -152,7 +152,7 @@ public class Teams {
         String teamName = getTeamName(request);
 
         Zebedee zebedee = Root.zebedee;
-        Session session = Root.zebedee.getSessionsService().get(request);
+        Session session = Root.zebedee.getSessions().get(request);
         String email = request.getParameter("email");
         Team team = zebedee.getTeamsService().findTeam(teamName);
 

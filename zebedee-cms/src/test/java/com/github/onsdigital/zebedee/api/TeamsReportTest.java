@@ -2,7 +2,7 @@ package com.github.onsdigital.zebedee.api;
 
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.service.ServiceSupplier;
-import com.github.onsdigital.zebedee.session.service.SessionsService;
+import com.github.onsdigital.zebedee.session.service.Sessions;
 import com.github.onsdigital.zebedee.teams.model.Team;
 import com.github.onsdigital.zebedee.teams.service.TeamsService;
 import org.apache.poi.hssf.usermodel.HSSFRow;
@@ -42,7 +42,7 @@ public class TeamsReportTest extends ZebedeeAPIBaseTestCase {
     private TeamsService teamsService;
 
     @Mock
-    private SessionsService sessionsService;
+    private Sessions sessions;
 
     private TeamsReport api;
 
@@ -53,7 +53,7 @@ public class TeamsReportTest extends ZebedeeAPIBaseTestCase {
         api = new TeamsReport();
 
         ServiceSupplier<TeamsService> teamsServiceSupplier = () -> teamsService;
-        ServiceSupplier<SessionsService> sessionsServiceSupplier = () -> sessionsService;
+        ServiceSupplier<Sessions> sessionsServiceSupplier = () -> sessions;
 
         ReflectionTestUtils.setField(api, "teamsServiceSupplier", teamsServiceSupplier);
         ReflectionTestUtils.setField(api, "serviceServiceSupplier", sessionsServiceSupplier);
@@ -66,7 +66,7 @@ public class TeamsReportTest extends ZebedeeAPIBaseTestCase {
 
     @Test(expected = UnauthorizedException.class)
     public void getReport_ShouldProbegateExceptionFromTeamsService() throws Exception {
-        when(sessionsService.get(mockRequest))
+        when(sessions.get(mockRequest))
                 .thenReturn(session);
         when(teamsService.getTeamMembersSummary(any()))
                 .thenThrow(new UnauthorizedException(""));
@@ -74,7 +74,7 @@ public class TeamsReportTest extends ZebedeeAPIBaseTestCase {
         try {
             api.getReport(mockRequest, mockResponse);
         } catch (UnauthorizedException e) {
-            verify(sessionsService, times(1)).get(mockRequest);
+            verify(sessions, times(1)).get(mockRequest);
             verify(teamsService, times(1)).getTeamMembersSummary(session);
             verify(mockResponse, never()).getOutputStream();
             throw e;
@@ -93,7 +93,7 @@ public class TeamsReportTest extends ZebedeeAPIBaseTestCase {
         teamUserMapping.add(create("CTeam", "userA"));
         teamUserMapping.add(create("CTeam", "userC"));
 
-        when(sessionsService.get(mockRequest))
+        when(sessions.get(mockRequest))
                 .thenReturn(session);
         when(teamsService.getTeamMembersSummary(session))
                 .thenReturn(teamUserMapping);
@@ -109,7 +109,7 @@ public class TeamsReportTest extends ZebedeeAPIBaseTestCase {
         assertThat(response.getStatus(), equalTo(HttpStatus.OK.value()));
         assertThat(response.getContentType(), equalTo(MediaType.APPLICATION_OCTET_STREAM_VALUE));
 
-        verify(sessionsService, times(1)).get(mockRequest);
+        verify(sessions, times(1)).get(mockRequest);
         verify(teamsService, times(1)).getTeamMembersSummary(session);
 
         // assert that HSSFWorkbook is as expected.

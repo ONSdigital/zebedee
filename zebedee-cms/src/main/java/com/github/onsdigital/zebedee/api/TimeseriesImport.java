@@ -28,7 +28,7 @@ public class TimeseriesImport {
         // otherwise the call to get a request parameter will actually consume the body:
         try (InputStream requestBody = request.getInputStream()) {
 
-            Session session = Root.zebedee.getSessionsService().get(request);
+            Session session = Root.zebedee.getSessions().get(request);
             com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request);
 
             CollectionWriter collectionWriter = new ZebedeeCollectionWriter(Root.zebedee, collection, session);

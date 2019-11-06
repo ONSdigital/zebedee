@@ -2,7 +2,6 @@ package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
-import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.util.ZebedeeCmsService;
 
@@ -29,7 +28,7 @@ public class CheckCollectionsForURI {
     public String get(HttpServletRequest request, HttpServletResponse response)
             throws IOException, UnauthorizedException {
 
-        Session session = Root.zebedee.getSessionsService().get(request);
+        Session session = Root.zebedee.getSessions().get(request);
         if (session == null || !zebedeeCmsService.getPermissions().canEdit(session.getEmail())) {
             throw new UnauthorizedException("You are not authorised to check collections for a URI");
         }

@@ -1,7 +1,6 @@
 package com.github.onsdigital.zebedee.model;
 
 import com.github.onsdigital.zebedee.Zebedee;
-import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
@@ -35,7 +34,7 @@ public class ZebedeeCollectionReaderFactory implements CollectionReaderFactory {
      */
     @Override
     public CollectionReader createCollectionReader(String collectionId, String sessionId) throws NotFoundException, IOException, BadRequestException, UnauthorizedException {
-        Session session = zebedee.getSessionsService().get(sessionId);
+        Session session = zebedee.getSessions().get(sessionId);
         Collection collection = zebedee.getCollections().getCollection(collectionId);
         return getCollectionReader(collection, session);
     }

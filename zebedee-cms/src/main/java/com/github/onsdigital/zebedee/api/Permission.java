@@ -41,7 +41,7 @@ public class Permission {
     public String grantPermission(HttpServletRequest request, HttpServletResponse response, PermissionDefinition permissionDefinition)
             throws IOException, ZebedeeException {
 
-        Session session = Root.zebedee.getSessionsService().get(request);
+        Session session = Root.zebedee.getSessions().get(request);
 
         // Administrator
         if (BooleanUtils.isTrue(permissionDefinition.isAdmin())) {
@@ -95,7 +95,7 @@ public class Permission {
     @GET
     public PermissionDefinition getPermissions(HttpServletRequest request, HttpServletResponse response) throws IOException, NotFoundException, UnauthorizedException {
 
-        Session session = Root.zebedee.getSessionsService().get(request);
+        Session session = Root.zebedee.getSessions().get(request);
         String email = request.getParameter("email");
 
         PermissionDefinition permissionDefinition = Root.zebedee.getPermissionsService().userPermissions(email, session);

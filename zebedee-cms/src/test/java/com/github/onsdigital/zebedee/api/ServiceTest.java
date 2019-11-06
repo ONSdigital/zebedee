@@ -6,7 +6,7 @@ import com.github.onsdigital.zebedee.model.ServiceAccount;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.service.ServiceStore;
 import com.github.onsdigital.zebedee.session.model.Session;
-import com.github.onsdigital.zebedee.session.service.SessionsService;
+import com.github.onsdigital.zebedee.session.service.Sessions;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -45,7 +45,7 @@ public class ServiceTest {
     private PermissionsService permissionsService;
 
     @Mock
-    private SessionsService sessionsService;
+    private Sessions sessions;
 
     @Mock
     private PrintWriter printWriterMock;
@@ -58,7 +58,7 @@ public class ServiceTest {
 
         ReflectionTestUtils.setField(api, "serviceStore", serviceStore);
         ReflectionTestUtils.setField(api, "permissionsService", permissionsService);
-        ReflectionTestUtils.setField(api, "sessionsService", sessionsService);
+        ReflectionTestUtils.setField(api, "sessions", sessions);
     }
 
     @Test
@@ -67,12 +67,12 @@ public class ServiceTest {
         session.setEmail("other@ons.gov.uk");
         session.setId("123");
 
-        when(sessionsService.get(mockRequest)).thenReturn(session);
+        when(sessions.get(mockRequest)).thenReturn(session);
         when(permissionsService.isAdministrator(session)).thenReturn(true);
         when(serviceStore.store(Mockito.anyString(), any())).thenReturn(new ServiceAccount("123"));
         when(mockResponse.getWriter()).thenReturn(printWriterMock);
         api.createService(mockRequest, mockResponse);
-        verify(sessionsService, times(1)).get(mockRequest);
+        verify(sessions, times(1)).get(mockRequest);
         verify(permissionsService, times(1)).isAdministrator(session);
         verify(serviceStore, times(1)).store(Mockito.anyString(), any());
         verify(mockResponse).setStatus(HttpServletResponse.SC_CREATED);
@@ -84,11 +84,11 @@ public class ServiceTest {
         session.setEmail("other@ons.gov.uk");
         session.setId("123");
 
-        when(sessionsService.get(mockRequest)).thenReturn(session);
+        when(sessions.get(mockRequest)).thenReturn(session);
         when(permissionsService.isAdministrator(session)).thenReturn(false);
         when(serviceStore.store(Mockito.anyString(), any())).thenReturn(new ServiceAccount("123"));
         api.createService(mockRequest, mockResponse);
-        verify(sessionsService, times(1)).get(mockRequest);
+        verify(sessions, times(1)).get(mockRequest);
         verify(permissionsService, times(1)).isAdministrator(session);
         verify(serviceStore, times(0)).store(Mockito.anyString(), any());
         verify(mockResponse).setStatus(HttpServletResponse.SC_FORBIDDEN);
@@ -106,7 +106,7 @@ public class ServiceTest {
         api = new Service(false); // explicitly disable the feature for this test case.
         api.createService(mockRequest, mockResponse);
 
-        verifyZeroInteractions(sessionsService, permissionsService, serviceStore);
+        verifyZeroInteractions(sessions, permissionsService, serviceStore);
 
         verify(mockResponse, times(1)).getWriter();
         verify(mockResponse, times(1)).setCharacterEncoding(StandardCharsets.UTF_8.name());

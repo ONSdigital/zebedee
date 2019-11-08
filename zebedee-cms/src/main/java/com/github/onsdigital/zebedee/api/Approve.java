@@ -41,7 +41,7 @@ public class Approve {
     public boolean approveCollection(HttpServletRequest request, HttpServletResponse response) throws IOException, ZebedeeException {
         info().log("approve endpoint: request received");
 
-        Session session = Root.zebedee.getSessionsService().get(request);
+        Session session = Root.zebedee.getSessions().get(request);
         if (session == null) {
             warn().log("approve request: request unsuccessful valid user session not found");
             throw new UnauthorizedException("You are not authorized to approve collections");

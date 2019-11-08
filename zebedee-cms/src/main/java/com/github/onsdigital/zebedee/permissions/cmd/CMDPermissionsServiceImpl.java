@@ -8,7 +8,7 @@ import com.github.onsdigital.zebedee.model.ServiceAccount;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.service.ServiceStore;
 import com.github.onsdigital.zebedee.session.model.Session;
-import com.github.onsdigital.zebedee.session.service.SessionsService;
+import com.github.onsdigital.zebedee.session.service.Sessions;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
@@ -45,14 +45,14 @@ public class CMDPermissionsServiceImpl implements CMDPermissionsService {
 
     public static CMDPermissionsService instance = null;
 
-    private SessionsService sessionsService;
+    private Sessions sessions;
     private Collections collectionsService;
     private ServiceStore serviceStore;
     private PermissionsService collectionPermissions;
 
-    CMDPermissionsServiceImpl(SessionsService sessionsService, Collections collectionsService,
+    CMDPermissionsServiceImpl(Sessions sessions, Collections collectionsService,
                               ServiceStore serviceStore, PermissionsService collectionPermissions) {
-        this.sessionsService = sessionsService;
+        this.sessions = sessions;
         this.collectionsService = collectionsService;
         this.serviceStore = serviceStore;
         this.collectionPermissions = collectionPermissions;
@@ -129,7 +129,7 @@ public class CMDPermissionsServiceImpl implements CMDPermissionsService {
 
         Session session = null;
         try {
-            session = sessionsService.get(sessionID);
+            session = sessions.get(sessionID);
         } catch (IOException ex) {
             error().exception(ex).log("user dataset permissions request failed error getting session");
             throw internalServerErrorException();
@@ -140,7 +140,7 @@ public class CMDPermissionsServiceImpl implements CMDPermissionsService {
             throw sessionNotFoundException();
         }
 
-        if (sessionsService.expired(session)) {
+        if (sessions.expired(session)) {
             info().log("user dataset permissions request denied session expired");
             throw sessionExpiredException();
         }
@@ -181,15 +181,12 @@ public class CMDPermissionsServiceImpl implements CMDPermissionsService {
         try {
             account = serviceStore.get(serviceToken);
         } catch (IOException ex) {
-            error().exception(ex)
-                    .serviceAccountToken(serviceToken)
-                    .log("service dataset permissons request failed error getting service account");
+            error().exception(ex).log("service dataset permissons request failed error getting service account");
             throw internalServerErrorException();
         }
 
         if (account == null) {
-            error().serviceAccountToken(serviceToken)
-                    .log("service dataset permissons request denied service account not found");
+            error().log("service dataset permissons request denied service account not found");
             throw serviceAccountNotFoundException();
         }
         return account;
@@ -238,12 +235,12 @@ public class CMDPermissionsServiceImpl implements CMDPermissionsService {
         if (instance == null) {
             synchronized (CMDPermissionsServiceImpl.class) {
                 if (instance == null) {
-                    SessionsService sessionsService = Root.zebedee.getSessionsService();
+                    Sessions sessions = Root.zebedee.getSessions();
                     ServiceStore serviceStore = Root.zebedee.getServiceStore();
                     Collections collections = Root.zebedee.getCollections();
                     PermissionsService permissionsService = Root.zebedee.getPermissionsService();
 
-                    instance = new CMDPermissionsServiceImpl(sessionsService, collections, serviceStore,
+                    instance = new CMDPermissionsServiceImpl(sessions, collections, serviceStore,
                             permissionsService);
                 }
             }

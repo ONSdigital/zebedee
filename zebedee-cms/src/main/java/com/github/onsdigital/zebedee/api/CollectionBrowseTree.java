@@ -33,7 +33,7 @@ public class CollectionBrowseTree {
         com.github.onsdigital.zebedee.model.Collection collection = Collections
                 .getCollection(request);
 
-        Session session = Root.zebedee.getSessionsService().get(request);
+        Session session = Root.zebedee.getSessions().get(request);
 
         CollectionReader collectionReader = new ZebedeeCollectionReader(Root.zebedee, collection, session);
         return ContentTree.getOverlayed(collection, collectionReader);

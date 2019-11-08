@@ -28,7 +28,7 @@ public class ContentRename {
     public boolean RenameContent(HttpServletRequest request, HttpServletResponse response) throws IOException,
             ZebedeeException {
 
-        Session session = Root.zebedee.getSessionsService().get(request);
+        Session session = Root.zebedee.getSessions().get(request);
         com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request);
 
         String uri = request.getParameter("uri");

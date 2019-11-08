@@ -16,7 +16,8 @@ import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
 import com.github.onsdigital.zebedee.service.DatasetService;
 import com.github.onsdigital.zebedee.service.ServiceStoreImpl;
 import com.github.onsdigital.zebedee.service.ZebedeeDatasetService;
-import com.github.onsdigital.zebedee.session.service.SessionsService;
+import com.github.onsdigital.zebedee.session.service.Sessions;
+import com.github.onsdigital.zebedee.session.service.SessionsServiceImpl;
 import com.github.onsdigital.zebedee.teams.service.TeamsService;
 import com.github.onsdigital.zebedee.teams.service.TeamsServiceImpl;
 import com.github.onsdigital.zebedee.teams.store.TeamsStoreFileSystemImpl;
@@ -73,7 +74,7 @@ public class ZebedeeConfiguration {
     private PermissionsService permissionsService;
     private UsersService usersService;
     private TeamsService teamsService;
-    private SessionsService sessionsService;
+    private Sessions sessions;
     private DataIndex dataIndex;
     private PermissionsStore permissionsStore;
     private DatasetService datasetService;
@@ -125,8 +126,8 @@ public class ZebedeeConfiguration {
         this.dataIndex = new DataIndex(new FileSystemContentReader(publishedContentPath));
         this.publishedCollections = new PublishedCollections(publishedCollectionsPath);
         this.applicationKeys = new ApplicationKeys(applicationKeysPath);
-        this.sessionsService = new SessionsService(sessionsPath);
-        this.keyringCache = new KeyringCache(sessionsService);
+        this.sessions = new SessionsServiceImpl(sessionsPath);
+        this.keyringCache = new KeyringCache(sessions);
 
         this.teamsService = new TeamsServiceImpl(
                 new TeamsStoreFileSystemImpl(teamsPath), this::getPermissionsService);
@@ -266,8 +267,8 @@ public class ZebedeeConfiguration {
         return this.applicationKeys;
     }
 
-    public SessionsService getSessionsService() {
-        return this.sessionsService;
+    public Sessions getSessions() {
+        return this.sessions;
     }
 
     public PermissionsService getPermissionsService() {

@@ -56,7 +56,7 @@ public class Users {
         Object result = null;
 
         String email = request.getParameter(EMAIL_PARAM);
-        Session session = Root.zebedee.getSessionsService().get(request);
+        Session session = Root.zebedee.getSessions().get(request);
 
         if (session != null) {
             // If email is empty
@@ -87,7 +87,7 @@ public class Users {
     @POST
     public UserSanitised create(HttpServletRequest request, HttpServletResponse response, User user) throws
             IOException, ConflictException, BadRequestException, UnauthorizedException {
-        Session session = Root.zebedee.getSessionsService().get(request);
+        Session session = Root.zebedee.getSessions().get(request);
         User created = usersServiceSupplier.getService().create(session, user);
 
         Audit.Event.USER_CREATED
@@ -111,7 +111,7 @@ public class Users {
     @PUT
     public UserSanitised update(HttpServletRequest request, HttpServletResponse response, User updatedUser) throws
             IOException, NotFoundException, BadRequestException, UnauthorizedException {
-        Session session = Root.zebedee.getSessionsService().get(request);
+        Session session = Root.zebedee.getSessions().get(request);
 
         String email = request.getParameter(EMAIL_PARAM);
         User user = usersServiceSupplier.getService().getUserByEmail(email);
@@ -136,7 +136,7 @@ public class Users {
     public boolean delete(HttpServletRequest request, HttpServletResponse response) throws
             UnauthorizedException, IOException, NotFoundException, BadRequestException {
 
-        Session session = Root.zebedee.getSessionsService().get(request);
+        Session session = Root.zebedee.getSessions().get(request);
         String email = request.getParameter(EMAIL_PARAM);
         User user = usersServiceSupplier.getService().getUserByEmail(email);
         boolean result = usersServiceSupplier.getService().delete(session, user);

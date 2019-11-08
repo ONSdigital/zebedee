@@ -46,7 +46,7 @@ public class Password {
     public String setPassword(HttpServletRequest request, HttpServletResponse response, Credentials credentials) throws IOException, UnauthorizedException, BadRequestException, NotFoundException {
 
         // Get the user session
-        Session session = Root.zebedee.getSessionsService().get(request);
+        Session session = Root.zebedee.getSessions().get(request);
 
         // If the user is not logged in, but they are attempting to change their password, authenticate using the old password
         if (session == null && credentials != null) {

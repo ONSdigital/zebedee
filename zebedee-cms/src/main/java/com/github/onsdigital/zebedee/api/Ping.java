@@ -5,7 +5,7 @@ import com.github.onsdigital.zebedee.json.PingRequest;
 import com.github.onsdigital.zebedee.json.PingResponse;
 import com.github.onsdigital.zebedee.reader.util.RequestUtils;
 import com.github.onsdigital.zebedee.session.model.Session;
-import com.github.onsdigital.zebedee.session.service.SessionsService;
+import com.github.onsdigital.zebedee.session.service.Sessions;
 import com.github.onsdigital.zebedee.util.mertics.service.MetricsService;
 
 import javax.servlet.http.HttpServletRequest;
@@ -44,13 +44,13 @@ public class Ping {
     private void setSessionDetails(HttpServletRequest request, PingResponse pingResponse) {
         String token = "";
         try {
-            SessionsService sessionsService = Root.zebedee.getSessionsService();
+            Sessions sessions = Root.zebedee.getSessions();
             token = RequestUtils.getSessionId(request);
-            if (sessionsService.exists(token)) {
-                Session session = sessionsService.read(token);
-                if (session != null && !sessionsService.expired(session)) {
+            if (sessions.exists(token)) {
+                Session session = sessions.get(token);
+                if (session != null && !sessions.expired(session)) {
                     pingResponse.hasSession = true;
-                    pingResponse.sessionExpiryDate = sessionsService.getExpiryDate(session);
+                    pingResponse.sessionExpiryDate = sessions.getExpiryDate(session);
                 }
             }
         } catch (IOException e) {

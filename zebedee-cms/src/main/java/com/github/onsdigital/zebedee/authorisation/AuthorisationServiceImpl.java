@@ -6,7 +6,7 @@ import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.service.ServiceStore;
 import com.github.onsdigital.zebedee.service.ServiceSupplier;
 import com.github.onsdigital.zebedee.session.model.Session;
-import com.github.onsdigital.zebedee.session.service.SessionsService;
+import com.github.onsdigital.zebedee.session.service.Sessions;
 import com.github.onsdigital.zebedee.user.service.UsersService;
 import org.apache.commons.lang3.StringUtils;
 
@@ -20,7 +20,7 @@ import static org.apache.http.HttpStatus.SC_UNAUTHORIZED;
 
 public class AuthorisationServiceImpl implements AuthorisationService {
 
-    private ServiceSupplier<SessionsService> sessionServiceSupplier = () -> Root.zebedee.getSessionsService();
+    private ServiceSupplier<Sessions> sessionsSupplier = () -> Root.zebedee.getSessions();
     private ServiceSupplier<UsersService> userServiceSupplier = () -> Root.zebedee.getUsersService();
     private ServiceSupplier<Collections> collectionsSupplier = () -> Root.zebedee.getCollections();
     private ServiceSupplier<PermissionsService> permissionsServiceSupplier = () -> Root.zebedee.getPermissionsService();
@@ -39,7 +39,7 @@ public class AuthorisationServiceImpl implements AuthorisationService {
 
         Session session;
         try {
-            session = sessionServiceSupplier.getService().get(sessionID);
+            session = sessionsSupplier.getService().get(sessionID);
         } catch (IOException e) {
             error().logException(e, "identify user error, unexpected error while attempting to get user session");
             throw new UserIdentityException(INTERNAL_ERROR, SC_INTERNAL_SERVER_ERROR);

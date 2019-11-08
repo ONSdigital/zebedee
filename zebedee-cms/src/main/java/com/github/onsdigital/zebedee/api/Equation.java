@@ -44,7 +44,7 @@ public class Equation {
             com.github.onsdigital.zebedee.content.page.statistics.document.figure.equation.Equation equation
     ) throws IOException, ZebedeeException, FileUploadException, TranscoderException {
 
-        Session session = Root.zebedee.getSessionsService().get(request);
+        Session session = Root.zebedee.getSessions().get(request);
         com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request);
         String uri = request.getParameter("uri");
 
@@ -95,7 +95,7 @@ public class Equation {
             HttpServletResponse response
     ) throws IOException, ZebedeeException, FileUploadException, TranscoderException {
 
-        Session session = Root.zebedee.getSessionsService().get(request);
+        Session session = Root.zebedee.getSessions().get(request);
         com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request);
         String uri = request.getParameter("uri");
 

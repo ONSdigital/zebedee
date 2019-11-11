@@ -14,5 +14,8 @@ inputs:
 outputs:
   - name: build
 
+params:
+  APPLICATION:
+
 run:
   path: zebedee/ci/scripts/build.sh

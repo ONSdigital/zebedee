@@ -90,8 +90,6 @@ public class Zebedee {
         this.publishedContentPath = configuration.getPublishedContentPath();
 
         this.sessions = configuration.getSessions();
-        //this.sessions = new SessionsClientService();
-
         this.keyringCache = configuration.getKeyringCache();
         this.permissionsService = configuration.getPermissionsService();
         this.published = configuration.getPublished();
@@ -283,7 +281,7 @@ public class Zebedee {
         try {
             session = sessions.create(user);
         } catch (Exception e) {
-            error().data("user", user.getEmail()).exceptionAll(e).log("error attempting to create session for user");
+            error().data("user", user.getEmail()).exception(e).log("error attempting to create session for user");
             throw new IOException(e);
         }
 

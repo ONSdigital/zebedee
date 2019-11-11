@@ -17,7 +17,7 @@ import com.github.onsdigital.zebedee.service.DatasetService;
 import com.github.onsdigital.zebedee.service.ServiceStoreImpl;
 import com.github.onsdigital.zebedee.service.ZebedeeDatasetService;
 import com.github.onsdigital.zebedee.session.service.Sessions;
-import com.github.onsdigital.zebedee.session.service.SessionsServiceImpl;
+import com.github.onsdigital.zebedee.session.service.SessionsClientService;
 import com.github.onsdigital.zebedee.teams.service.TeamsService;
 import com.github.onsdigital.zebedee.teams.service.TeamsServiceImpl;
 import com.github.onsdigital.zebedee.teams.store.TeamsStoreFileSystemImpl;
@@ -88,6 +88,7 @@ public class ZebedeeConfiguration {
         return dir;
     }
 
+
     /**
      * Create a new configuration object.
      *
@@ -96,6 +97,10 @@ public class ZebedeeConfiguration {
      * @throws IOException
      */
     public ZebedeeConfiguration(Path rootPath, boolean enableVerificationAgent) throws IOException {
+        this(rootPath, new SessionsClientService(), enableVerificationAgent);
+    }
+
+    public ZebedeeConfiguration(Path rootPath, Sessions sessions, boolean enableVerificationAgent) throws IOException {
         if (Files.exists(rootPath)) {
             info().data("path", rootPath.toString()).log("setting Zebedee root directory");
         } else {
@@ -123,10 +128,11 @@ public class ZebedeeConfiguration {
         this.useVerificationAgent = enableVerificationAgent;
 
         // Create the services and objects...
+        this.sessions = sessions;
+
         this.dataIndex = new DataIndex(new FileSystemContentReader(publishedContentPath));
         this.publishedCollections = new PublishedCollections(publishedCollectionsPath);
         this.applicationKeys = new ApplicationKeys(applicationKeysPath);
-        this.sessions = new SessionsServiceImpl(sessionsPath);
         this.keyringCache = new KeyringCache(sessions);
 
         this.teamsService = new TeamsServiceImpl(
@@ -177,6 +183,7 @@ public class ZebedeeConfiguration {
                 .data("enable_verification_agent", useVerificationAgent)
                 .log("zebedee configuration creation complete");
     }
+
 
     public boolean isUseVerificationAgent() {
         return useVerificationAgent;
@@ -293,5 +300,10 @@ public class ZebedeeConfiguration {
 
     public ServiceStoreImpl getServiceStore() {
         return new ServiceStoreImpl(servicePath);
+    }
+
+    public void setSessions(final Sessions sessions) {
+        this.sessions = sessions;
+        this.keyringCache = new KeyringCache(sessions);
     }
 }

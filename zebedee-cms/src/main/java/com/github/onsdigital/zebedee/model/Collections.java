@@ -734,7 +734,7 @@ public class Collections {
         } else if (Files.isDirectory(path)) {
             deleted = collection.deleteContentDirectory(session.getEmail(), uri);
         } else {
-            deleted = collection.deleteFile(uri);
+            deleted = deleteFile(collection, uri);
         }
 
         eventType = COLLECTION_CONTENT_DELETED;
@@ -746,6 +746,18 @@ public class Collections {
                     eventType, uri));
         }
         return deleted;
+    }
+
+    private boolean deleteFile(Collection collection, String uri) throws IOException {
+        boolean deleteSuccessful;
+
+        if (Content.isDataJsonFile(uri)) {
+            deleteSuccessful = collection.deleteDataJSON(uri);
+        } else {
+            deleteSuccessful = collection.deleteFile(uri);
+        }
+
+        return deleteSuccessful;
     }
 
     /**

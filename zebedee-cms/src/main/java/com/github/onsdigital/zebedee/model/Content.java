@@ -15,12 +15,14 @@ import java.net.URI;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
-import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 import static com.github.onsdigital.zebedee.model.PathUtils.findByCriteria;
 
 public class Content {
@@ -29,6 +31,7 @@ public class Content {
     public static final String REDIRECT = "redirect.txt";
     public static final String DATA_VIS_DIR = "visualisations";
     public static final String TIME_SERIES_KEYWORD = "timeseries";
+    private static final String DATA_JSON = "data.json";
 
     private static final Predicate<Path> IS_DATA_VIZ_FILE = (p) -> p != null && p.toFile().isDirectory() &&
             DATA_VIS_DIR.equals(p.getFileName().toString());
@@ -376,6 +379,49 @@ public class Content {
     }
 
     /**
+     *
+     */
+    public boolean deleteContentJson(String uri) throws IOException {
+        boolean deleteSuccessful;
+
+        Path pathToDelete = toPath(uri);
+
+        if (!Files.exists(pathToDelete)) {
+            deleteSuccessful = false;
+        } else if (isDataJsonFile(pathToDelete)) {
+            Path parentDir = pathToDelete.getParent();
+            deleteSuccessful = deleteFilesInDir(parentDir);
+        } else {
+            deleteSuccessful = Files.deleteIfExists(pathToDelete);
+        }
+
+        if (deleteSuccessful) {
+            deleteEmptyParentDirectories(pathToDelete);
+        }
+
+        return deleteSuccessful;
+    }
+
+    boolean deleteFilesInDir(Path path) throws IOException {
+        boolean deleteSuccessful = true;
+
+        if (!Files.isDirectory(path)) {
+            return false;
+        } else {
+            List<Path> filesToDelete = Files
+                    .list(path)
+                    .filter(p -> p.toFile().isFile())
+                    .collect(Collectors.toList());
+
+            for (Path p : filesToDelete) {
+                deleteSuccessful &= Files.deleteIfExists(p);
+            }
+        }
+
+        return deleteSuccessful;
+    }
+
+    /**
      * Delete any empty directories left in the folder tree by walking up the folder structure
      *
      * @param path
@@ -433,5 +479,20 @@ public class Content {
 
     public static boolean isDataVisualisationFile(Path path) {
         return findByCriteria(path, IS_DATA_VIZ_FILE);
+    }
+
+    public static boolean isDataJsonFile(String uri) {
+        if (StringUtils.isEmpty(uri)) {
+            return false;
+        }
+        return isDataJsonFile(Paths.get(uri));
+    }
+
+    public static boolean isDataJsonFile(Path path) {
+        boolean result = false;
+        if (path != null) {
+            result = !Files.isDirectory(path) && DATA_JSON.equals(path.getFileName().toString());
+        }
+        return result;
     }
 }

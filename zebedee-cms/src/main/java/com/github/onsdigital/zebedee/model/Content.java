@@ -413,8 +413,8 @@ public class Content {
                     .filter(p -> p.toFile().isFile())
                     .collect(Collectors.toList());
 
-            for (Path p : filesToDelete) {
-                deleteSuccessful &= Files.deleteIfExists(p);
+            for (Path uri : filesToDelete) {
+                deleteSuccessful &= Files.deleteIfExists(uri);
             }
         }
 

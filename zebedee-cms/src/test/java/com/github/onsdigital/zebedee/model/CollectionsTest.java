@@ -956,36 +956,6 @@ public class CollectionsTest {
         }
     }
 
-/*    @Test
-    public void shouldDeleteFile() throws IOException, ZebedeeException {
-        Path uri = rootDir.newFile("data.json").toPath();
-
-*//*        when(permissionsServiceMock.canEdit(TEST_EMAIL))
-                .thenReturn(true);*//*
-
-        String uriStr = uri.toString();
-
-        when(collectionMock.find(uriStr))
-                .thenReturn(uri);
-        when(collectionMock.isInCollection(uri.toString()))
-                .thenReturn(true);
-        when(collectionMock.deleteFile(uri.toString()))
-                .thenReturn(true);
-
-
-        assertThat(collections.deleteContent(collectionMock, uri.toString(), sessionMock), is(true));
-
-        verify(permissionsServiceMock, times(1)).canEdit(TEST_EMAIL);
-        verify(collectionMock, times(1)).find(uri.toString());
-        verify(collectionMock, times(1)).isInCollection(uri.toString());
-        verify(collectionMock, times(2)).getDescription();
-        verify(collectionMock, never()).deleteContentDirectory(any(), any());
-        verify(collectionMock, never()).deleteContentDirectory(anyString(), anyString());
-        verify(collectionMock, times(1)).deleteFile(uri.toString());
-        verify(collectionMock, times(1)).save();
-        verify(collectionHistoryDaoMock, times(1)).saveCollectionHistoryEvent(any(CollectionHistoryEvent.class));
-    }*/
-
     @Test
     public void shouldDeleteFolderRecursively() throws IOException, ZebedeeException {
         Path uri = collectionsPath.resolve("inprogress");

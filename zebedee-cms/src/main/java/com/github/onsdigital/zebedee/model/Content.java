@@ -32,20 +32,10 @@ public class Content {
     public static final String DATA_VIS_DIR = "visualisations";
     public static final String TIME_SERIES_KEYWORD = "timeseries";
     private static final String DATA_JSON = "data.json";
-    private static final String WELSH_DATA_JSON = "cy_data.json";
+    private static final String WELSH_DATA_JSON = "data_cy.json";
 
     private static final Predicate<Path> IS_DATA_VIZ_FILE = (p) -> p != null && p.toFile().isDirectory() &&
             DATA_VIS_DIR.equals(p.getFileName().toString());
-
-    private static final Predicate<Path> IS_CONTENT_DELETE = (p) -> {
-        boolean canDelete;
-        if (p == null) {
-            canDelete = false;
-        } else {
-            canDelete = !p.toFile().isDirectory() && !StringUtils.equals(p.toFile().getName(), WELSH_DATA_JSON);
-        }
-        return canDelete;
-    };
 
     public final Path path;
     public final Path dataVisualisationsPath;
@@ -389,9 +379,6 @@ public class Content {
         return false;
     }
 
-    /**
-     *
-     */
     public boolean deleteContentJson(String uri) throws IOException {
         boolean deleteSuccessful;
 

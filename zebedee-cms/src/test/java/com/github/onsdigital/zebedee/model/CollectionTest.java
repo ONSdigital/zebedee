@@ -1708,7 +1708,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
 
         Path uri = Paths.get("a/b/c");
         assertTrue(c1.complete.getPath().resolve(uri).resolve("data.json").toFile().createNewFile());
-        assertTrue(c1.complete.getPath().resolve(uri).resolve("cy_data.json").toFile().createNewFile());
+        assertTrue(c1.complete.getPath().resolve(uri).resolve("data_cy.json").toFile().createNewFile());
         assertTrue(c1.complete.getPath().resolve(uri).resolve("abc123.json").toFile().createNewFile());
         assertTrue(c1.complete.getPath().resolve(uri).resolve("abc123.xls").toFile().createNewFile());
 
@@ -1718,7 +1718,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         assertFalse(Files.exists(c1.complete.getPath().resolve("a/b/c/data.json")));
         assertFalse(Files.exists(c1.complete.getPath().resolve("a/b/c/abc123.json")));
         assertFalse(Files.exists(c1.complete.getPath().resolve("a/b/c/abc123.xls")));
-        assertTrue(Files.exists(c1.complete.getPath().resolve("a/b/c/cy_data.json")));
+        assertTrue(Files.exists(c1.complete.getPath().resolve("a/b/c/data_cy.json")));
     }
 
     /**

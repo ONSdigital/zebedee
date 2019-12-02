@@ -1698,6 +1698,30 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
     }
 
     /**
+     * deleteDataJSON should all files at the specified URI but should not delete any cy_data.json files if they exist.
+     */
+    @Test
+    public void deleteDataJSONShouldNotDeleteCYDataFiles() throws Exception {
+        Collection c1 = createCollection(rootDir.getRoot().toPath(), "nargle");
+
+        assertTrue(c1.complete.getPath().resolve("a/b/c").toFile().mkdirs());
+
+        Path uri = Paths.get("a/b/c");
+        assertTrue(c1.complete.getPath().resolve(uri).resolve("data.json").toFile().createNewFile());
+        assertTrue(c1.complete.getPath().resolve(uri).resolve("cy_data.json").toFile().createNewFile());
+        assertTrue(c1.complete.getPath().resolve(uri).resolve("abc123.json").toFile().createNewFile());
+        assertTrue(c1.complete.getPath().resolve(uri).resolve("abc123.xls").toFile().createNewFile());
+
+        boolean deleteSuccessful = c1.deleteDataJSON("/a/b/c/data.json");
+
+        assertTrue(deleteSuccessful);
+        assertFalse(Files.exists(c1.complete.getPath().resolve("a/b/c/data.json")));
+        assertFalse(Files.exists(c1.complete.getPath().resolve("a/b/c/abc123.json")));
+        assertFalse(Files.exists(c1.complete.getPath().resolve("a/b/c/abc123.xls")));
+        assertTrue(Files.exists(c1.complete.getPath().resolve("a/b/c/cy_data.json")));
+    }
+
+    /**
      * deleteDataJSON should delete all files at the specified URI and should also delete an previous version of
      * the URI that has been created in the reviewed dir.
      */

@@ -32,9 +32,20 @@ public class Content {
     public static final String DATA_VIS_DIR = "visualisations";
     public static final String TIME_SERIES_KEYWORD = "timeseries";
     private static final String DATA_JSON = "data.json";
+    private static final String WELSH_DATA_JSON = "cy_data.json";
 
     private static final Predicate<Path> IS_DATA_VIZ_FILE = (p) -> p != null && p.toFile().isDirectory() &&
             DATA_VIS_DIR.equals(p.getFileName().toString());
+
+    private static final Predicate<Path> IS_CONTENT_DELETE = (p) -> {
+        boolean canDelete;
+        if (p == null) {
+            canDelete = false;
+        } else {
+            canDelete = !p.toFile().isDirectory() && !StringUtils.equals(p.toFile().getName(), WELSH_DATA_JSON);
+        }
+        return canDelete;
+    };
 
     public final Path path;
     public final Path dataVisualisationsPath;
@@ -390,7 +401,7 @@ public class Content {
             deleteSuccessful = false;
         } else if (isDataJsonFile(pathToDelete)) {
             Path parentDir = pathToDelete.getParent();
-            deleteSuccessful = deleteFilesInDir(parentDir);
+            deleteSuccessful = deleteDataJsonFile(parentDir);
         } else {
             deleteSuccessful = Files.deleteIfExists(pathToDelete);
         }
@@ -402,7 +413,11 @@ public class Content {
         return deleteSuccessful;
     }
 
-    boolean deleteFilesInDir(Path path) throws IOException {
+    /**
+     * Delete files from the specified collection directory. directories and cy_data.json are exluded all other files
+     * will be deleted.
+     */
+    boolean deleteDataJsonFile(Path path) throws IOException {
         boolean deleteSuccessful = true;
 
         if (!Files.isDirectory(path)) {
@@ -410,7 +425,7 @@ public class Content {
         } else {
             List<Path> filesToDelete = Files
                     .list(path)
-                    .filter(p -> p.toFile().isFile())
+                    .filter(file -> canDeleteWithDataJson(file))
                     .collect(Collectors.toList());
 
             for (Path uri : filesToDelete) {
@@ -494,5 +509,22 @@ public class Content {
             result = !Files.isDirectory(path) && DATA_JSON.equals(path.getFileName().toString());
         }
         return result;
+    }
+
+    /**
+     * Determines if a file should also be deleted when a data.json file is delete from a collection.
+     * Returns true if the path is not null, is not for a directory and the file is not names cy_data.json.
+     *
+     * @param p the file path to evaluate.
+     * @return true or false.
+     */
+    static boolean canDeleteWithDataJson(Path p) {
+        boolean canDelete;
+        if (p == null) {
+            canDelete = false;
+        } else {
+            canDelete = !p.toFile().isDirectory() && !StringUtils.equals(p.toFile().getName(), WELSH_DATA_JSON);
+        }
+        return canDelete;
     }
 }

@@ -987,7 +987,7 @@ public class Collection {
     }
 
     /**
-     * Delete a content page and clean up any related/generated files.
+     * Delete a data.json page and any related/generated files.
      * <p>
      * Delete the specified data.json and any other files in the same directory - non data.json files in the same
      * directory are supplimentary files related to the page content - tables, charts, images etc. Also deletes any
@@ -995,7 +995,7 @@ public class Collection {
      *
      * @return true the delete is successful, false otherwise.
      */
-    public boolean deleteDataJSON(String uri) throws IOException {
+    public boolean deleteFileAndRelated(String uri) throws IOException {
         boolean deleteSuccessful = false;
 
         String checkURI = uri;

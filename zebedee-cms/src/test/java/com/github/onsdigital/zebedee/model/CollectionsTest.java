@@ -978,7 +978,7 @@ public class CollectionsTest {
         verify(permissionsServiceMock, times(1)).canEdit(TEST_EMAIL);
         verify(collectionMock, times(1)).find(uri.toString());
         verify(collectionMock, times(1)).isInCollection(uri.toString());
-        verify(collectionMock, times(2)).getDescription();
+        verify(collectionMock, times(4)).getDescription();
         /*verify(collectionMock, never()).deleteContentDirectory(any(), any());*/
         verify(collectionMock, times(1)).deleteContentDirectory(TEST_EMAIL, uri.toString());
         verify(collectionMock, never()).deleteFile(uri.toString());
@@ -1109,7 +1109,7 @@ public class CollectionsTest {
         when(collectionMock.isInCollection(uri.toString()))
                 .thenReturn(true);
 
-        when(collectionMock.deleteDataJSON(uri.toString()))
+        when(collectionMock.deleteFileAndRelated(uri.toString()))
                 .thenAnswer(i -> Files.deleteIfExists(uri));
 
         boolean deleteSuccessful = collections.deleteContent(collectionMock, uri.toString(), sessionMock);

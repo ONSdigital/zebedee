@@ -1665,7 +1665,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         assertTrue(c1.getInProgress().getPath().resolve(uri).resolve("abc123.json").toFile().createNewFile());
         assertTrue(c1.getInProgress().getPath().resolve(uri).resolve("abc123.xls").toFile().createNewFile());
 
-        boolean deleteSuccessful = c1.deleteDataJSON("/a/b/c/data.json");
+        boolean deleteSuccessful = c1.deleteFileAndRelated("/a/b/c/data.json");
 
         assertTrue(deleteSuccessful);
         assertTrue(c1.getInProgress().getPath().toFile().list().length == 0);
@@ -1688,7 +1688,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         assertTrue(c1.complete.getPath().resolve(uri).resolve("abc123.xls").toFile().createNewFile());
         assertTrue(c1.complete.getPath().resolve("a/b/c/d").resolve("data.json").toFile().createNewFile());
 
-        boolean deleteSuccessful = c1.deleteDataJSON("/a/b/c/data.json");
+        boolean deleteSuccessful = c1.deleteFileAndRelated("/a/b/c/data.json");
 
         assertTrue(deleteSuccessful);
         assertFalse(Files.exists(c1.complete.getPath().resolve("a/b/c/data.json")));
@@ -1712,7 +1712,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         assertTrue(c1.complete.getPath().resolve(uri).resolve("abc123.json").toFile().createNewFile());
         assertTrue(c1.complete.getPath().resolve(uri).resolve("abc123.xls").toFile().createNewFile());
 
-        boolean deleteSuccessful = c1.deleteDataJSON("/a/b/c/data.json");
+        boolean deleteSuccessful = c1.deleteFileAndRelated("/a/b/c/data.json");
 
         assertTrue(deleteSuccessful);
         assertFalse(Files.exists(c1.complete.getPath().resolve("a/b/c/data.json")));
@@ -1742,7 +1742,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         assertTrue(c1.reviewed.getPath().resolve("a/b/c/previous/v1/abc123.json").toFile().createNewFile());
         assertTrue(c1.reviewed.getPath().resolve("a/b/c/previous/v1/abc123.xls").toFile().createNewFile());
 
-        boolean deleteSuccessful = c1.deleteDataJSON("/a/b/c/data.json");
+        boolean deleteSuccessful = c1.deleteFileAndRelated("/a/b/c/data.json");
 
         assertTrue(deleteSuccessful);
         assertFalse(Files.exists(c1.complete.getPath().resolve("a/b/c/data.json")));

@@ -388,7 +388,7 @@ public class Content {
             deleteSuccessful = false;
         } else if (isDataJsonFile(pathToDelete)) {
             Path parentDir = pathToDelete.getParent();
-            deleteSuccessful = deleteDataJsonFile(parentDir);
+            deleteSuccessful = deleteDataJsonFileAndRelatedPreviousVersionFiles(parentDir);
         } else {
             deleteSuccessful = Files.deleteIfExists(pathToDelete);
         }
@@ -404,7 +404,7 @@ public class Content {
      * Delete files from the specified collection directory. directories and cy_data.json are exluded all other files
      * will be deleted.
      */
-    boolean deleteDataJsonFile(Path path) throws IOException {
+    boolean deleteDataJsonFileAndRelatedPreviousVersionFiles(Path path) throws IOException {
         boolean deleteSuccessful = true;
 
         if (!Files.isDirectory(path)) {

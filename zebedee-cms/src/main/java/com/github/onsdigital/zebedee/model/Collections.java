@@ -744,10 +744,10 @@ public class Collections {
         CMSLogEvent event = info().collectionID(collection).uri(contentTargetPath);
 
         if (isDataVisualisationFile(contentTargetPath)) {
-            event.log("deleting data viz zip form collection content");
+            event.log("deleting data viz zip from collection content");
             deleted = collection.deleteDataVisContent(session, Paths.get(uri));
         } else if (Files.isDirectory(contentTargetPath)) {
-            event.log("deleting directory form collection content");
+            event.log("deleting directory from collection content");
             deleted = collection.deleteContentDirectory(session.getEmail(), uri);
         } else if (Content.isDataJsonFile(uri)) {
             event.log("deleting data.json and related files from collection content");

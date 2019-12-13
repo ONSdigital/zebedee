@@ -16,6 +16,7 @@ import com.github.onsdigital.zebedee.json.ApprovalStatus;
 import com.github.onsdigital.zebedee.json.Event;
 import com.github.onsdigital.zebedee.json.EventType;
 import com.github.onsdigital.zebedee.json.Keyring;
+import com.github.onsdigital.zebedee.logging.CMSLogEvent;
 import com.github.onsdigital.zebedee.model.approval.ApprovalQueue;
 import com.github.onsdigital.zebedee.model.approval.ApproveTask;
 import com.github.onsdigital.zebedee.model.publishing.PostPublisher;
@@ -59,10 +60,10 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
-import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
-import static com.github.onsdigital.logging.v2.event.SimpleEvent.warn;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getUnauthorizedMessage;
+import static com.github.onsdigital.zebedee.logging.CMSLogEvent.error;
+import static com.github.onsdigital.zebedee.logging.CMSLogEvent.info;
+import static com.github.onsdigital.zebedee.logging.CMSLogEvent.warn;
 import static com.github.onsdigital.zebedee.model.Content.isDataVisualisationFile;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_APPROVED;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_COMPLETED_ERROR;
@@ -717,34 +718,45 @@ public class Collections {
         }
 
         // Find the file if it exists
-        Path path = collection.find(uri);
+        Path contentTargetPath = collection.find(uri);
 
         // Check the user has access to the given file
-        if (path == null || !collection.isInCollection(uri)) {
+        if (contentTargetPath == null || !collection.isInCollection(uri)) {
             throw new NotFoundException(
                     "This URI cannot be found in the collection");
         }
 
-        // Go ahead
-        boolean deleted;
-        CollectionEventType eventType;
+        boolean deleted = deletcContentFromCollection(collection, session, contentTargetPath, uri);
+        collection.save();
 
-        if (isDataVisualisationFile(path)) {
+        if (deleted) {
+            removeEmptyCollectionDirectories(contentTargetPath);
+            collectionHistoryDaoSupplier.get().saveCollectionHistoryEvent(new CollectionHistoryEvent(collection, session,
+                    COLLECTION_CONTENT_DELETED, uri));
+        }
+        return deleted;
+    }
+
+    boolean deletcContentFromCollection(Collection collection, Session session, Path contentTargetPath, String uri) throws IOException {
+        boolean deleted;
+        Path uriPath = Paths.get(uri);
+
+        CMSLogEvent event = info().collectionID(collection).uri(contentTargetPath);
+
+        if (isDataVisualisationFile(contentTargetPath)) {
+            event.log("deleting data viz zip from collection content");
             deleted = collection.deleteDataVisContent(session, Paths.get(uri));
-        } else if (Files.isDirectory(path)) {
+        } else if (Files.isDirectory(contentTargetPath)) {
+            event.log("deleting directory from collection content");
             deleted = collection.deleteContentDirectory(session.getEmail(), uri);
+        } else if (Content.isDataJsonFile(uri)) {
+            event.log("deleting data.json and related files from collection content");
+            deleted = collection.deleteFileAndRelated(uri);
         } else {
+            event.log("deleting single file from colleciton content");
             deleted = collection.deleteFile(uri);
         }
 
-        eventType = COLLECTION_CONTENT_DELETED;
-
-        collection.save();
-        if (deleted) {
-            removeEmptyCollectionDirectories(path);
-            collectionHistoryDaoSupplier.get().saveCollectionHistoryEvent(new CollectionHistoryEvent(collection, session,
-                    eventType, uri));
-        }
         return deleted;
     }
 

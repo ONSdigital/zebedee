@@ -11,6 +11,8 @@ import com.github.onsdigital.zebedee.permissions.cmd.CRUD;
 import com.github.onsdigital.zebedee.session.model.Session;
 import org.apache.commons.lang3.StringUtils;
 
+import java.nio.file.Path;
+
 import static com.github.onsdigital.logging.v2.DPLogger.logConfig;
 
 public class CMSLogEvent extends BaseEvent<CMSLogEvent> {
@@ -90,6 +92,20 @@ public class CMSLogEvent extends BaseEvent<CMSLogEvent> {
     public CMSLogEvent datasetPermissions(CRUD CRUD) {
         if (CRUD != null) {
             data("dataset_permissions", CRUD);
+        }
+        return this;
+    }
+
+    public CMSLogEvent uri(Path uri) {
+        if (uri != null) {
+            uri(uri.toString());
+        }
+        return this;
+    }
+
+    public CMSLogEvent uri(String uri) {
+        if (StringUtils.isNotEmpty(uri)) {
+            data("uri", uri);
         }
         return this;
     }

@@ -43,6 +43,9 @@ import java.util.concurrent.locks.Lock;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.warn;
 import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
 import static com.github.onsdigital.zebedee.model.publishing.PostPublisher.getPublishedCollection;
 import static com.github.onsdigital.zebedee.util.SlackNotification.CollectionStage.PUBLISH;
@@ -50,10 +53,6 @@ import static com.github.onsdigital.zebedee.util.SlackNotification.StageStatus.F
 import static com.github.onsdigital.zebedee.util.SlackNotification.StageStatus.STARTED;
 import static com.github.onsdigital.zebedee.util.SlackNotification.collectionAlarm;
 import static com.github.onsdigital.zebedee.util.SlackNotification.publishNotification;
-
-import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
-import static com.github.onsdigital.logging.v2.event.SimpleEvent.warn;
-import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
 
 
 public class Publisher {
@@ -239,7 +238,7 @@ public class Publisher {
             collectionAlarm(collection, "Exception publishAction collection", msg);
 
             // If an error was caught, attempt to roll back the transaction:
-            Map<String, String> transactionIds = collection.getDescription().publishTransactionIds;
+            Map<String, String> transactionIds = collection.getDescription().getPublishTransactionIds();
             if (transactionIds != null && transactionIds.size() > 0) {
 
                 error().data("publishing", true).data("collectionId", collection.getDescription().getId())
@@ -283,15 +282,15 @@ public class Publisher {
                     checkResponse(response, null, begin, collection.getDescription().getId());
                     hostToTransactionIDMap.put(host.toString(), response.body.transaction.id);
                 } catch (IOException e) {
+                    Map<String, String> transactionIdMap = collection.getDescription().getPublishTransactionIds();
                     error().data("publishing", true).data("trainHost", host).data("collectionId", collectionId).
                             logException(e, "error while attempting to create new transactions for collection");
 
-                    if (collection.getDescription().publishTransactionIds != null
-                            && !collection.getDescription().publishTransactionIds.isEmpty()) {
+                    if (transactionIdMap != null && !transactionIdMap.isEmpty()) {
                         warn().data("publishing", true).data("trainHost", host).data("collectionId", collectionId).
                                 log("clearing existing transactionIDs from collection");
 
-                        collection.getDescription().publishTransactionIds.clear();
+                        collection.getDescription().getPublishTransactionIds().clear();
                     }
                     result = e;
                 }
@@ -300,7 +299,7 @@ public class Publisher {
         }
 
         checkFutureResults(results, "error creating publishAction transaction");
-        collection.getDescription().publishTransactionIds = hostToTransactionIDMap;
+        collection.getDescription().setPublishTransactionIds(hostToTransactionIDMap);
         collection.save();
 
         info().data("publishing", true).data("collectionId", collectionId)
@@ -346,7 +345,7 @@ public class Publisher {
                         publishUri = StringUtils.removeEnd(uri, "-to-publish.zip");
                     }
 
-                    for (Map.Entry<String, String> entry : collection.getDescription().publishTransactionIds.entrySet()) {
+                    for (Map.Entry<String, String> entry : collection.getDescription().getPublishTransactionIds().entrySet()) {
                         Host theTrainHost = new Host(entry.getKey());
                         String transactionId = entry.getValue();
 
@@ -360,7 +359,7 @@ public class Publisher {
         checkFutureResults(results, "error while attempting to publish file");
 
         info().data("publishing", true).data("collectionId", collection.getDescription().getId())
-                .data("hostToTransactionID", collection.getDescription().publishTransactionIds)
+                .data("hostToTransactionID", collection.getDescription().getPublishTransactionIds())
                 .data("timeTaken", (System.currentTimeMillis() - start)).log("successfully sent all publish file requests to the train");
     }
 
@@ -414,7 +413,7 @@ public class Publisher {
 
         String collectionId = collection.getDescription().getId();
 
-        for (Map.Entry<String, String> entry : collection.getDescription().publishTransactionIds.entrySet()) {
+        for (Map.Entry<String, String> entry : collection.getDescription().getPublishTransactionIds().entrySet()) {
             Host theTrainHost = new Host(entry.getKey());
             String transactionId = entry.getValue();
 
@@ -444,7 +443,7 @@ public class Publisher {
         checkFutureResults(futures, "error sending publish manifest");
 
         info().data("publishing", true).data("collectionId", collection.getDescription().getId())
-                .data("hostToTransactionId", collection.getDescription().publishTransactionIds)
+                .data("hostToTransactionId", collection.getDescription().getPublishTransactionIds())
                 .data("timeTaken", System.currentTimeMillis() - start)
                 .log("successfully sent publish manifest for collection to train hosts");
     }
@@ -454,7 +453,7 @@ public class Publisher {
 
         // If all has gone well so far, commit the publishAction transaction:
         boolean isSuccess = true;
-        for (Result result : commitPublish(collection.getDescription().publishTransactionIds)) {
+        for (Result result : commitPublish(collection.getDescription().getPublishTransactionIds())) {
             isSuccess &= !result.error;
             collection.getDescription().AddPublishResult(result);
         }
@@ -573,7 +572,7 @@ public class Publisher {
      * @param collection the collection to roll back
      */
     public static void rollbackPublish(Collection collection) {
-        for (Map.Entry<String, String> entry : collection.getDescription().publishTransactionIds.entrySet()) {
+        for (Map.Entry<String, String> entry : collection.getDescription().getPublishTransactionIds().entrySet()) {
             Host host = new Host(entry.getKey());
 
             String transactionId = entry.getValue();
@@ -584,14 +583,14 @@ public class Publisher {
                         .setParameter(TRANSACTION_ID_PARAM, transactionId);
 
                 warn().data("publishing", true).data("collectionId", collectionId)
-                        .data("hostToTransactionId", collection.getDescription().publishTransactionIds)
+                        .data("hostToTransactionId", collection.getDescription().getPublishTransactionIds())
                         .log("sending rollback transaction request for collection");
 
                 Response<Result> response = http.post(endpoint, Result.class);
                 checkResponse(response, transactionId, endpoint, null);
 
                 info().data("publishing", true).data("collectionId", collectionId)
-                        .data("hostToTransactionId", collection.getDescription().publishTransactionIds)
+                        .data("hostToTransactionId", collection.getDescription().getPublishTransactionIds())
                         .log("publish rollback request was successful");
 
             } catch (IOException e) {
@@ -620,7 +619,7 @@ public class Publisher {
                     .data("statusCode", code)
                     .data("reason", reason)
                     .data("message", message)
-                    .logException(io,"request was unsuccessful");
+                    .logException(io, "request was unsuccessful");
             throw io;
 
         } else if (response.body.error == true) {
@@ -687,7 +686,7 @@ public class Publisher {
         String collectionId = collection.getDescription().getId();
 
         info().data("publishing", true).data("publishComplete", publishComplete).data("collectionId", collectionId)
-                .data("hostToTransactionId", collection.getDescription().publishTransactionIds)
+                .data("hostToTransactionId", collection.getDescription().getPublishTransactionIds())
                 .log("persisting collection changes to disk");
 
         try {
@@ -695,7 +694,7 @@ public class Publisher {
         } catch (Exception e) {
 
             error().data("publishing", true).data("collectionId", collectionId).data("publishComplete", publishComplete)
-                    .data("hostToTransactionId", collection.getDescription().publishTransactionIds)
+                    .data("hostToTransactionId", collection.getDescription().getPublishTransactionIds())
                     .logException(e, "error while attempting to persist collection changes to disk");
         }
     }

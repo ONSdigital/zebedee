@@ -24,7 +24,7 @@ public class CollectionDescription extends CollectionBase {
     public List<String> reviewedUris;
     public ApprovalStatus approvalStatus = ApprovalStatus.NOT_STARTED;
     public boolean publishComplete;
-    public Map<String, String> publishTransactionIds;
+    private Map<String, String> publishTransactionIds;
     public Date publishStartDate; // The date the publish process was actually started
     public Date publishEndDate; // The date the publish process ended.
     public boolean isEncrypted;
@@ -202,9 +202,10 @@ public class CollectionDescription extends CollectionBase {
 
     /**
      * Get the dataset version for the given values
+     *
      * @param datasetID - the dataset ID of the version
-     * @param edition - the dataset edition of the version
-     * @param version - the version
+     * @param edition   - the dataset edition of the version
+     * @param version   - the version
      * @return an optional containing the dataset version if it exists.
      */
     public Optional<CollectionDatasetVersion> getDatasetVersion(String datasetID, String edition, String version) {
@@ -222,6 +223,7 @@ public class CollectionDescription extends CollectionBase {
 
     /**
      * Add a dataset version to this collection.
+     *
      * @param version
      */
     public void addDatasetVersion(CollectionDatasetVersion version) {
@@ -243,5 +245,13 @@ public class CollectionDescription extends CollectionBase {
         if (this.datasetVersions == null) return;
 
         this.datasetVersions.remove(version);
+    }
+
+    public Map<String, String> getPublishTransactionIds() {
+        return this.publishTransactionIds;
+    }
+
+    public void setPublishTransactionIds(Map<String, String> publishTransactionIds) {
+        this.publishTransactionIds = publishTransactionIds;
     }
 }

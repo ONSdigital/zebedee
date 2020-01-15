@@ -21,6 +21,8 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
@@ -156,9 +158,16 @@ public class TeamsStoreFileSystemImplTest {
     public void listTeams_Success() throws Exception {
         ReflectionTestUtils.setField(store, "teamLock", rwLock);
 
-        List<Team> expected = createTeams();
+        // Sort teams by name to prevent any ordering weirdness
+        Comparator<Team> teamComparator = (c1, c2) -> c1.getName().compareTo(c2.getName());
 
-        assertThat(store.listTeams(), equalTo(expected));
+        List<Team> expected = createTeams();
+        Collections.sort(expected, teamComparator);
+
+        List<Team> actual = store.listTeams();
+        Collections.sort(actual, teamComparator);
+
+        assertThat(actual, equalTo(expected));
         verify(rwLock, times(2)).readLock();
         verify(lock, times(1)).lock();
         verify(lock, times(1)).unlock();

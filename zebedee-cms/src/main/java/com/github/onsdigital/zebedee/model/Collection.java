@@ -1486,7 +1486,7 @@ public class Collection {
     }
 
     public Content getInProgress() {
-        return this.complete;
+        return this.inProgress;
     }
 }
 

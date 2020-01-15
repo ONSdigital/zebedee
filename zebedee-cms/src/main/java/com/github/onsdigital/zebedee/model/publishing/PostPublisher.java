@@ -280,8 +280,8 @@ public class PostPublisher {
     private static void unzipTimeseries(Collection collection, CollectionReader collectionReader, Zebedee zebedee) throws IOException, ZebedeeException {
         info().data("collectionId", collection.getDescription().getId()).log("Unzipping files if required to move to master.");
 
-        for (String uri : collection.reviewed.uris()) {
-            Path source = collection.reviewed.get(uri);
+        for (String uri : collection.getReviewed().uris()) {
+            Path source = collection.getReviewed().get(uri);
             if (source != null) {
                 if (source.getFileName().toString().equals("timeseries-to-publish.zip")) {
                     String publishUri = StringUtils.removeStart(StringUtils.removeEnd(uri, "-to-publish.zip"), "/");
@@ -307,7 +307,7 @@ public class PostPublisher {
 
             long start = System.currentTimeMillis();
 
-            List<String> uris = collection.reviewed.uris("*data.json");
+            List<String> uris = collection.getReviewed().uris("*data.json");
             for (String uri : uris) {
                 if (isIndexedUri(uri)) {
                     String contentUri = URIUtils.removeLastSegment(uri);
@@ -365,7 +365,7 @@ public class PostPublisher {
         info().data("collectionId", collection.getDescription().getId()).log("Moving files from collection into master");
 
         // Move each item of content:
-        for (String uri : collection.reviewed.uris()) {
+        for (String uri : collection.getReviewed().uris()) {
             if (!VersionedContentItem.isVersionedUri(uri)
                     && !FilenameUtils.getName(uri).equals("timeseries-to-publish.zip")) {
                 Path destination = zebedee.getPublished().toPath(uri);
@@ -385,7 +385,7 @@ public class PostPublisher {
 
         String filename = PathUtils.toFilename(collection.getDescription().getName());
         Path collectionJsonSource = zebedee.getCollections().path.resolve(filename + ".json");
-        Path collectionFilesSource = collection.reviewed.path;
+        Path collectionFilesSource = collection.getReviewed().path;
         Path logPath = zebedee.getPublishedCollections().path;
 
         if (!Files.exists(logPath)) {
@@ -414,7 +414,7 @@ public class PostPublisher {
                 .data("to", collectionFilesDestination.toString())
                 .log("moving collection files");
 
-        for (String uri : collection.reviewed.uris()) {
+        for (String uri : collection.getReviewed().uris()) {
             try (
                     Resource resource = collectionReader.getResource(uri);
                     InputStream inputStream = resource.getData();

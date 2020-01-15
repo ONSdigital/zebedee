@@ -122,7 +122,7 @@ public class ApproveTask implements Callable<Boolean> {
             info().data("collectionId", collection.getDescription().getId())
                     .data("user", session.getEmail()).log("approve task: beginning approval process");
 
-            List<ContentDetail> collectionContent = contentDetailResolver.resolve(collection.reviewed,
+            List<ContentDetail> collectionContent = contentDetailResolver.resolve(collection.getReviewed(),
                     collectionReader.getReviewed());
             eventLog.resolvedDetails();
 

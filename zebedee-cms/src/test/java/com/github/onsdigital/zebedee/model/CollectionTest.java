@@ -1210,7 +1210,8 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         collection.review(builder.createSession(builder.publisher2), releaseJsonUri, recursive);
 
         ContentDetail articleDetail = new ContentDetail("My article", "/some/uri", PageType.article.toString());
-        FileUtils.write(collection.reviewed.path.resolve("some/uri/data.json").toFile(), Serialiser.serialise(articleDetail));
+        FileUtils.write(collection.getReviewed().path.resolve("some/uri/data.json").toFile(),
+                Serialiser.serialise(articleDetail));
 
 
         // When we attempt to populate the release from the collection.
@@ -1219,7 +1220,8 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
                 collection.description.getId());
         FakeCollectionWriter collectionWriter = new FakeCollectionWriter(zebedee.getCollections().path.toString(),
                 collection.description.getId());
-        Iterable<ContentDetail> collectionContent = ContentDetailUtil.resolveDetails(collection.reviewed, collectionReader.getReviewed());
+        Iterable<ContentDetail> collectionContent = ContentDetailUtil.resolveDetails(collection.getReviewed(),
+                collectionReader.getReviewed());
 
         Release result = collection.populateRelease(
                 collectionReader,
@@ -1331,14 +1333,14 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
 
         // Then the version directory is created, with the page and associated files copied into it
         // check versions file exists
-        Path versionsDirectoryPath = collection.reviewed.get(Paths.get(uri).resolve(VersionedContentItem.getVersionDirectoryName()).toUri());
+        Path versionsDirectoryPath = collection.getReviewed().get(Paths.get(uri).resolve(VersionedContentItem.getVersionDirectoryName()).toUri());
         assertTrue(Files.exists(versionsDirectoryPath));
 
         // check the json file is in there
-        assertTrue(Files.exists(collection.reviewed.get(version.getUri())));
+        assertTrue(Files.exists(collection.getReviewed().get(version.getUri())));
 
         // check for an associated file
-        assertTrue(Files.exists(collection.reviewed.get(Paths.get(version.getUri()).resolve("data.json").toString())));
+        assertTrue(Files.exists(collection.getReviewed().get(Paths.get(version.getUri()).resolve("data.json").toString())));
     }
 
     @Test(expected = NotFoundException.class)
@@ -1373,14 +1375,14 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         builder.createPublishedFile(uri + "/data.json");
         ContentItemVersion version = collection.version(publisher1Email, uri, collectionWriter);
 
-        assertTrue(Files.exists(collection.reviewed.get(version.getUri())));
-        assertTrue(Files.exists(collection.reviewed.get(version.getUri()).resolve("data.json")));
+        assertTrue(Files.exists(collection.getReviewed().get(version.getUri())));
+        assertTrue(Files.exists(collection.getReviewed().get(version.getUri()).resolve("data.json")));
 
         // When the delete version function is called for the version URI
         collection.deleteVersion(version.getUri());
 
         // Then the versions directory is deleted.
-        assertNull(collection.reviewed.get(version.getUri()));
+        assertNull(collection.getReviewed().get(version.getUri()));
     }
 
     private Release createRelease(String uri, Date releaseDate) throws IOException {
@@ -1669,8 +1671,8 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
 
         assertTrue(deleteSuccessful);
         assertTrue(c1.getInProgress().getPath().toFile().list().length == 0);
-        assertTrue(c1.complete.getPath().toFile().list().length == 0);
-        assertTrue(c1.reviewed.getPath().toFile().list().length == 0);
+        assertTrue(c1.getComplete().getPath().toFile().list().length == 0);
+        assertTrue(c1.getReviewed().getPath().toFile().list().length == 0);
     }
 
     /**
@@ -1680,21 +1682,21 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
     public void deleteDataJSONShouldNotDeleteSubDirs() throws Exception {
         Collection c1 = createCollection(rootDir.getRoot().toPath(), "nargle");
 
-        assertTrue(c1.complete.getPath().resolve("a/b/c/d").toFile().mkdirs());
+        assertTrue(c1.getComplete().getPath().resolve("a/b/c/d").toFile().mkdirs());
 
         Path uri = Paths.get("a/b/c");
-        assertTrue(c1.complete.getPath().resolve(uri).resolve("data.json").toFile().createNewFile());
-        assertTrue(c1.complete.getPath().resolve(uri).resolve("abc123.json").toFile().createNewFile());
-        assertTrue(c1.complete.getPath().resolve(uri).resolve("abc123.xls").toFile().createNewFile());
-        assertTrue(c1.complete.getPath().resolve("a/b/c/d").resolve("data.json").toFile().createNewFile());
+        assertTrue(c1.getComplete().getPath().resolve(uri).resolve("data.json").toFile().createNewFile());
+        assertTrue(c1.getComplete().getPath().resolve(uri).resolve("abc123.json").toFile().createNewFile());
+        assertTrue(c1.getComplete().getPath().resolve(uri).resolve("abc123.xls").toFile().createNewFile());
+        assertTrue(c1.getComplete().getPath().resolve("a/b/c/d").resolve("data.json").toFile().createNewFile());
 
         boolean deleteSuccessful = c1.deleteFileAndRelated("/a/b/c/data.json");
 
         assertTrue(deleteSuccessful);
-        assertFalse(Files.exists(c1.complete.getPath().resolve("a/b/c/data.json")));
-        assertFalse(Files.exists(c1.complete.getPath().resolve("a/b/c/abc123.json")));
-        assertFalse(Files.exists(c1.complete.getPath().resolve("a/b/c/abc123.xls")));
-        assertTrue(Files.exists(c1.complete.getPath().resolve("a/b/c/d/data.json")));
+        assertFalse(Files.exists(c1.getComplete().getPath().resolve("a/b/c/data.json")));
+        assertFalse(Files.exists(c1.getComplete().getPath().resolve("a/b/c/abc123.json")));
+        assertFalse(Files.exists(c1.getComplete().getPath().resolve("a/b/c/abc123.xls")));
+        assertTrue(Files.exists(c1.getComplete().getPath().resolve("a/b/c/d/data.json")));
     }
 
     /**
@@ -1704,21 +1706,21 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
     public void deleteDataJSONShouldNotDeleteCYDataFiles() throws Exception {
         Collection c1 = createCollection(rootDir.getRoot().toPath(), "nargle");
 
-        assertTrue(c1.complete.getPath().resolve("a/b/c").toFile().mkdirs());
+        assertTrue(c1.getComplete().getPath().resolve("a/b/c").toFile().mkdirs());
 
         Path uri = Paths.get("a/b/c");
-        assertTrue(c1.complete.getPath().resolve(uri).resolve("data.json").toFile().createNewFile());
-        assertTrue(c1.complete.getPath().resolve(uri).resolve("data_cy.json").toFile().createNewFile());
-        assertTrue(c1.complete.getPath().resolve(uri).resolve("abc123.json").toFile().createNewFile());
-        assertTrue(c1.complete.getPath().resolve(uri).resolve("abc123.xls").toFile().createNewFile());
+        assertTrue(c1.getComplete().getPath().resolve(uri).resolve("data.json").toFile().createNewFile());
+        assertTrue(c1.getComplete().getPath().resolve(uri).resolve("data_cy.json").toFile().createNewFile());
+        assertTrue(c1.getComplete().getPath().resolve(uri).resolve("abc123.json").toFile().createNewFile());
+        assertTrue(c1.getComplete().getPath().resolve(uri).resolve("abc123.xls").toFile().createNewFile());
 
         boolean deleteSuccessful = c1.deleteFileAndRelated("/a/b/c/data.json");
 
         assertTrue(deleteSuccessful);
-        assertFalse(Files.exists(c1.complete.getPath().resolve("a/b/c/data.json")));
-        assertFalse(Files.exists(c1.complete.getPath().resolve("a/b/c/abc123.json")));
-        assertFalse(Files.exists(c1.complete.getPath().resolve("a/b/c/abc123.xls")));
-        assertTrue(Files.exists(c1.complete.getPath().resolve("a/b/c/data_cy.json")));
+        assertFalse(Files.exists(c1.getComplete().getPath().resolve("a/b/c/data.json")));
+        assertFalse(Files.exists(c1.getComplete().getPath().resolve("a/b/c/abc123.json")));
+        assertFalse(Files.exists(c1.getComplete().getPath().resolve("a/b/c/abc123.xls")));
+        assertTrue(Files.exists(c1.getComplete().getPath().resolve("a/b/c/data_cy.json")));
     }
 
     /**
@@ -1729,29 +1731,29 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
     public void deleteDataJSONShouldDeletePreviousVersionFromReviewed() throws Exception {
         Collection c1 = createCollection(rootDir.getRoot().toPath(), "nargle");
 
-        assertTrue(c1.complete.getPath().resolve("a/b/c").toFile().mkdirs());
-        assertTrue(c1.reviewed.getPath().resolve("a/b/c/previous/v1").toFile().mkdirs());
+        assertTrue(c1.getComplete().getPath().resolve("a/b/c").toFile().mkdirs());
+        assertTrue(c1.getReviewed().getPath().resolve("a/b/c/previous/v1").toFile().mkdirs());
 
         Path uri = Paths.get("a/b/c");
-        assertTrue(c1.complete.getPath().resolve(uri).resolve("data.json").toFile().createNewFile());
-        assertTrue(c1.complete.getPath().resolve(uri).resolve("abc123.json").toFile().createNewFile());
-        assertTrue(c1.complete.getPath().resolve(uri).resolve("abc123.xls").toFile().createNewFile());
+        assertTrue(c1.getComplete().getPath().resolve(uri).resolve("data.json").toFile().createNewFile());
+        assertTrue(c1.getComplete().getPath().resolve(uri).resolve("abc123.json").toFile().createNewFile());
+        assertTrue(c1.getComplete().getPath().resolve(uri).resolve("abc123.xls").toFile().createNewFile());
 
         // mock a previous version of the content in the reviewed dir.
-        assertTrue(c1.reviewed.getPath().resolve("a/b/c/previous/v1/data.json").toFile().createNewFile());
-        assertTrue(c1.reviewed.getPath().resolve("a/b/c/previous/v1/abc123.json").toFile().createNewFile());
-        assertTrue(c1.reviewed.getPath().resolve("a/b/c/previous/v1/abc123.xls").toFile().createNewFile());
+        assertTrue(c1.getReviewed().getPath().resolve("a/b/c/previous/v1/data.json").toFile().createNewFile());
+        assertTrue(c1.getReviewed().getPath().resolve("a/b/c/previous/v1/abc123.json").toFile().createNewFile());
+        assertTrue(c1.getReviewed().getPath().resolve("a/b/c/previous/v1/abc123.xls").toFile().createNewFile());
 
         boolean deleteSuccessful = c1.deleteFileAndRelated("/a/b/c/data.json");
 
         assertTrue(deleteSuccessful);
-        assertFalse(Files.exists(c1.complete.getPath().resolve("a/b/c/data.json")));
-        assertFalse(Files.exists(c1.complete.getPath().resolve("a/b/c/abc123.json")));
-        assertFalse(Files.exists(c1.complete.getPath().resolve("a/b/c/abc123.xls")));
+        assertFalse(Files.exists(c1.getComplete().getPath().resolve("a/b/c/data.json")));
+        assertFalse(Files.exists(c1.getComplete().getPath().resolve("a/b/c/abc123.json")));
+        assertFalse(Files.exists(c1.getComplete().getPath().resolve("a/b/c/abc123.xls")));
 
-        assertFalse(Files.exists(c1.reviewed.getPath().resolve("a/b/c/previous/v1/data.json")));
-        assertFalse(Files.exists(c1.reviewed.getPath().resolve("a/b/c/previous/v1/abc123.json")));
-        assertFalse(Files.exists(c1.reviewed.getPath().resolve("a/b/c/previous/v1/abc123.xld")));
+        assertFalse(Files.exists(c1.getReviewed().getPath().resolve("a/b/c/previous/v1/data.json")));
+        assertFalse(Files.exists(c1.getReviewed().getPath().resolve("a/b/c/previous/v1/abc123.json")));
+        assertFalse(Files.exists(c1.getReviewed().getPath().resolve("a/b/c/previous/v1/abc123.xld")));
     }
 
     public static Collection createCollection(Path destination, String collectionName) throws CollectionNotFoundException, IOException {

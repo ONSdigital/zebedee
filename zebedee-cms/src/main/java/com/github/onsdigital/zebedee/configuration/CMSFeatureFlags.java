@@ -31,11 +31,11 @@ public class CMSFeatureFlags {
     private CMSFeatureFlags() {
         this.isDatasetImportEnabled = Boolean.valueOf(getConfigValue(ENABLE_DATASET_IMPORT));
         this.isPermissionsAuthEnabled = Boolean.valueOf(getConfigValue(ENABLE_PERMISSIONS_AUTH));
-        this.isVerifyPublishEnabled = Boolean.valueOf(getConfigValue(ENABLE_PERMISSIONS_AUTH));
+        this.isVerifyPublishEnabled = Boolean.valueOf(getConfigValue(ENABLE_VERIFY_PUBLISH_CONTENT));
 
         info().data(ENABLE_DATASET_IMPORT, isDatasetImportEnabled)
                 .data(ENABLE_PERMISSIONS_AUTH, isPermissionsAuthEnabled)
-                .data(ENABLE_PERMISSIONS_AUTH, isVerifyPublishEnabled)
+                .data(ENABLE_VERIFY_PUBLISH_CONTENT, isVerifyPublishEnabled)
                 .log("CMS feature flags configurations");
     }
 
@@ -59,8 +59,8 @@ public class CMSFeatureFlags {
     /**
      * @return true if the verify publish content feature has been to enabled false (default) otherwise.
      */
-    public static String getEnableVerifyPublishContent() {
-        return CMSFeatureFlags.ENABLE_VERIFY_PUBLISH_CONTENT;
+    public boolean isVerifyPublishEnabled() {
+        return this.isVerifyPublishEnabled;
     }
 
     public static String getConfigValue(String name) {

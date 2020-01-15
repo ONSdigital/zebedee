@@ -13,6 +13,7 @@ import java.io.InputStream;
 import java.text.MessageFormat;
 import java.util.concurrent.Callable;
 
+import static com.github.onsdigital.zebedee.logging.CMSLogEvent.info;
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -52,6 +53,11 @@ public class ContentHashVerificationTask implements Callable<Boolean> {
         String expected = getExpectedHashValue();
 
         if (StringUtils.equals(expected, actual)) {
+            info().collectionID(collectionID)
+                    .uri(uri)
+                    .data("train_host", host)
+                    .data("transaction_id", transactionId)
+                    .log("content hash verified");
             return true;
         }
 

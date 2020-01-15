@@ -3,6 +3,7 @@ package com.github.onsdigital.zebedee.model.publishing;
 import com.github.davidcarboni.httpino.Endpoint;
 import com.github.davidcarboni.httpino.Host;
 import com.github.davidcarboni.httpino.Response;
+import com.github.onsdigital.zebedee.configuration.CMSFeatureFlags;
 import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.json.ApprovalStatus;
 import com.github.onsdigital.zebedee.json.Event;
@@ -10,8 +11,13 @@ import com.github.onsdigital.zebedee.json.EventType;
 import com.github.onsdigital.zebedee.json.publishing.Result;
 import com.github.onsdigital.zebedee.json.publishing.UriInfo;
 import com.github.onsdigital.zebedee.json.publishing.request.Manifest;
+import com.github.onsdigital.zebedee.logging.CMSLogEvent;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
+import com.github.onsdigital.zebedee.model.publishing.client.PublishingClient;
+import com.github.onsdigital.zebedee.model.publishing.client.PublishingClientImpl;
+import com.github.onsdigital.zebedee.model.publishing.verify.ContentHashVerificationTask;
+import com.github.onsdigital.zebedee.model.publishing.verify.HashVerificationException;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.service.DatasetService;
@@ -28,6 +34,7 @@ import java.net.URI;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Date;
@@ -41,12 +48,13 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.locks.Lock;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
-import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
-import static com.github.onsdigital.logging.v2.event.SimpleEvent.warn;
 import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
+import static com.github.onsdigital.zebedee.logging.CMSLogEvent.error;
+import static com.github.onsdigital.zebedee.logging.CMSLogEvent.info;
+import static com.github.onsdigital.zebedee.logging.CMSLogEvent.warn;
 import static com.github.onsdigital.zebedee.model.publishing.PostPublisher.getPublishedCollection;
 import static com.github.onsdigital.zebedee.util.SlackNotification.CollectionStage.PUBLISH;
 import static com.github.onsdigital.zebedee.util.SlackNotification.StageStatus.FAILED;
@@ -95,10 +103,15 @@ public class Publisher {
      * Execute the publishing steps.
      */
     public static boolean executePublish(Collection collection, CollectionReader collectionReader, String email)
-            throws IOException {
+            throws IOException, ExecutionException, InterruptedException {
         boolean success = false;
 
         publishFilteredCollectionFiles(collection, collectionReader);
+
+        if (CMSFeatureFlags.cmsFeatureFlags().isVerifyPublishEnabled()) {
+            info().collectionID(collection).log("verifying publish content");
+            verifyPublishContent(collection, collectionReader);
+        }
 
         // TODO - feels like we should check/return here if unsuccessful?
         success = commitPublish(collection, email);
@@ -223,7 +236,8 @@ public class Publisher {
      * @return If publishAction succeeded, true.
      * @throws IOException If a general error occurs.
      */
-    public static boolean publishFilesToWebsite(Collection collection, String email, CollectionReader collectionReader) throws IOException {
+    public static boolean publishFilesToWebsite(Collection collection, String email, CollectionReader collectionReader)
+            throws IOException {
         boolean publishComplete = false;
 
         try {
@@ -233,32 +247,47 @@ public class Publisher {
             publishComplete = executePublish(collection, collectionReader, email);
 
             collection.getDescription().publishEndDate = new Date();
-        } catch (Exception e) {
-            PostMessageField msg = new PostMessageField("Error", e.getMessage(), false);
-            collectionAlarm(collection, "Exception publishAction collection", msg);
-
-            // If an error was caught, attempt to roll back the transaction:
-            Map<String, String> transactionIds = collection.getDescription().getPublishTransactionIds();
-            if (transactionIds != null && transactionIds.size() > 0) {
-
-                error().data("publishing", true).data("collectionId", collection.getDescription().getId())
-                        .data("hostToTransactionID", transactionIds)
-                        .logException(e, "error while attempting to publish, transaction IDs found for collection attempting to rollback");
-
-                rollbackPublish(collection);
-            } else {
-
-                error().data("publishing", true).data("collectionId", collection.getDescription().getId())
-                        .data("hostToTransactionID", transactionIds)
-                        .logException(e, "error while attempting to publish, no transaction IDs found for collection no rollback will be attempted");
-
-            }
-
+        } catch (Exception ex) {
+            handlePublishingException(ex, collection);
         } finally {
             // Save any updates to the collection
             saveCollection(collection, publishComplete);
         }
         return publishComplete;
+    }
+
+    private static void handlePublishingException(Exception ex, Collection collection) {
+        CMSLogEvent event = error().data("publishing", true).data("collectionId", collection.getDescription().getId());
+
+        if (ex instanceof ExecutionException) {
+            extractHashVerificationExceptionDetails((ExecutionException) ex, event);
+        }
+
+        PostMessageField msg = new PostMessageField("Error", ex.getMessage(), false);
+        collectionAlarm(collection, "Exception publishAction collection", msg);
+
+        // If an error was caught, attempt to roll back the transaction:
+        Map<String, String> transactionIds = collection.getDescription().getPublishTransactionIds();
+        if (transactionIds != null && transactionIds.size() > 0) {
+            String message = "error publishing transaction IDs found for collection attempting to rollback";
+            event.data("hostToTransactionID", transactionIds).logException(ex, message);
+
+            rollbackPublish(collection);
+        } else {
+            String message = "error publishing no transaction IDs found for collection no rollback will be attempted";
+            event.logException(ex, message);
+        }
+    }
+
+    private static void extractHashVerificationExceptionDetails(ExecutionException ex, CMSLogEvent event) {
+        Throwable cause = ex.getCause();
+        if ((cause != null) && (cause instanceof HashVerificationException)) {
+            HashVerificationException verificationEx = (HashVerificationException) cause;
+
+            event.data("train_host", verificationEx.getHost())
+                    .data("transaction_id", verificationEx.getTransactionId())
+                    .data("uri", verificationEx.getUri());
+        }
     }
 
     public static Map<String, String> createPublishingTransactions(Collection collection)
@@ -308,6 +337,60 @@ public class Publisher {
                 .log("successfully created publish transactions for collection");
 
         return hostToTransactionIDMap;
+    }
+
+    private static void verifyPublishContent(Collection collection, CollectionReader reader) throws IOException,
+            InterruptedException, ExecutionException {
+        List<Callable<Boolean>> tasks = createContentVerificationTasks(collection, reader);
+        List<Future<Boolean>> verifyResults = executeContentVerificationTasks(tasks);
+        checkVerifyContentResults(verifyResults);
+    }
+
+    private static List<Callable<Boolean>> createContentVerificationTasks(Collection collection,
+                                                                          CollectionReader reader) throws IOException {
+        List<Callable<Boolean>> tasks = new ArrayList<>();
+        PublishingClient publishingClient = new PublishingClientImpl();
+        Map<String, String> hostToTransactionMap = collection.getDescription().getPublishTransactionIds();
+
+        for (String uri : getCollectionUrisToVerify(collection)) {
+
+            for (Map.Entry<String, String> hostTransactionMapping : hostToTransactionMap.entrySet()) {
+                String host = hostTransactionMapping.getKey();
+                String transactionId = hostTransactionMapping.getValue();
+
+                tasks.add(new ContentHashVerificationTask.Builder()
+                        .collectionID(collection.getId())
+                        .collectionReader(reader)
+                        .contentURI(uri)
+                        .publishingAPIHost(host)
+                        .transactionId(transactionId)
+                        .publishingClient(publishingClient)
+                        .build());
+            }
+        }
+
+        return tasks;
+    }
+
+    private static List<String> getCollectionUrisToVerify(Collection collection) throws IOException {
+        Predicate<String> verifyUri = (uri) ->
+                !Paths.get(uri).toFile().getName().endsWith(".zip") && !VersionedContentItem.isVersionedUri(uri);
+
+        return collection.reviewed.uris()
+                .stream().filter(verifyUri)
+                .collect(Collectors.toList());
+    }
+
+    private static List<Future<Boolean>> executeContentVerificationTasks(List<Callable<Boolean>> tasks) throws
+            InterruptedException {
+        return pool.invokeAll(tasks);
+    }
+
+    private static void checkVerifyContentResults(List<Future<Boolean>> verifyResults) throws InterruptedException,
+            ExecutionException {
+        for (Future<Boolean> result : verifyResults) {
+            result.get();
+        }
     }
 
     /**

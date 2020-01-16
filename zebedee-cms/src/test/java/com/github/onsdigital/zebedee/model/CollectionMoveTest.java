@@ -121,9 +121,9 @@ public class CollectionMoveTest extends ZebedeeTestBaseFixture {
     }
 
     void savePages() throws IOException {
-        writePageToContent(collection.inProgress, martin);
-        writePageToContent(collection.inProgress, bedford);
-        writePageToContent(collection.inProgress, bedfordshire);
+        writePageToContent(collection.getInProgress(), martin);
+        writePageToContent(collection.getInProgress(), bedford);
+        writePageToContent(collection.getInProgress(), bedfordshire);
     }
 
     void reloadPages() throws IOException {

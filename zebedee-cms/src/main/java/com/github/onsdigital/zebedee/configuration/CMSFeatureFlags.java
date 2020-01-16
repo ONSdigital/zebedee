@@ -35,7 +35,7 @@ public class CMSFeatureFlags {
 
         info().data(ENABLE_DATASET_IMPORT, isDatasetImportEnabled)
                 .data(ENABLE_PERMISSIONS_AUTH, isPermissionsAuthEnabled)
-                .data(ENABLE_PERMISSIONS_AUTH, isVerifyPublishEnabled)
+                .data(ENABLE_VERIFY_PUBLISH_CONTENT, isVerifyPublishEnabled)
                 .log("CMS feature flags configurations");
     }
 

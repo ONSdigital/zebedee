@@ -70,7 +70,7 @@ public class CsdbImporterTest extends ZebedeeTestBaseFixture {
         collectionWriter = new FakeCollectionWriter(zebedee.getCollections().path.toString(), collection
                 .getDescription().getId());
 
-        try (InputStream inputStream = Files.newInputStream(collection.reviewed.get(datasetPath).resolve("data.json"))) {
+        try (InputStream inputStream = Files.newInputStream(collection.getReviewed().get(datasetPath).resolve("data.json"))) {
             unpublishedDataset = ContentUtil.deserialise(inputStream, Dataset.class);
         }
 

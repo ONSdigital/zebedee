@@ -412,11 +412,11 @@ public class Publisher {
         long start = System.currentTimeMillis();
 
         // Publish each item of content:
-        for (String uri : collection.reviewed.uris()) {
+        for (String uri : collection.getReviewed().uris()) {
             if (!shouldBeFiltered(filters, uri)) {
                 //publishFile(collection, encryptionPassword, results, uri, collectionReader);
 
-                Path source = collection.reviewed.get(uri);
+                Path source = collection.getReviewed().get(uri);
                 if (source != null) {
                     boolean zipped = false;
                     String publishUri = uri;

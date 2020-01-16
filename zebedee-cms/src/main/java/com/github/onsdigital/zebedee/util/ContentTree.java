@@ -53,9 +53,9 @@ public class ContentTree {
      */
     public static ContentDetail getOverlayed(Collection collection, CollectionReader reader) throws IOException, ZebedeeException {
         ContentDetail publishedDetails = get().clone();
-        publishedDetails.overlayDetails(ContentDetailUtil.resolveDetails(collection.inProgress, reader.getInProgress()));
-        publishedDetails.overlayDetails(ContentDetailUtil.resolveDetails(collection.complete, reader.getComplete()));
-        publishedDetails.overlayDetails(ContentDetailUtil.resolveDetails(collection.reviewed, reader.getReviewed()));
+        publishedDetails.overlayDetails(ContentDetailUtil.resolveDetails(collection.getInProgress(), reader.getInProgress()));
+        publishedDetails.overlayDetails(ContentDetailUtil.resolveDetails(collection.getComplete(), reader.getComplete()));
+        publishedDetails.overlayDetails(ContentDetailUtil.resolveDetails(collection.getReviewed(), reader.getReviewed()));
         contentDeleteService.overlayDeletedNodesInBrowseTree(publishedDetails);
         return publishedDetails;
     }

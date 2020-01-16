@@ -109,9 +109,9 @@ public class Collection {
 
     public final CollectionDescription description;
     public final Path path;
-    public final Content reviewed;
-    public final Content complete;
-    public final Content inProgress;
+    private final Content reviewed;
+    private final Content complete;
+    private final Content inProgress;
 
     public final Zebedee zebedee;
 
@@ -1383,11 +1383,6 @@ public class Collection {
         return true;
     }
 
-    public Content getInProgress() {
-        return inProgress;
-    }
-
-
     /**
      * Return true if this collection has had all of its content reviewed.
      */
@@ -1480,6 +1475,18 @@ public class Collection {
         }
 
         return conflictLogMap;
+    }
+
+    public Content getReviewed() {
+        return this.reviewed;
+    }
+
+    public Content getComplete() {
+        return this.complete;
+    }
+
+    public Content getInProgress() {
+        return this.inProgress;
     }
 }
 

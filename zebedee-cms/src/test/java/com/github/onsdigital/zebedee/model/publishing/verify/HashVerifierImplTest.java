@@ -9,6 +9,8 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.util.HashMap;
+
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.when;
@@ -84,6 +86,22 @@ public class HashVerifierImplTest {
             hashVerifier.verifyTransactionContent(collection, reader);
         } catch (IllegalArgumentException ex) {
             assertThat(ex.getMessage(), equalTo("description.publishingTransactionIds required but was null"));
+            throw ex;
+        }
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void verifyTransactionContent_HostTransactionMapEmpty_ExceptionThrown() throws Exception {
+        when(collection.getDescription())
+                .thenReturn(description);
+
+        when(description.getPublishTransactionIds())
+                .thenReturn(new HashMap<>());
+
+        try {
+            hashVerifier.verifyTransactionContent(collection, reader);
+        } catch (IllegalArgumentException ex) {
+            assertThat(ex.getMessage(), equalTo("error verifying transaction content: host-to-transactionId mapping expected but none found"));
             throw ex;
         }
     }

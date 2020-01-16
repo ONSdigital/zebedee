@@ -1,5 +1,6 @@
 package com.github.onsdigital.zebedee.model.publishing.verify;
 
+import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
 import com.github.onsdigital.zebedee.model.publishing.client.PublishingClient;
@@ -35,19 +36,30 @@ public class HashVerifierImpl implements HashVerifier {
 
     public void verifyTransactionContent(Collection collection, CollectionReader reader) throws IOException,
             InterruptedException, ExecutionException {
-
         validateParams(collection, reader);
 
         List<Callable<Boolean>> tasks = createVerifyTasks(collection, reader);
+
         List<Future<Boolean>> verifyResults = executeVerifyTasks(tasks);
+
         checkVerifyResults(verifyResults);
     }
 
     private void validateParams(Collection collection, CollectionReader reader) {
         requireNotNull(collection, "collection required but was null");
-        requireNotNull(collection.getDescription(), "collection.description required but was null");
-        requireNotNull(collection.getDescription().getPublishTransactionIds(), "description.publishingTransactionIds required but was null");
+
         requireNotNull(reader, "collection reader required but was null");
+
+        CollectionDescription desc = collection.getDescription();
+        requireNotNull(desc, "collection.description required but was null");
+
+        Map<String, String> hostTransactionMap = desc.getPublishTransactionIds();
+        requireNotNull(hostTransactionMap, "description.publishingTransactionIds required but was null");
+
+        if (hostTransactionMap.isEmpty()) {
+            throw new IllegalArgumentException(
+                    "error verifying transaction content: host-to-transactionId mapping expected but none found");
+        }
     }
 
     private <T> void requireNotNull(T t, String message) {
@@ -110,7 +122,7 @@ public class HashVerifierImpl implements HashVerifier {
         return pool.invokeAll(tasks);
     }
 
-    private static void checkVerifyResults(List<Future<Boolean>> verifyResults) throws InterruptedException,
+    private void checkVerifyResults(List<Future<Boolean>> verifyResults) throws InterruptedException,
             ExecutionException {
         for (Future<Boolean> result : verifyResults) {
             result.get();

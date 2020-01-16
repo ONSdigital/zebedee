@@ -18,6 +18,7 @@ import com.github.onsdigital.zebedee.model.publishing.client.PublishingClient;
 import com.github.onsdigital.zebedee.model.publishing.client.PublishingClientImpl;
 import com.github.onsdigital.zebedee.model.publishing.verify.ContentHashVerificationTask;
 import com.github.onsdigital.zebedee.model.publishing.verify.HashVerificationException;
+import com.github.onsdigital.zebedee.model.publishing.verify.HashVerifierImpl;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.service.DatasetService;
@@ -376,7 +377,8 @@ public class Publisher {
         Predicate<String> verifyUri = (uri) ->
                 !Paths.get(uri).toFile().getName().endsWith(".zip") && !VersionedContentItem.isVersionedUri(uri);
 
-        return collection.reviewed.uris()
+        return collection.getReviewed()
+                .uris()
                 .stream().filter(verifyUri)
                 .collect(Collectors.toList());
     }

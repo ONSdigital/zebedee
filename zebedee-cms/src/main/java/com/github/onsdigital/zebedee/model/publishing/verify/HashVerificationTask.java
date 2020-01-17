@@ -24,7 +24,7 @@ import static java.util.Objects.requireNonNull;
  * Implements {@link Callable} and returns true if the hash was as expected
  * throws an {@link HashVerificationException} wrapped in an {@link java.util.concurrent.ExecutionException} otherwise.
  */
-public class ContentHashVerificationTask implements Callable<Boolean> {
+public class HashVerificationTask implements Callable<Boolean> {
 
     static final String HASH_INCORRECT_ERR = "file content hash from remote server did not match the expected value " +
             "expected {0}, actual {1}";
@@ -38,7 +38,7 @@ public class ContentHashVerificationTask implements Callable<Boolean> {
     private String uri;
     private PublishingClient publishingClient;
 
-    private ContentHashVerificationTask(Builder builder) {
+    HashVerificationTask(Builder builder) {
         this.collectionID = requireNonNull(builder.getCollectionID());
         this.collectionReader = requireNonNull(builder.getReader());
         this.host = requireNonNull(builder.getPublishingAPIHost());
@@ -49,7 +49,7 @@ public class ContentHashVerificationTask implements Callable<Boolean> {
 
     @Override
     public Boolean call() throws Exception {
-        String actual = publishingClient.getContentHash(host, transactionId, uri).getHash();
+        String actual = getRemoteHashValue();
         String expected = getExpectedHashValue();
 
         if (StringUtils.equals(expected, actual)) {
@@ -62,6 +62,15 @@ public class ContentHashVerificationTask implements Callable<Boolean> {
         }
 
         throw incorrectHashValueException(expected, actual);
+    }
+
+    private String getRemoteHashValue() {
+        try {
+            return publishingClient.getContentHash(host, transactionId, uri).getHash();
+        } catch (Exception ex) {
+            throw new HashVerificationException("publishing client get content hash returned an error", ex,
+                    collectionID, host, transactionId, uri);
+        }
     }
 
     private String getExpectedHashValue() {
@@ -111,7 +120,7 @@ public class ContentHashVerificationTask implements Callable<Boolean> {
 
         if (o == null || getClass() != o.getClass()) return false;
 
-        ContentHashVerificationTask that = (ContentHashVerificationTask) o;
+        HashVerificationTask that = (HashVerificationTask) o;
 
         return new EqualsBuilder()
                 .append(this.collectionID, that.collectionID)
@@ -136,7 +145,7 @@ public class ContentHashVerificationTask implements Callable<Boolean> {
     }
 
     /**
-     * Class provides a <i>builder</i> style interface for creating a new {@link ContentHashVerificationTask} instance.
+     * Class provides a <i>builder</i> style interface for creating a new {@link HashVerificationTask} instance.
      */
     public static class Builder {
         private String collectionID;
@@ -195,10 +204,10 @@ public class ContentHashVerificationTask implements Callable<Boolean> {
         }
 
         /**
-         * Construct a new {@link ContentHashVerificationTask} instance.
+         * Construct a new {@link HashVerificationTask} instance.
          */
-        public ContentHashVerificationTask build() {
-            return new ContentHashVerificationTask(this);
+        public HashVerificationTask build() {
+            return new HashVerificationTask(this);
         }
 
         public String getCollectionID() {

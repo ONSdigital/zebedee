@@ -16,9 +16,8 @@ import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
 import com.github.onsdigital.zebedee.model.publishing.client.PublishingClient;
 import com.github.onsdigital.zebedee.model.publishing.client.PublishingClientImpl;
-import com.github.onsdigital.zebedee.model.publishing.verify.ContentHashVerificationTask;
+import com.github.onsdigital.zebedee.model.publishing.verify.HashVerificationTask;
 import com.github.onsdigital.zebedee.model.publishing.verify.HashVerificationException;
-import com.github.onsdigital.zebedee.model.publishing.verify.HashVerifierImpl;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.service.DatasetService;
@@ -359,7 +358,7 @@ public class Publisher {
                 String host = hostTransactionMapping.getKey();
                 String transactionId = hostTransactionMapping.getValue();
 
-                tasks.add(new ContentHashVerificationTask.Builder()
+                tasks.add(new HashVerificationTask.Builder()
                         .collectionID(collection.getId())
                         .collectionReader(reader)
                         .contentURI(uri)

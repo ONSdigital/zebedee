@@ -27,27 +27,22 @@ public class HashVerifierImpl implements HashVerifier {
     private PublishingClient publishingClient;
 
     public HashVerifierImpl() {
-        this.publishingClient = new PublishingClientImpl();
+        this(new PublishingClientImpl());
     }
 
     public HashVerifierImpl(PublishingClient publishingClient) {
         this.publishingClient = publishingClient;
     }
 
-    public void verifyTransactionContent(Collection collection, CollectionReader reader) throws IOException,
-            InterruptedException, ExecutionException {
+    public void verifyTransactionContent(Collection collection, CollectionReader reader) throws HashVerificationException {
         validateParams(collection, reader);
-
         List<Callable<Boolean>> tasks = createVerifyTasks(collection, reader);
-
         List<Future<Boolean>> verifyResults = executeVerifyTasks(tasks);
-
         checkVerifyResults(verifyResults);
     }
 
     private void validateParams(Collection collection, CollectionReader reader) {
         requireNotNull(collection, "collection required but was null");
-
         requireNotNull(reader, "collection reader required but was null");
 
         CollectionDescription desc = collection.getDescription();
@@ -68,8 +63,7 @@ public class HashVerifierImpl implements HashVerifier {
         }
     }
 
-    private List<Callable<Boolean>> createVerifyTasks(Collection collection, CollectionReader reader)
-            throws IOException {
+    private List<Callable<Boolean>> createVerifyTasks(Collection collection, CollectionReader reader) {
         Map<String, String> hostTransactionIdMap = collection.getDescription().getPublishTransactionIds();
         List<String> urisToVerify = getCollectionUrisToVerify(collection);
         List<Callable<Boolean>> tasks = new ArrayList<>();
@@ -99,7 +93,7 @@ public class HashVerifierImpl implements HashVerifier {
                                                              String host, String transactionId,
                                                              List<String> transactionURIs) {
         return transactionURIs.stream()
-                .map(uri -> new ContentHashVerificationTask.Builder()
+                .map(uri -> new HashVerificationTask.Builder()
                         .collectionID(collectionId)
                         .collectionReader(reader)
                         .contentURI(uri)
@@ -110,26 +104,46 @@ public class HashVerifierImpl implements HashVerifier {
                 .collect(Collectors.toList());
     }
 
-    private List<String> getCollectionUrisToVerify(Collection collection) throws IOException {
-        return collection.getReviewed().uris()
-                .stream()
-                .filter(publishedContentFilter())
-                .collect(Collectors.toList());
+    private List<String> getCollectionUrisToVerify(Collection collection) throws HashVerificationException {
+        try {
+            return collection.getReviewed().uris()
+                    .stream()
+                    .filter(publishedContentFilter())
+                    .collect(Collectors.toList());
+        } catch (IOException ex) {
+            throw new HashVerificationException("error getting collection reviewed uris", ex, collection.getId(), "",
+                    "", "");
+        }
     }
 
-    private List<Future<Boolean>> executeVerifyTasks(List<Callable<Boolean>> tasks) throws
-            InterruptedException {
-        return pool.invokeAll(tasks);
+    private List<Future<Boolean>> executeVerifyTasks(List<Callable<Boolean>> tasks) {
+        try {
+            return pool.invokeAll(tasks);
+        } catch (InterruptedException ex) {
+            throw new HashVerificationException("error executing content verification tasks", ex);
+        }
     }
 
-    private void checkVerifyResults(List<Future<Boolean>> verifyResults) throws InterruptedException,
-            ExecutionException {
-        for (Future<Boolean> result : verifyResults) {
-            result.get();
+    private void checkVerifyResults(List<Future<Boolean>> verifyResults) throws HashVerificationException {
+        try {
+            for (Future<Boolean> result : verifyResults) {
+                result.get();
+            }
+        } catch (Exception ex) {
+            handleCheckVerifyResultsException(ex);
         }
     }
 
     private Predicate<String> publishedContentFilter() {
-        return (uri) -> Paths.get(uri).toFile().getName().endsWith(".zip") && VersionedContentItem.isVersionedUri(uri);
+        return (uri) -> !Paths.get(uri).toFile().getName().endsWith(".zip") && !VersionedContentItem.isVersionedUri(uri);
+    }
+
+    private void handleCheckVerifyResultsException(Exception ex) throws HashVerificationException {
+        if (ex instanceof ExecutionException) {
+            if (ex.getCause() != null && ex.getCause() instanceof HashVerificationException) {
+                throw (HashVerificationException) ex.getCause();
+            }
+        }
+        throw new HashVerificationException("error checking verify results", ex);
     }
 }

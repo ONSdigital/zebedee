@@ -25,6 +25,10 @@ public class HashVerificationException extends RuntimeException {
         this.uri = uri;
     }
 
+    public HashVerificationException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
     public String getCollectionId() {
         return this.collectionId;
     }

@@ -14,10 +14,9 @@ import com.github.onsdigital.zebedee.json.publishing.request.Manifest;
 import com.github.onsdigital.zebedee.logging.CMSLogEvent;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
-import com.github.onsdigital.zebedee.model.publishing.client.PublishingClient;
-import com.github.onsdigital.zebedee.model.publishing.client.PublishingClientImpl;
-import com.github.onsdigital.zebedee.model.publishing.verify.HashVerificationTask;
 import com.github.onsdigital.zebedee.model.publishing.verify.HashVerificationException;
+import com.github.onsdigital.zebedee.model.publishing.verify.HashVerifier;
+import com.github.onsdigital.zebedee.model.publishing.verify.HashVerifierImpl;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.service.DatasetService;
@@ -34,7 +33,6 @@ import java.net.URI;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Date;
@@ -48,7 +46,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.locks.Lock;
 import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
@@ -109,8 +106,8 @@ public class Publisher {
         publishFilteredCollectionFiles(collection, collectionReader);
 
         if (CMSFeatureFlags.cmsFeatureFlags().isVerifyPublishEnabled()) {
-            info().collectionID(collection).log("verifying publish content");
-            verifyPublishContent(collection, collectionReader);
+            HashVerifier hashVerifier = HashVerifierImpl.getInstance();
+            hashVerifier.verifyTransactionContent(collection, collectionReader);
         }
 
         // TODO - feels like we should check/return here if unsuccessful?
@@ -259,8 +256,11 @@ public class Publisher {
     private static void handlePublishingException(Exception ex, Collection collection) {
         CMSLogEvent event = error().data("publishing", true).data("collectionId", collection.getDescription().getId());
 
-        if (ex instanceof ExecutionException) {
-            extractHashVerificationExceptionDetails((ExecutionException) ex, event);
+        if (ex instanceof HashVerificationException) {
+            HashVerificationException hex = (HashVerificationException) ex;
+            event.data("transaction_id", hex.getTransactionId())
+                    .data("train_host", hex.getHost())
+                    .data("uri", hex.getUri());
         }
 
         PostMessageField msg = new PostMessageField("Error", ex.getMessage(), false);
@@ -270,23 +270,14 @@ public class Publisher {
         Map<String, String> transactionIds = collection.getDescription().getPublishTransactionIds();
         if (transactionIds != null && transactionIds.size() > 0) {
             String message = "error publishing transaction IDs found for collection attempting to rollback";
-            event.data("hostToTransactionID", transactionIds).logException(ex, message);
+            event.data("hostToTransactionID", transactionIds)
+                    .exceptionAll(ex)
+                    .log(message);
 
             rollbackPublish(collection);
         } else {
             String message = "error publishing no transaction IDs found for collection no rollback will be attempted";
-            event.logException(ex, message);
-        }
-    }
-
-    private static void extractHashVerificationExceptionDetails(ExecutionException ex, CMSLogEvent event) {
-        Throwable cause = ex.getCause();
-        if ((cause != null) && (cause instanceof HashVerificationException)) {
-            HashVerificationException verificationEx = (HashVerificationException) cause;
-
-            event.data("train_host", verificationEx.getHost())
-                    .data("transaction_id", verificationEx.getTransactionId())
-                    .data("uri", verificationEx.getUri());
+            event.exceptionAll(ex).log(message);
         }
     }
 
@@ -337,61 +328,6 @@ public class Publisher {
                 .log("successfully created publish transactions for collection");
 
         return hostToTransactionIDMap;
-    }
-
-    private static void verifyPublishContent(Collection collection, CollectionReader reader) throws IOException,
-            InterruptedException, ExecutionException {
-        List<Callable<Boolean>> tasks = createContentVerificationTasks(collection, reader);
-        List<Future<Boolean>> verifyResults = executeContentVerificationTasks(tasks);
-        checkVerifyContentResults(verifyResults);
-    }
-
-    private static List<Callable<Boolean>> createContentVerificationTasks(Collection collection,
-                                                                          CollectionReader reader) throws IOException {
-        List<Callable<Boolean>> tasks = new ArrayList<>();
-        PublishingClient publishingClient = new PublishingClientImpl();
-        Map<String, String> hostToTransactionMap = collection.getDescription().getPublishTransactionIds();
-
-        for (String uri : getCollectionUrisToVerify(collection)) {
-
-            for (Map.Entry<String, String> hostTransactionMapping : hostToTransactionMap.entrySet()) {
-                String host = hostTransactionMapping.getKey();
-                String transactionId = hostTransactionMapping.getValue();
-
-                tasks.add(new HashVerificationTask.Builder()
-                        .collectionID(collection.getId())
-                        .collectionReader(reader)
-                        .contentURI(uri)
-                        .publishingAPIHost(host)
-                        .transactionId(transactionId)
-                        .publishingClient(publishingClient)
-                        .build());
-            }
-        }
-
-        return tasks;
-    }
-
-    private static List<String> getCollectionUrisToVerify(Collection collection) throws IOException {
-        Predicate<String> verifyUri = (uri) ->
-                !Paths.get(uri).toFile().getName().endsWith(".zip") && !VersionedContentItem.isVersionedUri(uri);
-
-        return collection.getReviewed()
-                .uris()
-                .stream().filter(verifyUri)
-                .collect(Collectors.toList());
-    }
-
-    private static List<Future<Boolean>> executeContentVerificationTasks(List<Callable<Boolean>> tasks) throws
-            InterruptedException {
-        return pool.invokeAll(tasks);
-    }
-
-    private static void checkVerifyContentResults(List<Future<Boolean>> verifyResults) throws InterruptedException,
-            ExecutionException {
-        for (Future<Boolean> result : verifyResults) {
-            result.get();
-        }
     }
 
     /**

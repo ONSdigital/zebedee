@@ -23,17 +23,33 @@ import java.util.stream.Collectors;
 public class HashVerifierImpl implements HashVerifier {
 
     // TODO how big?
-    private final ExecutorService pool = Executors.newFixedThreadPool(20);
+    private static final ExecutorService pool = Executors.newFixedThreadPool(50);
+    private static HashVerifier instance = null;
+
+
     private PublishingClient publishingClient;
 
-    public HashVerifierImpl() {
+    /**
+     * Construct a new instance using the default values.
+     */
+    HashVerifierImpl() {
         this(new PublishingClientImpl());
     }
 
-    public HashVerifierImpl(PublishingClient publishingClient) {
+    /**
+     * Construct a new instance using the {@link PublishingClient} provided.
+     */
+    HashVerifierImpl(PublishingClient publishingClient) {
         this.publishingClient = publishingClient;
     }
 
+    /**
+     * Verify the content sent to the publshing APIs was received correctly.
+     *
+     * @param collection the collection to verify.
+     * @param reader     a {@link CollectionReader} used read the collection content.
+     * @throws HashVerificationException thrown for any error while attempting to verify the content.
+     */
     public void verifyTransactionContent(Collection collection, CollectionReader reader) throws HashVerificationException {
         validateParams(collection, reader);
         List<Callable<Boolean>> tasks = createVerifyTasks(collection, reader);
@@ -111,9 +127,12 @@ public class HashVerifierImpl implements HashVerifier {
                     .filter(publishedContentFilter())
                     .collect(Collectors.toList());
         } catch (IOException ex) {
-            throw new HashVerificationException("error getting collection reviewed uris", ex, collection.getId(), "",
-                    "", "");
+            throw new HashVerificationException("error getting collection reviewed uris", ex, collection.getId());
         }
+    }
+
+    private Predicate<String> publishedContentFilter() {
+        return (uri) -> !Paths.get(uri).toFile().getName().endsWith(".zip") && !VersionedContentItem.isVersionedUri(uri);
     }
 
     private List<Future<Boolean>> executeVerifyTasks(List<Callable<Boolean>> tasks) {
@@ -134,10 +153,6 @@ public class HashVerifierImpl implements HashVerifier {
         }
     }
 
-    private Predicate<String> publishedContentFilter() {
-        return (uri) -> !Paths.get(uri).toFile().getName().endsWith(".zip") && !VersionedContentItem.isVersionedUri(uri);
-    }
-
     private void handleCheckVerifyResultsException(Exception ex) throws HashVerificationException {
         if (ex instanceof ExecutionException) {
             if (ex.getCause() != null && ex.getCause() instanceof HashVerificationException) {
@@ -145,5 +160,20 @@ public class HashVerifierImpl implements HashVerifier {
             }
         }
         throw new HashVerificationException("error checking verify results", ex);
+    }
+
+
+    /**
+     * @return a singleton {@link HashVerifier} instance.
+     */
+    public static HashVerifier getInstance() {
+        if (instance == null) {
+            synchronized (HashVerifierImpl.class) {
+                if (instance == null) {
+                    instance = new HashVerifierImpl();
+                }
+            }
+        }
+        return instance;
     }
 }

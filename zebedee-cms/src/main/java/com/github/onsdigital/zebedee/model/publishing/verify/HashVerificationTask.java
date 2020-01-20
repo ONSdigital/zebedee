@@ -13,13 +13,12 @@ import java.io.InputStream;
 import java.text.MessageFormat;
 import java.util.concurrent.Callable;
 
-import static com.github.onsdigital.zebedee.logging.CMSLogEvent.info;
 import static java.util.Objects.requireNonNull;
 
 /**
  * Task requests the SHA-1 file hash for a file in a publishing transaction from the Publishing API and
- * compares it to the file hash generated from the local collection file - confirming the content was
- * received successfully and not corrupted.
+ * compares it to the hash generated from the local collection file - confirming the content was received
+ * successfully and not corrupted.
  * <p></p>
  * Implements {@link Callable} and returns true if the hash was as expected
  * throws an {@link HashVerificationException} wrapped in an {@link java.util.concurrent.ExecutionException} otherwise.
@@ -38,6 +37,9 @@ public class HashVerificationTask implements Callable<Boolean> {
     private String uri;
     private PublishingClient publishingClient;
 
+    /**
+     * Construct a new instance from the {@link Builder} provided.
+     */
     HashVerificationTask(Builder builder) {
         this.collectionID = requireNonNull(builder.getCollectionID());
         this.collectionReader = requireNonNull(builder.getReader());
@@ -47,17 +49,21 @@ public class HashVerificationTask implements Callable<Boolean> {
         this.publishingClient = requireNonNull(builder.getPublishingClient());
     }
 
+    /**
+     * Verify the data receieved by the publishing API instance is correct. Retrive the SHA-1 file hash for the
+     * content URI from publishing API instance, generate a SHA-1 hash from the collection file locally and compare.
+     *
+     * @return true if the hash values match, throws {@link HashVerificationException} if the hash is incorrect, there
+     * was an error requesting the hash from the publishing API, or there was an error generating the local hash value.
+     * @throws Exception thrown if the hash is incorrect or if there was any error while attempting to verify the
+     *                   contentt.
+     */
     @Override
     public Boolean call() throws Exception {
         String actual = getRemoteHashValue();
         String expected = getExpectedHashValue();
 
         if (StringUtils.equals(expected, actual)) {
-            info().collectionID(collectionID)
-                    .uri(uri)
-                    .data("train_host", host)
-                    .data("transaction_id", transactionId)
-                    .log("content hash verified");
             return true;
         }
 

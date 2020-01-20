@@ -20,6 +20,9 @@ import java.util.concurrent.Future;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+/**
+ * Provides functionality for verifying the content send the publishing API was received correctly.
+ */
 public class HashVerifierImpl implements HashVerifier {
 
     // TODO how big?

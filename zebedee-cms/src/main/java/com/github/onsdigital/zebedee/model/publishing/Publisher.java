@@ -100,12 +100,14 @@ public class Publisher {
      * Execute the publishing steps.
      */
     public static boolean executePublish(Collection collection, CollectionReader collectionReader, String email)
-            throws IOException, ExecutionException, InterruptedException {
+            throws IOException {
         boolean success = false;
 
         publishFilteredCollectionFiles(collection, collectionReader);
 
         if (CMSFeatureFlags.cmsFeatureFlags().isVerifyPublishEnabled()) {
+            info().data("feature", "ENABLE_VERIFY_PUBLISH_CONTENT").log("feature enabled verifying publishing content");
+
             HashVerifier hashVerifier = HashVerifierImpl.getInstance();
             hashVerifier.verifyTransactionContent(collection, collectionReader);
         }

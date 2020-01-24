@@ -35,6 +35,24 @@ public class PublishingClientException extends RuntimeException {
      * Construct a new PublishingClientException.
      *
      * @param message       the context of the error.
+     * @param host          the host address of the publishing API the {@link PublishingClient} was
+     *                      attempting to communticate with.
+     * @param transactionId the publishing transaction ID.
+     * @param uri           the uri of transaction content the error pertains too.
+     * @param httpStatus    the http status code returned by the publishing API.
+     */
+    public PublishingClientException(String message, String host, String transactionId, String uri, int httpStatus) {
+        super(message);
+        this.host = host;
+        this.transactionId = transactionId;
+        this.uri = uri;
+        this.httpStatus = httpStatus;
+    }
+
+    /**
+     * Construct a new PublishingClientException.
+     *
+     * @param message       the context of the error.
      * @param cause         the cause of the error.
      * @param host          the host address of the publishing API the {@link PublishingClient} was attempting to
      *                      communticate with.
@@ -69,7 +87,7 @@ public class PublishingClientException extends RuntimeException {
 
     @Override
     public String getMessage() {
-        return MessageFormat.format("{0}, host: {1}, transactionId {2}, uri: {3}", super.getMessage(), getHost(),
-                getTransactionId(), getUri());
+        return MessageFormat.format("{0}, host: {1}, transactionId {2}, uri: {3}, status code: {4}", super.getMessage(),
+                getHost(), getTransactionId(), getUri(), getHttpStatus());
     }
 }

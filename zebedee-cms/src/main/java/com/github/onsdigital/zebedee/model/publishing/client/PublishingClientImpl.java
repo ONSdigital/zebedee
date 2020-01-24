@@ -1,7 +1,6 @@
 package com.github.onsdigital.zebedee.model.publishing.client;
 
 import com.google.gson.Gson;
-import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpUriRequest;
@@ -11,11 +10,8 @@ import org.apache.http.impl.client.HttpClients;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.StringWriter;
 import java.net.URISyntaxException;
 import java.util.function.Supplier;
-
-import static com.github.onsdigital.zebedee.logging.CMSLogEvent.error;
 
 /**
  * Implementation of {@link PublishingClient}.
@@ -56,12 +52,7 @@ public class PublishingClientImpl implements PublishingClient {
                 CloseableHttpResponse response = client.execute(request)
         ) {
             if (response.getStatusLine().getStatusCode() != 200) {
-                StringWriter writer = new StringWriter();
-                IOUtils.copy(response.getEntity().getContent(), writer);
-                error().data("response_body", writer.toString())
-                        .data("status", response.getStatusLine().getStatusCode())
-                        .log("publishing api returned an error response");
-                throw new PublishingClientException(host, transactionId, uri, response.getStatusLine().getStatusCode());
+                throw non200ResponseStatusException(host, transactionId, uri, response.getStatusLine().getStatusCode());
             }
             return getResponseEntity(response.getEntity(), GetContentHashEntity.class);
         }
@@ -74,5 +65,11 @@ public class PublishingClientImpl implements PublishingClient {
         ) {
             return new Gson().fromJson(reader, tClass);
         }
+    }
+
+    private PublishingClientException non200ResponseStatusException(String host, String transactionId, String uri,
+                                                                    int status) {
+        return new PublishingClientException("publishing API returned a non 200 status for get content hash request",
+                host, transactionId, uri, status);
     }
 }

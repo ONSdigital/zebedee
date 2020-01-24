@@ -25,7 +25,6 @@ import java.util.stream.Collectors;
  */
 public class HashVerifierImpl implements HashVerifier {
 
-    // TODO how big?
     private static final ExecutorService pool = Executors.newFixedThreadPool(50);
     private static HashVerifier instance = null;
 

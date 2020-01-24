@@ -74,8 +74,8 @@ public class HashVerificationTask implements Callable<Boolean> {
         try {
             return publishingClient.getContentHash(host, transactionId, uri).getHash();
         } catch (Exception ex) {
-            throw new HashVerificationException("publishing client get content hash returned an error", ex,
-                    collectionID, host, transactionId, uri);
+            throw new HashVerificationException("http request to publishing client /getContentHash returned an error",
+                    ex, collectionID, host, transactionId, uri);
         }
     }
 

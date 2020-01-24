@@ -14,7 +14,6 @@ import com.github.onsdigital.zebedee.json.publishing.request.Manifest;
 import com.github.onsdigital.zebedee.logging.CMSLogEvent;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
-import com.github.onsdigital.zebedee.model.publishing.verify.HashVerificationException;
 import com.github.onsdigital.zebedee.model.publishing.verify.HashVerifier;
 import com.github.onsdigital.zebedee.model.publishing.verify.HashVerifierImpl;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
@@ -256,30 +255,22 @@ public class Publisher {
     }
 
     private static void handlePublishingException(Exception ex, Collection collection) {
-        CMSLogEvent event = error().data("publishing", true).data("collectionId", collection.getDescription().getId());
-
-        if (ex instanceof HashVerificationException) {
-            HashVerificationException hex = (HashVerificationException) ex;
-            event.data("transaction_id", hex.getTransactionId())
-                    .data("train_host", hex.getHost())
-                    .data("uri", hex.getUri());
-        }
-
         PostMessageField msg = new PostMessageField("Error", ex.getMessage(), false);
         collectionAlarm(collection, "Exception publishAction collection", msg);
+
+        CMSLogEvent event = error().data("publishing", true).data("collectionId", collection.getDescription().getId());
 
         // If an error was caught, attempt to roll back the transaction:
         Map<String, String> transactionIds = collection.getDescription().getPublishTransactionIds();
         if (transactionIds != null && transactionIds.size() > 0) {
-            String message = "error publishing transaction IDs found for collection attempting to rollback";
             event.data("hostToTransactionID", transactionIds)
                     .exceptionAll(ex)
-                    .log(message);
+                    .log("publish collection error, attempting to rollback collection");
 
             rollbackPublish(collection);
         } else {
-            String message = "error publishing no transaction IDs found for collection no rollback will be attempted";
-            event.exceptionAll(ex).log(message);
+            event.exceptionAll(ex)
+                    .log("publish collection error. Unable rollback as no transaction IDs found for collection");
         }
     }
 

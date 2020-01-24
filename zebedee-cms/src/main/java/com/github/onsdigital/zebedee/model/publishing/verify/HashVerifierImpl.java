@@ -134,8 +134,20 @@ public class HashVerifierImpl implements HashVerifier {
         }
     }
 
+    /**
+     * Filter the URIS in a collection that should have their SHA-1 has verified after the collection content has
+     * been sent to the publishing API.
+     * <ul>
+     *     <li>Versioned files are skipped as these are never sent to the publishing API.</li>
+     *     <li>Time series files are sent to the publising API in a zip - as a peformance imporvement we check the
+     *     hash of the received zip instead of checking each file individually</li>
+     * </ul>
+     *
+     * @return a {@link Predicate} that filters the URIs of a collection to verify.
+     */
     private Predicate<String> publishedContentFilter() {
-        return (uri) -> !Paths.get(uri).toFile().getName().endsWith(".zip") && !VersionedContentItem.isVersionedUri(uri);
+        return (uri) -> !Paths.get(uri).toString().contains("/timeseries/")
+                && !VersionedContentItem.isVersionedUri(uri);
     }
 
     private List<Future<Boolean>> executeVerifyTasks(List<Callable<Boolean>> tasks) {

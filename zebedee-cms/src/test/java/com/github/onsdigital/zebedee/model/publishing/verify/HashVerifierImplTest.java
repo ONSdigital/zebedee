@@ -177,7 +177,7 @@ public class HashVerifierImplTest {
         try {
             hashVerifier.verifyTransactionContent(collection, reader);
         } catch (HashVerificationException ex) {
-            assertThat(ex.getMessage(), equalTo("publishing client get content hash returned an error"));
+            assertThat(ex.getMessage(), equalTo("http request to publishing API /getContentHash returned an error"));
             assertThat(ex.getHost(), equalTo("localhost"));
             assertThat(ex.getTransactionId(), equalTo("666"));
             assertThat(ex.getUri(), equalTo("/a/b/c/data.json"));

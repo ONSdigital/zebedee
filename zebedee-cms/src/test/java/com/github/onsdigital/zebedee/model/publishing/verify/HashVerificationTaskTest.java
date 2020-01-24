@@ -143,7 +143,7 @@ public class HashVerificationTaskTest {
             assertThat(ex.getCollectionId(), equalTo(COLLECTION_ID));
             assertThat(ex.getHost(), equalTo(HOST));
             assertThat(ex.getUri(), equalTo(URI));
-            assertThat(ex.getMessage(), equalTo("publishing client get content hash returned an error"));
+            assertThat(ex.getMessage(), equalTo("http request to publishing API /getContentHash returned an error"));
             throw ex;
         }
     }
@@ -160,7 +160,7 @@ public class HashVerificationTaskTest {
             assertThat(ex.getCollectionId(), equalTo(COLLECTION_ID));
             assertThat(ex.getHost(), equalTo(HOST));
             assertThat(ex.getUri(), equalTo(URI));
-            assertThat(ex.getMessage(), equalTo("publishing client get content hash returned an error"));
+            assertThat(ex.getMessage(), equalTo("http request to publishing API /getContentHash returned an error"));
             throw ex;
         }
     }

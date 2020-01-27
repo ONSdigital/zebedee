@@ -2,6 +2,8 @@ package com.github.onsdigital.zebedee.model.publishing.client;
 
 import java.text.MessageFormat;
 
+import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
+
 /**
  * Exception for errors occurring while sending requests and receiving responses to/from the publishing API.
  */
@@ -29,8 +31,46 @@ public class PublishingClientException extends RuntimeException {
         this.httpStatus = httpStatus;
     }
 
+    /**
+     * Construct a new PublishingClientException.
+     *
+     * @param message       the context of the error.
+     * @param host          the host address of the publishing API the {@link PublishingClient} was
+     *                      attempting to communticate with.
+     * @param transactionId the publishing transaction ID.
+     * @param uri           the uri of transaction content the error pertains too.
+     * @param httpStatus    the http status code returned by the publishing API.
+     */
+    public PublishingClientException(String message, String host, String transactionId, String uri, int httpStatus) {
+        super(message);
+        this.host = host;
+        this.transactionId = transactionId;
+        this.uri = uri;
+        this.httpStatus = httpStatus;
+    }
+
+    /**
+     * Construct a new PublishingClientException.
+     *
+     * @param message       the context of the error.
+     * @param cause         the cause of the error.
+     * @param host          the host address of the publishing API the {@link PublishingClient} was attempting to
+     *                      communticate with.
+     * @param transactionId the publishing transaction ID.
+     * @param uri           the uri of transaction content the error pertains too.
+     * @param httpStatus    the http status code returned by the publishing API.
+     */
+    public PublishingClientException(String message, Throwable cause, String host, String transactionId, String uri,
+                                     int httpStatus) {
+        super(message, cause);
+        this.host = host;
+        this.transactionId = transactionId;
+        this.uri = uri;
+        this.httpStatus = httpStatus;
+    }
+
     public String getHost() {
-        return this.host;
+        return defaultIfEmpty(this.host, "null");
     }
 
     public String getTransactionId() {
@@ -38,7 +78,7 @@ public class PublishingClientException extends RuntimeException {
     }
 
     public String getUri() {
-        return this.uri;
+        return defaultIfEmpty(this.uri, "null");
     }
 
     public int getHttpStatus() {
@@ -47,6 +87,7 @@ public class PublishingClientException extends RuntimeException {
 
     @Override
     public String getMessage() {
-        return MessageFormat.format("{0}, host: {1}, transactionId {2}, uri: {3}", super.getMessage(), host, transactionId, uri);
+        return MessageFormat.format("{0}, host: {1}, transactionId {2}, uri: {3}, status code: {4}", super.getMessage(),
+                getHost(), getTransactionId(), getUri(), getHttpStatus());
     }
 }

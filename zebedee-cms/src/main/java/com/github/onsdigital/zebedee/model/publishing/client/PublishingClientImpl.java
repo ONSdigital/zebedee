@@ -52,7 +52,7 @@ public class PublishingClientImpl implements PublishingClient {
                 CloseableHttpResponse response = client.execute(request)
         ) {
             if (response.getStatusLine().getStatusCode() != 200) {
-                throw new PublishingClientException(host, transactionId, uri, response.getStatusLine().getStatusCode());
+                throw non200ResponseStatusException(host, transactionId, uri, response.getStatusLine().getStatusCode());
             }
             return getResponseEntity(response.getEntity(), GetContentHashEntity.class);
         }
@@ -65,5 +65,11 @@ public class PublishingClientImpl implements PublishingClient {
         ) {
             return new Gson().fromJson(reader, tClass);
         }
+    }
+
+    private PublishingClientException non200ResponseStatusException(String host, String transactionId, String uri,
+                                                                    int status) {
+        return new PublishingClientException("publishing API returned a non 200 status for get content hash request",
+                host, transactionId, uri, status);
     }
 }

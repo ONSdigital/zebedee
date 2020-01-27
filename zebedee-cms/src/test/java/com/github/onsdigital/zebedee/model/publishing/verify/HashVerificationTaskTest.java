@@ -17,14 +17,14 @@ import java.net.URISyntaxException;
 import java.text.MessageFormat;
 import java.util.concurrent.Callable;
 
-import static com.github.onsdigital.zebedee.model.publishing.verify.ContentHashVerificationTask.GENERATE_HASH_ERR;
-import static com.github.onsdigital.zebedee.model.publishing.verify.ContentHashVerificationTask.HASH_INCORRECT_ERR;
+import static com.github.onsdigital.zebedee.model.publishing.verify.HashVerificationTask.GENERATE_HASH_ERR;
+import static com.github.onsdigital.zebedee.model.publishing.verify.HashVerificationTask.HASH_INCORRECT_ERR;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.when;
 
-public class ContentHashVerificationTaskTest {
+public class HashVerificationTaskTest {
 
     private static final String COLLECTION_ID = "666";
     private static final String HOST = "localhost";
@@ -48,7 +48,7 @@ public class ContentHashVerificationTaskTest {
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
 
-        task = new ContentHashVerificationTask.Builder()
+        task = new HashVerificationTask.Builder()
                 .collectionID(COLLECTION_ID)
                 .collectionReader(collectionReader)
                 .publishingAPIHost(HOST)
@@ -62,12 +62,12 @@ public class ContentHashVerificationTaskTest {
 
     @Test(expected = NullPointerException.class)
     public void testBuilder_collectionIdNull() {
-        new ContentHashVerificationTask.Builder().build();
+        new HashVerificationTask.Builder().build();
     }
 
     @Test(expected = NullPointerException.class)
     public void testBuilder_collectionReaderNull() {
-        new ContentHashVerificationTask.Builder()
+        new HashVerificationTask.Builder()
                 .collectionID(COLLECTION_ID)
                 .collectionReader(null)
                 .build();
@@ -75,7 +75,7 @@ public class ContentHashVerificationTaskTest {
 
     @Test(expected = NullPointerException.class)
     public void testBuilder_hostNull() {
-        new ContentHashVerificationTask.Builder()
+        new HashVerificationTask.Builder()
                 .collectionID(COLLECTION_ID)
                 .collectionReader(collectionReader)
                 .publishingAPIHost(null)
@@ -84,7 +84,7 @@ public class ContentHashVerificationTaskTest {
 
     @Test(expected = NullPointerException.class)
     public void testBuilder_transactionIdNull() {
-        new ContentHashVerificationTask.Builder()
+        new HashVerificationTask.Builder()
                 .collectionID(COLLECTION_ID)
                 .collectionReader(collectionReader)
                 .publishingAPIHost(HOST)
@@ -93,7 +93,7 @@ public class ContentHashVerificationTaskTest {
 
     @Test(expected = NullPointerException.class)
     public void testBuilder_uriNull() {
-        new ContentHashVerificationTask.Builder()
+        new HashVerificationTask.Builder()
                 .collectionID(COLLECTION_ID)
                 .collectionReader(collectionReader)
                 .publishingAPIHost(HOST)
@@ -103,7 +103,7 @@ public class ContentHashVerificationTaskTest {
 
     @Test(expected = NullPointerException.class)
     public void testBuilder_publishingClientNull() {
-        new ContentHashVerificationTask.Builder()
+        new HashVerificationTask.Builder()
                 .collectionID(COLLECTION_ID)
                 .collectionReader(collectionReader)
                 .publishingAPIHost(HOST)
@@ -114,7 +114,7 @@ public class ContentHashVerificationTaskTest {
 
     @Test
     public void testBuilder_success() {
-        ContentHashVerificationTask actual = new ContentHashVerificationTask.Builder()
+        HashVerificationTask actual = new HashVerificationTask.Builder()
                 .collectionID(COLLECTION_ID)
                 .collectionReader(collectionReader)
                 .publishingAPIHost(HOST)
@@ -131,20 +131,38 @@ public class ContentHashVerificationTaskTest {
         assertThat(actual.getPublishingClient(), equalTo(publishingClient));
     }
 
-    @Test(expected = IOException.class)
+    @Test(expected = HashVerificationException.class)
     public void testCall_publishingClientIOException() throws Exception {
         when(publishingClient.getContentHash(HOST, TRANSACTION_ID, URI))
                 .thenThrow(new IOException());
 
-        task.call();
+        try {
+            task.call();
+        } catch (HashVerificationException ex) {
+            assertThat(ex.getTransactionId(), equalTo(TRANSACTION_ID));
+            assertThat(ex.getCollectionId(), equalTo(COLLECTION_ID));
+            assertThat(ex.getHost(), equalTo(HOST));
+            assertThat(ex.getUri(), equalTo(URI));
+            assertThat(ex.getMessage(), equalTo("http request to publishing API /getContentHash returned an error"));
+            throw ex;
+        }
     }
 
-    @Test(expected = URISyntaxException.class)
+    @Test(expected = HashVerificationException.class)
     public void testCall_publishingClientURISyntaxException() throws Exception {
         when(publishingClient.getContentHash(HOST, TRANSACTION_ID, URI))
                 .thenThrow(new URISyntaxException("", ""));
 
-        task.call();
+        try {
+            task.call();
+        } catch (HashVerificationException ex) {
+            assertThat(ex.getTransactionId(), equalTo(TRANSACTION_ID));
+            assertThat(ex.getCollectionId(), equalTo(COLLECTION_ID));
+            assertThat(ex.getHost(), equalTo(HOST));
+            assertThat(ex.getUri(), equalTo(URI));
+            assertThat(ex.getMessage(), equalTo("http request to publishing API /getContentHash returned an error"));
+            throw ex;
+        }
     }
 
     @Test(expected = HashVerificationException.class)

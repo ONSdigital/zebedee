@@ -17,13 +17,13 @@ import static java.util.Objects.requireNonNull;
 
 /**
  * Task requests the SHA-1 file hash for a file in a publishing transaction from the Publishing API and
- * compares it to the file hash generated from the local collection file - confirming the content was
- * received successfully and not corrupted.
+ * compares it to the hash generated from the local collection file - confirming the content was received
+ * successfully and not corrupted.
  * <p></p>
  * Implements {@link Callable} and returns true if the hash was as expected
  * throws an {@link HashVerificationException} wrapped in an {@link java.util.concurrent.ExecutionException} otherwise.
  */
-public class ContentHashVerificationTask implements Callable<Boolean> {
+public class HashVerificationTask implements Callable<Boolean> {
 
     static final String HASH_INCORRECT_ERR = "file content hash from remote server did not match the expected value " +
             "expected {0}, actual {1}";
@@ -37,7 +37,10 @@ public class ContentHashVerificationTask implements Callable<Boolean> {
     private String uri;
     private PublishingClient publishingClient;
 
-    private ContentHashVerificationTask(Builder builder) {
+    /**
+     * Construct a new instance from the {@link Builder} provided.
+     */
+    HashVerificationTask(Builder builder) {
         this.collectionID = requireNonNull(builder.getCollectionID());
         this.collectionReader = requireNonNull(builder.getReader());
         this.host = requireNonNull(builder.getPublishingAPIHost());
@@ -46,9 +49,18 @@ public class ContentHashVerificationTask implements Callable<Boolean> {
         this.publishingClient = requireNonNull(builder.getPublishingClient());
     }
 
+    /**
+     * Verify the data receieved by the publishing API instance is correct. Retrive the SHA-1 file hash for the
+     * content URI from publishing API instance, generate a SHA-1 hash from the collection file locally and compare.
+     *
+     * @return true if the hash values match, throws {@link HashVerificationException} if the hash is incorrect, there
+     * was an error requesting the hash from the publishing API, or there was an error generating the local hash value.
+     * @throws Exception thrown if the hash is incorrect or if there was any error while attempting to verify the
+     *                   contentt.
+     */
     @Override
     public Boolean call() throws Exception {
-        String actual = publishingClient.getContentHash(host, transactionId, uri).getHash();
+        String actual = getRemoteHashValue();
         String expected = getExpectedHashValue();
 
         if (StringUtils.equals(expected, actual)) {
@@ -56,6 +68,15 @@ public class ContentHashVerificationTask implements Callable<Boolean> {
         }
 
         throw incorrectHashValueException(expected, actual);
+    }
+
+    private String getRemoteHashValue() {
+        try {
+            return publishingClient.getContentHash(host, transactionId, uri).getHash();
+        } catch (Exception ex) {
+            throw new HashVerificationException("http request to publishing API /getContentHash returned an error",
+                    ex, collectionID, host, transactionId, uri);
+        }
     }
 
     private String getExpectedHashValue() {
@@ -105,7 +126,7 @@ public class ContentHashVerificationTask implements Callable<Boolean> {
 
         if (o == null || getClass() != o.getClass()) return false;
 
-        ContentHashVerificationTask that = (ContentHashVerificationTask) o;
+        HashVerificationTask that = (HashVerificationTask) o;
 
         return new EqualsBuilder()
                 .append(this.collectionID, that.collectionID)
@@ -130,7 +151,7 @@ public class ContentHashVerificationTask implements Callable<Boolean> {
     }
 
     /**
-     * Class provides a <i>builder</i> style interface for creating a new {@link ContentHashVerificationTask} instance.
+     * Class provides a <i>builder</i> style interface for creating a new {@link HashVerificationTask} instance.
      */
     public static class Builder {
         private String collectionID;
@@ -189,10 +210,10 @@ public class ContentHashVerificationTask implements Callable<Boolean> {
         }
 
         /**
-         * Construct a new {@link ContentHashVerificationTask} instance.
+         * Construct a new {@link HashVerificationTask} instance.
          */
-        public ContentHashVerificationTask build() {
-            return new ContentHashVerificationTask(this);
+        public HashVerificationTask build() {
+            return new HashVerificationTask(this);
         }
 
         public String getCollectionID() {

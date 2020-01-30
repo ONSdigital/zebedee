@@ -258,19 +258,18 @@ public class Publisher {
         PostMessageField msg = new PostMessageField("Error", ex.getMessage(), false);
         collectionAlarm(collection, "Exception publishAction collection", msg);
 
-        CMSLogEvent event = error().data("publishing", true).data("collectionId", collection.getDescription().getId());
+        CMSLogEvent err = error().data("publishing", true).collectionID(collection);
 
         // If an error was caught, attempt to roll back the transaction:
         Map<String, String> transactionIds = collection.getDescription().getPublishTransactionIds();
         if (transactionIds != null && transactionIds.size() > 0) {
-            event.data("hostToTransactionID", transactionIds)
-                    .exceptionAll(ex)
+            err.data("hostToTransactionID", transactionIds)
+                    .exception(ex)
                     .log("publish collection error, attempting to rollback collection");
 
             rollbackPublish(collection);
         } else {
-            event.exceptionAll(ex)
-                    .log("publish collection error. Unable rollback as no transaction IDs found for collection");
+            err.exception(ex).log("publish collection error. Unable rollback as no transaction IDs found for collection");
         }
     }
 

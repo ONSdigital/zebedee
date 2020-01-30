@@ -118,4 +118,18 @@ public class CMSLogEvent extends BaseEvent<CMSLogEvent> {
         }
         return this;
     }
+
+    public CMSLogEvent host(String host) {
+        if (StringUtils.isNotEmpty(host)) {
+            data("host", host);
+        }
+        return this;
+    }
+
+    public CMSLogEvent transactionId(String transactionId) {
+        if (StringUtils.isNotEmpty(transactionId)) {
+            data("transaction_id", transactionId);
+        }
+        return this;
+    }
 }

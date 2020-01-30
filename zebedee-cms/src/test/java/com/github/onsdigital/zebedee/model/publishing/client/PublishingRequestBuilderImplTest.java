@@ -1,11 +1,13 @@
 package com.github.onsdigital.zebedee.model.publishing.client;
 
 import org.apache.http.client.methods.HttpUriRequest;
+import org.hamcrest.core.IsNull;
 import org.junit.Before;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
 
 public class PublishingRequestBuilderImplTest {
 
@@ -84,5 +86,6 @@ public class PublishingRequestBuilderImplTest {
         assertThat(getRequest.getURI().getHost(), equalTo("localhost"));
         assertThat(getRequest.getURI().getPath(), equalTo("/contentHash"));
         assertThat(getRequest.getURI().getQuery(), equalTo("transactionId=transactionId&uri=uri"));
+        assertThat(getRequest.getFirstHeader("trace_id"), is(IsNull.notNullValue()));
     }
 }

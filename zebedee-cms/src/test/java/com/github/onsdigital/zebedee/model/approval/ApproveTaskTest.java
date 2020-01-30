@@ -89,7 +89,7 @@ public class ApproveTaskTest {
     public void createPublishNotificationShouldIncludePendingDeletes() throws Exception {
         // Given a collection that contains pending deletes.
         Path collectionPath = Files.createTempDirectory(Random.id()); // create a temp directory to generate content into
-        Collection collection = CollectionTest.CreateCollection(collectionPath, "createPublishNotificationShouldIncludePendingDeletes");
+        Collection collection = CollectionTest.createCollection(collectionPath, "createPublishNotificationShouldIncludePendingDeletes");
         String uriToDelete = "some/uri/to/check";
         ContentDetail contentDetail = new ContentDetail("Title", uriToDelete, "type");
         PendingDelete pendingDelete = new PendingDelete("", contentDetail);

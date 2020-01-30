@@ -30,8 +30,9 @@ import com.github.onsdigital.zebedee.util.ContentDetailUtil;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
-import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -58,6 +59,9 @@ import static org.mockito.Mockito.spy;
 
 public class CollectionTest extends ZebedeeTestBaseFixture {
 
+    @Rule
+    public TemporaryFolder rootDir = new TemporaryFolder();
+
     private static final boolean recursive = false;
     Collection collection;
     Session publisherSession;
@@ -65,6 +69,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
     FakeCollectionWriter collectionWriter;
 
     public void setUp() throws Exception {
+        rootDir.create();
 
         collection = new Collection(builder.collections.get(1), zebedee);
 
@@ -740,7 +745,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
     }
 
     @Test(expected = UnauthorizedException.class)
-    public void shouldNotReviewAsPublisher() throws IOException, ZebedeeException{
+    public void shouldNotReviewAsPublisher() throws IOException, ZebedeeException {
 
         // Given
         // The content exists, has been edited and complete by publisher1:
@@ -876,7 +881,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
     }
 
     @Test(expected = BadRequestException.class)
-    public void shouldNotReviewIfAlreadyReviewed() throws IOException, ZebedeeException{
+    public void shouldNotReviewIfAlreadyReviewed() throws IOException, ZebedeeException {
 
         // Given
         // The content already exists:
@@ -1205,7 +1210,8 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         collection.review(builder.createSession(builder.publisher2), releaseJsonUri, recursive);
 
         ContentDetail articleDetail = new ContentDetail("My article", "/some/uri", PageType.article.toString());
-        FileUtils.write(collection.reviewed.path.resolve("some/uri/data.json").toFile(), Serialiser.serialise(articleDetail));
+        FileUtils.write(collection.getReviewed().path.resolve("some/uri/data.json").toFile(),
+                Serialiser.serialise(articleDetail));
 
 
         // When we attempt to populate the release from the collection.
@@ -1214,7 +1220,8 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
                 collection.description.getId());
         FakeCollectionWriter collectionWriter = new FakeCollectionWriter(zebedee.getCollections().path.toString(),
                 collection.description.getId());
-        Iterable<ContentDetail> collectionContent = ContentDetailUtil.resolveDetails(collection.reviewed, collectionReader.getReviewed());
+        Iterable<ContentDetail> collectionContent = ContentDetailUtil.resolveDetails(collection.getReviewed(),
+                collectionReader.getReviewed());
 
         Release result = collection.populateRelease(
                 collectionReader,
@@ -1326,14 +1333,14 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
 
         // Then the version directory is created, with the page and associated files copied into it
         // check versions file exists
-        Path versionsDirectoryPath = collection.reviewed.get(Paths.get(uri).resolve(VersionedContentItem.getVersionDirectoryName()).toUri());
+        Path versionsDirectoryPath = collection.getReviewed().get(Paths.get(uri).resolve(VersionedContentItem.getVersionDirectoryName()).toUri());
         assertTrue(Files.exists(versionsDirectoryPath));
 
         // check the json file is in there
-        assertTrue(Files.exists(collection.reviewed.get(version.getUri())));
+        assertTrue(Files.exists(collection.getReviewed().get(version.getUri())));
 
         // check for an associated file
-        assertTrue(Files.exists(collection.reviewed.get(Paths.get(version.getUri()).resolve("data.json").toString())));
+        assertTrue(Files.exists(collection.getReviewed().get(Paths.get(version.getUri()).resolve("data.json").toString())));
     }
 
     @Test(expected = NotFoundException.class)
@@ -1368,14 +1375,14 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         builder.createPublishedFile(uri + "/data.json");
         ContentItemVersion version = collection.version(publisher1Email, uri, collectionWriter);
 
-        assertTrue(Files.exists(collection.reviewed.get(version.getUri())));
-        assertTrue(Files.exists(collection.reviewed.get(version.getUri()).resolve("data.json")));
+        assertTrue(Files.exists(collection.getReviewed().get(version.getUri())));
+        assertTrue(Files.exists(collection.getReviewed().get(version.getUri()).resolve("data.json")));
 
         // When the delete version function is called for the version URI
         collection.deleteVersion(version.getUri());
 
         // Then the versions directory is deleted.
-        assertNull(collection.reviewed.get(version.getUri()));
+        assertNull(collection.getReviewed().get(version.getUri()));
     }
 
     private Release createRelease(String uri, Date releaseDate) throws IOException {
@@ -1461,7 +1468,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
 
         // Given an empty collection
         Path collectionPath = Files.createTempDirectory(Random.id()); // create a temp directory to generate content into
-        Collection collection = CollectionTest.CreateCollection(collectionPath, "isAllContentReviewed");
+        Collection collection = CollectionTest.createCollection(collectionPath, "isAllContentReviewed");
 
         // When isAllContentReviewed() is called
         boolean allContentReviewed = collection.isAllContentReviewed();
@@ -1476,7 +1483,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         // Given a collection with a file in progress
         Path collectionPath = Files.createTempDirectory(Random.id()); // create a temp directory to generate content into
         Collection collection = spy(
-                CollectionTest.CreateCollection(collectionPath,"isAllContentReviewed"));
+                CollectionTest.createCollection(collectionPath, "isAllContentReviewed"));
 
         ArrayList<String> uriList = new ArrayList<>(Arrays.asList("/some/uri"));
         doReturn(uriList).when(collection).inProgressUris();
@@ -1494,7 +1501,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         // Given a collection with a file in complete
         Path collectionPath = Files.createTempDirectory(Random.id()); // create a temp directory to generate content into
         Collection collection = spy(
-                CollectionTest.CreateCollection(collectionPath,"isAllContentReviewed"));
+                CollectionTest.createCollection(collectionPath, "isAllContentReviewed"));
 
         ArrayList<String> uriList = new ArrayList<>(Arrays.asList("/some/uri"));
         doReturn(uriList).when(collection).completeUris();
@@ -1514,7 +1521,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
             System.setProperty("ENABLE_DATASET_IMPORT", "true");
             // Given a collection with a dataset that has not been set to reviewed.
             Path collectionPath = Files.createTempDirectory(Random.id()); // create a temp directory to generate content into
-            Collection collection = CollectionTest.CreateCollection(collectionPath, "isAllContentReviewed");
+            Collection collection = CollectionTest.createCollection(collectionPath, "isAllContentReviewed");
 
             CollectionDataset dataset = new CollectionDataset();
             dataset.setState(ContentStatus.Complete);
@@ -1540,7 +1547,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
 
             // Given a collection with a dataset version that has not been set to reviewed.
             Path collectionPath = Files.createTempDirectory(Random.id()); // create a temp directory to generate content into
-            Collection collection = CollectionTest.CreateCollection(collectionPath, "isAllContentReviewed");
+            Collection collection = CollectionTest.createCollection(collectionPath, "isAllContentReviewed");
 
             CollectionDatasetVersion datasetVersion = new CollectionDatasetVersion();
             datasetVersion.setState(ContentStatus.Complete);
@@ -1562,7 +1569,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
 
         // Given a collection with a dataset that has been set to reviewed.
         Path collectionPath = Files.createTempDirectory(Random.id()); // create a temp directory to generate content into
-        Collection collection = CollectionTest.CreateCollection(collectionPath,"isAllContentReviewed");
+        Collection collection = CollectionTest.createCollection(collectionPath, "isAllContentReviewed");
 
         CollectionDataset dataset = new CollectionDataset();
         dataset.setState(ContentStatus.Reviewed);
@@ -1580,7 +1587,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
 
         // Given a collection with a dataset version that has been set to reviewed.
         Path collectionPath = Files.createTempDirectory(Random.id()); // create a temp directory to generate content into
-        Collection collection = CollectionTest.CreateCollection(collectionPath,"isAllContentReviewed");
+        Collection collection = CollectionTest.createCollection(collectionPath, "isAllContentReviewed");
 
         CollectionDatasetVersion datasetVersion = new CollectionDatasetVersion();
         datasetVersion.setState(ContentStatus.Reviewed);
@@ -1598,7 +1605,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
 
         // Given a collection with a dataset.
         Path collectionPath = Files.createTempDirectory(Random.id()); // create a temp directory to generate content into
-        Collection collection = CollectionTest.CreateCollection(collectionPath,"isAllContentReviewed");
+        Collection collection = CollectionTest.createCollection(collectionPath, "isAllContentReviewed");
 
         CollectionDataset dataset = new CollectionDataset();
         dataset.setUri("http://localhost:1234/datasets/123");
@@ -1621,7 +1628,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
 
         // Given a collection with a dataset version.
         Path collectionPath = Files.createTempDirectory(Random.id()); // create a temp directory to generate content into
-        Collection collection = CollectionTest.CreateCollection(collectionPath,"isAllContentReviewed");
+        Collection collection = CollectionTest.createCollection(collectionPath, "isAllContentReviewed");
 
         CollectionDatasetVersion datasetVersion = new CollectionDatasetVersion();
         datasetVersion.setId("123");
@@ -1635,7 +1642,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
 
         // Then the expected values have been set
         ContentDetail versionDetail = datasetContent.get(0);
-        assertEquals( "/datasets/123/editions/2015/versions/1", versionDetail.uri);
+        assertEquals("/datasets/123/editions/2015/versions/1", versionDetail.uri);
         assertEquals(PageType.api_dataset.toString(), versionDetail.type);
         assertEquals(datasetVersion.getTitle(), versionDetail.description.title);
 
@@ -1646,7 +1653,110 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         assertEquals(datasetVersion.getTitle(), datasetDetail.description.title);
     }
 
-    public static Collection CreateCollection(Path destination, String collectionName) throws CollectionNotFoundException, IOException {
+    /**
+     * deleteDataJSON should delete the data.json at the specified URI and any other files in the same directory.
+     */
+    @Test
+    public void shouldDeleteDataJsonAndAllSupplimentaryFiles() throws IOException, CollectionNotFoundException {
+        Collection c1 = createCollection(rootDir.getRoot().toPath(), "nargle");
+
+        assertTrue(c1.getInProgress().getPath().resolve("a/b/c").toFile().mkdirs());
+
+        Path uri = Paths.get("a/b/c");
+        assertTrue(c1.getInProgress().getPath().resolve(uri).resolve("data.json").toFile().createNewFile());
+        assertTrue(c1.getInProgress().getPath().resolve(uri).resolve("abc123.json").toFile().createNewFile());
+        assertTrue(c1.getInProgress().getPath().resolve(uri).resolve("abc123.xls").toFile().createNewFile());
+
+        boolean deleteSuccessful = c1.deleteFileAndRelated("/a/b/c/data.json");
+
+        assertTrue(deleteSuccessful);
+        assertTrue(c1.getInProgress().getPath().toFile().list().length == 0);
+        assertTrue(c1.getComplete().getPath().toFile().list().length == 0);
+        assertTrue(c1.getReviewed().getPath().toFile().list().length == 0);
+    }
+
+    /**
+     * deleteDataJSON should all files at the specified URI but should not delete any sub directories or thier content.
+     */
+    @Test
+    public void deleteDataJSONShouldNotDeleteSubDirs() throws Exception {
+        Collection c1 = createCollection(rootDir.getRoot().toPath(), "nargle");
+
+        assertTrue(c1.getComplete().getPath().resolve("a/b/c/d").toFile().mkdirs());
+
+        Path uri = Paths.get("a/b/c");
+        assertTrue(c1.getComplete().getPath().resolve(uri).resolve("data.json").toFile().createNewFile());
+        assertTrue(c1.getComplete().getPath().resolve(uri).resolve("abc123.json").toFile().createNewFile());
+        assertTrue(c1.getComplete().getPath().resolve(uri).resolve("abc123.xls").toFile().createNewFile());
+        assertTrue(c1.getComplete().getPath().resolve("a/b/c/d").resolve("data.json").toFile().createNewFile());
+
+        boolean deleteSuccessful = c1.deleteFileAndRelated("/a/b/c/data.json");
+
+        assertTrue(deleteSuccessful);
+        assertFalse(Files.exists(c1.getComplete().getPath().resolve("a/b/c/data.json")));
+        assertFalse(Files.exists(c1.getComplete().getPath().resolve("a/b/c/abc123.json")));
+        assertFalse(Files.exists(c1.getComplete().getPath().resolve("a/b/c/abc123.xls")));
+        assertTrue(Files.exists(c1.getComplete().getPath().resolve("a/b/c/d/data.json")));
+    }
+
+    /**
+     * deleteDataJSON should all files at the specified URI but should not delete any cy_data.json files if they exist.
+     */
+    @Test
+    public void deleteDataJSONShouldNotDeleteCYDataFiles() throws Exception {
+        Collection c1 = createCollection(rootDir.getRoot().toPath(), "nargle");
+
+        assertTrue(c1.getComplete().getPath().resolve("a/b/c").toFile().mkdirs());
+
+        Path uri = Paths.get("a/b/c");
+        assertTrue(c1.getComplete().getPath().resolve(uri).resolve("data.json").toFile().createNewFile());
+        assertTrue(c1.getComplete().getPath().resolve(uri).resolve("data_cy.json").toFile().createNewFile());
+        assertTrue(c1.getComplete().getPath().resolve(uri).resolve("abc123.json").toFile().createNewFile());
+        assertTrue(c1.getComplete().getPath().resolve(uri).resolve("abc123.xls").toFile().createNewFile());
+
+        boolean deleteSuccessful = c1.deleteFileAndRelated("/a/b/c/data.json");
+
+        assertTrue(deleteSuccessful);
+        assertFalse(Files.exists(c1.getComplete().getPath().resolve("a/b/c/data.json")));
+        assertFalse(Files.exists(c1.getComplete().getPath().resolve("a/b/c/abc123.json")));
+        assertFalse(Files.exists(c1.getComplete().getPath().resolve("a/b/c/abc123.xls")));
+        assertTrue(Files.exists(c1.getComplete().getPath().resolve("a/b/c/data_cy.json")));
+    }
+
+    /**
+     * deleteDataJSON should delete all files at the specified URI and should also delete an previous version of
+     * the URI that has been created in the reviewed dir.
+     */
+    @Test
+    public void deleteDataJSONShouldDeletePreviousVersionFromReviewed() throws Exception {
+        Collection c1 = createCollection(rootDir.getRoot().toPath(), "nargle");
+
+        assertTrue(c1.getComplete().getPath().resolve("a/b/c").toFile().mkdirs());
+        assertTrue(c1.getReviewed().getPath().resolve("a/b/c/previous/v1").toFile().mkdirs());
+
+        Path uri = Paths.get("a/b/c");
+        assertTrue(c1.getComplete().getPath().resolve(uri).resolve("data.json").toFile().createNewFile());
+        assertTrue(c1.getComplete().getPath().resolve(uri).resolve("abc123.json").toFile().createNewFile());
+        assertTrue(c1.getComplete().getPath().resolve(uri).resolve("abc123.xls").toFile().createNewFile());
+
+        // mock a previous version of the content in the reviewed dir.
+        assertTrue(c1.getReviewed().getPath().resolve("a/b/c/previous/v1/data.json").toFile().createNewFile());
+        assertTrue(c1.getReviewed().getPath().resolve("a/b/c/previous/v1/abc123.json").toFile().createNewFile());
+        assertTrue(c1.getReviewed().getPath().resolve("a/b/c/previous/v1/abc123.xls").toFile().createNewFile());
+
+        boolean deleteSuccessful = c1.deleteFileAndRelated("/a/b/c/data.json");
+
+        assertTrue(deleteSuccessful);
+        assertFalse(Files.exists(c1.getComplete().getPath().resolve("a/b/c/data.json")));
+        assertFalse(Files.exists(c1.getComplete().getPath().resolve("a/b/c/abc123.json")));
+        assertFalse(Files.exists(c1.getComplete().getPath().resolve("a/b/c/abc123.xls")));
+
+        assertFalse(Files.exists(c1.getReviewed().getPath().resolve("a/b/c/previous/v1/data.json")));
+        assertFalse(Files.exists(c1.getReviewed().getPath().resolve("a/b/c/previous/v1/abc123.json")));
+        assertFalse(Files.exists(c1.getReviewed().getPath().resolve("a/b/c/previous/v1/abc123.xld")));
+    }
+
+    public static Collection createCollection(Path destination, String collectionName) throws CollectionNotFoundException, IOException {
 
         CollectionDescription collection = new CollectionDescription(collectionName);
         collection.setType(CollectionType.manual);

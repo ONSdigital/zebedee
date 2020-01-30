@@ -20,13 +20,13 @@ import org.apache.http.message.BasicNameValuePair;
 import java.text.SimpleDateFormat;
 import java.util.AbstractMap;
 import java.util.Arrays;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
-import static com.github.onsdigital.logging.v2.event.SimpleEvent.warn;
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 
 /**
  * Sends messages to slack.
@@ -79,9 +79,9 @@ public class SlackNotification {
     }
 
     private static void addCollectionAttachment(PostMessageAttachment attch, Collection collection) {
-        attch.getFields().add(new PostMessageField("Collection", "<" + Configuration.getFlorenceUrl() + "/florence/collections/" + collection.getDescription().getId() + "|" + collection.getDescription().getName()+ ">", true));
+        attch.getFields().add(new PostMessageField("Collection", "<" + Configuration.getFlorenceUrl() + "/florence/collections/" + collection.getDescription().getId() + "|" + collection.getDescription().getName() + ">", true));
 
-        if(collection.getDescription().getPublishDate() == null) {
+        if (collection.getDescription().getPublishDate() == null) {
             attch.getFields().add(new PostMessageField("Publish date", "Manual", true));
         } else {
             attch.getFields().add(new PostMessageField("Publish date", slackFieldFormatVague.format(collection.getDescription().getPublishDate()), true));
@@ -91,23 +91,23 @@ public class SlackNotification {
             attch.getFields().add(new PostMessageField("Approval status", collection.getDescription().approvalStatus.toString(), true));
         }
 
-        if (collection.getDescription().publishTransactionIds != null
-                && !collection.getDescription().publishTransactionIds.isEmpty()) {
-            attch.getFields().add(new PostMessageField("Transaction IDs", StringUtils.join(collection.getDescription().publishTransactionIds.values(), "\n"), true));
+        Map<String, String> transactionIdMap = collection.getDescription().getPublishTransactionIds();
+        if (transactionIdMap != null && !transactionIdMap.isEmpty()) {
+            attch.getFields().add(new PostMessageField("Transaction IDs", StringUtils.join(transactionIdMap.values(), "\n"), true));
         }
     }
 
     private static void addCollectionAttachment(PostMessageAttachment attch, CollectionBase collection) {
         attch.getFields().add(new PostMessageField("Collection", "<" + Configuration.getFlorenceUrl() + "/florence/collections/" + collection.getId() + "|" + collection.getName() + ">", true));
 
-        if(collection.getPublishDate() == null) {
+        if (collection.getPublishDate() == null) {
             attch.getFields().add(new PostMessageField("Publish date", "Manual", true));
         } else {
             attch.getFields().add(new PostMessageField("Publish date", slackFieldFormatVague.format(collection.getPublishDate()), true));
         }
 
-        if(collection.getClass() == PublishedCollection.class) {
-            PublishedCollection publishedCollection = (PublishedCollection)collection;
+        if (collection.getClass() == PublishedCollection.class) {
+            PublishedCollection publishedCollection = (PublishedCollection) collection;
 
             if (publishedCollection.publishStartDate != null && publishedCollection.publishEndDate != null) {
                 String timeTaken = String.format("%.2f", (publishedCollection.publishEndDate.getTime()
@@ -124,7 +124,7 @@ public class SlackNotification {
                 attch.getFields().add(new PostMessageField("Publish end date", slackFieldFormatAccurate.format(publishedCollection.publishEndDate), true));
             }
 
-            if(publishedCollection.publishResults != null && publishedCollection.publishResults.size() > 0) {
+            if (publishedCollection.publishResults != null && publishedCollection.publishResults.size() > 0) {
                 // FIXME consider reporting on all transactions not just the first one
                 Result result = publishedCollection.publishResults.get(0);
 
@@ -143,7 +143,7 @@ public class SlackNotification {
     }
 
     private static void postSlackMessage(PostMessage message, String collectionID, boolean forceNewMessage) {
-        if(slackToken == null || slackToken.length() == 0) {
+        if (slackToken == null || slackToken.length() == 0) {
             info().log("postSlackMessage slackToken is null");
             return;
         }
@@ -152,10 +152,10 @@ public class SlackNotification {
             Exception result = null;
             Response<JsonObject> response;
             try (Http http = new Http()) {
-                if(collectionID != null && !forceNewMessage) {
+                if (collectionID != null && !forceNewMessage) {
                     // try and update a previous message
-                    AbstractMap.SimpleEntry<String,String> entry = collectionSlackMessageTimestamps.getIfPresent(collectionID);
-                    if(entry != null) {
+                    AbstractMap.SimpleEntry<String, String> entry = collectionSlackMessageTimestamps.getIfPresent(collectionID);
+                    if (entry != null) {
                         message.setTs(entry.getKey());
                         message.setChannel(entry.getValue());
                     }
@@ -167,7 +167,7 @@ public class SlackNotification {
                         new BasicNameValuePair("Authorization", "Bearer " + slackToken),
                         new BasicNameValuePair("Content-Type", "application/json"));
 
-                if(!response.body.get("ok").getAsBoolean()) {
+                if (!response.body.get("ok").getAsBoolean()) {
                     info().data("error", response.body.get("error").getAsString())
                             .data("responseStatusCode", response.statusLine.getStatusCode())
                             .log("sendSlackMessage");
@@ -177,7 +177,7 @@ public class SlackNotification {
                 String messageTs = response.body.get("ts").getAsString();
                 String channelID = response.body.get("channel").getAsString();
                 // message.ts is null if we're doing the initial postMessage rather than an update
-                if(message.getTs() == null && collectionID != null && messageTs != null && channelID != null) {
+                if (message.getTs() == null && collectionID != null && messageTs != null && channelID != null) {
                     // chat.update API doesn't support channel names, so we also store the channel ID
                     // from the initial chat.postMessage which we can use later
                     // (there's probably a more elegant way of doing this, or just use the channel ID in config)

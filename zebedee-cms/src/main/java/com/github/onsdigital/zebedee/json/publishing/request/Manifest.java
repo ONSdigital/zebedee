@@ -58,7 +58,7 @@ public class Manifest {
     }
 
     private static void updateManifest(Collection collection, Manifest manifest) throws IOException {
-        for (String uri : collection.reviewed.uris()) {
+        for (String uri : collection.getReviewed().uris()) {
             if (VersionedContentItem.isVersionedUri(uri)) {
                 manifest.addFileCopy(VersionedContentItem.resolveBaseUri(uri), uri);
             }

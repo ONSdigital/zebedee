@@ -79,6 +79,7 @@ import java.util.stream.Collectors;
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
+import static com.github.onsdigital.zebedee.model.content.item.VersionedContentItem.isVersionedUri;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_CONTENT_REVIEWED;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_CREATED;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_NAME_CHANGED;
@@ -109,9 +110,9 @@ public class Collection {
 
     public final CollectionDescription description;
     public final Path path;
-    public final Content reviewed;
-    public final Content complete;
-    public final Content inProgress;
+    private final Content reviewed;
+    private final Content complete;
+    private final Content inProgress;
 
     public final Zebedee zebedee;
 
@@ -987,6 +988,69 @@ public class Collection {
     }
 
     /**
+     * Delete a data.json page and any related/generated files.
+     * <p>
+     * Delete the specified data.json and any other files in the same directory - non data.json files in the same
+     * directory are supplimentary files related to the page content - tables, charts, images etc. Also deletes any
+     * files in the reviewed dir that are version URIs and start with the same dir path.
+     *
+     * @return true the delete is successful, false otherwise.
+     */
+    public boolean deleteFileAndRelated(String uri) throws IOException {
+        boolean deleteSuccessful = false;
+
+        String checkURI = uri;
+        if (Content.isDataJsonFile(uri)) {
+            checkURI = Paths.get(uri).getParent().toString();
+        }
+
+        if (isInProgress(checkURI)) {
+            deleteSuccessful = inProgress.deleteContentJson(uri);
+        } else if (isComplete(checkURI)) {
+            deleteSuccessful = complete.deleteContentJson(uri);
+        } else if (isReviewed(checkURI)) {
+            deleteSuccessful = reviewed.deleteContentJson(uri);
+        }
+
+        if (deleteSuccessful) {
+            deleteSuccessful &= deleteRelatedVersionedContent(uri);
+        }
+
+        return deleteSuccessful;
+    }
+
+    /**
+     * Delete all previous version content that is a child of the privided URI from the collection reviewed dir.
+     * <p>
+     * When new version of certain content types is created the previous versions are automagically
+     * calculated and put straight into reviewed state. Previous versions are not visible via Florence so if the
+     * newly created version is delete from the collection we need to tidy up these files as they can block users
+     * from appoving the collection or adding the same content again.
+     *
+     * @param uri
+     * @return
+     * @throws IOException
+     */
+    private boolean deleteRelatedVersionedContent(String uri) throws IOException {
+        boolean deleteSuccessful = true;
+
+        List<String> versionedFiles = reviewedUris()
+                .stream()
+                .filter(contentURI -> contentURI.startsWith(contentURI) && isVersionedUri(contentURI))
+                .collect(Collectors.toList());
+
+        if (!versionedFiles.isEmpty()) {
+            info().data("files", versionedFiles).data("uri", uri).log("deleting generated previous version files for uri");
+
+            for (String f : versionedFiles) {
+                deleteSuccessful &= deleteFile(f);
+            }
+        }
+
+        return deleteSuccessful;
+    }
+
+    /**
      * Delete all the content files in the directory of the given file.
      *
      * @param uri
@@ -1320,11 +1384,6 @@ public class Collection {
         return true;
     }
 
-    public Content getInProgress() {
-        return inProgress;
-    }
-
-
     /**
      * Return true if this collection has had all of its content reviewed.
      */
@@ -1417,6 +1476,18 @@ public class Collection {
         }
 
         return conflictLogMap;
+    }
+
+    public Content getReviewed() {
+        return this.reviewed;
+    }
+
+    public Content getComplete() {
+        return this.complete;
+    }
+
+    public Content getInProgress() {
+        return this.inProgress;
     }
 }
 

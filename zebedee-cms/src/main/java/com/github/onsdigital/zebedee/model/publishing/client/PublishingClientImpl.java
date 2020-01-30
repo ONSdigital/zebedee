@@ -13,6 +13,8 @@ import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 import java.util.function.Supplier;
 
+import static com.github.onsdigital.zebedee.logging.CMSLogEvent.info;
+
 /**
  * Implementation of {@link PublishingClient}.
  */
@@ -51,6 +53,13 @@ public class PublishingClientImpl implements PublishingClient {
                 CloseableHttpClient client = httpClientSupplier.get();
                 CloseableHttpResponse response = client.execute(request)
         ) {
+            info().request(request)
+                    .response(response)
+                    .uri(uri)
+                    .host(host)
+                    .transactionId(transactionId)
+                    .log("response received from publishing API for get content SHA-1 hash");
+
             if (response.getStatusLine().getStatusCode() != 200) {
                 throw non200ResponseStatusException(host, transactionId, uri, response.getStatusLine().getStatusCode());
             }

@@ -69,4 +69,6 @@ public interface Sessions {
      * @return the sessions expiration date time as a {@link Date} instance.
      */
     Date getExpiryDate(Session session);
+
+    boolean flushAllSessions() throws IOException;
 }

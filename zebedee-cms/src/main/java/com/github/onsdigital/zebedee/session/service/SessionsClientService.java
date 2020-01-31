@@ -13,6 +13,8 @@ import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
 
+import static com.github.onsdigital.zebedee.logging.CMSLogEvent.info;
+
 public class SessionsClientService implements Sessions {
 
     private SessionClient client;
@@ -75,6 +77,12 @@ public class SessionsClientService implements Sessions {
         } catch (IOException ex) {
             throw new RuntimeException(ex);
         }
+    }
+
+    @Override
+    public boolean flushAllSessions() {
+        info().log("flushing all sessiosn");
+        return client.clear();
     }
 
     Session fromAPIModel(com.session.service.Session sess) {

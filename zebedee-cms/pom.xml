@@ -69,6 +69,7 @@
             <groupId>com.daillew.spikes</groupId>
             <artifactId>session-service-client-java</artifactId>
             <version>1.0-SNAPSHOT</version>
+            <!--<version>master-SNAPSHOT</version>-->
         </dependency>
 
         <!-- File upload -->

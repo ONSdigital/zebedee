@@ -135,6 +135,7 @@ public class Root {
 
         info().data(ZEBEDEE_ROOT, rootDir).log("zebedee cmd initialization completed successfully");
     }
+
     /**
      * If we have not previously generated a key for CSDB import, generate one and distribute it.
      */
@@ -243,8 +244,13 @@ public class Root {
     private static Zebedee initialiseZebedee(Path root) throws IOException, NotFoundException, BadRequestException,
             UnauthorizedException {
         zebedee = new Zebedee(new ZebedeeConfiguration(root, true));
+        flushExistingSessions();
         createSystemUser();
         return zebedee;
+    }
+
+    private static void flushExistingSessions() throws IOException {
+        zebedee.getSessions().flushAllSessions();
     }
 
     private static void createSystemUser() throws NotFoundException, BadRequestException, UnauthorizedException, IOException {

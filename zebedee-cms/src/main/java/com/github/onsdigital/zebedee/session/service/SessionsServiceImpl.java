@@ -247,4 +247,10 @@ public class SessionsServiceImpl extends TimerTask implements Sessions {
         }
         return expiry;
     }
+
+    @Override
+    public boolean flushAllSessions() throws IOException {
+        // do nothing.
+        return true;
+    }
 }

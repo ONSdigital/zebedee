@@ -53,12 +53,12 @@ public class PublishingClientImpl implements PublishingClient {
                 CloseableHttpClient client = httpClientSupplier.get();
                 CloseableHttpResponse response = client.execute(request)
         ) {
-            info().request(request)
+/*            info().be(request.getR)
                     .response(response)
                     .uri(uri)
                     .host(host)
                     .transactionId(transactionId)
-                    .log("response received from publishing API for get content SHA-1 hash");
+                    .log("response received from publishing API for get content SHA-1 hash");*/
 
             if (response.getStatusLine().getStatusCode() != 200) {
                 throw non200ResponseStatusException(host, transactionId, uri, response.getStatusLine().getStatusCode());

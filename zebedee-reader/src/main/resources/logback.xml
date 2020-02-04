@@ -45,7 +45,7 @@
     </logger>
 
 
-    <root level="info">
+    <root level="WARN">
         <appender-ref ref="THIRD_PARTY"/>
     </root>
 

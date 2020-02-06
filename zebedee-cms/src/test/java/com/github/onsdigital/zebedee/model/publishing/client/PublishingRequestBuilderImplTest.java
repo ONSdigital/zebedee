@@ -86,6 +86,6 @@ public class PublishingRequestBuilderImplTest {
         assertThat(getRequest.getURI().getHost(), equalTo("localhost"));
         assertThat(getRequest.getURI().getPath(), equalTo("/contentHash"));
         assertThat(getRequest.getURI().getQuery(), equalTo("transactionId=transactionId&uri=uri"));
-        assertThat(getRequest.getFirstHeader("trace_id"), is(IsNull.notNullValue()));
+        assertThat(getRequest.getFirstHeader("X-Request-Id"), is(IsNull.notNullValue()));
     }
 }

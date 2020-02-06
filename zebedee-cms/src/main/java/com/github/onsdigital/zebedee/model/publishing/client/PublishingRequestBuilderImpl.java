@@ -22,6 +22,8 @@ public class PublishingRequestBuilderImpl implements PublishingRequestBuilder {
 
     private static final String URI_PARAM = "uri";
 
+    private static final String REQUEST_ID_HEADER = "X-Request-Id";
+
     private static final String TRACE_ID_HEADER = "trace_id";
 
     private static final String GET_CONTENT_HASH_URI = "/contentHash";
@@ -57,7 +59,7 @@ public class PublishingRequestBuilderImpl implements PublishingRequestBuilder {
     }
 
     private Header getTraceIDHeader() {
-        return new BasicHeader(TRACE_ID_HEADER, getTraceID());
+        return new BasicHeader(REQUEST_ID_HEADER, getTraceID());
     }
 
     /**

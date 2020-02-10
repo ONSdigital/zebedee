@@ -6,7 +6,7 @@ import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.api.ClickEventLog;
 import com.github.onsdigital.zebedee.api.CsdbKey;
 import com.github.onsdigital.zebedee.api.CsdbNotify;
-import com.github.onsdigital.zebedee.api.Health;
+import com.github.onsdigital.zebedee.reader.api.endpoint.Health;
 import com.github.onsdigital.zebedee.api.Identity;
 import com.github.onsdigital.zebedee.api.Login;
 import com.github.onsdigital.zebedee.api.Password;

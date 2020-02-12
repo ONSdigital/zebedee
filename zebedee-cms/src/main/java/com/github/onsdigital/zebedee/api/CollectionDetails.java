@@ -95,9 +95,9 @@ public class CollectionDetails {
 
         result.pendingDeletes = contentDeleteService.getDeleteItemsByCollection(collection);
 
-        result.inProgress = ContentDetailUtil.resolveDetails(collection.inProgress, collectionReader.getInProgress());
-        result.complete = ContentDetailUtil.resolveDetails(collection.complete, collectionReader.getComplete());
-        result.reviewed = ContentDetailUtil.resolveDetails(collection.reviewed, collectionReader.getReviewed());
+        result.inProgress = ContentDetailUtil.resolveDetails(collection.getInProgress(), collectionReader.getInProgress());
+        result.complete = ContentDetailUtil.resolveDetails(collection.getComplete(), collectionReader.getComplete());
+        result.reviewed = ContentDetailUtil.resolveDetails(collection.getReviewed(), collectionReader.getReviewed());
 
         result.approvalStatus = collection.getDescription().approvalStatus;
         result.events = collection.getDescription().events;

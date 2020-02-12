@@ -3,6 +3,7 @@ package com.github.onsdigital.zebedee.model.publishing;
 import com.github.davidcarboni.httpino.Endpoint;
 import com.github.davidcarboni.httpino.Host;
 import com.github.davidcarboni.httpino.Response;
+import com.github.onsdigital.zebedee.configuration.CMSFeatureFlags;
 import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.json.ApprovalStatus;
 import com.github.onsdigital.zebedee.json.Event;
@@ -10,8 +11,11 @@ import com.github.onsdigital.zebedee.json.EventType;
 import com.github.onsdigital.zebedee.json.publishing.Result;
 import com.github.onsdigital.zebedee.json.publishing.UriInfo;
 import com.github.onsdigital.zebedee.json.publishing.request.Manifest;
+import com.github.onsdigital.zebedee.logging.CMSLogEvent;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
+import com.github.onsdigital.zebedee.model.publishing.verify.HashVerifier;
+import com.github.onsdigital.zebedee.model.publishing.verify.HashVerifierImpl;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.service.DatasetService;
@@ -43,10 +47,10 @@ import java.util.concurrent.locks.Lock;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
-import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
-import static com.github.onsdigital.logging.v2.event.SimpleEvent.warn;
 import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
+import static com.github.onsdigital.zebedee.logging.CMSLogEvent.error;
+import static com.github.onsdigital.zebedee.logging.CMSLogEvent.info;
+import static com.github.onsdigital.zebedee.logging.CMSLogEvent.warn;
 import static com.github.onsdigital.zebedee.model.publishing.PostPublisher.getPublishedCollection;
 import static com.github.onsdigital.zebedee.util.SlackNotification.CollectionStage.PUBLISH;
 import static com.github.onsdigital.zebedee.util.SlackNotification.StageStatus.FAILED;
@@ -99,6 +103,13 @@ public class Publisher {
         boolean success = false;
 
         publishFilteredCollectionFiles(collection, collectionReader);
+
+        if (CMSFeatureFlags.cmsFeatureFlags().isVerifyPublishEnabled()) {
+            info().data("feature", "ENABLE_VERIFY_PUBLISH_CONTENT").log("feature enabled verifying publishing content");
+
+            HashVerifier hashVerifier = HashVerifierImpl.getInstance();
+            hashVerifier.verifyTransactionContent(collection, collectionReader);
+        }
 
         // TODO - feels like we should check/return here if unsuccessful?
         success = commitPublish(collection, email);
@@ -223,7 +234,8 @@ public class Publisher {
      * @return If publishAction succeeded, true.
      * @throws IOException If a general error occurs.
      */
-    public static boolean publishFilesToWebsite(Collection collection, String email, CollectionReader collectionReader) throws IOException {
+    public static boolean publishFilesToWebsite(Collection collection, String email, CollectionReader collectionReader)
+            throws IOException {
         boolean publishComplete = false;
 
         try {
@@ -233,32 +245,32 @@ public class Publisher {
             publishComplete = executePublish(collection, collectionReader, email);
 
             collection.getDescription().publishEndDate = new Date();
-        } catch (Exception e) {
-            PostMessageField msg = new PostMessageField("Error", e.getMessage(), false);
-            collectionAlarm(collection, "Exception publishAction collection", msg);
-
-            // If an error was caught, attempt to roll back the transaction:
-            Map<String, String> transactionIds = collection.getDescription().getPublishTransactionIds();
-            if (transactionIds != null && transactionIds.size() > 0) {
-
-                error().data("publishing", true).data("collectionId", collection.getDescription().getId())
-                        .data("hostToTransactionID", transactionIds)
-                        .logException(e, "error while attempting to publish, transaction IDs found for collection attempting to rollback");
-
-                rollbackPublish(collection);
-            } else {
-
-                error().data("publishing", true).data("collectionId", collection.getDescription().getId())
-                        .data("hostToTransactionID", transactionIds)
-                        .logException(e, "error while attempting to publish, no transaction IDs found for collection no rollback will be attempted");
-
-            }
-
+        } catch (Exception ex) {
+            handlePublishingException(ex, collection);
         } finally {
             // Save any updates to the collection
             saveCollection(collection, publishComplete);
         }
         return publishComplete;
+    }
+
+    private static void handlePublishingException(Exception ex, Collection collection) {
+        PostMessageField msg = new PostMessageField("Error", ex.getMessage(), false);
+        collectionAlarm(collection, "Exception publishAction collection", msg);
+
+        CMSLogEvent err = error().data("publishing", true).collectionID(collection);
+
+        // If an error was caught, attempt to roll back the transaction:
+        Map<String, String> transactionIds = collection.getDescription().getPublishTransactionIds();
+        if (transactionIds != null && transactionIds.size() > 0) {
+            err.data("hostToTransactionID", transactionIds)
+                    .exception(ex)
+                    .log("publish collection error, attempting to rollback collection");
+
+            rollbackPublish(collection);
+        } else {
+            err.exception(ex).log("publish collection error. Unable rollback as no transaction IDs found for collection");
+        }
     }
 
     public static Map<String, String> createPublishingTransactions(Collection collection)
@@ -329,11 +341,11 @@ public class Publisher {
         long start = System.currentTimeMillis();
 
         // Publish each item of content:
-        for (String uri : collection.reviewed.uris()) {
+        for (String uri : collection.getReviewed().uris()) {
             if (!shouldBeFiltered(filters, uri)) {
                 //publishFile(collection, encryptionPassword, results, uri, collectionReader);
 
-                Path source = collection.reviewed.get(uri);
+                Path source = collection.getReviewed().get(uri);
                 if (source != null) {
                     boolean zipped = false;
                     String publishUri = uri;

@@ -66,6 +66,13 @@ job "zebedee-reader" {
         name = "zebedee-reader"
         port = "http"
         tags = ["web"]
+
+        check {
+          type     = "http"
+          path     = "/health"
+          interval = "10s"
+          timeout  = "2s"
+        }
       }
 
       resources {

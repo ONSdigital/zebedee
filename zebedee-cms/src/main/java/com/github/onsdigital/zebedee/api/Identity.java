@@ -16,10 +16,10 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
 import java.io.IOException;
 
-import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
-import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
-import static com.github.onsdigital.logging.v2.event.SimpleEvent.warn;
 import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
+import static com.github.onsdigital.zebedee.logging.CMSLogEvent.error;
+import static com.github.onsdigital.zebedee.logging.CMSLogEvent.info;
+import static com.github.onsdigital.zebedee.logging.CMSLogEvent.warn;
 import static com.github.onsdigital.zebedee.service.ServiceTokenUtils.extractServiceAccountTokenFromAuthHeader;
 import static com.github.onsdigital.zebedee.service.ServiceTokenUtils.isValidServiceAuthorizationHeader;
 import static com.github.onsdigital.zebedee.service.ServiceTokenUtils.isValidServiceToken;
@@ -101,7 +101,6 @@ public class Identity {
     }
 
     private ServiceAccount handleServiceAccountRequest(HttpServletRequest request) throws IOException {
-        info().log("identity: handling service identity request");
         String authorizationHeader = request.getHeader(AUTHORIZATION_HEADER);
 
         ServiceAccount serviceAccount = null;
@@ -123,7 +122,7 @@ public class Identity {
             if (serviceAccount == null) {
                 warn().log("service account not found for service token");
             } else {
-                info().data("service_id", serviceAccount.getID()).log("identified valid service account");
+                info().serviceAccountID(serviceAccount).log("identified valid service account");
             }
         } catch (Exception ex) {
             error().exception(ex).log("unexpected error getting service account from service store");

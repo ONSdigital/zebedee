@@ -13,6 +13,8 @@ import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 import java.util.function.Supplier;
 
+import static com.github.onsdigital.zebedee.logging.CMSLogEvent.info;
+
 /**
  * Implementation of {@link PublishingClient}.
  */
@@ -51,8 +53,15 @@ public class PublishingClientImpl implements PublishingClient {
                 CloseableHttpClient client = httpClientSupplier.get();
                 CloseableHttpResponse response = client.execute(request)
         ) {
+            info().request(request)
+                    .response(response)
+                    .uri(uri)
+                    .host(host)
+                    .transactionId(transactionId)
+                    .log("response received from publishing API for get content SHA-1 hash");
+
             if (response.getStatusLine().getStatusCode() != 200) {
-                throw new PublishingClientException(host, transactionId, uri, response.getStatusLine().getStatusCode());
+                throw non200ResponseStatusException(host, transactionId, uri, response.getStatusLine().getStatusCode());
             }
             return getResponseEntity(response.getEntity(), GetContentHashEntity.class);
         }
@@ -65,5 +74,11 @@ public class PublishingClientImpl implements PublishingClient {
         ) {
             return new Gson().fromJson(reader, tClass);
         }
+    }
+
+    private PublishingClientException non200ResponseStatusException(String host, String transactionId, String uri,
+                                                                    int status) {
+        return new PublishingClientException("publishing API returned a non 200 status for get content hash request",
+                host, transactionId, uri, status);
     }
 }

@@ -38,7 +38,6 @@ public class ServiceTokenUtils {
 
         if (matches(token)) {
             isValid = true;
-            info().log("valid service token");
         } else {
             warn().log("invalid service token value: service tokens must contain 16 or more alphanumerica only characters");
         }
@@ -80,10 +79,7 @@ public class ServiceTokenUtils {
 
         } else if (!serviceAuthHeader.startsWith(BEARER_PREFIX_UC)) {
             warn().log("invalid service authorization header value not prefixed with Bearer (case sensitive)");
-            return false;
-
-        } else {
-            info().log("service authorization header valid");
+            isValid = false;
         }
 
         return isValid;
@@ -103,8 +99,8 @@ public class ServiceTokenUtils {
             warn().log("cannot remove Bearer prefix from null or empty service authorization header value");
         } else {
             serviceToken = rawHeader.replaceFirst(BEARER_PREFIX_UC, "").trim();
-            info().log("bearer prefix removed from service auth header");
         }
+
         return serviceToken;
     }
 

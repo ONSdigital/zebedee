@@ -49,16 +49,20 @@ public class PublishingClientImpl implements PublishingClient {
             URISyntaxException {
         HttpUriRequest request = requestBuilder.createGetContentHashRequest(host, transactionId, uri);
 
+        info().beginHTTP(request)
+                .transactionId(transactionId)
+                .host(host)
+                .uri(uri)
+                .log("executing get content hash request");
         try (
                 CloseableHttpClient client = httpClientSupplier.get();
                 CloseableHttpResponse response = client.execute(request)
         ) {
-            info().request(request)
-                    .response(response)
+            info().endHTTP(request, response)
                     .uri(uri)
                     .host(host)
                     .transactionId(transactionId)
-                    .log("response received from publishing API for get content SHA-1 hash");
+                    .log("execute get content hash request completed");
 
             if (response.getStatusLine().getStatusCode() != 200) {
                 throw non200ResponseStatusException(host, transactionId, uri, response.getStatusLine().getStatusCode());

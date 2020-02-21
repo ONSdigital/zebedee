@@ -19,6 +19,7 @@ import com.github.onsdigital.zebedee.service.ServiceStore;
 import com.github.onsdigital.zebedee.service.ServiceStoreImpl;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.session.service.Sessions;
+import com.github.onsdigital.zebedee.session.service.SessionsClientService;
 import com.github.onsdigital.zebedee.teams.service.TeamsService;
 import com.github.onsdigital.zebedee.user.model.User;
 import com.github.onsdigital.zebedee.user.service.UsersService;
@@ -87,6 +88,7 @@ public class Zebedee {
     public Zebedee(ZebedeeConfiguration configuration) {
         this.path = configuration.getZebedeePath();
         this.publishedContentPath = configuration.getPublishedContentPath();
+
         this.sessions = configuration.getSessions();
         this.keyringCache = configuration.getKeyringCache();
         this.permissionsService = configuration.getPermissionsService();
@@ -279,7 +281,7 @@ public class Zebedee {
         try {
             session = sessions.create(user);
         } catch (Exception e) {
-            error().data("user", user.getEmail()).logException(e, "error attempting to create session for user");
+            error().data("user", user.getEmail()).exception(e).log("error attempting to create session for user");
             throw new IOException(e);
         }
 

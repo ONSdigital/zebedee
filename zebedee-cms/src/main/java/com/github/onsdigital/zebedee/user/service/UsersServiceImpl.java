@@ -28,6 +28,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
+import static com.github.onsdigital.zebedee.logging.CMSLogEvent.error;
 import static java.text.MessageFormat.format;
 
 /**
@@ -102,11 +103,16 @@ public class UsersServiceImpl implements UsersService {
     @Override
     public User addKeyToKeyring(String email, String keyIdentifier, SecretKey key) throws IOException {
         lock.lock();
+        String userEmail = "";
         try {
             User user = userStore.get(email);
+            userEmail = user.getEmail();
             user.keyring().put(keyIdentifier, key);
             userStore.save(user);
             return user;
+        } catch (Exception ex) {
+            error().exception(ex).user(userEmail).log("HERE");
+            throw ex;
         } finally {
             lock.unlock();
         }

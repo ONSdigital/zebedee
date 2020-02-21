@@ -96,7 +96,7 @@
         <dependency>
             <groupId>com.github.ONSdigital</groupId>
             <artifactId>dp-dataset-api-java-client</artifactId>
-            <version>master-ac2deec232-1</version>
+            <version>master-9be0ebe9c1-1</version>
         </dependency>
 
     </dependencies>

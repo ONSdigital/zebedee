@@ -8,8 +8,13 @@ import org.junit.Test;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Optional;
 
-import static org.junit.Assert.*;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 
 public class VersionedContentItemTest {
@@ -160,5 +165,37 @@ public class VersionedContentItemTest {
 
         // Then a it creates a version after the highest version, ignoring the gap.
         assertEquals("v3", lastVersionIdentifier);
+    }
+
+    @Test
+    public void getVersionFromURI_uriNull_shouldReturnEmptyString() {
+        Optional<String> result = VersionedContentItem.getVersionFromURI(null);
+        assertFalse(result.isPresent());
+    }
+
+    @Test
+    public void getVersionFromURI_uriEmpty_shouldReturnEmptyString() {
+        Optional<String> result = VersionedContentItem.getVersionFromURI("");
+        assertFalse(result.isPresent());
+    }
+
+    @Test
+    public void getVersionFromURI_notVersionURI_shouldReturnEmptyString() {
+        Optional<String> result = VersionedContentItem.getVersionFromURI("/a/b/c");
+        assertFalse(result.isPresent());
+    }
+
+    @Test
+    public void getVersionFromURI_uriForVersionDir_shouldReturnVersion() {
+        Optional<String> result = VersionedContentItem.getVersionFromURI("/a/b/c/previous/v1");
+        assertTrue(result.isPresent());
+        assertThat(result.get(), equalTo("v1"));
+    }
+
+    @Test
+    public void getVersionFromURI_uriForVersionFile_shouldReturnVersion() {
+        Optional<String> result = VersionedContentItem.getVersionFromURI("/a/b/c/previous/v1/data.json");
+        assertTrue(result.isPresent());
+        assertThat(result.get(), equalTo("v1"));
     }
 }

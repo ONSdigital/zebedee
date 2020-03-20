@@ -1350,7 +1350,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         String uri = String.format("/economy/inflationandpriceindices/timeseries/%s/previous/v1", Random.id());
 
         // When we attempt to delete a version
-        collection.deleteVersion(uri);
+        collection.deleteVersion("", uri);
 
         // Then a not found exception is thrown.
     }
@@ -1362,7 +1362,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         String uri = String.format("/economy/inflationandpriceindices/timeseries/%s", Random.id());
 
         // When we attempt to delete a version
-        collection.deleteVersion(uri);
+        collection.deleteVersion("", uri);
 
         // Then a BadRequestException is thrown.
     }
@@ -1379,7 +1379,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         assertTrue(Files.exists(collection.getReviewed().get(version.getUri()).resolve("data.json")));
 
         // When the delete version function is called for the version URI
-        collection.deleteVersion(version.getUri());
+        collection.deleteVersion("bob", version.getUri());
 
         // Then the versions directory is deleted.
         assertNull(collection.getReviewed().get(version.getUri()));

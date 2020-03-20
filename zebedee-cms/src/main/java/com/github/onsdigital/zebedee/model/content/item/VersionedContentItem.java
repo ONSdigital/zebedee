@@ -8,6 +8,7 @@ import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.util.URIUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,6 +16,9 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static com.github.onsdigital.zebedee.util.URIUtils.removeLeadingSlash;
 
@@ -29,6 +33,7 @@ public class VersionedContentItem extends ContentItem {
 
     static final String VERSION_DIRECTORY = "previous";
     static final String VERSION_PREFIX = "v";
+    static final Pattern VERSION_DIR_PATTERN = Pattern.compile("v\\d+");
 
     public VersionedContentItem(String uri) throws NotFoundException {
         super(uri);
@@ -204,5 +209,19 @@ public class VersionedContentItem extends ContentItem {
         }
 
         return false;
+    }
+
+    public static Optional<String> getVersionFromURI(String uri) {
+        Optional<String> result = Optional.empty();
+
+        if (StringUtils.isNotEmpty(uri) && isVersionedUri(uri)) {
+            Matcher matcher = VERSION_DIR_PATTERN.matcher(uri);
+
+            if (matcher.find()) {
+                result = Optional.of(matcher.group(0));
+            }
+        }
+
+        return result;
     }
 }

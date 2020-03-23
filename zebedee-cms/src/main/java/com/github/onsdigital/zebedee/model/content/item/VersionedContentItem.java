@@ -32,8 +32,9 @@ import static com.github.onsdigital.zebedee.util.URIUtils.removeLeadingSlash;
 public class VersionedContentItem extends ContentItem {
 
     static final String VERSION_DIRECTORY = "previous";
+    static final String VERSION_URI = "/previous/";
     static final String VERSION_PREFIX = "v";
-    static final Pattern VERSION_DIR_PATTERN = Pattern.compile("v\\d+");
+    static final Pattern VERSION_DIR_PATTERN = Pattern.compile("/previous/v\\d+");
 
     public VersionedContentItem(String uri) throws NotFoundException {
         super(uri);
@@ -211,6 +212,13 @@ public class VersionedContentItem extends ContentItem {
         return false;
     }
 
+    /**
+     * Return an optional containing the the version directory name from the URI if it exists otherwise return an
+     * empty {@link Optional}. Example: Given uri "/a/b/c/previous/v1/data.json" returns "v1".
+     *
+     * @param uri
+     * @return an {@link Optional} with the uri version string if it exists. Otherwise return an empyt optional.
+     */
     public static Optional<String> getVersionFromURI(String uri) {
         Optional<String> result = Optional.empty();
 
@@ -218,7 +226,7 @@ public class VersionedContentItem extends ContentItem {
             Matcher matcher = VERSION_DIR_PATTERN.matcher(uri);
 
             if (matcher.find()) {
-                result = Optional.of(matcher.group(0));
+                result = Optional.of(matcher.group(0).replace(VERSION_URI, ""));
             }
         }
 

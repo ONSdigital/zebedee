@@ -89,7 +89,7 @@ public class Version {
         String uri = request.getParameter("uri");
 
         try {
-            info().uri(uri).collectionID(collection).user(session).log("deleting colleciton version content");
+            info().uri(uri).collectionID(collection).user(session).log("deleting collection version content");
             collection.deleteVersion(session.getEmail(), uri);
         } finally {
             collection.save();

@@ -1225,7 +1225,8 @@ public class Collection {
     /**
      * Delete the version at the given URI.
      *
-     * @param uri - The URI of the version to delete.
+     * @param email - the email of the user deleting the version from the collection
+     * @param uri   - The URI of the version to delete.
      * @throws NotFoundException   - if the given URI was not found in the collection.
      * @throws BadRequestException - if the given URI is not a valid version URI.
      */

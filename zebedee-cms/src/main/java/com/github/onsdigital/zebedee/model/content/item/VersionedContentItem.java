@@ -216,8 +216,9 @@ public class VersionedContentItem extends ContentItem {
      * Return an optional containing the the version directory name from the URI if it exists otherwise return an
      * empty {@link Optional}. Example: Given uri "/a/b/c/previous/v1/data.json" returns "v1".
      *
-     * @param uri
-     * @return an {@link Optional} with the uri version string if it exists. Otherwise return an empyt optional.
+     * @param uri the taxonomy uri to get the version from.
+     * @return an {@link Optional} with the uri version string if it exists and the input is a valid version uri.
+     * Otherwise return an empyt optional.
      */
     public static Optional<String> getVersionFromURI(String uri) {
         Optional<String> result = Optional.empty();

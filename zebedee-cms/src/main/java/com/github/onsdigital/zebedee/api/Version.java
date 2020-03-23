@@ -6,17 +6,19 @@ import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
-import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.CollectionWriter;
 import com.github.onsdigital.zebedee.model.ZebedeeCollectionWriter;
 import com.github.onsdigital.zebedee.model.content.item.ContentItemVersion;
+import com.github.onsdigital.zebedee.session.model.Session;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.POST;
 import java.io.IOException;
+
+import static com.github.onsdigital.zebedee.logging.CMSLogEvent.info;
 
 @Api
 public class Version {
@@ -34,7 +36,6 @@ public class Version {
      */
     @POST
     public String create(HttpServletRequest request, HttpServletResponse response) throws IOException, ZebedeeException {
-
         Session session = Root.zebedee.getSessions().get(request);
         if (session == null || !Root.zebedee.getPermissionsService().canEdit(session.getEmail())) {
             throw new UnauthorizedException("You are not authorised to edit content.");
@@ -43,8 +44,18 @@ public class Version {
         Collection collection = Collections.getCollection(request);
         String uri = request.getParameter("uri");
 
-        CollectionWriter collectionWriter = new ZebedeeCollectionWriter(Root.zebedee, collection, session);
-        ContentItemVersion version = collection.version(session.getEmail(), uri, collectionWriter);
+        ContentItemVersion version = null;
+        try {
+            CollectionWriter collectionWriter = new ZebedeeCollectionWriter(Root.zebedee, collection, session);
+            version = collection.version(session.getEmail(), uri, collectionWriter);
+            info().uri(uri)
+                    .collectionID(collection)
+                    .user(session)
+                    .data("version", version.getIdentifier())
+                    .log("new content version created");
+        } finally {
+            collection.save();
+        }
 
         Audit.Event.COLLECTION_VERSION_CREATED
                 .parameters()
@@ -77,7 +88,12 @@ public class Version {
         Collection collection = Collections.getCollection(request);
         String uri = request.getParameter("uri");
 
-        collection.deleteVersion(uri);
+        try {
+            info().uri(uri).collectionID(collection).user(session).log("deleting collection version content");
+            collection.deleteVersion(session.getEmail(), uri);
+        } finally {
+            collection.save();
+        }
 
         Audit.Event.COLLECTION_VERSION_DELETED
                 .parameters()

@@ -78,6 +78,7 @@ import java.util.stream.Collectors;
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
+import static com.github.onsdigital.zebedee.model.content.item.VersionedContentItem.getVersionFromURI;
 import static com.github.onsdigital.zebedee.model.content.item.VersionedContentItem.isVersionedUri;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_CONTENT_REVIEWED;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_CREATED;
@@ -1224,11 +1225,12 @@ public class Collection {
     /**
      * Delete the version at the given URI.
      *
-     * @param uri - The URI of the version to delete.
+     * @param email - the email of the user deleting the version from the collection
+     * @param uri   - The URI of the version to delete.
      * @throws NotFoundException   - if the given URI was not found in the collection.
      * @throws BadRequestException - if the given URI is not a valid version URI.
      */
-    public void deleteVersion(String uri) throws NotFoundException, BadRequestException, IOException {
+    public void deleteVersion(String email, String uri) throws NotFoundException, BadRequestException, IOException {
 
         if (!VersionedContentItem.isVersionedUri(uri)) {
             throw new BadRequestException("The given URI is not recognised as a version");
@@ -1240,6 +1242,10 @@ public class Collection {
         }
 
         FileUtils.deleteDirectory(reviewedPath.toFile());
+
+        Optional<String> version = getVersionFromURI(uri);
+        String note = version.isPresent() ? version.get() : uri;
+        addEvent(uri, new Event(new Date(), EventType.VERSION_DELETED, email, note));
     }
 
     /**

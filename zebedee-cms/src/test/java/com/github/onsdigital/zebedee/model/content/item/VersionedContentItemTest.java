@@ -198,4 +198,10 @@ public class VersionedContentItemTest {
         assertTrue(result.isPresent());
         assertThat(result.get(), equalTo("v1"));
     }
+
+    @Test
+    public void getVersionNumber_validURI_shouldReturnExpectedValue() {
+       // assertThat(VersionedContentItem.getVersionNumber("/a/b/c/current/previous/v1"), equalTo(1));
+        assertThat(VersionedContentItem.getVersionNumber("/a/b/c/current/previous/v1/data.json"), equalTo(1));
+    }
 }

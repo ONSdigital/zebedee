@@ -1,5 +1,6 @@
 package com.github.onsdigital.zebedee.model.content.item;
 
+import com.github.onsdigital.zebedee.content.page.statistics.dataset.Version;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.model.Content;
@@ -7,6 +8,7 @@ import com.github.onsdigital.zebedee.model.ContentWriter;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.util.URIUtils;
+import com.github.onsdigital.zebedee.util.versioning.VersionUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -16,6 +18,7 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -91,7 +94,9 @@ public class VersionedContentItem extends ContentItem {
         Path versionDirectory = versionSourcePath.resolve(getVersionDirectoryName());
 
         if (Files.exists(versionDirectory)) {
-            version = versionDirectory.toFile().listFiles().length + 1;
+            version = versionDirectory.toFile()
+                    .listFiles(f -> VersionUtils.isVersionDir(f))
+                    .length + 1;
         }
 
         String versionIdentifier = VERSION_PREFIX + version;
@@ -232,5 +237,24 @@ public class VersionedContentItem extends ContentItem {
         }
 
         return result;
+    }
+
+    public static int getVersionNumber(String uri) {
+        Integer version = -1;
+        Optional<String> vOpt = getVersionFromURI(uri);
+
+        if (vOpt.isPresent()) {
+            version = Integer.valueOf(vOpt.get().replaceFirst("v", ""));
+        }
+
+        return version;
+    }
+
+    public static void sort(List<Version> versions) {
+        versions.sort((v1, v2) -> {
+            Integer foo = getVersionNumber(v1.getUri().toString());
+            Integer bar = getVersionNumber(v2.getUri().toString());
+            return foo.compareTo(bar);
+        });
     }
 }

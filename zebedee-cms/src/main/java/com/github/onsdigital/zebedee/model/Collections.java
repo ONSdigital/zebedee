@@ -3,10 +3,6 @@ package com.github.onsdigital.zebedee.model;
 import com.github.davidcarboni.encryptedfileupload.EncryptedFileItemFactory;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.api.Root;
-import com.github.onsdigital.zebedee.content.page.base.Page;
-import com.github.onsdigital.zebedee.content.page.base.PageType;
-import com.github.onsdigital.zebedee.content.page.statistics.dataset.DatasetLandingPage;
-import com.github.onsdigital.zebedee.content.page.statistics.dataset.Version;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.data.json.DirectoryListing;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
@@ -15,6 +11,7 @@ import com.github.onsdigital.zebedee.exceptions.ConflictException;
 import com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
+import com.github.onsdigital.zebedee.exceptions.UnexpectedErrorException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.ApprovalStatus;
 import com.github.onsdigital.zebedee.json.Event;
@@ -35,6 +32,8 @@ import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
 import com.github.onsdigital.zebedee.session.model.Session;
+import com.github.onsdigital.zebedee.util.versioning.VersionNotFoundException;
+import com.github.onsdigital.zebedee.util.versioning.VersionUtils;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.ProgressListener;
@@ -337,6 +336,16 @@ public class Collections {
         CollectionReader collectionReader = collectionReaderWriterFactory.getReader(zebedeeSupplier.get(), collection, session);
         CollectionWriter collectionWriter = collectionReaderWriterFactory.getWriter(zebedeeSupplier.get(), collection, session);
         ContentReader publishedReader = contentReaderFactory.apply(this.published.path);
+
+        try {
+            VersionUtils.verifyCollectionDatasets(collection, collectionReader, session);
+        } catch (VersionNotFoundException ex) {
+            info().collectionID(collection)
+                    .user(session)
+                    .exception(ex)
+                    .log("error verifying collection datasets");
+            throw new UnexpectedErrorException(ex.getMessage(), 409);
+        }
 
         info().data("collectionId", collectionId)
                 .log("approve collection: setting collection status to approved");
@@ -967,26 +976,5 @@ public class Collections {
             return getCollectionByName(name) != null;
         }
 
-    }
-
-
-    public void checkExpectedDatasetVersionsExist(CollectionReader reader, Collection collection) throws ZebedeeException, IOException {
-        for (String uri : reader.getReviewed().listUris()) {
-            if (!uri.endsWith("data.json")) {
-                continue;
-            }
-
-            Page page = reader.getReviewed().getContent(uri);
-            if (!PageType.api_dataset_landing_page.equals(page.getType())) {
-                continue;
-            }
-
-            DatasetLandingPage dslp = (DatasetLandingPage) reader.getReviewed().getContent(uri);
-            for (Version version : dslp.getVersions()) {
-                // sort the versions
-                // get the latest
-                // check it exists in the reviewed dir.
-            }
-        }
     }
 }

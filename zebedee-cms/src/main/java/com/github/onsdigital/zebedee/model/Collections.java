@@ -3,6 +3,7 @@ package com.github.onsdigital.zebedee.model;
 import com.github.davidcarboni.encryptedfileupload.EncryptedFileItemFactory;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.api.Root;
+import com.github.onsdigital.zebedee.configuration.CMSFeatureFlags;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.data.json.DirectoryListing;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
@@ -342,15 +343,7 @@ public class Collections {
         CollectionWriter collectionWriter = collectionReaderWriterFactory.getWriter(zebedeeSupplier.get(), collection, session);
         ContentReader publishedReader = contentReaderFactory.apply(this.published.path);
 
-        try {
-            versionsService.verifyCollectionDatasets(zebedeeCmsService.getZebedeeReader(), collection, collectionReader, session);
-        } catch (VersionNotFoundException ex) {
-            info().collectionID(collection)
-                    .user(session)
-                    .exception(ex)
-                    .log("error verifying collection datasets");
-            throw new UnexpectedErrorException(ex.getMessage(), 409);
-        }
+        verifyDatasetVersions(collection, collectionReader, session);
 
         info().data("collectionId", collectionId)
                 .log("approve collection: setting collection status to approved");
@@ -981,5 +974,21 @@ public class Collections {
             return getCollectionByName(name) != null;
         }
 
+    }
+
+    public void verifyDatasetVersions(Collection collection, CollectionReader collectionReader, Session session) throws ZebedeeException, IOException {
+        if (CMSFeatureFlags.cmsFeatureFlags().isDatasetVersionVerificationEnabled()) {
+            info().collectionID(collection).log("dataset version verification feature enabled verifying collection");
+
+            try {
+                versionsService.verifyCollectionDatasets(zebedeeCmsService.getZebedeeReader(), collection, collectionReader, session);
+            } catch (VersionNotFoundException ex) {
+                info().collectionID(collection)
+                        .user(session)
+                        .exception(ex)
+                        .log("error verifying collection datasets");
+                throw new UnexpectedErrorException(ex.getMessage(), 409);
+            }
+        }
     }
 }

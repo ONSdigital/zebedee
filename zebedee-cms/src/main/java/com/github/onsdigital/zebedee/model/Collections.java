@@ -32,8 +32,9 @@ import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
 import com.github.onsdigital.zebedee.session.model.Session;
+import com.github.onsdigital.zebedee.util.ZebedeeCmsService;
 import com.github.onsdigital.zebedee.util.versioning.VersionNotFoundException;
-import com.github.onsdigital.zebedee.util.versioning.VersionUtils;
+import com.github.onsdigital.zebedee.util.versioning.VersionsService;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.ProgressListener;
@@ -85,16 +86,20 @@ public class Collections {
     private PermissionsService permissionsService;
     private Content published;
     private Supplier<Zebedee> zebedeeSupplier = () -> Root.zebedee;
+    private ZebedeeCmsService zebedeeCmsService = ZebedeeCmsService.getInstance();
     private CollectionReaderWriterFactory collectionReaderWriterFactory;
     private Function<ApproveTask, Future<Boolean>> addTaskToQueue = ApprovalQueue::add;
     private BiConsumer<Collection, EventType> publishingNotificationConsumer = (c, e) -> new PublishNotification(c).sendNotification(e);
     private Function<Path, ContentReader> contentReaderFactory = FileSystemContentReader::new;
     private Supplier<CollectionHistoryDao> collectionHistoryDaoSupplier = CollectionHistoryDaoFactory::getCollectionHistoryDao;
     private Comparator<String> strComparator = Comparator.comparing(String::toString);
+    private VersionsService versionsService;
 
-    public Collections(Path path, PermissionsService permissionsService, Content published) {
+    public Collections(Path path, PermissionsService permissionsService,
+                       VersionsService versionsService, Content published) {
         this.path = path;
         this.permissionsService = permissionsService;
+        this.versionsService = versionsService;
         this.published = published;
         this.collectionReaderWriterFactory = new CollectionReaderWriterFactory();
     }
@@ -338,7 +343,7 @@ public class Collections {
         ContentReader publishedReader = contentReaderFactory.apply(this.published.path);
 
         try {
-            VersionUtils.verifyCollectionDatasets(collection, collectionReader, session);
+            versionsService.verifyCollectionDatasets(zebedeeCmsService.getZebedeeReader(), collection, collectionReader, session);
         } catch (VersionNotFoundException ex) {
             info().collectionID(collection)
                     .user(session)

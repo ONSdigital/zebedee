@@ -21,9 +21,12 @@ import com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDao;
 import com.github.onsdigital.zebedee.persistence.model.CollectionHistoryEvent;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
+import com.github.onsdigital.zebedee.reader.ZebedeeReader;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.user.model.User;
 import com.github.onsdigital.zebedee.user.service.UsersService;
+import com.github.onsdigital.zebedee.util.ZebedeeCmsService;
+import com.github.onsdigital.zebedee.util.versioning.VersionsService;
 import org.apache.commons.fileupload.FileUploadException;
 import org.junit.Before;
 import org.junit.Rule;
@@ -80,6 +83,15 @@ public class CollectionsTest {
 
     @Mock
     private PermissionsService permissionsServiceMock;
+
+    @Mock
+    private ZebedeeCmsService zebedeeCmsService;
+
+    @Mock
+    private VersionsService versionsService;
+
+    @Mock
+    private ZebedeeReader zebedeeReader;
 
     @Mock
     private Zebedee zebedeeMock;
@@ -148,7 +160,7 @@ public class CollectionsTest {
         collectionsPath = rootDir.newFolder("collections").toPath();
 
         // Test target.
-        collections = new Collections(collectionsPath, permissionsServiceMock, publishedContentMock);
+        collections = new Collections(collectionsPath, permissionsServiceMock, versionsService, publishedContentMock);
 
         zebedeeSupplier = () -> zebedeeMock;
         publishingNotificationConsumer = (c, e) -> publishNotification.sendNotification(e);
@@ -164,6 +176,7 @@ public class CollectionsTest {
         ReflectionTestUtils.setField(collections, "collectionReaderWriterFactory", collectionReaderWriterFactoryMock);
         ReflectionTestUtils.setField(collections, "publishingNotificationConsumer", publishingNotificationConsumer);
         ReflectionTestUtils.setField(collections, "collectionHistoryDaoSupplier", collectionHistoryDaoSupplier);
+        ReflectionTestUtils.setField(collections, "zebedeeCmsService", zebedeeCmsService);
     }
 
     @Test
@@ -597,6 +610,7 @@ public class CollectionsTest {
 
         ReflectionTestUtils.setField(collections, "contentReaderFactory", contentReaderFunction);
         ReflectionTestUtils.setField(collections, "addTaskToQueue", addTaskToQueue);
+        ReflectionTestUtils.setField(collections, "addTaskToQueue", addTaskToQueue);
 
         when(permissionsServiceMock.canEdit(TEST_EMAIL))
                 .thenReturn(true);
@@ -606,6 +620,8 @@ public class CollectionsTest {
                 .thenReturn(collectionReaderMock);
         when(collectionReaderWriterFactoryMock.getWriter(zebedeeMock, collectionMock, sessionMock))
                 .thenReturn(collectionWriterMock);
+        when(zebedeeCmsService.getZebedeeReader())
+                .thenReturn(zebedeeReader);
 
         assertThat(futureMock, equalTo(collections.approve(collectionMock, sessionMock)));
 

@@ -40,6 +40,8 @@ import com.github.onsdigital.zebedee.service.ServiceSupplier;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.teams.model.Team;
 import com.github.onsdigital.zebedee.teams.service.TeamsService;
+import com.github.onsdigital.zebedee.util.versioning.VersionsService;
+import com.github.onsdigital.zebedee.util.versioning.VersionsServiceImpl;
 import com.google.common.annotations.VisibleForTesting;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -79,7 +81,6 @@ import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFea
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.error;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.info;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.warn;
-import static com.github.onsdigital.zebedee.model.content.item.VersionedContentItem.getVersionFromURI;
 import static com.github.onsdigital.zebedee.model.content.item.VersionedContentItem.isVersionedUri;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_CONTENT_REVIEWED;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_CREATED;
@@ -118,6 +119,7 @@ public class Collection {
     public final Zebedee zebedee;
 
     private final Path collectionJsonPath;
+    private VersionsService versionsService;
 
     private static ServiceSupplier<CollectionHistoryDao> collectionHistoryDaoServiceSupplier = () -> getCollectionHistoryDao();
 
@@ -174,6 +176,8 @@ public class Collection {
         this.reviewed = new Content(reviewed);
         this.complete = new Content(complete);
         this.inProgress = new Content(inProgress);
+
+        this.versionsService = new VersionsServiceImpl();
     }
 
     /**
@@ -1262,7 +1266,7 @@ public class Collection {
 
         FileUtils.deleteDirectory(reviewedPath.toFile());
 
-        Optional<String> version = getVersionFromURI(uri);
+        Optional<String> version = versionsService.getVersionNameFromURI(uri);
         String note = version.isPresent() ? version.get() : uri;
         addEvent(uri, new Event(new Date(), EventType.VERSION_DELETED, email, note));
     }

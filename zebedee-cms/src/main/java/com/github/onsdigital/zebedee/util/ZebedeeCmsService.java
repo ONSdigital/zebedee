@@ -18,6 +18,7 @@ import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
+import com.github.onsdigital.zebedee.reader.ZebedeeReader;
 import com.github.onsdigital.zebedee.service.DatasetService;
 import com.github.onsdigital.zebedee.session.model.Session;
 import dp.api.dataset.DatasetAPIClient;
@@ -124,6 +125,10 @@ public class ZebedeeCmsService {
 
     public Zebedee getZebedee() {
         return Root.zebedee;
+    }
+
+    public ZebedeeReader getZebedeeReader() {
+        return new ZebedeeReader(getZebedee().getPath().toString(), null);
     }
 
     public DatasetService getDatasetService() {

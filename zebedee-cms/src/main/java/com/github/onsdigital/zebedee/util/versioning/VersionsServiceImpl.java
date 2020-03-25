@@ -1,6 +1,5 @@
 package com.github.onsdigital.zebedee.util.versioning;
 
-import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.content.page.base.PageType;
 import com.github.onsdigital.zebedee.content.page.statistics.dataset.Dataset;
@@ -8,7 +7,6 @@ import com.github.onsdigital.zebedee.content.page.statistics.dataset.Version;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.model.Collection;
-import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ZebedeeReader;
 import com.github.onsdigital.zebedee.session.model.Session;
@@ -29,10 +27,9 @@ import java.util.stream.Collectors;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.info;
 import static java.text.MessageFormat.format;
 
-public class VersionUtils {
+public class VersionsServiceImpl implements VersionsService {
 
-    static final String VERSION_URI = "/previous/v";
-    static final String VERSION_PREFIX = "v";
+    static final String VERSION_URI = "/previous/";
     static final Pattern VERSION_DIR_PATTERN = Pattern.compile("/previous/v\\d+");
     static final Pattern VALID_VERSION_DIR_PATTERN = Pattern.compile("v\\d+");
 
@@ -40,8 +37,17 @@ public class VersionUtils {
             "expected content {0} in either collection {1} or published content - please investigate and fix this " +
             "issue before continuing with approval";
 
-    private VersionUtils() {
-        // only static methods
+    /**
+     * Determined if the input value is a version uri. Return true if input not null, not empty and contains
+     * substring matching the regex "/previous/v\\d+"
+     *
+     * @param uri the value to test.
+     * @return Return true if input not null, not empty and contains substring matching the regex "/previous/v\\d+"
+     * otherwise return false
+     */
+    @Override
+    public boolean isVersionedURI(String uri) {
+        return StringUtils.isNotEmpty(uri) && VERSION_DIR_PATTERN.matcher(uri).find();
     }
 
     /**
@@ -52,10 +58,11 @@ public class VersionUtils {
      * @return an {@link Optional} with the uri version string if it exists and the input is a valid version uri.
      * Otherwise return an empyt optional.
      */
-    public static Optional<String> getVersionFromURI(String uri) {
+    @Override
+    public Optional<String> getVersionNameFromURI(String uri) {
         Optional<String> result = Optional.empty();
 
-        if (isVersionedUri(uri)) {
+        if (isVersionedURI(uri)) {
             Matcher matcher = VERSION_DIR_PATTERN.matcher(uri);
 
             if (matcher.find()) {
@@ -66,14 +73,18 @@ public class VersionUtils {
         return result;
     }
 
-    public static boolean isVersionedUri(String uri) {
-        return StringUtils.isNotEmpty(uri) && uri.contains(VERSION_URI);
-    }
-
-
-    public static int getVersionNumber(String uri) {
+    /**
+     * Return the version number of a uri if the input value is a valid version uri. A valid version uri is a non
+     * null, non empty string containing the substring matching the regex "/previous/v\\d+".
+     * Example: "/a/b/c/previous/v1/data.json" will return 1
+     *
+     * @param uri the input proccess.
+     * @return the version number an int if the input is valid. Returns the a default of -1 for all invalid inputs.
+     */
+    @Override
+    public int getVersionNumberFromURI(String uri) {
         Integer version = -1;
-        Optional<String> vOpt = getVersionFromURI(uri);
+        Optional<String> vOpt = getVersionNameFromURI(uri);
 
         if (vOpt.isPresent()) {
             version = Integer.valueOf(vOpt.get().replaceFirst("v", ""));
@@ -82,27 +93,30 @@ public class VersionUtils {
         return version;
     }
 
-    public static Comparator<Version> versionComparator() {
+    @Override
+    public Comparator<Version> versionComparator() {
         return (Version v1, Version v2) -> {
-            Integer foo = getVersionNumber(v1.getUri().toString());
-            Integer bar = getVersionNumber(v2.getUri().toString());
+            Integer foo = getVersionNumberFromURI(v1.getUri().toString());
+            Integer bar = getVersionNumberFromURI(v2.getUri().toString());
             return foo.compareTo(bar);
         };
     }
 
-    public static boolean isVersionDir(File file) {
-        return file.isDirectory() && VALID_VERSION_DIR_PATTERN.matcher(file.getName()).matches();
+    @Override
+    public boolean isVersionDir(File file) {
+        return file != null && file.isDirectory() && VALID_VERSION_DIR_PATTERN.matcher(file.getName()).matches();
     }
 
 
-    public static void verifyCollectionDatasets(Collection collection, CollectionReader reader, Session session)
+    @Override
+    public void verifyCollectionDatasets(ZebedeeReader cmsReader, Collection collection,
+                                         CollectionReader reader, Session session)
             throws ZebedeeException, IOException, VersionNotFoundException {
 
         List<Dataset> datasets = getDatasetsInCollection(reader);
 
         if (datasets != null && !datasets.isEmpty()) {
-            ZebedeeReader zebedeeReader = new ZebedeeReader(Root.zebedee.getPublished().path.toString(), null);
-            verifyCollectionDatasets(zebedeeReader, collection, session, datasets);
+            verifyDatasetVersions(cmsReader, collection, session, datasets);
 
             info().collectionID(collection)
                     .user(session)
@@ -114,27 +128,27 @@ public class VersionUtils {
         }
     }
 
-    static List<Dataset> getDatasetsInCollection(CollectionReader reader) throws ZebedeeException, IOException {
+    List<Dataset> getDatasetsInCollection(CollectionReader reader) throws ZebedeeException, IOException {
         List<Dataset> datasets = new ArrayList<>();
 
         for (String uri : reader.getReviewed().listUris()) {
-            if (!uri.endsWith("data.json") || VersionedContentItem.isVersionedUri(uri)) {
-                continue;
-            }
 
-            Path parent = Paths.get(uri).getParent();
+            if (isDataJson(uri) && !isVersionedURI(uri)) {
 
-            Page page = reader.getReviewed().getContent(parent.toString());
-            if (PageType.dataset.equals(page.getType())) {
-                datasets.add((Dataset) page);
+                Path parent = Paths.get(uri).getParent();
+
+                Page page = reader.getReviewed().getContent(parent.toString());
+                if (PageType.dataset.equals(page.getType())) {
+                    datasets.add((Dataset) page);
+                }
             }
         }
 
         return datasets;
     }
 
-    static void verifyCollectionDatasets(ZebedeeReader zebedeeReader, Collection collection,
-                                         Session session, List<Dataset> datasets) throws ZebedeeException, IOException,
+    void verifyDatasetVersions(ZebedeeReader cmsReader, Collection collection, Session session,
+                               List<Dataset> datasets) throws ZebedeeException, IOException,
             VersionNotFoundException {
         for (Dataset ds : datasets) {
             info().collectionID(collection)
@@ -145,15 +159,19 @@ public class VersionUtils {
                 String uri = version.getUri().toString();
 
                 try {
-                    zebedeeReader.getCollectionContent(collection.getId(), session.getId(), uri);
+                    cmsReader.getCollectionContent(collection.getId(), session.getId(), uri);
                 } catch (NotFoundException ex) {
                     try {
-                        zebedeeReader.getPublishedContent(uri);
+                        cmsReader.getPublishedContent(uri);
                     } catch (NotFoundException ex1) {
                         throw new VersionNotFoundException(format(VERSION_NOT_FOUND, uri, collection.getId()));
                     }
                 }
             }
         }
+    }
+
+    boolean isDataJson(String uri) {
+        return StringUtils.isNotEmpty(uri) && uri.endsWith("data.json");
     }
 }

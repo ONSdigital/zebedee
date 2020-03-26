@@ -348,7 +348,8 @@ public class Collections {
 
         if (skipDatasetVersionsValidation(collection)) {
             warn().collectionID(collectionId)
-                    .log("warning approve collection valid override key provided dataset versions validation will be bypassed");
+                    .user(session)
+                    .log("warning valid dataset versions validation override key provided bypassing validation");
         } else {
             verifyDatasetVersions(collection, collectionReader, session);
         }

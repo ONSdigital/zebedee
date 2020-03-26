@@ -1,7 +1,6 @@
 package com.github.onsdigital.zebedee.content.page.statistics.dataset;
 
 import java.net.URI;
-import java.util.Comparator;
 import java.util.Date;
 
 /**
@@ -13,9 +12,13 @@ public class Version {
     private String correctionNotice;
     private String label;
 
-    public String getLabel() { return label; }
+    public String getLabel() {
+        return label;
+    }
 
-    public void setLabel(String label) { this.label = label; }
+    public void setLabel(String label) {
+        this.label = label;
+    }
 
     public URI getUri() {
         return uri;

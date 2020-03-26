@@ -24,18 +24,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import static com.github.onsdigital.zebedee.logging.CMSLogEvent.info;
-import static java.text.MessageFormat.format;
+import static com.github.onsdigital.zebedee.util.versioning.VersionNotFoundException.versionsNotFoundException;
 
 public class VersionsServiceImpl implements VersionsService {
 
     static final String VERSION_URI = "/previous/";
     static final Pattern VERSION_DIR_PATTERN = Pattern.compile("/previous/v\\d+");
     static final Pattern VALID_VERSION_DIR_PATTERN = Pattern.compile("v\\d+");
-
-    private static final String VERSION_NOT_FOUND = "error verifying collection legacy dataset - could not find " +
-            "expected content {0} in either collection {1} or published content - please investigate and fix this " +
-            "issue before continuing with approval";
 
     /**
      * Determined if the input value is a version uri. Return true if input not null, not empty and contains
@@ -116,59 +111,112 @@ public class VersionsServiceImpl implements VersionsService {
         List<Dataset> datasets = getDatasetsInCollection(reader);
 
         if (datasets != null && !datasets.isEmpty()) {
-            verifyDatasetVersions(cmsReader, collection, session, datasets);
 
-            info().collectionID(collection)
-                    .user(session)
-                    .data("datasets",
-                            datasets.stream()
-                                    .map(ds -> ds.getDescription().getTitle())
-                                    .collect(Collectors.toList()))
-                    .log("collection legacy datasets verified successfully");
+            List<MissingVersion> missingVersions = getMissingDatasetVersions(cmsReader, collection, session, datasets);
+
+            if (!missingVersions.isEmpty()) {
+                throw versionsNotFoundException(collection, missingVersions);
+            }
         }
     }
 
     List<Dataset> getDatasetsInCollection(CollectionReader reader) throws ZebedeeException, IOException {
+        List<String> filtered = reader.getReviewed()
+                .listUris()
+                .stream()
+                .filter(uri -> StringUtils.isNotEmpty(uri) && uri.contains("/datasets/") && isDataJson(uri) && !isVersionedURI(uri))
+                .collect(Collectors.toList());
+
         List<Dataset> datasets = new ArrayList<>();
 
-        for (String uri : reader.getReviewed().listUris()) {
+        for (String uri : filtered) {
+            Path parent = Paths.get(uri).getParent();
+            Page page = reader.getReviewed().getContent(parent.toString());
 
-            if (isDataJson(uri) && !isVersionedURI(uri)) {
-
-                Path parent = Paths.get(uri).getParent();
-
-                Page page = reader.getReviewed().getContent(parent.toString());
-                if (PageType.dataset.equals(page.getType())) {
-                    datasets.add((Dataset) page);
-                }
+            if (PageType.dataset.equals(page.getType())) {
+                datasets.add((Dataset) page);
             }
         }
 
         return datasets;
     }
 
-    void verifyDatasetVersions(ZebedeeReader cmsReader, Collection collection, Session session,
-                               List<Dataset> datasets) throws ZebedeeException, IOException,
-            VersionNotFoundException {
-        for (Dataset ds : datasets) {
-            info().collectionID(collection)
-                    .data("dataset", ds.getDescription().getTitle())
-                    .log("verifying collection dataset versions");
+    /**
+     * Get a {@link List} of {@link MissingVersion} if any {@link Dataset} {@link Version} can not be found.
+     *
+     * @param cmsReader  a {@link ZebedeeReader} to read content from the collection and published content directories.
+     * @param collection the collection to check.
+     * @param session    the user {@link Session} making the request.
+     * @param datasets   the datasets to check.
+     * @return a {@link List} of {@link MissingVersion} of any missing dataset versions.
+     * @throws ZebedeeException unexpected error checking version.
+     * @throws IOException      unexpected error checking version.
+     */
+    List<MissingVersion> getMissingDatasetVersions(ZebedeeReader cmsReader, Collection collection, Session session,
+                                                   List<Dataset> datasets) throws ZebedeeException, IOException {
+        List<MissingVersion> missingVersions = new ArrayList<>();
 
-            for (Version version : ds.getVersions()) {
-                String uri = version.getUri().toString();
+        for (Dataset dataset : datasets) {
+            missingVersions.addAll(getMissingVersions(cmsReader, collection, session, dataset));
+        }
 
-                try {
-                    cmsReader.getCollectionContent(collection.getId(), session.getId(), uri);
-                } catch (NotFoundException ex) {
-                    try {
-                        cmsReader.getPublishedContent(uri);
-                    } catch (NotFoundException ex1) {
-                        throw new VersionNotFoundException(format(VERSION_NOT_FOUND, uri, collection.getId()));
-                    }
-                }
+        return missingVersions;
+    }
+
+    /**
+     * Identify any missing dataset versions. Uses the {@link Dataset#versions} to determined what versions should
+     * exist.
+     *
+     * @param cmsReader  a {@link ZebedeeReader} to read content from the collection and published content directories.
+     * @param collection the collection to check.
+     * @param session    the user {@link Session} making the request.
+     * @param dataset    the {@link Dataset} to check.
+     * @return a {@link List} of {@link MissingVersion} for the missing dataset version.
+     * @throws ZebedeeException unexpected error checking version.
+     * @throws IOException      unexpected error checking version.
+     */
+    List<MissingVersion> getMissingVersions(ZebedeeReader cmsReader, Collection collection, Session session, Dataset dataset)
+            throws ZebedeeException, IOException {
+
+        List<MissingVersion> missingVersions = new ArrayList<>();
+
+        for (Version version : dataset.getVersions()) {
+
+            if (!versionExists(cmsReader, collection, session, version)) {
+                missingVersions.add(new MissingVersion(version));
             }
         }
+
+        return missingVersions;
+    }
+
+    /**
+     * Check if the content version exists.
+     *
+     * @param cmsReader  a {@link ZebedeeReader} to read content from the collection and published content directories.
+     * @param collection the collection to check.
+     * @param session    the user {@link Session} making the request.
+     * @param version    the {@link Version} to find.
+     * @return true if the content version exists in either the collection or the published content.
+     * @throws ZebedeeException unexpected error checking version.
+     * @throws IOException      unexpected error checking version.
+     */
+    boolean versionExists(ZebedeeReader cmsReader, Collection collection, Session session, Version version)
+            throws ZebedeeException, IOException {
+        boolean exists = true;
+        String uri = version.getUri().toString();
+
+        try {
+            cmsReader.getCollectionContent(collection.getId(), session.getId(), uri);
+        } catch (NotFoundException ex) {
+            try {
+                cmsReader.getPublishedContent(uri);
+            } catch (NotFoundException ex1) {
+                exists = false;
+            }
+        }
+
+        return exists;
     }
 
     boolean isDataJson(String uri) {

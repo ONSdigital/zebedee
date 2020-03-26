@@ -52,6 +52,9 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Duration;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -343,7 +346,12 @@ public class Collections {
         CollectionWriter collectionWriter = collectionReaderWriterFactory.getWriter(zebedeeSupplier.get(), collection, session);
         ContentReader publishedReader = contentReaderFactory.apply(this.published.path);
 
-        verifyDatasetVersions(collection, collectionReader, session);
+        if (skipDatasetVersionsValidation(collection)) {
+            warn().collectionID(collectionId)
+                    .log("warning approve collection valid override key provided dataset versions validation will be bypassed");
+        } else {
+            verifyDatasetVersions(collection, collectionReader, session);
+        }
 
         info().data("collectionId", collectionId)
                 .log("approve collection: setting collection status to approved");
@@ -983,12 +991,21 @@ public class Collections {
             try {
                 versionsService.verifyCollectionDatasets(zebedeeCmsService.getZebedeeReader(), collection, collectionReader, session);
             } catch (VersionNotFoundException ex) {
-                info().collectionID(collection)
+                error().collectionID(collection)
                         .user(session)
                         .exception(ex)
-                        .log("error verifying collection datasets");
+                        .log("collection approval denied. Error verifying dataset(s) - version(s) not found in either" +
+                                " collection or published content");
                 throw new UnexpectedErrorException(ex.getMessage(), 409);
             }
         }
+    }
+
+    public boolean skipDatasetVersionsValidation(Collection collection) {
+        LocalDate localDate = LocalDate.now();
+        LocalDateTime midnight = localDate.plusDays(1).atStartOfDay();
+
+        long minsToMidnight = Duration.between(LocalDateTime.now(), midnight).toMinutes();
+        return minsToMidnight == collection.getVersionCheckOverrideKey();
     }
 }

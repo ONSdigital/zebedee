@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static com.github.onsdigital.zebedee.util.versioning.VersionNotFoundException.versionsNotFoundException;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
@@ -31,9 +32,14 @@ import static org.mockito.Mockito.when;
 
 public class VersionsServiceImplTest {
 
-    static final String CONTENT_PATH = "/a/b/c/data.json";
-    static final String CONTENT_URI = "/a/b/c";
-    static final String VERSOIN_URI = CONTENT_URI + "/previous/v1";
+    static final String CONTENT_PATH =
+            "/economy/economicoutputandproductivity/output/datasets/outputoftheproductionindustries/current/data.json";
+    static final String CONTENT_URI =
+            "/economy/economicoutputandproductivity/output/datasets/outputoftheproductionindustries/current";
+    static final String VERSION_URI =
+            "/economy/economicoutputandproductivity/output/datasets/outputoftheproductionindustries/current/previous/v1";
+    static final String VERSION_2_URI =
+            "/economy/economicoutputandproductivity/output/datasets/outputoftheproductionindustries/current/previous/v2";
 
     @Mock
     private File file;
@@ -56,6 +62,7 @@ public class VersionsServiceImplTest {
     private List<String> reviewedURIs;
     private List<Version> versions;
     private Version v1;
+    private Version v2;
     private Dataset dataset;
 
     private VersionsServiceImpl service;
@@ -76,13 +83,17 @@ public class VersionsServiceImplTest {
         reviewedURIs.add(CONTENT_PATH);
 
         v1 = new Version();
-        v1.setUri(new URI(VERSOIN_URI));
+        v1.setUri(new URI(VERSION_URI));
+
+        v2 = new Version();
+        v2.setUri(new URI(VERSION_2_URI));
 
         versions = new ArrayList<>();
         versions.add(v1);
+        versions.add(v2);
 
         PageDescription desc = new PageDescription();
-        desc.setTitle("Covid-19");
+        desc.setTitle("Output of the Production Industries");
 
         dataset = new Dataset();
         dataset.setDescription(desc);
@@ -230,13 +241,30 @@ public class VersionsServiceImplTest {
         when(contentReader.getContent(CONTENT_URI))
                 .thenReturn(dataset);
 
-        when(cmsReader.getCollectionContent(anyString(), anyString(), eq(VERSOIN_URI)))
+        when(cmsReader.getCollectionContent(anyString(), anyString(), eq(VERSION_URI)))
                 .thenThrow(new NotFoundException(""));
 
-        when(cmsReader.getPublishedContent(VERSOIN_URI))
+        when(cmsReader.getCollectionContent(anyString(), anyString(), eq(VERSION_2_URI)))
                 .thenThrow(new NotFoundException(""));
 
-        service.verifyCollectionDatasets(cmsReader, collection, collectionReader, session);
+        when(cmsReader.getPublishedContent(VERSION_URI))
+                .thenThrow(new NotFoundException(""));
+
+        when(cmsReader.getPublishedContent(VERSION_2_URI))
+                .thenThrow(new NotFoundException(""));
+
+        try {
+            service.verifyCollectionDatasets(cmsReader, collection, collectionReader, session);
+        } catch (VersionNotFoundException ex) {
+
+            List<MissingVersion> missingVersions = new ArrayList<MissingVersion>() {{
+                add(new MissingVersion(v1));
+                add(new MissingVersion(v2));
+            }};
+
+            assertThat(ex.getMessage(), equalTo(versionsNotFoundException(collection, missingVersions).getMessage()));
+            throw ex;
+        }
     }
 
     @Test
@@ -251,11 +279,11 @@ public class VersionsServiceImplTest {
                 .thenReturn(dataset);
 
         // the dataset version is not found in the collection.
-        when(cmsReader.getCollectionContent(anyString(), anyString(), eq(VERSOIN_URI)))
+        when(cmsReader.getCollectionContent(anyString(), anyString(), eq(VERSION_URI)))
                 .thenThrow(new NotFoundException(""));
 
         // The dataset versions are all found in the published content.
-        when(cmsReader.getPublishedContent(VERSOIN_URI))
+        when(cmsReader.getPublishedContent(VERSION_URI))
                 .thenReturn(dataset);
 
         service.verifyCollectionDatasets(cmsReader, collection, collectionReader, session);
@@ -273,7 +301,7 @@ public class VersionsServiceImplTest {
                 .thenReturn(dataset);
 
         // the dataset version is exists in the collection
-        when(cmsReader.getCollectionContent(anyString(), anyString(), eq(VERSOIN_URI)))
+        when(cmsReader.getCollectionContent(anyString(), anyString(), eq(VERSION_URI)))
                 .thenReturn(dataset);
 
         service.verifyCollectionDatasets(cmsReader, collection, collectionReader, session);

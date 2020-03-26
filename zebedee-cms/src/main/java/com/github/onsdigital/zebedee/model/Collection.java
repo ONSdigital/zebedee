@@ -106,6 +106,7 @@ public class Collection {
     private static final String BLOCKING_COLLECTION = "blockingCollection";
     private static final String TARGET_PATH = "targetPath";
     private static final String TARGET_COLLECTION = "targetCollection";
+    private static final String DATASETS_URI = "/datasets/";
 
     private static ConcurrentMap<Path, ReadWriteLock> collectionLocks = new ConcurrentHashMap<>();
     private static KeyManangerUtil keyManagerUtil = new KeyManangerUtil();
@@ -120,6 +121,8 @@ public class Collection {
 
     private final Path collectionJsonPath;
     private VersionsService versionsService;
+
+    private transient long versionCheckOverrideKey;
 
     private static ServiceSupplier<CollectionHistoryDao> collectionHistoryDaoServiceSupplier = () -> getCollectionHistoryDao();
 
@@ -868,7 +871,7 @@ public class Collection {
     }
 
     private void reviewRecursive(Path src, Path dest, Session session) throws IOException {
-        if (src.toString().contains("/dataset/")) {
+        if (src.toString().contains(DATASETS_URI)) {
             // TODO temp logging to help identify unknown publishing issue - Trello #4687
             warn().collectionID(this)
                     .uri(dest.toString())
@@ -1516,6 +1519,14 @@ public class Collection {
 
     public Content getInProgress() {
         return this.inProgress;
+    }
+
+    public void setVersionCheckOverrideKey(long key) {
+        this.versionCheckOverrideKey = key;
+    }
+
+    public long getVersionCheckOverrideKey() {
+        return this.versionCheckOverrideKey;
     }
 }
 

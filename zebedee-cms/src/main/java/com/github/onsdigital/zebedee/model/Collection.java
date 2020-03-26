@@ -122,8 +122,6 @@ public class Collection {
     private final Path collectionJsonPath;
     private VersionsService versionsService;
 
-    private transient long versionCheckOverrideKey;
-
     private static ServiceSupplier<CollectionHistoryDao> collectionHistoryDaoServiceSupplier = () -> getCollectionHistoryDao();
 
     @VisibleForTesting
@@ -1519,14 +1517,6 @@ public class Collection {
 
     public Content getInProgress() {
         return this.inProgress;
-    }
-
-    public void setVersionCheckOverrideKey(long key) {
-        this.versionCheckOverrideKey = key;
-    }
-
-    public long getVersionCheckOverrideKey() {
-        return this.versionCheckOverrideKey;
     }
 }
 

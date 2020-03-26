@@ -312,7 +312,11 @@ public class Collections {
      * @throws BadRequestException
      * @throws ConflictException
      */
-    public Future<Boolean> approve(Collection collection, Session session)
+    public Future<Boolean> approve(Collection collection, Session session) throws IOException, ZebedeeException {
+        return approve(collection, session, null);
+    }
+
+    public Future<Boolean> approve(Collection collection, Session session, Long overrideKey)
             throws IOException, ZebedeeException {
 
         // Collection exists
@@ -346,7 +350,7 @@ public class Collections {
         CollectionWriter collectionWriter = collectionReaderWriterFactory.getWriter(zebedeeSupplier.get(), collection, session);
         ContentReader publishedReader = contentReaderFactory.apply(this.published.path);
 
-        if (skipDatasetVersionsValidation(collection)) {
+        if (skipDatasetVersionsValidation(overrideKey, session)) {
             warn().collectionID(collectionId)
                     .user(session)
                     .log("warning valid dataset versions validation override key provided bypassing validation");
@@ -1002,11 +1006,16 @@ public class Collections {
         }
     }
 
-    public boolean skipDatasetVersionsValidation(Collection collection) {
+    /**
+     * Allow the verify datasets process to skipped by an admin user by providing a valid key - temp until defect is
+     * fixed properly.
+     */
+    public boolean skipDatasetVersionsValidation(Long userKey, Session session) throws IOException {
         LocalDate localDate = LocalDate.now();
         LocalDateTime midnight = localDate.plusDays(1).atStartOfDay();
+        final long overrideKey = Duration.between(LocalDateTime.now(), midnight).toMinutes();
 
-        long minsToMidnight = Duration.between(LocalDateTime.now(), midnight).toMinutes();
-        return minsToMidnight == collection.getVersionCheckOverrideKey();
+        return userKey != null && permissionsService.isAdministrator(session) && overrideKey == userKey;
     }
+
 }

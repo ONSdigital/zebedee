@@ -56,10 +56,10 @@ public class Approve {
         String collectionId = Collections.getCollectionId(request);
         info().data("collectionId", collectionId).data("user", session.getEmail()).log("approve endpoint: submitting approve request");
 
-        collection.setVersionCheckOverrideKey(getOverrideKey(request));
+        long overrideKey = getOverrideKey(request);
 
         try {
-            Root.zebedee.getCollections().approve(collection, session);
+            Root.zebedee.getCollections().approve(collection, session, overrideKey);
         } catch (Exception e) {
             error().data("collectionId", collectionId).data("user", session.getEmail()).log("approve endpoint: request unsuccessful error while approving collection");
             throw e;

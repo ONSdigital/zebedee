@@ -13,9 +13,9 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.POST;
 import java.io.IOException;
 
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.warn;
-import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
 
 /**
  * Created by kanemorgan on 01/04/2015.
@@ -56,8 +56,10 @@ public class Approve {
         String collectionId = Collections.getCollectionId(request);
         info().data("collectionId", collectionId).data("user", session.getEmail()).log("approve endpoint: submitting approve request");
 
+        long overrideKey = getOverrideKey(request);
+
         try {
-            Root.zebedee.getCollections().approve(collection, session);
+            Root.zebedee.getCollections().approve(collection, session, overrideKey);
         } catch (Exception e) {
             error().data("collectionId", collectionId).data("user", session.getEmail()).log("approve endpoint: request unsuccessful error while approving collection");
             throw e;
@@ -72,5 +74,16 @@ public class Approve {
 
         info().data("user", session.getEmail()).log("approve endpoint: request completed successfully");
         return true;
+    }
+
+    private long getOverrideKey(HttpServletRequest request) {
+        String overrideKey = request.getParameter("overrideKey");
+        long key = 0;
+        try {
+            key = Long.valueOf(overrideKey);
+        } catch (NumberFormatException ex) {
+            // use default
+        }
+        return key;
     }
 }

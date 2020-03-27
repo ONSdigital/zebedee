@@ -40,6 +40,8 @@ import com.github.onsdigital.zebedee.service.ServiceSupplier;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.teams.model.Team;
 import com.github.onsdigital.zebedee.teams.service.TeamsService;
+import com.github.onsdigital.zebedee.util.versioning.VersionsService;
+import com.github.onsdigital.zebedee.util.versioning.VersionsServiceImpl;
 import com.google.common.annotations.VisibleForTesting;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -75,10 +77,10 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
 
-import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
-import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
-import static com.github.onsdigital.zebedee.model.content.item.VersionedContentItem.getVersionFromURI;
+import static com.github.onsdigital.zebedee.logging.CMSLogEvent.error;
+import static com.github.onsdigital.zebedee.logging.CMSLogEvent.info;
+import static com.github.onsdigital.zebedee.logging.CMSLogEvent.warn;
 import static com.github.onsdigital.zebedee.model.content.item.VersionedContentItem.isVersionedUri;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_CONTENT_REVIEWED;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_CREATED;
@@ -104,6 +106,7 @@ public class Collection {
     private static final String BLOCKING_COLLECTION = "blockingCollection";
     private static final String TARGET_PATH = "targetPath";
     private static final String TARGET_COLLECTION = "targetCollection";
+    private static final String DATASETS_URI = "/datasets/";
 
     private static ConcurrentMap<Path, ReadWriteLock> collectionLocks = new ConcurrentHashMap<>();
     private static KeyManangerUtil keyManagerUtil = new KeyManangerUtil();
@@ -117,6 +120,7 @@ public class Collection {
     public final Zebedee zebedee;
 
     private final Path collectionJsonPath;
+    private VersionsService versionsService;
 
     private static ServiceSupplier<CollectionHistoryDao> collectionHistoryDaoServiceSupplier = () -> getCollectionHistoryDao();
 
@@ -173,6 +177,8 @@ public class Collection {
         this.reviewed = new Content(reviewed);
         this.complete = new Content(complete);
         this.inProgress = new Content(inProgress);
+
+        this.versionsService = new VersionsServiceImpl();
     }
 
     /**
@@ -847,12 +853,9 @@ public class Collection {
             Path destination = reviewed.toPath(uri);
 
             if (recursive) {
-                FileUtils.deleteDirectory(destination.getParent().toFile());
-                FileUtils.moveDirectory(source.getParent().toFile(), destination.getParent().toFile());
-                zebedee.getCollections().removeEmptyCollectionDirectories(source.getParent());
+                reviewRecursive(source, destination, session);
             } else {
-                PathUtils.moveFilesInDirectory(source, destination);
-                zebedee.getCollections().removeEmptyCollectionDirectories(source);
+                reviewSingleFile(source, destination);
             }
 
             addEvent(uri, new Event(new Date(), EventType.REVIEWED, session.getEmail()));
@@ -863,6 +866,27 @@ public class Collection {
         }
 
         return result;
+    }
+
+    private void reviewRecursive(Path src, Path dest, Session session) throws IOException {
+        if (src.toString().contains(DATASETS_URI)) {
+            // TODO temp logging to help identify unknown publishing issue - Trello #4687
+            warn().collectionID(this)
+                    .uri(dest.toString())
+                    .user(session)
+                    .log("warning received recursive review request for dataset content uri - this is a " +
+                            "potentially destructive action and could delete the updated previous version in the " +
+                            "collection");
+        }
+
+        FileUtils.deleteDirectory(dest.getParent().toFile());
+        FileUtils.moveDirectory(src.getParent().toFile(), dest.getParent().toFile());
+        zebedee.getCollections().removeEmptyCollectionDirectories(src.getParent());
+    }
+
+    private void reviewSingleFile(Path src, Path dest) throws IOException {
+        PathUtils.moveFilesInDirectory(src, dest);
+        zebedee.getCollections().removeEmptyCollectionDirectories(src);
     }
 
     private boolean contentWasCompleted(String uri) {
@@ -1243,7 +1267,7 @@ public class Collection {
 
         FileUtils.deleteDirectory(reviewedPath.toFile());
 
-        Optional<String> version = getVersionFromURI(uri);
+        Optional<String> version = versionsService.getVersionNameFromURI(uri);
         String note = version.isPresent() ? version.get() : uri;
         addEvent(uri, new Event(new Date(), EventType.VERSION_DELETED, email, note));
     }

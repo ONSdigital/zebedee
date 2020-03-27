@@ -7,8 +7,9 @@ import com.github.onsdigital.zebedee.model.ContentWriter;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.util.URIUtils;
+import com.github.onsdigital.zebedee.util.versioning.VersionsService;
+import com.github.onsdigital.zebedee.util.versioning.VersionsServiceImpl;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,8 +17,6 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Optional;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static com.github.onsdigital.zebedee.util.URIUtils.removeLeadingSlash;
@@ -35,6 +34,7 @@ public class VersionedContentItem extends ContentItem {
     static final String VERSION_URI = "/previous/";
     static final String VERSION_PREFIX = "v";
     static final Pattern VERSION_DIR_PATTERN = Pattern.compile("/previous/v\\d+");
+    static final VersionsService VERSIONS_SERVICE = new VersionsServiceImpl();
 
     public VersionedContentItem(String uri) throws NotFoundException {
         super(uri);
@@ -91,7 +91,9 @@ public class VersionedContentItem extends ContentItem {
         Path versionDirectory = versionSourcePath.resolve(getVersionDirectoryName());
 
         if (Files.exists(versionDirectory)) {
-            version = versionDirectory.toFile().listFiles().length + 1;
+            version = versionDirectory.toFile()
+                    .listFiles(f -> VERSIONS_SERVICE.isVersionDir(f))
+                    .length + 1;
         }
 
         String versionIdentifier = VERSION_PREFIX + version;
@@ -210,27 +212,5 @@ public class VersionedContentItem extends ContentItem {
         }
 
         return false;
-    }
-
-    /**
-     * Return an optional containing the the version directory name from the URI if it exists otherwise return an
-     * empty {@link Optional}. Example: Given uri "/a/b/c/previous/v1/data.json" returns "v1".
-     *
-     * @param uri the taxonomy uri to get the version from.
-     * @return an {@link Optional} with the uri version string if it exists and the input is a valid version uri.
-     * Otherwise return an empyt optional.
-     */
-    public static Optional<String> getVersionFromURI(String uri) {
-        Optional<String> result = Optional.empty();
-
-        if (StringUtils.isNotEmpty(uri) && isVersionedUri(uri)) {
-            Matcher matcher = VERSION_DIR_PATTERN.matcher(uri);
-
-            if (matcher.find()) {
-                result = Optional.of(matcher.group(0).replace(VERSION_URI, ""));
-            }
-        }
-
-        return result;
     }
 }

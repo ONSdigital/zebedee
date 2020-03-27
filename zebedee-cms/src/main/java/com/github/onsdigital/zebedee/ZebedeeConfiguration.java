@@ -24,6 +24,8 @@ import com.github.onsdigital.zebedee.teams.store.TeamsStoreFileSystemImpl;
 import com.github.onsdigital.zebedee.user.service.UsersService;
 import com.github.onsdigital.zebedee.user.service.UsersServiceImpl;
 import com.github.onsdigital.zebedee.user.store.UserStoreFileSystemImpl;
+import com.github.onsdigital.zebedee.util.versioning.VersionsService;
+import com.github.onsdigital.zebedee.util.versioning.VersionsServiceImpl;
 import com.github.onsdigital.zebedee.verification.VerificationAgent;
 import dp.api.dataset.DatasetAPIClient;
 import dp.api.dataset.DatasetClient;
@@ -140,7 +142,8 @@ public class ZebedeeConfiguration {
         this.permissionsService = new PermissionsServiceImpl(permissionsStore,
                 this::getUsersService, this::getTeamsService, keyringCache);
 
-        this.collections = new Collections(collectionsPath, permissionsService, published);
+        VersionsService versionsService = new VersionsServiceImpl();
+        this.collections = new Collections(collectionsPath, permissionsService, versionsService, published);
 
         this.usersService = UsersServiceImpl.getInstance(
                 new UserStoreFileSystemImpl(this.usersPath),

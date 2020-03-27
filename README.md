@@ -102,6 +102,35 @@ _Congratulations_ :tada:! Advanced to GO collect £200 :dollar:
 
 Otherwise :violin: kindly ask someone from the dev team to help troubleshoot.
 
+
+### :spider: Collection approval: Skipping dataset version verification :spider:
+There is currently an intermittant defect where the previous versions of a dataset are not being correctly added to
+ the reviewed directory of the collection. This causes complications if it goes unnoticed and the collection is
+  published. Work is ongoing to identify the cause.
+  
+To combat this an additonal check has been added to the `/approve` endpoint. If the collection contains dataset pages
+ that are missing any of the expected versions the approval will be rejected.
+ 
+This check (if enabled) can be manually bypassed by admin users. :warning: This should only be used as a last resort. 
+Publising a collection in this state will require a manual datafix on the live environment - you are delaying the
+ inevitable.
+ 
+To bypass this check:
+- Login into Florence and use the Chrome developer tools to get the collection ID and auth token for your user. 
+- Use the `dp-cli` tool to access to publishing / publishing_mount
+- Run `sudo docker ps -a` to get the `IP`and `port` for the publishing Zebedee instance
+- Generate an override key - The number of minutes remaining until midnight.
+- From the publishing box run the following `curl` command:
+ 
+ ```bash
+ curl -H "X-Florence-Token: <ZEBEDEE_SESSION_TOKEN>" -XPOST "https://<DOMAIN>/zebedee/approve/<COLLECTION_ID>?overrideKey=<OVERRIDE_KEY>"
+ ```
+ 
+ - `ZEBEDEE_SESSION_TOKEN` - A valid Zebedee session token for your user.
+ - `<DOMAIN>` - the address of the Zebedee publishing instance.
+ - `<COLLECTION_ID>` - the ID of the collection to be approved.
+ - `<OVERRIDE_KEY>` - the secret key required to override the check.
+
 #### Service authentication with Zebedee
 
 1) Login to florence using: `curl -X POST -d '{"email":"florence@magicroundabout.ons.gov.uk","password":"<your password>"}' http://localhost:8082/login`

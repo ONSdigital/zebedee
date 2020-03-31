@@ -83,6 +83,11 @@ In order to use Zebedee you will need to have the following other project runnin
 
 Follow the steps in the README of each project.
 
+#### Zebedee content 
+Zebedee needs contents before it can be run. Basic demo content and file structures can be generated via the 
+[dp-zebedee-content](https://github.com/ONSdigital/dp-zebedee-content) by following the instructions in the 
+[dp-zebedee-content readme](https://github.com/ONSdigital/dp-zebedee-content/blob/master/README.md)
+
 #### Running zebedee 
 ```bash
 ./run-cms.sh

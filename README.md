@@ -108,7 +108,9 @@ _Congratulations_ :tada:! Advanced to GO collect £200 :dollar:
 Otherwise :violin: kindly ask someone from the dev team to help troubleshoot.
 
 
-### :spider: Legacy dataset versions defect :spider:
+***
+### :spider: :spider:
+### Legacy dataset versions defect
 There is currently an intermittant defect where the previous versions of a dataset are not being correctly added to
  the reviewed directory of the collection. This causes complications if it goes unnoticed and the collection is
   published. Work is ongoing to identify the cause.
@@ -138,6 +140,7 @@ To bypass this check:
  - `<DOMAIN>` - the address of the Zebedee publishing instance.
  - `<COLLECTION_ID>` - the ID of the collection to be approved.
  - `<OVERRIDE_KEY>` - the secret key required to override the check.
+***
 
 #### Service authentication with Zebedee
 
@@ -156,4 +159,3 @@ To bypass this check:
 [4]: http://localhost:8081/florence/login
 [5]: https://github.com/ONSdigital/sixteens
 [6]: https://github.com/ONSdigital/dp-compose
->>>>>>> develop

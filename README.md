@@ -109,7 +109,7 @@ Otherwise :violin: kindly ask someone from the dev team to help troubleshoot.
 
 
 ***
-### :spider: :spider:
+### :spider: :spider: :spider: :spider:
 ### Legacy dataset versions defect
 There is currently an intermittant defect where the previous versions of a dataset are not being correctly added to
  the reviewed directory of the collection. This causes complications if it goes unnoticed and the collection is
@@ -123,7 +123,8 @@ To combat this an additonal check has been added to the `/approve` endpoint. If 
 
 This check (if enabled) can be manually bypassed by admin users. 
 
-:warning: This should only be used as a last resort. Publising a collection in this state will require a manual datafix on the live environment - you are delaying the inevitable. :warning:
+**This should only be used as a last resort. Publising a collection in this state will require a manual datafix on the
+ live environment - you are delaying the inevitable.**
  
 To bypass this check:
 - Login into Florence and use the Chrome developer tools to get the collection ID and auth token for your user. 

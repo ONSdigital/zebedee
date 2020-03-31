@@ -9,11 +9,8 @@ image_resource:
 inputs:
   - name: zebedee
 
-outputs:
-  - name: build
-
 params:
   APPLICATION:
 
 run:
-  path: zebedee/ci/scripts/build.sh
+  path: zebedee/ci/scripts/audit.sh

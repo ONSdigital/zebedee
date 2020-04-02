@@ -115,7 +115,7 @@ public class VersionsServiceImpl implements VersionsService {
             List<MissingVersion> missingVersions = getMissingDatasetVersions(cmsReader, collection, session, datasets);
 
             if (!missingVersions.isEmpty()) {
-                throw versionsNotFoundException(collection, missingVersions);
+                throw versionsNotFoundException(missingVersions);
             }
         }
     }
@@ -183,7 +183,7 @@ public class VersionsServiceImpl implements VersionsService {
         for (Version version : dataset.getVersions()) {
 
             if (!versionExists(cmsReader, collection, session, version)) {
-                missingVersions.add(new MissingVersion(version));
+                missingVersions.add(new MissingVersion(dataset, version));
             }
         }
 

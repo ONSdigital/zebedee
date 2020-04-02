@@ -316,7 +316,7 @@ public class Collections {
         return approve(collection, session, null);
     }
 
-    public Future<Boolean> approve(Collection collection, Session session, Long overrideKey)
+    public Future<Boolean> approve(Collection collection, Session session, Long userOverrideKey)
             throws IOException, ZebedeeException {
 
         // Collection exists
@@ -350,7 +350,7 @@ public class Collections {
         CollectionWriter collectionWriter = collectionReaderWriterFactory.getWriter(zebedeeSupplier.get(), collection, session);
         ContentReader publishedReader = contentReaderFactory.apply(this.published.path);
 
-        if (skipDatasetVersionsValidation(overrideKey, session)) {
+        if (skipDatasetVersionsValidation(userOverrideKey, getDatasetVersionVerificationOverrideKey(), session)) {
             warn().collectionID(collectionId)
                     .user(session)
                     .log("warning valid dataset versions validation override key provided bypassing validation");
@@ -990,32 +990,66 @@ public class Collections {
     }
 
     public void verifyDatasetVersions(Collection collection, CollectionReader collectionReader, Session session) throws ZebedeeException, IOException {
-        if (CMSFeatureFlags.cmsFeatureFlags().isDatasetVersionVerificationEnabled()) {
-            info().collectionID(collection).log("dataset version verification feature enabled verifying collection");
+        if (!CMSFeatureFlags.cmsFeatureFlags().isDatasetVersionVerificationEnabled()) {
+            info().collectionID(collection).log("skipping dataset version verification feature not enabled");
+            return;
+        }
 
-            try {
-                versionsService.verifyCollectionDatasets(zebedeeCmsService.getZebedeeReader(), collection, collectionReader, session);
-            } catch (VersionNotFoundException ex) {
-                error().collectionID(collection)
-                        .user(session)
-                        .exception(ex)
-                        .log("collection approval denied. Error verifying dataset(s) - version(s) not found in either" +
-                                " collection or published content");
-                throw new UnexpectedErrorException(ex.getMessage(), 409);
-            }
+        info().collectionID(collection).log("feature enabled verifying collection dataset versions");
+
+        try {
+            versionsService.verifyCollectionDatasets(zebedeeCmsService.getZebedeeReader(), collection, collectionReader, session);
+        } catch (VersionNotFoundException ex) {
+            error().collectionID(collection)
+                    .user(session)
+                    .exception(ex)
+                    .reason("error verifying dataset(s), version(s) not found in either collection or published content")
+                    .log("collection approval denied");
+            throw new UnexpectedErrorException(ex.getMessage(), 409);
         }
     }
 
     /**
-     * Allow the verify datasets process to skipped by an admin user by providing a valid key - temp until defect is
+     * Allow the verify datasets process to skipped by a publisher user by providing a valid key - temp until defect is
      * fixed properly.
      */
-    public boolean skipDatasetVersionsValidation(Long userKey, Session session) throws IOException {
+    public boolean skipDatasetVersionsValidation(Long userKey, Long overrideKey, Session session) throws IOException {
+        if (userKey == null) {
+            info().reason("no user overrideKey provided")
+                    .log("dataset version validation not bypassed");
+            return false;
+        }
+
+        if (overrideKey == null) {
+            info().reason("expected overrideKey not provided")
+                    .log("dataset version validation not bypassed");
+            return false;
+        }
+
+        if (!permissionsService.isPublisher(session)) {
+            info().user(session)
+                    .reason("publisher permissions required")
+                    .log("dataset version validation not bypassed");
+            return false;
+        }
+
+        if (!overrideKey.equals(userKey)) {
+            info().user(session)
+                    .reason("user overrideKey incorrect")
+                    .log("dataset version validation not bypassed");
+            return false;
+        }
+
+        info().user(session)
+                .reason("correct user permissions and overrideKey provided")
+                .log("bypassing dataset version validation ");
+        return true;
+    }
+
+    private Long getDatasetVersionVerificationOverrideKey() {
         LocalDate localDate = LocalDate.now();
         LocalDateTime midnight = localDate.plusDays(1).atStartOfDay();
-        final long overrideKey = Duration.between(LocalDateTime.now(), midnight).toMinutes();
-
-        return userKey != null && permissionsService.isAdministrator(session) && overrideKey == userKey;
+        return Duration.between(LocalDateTime.now(), midnight).toMinutes();
     }
 
 }

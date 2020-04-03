@@ -52,9 +52,8 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.Duration;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -83,6 +82,7 @@ import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLL
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_UNLOCKED;
 import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData.contentMoved;
 import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData.contentRenamed;
+import static java.time.temporal.ChronoUnit.MINUTES;
 
 public class Collections {
 
@@ -1047,9 +1047,9 @@ public class Collections {
     }
 
     private Long getDatasetVersionVerificationOverrideKey() {
-        LocalDate localDate = LocalDate.now();
-        LocalDateTime midnight = localDate.plusDays(1).atStartOfDay();
-        return Duration.between(LocalDateTime.now(), midnight).toMinutes();
+        Instant now = Instant.now();
+        Instant midnight = now.plus(1, ChronoUnit.DAYS).truncatedTo(ChronoUnit.DAYS);
+        return now.until(midnight, MINUTES);
     }
 
 }

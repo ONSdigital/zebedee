@@ -26,8 +26,7 @@ public class VersionNotFoundException extends Exception {
         String details = missingVersions
                 .stream()
                 .map(i -> i.getCurrentURI())
-                .collect(Collectors.toSet())
-                .stream()
+                .distinct()
                 .collect(Collectors.joining(","));
 
         String message = format(VERSION_NOT_FOUND_FMT, details);

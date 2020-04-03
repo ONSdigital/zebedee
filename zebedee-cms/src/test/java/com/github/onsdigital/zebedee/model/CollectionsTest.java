@@ -54,6 +54,7 @@ import java.util.function.Supplier;
 
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_DELETED;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_UNLOCKED;
+import static junit.framework.Assert.assertFalse;
 import static junit.framework.TestCase.assertTrue;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
@@ -1132,5 +1133,60 @@ public class CollectionsTest {
 
         assertTrue(deleteSuccessful);
         assertThat(collectionsPath.resolve("col1/inprogress").toFile().list().length, equalTo(0));
+    }
+
+
+    @Test
+    public void skipDatasetVersionsValidation_userKeyNull_shouldReturnFalse() throws IOException {
+        assertFalse(collections.skipDatasetVersionsValidation(null, null, null));
+    }
+
+    @Test
+    public void skipDatasetVersionsValidation_overrideKeyNull_shouldReturnFalse() throws IOException {
+        assertFalse(collections.skipDatasetVersionsValidation(666L, null, null));
+    }
+
+    @Test
+    public void skipDatasetVersionsValidation_sessionNull_shouldReturnFalse() throws IOException {
+        Session expectedSession = null;
+
+        when(permissionsServiceMock.isPublisher(expectedSession))
+                .thenReturn(false);
+
+        assertFalse(collections.skipDatasetVersionsValidation(666L, 666L, expectedSession));
+    }
+
+    @Test
+    public void skipDatasetVersionsValidation_userNotPublisher_shouldReturnFalse() throws IOException {
+        when(permissionsServiceMock.isPublisher(sessionMock))
+                .thenReturn(false);
+
+        assertFalse(collections.skipDatasetVersionsValidation(666L, 666L, sessionMock));
+    }
+
+    @Test
+    public void skipDatasetVersionsValidation_incorrectKey_shouldReturnFalse() throws IOException {
+        when(permissionsServiceMock.isPublisher(sessionMock))
+                .thenReturn(true);
+
+        assertFalse(collections.skipDatasetVersionsValidation(123L, 666L, sessionMock));
+    }
+
+    @Test
+    public void skipDatasetVersionsValidation_correctKey_shouldReturnTrue() throws IOException {
+        when(permissionsServiceMock.isPublisher(sessionMock))
+                .thenReturn(true);
+
+        long actual = 666;
+        long user = 666;
+        assertTrue(collections.skipDatasetVersionsValidation(user, actual, sessionMock));
+    }
+
+    @Test
+    public void skipDatasetVersionsValidation_correctKeyInvalidPermssions_shouldReturnFalse() throws IOException {
+        when(permissionsServiceMock.isPublisher(sessionMock))
+                .thenReturn(false);
+
+        assertFalse(collections.skipDatasetVersionsValidation(666L, 666L, sessionMock));
     }
 }

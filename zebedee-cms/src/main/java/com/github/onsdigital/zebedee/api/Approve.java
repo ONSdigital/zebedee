@@ -6,6 +6,7 @@ import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.session.model.Session;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.http.HttpStatus;
 
 import javax.servlet.http.HttpServletRequest;
@@ -22,6 +23,8 @@ import static com.github.onsdigital.logging.v2.event.SimpleEvent.warn;
  */
 @Api
 public class Approve {
+
+    static final String OVERRIDE_KEY_PARAM = "overrideKey";
 
     /**
      * Approves the content of a collection at the endpoint /Approve/[CollectionName].
@@ -56,10 +59,10 @@ public class Approve {
         String collectionId = Collections.getCollectionId(request);
         info().data("collectionId", collectionId).data("user", session.getEmail()).log("approve endpoint: submitting approve request");
 
-        long overrideKey = getOverrideKey(request);
+        Long userOverrideKey = getOverrideKey(request);
 
         try {
-            Root.zebedee.getCollections().approve(collection, session, overrideKey);
+            Root.zebedee.getCollections().approve(collection, session, userOverrideKey);
         } catch (Exception e) {
             error().data("collectionId", collectionId).data("user", session.getEmail()).log("approve endpoint: request unsuccessful error while approving collection");
             throw e;
@@ -76,13 +79,24 @@ public class Approve {
         return true;
     }
 
-    private long getOverrideKey(HttpServletRequest request) {
-        String overrideKey = request.getParameter("overrideKey");
-        long key = 0;
+    /**
+     * Get the "overrideKey" request parameter as a {@link Long}.
+     *
+     * @param request the {@link HttpServletRequest} to get parameter from.
+     * @return the value as a {@link Long} if present otherwise return null if value is null/empty or an invalid
+     * numeric value.
+     */
+    Long getOverrideKey(HttpServletRequest request) {
+        String overrideKey = request.getParameter(OVERRIDE_KEY_PARAM);
+        if (StringUtils.isEmpty(overrideKey)) {
+            return null;
+        }
+
+        Long key = null;
         try {
             key = Long.valueOf(overrideKey);
         } catch (NumberFormatException ex) {
-            // use default
+            info().exception(ex).log("failed to convert override parameter to long");
         }
         return key;
     }

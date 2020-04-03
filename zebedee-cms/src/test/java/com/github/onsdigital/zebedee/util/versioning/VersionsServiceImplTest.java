@@ -96,6 +96,7 @@ public class VersionsServiceImplTest {
         desc.setTitle("Output of the Production Industries");
 
         dataset = new Dataset();
+        dataset.setUri(new URI(CONTENT_URI));
         dataset.setDescription(desc);
         dataset.setVersions(versions);
     }
@@ -258,11 +259,11 @@ public class VersionsServiceImplTest {
         } catch (VersionNotFoundException ex) {
 
             List<MissingVersion> missingVersions = new ArrayList<MissingVersion>() {{
-                add(new MissingVersion(v1));
-                add(new MissingVersion(v2));
+                add(new MissingVersion(dataset, v1));
+                add(new MissingVersion(dataset, v2));
             }};
 
-            assertThat(ex.getMessage(), equalTo(versionsNotFoundException(collection, missingVersions).getMessage()));
+            assertThat(ex.getMessage(), equalTo(versionsNotFoundException(missingVersions).getMessage()));
             throw ex;
         }
     }

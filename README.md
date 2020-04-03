@@ -131,9 +131,8 @@ To bypass this check:
  (remember you must be a publisher user). 
 - Use the `dp-cli` tool to access to publishing / publishing_mount
 - Run `sudo docker ps -a` to get the `IP`and `port` for the publishing Zebedee instance
-- Generate an override key - The number of minutes remaining until midnight. You can use the `dp` tool to calculate
- this for you - 
- `dp override-key`
+- Generate an override key - The number of minutes remaining until midnight **(UTC)**. You can use the `dp` tool to
+ calculate this for you - `dp override-key`
 - From the publishing box run the following `curl` command:
  
  ```bash

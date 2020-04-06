@@ -1189,4 +1189,19 @@ public class CollectionsTest {
 
         assertFalse(collections.skipDatasetVersionsValidation(666L, 666L, sessionMock));
     }
+
+    @Test
+    public void skipDatasetVersionsValidation_success() throws IOException {
+        CollectionDescription description = new CollectionDescription();
+
+        when(collectionMock.getDescription())
+                .thenReturn(description);
+
+        collections.skipDatasetVersionsValidation(collectionMock, sessionMock);
+
+        assertThat(description.events.size(), equalTo(1));
+
+        Event event = description.events.get(0);
+        assertThat(event.getType(), equalTo(EventType.VERSION_VERIFICATION_BYPASSED));
+    }
 }

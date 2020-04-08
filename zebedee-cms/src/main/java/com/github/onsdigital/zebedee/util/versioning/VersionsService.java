@@ -25,4 +25,7 @@ public interface VersionsService {
 
     void verifyCollectionDatasets(ZebedeeReader cmsReader, Collection collection, CollectionReader reader,
                                   Session session) throws ZebedeeException, IOException, VersionNotFoundException;
+
+
+    boolean isVersionOf(String parentURI, String s);
 }

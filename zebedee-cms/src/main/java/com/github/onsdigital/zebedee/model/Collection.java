@@ -81,7 +81,6 @@ import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFea
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.error;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.info;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.warn;
-import static com.github.onsdigital.zebedee.model.content.item.VersionedContentItem.isVersionedUri;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_CONTENT_REVIEWED;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_CREATED;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_NAME_CHANGED;
@@ -1037,7 +1036,7 @@ public class Collection {
         }
 
         if (deleteSuccessful) {
-            deleteSuccessful &= deletePreviousVersionsFromCollectionReviewed(checkURI);
+            deleteSuccessful &= deletePreviousVersionFromReviewed(checkURI);
         }
 
         return deleteSuccessful;
@@ -1055,13 +1054,9 @@ public class Collection {
      * @return
      * @throws IOException
      */
-    private boolean deletePreviousVersionsFromCollectionReviewed(String targetURI) throws IOException {
+    private boolean deletePreviousVersionFromReviewed(String targetURI) throws IOException {
         boolean deleteSuccessful = true;
-
-        List<String> versionedFiles = reviewedUris()
-                .stream()
-                .filter(contentURI -> contentURI.startsWith(targetURI) && isVersionedUri(contentURI))
-                .collect(Collectors.toList());
+        List<String> versionedFiles = getReviewPreviousVersionContentForURI(reviewedUris(), targetURI);
 
         if (!versionedFiles.isEmpty()) {
             info().data("files", versionedFiles).uri(targetURI).log("deleting generated previous version files for uri");
@@ -1072,6 +1067,13 @@ public class Collection {
         }
 
         return deleteSuccessful;
+    }
+
+    List<String> getReviewPreviousVersionContentForURI(List<String> reviewedURIs, String targetURI) throws IOException {
+        return reviewedURIs
+                .stream()
+                .filter(contentURI -> versionsService.isVersionOf(targetURI, contentURI))
+                .collect(Collectors.toList());
     }
 
     /**

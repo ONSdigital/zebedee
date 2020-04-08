@@ -222,4 +222,14 @@ public class VersionsServiceImpl implements VersionsService {
     boolean isDataJson(String uri) {
         return StringUtils.isNotEmpty(uri) && uri.endsWith("data.json");
     }
+
+    @Override
+    public boolean isVersionOf(String target, String input) {
+        if (!target.endsWith("/current")) {
+            return false;
+        }
+
+        String regex = target +"/previous/v\\d+/.+";
+        return Pattern.compile(regex).matcher(input).matches();
+    }
 }

@@ -1056,7 +1056,7 @@ public class Collection {
      */
     private boolean deletePreviousVersionFromReviewed(String targetURI) throws IOException {
         boolean deleteSuccessful = true;
-        List<String> versionedFiles = getReviewPreviousVersionContentForURI(reviewedUris(), targetURI);
+        List<String> versionedFiles = getPreviousVersionContentForURI(reviewedUris(), targetURI);
 
         if (!versionedFiles.isEmpty()) {
             info().data("files", versionedFiles).uri(targetURI).log("deleting generated previous version files for uri");
@@ -1069,7 +1069,7 @@ public class Collection {
         return deleteSuccessful;
     }
 
-    List<String> getReviewPreviousVersionContentForURI(List<String> reviewedURIs, String targetURI) throws IOException {
+    List<String> getPreviousVersionContentForURI(List<String> reviewedURIs, String targetURI) throws IOException {
         return reviewedURIs
                 .stream()
                 .filter(contentURI -> versionsService.isVersionOf(targetURI, contentURI))

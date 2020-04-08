@@ -1037,7 +1037,7 @@ public class Collection {
         }
 
         if (deleteSuccessful) {
-            deleteSuccessful &= deleteRelatedVersionedContent(uri);
+            deleteSuccessful &= deletePreviousVersionsFromCollectionReviewed(checkURI);
         }
 
         return deleteSuccessful;
@@ -1051,20 +1051,20 @@ public class Collection {
      * newly created version is delete from the collection we need to tidy up these files as they can block users
      * from appoving the collection or adding the same content again.
      *
-     * @param uri
+     * @param targetURI
      * @return
      * @throws IOException
      */
-    private boolean deleteRelatedVersionedContent(String uri) throws IOException {
+    private boolean deletePreviousVersionsFromCollectionReviewed(String targetURI) throws IOException {
         boolean deleteSuccessful = true;
 
         List<String> versionedFiles = reviewedUris()
                 .stream()
-                .filter(contentURI -> contentURI.startsWith(contentURI) && isVersionedUri(contentURI))
+                .filter(contentURI -> contentURI.startsWith(targetURI) && isVersionedUri(contentURI))
                 .collect(Collectors.toList());
 
         if (!versionedFiles.isEmpty()) {
-            info().data("files", versionedFiles).data("uri", uri).log("deleting generated previous version files for uri");
+            info().data("files", versionedFiles).uri(targetURI).log("deleting generated previous version files for uri");
 
             for (String f : versionedFiles) {
                 deleteSuccessful &= deleteFile(f);

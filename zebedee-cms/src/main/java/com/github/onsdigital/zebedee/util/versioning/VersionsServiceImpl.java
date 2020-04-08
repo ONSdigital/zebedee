@@ -7,6 +7,7 @@ import com.github.onsdigital.zebedee.content.page.statistics.dataset.Version;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.model.Collection;
+import com.github.onsdigital.zebedee.model.Content;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ZebedeeReader;
 import com.github.onsdigital.zebedee.session.model.Session;
@@ -229,7 +230,15 @@ public class VersionsServiceImpl implements VersionsService {
             return false;
         }
 
-        String regex = target +"/previous/v\\d+/.+";
+        String regex = target + "/previous/v\\d+/.+";
         return Pattern.compile(regex).matcher(input).matches();
+    }
+
+    @Override
+    public List<String> getPreviousVersionsOf(String targetURI, Content content) throws IOException {
+        return content.uris()
+                .stream()
+                .filter(contentURI -> isVersionOf(targetURI, contentURI))
+                .collect(Collectors.toList());
     }
 }

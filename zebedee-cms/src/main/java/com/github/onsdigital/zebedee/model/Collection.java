@@ -1059,7 +1059,10 @@ public class Collection {
         List<String> versionedFiles = versionsService.getPreviousVersionsOf(targetURI, reviewed);
 
         if (!versionedFiles.isEmpty()) {
-            info().data("files", versionedFiles).uri(targetURI).log("deleting generated previous version files for uri");
+            info().collectionID(this)
+                    .uri(targetURI)
+                    .data("related_version_files", versionedFiles)
+                    .log("removing previous version files form reviewed content");
 
             for (String f : versionedFiles) {
                 deleteSuccessful &= deleteFile(f);
@@ -1068,6 +1071,7 @@ public class Collection {
 
         return deleteSuccessful;
     }
+
     /**
      * Delete all the content files in the directory of the given file.
      *

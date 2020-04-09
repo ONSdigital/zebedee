@@ -1062,7 +1062,7 @@ public class Collection {
             info().collectionID(this)
                     .uri(targetURI)
                     .data("related_version_files", versionedFiles)
-                    .log("removing previous version files form reviewed content");
+                    .log("file deleted removing previous version content from collection reviewed dir");
 
             for (String f : versionedFiles) {
                 deleteSuccessful &= deleteFile(f);

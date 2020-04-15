@@ -41,8 +41,8 @@
             <artifactId>restolino</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.github.davidcarboni</groupId>
-            <artifactId>cryptolite</artifactId>
+            <groupId>com.github.onsdigital</groupId>
+            <artifactId>dp-cryptolite-java</artifactId>
         </dependency>
 
         <dependency>
@@ -67,6 +67,14 @@
             <groupId>com.github.davidcarboni</groupId>
             <artifactId>encrypted-file-upload</artifactId>
             <version>1.0.0</version>
+            <exclusions>
+                <!-- Brings in an older version of davidcarboni/cryptolite which conflicts
+                     with the onsdigital fork. This stops the old version being imported. -->
+                <exclusion>
+                    <groupId>com.github.davidcarboni</groupId>
+                    <artifactId>cryptolite</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>

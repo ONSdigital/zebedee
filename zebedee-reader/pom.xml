@@ -68,8 +68,8 @@
 
         <!-- Encryption -->
         <dependency>
-            <groupId>com.github.davidcarboni</groupId>
-            <artifactId>cryptolite</artifactId>
+            <groupId>com.github.onsdigital</groupId>
+            <artifactId>dp-cryptolite-java</artifactId>
         </dependency>
 
         <!-- Spreadsheet generator -->

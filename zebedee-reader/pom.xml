@@ -33,7 +33,7 @@
     <dependencies>
         <!--Restolino-->
         <dependency>
-            <groupId>com.github.davidcarboni</groupId>
+            <groupId>com.github.onsdigital</groupId>
             <artifactId>restolino</artifactId>
         </dependency>
 
@@ -88,13 +88,13 @@
 
         <!-- Logging -->
         <dependency>
-            <groupId>com.github.ONSdigital</groupId>
+            <groupId>com.github.onsdigital</groupId>
             <artifactId>dp-logging</artifactId>
             <version>v1.6.0</version>
         </dependency>
 
         <dependency>
-            <groupId>com.github.ONSdigital</groupId>
+            <groupId>com.github.onsdigital</groupId>
             <artifactId>dp-dataset-api-java-client</artifactId>
             <version>v1.0.0</version>
         </dependency>

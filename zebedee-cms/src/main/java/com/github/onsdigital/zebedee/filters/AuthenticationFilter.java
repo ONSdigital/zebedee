@@ -1,6 +1,6 @@
 package com.github.onsdigital.zebedee.filters;
 
-import com.github.davidcarboni.restolino.framework.Filter;
+import com.github.davidcarboni.restolino.framework.PreFilter;
 import com.github.davidcarboni.restolino.helpers.Path;
 import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.api.ClickEventLog;
@@ -26,7 +26,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-public class AuthenticationFilter implements Filter {
+public class AuthenticationFilter implements PreFilter {
 
     /**
      * Endpoints that do not require authorisation.

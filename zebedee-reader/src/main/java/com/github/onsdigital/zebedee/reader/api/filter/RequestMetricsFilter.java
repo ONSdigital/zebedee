@@ -1,6 +1,6 @@
 package com.github.onsdigital.zebedee.reader.api.filter;
 
-import com.github.davidcarboni.restolino.framework.Filter;
+import com.github.davidcarboni.restolino.framework.PreFilter;
 import com.github.onsdigital.zebedee.util.mertics.service.MetricsService;
 import org.apache.commons.lang3.StringUtils;
 
@@ -12,7 +12,7 @@ import static com.github.onsdigital.zebedee.logging.ReaderLogger.error;
 /**
  * Created by dave on 8/8/16.
  */
-public class RequestMetricsFilter implements Filter {
+public class RequestMetricsFilter implements PreFilter {
 
     private static final String IGNORE_METRICS_HEADER = "metrics-disabled";
     private static MetricsService metricsService = MetricsService.getInstance();

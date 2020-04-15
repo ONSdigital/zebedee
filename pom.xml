@@ -105,9 +105,9 @@
 
             <!-- Main -->
             <dependency>
-                <groupId>com.github.davidcarboni</groupId>
+                <groupId>com.github.onsdigital</groupId>
                 <artifactId>restolino</artifactId>
-                <version>0.1.14</version>
+                <version>v0.2.1</version>
             </dependency>
 
             <!-- Cryptography -->

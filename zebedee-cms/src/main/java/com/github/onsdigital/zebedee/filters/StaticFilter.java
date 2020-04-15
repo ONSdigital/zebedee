@@ -1,6 +1,6 @@
 package com.github.onsdigital.zebedee.filters;
 
-import com.github.davidcarboni.restolino.framework.Filter;
+import com.github.davidcarboni.restolino.framework.PreFilter;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -10,7 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * Captures requests with a file extension as they do not get routed to the API.
  */
-public class StaticFilter implements Filter
+public class StaticFilter implements PreFilter
 {
 
     @Override

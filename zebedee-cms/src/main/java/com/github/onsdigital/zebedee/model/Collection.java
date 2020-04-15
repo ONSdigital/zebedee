@@ -1414,9 +1414,9 @@ public class Collection {
     /**
      * Return true if this collection has had all of its content reviewed.
      */
-    public boolean isAllContentReviewed() throws IOException {
+    public boolean isAllContentReviewed(boolean datasetImportEnabled) throws IOException {
         // FIXME CMD feature flag
-        if (cmsFeatureFlags().isEnableDatasetImport()) {
+        if (datasetImportEnabled) {
             boolean allDatasetsReviewed = description.getDatasets()
                     .stream()
                     .allMatch(ds -> ds.getState().equals(ContentStatus.Reviewed));

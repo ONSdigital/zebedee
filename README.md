@@ -137,7 +137,7 @@ To bypass this check:
  
  ```bash
  curl -H "X-Florence-Token: <ZEBEDEE_SESSION_TOKEN>" -XPOST "http://<DOMAIN>/approve/<COLLECTION_ID>?overrideKey
-=<OVERRIDE_KEY> | jq ."
+=<OVERRIDE_KEY>" | jq .
  ```
  
  - `ZEBEDEE_SESSION_TOKEN` - A valid Zebedee session token for your user.

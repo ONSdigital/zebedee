@@ -15,6 +15,7 @@ import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.UnexpectedErrorException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.ApprovalStatus;
+import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.Event;
 import com.github.onsdigital.zebedee.json.EventType;
 import com.github.onsdigital.zebedee.json.Keyring;
@@ -67,7 +68,10 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getUnauthorizedMessage;
+import static com.github.onsdigital.zebedee.json.EventType.VERSION_VERIFICATION_BYPASSED;
+import static com.github.onsdigital.zebedee.json.EventType.VERSION_VERIFICATION_FAILED;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.error;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.info;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.warn;
@@ -334,8 +338,10 @@ public class Collections {
         collection.getDescription().addEvent(new Event(new Date(), EventType.APPROVE_SUBMITTED, session.getEmail()));
         String collectionId = collection.getDescription().getId();
 
+        boolean isDatasetImportEnabled = cmsFeatureFlags().isEnableDatasetImport();
+
         // Everything is completed
-        if (!collection.isAllContentReviewed()) {
+        if (!collection.isAllContentReviewed(isDatasetImportEnabled)) {
             collection.getDescription().addEvent(new Event(new Date(), EventType.APPROVE_SUBMITTED, session.getEmail()));
 
             error().data("inProgressEmpty", collection.inProgressUris().isEmpty())
@@ -351,9 +357,7 @@ public class Collections {
         ContentReader publishedReader = contentReaderFactory.apply(this.published.path);
 
         if (skipDatasetVersionsValidation(userOverrideKey, getDatasetVersionVerificationOverrideKey(), session)) {
-            warn().collectionID(collectionId)
-                    .user(session)
-                    .log("warning valid dataset versions validation override key provided bypassing validation");
+            skipDatasetVersionsValidation(collection, session);
         } else {
             verifyDatasetVersions(collection, collectionReader, session);
         }
@@ -990,7 +994,7 @@ public class Collections {
     }
 
     public void verifyDatasetVersions(Collection collection, CollectionReader collectionReader, Session session) throws ZebedeeException, IOException {
-        if (!CMSFeatureFlags.cmsFeatureFlags().isDatasetVersionVerificationEnabled()) {
+        if (!cmsFeatureFlags().isDatasetVersionVerificationEnabled()) {
             info().collectionID(collection).log("skipping dataset version verification feature not enabled");
             return;
         }
@@ -1000,12 +1004,17 @@ public class Collections {
         try {
             versionsService.verifyCollectionDatasets(zebedeeCmsService.getZebedeeReader(), collection, collectionReader, session);
         } catch (VersionNotFoundException ex) {
+            CollectionDescription description = collection.getDescription();
+            description.addEvent(new Event(new Date(), VERSION_VERIFICATION_FAILED, session.getEmail()));
+
             error().collectionID(collection)
                     .user(session)
                     .exception(ex)
                     .reason("error verifying dataset(s), version(s) not found in either collection or published content")
                     .log("collection approval denied");
             throw new UnexpectedErrorException(ex.getMessage(), 409);
+        } finally {
+            collection.save();
         }
     }
 
@@ -1044,6 +1053,19 @@ public class Collections {
                 .reason("correct user permissions and overrideKey provided")
                 .log("bypassing dataset version validation ");
         return true;
+    }
+
+    void skipDatasetVersionsValidation(Collection collection, Session session) throws IOException {
+        try {
+            CollectionDescription description = collection.getDescription();
+            description.addEvent(new Event(new Date(), VERSION_VERIFICATION_BYPASSED, session.getEmail()));
+
+            warn().collectionID(collection)
+                    .user(session)
+                    .log("warning valid dataset versions validation override key provided bypassing validation");
+        } finally {
+            collection.save();
+        }
     }
 
     private Long getDatasetVersionVerificationOverrideKey() {

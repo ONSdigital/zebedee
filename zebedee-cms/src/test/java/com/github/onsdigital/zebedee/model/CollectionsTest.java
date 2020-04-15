@@ -578,7 +578,7 @@ public class CollectionsTest {
 
         when(permissionsServiceMock.canEdit(TEST_EMAIL))
                 .thenReturn(true);
-        when(collectionMock.isAllContentReviewed())
+        when(collectionMock.isAllContentReviewed(false))
                 .thenReturn(false);
         when(collectionMock.inProgressUris())
                 .thenReturn(new ArrayList<String>());
@@ -615,7 +615,7 @@ public class CollectionsTest {
 
         when(permissionsServiceMock.canEdit(TEST_EMAIL))
                 .thenReturn(true);
-        when(collectionMock.isAllContentReviewed())
+        when(collectionMock.isAllContentReviewed(false))
                 .thenReturn(true);
         when(collectionReaderWriterFactoryMock.getReader(zebedeeMock, collectionMock, sessionMock))
                 .thenReturn(collectionReaderMock);
@@ -627,7 +627,7 @@ public class CollectionsTest {
         assertThat(futureMock, equalTo(collections.approve(collectionMock, sessionMock)));
 
         verify(permissionsServiceMock, times(1)).canEdit(TEST_EMAIL);
-        verify(collectionMock, times(1)).isAllContentReviewed();
+        verify(collectionMock, times(1)).isAllContentReviewed(false);
         verify(collectionReaderWriterFactoryMock, times(1)).getReader(zebedeeMock, collectionMock, sessionMock);
         verify(collectionReaderWriterFactoryMock, times(1)).getWriter(zebedeeMock, collectionMock, sessionMock);
         verify(collectionHistoryDaoMock, times(1)).saveCollectionHistoryEvent(any(), any(), any());
@@ -1188,5 +1188,20 @@ public class CollectionsTest {
                 .thenReturn(false);
 
         assertFalse(collections.skipDatasetVersionsValidation(666L, 666L, sessionMock));
+    }
+
+    @Test
+    public void skipDatasetVersionsValidation_success() throws IOException {
+        CollectionDescription description = new CollectionDescription();
+
+        when(collectionMock.getDescription())
+                .thenReturn(description);
+
+        collections.skipDatasetVersionsValidation(collectionMock, sessionMock);
+
+        assertThat(description.events.size(), equalTo(1));
+
+        Event event = description.events.get(0);
+        assertThat(event.getType(), equalTo(EventType.VERSION_VERIFICATION_BYPASSED));
     }
 }

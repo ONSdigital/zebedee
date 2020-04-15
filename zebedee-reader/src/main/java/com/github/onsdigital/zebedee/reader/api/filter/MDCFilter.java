@@ -13,10 +13,19 @@ import static com.github.onsdigital.zebedee.logging.ReaderLogger.info;
  */
 public class MDCFilter implements Filter {
 
+    private static final String PING = "/ping";
+    private static final String REQUEST_RECEIVED = "request received";
+
+
     @Override
     public boolean filter(HttpServletRequest request, HttpServletResponse response) {
-        RequestLogUtil.extractDiagnosticContext(request);
-        info().beginHTTP(request).log("request receieved");
+        String uri = request.getRequestURI();
+
+        if (!uri.startsWith(PING)) {
+            RequestLogUtil.extractDiagnosticContext(request);
+            info().beginHTTP(request).log(REQUEST_RECEIVED);
+        }
+
         return true;
     }
 }

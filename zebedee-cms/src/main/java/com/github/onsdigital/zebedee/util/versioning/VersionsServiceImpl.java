@@ -7,6 +7,7 @@ import com.github.onsdigital.zebedee.content.page.statistics.dataset.Version;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.model.Collection;
+import com.github.onsdigital.zebedee.model.Content;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ZebedeeReader;
 import com.github.onsdigital.zebedee.session.model.Session;
@@ -25,10 +26,12 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static com.github.onsdigital.zebedee.util.versioning.VersionNotFoundException.versionsNotFoundException;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 public class VersionsServiceImpl implements VersionsService {
 
     static final String VERSION_URI = "/previous/";
+    static final String VERSION_FILE_REGEX = "/previous/v\\d+/.+";
     static final Pattern VERSION_DIR_PATTERN = Pattern.compile("/previous/v\\d+");
     static final Pattern VALID_VERSION_DIR_PATTERN = Pattern.compile("v\\d+");
 
@@ -221,5 +224,38 @@ public class VersionsServiceImpl implements VersionsService {
 
     boolean isDataJson(String uri) {
         return StringUtils.isNotEmpty(uri) && uri.endsWith("data.json");
+    }
+
+    /**
+     * Check if the URI is a previous version of the parent URI.
+     *
+     * @param parentURI the URI to compare files against.
+     * @param uri       the URI to check.
+     * @return true if the uri matches the pattern: parentURI + "/previous/v{d}/{filename}" return false otherwise.
+     */
+    @Override
+    public boolean isVersionOf(String parentURI, String uri) {
+        if (isEmpty(parentURI) || isEmpty(uri)) {
+            return false;
+        }
+
+        String regex = parentURI + VERSION_FILE_REGEX;
+        return Pattern.compile(regex).matcher(uri).matches();
+    }
+
+    /**
+     * Filter the content returning a list of URIS that are a previous version of the targetURI.
+     *
+     * @param targetURI the URI to compare against.
+     * @param content   the collection content to filter.
+     * @return {@link List} of URIs in the collection that are previous versions of targetURI.
+     * @throws IOException error getting the content URIs.
+     */
+    @Override
+    public List<String> getPreviousVersionsOf(String targetURI, Content content) throws IOException {
+        return content.uris()
+                .stream()
+                .filter(contentURI -> isVersionOf(targetURI, contentURI))
+                .collect(Collectors.toList());
     }
 }

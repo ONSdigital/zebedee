@@ -81,7 +81,6 @@ import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFea
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.error;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.info;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.warn;
-import static com.github.onsdigital.zebedee.model.content.item.VersionedContentItem.isVersionedUri;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_CONTENT_REVIEWED;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_CREATED;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_NAME_CHANGED;
@@ -1037,7 +1036,7 @@ public class Collection {
         }
 
         if (deleteSuccessful) {
-            deleteSuccessful &= deleteRelatedVersionedContent(uri);
+            deleteSuccessful &= deletePreviousVersionFromReviewed(checkURI);
         }
 
         return deleteSuccessful;
@@ -1051,20 +1050,19 @@ public class Collection {
      * newly created version is delete from the collection we need to tidy up these files as they can block users
      * from appoving the collection or adding the same content again.
      *
-     * @param uri
+     * @param targetURI
      * @return
      * @throws IOException
      */
-    private boolean deleteRelatedVersionedContent(String uri) throws IOException {
+    private boolean deletePreviousVersionFromReviewed(String targetURI) throws IOException {
         boolean deleteSuccessful = true;
-
-        List<String> versionedFiles = reviewedUris()
-                .stream()
-                .filter(contentURI -> contentURI.startsWith(contentURI) && isVersionedUri(contentURI))
-                .collect(Collectors.toList());
+        List<String> versionedFiles = versionsService.getPreviousVersionsOf(targetURI, reviewed);
 
         if (!versionedFiles.isEmpty()) {
-            info().data("files", versionedFiles).data("uri", uri).log("deleting generated previous version files for uri");
+            info().collectionID(this)
+                    .uri(targetURI)
+                    .data("related_version_files", versionedFiles)
+                    .log("file deleted removing previous version content from collection reviewed dir");
 
             for (String f : versionedFiles) {
                 deleteSuccessful &= deleteFile(f);

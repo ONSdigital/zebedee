@@ -6,6 +6,7 @@ import com.github.onsdigital.zebedee.content.page.statistics.dataset.Version;
 import com.github.onsdigital.zebedee.content.page.statistics.document.bulletin.Bulletin;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.model.Collection;
+import com.github.onsdigital.zebedee.model.Content;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.ZebedeeReader;
@@ -28,6 +29,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class VersionsServiceImplTest {
@@ -40,6 +42,9 @@ public class VersionsServiceImplTest {
             "/economy/economicoutputandproductivity/output/datasets/outputoftheproductionindustries/current/previous/v1";
     static final String VERSION_2_URI =
             "/economy/economicoutputandproductivity/output/datasets/outputoftheproductionindustries/current/previous/v2";
+
+    static final String DS_LANDING_PAGE_URI =
+            "/economy/economicoutputandproductivity/output/datasets/outputoftheproductionindustries";
 
     @Mock
     private File file;
@@ -306,5 +311,106 @@ public class VersionsServiceImplTest {
                 .thenReturn(dataset);
 
         service.verifyCollectionDatasets(cmsReader, collection, collectionReader, session);
+    }
+
+    @Test
+    public void isVersionOf_notVersionsOfParent_shouldReturnFalse() {
+        assertFalse(service.isVersionOf(null, null));
+        assertFalse(service.isVersionOf("", null));
+        assertFalse(service.isVersionOf("/a/b/c", null));
+        assertFalse(service.isVersionOf("/a/b/c", ""));
+        assertFalse(service.isVersionOf("/a/b/c", "/x/y/z/current/previous/v1"));
+        assertFalse(service.isVersionOf("/a/b/c", "/a/b/c/current/previous/v1"));
+        assertFalse(service.isVersionOf("/a/b/c/current", "/a/b/c/current"));
+        assertFalse(service.isVersionOf("/a/b/c/current", "/a/b/c/current/previous"));
+        assertFalse(service.isVersionOf("/a/b/c/current/previous", "/a/b/c/current/previous/v1"));
+        assertFalse(service.isVersionOf("/a/b/c/current", "/x/y/z/current/previous/v1"));
+
+        assertFalse(service.isVersionOf(
+                "/economy/economicoutputandproductivity/output/datasets/outputoftheproductionindustries",
+                "/economy/economicoutputandproductivity/output/datasets/outputoftheproductionindustries/current/previous/v1/data.json"
+        ));
+
+        assertFalse(service.isVersionOf(
+                "/economy/economicoutputandproductivity/output/datasets/outputoftheproductionindustries",
+                "/economy/economicoutputandproductivity/output/datasets/outputoftheproductionindustries/current/previous/v1/data.xlsx"
+        ));
+
+        assertFalse(service.isVersionOf(
+                "/peoplepopulationandcommunity/populationandmigration/populationestimates/bulletins/annualmidyearpopulationestimates",
+                "/peoplepopulationandcommunity/populationandmigration/populationestimates/bulletins/annualmidyearpopulationestimates/mid2018/previous/v2/data.json"
+        ));
+
+        assertFalse(service.isVersionOf(
+                "/economy/economicoutputandproductivity/output/datasets/indexofservices",
+                "/economy/economicoutputandproductivity/output/datasets/indexofservices/current/previous/v4/ios1.csv"
+        ));
+    }
+
+    @Test
+    public void isVersionOf_previousVersionOfParent_shouldReturnTrue() {
+        assertTrue(service.isVersionOf("/a/b/c/current", "/a/b/c/current/previous/v1/data.json"));
+        assertTrue(service.isVersionOf("/a/b/c/current", "/a/b/c/current/previous/v1/data.xlxs"));
+        assertTrue(service.isVersionOf("/a/b/c/current", "/a/b/c/current/previous/v1/data.png"));
+        assertTrue(service.isVersionOf("/a/b/c/current", "/a/b/c/current/previous/v1/nested/data.png"));
+
+        assertTrue(service.isVersionOf(
+                "/economy/economicoutputandproductivity/output/datasets/outputoftheproductionindustries/current",
+                "/economy/economicoutputandproductivity/output/datasets/outputoftheproductionindustries/current/previous/v1/data.json"
+        ));
+
+        assertTrue(service.isVersionOf(
+                "/economy/economicoutputandproductivity/output/datasets/outputoftheproductionindustries/current",
+                "/economy/economicoutputandproductivity/output/datasets/outputoftheproductionindustries/current/previous/v1/data.xlsx"
+        ));
+
+        assertTrue(service.isVersionOf(
+                "/peoplepopulationandcommunity/populationandmigration/populationestimates/bulletins/annualmidyearpopulationestimates/mid2018",
+                "/peoplepopulationandcommunity/populationandmigration/populationestimates/bulletins/annualmidyearpopulationestimates/mid2018/previous/v2/data.json"
+        ));
+
+        assertTrue(service.isVersionOf(
+                "/economy/economicoutputandproductivity/output/datasets/indexofservices/current",
+                "/economy/economicoutputandproductivity/output/datasets/indexofservices/current/previous/v4/ios1.csv"
+        ));
+    }
+
+    @Test
+    public void getetPreviousVersionsOf_noneInCollection_shouldReturnEmptyList() throws Exception {
+        List<String> uris = new ArrayList<>();
+        uris.add("/economy/economicoutputandproductivity/output/datasets/outputoftheproductionindustries");
+        uris.add("/peoplepopulationandcommunity/populationandmigration/populationestimates/bulletins/annualmidyearpopulationestimates");
+        uris.add("/economy/economicoutputandproductivity/output/datasets/indexofservices");
+
+        Content content = mock(Content.class);
+        when(content.uris()).thenReturn(uris);
+
+        List<String> result = service.getPreviousVersionsOf(
+                "/economy/economicoutputandproductivity/output/datasets/outputoftheproductionindustries", content);
+
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    public void getetPreviousVersionsOf_previousVersionsInCollection_shouldReturnExpectedURIs() throws Exception {
+        List<String> uris = new ArrayList<>();
+        uris.add("/peoplepopulationandcommunity/populationandmigration/populationestimates/bulletins/annualmidyearpopulationestimates");
+        uris.add("/economy/economicoutputandproductivity/output/datasets/indexofservices");
+        uris.add("/economy/economicoutputandproductivity/output/datasets/outputoftheproductionindustries/data.json");
+        uris.add("/economy/economicoutputandproductivity/output/datasets/outputoftheproductionindustries/current/data.json");
+        uris.add("/economy/economicoutputandproductivity/output/datasets/outputoftheproductionindustries/current/previous/v1/data.json");
+        uris.add("/economy/economicoutputandproductivity/output/datasets/outputoftheproductionindustries/current/previous/v1/data.xlsx");
+
+        Content content = mock(Content.class);
+        when(content.uris()).thenReturn(uris);
+
+        List<String> result = service.getPreviousVersionsOf(
+                "/economy/economicoutputandproductivity/output/datasets/outputoftheproductionindustries/current", content);
+
+        List<String> expected = new ArrayList<>();
+        expected.add("/economy/economicoutputandproductivity/output/datasets/outputoftheproductionindustries/current/previous/v1/data.json");
+        expected.add("/economy/economicoutputandproductivity/output/datasets/outputoftheproductionindustries/current/previous/v1/data.xlsx");
+
+        assertThat(result, equalTo(expected));
     }
 }

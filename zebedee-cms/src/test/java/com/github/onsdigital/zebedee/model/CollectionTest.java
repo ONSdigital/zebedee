@@ -1731,29 +1731,29 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
     public void deleteDataJSONShouldDeletePreviousVersionFromReviewed() throws Exception {
         Collection c1 = createCollection(rootDir.getRoot().toPath(), "nargle");
 
-        assertTrue(c1.getComplete().getPath().resolve("a/b/c").toFile().mkdirs());
-        assertTrue(c1.getReviewed().getPath().resolve("a/b/c/previous/v1").toFile().mkdirs());
+        assertTrue(c1.getComplete().getPath().resolve("a/b/c/current").toFile().mkdirs());
+        assertTrue(c1.getReviewed().getPath().resolve("a/b/c/current/previous/v1").toFile().mkdirs());
 
-        Path uri = Paths.get("a/b/c");
+        Path uri = Paths.get("a/b/c/current");
         assertTrue(c1.getComplete().getPath().resolve(uri).resolve("data.json").toFile().createNewFile());
         assertTrue(c1.getComplete().getPath().resolve(uri).resolve("abc123.json").toFile().createNewFile());
         assertTrue(c1.getComplete().getPath().resolve(uri).resolve("abc123.xls").toFile().createNewFile());
 
         // mock a previous version of the content in the reviewed dir.
-        assertTrue(c1.getReviewed().getPath().resolve("a/b/c/previous/v1/data.json").toFile().createNewFile());
-        assertTrue(c1.getReviewed().getPath().resolve("a/b/c/previous/v1/abc123.json").toFile().createNewFile());
-        assertTrue(c1.getReviewed().getPath().resolve("a/b/c/previous/v1/abc123.xls").toFile().createNewFile());
+        assertTrue(c1.getReviewed().getPath().resolve("a/b/c/current/previous/v1/data.json").toFile().createNewFile());
+        assertTrue(c1.getReviewed().getPath().resolve("a/b/c/current/previous/v1/abc123.json").toFile().createNewFile());
+        assertTrue(c1.getReviewed().getPath().resolve("a/b/c/current/previous/v1/abc123.xls").toFile().createNewFile());
 
-        boolean deleteSuccessful = c1.deleteFileAndRelated("/a/b/c/data.json");
+        boolean deleteSuccessful = c1.deleteFileAndRelated("/a/b/c/current/data.json");
 
         assertTrue(deleteSuccessful);
         assertFalse(Files.exists(c1.getComplete().getPath().resolve("a/b/c/data.json")));
         assertFalse(Files.exists(c1.getComplete().getPath().resolve("a/b/c/abc123.json")));
         assertFalse(Files.exists(c1.getComplete().getPath().resolve("a/b/c/abc123.xls")));
 
-        assertFalse(Files.exists(c1.getReviewed().getPath().resolve("a/b/c/previous/v1/data.json")));
-        assertFalse(Files.exists(c1.getReviewed().getPath().resolve("a/b/c/previous/v1/abc123.json")));
-        assertFalse(Files.exists(c1.getReviewed().getPath().resolve("a/b/c/previous/v1/abc123.xld")));
+        assertFalse(Files.exists(c1.getReviewed().getPath().resolve("a/b/c/current/previous/v1/data.json")));
+        assertFalse(Files.exists(c1.getReviewed().getPath().resolve("a/b/c/current/previous/v1/abc123.json")));
+        assertFalse(Files.exists(c1.getReviewed().getPath().resolve("a/b/c/current/previous/v1/abc123.xlsx")));
     }
 
     public static Collection createCollection(Path destination, String collectionName) throws CollectionNotFoundException, IOException {

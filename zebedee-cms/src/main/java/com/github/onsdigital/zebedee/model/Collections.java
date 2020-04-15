@@ -68,6 +68,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getUnauthorizedMessage;
 import static com.github.onsdigital.zebedee.json.EventType.VERSION_VERIFICATION_BYPASSED;
 import static com.github.onsdigital.zebedee.json.EventType.VERSION_VERIFICATION_FAILED;
@@ -337,8 +338,10 @@ public class Collections {
         collection.getDescription().addEvent(new Event(new Date(), EventType.APPROVE_SUBMITTED, session.getEmail()));
         String collectionId = collection.getDescription().getId();
 
+        boolean isDatasetImportEnabled = cmsFeatureFlags().isEnableDatasetImport();
+
         // Everything is completed
-        if (!collection.isAllContentReviewed()) {
+        if (!collection.isAllContentReviewed(isDatasetImportEnabled)) {
             collection.getDescription().addEvent(new Event(new Date(), EventType.APPROVE_SUBMITTED, session.getEmail()));
 
             error().data("inProgressEmpty", collection.inProgressUris().isEmpty())
@@ -991,7 +994,7 @@ public class Collections {
     }
 
     public void verifyDatasetVersions(Collection collection, CollectionReader collectionReader, Session session) throws ZebedeeException, IOException {
-        if (!CMSFeatureFlags.cmsFeatureFlags().isDatasetVersionVerificationEnabled()) {
+        if (!cmsFeatureFlags().isDatasetVersionVerificationEnabled()) {
             info().collectionID(collection).log("skipping dataset version verification feature not enabled");
             return;
         }

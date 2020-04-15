@@ -1471,7 +1471,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         Collection collection = CollectionTest.createCollection(collectionPath, "isAllContentReviewed");
 
         // When isAllContentReviewed() is called
-        boolean allContentReviewed = collection.isAllContentReviewed();
+        boolean allContentReviewed = collection.isAllContentReviewed(false);
 
         // Then the result is true
         assertTrue(allContentReviewed);
@@ -1489,7 +1489,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         doReturn(uriList).when(collection).inProgressUris();
 
         // When isAllContentReviewed() is called
-        boolean allContentReviewed = collection.isAllContentReviewed();
+        boolean allContentReviewed = collection.isAllContentReviewed(false);
 
         // Then the result is false
         assertFalse(allContentReviewed);
@@ -1507,7 +1507,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         doReturn(uriList).when(collection).completeUris();
 
         // When isAllContentReviewed() is called
-        boolean allContentReviewed = collection.isAllContentReviewed();
+        boolean allContentReviewed = collection.isAllContentReviewed(false);
 
         // Then the result is false
         assertFalse(allContentReviewed);
@@ -1515,10 +1515,6 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
 
     @Test
     public void isAllContentReviewed_shouldReturnFalseWhenDatasetNotReviewed() throws IOException, ZebedeeException {
-
-        try {
-            // Should only valid Dataset version reviewed if feature flag ENABLE_DATASET_IMPORT is enabled
-            System.setProperty("ENABLE_DATASET_IMPORT", "true");
             // Given a collection with a dataset that has not been set to reviewed.
             Path collectionPath = Files.createTempDirectory(Random.id()); // create a temp directory to generate content into
             Collection collection = CollectionTest.createCollection(collectionPath, "isAllContentReviewed");
@@ -1528,23 +1524,14 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
             collection.getDescription().addDataset(dataset);
 
             // When isAllContentReviewed() is called
-            boolean allContentReviewed = collection.isAllContentReviewed();
+            boolean allContentReviewed = collection.isAllContentReviewed(true);
 
             // Then the result is false
             assertFalse(allContentReviewed);
-        } finally {
-            // Should only valid Dataset version reviewed if feature flag ENABLE_DATASET_IMPORT is enabled
-            System.clearProperty("ENABLE_DATASET_IMPORT");
-        }
     }
 
     @Test
     public void isAllContentReviewed_shouldReturnFalseWhenDatasetVersionNotReviewed() throws IOException, ZebedeeException {
-        try {
-            // FIXME CMD feature flag
-            // Should only valid Dataset version reviewed if feature flag ENABLE_DATASET_IMPORT is enabled
-            System.setProperty("ENABLE_DATASET_IMPORT", "true");
-
             // Given a collection with a dataset version that has not been set to reviewed.
             Path collectionPath = Files.createTempDirectory(Random.id()); // create a temp directory to generate content into
             Collection collection = CollectionTest.createCollection(collectionPath, "isAllContentReviewed");
@@ -1554,14 +1541,10 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
             collection.getDescription().addDatasetVersion(datasetVersion);
 
             // When isAllContentReviewed() is called
-            boolean allContentReviewed = collection.isAllContentReviewed();
+            boolean allContentReviewed = collection.isAllContentReviewed(true);
 
             // Then the result is false
             assertFalse(allContentReviewed);
-        } finally {
-            // Should only valid Dataset version reviewed if feature flag ENABLE_DATASET_IMPORT is enabled
-            System.clearProperty("ENABLE_DATASET_IMPORT");
-        }
     }
 
     @Test
@@ -1576,7 +1559,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         collection.getDescription().addDataset(dataset);
 
         // When isAllContentReviewed() is called
-        boolean allContentReviewed = collection.isAllContentReviewed();
+        boolean allContentReviewed = collection.isAllContentReviewed(false);
 
         // Then the result is true
         assertTrue(allContentReviewed);
@@ -1594,7 +1577,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         collection.getDescription().addDatasetVersion(datasetVersion);
 
         // When isAllContentReviewed() is called
-        boolean allContentReviewed = collection.isAllContentReviewed();
+        boolean allContentReviewed = collection.isAllContentReviewed(false);
 
         // Then the result is true
         assertTrue(allContentReviewed);

@@ -40,6 +40,8 @@ import com.github.onsdigital.zebedee.service.ServiceSupplier;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.teams.model.Team;
 import com.github.onsdigital.zebedee.teams.service.TeamsService;
+import com.github.onsdigital.zebedee.util.versioning.VersionsService;
+import com.github.onsdigital.zebedee.util.versioning.VersionsServiceImpl;
 import com.google.common.annotations.VisibleForTesting;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -75,10 +77,10 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
 
-import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
-import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
-import static com.github.onsdigital.zebedee.model.content.item.VersionedContentItem.isVersionedUri;
+import static com.github.onsdigital.zebedee.logging.CMSLogEvent.error;
+import static com.github.onsdigital.zebedee.logging.CMSLogEvent.info;
+import static com.github.onsdigital.zebedee.logging.CMSLogEvent.warn;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_CONTENT_REVIEWED;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_CREATED;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_NAME_CHANGED;
@@ -103,6 +105,7 @@ public class Collection {
     private static final String BLOCKING_COLLECTION = "blockingCollection";
     private static final String TARGET_PATH = "targetPath";
     private static final String TARGET_COLLECTION = "targetCollection";
+    private static final String DATASETS_URI = "/datasets/";
 
     private static ConcurrentMap<Path, ReadWriteLock> collectionLocks = new ConcurrentHashMap<>();
     private static KeyManangerUtil keyManagerUtil = new KeyManangerUtil();
@@ -116,6 +119,7 @@ public class Collection {
     public final Zebedee zebedee;
 
     private final Path collectionJsonPath;
+    private VersionsService versionsService;
 
     private static ServiceSupplier<CollectionHistoryDao> collectionHistoryDaoServiceSupplier = () -> getCollectionHistoryDao();
 
@@ -172,6 +176,8 @@ public class Collection {
         this.reviewed = new Content(reviewed);
         this.complete = new Content(complete);
         this.inProgress = new Content(inProgress);
+
+        this.versionsService = new VersionsServiceImpl();
     }
 
     /**
@@ -846,12 +852,9 @@ public class Collection {
             Path destination = reviewed.toPath(uri);
 
             if (recursive) {
-                FileUtils.deleteDirectory(destination.getParent().toFile());
-                FileUtils.moveDirectory(source.getParent().toFile(), destination.getParent().toFile());
-                zebedee.getCollections().removeEmptyCollectionDirectories(source.getParent());
+                reviewRecursive(source, destination, session);
             } else {
-                PathUtils.moveFilesInDirectory(source, destination);
-                zebedee.getCollections().removeEmptyCollectionDirectories(source);
+                reviewSingleFile(source, destination);
             }
 
             addEvent(uri, new Event(new Date(), EventType.REVIEWED, session.getEmail()));
@@ -862,6 +865,27 @@ public class Collection {
         }
 
         return result;
+    }
+
+    private void reviewRecursive(Path src, Path dest, Session session) throws IOException {
+        if (src.toString().contains(DATASETS_URI)) {
+            // TODO temp logging to help identify unknown publishing issue - Trello #4687
+            warn().collectionID(this)
+                    .uri(dest.toString())
+                    .user(session)
+                    .log("warning received recursive review request for dataset content uri - this is a " +
+                            "potentially destructive action and could delete the updated previous version in the " +
+                            "collection");
+        }
+
+        FileUtils.deleteDirectory(dest.getParent().toFile());
+        FileUtils.moveDirectory(src.getParent().toFile(), dest.getParent().toFile());
+        zebedee.getCollections().removeEmptyCollectionDirectories(src.getParent());
+    }
+
+    private void reviewSingleFile(Path src, Path dest) throws IOException {
+        PathUtils.moveFilesInDirectory(src, dest);
+        zebedee.getCollections().removeEmptyCollectionDirectories(src);
     }
 
     private boolean contentWasCompleted(String uri) {
@@ -1012,7 +1036,7 @@ public class Collection {
         }
 
         if (deleteSuccessful) {
-            deleteSuccessful &= deleteRelatedVersionedContent(uri);
+            deleteSuccessful &= deletePreviousVersionFromReviewed(checkURI);
         }
 
         return deleteSuccessful;
@@ -1026,20 +1050,19 @@ public class Collection {
      * newly created version is delete from the collection we need to tidy up these files as they can block users
      * from appoving the collection or adding the same content again.
      *
-     * @param uri
+     * @param targetURI
      * @return
      * @throws IOException
      */
-    private boolean deleteRelatedVersionedContent(String uri) throws IOException {
+    private boolean deletePreviousVersionFromReviewed(String targetURI) throws IOException {
         boolean deleteSuccessful = true;
-
-        List<String> versionedFiles = reviewedUris()
-                .stream()
-                .filter(contentURI -> contentURI.startsWith(contentURI) && isVersionedUri(contentURI))
-                .collect(Collectors.toList());
+        List<String> versionedFiles = versionsService.getPreviousVersionsOf(targetURI, reviewed);
 
         if (!versionedFiles.isEmpty()) {
-            info().data("files", versionedFiles).data("uri", uri).log("deleting generated previous version files for uri");
+            info().collectionID(this)
+                    .uri(targetURI)
+                    .data("related_version_files", versionedFiles)
+                    .log("file deleted removing previous version content from collection reviewed dir");
 
             for (String f : versionedFiles) {
                 deleteSuccessful &= deleteFile(f);
@@ -1224,11 +1247,12 @@ public class Collection {
     /**
      * Delete the version at the given URI.
      *
-     * @param uri - The URI of the version to delete.
+     * @param email - the email of the user deleting the version from the collection
+     * @param uri   - The URI of the version to delete.
      * @throws NotFoundException   - if the given URI was not found in the collection.
      * @throws BadRequestException - if the given URI is not a valid version URI.
      */
-    public void deleteVersion(String uri) throws NotFoundException, BadRequestException, IOException {
+    public void deleteVersion(String email, String uri) throws NotFoundException, BadRequestException, IOException {
 
         if (!VersionedContentItem.isVersionedUri(uri)) {
             throw new BadRequestException("The given URI is not recognised as a version");
@@ -1240,6 +1264,10 @@ public class Collection {
         }
 
         FileUtils.deleteDirectory(reviewedPath.toFile());
+
+        Optional<String> version = versionsService.getVersionNameFromURI(uri);
+        String note = version.isPresent() ? version.get() : uri;
+        addEvent(uri, new Event(new Date(), EventType.VERSION_DELETED, email, note));
     }
 
     /**
@@ -1386,9 +1414,9 @@ public class Collection {
     /**
      * Return true if this collection has had all of its content reviewed.
      */
-    public boolean isAllContentReviewed() throws IOException {
+    public boolean isAllContentReviewed(boolean datasetImportEnabled) throws IOException {
         // FIXME CMD feature flag
-        if (cmsFeatureFlags().isEnableDatasetImport()) {
+        if (datasetImportEnabled) {
             boolean allDatasetsReviewed = description.getDatasets()
                     .stream()
                     .allMatch(ds -> ds.getState().equals(ContentStatus.Reviewed));

@@ -7,6 +7,8 @@ import com.github.onsdigital.zebedee.model.ContentWriter;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.util.URIUtils;
+import com.github.onsdigital.zebedee.util.versioning.VersionsService;
+import com.github.onsdigital.zebedee.util.versioning.VersionsServiceImpl;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.IOException;
@@ -15,6 +17,7 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.regex.Pattern;
 
 import static com.github.onsdigital.zebedee.util.URIUtils.removeLeadingSlash;
 
@@ -28,7 +31,10 @@ import static com.github.onsdigital.zebedee.util.URIUtils.removeLeadingSlash;
 public class VersionedContentItem extends ContentItem {
 
     static final String VERSION_DIRECTORY = "previous";
+    static final String VERSION_URI = "/previous/";
     static final String VERSION_PREFIX = "v";
+    static final Pattern VERSION_DIR_PATTERN = Pattern.compile("/previous/v\\d+");
+    static final VersionsService VERSIONS_SERVICE = new VersionsServiceImpl();
 
     public VersionedContentItem(String uri) throws NotFoundException {
         super(uri);
@@ -85,7 +91,9 @@ public class VersionedContentItem extends ContentItem {
         Path versionDirectory = versionSourcePath.resolve(getVersionDirectoryName());
 
         if (Files.exists(versionDirectory)) {
-            version = versionDirectory.toFile().listFiles().length + 1;
+            version = versionDirectory.toFile()
+                    .listFiles(f -> VERSIONS_SERVICE.isVersionDir(f))
+                    .length + 1;
         }
 
         String versionIdentifier = VERSION_PREFIX + version;

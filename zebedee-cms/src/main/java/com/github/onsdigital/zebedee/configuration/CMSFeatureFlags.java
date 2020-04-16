@@ -13,6 +13,7 @@ public class CMSFeatureFlags {
     public static final String ENABLE_DATASET_IMPORT = "ENABLE_DATASET_IMPORT";
     public static final String ENABLE_PERMISSIONS_AUTH = "ENABLE_PERMISSIONS_AUTH";
     private static final String ENABLE_VERIFY_PUBLISH_CONTENT = "ENABLE_VERIFY_PUBLISH_CONTENT";
+    private static final String ENABLE_DATASET_VERSION_VERIFICATION = "ENABLE_DATASET_VERSION_VERIFICATION";
 
     /**
      * Singleton instance
@@ -25,6 +26,8 @@ public class CMSFeatureFlags {
 
     private final boolean isVerifyPublishEnabled;
 
+    private final boolean isDatasetVersionVerificationEnabled;
+
     /**
      * Construct a new feature flags instance.
      */
@@ -32,10 +35,12 @@ public class CMSFeatureFlags {
         this.isDatasetImportEnabled = Boolean.valueOf(getConfigValue(ENABLE_DATASET_IMPORT));
         this.isPermissionsAuthEnabled = Boolean.valueOf(getConfigValue(ENABLE_PERMISSIONS_AUTH));
         this.isVerifyPublishEnabled = Boolean.valueOf(getConfigValue(ENABLE_VERIFY_PUBLISH_CONTENT));
+        this.isDatasetVersionVerificationEnabled = Boolean.valueOf(getConfigValue(ENABLE_DATASET_VERSION_VERIFICATION));
 
         info().data(ENABLE_DATASET_IMPORT, isDatasetImportEnabled)
                 .data(ENABLE_PERMISSIONS_AUTH, isPermissionsAuthEnabled)
                 .data(ENABLE_VERIFY_PUBLISH_CONTENT, isVerifyPublishEnabled)
+                .data(ENABLE_DATASET_VERSION_VERIFICATION, isDatasetVersionVerificationEnabled)
                 .log("CMS feature flags configurations");
     }
 
@@ -61,6 +66,17 @@ public class CMSFeatureFlags {
      */
     public boolean isVerifyPublishEnabled() {
         return this.isVerifyPublishEnabled;
+    }
+
+    /**
+     * If true collection approval requests will verify each version of dataset page exists in either the collection
+     * reviewed dir or in the published content. If not the approval with be prevented. This is a temp fix to help
+     * identify the cause of Trello #4687.
+     *
+     * @return true if enabled false otherwise.
+     */
+    public boolean isDatasetVersionVerificationEnabled() {
+        return this.isDatasetVersionVerificationEnabled;
     }
 
     public static String getConfigValue(String name) {

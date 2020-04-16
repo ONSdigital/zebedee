@@ -21,9 +21,12 @@ import com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDao;
 import com.github.onsdigital.zebedee.persistence.model.CollectionHistoryEvent;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
+import com.github.onsdigital.zebedee.reader.ZebedeeReader;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.user.model.User;
 import com.github.onsdigital.zebedee.user.service.UsersService;
+import com.github.onsdigital.zebedee.util.ZebedeeCmsService;
+import com.github.onsdigital.zebedee.util.versioning.VersionsService;
 import org.apache.commons.fileupload.FileUploadException;
 import org.junit.Before;
 import org.junit.Rule;
@@ -51,6 +54,7 @@ import java.util.function.Supplier;
 
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_DELETED;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_UNLOCKED;
+import static junit.framework.Assert.assertFalse;
 import static junit.framework.TestCase.assertTrue;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
@@ -80,6 +84,15 @@ public class CollectionsTest {
 
     @Mock
     private PermissionsService permissionsServiceMock;
+
+    @Mock
+    private ZebedeeCmsService zebedeeCmsService;
+
+    @Mock
+    private VersionsService versionsService;
+
+    @Mock
+    private ZebedeeReader zebedeeReader;
 
     @Mock
     private Zebedee zebedeeMock;
@@ -148,7 +161,7 @@ public class CollectionsTest {
         collectionsPath = rootDir.newFolder("collections").toPath();
 
         // Test target.
-        collections = new Collections(collectionsPath, permissionsServiceMock, publishedContentMock);
+        collections = new Collections(collectionsPath, permissionsServiceMock, versionsService, publishedContentMock);
 
         zebedeeSupplier = () -> zebedeeMock;
         publishingNotificationConsumer = (c, e) -> publishNotification.sendNotification(e);
@@ -164,6 +177,7 @@ public class CollectionsTest {
         ReflectionTestUtils.setField(collections, "collectionReaderWriterFactory", collectionReaderWriterFactoryMock);
         ReflectionTestUtils.setField(collections, "publishingNotificationConsumer", publishingNotificationConsumer);
         ReflectionTestUtils.setField(collections, "collectionHistoryDaoSupplier", collectionHistoryDaoSupplier);
+        ReflectionTestUtils.setField(collections, "zebedeeCmsService", zebedeeCmsService);
     }
 
     @Test
@@ -564,7 +578,7 @@ public class CollectionsTest {
 
         when(permissionsServiceMock.canEdit(TEST_EMAIL))
                 .thenReturn(true);
-        when(collectionMock.isAllContentReviewed())
+        when(collectionMock.isAllContentReviewed(false))
                 .thenReturn(false);
         when(collectionMock.inProgressUris())
                 .thenReturn(new ArrayList<String>());
@@ -597,20 +611,23 @@ public class CollectionsTest {
 
         ReflectionTestUtils.setField(collections, "contentReaderFactory", contentReaderFunction);
         ReflectionTestUtils.setField(collections, "addTaskToQueue", addTaskToQueue);
+        ReflectionTestUtils.setField(collections, "addTaskToQueue", addTaskToQueue);
 
         when(permissionsServiceMock.canEdit(TEST_EMAIL))
                 .thenReturn(true);
-        when(collectionMock.isAllContentReviewed())
+        when(collectionMock.isAllContentReviewed(false))
                 .thenReturn(true);
         when(collectionReaderWriterFactoryMock.getReader(zebedeeMock, collectionMock, sessionMock))
                 .thenReturn(collectionReaderMock);
         when(collectionReaderWriterFactoryMock.getWriter(zebedeeMock, collectionMock, sessionMock))
                 .thenReturn(collectionWriterMock);
+        when(zebedeeCmsService.getZebedeeReader())
+                .thenReturn(zebedeeReader);
 
         assertThat(futureMock, equalTo(collections.approve(collectionMock, sessionMock)));
 
         verify(permissionsServiceMock, times(1)).canEdit(TEST_EMAIL);
-        verify(collectionMock, times(1)).isAllContentReviewed();
+        verify(collectionMock, times(1)).isAllContentReviewed(false);
         verify(collectionReaderWriterFactoryMock, times(1)).getReader(zebedeeMock, collectionMock, sessionMock);
         verify(collectionReaderWriterFactoryMock, times(1)).getWriter(zebedeeMock, collectionMock, sessionMock);
         verify(collectionHistoryDaoMock, times(1)).saveCollectionHistoryEvent(any(), any(), any());
@@ -1116,5 +1133,75 @@ public class CollectionsTest {
 
         assertTrue(deleteSuccessful);
         assertThat(collectionsPath.resolve("col1/inprogress").toFile().list().length, equalTo(0));
+    }
+
+
+    @Test
+    public void skipDatasetVersionsValidation_userKeyNull_shouldReturnFalse() throws IOException {
+        assertFalse(collections.skipDatasetVersionsValidation(null, null, null));
+    }
+
+    @Test
+    public void skipDatasetVersionsValidation_overrideKeyNull_shouldReturnFalse() throws IOException {
+        assertFalse(collections.skipDatasetVersionsValidation(666L, null, null));
+    }
+
+    @Test
+    public void skipDatasetVersionsValidation_sessionNull_shouldReturnFalse() throws IOException {
+        Session expectedSession = null;
+
+        when(permissionsServiceMock.isPublisher(expectedSession))
+                .thenReturn(false);
+
+        assertFalse(collections.skipDatasetVersionsValidation(666L, 666L, expectedSession));
+    }
+
+    @Test
+    public void skipDatasetVersionsValidation_userNotPublisher_shouldReturnFalse() throws IOException {
+        when(permissionsServiceMock.isPublisher(sessionMock))
+                .thenReturn(false);
+
+        assertFalse(collections.skipDatasetVersionsValidation(666L, 666L, sessionMock));
+    }
+
+    @Test
+    public void skipDatasetVersionsValidation_incorrectKey_shouldReturnFalse() throws IOException {
+        when(permissionsServiceMock.isPublisher(sessionMock))
+                .thenReturn(true);
+
+        assertFalse(collections.skipDatasetVersionsValidation(123L, 666L, sessionMock));
+    }
+
+    @Test
+    public void skipDatasetVersionsValidation_correctKey_shouldReturnTrue() throws IOException {
+        when(permissionsServiceMock.isPublisher(sessionMock))
+                .thenReturn(true);
+
+        long actual = 666;
+        long user = 666;
+        assertTrue(collections.skipDatasetVersionsValidation(user, actual, sessionMock));
+    }
+
+    @Test
+    public void skipDatasetVersionsValidation_correctKeyInvalidPermssions_shouldReturnFalse() throws IOException {
+        when(permissionsServiceMock.isPublisher(sessionMock))
+                .thenReturn(false);
+
+        assertFalse(collections.skipDatasetVersionsValidation(666L, 666L, sessionMock));
+    }
+
+    @Test
+    public void skipDatasetVersionsValidation_success() throws IOException {
+        CollectionDescription description = new CollectionDescription();
+
+        when(collectionMock.getDescription())
+                .thenReturn(description);
+
+        collections.skipDatasetVersionsValidation(collectionMock, sessionMock);
+
+        assertThat(description.events.size(), equalTo(1));
+
+        Event event = description.events.get(0);
+        assertThat(event.getType(), equalTo(EventType.VERSION_VERIFICATION_BYPASSED));
     }
 }

@@ -132,4 +132,11 @@ public class CMSLogEvent extends BaseEvent<CMSLogEvent> {
         }
         return this;
     }
+
+    public CMSLogEvent reason(String reason) {
+        if (StringUtils.isNotEmpty(reason)) {
+            data("reason", reason);
+        }
+        return this;
+    }
 }

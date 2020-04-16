@@ -3,6 +3,7 @@ package com.github.onsdigital.zebedee.model;
 import com.github.davidcarboni.encryptedfileupload.EncryptedFileItemFactory;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.api.Root;
+import com.github.onsdigital.zebedee.configuration.CMSFeatureFlags;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.data.json.DirectoryListing;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
@@ -11,8 +12,10 @@ import com.github.onsdigital.zebedee.exceptions.ConflictException;
 import com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
+import com.github.onsdigital.zebedee.exceptions.UnexpectedErrorException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.ApprovalStatus;
+import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.Event;
 import com.github.onsdigital.zebedee.json.EventType;
 import com.github.onsdigital.zebedee.json.Keyring;
@@ -31,6 +34,9 @@ import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
 import com.github.onsdigital.zebedee.session.model.Session;
+import com.github.onsdigital.zebedee.util.ZebedeeCmsService;
+import com.github.onsdigital.zebedee.util.versioning.VersionNotFoundException;
+import com.github.onsdigital.zebedee.util.versioning.VersionsService;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.ProgressListener;
@@ -47,6 +53,8 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -60,7 +68,10 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getUnauthorizedMessage;
+import static com.github.onsdigital.zebedee.json.EventType.VERSION_VERIFICATION_BYPASSED;
+import static com.github.onsdigital.zebedee.json.EventType.VERSION_VERIFICATION_FAILED;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.error;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.info;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.warn;
@@ -75,6 +86,7 @@ import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLL
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_UNLOCKED;
 import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData.contentMoved;
 import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData.contentRenamed;
+import static java.time.temporal.ChronoUnit.MINUTES;
 
 public class Collections {
 
@@ -82,16 +94,20 @@ public class Collections {
     private PermissionsService permissionsService;
     private Content published;
     private Supplier<Zebedee> zebedeeSupplier = () -> Root.zebedee;
+    private ZebedeeCmsService zebedeeCmsService = ZebedeeCmsService.getInstance();
     private CollectionReaderWriterFactory collectionReaderWriterFactory;
     private Function<ApproveTask, Future<Boolean>> addTaskToQueue = ApprovalQueue::add;
     private BiConsumer<Collection, EventType> publishingNotificationConsumer = (c, e) -> new PublishNotification(c).sendNotification(e);
     private Function<Path, ContentReader> contentReaderFactory = FileSystemContentReader::new;
     private Supplier<CollectionHistoryDao> collectionHistoryDaoSupplier = CollectionHistoryDaoFactory::getCollectionHistoryDao;
     private Comparator<String> strComparator = Comparator.comparing(String::toString);
+    private VersionsService versionsService;
 
-    public Collections(Path path, PermissionsService permissionsService, Content published) {
+    public Collections(Path path, PermissionsService permissionsService,
+                       VersionsService versionsService, Content published) {
         this.path = path;
         this.permissionsService = permissionsService;
+        this.versionsService = versionsService;
         this.published = published;
         this.collectionReaderWriterFactory = new CollectionReaderWriterFactory();
     }
@@ -300,7 +316,11 @@ public class Collections {
      * @throws BadRequestException
      * @throws ConflictException
      */
-    public Future<Boolean> approve(Collection collection, Session session)
+    public Future<Boolean> approve(Collection collection, Session session) throws IOException, ZebedeeException {
+        return approve(collection, session, null);
+    }
+
+    public Future<Boolean> approve(Collection collection, Session session, Long userOverrideKey)
             throws IOException, ZebedeeException {
 
         // Collection exists
@@ -318,8 +338,10 @@ public class Collections {
         collection.getDescription().addEvent(new Event(new Date(), EventType.APPROVE_SUBMITTED, session.getEmail()));
         String collectionId = collection.getDescription().getId();
 
+        boolean isDatasetImportEnabled = cmsFeatureFlags().isEnableDatasetImport();
+
         // Everything is completed
-        if (!collection.isAllContentReviewed()) {
+        if (!collection.isAllContentReviewed(isDatasetImportEnabled)) {
             collection.getDescription().addEvent(new Event(new Date(), EventType.APPROVE_SUBMITTED, session.getEmail()));
 
             error().data("inProgressEmpty", collection.inProgressUris().isEmpty())
@@ -333,6 +355,12 @@ public class Collections {
         CollectionReader collectionReader = collectionReaderWriterFactory.getReader(zebedeeSupplier.get(), collection, session);
         CollectionWriter collectionWriter = collectionReaderWriterFactory.getWriter(zebedeeSupplier.get(), collection, session);
         ContentReader publishedReader = contentReaderFactory.apply(this.published.path);
+
+        if (skipDatasetVersionsValidation(userOverrideKey, getDatasetVersionVerificationOverrideKey(), session)) {
+            skipDatasetVersionsValidation(collection, session);
+        } else {
+            verifyDatasetVersions(collection, collectionReader, session);
+        }
 
         info().data("collectionId", collectionId)
                 .log("approve collection: setting collection status to approved");
@@ -964,4 +992,86 @@ public class Collections {
         }
 
     }
+
+    public void verifyDatasetVersions(Collection collection, CollectionReader collectionReader, Session session) throws ZebedeeException, IOException {
+        if (!cmsFeatureFlags().isDatasetVersionVerificationEnabled()) {
+            info().collectionID(collection).log("skipping dataset version verification feature not enabled");
+            return;
+        }
+
+        info().collectionID(collection).log("feature enabled verifying collection dataset versions");
+
+        try {
+            versionsService.verifyCollectionDatasets(zebedeeCmsService.getZebedeeReader(), collection, collectionReader, session);
+        } catch (VersionNotFoundException ex) {
+            CollectionDescription description = collection.getDescription();
+            description.addEvent(new Event(new Date(), VERSION_VERIFICATION_FAILED, session.getEmail()));
+
+            error().collectionID(collection)
+                    .user(session)
+                    .exception(ex)
+                    .reason("error verifying dataset(s), version(s) not found in either collection or published content")
+                    .log("collection approval denied");
+            throw new UnexpectedErrorException(ex.getMessage(), 409);
+        } finally {
+            collection.save();
+        }
+    }
+
+    /**
+     * Allow the verify datasets process to skipped by a publisher user by providing a valid key - temp until defect is
+     * fixed properly.
+     */
+    public boolean skipDatasetVersionsValidation(Long userKey, Long overrideKey, Session session) throws IOException {
+        if (userKey == null) {
+            info().reason("no user overrideKey provided")
+                    .log("dataset version validation not bypassed");
+            return false;
+        }
+
+        if (overrideKey == null) {
+            info().reason("expected overrideKey not provided")
+                    .log("dataset version validation not bypassed");
+            return false;
+        }
+
+        if (!permissionsService.isPublisher(session)) {
+            info().user(session)
+                    .reason("publisher permissions required")
+                    .log("dataset version validation not bypassed");
+            return false;
+        }
+
+        if (!overrideKey.equals(userKey)) {
+            info().user(session)
+                    .reason("user overrideKey incorrect")
+                    .log("dataset version validation not bypassed");
+            return false;
+        }
+
+        info().user(session)
+                .reason("correct user permissions and overrideKey provided")
+                .log("bypassing dataset version validation ");
+        return true;
+    }
+
+    void skipDatasetVersionsValidation(Collection collection, Session session) throws IOException {
+        try {
+            CollectionDescription description = collection.getDescription();
+            description.addEvent(new Event(new Date(), VERSION_VERIFICATION_BYPASSED, session.getEmail()));
+
+            warn().collectionID(collection)
+                    .user(session)
+                    .log("warning valid dataset versions validation override key provided bypassing validation");
+        } finally {
+            collection.save();
+        }
+    }
+
+    private Long getDatasetVersionVerificationOverrideKey() {
+        Instant now = Instant.now();
+        Instant midnight = now.plus(1, ChronoUnit.DAYS).truncatedTo(ChronoUnit.DAYS);
+        return now.until(midnight, MINUTES);
+    }
+
 }

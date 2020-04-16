@@ -83,6 +83,11 @@ In order to use Zebedee you will need to have the following other project runnin
 
 Follow the steps in the README of each project.
 
+#### Zebedee content 
+Zebedee needs contents before it can be run. Basic demo content and file structures can be generated via the 
+[dp-zebedee-content](https://github.com/ONSdigital/dp-zebedee-content) by following the instructions in the 
+[dp-zebedee-content readme](https://github.com/ONSdigital/dp-zebedee-content/blob/master/README.md)
+
 #### Running zebedee 
 ```bash
 ./run-cms.sh
@@ -102,6 +107,55 @@ _Congratulations_ :tada:! Advanced to GO collect £200 :dollar:
 
 Otherwise :violin: kindly ask someone from the dev team to help troubleshoot.
 
+
+***
+### :spider: :spider: :spider: :spider:
+### Legacy dataset versions defect
+There is currently an intermittant defect where the previous versions of a dataset are not being correctly added to
+ the reviewed directory of the collection. This causes complications if it goes unnoticed and the collection is
+  published. Work is ongoing to identify the cause.
+  
+To combat this an additonal check has been added to the `/approve` endpoint. If the collection contains dataset pages
+ that are missing any of the expected versions the approval will be rejected.
+
+ 
+### Bypassing the check
+
+This check (if enabled) can be manually bypassed by a publisher user using an overrideKey on the approval request. 
+
+**This should only be used as a last resort. Publising a collection in this state will require a manual datafix on the
+ live environment and should only be done with service manager approval.**
+ 
+To bypass this check:
+- Login into Florence and use the Chrome developer tools to get the collection ID and auth token for your user
+ (remember you must be a publisher user). 
+- Use the `dp-cli` tool to access to publishing / publishing_mount
+- Run `sudo docker ps -a` to get the `IP`and `port` for the publishing Zebedee instance
+- Generate an override key - The number of minutes remaining until midnight **(UTC)**. You can use the `dp` tool to
+ calculate this for you - `dp override-key`
+- From the publishing box run the following `curl` command:
+ 
+ ```bash
+ curl -H "X-Florence-Token: <ZEBEDEE_SESSION_TOKEN>" -XPOST "http://<DOMAIN>/approve/<COLLECTION_ID>?overrideKey
+=<OVERRIDE_KEY>" | jq .
+ ```
+ 
+ - `ZEBEDEE_SESSION_TOKEN` - A valid Zebedee session token for your user.
+ - `<DOMAIN>` - the address of the Zebedee publishing instance.
+ - `<COLLECTION_ID>` - the ID of the collection to be approved.
+ - `<OVERRIDE_KEY>` - the secret key required to override the check.
+ 
+If successful you should get something similar too:
+
+```bash
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100     4  100     4    0     0    285      0 --:--:-- --:--:-- --:--:--   285
+true
+```
+If this is fails try again after regenerating an override key as it may have expired before your request was sent.  
+***
+
 #### Service authentication with Zebedee
 
 1) Login to florence using: `curl -X POST -d '{"email":"florence@magicroundabout.ons.gov.uk","password":"<your password>"}' http://localhost:8082/login`
@@ -119,4 +173,3 @@ Otherwise :violin: kindly ask someone from the dev team to help troubleshoot.
 [4]: http://localhost:8081/florence/login
 [5]: https://github.com/ONSdigital/sixteens
 [6]: https://github.com/ONSdigital/dp-compose
->>>>>>> develop

@@ -1350,7 +1350,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         String uri = String.format("/economy/inflationandpriceindices/timeseries/%s/previous/v1", Random.id());
 
         // When we attempt to delete a version
-        collection.deleteVersion(uri);
+        collection.deleteVersion("", uri);
 
         // Then a not found exception is thrown.
     }
@@ -1362,7 +1362,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         String uri = String.format("/economy/inflationandpriceindices/timeseries/%s", Random.id());
 
         // When we attempt to delete a version
-        collection.deleteVersion(uri);
+        collection.deleteVersion("", uri);
 
         // Then a BadRequestException is thrown.
     }
@@ -1379,7 +1379,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         assertTrue(Files.exists(collection.getReviewed().get(version.getUri()).resolve("data.json")));
 
         // When the delete version function is called for the version URI
-        collection.deleteVersion(version.getUri());
+        collection.deleteVersion("bob", version.getUri());
 
         // Then the versions directory is deleted.
         assertNull(collection.getReviewed().get(version.getUri()));
@@ -1471,7 +1471,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         Collection collection = CollectionTest.createCollection(collectionPath, "isAllContentReviewed");
 
         // When isAllContentReviewed() is called
-        boolean allContentReviewed = collection.isAllContentReviewed();
+        boolean allContentReviewed = collection.isAllContentReviewed(false);
 
         // Then the result is true
         assertTrue(allContentReviewed);
@@ -1489,7 +1489,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         doReturn(uriList).when(collection).inProgressUris();
 
         // When isAllContentReviewed() is called
-        boolean allContentReviewed = collection.isAllContentReviewed();
+        boolean allContentReviewed = collection.isAllContentReviewed(false);
 
         // Then the result is false
         assertFalse(allContentReviewed);
@@ -1507,7 +1507,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         doReturn(uriList).when(collection).completeUris();
 
         // When isAllContentReviewed() is called
-        boolean allContentReviewed = collection.isAllContentReviewed();
+        boolean allContentReviewed = collection.isAllContentReviewed(false);
 
         // Then the result is false
         assertFalse(allContentReviewed);
@@ -1515,10 +1515,6 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
 
     @Test
     public void isAllContentReviewed_shouldReturnFalseWhenDatasetNotReviewed() throws IOException, ZebedeeException {
-
-        try {
-            // Should only valid Dataset version reviewed if feature flag ENABLE_DATASET_IMPORT is enabled
-            System.setProperty("ENABLE_DATASET_IMPORT", "true");
             // Given a collection with a dataset that has not been set to reviewed.
             Path collectionPath = Files.createTempDirectory(Random.id()); // create a temp directory to generate content into
             Collection collection = CollectionTest.createCollection(collectionPath, "isAllContentReviewed");
@@ -1528,23 +1524,14 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
             collection.getDescription().addDataset(dataset);
 
             // When isAllContentReviewed() is called
-            boolean allContentReviewed = collection.isAllContentReviewed();
+            boolean allContentReviewed = collection.isAllContentReviewed(true);
 
             // Then the result is false
             assertFalse(allContentReviewed);
-        } finally {
-            // Should only valid Dataset version reviewed if feature flag ENABLE_DATASET_IMPORT is enabled
-            System.clearProperty("ENABLE_DATASET_IMPORT");
-        }
     }
 
     @Test
     public void isAllContentReviewed_shouldReturnFalseWhenDatasetVersionNotReviewed() throws IOException, ZebedeeException {
-        try {
-            // FIXME CMD feature flag
-            // Should only valid Dataset version reviewed if feature flag ENABLE_DATASET_IMPORT is enabled
-            System.setProperty("ENABLE_DATASET_IMPORT", "true");
-
             // Given a collection with a dataset version that has not been set to reviewed.
             Path collectionPath = Files.createTempDirectory(Random.id()); // create a temp directory to generate content into
             Collection collection = CollectionTest.createCollection(collectionPath, "isAllContentReviewed");
@@ -1554,14 +1541,10 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
             collection.getDescription().addDatasetVersion(datasetVersion);
 
             // When isAllContentReviewed() is called
-            boolean allContentReviewed = collection.isAllContentReviewed();
+            boolean allContentReviewed = collection.isAllContentReviewed(true);
 
             // Then the result is false
             assertFalse(allContentReviewed);
-        } finally {
-            // Should only valid Dataset version reviewed if feature flag ENABLE_DATASET_IMPORT is enabled
-            System.clearProperty("ENABLE_DATASET_IMPORT");
-        }
     }
 
     @Test
@@ -1576,7 +1559,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         collection.getDescription().addDataset(dataset);
 
         // When isAllContentReviewed() is called
-        boolean allContentReviewed = collection.isAllContentReviewed();
+        boolean allContentReviewed = collection.isAllContentReviewed(false);
 
         // Then the result is true
         assertTrue(allContentReviewed);
@@ -1594,7 +1577,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         collection.getDescription().addDatasetVersion(datasetVersion);
 
         // When isAllContentReviewed() is called
-        boolean allContentReviewed = collection.isAllContentReviewed();
+        boolean allContentReviewed = collection.isAllContentReviewed(false);
 
         // Then the result is true
         assertTrue(allContentReviewed);
@@ -1731,29 +1714,29 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
     public void deleteDataJSONShouldDeletePreviousVersionFromReviewed() throws Exception {
         Collection c1 = createCollection(rootDir.getRoot().toPath(), "nargle");
 
-        assertTrue(c1.getComplete().getPath().resolve("a/b/c").toFile().mkdirs());
-        assertTrue(c1.getReviewed().getPath().resolve("a/b/c/previous/v1").toFile().mkdirs());
+        assertTrue(c1.getComplete().getPath().resolve("a/b/c/current").toFile().mkdirs());
+        assertTrue(c1.getReviewed().getPath().resolve("a/b/c/current/previous/v1").toFile().mkdirs());
 
-        Path uri = Paths.get("a/b/c");
+        Path uri = Paths.get("a/b/c/current");
         assertTrue(c1.getComplete().getPath().resolve(uri).resolve("data.json").toFile().createNewFile());
         assertTrue(c1.getComplete().getPath().resolve(uri).resolve("abc123.json").toFile().createNewFile());
         assertTrue(c1.getComplete().getPath().resolve(uri).resolve("abc123.xls").toFile().createNewFile());
 
         // mock a previous version of the content in the reviewed dir.
-        assertTrue(c1.getReviewed().getPath().resolve("a/b/c/previous/v1/data.json").toFile().createNewFile());
-        assertTrue(c1.getReviewed().getPath().resolve("a/b/c/previous/v1/abc123.json").toFile().createNewFile());
-        assertTrue(c1.getReviewed().getPath().resolve("a/b/c/previous/v1/abc123.xls").toFile().createNewFile());
+        assertTrue(c1.getReviewed().getPath().resolve("a/b/c/current/previous/v1/data.json").toFile().createNewFile());
+        assertTrue(c1.getReviewed().getPath().resolve("a/b/c/current/previous/v1/abc123.json").toFile().createNewFile());
+        assertTrue(c1.getReviewed().getPath().resolve("a/b/c/current/previous/v1/abc123.xls").toFile().createNewFile());
 
-        boolean deleteSuccessful = c1.deleteFileAndRelated("/a/b/c/data.json");
+        boolean deleteSuccessful = c1.deleteFileAndRelated("/a/b/c/current/data.json");
 
         assertTrue(deleteSuccessful);
         assertFalse(Files.exists(c1.getComplete().getPath().resolve("a/b/c/data.json")));
         assertFalse(Files.exists(c1.getComplete().getPath().resolve("a/b/c/abc123.json")));
         assertFalse(Files.exists(c1.getComplete().getPath().resolve("a/b/c/abc123.xls")));
 
-        assertFalse(Files.exists(c1.getReviewed().getPath().resolve("a/b/c/previous/v1/data.json")));
-        assertFalse(Files.exists(c1.getReviewed().getPath().resolve("a/b/c/previous/v1/abc123.json")));
-        assertFalse(Files.exists(c1.getReviewed().getPath().resolve("a/b/c/previous/v1/abc123.xld")));
+        assertFalse(Files.exists(c1.getReviewed().getPath().resolve("a/b/c/current/previous/v1/data.json")));
+        assertFalse(Files.exists(c1.getReviewed().getPath().resolve("a/b/c/current/previous/v1/abc123.json")));
+        assertFalse(Files.exists(c1.getReviewed().getPath().resolve("a/b/c/current/previous/v1/abc123.xlsx")));
     }
 
     public static Collection createCollection(Path destination, String collectionName) throws CollectionNotFoundException, IOException {

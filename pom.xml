@@ -105,16 +105,16 @@
 
             <!-- Main -->
             <dependency>
-                <groupId>com.github.davidcarboni</groupId>
+                <groupId>com.github.onsdigital</groupId>
                 <artifactId>restolino</artifactId>
-                <version>0.1.14</version>
+                <version>v0.2.1</version>
             </dependency>
 
             <!-- Cryptography -->
             <dependency>
-                <groupId>com.github.davidcarboni</groupId>
-                <artifactId>cryptolite</artifactId>
-                <version>1.3.2</version>
+                <groupId>com.github.onsdigital</groupId>
+                <artifactId>dp-cryptolite-java</artifactId>
+                <version>v1.4.0</version>
             </dependency>
 
             <!-- Any sub modules depending on Zebedee reader and content wrappers should depend on project version as all modules are released together under same version-->

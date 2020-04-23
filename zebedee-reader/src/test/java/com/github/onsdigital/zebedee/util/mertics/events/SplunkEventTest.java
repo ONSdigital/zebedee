@@ -1,6 +1,6 @@
 package com.github.onsdigital.zebedee.util.mertics.events;
 
-import com.github.davidcarboni.restolino.framework.HttpMethod;
+import com.github.davidcarboni.restolino.api.HttpMethod;
 import com.google.common.collect.ImmutableMap;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;

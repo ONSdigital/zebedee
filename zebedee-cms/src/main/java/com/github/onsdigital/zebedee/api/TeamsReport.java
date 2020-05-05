@@ -15,11 +15,12 @@ import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
-import org.springframework.http.HttpStatus;
+import org.apache.http.HttpStatus;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
+import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -29,7 +30,6 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static java.text.MessageFormat.format;
-import static org.springframework.http.MediaType.APPLICATION_OCTET_STREAM_VALUE;
 
 /**
  * API endpoint for generating Team members XLS report.
@@ -63,9 +63,9 @@ public class TeamsReport {
     public void getReport(HttpServletRequest request, HttpServletResponse response) throws IOException,
             BadRequestException, UnauthorizedException, ForbiddenException {
         Session session = serviceServiceSupplier.getService().get(request);
-        response.setContentType(APPLICATION_OCTET_STREAM_VALUE);
+        response.setContentType(MediaType.APPLICATION_OCTET_STREAM);
         response.setHeader(CONTENT_DISPOSITION_HEADER, format(CONTENT_DISPOSITION_VALUE, getDateString()));
-        response.setStatus(HttpStatus.OK.value());
+        response.setStatus(HttpStatus.SC_OK);
         createWorkbook(session, response);
     }
 

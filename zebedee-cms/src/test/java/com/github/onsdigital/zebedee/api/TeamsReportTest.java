@@ -36,8 +36,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-//import org.springframework.mock.web.MockHttpServletResponse;
-
 /**
  * Verify the behaviour of the {@link TeamsReport} API.
  */

@@ -5,18 +5,21 @@ import com.github.onsdigital.zebedee.service.ServiceSupplier;
 import com.github.onsdigital.zebedee.session.service.Sessions;
 import com.github.onsdigital.zebedee.teams.model.Team;
 import com.github.onsdigital.zebedee.teams.service.TeamsService;
+import org.apache.http.HttpStatus;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.junit.Test;
 import org.mockito.Mock;
-import javax.ws.rs.core.MediaType;
-import org.apache.http.HttpStatus;
-import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import javax.servlet.ServletOutputStream;
+import javax.servlet.WriteListener;
+import javax.ws.rs.core.MediaType;
 import java.io.ByteArrayInputStream;
-import java.io.InputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,6 +35,8 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+//import org.springframework.mock.web.MockHttpServletResponse;
 
 /**
  * Verify the behaviour of the {@link TeamsReport} API.
@@ -83,8 +88,6 @@ public class TeamsReportTest extends ZebedeeAPIBaseTestCase {
 
     @Test
     public void getReport_Success() throws Exception {
-        mockResponse = new MockHttpServletResponse();
-
         List<AbstractMap.SimpleEntry<String, String>> teamUserMapping = new ArrayList<>();
         teamUserMapping.add(create("ATeam", "userA"));
         teamUserMapping.add(create("ATeam", "userB"));
@@ -98,17 +101,17 @@ public class TeamsReportTest extends ZebedeeAPIBaseTestCase {
         when(teamsService.getTeamMembersSummary(session))
                 .thenReturn(teamUserMapping);
 
+        ByteArrayOutputStream content = new ByteArrayOutputStream(1024);
+        when(mockResponse.getOutputStream())
+                .thenReturn(new StubServletOutputStream(content));
+
         api.getReport(mockRequest, mockResponse);
 
-        MockHttpServletResponse response = (MockHttpServletResponse) mockResponse;
-        InputStream in = new ByteArrayInputStream(response.getContentAsByteArray());
-
-        HSSFWorkbook result = new HSSFWorkbook(in);
+        HSSFWorkbook result = new HSSFWorkbook(new ByteArrayInputStream(content.toByteArray()));
         HSSFSheet sheet = result.getSheetAt(0);
 
-        assertThat(response.getStatus(), equalTo(HttpStatus.SC_OK));
-        assertThat(response.getContentType(), equalTo(MediaType.APPLICATION_OCTET_STREAM));
-
+        verify(mockResponse, times(1)).setStatus(HttpStatus.SC_OK);
+        verify(mockResponse, times(1)).setContentType(MediaType.APPLICATION_OCTET_STREAM);
         verify(sessions, times(1)).get(mockRequest);
         verify(teamsService, times(1)).getTeamMembersSummary(session);
 
@@ -135,5 +138,34 @@ public class TeamsReportTest extends ZebedeeAPIBaseTestCase {
 
     private AbstractMap.SimpleEntry<String, String> create(String team, String user) {
         return new AbstractMap.SimpleEntry<String, String>(team, user);
+    }
+
+    private class StubServletOutputStream extends ServletOutputStream {
+        private OutputStream target;
+
+        public StubServletOutputStream(final OutputStream target) {
+            this.target = target;
+        }
+
+        @Override
+        public boolean isReady() {
+            return true;
+        }
+
+        @Override
+        public void setWriteListener(WriteListener writeListener) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void write(int b) throws IOException {
+            target.write(b);
+        }
+
+        @Override
+        public void flush() throws IOException {
+            super.flush();
+            target.flush();
+        }
     }
 }

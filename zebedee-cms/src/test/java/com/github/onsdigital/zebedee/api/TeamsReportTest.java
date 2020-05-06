@@ -10,8 +10,8 @@ import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
+import javax.ws.rs.core.MediaType;
+import org.apache.http.HttpStatus;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -106,8 +106,8 @@ public class TeamsReportTest extends ZebedeeAPIBaseTestCase {
         HSSFWorkbook result = new HSSFWorkbook(in);
         HSSFSheet sheet = result.getSheetAt(0);
 
-        assertThat(response.getStatus(), equalTo(HttpStatus.OK.value()));
-        assertThat(response.getContentType(), equalTo(MediaType.APPLICATION_OCTET_STREAM_VALUE));
+        assertThat(response.getStatus(), equalTo(HttpStatus.SC_OK));
+        assertThat(response.getContentType(), equalTo(MediaType.APPLICATION_OCTET_STREAM));
 
         verify(sessions, times(1)).get(mockRequest);
         verify(teamsService, times(1)).getTeamMembersSummary(session);

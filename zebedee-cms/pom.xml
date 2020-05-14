@@ -31,6 +31,7 @@
 
     <properties>
         <spring.version>5.2.5.RELEASE</spring.version>
+        <fasterxml.jackson.version>2.11.0</fasterxml.jackson.version>
     </properties>
 
     <dependencies>
@@ -175,6 +176,20 @@
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>26.0-jre</version>
+        </dependency>
+
+        <!-- Fasterxml Jackson dependencies - overrides vulnerable transitive dependencies
+        and declared explicitly to resolve conflicts in elasticsearch and dp-logging -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>${fasterxml.jackson.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+            <version>${fasterxml.jackson.version}</version>
         </dependency>
 
     </dependencies>

@@ -11,6 +11,15 @@ public class HomeContentItem {
     private String description;
     private Image image;
 
+    public HomeContentItem() {
+    }
+
+    public HomeContentItem(String Title, URI uri, String description) {
+        setTitle(title);
+        setUri(uri);
+        setDescription(description);
+    }
+
     public String getTitle() {
         return title;
     }
@@ -33,6 +42,14 @@ public class HomeContentItem {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public Image getImage() {
+        return image;
+    }
+
+    public void setImage(Image image) {
+        this.image = image;
     }
     
 }

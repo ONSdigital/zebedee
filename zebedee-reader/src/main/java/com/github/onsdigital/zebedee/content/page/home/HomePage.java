@@ -6,6 +6,7 @@ import com.github.onsdigital.zebedee.content.partial.markdown.MarkdownSection;
 import com.github.onsdigital.zebedee.content.util.ContentConstants;
 
 import java.util.List;
+import java.util.ArrayList;
 
 /**
  * Created by bren on 04/06/15.
@@ -26,6 +27,9 @@ public class HomePage extends TaxonomyNode {
     public HomePage() {
         intro = new MarkdownSection();
         intro.setTitle(ContentConstants.HOMEPAGE_INTRO_TITLE);
+
+        this.sections = new ArrayList<HomeSection>();
+        this.featuredContent = new ArrayList<HomeContentItem>();
     }
 
     @Override

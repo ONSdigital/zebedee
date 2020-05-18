@@ -6,6 +6,10 @@ public class Image {
 
     private URI uri;
 
+    public Image(URI uri) {
+        setUri(uri);
+    }
+
     public URI getUri() {
         return uri;
     }

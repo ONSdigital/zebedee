@@ -19,6 +19,7 @@ public class HomePage extends TaxonomyNode {
     private MarkdownSection intro;
 
     private List<HomeSection> sections;
+    private List<HomeContentItem> featuredContent;
 
     private String serviceMessage;
 
@@ -38,6 +39,14 @@ public class HomePage extends TaxonomyNode {
 
     public void setSections(List<HomeSection> sections) {
         this.sections = sections;
+    }
+
+    public List<HomeContentItem> getFeaturedContent() {
+        return featuredContent;
+    }
+
+    public void setFeaturedContent(List<HomeContentItem> featuredContent) {
+        this.featuredContent = featuredContent;
     }
 
     public MarkdownSection getIntro() {

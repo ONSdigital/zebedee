@@ -90,13 +90,27 @@
         <dependency>
             <groupId>com.github.onsdigital</groupId>
             <artifactId>dp-logging</artifactId>
-            <version>v1.6.0</version>
+            <version>v1.7.0</version>
         </dependency>
 
         <dependency>
             <groupId>com.github.onsdigital</groupId>
             <artifactId>dp-dataset-api-java-client</artifactId>
-            <version>v1.0.0</version>
+            <version>v1.1.0</version>
+        </dependency>
+
+        <!-- Fasterxml Jackson dependencies - overrides vulnerable transitive dependencies
+        and declared explicitly to resolve conflicts in elasticsearch and dp-logging -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>${fasterxml.jackson.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+            <version>${fasterxml.jackson.version}</version>
         </dependency>
 
     </dependencies>

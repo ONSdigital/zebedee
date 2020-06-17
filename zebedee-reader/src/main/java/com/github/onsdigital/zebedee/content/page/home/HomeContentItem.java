@@ -12,8 +12,8 @@ public class HomeContentItem {
     public HomeContentItem() {
     }
 
-    public HomeContentItem(String Title, URI uri, String description, String image) {
-        setTitle(Title);
+    public HomeContentItem(String title, URI uri, String description, String image) {
+        setTitle(title);
         setUri(uri);
         setDescription(description);
         setImage(image);

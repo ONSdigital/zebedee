@@ -1,7 +1,5 @@
 package com.github.onsdigital.zebedee.content.page.home;
 
-import com.github.onsdigital.zebedee.content.partial.Image;
-
 import java.net.URI;
 
 public class HomeContentItem {
@@ -9,15 +7,13 @@ public class HomeContentItem {
     private String title;
     private URI uri;
     private String description;
-    private Image image;
+    private String image;
 
-    public HomeContentItem() {
-    }
-
-    public HomeContentItem(String Title, URI uri, String description) {
-        setTitle(title);
+    public HomeContentItem(String Title, URI uri, String description, String image) {
+        setTitle(Title);
         setUri(uri);
         setDescription(description);
+        setImage(image);
     }
 
     public String getTitle() {
@@ -44,12 +40,11 @@ public class HomeContentItem {
         this.description = description;
     }
 
-    public Image getImage() {
+    public String getImage() {
         return image;
     }
 
-    public void setImage(Image image) {
+    public void setImage(String image) {
         this.image = image;
     }
-    
 }

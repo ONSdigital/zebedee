@@ -9,6 +9,9 @@ public class HomeContentItem {
     private String description;
     private String image;
 
+    public HomeContentItem() {
+    }
+
     public HomeContentItem(String Title, URI uri, String description, String image) {
         setTitle(Title);
         setUri(uri);

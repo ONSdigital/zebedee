@@ -60,7 +60,7 @@ requires a specific directory structure in order to function correctly.
 towards deprecating it._
 ***
 
-To save yourself some pain you can use the [dp-zebedee-utils/content][3] tool to create the required directory 
+To save yourself some pain you can use the [dp-zebedee-content][3] tool to create the required directory 
 structure and populate the CMS with some "default content" - follow the steps in the [README][3] before going any further.
  
 Once the script has run successfully copy the generated script from `dp-zebedee-utils/content/generated/run-cms.sh` into
@@ -85,7 +85,7 @@ Follow the steps in the README of each project.
 
 #### Zebedee content 
 Zebedee needs contents before it can be run. Basic demo content and file structures can be generated via the 
-[dp-zebedee-content](https://github.com/ONSdigital/dp-zebedee-content) by following the instructions in the 
+[dp-zebedee-content][3] by following the instructions in the 
 [dp-zebedee-content readme](https://github.com/ONSdigital/dp-zebedee-content/blob/master/README.md)
 
 #### Running zebedee 
@@ -169,7 +169,7 @@ If this is fails try again after regenerating an override key as it may have exp
 
 [1]: https://github.com/ONSdigital/babbage
 [2]: https://github.com/ONSdigital/florence
-[3]: https://github.com/ONSdigital/dp-zebedee-utils/tree/master/content
+[3]: https://github.com/ONSdigital/dp-zebedee-content
 [4]: http://localhost:8081/florence/login
 [5]: https://github.com/ONSdigital/sixteens
 [6]: https://github.com/ONSdigital/dp-compose

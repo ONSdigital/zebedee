@@ -2,8 +2,8 @@
 
 pushd zebedee
     if [[ "$APPLICATION" == "zebedee" ]]; then
-        make test-cms
+        make audit-cms
     elif [[ "$APPLICATION" == "zebedee-reader" ]]; then
-        make test-reader
+        make audit-reader
     fi
 popd

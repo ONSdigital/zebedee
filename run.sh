@@ -23,7 +23,7 @@ export DATASET_API_URL="http://localhost:22000"
 export DATASET_API_AUTH_TOKEN="FD0108EA-825D-411C-9B1D-41EF7727F465"
 
 # Development: reloadable
-mvn clean package dependency:copy-dependencies -Dmaven.test.skip=true && \
+mvn clean package dependency:copy-dependencies -Dmaven.test.skip=true -Dossindex.skip=true && \
 java $JAVA_OPTS \
  -Dlogback.configurationFile=zebedee-cms/target/classes/logback.xml \
  -Ddb_audit_url=$db_audit_url \

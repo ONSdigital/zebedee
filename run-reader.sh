@@ -19,7 +19,7 @@ export DATASET_API_AUTH_TOKEN="FD0108EA-825D-411C-9B1D-41EF7727F465"
 export FORMAT_LOGGING=true
 
 # Development: reloadable
-mvn clean package dependency:copy-dependencies -Dmaven.test.skip=true && \
+mvn clean package dependency:copy-dependencies -Dmaven.test.skip=true -Dossindex.skip=true && \
 java $JAVA_OPTS \
  -DFORMAT_LOGGING=$FORMAT_LOGGING \
  -Dlogback.configurationFile=zebedee-reader/target/classes/logback.xml \

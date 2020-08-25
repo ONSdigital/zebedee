@@ -17,18 +17,11 @@ import java.util.ArrayList;
  */
 public class HomePage extends TaxonomyNode {
 
-    private MarkdownSection intro;
-
-    private List<HomeSection> sections;
     private List<HomeContentItem> featuredContent;
 
     private String serviceMessage;
 
     public HomePage() {
-        intro = new MarkdownSection();
-        intro.setTitle(ContentConstants.HOMEPAGE_INTRO_TITLE);
-
-        this.sections = new ArrayList<HomeSection>();
         this.featuredContent = new ArrayList<HomeContentItem>();
     }
 
@@ -37,28 +30,12 @@ public class HomePage extends TaxonomyNode {
         return PageType.home_page;
     }
 
-    public List<HomeSection> getSections() {
-        return sections;
-    }
-
-    public void setSections(List<HomeSection> sections) {
-        this.sections = sections;
-    }
-
     public List<HomeContentItem> getFeaturedContent() {
         return featuredContent;
     }
 
-    public void setFeaturedContent(List<HomeContentItem> featuredContent) {
+    public void etFeaturedContent(List<HomeContentItem> featuredContent) {
         this.featuredContent = featuredContent;
-    }
-
-    public MarkdownSection getIntro() {
-        return intro;
-    }
-
-    public void setIntro(MarkdownSection intro) {
-        this.intro = intro;
     }
 
     public String getServiceMessage() {

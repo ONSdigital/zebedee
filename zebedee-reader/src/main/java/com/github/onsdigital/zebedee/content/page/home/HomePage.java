@@ -32,7 +32,7 @@ public class HomePage extends TaxonomyNode {
         return featuredContent;
     }
 
-    public void etFeaturedContent(List<HomeContentItem> featuredContent) {
+    public void setFeaturedContent(List<HomeContentItem> featuredContent) {
         this.featuredContent = featuredContent;
     }
 

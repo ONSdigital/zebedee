@@ -2,11 +2,9 @@ package com.github.onsdigital.zebedee.content.page.home;
 
 import com.github.onsdigital.zebedee.content.page.base.PageType;
 import com.github.onsdigital.zebedee.content.page.taxonomy.base.TaxonomyNode;
-import com.github.onsdigital.zebedee.content.partial.markdown.MarkdownSection;
-import com.github.onsdigital.zebedee.content.util.ContentConstants;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by bren on 04/06/15.

@@ -2,11 +2,9 @@ package com.github.onsdigital.zebedee.content.page.home;
 
 import com.github.onsdigital.zebedee.content.page.base.PageType;
 import com.github.onsdigital.zebedee.content.page.taxonomy.base.TaxonomyNode;
-import com.github.onsdigital.zebedee.content.partial.markdown.MarkdownSection;
-import com.github.onsdigital.zebedee.content.util.ContentConstants;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by bren on 04/06/15.
@@ -17,18 +15,11 @@ import java.util.ArrayList;
  */
 public class HomePage extends TaxonomyNode {
 
-    private MarkdownSection intro;
-
-    private List<HomeSection> sections;
     private List<HomeContentItem> featuredContent;
 
     private String serviceMessage;
 
     public HomePage() {
-        intro = new MarkdownSection();
-        intro.setTitle(ContentConstants.HOMEPAGE_INTRO_TITLE);
-
-        this.sections = new ArrayList<HomeSection>();
         this.featuredContent = new ArrayList<HomeContentItem>();
     }
 
@@ -37,28 +28,12 @@ public class HomePage extends TaxonomyNode {
         return PageType.home_page;
     }
 
-    public List<HomeSection> getSections() {
-        return sections;
-    }
-
-    public void setSections(List<HomeSection> sections) {
-        this.sections = sections;
-    }
-
     public List<HomeContentItem> getFeaturedContent() {
         return featuredContent;
     }
 
     public void setFeaturedContent(List<HomeContentItem> featuredContent) {
         this.featuredContent = featuredContent;
-    }
-
-    public MarkdownSection getIntro() {
-        return intro;
-    }
-
-    public void setIntro(MarkdownSection intro) {
-        this.intro = intro;
     }
 
     public String getServiceMessage() {

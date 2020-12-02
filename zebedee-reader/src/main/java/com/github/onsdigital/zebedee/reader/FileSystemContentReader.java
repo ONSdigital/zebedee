@@ -84,13 +84,12 @@ public class FileSystemContentReader implements ContentReader {
     /**
      * Determine the mime type of the file at the given path.
      *
-     * @param path
-     * @return
-     * @throws IOException
+     * @param path the file path of the content to check.
+     * @return the MIME type for the file, (default is application/octet-stream).
+     * @throws IOException error determining MIME type.
      */
     protected static String determineMimeType(Path path) throws IOException {
-        String mimeType = tika.detect(path);
-        return StringUtils.defaultIfEmpty(mimeType, DEFAULT_MIME_TYPE);
+        return StringUtils.defaultIfEmpty(tika.detect(path), DEFAULT_MIME_TYPE);
     }
 
     /**

@@ -19,10 +19,10 @@ import com.github.onsdigital.zebedee.util.PathUtils;
 import com.github.onsdigital.zebedee.util.URIUtils;
 import com.google.gson.JsonSyntaxException;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.tika.Tika;
 
 import java.io.IOException;
 import java.net.URI;
-import java.net.URLConnection;
 import java.nio.file.DirectoryStream;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -45,7 +45,6 @@ import static java.nio.file.Files.exists;
 import static java.nio.file.Files.isDirectory;
 import static java.nio.file.Files.newDirectoryStream;
 import static java.nio.file.Files.newInputStream;
-import static java.nio.file.Files.probeContentType;
 import static java.nio.file.Files.size;
 import static org.apache.commons.lang3.StringUtils.removeEnd;
 
@@ -58,6 +57,14 @@ import static org.apache.commons.lang3.StringUtils.removeEnd;
  * <p>
  */
 public class FileSystemContentReader implements ContentReader {
+
+    private static final String DEFAULT_MIME_TYPE = "application/octet-stream";
+
+    /**
+     * Apache TIKA is a library providing helper methods for determining the MIME type of files. Using this in place
+     * of {@link Files#probeContentType(Path)} due to know issues and bugs depending on the OS its used on.
+     */
+    private static Tika tika = new Tika();
 
     private final Path ROOT_FOLDER;
     private ContentLanguage language = ContentLanguage.en;
@@ -77,22 +84,12 @@ public class FileSystemContentReader implements ContentReader {
     /**
      * Determine the mime type of the file at the given path.
      *
-     * @param path
-     * @return
-     * @throws IOException
+     * @param path the file path of the content to check.
+     * @return the MIME type for the file, (default is application/octet-stream).
+     * @throws IOException error determining MIME type.
      */
     protected static String determineMimeType(Path path) throws IOException {
-        String mimeType = probeContentType(path);
-
-        // probeContentType returning null for a number of file types. (images on mac at least)
-        // using another method as a fallback.
-        if (mimeType == null)
-            mimeType = URLConnection.guessContentTypeFromName(path.getFileName().toString());
-
-        if (mimeType == null)
-            mimeType = "application/octet-stream";
-
-        return mimeType;
+        return StringUtils.defaultIfEmpty(tika.detect(path), DEFAULT_MIME_TYPE);
     }
 
     /**
@@ -224,7 +221,8 @@ public class FileSystemContentReader implements ContentReader {
     }
 
     @Override
-    public DirectoryStream<Path> getDirectoryStream(String path, String filter) throws BadRequestException, IOException {
+    public DirectoryStream<Path> getDirectoryStream(String path, String filter) throws
+            BadRequestException, IOException {
         Path node = resolvePath(path);
         return newDirectoryStream(node, filter);
     }

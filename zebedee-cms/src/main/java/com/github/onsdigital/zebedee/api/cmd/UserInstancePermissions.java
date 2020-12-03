@@ -12,7 +12,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
-import static com.github.onsdigital.zebedee.logging.CMSLogEvent.info;
 import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.internalServerErrorException;
 import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.sessionIDNotProvidedException;
 import static com.github.onsdigital.zebedee.util.JsonUtils.writeResponseEntity;
@@ -44,7 +43,6 @@ public class UserInstancePermissions extends PermissionsAPIBase {
 
     @Override
     public CRUD getPermissions(HttpServletRequest request, HttpServletResponse response) throws PermissionsException {
-        info().log("handling get user instance permissions request");
         validateRequest(request);
         GetPermissionsRequest getPermissionsRequest = new GetPermissionsRequest(request);
         return permissionsService.getUserInstancePermissions(getPermissionsRequest);
@@ -59,6 +57,5 @@ public class UserInstancePermissions extends PermissionsAPIBase {
         if (isEmpty(sessionID)) {
             throw sessionIDNotProvidedException();
         }
-        info().log("handling valid get user instance permissions request");
     }
 }

@@ -18,7 +18,6 @@ import java.io.IOException;
 
 import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.error;
-import static com.github.onsdigital.zebedee.logging.CMSLogEvent.info;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.warn;
 import static com.github.onsdigital.zebedee.service.ServiceTokenUtils.extractServiceAccountTokenFromAuthHeader;
 import static com.github.onsdigital.zebedee.service.ServiceTokenUtils.isValidServiceAuthorizationHeader;
@@ -92,7 +91,6 @@ public class Identity {
 
         try {
             UserIdentity identity = authorisationService.identifyUser(sessionID);
-            info().data("user", identity.getIdentifier()).log("authenticated user identity confirmed");
             writeResponseEntity(response, identity, SC_OK);
         } catch (UserIdentityException e) {
             error().logException(e, "identity endpoint: identify user failure, returning error response");
@@ -121,8 +119,6 @@ public class Identity {
             serviceAccount = serviceStore.get(serviceToken);
             if (serviceAccount == null) {
                 warn().log("service account not found for service token");
-            } else {
-                info().serviceAccountID(serviceAccount).log("identified valid service account");
             }
         } catch (Exception ex) {
             error().exception(ex).log("unexpected error getting service account from service store");

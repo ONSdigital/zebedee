@@ -12,7 +12,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
-import static com.github.onsdigital.zebedee.logging.CMSLogEvent.info;
 import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.datasetIDNotProvidedException;
 import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.internalServerErrorException;
 import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.serviceTokenNotProvidedException;
@@ -44,9 +43,6 @@ public class ServiceDatasetPermissions extends PermissionsAPIBase {
         GetPermissionsRequest getPermissionsRequest = new GetPermissionsRequest(request);
 
         validateGetPermissionsRequest(getPermissionsRequest);
-
-        info().datasetID(getPermissionsRequest.getDatasetID())
-                .log("handling get dataset permissions request for service account");
 
         return permissionsService.getServiceDatasetPermissions(getPermissionsRequest);
     }

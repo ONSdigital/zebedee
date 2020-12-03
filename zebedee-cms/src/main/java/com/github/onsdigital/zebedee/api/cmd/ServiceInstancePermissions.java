@@ -12,7 +12,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
-import static com.github.onsdigital.zebedee.logging.CMSLogEvent.info;
 import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.serviceTokenNotProvidedException;
 import static com.github.onsdigital.zebedee.util.JsonUtils.writeResponseEntity;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
@@ -43,7 +42,6 @@ public class ServiceInstancePermissions extends PermissionsAPIBase {
 
     @Override
     public CRUD getPermissions(HttpServletRequest request, HttpServletResponse response) throws PermissionsException {
-        info().log("handling get service instance permissions request");
         validateRequest(request);
         GetPermissionsRequest getPermissionsRequest = new GetPermissionsRequest(request);
         return permissionsService.getServiceInstancePermissions(getPermissionsRequest);
@@ -58,7 +56,5 @@ public class ServiceInstancePermissions extends PermissionsAPIBase {
         if (isEmpty(serviceToken)) {
             throw serviceTokenNotProvidedException();
         }
-
-        info().log("handling valid service instance permissions request");
     }
 }

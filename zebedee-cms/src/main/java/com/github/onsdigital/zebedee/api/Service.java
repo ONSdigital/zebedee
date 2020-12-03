@@ -18,9 +18,8 @@ import javax.ws.rs.POST;
 import java.io.IOException;
 import java.util.function.Supplier;
 
-import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.warn;
-import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
+import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
 import static com.github.onsdigital.zebedee.util.JsonUtils.writeResponseEntity;
 import static org.apache.http.HttpStatus.SC_CREATED;
 import static org.apache.http.HttpStatus.SC_NOT_FOUND;
@@ -57,19 +56,17 @@ public class Service {
             NotFoundException, UnauthorizedException {
         // FIXME CMD feature.
         if (!datasetImportEnabled) {
-            warn().data("responseStatus", SC_NOT_FOUND).log("service post endpoint: endpoint is not supported as feature EnableDatasetImport is disabled");
+            warn().data("responseStatus", SC_NOT_FOUND)
+                    .log("service post endpoint: endpoint is not supported as feature EnableDatasetImport is disabled");
             writeResponseEntity(response, NOT_FOUND_ERR, SC_NOT_FOUND);
             return;
         }
-
-        info().log("feature EnableDatasetImport is enabled");
 
         final Session session = getSessions().get(request);
         if (session != null && getPermissionsService().isAdministrator(session)) {
             final ServiceStore serviceStoreImpl = getServiceStore();
             final String token = randomIdGenerator.get();
             ServiceAccount service = serviceStoreImpl.store(token, request.getInputStream());
-            info().data("id", service.getID()).log("service post endpoint: new service account created");
             writeResponseEntity(response, new ServiceAccountWithToken(service.getID(), token), SC_CREATED);
             return;
         }

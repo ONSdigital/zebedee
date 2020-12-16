@@ -1,6 +1,8 @@
 package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
+import com.github.onsdigital.zebedee.exceptions.CollectionNotFoundException;
+import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.CollectionDetail;
 import com.github.onsdigital.zebedee.model.Collection;
@@ -16,7 +18,15 @@ import java.io.IOException;
 @Api
 public class PublishingQueueCollectionDetails {
 
-    private static ZebedeeCmsService zebedeeCmsService = ZebedeeCmsService.getInstance();
+    private ZebedeeCmsService zebedeeCmsService;
+
+    public PublishingQueueCollectionDetails() {
+        zebedeeCmsService = ZebedeeCmsService.getInstance();
+    }
+
+    public PublishingQueueCollectionDetails(ZebedeeCmsService zebedeeCmsService) {
+        this.zebedeeCmsService = zebedeeCmsService;
+    }
 
     /**
      * Retrieves a CollectionDetail object at the endpoint /PublishingQueueCollectionDetails/[CollectionName]
@@ -32,18 +42,15 @@ public class PublishingQueueCollectionDetails {
     public CollectionDetail get(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ZebedeeException {
 
-        Collection collection = Collections
-                .getCollection(request);
+        Collection collection = zebedeeCmsService.getCollection(request);
 
         if (collection == null) {
-            response.setStatus(HttpStatus.NOT_FOUND_404);
-            return null;
+            throw new CollectionNotFoundException("collection not found");
         }
 
         Session session = zebedeeCmsService.getSession(request);
-        if (!zebedeeCmsService.getPermissions().canView(session.getEmail(), collection.getDescription())) {
-            response.setStatus(HttpStatus.UNAUTHORIZED_401);
-            return null;
+        if (session == null || !zebedeeCmsService.getPermissions().canView(session.getEmail(), collection.getDescription())) {
+            throw new UnauthorizedException("unauthorised call to get publishing queue collection details");
         }
 
         CollectionDetail result = new CollectionDetail();
@@ -53,7 +60,6 @@ public class PublishingQueueCollectionDetails {
         result.setType(collection.getDescription().getType());
         result.setPublishDate(collection.getDescription().getPublishDate());
         result.setReleaseUri(collection.getDescription().getReleaseUri());
-
         result.approvalStatus = collection.getDescription().approvalStatus;
 
         return result;

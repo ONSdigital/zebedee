@@ -3,6 +3,7 @@ package com.github.onsdigital.zebedee.api;
 import com.github.davidcarboni.restolino.framework.Api;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.CollectionDetail;
+import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.util.ZebedeeCmsService;
 import org.eclipse.jetty.http.HttpStatus;
@@ -31,7 +32,7 @@ public class PublishingQueueCollectionDetails {
     public CollectionDetail get(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ZebedeeException {
 
-        com.github.onsdigital.zebedee.model.Collection collection = Collections
+        Collection collection = Collections
                 .getCollection(request);
 
         if (collection == null) {

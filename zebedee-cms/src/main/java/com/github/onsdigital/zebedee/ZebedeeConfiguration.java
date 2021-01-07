@@ -16,6 +16,7 @@ import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
 import com.github.onsdigital.zebedee.service.DatasetService;
 import com.github.onsdigital.zebedee.service.ServiceStoreImpl;
 import com.github.onsdigital.zebedee.service.ZebedeeDatasetService;
+import com.github.onsdigital.zebedee.session.service.NewSessionsServiceImpl;
 import com.github.onsdigital.zebedee.session.service.Sessions;
 import com.github.onsdigital.zebedee.session.service.SessionsServiceImpl;
 import com.github.onsdigital.zebedee.teams.service.TeamsService;
@@ -27,6 +28,8 @@ import com.github.onsdigital.zebedee.user.store.UserStoreFileSystemImpl;
 import com.github.onsdigital.zebedee.util.versioning.VersionsService;
 import com.github.onsdigital.zebedee.util.versioning.VersionsServiceImpl;
 import com.github.onsdigital.zebedee.verification.VerificationAgent;
+import com.session.service.client.SessionClient;
+import com.session.service.client.SessionClientImpl;
 import dp.api.dataset.DatasetAPIClient;
 import dp.api.dataset.DatasetClient;
 
@@ -80,6 +83,7 @@ public class ZebedeeConfiguration {
     private DataIndex dataIndex;
     private PermissionsStore permissionsStore;
     private DatasetService datasetService;
+    private SessionClient sessionClient;
 
     private static Path createDir(Path root, String dirName) throws IOException {
         Path dir = root.resolve(dirName);
@@ -128,7 +132,9 @@ public class ZebedeeConfiguration {
         this.dataIndex = new DataIndex(new FileSystemContentReader(publishedContentPath));
         this.publishedCollections = new PublishedCollections(publishedCollectionsPath);
         this.applicationKeys = new ApplicationKeys(applicationKeysPath);
-        this.sessions = new SessionsServiceImpl(sessionsPath);
+        this.sessionClient = new SessionClientImpl("host", "token");
+        //this.sessions = new SessionsServiceImpl(sessionsPath);
+        this.sessions = new NewSessionsServiceImpl(sessionClient);
         this.keyringCache = new KeyringCache(sessions);
 
         this.teamsService = new TeamsServiceImpl(

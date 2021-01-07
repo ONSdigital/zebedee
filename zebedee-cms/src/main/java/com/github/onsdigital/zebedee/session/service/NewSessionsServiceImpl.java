@@ -13,7 +13,11 @@ import java.util.Date;
 
 public class NewSessionsServiceImpl implements Sessions {
 
-    private SessionClient client = new SessionClientImpl("host", "auth");
+    private SessionClient client;
+
+    public NewSessionsServiceImpl(SessionClient sessionClient) {
+        this.client = sessionClient;
+    }
 
     /**
      * Create a new {@link Session} for the user.

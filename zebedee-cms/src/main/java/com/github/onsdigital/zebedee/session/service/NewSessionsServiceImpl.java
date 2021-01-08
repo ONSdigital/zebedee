@@ -117,7 +117,7 @@ public class NewSessionsServiceImpl implements Sessions {
     }
 
     private Session createZebedeeSession(com.session.service.Session clientSession) {
-        Session session = null;
+        Session session = new Session();
         session.setId(clientSession.getId());
         session.setEmail(clientSession.getEmail());
         session.setLastAccess(clientSession.getLastAccess());

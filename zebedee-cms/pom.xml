@@ -192,8 +192,8 @@
         </dependency>
 
         <dependency>
-            <groupId>com.github.ONSdigital</groupId>
-            <artifactId>dp-sessions-client-java</artifactId>
+            <groupId>com.github.onsdigital</groupId>
+            <artifactId>dp-session-service-client-java</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
 

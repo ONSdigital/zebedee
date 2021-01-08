@@ -28,6 +28,7 @@ import com.github.onsdigital.zebedee.user.store.UserStoreFileSystemImpl;
 import com.github.onsdigital.zebedee.util.versioning.VersionsService;
 import com.github.onsdigital.zebedee.util.versioning.VersionsServiceImpl;
 import com.github.onsdigital.zebedee.verification.VerificationAgent;
+import com.session.service.client.Http;
 import com.session.service.client.SessionClient;
 import com.session.service.client.SessionClientImpl;
 import dp.api.dataset.DatasetAPIClient;
@@ -132,7 +133,7 @@ public class ZebedeeConfiguration {
         this.dataIndex = new DataIndex(new FileSystemContentReader(publishedContentPath));
         this.publishedCollections = new PublishedCollections(publishedCollectionsPath);
         this.applicationKeys = new ApplicationKeys(applicationKeysPath);
-        this.sessionClient = new SessionClientImpl("host", "token");
+        this.sessionClient = new SessionClientImpl(Configuration.getSessionsApiUrl(), Configuration.getServiceAuthToken(), new Http());
         //this.sessions = new SessionsServiceImpl(sessionsPath);
         this.sessions = new NewSessionsServiceImpl(sessionClient);
         this.keyringCache = new KeyringCache(sessions);

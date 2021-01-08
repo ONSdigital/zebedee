@@ -31,6 +31,10 @@ public class NewSessionsServiceImpl implements Sessions {
         SessionCreated sessionCreated = client.createNewSession(user.getEmail());
         com.session.service.Session clientSession = client.getSessionByID(sessionCreated.getId());
 
+        if (clientSession == null) {
+            throw new IOException();
+        }
+
         Session session = createZebedeeSession(clientSession);
         return session;
     }
@@ -113,7 +117,7 @@ public class NewSessionsServiceImpl implements Sessions {
     }
 
     private Session createZebedeeSession(com.session.service.Session clientSession) {
-        Session session = new Session();
+        Session session = null;
         session.setId(clientSession.getId());
         session.setEmail(clientSession.getEmail());
         session.setLastAccess(clientSession.getLastAccess());

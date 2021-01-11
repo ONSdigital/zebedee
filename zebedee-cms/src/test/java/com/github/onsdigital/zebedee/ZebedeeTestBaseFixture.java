@@ -4,9 +4,14 @@ import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDao;
 import com.github.onsdigital.zebedee.service.ServiceSupplier;
+import com.github.onsdigital.zebedee.session.service.NewSessionsServiceImpl;
 import com.github.onsdigital.zebedee.user.model.User;
 import com.github.onsdigital.zebedee.user.model.UserList;
 import com.github.onsdigital.zebedee.user.service.UsersService;
+import com.session.service.Session;
+import com.session.service.ZebedeeSession;
+import com.session.service.client.SessionClient;
+import com.session.service.entities.SessionCreated;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -17,10 +22,13 @@ import org.mockito.stubbing.Answer;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import javax.crypto.SecretKey;
+import java.sql.Time;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.when;
 
@@ -40,6 +48,9 @@ public abstract class ZebedeeTestBaseFixture {
 
     @Mock
     private PermissionsService permissionsService;
+
+    @Mock
+    private SessionClient client;
 
     protected Zebedee zebedee;
     protected Builder builder;
@@ -61,6 +72,8 @@ public abstract class ZebedeeTestBaseFixture {
         ReflectionTestUtils.setField(zebedee, "usersService", usersService);
         ReflectionTestUtils.setField(zebedee.getPermissionsService(), "usersServiceSupplier", usersServiceServiceSupplier);
 
+        ReflectionTestUtils.setField(zebedee, "sessions", new NewSessionsServiceImpl(client));
+
         ServiceSupplier<CollectionHistoryDao> collectionHistoryDaoServiceSupplier = () -> collectionHistoryDao;
 
         Collection.setCollectionHistoryDaoServiceSupplier(collectionHistoryDaoServiceSupplier);
@@ -78,10 +91,22 @@ public abstract class ZebedeeTestBaseFixture {
         when(usersService.list())
                 .thenReturn(usersList);
 
+        Session session = new ZebedeeSession();
+        session.setId("1234");
+        session.setEmail("test@test.com");
+        session.setStart(new Date());
+        session.setLastAccess(new Date());
+
+        SessionCreated sessionCreated = new SessionCreated("uri", "1234");
+
+        when(client.createNewSession(anyString())).thenReturn(sessionCreated);
+        when(client.getSessionByID(anyString())).thenReturn(session);
+        when(client.getSessionByEmail(anyString())).thenReturn(session);
+
         Map<String, String> emailToCreds = new HashMap<>();
         emailToCreds.put(builder.publisher1.getEmail(), builder.publisher1Credentials.password);
 
-        // UsersService is now mocked so needs to add this mannually.
+        // UsersService is now mocked so needs to add this manually.
         doAnswer(new Answer() {
             @Override
             public Object answer(InvocationOnMock invocationOnMock) throws Throwable {

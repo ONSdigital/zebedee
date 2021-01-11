@@ -4,14 +4,12 @@ import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDao;
 import com.github.onsdigital.zebedee.service.ServiceSupplier;
+import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.session.service.NewSessionsServiceImpl;
+import com.github.onsdigital.zebedee.session.service.Sessions;
 import com.github.onsdigital.zebedee.user.model.User;
 import com.github.onsdigital.zebedee.user.model.UserList;
 import com.github.onsdigital.zebedee.user.service.UsersService;
-import com.session.service.Session;
-import com.session.service.ZebedeeSession;
-import com.session.service.client.SessionClient;
-import com.session.service.entities.SessionCreated;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -22,6 +20,10 @@ import org.mockito.stubbing.Answer;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import javax.crypto.SecretKey;
+import javax.servlet.http.HttpServletRequest;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.sql.Time;
 import java.util.Date;
 import java.util.HashMap;
@@ -50,7 +52,7 @@ public abstract class ZebedeeTestBaseFixture {
     private PermissionsService permissionsService;
 
     @Mock
-    private SessionClient client;
+    private NewSessionsServiceImpl newSessionsService;
 
     protected Zebedee zebedee;
     protected Builder builder;
@@ -71,8 +73,7 @@ public abstract class ZebedeeTestBaseFixture {
 
         ReflectionTestUtils.setField(zebedee, "usersService", usersService);
         ReflectionTestUtils.setField(zebedee.getPermissionsService(), "usersServiceSupplier", usersServiceServiceSupplier);
-
-        ReflectionTestUtils.setField(zebedee, "sessions", new NewSessionsServiceImpl(client));
+        ReflectionTestUtils.setField(zebedee, "sessions", newSessionsService);
 
         ServiceSupplier<CollectionHistoryDao> collectionHistoryDaoServiceSupplier = () -> collectionHistoryDao;
 
@@ -91,17 +92,15 @@ public abstract class ZebedeeTestBaseFixture {
         when(usersService.list())
                 .thenReturn(usersList);
 
-        Session session = new ZebedeeSession();
+        Session session = new Session();
+        session.setEmail(builder.publisher1.getEmail());
         session.setId("1234");
-        session.setEmail("test@test.com");
-        session.setStart(new Date());
         session.setLastAccess(new Date());
+        session.setStart(new Date());
 
-        SessionCreated sessionCreated = new SessionCreated("uri", "1234");
-
-        when(client.createNewSession(anyString())).thenReturn(sessionCreated);
-        when(client.getSessionByID(anyString())).thenReturn(session);
-        when(client.getSessionByEmail(anyString())).thenReturn(session);
+        when(newSessionsService.create(any(User.class))).thenReturn(session);
+        when(newSessionsService.get(anyString())).thenReturn(session);
+        when(newSessionsService.find(anyString())).thenReturn(session);
 
         Map<String, String> emailToCreds = new HashMap<>();
         emailToCreds.put(builder.publisher1.getEmail(), builder.publisher1Credentials.password);

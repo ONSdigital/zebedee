@@ -37,7 +37,7 @@ public class KeyringCacheTest extends ZebedeeTestBaseFixture {
         Keyring keyring = zebedee.getKeyringCache().get(user);
 
         // Then
-        // We sholud be able to get the user's keyring
+        // We should be able to get the user's keyring
         assertNotNull(keyring);
         assertTrue(keyring.isUnlocked());
     }

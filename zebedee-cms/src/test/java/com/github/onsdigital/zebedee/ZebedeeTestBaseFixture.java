@@ -2,12 +2,10 @@ package com.github.onsdigital.zebedee;
 
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.KeyringCache;
-import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDao;
 import com.github.onsdigital.zebedee.service.ServiceSupplier;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.session.service.NewSessionsServiceImpl;
-import com.github.onsdigital.zebedee.session.service.Sessions;
 import com.github.onsdigital.zebedee.user.model.User;
 import com.github.onsdigital.zebedee.user.model.UserList;
 import com.github.onsdigital.zebedee.user.service.UsersService;
@@ -21,11 +19,6 @@ import org.mockito.stubbing.Answer;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import javax.crypto.SecretKey;
-import javax.servlet.http.HttpServletRequest;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.sql.Time;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -48,9 +41,6 @@ public abstract class ZebedeeTestBaseFixture {
 
     @Mock
     private CollectionHistoryDao collectionHistoryDao;
-
-    @Mock
-    private PermissionsService permissionsService;
 
     @Mock
     private NewSessionsServiceImpl newSessionsService;

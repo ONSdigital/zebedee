@@ -7,6 +7,8 @@ import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.user.model.User;
 import org.junit.Test;
 
+import java.util.Date;
+
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -17,10 +19,20 @@ import static org.junit.Assert.assertTrue;
 public class KeyringCacheTest extends ZebedeeTestBaseFixture {
 
     private KeyringCache keyringCache;
+    private Session session;
+    private User user;
 
     @Override
     public void setUp() throws Exception {
         keyringCache = zebedee.getKeyringCache();
+
+        user = user();
+
+        session = new Session();
+        session.setEmail(builder.publisher1.getEmail());
+        session.setId("1234");
+        session.setLastAccess(new Date());
+        session.setStart(new Date());
     }
 
     @Test
@@ -28,8 +40,6 @@ public class KeyringCacheTest extends ZebedeeTestBaseFixture {
 
         // Given
         // A user with a session
-        User user = user();
-        Session session = builder.createSession(user);
 
         // When
         // We put the user's keyring
@@ -49,7 +59,7 @@ public class KeyringCacheTest extends ZebedeeTestBaseFixture {
         // A null user and missing session
         User nullUser = null;
         User noSessionUser = user();
-        Session session = null;
+        session = null;
 
         // When
         // We put the user's keyring
@@ -87,7 +97,7 @@ public class KeyringCacheTest extends ZebedeeTestBaseFixture {
         // Given
         // A keyring in the cache
         User user = user();
-        Session session = builder.createSession(user);
+
         keyringCache.put(user, session);
 
         // When
@@ -106,7 +116,7 @@ public class KeyringCacheTest extends ZebedeeTestBaseFixture {
         // A null session and user not in the cache
         Session nullSession = null;
         User user = user();
-        Session notInCacheSession = builder.createSession(user);
+        Session notInCacheSession = session;
 
         // When
         // We put the user's keyring

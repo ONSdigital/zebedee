@@ -134,7 +134,6 @@ public class ZebedeeConfiguration {
         this.publishedCollections = new PublishedCollections(publishedCollectionsPath);
         this.applicationKeys = new ApplicationKeys(applicationKeysPath);
         this.sessionClient = new SessionClientImpl(Configuration.getSessionsApiUrl(), Configuration.getServiceAuthToken(), new Http());
-        //this.sessions = new SessionsServiceImpl(sessionsPath);
         this.sessions = new NewSessionsServiceImpl(sessionClient);
         this.keyringCache = new KeyringCache(sessions);
 

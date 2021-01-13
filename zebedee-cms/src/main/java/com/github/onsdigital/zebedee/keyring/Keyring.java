@@ -1,33 +1,30 @@
 package com.github.onsdigital.zebedee.keyring;
 
-import com.github.onsdigital.zebedee.model.Collection;
-
 import javax.crypto.SecretKey;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
-public interface Keyring {
+public class Keyring {
 
-    /**
-     * Added a new {@link Collection} encryption key to the keyring.
-     *
-     * @param collection the {@link Collection} the encryption key belongs to (required, not null).
-     * @param collectionKey  the {@link SecretKey} to decrypt the collection content.
-     * @throws KeyringException problem adding secret key to keyring.
-     */
-    void add(final Collection collection, final SecretKey collectionKey) throws KeyringException;
+    private Map<String, SecretKey> keys;
 
-    /**
-     * Get the encrption key for the specified collection if it exists in the keyring. Otherwise return null.
-     *
-     * @param collection the {@link Collection} get the encyption key for (required, not null).
-     * @return
-     * @throws KeyringException problem getting the {@link SecretKey} for the collection.
-     */
-    SecretKey get(final Collection collection) throws KeyringException;
+    Keyring() {
+        this(new ConcurrentHashMap<>());
+    }
 
-    /**
-     * @param collection
-     * @return
-     * @throws KeyringException
-     */
-    boolean remove(final Collection collection) throws KeyringException;
+    Keyring(final Map<String, SecretKey> keys) {
+        this.keys = keys;
+    }
+
+    boolean isEmpty() {
+        return keys.isEmpty();
+    }
+
+    void add(String collectionID, SecretKey collectionKey) {
+        this.keys.put(collectionID, collectionKey);
+    }
+
+    SecretKey get(String collectionID) {
+        return this.keys.get(collectionID);
+    }
 }

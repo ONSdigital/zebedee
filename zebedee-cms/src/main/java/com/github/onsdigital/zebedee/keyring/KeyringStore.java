@@ -1,8 +1,10 @@
 package com.github.onsdigital.zebedee.keyring;
 
-import java.security.KeyException;
+import com.github.onsdigital.zebedee.model.Collection;
+
+import javax.crypto.SecretKey;
 
 public interface KeyringStore {
 
-    void write(Keyring keyring) throws KeyException;
+    boolean save(Collection collection, SecretKey collectionKey) throws KeyringException;
 }

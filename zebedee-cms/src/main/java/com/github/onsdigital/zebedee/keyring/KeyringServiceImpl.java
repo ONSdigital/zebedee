@@ -3,25 +3,46 @@ package com.github.onsdigital.zebedee.keyring;
 import com.github.onsdigital.zebedee.model.Collection;
 
 import javax.crypto.SecretKey;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReentrantLock;
 
-public class KeyringImpl implements Keyring {
+public class KeyringServiceImpl implements KeyringService {
 
-    private transient SecretKey secretKey;
+    private transient ReentrantLock lock;
     private transient KeyringStore store;
-    private Map<String, SecretKey> cache;
+    private transient Keyring cache;
 
-    public KeyringImpl(final KeyringStore store, final SecretKey secretKey) {
+    public KeyringServiceImpl(final KeyringStore store) {
+        this.lock = new ReentrantLock();
         this.store = store;
-        this.secretKey = secretKey;
-        this.cache = new ConcurrentHashMap<>();
+        this.cache = new Keyring();
+    }
+
+    public KeyringServiceImpl(final KeyringStore store, Keyring cache) {
+        this.lock = new ReentrantLock();
+        this.store = store;
+        this.cache = cache;
     }
 
     @Override
     public void add(Collection collection, SecretKey collectionKey) throws KeyringException {
         validateParam(collection);
         validateParam(collectionKey);
+
+        addNewKeyToKeyring(collection, collectionKey);
+    }
+
+    private void addNewKeyToKeyring(Collection collection, SecretKey collectionKey) throws KeyringException {
+        lock.lock();
+        try {
+            boolean writeSuccessful = store.save(collection, collectionKey);
+            if (!writeSuccessful) {
+                throw new KeyringException("updating keyring was unsuccessful", collection.getDescription().getId());
+            }
+
+            this.cache.add(collection.getDescription().getId(), collectionKey);
+        } finally {
+            lock.unlock();
+        }
     }
 
     @Override

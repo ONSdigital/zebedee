@@ -19,7 +19,7 @@ import static org.junit.Assert.*;
 /**
  * Tests for {@link Keyring}.
  */
-public class KeyringTest {
+public class KeyringImplTest {
 
     String password;
     Keyring generated;

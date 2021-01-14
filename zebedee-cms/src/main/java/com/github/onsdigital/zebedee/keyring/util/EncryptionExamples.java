@@ -21,8 +21,12 @@ public class EncryptionExamples {
     static Path OUTPUT_FILE = BASE_PATH.resolve("encrypted-file.json");
 
     public static void main(String[] args) throws Exception {
-        encrypt("You can't kill Joey Rammone");
-        System.out.println("Decrypted file: " + decrypt());
+        generateSecretKeyFile();
+        generateIV();
+
+
+     //   encrypt("You can't kill Joey Rammone");
+      //  System.out.println("Decrypted file: " + decrypt());
     }
 
     static void encrypt(String message) throws Exception {

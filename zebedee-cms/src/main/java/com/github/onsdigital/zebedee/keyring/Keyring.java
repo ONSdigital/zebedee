@@ -1,30 +1,14 @@
 package com.github.onsdigital.zebedee.keyring;
 
+import com.github.onsdigital.zebedee.model.Collection;
+
 import javax.crypto.SecretKey;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
-public class Keyring {
+public interface Keyring {
 
-    private Map<String, SecretKey> keys;
+    void add(final Collection collection, final SecretKey secretKey) throws KeyringException;
 
-    Keyring() {
-        this(new ConcurrentHashMap<>());
-    }
+    SecretKey get(final Collection collection) throws KeyringException;
 
-    Keyring(final Map<String, SecretKey> keys) {
-        this.keys = keys;
-    }
-
-    boolean isEmpty() {
-        return keys.isEmpty();
-    }
-
-    void add(String collectionID, SecretKey collectionKey) {
-        this.keys.put(collectionID, collectionKey);
-    }
-
-    SecretKey get(String collectionID) {
-        return this.keys.get(collectionID);
-    }
+    void remove(final Collection collection) throws KeyringException;
 }

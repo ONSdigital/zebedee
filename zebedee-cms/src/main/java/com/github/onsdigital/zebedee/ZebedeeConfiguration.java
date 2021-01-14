@@ -50,7 +50,6 @@ import static com.github.onsdigital.zebedee.Zebedee.SESSIONS;
 import static com.github.onsdigital.zebedee.Zebedee.TEAMS;
 import static com.github.onsdigital.zebedee.Zebedee.USERS;
 import static com.github.onsdigital.zebedee.Zebedee.ZEBEDEE;
-import static com.github.onsdigital.zebedee.configuration.Configuration.getKeyringSecretKey;
 import static com.github.onsdigital.zebedee.permissions.store.PermissionsStoreFileSystemImpl.initialisePermissions;
 
 /**
@@ -131,17 +130,6 @@ public class ZebedeeConfiguration {
         }
 
         this.useVerificationAgent = enableVerificationAgent;
-
-        // Create the services and objects...
-        this.keyringEncryptionKey = getKeyringSecretKey();
-        if (keyringEncryptionKey == null) {
-            throw new RuntimeException("failed to load keyring secret key from application configuration");
-        }
-
-        this.keyringInitVector = getKeyringInitVector();
-        if (keyringInitVector == null) {
-            throw new RuntimeException("failed to load keyring initialization vector in from application configuration");
-        }
 
         this.dataIndex = new DataIndex(new FileSystemContentReader(publishedContentPath));
         this.publishedCollections = new PublishedCollections(publishedCollectionsPath);

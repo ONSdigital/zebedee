@@ -1,5 +1,6 @@
-package com.github.onsdigital.zebedee.keyring.util;
+package com.github.onsdigital.zebedee.playground;
 
+import com.github.onsdigital.zebedee.configuration.Configuration;
 import org.apache.commons.io.FileUtils;
 
 import javax.crypto.Cipher;
@@ -20,13 +21,30 @@ public class EncryptionExamples {
     static Path IV_FILE = BASE_PATH.resolve("init-vector");
     static Path OUTPUT_FILE = BASE_PATH.resolve("encrypted-file.json");
 
+    public static void testSecretKeys() {
+        SecretKey secretKey = Configuration.getCollectionKeyringSecretKey();
+        IvParameterSpec iv = Configuration.getCollectionKeyringInitVector();
+
+        try {
+            System.out.println("Decrypted test file: " + decrypt(secretKey, iv));
+        } catch (Exception ex) {
+            System.out.println("failed to decrypt test file " + ex.getMessage());
+        }
+
+    }
+
     public static void main(String[] args) throws Exception {
         generateSecretKeyFile();
         generateIV();
 
 
-     //   encrypt("You can't kill Joey Rammone");
-      //  System.out.println("Decrypted file: " + decrypt());
+        encrypt("Master of puppets is pulling your strings");
+
+
+        SecretKey secretKey = Configuration.getCollectionKeyringSecretKey();
+        IvParameterSpec iv = Configuration.getCollectionKeyringInitVector();
+
+        System.out.println("Decrypted file: " + decrypt(secretKey, iv));
     }
 
     static void encrypt(String message) throws Exception {
@@ -40,10 +58,7 @@ public class EncryptionExamples {
         FileUtils.writeByteArrayToFile(OUTPUT_FILE.toFile(), encryptedBytes);
     }
 
-    static String decrypt() throws Exception {
-        SecretKey secretKey = loadSecretKey();
-        IvParameterSpec iv = loadInitVector();
-
+    static String decrypt(SecretKey secretKey, IvParameterSpec iv) throws Exception {
         Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
         cipher.init(Cipher.DECRYPT_MODE, secretKey, iv);
 

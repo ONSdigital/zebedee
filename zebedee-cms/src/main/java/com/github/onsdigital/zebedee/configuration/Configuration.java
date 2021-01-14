@@ -176,8 +176,8 @@ public class Configuration {
         return StringUtils.defaultIfBlank(getValue("db_audit_password"), "");
     }
 
-    public static SecretKey getKeyringSecretKey() {
-        String s = getValue("KEYRING_SECRET_KEY");
+    public static SecretKey getCollectionKeyringSecretKey() {
+        String s = getValue("COLLECTION_KEYRING_SECRET_KEY");
         if (StringUtils.isEmpty(s)) {
             return null;
         }
@@ -186,8 +186,8 @@ public class Configuration {
         return new SecretKeySpec(keyBytes, 0, keyBytes.length, "AES");
     }
 
-    public static IvParameterSpec getKeyringInitVector() {
-        String s = getValue("KEYRING_INIT_VECTOR");
+    public static IvParameterSpec getCollectionKeyringInitVector() {
+        String s = getValue("COLLECTION_KEYRING_KEY_INIT_VECTOR");
         if (StringUtils.isEmpty(s)) {
             return null;
         }

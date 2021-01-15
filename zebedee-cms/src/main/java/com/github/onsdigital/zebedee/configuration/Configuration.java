@@ -5,12 +5,8 @@ import com.github.onsdigital.zebedee.session.model.Session;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import javax.crypto.SecretKey;
-import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Base64;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -174,26 +170,6 @@ public class Configuration {
 
     public static String getAuditDBPassword() {
         return StringUtils.defaultIfBlank(getValue("db_audit_password"), "");
-    }
-
-    public static SecretKey getCollectionKeyringSecretKey() {
-        String s = getValue("COLLECTION_KEYRING_SECRET_KEY");
-        if (StringUtils.isEmpty(s)) {
-            return null;
-        }
-
-        byte[] keyBytes = Base64.getDecoder().decode(s);
-        return new SecretKeySpec(keyBytes, 0, keyBytes.length, "AES");
-    }
-
-    public static IvParameterSpec getCollectionKeyringInitVector() {
-        String s = getValue("COLLECTION_KEYRING_KEY_INIT_VECTOR");
-        if (StringUtils.isEmpty(s)) {
-            return null;
-        }
-
-        byte[] iv = Base64.getDecoder().decode(s);
-        return new IvParameterSpec(iv);
     }
 
     /**

@@ -30,8 +30,6 @@ import com.github.onsdigital.zebedee.verification.VerificationAgent;
 import dp.api.dataset.DatasetAPIClient;
 import dp.api.dataset.DatasetClient;
 
-import javax.crypto.SecretKey;
-import javax.crypto.spec.IvParameterSpec;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
@@ -41,7 +39,6 @@ import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 import static com.github.onsdigital.zebedee.Zebedee.APPLICATION_KEYS;
 import static com.github.onsdigital.zebedee.Zebedee.COLLECTIONS;
-import static com.github.onsdigital.zebedee.Zebedee.KEYRING;
 import static com.github.onsdigital.zebedee.Zebedee.PERMISSIONS;
 import static com.github.onsdigital.zebedee.Zebedee.PUBLISHED;
 import static com.github.onsdigital.zebedee.Zebedee.PUBLISHED_COLLECTIONS;
@@ -70,7 +67,6 @@ public class ZebedeeConfiguration {
     private Path applicationKeysPath;
     private Path redirectPath;
     private Path servicePath;
-    private Path keyringPath;
     private boolean useVerificationAgent;
     private ApplicationKeys applicationKeys;
     private PublishedCollections publishedCollections;
@@ -84,8 +80,6 @@ public class ZebedeeConfiguration {
     private DataIndex dataIndex;
     private PermissionsStore permissionsStore;
     private DatasetService datasetService;
-    private SecretKey keyringEncryptionKey;
-    private IvParameterSpec keyringInitVector;
 
     private static Path createDir(Path root, String dirName) throws IOException {
         Path dir = root.resolve(dirName);
@@ -123,7 +117,6 @@ public class ZebedeeConfiguration {
         this.applicationKeysPath = createDir(zebedeePath, APPLICATION_KEYS);
         this.redirectPath = this.publishedContentPath.resolve(Content.REDIRECT);
         this.servicePath = createDir(zebedeePath, SERVICES);
-        this.keyringPath = createDir(zebedeePath, KEYRING);
 
         if (!Files.exists(redirectPath)) {
             Files.createFile(redirectPath);
@@ -304,11 +297,4 @@ public class ZebedeeConfiguration {
         return new ServiceStoreImpl(servicePath);
     }
 
-    public SecretKey getKeyringEncryptionKey() {
-        return this.keyringEncryptionKey;
-    }
-
-    public IvParameterSpec getKeyringInitVector() {
-        return this.keyringInitVector;
-    }
 }

@@ -51,7 +51,6 @@ public class Zebedee {
     public static final String LAUNCHPAD = "launchpad";
     public static final String APPLICATION_KEYS = "application-keys";
     public static final String SERVICES = "services";
-    public static final String KEYRING = "keyring";
 
     private final Path publishedCollectionsPath;
     private final Path collectionsPath;

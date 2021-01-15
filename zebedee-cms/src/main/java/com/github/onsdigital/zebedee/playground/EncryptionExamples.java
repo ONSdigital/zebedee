@@ -1,6 +1,5 @@
 package com.github.onsdigital.zebedee.playground;
 
-import com.github.onsdigital.zebedee.configuration.Configuration;
 import org.apache.commons.io.FileUtils;
 
 import javax.crypto.Cipher;
@@ -22,14 +21,14 @@ public class EncryptionExamples {
     static Path OUTPUT_FILE = BASE_PATH.resolve("encrypted-file.json");
 
     public static void testSecretKeys() {
-        SecretKey secretKey = Configuration.getCollectionKeyringSecretKey();
+/*        SecretKey secretKey = Configuration.getCollectionKeyringSecretKey();
         IvParameterSpec iv = Configuration.getCollectionKeyringInitVector();
 
         try {
             System.out.println("Decrypted test file: " + decrypt(secretKey, iv));
         } catch (Exception ex) {
             System.out.println("failed to decrypt test file " + ex.getMessage());
-        }
+        }*/
 
     }
 
@@ -38,13 +37,13 @@ public class EncryptionExamples {
         generateIV();
 
 
-        encrypt("Master of puppets is pulling your strings");
+/*        encrypt("Master of puppets is pulling your strings");
 
 
         SecretKey secretKey = Configuration.getCollectionKeyringSecretKey();
         IvParameterSpec iv = Configuration.getCollectionKeyringInitVector();
 
-        System.out.println("Decrypted file: " + decrypt(secretKey, iv));
+        System.out.println("Decrypted file: " + decrypt(secretKey, iv));*/
     }
 
     static void encrypt(String message) throws Exception {

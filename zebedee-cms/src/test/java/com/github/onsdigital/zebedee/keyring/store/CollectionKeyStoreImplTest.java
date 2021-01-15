@@ -88,7 +88,8 @@ public class CollectionKeyStoreImplTest {
         SecretKey masterKey = createNewSecretKey();
         IvParameterSpec iv = createNewInitVector();
 
-        createPlainTextCollectionKeyFile(TEST_COLLECTION_ID);
+        SecretKey wrappedKey = createNewSecretKey();
+        createPlainTextCollectionKeyFile(TEST_COLLECTION_ID, wrappedKey);
 
         keyStore = new CollectionKeyStoreImpl(keyringDir.toPath(), masterKey, iv);
 
@@ -105,31 +106,40 @@ public class CollectionKeyStoreImplTest {
     }
 
     @Test
-    public void testRead_shouldReturnCollectionKey() throws Exception {
+    public void testRead_Success() throws Exception {
+        // Create the key store
         SecretKey masterKey = createNewSecretKey();
         IvParameterSpec masterIV = createNewInitVector();
         keyStore = new CollectionKeyStoreImpl(keyringDir.toPath(), masterKey, masterIV);
 
+        // Create a collection key to add to the keystore.
         IvParameterSpec initVector = createNewInitVector();
         CollectionKey collectionKey = new CollectionKey(TEST_COLLECTION_ID, createNewSecretKey());
 
+        // Encrypt a test message using the collection key.
         String plainText = "Blackened is the end, Winter it will send, Throwing all you see Into obscurity";
         byte[] encryptedMessage = encyrpt(plainText, collectionKey.getSecretKey(), initVector);
 
+        // write the key to the store.
         keyStore.write(collectionKey);
         assertTrue(Files.exists(keyringDir.toPath().resolve(TEST_COLLECTION_ID + ".json")));
 
-
+        // retieve the key from the store.
         CollectionKey actual = keyStore.read(TEST_COLLECTION_ID);
         assertThat(actual.getCollectionID(), equalTo(TEST_COLLECTION_ID));
 
+        // attempt to decrypt the test message using the key retrieve from the store - if its working as expected the
+        // decrypted message should equal the original input.
         String decryptedMessage = decrypt(encryptedMessage, collectionKey.getSecretKey(), initVector);
         assertThat(decryptedMessage, equalTo(plainText));
     }
 
-    CollectionKey createPlainTextCollectionKeyFile(String collectionID) throws Exception {
-        CollectionKey key = new CollectionKey(collectionID, null);
-        byte[] json = new GsonBuilder().setPrettyPrinting().create().toJson(key).getBytes();
+    CollectionKey createPlainTextCollectionKeyFile(String collectionID, SecretKey secretKey) throws Exception {
+        CollectionKey key = new CollectionKey(collectionID, secretKey);
+        byte[] json = new GsonBuilder()
+                .registerTypeAdapter(CollectionKey.class, new CollectionKeySerializer())
+                .setPrettyPrinting()
+                .create().toJson(key).getBytes();
 
         Path p = keyringDir.toPath().resolve(collectionID + ".json");
 

@@ -10,10 +10,13 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import javax.crypto.Cipher;
+import javax.crypto.CipherInputStream;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.SecureRandom;
@@ -130,8 +133,84 @@ public class CollectionKeyStoreImplTest {
 
         // attempt to decrypt the test message using the key retrieve from the store - if its working as expected the
         // decrypted message should equal the original input.
-        String decryptedMessage = decrypt(encryptedMessage, collectionKey.getSecretKey(), initVector);
+        byte[] decryptedBytes = decrypt(encryptedMessage, collectionKey.getSecretKey(), initVector);
+        String decryptedMessage = new String(decryptedBytes);
         assertThat(decryptedMessage, equalTo(plainText));
+    }
+
+    @Test(expected = KeyringException.class)
+    public void testWrite_shouldThrowException_ifCollectionKeyIsNull() throws Exception {
+        keyStore = new CollectionKeyStoreImpl(keyringDir.toPath(), null, null);
+
+        try {
+            keyStore.write(null);
+        } catch (KeyringException ex) {
+            assertThat(ex.getMessage(), equalTo("collectionKey required but was null"));
+            assertThat(ex.getCollectionID(), is(nullValue()));
+            throw ex;
+        }
+    }
+
+    @Test(expected = KeyringException.class)
+    public void testWrite_shouldThrowException_ifCollectionKeyIDIsNull() throws Exception {
+        keyStore = new CollectionKeyStoreImpl(keyringDir.toPath(), null, null);
+
+        try {
+            keyStore.write(new CollectionKey(null, null));
+        } catch (KeyringException ex) {
+            assertThat(ex.getMessage(), equalTo("collectionKey.ID required but was null or empty"));
+            assertThat(ex.getCollectionID(), is(nullValue()));
+            throw ex;
+        }
+    }
+
+    @Test(expected = KeyringException.class)
+    public void testWrite_shouldThrowException_ifCollectionKeySecretKeyIsNull() throws Exception {
+        keyStore = new CollectionKeyStoreImpl(keyringDir.toPath(), null, null);
+
+        try {
+            keyStore.write(new CollectionKey(TEST_COLLECTION_ID, null));
+        } catch (KeyringException ex) {
+            assertThat(ex.getMessage(), equalTo("collectionKey.secretKey required but was null"));
+            assertThat(ex.getCollectionID(), equalTo(TEST_COLLECTION_ID));
+            throw ex;
+        }
+    }
+
+    @Test
+    public void testWrite_success_shouldWriteKeyToEncryptedFile() throws Exception {
+        // Create the key store
+        SecretKey masterKey = createNewSecretKey();
+        IvParameterSpec masterIV = createNewInitVector();
+        keyStore = new CollectionKeyStoreImpl(keyringDir.toPath(), masterKey, masterIV);
+
+        // Create a collection key and add to the keystore.
+        CollectionKey input = new CollectionKey(TEST_COLLECTION_ID, createNewSecretKey());
+        keyStore.write(input);
+
+        // check the file exists
+        File f = keyringDir.toPath().resolve(TEST_COLLECTION_ID + ".json").toFile();
+        assertTrue(Files.exists(f.toPath()));
+
+        // Attempt to decrypt the file - if successful we can assume the encryption was also successful.
+        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+        cipher.init(Cipher.DECRYPT_MODE, masterKey, masterIV);
+
+        CollectionKey result = null;
+        try (
+                FileInputStream fin = new FileInputStream(f);
+                CipherInputStream cin = new CipherInputStream(fin, cipher);
+                InputStreamReader reader = new InputStreamReader(cin)
+        ) {
+            result = new GsonBuilder()
+                    .registerTypeAdapter(CollectionKey.class, new CollectionKeySerializer())
+                    .create()
+                    .fromJson(reader, CollectionKey.class);
+        }
+
+        // Verify the Collection key we created from decrypting the file and marshalling into the target object type
+        // matches the origin input object.
+        assertThat(result, equalTo(input));
     }
 
     CollectionKey createPlainTextCollectionKeyFile(String collectionID, SecretKey secretKey) throws Exception {
@@ -155,12 +234,12 @@ public class CollectionKeyStoreImplTest {
         return Base64.getEncoder().encode(cipher.doFinal(plainText.getBytes("UTF-8")));
     }
 
-    String decrypt(byte[] encryptedMessage, SecretKey key, IvParameterSpec iv) throws Exception {
+    byte[] decrypt(byte[] encryptedMessage, SecretKey key, IvParameterSpec iv) throws Exception {
         Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
         cipher.init(Cipher.DECRYPT_MODE, key, iv);
 
         byte[] bytes = Base64.getDecoder().decode(encryptedMessage);
-        return new String(cipher.doFinal(bytes));
+        return cipher.doFinal(bytes);
     }
 
     SecretKey createNewSecretKey() throws Exception {

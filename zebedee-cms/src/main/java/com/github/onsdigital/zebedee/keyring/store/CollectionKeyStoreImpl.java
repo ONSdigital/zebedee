@@ -20,6 +20,8 @@ import java.nio.file.Paths;
 
 public class CollectionKeyStoreImpl implements CollectionKeyStore {
 
+    private static final String ALGORITHM = "AES/CBC/PKCS5Padding";
+
     private Path keyringDir;
     private SecretKey masterKey;
     private IvParameterSpec masterIv;
@@ -59,7 +61,8 @@ public class CollectionKeyStoreImpl implements CollectionKeyStore {
 
     @Override
     public void write(CollectionKey key) throws KeyringException {
-        // TODO validate key
+        validateCollectionKey(key);
+
         try (
                 FileOutputStream fos = new FileOutputStream(getKeyPath(key.getCollectionID()));
                 CipherOutputStream cos = new CipherOutputStream(fos, getEncryptCipher())
@@ -67,7 +70,21 @@ public class CollectionKeyStoreImpl implements CollectionKeyStore {
             cos.write(gson.toJson(key).getBytes());
             cos.flush();
         } catch (Exception ex) {
-            throw new KeyringException(ex);
+            throw new KeyringException("error writing collection key to store", key.getCollectionID(), ex);
+        }
+    }
+
+    private void validateCollectionKey(CollectionKey key) throws KeyringException {
+        if (key == null) {
+            throw new KeyringException("collectionKey required but was null");
+        }
+
+        if (StringUtils.isEmpty(key.getCollectionID())) {
+            throw new KeyringException("collectionKey.ID required but was null or empty");
+        }
+
+        if (key.getSecretKey() == null) {
+            throw new KeyringException("collectionKey.secretKey required but was null", key.getCollectionID());
         }
     }
 
@@ -77,7 +94,7 @@ public class CollectionKeyStoreImpl implements CollectionKeyStore {
 
     private Cipher getEncryptCipher() throws KeyringException {
         try {
-            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+            Cipher cipher = Cipher.getInstance(ALGORITHM);
             cipher.init(Cipher.ENCRYPT_MODE, masterKey, masterIv);
             return cipher;
         } catch (Exception ex) {
@@ -87,7 +104,7 @@ public class CollectionKeyStoreImpl implements CollectionKeyStore {
 
     private Cipher getDecryptCipher() throws KeyringException {
         try {
-            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+            Cipher cipher = Cipher.getInstance(ALGORITHM);
             cipher.init(Cipher.DECRYPT_MODE, masterKey, masterIv);
             return cipher;
         } catch (Exception ex) {

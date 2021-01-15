@@ -18,6 +18,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+/**
+ * File system implementation of {@link CollectionKeyStore}. Store {@link CollectionKey} objects as encyrpted json
+ * files on disk. Files are named using the ID of the collection they belong to.
+ */
 public class CollectionKeyStoreImpl implements CollectionKeyStore {
 
     private static final String ALGORITHM = "AES/CBC/PKCS5Padding";
@@ -27,6 +31,25 @@ public class CollectionKeyStoreImpl implements CollectionKeyStore {
     private IvParameterSpec masterIv;
     private Gson gson;
 
+    /**
+     * <p>
+     * Create a new instance of the keystore.
+     * </p>
+     *
+     * <p>
+     * <b>Important Notice:</b> It is strongly recommended that the {@link SecretKey} & {@link IvParameterSpec}
+     * are not modified once they have been used to store collection keys. Changing these parameters means the
+     * store will no longer have the correct encryption/decryption details to access any files created before the
+     * change.
+     * <p>
+     * Reverting the key/init vector values will allow access to the older files however the same issue will be
+     * inplace for any key files written with the updated encryption params.
+     * </p>
+     *
+     * @param keyringDir the {@link Path} the write the {@link CollectionKey} files to.
+     * @param masterKey  the {@link SecretKey} to use when encrypting/decrypting the {@link CollectionKey} files.
+     * @param masterIv   the {@link IvParameterSpec} to use when initializing the encryption {@link Cipher}.
+     */
     public CollectionKeyStoreImpl(final Path keyringDir, final SecretKey masterKey, final IvParameterSpec masterIv) {
         this.keyringDir = keyringDir;
         this.masterKey = masterKey;

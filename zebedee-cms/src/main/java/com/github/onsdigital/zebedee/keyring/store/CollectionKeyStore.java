@@ -18,5 +18,11 @@ public interface CollectionKeyStore {
      */
     CollectionKey read(String collectionID) throws KeyringException;
 
+    /**
+     * Write a {@link CollectionKey} to the store.
+     *
+     * @param key the {@link CollectionKey} to write.
+     * @throws KeyringException problem writing the key to the store.
+     */
     void write(CollectionKey key) throws KeyringException;
 }

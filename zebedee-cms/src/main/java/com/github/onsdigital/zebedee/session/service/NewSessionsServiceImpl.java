@@ -6,9 +6,12 @@ import com.github.onsdigital.zebedee.user.model.User;
 import com.session.service.client.SessionClient;
 import com.session.service.client.SessionClientImpl;
 import com.session.service.entities.SessionCreated;
+import com.session.service.error.SessionClientException;
+import org.apache.commons.lang.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.Date;
 
 public class NewSessionsServiceImpl implements Sessions {
@@ -32,7 +35,7 @@ public class NewSessionsServiceImpl implements Sessions {
         com.session.service.Session clientSession = client.getSessionByID(sessionCreated.getId());
 
         if (clientSession == null) {
-            throw new IOException();
+            throw new IOException("client has failed to retrieve the session");
         }
 
         Session session = createZebedeeSession(clientSession);
@@ -62,9 +65,8 @@ public class NewSessionsServiceImpl implements Sessions {
     @Override
     public Session get(String id) throws IOException {
         com.session.service.Session clientSession = client.getSessionByID(id);
-
-        Session session = createZebedeeSession(clientSession);
-        return session;
+        
+        return createZebedeeSession(clientSession);
     }
 
     /**
@@ -91,7 +93,7 @@ public class NewSessionsServiceImpl implements Sessions {
      */
     @Override
     public boolean exists(String id) throws IOException {
-        return false;
+        throw new UnsupportedOperationException();
     }
 
     /**
@@ -102,7 +104,7 @@ public class NewSessionsServiceImpl implements Sessions {
      */
     @Override
     public boolean expired(Session session) {
-        return false;
+        throw new UnsupportedOperationException();
     }
 
     /**
@@ -113,11 +115,20 @@ public class NewSessionsServiceImpl implements Sessions {
      */
     @Override
     public Date getExpiryDate(Session session) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     private Session createZebedeeSession(com.session.service.Session clientSession) {
         Session session = new Session();
+
+        if (clientSession.getId() == null || StringUtils.isEmpty(clientSession.getId())) {
+            throw new SessionClientException("client has returned a session with a null/empty id");
+        }
+
+        if (clientSession.getEmail() == null || StringUtils.isEmpty(clientSession.getEmail())) {
+            throw new SessionClientException("client has returned a session with a null/empty email");
+        }
+
         session.setId(clientSession.getId());
         session.setEmail(clientSession.getEmail());
         session.setLastAccess(clientSession.getLastAccess());

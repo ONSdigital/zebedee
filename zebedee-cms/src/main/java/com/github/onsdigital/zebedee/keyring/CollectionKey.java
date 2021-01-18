@@ -6,7 +6,8 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import javax.crypto.SecretKey;
 
 /**
- * Object defines the stucture of a collection enctryption key when converted to JSON.
+ * A collection key encapsulates a {@link SecretKey} used to encrypt collection content. Collection keys are
+ * added/managed via the {@link Keyring}.
  */
 public class CollectionKey {
 
@@ -14,7 +15,7 @@ public class CollectionKey {
     private SecretKey secretKey;
 
     /**
-     * Construct a new collectionkey.
+     * Construct a new collection key.
      *
      * @param collectionID the ID of the collection the encryption key is for.
      * @param secretKey    the {@link SecretKey} used to encrypt the collection content.

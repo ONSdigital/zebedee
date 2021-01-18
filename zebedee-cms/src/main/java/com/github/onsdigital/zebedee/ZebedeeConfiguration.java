@@ -124,6 +124,7 @@ public class ZebedeeConfiguration {
 
         this.useVerificationAgent = enableVerificationAgent;
 
+        // Create the services and objects...
         this.dataIndex = new DataIndex(new FileSystemContentReader(publishedContentPath));
         this.publishedCollections = new PublishedCollections(publishedCollectionsPath);
         this.applicationKeys = new ApplicationKeys(applicationKeysPath);
@@ -296,5 +297,4 @@ public class ZebedeeConfiguration {
     public ServiceStoreImpl getServiceStore() {
         return new ServiceStoreImpl(servicePath);
     }
-
 }

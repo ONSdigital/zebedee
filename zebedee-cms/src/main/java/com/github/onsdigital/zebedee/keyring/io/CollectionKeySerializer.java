@@ -1,4 +1,4 @@
-package com.github.onsdigital.zebedee.keyring.store;
+package com.github.onsdigital.zebedee.keyring.io;
 
 import com.github.onsdigital.zebedee.keyring.CollectionKey;
 import com.google.gson.JsonDeserializationContext;

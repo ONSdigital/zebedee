@@ -1,4 +1,4 @@
-package com.github.onsdigital.zebedee.keyring.store;
+package com.github.onsdigital.zebedee.keyring.io;
 
 import com.github.onsdigital.zebedee.keyring.CollectionKey;
 import com.github.onsdigital.zebedee.keyring.KeyringException;
@@ -19,10 +19,13 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 /**
- * File system implementation of {@link CollectionKeyStore}. Store {@link CollectionKey} objects as encyrpted json
- * files on disk. Files are named using the ID of the collection they belong to.
+ * {@link java.io.File} based implementation of {@link CollectionKeyReadWriter}. Reads and writes
+ * {@link CollectionKey} objects to/from encrypted files on disk.
+ * <p><b>We strongly advised against using/extending this
+ * code for anything other than maintaining legacy functionality in Zebedee CMS.</b></p>For all other purposes it
+ * should be considered deprecated.
  */
-public class CollectionKeyStoreImpl implements CollectionKeyStore {
+public class CollectionKeyReadWriterImpl implements CollectionKeyReadWriter {
 
     private static final String ALGORITHM = "AES/CBC/PKCS5Padding";
 
@@ -33,24 +36,30 @@ public class CollectionKeyStoreImpl implements CollectionKeyStore {
 
     /**
      * <p>
-     * Create a new instance of the keystore.
+     * Create a new readWriter instance.
      * </p>
      *
      * <p>
-     * <b>Important Notice:</b> It is strongly recommended that the {@link SecretKey} & {@link IvParameterSpec}
-     * are not modified once they have been used to store collection keys. Changing these parameters means the
-     * store will no longer have the correct encryption/decryption details to access any files created before the
-     * change.
+     * <b>Important:</b> It is strongly recommended that the {@link SecretKey} & {@link IvParameterSpec}
+     * are not modified once they have been used to store collection keys. Changing these inputs will result in this
+     * object no longer being able to decrypt collection key files written with the previous encryption key.
      * <p>
-     * Reverting the key/init vector values will allow access to the older files however the same issue will be
-     * inplace for any key files written with the updated encryption params.
+     * Reverting the key/init vector values will resolve this issue for keys written with the original encryption
+     * parameters however, the same issue will now be the case for any key files written using the modified encryption
+     * params.
      * </p>
      *
-     * @param keyringDir the {@link Path} the write the {@link CollectionKey} files to.
-     * @param masterKey  the {@link SecretKey} to use when encrypting/decrypting the {@link CollectionKey} files.
+     * <p>
+     * <b>
+     * If a encryption parameters change is necessary it is strongly recommended you migrate all existing keys to
+     * use the updated encryption values.</b>
+     * </p>
+     *
+     * @param keyringDir the {@link Path} the read the {@link CollectionKey} files from.
+     * @param masterKey  the {@link SecretKey} to use when decrypting the {@link CollectionKey} files.
      * @param masterIv   the {@link IvParameterSpec} to use when initializing the encryption {@link Cipher}.
      */
-    public CollectionKeyStoreImpl(final Path keyringDir, final SecretKey masterKey, final IvParameterSpec masterIv) {
+    public CollectionKeyReadWriterImpl(final Path keyringDir, final SecretKey masterKey, final IvParameterSpec masterIv) {
         this.keyringDir = keyringDir;
         this.masterKey = masterKey;
         this.masterIv = masterIv;
@@ -82,8 +91,22 @@ public class CollectionKeyStoreImpl implements CollectionKeyStore {
         }
     }
 
+    private String getKeyPath(String collectionID) {
+        return keyringDir.resolve(collectionID + ".json").toString();
+    }
+
+    private Cipher getDecryptCipher() throws KeyringException {
+        try {
+            Cipher cipher = Cipher.getInstance(ALGORITHM);
+            cipher.init(Cipher.DECRYPT_MODE, masterKey, masterIv);
+            return cipher;
+        } catch (Exception ex) {
+            throw new KeyringException(ex);
+        }
+    }
+
     @Override
-    public void write(CollectionKey key) throws KeyringException {
+    public void write(final CollectionKey key) throws KeyringException {
         validateCollectionKey(key);
 
         try (
@@ -111,10 +134,6 @@ public class CollectionKeyStoreImpl implements CollectionKeyStore {
         }
     }
 
-    private String getKeyPath(String collectionID) {
-        return keyringDir.resolve(collectionID + ".json").toString();
-    }
-
     private Cipher getEncryptCipher() throws KeyringException {
         try {
             Cipher cipher = Cipher.getInstance(ALGORITHM);
@@ -125,13 +144,4 @@ public class CollectionKeyStoreImpl implements CollectionKeyStore {
         }
     }
 
-    private Cipher getDecryptCipher() throws KeyringException {
-        try {
-            Cipher cipher = Cipher.getInstance(ALGORITHM);
-            cipher.init(Cipher.DECRYPT_MODE, masterKey, masterIv);
-            return cipher;
-        } catch (Exception ex) {
-            throw new KeyringException(ex);
-        }
-    }
 }

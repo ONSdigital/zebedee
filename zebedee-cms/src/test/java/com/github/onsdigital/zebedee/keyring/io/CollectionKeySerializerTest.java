@@ -1,4 +1,4 @@
-package com.github.onsdigital.zebedee.keyring.store;
+package com.github.onsdigital.zebedee.keyring.io;
 
 import com.github.onsdigital.zebedee.keyring.CollectionKey;
 import com.google.gson.JsonElement;
@@ -14,10 +14,10 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.util.Base64;
 
-import static com.github.onsdigital.zebedee.keyring.store.CollectionKeySerializer.COLLECTION_ID_FIELD;
-import static com.github.onsdigital.zebedee.keyring.store.CollectionKeySerializer.FIELD_EMPTY_ERR;
-import static com.github.onsdigital.zebedee.keyring.store.CollectionKeySerializer.FIELD_MISSING_ERR;
-import static com.github.onsdigital.zebedee.keyring.store.CollectionKeySerializer.SECRET_KEY_FIELD;
+import static com.github.onsdigital.zebedee.keyring.io.CollectionKeySerializer.COLLECTION_ID_FIELD;
+import static com.github.onsdigital.zebedee.keyring.io.CollectionKeySerializer.FIELD_EMPTY_ERR;
+import static com.github.onsdigital.zebedee.keyring.io.CollectionKeySerializer.FIELD_MISSING_ERR;
+import static com.github.onsdigital.zebedee.keyring.io.CollectionKeySerializer.SECRET_KEY_FIELD;
 import static java.text.MessageFormat.format;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;

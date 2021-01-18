@@ -139,6 +139,19 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.sonatype.ossindex.maven</groupId>
+                <artifactId>ossindex-maven-plugin</artifactId>
+                <configuration>
+                    <excludeCoordinates>
+                        <exlude>
+                            <groupId>io.netty</groupId>
+                            <artifactId>netty</artifactId>
+                            <version>3.10.5.Final</version>
+                        </exlude>
+                    </excludeCoordinates>
+                </configuration>
+            </plugin>
 
         </plugins>
 

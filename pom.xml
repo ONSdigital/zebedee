@@ -89,7 +89,7 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.12</version>
+            <version>4.13.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -183,6 +183,19 @@
                     <cvssScoreThreshold>7.0</cvssScoreThreshold>
                 </configuration>
             </plugin>
+<!--            <plugin>
+                <groupId>org.sonatype.ossindex.maven</groupId>
+                <artifactId>ossindex-maven-plugin</artifactId>
+                <configuration>
+                    <excludeCoordinates>
+                        <exclude>
+                            <groupId>org.apache.xmlgraphics</groupId>
+                            <artifactId>batik-codec</artifactId>
+                            <version>1.12</version>
+                        </exclude>
+                    </excludeCoordinates>
+                </configuration>
+            </plugin>-->
         </plugins>
     </build>
 </project>

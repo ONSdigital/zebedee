@@ -6,6 +6,7 @@ audit : audit-cms
 
 .PHONY: audit-cms
 audit-cms:
+	mvn install -pl zebedee-reader -Dmaven.test.skip -Dossindex.skip=true
 	mvn ossindex:audit
 
 .PHONY: audit-reader

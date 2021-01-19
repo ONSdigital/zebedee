@@ -109,6 +109,9 @@ public class CollectionKeyReadWriterImpl implements CollectionKeyReadWriter {
     public void write(final CollectionKey key) throws KeyringException {
         validateCollectionKey(key);
 
+        // TODO if key file already exists this should probably be an error.
+        // If not the key value could change?
+
         try (
                 FileOutputStream fos = new FileOutputStream(getKeyPath(key.getCollectionID()));
                 CipherOutputStream cos = new CipherOutputStream(fos, getEncryptCipher())

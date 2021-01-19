@@ -14,6 +14,7 @@ public class KeyringImpl implements Keyring {
     static final String INVALID_SECRET_KEY_ERR_MSG = "expected secret key but was null";
     static final String KEY_MISMATCH_ERR_MSG =
             "add unsuccessful a SecretKey with a different value is already associated with this collection ID";
+    static final String KEY_NOT_FOUND_ERR_MSG = "collectionKey not found for this collection ID";
 
     private CollectionKeyReadWriter collectionKeyReadWriter;
     private Map<String, CollectionKey> cache;
@@ -83,7 +84,33 @@ public class KeyringImpl implements Keyring {
 
     @Override
     public SecretKey get(String collectionID) throws KeyringException {
-        return null;
+        if (StringUtils.isEmpty(collectionID)) {
+            throw new KeyringException(INVALID_COLLECTION_ID_ERR_MSG);
+        }
+
+        lock.lock();
+        try {
+            CollectionKey collectionKey = cache.get(collectionID);
+            if (collectionKey != null) {
+                return getSecretKey(collectionKey);
+            }
+
+            collectionKey = collectionKeyReadWriter.read(collectionID);
+            if (collectionKey != null) {
+                return getSecretKey(collectionKey);
+            }
+
+            throw new KeyringException(KEY_NOT_FOUND_ERR_MSG);
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    private SecretKey getSecretKey(CollectionKey collectionKey) throws KeyringException {
+        if (collectionKey.getSecretKey() == null) {
+            throw new KeyringException(INVALID_SECRET_KEY_ERR_MSG);
+        }
+        return collectionKey.getSecretKey();
     }
 
     @Override

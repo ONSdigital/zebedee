@@ -21,6 +21,7 @@ import java.util.concurrent.Future;
 import static com.github.onsdigital.zebedee.keyring.KeyringImpl.INVALID_COLLECTION_ID_ERR_MSG;
 import static com.github.onsdigital.zebedee.keyring.KeyringImpl.INVALID_SECRET_KEY_ERR_MSG;
 import static com.github.onsdigital.zebedee.keyring.KeyringImpl.KEY_MISMATCH_ERR_MSG;
+import static com.github.onsdigital.zebedee.keyring.KeyringImpl.KEY_NOT_FOUND_ERR_MSG;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -33,6 +34,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class KeyringImplTest {
 
@@ -195,4 +197,76 @@ public class KeyringImplTest {
             assertThat(actual, equalTo(expected));
         }
     }
+
+    @Test(expected = KeyringException.class)
+    public void testGet_collectionIDNull_shouldThrowException() throws Exception {
+        try {
+            keyring.get(null);
+        } catch (KeyringException ex) {
+            assertThat(ex.getMessage(), equalTo(INVALID_COLLECTION_ID_ERR_MSG));
+            throw ex;
+        }
+    }
+
+    @Test(expected = KeyringException.class)
+    public void testGet_collectionIDEmpty_shouldThrowException() throws Exception {
+        try {
+            keyring.get("");
+        } catch (KeyringException ex) {
+            assertThat(ex.getMessage(), equalTo(INVALID_COLLECTION_ID_ERR_MSG));
+            throw ex;
+        }
+    }
+
+    @Test(expected = KeyringException.class)
+    public void testGet_keyNotExist_shouldThrowException() throws Exception {
+        when(collectionKeyReadWriter.read(TEST_COLLECTION_ID))
+                .thenReturn(null);
+
+        try {
+            keyring.get(TEST_COLLECTION_ID);
+        } catch (KeyringException ex) {
+            verify(collectionKeyReadWriter, times(1)).read(TEST_COLLECTION_ID);
+
+            assertThat(ex.getMessage(), equalTo(KEY_NOT_FOUND_ERR_MSG));
+            throw ex;
+        }
+    }
+
+    @Test(expected = KeyringException.class)
+    public void testGet_secretKeyValueNull_shouldThrowException() throws Exception {
+        when(collectionKeyReadWriter.read(TEST_COLLECTION_ID))
+                .thenReturn(new CollectionKey(TEST_COLLECTION_ID, null));
+
+        try {
+            keyring.get(TEST_COLLECTION_ID);
+        } catch (KeyringException ex) {
+            verify(collectionKeyReadWriter, times(1)).read(TEST_COLLECTION_ID);
+
+            assertThat(ex.getMessage(), equalTo(INVALID_SECRET_KEY_ERR_MSG));
+            throw ex;
+        }
+    }
+
+    @Test
+    public void testGet_keyNotExistInCache_shouldReadKeyFromDisk() throws Exception {
+        when(collectionKeyReadWriter.read(TEST_COLLECTION_ID))
+                .thenReturn(collectionKey);
+
+        SecretKey actual = keyring.get(TEST_COLLECTION_ID);
+
+        assertThat(actual, equalTo(secretKey));
+        verify(collectionKeyReadWriter, times(1)).read(TEST_COLLECTION_ID);
+    }
+
+    @Test
+    public void testGet_keyExistInCache_shouldReturnCachedValue() throws Exception {
+        cache.put(TEST_COLLECTION_ID, collectionKey);
+
+        SecretKey actual = keyring.get(TEST_COLLECTION_ID);
+
+        assertThat(actual, equalTo(secretKey));
+        verify(collectionKeyReadWriter, never()).read(TEST_COLLECTION_ID);
+    }
+
 }

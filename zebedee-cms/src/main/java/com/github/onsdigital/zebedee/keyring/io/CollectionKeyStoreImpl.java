@@ -19,13 +19,13 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 /**
- * {@link java.io.File} based implementation of {@link CollectionKeyReadWriter}. Reads and writes
+ * {@link java.io.File} based implementation of {@link CollectionKeyStore}. Reads and writes
  * {@link CollectionKey} objects to/from encrypted files on disk.
  * <p><b>We strongly advised against using/extending this
  * code for anything other than maintaining legacy functionality in Zebedee CMS.</b></p>For all other purposes it
  * should be considered deprecated.
  */
-public class CollectionKeyReadWriterImpl implements CollectionKeyReadWriter {
+public class CollectionKeyStoreImpl implements CollectionKeyStore {
 
     private static final String ALGORITHM = "AES/CBC/PKCS5Padding";
 
@@ -36,7 +36,7 @@ public class CollectionKeyReadWriterImpl implements CollectionKeyReadWriter {
 
     /**
      * <p>
-     * Create a new readWriter instance.
+     * Create a new CollectionKeyStore instance.
      * </p>
      *
      * <p>
@@ -59,7 +59,7 @@ public class CollectionKeyReadWriterImpl implements CollectionKeyReadWriter {
      * @param masterKey  the {@link SecretKey} to use when decrypting the {@link CollectionKey} files.
      * @param masterIv   the {@link IvParameterSpec} to use when initializing the encryption {@link Cipher}.
      */
-    public CollectionKeyReadWriterImpl(final Path keyringDir, final SecretKey masterKey, final IvParameterSpec masterIv) {
+    public CollectionKeyStoreImpl(final Path keyringDir, final SecretKey masterKey, final IvParameterSpec masterIv) {
         this.keyringDir = keyringDir;
         this.masterKey = masterKey;
         this.masterIv = masterIv;

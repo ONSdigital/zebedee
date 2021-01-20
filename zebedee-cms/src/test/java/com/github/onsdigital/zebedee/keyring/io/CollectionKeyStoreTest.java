@@ -28,14 +28,14 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertTrue;
 
-public class CollectionKeyReadWriterTest {
+public class CollectionKeyStoreTest {
 
     static final String TEST_COLLECTION_ID = "1234567890";
 
     @Rule
     public TemporaryFolder folder = new TemporaryFolder();
 
-    private CollectionKeyReadWriter readerWriter;
+    private CollectionKeyStore store;
     private File keyringDir;
 
     @Before
@@ -45,11 +45,11 @@ public class CollectionKeyReadWriterTest {
 
     @Test(expected = KeyringException.class)
     public void read_shouldThrowException_ifCollectionIDNull() throws Exception {
-        readerWriter = new CollectionKeyReadWriterImpl(keyringDir.toPath(), null, null);
+        store = new CollectionKeyStoreImpl(keyringDir.toPath(), null, null);
 
         CollectionKey key = null;
         try {
-            key = readerWriter.read(null);
+            key = store.read(null);
         } catch (KeyringException ex) {
             assertThat(key, is(nullValue()));
             assertThat(ex.getMessage(), equalTo("collectionID required but was null or empty"));
@@ -59,11 +59,11 @@ public class CollectionKeyReadWriterTest {
 
     @Test(expected = KeyringException.class)
     public void read_shouldThrowException_ifCollectionIDEmpty() throws Exception {
-        readerWriter = new CollectionKeyReadWriterImpl(keyringDir.toPath(), null, null);
+        store = new CollectionKeyStoreImpl(keyringDir.toPath(), null, null);
 
         CollectionKey key = null;
         try {
-            key = readerWriter.read("");
+            key = store.read("");
         } catch (KeyringException ex) {
             assertThat(key, is(nullValue()));
             assertThat(ex.getMessage(), equalTo("collectionID required but was null or empty"));
@@ -73,11 +73,11 @@ public class CollectionKeyReadWriterTest {
 
     @Test(expected = KeyringException.class)
     public void read_shouldThrowException_ifKeyNotFound() throws Exception {
-        readerWriter = new CollectionKeyReadWriterImpl(keyringDir.toPath(), null, null);
+        store = new CollectionKeyStoreImpl(keyringDir.toPath(), null, null);
 
         CollectionKey key = null;
         try {
-            key = readerWriter.read(TEST_COLLECTION_ID);
+            key = store.read(TEST_COLLECTION_ID);
         } catch (KeyringException ex) {
             assertThat(key, is(nullValue()));
             assertThat(ex.getMessage(), equalTo("collectionKey not found"));
@@ -94,12 +94,12 @@ public class CollectionKeyReadWriterTest {
         SecretKey wrappedKey = createNewSecretKey();
         createPlainTextCollectionKeyFile(TEST_COLLECTION_ID, wrappedKey);
 
-        readerWriter = new CollectionKeyReadWriterImpl(keyringDir.toPath(), masterKey, iv);
+        store = new CollectionKeyStoreImpl(keyringDir.toPath(), masterKey, iv);
 
         CollectionKey actual = null;
 
         try {
-            actual = readerWriter.read(TEST_COLLECTION_ID);
+            actual = store.read(TEST_COLLECTION_ID);
         } catch (KeyringException ex) {
             assertThat(actual, is(nullValue()));
             assertThat(ex.getMessage(), equalTo("error while decrypting collectionKey file"));
@@ -113,7 +113,7 @@ public class CollectionKeyReadWriterTest {
         // Create the key store
         SecretKey masterKey = createNewSecretKey();
         IvParameterSpec masterIV = createNewInitVector();
-        readerWriter = new CollectionKeyReadWriterImpl(keyringDir.toPath(), masterKey, masterIV);
+        store = new CollectionKeyStoreImpl(keyringDir.toPath(), masterKey, masterIV);
 
         // Create a collection key to add to the keystore.
         IvParameterSpec initVector = createNewInitVector();
@@ -124,11 +124,11 @@ public class CollectionKeyReadWriterTest {
         byte[] encryptedMessage = encyrpt(plainText, collectionKey.getSecretKey(), initVector);
 
         // write the key to the store.
-        readerWriter.write(collectionKey);
+        store.write(collectionKey);
         assertTrue(Files.exists(keyringDir.toPath().resolve(TEST_COLLECTION_ID + ".json")));
 
         // retieve the key from the store.
-        CollectionKey actual = readerWriter.read(TEST_COLLECTION_ID);
+        CollectionKey actual = store.read(TEST_COLLECTION_ID);
         assertThat(actual.getCollectionID(), equalTo(TEST_COLLECTION_ID));
 
         // attempt to decrypt the test message using the key retrieve from the store - if its working as expected the
@@ -140,10 +140,10 @@ public class CollectionKeyReadWriterTest {
 
     @Test(expected = KeyringException.class)
     public void testWrite_shouldThrowException_ifCollectionKeyIsNull() throws Exception {
-        readerWriter = new CollectionKeyReadWriterImpl(keyringDir.toPath(), null, null);
+        store = new CollectionKeyStoreImpl(keyringDir.toPath(), null, null);
 
         try {
-            readerWriter.write(null);
+            store.write(null);
         } catch (KeyringException ex) {
             assertThat(ex.getMessage(), equalTo("collectionKey required but was null"));
             assertThat(ex.getCollectionID(), is(nullValue()));
@@ -153,10 +153,10 @@ public class CollectionKeyReadWriterTest {
 
     @Test(expected = KeyringException.class)
     public void testWrite_shouldThrowException_ifCollectionKeyIDIsNull() throws Exception {
-        readerWriter = new CollectionKeyReadWriterImpl(keyringDir.toPath(), null, null);
+        store = new CollectionKeyStoreImpl(keyringDir.toPath(), null, null);
 
         try {
-            readerWriter.write(new CollectionKey(null, null));
+            store.write(new CollectionKey(null, null));
         } catch (KeyringException ex) {
             assertThat(ex.getMessage(), equalTo("collectionKey.ID required but was null or empty"));
             assertThat(ex.getCollectionID(), is(nullValue()));
@@ -166,10 +166,10 @@ public class CollectionKeyReadWriterTest {
 
     @Test(expected = KeyringException.class)
     public void testWrite_shouldThrowException_ifCollectionKeySecretKeyIsNull() throws Exception {
-        readerWriter = new CollectionKeyReadWriterImpl(keyringDir.toPath(), null, null);
+        store = new CollectionKeyStoreImpl(keyringDir.toPath(), null, null);
 
         try {
-            readerWriter.write(new CollectionKey(TEST_COLLECTION_ID, null));
+            store.write(new CollectionKey(TEST_COLLECTION_ID, null));
         } catch (KeyringException ex) {
             assertThat(ex.getMessage(), equalTo("collectionKey.secretKey required but was null"));
             assertThat(ex.getCollectionID(), equalTo(TEST_COLLECTION_ID));
@@ -182,11 +182,11 @@ public class CollectionKeyReadWriterTest {
         // Create a collection key writer.
         SecretKey masterKey = createNewSecretKey();
         IvParameterSpec masterIV = createNewInitVector();
-        readerWriter = new CollectionKeyReadWriterImpl(keyringDir.toPath(), masterKey, masterIV);
+        store = new CollectionKeyStoreImpl(keyringDir.toPath(), masterKey, masterIV);
 
         // Create a new collection key and write it's to the target destination.
         CollectionKey input = new CollectionKey(TEST_COLLECTION_ID, createNewSecretKey());
-        readerWriter.write(input);
+        store.write(input);
 
         // check the file exists
         File f = keyringDir.toPath().resolve(TEST_COLLECTION_ID + ".json").toFile();

@@ -4,12 +4,12 @@ import com.github.onsdigital.zebedee.keyring.CollectionKey;
 import com.github.onsdigital.zebedee.keyring.KeyringException;
 
 /**
- * A {@link CollectionKey} read writer is used to read and write Collection keys to/from encrypted files on disk.
+ * Defines the behaviour of a {@link CollectionKey} storage mechanism.
  */
-public interface CollectionKeyReadWriter {
+public interface CollectionKeyStore {
 
     /**
-     * Read a {@link CollectionKey} with the specified collection ID from the file system if it exists.
+     * Read a {@link CollectionKey} with the specified collection ID from the store if it exists.
      *
      * @param collectionID the {@link com.github.onsdigital.zebedee.model.Collection} ID of the collection key to read.
      * @return the {@link CollectionKey} if it exists.
@@ -18,7 +18,7 @@ public interface CollectionKeyReadWriter {
     CollectionKey read(String collectionID) throws KeyringException;
 
     /**
-     * Write a {@link CollectionKey} to an encrypted file.
+     * Write a {@link CollectionKey} to the store
      *
      * @param key the {@link CollectionKey} to write.
      * @throws KeyringException problem writing the key to the store.

@@ -21,7 +21,16 @@ public interface CollectionKeyStore {
      * Write a {@link CollectionKey} to the store
      *
      * @param key the {@link CollectionKey} to write.
-     * @throws KeyringException problem writing the key to the store.
+     * @throws KeyringException problem writing the key to the store, collection key already exists with the
+     *                          specified collection ID.
      */
     void write(final CollectionKey key) throws KeyringException;
+
+    /**
+     * Delete a {@link CollectionKey} from the store.
+     *
+     * @param collectionID the collection ID of the key to delete.
+     * @throws KeyringException thrown if the requested key does not exist or if there was a problem deleting the key.
+     */
+    void delete(final String collectionID) throws KeyringException;
 }

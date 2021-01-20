@@ -12,7 +12,7 @@ import javax.crypto.SecretKey;
 public class CollectionKey {
 
     private String collectionID;
-    private SecretKey secretKey;
+    private transient SecretKey secretKey;
 
     /**
      * Construct a new collection key.

@@ -22,15 +22,23 @@ import java.nio.file.Path;
 import java.security.SecureRandom;
 import java.util.Base64;
 
+import static com.github.onsdigital.zebedee.keyring.io.CollectionKeyStoreImpl.COLLECTION_KEY_ALREADY_EXISTS_ERR;
+import static com.github.onsdigital.zebedee.keyring.io.CollectionKeyStoreImpl.COLLECTION_KEY_ID_NULL_ERR;
+import static com.github.onsdigital.zebedee.keyring.io.CollectionKeyStoreImpl.COLLECTION_KEY_KEY_NULL_ERR;
+import static com.github.onsdigital.zebedee.keyring.io.CollectionKeyStoreImpl.COLLECTION_KEY_NOT_FOUND_ERR;
+import static com.github.onsdigital.zebedee.keyring.io.CollectionKeyStoreImpl.COLLECTION_KEY_NULL_ERR;
+import static com.github.onsdigital.zebedee.keyring.io.CollectionKeyStoreImpl.INVALID_COLLECTION_ID_ERR;
+import static com.github.onsdigital.zebedee.keyring.io.CollectionKeyStoreImpl.KEY_DECRYPTION_ERR;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertTrue;
 
-public class CollectionKeyStoreTest {
+public class CollectionKeyStoreImplTest {
 
     static final String TEST_COLLECTION_ID = "1234567890";
+    static final String CIPHER_ALGORITHM = "AES/CBC/PKCS5Padding";
 
     @Rule
     public TemporaryFolder folder = new TemporaryFolder();
@@ -52,7 +60,7 @@ public class CollectionKeyStoreTest {
             key = store.read(null);
         } catch (KeyringException ex) {
             assertThat(key, is(nullValue()));
-            assertThat(ex.getMessage(), equalTo("collectionID required but was null or empty"));
+            assertThat(ex.getMessage(), equalTo(INVALID_COLLECTION_ID_ERR));
             throw ex;
         }
     }
@@ -66,7 +74,7 @@ public class CollectionKeyStoreTest {
             key = store.read("");
         } catch (KeyringException ex) {
             assertThat(key, is(nullValue()));
-            assertThat(ex.getMessage(), equalTo("collectionID required but was null or empty"));
+            assertThat(ex.getMessage(), equalTo(INVALID_COLLECTION_ID_ERR));
             throw ex;
         }
     }
@@ -80,7 +88,7 @@ public class CollectionKeyStoreTest {
             key = store.read(TEST_COLLECTION_ID);
         } catch (KeyringException ex) {
             assertThat(key, is(nullValue()));
-            assertThat(ex.getMessage(), equalTo("collectionKey not found"));
+            assertThat(ex.getMessage(), equalTo(COLLECTION_KEY_NOT_FOUND_ERR));
             assertThat(ex.getCollectionID(), equalTo(TEST_COLLECTION_ID));
             throw ex;
         }
@@ -102,7 +110,7 @@ public class CollectionKeyStoreTest {
             actual = store.read(TEST_COLLECTION_ID);
         } catch (KeyringException ex) {
             assertThat(actual, is(nullValue()));
-            assertThat(ex.getMessage(), equalTo("error while decrypting collectionKey file"));
+            assertThat(ex.getMessage(), equalTo(KEY_DECRYPTION_ERR));
             assertThat(ex.getCollectionID(), equalTo(TEST_COLLECTION_ID));
             throw ex;
         }
@@ -145,7 +153,7 @@ public class CollectionKeyStoreTest {
         try {
             store.write(null);
         } catch (KeyringException ex) {
-            assertThat(ex.getMessage(), equalTo("collectionKey required but was null"));
+            assertThat(ex.getMessage(), equalTo(COLLECTION_KEY_NULL_ERR));
             assertThat(ex.getCollectionID(), is(nullValue()));
             throw ex;
         }
@@ -158,7 +166,7 @@ public class CollectionKeyStoreTest {
         try {
             store.write(new CollectionKey(null, null));
         } catch (KeyringException ex) {
-            assertThat(ex.getMessage(), equalTo("collectionKey.ID required but was null or empty"));
+            assertThat(ex.getMessage(), equalTo(COLLECTION_KEY_ID_NULL_ERR));
             assertThat(ex.getCollectionID(), is(nullValue()));
             throw ex;
         }
@@ -171,7 +179,26 @@ public class CollectionKeyStoreTest {
         try {
             store.write(new CollectionKey(TEST_COLLECTION_ID, null));
         } catch (KeyringException ex) {
-            assertThat(ex.getMessage(), equalTo("collectionKey.secretKey required but was null"));
+            assertThat(ex.getMessage(), equalTo(COLLECTION_KEY_KEY_NULL_ERR));
+            assertThat(ex.getCollectionID(), equalTo(TEST_COLLECTION_ID));
+            throw ex;
+        }
+    }
+
+    @Test(expected = KeyringException.class)
+    public void testWrite_shouldThrowException_ifCollectionKeyAlreadyExists() throws Exception {
+        SecretKey masterKey = createNewSecretKey();
+        IvParameterSpec masterIV = createNewInitVector();
+        store = new CollectionKeyStoreImpl(keyringDir.toPath(), masterKey, masterIV);
+
+        // create a plain key file in the keyring dir.
+        createPlainTextCollectionKeyFile(TEST_COLLECTION_ID, createNewSecretKey());
+
+        try {
+            // attempt to write another key with the same collection ID.
+            store.write(new CollectionKey(TEST_COLLECTION_ID, createNewSecretKey()));
+        } catch (KeyringException ex) {
+            assertThat(ex.getMessage(), equalTo(COLLECTION_KEY_ALREADY_EXISTS_ERR));
             assertThat(ex.getCollectionID(), equalTo(TEST_COLLECTION_ID));
             throw ex;
         }
@@ -193,7 +220,7 @@ public class CollectionKeyStoreTest {
         assertTrue(Files.exists(f.toPath()));
 
         // Attempt to decrypt the file - if successful we can assume the encryption was also successful.
-        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+        Cipher cipher = Cipher.getInstance(CIPHER_ALGORITHM);
         cipher.init(Cipher.DECRYPT_MODE, masterKey, masterIV);
 
         CollectionKey result = null;
@@ -213,6 +240,18 @@ public class CollectionKeyStoreTest {
         assertThat(result, equalTo(input));
     }
 
+    @Test(expected = KeyringException.class)
+    public void testDelete_collectionIDNull_shouldThrowException() throws Exception {
+        store = new CollectionKeyStoreImpl(null, null, null);
+
+        try {
+            store.delete(null);
+        } catch (KeyringException ex) {
+            assertThat(ex.getMessage(), equalTo(INVALID_COLLECTION_ID_ERR));
+            throw ex;
+        }
+    }
+
     SecretKey createNewSecretKey() throws Exception {
         return KeyGenerator.getInstance("AES").generateKey();
     }
@@ -227,14 +266,14 @@ public class CollectionKeyStoreTest {
     }
 
     byte[] encyrpt(String plainText, SecretKey key, IvParameterSpec iv) throws Exception {
-        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+        Cipher cipher = Cipher.getInstance(CIPHER_ALGORITHM);
         cipher.init(Cipher.ENCRYPT_MODE, key, iv);
 
         return Base64.getEncoder().encode(cipher.doFinal(plainText.getBytes("UTF-8")));
     }
 
     byte[] decrypt(byte[] encryptedMessage, SecretKey key, IvParameterSpec iv) throws Exception {
-        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+        Cipher cipher = Cipher.getInstance(CIPHER_ALGORITHM);
         cipher.init(Cipher.DECRYPT_MODE, key, iv);
 
         byte[] bytes = Base64.getDecoder().decode(encryptedMessage);

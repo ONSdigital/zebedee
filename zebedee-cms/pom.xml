@@ -239,7 +239,7 @@
                     <excludeCoordinates>
                         <!--
                         Trello card for the following exclusions.
-                        https://trello.com/c/jKsZJby5/1717-ionettynettyjar3105finalcompile-security -vulnerabilities
+                        https://trello.com/c/jKsZJby5/1717-ionettynettyjar3105finalcompile-security-vulnerabilities
                         -->
                         <exlude>
                             <groupId>io.netty</groupId>

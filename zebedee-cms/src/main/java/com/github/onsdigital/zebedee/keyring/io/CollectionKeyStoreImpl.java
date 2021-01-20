@@ -100,7 +100,7 @@ public class CollectionKeyStoreImpl implements CollectionKeyStore {
                 CipherInputStream cin = new CipherInputStream(in, getDecryptCipher());
                 InputStreamReader reader = new InputStreamReader(cin);
         ) {
-            // FileLock documentation states the lock will released when the FileChannel used to aquire it is closed.
+            // FileLock documentation states the lock will released when the FileChannel used to acquire it is closed.
             // FileChannel implements autoclosable and in this case is defined inside a try-with-resources which
             // guarantees auto closeable resourses are closed.
             channel.lock();
@@ -134,7 +134,7 @@ public class CollectionKeyStoreImpl implements CollectionKeyStore {
                 OutputStream out = Channels.newOutputStream(channel);
                 CipherOutputStream cos = new CipherOutputStream(out, getEncryptCipher())
         ) {
-            // FileLock documentation states the lock will released when the FileChannel used to aquire it is closed.
+            // FileLock documentation states the lock will released when the FileChannel used to acquire it is closed.
             // FileChannel implements autoclosable and in this case is defined inside a try-with-resources which
             // guarantees auto closeable resourses are closed.
             channel.lock();
@@ -147,9 +147,7 @@ public class CollectionKeyStoreImpl implements CollectionKeyStore {
 
     @Override
     public void delete(String collectionID) throws KeyringException {
-        if (isEmpty(collectionID)) {
-            throw new KeyringException(INVALID_COLLECTION_ID_ERR);
-        }
+        // TODO implementation coming soon.
     }
 
     private void validateCollectionKey(CollectionKey key) throws KeyringException {

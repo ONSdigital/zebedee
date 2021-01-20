@@ -1,12 +1,13 @@
 package com.github.onsdigital.zebedee.keyring;
 
 import com.github.onsdigital.zebedee.keyring.io.CollectionKeyReadWriter;
-import org.apache.commons.lang3.StringUtils;
 
 import javax.crypto.SecretKey;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
+
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 public class KeyringImpl implements Keyring {
 
@@ -18,6 +19,9 @@ public class KeyringImpl implements Keyring {
 
     private CollectionKeyReadWriter collectionKeyReadWriter;
     private Map<String, CollectionKey> cache;
+
+    // Lock is used to ensure thread safety of the cache map. Keyring useage is fairly low so the performance impact
+    // should be reasonably small.
     private final ReentrantLock lock = new ReentrantLock();
 
     public KeyringImpl(final CollectionKeyReadWriter collectionKeyReadWriter) {
@@ -48,7 +52,7 @@ public class KeyringImpl implements Keyring {
     }
 
     private void validateAddNewKeyParams(String collectionID, SecretKey secretKey) throws KeyringException {
-        if (StringUtils.isEmpty(collectionID)) {
+        if (isEmpty(collectionID)) {
             throw new KeyringException(INVALID_COLLECTION_ID_ERR_MSG);
         }
 
@@ -84,7 +88,7 @@ public class KeyringImpl implements Keyring {
 
     @Override
     public SecretKey get(String collectionID) throws KeyringException {
-        if (StringUtils.isEmpty(collectionID)) {
+        if (isEmpty(collectionID)) {
             throw new KeyringException(INVALID_COLLECTION_ID_ERR_MSG);
         }
 
@@ -114,7 +118,7 @@ public class KeyringImpl implements Keyring {
     }
 
     @Override
-    public boolean remove(String collectionID) throws KeyringException {
-        return false;
+    public void remove(String collectionID) throws KeyringException {
+
     }
 }

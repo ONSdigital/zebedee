@@ -8,5 +8,5 @@ public interface Keyring {
 
     SecretKey get(final String collectionID) throws KeyringException;
 
-    boolean remove(final String collectionID) throws KeyringException;
+    void remove(final String collectionID) throws KeyringException;
 }

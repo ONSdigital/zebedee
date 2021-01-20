@@ -33,7 +33,7 @@ public class CollectionKey {
     }
 
     /**
-     * @return the secret key the used to encrypt/decrypt the collection content.
+     * @return the secret key used to encrypt/decrypt the collection content.
      */
     public SecretKey getSecretKey() {
         return this.secretKey;

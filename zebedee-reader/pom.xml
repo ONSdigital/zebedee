@@ -139,59 +139,6 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
-                <groupId>org.sonatype.ossindex.maven</groupId>
-                <artifactId>ossindex-maven-plugin</artifactId>
-                <configuration>
-                    <excludeCoordinates>
-                        <!--
-                            Trello card for the following exclusions.
-                            https://trello.com/c/jKsZJby5/1717-ionettynettyjar3105finalcompile-security -vulnerabilities
-                         -->
-                        <exlude>
-                            <groupId>io.netty</groupId>
-                            <artifactId>netty</artifactId>
-                            <version>3.10.5.Final</version>
-                        </exlude>
-                        <exlude>
-                            <groupId>org.apache.xmlgraphics</groupId>
-                            <artifactId>batik-transcoder</artifactId>
-                            <version>1.12</version>
-                        </exlude>
-                        <exlude>
-                            <groupId>org.elasticsearch</groupId>
-                            <artifactId>elasticsearch</artifactId>
-                            <version>2.1.1</version>
-                        </exlude>
-                        <exlude>
-                            <groupId>org.yaml</groupId>
-                            <artifactId>snakeyaml</artifactId>
-                            <version>1.15</version>
-                        </exlude>
-                        <exlude>
-                            <groupId>org.eclipse.jetty</groupId>
-                            <artifactId>jetty-http</artifactId>
-                            <version>9.4.28.v20200408</version>
-                        </exlude>
-                        <exlude>
-                            <groupId>org.eclipse.jetty</groupId>
-                            <artifactId>jetty-server</artifactId>
-                            <version>9.4.28.v20200408</version>
-                        </exlude>
-                        <exlude>
-                            <groupId>org.apache.poi</groupId>
-                            <artifactId>poi</artifactId>
-                            <version>3.13</version>
-                        </exlude>
-                        <exlude>
-                            <groupId>org.apache.xmlgraphics</groupId>
-                            <artifactId>batik-dom</artifactId>
-                            <version>1.12</version>
-                        </exlude>
-                        <!-- End #1717 -->
-                    </excludeCoordinates>
-                </configuration>
-            </plugin>
 
         </plugins>
 

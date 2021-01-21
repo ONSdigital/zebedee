@@ -14,10 +14,19 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.Date;
 
+/**
+ * @author Scott Morse
+ * NewSessionsServiceImpl is a replacement implemtation for {@link SessionsServiceImpl}
+ * It makes use of dp-sessions-api using dp-session-service-client-java
+ */
 public class NewSessionsServiceImpl implements Sessions {
 
     private SessionClient client;
 
+    /**
+     * Constructor requires a configured {@link SessionClient}
+     * @param sessionClient
+     */
     public NewSessionsServiceImpl(SessionClient sessionClient) {
         this.client = sessionClient;
     }
@@ -45,13 +54,13 @@ public class NewSessionsServiceImpl implements Sessions {
     /**
      * Get a {@link Session} from the provided {@link HttpServletRequest}.
      *
-     * @param request the {@link HttpServletRequest} to get the session for.
+     * @param id the {@link HttpServletRequest} to get the session for.
      * @return a {@link Session} instance if once exists returns null otherwise.
-     * @throws IOException for any problem getting a sesison from the request.
+     * @throws IOException for any problem getting a session from the request.
      */
     @Override
-    public Session get(HttpServletRequest request) throws IOException {
-        String token = RequestUtils.getSessionId(request);
+    public Session get(HttpServletRequest id) throws IOException {
+        String token = RequestUtils.getSessionId(id);
         return get(token);
     }
 
@@ -65,7 +74,7 @@ public class NewSessionsServiceImpl implements Sessions {
     @Override
     public Session get(String id) throws IOException {
         com.session.service.Session clientSession = client.getSessionByID(id);
-        
+
         return createZebedeeSession(clientSession);
     }
 
@@ -85,6 +94,8 @@ public class NewSessionsServiceImpl implements Sessions {
     }
 
     /**
+     * @deprecated This is a deprecated method and not supported by this implementation
+     *
      * Check if an active {@link Session} exists with the provided ID.
      *
      * @param id the session ID to find.
@@ -93,10 +104,12 @@ public class NewSessionsServiceImpl implements Sessions {
      */
     @Override
     public boolean exists(String id) throws IOException {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("exists is a deprecated method and not supported by this sessions implementation.");
     }
 
     /**
+     * @deprecated This is a deprecated method and not supported by this implementation
+     *
      * Check if the provided {@link Session} is expired.
      *
      * @param session the {@link Session} to check.
@@ -104,10 +117,12 @@ public class NewSessionsServiceImpl implements Sessions {
      */
     @Override
     public boolean expired(Session session) {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("exists is a deprecated method and not supported by this sessions implementation.");
     }
 
     /**
+     * @deprecated This is a deprecated method and not supported by this implementation
+     *
      * Get the expiry date of the provided {@link Session}
      *
      * @param session the  {@link Session} to use.
@@ -115,19 +130,19 @@ public class NewSessionsServiceImpl implements Sessions {
      */
     @Override
     public Date getExpiryDate(Session session) {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("exists is a deprecated method and not supported by this sessions implementation.");
     }
 
     private Session createZebedeeSession(com.session.service.Session clientSession) {
-        Session session = new Session();
-
-        if (clientSession.getId() == null || StringUtils.isEmpty(clientSession.getId())) {
+        if (clientSession.getId() == null) {
             throw new SessionClientException("client has returned a session with a null/empty id");
         }
 
-        if (clientSession.getEmail() == null || StringUtils.isEmpty(clientSession.getEmail())) {
+        if (clientSession.getEmail() == null) {
             throw new SessionClientException("client has returned a session with a null/empty email");
         }
+
+        Session session = new Session();
 
         session.setId(clientSession.getId());
         session.setEmail(clientSession.getEmail());

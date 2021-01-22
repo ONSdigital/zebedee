@@ -52,11 +52,9 @@ public class CollectionKeyStoreImplTest {
     public void read_collectionIDNull_shouldThrowException() throws Exception {
         store = new CollectionKeyStoreImpl(keyringDir.toPath(), null, null);
 
-        SecretKey key = null;
         try {
-            key = store.read(null);
+            store.read(null);
         } catch (KeyringException ex) {
-            assertThat(key, is(nullValue()));
             assertThat(ex.getMessage(), equalTo(INVALID_COLLECTION_ID_ERR));
             throw ex;
         }
@@ -66,11 +64,9 @@ public class CollectionKeyStoreImplTest {
     public void read_collectionIDEmpty_shouldThrowException() throws Exception {
         store = new CollectionKeyStoreImpl(keyringDir.toPath(), null, null);
 
-        SecretKey key = null;
         try {
-            key = store.read("");
+            store.read("");
         } catch (KeyringException ex) {
-            assertThat(key, is(nullValue()));
             assertThat(ex.getMessage(), equalTo(INVALID_COLLECTION_ID_ERR));
             throw ex;
         }
@@ -80,11 +76,9 @@ public class CollectionKeyStoreImplTest {
     public void read_keyNotFound_shouldThrowException() throws Exception {
         store = new CollectionKeyStoreImpl(keyringDir.toPath(), null, null);
 
-        SecretKey key = null;
         try {
-            key = store.read(TEST_COLLECTION_ID);
+            store.read(TEST_COLLECTION_ID);
         } catch (KeyringException ex) {
-            assertThat(key, is(nullValue()));
             assertThat(ex.getMessage(), equalTo(COLLECTION_KEY_NOT_FOUND_ERR));
             assertThat(ex.getCollectionID(), equalTo(TEST_COLLECTION_ID));
             throw ex;
@@ -96,17 +90,13 @@ public class CollectionKeyStoreImplTest {
         SecretKey masterKey = createNewSecretKey();
         IvParameterSpec iv = createNewInitVector();
 
-        SecretKey wrappedKey = createNewSecretKey();
-        createPlainTextCollectionKeyFile(TEST_COLLECTION_ID, wrappedKey);
+        createPlainTextCollectionKeyFile(TEST_COLLECTION_ID);
 
         store = new CollectionKeyStoreImpl(keyringDir.toPath(), masterKey, iv);
 
-        SecretKey actual = null;
-
         try {
-            actual = store.read(TEST_COLLECTION_ID);
+            store.read(TEST_COLLECTION_ID);
         } catch (KeyringException ex) {
-            assertThat(actual, is(nullValue()));
             assertThat(ex.getMessage(), equalTo(KEY_DECRYPTION_ERR));
             assertThat(ex.getCollectionID(), equalTo(TEST_COLLECTION_ID));
             throw ex;
@@ -126,18 +116,18 @@ public class CollectionKeyStoreImplTest {
 
         // Encrypt a test message using the collection key.
         String plainText = "Blackened is the end, Winter it will send, Throwing all you see Into obscurity";
-        byte[] encryptedMessage = encyrpt(plainText, collectionKey, initVector);
+        byte[] encryptedMessage = encrypt(plainText, collectionKey, initVector);
 
         // write the key to the store.
         store.write(TEST_COLLECTION_ID, collectionKey);
         assertTrue(Files.exists(keyringDir.toPath().resolve(TEST_COLLECTION_ID + ".key")));
 
-        // retieve the key from the store.
-        SecretKey actual = store.read(TEST_COLLECTION_ID);
+        // retrieve the key from the store.
+        SecretKey keyReturned = store.read(TEST_COLLECTION_ID);
 
-        // attempt to decrypt the test message using the key retrieve from the store - if its working as expected the
+        // attempt to decrypt the test message using the key retrieved from the store - if its working as expected the
         // decrypted message should equal the original input.
-        byte[] decryptedBytes = decrypt(encryptedMessage, collectionKey, initVector);
+        byte[] decryptedBytes = decrypt(encryptedMessage, keyReturned, initVector);
         String decryptedMessage = new String(decryptedBytes);
         assertThat(decryptedMessage, equalTo(plainText));
     }
@@ -189,7 +179,7 @@ public class CollectionKeyStoreImplTest {
         store = new CollectionKeyStoreImpl(keyringDir.toPath(), masterKey, masterIV);
 
         // create a plain key file in the keyring dir.
-        createPlainTextCollectionKeyFile(TEST_COLLECTION_ID, createNewSecretKey());
+        createPlainTextCollectionKeyFile(TEST_COLLECTION_ID);
 
         try {
             // attempt to write another key with the same collection ID.
@@ -259,7 +249,7 @@ public class CollectionKeyStoreImplTest {
         return new IvParameterSpec(iv);
     }
 
-    byte[] encyrpt(String plainText, SecretKey key, IvParameterSpec iv) throws Exception {
+    byte[] encrypt(String plainText, SecretKey key, IvParameterSpec iv) throws Exception {
         Cipher cipher = Cipher.getInstance(CIPHER_ALGORITHM);
         cipher.init(Cipher.ENCRYPT_MODE, key, iv);
 
@@ -274,7 +264,7 @@ public class CollectionKeyStoreImplTest {
         return cipher.doFinal(bytes);
     }
 
-    void createPlainTextCollectionKeyFile(String collectionID, SecretKey secretKey) throws Exception {
+    void createPlainTextCollectionKeyFile(String collectionID) throws Exception {
         Path p = keyringDir.toPath().resolve(collectionID + ".key");
         FileUtils.writeByteArrayToFile(p.toFile(), "This is not a valid secret key".getBytes());
     }

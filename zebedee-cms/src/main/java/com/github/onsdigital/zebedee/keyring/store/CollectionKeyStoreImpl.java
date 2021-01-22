@@ -39,9 +39,9 @@ public class CollectionKeyStoreImpl implements CollectionKeyStore {
     static final String CIPHER_ALGORITHM = "AES/CBC/PKCS5Padding";
 
     private Path keyringDir;
-    private transient SecretKey masterKey;
-    private transient IvParameterSpec masterIv;
-    private transient Object lock = new Object();
+    private SecretKey masterKey;
+    private IvParameterSpec masterIv;
+    private final Object lock = new Object();
 
     /**
      * <p>
@@ -102,7 +102,7 @@ public class CollectionKeyStoreImpl implements CollectionKeyStore {
             throw new KeyringException(KEY_DECRYPTION_ERR, collectionID, ex);
         } finally {
             if (keyBytes != null) {
-                destoryKeyBytes(keyBytes);
+                destroyKeyBytes(keyBytes);
             }
         }
     }
@@ -185,13 +185,13 @@ public class CollectionKeyStoreImpl implements CollectionKeyStore {
 
     /**
      * Even after an object has gone out of scope it will remain on the heap until GC runs to release it. While the
-     * object remains in memory it is technically possible for someone retieve it using Java memory monitoring tools.
+     * object remains in memory it is technically possible for someone retrieve it using Java memory monitoring tools.
      * This is very very unlikely but as an additional safeguard to minimise the window of opportunity we "zero" the
      * SecretKey data as soon as we have finished using it ensuring its only available for the time its required.
      *
      * @param keyBytes the array of bytes "destroy".
      */
-    private void destoryKeyBytes(byte[] keyBytes) {
+    private void destroyKeyBytes(byte[] keyBytes) {
         Arrays.fill(keyBytes, (byte) 0);
     }
 

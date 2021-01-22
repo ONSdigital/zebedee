@@ -23,10 +23,12 @@ import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 /**
  * {@link java.io.File} based implementation of {@link CollectionKeyStore}. Reads and writes
- * {@link SecretKey} objects to/from encrypted files on disk. Methods read, write & delete all acquire an exclusive
- * {@link java.nio.channels.FileLock} when accessing the key files. <p><b>We strongly advised against using/extending
- * this code for anything other than maintaining legacy functionality in Zebedee CMS.</b></p>For all other purposes
- * it should be considered deprecated.
+ * {@link SecretKey} objects to/from encrypted files on disk. Each method employs a synchronized block to prevent
+ * race conditions whilst accessing the key files. This negative performance impact is a necessary and unavoidable
+ * drawback to using files on disk instead of database.
+ *
+ * <p><b>We strongly advised against using/extending this code for anything other than maintaining legacy
+ * functionality in Zebedee CMS.</b></p>For all other purposes it should be considered deprecated. Use at your own risk.
  */
 public class CollectionKeyStoreImpl implements CollectionKeyStore {
 
@@ -43,6 +45,7 @@ public class CollectionKeyStoreImpl implements CollectionKeyStore {
     private Path keyringDir;
     private transient SecretKey masterKey;
     private transient IvParameterSpec masterIv;
+    private transient Object lock = new Object();
 
     /**
      * <p>
@@ -77,8 +80,13 @@ public class CollectionKeyStoreImpl implements CollectionKeyStore {
 
     @Override
     public SecretKey read(final String collectionID) throws KeyringException {
-        validateRead(collectionID);
+        synchronized (lock) {
+            validateRead(collectionID);
+            return readKeyFromFile(collectionID);
+        }
+    }
 
+    private SecretKey readKeyFromFile(final String collectionID) throws KeyringException {
         byte[] keyBytes = null;
         try (
                 RandomAccessFile raf = new RandomAccessFile(getKeyPath(collectionID), FILE_ACCESS_MODE);
@@ -103,8 +111,13 @@ public class CollectionKeyStoreImpl implements CollectionKeyStore {
 
     @Override
     public void write(final String collectionID, final SecretKey collectionKey) throws KeyringException {
-        validateWrite(collectionID, collectionKey);
+        synchronized (lock) {
+            validateWrite(collectionID, collectionKey);
+            writeKeyToFile(collectionID, collectionKey);
+        }
+    }
 
+    private void writeKeyToFile(final String collectionID, final SecretKey collectionKey) throws KeyringException {
         try (
                 RandomAccessFile randomAccessFile = new RandomAccessFile(getKeyPath(collectionID), FILE_ACCESS_MODE);
                 FileChannel channel = randomAccessFile.getChannel();

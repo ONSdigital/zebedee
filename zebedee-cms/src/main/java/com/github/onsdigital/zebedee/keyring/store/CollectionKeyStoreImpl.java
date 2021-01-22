@@ -9,11 +9,8 @@ import javax.crypto.CipherOutputStream;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.RandomAccessFile;
-import java.nio.channels.Channels;
-import java.nio.channels.FileChannel;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -40,7 +37,6 @@ public class CollectionKeyStoreImpl implements CollectionKeyStore {
     static final String COLLECTION_KEY_ALREADY_EXISTS_ERR = "collectionKey for this collection ID already exists";
     static final String ENCRYPTION_ALGORITHM = "AES";
     static final String CIPHER_ALGORITHM = "AES/CBC/PKCS5Padding";
-    static final String FILE_ACCESS_MODE = "rw";
 
     private Path keyringDir;
     private transient SecretKey masterKey;
@@ -89,15 +85,9 @@ public class CollectionKeyStoreImpl implements CollectionKeyStore {
     private SecretKey readKeyFromFile(final String collectionID) throws KeyringException {
         byte[] keyBytes = null;
         try (
-                RandomAccessFile raf = new RandomAccessFile(getKeyPath(collectionID), FILE_ACCESS_MODE);
-                FileChannel channel = raf.getChannel();
-                InputStream in = Channels.newInputStream(channel);
-                CipherInputStream cin = new CipherInputStream(in, getDecryptCipher());
+                FileInputStream fin = new FileInputStream(getKeyPath(collectionID));
+                CipherInputStream cin = new CipherInputStream(fin, getDecryptCipher());
         ) {
-            // FileLock documentation states the lock will released when the FileChannel used to acquire it is closed.
-            // FileChannel implements autoclosable and in this case is defined inside a try-with-resources which
-            // guarantees auto closeable resourses are closed.
-            channel.lock();
             keyBytes = IOUtils.toByteArray(cin);
             return new SecretKeySpec(keyBytes, 0, keyBytes.length, ENCRYPTION_ALGORITHM);
         } catch (Exception ex) {
@@ -119,15 +109,9 @@ public class CollectionKeyStoreImpl implements CollectionKeyStore {
 
     private void writeKeyToFile(final String collectionID, final SecretKey collectionKey) throws KeyringException {
         try (
-                RandomAccessFile randomAccessFile = new RandomAccessFile(getKeyPath(collectionID), FILE_ACCESS_MODE);
-                FileChannel channel = randomAccessFile.getChannel();
-                OutputStream out = Channels.newOutputStream(channel);
-                CipherOutputStream cos = new CipherOutputStream(out, getEncryptCipher())
+                FileOutputStream fos = new FileOutputStream(getKeyPath(collectionID));
+                CipherOutputStream cos = new CipherOutputStream(fos, getEncryptCipher())
         ) {
-            // FileLock documentation states the lock will released when the FileChannel used to acquire it is closed.
-            // FileChannel implements autoclosable and in this case is defined inside a try-with-resources which
-            // guarantees auto closeable resourses are closed.
-            channel.lock();
             cos.write(collectionKey.getEncoded());
             cos.flush();
         } catch (Exception ex) {

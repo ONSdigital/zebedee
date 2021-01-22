@@ -234,6 +234,18 @@ public class CollectionKeyStoreImplTest {
         assertThat(actualKey, equalTo(collectionKey));
     }
 
+    @Test(expected = KeyringException.class)
+    public void testExists_collectionIDNull_shouldThrowException() throws Exception {
+        store = new CollectionKeyStoreImpl(null, null, null);
+
+        try {
+            store.exists(null);
+        } catch (KeyringException ex) {
+            assertThat(ex.getMessage(), equalTo(INVALID_COLLECTION_ID_ERR));
+            throw ex;
+        }
+    }
+
     SecretKey createNewSecretKey() throws Exception {
         return KeyGenerator.getInstance("AES").generateKey();
     }

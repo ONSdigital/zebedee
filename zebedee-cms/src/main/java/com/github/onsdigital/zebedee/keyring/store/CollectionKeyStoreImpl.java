@@ -75,6 +75,14 @@ public class CollectionKeyStoreImpl implements CollectionKeyStore {
     }
 
     @Override
+    public boolean exists(String collectionID) throws KeyringException {
+        if (isEmpty(collectionID)) {
+            throw new KeyringException(INVALID_COLLECTION_ID_ERR);
+        }
+        return false;
+    }
+
+    @Override
     public SecretKey read(final String collectionID) throws KeyringException {
         synchronized (lock) {
             validateRead(collectionID);

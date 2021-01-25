@@ -7,6 +7,7 @@ import com.github.onsdigital.zebedee.reader.util.RequestUtils;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.session.service.Sessions;
 import com.github.onsdigital.zebedee.util.mertics.service.MetricsService;
+import org.apache.commons.lang.time.DateUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -46,12 +47,10 @@ public class Ping {
         try {
             Sessions sessions = Root.zebedee.getSessions();
             token = RequestUtils.getSessionId(request);
-            if (sessions.exists(token)) {
-                Session session = sessions.get(token);
-                if (session != null && !sessions.expired(session)) {
-                    pingResponse.hasSession = true;
-                    pingResponse.sessionExpiryDate = sessions.getExpiryDate(session);
-                }
+            Session session = sessions.get(token);
+            if (session != null) {
+                pingResponse.hasSession = true;
+                pingResponse.sessionExpiryDate = DateUtils.addMinutes(session.getLastAccess(), 30);
             }
         } catch (IOException e) {
             error().exception(e).log("error setting session details");

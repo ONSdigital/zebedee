@@ -50,7 +50,6 @@ public class Ping {
             Session session = sessions.get(token);
             if (session != null) {
                 pingResponse.hasSession = true;
-                pingResponse.sessionExpiryDate = DateUtils.addMinutes(session.getLastAccess(), 30);
             }
         } catch (IOException e) {
             error().exception(e).log("error setting session details");

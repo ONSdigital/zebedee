@@ -147,9 +147,7 @@ public class CollectionKeyStoreImpl implements CollectionKeyStore {
             throw new KeyringException(INVALID_COLLECTION_ID_ERR);
         }
 
-        Path keyPath = Paths.get(getKeyPath(collectionID));
-
-        if (Files.notExists(keyPath)) {
+        if (!exists(collectionID)) {
             throw new KeyringException(COLLECTION_KEY_NOT_FOUND_ERR, collectionID);
         }
     }
@@ -160,7 +158,7 @@ public class CollectionKeyStoreImpl implements CollectionKeyStore {
         }
 
         Path keyPath = Paths.get(getKeyPath(collectionID));
-        if (Files.exists(keyPath)) {
+        if (exists(collectionID)) {
             throw new KeyringException(COLLECTION_KEY_ALREADY_EXISTS_ERR, collectionID);
         }
 

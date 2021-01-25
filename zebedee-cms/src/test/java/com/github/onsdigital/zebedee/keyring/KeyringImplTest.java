@@ -20,7 +20,9 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.when;
 
 public class KeyringImplTest {
 
@@ -121,6 +123,63 @@ public class KeyringImplTest {
     }
 
     @Test
+    public void testAdd_keyNotInCacheButExistsInStore_shouldAddKeyToCache() throws Exception {
+        when(keyStore.exists(TEST_COLLECTION_ID))
+                .thenReturn(true);
+
+        when(keyStore.read(TEST_COLLECTION_ID))
+                .thenReturn(secretKey);
+
+        keyring.add(TEST_COLLECTION_ID, secretKey);
+
+        assertTrue(cache.containsKey(TEST_COLLECTION_ID));
+        assertThat(cache.get(TEST_COLLECTION_ID), equalTo(secretKey));
+    }
+
+    @Test(expected = KeyringException.class)
+    public void testAdd_keyNotInCacheKeyStoreExistsError_shouldThrowException() throws Exception {
+        when(keyStore.exists(TEST_COLLECTION_ID))
+                .thenReturn(true);
+
+        when(keyStore.read(TEST_COLLECTION_ID))
+                .thenThrow(new KeyringException("unexpected error"));
+
+        try {
+            keyring.add(TEST_COLLECTION_ID, secretKey);
+        } catch (KeyringException ex) {
+            assertTrue(cache.isEmpty());
+            assertThat(ex.getMessage(), equalTo("unexpected error"));
+
+            verify(keyStore, times(1)).exists(TEST_COLLECTION_ID);
+            verify(keyStore, times(1)).read(TEST_COLLECTION_ID);
+            verifyNoMoreInteractions(keyStore);
+            throw ex;
+        }
+    }
+
+    @Test(expected = KeyringException.class)
+    public void testAdd_keystoreKeyMismatch_shouldThrowException() throws Exception {
+        when(keyStore.exists(TEST_COLLECTION_ID))
+                .thenReturn(true);
+
+        when(keyStore.read(TEST_COLLECTION_ID))
+                .thenReturn(mock(SecretKey.class));
+
+        try {
+            keyring.add(TEST_COLLECTION_ID, secretKey);
+        } catch (KeyringException ex) {
+            assertTrue(cache.isEmpty());
+            assertThat(ex.getMessage(), equalTo(KEY_MISMATCH_ERR_MSG));
+            assertThat(ex.getCollectionID(), equalTo(TEST_COLLECTION_ID));
+
+            verify(keyStore, times(1)).exists(TEST_COLLECTION_ID);
+            verify(keyStore, times(1)).read(TEST_COLLECTION_ID);
+            verifyNoMoreInteractions(keyStore);
+            throw ex;
+        }
+    }
+
+    @Test
     public void testAdd_success_shouldWriteKeyToStoreAndCache() throws Exception {
         keyring.add(TEST_COLLECTION_ID, secretKey);
 
@@ -129,6 +188,4 @@ public class KeyringImplTest {
         assertTrue(cache.containsKey(TEST_COLLECTION_ID));
         assertThat(cache.get(TEST_COLLECTION_ID), equalTo(secretKey));
     }
-
-
 }

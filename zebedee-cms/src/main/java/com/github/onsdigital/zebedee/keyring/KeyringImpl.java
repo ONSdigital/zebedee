@@ -7,18 +7,48 @@ import javax.crypto.SecretKey;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * In memory {@link Keyring} implmentation. Keyring uses a {@link CollectionKeyStore} to persist entries to storage
+ * whilst maintaining a copy of the data in an in-memory cache for speedy retreival. If an attempt is made to add a
+ * duplicate key the Keyring will compare the new & existing {@link SecretKey} values. If the keys are not equal then a
+ * {@link KeyringException} is thrown. This aims to prevent collection key values being overwritten as this will
+ * result in a collection that can no longer be decrypted. Otherwise the key values are the same and the entry
+ * already exists so no action is taken.
+ * <p>
+ * This implementation uses a {@link HashMap} as a cache. This approach means all collection keys will be held in
+ * memory at once. At the time of writing this Class we don't feel this memory footprint will be problematic:
+ * <ul>
+ *     <li>There are usually only a small number of collections in existence at any given time.</li>
+ *     <li>The size of the data held in the cache is fairly small.</li>
+ * </ul>
+ *  However if this does become an issue consider replacing the Hashmap with some type time based eviction object
+ *  whereby entries are automatically evicted after duration X of inactivity.
+ */
 public class KeyringImpl implements Keyring {
 
     static final String INVALID_COLLECTION_ID_ERR_MSG = "expected collection ID but was null or empty";
     static final String INVALID_SECRET_KEY_ERR_MSG = "expected secret key but was null";
-    static final String DUPLICATE_KEY_ERR_MSG = "collection key already exists for this collection";
     static final String KEY_MISMATCH_ERR_MSG =
             "add unsuccessful a different SecretKey already exists for a collection with ID";
     static final String KEY_NOT_FOUND_ERR_MSG = "collectionKey not found for this collection ID";
 
     private CollectionKeyStore keyStore;
+
+    /**
+     * Implementation note: Using a Hashmap as the cache means all collection keys will be held in memory at once. At
+     * the time of writing we don't feel memory footprint of this decision will be problematic:
+     * - There are usually a small number of collections in existence at any time
+     * - The size of the data in the cache is fairly small.
+     * However if this does become an issue consider replacing the Hashmap with some type time based eviction cache
+     * to remove entries after duration X of inactivity.
+     */
     private Map<String, SecretKey> cache;
 
+    /**
+     * Create a new instance of the Keyring.
+     *
+     * @param keyStore {@link CollectionKeyStore} to use to read/write entries to/from persistent storage.
+     */
     public KeyringImpl(final CollectionKeyStore keyStore) {
         this(keyStore, new HashMap<>());
     }
@@ -32,10 +62,17 @@ public class KeyringImpl implements Keyring {
     public synchronized void add(final String collectionID, final SecretKey secretKey) throws KeyringException {
         validateAddKeyParams(collectionID, secretKey);
 
-        if (!isCached(collectionID, secretKey)) {
-            keyStore.write(collectionID, secretKey);
-            cache.put(collectionID, secretKey);
+        if (keyExistsInCache(collectionID, secretKey)) {
+            return;
         }
+
+        if (keyExistsInStore(collectionID, secretKey)) {
+            cache.put(collectionID, secretKey);
+            return;
+        }
+
+        keyStore.write(collectionID, secretKey);
+        cache.put(collectionID, secretKey);
     }
 
     private void validateAddKeyParams(String collectionID, SecretKey secretKey) throws KeyringException {
@@ -48,7 +85,7 @@ public class KeyringImpl implements Keyring {
         }
     }
 
-    private boolean isCached(String collectionID, SecretKey keyToAdd) throws KeyringException {
+    private boolean keyExistsInCache(String collectionID, SecretKey keyToAdd) throws KeyringException {
         if (!cache.containsKey(collectionID)) {
             return false;
         }
@@ -61,13 +98,27 @@ public class KeyringImpl implements Keyring {
         throw new KeyringException(KEY_MISMATCH_ERR_MSG, collectionID);
     }
 
+    private boolean keyExistsInStore(String collectionID, SecretKey secretKey) throws KeyringException {
+        if (!keyStore.exists(collectionID)) {
+            return false;
+        }
+
+        SecretKey existingKey = keyStore.read(collectionID);
+        if (secretKey.equals(existingKey)) {
+            return true;
+        }
+
+        throw new KeyringException(KEY_MISMATCH_ERR_MSG, collectionID);
+    }
+
     @Override
     public synchronized SecretKey get(String collectionID) throws KeyringException {
+        // TODO implementation coming soon.
         return null;
     }
 
     @Override
     public synchronized void remove(String collectionID) throws KeyringException {
-
+        // TODO implementation coming soon.
     }
 }

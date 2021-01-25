@@ -21,8 +21,8 @@ import java.util.Map;
  *     <li>There are usually only a small number of collections in existence at any given time.</li>
  *     <li>The size of the data held in the cache is fairly small.</li>
  * </ul>
- *  However if this does become an issue consider replacing the Hashmap with some type time based eviction object
- *  whereby entries are automatically evicted after duration X of inactivity.
+ * However if this does become an issue consider replacing the Hashmap with some type time based cache object to
+ * automatically evicted after a duration of inactivity.
  */
 public class KeyringImpl implements Keyring {
 
@@ -33,15 +33,6 @@ public class KeyringImpl implements Keyring {
     static final String KEY_NOT_FOUND_ERR_MSG = "collectionKey not found for this collection ID";
 
     private CollectionKeyStore keyStore;
-
-    /**
-     * Implementation note: Using a Hashmap as the cache means all collection keys will be held in memory at once. At
-     * the time of writing we don't feel memory footprint of this decision will be problematic:
-     * - There are usually a small number of collections in existence at any time
-     * - The size of the data in the cache is fairly small.
-     * However if this does become an issue consider replacing the Hashmap with some type time based eviction cache
-     * to remove entries after duration X of inactivity.
-     */
     private Map<String, SecretKey> cache;
 
     /**

@@ -76,6 +76,17 @@ public class KeyringImpl implements Keyring {
         }
     }
 
+    /**
+     * Check if an entry for this collection ID already exists in the cache. If so retieve the entry from the cache
+     * and check the existing key matches the key being added.
+     *
+     * @param collectionID the collection ID the entry is being added against.
+     * @param keyToAdd     the {@link SecretKey} used to encrypt the collection content.
+     * @return false if there is no existing entry in the cache for this collection ID. Return true if an entry for
+     * this collection ID already exists and the new & existing keys are equal.
+     * @throws KeyringException thrown if an entry already exists for this collection ID but the new key does not
+     *                          equal the existing key.
+     */
     private boolean keyExistsInCache(String collectionID, SecretKey keyToAdd) throws KeyringException {
         if (!cache.containsKey(collectionID)) {
             return false;
@@ -89,6 +100,17 @@ public class KeyringImpl implements Keyring {
         throw new KeyringException(KEY_MISMATCH_ERR_MSG, collectionID);
     }
 
+    /**
+     * Check if an entry for this collection ID already exists in the {@link CollectionKeyStore}. If so retieve the entry from the
+     * store and check the existing key matches the key being added.
+     *
+     * @param collectionID the collection ID the entry is being added against.
+     * @param secretKey    the {@link SecretKey} used to encrypt the collection content.
+     * @return false if there is no existing entry in the store for this collection ID. Return true if an entry for
+     * this collection ID already exists and the new & existing keys are equal.
+     * @throws KeyringException thrown if an entry already exists for this collection ID but the new key does not
+     *                          equal the existing key.
+     */
     private boolean keyExistsInStore(String collectionID, SecretKey secretKey) throws KeyringException {
         if (!keyStore.exists(collectionID)) {
             return false;

@@ -41,7 +41,6 @@ public class CollectionKeyStoreImpl implements CollectionKeyStore {
     private Path keyringDir;
     private SecretKey masterKey;
     private IvParameterSpec masterIv;
-    private final Object lock = new Object();
 
     /**
      * <p>
@@ -75,19 +74,18 @@ public class CollectionKeyStoreImpl implements CollectionKeyStore {
     }
 
     @Override
-    public boolean exists(String collectionID) throws KeyringException {
+    public synchronized boolean exists(String collectionID) throws KeyringException {
         if (isEmpty(collectionID)) {
             throw new KeyringException(INVALID_COLLECTION_ID_ERR);
         }
-        return false;
+
+        return Files.exists(Paths.get(getKeyPath(collectionID)));
     }
 
     @Override
-    public SecretKey read(final String collectionID) throws KeyringException {
-        synchronized (lock) {
-            validateRead(collectionID);
-            return readKeyFromFile(collectionID);
-        }
+    public synchronized SecretKey read(final String collectionID) throws KeyringException {
+        validateRead(collectionID);
+        return readKeyFromFile(collectionID);
     }
 
     private SecretKey readKeyFromFile(final String collectionID) throws KeyringException {
@@ -108,11 +106,9 @@ public class CollectionKeyStoreImpl implements CollectionKeyStore {
     }
 
     @Override
-    public void write(final String collectionID, final SecretKey collectionKey) throws KeyringException {
-        synchronized (lock) {
-            validateWrite(collectionID, collectionKey);
-            writeKeyToFile(collectionID, collectionKey);
-        }
+    public synchronized void write(final String collectionID, final SecretKey collectionKey) throws KeyringException {
+        validateWrite(collectionID, collectionKey);
+        writeKeyToFile(collectionID, collectionKey);
     }
 
     private void writeKeyToFile(final String collectionID, final SecretKey collectionKey) throws KeyringException {
@@ -128,7 +124,7 @@ public class CollectionKeyStoreImpl implements CollectionKeyStore {
     }
 
     @Override
-    public void delete(String collectionID) throws KeyringException {
+    public synchronized void delete(String collectionID) throws KeyringException {
         // TODO implementation coming soon.
     }
 

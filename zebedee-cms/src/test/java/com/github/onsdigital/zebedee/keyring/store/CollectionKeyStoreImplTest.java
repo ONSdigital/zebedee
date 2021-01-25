@@ -30,6 +30,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class CollectionKeyStoreImplTest {
@@ -234,6 +235,35 @@ public class CollectionKeyStoreImplTest {
             assertThat(ex.getMessage(), equalTo(INVALID_COLLECTION_ID_ERR));
             throw ex;
         }
+    }
+
+    @Test(expected = KeyringException.class)
+    public void testExists_collectionIEmpty_shouldThrowException() throws Exception {
+        store = new CollectionKeyStoreImpl(null, null, null);
+
+        try {
+            store.exists("");
+        } catch (KeyringException ex) {
+            assertThat(ex.getMessage(), equalTo(INVALID_COLLECTION_ID_ERR));
+            throw ex;
+        }
+    }
+
+    @Test
+    public void testExists_keyFileNotExist_shouldReturnFalse() throws Exception {
+        store = new CollectionKeyStoreImpl(keyringDir.toPath(), null, null);
+
+        assertFalse(store.exists(TEST_COLLECTION_ID));
+    }
+
+    @Test
+    public void testExists_keyFileExist_shouldReturnTrue() throws Exception {
+        store = new CollectionKeyStoreImpl(keyringDir.toPath(), null, null);
+
+        Path p = Files.createFile(keyringDir.toPath().resolve(TEST_COLLECTION_ID + ".key"));
+        assertTrue(Files.exists(p));
+
+        assertTrue(store.exists(TEST_COLLECTION_ID));
     }
 
     SecretKey createNewSecretKey() throws Exception {

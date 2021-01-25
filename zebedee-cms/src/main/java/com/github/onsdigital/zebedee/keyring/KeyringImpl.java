@@ -18,7 +18,6 @@ public class KeyringImpl implements Keyring {
 
     private CollectionKeyStore keyStore;
     private Map<String, SecretKey> cache;
-    private transient Object lock = new Object();
 
     public KeyringImpl(final CollectionKeyStore keyStore) {
         this(keyStore, new HashMap<>());
@@ -30,16 +29,13 @@ public class KeyringImpl implements Keyring {
     }
 
     @Override
-    public void add(final String collectionID, final SecretKey secretKey) throws KeyringException {
+    public synchronized void add(final String collectionID, final SecretKey secretKey) throws KeyringException {
         validateAddKeyParams(collectionID, secretKey);
 
-        synchronized (lock) {
-            if (!isCached(collectionID, secretKey)) {
-                keyStore.write(collectionID, secretKey);
-                cache.put(collectionID, secretKey);
-            }
+        if (!isCached(collectionID, secretKey)) {
+            keyStore.write(collectionID, secretKey);
+            cache.put(collectionID, secretKey);
         }
-
     }
 
     private void validateAddKeyParams(String collectionID, SecretKey secretKey) throws KeyringException {
@@ -66,12 +62,12 @@ public class KeyringImpl implements Keyring {
     }
 
     @Override
-    public SecretKey get(String collectionID) throws KeyringException {
+    public synchronized SecretKey get(String collectionID) throws KeyringException {
         return null;
     }
 
     @Override
-    public void remove(String collectionID) throws KeyringException {
+    public synchronized void remove(String collectionID) throws KeyringException {
 
     }
 }

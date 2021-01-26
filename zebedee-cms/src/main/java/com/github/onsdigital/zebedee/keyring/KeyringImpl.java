@@ -129,6 +129,11 @@ public class KeyringImpl implements Keyring {
         if (StringUtils.isEmpty(collectionID)) {
             throw new KeyringException(INVALID_COLLECTION_ID_ERR_MSG);
         }
+
+        if (cache.containsKey(collectionID)) {
+            return cache.get(collectionID);
+        }
+
         return null;
     }
 

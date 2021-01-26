@@ -15,6 +15,7 @@ import static com.github.onsdigital.zebedee.keyring.KeyringImpl.INVALID_SECRET_K
 import static com.github.onsdigital.zebedee.keyring.KeyringImpl.KEY_MISMATCH_ERR_MSG;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -45,38 +46,29 @@ public class KeyringImplTest {
         this.keyring = new KeyringImpl(keyStore, cache);
     }
 
-    @Test(expected = KeyringException.class)
-    public void testAdd_collectionIDNull_shouldThrowException() throws Exception {
-        try {
-            keyring.add(null, null);
-        } catch (KeyringException ex) {
-            assertThat(ex.getMessage(), equalTo(INVALID_COLLECTION_ID_ERR_MSG));
-            assertTrue(cache.isEmpty());
-            throw ex;
-        }
+    @Test
+    public void testAdd_collectionIDNull_shouldThrowException() {
+        KeyringException ex = assertThrows(KeyringException.class, () -> keyring.add(null, null));
+
+        assertThat(ex.getMessage(), equalTo(INVALID_COLLECTION_ID_ERR_MSG));
+        assertTrue(cache.isEmpty());
     }
 
-    @Test(expected = KeyringException.class)
+    @Test
     public void testAdd_collectionIDEmpty_shouldThrowException() throws Exception {
-        try {
-            keyring.add("", null);
-        } catch (KeyringException ex) {
-            assertThat(ex.getMessage(), equalTo(INVALID_COLLECTION_ID_ERR_MSG));
-            assertTrue(cache.isEmpty());
-            throw ex;
-        }
+        KeyringException ex = assertThrows(KeyringException.class, () -> keyring.add("", null));
+
+        assertThat(ex.getMessage(), equalTo(INVALID_COLLECTION_ID_ERR_MSG));
+        assertTrue(cache.isEmpty());
     }
 
-    @Test(expected = KeyringException.class)
+    @Test
     public void testAdd_secretKeyNull_shouldThrowException() throws Exception {
-        try {
-            keyring.add(TEST_COLLECTION_ID, null);
-        } catch (KeyringException ex) {
-            assertThat(ex.getMessage(), equalTo(INVALID_SECRET_KEY_ERR_MSG));
-            assertThat(ex.getCollectionID(), equalTo(TEST_COLLECTION_ID));
-            assertTrue(cache.isEmpty());
-            throw ex;
-        }
+        KeyringException ex = assertThrows(KeyringException.class, () -> keyring.add(TEST_COLLECTION_ID, null));
+
+        assertThat(ex.getMessage(), equalTo(INVALID_SECRET_KEY_ERR_MSG));
+        assertThat(ex.getCollectionID(), equalTo(TEST_COLLECTION_ID));
+        assertTrue(cache.isEmpty());
     }
 
     @Test
@@ -92,34 +84,29 @@ public class KeyringImplTest {
         verifyZeroInteractions(keyStore);
     }
 
-    @Test(expected = KeyringException.class)
+    @Test
     public void testAdd_keyWithDiffentValueExistsInCache_shouldThrowException() throws Exception {
         SecretKey key2 = mock(SecretKey.class);
         cache.put(TEST_COLLECTION_ID, key2);
 
-        try {
-            keyring.add(TEST_COLLECTION_ID, secretKey);
-        } catch (KeyringException ex) {
-            verifyZeroInteractions(keyStore);
-            assertThat(cache.size(), equalTo(1));
-            assertThat(ex.getMessage(), equalTo(KEY_MISMATCH_ERR_MSG));
-            assertThat(ex.getCollectionID(), equalTo(TEST_COLLECTION_ID));
-            throw ex;
-        }
+        KeyringException ex = assertThrows(KeyringException.class, () -> keyring.add(TEST_COLLECTION_ID, secretKey));
+
+        verifyZeroInteractions(keyStore);
+        assertThat(cache.size(), equalTo(1));
+        assertThat(ex.getMessage(), equalTo(KEY_MISMATCH_ERR_MSG));
+        assertThat(ex.getCollectionID(), equalTo(TEST_COLLECTION_ID));
     }
 
-    @Test(expected = KeyringException.class)
+    @Test
     public void testAdd_keystoreThrowsException_shouldThrowException() throws Exception {
         doThrow(KeyringException.class)
                 .when(keyStore)
                 .write(TEST_COLLECTION_ID, secretKey);
-        try {
-            keyring.add(TEST_COLLECTION_ID, secretKey);
-        } catch (KeyringException ex) {
-            verify(keyStore, times(1)).write(TEST_COLLECTION_ID, secretKey);
-            assertTrue(cache.isEmpty());
-            throw ex;
-        }
+
+        KeyringException ex = assertThrows(KeyringException.class, () -> keyring.add(TEST_COLLECTION_ID, secretKey));
+
+        verify(keyStore, times(1)).write(TEST_COLLECTION_ID, secretKey);
+        assertTrue(cache.isEmpty());
     }
 
     @Test
@@ -136,7 +123,7 @@ public class KeyringImplTest {
         assertThat(cache.get(TEST_COLLECTION_ID), equalTo(secretKey));
     }
 
-    @Test(expected = KeyringException.class)
+    @Test
     public void testAdd_keyNotInCacheKeyStoreExistsError_shouldThrowException() throws Exception {
         when(keyStore.exists(TEST_COLLECTION_ID))
                 .thenReturn(true);
@@ -144,20 +131,17 @@ public class KeyringImplTest {
         when(keyStore.read(TEST_COLLECTION_ID))
                 .thenThrow(new KeyringException("unexpected error"));
 
-        try {
-            keyring.add(TEST_COLLECTION_ID, secretKey);
-        } catch (KeyringException ex) {
-            assertTrue(cache.isEmpty());
-            assertThat(ex.getMessage(), equalTo("unexpected error"));
+        KeyringException ex = assertThrows(KeyringException.class, () -> keyring.add(TEST_COLLECTION_ID, secretKey));
 
-            verify(keyStore, times(1)).exists(TEST_COLLECTION_ID);
-            verify(keyStore, times(1)).read(TEST_COLLECTION_ID);
-            verifyNoMoreInteractions(keyStore);
-            throw ex;
-        }
+        assertTrue(cache.isEmpty());
+        assertThat(ex.getMessage(), equalTo("unexpected error"));
+
+        verify(keyStore, times(1)).exists(TEST_COLLECTION_ID);
+        verify(keyStore, times(1)).read(TEST_COLLECTION_ID);
+        verifyNoMoreInteractions(keyStore);
     }
 
-    @Test(expected = KeyringException.class)
+    @Test
     public void testAdd_keystoreKeyMismatch_shouldThrowException() throws Exception {
         when(keyStore.exists(TEST_COLLECTION_ID))
                 .thenReturn(true);
@@ -165,18 +149,14 @@ public class KeyringImplTest {
         when(keyStore.read(TEST_COLLECTION_ID))
                 .thenReturn(mock(SecretKey.class));
 
-        try {
-            keyring.add(TEST_COLLECTION_ID, secretKey);
-        } catch (KeyringException ex) {
-            assertTrue(cache.isEmpty());
-            assertThat(ex.getMessage(), equalTo(KEY_MISMATCH_ERR_MSG));
-            assertThat(ex.getCollectionID(), equalTo(TEST_COLLECTION_ID));
+        KeyringException ex = assertThrows(KeyringException.class, () -> keyring.add(TEST_COLLECTION_ID, secretKey));
 
-            verify(keyStore, times(1)).exists(TEST_COLLECTION_ID);
-            verify(keyStore, times(1)).read(TEST_COLLECTION_ID);
-            verifyNoMoreInteractions(keyStore);
-            throw ex;
-        }
+        assertThat(ex.getMessage(), equalTo(KEY_MISMATCH_ERR_MSG));
+        assertThat(ex.getCollectionID(), equalTo(TEST_COLLECTION_ID));
+
+        verify(keyStore, times(1)).exists(TEST_COLLECTION_ID);
+        verify(keyStore, times(1)).read(TEST_COLLECTION_ID);
+        verifyNoMoreInteractions(keyStore);
     }
 
     @Test
@@ -200,14 +180,21 @@ public class KeyringImplTest {
         }
     }
 
-    @Test(expected = KeyringException.class)
+    @Test
     public void testGet_collectionIDEmpty_shouldThrowException() throws Exception {
-        try {
-            keyring.get(null);
-        } catch (KeyringException ex) {
-            assertThat(ex.getMessage(), equalTo(INVALID_COLLECTION_ID_ERR_MSG));
-            verifyZeroInteractions(keyStore);
-            throw ex;
-        }
+        KeyringException ex = assertThrows(KeyringException.class, () -> keyring.get(null));
+
+        assertThat(ex.getMessage(), equalTo(INVALID_COLLECTION_ID_ERR_MSG));
+        verifyZeroInteractions(keyStore);
+    }
+
+    @Test
+    public void testGet_keyExistsInCache_shouldReturnKey() throws Exception {
+        cache.put(TEST_COLLECTION_ID, secretKey);
+
+        SecretKey actual = keyring.get(TEST_COLLECTION_ID);
+
+        assertThat(actual, equalTo(secretKey));
+        verifyZeroInteractions(keyStore);
     }
 }

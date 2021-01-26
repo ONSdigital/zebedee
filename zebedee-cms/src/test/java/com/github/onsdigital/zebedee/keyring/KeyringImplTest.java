@@ -188,4 +188,26 @@ public class KeyringImplTest {
         assertTrue(cache.containsKey(TEST_COLLECTION_ID));
         assertThat(cache.get(TEST_COLLECTION_ID), equalTo(secretKey));
     }
+
+    @Test(expected = KeyringException.class)
+    public void testGet_collectionIDNull_shouldThrowException() throws Exception {
+        try {
+            keyring.get(null);
+        } catch (KeyringException ex) {
+            assertThat(ex.getMessage(), equalTo(INVALID_COLLECTION_ID_ERR_MSG));
+            verifyZeroInteractions(keyStore);
+            throw ex;
+        }
+    }
+
+    @Test(expected = KeyringException.class)
+    public void testGet_collectionIDEmpty_shouldThrowException() throws Exception {
+        try {
+            keyring.get(null);
+        } catch (KeyringException ex) {
+            assertThat(ex.getMessage(), equalTo(INVALID_COLLECTION_ID_ERR_MSG));
+            verifyZeroInteractions(keyStore);
+            throw ex;
+        }
+    }
 }

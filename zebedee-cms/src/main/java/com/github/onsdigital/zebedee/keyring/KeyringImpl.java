@@ -126,7 +126,9 @@ public class KeyringImpl implements Keyring {
 
     @Override
     public synchronized SecretKey get(String collectionID) throws KeyringException {
-        // TODO implementation coming soon.
+        if (StringUtils.isEmpty(collectionID)) {
+            throw new KeyringException(INVALID_COLLECTION_ID_ERR_MSG);
+        }
         return null;
     }
 

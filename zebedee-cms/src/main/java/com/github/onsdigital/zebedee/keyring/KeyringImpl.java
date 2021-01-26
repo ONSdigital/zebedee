@@ -30,7 +30,7 @@ public class KeyringImpl implements Keyring {
     static final String INVALID_SECRET_KEY_ERR_MSG = "expected secret key but was null";
     static final String KEY_MISMATCH_ERR_MSG =
             "add unsuccessful as a different SecretKey already exists for this collection ID";
-    static final String KEY_NOT_FOUND_ERR_MSG = "collectionKey not found for this collection ID";
+    static final String KEY_NOT_FOUND_ERR_MSG = "SecretKey not found for this collection ID";
 
     private CollectionKeyStore keyStore;
     private Map<String, SecretKey> cache;
@@ -134,7 +134,14 @@ public class KeyringImpl implements Keyring {
             return cache.get(collectionID);
         }
 
-        return null;
+        if (!keyStore.exists(collectionID)) {
+            throw new KeyringException(KEY_NOT_FOUND_ERR_MSG, collectionID);
+        }
+
+        SecretKey key = keyStore.read(collectionID);
+        cache.put(collectionID, key);
+
+        return key;
     }
 
     @Override

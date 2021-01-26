@@ -52,6 +52,7 @@ public interface Sessions {
      * @return true if an active session exists with this ID, false otherwise.
      * @throws IOException problem checking the session exists.
      */
+    @Deprecated
     boolean exists(String id) throws IOException;
 
     /**
@@ -60,6 +61,7 @@ public interface Sessions {
      * @param session the {@link Session} to check.
      * @return true if expired, false otherwise.
      */
+    @Deprecated
     boolean expired(Session session);
 
     /**
@@ -68,5 +70,6 @@ public interface Sessions {
      * @param session the  {@link Session} to use.
      * @return the sessions expiration date time as a {@link Date} instance.
      */
+    @Deprecated
     Date getExpiryDate(Session session);
 }

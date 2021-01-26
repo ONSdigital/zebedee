@@ -1,9 +1,11 @@
 package com.github.onsdigital.zebedee;
 
 import com.github.onsdigital.zebedee.model.Collection;
-import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
+import com.github.onsdigital.zebedee.model.KeyringCache;
 import com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDao;
 import com.github.onsdigital.zebedee.service.ServiceSupplier;
+import com.github.onsdigital.zebedee.session.model.Session;
+import com.github.onsdigital.zebedee.session.service.NewSessionsServiceImpl;
 import com.github.onsdigital.zebedee.user.model.User;
 import com.github.onsdigital.zebedee.user.model.UserList;
 import com.github.onsdigital.zebedee.user.service.UsersService;
@@ -17,10 +19,12 @@ import org.mockito.stubbing.Answer;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import javax.crypto.SecretKey;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.when;
 
@@ -39,7 +43,7 @@ public abstract class ZebedeeTestBaseFixture {
     private CollectionHistoryDao collectionHistoryDao;
 
     @Mock
-    private PermissionsService permissionsService;
+    private NewSessionsServiceImpl newSessionsService;
 
     protected Zebedee zebedee;
     protected Builder builder;
@@ -60,6 +64,8 @@ public abstract class ZebedeeTestBaseFixture {
 
         ReflectionTestUtils.setField(zebedee, "usersService", usersService);
         ReflectionTestUtils.setField(zebedee.getPermissionsService(), "usersServiceSupplier", usersServiceServiceSupplier);
+        ReflectionTestUtils.setField(zebedee, "sessions", newSessionsService);
+        ReflectionTestUtils.setField(zebedee, "keyringCache", new KeyringCache(newSessionsService));
 
         ServiceSupplier<CollectionHistoryDao> collectionHistoryDaoServiceSupplier = () -> collectionHistoryDao;
 
@@ -78,10 +84,20 @@ public abstract class ZebedeeTestBaseFixture {
         when(usersService.list())
                 .thenReturn(usersList);
 
+        Session session = new Session();
+        session.setEmail(builder.publisher1.getEmail());
+        session.setId("1234");
+        session.setLastAccess(new Date());
+        session.setStart(new Date());
+
+        when(newSessionsService.create(any(User.class))).thenReturn(session);
+        when(newSessionsService.get(anyString())).thenReturn(session);
+        when(newSessionsService.find(anyString())).thenReturn(session);
+
         Map<String, String> emailToCreds = new HashMap<>();
         emailToCreds.put(builder.publisher1.getEmail(), builder.publisher1Credentials.password);
 
-        // UsersService is now mocked so needs to add this mannually.
+        // UsersService is now mocked so needs to add this manually.
         doAnswer(new Answer() {
             @Override
             public Object answer(InvocationOnMock invocationOnMock) throws Throwable {

@@ -8,8 +8,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * In memory {@link Keyring} implmentation. Keyring uses a {@link CollectionKeyStore} to persist entries to storage
- * whilst maintaining a copy of the data in an in-memory cache for speedy retreival. If an attempt is made to add a
+ * In memory {@link Keyring} implementation. Keyring uses a {@link CollectionKeyStore} to persist entries to storage
+ * whilst maintaining a copy of the data in an in-memory cache for speedy retrieval. If an attempt is made to add a
  * duplicate key the Keyring will compare the new & existing {@link SecretKey} values. If the keys are not equal then a
  * {@link KeyringException} is thrown. This aims to prevent collection key values being overwritten as this will
  * result in a collection that can no longer be decrypted. Otherwise the key values are the same and the entry
@@ -29,7 +29,7 @@ public class KeyringImpl implements Keyring {
     static final String INVALID_COLLECTION_ID_ERR_MSG = "expected collection ID but was null or empty";
     static final String INVALID_SECRET_KEY_ERR_MSG = "expected secret key but was null";
     static final String KEY_MISMATCH_ERR_MSG =
-            "add unsuccessful a different SecretKey already exists for a collection with ID";
+            "add unsuccessful as a different SecretKey already exists for this collection ID";
     static final String KEY_NOT_FOUND_ERR_MSG = "collectionKey not found for this collection ID";
 
     private CollectionKeyStore keyStore;

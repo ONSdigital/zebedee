@@ -39,9 +39,8 @@ public class CollectionKeyStoreImpl implements CollectionKeyStore {
     static final String CIPHER_ALGORITHM = "AES/CBC/PKCS5Padding";
 
     private Path keyringDir;
-    private transient SecretKey masterKey;
-    private transient IvParameterSpec masterIv;
-    private transient Object lock = new Object();
+    private SecretKey masterKey;
+    private IvParameterSpec masterIv;
 
     /**
      * <p>
@@ -75,11 +74,18 @@ public class CollectionKeyStoreImpl implements CollectionKeyStore {
     }
 
     @Override
-    public SecretKey read(final String collectionID) throws KeyringException {
-        synchronized (lock) {
-            validateRead(collectionID);
-            return readKeyFromFile(collectionID);
+    public synchronized boolean exists(String collectionID) throws KeyringException {
+        if (isEmpty(collectionID)) {
+            throw new KeyringException(INVALID_COLLECTION_ID_ERR);
         }
+
+        return Files.exists(Paths.get(getKeyPath(collectionID)));
+    }
+
+    @Override
+    public synchronized SecretKey read(final String collectionID) throws KeyringException {
+        validateRead(collectionID);
+        return readKeyFromFile(collectionID);
     }
 
     private SecretKey readKeyFromFile(final String collectionID) throws KeyringException {
@@ -94,17 +100,15 @@ public class CollectionKeyStoreImpl implements CollectionKeyStore {
             throw new KeyringException(KEY_DECRYPTION_ERR, collectionID, ex);
         } finally {
             if (keyBytes != null) {
-                destoryKeyBytes(keyBytes);
+                destroyKeyBytes(keyBytes);
             }
         }
     }
 
     @Override
-    public void write(final String collectionID, final SecretKey collectionKey) throws KeyringException {
-        synchronized (lock) {
-            validateWrite(collectionID, collectionKey);
-            writeKeyToFile(collectionID, collectionKey);
-        }
+    public synchronized void write(final String collectionID, final SecretKey collectionKey) throws KeyringException {
+        validateWrite(collectionID, collectionKey);
+        writeKeyToFile(collectionID, collectionKey);
     }
 
     private void writeKeyToFile(final String collectionID, final SecretKey collectionKey) throws KeyringException {
@@ -120,7 +124,7 @@ public class CollectionKeyStoreImpl implements CollectionKeyStore {
     }
 
     @Override
-    public void delete(String collectionID) throws KeyringException {
+    public synchronized void delete(String collectionID) throws KeyringException {
         // TODO implementation coming soon.
     }
 
@@ -143,9 +147,7 @@ public class CollectionKeyStoreImpl implements CollectionKeyStore {
             throw new KeyringException(INVALID_COLLECTION_ID_ERR);
         }
 
-        Path keyPath = Paths.get(getKeyPath(collectionID));
-
-        if (Files.notExists(keyPath)) {
+        if (!exists(collectionID)) {
             throw new KeyringException(COLLECTION_KEY_NOT_FOUND_ERR, collectionID);
         }
     }
@@ -156,7 +158,7 @@ public class CollectionKeyStoreImpl implements CollectionKeyStore {
         }
 
         Path keyPath = Paths.get(getKeyPath(collectionID));
-        if (Files.exists(keyPath)) {
+        if (exists(collectionID)) {
             throw new KeyringException(COLLECTION_KEY_ALREADY_EXISTS_ERR, collectionID);
         }
 
@@ -177,13 +179,13 @@ public class CollectionKeyStoreImpl implements CollectionKeyStore {
 
     /**
      * Even after an object has gone out of scope it will remain on the heap until GC runs to release it. While the
-     * object remains in memory it is technically possible for someone retieve it using Java memory monitoring tools.
+     * object remains in memory it is technically possible for someone retrieve it using Java memory monitoring tools.
      * This is very very unlikely but as an additional safeguard to minimise the window of opportunity we "zero" the
      * SecretKey data as soon as we have finished using it ensuring its only available for the time its required.
      *
      * @param keyBytes the array of bytes "destroy".
      */
-    private void destoryKeyBytes(byte[] keyBytes) {
+    private void destroyKeyBytes(byte[] keyBytes) {
         Arrays.fill(keyBytes, (byte) 0);
     }
 

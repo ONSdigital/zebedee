@@ -67,7 +67,7 @@ public class NewSessionsServiceImpl implements Sessions {
      * Get a {@link Session} by it's ID.
      *
      * @param id the ID of the session to get,
-     * @return the {@link Session} instance if it exists and is not expired.
+     * @return the {@link Session} instance if it exists and is not expired. If the id is null or empty will return null.
      * @throws IOException for any problems getting the session.
      */
     @Override

@@ -28,9 +28,9 @@ import com.github.onsdigital.zebedee.user.store.UserStoreFileSystemImpl;
 import com.github.onsdigital.zebedee.util.versioning.VersionsService;
 import com.github.onsdigital.zebedee.util.versioning.VersionsServiceImpl;
 import com.github.onsdigital.zebedee.verification.VerificationAgent;
-import com.session.service.client.Http;
-import com.session.service.client.SessionClient;
-import com.session.service.client.SessionClientImpl;
+import com.github.onsdigital.session.service.client.Http;
+import com.github.onsdigital.session.service.client.SessionClient;
+import com.github.onsdigital.session.service.client.SessionClientImpl;
 import dp.api.dataset.DatasetAPIClient;
 import dp.api.dataset.DatasetClient;
 

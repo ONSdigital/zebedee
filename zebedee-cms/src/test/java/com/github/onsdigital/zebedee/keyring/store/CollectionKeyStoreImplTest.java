@@ -31,6 +31,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
 public class CollectionKeyStoreImplTest {
@@ -49,44 +50,35 @@ public class CollectionKeyStoreImplTest {
         keyringDir = folder.newFolder("keyring");
     }
 
-    @Test(expected = KeyringException.class)
+    @Test
     public void read_collectionIDNull_shouldThrowException() throws Exception {
         store = new CollectionKeyStoreImpl(keyringDir.toPath(), null, null);
 
-        try {
-            store.read(null);
-        } catch (KeyringException ex) {
-            assertThat(ex.getMessage(), equalTo(INVALID_COLLECTION_ID_ERR));
-            throw ex;
-        }
+        KeyringException ex = assertThrows(KeyringException.class, () -> store.read(null));
+
+        assertThat(ex.getMessage(), equalTo(INVALID_COLLECTION_ID_ERR));
     }
 
-    @Test(expected = KeyringException.class)
+    @Test
     public void read_collectionIDEmpty_shouldThrowException() throws Exception {
         store = new CollectionKeyStoreImpl(keyringDir.toPath(), null, null);
 
-        try {
-            store.read("");
-        } catch (KeyringException ex) {
-            assertThat(ex.getMessage(), equalTo(INVALID_COLLECTION_ID_ERR));
-            throw ex;
-        }
+        KeyringException ex = assertThrows(KeyringException.class, () -> store.read(""));
+
+        assertThat(ex.getMessage(), equalTo(INVALID_COLLECTION_ID_ERR));
     }
 
-    @Test(expected = KeyringException.class)
+    @Test
     public void read_keyNotFound_shouldThrowException() throws Exception {
         store = new CollectionKeyStoreImpl(keyringDir.toPath(), null, null);
 
-        try {
-            store.read(TEST_COLLECTION_ID);
-        } catch (KeyringException ex) {
-            assertThat(ex.getMessage(), equalTo(COLLECTION_KEY_NOT_FOUND_ERR));
-            assertThat(ex.getCollectionID(), equalTo(TEST_COLLECTION_ID));
-            throw ex;
-        }
+        KeyringException ex = assertThrows(KeyringException.class, () -> store.read(TEST_COLLECTION_ID));
+
+        assertThat(ex.getMessage(), equalTo(COLLECTION_KEY_NOT_FOUND_ERR));
+        assertThat(ex.getCollectionID(), equalTo(TEST_COLLECTION_ID));
     }
 
-    @Test(expected = KeyringException.class)
+    @Test
     public void testRead_keyContentInvalid_shouldThrowException() throws Exception {
         SecretKey masterKey = createNewSecretKey();
         IvParameterSpec iv = createNewInitVector();
@@ -95,13 +87,10 @@ public class CollectionKeyStoreImplTest {
 
         store = new CollectionKeyStoreImpl(keyringDir.toPath(), masterKey, iv);
 
-        try {
-            store.read(TEST_COLLECTION_ID);
-        } catch (KeyringException ex) {
-            assertThat(ex.getMessage(), equalTo(KEY_DECRYPTION_ERR));
-            assertThat(ex.getCollectionID(), equalTo(TEST_COLLECTION_ID));
-            throw ex;
-        }
+        KeyringException ex = assertThrows(KeyringException.class, () -> store.read(TEST_COLLECTION_ID));
+
+        assertThat(ex.getMessage(), equalTo(KEY_DECRYPTION_ERR));
+        assertThat(ex.getCollectionID(), equalTo(TEST_COLLECTION_ID));
     }
 
     @Test
@@ -134,46 +123,37 @@ public class CollectionKeyStoreImplTest {
     }
 
 
-    @Test(expected = KeyringException.class)
+    @Test
     public void testWrite_collectionIDNull_shouldThrowException() throws Exception {
         store = new CollectionKeyStoreImpl(keyringDir.toPath(), null, null);
 
-        try {
-            store.write(null, null);
-        } catch (KeyringException ex) {
-            assertThat(ex.getMessage(), equalTo(INVALID_COLLECTION_ID_ERR));
-            assertThat(ex.getCollectionID(), is(nullValue()));
-            throw ex;
-        }
+        KeyringException ex = assertThrows(KeyringException.class, () -> store.write(null, null));
+
+        assertThat(ex.getMessage(), equalTo(INVALID_COLLECTION_ID_ERR));
+        assertThat(ex.getCollectionID(), is(nullValue()));
     }
 
-    @Test(expected = KeyringException.class)
+    @Test
     public void testWrite_collectionIDEmpty_shouldThrowException() throws Exception {
         store = new CollectionKeyStoreImpl(keyringDir.toPath(), null, null);
 
-        try {
-            store.write("", null);
-        } catch (KeyringException ex) {
-            assertThat(ex.getMessage(), equalTo(INVALID_COLLECTION_ID_ERR));
-            assertThat(ex.getCollectionID(), is(nullValue()));
-            throw ex;
-        }
+        KeyringException ex = assertThrows(KeyringException.class, () -> store.write("", null));
+
+        assertThat(ex.getMessage(), equalTo(INVALID_COLLECTION_ID_ERR));
+        assertThat(ex.getCollectionID(), is(nullValue()));
     }
 
-    @Test(expected = KeyringException.class)
+    @Test
     public void testWrite_collectionKeyNull_shouldThrowException() throws Exception {
         store = new CollectionKeyStoreImpl(keyringDir.toPath(), null, null);
 
-        try {
-            store.write(TEST_COLLECTION_ID, null);
-        } catch (KeyringException ex) {
-            assertThat(ex.getMessage(), equalTo(COLLECTION_KEY_NULL_ERR));
-            assertThat(ex.getCollectionID(), equalTo(TEST_COLLECTION_ID));
-            throw ex;
-        }
+        KeyringException ex = assertThrows(KeyringException.class, () -> store.write(TEST_COLLECTION_ID, null));
+
+        assertThat(ex.getMessage(), equalTo(COLLECTION_KEY_NULL_ERR));
+        assertThat(ex.getCollectionID(), equalTo(TEST_COLLECTION_ID));
     }
 
-    @Test(expected = KeyringException.class)
+    @Test
     public void testWrite_shouldThrowException_ifCollectionKeyAlreadyExists() throws Exception {
         SecretKey masterKey = createNewSecretKey();
         IvParameterSpec masterIV = createNewInitVector();
@@ -182,14 +162,11 @@ public class CollectionKeyStoreImplTest {
         // create a plain key file in the keyring dir.
         createPlainTextCollectionKeyFile(TEST_COLLECTION_ID);
 
-        try {
-            // attempt to write another key with the same collection ID.
-            store.write(TEST_COLLECTION_ID, createNewSecretKey());
-        } catch (KeyringException ex) {
-            assertThat(ex.getMessage(), equalTo(COLLECTION_KEY_ALREADY_EXISTS_ERR));
-            assertThat(ex.getCollectionID(), equalTo(TEST_COLLECTION_ID));
-            throw ex;
-        }
+        KeyringException ex = assertThrows(KeyringException.class,
+                () -> store.write(TEST_COLLECTION_ID, createNewSecretKey()));
+
+        assertThat(ex.getMessage(), equalTo(COLLECTION_KEY_ALREADY_EXISTS_ERR));
+        assertThat(ex.getCollectionID(), equalTo(TEST_COLLECTION_ID));
     }
 
     @Test
@@ -225,28 +202,22 @@ public class CollectionKeyStoreImplTest {
         assertThat(actualKey, equalTo(collectionKey));
     }
 
-    @Test(expected = KeyringException.class)
+    @Test
     public void testExists_collectionIDNull_shouldThrowException() throws Exception {
         store = new CollectionKeyStoreImpl(null, null, null);
 
-        try {
-            store.exists(null);
-        } catch (KeyringException ex) {
-            assertThat(ex.getMessage(), equalTo(INVALID_COLLECTION_ID_ERR));
-            throw ex;
-        }
+        KeyringException ex = assertThrows(KeyringException.class, () -> store.exists(null));
+
+        assertThat(ex.getMessage(), equalTo(INVALID_COLLECTION_ID_ERR));
     }
 
-    @Test(expected = KeyringException.class)
+    @Test
     public void testExists_collectionIEmpty_shouldThrowException() throws Exception {
         store = new CollectionKeyStoreImpl(null, null, null);
 
-        try {
-            store.exists("");
-        } catch (KeyringException ex) {
-            assertThat(ex.getMessage(), equalTo(INVALID_COLLECTION_ID_ERR));
-            throw ex;
-        }
+        KeyringException ex = assertThrows(KeyringException.class, () -> store.exists(""));
+
+        assertThat(ex.getMessage(), equalTo(INVALID_COLLECTION_ID_ERR));
     }
 
     @Test

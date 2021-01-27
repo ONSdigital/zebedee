@@ -9,6 +9,8 @@ import javax.crypto.SecretKey;
  */
 public interface CollectionKeyStore {
 
+    boolean exists(String collectionID) throws KeyringException;
+
     /**
      * Retrieve a {@link SecretKey} from the store for the specified collection.
      *

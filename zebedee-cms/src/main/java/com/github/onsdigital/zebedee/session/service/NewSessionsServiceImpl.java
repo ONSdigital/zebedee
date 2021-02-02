@@ -89,6 +89,10 @@ public class NewSessionsServiceImpl implements Sessions {
      */
     @Override
     public Session find(String email) throws IOException, SessionClientException {
+        if (StringUtils.isEmpty(email)) {
+            return null;
+        }
+
         com.github.onsdigital.session.service.Session clientSession = client.getSessionByEmail(email);
         return createZebedeeSession(clientSession);
     }
@@ -131,6 +135,10 @@ public class NewSessionsServiceImpl implements Sessions {
     }
 
     private Session createZebedeeSession(com.github.onsdigital.session.service.Session clientSession) {
+        if (clientSession == null) {
+            return null;
+        }
+
         if (clientSession.getId() == null) {
             throw new SessionClientException("client has returned a session with a null/empty id");
         }

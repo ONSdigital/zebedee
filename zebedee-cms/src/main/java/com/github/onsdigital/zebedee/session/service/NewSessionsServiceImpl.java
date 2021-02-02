@@ -40,13 +40,13 @@ public class NewSessionsServiceImpl implements Sessions {
     @Override
     public Session create(User user) throws IOException {
         SessionCreated sessionCreated = client.createNewSession(user.getEmail());
-        com.github.onsdigital.session.service.Session clientSession = client.getSessionByID(sessionCreated.getId());
+        com.github.onsdigital.session.service.Session cachedSession = client.getSessionByID(sessionCreated.getId());
 
-        if (clientSession == null) {
-            throw new IOException("client has failed to retrieve the session");
+        if (cachedSession == null) {
+            throw new IOException("client has failed to retrieve new session from cache");
         }
 
-        Session session = createZebedeeSession(clientSession);
+        Session session = createZebedeeSession(cachedSession);
         return session;
     }
 
@@ -76,8 +76,12 @@ public class NewSessionsServiceImpl implements Sessions {
             return null;
         }
 
-        com.github.onsdigital.session.service.Session clientSession = client.getSessionByID(id);
-        return createZebedeeSession(clientSession);
+        com.github.onsdigital.session.service.Session cachedSession = client.getSessionByID(id);
+
+        if (cachedSession == null) {
+            return null;
+        }
+        return createZebedeeSession(cachedSession);
     }
 
     /**
@@ -93,8 +97,12 @@ public class NewSessionsServiceImpl implements Sessions {
             return null;
         }
 
-        com.github.onsdigital.session.service.Session clientSession = client.getSessionByEmail(email);
-        return createZebedeeSession(clientSession);
+        com.github.onsdigital.session.service.Session cachedSession = client.getSessionByEmail(email);
+
+        if (cachedSession == null) {
+            return null;
+        }
+        return createZebedeeSession(cachedSession);
     }
 
     /**
@@ -136,7 +144,7 @@ public class NewSessionsServiceImpl implements Sessions {
 
     private Session createZebedeeSession(com.github.onsdigital.session.service.Session clientSession) {
         if (clientSession == null) {
-            return null;
+            throw new SessionClientException("expected cached session but returned null");
         }
 
         if (clientSession.getId() == null) {

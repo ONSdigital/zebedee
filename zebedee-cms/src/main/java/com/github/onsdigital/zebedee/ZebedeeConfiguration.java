@@ -3,7 +3,6 @@ package com.github.onsdigital.zebedee;
 import com.github.onsdigital.session.service.client.Http;
 import com.github.onsdigital.session.service.client.SessionClient;
 import com.github.onsdigital.session.service.client.SessionClientImpl;
-import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.data.processing.DataIndex;
 import com.github.onsdigital.zebedee.model.Collections;
 import com.github.onsdigital.zebedee.model.Content;
@@ -52,6 +51,8 @@ import static com.github.onsdigital.zebedee.Zebedee.TEAMS;
 import static com.github.onsdigital.zebedee.Zebedee.USERS;
 import static com.github.onsdigital.zebedee.Zebedee.ZEBEDEE;
 import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
+import static com.github.onsdigital.zebedee.configuration.Configuration.getDatasetAPIAuthToken;
+import static com.github.onsdigital.zebedee.configuration.Configuration.getDatasetAPIURL;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getServiceAuthToken;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getSessionsApiUrl;
 import static com.github.onsdigital.zebedee.permissions.store.PermissionsStoreFileSystemImpl.initialisePermissions;
@@ -170,10 +171,7 @@ public class ZebedeeConfiguration {
 
         DatasetClient datasetClient;
         try {
-            datasetClient = new DatasetAPIClient(
-                    Configuration.getDatasetAPIURL(),
-                    Configuration.getDatasetAPIAuthToken(),
-                    getServiceAuthToken());
+            datasetClient = new DatasetAPIClient(getDatasetAPIURL(), getDatasetAPIAuthToken(), getServiceAuthToken());
         } catch (URISyntaxException e) {
             error().logException(e, "failed to initialise dataset api client - invalid URI");
             throw new RuntimeException(e);

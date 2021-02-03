@@ -1,23 +1,25 @@
 package com.github.onsdigital.zebedee.session.service;
 
-import com.github.onsdigital.zebedee.reader.util.RequestUtils;
-import com.github.onsdigital.zebedee.session.model.Session;
-import com.github.onsdigital.zebedee.user.model.User;
 import com.github.onsdigital.session.service.client.SessionClient;
 import com.github.onsdigital.session.service.entities.SessionCreated;
 import com.github.onsdigital.session.service.error.SessionClientException;
+import com.github.onsdigital.zebedee.reader.util.RequestUtils;
+import com.github.onsdigital.zebedee.session.model.Session;
+import com.github.onsdigital.zebedee.user.model.User;
 import org.apache.commons.lang.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.Date;
 
+import static org.apache.commons.lang3.StringUtils.isEmpty;
+
 /**
  * @author Scott Morse
  * NewSessionsServiceImpl is a replacement implemtation for {@link SessionsServiceImpl}
  * It makes use of dp-sessions-api using dp-session-service-client-java
  */
-public class NewSessionsServiceImpl implements Sessions {
+public class SessionsAPIServiceImpl implements Sessions {
 
     private SessionClient client;
 
@@ -26,7 +28,7 @@ public class NewSessionsServiceImpl implements Sessions {
      *
      * @param sessionClient
      */
-    public NewSessionsServiceImpl(SessionClient sessionClient) {
+    public SessionsAPIServiceImpl(SessionClient sessionClient) {
         this.client = sessionClient;
     }
 
@@ -39,14 +41,25 @@ public class NewSessionsServiceImpl implements Sessions {
      */
     @Override
     public Session create(User user) throws IOException {
-        SessionCreated sessionCreated = client.createNewSession(user.getEmail());
-        com.github.onsdigital.session.service.Session cachedSession = client.getSessionByID(sessionCreated.getId());
-
-        if (cachedSession == null) {
-            throw new IOException("client has failed to retrieve new session from cache");
+        if (user == null) {
+            throw new IOException("create session requires user but was null");
         }
 
-        Session session = createZebedeeSession(cachedSession);
+        if (StringUtils.isEmpty(user.getEmail())) {
+            throw new IOException("create session requires user email but was null or empty");
+        }
+
+        SessionCreated sessionCreated = client.createNewSession(user.getEmail());
+        if (sessionCreated == null) {
+            throw new IOException("unexpected error creating new session expected session but was null");
+        }
+
+        com.github.onsdigital.session.service.Session apiSession = client.getSessionByID(sessionCreated.getId());
+        if (apiSession == null) {
+            throw new IOException("client failed to retrieve session from sessions api");
+        }
+
+        Session session = createZebedeeSession(apiSession);
         return session;
     }
 
@@ -142,26 +155,19 @@ public class NewSessionsServiceImpl implements Sessions {
         throw new UnsupportedOperationException("exists is a deprecated method and not supported by this sessions implementation.");
     }
 
-    private Session createZebedeeSession(com.github.onsdigital.session.service.Session clientSession) {
-        if (clientSession == null) {
-            throw new SessionClientException("expected cached session but returned null");
+    private Session createZebedeeSession(com.github.onsdigital.session.service.Session sess) throws IOException {
+        if (sess == null) {
+            throw new IOException("expected cached session but returned null");
         }
 
-        if (clientSession.getId() == null) {
-            throw new SessionClientException("client has returned a session with a null/empty id");
+        if (isEmpty(sess.getId())) {
+            throw new IOException("client has returned a session with a null/empty id");
         }
 
-        if (clientSession.getEmail() == null) {
-            throw new SessionClientException("client has returned a session with a null/empty email");
+        if (isEmpty(sess.getEmail())) {
+            throw new IOException("client has returned a session with a null/empty email");
         }
 
-        Session session = new Session();
-
-        session.setId(clientSession.getId());
-        session.setEmail(clientSession.getEmail());
-        session.setLastAccess(clientSession.getLastAccess());
-        session.setStart(clientSession.getStart());
-
-        return session;
+        return Session.fromAPIModel(sess);
     }
 }

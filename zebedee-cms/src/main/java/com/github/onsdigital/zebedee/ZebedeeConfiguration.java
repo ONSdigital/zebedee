@@ -18,7 +18,7 @@ import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
 import com.github.onsdigital.zebedee.service.DatasetService;
 import com.github.onsdigital.zebedee.service.ServiceStoreImpl;
 import com.github.onsdigital.zebedee.service.ZebedeeDatasetService;
-import com.github.onsdigital.zebedee.session.service.NewSessionsServiceImpl;
+import com.github.onsdigital.zebedee.session.service.SessionsAPIServiceImpl;
 import com.github.onsdigital.zebedee.session.service.Sessions;
 import com.github.onsdigital.zebedee.session.service.SessionsServiceImpl;
 import com.github.onsdigital.zebedee.teams.service.TeamsService;
@@ -141,7 +141,7 @@ public class ZebedeeConfiguration {
         // Feature flag to cut to new sessions API.
         if (cmsFeatureFlags().isSessionAPIEnabled()) {
             this.sessionClient = new SessionClientImpl(getSessionsApiUrl(), getServiceAuthToken(), new Http());
-            this.sessions = new NewSessionsServiceImpl(sessionClient);
+            this.sessions = new SessionsAPIServiceImpl(sessionClient);
         } else {
             this.sessions = new SessionsServiceImpl(sessionsPath);
         }

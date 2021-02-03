@@ -354,4 +354,145 @@ public class SessionsAPIServiceImplTest {
         verify(sessionCli, times(1)).getSessionByID(TEST_ID);
     }
 
+    @Test
+    public void testFind_emailNull_shouldThrowException() throws Exception {
+        String email = null;
+
+        Session actual = sessions.find(email);
+
+        assertThat(actual, is(nullValue()));
+        verifyZeroInteractions(sessionCli);
+    }
+
+
+    @Test
+    public void testFind_emailEmpty_shouldThrowException() throws Exception {
+        Session actual = sessions.find("");
+
+        assertThat(actual, is(nullValue()));
+        verifyZeroInteractions(sessionCli);
+    }
+
+    @Test
+    public void testFind_clientException_shouldThrowException() throws Exception {
+        when(sessionCli.getSessionByEmail(TEST_EMAIL))
+                .thenThrow(new SessionClientException("borked!"));
+
+        SessionClientException ex = assertThrows(SessionClientException.class, () -> sessions.find(TEST_EMAIL));
+
+        assertThat(ex.getMessage(), equalTo("borked!"));
+        verify(sessionCli, times(1)).getSessionByEmail(TEST_EMAIL);
+    }
+
+    @Test
+    public void testFind_clientReturnsNull_shouldThrowException() throws Exception {
+        when(sessionCli.getSessionByEmail(TEST_EMAIL))
+                .thenReturn(null);
+
+        Session actual = sessions.find(TEST_EMAIL);
+
+        assertThat(actual, is(nullValue()));
+        verify(sessionCli, times(1)).getSessionByEmail(TEST_EMAIL);
+    }
+
+    @Test
+    public void testFind_sessionIDNull_shouldThrowException() throws Exception {
+        when(sessionCli.getSessionByEmail(TEST_EMAIL))
+                .thenReturn(apiSession);
+
+        when(apiSession.getId())
+                .thenReturn(null);
+
+        IOException ex = assertThrows(IOException.class, () -> sessions.find(TEST_EMAIL));
+
+        assertThat(ex.getMessage(), equalTo("client has returned a session with a null/empty id"));
+        verify(sessionCli, times(1)).getSessionByEmail(TEST_EMAIL);
+    }
+
+    @Test
+    public void testFind_sessionIDEmpty_shouldThrowException() throws Exception {
+        when(sessionCli.getSessionByEmail(TEST_EMAIL))
+                .thenReturn(apiSession);
+
+        when(apiSession.getId())
+                .thenReturn("");
+
+        IOException ex = assertThrows(IOException.class, () -> sessions.find(TEST_EMAIL));
+
+        assertThat(ex.getMessage(), equalTo("client has returned a session with a null/empty id"));
+        verify(sessionCli, times(1)).getSessionByEmail(TEST_EMAIL);
+    }
+
+    @Test
+    public void testFind_sessionEmailNull_shouldThrowException() throws Exception {
+        when(sessionCli.getSessionByEmail(TEST_EMAIL))
+                .thenReturn(apiSession);
+
+        when(apiSession.getEmail())
+                .thenReturn(null);
+
+        IOException ex = assertThrows(IOException.class, () -> sessions.find(TEST_EMAIL));
+
+        assertThat(ex.getMessage(), equalTo("client has returned a session with a null/empty email"));
+        verify(sessionCli, times(1)).getSessionByEmail(TEST_EMAIL);
+    }
+
+    @Test
+    public void testFind_sessionEmailEmpty_shouldThrowException() throws Exception {
+        when(sessionCli.getSessionByEmail(TEST_EMAIL))
+                .thenReturn(apiSession);
+
+        when(apiSession.getEmail())
+                .thenReturn("");
+
+        IOException ex = assertThrows(IOException.class, () -> sessions.find(TEST_EMAIL));
+
+        assertThat(ex.getMessage(), equalTo("client has returned a session with a null/empty email"));
+        verify(sessionCli, times(1)).getSessionByEmail(TEST_EMAIL);
+    }
+
+    @Test
+    public void testFind_success_shouldReturnSession() throws Exception {
+        when(sessionCli.getSessionByEmail(TEST_EMAIL))
+                .thenReturn(apiSession);
+
+        Session expected = Session.fromAPIModel(apiSession);
+
+        Session actual = sessions.find(TEST_EMAIL);
+
+        assertThat(actual, equalTo(expected));
+        verify(sessionCli, times(1)).getSessionByEmail(TEST_EMAIL);
+    }
+
+    @Test
+    public void testExists_shouldThrowUnsupportedOperationException() {
+        UnsupportedOperationException ex = assertThrows(UnsupportedOperationException.class, () -> sessions.exists(null));
+        assertThat(ex.getMessage(), equalTo("exists is a deprecated method and not supported by this sessions implementation."));
+
+        ex = assertThrows(UnsupportedOperationException.class, () -> sessions.exists(""));
+        assertThat(ex.getMessage(), equalTo("exists is a deprecated method and not supported by this sessions implementation."));
+
+        ex = assertThrows(UnsupportedOperationException.class, () -> sessions.exists(TEST_ID));
+        assertThat(ex.getMessage(), equalTo("exists is a deprecated method and not supported by this sessions implementation."));
+    }
+
+    @Test
+    public void testExpired_shouldThrowUnsupportedOperationException() {
+        UnsupportedOperationException ex = assertThrows(UnsupportedOperationException.class, () -> sessions.expired(null));
+        assertThat(ex.getMessage(), equalTo("expired is a deprecated method and not supported by this sessions implementation."));
+
+        ex = assertThrows(UnsupportedOperationException.class, () -> sessions.expired(new Session()));
+        assertThat(ex.getMessage(), equalTo("expired is a deprecated method and not supported by this sessions implementation."));
+    }
+
+    @Test
+    public void testGetExpiryDate_shouldThrowUnsupportedOperationException() {
+        UnsupportedOperationException ex = assertThrows(UnsupportedOperationException.class, () -> sessions.getExpiryDate(null));
+        assertThat(ex.getMessage(), equalTo("getExpiryDate is a deprecated method and not supported by this sessions implementation."));
+
+        ex = assertThrows(UnsupportedOperationException.class, () -> sessions.getExpiryDate(new Session()));
+        assertThat(ex.getMessage(), equalTo("getExpiryDate is a deprecated method and not supported by this sessions implementation."));
+    }
+
+
 }

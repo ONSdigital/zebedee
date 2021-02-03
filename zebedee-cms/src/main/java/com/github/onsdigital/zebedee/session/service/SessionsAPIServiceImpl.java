@@ -140,7 +140,7 @@ public class SessionsAPIServiceImpl implements Sessions {
      */
     @Override
     public boolean expired(Session session) {
-        throw new UnsupportedOperationException("exists is a deprecated method and not supported by this sessions implementation.");
+        throw new UnsupportedOperationException("expired is a deprecated method and not supported by this sessions implementation.");
     }
 
     /**
@@ -152,7 +152,7 @@ public class SessionsAPIServiceImpl implements Sessions {
      */
     @Override
     public Date getExpiryDate(Session session) {
-        throw new UnsupportedOperationException("exists is a deprecated method and not supported by this sessions implementation.");
+        throw new UnsupportedOperationException("getExpiryDate is a deprecated method and not supported by this sessions implementation.");
     }
 
     private Session createZebedeeSession(com.github.onsdigital.session.service.Session sess) throws IOException {

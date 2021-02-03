@@ -19,13 +19,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.verifyZeroInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class KeyringImplTest {
 
@@ -245,4 +239,81 @@ public class KeyringImplTest {
         verify(keyStore, times(1)).exists(TEST_COLLECTION_ID);
         verify(keyStore, times(1)).read(TEST_COLLECTION_ID);
     }
+
+    @Test
+    public void testRemove_collectionIDNull_shouldThrowException() {
+        KeyringException ex = assertThrows(KeyringException.class, () -> keyring.remove(null));
+
+        assertThat(ex.getMessage(), equalTo(INVALID_COLLECTION_ID_ERR_MSG));
+
+        verifyZeroInteractions(keyStore);
+    }
+
+    @Test
+    public void testRemove_collectionIDEmpty_shouldThrowException() {
+        KeyringException ex = assertThrows(KeyringException.class, () -> keyring.remove(""));
+
+        assertThat(ex.getMessage(), equalTo(INVALID_COLLECTION_ID_ERR_MSG));
+
+        verifyZeroInteractions(keyStore);
+    }
+
+    @Test
+    public void testRemove_collectionKeyDoesntExist_shouldThrowException() throws KeyringException {
+        when(keyStore.exists(TEST_COLLECTION_ID))
+                .thenReturn(false);
+
+        KeyringException ex = assertThrows(KeyringException.class, () -> keyring.remove(TEST_COLLECTION_ID));
+
+        assertThat(ex.getMessage(), equalTo(KEY_NOT_FOUND_ERR_MSG));
+
+        verify(keyStore, times(1)).exists(TEST_COLLECTION_ID);
+        verify(keyStore, never()).delete(TEST_COLLECTION_ID);
+    }
+
+    @Test
+    public void testRemove_keyStoreDeleteEx_shouldThrowException() throws KeyringException {
+        when(keyStore.exists(TEST_COLLECTION_ID))
+                .thenReturn(true);
+
+        doThrow(new KeyringException("pr review me"))
+                .when(keyStore)
+                .delete(TEST_COLLECTION_ID);
+
+        KeyringException ex = assertThrows(KeyringException.class, () -> keyring.remove(TEST_COLLECTION_ID));
+
+        assertThat(ex.getMessage(), equalTo("pr review me"));
+
+        verify(keyStore, times(1)).exists(TEST_COLLECTION_ID);
+        verify(keyStore, times(1)).delete(TEST_COLLECTION_ID);
+    }
+
+    @Test
+    public void testRemove_keyFileExistsButNotInCache_shouldDeleteFile() throws KeyringException {
+        when(keyStore.exists(TEST_COLLECTION_ID))
+                .thenReturn(true);
+
+        keyring.remove(TEST_COLLECTION_ID);
+
+        verify(keyStore, times(1)).exists(TEST_COLLECTION_ID);
+        verify(keyStore, times(1)).delete(TEST_COLLECTION_ID);
+    }
+
+    @Test
+    public void testRemove_success_shouldRemoveKeyFromFileAndCache() throws KeyringException {
+        cache.put(TEST_COLLECTION_ID, secretKey);
+        assertTrue(cache.containsKey(TEST_COLLECTION_ID));
+        assertThat(cache.size(), equalTo(1));
+
+        when(keyStore.exists(TEST_COLLECTION_ID))
+                .thenReturn(true);
+
+        keyring.remove(TEST_COLLECTION_ID);
+
+        assertFalse(cache.containsKey(TEST_COLLECTION_ID));
+
+        verify(keyStore, times(1)).exists(TEST_COLLECTION_ID);
+        verify(keyStore, times(1)).delete(TEST_COLLECTION_ID);
+    }
+
 }

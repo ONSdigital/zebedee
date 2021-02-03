@@ -146,6 +146,15 @@ public class KeyringImpl implements Keyring {
 
     @Override
     public synchronized void remove(String collectionID) throws KeyringException {
-        // TODO implementation coming soon.
+        if (StringUtils.isEmpty(collectionID)) {
+            throw new KeyringException(INVALID_COLLECTION_ID_ERR_MSG);
+        }
+
+        if (!keyStore.exists(collectionID)) {
+            throw new KeyringException(KEY_NOT_FOUND_ERR_MSG);
+        }
+
+        keyStore.delete(collectionID);
+        cache.remove(collectionID);
     }
 }

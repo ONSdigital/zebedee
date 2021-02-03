@@ -90,10 +90,10 @@ public class SessionsAPIServiceImpl implements Sessions {
         }
 
         com.github.onsdigital.session.service.Session cachedSession = client.getSessionByID(id);
-
         if (cachedSession == null) {
             return null;
         }
+
         return createZebedeeSession(cachedSession);
     }
 

@@ -14,6 +14,8 @@ import java.io.IOException;
 import java.util.Date;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertThrows;
 import static org.mockito.Mockito.times;
@@ -240,6 +242,115 @@ public class SessionsAPIServiceImplTest {
 
         assertThat(actual, equalTo(expected));
         verify(sessionCli, times(1)).createNewSession(TEST_EMAIL);
+        verify(sessionCli, times(1)).getSessionByID(TEST_ID);
+    }
+
+    @Test
+    public void testGetByID_idNull_shouldThrowException() throws Exception {
+        String id = null;
+
+        Session actual = sessions.get(id);
+
+        assertThat(actual, is(nullValue()));
+        verifyZeroInteractions(sessionCli);
+    }
+
+    @Test
+    public void testGetByID_idEmpty_shouldThrowException() throws Exception {
+        Session actual = sessions.get("");
+
+        assertThat(actual, is(nullValue()));
+        verifyZeroInteractions(sessionCli);
+    }
+
+    @Test
+    public void testGetByID_clientException_shouldThrowException() throws Exception {
+        when(sessionCli.getSessionByID(TEST_ID))
+                .thenThrow(new SessionClientException("borked!"));
+
+        SessionClientException ex = assertThrows(SessionClientException.class, () -> sessions.get(TEST_ID));
+
+        assertThat(ex.getMessage(), equalTo("borked!"));
+        verify(sessionCli, times(1)).getSessionByID(TEST_ID);
+    }
+
+    @Test
+    public void testGetByID_clientReturnsNull_shouldThrowException() throws Exception {
+        when(sessionCli.getSessionByID(TEST_ID))
+                .thenReturn(null);
+
+        Session actual = sessions.get(TEST_ID);
+
+        assertThat(actual, is(nullValue()));
+        verify(sessionCli, times(1)).getSessionByID(TEST_ID);
+    }
+
+    @Test
+    public void testGetByID_sessionIDNull_shouldThrowException() throws Exception {
+        when(sessionCli.getSessionByID(TEST_ID))
+                .thenReturn(apiSession);
+
+        when(apiSession.getId())
+                .thenReturn(null);
+
+        IOException ex = assertThrows(IOException.class, () -> sessions.get(TEST_ID));
+
+        assertThat(ex.getMessage(), equalTo("client has returned a session with a null/empty id"));
+        verify(sessionCli, times(1)).getSessionByID(TEST_ID);
+    }
+
+    @Test
+    public void testGetByID_sessionIDEmpty_shouldThrowException() throws Exception {
+        when(sessionCli.getSessionByID(TEST_ID))
+                .thenReturn(apiSession);
+
+        when(apiSession.getId())
+                .thenReturn("");
+
+        IOException ex = assertThrows(IOException.class, () -> sessions.get(TEST_ID));
+
+        assertThat(ex.getMessage(), equalTo("client has returned a session with a null/empty id"));
+        verify(sessionCli, times(1)).getSessionByID(TEST_ID);
+    }
+
+    @Test
+    public void testGetByID_sessionEmailNull_shouldThrowException() throws Exception {
+        when(sessionCli.getSessionByID(TEST_ID))
+                .thenReturn(apiSession);
+
+        when(apiSession.getEmail())
+                .thenReturn(null);
+
+        IOException ex = assertThrows(IOException.class, () -> sessions.get(TEST_ID));
+
+        assertThat(ex.getMessage(), equalTo("client has returned a session with a null/empty email"));
+        verify(sessionCli, times(1)).getSessionByID(TEST_ID);
+    }
+
+    @Test
+    public void testGetByID_sessionEmailEmpty_shouldThrowException() throws Exception {
+        when(sessionCli.getSessionByID(TEST_ID))
+                .thenReturn(apiSession);
+
+        when(apiSession.getEmail())
+                .thenReturn("");
+
+        IOException ex = assertThrows(IOException.class, () -> sessions.get(TEST_ID));
+
+        assertThat(ex.getMessage(), equalTo("client has returned a session with a null/empty email"));
+        verify(sessionCli, times(1)).getSessionByID(TEST_ID);
+    }
+
+    @Test
+    public void testGetByID_success_shouldReturnSession() throws Exception {
+        when(sessionCli.getSessionByID(TEST_ID))
+                .thenReturn(apiSession);
+
+        Session expected = Session.fromAPIModel(apiSession);
+
+        Session actual = sessions.get(TEST_ID);
+
+        assertThat(actual, equalTo(expected));
         verify(sessionCli, times(1)).getSessionByID(TEST_ID);
     }
 

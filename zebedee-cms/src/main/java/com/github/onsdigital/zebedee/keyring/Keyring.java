@@ -13,7 +13,8 @@ public interface Keyring {
 
     /**
      * Populate the keyring.
-     * @throws KeyringException
+     *
+     * @throws KeyringException problem populating the keyring.
      */
     void load() throws KeyringException;
 

@@ -5,7 +5,7 @@ import com.github.onsdigital.zebedee.model.KeyringCache;
 import com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDao;
 import com.github.onsdigital.zebedee.service.ServiceSupplier;
 import com.github.onsdigital.zebedee.session.model.Session;
-import com.github.onsdigital.zebedee.session.service.NewSessionsServiceImpl;
+import com.github.onsdigital.zebedee.session.service.SessionsAPIServiceImpl;
 import com.github.onsdigital.zebedee.user.model.User;
 import com.github.onsdigital.zebedee.user.model.UserList;
 import com.github.onsdigital.zebedee.user.service.UsersService;
@@ -43,7 +43,7 @@ public abstract class ZebedeeTestBaseFixture {
     private CollectionHistoryDao collectionHistoryDao;
 
     @Mock
-    private NewSessionsServiceImpl newSessionsService;
+    private SessionsAPIServiceImpl sessionsService;
 
     protected Zebedee zebedee;
     protected Builder builder;
@@ -64,8 +64,8 @@ public abstract class ZebedeeTestBaseFixture {
 
         ReflectionTestUtils.setField(zebedee, "usersService", usersService);
         ReflectionTestUtils.setField(zebedee.getPermissionsService(), "usersServiceSupplier", usersServiceServiceSupplier);
-        ReflectionTestUtils.setField(zebedee, "sessions", newSessionsService);
-        ReflectionTestUtils.setField(zebedee, "keyringCache", new KeyringCache(newSessionsService));
+        ReflectionTestUtils.setField(zebedee, "sessions", sessionsService);
+        ReflectionTestUtils.setField(zebedee, "keyringCache", new KeyringCache(sessionsService));
 
         ServiceSupplier<CollectionHistoryDao> collectionHistoryDaoServiceSupplier = () -> collectionHistoryDao;
 
@@ -90,9 +90,9 @@ public abstract class ZebedeeTestBaseFixture {
         session.setLastAccess(new Date());
         session.setStart(new Date());
 
-        when(newSessionsService.create(any(User.class))).thenReturn(session);
-        when(newSessionsService.get(anyString())).thenReturn(session);
-        when(newSessionsService.find(anyString())).thenReturn(session);
+        when(sessionsService.create(any(User.class))).thenReturn(session);
+        when(sessionsService.get(anyString())).thenReturn(session);
+        when(sessionsService.find(anyString())).thenReturn(session);
 
         Map<String, String> emailToCreds = new HashMap<>();
         emailToCreds.put(builder.publisher1.getEmail(), builder.publisher1Credentials.password);

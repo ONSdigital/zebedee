@@ -16,7 +16,7 @@ import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 /**
  * @author Scott Morse
- * NewSessionsServiceImpl is a replacement implemtation for {@link SessionsServiceImpl}
+ * SessionsAPIServiceImpl is a replacement implemtation for {@link SessionsServiceImpl}
  * It makes use of dp-sessions-api using dp-session-service-client-java
  */
 public class SessionsAPIServiceImpl implements Sessions {

@@ -3,11 +3,19 @@ package com.github.onsdigital.zebedee.keyring.store;
 import com.github.onsdigital.zebedee.keyring.KeyringException;
 
 import javax.crypto.SecretKey;
+import java.util.Map;
 
 /**
  * Defines the behaviour of a class for storing {@link SecretKey}s.
  */
 public interface CollectionKeyStore {
+
+    /**
+     *
+     * @return
+     * @throws KeyringException
+     */
+    Map<String, SecretKey> readAll() throws KeyringException;
 
     boolean exists(String collectionID) throws KeyringException;
 

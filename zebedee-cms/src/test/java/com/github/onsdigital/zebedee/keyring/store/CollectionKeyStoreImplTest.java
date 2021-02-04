@@ -18,8 +18,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.SecureRandom;
 import java.util.Base64;
+import java.util.Map;
 
 import static com.github.onsdigital.zebedee.keyring.store.CollectionKeyStoreImpl.COLLECTION_KEY_ALREADY_EXISTS_ERR;
 import static com.github.onsdigital.zebedee.keyring.store.CollectionKeyStoreImpl.COLLECTION_KEY_NOT_FOUND_ERR;
@@ -235,6 +237,68 @@ public class CollectionKeyStoreImplTest {
         assertTrue(Files.exists(p));
 
         assertTrue(store.exists(TEST_COLLECTION_ID));
+    }
+
+    @Test
+    public void testReadAll_noKeyFiles_shouldReturnEmptyMap() throws Exception {
+        store = new CollectionKeyStoreImpl(keyringDir.toPath(), null, null);
+
+        Map<String, SecretKey> actual = store.readAll();
+
+        assertTrue(actual.isEmpty());
+    }
+
+    @Test
+    public void testReadAll_failToDecryptKey_shouldThrowException() throws Exception {
+        store = new CollectionKeyStoreImpl(keyringDir.toPath(), createNewSecretKey(), createNewInitVector());
+
+        createPlainTextCollectionKeyFile(TEST_COLLECTION_ID);
+
+        KeyringException ex = assertThrows(KeyringException.class, () -> store.readAll());
+        assertThat(ex.getMessage(), equalTo(KEY_DECRYPTION_ERR));
+        assertThat(ex.getCollectionID(), equalTo(TEST_COLLECTION_ID));
+    }
+
+    @Test
+    public void testReadAll_secondKeyFailsToDecrypt_shouldThrowException() throws Exception {
+        store = new CollectionKeyStoreImpl(keyringDir.toPath(), createNewSecretKey(), createNewInitVector());
+
+        // write a valid encrypted secret key to the store.
+        store.write(TEST_COLLECTION_ID, createNewSecretKey());
+
+        // Write an invalid unencrypted key to the store.
+        createPlainTextCollectionKeyFile("abc123");
+
+        // When the unencrypted key file is read it should fail to decrypt and throw exception.
+        KeyringException ex = assertThrows(KeyringException.class, () -> store.readAll());
+
+        assertThat(ex.getMessage(), equalTo(KEY_DECRYPTION_ERR));
+        assertThat(ex.getCollectionID(), equalTo("abc123"));
+    }
+
+    @Test
+    public void testReadAll_success_shouldReturnMapOfDecryptedKeys() throws Exception {
+        store = new CollectionKeyStoreImpl(keyringDir.toPath(), createNewSecretKey(), createNewInitVector());
+
+        // write a valid encrypted secret key to the store.
+        SecretKey expectedColKey = createNewSecretKey();
+        store.write(TEST_COLLECTION_ID, expectedColKey);
+
+        Map<String, SecretKey> actual = store.readAll();
+
+        assertFalse(actual.isEmpty());
+        assertThat(actual.size(), equalTo(1));
+        assertTrue(actual.containsKey(TEST_COLLECTION_ID));
+        assertThat(actual.get(TEST_COLLECTION_ID), equalTo(expectedColKey));
+    }
+
+    @Test
+    public void testReadAll_keyringDirDoesNotExist_shouldThrowException() {
+        store = new CollectionKeyStoreImpl(Paths.get("/nonexistantpath"), null, null);
+
+        KeyringException ex = assertThrows(KeyringException.class, () -> store.readAll());
+
+        assertThat(ex.getMessage(), equalTo("error reading collectionKey keyring dir not found"));
     }
 
     SecretKey createNewSecretKey() throws Exception {

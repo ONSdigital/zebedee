@@ -2,6 +2,7 @@ package com.github.onsdigital.zebedee.keyring.store;
 
 import com.github.onsdigital.zebedee.keyring.KeyringException;
 import org.apache.commons.io.IOUtils;
+import org.checkerframework.checker.units.qual.K;
 
 import javax.crypto.Cipher;
 import javax.crypto.CipherInputStream;
@@ -11,6 +12,7 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -35,8 +37,10 @@ public class CollectionKeyStoreImpl implements CollectionKeyStore {
     static final String KEY_DECRYPTION_ERR = "error while decrypting collectionKey file";
     static final String WRITE_KEY_ERR = "error writing collection key to store";
     static final String COLLECTION_KEY_ALREADY_EXISTS_ERR = "collectionKey for this collection ID already exists";
+    static final String FAILED_TO_DELETE_COLLECTION_KEY_ERR = "failed to delete collection key";
     static final String ENCRYPTION_ALGORITHM = "AES";
     static final String CIPHER_ALGORITHM = "AES/CBC/PKCS5Padding";
+
 
     private Path keyringDir;
     private SecretKey masterKey;
@@ -125,7 +129,22 @@ public class CollectionKeyStoreImpl implements CollectionKeyStore {
 
     @Override
     public synchronized void delete(String collectionID) throws KeyringException {
-        // TODO implementation coming soon.
+        if (isEmpty(collectionID)) {
+            throw new KeyringException(INVALID_COLLECTION_ID_ERR);
+        }
+
+        if (!exists(collectionID)) {
+            throw new KeyringException(COLLECTION_KEY_NOT_FOUND_ERR, collectionID);
+        }
+
+        Path keyPath = Paths.get(getKeyPath(collectionID));
+        try {
+            if (!Files.deleteIfExists(keyPath)) {
+                throw new KeyringException(FAILED_TO_DELETE_COLLECTION_KEY_ERR, collectionID);
+            }
+        } catch (IOException ex) {
+            throw new KeyringException(FAILED_TO_DELETE_COLLECTION_KEY_ERR, collectionID, ex);
+        }
     }
 
     private String getKeyPath(String collectionID) {

@@ -30,6 +30,27 @@ public class Session {
      */
     private Date lastAccess = new Date();
 
+    /**
+     * Construct a new empty session.
+     */
+    public Session() {
+        // default constructor required to maintain existing functionality
+    }
+
+    /**
+     * Construct a new Session from the details provided.
+     *
+     * @param id         the unqiue ID of the session.
+     * @param email      the user email the session belongs to.
+     * @param start      the time the session was created
+     * @param lastAccess the time the session was last accessed
+     */
+    public Session(final String id, final String email, final Date start, final Date lastAccess) {
+        this.id = id;
+        this.email = email;
+        this.start = start;
+        this.lastAccess = lastAccess;
+    }
 
     public String getId() {
         return id;
@@ -79,5 +100,16 @@ public class Session {
         return obj != null &&
                 Session.class.isAssignableFrom(obj.getClass()) &&
                 StringUtils.equals(id, ((Session) obj).id);
+    }
+
+    /**
+     * Construct a Zebedee {@link Session} object from the external Session API
+     * {@link com.github.onsdigital.session.service.Session} model.
+     *
+     * @param sess the sesison to use.
+     * @return a Session with details provided.
+     */
+    public static Session fromAPIModel(com.github.onsdigital.session.service.Session sess) {
+        return new Session(sess.getId(), sess.getEmail(), sess.getStart(), sess.getLastAccess());
     }
 }

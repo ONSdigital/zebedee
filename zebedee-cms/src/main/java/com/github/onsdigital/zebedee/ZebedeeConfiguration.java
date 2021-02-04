@@ -1,6 +1,8 @@
 package com.github.onsdigital.zebedee;
 
-import com.github.onsdigital.zebedee.configuration.Configuration;
+import com.github.onsdigital.session.service.client.Http;
+import com.github.onsdigital.session.service.client.SessionClient;
+import com.github.onsdigital.session.service.client.SessionClientImpl;
 import com.github.onsdigital.zebedee.data.processing.DataIndex;
 import com.github.onsdigital.zebedee.model.Collections;
 import com.github.onsdigital.zebedee.model.Content;
@@ -16,7 +18,7 @@ import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
 import com.github.onsdigital.zebedee.service.DatasetService;
 import com.github.onsdigital.zebedee.service.ServiceStoreImpl;
 import com.github.onsdigital.zebedee.service.ZebedeeDatasetService;
-import com.github.onsdigital.zebedee.session.service.NewSessionsServiceImpl;
+import com.github.onsdigital.zebedee.session.service.SessionsAPIServiceImpl;
 import com.github.onsdigital.zebedee.session.service.Sessions;
 import com.github.onsdigital.zebedee.session.service.SessionsServiceImpl;
 import com.github.onsdigital.zebedee.teams.service.TeamsService;
@@ -28,9 +30,6 @@ import com.github.onsdigital.zebedee.user.store.UserStoreFileSystemImpl;
 import com.github.onsdigital.zebedee.util.versioning.VersionsService;
 import com.github.onsdigital.zebedee.util.versioning.VersionsServiceImpl;
 import com.github.onsdigital.zebedee.verification.VerificationAgent;
-import com.session.service.client.Http;
-import com.session.service.client.SessionClient;
-import com.session.service.client.SessionClientImpl;
 import dp.api.dataset.DatasetAPIClient;
 import dp.api.dataset.DatasetClient;
 
@@ -51,6 +50,11 @@ import static com.github.onsdigital.zebedee.Zebedee.SESSIONS;
 import static com.github.onsdigital.zebedee.Zebedee.TEAMS;
 import static com.github.onsdigital.zebedee.Zebedee.USERS;
 import static com.github.onsdigital.zebedee.Zebedee.ZEBEDEE;
+import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
+import static com.github.onsdigital.zebedee.configuration.Configuration.getDatasetAPIAuthToken;
+import static com.github.onsdigital.zebedee.configuration.Configuration.getDatasetAPIURL;
+import static com.github.onsdigital.zebedee.configuration.Configuration.getServiceAuthToken;
+import static com.github.onsdigital.zebedee.configuration.Configuration.getSessionsApiUrl;
 import static com.github.onsdigital.zebedee.permissions.store.PermissionsStoreFileSystemImpl.initialisePermissions;
 
 /**
@@ -133,8 +137,15 @@ public class ZebedeeConfiguration {
         this.dataIndex = new DataIndex(new FileSystemContentReader(publishedContentPath));
         this.publishedCollections = new PublishedCollections(publishedCollectionsPath);
         this.applicationKeys = new ApplicationKeys(applicationKeysPath);
-        this.sessionClient = new SessionClientImpl(Configuration.getSessionsApiUrl(), Configuration.getServiceAuthToken(), new Http());
-        this.sessions = new NewSessionsServiceImpl(sessionClient);
+
+        // Feature flag to cut to new sessions API.
+        if (cmsFeatureFlags().isSessionAPIEnabled()) {
+            this.sessionClient = new SessionClientImpl(getSessionsApiUrl(), getServiceAuthToken(), new Http());
+            this.sessions = new SessionsAPIServiceImpl(sessionClient);
+        } else {
+            this.sessions = new SessionsServiceImpl(sessionsPath);
+        }
+
         this.keyringCache = new KeyringCache(sessions);
 
         this.teamsService = new TeamsServiceImpl(
@@ -160,10 +171,7 @@ public class ZebedeeConfiguration {
 
         DatasetClient datasetClient;
         try {
-            datasetClient = new DatasetAPIClient(
-                    Configuration.getDatasetAPIURL(),
-                    Configuration.getDatasetAPIAuthToken(),
-                    Configuration.getServiceAuthToken());
+            datasetClient = new DatasetAPIClient(getDatasetAPIURL(), getDatasetAPIAuthToken(), getServiceAuthToken());
         } catch (URISyntaxException e) {
             error().logException(e, "failed to initialise dataset api client - invalid URI");
             throw new RuntimeException(e);
@@ -184,6 +192,7 @@ public class ZebedeeConfiguration {
                 .data("redirect_path", applicationKeysPath.toString())
                 .data("services_path", servicePath.toString())
                 .data("enable_verification_agent", useVerificationAgent)
+                .data("sessions_api_enabled", cmsFeatureFlags().isSessionAPIEnabled())
                 .log("zebedee configuration creation complete");
     }
 

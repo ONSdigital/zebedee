@@ -12,6 +12,12 @@ import javax.crypto.SecretKey;
 public interface Keyring {
 
     /**
+     * Populate the keyring.
+     * @throws KeyringException
+     */
+    void load() throws KeyringException;
+
+    /**
      * Add a entry to the Keyring.
      *
      * @param collectionID  the collection ID the {@link SecretKey} belongs to.

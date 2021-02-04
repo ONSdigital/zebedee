@@ -26,11 +26,12 @@ import java.util.Map;
  */
 public class KeyringImpl implements Keyring {
 
-    static final String INVALID_COLLECTION_ID_ERR_MSG = "expected collection ID but was null or empty";
-    static final String INVALID_SECRET_KEY_ERR_MSG = "expected secret key but was null";
-    static final String KEY_MISMATCH_ERR_MSG =
+    static final String INVALID_COLLECTION_ID_ERR = "expected collection ID but was null or empty";
+    static final String INVALID_SECRET_KEY_ERR = "expected secret key but was null";
+    static final String KEY_MISMATCH_ERR =
             "add unsuccessful as a different SecretKey already exists for this collection ID";
-    static final String KEY_NOT_FOUND_ERR_MSG = "SecretKey not found for this collection ID";
+    static final String KEY_NOT_FOUND_ERR = "SecretKey not found for this collection ID";
+    static final String LOAD_KEYS_NULL_ERR = "error loading keystore expected map but was null";
 
     private CollectionKeyStore keyStore;
     private Map<String, SecretKey> cache;
@@ -47,6 +48,27 @@ public class KeyringImpl implements Keyring {
     KeyringImpl(final CollectionKeyStore keyStore, final Map<String, SecretKey> cache) {
         this.keyStore = keyStore;
         this.cache = cache;
+    }
+
+    /**
+     * {@inheritDoc}
+     * <b>WARNING: This action is destructive</b>. Calling load on a populated keyring will clear all existing values
+     * from it before repolating it with the the values returned by {@link CollectionKeyStore#readAll()}. It is
+     * strongly advised to only use this method when the keyring is initialised on start up.
+     *
+     * @throws KeyringException problem loading the keyring.
+     */
+    @Override
+    public synchronized void load() throws KeyringException {
+        Map<String, SecretKey> keyMapping = keyStore.readAll();
+        if (keyMapping == null) {
+            throw new KeyringException(LOAD_KEYS_NULL_ERR);
+        }
+
+        if (!keyMapping.isEmpty()) {
+            cache.clear();
+            cache.putAll(keyMapping);
+        }
     }
 
     @Override
@@ -68,11 +90,11 @@ public class KeyringImpl implements Keyring {
 
     private void validateAddKeyParams(String collectionID, SecretKey secretKey) throws KeyringException {
         if (StringUtils.isEmpty(collectionID)) {
-            throw new KeyringException(INVALID_COLLECTION_ID_ERR_MSG);
+            throw new KeyringException(INVALID_COLLECTION_ID_ERR);
         }
 
         if (secretKey == null) {
-            throw new KeyringException(INVALID_SECRET_KEY_ERR_MSG, collectionID);
+            throw new KeyringException(INVALID_SECRET_KEY_ERR, collectionID);
         }
     }
 
@@ -97,7 +119,7 @@ public class KeyringImpl implements Keyring {
             return true;
         }
 
-        throw new KeyringException(KEY_MISMATCH_ERR_MSG, collectionID);
+        throw new KeyringException(KEY_MISMATCH_ERR, collectionID);
     }
 
     /**
@@ -121,13 +143,13 @@ public class KeyringImpl implements Keyring {
             return true;
         }
 
-        throw new KeyringException(KEY_MISMATCH_ERR_MSG, collectionID);
+        throw new KeyringException(KEY_MISMATCH_ERR, collectionID);
     }
 
     @Override
     public synchronized SecretKey get(String collectionID) throws KeyringException {
         if (StringUtils.isEmpty(collectionID)) {
-            throw new KeyringException(INVALID_COLLECTION_ID_ERR_MSG);
+            throw new KeyringException(INVALID_COLLECTION_ID_ERR);
         }
 
         if (cache.containsKey(collectionID)) {
@@ -135,7 +157,7 @@ public class KeyringImpl implements Keyring {
         }
 
         if (!keyStore.exists(collectionID)) {
-            throw new KeyringException(KEY_NOT_FOUND_ERR_MSG, collectionID);
+            throw new KeyringException(KEY_NOT_FOUND_ERR, collectionID);
         }
 
         SecretKey key = keyStore.read(collectionID);
@@ -147,11 +169,11 @@ public class KeyringImpl implements Keyring {
     @Override
     public synchronized void remove(String collectionID) throws KeyringException {
         if (StringUtils.isEmpty(collectionID)) {
-            throw new KeyringException(INVALID_COLLECTION_ID_ERR_MSG);
+            throw new KeyringException(INVALID_COLLECTION_ID_ERR);
         }
 
         if (!keyStore.exists(collectionID)) {
-            throw new KeyringException(KEY_NOT_FOUND_ERR_MSG);
+            throw new KeyringException(KEY_NOT_FOUND_ERR);
         }
 
         keyStore.delete(collectionID);

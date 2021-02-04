@@ -53,7 +53,7 @@ public class KeyringImpl implements Keyring {
     /**
      * {@inheritDoc}
      * <b>WARNING: This action is destructive</b>. Calling load on a populated keyring will clear all existing values
-     * from it before repolating it with the the values returned by {@link CollectionKeyStore#readAll()}. It is
+     * from it before repopulating it with the the values returned by {@link CollectionKeyStore#readAll()}. It is
      * strongly advised to only use this method when the keyring is initialised on start up.
      *
      * @throws KeyringException problem loading the keyring.

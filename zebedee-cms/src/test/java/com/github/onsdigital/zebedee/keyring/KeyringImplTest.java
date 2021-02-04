@@ -357,7 +357,7 @@ public class KeyringImplTest {
     }
 
     @Test
-    public void testLoad_keystoreReturnsKeyMapping_cacheShouldBeEmpty() throws Exception {
+    public void testLoad_keystoreReturnsKeyMapping_cacheShouldBePopulated() throws Exception {
         Map<String, SecretKey> keysInStore = new HashMap<String, SecretKey>() {{
             put(TEST_COLLECTION_ID, secretKey);
         }};

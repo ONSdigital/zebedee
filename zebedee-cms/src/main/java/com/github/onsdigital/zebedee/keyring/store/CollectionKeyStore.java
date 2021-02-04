@@ -11,12 +11,20 @@ import java.util.Map;
 public interface CollectionKeyStore {
 
     /**
+     * Read and decrypt all collection key files and returns a map mapping collectionID -> SecretKey.
      *
-     * @return
-     * @throws KeyringException
+     * @return {@link java.util.HashMap} mapping collectionID -> SecretKey.
+     * @throws KeyringException problem reading the collection key files.
      */
     Map<String, SecretKey> readAll() throws KeyringException;
 
+    /**
+     * Check if a collection key file exists for this collection ID.
+     *
+     * @param collectionID the collection ID to look for.
+     * @return true of a key file exists with this collection ID, false otherwise.
+     * @throws KeyringException problem checking the key file.
+     */
     boolean exists(String collectionID) throws KeyringException;
 
     /**

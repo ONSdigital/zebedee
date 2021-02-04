@@ -2,7 +2,6 @@ package com.github.onsdigital.zebedee.keyring.store;
 
 import com.github.onsdigital.zebedee.keyring.KeyringException;
 import org.apache.commons.io.IOUtils;
-import org.checkerframework.checker.units.qual.K;
 
 import javax.crypto.Cipher;
 import javax.crypto.CipherInputStream;
@@ -17,7 +16,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import static org.apache.commons.io.FilenameUtils.removeExtension;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 /**
@@ -36,11 +41,12 @@ public class CollectionKeyStoreImpl implements CollectionKeyStore {
     static final String COLLECTION_KEY_NOT_FOUND_ERR = "collectionKey not found";
     static final String KEY_DECRYPTION_ERR = "error while decrypting collectionKey file";
     static final String WRITE_KEY_ERR = "error writing collection key to store";
-    static final String COLLECTION_KEY_ALREADY_EXISTS_ERR = "collectionKey for this collection ID already exists";
-    static final String FAILED_TO_DELETE_COLLECTION_KEY_ERR = "failed to delete collection key";
+    static final String KEY_ALREADY_EXISTS_ERR = "collectionKey for this collection ID already exists";
+    static final String DELETE_KEY_FAILED_ERR = "failed to delete collection key";
+    static final String KEYRING_DIR_DOES_NOT_EXIST_ERR = "error reading collectionKey keyring dir not found";
     static final String ENCRYPTION_ALGORITHM = "AES";
     static final String CIPHER_ALGORITHM = "AES/CBC/PKCS5Padding";
-
+    static final String KEY_EXT = ".key";
 
     private Path keyringDir;
     private SecretKey masterKey;
@@ -75,6 +81,39 @@ public class CollectionKeyStoreImpl implements CollectionKeyStore {
         this.keyringDir = keyringDir;
         this.masterKey = masterKey;
         this.masterIv = masterIv;
+    }
+
+    @Override
+    public Map<String, SecretKey> readAll() throws KeyringException {
+        Map<String, SecretKey> keyMap = new HashMap<>();
+
+        for (Path keyPath : getKeyFilePaths()) {
+            String collectionID = getCollectionIDFromFilePath(keyPath);
+            keyMap.put(collectionID, readKeyFromFile(collectionID));
+        }
+
+        return keyMap;
+    }
+
+    private List<Path> getKeyFilePaths() throws KeyringException {
+        if (Files.notExists(keyringDir)) {
+            throw new KeyringException(KEYRING_DIR_DOES_NOT_EXIST_ERR);
+        }
+
+        try (Stream<Path> stream = Files.list(keyringDir)) {
+            return stream.filter(p -> isCollectionKeyFile(p))
+                    .collect(Collectors.toList());
+        } catch (IOException ex) {
+            throw new KeyringException(ex);
+        }
+    }
+
+    private String getCollectionIDFromFilePath(Path p) {
+        return removeExtension(p.getFileName().toString());
+    }
+
+    private boolean isCollectionKeyFile(Path p) {
+        return !p.toFile().isDirectory() && p.toString().endsWith(KEY_EXT);
     }
 
     @Override
@@ -140,15 +179,15 @@ public class CollectionKeyStoreImpl implements CollectionKeyStore {
         Path keyPath = Paths.get(getKeyPath(collectionID));
         try {
             if (!Files.deleteIfExists(keyPath)) {
-                throw new KeyringException(FAILED_TO_DELETE_COLLECTION_KEY_ERR, collectionID);
+                throw new KeyringException(DELETE_KEY_FAILED_ERR, collectionID);
             }
         } catch (IOException ex) {
-            throw new KeyringException(FAILED_TO_DELETE_COLLECTION_KEY_ERR, collectionID, ex);
+            throw new KeyringException(DELETE_KEY_FAILED_ERR, collectionID, ex);
         }
     }
 
     private String getKeyPath(String collectionID) {
-        return keyringDir.resolve(collectionID + ".key").toString();
+        return keyringDir.resolve(collectionID + KEY_EXT).toString();
     }
 
     private Cipher getDecryptCipher() throws KeyringException {
@@ -178,7 +217,7 @@ public class CollectionKeyStoreImpl implements CollectionKeyStore {
 
         Path keyPath = Paths.get(getKeyPath(collectionID));
         if (exists(collectionID)) {
-            throw new KeyringException(COLLECTION_KEY_ALREADY_EXISTS_ERR, collectionID);
+            throw new KeyringException(KEY_ALREADY_EXISTS_ERR, collectionID);
         }
 
         if (collectionKey == null) {

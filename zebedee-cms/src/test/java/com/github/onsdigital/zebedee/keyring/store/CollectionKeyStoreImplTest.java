@@ -16,9 +16,6 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.RandomAccessFile;
-import java.nio.channels.FileChannel;
-import java.nio.channels.FileLock;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -31,8 +28,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
@@ -168,7 +163,7 @@ public class CollectionKeyStoreImplTest {
         KeyringException ex = assertThrows(KeyringException.class,
                 () -> store.write(TEST_COLLECTION_ID, createNewSecretKey()));
 
-        assertThat(ex.getMessage(), equalTo(COLLECTION_KEY_ALREADY_EXISTS_ERR));
+        assertThat(ex.getMessage(), equalTo(KEY_ALREADY_EXISTS_ERR));
         assertThat(ex.getCollectionID(), equalTo(TEST_COLLECTION_ID));
     }
 
@@ -302,18 +297,6 @@ public class CollectionKeyStoreImplTest {
         assertThat(ex.getMessage(), equalTo("error reading collectionKey keyring dir not found"));
     }
 
-    SecretKey createNewSecretKey() throws Exception {
-        return KeyGenerator.getInstance("AES").generateKey();
-    }
-
-    IvParameterSpec createNewInitVector() {
-        byte[] iv = new byte[16];
-
-        SecureRandom random = new SecureRandom();
-        random.nextBytes(iv);
-
-        return new IvParameterSpec(iv);
-    }
 
     @Test
     public void testDelete_collectionIDNull_shouldThrowKeyringException() {
@@ -374,5 +357,18 @@ public class CollectionKeyStoreImplTest {
     void createPlainTextCollectionKeyFile(String collectionID) throws Exception {
         Path p = keyringDir.toPath().resolve(collectionID + ".key");
         FileUtils.writeByteArrayToFile(p.toFile(), "This is not a valid secret key".getBytes());
+    }
+
+    SecretKey createNewSecretKey() throws Exception {
+        return KeyGenerator.getInstance("AES").generateKey();
+    }
+
+    IvParameterSpec createNewInitVector() {
+        byte[] iv = new byte[16];
+
+        SecureRandom random = new SecureRandom();
+        random.nextBytes(iv);
+
+        return new IvParameterSpec(iv);
     }
 }

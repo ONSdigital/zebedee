@@ -15,11 +15,12 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.apache.commons.io.FilenameUtils.removeExtension;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
@@ -40,8 +41,8 @@ public class CollectionKeyStoreImpl implements CollectionKeyStore {
     static final String COLLECTION_KEY_NOT_FOUND_ERR = "collectionKey not found";
     static final String KEY_DECRYPTION_ERR = "error while decrypting collectionKey file";
     static final String WRITE_KEY_ERR = "error writing collection key to store";
-    static final String COLLECTION_KEY_ALREADY_EXISTS_ERR = "collectionKey for this collection ID already exists";
-    static final String FAILED_TO_DELETE_COLLECTION_KEY_ERR = "failed to delete collection key";
+    static final String KEY_ALREADY_EXISTS_ERR = "collectionKey for this collection ID already exists";
+    static final String DELETE_KEY_FAILED_ERR = "failed to delete collection key";
     static final String KEYRING_DIR_DOES_NOT_EXIST_ERR = "error reading collectionKey keyring dir not found";
     static final String ENCRYPTION_ALGORITHM = "AES";
     static final String CIPHER_ALGORITHM = "AES/CBC/PKCS5Padding";
@@ -99,15 +100,12 @@ public class CollectionKeyStoreImpl implements CollectionKeyStore {
             throw new KeyringException(KEYRING_DIR_DOES_NOT_EXIST_ERR);
         }
 
-        List<Path> keyPaths = new ArrayList<>();
-        try {
-            Files.newDirectoryStream(keyringDir,
-                    p -> isCollectionKeyFile(p)).forEach(p -> keyPaths.add(p));
+        try (Stream<Path> stream = Files.list(keyringDir)) {
+            return stream.filter(p -> isCollectionKeyFile(p))
+                    .collect(Collectors.toList());
         } catch (IOException ex) {
             throw new KeyringException(ex);
         }
-
-        return keyPaths;
     }
 
     private String getCollectionIDFromFilePath(Path p) {
@@ -181,10 +179,10 @@ public class CollectionKeyStoreImpl implements CollectionKeyStore {
         Path keyPath = Paths.get(getKeyPath(collectionID));
         try {
             if (!Files.deleteIfExists(keyPath)) {
-                throw new KeyringException(FAILED_TO_DELETE_COLLECTION_KEY_ERR, collectionID);
+                throw new KeyringException(DELETE_KEY_FAILED_ERR, collectionID);
             }
         } catch (IOException ex) {
-            throw new KeyringException(FAILED_TO_DELETE_COLLECTION_KEY_ERR, collectionID, ex);
+            throw new KeyringException(DELETE_KEY_FAILED_ERR, collectionID, ex);
         }
     }
 
@@ -219,7 +217,7 @@ public class CollectionKeyStoreImpl implements CollectionKeyStore {
 
         Path keyPath = Paths.get(getKeyPath(collectionID));
         if (exists(collectionID)) {
-            throw new KeyringException(COLLECTION_KEY_ALREADY_EXISTS_ERR, collectionID);
+            throw new KeyringException(KEY_ALREADY_EXISTS_ERR, collectionID);
         }
 
         if (collectionKey == null) {

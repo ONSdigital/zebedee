@@ -11,7 +11,7 @@ import java.util.Map;
 public interface CollectionKeyStore {
 
     /**
-     * Read and decrypt all collection key files and returns a map mapping collectionID -> SecretKey.
+     * Read and decrypt all collection key files into a {@link java.util.HashMap}.
      *
      * @return {@link java.util.HashMap} mapping collectionID -> SecretKey.
      * @throws KeyringException problem reading the collection key files.

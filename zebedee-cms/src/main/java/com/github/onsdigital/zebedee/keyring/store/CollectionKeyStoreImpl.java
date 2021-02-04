@@ -41,6 +41,7 @@ public class CollectionKeyStoreImpl implements CollectionKeyStore {
     static final String KEY_DECRYPTION_ERR = "error while decrypting collectionKey file";
     static final String WRITE_KEY_ERR = "error writing collection key to store";
     static final String COLLECTION_KEY_ALREADY_EXISTS_ERR = "collectionKey for this collection ID already exists";
+    static final String FAILED_TO_DELETE_COLLECTION_KEY_ERR = "failed to delete collection key";
     static final String KEYRING_DIR_DOES_NOT_EXIST_ERR = "error reading collectionKey keyring dir not found";
     static final String ENCRYPTION_ALGORITHM = "AES";
     static final String CIPHER_ALGORITHM = "AES/CBC/PKCS5Padding";
@@ -169,7 +170,22 @@ public class CollectionKeyStoreImpl implements CollectionKeyStore {
 
     @Override
     public synchronized void delete(String collectionID) throws KeyringException {
-        // TODO implementation coming soon.
+        if (isEmpty(collectionID)) {
+            throw new KeyringException(INVALID_COLLECTION_ID_ERR);
+        }
+
+        if (!exists(collectionID)) {
+            throw new KeyringException(COLLECTION_KEY_NOT_FOUND_ERR, collectionID);
+        }
+
+        Path keyPath = Paths.get(getKeyPath(collectionID));
+        try {
+            if (!Files.deleteIfExists(keyPath)) {
+                throw new KeyringException(FAILED_TO_DELETE_COLLECTION_KEY_ERR, collectionID);
+            }
+        } catch (IOException ex) {
+            throw new KeyringException(FAILED_TO_DELETE_COLLECTION_KEY_ERR, collectionID, ex);
+        }
     }
 
     private String getKeyPath(String collectionID) {

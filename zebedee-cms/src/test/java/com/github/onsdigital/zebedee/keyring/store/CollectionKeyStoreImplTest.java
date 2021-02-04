@@ -16,6 +16,9 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.RandomAccessFile;
+import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -23,15 +26,13 @@ import java.security.SecureRandom;
 import java.util.Base64;
 import java.util.Map;
 
-import static com.github.onsdigital.zebedee.keyring.store.CollectionKeyStoreImpl.COLLECTION_KEY_ALREADY_EXISTS_ERR;
-import static com.github.onsdigital.zebedee.keyring.store.CollectionKeyStoreImpl.COLLECTION_KEY_NOT_FOUND_ERR;
-import static com.github.onsdigital.zebedee.keyring.store.CollectionKeyStoreImpl.COLLECTION_KEY_NULL_ERR;
-import static com.github.onsdigital.zebedee.keyring.store.CollectionKeyStoreImpl.INVALID_COLLECTION_ID_ERR;
-import static com.github.onsdigital.zebedee.keyring.store.CollectionKeyStoreImpl.KEY_DECRYPTION_ERR;
+import static com.github.onsdigital.zebedee.keyring.store.CollectionKeyStoreImpl.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
@@ -312,6 +313,47 @@ public class CollectionKeyStoreImplTest {
         random.nextBytes(iv);
 
         return new IvParameterSpec(iv);
+    }
+
+    @Test
+    public void testDelete_collectionIDNull_shouldThrowKeyringException() {
+        store = new CollectionKeyStoreImpl(null, null, null);
+
+        KeyringException ex = assertThrows(KeyringException.class, () -> store.delete(null));
+
+        assertThat(ex.getMessage(), equalTo(INVALID_COLLECTION_ID_ERR));
+    }
+
+    @Test
+    public void testDelete_collectionIDEmpty_shouldThrowKeyringException() {
+        store = new CollectionKeyStoreImpl(null, null, null);
+
+        KeyringException ex = assertThrows(KeyringException.class, () -> store.delete(""));
+
+        assertThat(ex.getMessage(), equalTo(INVALID_COLLECTION_ID_ERR));
+    }
+
+    @Test
+    public void testDelete_keyNotExists_shouldThrowException() {
+        store = new CollectionKeyStoreImpl(keyringDir.toPath(), null, null);
+
+        KeyringException ex = assertThrows(KeyringException.class, () -> store.delete(TEST_COLLECTION_ID));
+
+        assertThat(ex.getMessage(), equalTo(COLLECTION_KEY_NOT_FOUND_ERR));
+        assertThat(ex.getCollectionID(), equalTo(TEST_COLLECTION_ID));
+    }
+
+    @Test
+    public void testDelete_success_shouldDeleteFile() throws Exception {
+        store = new CollectionKeyStoreImpl(keyringDir.toPath(), null, null);
+
+        createPlainTextCollectionKeyFile(TEST_COLLECTION_ID);
+        Path p = keyringDir.toPath().resolve(TEST_COLLECTION_ID + ".key");
+        assertTrue(Files.exists(p));
+
+        store.delete(TEST_COLLECTION_ID);
+
+        assertFalse(Files.exists(p));
     }
 
     byte[] encrypt(String plainText, SecretKey key, IvParameterSpec iv) throws Exception {

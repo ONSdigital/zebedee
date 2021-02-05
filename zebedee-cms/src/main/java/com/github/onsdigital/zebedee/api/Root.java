@@ -132,7 +132,6 @@ public class Root {
             loadExistingCollectionsIntoScheduler(collections);
         } catch (IOException e) {
             error().logException(e, "zebedee root: failed to load collections list check in progress approvals");
-            return;
         }
 
         initialiseCsdbImportKeys();

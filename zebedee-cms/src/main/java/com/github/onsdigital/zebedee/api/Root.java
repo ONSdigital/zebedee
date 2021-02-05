@@ -8,6 +8,7 @@ import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
+import com.github.onsdigital.zebedee.json.ApprovalStatus;
 import com.github.onsdigital.zebedee.json.serialiser.IsoDateSerializer;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.Collections;
@@ -19,6 +20,8 @@ import com.github.onsdigital.zebedee.model.publishing.scheduled.Scheduler;
 import com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration;
 import com.github.onsdigital.zebedee.user.model.User;
 import com.github.onsdigital.zebedee.util.SlackNotification;
+import com.github.onsdigital.zebedee.util.slack.Notifier;
+import com.github.onsdigital.zebedee.util.slack.SlackNotifier;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -122,9 +125,17 @@ public class Root {
 
         SlackNotification.alarm("Zebedee has just started. Ensure an administrator has logged in.");
 
-        loadExistingCollectionsIntoScheduler();
+
+        try {
+            Collections.CollectionList collections = zebedee.getCollections().list();
+            alertOnInProgressCollections(collections, new SlackNotifier());
+            loadExistingCollectionsIntoScheduler(collections);
+        } catch (IOException e) {
+            error().logException(e, "zebedee root: failed to load collections list check in progress approvals");
+            return;
+        }
+
         initialiseCsdbImportKeys();
-        indexPublishedCollections();
 
         try {
             cleanupStaleCollectionKeys();
@@ -135,6 +146,7 @@ public class Root {
 
         info().data(ZEBEDEE_ROOT, rootDir).log("zebedee cmd initialization completed successfully");
     }
+
     /**
      * If we have not previously generated a key for CSDB import, generate one and distribute it.
      */
@@ -164,28 +176,10 @@ public class Root {
         }
     }
 
-
-    private static void indexPublishedCollections() {
-//        try {
-//            zebedee.publishedCollections.init(ElasticSearchClient.getClient());
-//        } catch (IOException e) {
-//            Log.print(e, "Exception indexing published collections: %s", e.getMessage());
-//        }
-    }
-
-    private static void loadExistingCollectionsIntoScheduler() {
+    private static void loadExistingCollectionsIntoScheduler(Collections.CollectionList collections) {
         if (Configuration.isSchedulingEnabled()) {
 
             info().log("zebedee root: adding existing collections to the scheduler.");
-
-            Collections.CollectionList collections;
-            try {
-                collections = zebedee.getCollections().list();
-            } catch (IOException e) {
-                error().logException(e, "zebedee root: failed to load collections list to schedule publishes");
-                return;
-            }
-
             for (Collection collection : collections) {
                 schedulePublish(collection);
             }
@@ -194,6 +188,18 @@ public class Root {
         }
     }
 
+    static void alertOnInProgressCollections(Collections.CollectionList collections, Notifier notifier) {
+        info().log("zebedee root: checking existing collections for in progress approvals");
+        collections.stream()
+                .filter(c -> c.getDescription().approvalStatus == ApprovalStatus.IN_PROGRESS
+                        || c.getDescription().approvalStatus == ApprovalStatus.ERROR)
+                .forEach(c -> {
+                    info().data("collectionId", c.getDescription().getId())
+                            .data("type", c.getDescription().getType().name())
+                            .log("zebedee root: collection approval is in error or in progress state on zebedee startup");
+                    notifier.collectionAlarm(c, "Collection approval is in IN_PROGRESS or ERROR state on zebedee startup. It may need to be re-approved manually.");
+                });
+    }
 
     public static void cancelPublish(Collection collection) {
         try {

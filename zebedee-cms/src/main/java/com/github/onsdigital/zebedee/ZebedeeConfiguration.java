@@ -40,16 +40,7 @@ import java.nio.file.Path;
 
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
-import static com.github.onsdigital.zebedee.Zebedee.APPLICATION_KEYS;
-import static com.github.onsdigital.zebedee.Zebedee.COLLECTIONS;
-import static com.github.onsdigital.zebedee.Zebedee.PERMISSIONS;
-import static com.github.onsdigital.zebedee.Zebedee.PUBLISHED;
-import static com.github.onsdigital.zebedee.Zebedee.PUBLISHED_COLLECTIONS;
-import static com.github.onsdigital.zebedee.Zebedee.SERVICES;
-import static com.github.onsdigital.zebedee.Zebedee.SESSIONS;
-import static com.github.onsdigital.zebedee.Zebedee.TEAMS;
-import static com.github.onsdigital.zebedee.Zebedee.USERS;
-import static com.github.onsdigital.zebedee.Zebedee.ZEBEDEE;
+import static com.github.onsdigital.zebedee.Zebedee.*;
 import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getDatasetAPIAuthToken;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getDatasetAPIURL;
@@ -75,6 +66,7 @@ public class ZebedeeConfiguration {
     private Path applicationKeysPath;
     private Path redirectPath;
     private Path servicePath;
+    private Path keyRingPath;
     private boolean useVerificationAgent;
     private ApplicationKeys applicationKeys;
     private PublishedCollections publishedCollections;
@@ -126,9 +118,13 @@ public class ZebedeeConfiguration {
         this.applicationKeysPath = createDir(zebedeePath, APPLICATION_KEYS);
         this.redirectPath = this.publishedContentPath.resolve(Content.REDIRECT);
         this.servicePath = createDir(zebedeePath, SERVICES);
+        this.keyRingPath = createDir(zebedeePath, KEYRING);
 
         if (!Files.exists(redirectPath)) {
             Files.createFile(redirectPath);
+        }
+        if (!Files.exists(keyRingPath)){
+            Files.createFile(keyRingPath);
         }
 
         this.useVerificationAgent = enableVerificationAgent;
@@ -181,6 +177,7 @@ public class ZebedeeConfiguration {
 
         info().data("root_path", rootPath.toString())
                 .data("zebedee_path", zebedeePath.toString())
+                .data("keyring_path", keyRingPath.toString())
                 .data("published_content_path", publishedContentPath.toString())
                 .data("collections_path", collectionsPath.toString())
                 .data("published_collections_path", publishedCollectionsPath.toString())
@@ -194,6 +191,7 @@ public class ZebedeeConfiguration {
                 .data("enable_verification_agent", useVerificationAgent)
                 .data("sessions_api_enabled", cmsFeatureFlags().isSessionAPIEnabled())
                 .log("zebedee configuration creation complete");
+
     }
 
     public boolean isUseVerificationAgent() {
@@ -238,6 +236,10 @@ public class ZebedeeConfiguration {
 
     public Path getRedirectPath() {
         return redirectPath;
+    }
+
+    public Path getKeyRingPath() {
+        return keyRingPath;
     }
 
     public Path getServicePath() {

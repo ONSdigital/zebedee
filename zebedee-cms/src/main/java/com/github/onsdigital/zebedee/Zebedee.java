@@ -51,6 +51,7 @@ public class Zebedee {
     public static final String LAUNCHPAD = "launchpad";
     public static final String APPLICATION_KEYS = "application-keys";
     public static final String SERVICES = "services";
+    public static final String KEYRING = "keyring";
 
     private final Path publishedCollectionsPath;
     private final Path collectionsPath;
@@ -61,6 +62,7 @@ public class Zebedee {
     private final Path applicationKeysPath;
     private final Path redirectPath;
     private final Path servicePath;
+    private final Path keyRingPath;
 
     private final VerificationAgent verificationAgent;
     private final ApplicationKeys applicationKeys;
@@ -110,6 +112,7 @@ public class Zebedee {
         this.applicationKeysPath = configuration.getApplicationKeysPath();
         this.redirectPath = configuration.getRedirectPath();
         this.servicePath = configuration.getServicePath();
+        this.keyRingPath = configuration.getKeyRingPath();
     }
 
     /**

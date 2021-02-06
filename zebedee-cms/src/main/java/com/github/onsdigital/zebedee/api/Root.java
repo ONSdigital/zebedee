@@ -131,7 +131,7 @@ public class Root {
             alertOnInProgressCollections(collections, new SlackNotifier());
             loadExistingCollectionsIntoScheduler(collections);
         } catch (IOException e) {
-            error().logException(e, "zebedee root: failed to load collections list check in progress approvals");
+            error().logException(e, "zebedee root: failed to load collections list on startup");
         }
 
         initialiseCsdbImportKeys();

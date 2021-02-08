@@ -990,7 +990,7 @@ public class Collections {
             return getCollectionByName(name) != null;
         }
 
-        public List<Collection> withApprovalInProgress() {
+        public List<Collection> withApprovalInProgressOrError() {
             return this.stream()
                     .filter(c -> c.getDescription().getApprovalStatus() == ApprovalStatus.IN_PROGRESS
                             || c.getDescription().getApprovalStatus() == ApprovalStatus.ERROR)

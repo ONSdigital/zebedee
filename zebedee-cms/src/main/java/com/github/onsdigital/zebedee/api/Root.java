@@ -189,7 +189,7 @@ public class Root {
 
     static void alertOnInProgressCollections(Collections.CollectionList collections, Notifier notifier) {
         info().log("zebedee root: checking existing collections for in progress approvals");
-        collections.withApprovalInProgress().forEach(c -> {
+        collections.withApprovalInProgressOrError().forEach(c -> {
             info().data("collectionId", c.getDescription().getId())
                     .data("type", c.getDescription().getType().name())
                     .log("zebedee root: collection approval is in error or in progress state on zebedee startup");

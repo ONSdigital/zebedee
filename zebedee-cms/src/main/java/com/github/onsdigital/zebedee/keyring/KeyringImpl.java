@@ -40,11 +40,12 @@ public class KeyringImpl implements Keyring {
     private static Keyring INSTANCE = null;
 
     /**
-     * Create a new instance of the Keyring.
+     * Create a new instance of the Keyring. Use {@link KeyringImpl#init(CollectionKeyStore)} to constuct a new
+     * instance.
      *
      * @param keyStore {@link CollectionKeyStore} to use to read/write entries to/from persistent storage.
      */
-    public KeyringImpl(final CollectionKeyStore keyStore) throws KeyringException {
+    KeyringImpl(final CollectionKeyStore keyStore) throws KeyringException {
         if (keyStore == null) {
             throw new KeyringException(KEYSTORE_NULL_ERR);
         }
@@ -190,7 +191,7 @@ public class KeyringImpl implements Keyring {
     }
 
     /**
-     * Construct and initialise the keyring.
+     * Construct and initialise a new singleton instance of the keyring.
      *
      * @param keystore the {@link CollectionKeyStore} to use.
      * @return a new {@link Keyring} instance.

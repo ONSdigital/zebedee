@@ -40,7 +40,17 @@ import java.nio.file.Path;
 
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
-import static com.github.onsdigital.zebedee.Zebedee.*;
+import static com.github.onsdigital.zebedee.Zebedee.APPLICATION_KEYS;
+import static com.github.onsdigital.zebedee.Zebedee.COLLECTIONS;
+import static com.github.onsdigital.zebedee.Zebedee.PERMISSIONS;
+import static com.github.onsdigital.zebedee.Zebedee.PUBLISHED;
+import static com.github.onsdigital.zebedee.Zebedee.PUBLISHED_COLLECTIONS;
+import static com.github.onsdigital.zebedee.Zebedee.SERVICES;
+import static com.github.onsdigital.zebedee.Zebedee.SESSIONS;
+import static com.github.onsdigital.zebedee.Zebedee.TEAMS;
+import static com.github.onsdigital.zebedee.Zebedee.USERS;
+import static com.github.onsdigital.zebedee.Zebedee.ZEBEDEE;
+import static com.github.onsdigital.zebedee.Zebedee.KEYRING;
 import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getDatasetAPIAuthToken;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getDatasetAPIURL;
@@ -122,9 +132,6 @@ public class ZebedeeConfiguration {
 
         if (!Files.exists(redirectPath)) {
             Files.createFile(redirectPath);
-        }
-        if (!Files.exists(keyRingPath)){
-            Files.createFile(keyRingPath);
         }
 
         this.useVerificationAgent = enableVerificationAgent;

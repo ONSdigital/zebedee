@@ -358,4 +358,8 @@ public class Zebedee {
     public Path getServicePath() {
         return servicePath;
     }
+
+    public Path getKeyRingPath() {
+        return keyRingPath;
+    }
 }

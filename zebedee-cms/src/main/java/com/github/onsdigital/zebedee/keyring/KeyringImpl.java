@@ -37,7 +37,6 @@ public class KeyringImpl implements Keyring {
     private CollectionKeyStore keyStore;
     private Map<String, SecretKey> cache;
 
-    private static Object MUTEX = new Object();
     private static Keyring INSTANCE = null;
 
     /**

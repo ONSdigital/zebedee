@@ -12,6 +12,7 @@ import java.util.Map;
 
 import static com.github.onsdigital.zebedee.keyring.KeyringImpl.INVALID_COLLECTION_ID_ERR;
 import static com.github.onsdigital.zebedee.keyring.KeyringImpl.INVALID_SECRET_KEY_ERR;
+import static com.github.onsdigital.zebedee.keyring.KeyringImpl.KEYSTORE_NULL_ERR;
 import static com.github.onsdigital.zebedee.keyring.KeyringImpl.KEY_MISMATCH_ERR;
 import static com.github.onsdigital.zebedee.keyring.KeyringImpl.KEY_NOT_FOUND_ERR;
 import static com.github.onsdigital.zebedee.keyring.KeyringImpl.LOAD_KEYS_NULL_ERR;
@@ -391,6 +392,49 @@ public class KeyringImplTest {
         assertTrue(cache.containsKey(TEST_COLLECTION_ID));
         assertTrue(!cache.containsKey("abc123"));
         assertThat(cache.get(TEST_COLLECTION_ID), equalTo(secretKey));
+        verify(keyStore, times(1)).readAll();
+    }
+
+    @Test
+    public void testInit_keystoreNull_shouldThrowException() {
+        KeyringException ex = assertThrows(KeyringException.class, () -> KeyringImpl.init(null));
+
+        assertThat(ex.getMessage(), equalTo(KEYSTORE_NULL_ERR));
+    }
+
+    @Test
+    public void testInit_keystoreException_shouldThrowException() throws Exception {
+        when(keyStore.readAll())
+                .thenThrow(new KeyringException("boom"));
+
+        KeyringException ex = assertThrows(KeyringException.class, () -> KeyringImpl.init(keyStore));
+
+        assertThat(ex.getMessage(), equalTo("boom"));
+        verify(keyStore, times(1)).readAll();
+    }
+
+    @Test
+    public void testInit_keystoreReturnsNull_shouldThrowException() throws Exception {
+        when(keyStore.readAll())
+                .thenReturn(null);
+
+        KeyringException ex = assertThrows(KeyringException.class, () -> KeyringImpl.init(keyStore));
+
+        assertThat(ex.getMessage(), equalTo(LOAD_KEYS_NULL_ERR));
+        verify(keyStore, times(1)).readAll();
+    }
+
+    @Test
+    public void testInit_success_shouldContainKey() throws Exception {
+        Map<String, SecretKey> keys = new HashMap<>();
+        keys.put(TEST_COLLECTION_ID, secretKey);
+
+        when(keyStore.readAll())
+                .thenReturn(keys);
+
+        Keyring keyring = KeyringImpl.init(keyStore);
+
+        assertThat(keyring.get(TEST_COLLECTION_ID), equalTo(secretKey));
         verify(keyStore, times(1)).readAll();
     }
 

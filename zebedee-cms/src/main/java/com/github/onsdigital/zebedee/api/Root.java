@@ -8,7 +8,6 @@ import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
-import com.github.onsdigital.zebedee.json.ApprovalStatus;
 import com.github.onsdigital.zebedee.json.serialiser.IsoDateSerializer;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.Collections;
@@ -19,7 +18,6 @@ import com.github.onsdigital.zebedee.model.publishing.scheduled.PublishScheduler
 import com.github.onsdigital.zebedee.model.publishing.scheduled.Scheduler;
 import com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration;
 import com.github.onsdigital.zebedee.user.model.User;
-import com.github.onsdigital.zebedee.util.SlackNotification;
 import com.github.onsdigital.zebedee.util.slack.Notifier;
 import com.github.onsdigital.zebedee.util.slack.SlackNotifier;
 import org.apache.commons.io.IOUtils;
@@ -123,15 +121,17 @@ public class Root {
         //Setting zebedee root as system property for zebedee reader module, since zebedee root is not set as environment variable on develop environment
         System.setProperty(ZEBEDEE_ROOT, root.toString());
 
-        SlackNotification.alarm("Zebedee has just started. Ensure an administrator has logged in.");
-
+        final SlackNotifier notifier = new SlackNotifier();
+        notifier.alarm("Zebedee has just started. Ensure an administrator has logged in.");
 
         try {
             Collections.CollectionList collections = zebedee.getCollections().list();
-            alertOnInProgressCollections(collections, new SlackNotifier());
+            alertOnInProgressCollections(collections, notifier);
             loadExistingCollectionsIntoScheduler(collections);
         } catch (IOException e) {
-            error().logException(e, "zebedee root: failed to load collections list on startup");
+            final String message = "failed to load collections list on startup";
+            error().logException(e, message);
+            throw new RuntimeException(message, e);
         }
 
         initialiseCsdbImportKeys();
@@ -189,15 +189,12 @@ public class Root {
 
     static void alertOnInProgressCollections(Collections.CollectionList collections, Notifier notifier) {
         info().log("zebedee root: checking existing collections for in progress approvals");
-        collections.stream()
-                .filter(c -> c.getDescription().approvalStatus == ApprovalStatus.IN_PROGRESS
-                        || c.getDescription().approvalStatus == ApprovalStatus.ERROR)
-                .forEach(c -> {
-                    info().data("collectionId", c.getDescription().getId())
-                            .data("type", c.getDescription().getType().name())
-                            .log("zebedee root: collection approval is in error or in progress state on zebedee startup");
-                    notifier.collectionAlarm(c, "Collection approval is in IN_PROGRESS or ERROR state on zebedee startup. It may need to be re-approved manually.");
-                });
+        collections.withApprovalInProgress().forEach(c -> {
+            info().data("collectionId", c.getDescription().getId())
+                    .data("type", c.getDescription().getType().name())
+                    .log("zebedee root: collection approval is in error or in progress state on zebedee startup");
+            notifier.collectionAlarm(c, "Collection approval is in IN_PROGRESS or ERROR state on zebedee startup. It may need to be re-approved manually.");
+        });
     }
 
     public static void cancelPublish(Collection collection) {

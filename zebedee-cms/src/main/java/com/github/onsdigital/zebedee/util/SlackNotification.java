@@ -28,9 +28,13 @@ import java.util.concurrent.TimeUnit;
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 
+
 /**
  * Sends messages to slack.
+ *
+ * @deprecated - If possible use the non-static wrapper implementation {@link SlackNotification}
  */
+@Deprecated
 public class SlackNotification {
 
     public enum CollectionStage {
@@ -138,7 +142,6 @@ public class SlackNotification {
                             attch.getFields().add(new PostMessageField("Example page", "https://www.ons.gov.uk" + urlInfo.uri.substring(0, urlInfo.uri.length() - (DATA_JSON).length()), false));
                         });
             }
-
         }
     }
 

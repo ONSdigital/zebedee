@@ -32,17 +32,27 @@ public class KeyringImpl implements Keyring {
             "add unsuccessful as a different SecretKey already exists for this collection ID";
     static final String KEY_NOT_FOUND_ERR = "SecretKey not found for this collection ID";
     static final String LOAD_KEYS_NULL_ERR = "error loading keystore expected map but was null";
+    static final String KEYSTORE_NULL_ERR = "collection key store required but was null";
 
     private CollectionKeyStore keyStore;
     private Map<String, SecretKey> cache;
 
+    private static Keyring INSTANCE = null;
+
     /**
-     * Create a new instance of the Keyring.
+     * Create a new instance of the Keyring. Use {@link KeyringImpl#init(CollectionKeyStore)} to constuct a new
+     * instance.
      *
      * @param keyStore {@link CollectionKeyStore} to use to read/write entries to/from persistent storage.
      */
-    public KeyringImpl(final CollectionKeyStore keyStore) {
-        this(keyStore, new HashMap<>());
+    KeyringImpl(final CollectionKeyStore keyStore) throws KeyringException {
+        if (keyStore == null) {
+            throw new KeyringException(KEYSTORE_NULL_ERR);
+        }
+
+        this.keyStore = keyStore;
+        this.cache = new HashMap<>();
+        this.load();
     }
 
     KeyringImpl(final CollectionKeyStore keyStore, final Map<String, SecretKey> cache) {
@@ -178,5 +188,23 @@ public class KeyringImpl implements Keyring {
 
         keyStore.delete(collectionID);
         cache.remove(collectionID);
+    }
+
+    /**
+     * Construct and initialise a new singleton instance of the keyring.
+     *
+     * @param keystore the {@link CollectionKeyStore} to use.
+     * @return a new {@link Keyring} instance.
+     * @throws KeyringException problem initalising the keyring.
+     */
+    public static Keyring init(CollectionKeyStore keystore) throws KeyringException {
+        if (INSTANCE == null) {
+            synchronized (KeyringImpl.class) {
+                if (INSTANCE == null) {
+                    INSTANCE = new KeyringImpl(keystore);
+                }
+            }
+        }
+        return INSTANCE;
     }
 }

@@ -59,6 +59,8 @@ import static junit.framework.TestCase.assertTrue;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
@@ -1135,7 +1137,6 @@ public class CollectionsTest {
         assertThat(collectionsPath.resolve("col1/inprogress").toFile().list().length, equalTo(0));
     }
 
-
     @Test
     public void skipDatasetVersionsValidation_userKeyNull_shouldReturnFalse() throws IOException {
         assertFalse(collections.skipDatasetVersionsValidation(null, null, null));
@@ -1203,5 +1204,126 @@ public class CollectionsTest {
 
         Event event = description.events.get(0);
         assertThat(event.getType(), equalTo(EventType.VERSION_VERIFICATION_BYPASSED));
+    }
+
+    @Test
+    public void collectionsList_withApprovalInProgressOrError_emptyCollectionsList() {
+
+        // Given an empty list of collections
+        Collections.CollectionList collections = new Collections.CollectionList();
+
+        // When the withApprovalInProgressOrError function is called
+        final List<Collection> filteredCollections = collections.withApprovalInProgressOrError();
+
+        // Then an empty collection is returned
+        assertThat(filteredCollections, hasSize(0));
+    }
+
+    @Test
+    public void collectionsList_withApprovalInProgressOrError_noInProgressCollections() {
+
+        // Given a list of collections with none in approval state IN_PROGRESS or ERROR
+        Collections.CollectionList collections = new Collections.CollectionList();
+        Collection collection = getMockCollection(ApprovalStatus.NOT_STARTED);
+        collections.add(collection);
+
+        // When the withApprovalInProgressOrError function is called
+        final List<Collection> filteredCollections = collections.withApprovalInProgressOrError();
+
+        // Then an empty collection is returned
+        assertThat(filteredCollections, hasSize(0));
+    }
+
+    @Test
+    public void collectionsList_withApprovalInProgressOrError_inProgressCollection() {
+
+        // Given a list of collections with one in approval state IN_PROGRESS
+        Collections.CollectionList collections = new Collections.CollectionList();
+        Collection collection = getMockCollection(ApprovalStatus.IN_PROGRESS);
+        collections.add(collection);
+
+        // When the withApprovalInProgressOrError function is called
+        final List<Collection> filteredCollections = collections.withApprovalInProgressOrError();
+
+        // Then the list returned contains the collection
+        assertThat(filteredCollections, hasSize(1));
+        assertThat(filteredCollections, contains(collection));
+    }
+
+    @Test
+    public void collectionsList_withApprovalInProgressOrError_erroredCollection() {
+
+        // Given a list of collections with one in approval state ERROR
+        Collections.CollectionList collections = new Collections.CollectionList();
+        Collection collection = getMockCollection(ApprovalStatus.ERROR);
+        collections.add(collection);
+
+        // When the withApprovalInProgressOrError function is called
+        final List<Collection> filteredCollections = collections.withApprovalInProgressOrError();
+
+        // Then the list returned contains the collection
+        assertThat(filteredCollections, hasSize(1));
+        assertThat(filteredCollections, contains(collection));
+    }
+
+    @Test
+    public void collectionsList_withApprovalInProgressOrError_erroredAndInProgressCollections() {
+
+        // Given a list of collections with collections in both ERROR and IN_PROGRESS approval states
+        Collection inProgressCollection = getMockCollection(ApprovalStatus.IN_PROGRESS);
+        Collection erroredCollection = getMockCollection(ApprovalStatus.ERROR);
+        Collection notStartedCollection = getMockCollection(ApprovalStatus.NOT_STARTED);
+
+        Collections.CollectionList collections = new Collections.CollectionList();
+        collections.add(inProgressCollection);
+        collections.add(notStartedCollection);
+        collections.add(erroredCollection);
+
+        // When the withApprovalInProgressOrError function is called
+        final List<Collection> filteredCollections = collections.withApprovalInProgressOrError();
+
+        // Then the list returned contains only the collections in ERROR and IN_PROGRESS approval states
+        assertThat(filteredCollections, hasSize(2));
+        assertThat(filteredCollections, contains(inProgressCollection, erroredCollection));
+    }
+
+    @Test
+    public void collectionsList_withApprovalInProgressOrError_multipleCollections() {
+
+        // Given a list of collections with multiple collections in both ERROR and IN_PROGRESS approval states
+        Collection inProgressCollection1 = getMockCollection(ApprovalStatus.IN_PROGRESS);
+        Collection inProgressCollection2 = getMockCollection(ApprovalStatus.IN_PROGRESS);
+        Collection erroredCollection1 = getMockCollection(ApprovalStatus.ERROR);
+        Collection erroredCollection2 = getMockCollection(ApprovalStatus.ERROR);
+        Collection notStartedCollection1 = getMockCollection(ApprovalStatus.NOT_STARTED);
+        Collection notStartedCollection2 = getMockCollection(ApprovalStatus.NOT_STARTED);
+
+        Collections.CollectionList collections = new Collections.CollectionList();
+        collections.add(inProgressCollection1);
+        collections.add(inProgressCollection2);
+        collections.add(notStartedCollection1);
+        collections.add(notStartedCollection2);
+        collections.add(erroredCollection1);
+        collections.add(erroredCollection2);
+
+        // When the withApprovalInProgressOrError function is called
+        final List<Collection> filteredCollections = collections.withApprovalInProgressOrError();
+
+        // Then the list returned contains only the collections in ERROR and IN_PROGRESS approval states
+        assertThat(filteredCollections, hasSize(4));
+        assertThat(filteredCollections, contains(
+                inProgressCollection1,
+                inProgressCollection2,
+                erroredCollection1,
+                erroredCollection2));
+    }
+
+    private Collection getMockCollection(ApprovalStatus approvalStatus) {
+        Collection collection = mock(Collection.class);
+        CollectionDescription description = new CollectionDescription();
+        description.setApprovalStatus(approvalStatus);
+        description.setType(CollectionType.scheduled);
+        when(collection.getDescription()).thenReturn(description);
+        return collection;
     }
 }

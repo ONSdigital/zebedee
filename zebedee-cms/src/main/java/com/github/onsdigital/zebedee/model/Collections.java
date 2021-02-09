@@ -3,7 +3,6 @@ package com.github.onsdigital.zebedee.model;
 import com.github.davidcarboni.encryptedfileupload.EncryptedFileItemFactory;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.api.Root;
-import com.github.onsdigital.zebedee.configuration.CMSFeatureFlags;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.data.json.DirectoryListing;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
@@ -991,6 +990,12 @@ public class Collections {
             return getCollectionByName(name) != null;
         }
 
+        public List<Collection> withApprovalInProgressOrError() {
+            return this.stream()
+                    .filter(c -> c.getDescription().getApprovalStatus() == ApprovalStatus.IN_PROGRESS
+                            || c.getDescription().getApprovalStatus() == ApprovalStatus.ERROR)
+                    .collect(Collectors.toList());
+        }
     }
 
     public void verifyDatasetVersions(Collection collection, CollectionReader collectionReader, Session session) throws ZebedeeException, IOException {

@@ -75,7 +75,7 @@ public class VerificationAgent {
     private void reSubmit(final PublishedCollection publishedCollection, final Path jsonPath, final UriInfo uriInfo) {
         ((Runnable) () -> {
             try {
-                Thread.sleep(Configuration.getVerifyRetrtyDelay());
+                Thread.sleep(Configuration.getVerifyRetryDelay());
             } catch (InterruptedException e) {
                 error().logException(e, "Retry delay failed, continuing with verification retry");
             }
@@ -123,7 +123,7 @@ public class VerificationAgent {
         }
 
         private void onVerifyFailed(String errorMessage) {
-            if (Configuration.getVerifyRetrtyCount() == uriInfo.verificationRetryCount) {
+            if (Configuration.getVerifyRetryCount() == uriInfo.verificationRetryCount) {
                 uriInfo.verificationStatus = UriInfo.VERIFY_FAILED;
                 publishedCollection.incrementVerifyFailed();
                 publishedCollection.decrementVerifyInProgressCount();

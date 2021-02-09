@@ -191,8 +191,11 @@ public class Configuration {
         }
 
         byte[] keyBytes = Base64.getDecoder().decode(keyStr);
+        SecretKey secretKey = new SecretKeySpec(keyBytes, 0, keyBytes.length, "AES");
 
-        return new SecretKeySpec(keyBytes, 0, keyBytes.length, "AES");
+        Arrays.fill(keyBytes, (byte) 0);
+
+        return secretKey;
     }
 
     /**
@@ -205,8 +208,11 @@ public class Configuration {
         }
 
         byte[] vectorBytes = Base64.getDecoder().decode(vectorStr);
+        IvParameterSpec ivParameterSpec = new IvParameterSpec(vectorBytes);
 
-        return new IvParameterSpec(vectorBytes);
+        Arrays.fill(vectorBytes, (byte) 0);
+
+        return ivParameterSpec;
     }
 
     /**

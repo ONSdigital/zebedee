@@ -4,6 +4,10 @@ import com.github.onsdigital.session.service.client.Http;
 import com.github.onsdigital.session.service.client.SessionClient;
 import com.github.onsdigital.session.service.client.SessionClientImpl;
 import com.github.onsdigital.zebedee.data.processing.DataIndex;
+import com.github.onsdigital.zebedee.keyring.Keyring;
+import com.github.onsdigital.zebedee.keyring.KeyringImpl;
+import com.github.onsdigital.zebedee.keyring.store.CollectionKeyStore;
+import com.github.onsdigital.zebedee.keyring.store.CollectionKeyStoreImpl;
 import com.github.onsdigital.zebedee.model.Collections;
 import com.github.onsdigital.zebedee.model.Content;
 import com.github.onsdigital.zebedee.model.KeyringCache;
@@ -18,8 +22,8 @@ import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
 import com.github.onsdigital.zebedee.service.DatasetService;
 import com.github.onsdigital.zebedee.service.ServiceStoreImpl;
 import com.github.onsdigital.zebedee.service.ZebedeeDatasetService;
-import com.github.onsdigital.zebedee.session.service.SessionsAPIServiceImpl;
 import com.github.onsdigital.zebedee.session.service.Sessions;
+import com.github.onsdigital.zebedee.session.service.SessionsAPIServiceImpl;
 import com.github.onsdigital.zebedee.session.service.SessionsServiceImpl;
 import com.github.onsdigital.zebedee.teams.service.TeamsService;
 import com.github.onsdigital.zebedee.teams.service.TeamsServiceImpl;
@@ -42,6 +46,7 @@ import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 import static com.github.onsdigital.zebedee.Zebedee.APPLICATION_KEYS;
 import static com.github.onsdigital.zebedee.Zebedee.COLLECTIONS;
+import static com.github.onsdigital.zebedee.Zebedee.KEYRING;
 import static com.github.onsdigital.zebedee.Zebedee.PERMISSIONS;
 import static com.github.onsdigital.zebedee.Zebedee.PUBLISHED;
 import static com.github.onsdigital.zebedee.Zebedee.PUBLISHED_COLLECTIONS;
@@ -50,10 +55,11 @@ import static com.github.onsdigital.zebedee.Zebedee.SESSIONS;
 import static com.github.onsdigital.zebedee.Zebedee.TEAMS;
 import static com.github.onsdigital.zebedee.Zebedee.USERS;
 import static com.github.onsdigital.zebedee.Zebedee.ZEBEDEE;
-import static com.github.onsdigital.zebedee.Zebedee.KEYRING;
 import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getDatasetAPIAuthToken;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getDatasetAPIURL;
+import static com.github.onsdigital.zebedee.configuration.Configuration.getKeyringInitVector;
+import static com.github.onsdigital.zebedee.configuration.Configuration.getKeyringSecretKey;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getServiceAuthToken;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getSessionsApiUrl;
 import static com.github.onsdigital.zebedee.permissions.store.PermissionsStoreFileSystemImpl.initialisePermissions;
@@ -91,6 +97,7 @@ public class ZebedeeConfiguration {
     private PermissionsStore permissionsStore;
     private DatasetService datasetService;
     private SessionClient sessionClient;
+    private Keyring keyring;
 
     private static Path createDir(Path root, String dirName) throws IOException {
         Path dir = root.resolve(dirName);
@@ -147,6 +154,12 @@ public class ZebedeeConfiguration {
             this.sessions = new SessionsAPIServiceImpl(sessionClient);
         } else {
             this.sessions = new SessionsServiceImpl(sessionsPath);
+        }
+
+        // Feature flag to enable new keyring implementation
+        if (cmsFeatureFlags().isCentralisedKeyringEnabled()) {
+            CollectionKeyStore keyStore = new CollectionKeyStoreImpl(getKeyRingPath(), getKeyringSecretKey(), getKeyringInitVector());
+            this.keyring = KeyringImpl.init(keyStore);
         }
 
         this.keyringCache = new KeyringCache(sessions);

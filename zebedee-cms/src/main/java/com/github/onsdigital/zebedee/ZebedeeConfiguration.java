@@ -4,13 +4,12 @@ import com.github.onsdigital.session.service.client.Http;
 import com.github.onsdigital.session.service.client.SessionClient;
 import com.github.onsdigital.session.service.client.SessionClientImpl;
 import com.github.onsdigital.zebedee.data.processing.DataIndex;
-import com.github.onsdigital.zebedee.keyring.Keyring;
-import com.github.onsdigital.zebedee.keyring.KeyringImpl;
-import com.github.onsdigital.zebedee.keyring.store.CollectionKeyStore;
-import com.github.onsdigital.zebedee.keyring.store.CollectionKeyStoreImpl;
+import com.github.onsdigital.zebedee.keyring.cache.KeyringCache;
+import com.github.onsdigital.zebedee.keyring.cache.KeyringCacheImpl;
+import com.github.onsdigital.zebedee.keyring.store.KeyringStore;
+import com.github.onsdigital.zebedee.keyring.store.KeyringStoreImpl;
 import com.github.onsdigital.zebedee.model.Collections;
 import com.github.onsdigital.zebedee.model.Content;
-import com.github.onsdigital.zebedee.model.KeyringCache;
 import com.github.onsdigital.zebedee.model.RedirectTablePartialMatch;
 import com.github.onsdigital.zebedee.model.encryption.ApplicationKeys;
 import com.github.onsdigital.zebedee.model.publishing.PublishedCollections;
@@ -88,7 +87,7 @@ public class ZebedeeConfiguration {
     private PublishedCollections publishedCollections;
     private Collections collections;
     private Content published;
-    private KeyringCache keyringCache;
+    private com.github.onsdigital.zebedee.model.KeyringCache legacyKeyringCache;
     private PermissionsService permissionsService;
     private UsersService usersService;
     private TeamsService teamsService;
@@ -97,7 +96,7 @@ public class ZebedeeConfiguration {
     private PermissionsStore permissionsStore;
     private DatasetService datasetService;
     private SessionClient sessionClient;
-    private Keyring keyring;
+    private KeyringCache keyringCache;
 
     private static Path createDir(Path root, String dirName) throws IOException {
         Path dir = root.resolve(dirName);
@@ -158,11 +157,11 @@ public class ZebedeeConfiguration {
 
         // Feature flag to enable new keyring implementation
         if (cmsFeatureFlags().isCentralisedKeyringEnabled()) {
-            CollectionKeyStore keyStore = new CollectionKeyStoreImpl(getKeyRingPath(), getKeyringSecretKey(), getKeyringInitVector());
-            this.keyring = KeyringImpl.init(keyStore);
+            KeyringStore keyStore = new KeyringStoreImpl(getKeyRingPath(), getKeyringSecretKey(), getKeyringInitVector());
+            this.keyringCache = KeyringCacheImpl.init(keyStore);
         }
 
-        this.keyringCache = new KeyringCache(sessions);
+        this.legacyKeyringCache = new com.github.onsdigital.zebedee.model.KeyringCache(sessions);
 
         this.teamsService = new TeamsServiceImpl(
                 new TeamsStoreFileSystemImpl(teamsPath), this::getPermissionsService);
@@ -173,7 +172,7 @@ public class ZebedeeConfiguration {
         this.permissionsStore = new PermissionsStoreFileSystemImpl(permissionsPath);
 
         this.permissionsService = new PermissionsServiceImpl(permissionsStore,
-                this::getUsersService, this::getTeamsService, keyringCache);
+                this::getUsersService, this::getTeamsService, legacyKeyringCache);
 
         VersionsService versionsService = new VersionsServiceImpl();
         this.collections = new Collections(collectionsPath, permissionsService, versionsService, published);
@@ -183,7 +182,7 @@ public class ZebedeeConfiguration {
                 collections,
                 permissionsService,
                 applicationKeys,
-                keyringCache);
+                legacyKeyringCache);
 
         DatasetClient datasetClient;
         try {
@@ -299,8 +298,8 @@ public class ZebedeeConfiguration {
         return this.publishedCollections;
     }
 
-    public KeyringCache getKeyringCache() {
-        return this.keyringCache;
+    public com.github.onsdigital.zebedee.model.KeyringCache getKeyringCache() {
+        return this.legacyKeyringCache;
     }
 
     public ApplicationKeys getApplicationKeys() {

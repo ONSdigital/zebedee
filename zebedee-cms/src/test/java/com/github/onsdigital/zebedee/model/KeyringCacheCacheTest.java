@@ -16,7 +16,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * Test for {@link KeyringCache}.
  */
-public class KeyringCacheTest extends ZebedeeTestBaseFixture {
+public class KeyringCacheCacheTest extends ZebedeeTestBaseFixture {
 
     private KeyringCache keyringCache;
     private Session session;

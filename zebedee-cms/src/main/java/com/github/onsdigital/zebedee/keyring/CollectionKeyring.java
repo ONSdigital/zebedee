@@ -2,7 +2,7 @@ package com.github.onsdigital.zebedee.keyring;
 
 import com.github.onsdigital.zebedee.user.model.User;
 
-public interface SecureKeyring {
+public interface CollectionKeyring {
 
     /**
      * Populate the Keyring from an unlocked {@link User#keyring()}

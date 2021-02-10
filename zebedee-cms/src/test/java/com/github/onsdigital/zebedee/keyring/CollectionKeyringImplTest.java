@@ -1,5 +1,6 @@
 package com.github.onsdigital.zebedee.keyring;
 
+import com.github.onsdigital.zebedee.keyring.cache.KeyringCache;
 import com.github.onsdigital.zebedee.user.model.User;
 import org.junit.Before;
 import org.junit.Test;
@@ -9,9 +10,9 @@ import org.mockito.MockitoAnnotations;
 import javax.crypto.SecretKey;
 import java.util.HashSet;
 
-import static com.github.onsdigital.zebedee.keyring.SecureKeyringImpl.USER_KEYRING_LOCKED_ERR;
-import static com.github.onsdigital.zebedee.keyring.SecureKeyringImpl.USER_KEYRING_NULL_ERR;
-import static com.github.onsdigital.zebedee.keyring.SecureKeyringImpl.USER_NULL_ERR;
+import static com.github.onsdigital.zebedee.keyring.CollectionKeyringImpl.USER_KEYRING_LOCKED_ERR;
+import static com.github.onsdigital.zebedee.keyring.CollectionKeyringImpl.USER_KEYRING_NULL_ERR;
+import static com.github.onsdigital.zebedee.keyring.CollectionKeyringImpl.USER_NULL_ERR;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertThrows;
@@ -22,14 +23,14 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
-public class SecureKeyringImplTest {
+public class CollectionKeyringImplTest {
 
     static final String TEST_COLLECTION_ID = "44";
 
-    private SecureKeyring keyring;
+    private CollectionKeyring keyring;
 
     @Mock
-    private Keyring centralKeyring;
+    private KeyringCache cache;
 
     @Mock
     private User user;
@@ -44,7 +45,7 @@ public class SecureKeyringImplTest {
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
 
-        keyring = new SecureKeyringImpl(centralKeyring);
+        keyring = new CollectionKeyringImpl(cache);
     }
 
     @Test
@@ -53,9 +54,9 @@ public class SecureKeyringImplTest {
         // when populateFromUser is called
         KeyringException ex = assertThrows(KeyringException.class, () -> keyring.populateFromUser(null));
 
-        // then a Keyring exeption is thrown.
+        // then a Keyring exception is thrown.
         assertThat(ex.getMessage(), equalTo(USER_NULL_ERR));
-        verifyZeroInteractions(centralKeyring);
+        verifyZeroInteractions(cache);
     }
 
     @Test
@@ -67,9 +68,9 @@ public class SecureKeyringImplTest {
         // When populateFromUser is called
         KeyringException ex = assertThrows(KeyringException.class, () -> keyring.populateFromUser(user));
 
-        // Then a Keyring exeption is thrown.
+        // Then a Keyring exception is thrown.
         assertThat(ex.getMessage(), equalTo(USER_KEYRING_NULL_ERR));
-        verifyZeroInteractions(centralKeyring);
+        verifyZeroInteractions(cache);
     }
 
     @Test
@@ -84,9 +85,9 @@ public class SecureKeyringImplTest {
         // When populateFromUser is called
         KeyringException ex = assertThrows(KeyringException.class, () -> keyring.populateFromUser(user));
 
-        // Then a Keyring exeption is thrown.
+        // Then a Keyring exception is thrown.
         assertThat(ex.getMessage(), equalTo(USER_KEYRING_LOCKED_ERR));
-        verifyZeroInteractions(centralKeyring);
+        verifyZeroInteractions(cache);
     }
 
     @Test
@@ -105,7 +106,7 @@ public class SecureKeyringImplTest {
         keyring.populateFromUser(user);
 
         // Then the central keyring is not updated.
-        verifyZeroInteractions(centralKeyring);
+        verifyZeroInteractions(cache);
     }
 
     @Test
@@ -126,14 +127,14 @@ public class SecureKeyringImplTest {
                 .thenReturn(secretKey);
 
         doThrow(KeyringException.class)
-                .when(centralKeyring)
+                .when(cache)
                 .add(any(), any());
 
         // When populateFromUser is called
         assertThrows(KeyringException.class, () -> keyring.populateFromUser(user));
 
         // Then the central keyring is not updated.
-        verify(centralKeyring, times(1)).add(any(), any());
+        verify(cache, times(1)).add(any(), any());
     }
 
     @Test
@@ -157,6 +158,6 @@ public class SecureKeyringImplTest {
         keyring.populateFromUser(user);
 
         // Then the central keyring is updated with each entry in the user keyring.
-        verify(centralKeyring, times(1)).add(TEST_COLLECTION_ID, secretKey);
+        verify(cache, times(1)).add(TEST_COLLECTION_ID, secretKey);
     }
 }

@@ -6,6 +6,7 @@ import com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedExcept
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.Credentials;
+import com.github.onsdigital.zebedee.json.Keyring;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.Collections;
 import com.github.onsdigital.zebedee.model.Content;
@@ -270,10 +271,10 @@ public class Zebedee {
         }
 
         // Get the user
-        User user = usersService.getUserByEmail(credentials.email);
+        User user = usersService.getUserByEmail(credentials.getEmail());
 
         if (user == null) {
-            info().data("user", user.getEmail()).log("user not found no session will be created");
+            info().data("user", credentials.getEmail()).log("user not found no session will be created");
             return null;
         }
 
@@ -287,7 +288,11 @@ public class Zebedee {
         }
 
         // Unlock and cache keyring
-        user.keyring().unlock(credentials.password);
+        Keyring legacyKeyring = user.keyring();
+        if (!legacyKeyring.unlock(credentials.getPassword())) {
+            throw new IOException("failed to unlock user keyring");
+        }
+
         applicationKeys.populateCacheFromUserKeyring(user.keyring());
         keyringCache.put(user, session);
 

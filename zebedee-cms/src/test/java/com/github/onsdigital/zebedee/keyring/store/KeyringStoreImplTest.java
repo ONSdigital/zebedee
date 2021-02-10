@@ -23,7 +23,7 @@ import java.security.SecureRandom;
 import java.util.Base64;
 import java.util.Map;
 
-import static com.github.onsdigital.zebedee.keyring.store.CollectionKeyStoreImpl.*;
+import static com.github.onsdigital.zebedee.keyring.store.KeyringStoreImpl.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
@@ -32,7 +32,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
-public class CollectionKeyStoreImplTest {
+public class KeyringStoreImplTest {
 
     static final String TEST_COLLECTION_ID = "1234567890";
     static final String CIPHER_ALGORITHM = "AES/CBC/PKCS5Padding";
@@ -40,7 +40,7 @@ public class CollectionKeyStoreImplTest {
     @Rule
     public TemporaryFolder folder = new TemporaryFolder();
 
-    private CollectionKeyStore store;
+    private KeyringStore store;
     private File keyringDir;
 
     @Before
@@ -50,7 +50,7 @@ public class CollectionKeyStoreImplTest {
 
     @Test
     public void read_collectionIDNull_shouldThrowException() throws Exception {
-        store = new CollectionKeyStoreImpl(keyringDir.toPath(), null, null);
+        store = new KeyringStoreImpl(keyringDir.toPath(), null, null);
 
         KeyringException ex = assertThrows(KeyringException.class, () -> store.read(null));
 
@@ -59,7 +59,7 @@ public class CollectionKeyStoreImplTest {
 
     @Test
     public void read_collectionIDEmpty_shouldThrowException() throws Exception {
-        store = new CollectionKeyStoreImpl(keyringDir.toPath(), null, null);
+        store = new KeyringStoreImpl(keyringDir.toPath(), null, null);
 
         KeyringException ex = assertThrows(KeyringException.class, () -> store.read(""));
 
@@ -68,7 +68,7 @@ public class CollectionKeyStoreImplTest {
 
     @Test
     public void read_keyNotFound_shouldThrowException() throws Exception {
-        store = new CollectionKeyStoreImpl(keyringDir.toPath(), null, null);
+        store = new KeyringStoreImpl(keyringDir.toPath(), null, null);
 
         KeyringException ex = assertThrows(KeyringException.class, () -> store.read(TEST_COLLECTION_ID));
 
@@ -83,7 +83,7 @@ public class CollectionKeyStoreImplTest {
 
         createPlainTextCollectionKeyFile(TEST_COLLECTION_ID);
 
-        store = new CollectionKeyStoreImpl(keyringDir.toPath(), masterKey, iv);
+        store = new KeyringStoreImpl(keyringDir.toPath(), masterKey, iv);
 
         KeyringException ex = assertThrows(KeyringException.class, () -> store.read(TEST_COLLECTION_ID));
 
@@ -96,7 +96,7 @@ public class CollectionKeyStoreImplTest {
         // Create the key store
         SecretKey masterKey = createNewSecretKey();
         IvParameterSpec masterIV = createNewInitVector();
-        store = new CollectionKeyStoreImpl(keyringDir.toPath(), masterKey, masterIV);
+        store = new KeyringStoreImpl(keyringDir.toPath(), masterKey, masterIV);
 
         // Create a collection key to add to the keystore.
         IvParameterSpec initVector = createNewInitVector();
@@ -123,7 +123,7 @@ public class CollectionKeyStoreImplTest {
 
     @Test
     public void testWrite_collectionIDNull_shouldThrowException() throws Exception {
-        store = new CollectionKeyStoreImpl(keyringDir.toPath(), null, null);
+        store = new KeyringStoreImpl(keyringDir.toPath(), null, null);
 
         KeyringException ex = assertThrows(KeyringException.class, () -> store.write(null, null));
 
@@ -133,7 +133,7 @@ public class CollectionKeyStoreImplTest {
 
     @Test
     public void testWrite_collectionIDEmpty_shouldThrowException() throws Exception {
-        store = new CollectionKeyStoreImpl(keyringDir.toPath(), null, null);
+        store = new KeyringStoreImpl(keyringDir.toPath(), null, null);
 
         KeyringException ex = assertThrows(KeyringException.class, () -> store.write("", null));
 
@@ -143,7 +143,7 @@ public class CollectionKeyStoreImplTest {
 
     @Test
     public void testWrite_collectionKeyNull_shouldThrowException() throws Exception {
-        store = new CollectionKeyStoreImpl(keyringDir.toPath(), null, null);
+        store = new KeyringStoreImpl(keyringDir.toPath(), null, null);
 
         KeyringException ex = assertThrows(KeyringException.class, () -> store.write(TEST_COLLECTION_ID, null));
 
@@ -155,7 +155,7 @@ public class CollectionKeyStoreImplTest {
     public void testWrite_shouldThrowException_ifCollectionKeyAlreadyExists() throws Exception {
         SecretKey masterKey = createNewSecretKey();
         IvParameterSpec masterIV = createNewInitVector();
-        store = new CollectionKeyStoreImpl(keyringDir.toPath(), masterKey, masterIV);
+        store = new KeyringStoreImpl(keyringDir.toPath(), masterKey, masterIV);
 
         // create a plain key file in the keyring dir.
         createPlainTextCollectionKeyFile(TEST_COLLECTION_ID);
@@ -172,7 +172,7 @@ public class CollectionKeyStoreImplTest {
         // Create a collection key writer.
         SecretKey masterKey = createNewSecretKey();
         IvParameterSpec masterIV = createNewInitVector();
-        store = new CollectionKeyStoreImpl(keyringDir.toPath(), masterKey, masterIV);
+        store = new KeyringStoreImpl(keyringDir.toPath(), masterKey, masterIV);
 
         // Create a new collection key and write it's to the target destination.
         SecretKey collectionKey = createNewSecretKey();
@@ -202,7 +202,7 @@ public class CollectionKeyStoreImplTest {
 
     @Test
     public void testExists_collectionIDNull_shouldThrowException() throws Exception {
-        store = new CollectionKeyStoreImpl(null, null, null);
+        store = new KeyringStoreImpl(null, null, null);
 
         KeyringException ex = assertThrows(KeyringException.class, () -> store.exists(null));
 
@@ -211,7 +211,7 @@ public class CollectionKeyStoreImplTest {
 
     @Test
     public void testExists_collectionIEmpty_shouldThrowException() throws Exception {
-        store = new CollectionKeyStoreImpl(null, null, null);
+        store = new KeyringStoreImpl(null, null, null);
 
         KeyringException ex = assertThrows(KeyringException.class, () -> store.exists(""));
 
@@ -220,14 +220,14 @@ public class CollectionKeyStoreImplTest {
 
     @Test
     public void testExists_keyFileNotExist_shouldReturnFalse() throws Exception {
-        store = new CollectionKeyStoreImpl(keyringDir.toPath(), null, null);
+        store = new KeyringStoreImpl(keyringDir.toPath(), null, null);
 
         assertFalse(store.exists(TEST_COLLECTION_ID));
     }
 
     @Test
     public void testExists_keyFileExist_shouldReturnTrue() throws Exception {
-        store = new CollectionKeyStoreImpl(keyringDir.toPath(), null, null);
+        store = new KeyringStoreImpl(keyringDir.toPath(), null, null);
 
         Path p = Files.createFile(keyringDir.toPath().resolve(TEST_COLLECTION_ID + ".key"));
         assertTrue(Files.exists(p));
@@ -237,7 +237,7 @@ public class CollectionKeyStoreImplTest {
 
     @Test
     public void testReadAll_noKeyFiles_shouldReturnEmptyMap() throws Exception {
-        store = new CollectionKeyStoreImpl(keyringDir.toPath(), null, null);
+        store = new KeyringStoreImpl(keyringDir.toPath(), null, null);
 
         Map<String, SecretKey> actual = store.readAll();
 
@@ -246,7 +246,7 @@ public class CollectionKeyStoreImplTest {
 
     @Test
     public void testReadAll_failToDecryptKey_shouldThrowException() throws Exception {
-        store = new CollectionKeyStoreImpl(keyringDir.toPath(), createNewSecretKey(), createNewInitVector());
+        store = new KeyringStoreImpl(keyringDir.toPath(), createNewSecretKey(), createNewInitVector());
 
         createPlainTextCollectionKeyFile(TEST_COLLECTION_ID);
 
@@ -257,7 +257,7 @@ public class CollectionKeyStoreImplTest {
 
     @Test
     public void testReadAll_secondKeyFailsToDecrypt_shouldThrowException() throws Exception {
-        store = new CollectionKeyStoreImpl(keyringDir.toPath(), createNewSecretKey(), createNewInitVector());
+        store = new KeyringStoreImpl(keyringDir.toPath(), createNewSecretKey(), createNewInitVector());
 
         // write a valid encrypted secret key to the store.
         store.write(TEST_COLLECTION_ID, createNewSecretKey());
@@ -274,7 +274,7 @@ public class CollectionKeyStoreImplTest {
 
     @Test
     public void testReadAll_success_shouldReturnMapOfDecryptedKeys() throws Exception {
-        store = new CollectionKeyStoreImpl(keyringDir.toPath(), createNewSecretKey(), createNewInitVector());
+        store = new KeyringStoreImpl(keyringDir.toPath(), createNewSecretKey(), createNewInitVector());
 
         // write a valid encrypted secret key to the store.
         SecretKey expectedColKey = createNewSecretKey();
@@ -290,7 +290,7 @@ public class CollectionKeyStoreImplTest {
 
     @Test
     public void testReadAll_keyringDirDoesNotExist_shouldThrowException() {
-        store = new CollectionKeyStoreImpl(Paths.get("/nonexistantpath"), null, null);
+        store = new KeyringStoreImpl(Paths.get("/nonexistantpath"), null, null);
 
         KeyringException ex = assertThrows(KeyringException.class, () -> store.readAll());
 
@@ -300,7 +300,7 @@ public class CollectionKeyStoreImplTest {
 
     @Test
     public void testDelete_collectionIDNull_shouldThrowKeyringException() {
-        store = new CollectionKeyStoreImpl(null, null, null);
+        store = new KeyringStoreImpl(null, null, null);
 
         KeyringException ex = assertThrows(KeyringException.class, () -> store.delete(null));
 
@@ -309,7 +309,7 @@ public class CollectionKeyStoreImplTest {
 
     @Test
     public void testDelete_collectionIDEmpty_shouldThrowKeyringException() {
-        store = new CollectionKeyStoreImpl(null, null, null);
+        store = new KeyringStoreImpl(null, null, null);
 
         KeyringException ex = assertThrows(KeyringException.class, () -> store.delete(""));
 
@@ -318,7 +318,7 @@ public class CollectionKeyStoreImplTest {
 
     @Test
     public void testDelete_keyNotExists_shouldThrowException() {
-        store = new CollectionKeyStoreImpl(keyringDir.toPath(), null, null);
+        store = new KeyringStoreImpl(keyringDir.toPath(), null, null);
 
         KeyringException ex = assertThrows(KeyringException.class, () -> store.delete(TEST_COLLECTION_ID));
 
@@ -328,7 +328,7 @@ public class CollectionKeyStoreImplTest {
 
     @Test
     public void testDelete_success_shouldDeleteFile() throws Exception {
-        store = new CollectionKeyStoreImpl(keyringDir.toPath(), null, null);
+        store = new KeyringStoreImpl(keyringDir.toPath(), null, null);
 
         createPlainTextCollectionKeyFile(TEST_COLLECTION_ID);
         Path p = keyringDir.toPath().resolve(TEST_COLLECTION_ID + ".key");

@@ -1,6 +1,7 @@
-package com.github.onsdigital.zebedee.keyring;
+package com.github.onsdigital.zebedee.keyring.cache;
 
-import com.github.onsdigital.zebedee.keyring.store.CollectionKeyStore;
+import com.github.onsdigital.zebedee.keyring.KeyringException;
+import com.github.onsdigital.zebedee.keyring.store.KeyringStore;
 import liquibase.util.StringUtils;
 
 import javax.crypto.SecretKey;
@@ -8,7 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * In memory {@link Keyring} implementation. Keyring uses a {@link CollectionKeyStore} to persist entries to storage
+ * In memory {@link KeyringCache} implementation. Keyring uses a {@link KeyringStore} to persist entries to storage
  * whilst maintaining a copy of the data in an in-memory cache for speedy retrieval. If an attempt is made to add a
  * duplicate key the Keyring will compare the new & existing {@link SecretKey} values. If the keys are not equal then a
  * {@link KeyringException} is thrown. This aims to prevent collection key values being overwritten as this will
@@ -24,7 +25,7 @@ import java.util.Map;
  * However if this does become an issue consider replacing the Hashmap with some type time based cache object to
  * automatically evicted after a duration of inactivity.
  */
-public class KeyringImpl implements Keyring {
+public class KeyringCacheImpl implements KeyringCache {
 
     static final String INVALID_COLLECTION_ID_ERR = "expected collection ID but was null or empty";
     static final String INVALID_SECRET_KEY_ERR = "expected secret key but was null";
@@ -34,18 +35,18 @@ public class KeyringImpl implements Keyring {
     static final String LOAD_KEYS_NULL_ERR = "error loading keystore expected map but was null";
     static final String KEYSTORE_NULL_ERR = "collection key store required but was null";
 
-    private CollectionKeyStore keyStore;
+    private KeyringStore keyStore;
     private Map<String, SecretKey> cache;
 
-    private static Keyring INSTANCE = null;
+    private static KeyringCache INSTANCE = null;
 
     /**
-     * Create a new instance of the Keyring. Use {@link KeyringImpl#init(CollectionKeyStore)} to constuct a new
+     * Create a new instance of the Keyring. Use {@link KeyringCacheImpl#init(KeyringStore)} to constuct a new
      * instance.
      *
-     * @param keyStore {@link CollectionKeyStore} to use to read/write entries to/from persistent storage.
+     * @param keyStore {@link KeyringStore} to use to read/write entries to/from persistent storage.
      */
-    KeyringImpl(final CollectionKeyStore keyStore) throws KeyringException {
+    KeyringCacheImpl(final KeyringStore keyStore) throws KeyringException {
         if (keyStore == null) {
             throw new KeyringException(KEYSTORE_NULL_ERR);
         }
@@ -55,7 +56,7 @@ public class KeyringImpl implements Keyring {
         this.load();
     }
 
-    KeyringImpl(final CollectionKeyStore keyStore, final Map<String, SecretKey> cache) {
+    KeyringCacheImpl(final KeyringStore keyStore, final Map<String, SecretKey> cache) {
         this.keyStore = keyStore;
         this.cache = cache;
     }
@@ -63,7 +64,7 @@ public class KeyringImpl implements Keyring {
     /**
      * {@inheritDoc}
      * <b>WARNING: This action is destructive</b>. Calling load on a populated keyring will clear all existing values
-     * from it before repopulating it with the the values returned by {@link CollectionKeyStore#readAll()}. It is
+     * from it before repopulating it with the the values returned by {@link KeyringStore#readAll()}. It is
      * strongly advised to only use this method when the keyring is initialised on start up.
      *
      * @throws KeyringException problem loading the keyring.
@@ -133,7 +134,7 @@ public class KeyringImpl implements Keyring {
     }
 
     /**
-     * Check if an entry for this collection ID already exists in the {@link CollectionKeyStore}. If so retieve the entry from the
+     * Check if an entry for this collection ID already exists in the {@link KeyringStore}. If so retieve the entry from the
      * store and check the existing key matches the key being added.
      *
      * @param collectionID the collection ID the entry is being added against.
@@ -193,15 +194,15 @@ public class KeyringImpl implements Keyring {
     /**
      * Construct and initialise a new singleton instance of the keyring.
      *
-     * @param keystore the {@link CollectionKeyStore} to use.
-     * @return a new {@link Keyring} instance.
+     * @param keystore the {@link KeyringStore} to use.
+     * @return a new {@link KeyringCache} instance.
      * @throws KeyringException problem initalising the keyring.
      */
-    public static Keyring init(CollectionKeyStore keystore) throws KeyringException {
+    public static KeyringCache init(KeyringStore keystore) throws KeyringException {
         if (INSTANCE == null) {
-            synchronized (KeyringImpl.class) {
+            synchronized (KeyringCacheImpl.class) {
                 if (INSTANCE == null) {
-                    INSTANCE = new KeyringImpl(keystore);
+                    INSTANCE = new KeyringCacheImpl(keystore);
                 }
             }
         }

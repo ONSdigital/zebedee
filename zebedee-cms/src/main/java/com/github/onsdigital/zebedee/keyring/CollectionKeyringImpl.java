@@ -1,21 +1,22 @@
 package com.github.onsdigital.zebedee.keyring;
 
+import com.github.onsdigital.zebedee.keyring.cache.KeyringCache;
 import com.github.onsdigital.zebedee.user.model.User;
 
 /**
- * SecureKeyringImpl adds a permissions check wrapper around a {@link Keyring} instance to ensure only authorised
+ * SecureKeyringImpl adds a permissions check wrapper around a {@link KeyringCache} instance to ensure only authorised
  * users can access collection encryption keys
  */
-public class SecureKeyringImpl implements SecureKeyring {
+public class CollectionKeyringImpl implements CollectionKeyring {
 
     static final String USER_NULL_ERR = "user required but was null";
     static final String USER_KEYRING_NULL_ERR = "user keyring required but was null";
     static final String USER_KEYRING_LOCKED_ERR = "error user keyring is locked";
 
-    private final Keyring centralKeyring;
+    private final KeyringCache cache;
 
-    public SecureKeyringImpl(Keyring centralKeyring) {
-        this.centralKeyring = centralKeyring;
+    public CollectionKeyringImpl(KeyringCache cache) {
+        this.cache = cache;
     }
 
     @Override
@@ -34,7 +35,7 @@ public class SecureKeyringImpl implements SecureKeyring {
 
         if (!user.keyring().list().isEmpty()) {
             for (String collectionID : user.keyring().list()) {
-                centralKeyring.add(collectionID, user.keyring().get(collectionID));
+                cache.add(collectionID, user.keyring().get(collectionID));
             }
         }
     }

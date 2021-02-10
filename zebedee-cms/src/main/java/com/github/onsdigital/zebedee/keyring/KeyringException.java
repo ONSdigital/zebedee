@@ -1,9 +1,11 @@
 package com.github.onsdigital.zebedee.keyring;
 
+import com.github.onsdigital.zebedee.keyring.cache.KeyringCache;
+
 import java.io.IOException;
 
 /**
- * Exception type for errors while accessing/storing collection keys in the {@link Keyring}
+ * Exception type for errors while accessing/storing collection keys in the {@link KeyringCache}
  */
 public class KeyringException extends IOException {
 

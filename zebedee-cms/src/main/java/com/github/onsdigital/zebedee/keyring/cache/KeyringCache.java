@@ -1,5 +1,6 @@
-package com.github.onsdigital.zebedee.keyring;
+package com.github.onsdigital.zebedee.keyring.cache;
 
+import com.github.onsdigital.zebedee.keyring.KeyringException;
 import com.github.onsdigital.zebedee.model.Collection;
 
 import javax.crypto.SecretKey;
@@ -9,7 +10,7 @@ import javax.crypto.SecretKey;
  * {@link com.github.onsdigital.zebedee.model.Collection}s. Provides methods to add, retrieve and remove keys to/from
  * the keyring.
  */
-public interface Keyring {
+public interface KeyringCache {
 
     /**
      * Populate the keyring.

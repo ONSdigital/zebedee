@@ -21,6 +21,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
@@ -206,6 +207,20 @@ public class CollectionKeyringImplTest {
 
         // Then an exception is thrown
         assertThat(ex.getMessage(), equalTo("keyringCache required but was null"));
+    }
+
+    @Test
+    public void test_InitNop() throws Exception {
+        resetInstanceToNull();
+
+        // Given init NOP is invoked.
+        CollectionKeyringImpl.initNoOp();
+
+        // When getInstance is called
+        CollectionKeyring collectionKeyring = CollectionKeyringImpl.getInstance();
+
+        // That a Nop instance is returned
+        assertTrue(collectionKeyring instanceof NopCollectionKeyring);
     }
 
     private void resetInstanceToNull() throws Exception {

@@ -17,9 +17,9 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.warn;
-import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
 
 public class PublishTask implements Runnable {
 
@@ -62,7 +62,8 @@ public class PublishTask implements Runnable {
                 // Publish the s
                 boolean skipVerification = false;
 
-                ZebedeeCollectionReader collectionReader = new ZebedeeCollectionReader(collection, zebedee.getKeyringCache().schedulerCache.get(collectionId));
+                ZebedeeCollectionReader collectionReader = new ZebedeeCollectionReader(collection,
+                        zebedee.getKeyringCache().getSchedulerCache().get(collectionId));
                 long publishStart = System.currentTimeMillis();
                 publishComplete = Publisher.publish(collection, "System", collectionReader);
 

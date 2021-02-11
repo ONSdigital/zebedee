@@ -13,13 +13,15 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Provides an basic in-memory cache for {@link Keyring} instances.
  */
+@Deprecated
 public class KeyringCache {
 
     // Publisher keyring keeps all available secret keys available
-    public Map<String, SecretKey> schedulerCache = new ConcurrentHashMap<>();
+    private Map<String, SecretKey> schedulerCache = new ConcurrentHashMap<>();
     private Map<Session, Keyring> keyringMap = new ConcurrentHashMap<>();
     private Sessions sessions;
 
+    @Deprecated
     public KeyringCache(Sessions sessions) {
         this.sessions = sessions;
     }
@@ -30,6 +32,7 @@ public class KeyringCache {
      * @param user The user whose {@link Keyring} is to be stored.
      * @throws IOException If a general error occurs.
      */
+    @Deprecated
     public void put(User user, Session session) throws IOException {
         if (user != null && user.keyring() != null && user.keyring().isUnlocked()) {
             if (session != null) {
@@ -52,6 +55,7 @@ public class KeyringCache {
      * @return The {@link Keyring} if present, or null.
      * @throws IOException If a general error occurs.
      */
+    @Deprecated
     public Keyring get(User user) throws IOException {
         Keyring result = null;
 
@@ -72,6 +76,7 @@ public class KeyringCache {
      * @return The {@link Keyring} if present, or null.
      * @throws IOException If a general error occurs.
      */
+    @Deprecated
     public Keyring get(Session session) throws IOException {
         Keyring result = null;
 
@@ -87,12 +92,14 @@ public class KeyringCache {
      * @param session The expired {@link Session} for which the {@link Keyring} is to be removed.
      * @throws IOException If a general error occurs.
      */
+    @Deprecated
     public void remove(Session session) throws IOException {
         if (session != null) {
             keyringMap.remove(session);
         }
     }
 
+    @Deprecated
     public Map<String, SecretKey> getSchedulerCache() {
         return this.schedulerCache;
     }

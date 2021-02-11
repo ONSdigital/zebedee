@@ -44,7 +44,7 @@ public class CsdbNotify {
                 csdbId,
                 dylanClient,
                 Root.zebedee.getCollections(),
-                Root.zebedee.getKeyringCache().schedulerCache);
+                Root.zebedee.getKeyringCache().getSchedulerCache());
 
         Audit.Event.CSDB_NEW_FILE_NOTIFICATION
                 .parameters()

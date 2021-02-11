@@ -151,7 +151,7 @@ public class PrePublishCollectionsTask extends ScheduledTask {
                         // send versioned files manifest ahead of time. allowing files to be copied from the website into the transaction.
                         Publisher.sendManifest(collection);
 
-                        SecretKey key = zebedee.getKeyringCache().schedulerCache.get(collection.getDescription().getId());
+                        SecretKey key = zebedee.getKeyringCache().getSchedulerCache().get(collection.getDescription().getId());
                         ZebedeeCollectionReader collectionReader = new ZebedeeCollectionReader(collection, key);
                         PublishCollectionTask publishCollectionTask = new PublishCollectionTask(collection, collectionReader, hostToTransactionIdMap);
 

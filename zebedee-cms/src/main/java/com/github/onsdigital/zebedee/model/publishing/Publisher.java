@@ -19,6 +19,7 @@ import com.github.onsdigital.zebedee.model.publishing.verify.HashVerifierImpl;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.service.DatasetService;
+import com.github.onsdigital.zebedee.service.ImageService;
 import com.github.onsdigital.zebedee.service.ServiceSupplier;
 import com.github.onsdigital.zebedee.util.Http;
 import com.github.onsdigital.zebedee.util.SlackNotification;
@@ -77,6 +78,7 @@ public class Publisher {
     private static final String ZIP_PARAM = "zip";
 
     private static ServiceSupplier<DatasetService> datasetServiceSupplier;
+    private static ServiceSupplier<ImageService> imageServiceSupplier;
 
     static {
         theTrainHosts = Configuration.getTheTrainHosts();
@@ -84,6 +86,7 @@ public class Publisher {
 
         // lazy loaded approach for getting the datasetService.
         datasetServiceSupplier = () -> ZebedeeCmsService.getInstance().getDatasetService();
+        imageServiceSupplier = () -> ZebedeeCmsService.getInstance().getImageService();
     }
 
     /**
@@ -172,7 +175,15 @@ public class Publisher {
                         return false;
                     }
 
+                    Future<Boolean> imageFuture = publishImages(collection);
+
                     publishComplete = publishFilesToWebsite(collection, email, collectionReader);
+
+                    try {
+                        publishComplete &= imageFuture.get().booleanValue();
+                    } catch (InterruptedException | ExecutionException e) {
+                        publishComplete = false;
+                    }
 
                     info().data("publishing", true).data("collectionId", collectionId)
                             .data("timeTaken", (System.currentTimeMillis() - publishStart))
@@ -690,6 +701,25 @@ public class Publisher {
             saveCollection(collection, datasetsPublished);
         }
         return datasetsPublished;
+    }
+
+    private static Future<Boolean> publishImages(Collection collection){
+        String collectionId = collection.getDescription().getId();
+
+        return pool.submit(() -> {
+            Boolean complete = false;
+            try {
+                imageServiceSupplier.getService().publishImagesInCollection(collection);
+                complete = true;
+            } catch (Exception e) {
+                error().data("collectionId", collectionId).data("publishing", true)
+                        .logException(e, "Exception publishing images via image API");
+
+                PostMessageField msg = new PostMessageField("Error", e.getMessage(), false);
+                collectionAlarm(collection, "Exception publishing images via image API", msg);
+            }
+            return complete;
+        });
     }
 
     private static void saveCollection(Collection collection, boolean publishComplete) {

@@ -18,9 +18,7 @@ import com.github.onsdigital.zebedee.permissions.service.PermissionsServiceImpl;
 import com.github.onsdigital.zebedee.permissions.store.PermissionsStore;
 import com.github.onsdigital.zebedee.permissions.store.PermissionsStoreFileSystemImpl;
 import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
-import com.github.onsdigital.zebedee.service.DatasetService;
-import com.github.onsdigital.zebedee.service.ServiceStoreImpl;
-import com.github.onsdigital.zebedee.service.ZebedeeDatasetService;
+import com.github.onsdigital.zebedee.service.*;
 import com.github.onsdigital.zebedee.session.service.Sessions;
 import com.github.onsdigital.zebedee.session.service.SessionsAPIServiceImpl;
 import com.github.onsdigital.zebedee.session.service.SessionsServiceImpl;
@@ -35,6 +33,8 @@ import com.github.onsdigital.zebedee.util.versioning.VersionsServiceImpl;
 import com.github.onsdigital.zebedee.verification.VerificationAgent;
 import dp.api.dataset.DatasetAPIClient;
 import dp.api.dataset.DatasetClient;
+import com.github.onsdigital.dp.image.api.client.ImageAPIClient;
+import com.github.onsdigital.dp.image.api.client.ImageClient;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -57,6 +57,7 @@ import static com.github.onsdigital.zebedee.Zebedee.ZEBEDEE;
 import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getDatasetAPIAuthToken;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getDatasetAPIURL;
+import static com.github.onsdigital.zebedee.configuration.Configuration.getImageAPIURL;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getKeyringInitVector;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getKeyringSecretKey;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getServiceAuthToken;
@@ -95,6 +96,7 @@ public class ZebedeeConfiguration {
     private DataIndex dataIndex;
     private PermissionsStore permissionsStore;
     private DatasetService datasetService;
+    private ImageService imageService;
     private SessionClient sessionClient;
     private KeyringCache keyringCache;
 
@@ -193,6 +195,16 @@ public class ZebedeeConfiguration {
         }
 
         datasetService = new ZebedeeDatasetService(datasetClient);
+
+        ImageClient imageClient;
+        try {
+            imageClient = new ImageAPIClient(getImageAPIURL(),getServiceAuthToken());
+        } catch (URISyntaxException e) {
+            error().logException(e, "failed to initialise image api client - invalid URI");
+            throw new RuntimeException(e);
+        }
+
+        imageService = new ZebedeeImageService(imageClient);
 
         info().data("root_path", rootPath.toString())
                 .data("zebedee_path", zebedeePath.toString())
@@ -328,6 +340,10 @@ public class ZebedeeConfiguration {
 
     public DatasetService getDatasetService() {
         return datasetService;
+    }
+
+    public ImageService getImageService() {
+        return imageService;
     }
 
     public ServiceStoreImpl getServiceStore() {

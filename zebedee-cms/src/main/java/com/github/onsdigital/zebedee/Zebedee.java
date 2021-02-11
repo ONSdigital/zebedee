@@ -70,7 +70,7 @@ public class Zebedee {
     private final PublishedCollections publishedCollections;
     private final Collections collections;
     private final Content published;
-    private final KeyringCache keyringCache;
+    private final KeyringCache legacyKeyringCache;
     private final Path publishedContentPath;
     private final Path path;
     private final PermissionsService permissionsService;
@@ -91,7 +91,7 @@ public class Zebedee {
         this.path = configuration.getZebedeePath();
         this.publishedContentPath = configuration.getPublishedContentPath();
         this.sessions = configuration.getSessions();
-        this.keyringCache = configuration.getKeyringCache();
+        this.legacyKeyringCache = configuration.getKeyringCache();
         this.permissionsService = configuration.getPermissionsService();
         this.published = configuration.getPublished();
         this.dataIndex = configuration.getDataIndex();
@@ -294,7 +294,7 @@ public class Zebedee {
         }
 
         applicationKeys.populateCacheFromUserKeyring(user.keyring());
-        keyringCache.put(user, session);
+        legacyKeyringCache.put(user, session);
 
         // Return a session
         return session;
@@ -328,8 +328,9 @@ public class Zebedee {
         return this.publishedCollections;
     }
 
-    public KeyringCache getKeyringCache() {
-        return this.keyringCache;
+    @Deprecated
+    public KeyringCache getLegacyKeyringCache() {
+        return this.legacyKeyringCache;
     }
 
     public ApplicationKeys getApplicationKeys() {

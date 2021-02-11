@@ -77,7 +77,7 @@ public class CollectionKeyringImpl implements CollectionKeyring {
 
     /**
      * @return a singleton instance of the CollectionKeyring
-     * @throws KeyringException CollectionKeyring has not been initalised.
+     * @throws KeyringException CollectionKeyring has not been initalised before being accessed.
      */
     public static CollectionKeyring getInstance() throws KeyringException {
         if (INSTANCE == null) {

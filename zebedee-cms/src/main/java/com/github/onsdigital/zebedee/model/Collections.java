@@ -463,7 +463,7 @@ public class Collections {
             return true;
         }
 
-        Keyring keyring = zebedeeSupplier.get().getKeyringCache().get(session);
+        Keyring keyring = zebedeeSupplier.get().getLegacyKeyringCache().get(session);
         if (keyring == null) {
             throw new UnauthorizedException("No keyring is available for " + session.getEmail());
         }

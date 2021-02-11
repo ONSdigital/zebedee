@@ -63,7 +63,7 @@ public class PublishTask implements Runnable {
                 boolean skipVerification = false;
 
                 ZebedeeCollectionReader collectionReader = new ZebedeeCollectionReader(collection,
-                        zebedee.getKeyringCache().getSchedulerCache().get(collectionId));
+                        zebedee.getLegacyKeyringCache().getSchedulerCache().get(collectionId));
                 long publishStart = System.currentTimeMillis();
                 publishComplete = Publisher.publish(collection, "System", collectionReader);
 

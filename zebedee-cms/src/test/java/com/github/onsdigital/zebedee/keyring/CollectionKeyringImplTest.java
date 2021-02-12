@@ -1,6 +1,9 @@
 package com.github.onsdigital.zebedee.keyring;
 
+import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.keyring.cache.KeyringCache;
+import com.github.onsdigital.zebedee.model.Collection;
+import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.user.model.User;
 import org.junit.After;
 import org.junit.Before;
@@ -9,16 +12,23 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import javax.crypto.SecretKey;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.HashSet;
 
+import static com.github.onsdigital.zebedee.keyring.CollectionKeyringImpl.COLLECTION_DESCRIPTION_NULL_ERR;
+import static com.github.onsdigital.zebedee.keyring.CollectionKeyringImpl.COLLECTION_ID_NULL_OR_EMPTY_ERR;
+import static com.github.onsdigital.zebedee.keyring.CollectionKeyringImpl.COLLECTION_NULL_ERR;
+import static com.github.onsdigital.zebedee.keyring.CollectionKeyringImpl.KEYRING_CACHE_NULL_ERR;
 import static com.github.onsdigital.zebedee.keyring.CollectionKeyringImpl.NOT_INITALISED_ERR;
+import static com.github.onsdigital.zebedee.keyring.CollectionKeyringImpl.PERMISSION_SERVICE_NULL_ERR;
 import static com.github.onsdigital.zebedee.keyring.CollectionKeyringImpl.USER_KEYRING_LOCKED_ERR;
 import static com.github.onsdigital.zebedee.keyring.CollectionKeyringImpl.USER_KEYRING_NULL_ERR;
 import static com.github.onsdigital.zebedee.keyring.CollectionKeyringImpl.USER_NULL_ERR;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
@@ -47,11 +57,20 @@ public class CollectionKeyringImplTest {
     @Mock
     private SecretKey secretKey;
 
+    @Mock
+    private Collection collection;
+
+    @Mock
+    private CollectionDescription collDesc;
+
+    @Mock
+    private PermissionsService permissionsService;
+
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
 
-        CollectionKeyringImpl.init(keyringCache);
+        CollectionKeyringImpl.init(keyringCache, permissionsService);
         keyring = CollectionKeyringImpl.getInstance();
     }
 
@@ -197,16 +216,24 @@ public class CollectionKeyringImplTest {
 
     @Test
     public void testInit_keyringCacheNull() throws Exception {
-        // Given keyringCache is null
-        KeyringCache keyringCache = null;
-
         resetInstanceToNull();
 
         // When init is called
-        KeyringException ex = assertThrows(KeyringException.class, () -> CollectionKeyringImpl.init(keyringCache));
+        KeyringException ex = assertThrows(KeyringException.class, () -> CollectionKeyringImpl.init(null, null));
 
         // Then an exception is thrown
-        assertThat(ex.getMessage(), equalTo("keyringCache required but was null"));
+        assertThat(ex.getMessage(), equalTo(KEYRING_CACHE_NULL_ERR));
+    }
+
+    @Test
+    public void testInit_permissionServiceNull() throws Exception {
+        resetInstanceToNull();
+
+        // When init is called
+        KeyringException ex = assertThrows(KeyringException.class, () -> CollectionKeyringImpl.init(keyringCache, null));
+
+        // Then an exception is thrown
+        assertThat(ex.getMessage(), equalTo(PERMISSION_SERVICE_NULL_ERR));
     }
 
     @Test
@@ -221,6 +248,153 @@ public class CollectionKeyringImplTest {
 
         // That a Nop instance is returned
         assertTrue(collectionKeyring instanceof NopCollectionKeyring);
+    }
+
+    @Test
+    public void testGet_userIsNull_shouldThrowException() {
+        KeyringException ex = assertThrows(KeyringException.class, () -> keyring.get(null, null));
+
+        assertThat(ex.getMessage(), equalTo(USER_NULL_ERR));
+    }
+
+    @Test
+    public void testGet_collectionIsNull_shouldThrowException() {
+        KeyringException ex = assertThrows(KeyringException.class, () -> keyring.get(user, null));
+
+        assertThat(ex.getMessage(), equalTo(COLLECTION_NULL_ERR));
+    }
+
+    @Test
+    public void testGet_collectionDescriptionIsNull_shouldThrowException() {
+        when(collection.getDescription())
+                .thenReturn(null);
+
+        KeyringException ex = assertThrows(KeyringException.class, () -> keyring.get(user, collection));
+
+        assertThat(ex.getMessage(), equalTo(COLLECTION_DESCRIPTION_NULL_ERR));
+    }
+
+    @Test
+    public void testGet_collectionIDNull_shouldThrowException() {
+        when(collection.getDescription())
+                .thenReturn(collDesc);
+
+        when(collDesc.getId())
+                .thenReturn(null);
+
+        KeyringException ex = assertThrows(KeyringException.class, () -> keyring.get(user, collection));
+
+        assertThat(ex.getMessage(), equalTo(COLLECTION_ID_NULL_OR_EMPTY_ERR));
+    }
+
+    @Test
+    public void testGet_collectionIDEmpty_shouldThrowException() {
+        when(collection.getDescription())
+                .thenReturn(collDesc);
+
+        when(collDesc.getId())
+                .thenReturn("");
+
+        KeyringException ex = assertThrows(KeyringException.class, () -> keyring.get(user, collection));
+
+        assertThat(ex.getMessage(), equalTo(COLLECTION_ID_NULL_OR_EMPTY_ERR));
+    }
+
+    @Test
+    public void testGet_permissionsServiceThrowsException() throws Exception {
+        when(collection.getDescription())
+                .thenReturn(collDesc);
+
+        when(collDesc.getId())
+                .thenReturn(TEST_COLLECTION_ID);
+
+        when(permissionsService.hasAccessToCollection(user, collection))
+                .thenThrow(new IOException("Bork"));
+
+        KeyringException ex = assertThrows(KeyringException.class, () -> keyring.get(user, collection));
+
+        assertThat(ex.getCause().getMessage(), equalTo("Bork"));
+        verify(permissionsService, times(1)).hasAccessToCollection(user, collection);
+    }
+
+    @Test
+    public void testGet_permissionsServiceReturnsFalse() throws Exception {
+        when(collection.getDescription())
+                .thenReturn(collDesc);
+
+        when(collDesc.getId())
+                .thenReturn(TEST_COLLECTION_ID);
+
+        when(permissionsService.hasAccessToCollection(user, collection))
+                .thenReturn(false);
+
+        SecretKey secretKey = keyring.get(user, collection);
+
+        assertThat(secretKey, is(nullValue()));
+        verify(permissionsService, times(1)).hasAccessToCollection(user, collection);
+    }
+
+    @Test
+    public void testGet_keyringCacheThrowsException() throws Exception {
+        when(collection.getDescription())
+                .thenReturn(collDesc);
+
+        when(collDesc.getId())
+                .thenReturn(TEST_COLLECTION_ID);
+
+        when(permissionsService.hasAccessToCollection(user, collection))
+                .thenReturn(true);
+
+        when(keyringCache.get(TEST_COLLECTION_ID))
+                .thenThrow(new KeyringException("Beep"));
+
+        KeyringException ex = assertThrows(KeyringException.class, () -> keyring.get(user, collection));
+        assertThat(ex.getMessage(), equalTo("Beep"));
+
+        verify(permissionsService, times(1)).hasAccessToCollection(user, collection);
+        verify(keyringCache, times(1)).get(TEST_COLLECTION_ID);
+    }
+
+    @Test
+    public void testGet_keyringCacheReturnsNull() throws Exception {
+        when(collection.getDescription())
+                .thenReturn(collDesc);
+
+        when(collDesc.getId())
+                .thenReturn(TEST_COLLECTION_ID);
+
+        when(permissionsService.hasAccessToCollection(user, collection))
+                .thenReturn(true);
+
+        when(keyringCache.get(TEST_COLLECTION_ID))
+                .thenReturn(null);
+
+        SecretKey key = keyring.get(user, collection);
+
+        assertThat(key, is(nullValue()));
+        verify(permissionsService, times(1)).hasAccessToCollection(user, collection);
+        verify(keyringCache, times(1)).get(TEST_COLLECTION_ID);
+    }
+
+    @Test
+    public void testGet_keyringCacheReturnsCollectionKey() throws Exception {
+        when(collection.getDescription())
+                .thenReturn(collDesc);
+
+        when(collDesc.getId())
+                .thenReturn(TEST_COLLECTION_ID);
+
+        when(permissionsService.hasAccessToCollection(user, collection))
+                .thenReturn(true);
+
+        when(keyringCache.get(TEST_COLLECTION_ID))
+                .thenReturn(secretKey);
+
+        SecretKey key = keyring.get(user, collection);
+
+        assertThat(key, equalTo(secretKey));
+        verify(permissionsService, times(1)).hasAccessToCollection(user, collection);
+        verify(keyringCache, times(1)).get(TEST_COLLECTION_ID);
     }
 
     private void resetInstanceToNull() throws Exception {

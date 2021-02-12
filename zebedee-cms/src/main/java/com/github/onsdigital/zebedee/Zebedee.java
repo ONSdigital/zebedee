@@ -7,6 +7,7 @@ import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.Credentials;
 import com.github.onsdigital.zebedee.json.Keyring;
+import com.github.onsdigital.zebedee.keyring.CollectionKeyring;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.Collections;
 import com.github.onsdigital.zebedee.model.Content;
@@ -70,7 +71,7 @@ public class Zebedee {
     private final PublishedCollections publishedCollections;
     private final Collections collections;
     private final Content published;
-    private final KeyringCache keyringCache;
+    private final KeyringCache legacyKeyringCache;
     private final Path publishedContentPath;
     private final Path path;
     private final PermissionsService permissionsService;
@@ -81,6 +82,7 @@ public class Zebedee {
     private final DataIndex dataIndex;
     private final DatasetService datasetService;
     private final ServiceStoreImpl serviceStoreImpl;
+    private final CollectionKeyring collectionKeyring;
 
     /**
      * Create a new instance of Zebedee setting.
@@ -91,7 +93,7 @@ public class Zebedee {
         this.path = configuration.getZebedeePath();
         this.publishedContentPath = configuration.getPublishedContentPath();
         this.sessions = configuration.getSessions();
-        this.keyringCache = configuration.getKeyringCache();
+        this.legacyKeyringCache = configuration.getKeyringCache();
         this.permissionsService = configuration.getPermissionsService();
         this.published = configuration.getPublished();
         this.dataIndex = configuration.getDataIndex();
@@ -103,6 +105,7 @@ public class Zebedee {
         this.verificationAgent = configuration.getVerificationAgent(isVerificationEnabled(), this);
         this.datasetService = configuration.getDatasetService();
         this.serviceStoreImpl = configuration.getServiceStore();
+        this.collectionKeyring = configuration.getCollectionKeyring();
 
         this.collectionsPath = configuration.getCollectionsPath();
         this.publishedCollectionsPath = configuration.getPublishedCollectionsPath();
@@ -294,7 +297,8 @@ public class Zebedee {
         }
 
         applicationKeys.populateCacheFromUserKeyring(user.keyring());
-        keyringCache.put(user, session);
+        legacyKeyringCache.put(user, session);
+        collectionKeyring.populateFromUser(user);
 
         // Return a session
         return session;
@@ -328,8 +332,9 @@ public class Zebedee {
         return this.publishedCollections;
     }
 
-    public KeyringCache getKeyringCache() {
-        return this.keyringCache;
+    @Deprecated
+    public KeyringCache getLegacyKeyringCache() {
+        return this.legacyKeyringCache;
     }
 
     public ApplicationKeys getApplicationKeys() {

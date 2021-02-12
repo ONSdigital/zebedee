@@ -241,7 +241,7 @@ public class ZebedeeTest extends ZebedeeTestBaseFixture {
 
         // Then null is returned
         assertThat(actual, is(nullValue()));
-        verifyZeroInteractions(sessions, usersService, applicationKeys, legacyKeyringCache);
+        verifyZeroInteractions(sessions, usersService, applicationKeys, legacyKeyringCache, collectionKeyring);
     }
 
     @Test
@@ -263,7 +263,7 @@ public class ZebedeeTest extends ZebedeeTestBaseFixture {
         // Then an exception is thrown
         assertThat(ex.getMessage(), equalTo("boom"));
         verify(usersService, times(1)).getUserByEmail(TEST_EMAIL);
-        verifyZeroInteractions(sessions, usersService, applicationKeys, legacyKeyringCache);
+        verifyZeroInteractions(sessions, usersService, applicationKeys, legacyKeyringCache, collectionKeyring);
     }
 
     @Test
@@ -286,7 +286,7 @@ public class ZebedeeTest extends ZebedeeTestBaseFixture {
         assertThat(actual, is(nullValue()));
         verify(usersService, times(1)).getUserByEmail(TEST_EMAIL);
 
-        verifyZeroInteractions(sessions, applicationKeys, legacyKeyringCache);
+        verifyZeroInteractions(sessions, applicationKeys, legacyKeyringCache, collectionKeyring);
     }
 
     @Test
@@ -314,7 +314,7 @@ public class ZebedeeTest extends ZebedeeTestBaseFixture {
         verify(sessions, times(1)).create(user);
         verify(user, never()).keyring();
 
-        verifyZeroInteractions(applicationKeys, legacyKeyringCache);
+        verifyZeroInteractions(applicationKeys, legacyKeyringCache, collectionKeyring);
     }
 
     @Test
@@ -349,7 +349,7 @@ public class ZebedeeTest extends ZebedeeTestBaseFixture {
         verify(user, times(1)).keyring();
         verify(legacyKeyring, times(1)).unlock(any());
 
-        verifyZeroInteractions(applicationKeys, legacyKeyringCache);
+        verifyZeroInteractions(applicationKeys, legacyKeyringCache, collectionKeyring);
     }
 
     @Test
@@ -387,6 +387,7 @@ public class ZebedeeTest extends ZebedeeTestBaseFixture {
         verify(legacyKeyring, times(1)).unlock(any());
         verify(applicationKeys, times(1)).populateCacheFromUserKeyring(legacyKeyring);
         verify(legacyKeyringCache, times(1)).put(user, userSession);
+        verify(collectionKeyring, never()).populateFromUser(any());
     }
 
     @Test
@@ -421,6 +422,7 @@ public class ZebedeeTest extends ZebedeeTestBaseFixture {
         verify(legacyKeyring, times(1)).unlock(any());
         verify(applicationKeys, times(1)).populateCacheFromUserKeyring(legacyKeyring);
         verify(legacyKeyringCache, times(1)).put(user, userSession);
+        verify(collectionKeyring, times(1)).populateFromUser(user);
     }
 
 

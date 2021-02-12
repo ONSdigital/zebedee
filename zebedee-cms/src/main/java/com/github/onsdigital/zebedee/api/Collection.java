@@ -128,7 +128,7 @@ public class Collection {
 
         info().data("user", session.getEmail()).log("create collection endpoint: user granted canEdit permission");
 
-        Keyring keyring = Root.zebedee.getKeyringCache().get(session);
+        Keyring keyring = Root.zebedee.getLegacyKeyringCache().get(session);
         if (keyring == null) {
             warn().data("user", session.getEmail()).log("create collection endpoint: request unsuccessful Keyring is not initialised");
             throw new UnauthorizedException("Keyring is not initialised.");

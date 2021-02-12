@@ -24,7 +24,7 @@ public class KeyringCacheCacheTest extends ZebedeeTestBaseFixture {
 
     @Override
     public void setUp() throws Exception {
-        keyringCache = zebedee.getKeyringCache();
+        keyringCache = zebedee.getLegacyKeyringCache();
 
         user = user();
 
@@ -44,7 +44,7 @@ public class KeyringCacheCacheTest extends ZebedeeTestBaseFixture {
         // When
         // We put the user's keyring
         keyringCache.put(user, session);
-        Keyring keyring = zebedee.getKeyringCache().get(user);
+        Keyring keyring = zebedee.getLegacyKeyringCache().get(user);
 
         // Then
         // We should be able to get the user's keyring
@@ -102,11 +102,11 @@ public class KeyringCacheCacheTest extends ZebedeeTestBaseFixture {
 
         // When
         // We remove the user's keyring
-        zebedee.getKeyringCache().remove(session);
+        zebedee.getLegacyKeyringCache().remove(session);
 
         // Then
         // The user's keyring should not be present in the cache
-        assertNull(zebedee.getKeyringCache().get(user));
+        assertNull(zebedee.getLegacyKeyringCache().get(user));
     }
 
     @Test

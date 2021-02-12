@@ -49,7 +49,7 @@ public class KeyManager {
      */
     public static synchronized void distributeCollectionKey(Zebedee zebedee, Session session, Collection collection,
                                                             boolean isNewCollection) throws IOException {
-        SecretKey key = zebedee.getKeyringCache()
+        SecretKey key = zebedee.getLegacyKeyringCache()
                 .get(session)
                 .get(collection.getDescription().getId());
 
@@ -75,7 +75,7 @@ public class KeyManager {
             assignKeyToUser(zebedee, recipient, collection.getDescription().getId(), key);
         }
 
-        zebedee.getKeyringCache()
+        zebedee.getLegacyKeyringCache()
                 .getSchedulerCache()
                 .put(collection.getDescription().getId(), key);
     }
@@ -123,7 +123,7 @@ public class KeyManager {
 
         // Put the Key in the schedule cache.
         collectionKeyTasks.add(() -> {
-            zebedee.getKeyringCache().getSchedulerCache().put(collection.getDescription().getId(), secretKey);
+            zebedee.getLegacyKeyringCache().getSchedulerCache().put(collection.getDescription().getId(), secretKey);
             return true;
         });
         return collectionKeyTasks;
@@ -162,7 +162,7 @@ public class KeyManager {
      * @throws IOException
      */
     public static void distributeKeyToUser(Zebedee zebedee, Collection collection, Session session, User user) throws IOException {
-        SecretKey key = zebedee.getKeyringCache().get(session).get(collection.getDescription().getId());
+        SecretKey key = zebedee.getLegacyKeyringCache().get(session).get(collection.getDescription().getId());
         distributeKeyToUser(zebedee, collection, key, user);
     }
 
@@ -194,7 +194,7 @@ public class KeyManager {
         // If the user is logged in assign the key to their cached keyring
         Session session = zebedee.getSessions().find(user.getEmail());
         if (session != null) {
-            Keyring keyring = zebedee.getKeyringCache().get(session);
+            Keyring keyring = zebedee.getLegacyKeyringCache().get(session);
             try {
                 if (keyring != null) {
                     keyring.put(keyIdentifier, key);
@@ -224,7 +224,7 @@ public class KeyManager {
         // If the user is logged in remove the key from their cached keyring
         Session session = zebedee.getSessions().find(user.getEmail());
         if (session != null) {
-            Keyring keyring = zebedee.getKeyringCache().get(session);
+            Keyring keyring = zebedee.getLegacyKeyringCache().get(session);
             try {
                 if (keyring != null) {
                     keyring.remove(keyIdentifier);

@@ -108,7 +108,7 @@ public class KeyringStoreImplTest {
 
         // write the key to the store.
         store.write(TEST_COLLECTION_ID, collectionKey);
-        assertTrue(Files.exists(keyringDir.toPath().resolve(TEST_COLLECTION_ID + ".key")));
+        assertTrue(Files.exists(keyringDir.toPath().resolve(TEST_COLLECTION_ID + KEY_EXT)));
 
         // retrieve the key from the store.
         SecretKey keyReturned = store.read(TEST_COLLECTION_ID);
@@ -179,7 +179,7 @@ public class KeyringStoreImplTest {
         store.write(TEST_COLLECTION_ID, collectionKey);
 
         // check the file exists
-        File f = keyringDir.toPath().resolve(TEST_COLLECTION_ID + ".key").toFile();
+        File f = keyringDir.toPath().resolve(TEST_COLLECTION_ID + KEY_EXT).toFile();
         assertTrue(Files.exists(f.toPath()));
 
         // Attempt to decrypt the file - if successful we can assume the encryption was also successful.
@@ -229,7 +229,7 @@ public class KeyringStoreImplTest {
     public void testExists_keyFileExist_shouldReturnTrue() throws Exception {
         store = new KeyringStoreImpl(keyringDir.toPath(), null, null);
 
-        Path p = Files.createFile(keyringDir.toPath().resolve(TEST_COLLECTION_ID + ".key"));
+        Path p = Files.createFile(keyringDir.toPath().resolve(TEST_COLLECTION_ID + KEY_EXT));
         assertTrue(Files.exists(p));
 
         assertTrue(store.exists(TEST_COLLECTION_ID));
@@ -331,7 +331,7 @@ public class KeyringStoreImplTest {
         store = new KeyringStoreImpl(keyringDir.toPath(), null, null);
 
         createPlainTextCollectionKeyFile(TEST_COLLECTION_ID);
-        Path p = keyringDir.toPath().resolve(TEST_COLLECTION_ID + ".key");
+        Path p = keyringDir.toPath().resolve(TEST_COLLECTION_ID + KEY_EXT);
         assertTrue(Files.exists(p));
 
         store.delete(TEST_COLLECTION_ID);
@@ -355,7 +355,7 @@ public class KeyringStoreImplTest {
     }
 
     void createPlainTextCollectionKeyFile(String collectionID) throws Exception {
-        Path p = keyringDir.toPath().resolve(collectionID + ".key");
+        Path p = keyringDir.toPath().resolve(collectionID + KEY_EXT);
         FileUtils.writeByteArrayToFile(p.toFile(), "This is not a valid secret key".getBytes());
     }
 

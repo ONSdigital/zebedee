@@ -2,6 +2,7 @@ package com.github.onsdigital.zebedee;
 
 import com.github.onsdigital.zebedee.json.Credentials;
 import com.github.onsdigital.zebedee.json.Keyring;
+import com.github.onsdigital.zebedee.keyring.CollectionKeyring;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.KeyringCache;
 import com.github.onsdigital.zebedee.model.encryption.ApplicationKeys;
@@ -64,6 +65,9 @@ public abstract class ZebedeeTestBaseFixture {
     protected KeyringCache legacyKeyringCache;
 
     @Mock
+    protected CollectionKeyring collectionKeyring;
+
+    @Mock
     protected Credentials credentials;
 
     @Mock
@@ -95,7 +99,7 @@ public abstract class ZebedeeTestBaseFixture {
         ReflectionTestUtils.setField(zebedee, "usersService", usersService);
         ReflectionTestUtils.setField(zebedee.getPermissionsService(), "usersServiceSupplier", usersServiceServiceSupplier);
         ReflectionTestUtils.setField(zebedee, "sessions", sessionsService);
-        ReflectionTestUtils.setField(zebedee, "keyringCache", new KeyringCache(sessionsService));
+        ReflectionTestUtils.setField(zebedee, "legacyKeyringCache", new KeyringCache(sessionsService));
 
         ServiceSupplier<CollectionHistoryDao> collectionHistoryDaoServiceSupplier = () -> collectionHistoryDao;
 
@@ -158,6 +162,9 @@ public abstract class ZebedeeTestBaseFixture {
 
         when(zebCfg.getKeyringCache())
                 .thenReturn(legacyKeyringCache);
+
+        when(zebCfg.getCollectionKeyring())
+                .thenReturn(collectionKeyring);
     }
 
     public abstract void setUp() throws Exception;

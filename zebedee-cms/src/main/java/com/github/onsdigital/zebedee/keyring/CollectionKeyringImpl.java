@@ -76,8 +76,17 @@ public class CollectionKeyringImpl implements CollectionKeyring {
     }
 
     /**
+     * Initalise a NOP impl.
+     */
+    public static void initNoOp() {
+        if (INSTANCE == null) {
+            INSTANCE = new NopCollectionKeyring();
+        }
+    }
+
+    /**
      * @return a singleton instance of the CollectionKeyring
-     * @throws KeyringException CollectionKeyring has not been initalised.
+     * @throws KeyringException CollectionKeyring has not been initalised before being accessed.
      */
     public static CollectionKeyring getInstance() throws KeyringException {
         if (INSTANCE == null) {

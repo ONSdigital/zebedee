@@ -159,7 +159,7 @@ public class ZebedeeConfiguration {
             KeyringCacheImpl.init(keyStore);
             KeyringCache keyringCache = KeyringCacheImpl.getInstance();
 
-            CollectionKeyringImpl.init(keyringCache);
+            CollectionKeyringImpl.init(keyringCache, null);
             this.collectionKeyring = CollectionKeyringImpl.getInstance();
         } else {
             this.collectionKeyring = new NopCollectionKeyring();

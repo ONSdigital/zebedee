@@ -34,11 +34,20 @@ public class KeyringCacheImpl implements KeyringCache {
     static final String KEY_NOT_FOUND_ERR = "SecretKey not found for this collection ID";
     static final String LOAD_KEYS_NULL_ERR = "error loading keystore expected map but was null";
     static final String KEYSTORE_NULL_ERR = "collection key store required but was null";
+    static final String NOT_INITIALISED_ERR = "keyringCache accessed but not yet initialised";
 
     private KeyringStore keyStore;
     private Map<String, SecretKey> cache;
 
     private static KeyringCache INSTANCE = null;
+
+    /**
+     * KeyringCache is a singleton instance. Use {@link KeyringCacheImpl#init(KeyringStore)} to initialise and
+     * {@link KeyringCacheImpl#getInstance()} to access the singleton.
+     */
+    private KeyringCacheImpl() {
+        // private constructor to force use of static get instance method.
+    }
 
     /**
      * Create a new instance of the Keyring. Use {@link KeyringCacheImpl#init(KeyringStore)} to constuct a new
@@ -198,13 +207,23 @@ public class KeyringCacheImpl implements KeyringCache {
      * @return a new {@link KeyringCache} instance.
      * @throws KeyringException problem initalising the keyring.
      */
-    public static KeyringCache init(KeyringStore keystore) throws KeyringException {
+    public static void init(KeyringStore keystore) throws KeyringException {
         if (INSTANCE == null) {
             synchronized (KeyringCacheImpl.class) {
                 if (INSTANCE == null) {
                     INSTANCE = new KeyringCacheImpl(keystore);
                 }
             }
+        }
+    }
+
+    /**
+     * @return a singleton instance of the {@link KeyringCache}
+     * @throws KeyringException the instance has not been initalised before being accessed.
+     */
+    public static KeyringCache getInstance() throws KeyringException {
+        if (INSTANCE == null) {
+            throw new KeyringException(NOT_INITIALISED_ERR);
         }
         return INSTANCE;
     }

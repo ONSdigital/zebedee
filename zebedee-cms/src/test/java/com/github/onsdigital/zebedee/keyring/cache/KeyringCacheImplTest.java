@@ -17,7 +17,11 @@ import static com.github.onsdigital.zebedee.keyring.cache.KeyringCacheImpl.KEYST
 import static com.github.onsdigital.zebedee.keyring.cache.KeyringCacheImpl.KEY_MISMATCH_ERR;
 import static com.github.onsdigital.zebedee.keyring.cache.KeyringCacheImpl.KEY_NOT_FOUND_ERR;
 import static com.github.onsdigital.zebedee.keyring.cache.KeyringCacheImpl.LOAD_KEYS_NULL_ERR;
+import static com.github.onsdigital.zebedee.keyring.cache.KeyringCacheImpl.NOT_INITIALISED_ERR;
+import static com.github.onsdigital.zebedee.keyring.cache.KeyringCacheImpl.getInstance;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThrows;
@@ -433,10 +437,34 @@ public class KeyringCacheImplTest {
         when(keyStore.readAll())
                 .thenReturn(keys);
 
-        KeyringCache keyringCache = KeyringCacheImpl.init(keyStore);
+        KeyringCacheImpl.init(keyStore);
+        KeyringCache keyringCache = getInstance();
 
         assertThat(keyringCache.get(TEST_COLLECTION_ID), equalTo(secretKey));
         verify(keyStore, times(1)).readAll();
+    }
+
+    @Test
+    public void testGetInstance_notInitialised() {
+        // Given the KeyringCache has not been initalised
+
+        // When getInstance is called
+        KeyringException ex = assertThrows(KeyringException.class, () -> KeyringCacheImpl.getInstance());
+
+        // Then an exception is thrown
+        assertThat(ex.getMessage(), equalTo(NOT_INITIALISED_ERR));
+    }
+
+    @Test
+    public void testGetInstance_success() throws Exception {
+        // Given the KeyringCache has been initalised
+        KeyringCacheImpl.init(keyStore);
+
+        // When getInstance is called
+        KeyringCache actual = KeyringCacheImpl.getInstance();
+
+        // Then the singleton instance is returned
+        assertThat(actual, is(notNullValue()));
     }
 
 }

@@ -4,6 +4,9 @@ import com.github.onsdigital.session.service.client.Http;
 import com.github.onsdigital.session.service.client.SessionClient;
 import com.github.onsdigital.session.service.client.SessionClientImpl;
 import com.github.onsdigital.zebedee.data.processing.DataIndex;
+import com.github.onsdigital.zebedee.keyring.CollectionKeyring;
+import com.github.onsdigital.zebedee.keyring.CollectionKeyringImpl;
+import com.github.onsdigital.zebedee.keyring.NopCollectionKeyring;
 import com.github.onsdigital.zebedee.keyring.cache.KeyringCache;
 import com.github.onsdigital.zebedee.keyring.cache.KeyringCacheImpl;
 import com.github.onsdigital.zebedee.keyring.store.KeyringStore;
@@ -99,15 +102,8 @@ public class ZebedeeConfiguration {
     private ImageService imageService;
     private SessionClient sessionClient;
     private KeyringCache keyringCache;
+    private CollectionKeyring collectionKeyring;
 
-    private static Path createDir(Path root, String dirName) throws IOException {
-        Path dir = root.resolve(dirName);
-        if (!Files.exists(dir)) {
-            info().data("path", dirName).log("creating required Zebedee directory as it does not exist.");
-            Files.createDirectory(dir);
-        }
-        return dir;
-    }
 
     /**
      * Create a new configuration object.
@@ -149,20 +145,29 @@ public class ZebedeeConfiguration {
         this.publishedCollections = new PublishedCollections(publishedCollectionsPath);
         this.applicationKeys = new ApplicationKeys(applicationKeysPath);
 
-        // Feature flag to cut to new sessions API.
+        // Configure the sessions
         if (cmsFeatureFlags().isSessionAPIEnabled()) {
-            this.sessionClient = new SessionClientImpl(getSessionsApiUrl(), getServiceAuthToken(), new Http());
+            sessionClient = new SessionClientImpl(getSessionsApiUrl(), getServiceAuthToken(), new Http());
             this.sessions = new SessionsAPIServiceImpl(sessionClient);
         } else {
             this.sessions = new SessionsServiceImpl(sessionsPath);
         }
 
-        // Feature flag to enable new keyring implementation
+        // Configure the new KeyringCache if enabled
         if (cmsFeatureFlags().isCentralisedKeyringEnabled()) {
-            KeyringStore keyStore = new KeyringStoreImpl(getKeyRingPath(), getKeyringSecretKey(), getKeyringInitVector());
-            this.keyringCache = KeyringCacheImpl.init(keyStore);
+            KeyringStore keyStore = new KeyringStoreImpl(getKeyRingPath(), getKeyringSecretKey(),
+                    getKeyringInitVector());
+
+            KeyringCacheImpl.init(keyStore);
+            KeyringCache keyringCache = KeyringCacheImpl.getInstance();
+
+            CollectionKeyringImpl.init(keyringCache, null);
+            this.collectionKeyring = CollectionKeyringImpl.getInstance();
+        } else {
+            this.collectionKeyring = new NopCollectionKeyring();
         }
 
+        // Initialise legacy keyring regardless - they will dual run until we cut over to new impl.
         this.legacyKeyringCache = new com.github.onsdigital.zebedee.model.KeyringCache(sessions);
 
         this.teamsService = new TeamsServiceImpl(
@@ -348,5 +353,18 @@ public class ZebedeeConfiguration {
 
     public ServiceStoreImpl getServiceStore() {
         return new ServiceStoreImpl(servicePath);
+    }
+
+    public CollectionKeyring getCollectionKeyring() {
+        return this.collectionKeyring;
+    }
+
+    private Path createDir(Path root, String dirName) throws IOException {
+        Path dir = root.resolve(dirName);
+        if (!Files.exists(dir)) {
+            info().data("path", dirName).log("creating required Zebedee directory as it does not exist.");
+            Files.createDirectory(dir);
+        }
+        return dir;
     }
 }

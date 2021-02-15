@@ -66,6 +66,14 @@ public interface PermissionsService {
     List<User> getCollectionAccessMapping(Collection collection) throws IOException;
 
     /**
+     *
+     * @param user
+     * @return
+     * @throws IOException
+     */
+    boolean hasAccessToCollection(User user, Collection collection) throws IOException;
+
+    /**
      * @return true if an Admin user exists, false otherwise.
      * @throws IOException unexpected error accessing users.
      */

@@ -1,10 +1,15 @@
 package com.github.onsdigital.zebedee;
 
+import com.github.onsdigital.zebedee.json.Credentials;
+import com.github.onsdigital.zebedee.json.Keyring;
+import com.github.onsdigital.zebedee.keyring.CollectionKeyring;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.KeyringCache;
+import com.github.onsdigital.zebedee.model.encryption.ApplicationKeys;
 import com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDao;
 import com.github.onsdigital.zebedee.service.ServiceSupplier;
 import com.github.onsdigital.zebedee.session.model.Session;
+import com.github.onsdigital.zebedee.session.service.Sessions;
 import com.github.onsdigital.zebedee.session.service.SessionsAPIServiceImpl;
 import com.github.onsdigital.zebedee.user.model.User;
 import com.github.onsdigital.zebedee.user.model.UserList;
@@ -33,8 +38,10 @@ import static org.mockito.Mockito.when;
  */
 public abstract class ZebedeeTestBaseFixture {
 
+    static final String TEST_EMAIL = "test@ons.gov.uk";
+
     @Mock
-    private UsersService usersService;
+    protected UsersService usersService;
 
     @Mock
     private KeyManangerUtil keyManangerUtil;
@@ -44,6 +51,33 @@ public abstract class ZebedeeTestBaseFixture {
 
     @Mock
     private SessionsAPIServiceImpl sessionsService;
+
+    @Mock
+    protected ZebedeeConfiguration zebCfg;
+
+    @Mock
+    protected Sessions sessions;
+
+    @Mock
+    protected ApplicationKeys applicationKeys;
+
+    @Mock
+    protected KeyringCache legacyKeyringCache;
+
+    @Mock
+    protected CollectionKeyring collectionKeyring;
+
+    @Mock
+    protected Credentials credentials;
+
+    @Mock
+    protected User user;
+
+    @Mock
+    protected Keyring legacyKeyring;
+
+    @Mock
+    protected Session userSession;
 
     protected Zebedee zebedee;
     protected Builder builder;
@@ -65,7 +99,7 @@ public abstract class ZebedeeTestBaseFixture {
         ReflectionTestUtils.setField(zebedee, "usersService", usersService);
         ReflectionTestUtils.setField(zebedee.getPermissionsService(), "usersServiceSupplier", usersServiceServiceSupplier);
         ReflectionTestUtils.setField(zebedee, "sessions", sessionsService);
-        ReflectionTestUtils.setField(zebedee, "keyringCache", new KeyringCache(sessionsService));
+        ReflectionTestUtils.setField(zebedee, "legacyKeyringCache", new KeyringCache(sessionsService));
 
         ServiceSupplier<CollectionHistoryDao> collectionHistoryDaoServiceSupplier = () -> collectionHistoryDao;
 
@@ -114,6 +148,23 @@ public abstract class ZebedeeTestBaseFixture {
         }).when(keyManangerUtil).assignKeyToUser(any(), any(), any(), any());
 
         setUp();
+    }
+
+    protected void setUpOpenSessionsTestMocks() {
+        when(zebCfg.getSessions())
+                .thenReturn(sessions);
+
+        when(zebCfg.getUsersService())
+                .thenReturn(usersService);
+
+        when(zebCfg.getApplicationKeys())
+                .thenReturn(applicationKeys);
+
+        when(zebCfg.getKeyringCache())
+                .thenReturn(legacyKeyringCache);
+
+        when(zebCfg.getCollectionKeyring())
+                .thenReturn(collectionKeyring);
     }
 
     public abstract void setUp() throws Exception;

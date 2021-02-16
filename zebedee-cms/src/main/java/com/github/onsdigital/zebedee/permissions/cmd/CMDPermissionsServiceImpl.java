@@ -140,6 +140,7 @@ public class CMDPermissionsServiceImpl implements CMDPermissionsService {
             throw sessionNotFoundException();
         }
 
+        // todo - remove this deprecated call once the migration to the sessions API is complete.
         if (sessions.expired(session)) {
             info().log("user dataset permissions request denied session expired");
             throw sessionExpiredException();

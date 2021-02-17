@@ -151,20 +151,6 @@ public class ZebedeeConfiguration {
             this.sessions = new SessionsServiceImpl(sessionsPath);
         }
 
-        // Configure the new KeyringCache if enabled
-        if (cmsFeatureFlags().isCentralisedKeyringEnabled()) {
-            KeyringStore keyStore = new KeyringStoreImpl(getKeyRingPath(), getKeyringSecretKey(),
-                    getKeyringInitVector());
-
-            KeyringCacheImpl.init(keyStore);
-            KeyringCache keyringCache = KeyringCacheImpl.getInstance();
-
-            CollectionKeyringImpl.init(keyringCache, null);
-            this.collectionKeyring = CollectionKeyringImpl.getInstance();
-        } else {
-            this.collectionKeyring = new NopCollectionKeyring();
-        }
-
         // Initialise legacy keyring regardless - they will dual run until we cut over to new impl.
         this.legacyKeyringCache = new com.github.onsdigital.zebedee.model.KeyringCache(sessions);
 
@@ -178,6 +164,20 @@ public class ZebedeeConfiguration {
 
         this.permissionsService = new PermissionsServiceImpl(permissionsStore,
                 this::getUsersService, this::getTeamsService, legacyKeyringCache);
+
+        // Configure the new KeyringCache if enabled
+        if (cmsFeatureFlags().isCentralisedKeyringEnabled()) {
+            KeyringStore keyStore = new KeyringStoreImpl(getKeyRingPath(), getKeyringSecretKey(),
+                    getKeyringInitVector());
+
+            KeyringCacheImpl.init(keyStore);
+            KeyringCache keyringCache = KeyringCacheImpl.getInstance();
+
+            CollectionKeyringImpl.init(keyringCache, permissionsService);
+            this.collectionKeyring = CollectionKeyringImpl.getInstance();
+        } else {
+            this.collectionKeyring = new NopCollectionKeyring();
+        }
 
         VersionsService versionsService = new VersionsServiceImpl();
         this.collections = new Collections(collectionsPath, permissionsService, versionsService, published);

@@ -10,7 +10,6 @@ import org.apache.commons.lang.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.util.Date;
 
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
@@ -119,19 +118,6 @@ public class SessionsAPIServiceImpl implements Sessions {
     }
 
     /**
-     * @param id the session ID to find.
-     * @return true if an active session exists with this ID, false otherwise.
-     * @throws IOException problem checking the session exists.
-     * @deprecated This is a deprecated method and not supported by this implementation
-     * <p>
-     * Check if an active {@link Session} exists with the provided ID.
-     */
-    @Override
-    public boolean exists(String id) throws IOException {
-        throw new UnsupportedOperationException("exists is a deprecated method and not supported by this sessions implementation.");
-    }
-
-    /**
      * @param session the {@link Session} to check.
      * @return true if expired, false otherwise.
      * @deprecated This is a deprecated method and not supported by this implementation
@@ -140,19 +126,7 @@ public class SessionsAPIServiceImpl implements Sessions {
      */
     @Override
     public boolean expired(Session session) {
-        throw new UnsupportedOperationException("expired is a deprecated method and not supported by this sessions implementation.");
-    }
-
-    /**
-     * @param session the  {@link Session} to use.
-     * @return the sessions expiration date time as a {@link Date} instance.
-     * @deprecated This is a deprecated method and not supported by this implementation
-     * <p>
-     * Get the expiry date of the provided {@link Session}
-     */
-    @Override
-    public Date getExpiryDate(Session session) {
-        throw new UnsupportedOperationException("getExpiryDate is a deprecated method and not supported by this sessions implementation.");
+        return session == null;
     }
 
     private Session createZebedeeSession(com.github.onsdigital.session.service.Session sess) throws IOException {

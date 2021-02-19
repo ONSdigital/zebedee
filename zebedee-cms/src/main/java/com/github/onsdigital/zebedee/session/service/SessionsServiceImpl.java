@@ -147,23 +147,11 @@ public class SessionsServiceImpl extends TimerTask implements Sessions {
     }
 
     /**
-     * Determines whether a session exists for the given ID.
-     *
-     * @param id The ID to check.
-     * @return If the ID is not blank and a corresponding session exists, true.
-     * @throws IOException If a filesystem error occurs.
-     */
-    public boolean exists(String id) throws IOException {
-        return sessionsStore.exists(id);
-    }
-
-
-    /**
      * Iterates all sessions and deletes expired ones.
      *
      * @throws IOException If a filesystem error occurs.
      */
-    public void deleteExpiredSessions() throws IOException {
+    void deleteExpiredSessions() throws IOException {
         Predicate<Session> isExpired = (session) -> expired(session);
         List<Session> expired = sessionsStore.filterSessions(isExpired);
 
@@ -235,7 +223,7 @@ public class SessionsServiceImpl extends TimerTask implements Sessions {
         return sessionsStore.read(sessionPath(id));
     }
 
-    public Date getExpiryDate(Session session) {
+    Date getExpiryDate(Session session) {
         Date expiry = null;
 
         if (session != null) {

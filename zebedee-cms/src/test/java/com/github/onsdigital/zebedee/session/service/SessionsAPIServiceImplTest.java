@@ -17,7 +17,9 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -465,34 +467,13 @@ public class SessionsAPIServiceImplTest {
     }
 
     @Test
-    public void testExists_shouldThrowUnsupportedOperationException() {
-        UnsupportedOperationException ex = assertThrows(UnsupportedOperationException.class, () -> sessions.exists(null));
-        assertThat(ex.getMessage(), equalTo("exists is a deprecated method and not supported by this sessions implementation."));
-
-        ex = assertThrows(UnsupportedOperationException.class, () -> sessions.exists(""));
-        assertThat(ex.getMessage(), equalTo("exists is a deprecated method and not supported by this sessions implementation."));
-
-        ex = assertThrows(UnsupportedOperationException.class, () -> sessions.exists(TEST_ID));
-        assertThat(ex.getMessage(), equalTo("exists is a deprecated method and not supported by this sessions implementation."));
+    public void testExpired_shouldReturnTrueForNullSession() {
+        assertTrue(sessions.expired(null));
     }
 
     @Test
-    public void testExpired_shouldThrowUnsupportedOperationException() {
-        UnsupportedOperationException ex = assertThrows(UnsupportedOperationException.class, () -> sessions.expired(null));
-        assertThat(ex.getMessage(), equalTo("expired is a deprecated method and not supported by this sessions implementation."));
-
-        ex = assertThrows(UnsupportedOperationException.class, () -> sessions.expired(new Session()));
-        assertThat(ex.getMessage(), equalTo("expired is a deprecated method and not supported by this sessions implementation."));
+    public void testExpired_shouldReturnFalseWithSession() {
+        assertFalse(sessions.expired(new Session()));
     }
-
-    @Test
-    public void testGetExpiryDate_shouldThrowUnsupportedOperationException() {
-        UnsupportedOperationException ex = assertThrows(UnsupportedOperationException.class, () -> sessions.getExpiryDate(null));
-        assertThat(ex.getMessage(), equalTo("getExpiryDate is a deprecated method and not supported by this sessions implementation."));
-
-        ex = assertThrows(UnsupportedOperationException.class, () -> sessions.getExpiryDate(new Session()));
-        assertThat(ex.getMessage(), equalTo("getExpiryDate is a deprecated method and not supported by this sessions implementation."));
-    }
-
 
 }

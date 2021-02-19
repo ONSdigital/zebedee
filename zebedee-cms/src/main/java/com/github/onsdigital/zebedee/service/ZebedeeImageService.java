@@ -26,7 +26,7 @@ public class ZebedeeImageService implements ImageService {
     @Override
     public void publishImagesInCollection(Collection collection) throws IOException, ImageAPIException {
 
-        Images images = imageClient.getImagesWithCollectionId(collection.getId());
+        Images images = imageClient.getImages(collection.getId());
 
         for (Image image : images.getItems()) {
             imageClient.publishImage(image.getId());

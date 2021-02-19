@@ -6,7 +6,6 @@ import com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedExcept
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.Credentials;
-import com.github.onsdigital.zebedee.keyring.Keyring;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.Collections;
 import com.github.onsdigital.zebedee.model.Content;
@@ -81,7 +80,6 @@ public class Zebedee {
     private final DataIndex dataIndex;
     private final DatasetService datasetService;
     private final ServiceStoreImpl serviceStoreImpl;
-    private final Keyring keyring;
 
     /**
      * Create a new instance of Zebedee setting.
@@ -104,7 +102,6 @@ public class Zebedee {
         this.verificationAgent = configuration.getVerificationAgent(isVerificationEnabled(), this);
         this.datasetService = configuration.getDatasetService();
         this.serviceStoreImpl = configuration.getServiceStore();
-        this.keyring = configuration.getCollectionKeyring();
 
         this.collectionsPath = configuration.getCollectionsPath();
         this.publishedCollectionsPath = configuration.getPublishedCollectionsPath();
@@ -297,7 +294,6 @@ public class Zebedee {
 
         applicationKeys.populateCacheFromUserKeyring(user.keyring());
         legacyKeyringCache.put(user, session);
-        keyring.populateFromUser(user);
 
         // Return a session
         return session;

@@ -16,11 +16,21 @@ public interface Keyring {
     void populateFromUser(User user) throws KeyringException;
 
     /**
+     * Get a key from the keyring for the specified collection.
      *
-     * @param user
-     * @param collection
-     * @return
-     * @throws KeyringException
+     * @param user       the user requesting the key.
+     * @param collection the collection to get the key for.
+     * @return the collection key if it exists null if not.
+     * @throws KeyringException problem getting the key.
      */
     SecretKey get(User user, Collection collection) throws KeyringException;
+
+    /**
+     * Remove a key from the keyring.
+     *
+     * @param user       the user performing the action.
+     * @param collection the collection the the key belongs to.
+     * @throws KeyringException problem removing the key.
+     */
+    void remove(User user, Collection collection) throws KeyringException;
 }

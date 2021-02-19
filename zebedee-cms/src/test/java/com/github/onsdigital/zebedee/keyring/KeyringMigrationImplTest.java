@@ -187,4 +187,110 @@ public class KeyringMigrationImplTest {
         verifyZeroInteractions(user, centralKeyring);
     }
 
+    @Test
+    public void testRemove_UserIsNull_throwsException() {
+        // Given the user is null
+
+        // When remove is called
+        KeyringException keyringException = assertThrows(KeyringException.class, () -> keyring.remove(null, null));
+
+        // Then an exception is thrown
+        assertThat(keyringException.getMessage(), equalTo(USER_NULL_ERR));
+        verifyZeroInteractions(user);
+    }
+
+    @Test
+    public void testRemove_CollectionIsNull_throwsException() {
+        // Given the collection is null
+
+        // When remove is called
+        KeyringException keyringException = assertThrows(KeyringException.class, () -> keyring.remove(user, null));
+
+        // Then an exception is thrown
+        assertThat(keyringException.getMessage(), equalTo(COLLECTION_NULL_ERR));
+        verifyZeroInteractions(user);
+    }
+
+    @Test
+    public void testRemove_CollectionDescIsNull_throwsException() {
+        // Given the collection description is null
+        when(collection.getDescription())
+                .thenReturn(null);
+
+        // When remove is called
+        KeyringException keyringException = assertThrows(KeyringException.class, () -> keyring.remove(user, collection));
+
+        // Then an exception is thrown
+        assertThat(keyringException.getMessage(), equalTo(COLLECTION_DESC_NULL_ERR));
+        verifyZeroInteractions(user);
+    }
+
+    @Test
+    public void testRemove_CollectionIDIsNull_throwsException() {
+        // Given the collection description is null
+        when(description.getId())
+                .thenReturn(null);
+
+        // When remove is called
+        KeyringException keyringException = assertThrows(KeyringException.class, () -> keyring.remove(user, collection));
+
+        // Then an exception is thrown
+        assertThat(keyringException.getMessage(), equalTo(COLLECTION_ID_EMPTY_ERR));
+        verifyZeroInteractions(user);
+    }
+
+    @Test
+    public void testRemove_CollectionIDIsEmpty_throwsException() {
+        // Given the collection description is null
+        when(description.getId())
+                .thenReturn("");
+
+        // When remove is called
+        KeyringException keyringException = assertThrows(KeyringException.class, () -> keyring.remove(user, collection));
+
+        // Then an exception is thrown
+        assertThat(keyringException.getMessage(), equalTo(COLLECTION_ID_EMPTY_ERR));
+        verifyZeroInteractions(user);
+    }
+
+    @Test
+    public void testRemove_KeyringIsNull_throwsException() {
+        // Given the keyring is null
+        when(user.keyring()).
+                thenReturn(null);
+
+        // When remove is called
+        KeyringException keyringException = assertThrows(KeyringException.class, () -> keyring.remove(user,
+                collection));
+
+        // Then an execption is thrown
+        assertThat(keyringException.getMessage(), equalTo(USER_KEYRING_NULL_ERR));
+        verify(user, times(1)).keyring();
+    }
+
+    @Test
+    public void testRemove_Success_shouldNotReturnError() throws Exception {
+        // Given remove is successful
+
+        // When remove is called
+        keyring.remove(user, collection);
+
+        // Then keyring.remove is called 1 time.
+        verify(user, times(1)).keyring();
+        verify(legacyKeyring, times(1)).remove(TEST_COLLECTION_ID);
+        verifyZeroInteractions(centralKeyring);
+    }
+
+    @Test
+    public void testRemove_centralKeyringEnabled_RemoveShouldReturnNull() throws Exception {
+        // Given central keyring is enabled
+        keyring = new KeyringMigrationImpl(true, centralKeyring);
+
+        // when remove is called
+        keyring.remove(user, collection);
+
+        // Then no action is taken
+        verifyZeroInteractions(user, centralKeyring);
+    }
+
 }

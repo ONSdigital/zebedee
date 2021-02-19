@@ -5,7 +5,7 @@ import com.github.onsdigital.zebedee.user.model.User;
 
 import javax.crypto.SecretKey;
 
-public class NopCollectionKeyring implements CollectionKeyring {
+public class NopKeyring implements Keyring {
 
     @Override
     public void populateFromUser(User user) throws KeyringException {

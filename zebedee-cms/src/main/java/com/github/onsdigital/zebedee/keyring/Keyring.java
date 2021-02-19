@@ -5,7 +5,7 @@ import com.github.onsdigital.zebedee.user.model.User;
 
 import javax.crypto.SecretKey;
 
-public interface CollectionKeyring {
+public interface Keyring {
 
     /**
      * Populate the Keyring from an unlocked {@link User#keyring()}

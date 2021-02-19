@@ -13,7 +13,7 @@ import java.io.IOException;
  * CollectionKeyringImpl adds a permissions check wrapper around a {@link KeyringCache} instance to ensure only
  * authorised users can access collection encryption keys
  */
-public class CollectionKeyringImpl implements CollectionKeyring {
+public class KeyringImpl implements Keyring {
 
     static final String USER_NULL_ERR = "user required but was null";
     static final String USER_KEYRING_NULL_ERR = "user keyring required but was null";
@@ -28,20 +28,20 @@ public class CollectionKeyringImpl implements CollectionKeyring {
     /**
      * Singleton instance.
      */
-    private static CollectionKeyring INSTANCE = null;
+    private static Keyring INSTANCE = null;
 
     private final KeyringCache cache;
     private final PermissionsService permissionsService;
 
     /**
-     * CollectionKeyringImpl is a singleton instance. Use {@link CollectionKeyringImpl#init(KeyringCache, PermissionsService)} to
-     * construct and initialise a new instance. Use {@link CollectionKeyringImpl#getInstance()} to accessed the
+     * CollectionKeyringImpl is a singleton instance. Use {@link KeyringImpl#init(KeyringCache, PermissionsService)} to
+     * construct and initialise a new instance. Use {@link KeyringImpl#getInstance()} to accessed the
      * singleton.
      *
      * @param cache the {@link KeyringCache} instance to use.
      * @throws KeyringException the {@link KeyringCache} was null.
      */
-    private CollectionKeyringImpl(KeyringCache cache, PermissionsService permissionsService) throws KeyringException {
+    private KeyringImpl(KeyringCache cache, PermissionsService permissionsService) throws KeyringException {
         if (cache == null) {
             throw new KeyringException(KEYRING_CACHE_NULL_ERR);
         }
@@ -125,9 +125,9 @@ public class CollectionKeyringImpl implements CollectionKeyring {
      */
     public static void init(KeyringCache keyringCache, PermissionsService permissionsService) throws KeyringException {
         if (INSTANCE == null) {
-            synchronized (CollectionKeyringImpl.class) {
+            synchronized (KeyringImpl.class) {
                 if (INSTANCE == null) {
-                    INSTANCE = new CollectionKeyringImpl(keyringCache, permissionsService);
+                    INSTANCE = new KeyringImpl(keyringCache, permissionsService);
                 }
             }
         }
@@ -138,7 +138,7 @@ public class CollectionKeyringImpl implements CollectionKeyring {
      */
     public static void initNoOp() {
         if (INSTANCE == null) {
-            INSTANCE = new NopCollectionKeyring();
+            INSTANCE = new NopKeyring();
         }
     }
 
@@ -146,7 +146,7 @@ public class CollectionKeyringImpl implements CollectionKeyring {
      * @return a singleton instance of the CollectionKeyring
      * @throws KeyringException CollectionKeyring has not been initalised before being accessed.
      */
-    public static CollectionKeyring getInstance() throws KeyringException {
+    public static Keyring getInstance() throws KeyringException {
         if (INSTANCE == null) {
             throw new KeyringException(NOT_INITALISED_ERR);
         }

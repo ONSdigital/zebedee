@@ -1,8 +1,7 @@
 package com.github.onsdigital.zebedee;
 
 import com.github.onsdigital.zebedee.json.Credentials;
-import com.github.onsdigital.zebedee.json.Keyring;
-import com.github.onsdigital.zebedee.keyring.CollectionKeyring;
+import com.github.onsdigital.zebedee.keyring.Keyring;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.KeyringCache;
 import com.github.onsdigital.zebedee.model.encryption.ApplicationKeys;
@@ -65,7 +64,7 @@ public abstract class ZebedeeTestBaseFixture {
     protected KeyringCache legacyKeyringCache;
 
     @Mock
-    protected CollectionKeyring collectionKeyring;
+    protected Keyring keyring;
 
     @Mock
     protected Credentials credentials;
@@ -74,7 +73,7 @@ public abstract class ZebedeeTestBaseFixture {
     protected User user;
 
     @Mock
-    protected Keyring legacyKeyring;
+    protected com.github.onsdigital.zebedee.json.Keyring legacyKeyring;
 
     @Mock
     protected Session userSession;
@@ -164,7 +163,7 @@ public abstract class ZebedeeTestBaseFixture {
                 .thenReturn(legacyKeyringCache);
 
         when(zebCfg.getCollectionKeyring())
-                .thenReturn(collectionKeyring);
+                .thenReturn(keyring);
     }
 
     public abstract void setUp() throws Exception;

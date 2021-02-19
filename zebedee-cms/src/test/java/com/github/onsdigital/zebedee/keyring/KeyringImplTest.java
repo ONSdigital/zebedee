@@ -16,15 +16,15 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.HashSet;
 
-import static com.github.onsdigital.zebedee.keyring.CollectionKeyringImpl.COLLECTION_DESCRIPTION_NULL_ERR;
-import static com.github.onsdigital.zebedee.keyring.CollectionKeyringImpl.COLLECTION_ID_NULL_OR_EMPTY_ERR;
-import static com.github.onsdigital.zebedee.keyring.CollectionKeyringImpl.COLLECTION_NULL_ERR;
-import static com.github.onsdigital.zebedee.keyring.CollectionKeyringImpl.KEYRING_CACHE_NULL_ERR;
-import static com.github.onsdigital.zebedee.keyring.CollectionKeyringImpl.NOT_INITALISED_ERR;
-import static com.github.onsdigital.zebedee.keyring.CollectionKeyringImpl.PERMISSION_SERVICE_NULL_ERR;
-import static com.github.onsdigital.zebedee.keyring.CollectionKeyringImpl.USER_KEYRING_LOCKED_ERR;
-import static com.github.onsdigital.zebedee.keyring.CollectionKeyringImpl.USER_KEYRING_NULL_ERR;
-import static com.github.onsdigital.zebedee.keyring.CollectionKeyringImpl.USER_NULL_ERR;
+import static com.github.onsdigital.zebedee.keyring.KeyringImpl.COLLECTION_DESCRIPTION_NULL_ERR;
+import static com.github.onsdigital.zebedee.keyring.KeyringImpl.COLLECTION_ID_NULL_OR_EMPTY_ERR;
+import static com.github.onsdigital.zebedee.keyring.KeyringImpl.COLLECTION_NULL_ERR;
+import static com.github.onsdigital.zebedee.keyring.KeyringImpl.KEYRING_CACHE_NULL_ERR;
+import static com.github.onsdigital.zebedee.keyring.KeyringImpl.NOT_INITALISED_ERR;
+import static com.github.onsdigital.zebedee.keyring.KeyringImpl.PERMISSION_SERVICE_NULL_ERR;
+import static com.github.onsdigital.zebedee.keyring.KeyringImpl.USER_KEYRING_LOCKED_ERR;
+import static com.github.onsdigital.zebedee.keyring.KeyringImpl.USER_KEYRING_NULL_ERR;
+import static com.github.onsdigital.zebedee.keyring.KeyringImpl.USER_NULL_ERR;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -39,11 +39,11 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
-public class CollectionKeyringImplTest {
+public class KeyringImplTest {
 
     static final String TEST_COLLECTION_ID = "44";
 
-    private CollectionKeyring keyring;
+    private Keyring keyring;
 
     @Mock
     private KeyringCache keyringCache;
@@ -70,8 +70,8 @@ public class CollectionKeyringImplTest {
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
 
-        CollectionKeyringImpl.init(keyringCache, permissionsService);
-        keyring = CollectionKeyringImpl.getInstance();
+        KeyringImpl.init(keyringCache, permissionsService);
+        keyring = KeyringImpl.getInstance();
     }
 
     @After
@@ -199,7 +199,7 @@ public class CollectionKeyringImplTest {
 
         // When GetInstance is called
         // Then an exception is thrown
-        KeyringException ex = assertThrows(KeyringException.class, () -> CollectionKeyringImpl.getInstance());
+        KeyringException ex = assertThrows(KeyringException.class, () -> KeyringImpl.getInstance());
         assertThat(ex.getMessage(), equalTo(NOT_INITALISED_ERR));
     }
 
@@ -208,10 +208,10 @@ public class CollectionKeyringImplTest {
         // Given CollectionKeyring has been initalised
 
         // When GetInstance is called
-        CollectionKeyring collectionKeyring = CollectionKeyringImpl.getInstance();
+        Keyring keyring = KeyringImpl.getInstance();
 
         // Then a non null instance is returned
-        assertThat(collectionKeyring, is(notNullValue()));
+        assertThat(keyring, is(notNullValue()));
     }
 
     @Test
@@ -219,7 +219,7 @@ public class CollectionKeyringImplTest {
         resetInstanceToNull();
 
         // When init is called
-        KeyringException ex = assertThrows(KeyringException.class, () -> CollectionKeyringImpl.init(null, null));
+        KeyringException ex = assertThrows(KeyringException.class, () -> KeyringImpl.init(null, null));
 
         // Then an exception is thrown
         assertThat(ex.getMessage(), equalTo(KEYRING_CACHE_NULL_ERR));
@@ -230,7 +230,7 @@ public class CollectionKeyringImplTest {
         resetInstanceToNull();
 
         // When init is called
-        KeyringException ex = assertThrows(KeyringException.class, () -> CollectionKeyringImpl.init(keyringCache, null));
+        KeyringException ex = assertThrows(KeyringException.class, () -> KeyringImpl.init(keyringCache, null));
 
         // Then an exception is thrown
         assertThat(ex.getMessage(), equalTo(PERMISSION_SERVICE_NULL_ERR));
@@ -241,13 +241,13 @@ public class CollectionKeyringImplTest {
         resetInstanceToNull();
 
         // Given init NOP is invoked.
-        CollectionKeyringImpl.initNoOp();
+        KeyringImpl.initNoOp();
 
         // When getInstance is called
-        CollectionKeyring collectionKeyring = CollectionKeyringImpl.getInstance();
+        Keyring keyring = KeyringImpl.getInstance();
 
         // That a Nop instance is returned
-        assertTrue(collectionKeyring instanceof NopCollectionKeyring);
+        assertTrue(keyring instanceof NopKeyring);
     }
 
     @Test
@@ -399,7 +399,7 @@ public class CollectionKeyringImplTest {
 
     private void resetInstanceToNull() throws Exception {
         // Use some evil reflection magic to set the instance back to null for this test case.
-        Field field = CollectionKeyringImpl.class.getDeclaredField("INSTANCE");
+        Field field = KeyringImpl.class.getDeclaredField("INSTANCE");
         field.setAccessible(true);
         field.set(null, null);
     }

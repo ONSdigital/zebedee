@@ -31,7 +31,6 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
@@ -234,20 +233,6 @@ public class KeyringImplTest {
 
         // Then an exception is thrown
         assertThat(ex.getMessage(), equalTo(PERMISSION_SERVICE_NULL_ERR));
-    }
-
-    @Test
-    public void test_InitNop() throws Exception {
-        resetInstanceToNull();
-
-        // Given init NOP is invoked.
-        KeyringImpl.initNoOp();
-
-        // When getInstance is called
-        Keyring keyring = KeyringImpl.getInstance();
-
-        // That a Nop instance is returned
-        assertTrue(keyring instanceof NopKeyring);
     }
 
     @Test

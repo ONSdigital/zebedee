@@ -6,7 +6,6 @@ import com.github.onsdigital.session.service.client.SessionClientImpl;
 import com.github.onsdigital.zebedee.data.processing.DataIndex;
 import com.github.onsdigital.zebedee.keyring.Keyring;
 import com.github.onsdigital.zebedee.keyring.KeyringImpl;
-import com.github.onsdigital.zebedee.keyring.NopKeyring;
 import com.github.onsdigital.zebedee.keyring.cache.KeyringCache;
 import com.github.onsdigital.zebedee.keyring.cache.KeyringCacheImpl;
 import com.github.onsdigital.zebedee.keyring.store.KeyringStore;
@@ -175,8 +174,6 @@ public class ZebedeeConfiguration {
 
             KeyringImpl.init(keyringCache, permissionsService);
             this.keyring = KeyringImpl.getInstance();
-        } else {
-            this.keyring = new NopKeyring();
         }
 
         VersionsService versionsService = new VersionsServiceImpl();

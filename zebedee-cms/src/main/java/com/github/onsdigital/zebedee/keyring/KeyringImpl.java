@@ -99,6 +99,11 @@ public class KeyringImpl implements Keyring {
         return cache.get(collection.getDescription().getId());
     }
 
+    @Override
+    public void remove(User user, Collection collection) throws KeyringException {
+
+    }
+
     private void validGetParams(User user, Collection collection) throws KeyringException {
         if (user == null) {
             throw new KeyringException(USER_NULL_ERR);
@@ -130,15 +135,6 @@ public class KeyringImpl implements Keyring {
                     INSTANCE = new KeyringImpl(keyringCache, permissionsService);
                 }
             }
-        }
-    }
-
-    /**
-     * Initalise a NOP impl.
-     */
-    public static void initNoOp() {
-        if (INSTANCE == null) {
-            INSTANCE = new NopKeyring();
         }
     }
 

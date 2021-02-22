@@ -6,8 +6,6 @@ import com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedExcept
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.Credentials;
-import com.github.onsdigital.zebedee.json.Keyring;
-import com.github.onsdigital.zebedee.keyring.CollectionKeyring;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.Collections;
 import com.github.onsdigital.zebedee.model.Content;
@@ -84,7 +82,6 @@ public class Zebedee {
     private final DatasetService datasetService;
     private final ImageService imageService;
     private final ServiceStoreImpl serviceStoreImpl;
-    private final CollectionKeyring collectionKeyring;
 
     /**
      * Create a new instance of Zebedee setting.
@@ -108,7 +105,6 @@ public class Zebedee {
         this.datasetService = configuration.getDatasetService();
         this.imageService = configuration.getImageService();
         this.serviceStoreImpl = configuration.getServiceStore();
-        this.collectionKeyring = configuration.getCollectionKeyring();
 
         this.collectionsPath = configuration.getCollectionsPath();
         this.publishedCollectionsPath = configuration.getPublishedCollectionsPath();
@@ -294,14 +290,13 @@ public class Zebedee {
         }
 
         // Unlock and cache keyring
-        Keyring legacyKeyring = user.keyring();
+        com.github.onsdigital.zebedee.json.Keyring legacyKeyring = user.keyring();
         if (!legacyKeyring.unlock(credentials.getPassword())) {
             throw new IOException("failed to unlock user keyring");
         }
 
         applicationKeys.populateCacheFromUserKeyring(user.keyring());
         legacyKeyringCache.put(user, session);
-        collectionKeyring.populateFromUser(user);
 
         // Return a session
         return session;

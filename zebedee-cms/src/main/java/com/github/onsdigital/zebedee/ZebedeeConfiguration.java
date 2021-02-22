@@ -4,9 +4,8 @@ import com.github.onsdigital.session.service.client.Http;
 import com.github.onsdigital.session.service.client.SessionClient;
 import com.github.onsdigital.session.service.client.SessionClientImpl;
 import com.github.onsdigital.zebedee.data.processing.DataIndex;
-import com.github.onsdigital.zebedee.keyring.CollectionKeyring;
-import com.github.onsdigital.zebedee.keyring.CollectionKeyringImpl;
-import com.github.onsdigital.zebedee.keyring.NopCollectionKeyring;
+import com.github.onsdigital.zebedee.keyring.Keyring;
+import com.github.onsdigital.zebedee.keyring.KeyringImpl;
 import com.github.onsdigital.zebedee.keyring.cache.KeyringCache;
 import com.github.onsdigital.zebedee.keyring.cache.KeyringCacheImpl;
 import com.github.onsdigital.zebedee.keyring.store.KeyringStore;
@@ -102,7 +101,7 @@ public class ZebedeeConfiguration {
     private ImageService imageService;
     private SessionClient sessionClient;
     private KeyringCache keyringCache;
-    private CollectionKeyring collectionKeyring;
+    private Keyring keyring;
 
 
     /**
@@ -175,10 +174,8 @@ public class ZebedeeConfiguration {
             KeyringCacheImpl.init(keyStore);
             KeyringCache keyringCache = KeyringCacheImpl.getInstance();
 
-            CollectionKeyringImpl.init(keyringCache, permissionsService);
-            this.collectionKeyring = CollectionKeyringImpl.getInstance();
-        } else {
-            this.collectionKeyring = new NopCollectionKeyring();
+            KeyringImpl.init(keyringCache, permissionsService);
+            this.keyring = KeyringImpl.getInstance();
         }
 
         VersionsService versionsService = new VersionsServiceImpl();
@@ -355,8 +352,8 @@ public class ZebedeeConfiguration {
         return new ServiceStoreImpl(servicePath);
     }
 
-    public CollectionKeyring getCollectionKeyring() {
-        return this.collectionKeyring;
+    public Keyring getCollectionKeyring() {
+        return this.keyring;
     }
 
     private Path createDir(Path root, String dirName) throws IOException {

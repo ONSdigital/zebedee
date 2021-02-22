@@ -53,6 +53,16 @@ public class KeyringMigrationImpl implements Keyring {
         validateUser(user);
         validateCollection(collection);
         validateSecretKey(key);
+
+        if (centralKeyringEnabled) {
+            return;
+        }
+
+        addKeyToLegacyKeyring(user, collection, key);
+    }
+
+    private void addKeyToLegacyKeyring(User user, Collection collection, SecretKey key) throws KeyringException {
+        getUseKeyring(user).put(collection.getDescription().getId(), key);
     }
 
     @Override
@@ -65,6 +75,10 @@ public class KeyringMigrationImpl implements Keyring {
         }
 
         return getFromLegacyKeyring(user, collection);
+    }
+
+    private SecretKey getFromLegacyKeyring(User user, Collection collection) throws KeyringException {
+        return getUseKeyring(user).get(collection.getDescription().getId());
     }
 
     @Override
@@ -80,21 +94,7 @@ public class KeyringMigrationImpl implements Keyring {
     }
 
     private void removeFromLegacyKeyring(User user, Collection collection) throws KeyringException {
-        com.github.onsdigital.zebedee.json.Keyring userKeyring = user.keyring();
-        if (userKeyring == null) {
-            throw new KeyringException(USER_KEYRING_NULL_ERR);
-        }
-
-        userKeyring.remove(collection.getDescription().getId());
-    }
-
-    private SecretKey getFromLegacyKeyring(User user, Collection collection) throws KeyringException {
-        com.github.onsdigital.zebedee.json.Keyring userKeyring = user.keyring();
-        if (userKeyring == null) {
-            throw new KeyringException(USER_KEYRING_NULL_ERR);
-        }
-
-        return userKeyring.get(collection.getDescription().getId());
+        getUseKeyring(user).remove(collection.getDescription().getId());
     }
 
     private void validateUser(User user) throws KeyringException {
@@ -122,4 +122,15 @@ public class KeyringMigrationImpl implements Keyring {
             throw new KeyringException(SECRET_KEY_NULL_ERR);
         }
     }
+
+    private com.github.onsdigital.zebedee.json.Keyring getUseKeyring(User user) throws KeyringException {
+        com.github.onsdigital.zebedee.json.Keyring userKeyring = user.keyring();
+
+        if (userKeyring == null) {
+            throw new KeyringException(USER_KEYRING_NULL_ERR);
+        }
+
+        return userKeyring;
+    }
+
 }

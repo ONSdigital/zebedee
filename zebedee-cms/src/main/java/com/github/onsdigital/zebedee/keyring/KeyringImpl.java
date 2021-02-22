@@ -104,6 +104,11 @@ public class KeyringImpl implements Keyring {
 
     }
 
+    @Override
+    public void add(User user, Collection collection, SecretKey key) throws KeyringException {
+
+    }
+
     private void validGetParams(User user, Collection collection) throws KeyringException {
         if (user == null) {
             throw new KeyringException(USER_NULL_ERR);

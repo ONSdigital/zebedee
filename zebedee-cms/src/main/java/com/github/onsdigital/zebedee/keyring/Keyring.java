@@ -33,4 +33,6 @@ public interface Keyring {
      * @throws KeyringException problem removing the key.
      */
     void remove(User user, Collection collection) throws KeyringException;
+
+    void add(User user, Collection collection, SecretKey key) throws KeyringException;
 }

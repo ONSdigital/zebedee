@@ -2,6 +2,10 @@ package com.github.onsdigital.zebedee.keyring;
 
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.model.Collection;
+import com.github.onsdigital.zebedee.model.KeyringCache;
+import com.github.onsdigital.zebedee.model.encryption.ApplicationKeys;
+import com.github.onsdigital.zebedee.session.model.Session;
+import com.github.onsdigital.zebedee.session.service.Sessions;
 import com.github.onsdigital.zebedee.user.model.User;
 import org.junit.Before;
 import org.junit.Test;
@@ -9,18 +13,24 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import javax.crypto.SecretKey;
+import java.io.IOException;
 
 import static com.github.onsdigital.zebedee.keyring.KeyringImpl.COLLECTION_NULL_ERR;
 import static com.github.onsdigital.zebedee.keyring.KeyringImpl.USER_NULL_ERR;
 import static com.github.onsdigital.zebedee.keyring.KeyringMigrationImpl.COLLECTION_DESC_NULL_ERR;
 import static com.github.onsdigital.zebedee.keyring.KeyringMigrationImpl.COLLECTION_ID_EMPTY_ERR;
+import static com.github.onsdigital.zebedee.keyring.KeyringMigrationImpl.EMAIL_EMPTY_ERR;
+import static com.github.onsdigital.zebedee.keyring.KeyringMigrationImpl.GET_SESSION_ERR;
+import static com.github.onsdigital.zebedee.keyring.KeyringMigrationImpl.LEGACY_CACHE_ERR;
 import static com.github.onsdigital.zebedee.keyring.KeyringMigrationImpl.SECRET_KEY_NULL_ERR;
+import static com.github.onsdigital.zebedee.keyring.KeyringMigrationImpl.SESSION_NULL_ERR;
 import static com.github.onsdigital.zebedee.keyring.KeyringMigrationImpl.USER_KEYRING_NULL_ERR;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertThrows;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
@@ -30,6 +40,9 @@ import static org.mockito.Mockito.when;
 public class KeyringMigrationImplTest {
 
     static final String TEST_COLLECTION_ID = "abc123";
+    static final String TEST_EMAIL = "bertandernie@sesamestreet.com";
+    final boolean enabled = true;
+    final boolean disabled = false;
 
     private Keyring keyring;
 
@@ -51,6 +64,18 @@ public class KeyringMigrationImplTest {
     @Mock
     private Keyring centralKeyring;
 
+    @Mock
+    private KeyringCache legacyKeyringCache;
+
+    @Mock
+    private ApplicationKeys applicationKeys;
+
+    @Mock
+    private Sessions sessionsService;
+
+    @Mock
+    private Session session;
+
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
@@ -64,7 +89,13 @@ public class KeyringMigrationImplTest {
         when(user.keyring())
                 .thenReturn(legacyKeyring);
 
-        this.keyring = new KeyringMigrationImpl(false, null);
+        when(user.getEmail())
+                .thenReturn(TEST_EMAIL);
+
+        when(sessionsService.find(TEST_EMAIL))
+                .thenReturn(session);
+
+        this.keyring = new KeyringMigrationImpl(disabled, centralKeyring, legacyKeyringCache, applicationKeys, sessionsService);
     }
 
     @Test
@@ -178,7 +209,7 @@ public class KeyringMigrationImplTest {
     @Test
     public void testGetCentralKeyingEnabled_shouldReturnNull() throws Exception {
         // Given central keyring is enabled
-        keyring = new KeyringMigrationImpl(true, centralKeyring);
+        keyring = new KeyringMigrationImpl(enabled, centralKeyring, legacyKeyringCache, applicationKeys, sessionsService);
 
         // When get is called
         SecretKey actualKey = keyring.get(user, collection);
@@ -298,7 +329,7 @@ public class KeyringMigrationImplTest {
     @Test
     public void testRemove_centralKeyringEnabled_RemoveShouldReturnNull() throws Exception {
         // Given central keyring is enabled
-        keyring = new KeyringMigrationImpl(true, centralKeyring);
+        keyring = new KeyringMigrationImpl(enabled, centralKeyring, legacyKeyringCache, applicationKeys, sessionsService);
 
         // when remove is called
         keyring.remove(user, collection);
@@ -322,7 +353,7 @@ public class KeyringMigrationImplTest {
     public void testAdd_UserIsNullCentralKeyringEnabled_shouldThrowException() {
         // Given the user is null
         // And central keyring is enabled
-        keyring = new KeyringMigrationImpl(true, centralKeyring);
+        keyring = new KeyringMigrationImpl(enabled, centralKeyring, legacyKeyringCache, applicationKeys, sessionsService);
 
         // When add is called
         KeyringException ex = assertThrows(KeyringException.class, () -> keyring.add(null, null, null));
@@ -346,7 +377,7 @@ public class KeyringMigrationImplTest {
     @Test
     public void testAdd_CollectionIsNullCentralKeyringEnabled_shouldThrowException() {
         // Given the collection is null
-        keyring = new KeyringMigrationImpl(true, centralKeyring);
+        keyring = new KeyringMigrationImpl(enabled, centralKeyring, legacyKeyringCache, applicationKeys, sessionsService);
 
         // When add is called
         KeyringException ex = assertThrows(KeyringException.class, () -> keyring.add(user, null, null));
@@ -375,7 +406,7 @@ public class KeyringMigrationImplTest {
         when(collection.getDescription())
                 .thenReturn(null);
 
-        keyring = new KeyringMigrationImpl(true, centralKeyring);
+        keyring = new KeyringMigrationImpl(enabled, centralKeyring, legacyKeyringCache, applicationKeys, sessionsService);
 
         // When add is called
         KeyringException ex = assertThrows(KeyringException.class, () -> keyring.add(user, collection, null));
@@ -404,7 +435,7 @@ public class KeyringMigrationImplTest {
         when(description.getId())
                 .thenReturn(null);
 
-        keyring = new KeyringMigrationImpl(true, centralKeyring);
+        keyring = new KeyringMigrationImpl(enabled, centralKeyring, legacyKeyringCache, applicationKeys, sessionsService);
 
         // When add is called
         KeyringException ex = assertThrows(KeyringException.class, () -> keyring.add(user, collection, null));
@@ -433,7 +464,7 @@ public class KeyringMigrationImplTest {
         when(description.getId())
                 .thenReturn("");
 
-        keyring = new KeyringMigrationImpl(true, centralKeyring);
+        keyring = new KeyringMigrationImpl(enabled, centralKeyring, legacyKeyringCache, applicationKeys, sessionsService);
 
         // When add is called
         KeyringException ex = assertThrows(KeyringException.class, () -> keyring.add(user, collection, null));
@@ -457,7 +488,7 @@ public class KeyringMigrationImplTest {
     @Test
     public void testAdd_secretKeyIsNullCentralKeyringEnabled_shouldThrowException() {
         // Given the secret key is null
-        keyring = new KeyringMigrationImpl(true, centralKeyring);
+        keyring = new KeyringMigrationImpl(enabled, centralKeyring, legacyKeyringCache, applicationKeys, sessionsService);
 
         // When add is called
         KeyringException ex = assertThrows(KeyringException.class, () -> keyring.add(user, collection, null));
@@ -494,6 +525,147 @@ public class KeyringMigrationImplTest {
     public void testAdd_successCentralKeyringEnabled_shouldDoNothing() throws Exception {
         keyring.add(user, collection, secretKey);
 
+        verifyZeroInteractions(centralKeyring);
+    }
+
+    @Test
+    public void testPopulateFromUser_userNull_shouldThrowException() {
+        // Give the user is null
+
+        // When populate from user is called
+        KeyringException ex = assertThrows(KeyringException.class, () -> keyring.populateFromUser(null));
+
+        // Then an exception is thrown
+        assertThat(ex.getMessage(), equalTo(USER_NULL_ERR));
+        verifyZeroInteractions(centralKeyring, legacyKeyringCache, applicationKeys, sessionsService);
+    }
+
+    @Test
+    public void testPopulateFromUser_userNullCentralKeyringEnabled_shouldThrowException() {
+        // Give the user is null
+        // and central keyring is enabled
+        keyring = new KeyringMigrationImpl(enabled, centralKeyring, legacyKeyringCache, applicationKeys, sessionsService);
+
+        // When populate from user is called
+        KeyringException ex = assertThrows(KeyringException.class, () -> keyring.populateFromUser(null));
+
+        // Then an exception is thrown
+        assertThat(ex.getMessage(), equalTo(USER_NULL_ERR));
+        verifyZeroInteractions(centralKeyring, legacyKeyringCache, applicationKeys, sessionsService);
+    }
+
+    @Test
+    public void testPopulateFromUser_successCentralKeyringEnabled_shouldDoNothing() throws Exception {
+        // Give central keyring is enabled
+        keyring = new KeyringMigrationImpl(enabled, centralKeyring, legacyKeyringCache, applicationKeys, sessionsService);
+
+        // When populate from user is called
+        keyring.populateFromUser(user);
+
+        // Then no action is taken
+        verifyZeroInteractions(centralKeyring, legacyKeyringCache, applicationKeys, sessionsService);
+    }
+
+    @Test
+    public void testPopulateFromUser_userEmailNull_shouldThrowException() throws Exception {
+        // Give get user email is null
+        when(user.getEmail())
+                .thenReturn(null);
+
+        // When populate from user is called
+        KeyringException ex = assertThrows(KeyringException.class, () -> keyring.populateFromUser(user));
+
+        // Then an exception is thrown
+        assertThat(ex.getMessage(), equalTo(EMAIL_EMPTY_ERR));
+        verifyZeroInteractions(centralKeyring, legacyKeyringCache, applicationKeys, sessionsService);
+    }
+
+    @Test
+    public void testPopulateFromUser_userEmailEmpty_shouldThrowException() throws Exception {
+        // Give get user email is null
+        when(user.getEmail())
+                .thenReturn("");
+
+        // When populate from user is called
+        KeyringException ex = assertThrows(KeyringException.class, () -> keyring.populateFromUser(user));
+
+        // Then an exception is thrown
+        assertThat(ex.getMessage(), equalTo(EMAIL_EMPTY_ERR));
+        verifyZeroInteractions(centralKeyring, legacyKeyringCache, applicationKeys, sessionsService);
+    }
+
+    @Test
+    public void testPopulateFromUser_getSessionError_shouldThrowException() throws Exception {
+        // Give get user session returns an error
+        when(sessionsService.find(TEST_EMAIL))
+                .thenThrow(new IOException("Bert! Bert! You're shouting again Bert"));
+
+        // When populate from user is called
+        KeyringException ex = assertThrows(KeyringException.class, () -> keyring.populateFromUser(user));
+
+        // Then an exception is thrown
+        assertThat(ex.getMessage(), equalTo(GET_SESSION_ERR));
+        verify(sessionsService, times(1)).find(TEST_EMAIL);
+        verifyZeroInteractions(centralKeyring, legacyKeyringCache, applicationKeys);
+    }
+
+    @Test
+    public void testPopulateFromUser_getSessionReturnsNull_shouldThrowException() throws Exception {
+        // Give get user session returns null
+        when(sessionsService.find(TEST_EMAIL))
+                .thenReturn(null);
+
+        // When populate from user is called
+        KeyringException ex = assertThrows(KeyringException.class, () -> keyring.populateFromUser(user));
+
+        // Then an exception is thrown
+        assertThat(ex.getMessage(), equalTo(SESSION_NULL_ERR));
+        verify(sessionsService, times(1)).find(TEST_EMAIL);
+        verifyZeroInteractions(centralKeyring, legacyKeyringCache, applicationKeys);
+    }
+
+    @Test
+    public void testPopulateFromUser_legacyKeyringCacheError_shouldThrowException() throws Exception {
+        // Give get legacy keyring cache throws exception
+        doThrow(IOException.class)
+                .when(legacyKeyringCache)
+                .put(user, session);
+
+        // When populate from user is called
+        KeyringException ex = assertThrows(KeyringException.class, () -> keyring.populateFromUser(user));
+
+        // Then an exception is thrown
+        assertThat(ex.getMessage(), equalTo(LEGACY_CACHE_ERR));
+        verify(sessionsService, times(1)).find(TEST_EMAIL);
+        verify(legacyKeyringCache, times(1)).put(user, session);
+        verifyZeroInteractions(centralKeyring, applicationKeys);
+    }
+
+    @Test
+    public void testPopulateFromUser_userKeyringIsNull_shouldThrowException() throws Exception {
+        // Give the user keyring is null
+        when(user.keyring())
+                .thenReturn(null);
+
+        // When populate from user is called
+        KeyringException ex = assertThrows(KeyringException.class, () -> keyring.populateFromUser(user));
+
+        // Then an exception is thrown
+        assertThat(ex.getMessage(), equalTo(USER_KEYRING_NULL_ERR));
+        verifyZeroInteractions(sessionsService, legacyKeyringCache, centralKeyring, applicationKeys);
+    }
+
+    @Test
+    public void testPopulateFromUser_success_shouldPopulateLegacyKeyringCache() throws Exception {
+        // Give there are no errors
+
+        // When populate from user is called
+        keyring.populateFromUser(user);
+
+        // Then the legacy keyring cache and application keys are populate from the user keyring
+        verify(sessionsService, times(1)).find(TEST_EMAIL);
+        verify(legacyKeyringCache, times(1)).put(user, session);
+        verify(applicationKeys, times(1)).populateCacheFromUserKeyring(legacyKeyring);
         verifyZeroInteractions(centralKeyring);
     }
 

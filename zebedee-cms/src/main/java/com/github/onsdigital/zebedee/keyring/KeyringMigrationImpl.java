@@ -1,10 +1,15 @@
 package com.github.onsdigital.zebedee.keyring;
 
 import com.github.onsdigital.zebedee.model.Collection;
+import com.github.onsdigital.zebedee.model.KeyringCache;
+import com.github.onsdigital.zebedee.model.encryption.ApplicationKeys;
+import com.github.onsdigital.zebedee.session.model.Session;
+import com.github.onsdigital.zebedee.session.service.Sessions;
 import com.github.onsdigital.zebedee.user.model.User;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.crypto.SecretKey;
+import java.io.IOException;
 
 /**
  * KeyringMigrationImpl is an abstraction in front of the existing keyring funtionality. This abstraction enables us to
@@ -27,9 +32,16 @@ public class KeyringMigrationImpl implements Keyring {
     static final String COLLECTION_ID_EMPTY_ERR = "collection ID required but was null/empty";
     static final String USER_KEYRING_NULL_ERR = "user keyring expected was null";
     static final String SECRET_KEY_NULL_ERR = "secret key required but was null";
+    static final String GET_SESSION_ERR = "error getting user session";
+    static final String EMAIL_EMPTY_ERR = "user email required but was empty";
+    static final String SESSION_NULL_ERR = "user session required but was null";
+    static final String LEGACY_CACHE_ERR = "error populating legacy keyring cache from user";
 
-    private Keyring centralKeyring;
     private boolean centralKeyringEnabled;
+    private Keyring centralKeyring;
+    private KeyringCache legacyKeyringCache;
+    private ApplicationKeys applicationKeys;
+    private Sessions sessionsService;
 
     /**
      * Construct a new instance of the the keyring.
@@ -38,14 +50,38 @@ public class KeyringMigrationImpl implements Keyring {
      *                              existing legacy keyring implementation
      * @param centralKeyring        the new central keyring implemnetation to use.
      */
-    public KeyringMigrationImpl(boolean centralKeyringEnabled, Keyring centralKeyring) {
+    public KeyringMigrationImpl(boolean centralKeyringEnabled, Keyring centralKeyring, KeyringCache legacyKeyringCache,
+                                ApplicationKeys applicationKeys, Sessions sessionsService) {
         this.centralKeyring = centralKeyring;
         this.centralKeyringEnabled = centralKeyringEnabled;
+        this.legacyKeyringCache = legacyKeyringCache;
+        this.applicationKeys = applicationKeys;
+        this.sessionsService = sessionsService;
     }
 
     @Override
     public void populateFromUser(User user) throws KeyringException {
-        // TODO
+        validateUser(user);
+
+        if (centralKeyringEnabled) {
+            return;
+        }
+
+        populateLegacyKeyringCacheFromUser(user);
+    }
+
+    private void populateLegacyKeyringCacheFromUser(User user) throws KeyringException {
+        com.github.onsdigital.zebedee.json.Keyring userKeyring = getUserKeyring(user);
+
+        Session session = getUserSession(user);
+
+        try {
+            legacyKeyringCache.put(user, session);
+        } catch (IOException ex) {
+            throw new KeyringException(LEGACY_CACHE_ERR, ex);
+        }
+
+        applicationKeys.populateCacheFromUserKeyring(userKeyring);
     }
 
     @Override
@@ -131,6 +167,30 @@ public class KeyringMigrationImpl implements Keyring {
         }
 
         return userKeyring;
+    }
+
+    private String getUserEmail(User user) throws KeyringException {
+        if (StringUtils.isEmpty(user.getEmail())) {
+            throw new KeyringException(EMAIL_EMPTY_ERR);
+        }
+
+        return user.getEmail();
+    }
+
+    private Session getUserSession(User user) throws KeyringException {
+        String email = getUserEmail(user);
+
+        Session session = null;
+        try {
+            session = sessionsService.find(email);
+        } catch (IOException ex) {
+            throw new KeyringException(GET_SESSION_ERR, ex);
+        }
+
+        if (session == null) {
+            throw new KeyringException(SESSION_NULL_ERR);
+        }
+        return session;
     }
 
 }

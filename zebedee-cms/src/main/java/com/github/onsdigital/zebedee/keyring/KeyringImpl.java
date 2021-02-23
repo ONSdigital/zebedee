@@ -101,12 +101,12 @@ public class KeyringImpl implements Keyring {
 
     @Override
     public void remove(User user, Collection collection) throws KeyringException {
-
+        // TODO
     }
 
     @Override
     public void add(User user, Collection collection, SecretKey key) throws KeyringException {
-
+        // TODO
     }
 
     private void validGetParams(User user, Collection collection) throws KeyringException {

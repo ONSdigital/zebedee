@@ -62,7 +62,7 @@ public class KeyringMigrationImpl implements Keyring {
     }
 
     private void addKeyToLegacyKeyring(User user, Collection collection, SecretKey key) throws KeyringException {
-        getUseKeyring(user).put(collection.getDescription().getId(), key);
+        getUserKeyring(user).put(collection.getDescription().getId(), key);
     }
 
     @Override
@@ -78,7 +78,7 @@ public class KeyringMigrationImpl implements Keyring {
     }
 
     private SecretKey getFromLegacyKeyring(User user, Collection collection) throws KeyringException {
-        return getUseKeyring(user).get(collection.getDescription().getId());
+        return getUserKeyring(user).get(collection.getDescription().getId());
     }
 
     @Override
@@ -94,7 +94,7 @@ public class KeyringMigrationImpl implements Keyring {
     }
 
     private void removeFromLegacyKeyring(User user, Collection collection) throws KeyringException {
-        getUseKeyring(user).remove(collection.getDescription().getId());
+        getUserKeyring(user).remove(collection.getDescription().getId());
     }
 
     private void validateUser(User user) throws KeyringException {
@@ -123,7 +123,7 @@ public class KeyringMigrationImpl implements Keyring {
         }
     }
 
-    private com.github.onsdigital.zebedee.json.Keyring getUseKeyring(User user) throws KeyringException {
+    private com.github.onsdigital.zebedee.json.Keyring getUserKeyring(User user) throws KeyringException {
         com.github.onsdigital.zebedee.json.Keyring userKeyring = user.keyring();
 
         if (userKeyring == null) {

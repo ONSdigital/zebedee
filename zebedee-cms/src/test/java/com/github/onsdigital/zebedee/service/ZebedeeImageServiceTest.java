@@ -93,18 +93,12 @@ public class ZebedeeImageServiceTest {
     @Test
     public void testPublishImagesInCollection_unexpectedPaging() throws Exception {
         // Given an api that returns one page of good images but with more pages available
-        Images testImages = createTestImages(IMAGE1,IMAGE2);
+        Images testImages = createTestImages(IMAGE1, IMAGE2);
         testImages.setTotalCount(3);
         when(mockImageAPI.getImages(COLLECTION_ID)).thenReturn(testImages);
         ImageService imageService = new ZebedeeImageService(mockImageAPI);
 
-        // When publish is called on the collection
-        Exception caughtException = null;
-        try {
-            imageService.publishImagesInCollection(mockCollection);
-        } catch (IOException e) {
-            caughtException = e;
-        }
+        Exception ex = Assert.assertThrows(IOException.class, () -> imageService.publishImagesInCollection(mockCollection));
 
         // Then publishImage should be called on the API for each image that it does have.
         ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
@@ -113,8 +107,7 @@ public class ZebedeeImageServiceTest {
         Assert.assertEquals(IMAGE2, captor.getAllValues().get(1));
 
         // Then an IOException is expected (because zebedee uses IOExceptions inappropriately)
-        Assert.assertNotNull(caughtException);
-        Assert.assertEquals(IOException.class,caughtException.getClass());
+        Assert.assertEquals("Not all images have been published due to API paging", ex.getMessage());
     }
 
     private Image createTestImage(String id) {

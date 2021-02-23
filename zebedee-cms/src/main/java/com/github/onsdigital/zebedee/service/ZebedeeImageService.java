@@ -32,6 +32,10 @@ public class ZebedeeImageService implements ImageService {
             imageClient.publishImage(image.getId());
         }
 
+        // Image API does not implement paging. Capture scenario if it is implemented unexpectedly.
+        if (images.getTotalCount() > images.getCount()) {
+            throw new IOException("Not all images have been published due to API paging");
+        }
     }
 
 }

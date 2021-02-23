@@ -64,6 +64,7 @@ public class Publisher {
 
     private static final List<Host> theTrainHosts;
     private static final ExecutorService pool = Executors.newFixedThreadPool(20);
+    private static final ExecutorService apiPool = Executors.newFixedThreadPool(5);
 
     // endpoints
     private static final String BEGIN_ENDPOINT = "begin";
@@ -105,6 +106,11 @@ public class Publisher {
             throws IOException {
         boolean success = false;
 
+        Future<Boolean> imageFuture = null;
+        if (CMSFeatureFlags.cmsFeatureFlags().isImagePublishingEnabled()) {
+            imageFuture = publishImages(collection);
+        }
+
         publishFilteredCollectionFiles(collection, collectionReader);
 
         if (CMSFeatureFlags.cmsFeatureFlags().isVerifyPublishEnabled()) {
@@ -120,6 +126,14 @@ public class Publisher {
         // FIXME CMD feature
         if (cmsFeatureFlags().isEnableDatasetImport()) {
             success &= publishDatasets(collection);
+        }
+
+        if (imageFuture != null) {
+            try {
+                success = success && imageFuture.get();
+            } catch (InterruptedException | ExecutionException e) {
+                success = false;
+            }
         }
 
         info().data("milliseconds", collection.getPublishTimeMilliseconds())
@@ -175,15 +189,7 @@ public class Publisher {
                         return false;
                     }
 
-                    Future<Boolean> imageFuture = publishImages(collection);
-
                     publishComplete = publishFilesToWebsite(collection, email, collectionReader);
-
-                    try {
-                        publishComplete &= imageFuture.get().booleanValue();
-                    } catch (InterruptedException | ExecutionException e) {
-                        publishComplete = false;
-                    }
 
                     info().data("publishing", true).data("collectionId", collectionId)
                             .data("timeTaken", (System.currentTimeMillis() - publishStart))
@@ -706,7 +712,7 @@ public class Publisher {
     private static Future<Boolean> publishImages(Collection collection){
         String collectionId = collection.getDescription().getId();
 
-        return pool.submit(() -> {
+        return apiPool.submit(() -> {
             Boolean complete = false;
             try {
                 imageServiceSupplier.getService().publishImagesInCollection(collection);

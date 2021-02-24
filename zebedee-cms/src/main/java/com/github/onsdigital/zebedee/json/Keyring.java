@@ -15,15 +15,15 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 
 /**
  * Represents the encryption keys needed for a user account to access collections.
  */
 public class Keyring implements Cloneable {
 
-    public transient Map<String, SecretKey> keys = new ConcurrentHashMap<>();
+    private transient Map<String, SecretKey> keys = new ConcurrentHashMap<>();
     // Key storage:
     private String privateKeySalt;
     private String privateKey;
@@ -227,5 +227,12 @@ public class Keyring implements Cloneable {
     @Override
     public String toString() {
         return keyring.keySet().toString();
+    }
+
+    public Set<String> keySet() {
+        if (keyring != null) {
+            return keyring.keySet();
+        }
+        return null;
     }
 }

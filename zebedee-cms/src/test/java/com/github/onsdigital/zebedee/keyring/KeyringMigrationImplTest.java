@@ -14,6 +14,8 @@ import org.mockito.MockitoAnnotations;
 
 import javax.crypto.SecretKey;
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 import static com.github.onsdigital.zebedee.keyring.KeyringImpl.COLLECTION_NULL_ERR;
 import static com.github.onsdigital.zebedee.keyring.KeyringImpl.USER_NULL_ERR;
@@ -30,6 +32,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -667,6 +670,72 @@ public class KeyringMigrationImplTest {
         verify(legacyKeyringCache, times(1)).put(user, session);
         verify(applicationKeys, times(1)).populateCacheFromUserKeyring(legacyKeyring);
         verifyZeroInteractions(centralKeyring);
+    }
+
+    @Test
+    public void testList_userNull_shouldThrowException() {
+        // Given the user is null
+
+        // When list is called
+        KeyringException ex = assertThrows(KeyringException.class, () -> keyring.list(null));
+
+        // Then an exception is thrown
+        assertThat(ex.getMessage(), equalTo(USER_NULL_ERR));
+    }
+
+    @Test
+    public void testList_userNullCentralKeyringEnabled_shouldReturnNothing() throws KeyringException {
+        // Given the user is null
+        // And the central keyring is enabled
+        keyring = new KeyringMigrationImpl(enabled, centralKeyring, legacyKeyringCache, applicationKeys, sessionsService);
+
+        // When list is called
+        Set<String> actual = keyring.list(null);
+
+        // Then an exception is thrown
+        assertThat(actual, is(nullValue()));
+    }
+
+    @Test
+    public void testList_userKeyringNull_shouldThrowException() {
+        // Given user keyring is null
+        when(user.keyring())
+                .thenReturn(null);
+
+        // When list is called
+        KeyringException ex = assertThrows(KeyringException.class, () -> keyring.list(user));
+
+        // Then an exception is thrown
+        assertThat(ex.getMessage(), equalTo(USER_KEYRING_NULL_ERR));
+    }
+
+    @Test
+    public void testList_userKeyringEmpty_shouldReturnEmptySet() throws KeyringException {
+        // Give user keyring is empty
+        when(legacyKeyring.keySet())
+                .thenReturn(new HashSet<>());
+
+        // When list is called
+        Set<String> actual = keyring.list(user);
+
+        // Then empty set returned
+        assertTrue(actual.isEmpty());
+    }
+
+    @Test
+    public void testList_userKeyringIsNotEmpty_shouldReturnSet() throws KeyringException {
+        // Give user keyring is empty
+        when(legacyKeyring.keySet())
+                .thenReturn(new HashSet<String>() {{
+                    add(TEST_COLLECTION_ID);
+                }});
+
+        // When list is called
+        Set<String> actual = keyring.list(user);
+
+        // Then empty set returned
+        assertThat(actual.size(), equalTo(1));
+        assertTrue(actual.contains(TEST_COLLECTION_ID));
     }
 
 }

@@ -235,6 +235,11 @@
                                     <version>0.9.2.1</version>
                                 </exlude>
                                 <!-- End Trello #1717 -->
+                                <exlude>
+                                    <groupId>org.bouncycastle</groupId>
+                                    <artifactId>bcprov-jdk15on</artifactId>
+                                    <version>1.65</version>
+                                </exlude>
                             </excludeCoordinates>
                 </configuration>
             </plugin>

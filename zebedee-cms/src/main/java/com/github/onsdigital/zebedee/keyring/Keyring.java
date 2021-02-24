@@ -33,4 +33,14 @@ public interface Keyring {
      * @throws KeyringException problem removing the key.
      */
     void remove(User user, Collection collection) throws KeyringException;
+
+    /**
+     * Add a key to the keyring.
+     *
+     * @param user       the user adding the key.
+     * @param collection the {@link Collection} the key belongs to.
+     * @param key        the {@link SecretKey} to add.
+     * @throws KeyringException problem adding the key to the keyring.
+     */
+    void add(User user, Collection collection, SecretKey key) throws KeyringException;
 }

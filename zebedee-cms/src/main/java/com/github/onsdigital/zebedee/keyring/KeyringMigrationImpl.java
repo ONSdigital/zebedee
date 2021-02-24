@@ -25,8 +25,8 @@ public class KeyringMigrationImpl implements Keyring {
     static final String COLLECTION_NULL_ERR = "collection required but was null";
     static final String COLLECTION_DESC_NULL_ERR = "collection description required but was null";
     static final String COLLECTION_ID_EMPTY_ERR = "collection ID required but was null/empty";
-
     static final String USER_KEYRING_NULL_ERR = "user keyring expected was null";
+    static final String SECRET_KEY_NULL_ERR = "secret key required but was null";
 
     private Keyring centralKeyring;
     private boolean centralKeyringEnabled;
@@ -49,8 +49,26 @@ public class KeyringMigrationImpl implements Keyring {
     }
 
     @Override
+    public void add(User user, Collection collection, SecretKey key) throws KeyringException {
+        validateUser(user);
+        validateCollection(collection);
+        validateSecretKey(key);
+
+        if (centralKeyringEnabled) {
+            return;
+        }
+
+        addKeyToLegacyKeyring(user, collection, key);
+    }
+
+    private void addKeyToLegacyKeyring(User user, Collection collection, SecretKey key) throws KeyringException {
+        getUserKeyring(user).put(collection.getDescription().getId(), key);
+    }
+
+    @Override
     public SecretKey get(User user, Collection collection) throws KeyringException {
-        validate(user, collection);
+        validateUser(user);
+        validateCollection(collection);
 
         if (centralKeyringEnabled) {
             return null;
@@ -59,9 +77,14 @@ public class KeyringMigrationImpl implements Keyring {
         return getFromLegacyKeyring(user, collection);
     }
 
+    private SecretKey getFromLegacyKeyring(User user, Collection collection) throws KeyringException {
+        return getUserKeyring(user).get(collection.getDescription().getId());
+    }
+
     @Override
     public void remove(User user, Collection collection) throws KeyringException {
-        validate(user, collection);
+        validateUser(user);
+        validateCollection(collection);
 
         if (centralKeyringEnabled) {
             return;
@@ -71,28 +94,16 @@ public class KeyringMigrationImpl implements Keyring {
     }
 
     private void removeFromLegacyKeyring(User user, Collection collection) throws KeyringException {
-        com.github.onsdigital.zebedee.json.Keyring userKeyring = user.keyring();
-        if (userKeyring == null) {
-            throw new KeyringException(USER_KEYRING_NULL_ERR);
-        }
-
-        userKeyring.remove(collection.getDescription().getId());
+        getUserKeyring(user).remove(collection.getDescription().getId());
     }
 
-    private SecretKey getFromLegacyKeyring(User user, Collection collection) throws KeyringException {
-        com.github.onsdigital.zebedee.json.Keyring userKeyring = user.keyring();
-        if (userKeyring == null) {
-            throw new KeyringException(USER_KEYRING_NULL_ERR);
-        }
-
-        return userKeyring.get(collection.getDescription().getId());
-    }
-
-    private void validate(User user, Collection collection) throws KeyringException {
+    private void validateUser(User user) throws KeyringException {
         if (user == null) {
             throw new KeyringException(USER_NULL_ERR);
         }
+    }
 
+    private void validateCollection(Collection collection) throws KeyringException {
         if (collection == null) {
             throw new KeyringException(COLLECTION_NULL_ERR);
         }
@@ -105,4 +116,21 @@ public class KeyringMigrationImpl implements Keyring {
             throw new KeyringException(COLLECTION_ID_EMPTY_ERR);
         }
     }
+
+    private void validateSecretKey(SecretKey key) throws KeyringException {
+        if (key == null) {
+            throw new KeyringException(SECRET_KEY_NULL_ERR);
+        }
+    }
+
+    private com.github.onsdigital.zebedee.json.Keyring getUserKeyring(User user) throws KeyringException {
+        com.github.onsdigital.zebedee.json.Keyring userKeyring = user.keyring();
+
+        if (userKeyring == null) {
+            throw new KeyringException(USER_KEYRING_NULL_ERR);
+        }
+
+        return userKeyring;
+    }
+
 }

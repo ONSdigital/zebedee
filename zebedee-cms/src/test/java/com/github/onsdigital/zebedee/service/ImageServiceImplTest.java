@@ -17,7 +17,7 @@ import java.util.List;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
 
-public class ZebedeeImageServiceTest {
+public class ImageServiceImplTest {
 
     private static final String COLLECTION_ID = "col123";
     private static final String IMAGE1 = "i1";
@@ -39,7 +39,7 @@ public class ZebedeeImageServiceTest {
     public void testPublishImagesInCollection_threeImages() throws Exception {
         // Given an api that returns three images
         when(mockImageAPI.getImages(COLLECTION_ID)).thenReturn(createTestImages(IMAGE1, IMAGE2, IMAGE3));
-        ImageService imageService = new ZebedeeImageService(mockImageAPI);
+        ImageService imageService = new ImageServiceImpl(mockImageAPI);
 
         // When publish is called on the collection
         imageService.publishImagesInCollection(mockCollection);
@@ -56,7 +56,7 @@ public class ZebedeeImageServiceTest {
     public void testPublishImagesInCollection_zeroImages() throws Exception {
         // Given an api that returns zero images
         when(mockImageAPI.getImages(COLLECTION_ID)).thenReturn(createTestImages());
-        ImageService imageService = new ZebedeeImageService(mockImageAPI);
+        ImageService imageService = new ImageServiceImpl(mockImageAPI);
 
         // When publish is called on the collection
         imageService.publishImagesInCollection(mockCollection);
@@ -69,7 +69,7 @@ public class ZebedeeImageServiceTest {
     public void testPublishImagesInCollection_getImagesException() throws Exception {
         // Given an api that returns throws an exception when getting publishable images
         when(mockImageAPI.getImages(COLLECTION_ID)).thenThrow(apiException);
-        ImageService imageService = new ZebedeeImageService(mockImageAPI);
+        ImageService imageService = new ImageServiceImpl(mockImageAPI);
 
         // When publish is called on the collection
         imageService.publishImagesInCollection(mockCollection);
@@ -82,7 +82,7 @@ public class ZebedeeImageServiceTest {
         // Given an api that returns a good image but throws an exception when publishing
         when(mockImageAPI.getImages(COLLECTION_ID)).thenReturn(createTestImages(IMAGE1));
         doThrow(apiException).when(mockImageAPI).publishImage(anyString());
-        ImageService imageService = new ZebedeeImageService(mockImageAPI);
+        ImageService imageService = new ImageServiceImpl(mockImageAPI);
 
         // When publish is called on the collection
         imageService.publishImagesInCollection(mockCollection);
@@ -96,7 +96,7 @@ public class ZebedeeImageServiceTest {
         Images testImages = createTestImages(IMAGE1, IMAGE2);
         testImages.setTotalCount(3);
         when(mockImageAPI.getImages(COLLECTION_ID)).thenReturn(testImages);
-        ImageService imageService = new ZebedeeImageService(mockImageAPI);
+        ImageService imageService = new ImageServiceImpl(mockImageAPI);
 
         Exception ex = Assert.assertThrows(IOException.class, () -> imageService.publishImagesInCollection(mockCollection));
 

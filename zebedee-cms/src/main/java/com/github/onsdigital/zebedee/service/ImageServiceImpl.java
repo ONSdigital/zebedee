@@ -11,11 +11,16 @@ import java.io.IOException;
 /**
  * Image related services
  */
-public class ZebedeeImageService implements ImageService {
+public class ImageServiceImpl implements ImageService {
 
     private ImageClient imageClient;
 
-    public ZebedeeImageService(ImageClient imageClient) {
+    /**
+     * Construct a new instance of the the image service
+     *
+     * @param imageClient An instance of an Image API client to be used by the service
+     */
+    public ImageServiceImpl(ImageClient imageClient) {
         this.imageClient = imageClient;
     }
 

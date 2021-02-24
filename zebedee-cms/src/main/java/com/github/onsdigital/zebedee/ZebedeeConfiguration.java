@@ -206,7 +206,7 @@ public class ZebedeeConfiguration {
             throw new RuntimeException(e);
         }
 
-        imageService = new ZebedeeImageService(imageClient);
+        imageService = new ImageServiceImpl(imageClient);
 
         info().data("root_path", rootPath.toString())
                 .data("zebedee_path", zebedeePath.toString())

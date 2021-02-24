@@ -45,7 +45,6 @@ import static org.mockito.Mockito.when;
  */
 public class SessionsServiceServiceImplTest {
 
-    private static ObjectMapper OBJ_MAPPER = new ObjectMapper();
     private static final String EMAIL = "TEST@ons.gov.uk";
     private static final String PWD = "1 2 3 4";
     private static final String SESSION_ID = "1234567890";
@@ -53,9 +52,6 @@ public class SessionsServiceServiceImplTest {
 
     @Rule
     public TemporaryFolder rootDir = new TemporaryFolder();
-
-    @Mock
-    private UsersService usersService;
 
     @Mock
     private Supplier<String> randomIdGenerator;

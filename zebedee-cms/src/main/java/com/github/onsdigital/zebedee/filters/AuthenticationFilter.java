@@ -77,6 +77,7 @@ public class AuthenticationFilter implements PreFilter {
         boolean result = false;
         try {
             Session session = Root.zebedee.getSessions().get(request);
+
             if (session == null) {
                 forbidden(response);
             } else {

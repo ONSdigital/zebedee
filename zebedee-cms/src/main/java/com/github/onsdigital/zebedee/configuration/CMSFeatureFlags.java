@@ -14,6 +14,8 @@ public class CMSFeatureFlags {
     public static final String ENABLE_PERMISSIONS_AUTH = "ENABLE_PERMISSIONS_AUTH";
     private static final String ENABLE_VERIFY_PUBLISH_CONTENT = "ENABLE_VERIFY_PUBLISH_CONTENT";
     private static final String ENABLE_DATASET_VERSION_VERIFICATION = "ENABLE_DATASET_VERSION_VERIFICATION";
+    private static final String ENABLE_SESSIONS_API = "ENABLE_SESSIONS_API";
+    private static final String ENABLE_CENTRALISED_KEYRING = "ENABLE_CENTRALISED_KEYRING";
 
     /**
      * Singleton instance
@@ -28,6 +30,10 @@ public class CMSFeatureFlags {
 
     private final boolean isDatasetVersionVerificationEnabled;
 
+    private final boolean isSessionAPIEnabled;
+
+    private final boolean isCentralisedKeyringEnabled;
+
     /**
      * Construct a new feature flags instance.
      */
@@ -36,11 +42,15 @@ public class CMSFeatureFlags {
         this.isPermissionsAuthEnabled = Boolean.valueOf(getConfigValue(ENABLE_PERMISSIONS_AUTH));
         this.isVerifyPublishEnabled = Boolean.valueOf(getConfigValue(ENABLE_VERIFY_PUBLISH_CONTENT));
         this.isDatasetVersionVerificationEnabled = Boolean.valueOf(getConfigValue(ENABLE_DATASET_VERSION_VERIFICATION));
+        this.isSessionAPIEnabled = Boolean.valueOf(getConfigValue(ENABLE_SESSIONS_API));
+        this.isCentralisedKeyringEnabled = Boolean.valueOf(getConfigValue(ENABLE_CENTRALISED_KEYRING));
 
         info().data(ENABLE_DATASET_IMPORT, isDatasetImportEnabled)
                 .data(ENABLE_PERMISSIONS_AUTH, isPermissionsAuthEnabled)
                 .data(ENABLE_VERIFY_PUBLISH_CONTENT, isVerifyPublishEnabled)
                 .data(ENABLE_DATASET_VERSION_VERIFICATION, isDatasetVersionVerificationEnabled)
+                .data(ENABLE_SESSIONS_API, isSessionAPIEnabled)
+                .data(ENABLE_CENTRALISED_KEYRING, isCentralisedKeyringEnabled)
                 .log("CMS feature flags configurations");
     }
 
@@ -77,6 +87,14 @@ public class CMSFeatureFlags {
      */
     public boolean isDatasetVersionVerificationEnabled() {
         return this.isDatasetVersionVerificationEnabled;
+    }
+
+    public boolean isSessionAPIEnabled() {
+        return this.isSessionAPIEnabled;
+    }
+
+    public boolean isCentralisedKeyringEnabled() {
+        return isCentralisedKeyringEnabled;
     }
 
     public static String getConfigValue(String name) {

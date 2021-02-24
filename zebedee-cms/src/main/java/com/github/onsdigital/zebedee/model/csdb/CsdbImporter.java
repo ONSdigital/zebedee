@@ -226,7 +226,7 @@ public class CsdbImporter {
      * @throws ZebedeeException
      */
     public void preProcessCollection(Collection collection) throws IOException, ZebedeeException, URISyntaxException {
-        SecretKey collectionKey = Root.zebedee.getKeyringCache().schedulerCache.get(collection.getDescription().getId());
+        SecretKey collectionKey = Root.zebedee.getLegacyKeyringCache().getSchedulerCache().get(collection.getDescription().getId());
         CollectionReader collectionReader = new ZebedeeCollectionReader(collection, collectionKey);
         CollectionWriter collectionWriter = new ZebedeeCollectionWriter(collection, collectionKey);
         ContentReader publishedReader = new FileSystemContentReader(Root.zebedee.getPublished().path);

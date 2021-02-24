@@ -191,6 +191,12 @@
             <version>${fasterxml.jackson.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.github.onsdigital</groupId>
+            <artifactId>dp-session-service-client-java</artifactId>
+            <version>0.2.1</version>
+        </dependency>
+
     </dependencies>
 
     <build>

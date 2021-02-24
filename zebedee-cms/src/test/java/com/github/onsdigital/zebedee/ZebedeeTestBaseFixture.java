@@ -1,9 +1,15 @@
 package com.github.onsdigital.zebedee;
 
+import com.github.onsdigital.zebedee.json.Credentials;
+import com.github.onsdigital.zebedee.keyring.Keyring;
 import com.github.onsdigital.zebedee.model.Collection;
-import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
+import com.github.onsdigital.zebedee.model.KeyringCache;
+import com.github.onsdigital.zebedee.model.encryption.ApplicationKeys;
 import com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDao;
 import com.github.onsdigital.zebedee.service.ServiceSupplier;
+import com.github.onsdigital.zebedee.session.model.Session;
+import com.github.onsdigital.zebedee.session.service.Sessions;
+import com.github.onsdigital.zebedee.session.service.SessionsAPIServiceImpl;
 import com.github.onsdigital.zebedee.user.model.User;
 import com.github.onsdigital.zebedee.user.model.UserList;
 import com.github.onsdigital.zebedee.user.service.UsersService;
@@ -17,10 +23,12 @@ import org.mockito.stubbing.Answer;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import javax.crypto.SecretKey;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.when;
 
@@ -29,8 +37,10 @@ import static org.mockito.Mockito.when;
  */
 public abstract class ZebedeeTestBaseFixture {
 
+    static final String TEST_EMAIL = "test@ons.gov.uk";
+
     @Mock
-    private UsersService usersService;
+    protected UsersService usersService;
 
     @Mock
     private KeyManangerUtil keyManangerUtil;
@@ -39,7 +49,34 @@ public abstract class ZebedeeTestBaseFixture {
     private CollectionHistoryDao collectionHistoryDao;
 
     @Mock
-    private PermissionsService permissionsService;
+    private SessionsAPIServiceImpl sessionsService;
+
+    @Mock
+    protected ZebedeeConfiguration zebCfg;
+
+    @Mock
+    protected Sessions sessions;
+
+    @Mock
+    protected ApplicationKeys applicationKeys;
+
+    @Mock
+    protected KeyringCache legacyKeyringCache;
+
+    @Mock
+    protected Keyring keyring;
+
+    @Mock
+    protected Credentials credentials;
+
+    @Mock
+    protected User user;
+
+    @Mock
+    protected com.github.onsdigital.zebedee.json.Keyring legacyKeyring;
+
+    @Mock
+    protected Session userSession;
 
     protected Zebedee zebedee;
     protected Builder builder;
@@ -60,6 +97,8 @@ public abstract class ZebedeeTestBaseFixture {
 
         ReflectionTestUtils.setField(zebedee, "usersService", usersService);
         ReflectionTestUtils.setField(zebedee.getPermissionsService(), "usersServiceSupplier", usersServiceServiceSupplier);
+        ReflectionTestUtils.setField(zebedee, "sessions", sessionsService);
+        ReflectionTestUtils.setField(zebedee, "legacyKeyringCache", new KeyringCache(sessionsService));
 
         ServiceSupplier<CollectionHistoryDao> collectionHistoryDaoServiceSupplier = () -> collectionHistoryDao;
 
@@ -78,10 +117,20 @@ public abstract class ZebedeeTestBaseFixture {
         when(usersService.list())
                 .thenReturn(usersList);
 
+        Session session = new Session();
+        session.setEmail(builder.publisher1.getEmail());
+        session.setId("1234");
+        session.setLastAccess(new Date());
+        session.setStart(new Date());
+
+        when(sessionsService.create(any(User.class))).thenReturn(session);
+        when(sessionsService.get(anyString())).thenReturn(session);
+        when(sessionsService.find(anyString())).thenReturn(session);
+
         Map<String, String> emailToCreds = new HashMap<>();
         emailToCreds.put(builder.publisher1.getEmail(), builder.publisher1Credentials.password);
 
-        // UsersService is now mocked so needs to add this mannually.
+        // UsersService is now mocked so needs to add this manually.
         doAnswer(new Answer() {
             @Override
             public Object answer(InvocationOnMock invocationOnMock) throws Throwable {
@@ -98,6 +147,23 @@ public abstract class ZebedeeTestBaseFixture {
         }).when(keyManangerUtil).assignKeyToUser(any(), any(), any(), any());
 
         setUp();
+    }
+
+    protected void setUpOpenSessionsTestMocks() {
+        when(zebCfg.getSessions())
+                .thenReturn(sessions);
+
+        when(zebCfg.getUsersService())
+                .thenReturn(usersService);
+
+        when(zebCfg.getApplicationKeys())
+                .thenReturn(applicationKeys);
+
+        when(zebCfg.getKeyringCache())
+                .thenReturn(legacyKeyringCache);
+
+        when(zebCfg.getCollectionKeyring())
+                .thenReturn(keyring);
     }
 
     public abstract void setUp() throws Exception;

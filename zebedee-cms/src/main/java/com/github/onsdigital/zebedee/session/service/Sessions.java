@@ -5,7 +5,6 @@ import com.github.onsdigital.zebedee.user.model.User;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.util.Date;
 
 public interface Sessions {
 
@@ -46,27 +45,11 @@ public interface Sessions {
     Session find(String email) throws IOException;
 
     /**
-     * Check if an active {@link Session} exists with the provided ID.
-     *
-     * @param id the session ID to find.
-     * @return true if an active session exists with this ID, false otherwise.
-     * @throws IOException problem checking the session exists.
-     */
-    boolean exists(String id) throws IOException;
-
-    /**
      * Check if the provided {@link Session} is expired.
      *
      * @param session the {@link Session} to check.
      * @return true if expired, false otherwise.
      */
+    @Deprecated
     boolean expired(Session session);
-
-    /**
-     * Get the expiry date of the provided {@link Session}
-     *
-     * @param session the  {@link Session} to use.
-     * @return the sessions expiration date time as a {@link Date} instance.
-     */
-    Date getExpiryDate(Session session);
 }

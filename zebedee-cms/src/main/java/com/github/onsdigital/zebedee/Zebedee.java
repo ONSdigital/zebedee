@@ -51,6 +51,7 @@ public class Zebedee {
     public static final String LAUNCHPAD = "launchpad";
     public static final String APPLICATION_KEYS = "application-keys";
     public static final String SERVICES = "services";
+    public static final String KEYRING = "keyring";
 
     private final Path publishedCollectionsPath;
     private final Path collectionsPath;
@@ -61,13 +62,14 @@ public class Zebedee {
     private final Path applicationKeysPath;
     private final Path redirectPath;
     private final Path servicePath;
+    private final Path keyRingPath;
 
     private final VerificationAgent verificationAgent;
     private final ApplicationKeys applicationKeys;
     private final PublishedCollections publishedCollections;
     private final Collections collections;
     private final Content published;
-    private final KeyringCache keyringCache;
+    private final KeyringCache legacyKeyringCache;
     private final Path publishedContentPath;
     private final Path path;
     private final PermissionsService permissionsService;
@@ -88,7 +90,7 @@ public class Zebedee {
         this.path = configuration.getZebedeePath();
         this.publishedContentPath = configuration.getPublishedContentPath();
         this.sessions = configuration.getSessions();
-        this.keyringCache = configuration.getKeyringCache();
+        this.legacyKeyringCache = configuration.getKeyringCache();
         this.permissionsService = configuration.getPermissionsService();
         this.published = configuration.getPublished();
         this.dataIndex = configuration.getDataIndex();
@@ -110,6 +112,7 @@ public class Zebedee {
         this.applicationKeysPath = configuration.getApplicationKeysPath();
         this.redirectPath = configuration.getRedirectPath();
         this.servicePath = configuration.getServicePath();
+        this.keyRingPath = configuration.getKeyRingPath();
     }
 
     /**
@@ -267,10 +270,10 @@ public class Zebedee {
         }
 
         // Get the user
-        User user = usersService.getUserByEmail(credentials.email);
+        User user = usersService.getUserByEmail(credentials.getEmail());
 
         if (user == null) {
-            info().data("user", user.getEmail()).log("user not found no session will be created");
+            info().data("user", credentials.getEmail()).log("user not found no session will be created");
             return null;
         }
 
@@ -284,9 +287,13 @@ public class Zebedee {
         }
 
         // Unlock and cache keyring
-        user.keyring().unlock(credentials.password);
+        com.github.onsdigital.zebedee.json.Keyring legacyKeyring = user.keyring();
+        if (!legacyKeyring.unlock(credentials.getPassword())) {
+            throw new IOException("failed to unlock user keyring");
+        }
+
         applicationKeys.populateCacheFromUserKeyring(user.keyring());
-        keyringCache.put(user, session);
+        legacyKeyringCache.put(user, session);
 
         // Return a session
         return session;
@@ -320,8 +327,9 @@ public class Zebedee {
         return this.publishedCollections;
     }
 
-    public KeyringCache getKeyringCache() {
-        return this.keyringCache;
+    @Deprecated
+    public KeyringCache getLegacyKeyringCache() {
+        return this.legacyKeyringCache;
     }
 
     public ApplicationKeys getApplicationKeys() {
@@ -354,5 +362,9 @@ public class Zebedee {
 
     public Path getServicePath() {
         return servicePath;
+    }
+
+    public Path getKeyRingPath() {
+        return keyRingPath;
     }
 }

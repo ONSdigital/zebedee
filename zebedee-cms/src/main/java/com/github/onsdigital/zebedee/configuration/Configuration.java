@@ -5,8 +5,12 @@ import com.github.onsdigital.zebedee.session.model.Session;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import javax.crypto.SecretKey;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,9 +33,12 @@ public class Configuration {
     private static final String DATASET_API_AUTH_TOKEN = "FD0108EA-825D-411C-9B1D-41EF7727F465";
     private static final String SERVICE_AUTH_TOKEN = "15C0E4EE-777F-4C61-8CDB-2898CEB34657";
     private static final String DEFAULT_SLACK_USERNAME = "Zebedee";
+    private static final String SESSIONS_API_URL = "http://localhost:24400";
+    private static final String KEYRING_SECRET_KEY = "KEYRING_SECRET_KEY";
+    private static final String KEYRING_INIT_VECTOR = "KEYRING_INIT_VECTOR";
 
-    private static final int VERIFY_RETRTY_DELAY = 5000; //milliseconds
-    private static final int VERIFY_RETRTY_COUNT = 10;
+    private static final int VERIFY_RETRY_DELAY = 5000; //milliseconds
+    private static final int VERIFY_RETRY_COUNT = 10;
 
     // how many seconds before the actual publish time should we run the preprocess
     private static final int DEFAULT_PREPROCESS_SECONDS_BEFORE_PUBLISH = 30;
@@ -140,12 +147,12 @@ public class Configuration {
         return StringUtils.defaultIfBlank(getValue("dylan_url"), DEFAULT_DYLAN_URL);
     }
 
-    public static int getVerifyRetrtyDelay() {
-        return VERIFY_RETRTY_DELAY;
+    public static int getVerifyRetryDelay() {
+        return VERIFY_RETRY_DELAY;
     }
 
-    public static int getVerifyRetrtyCount() {
-        return VERIFY_RETRTY_COUNT;
+    public static int getVerifyRetryCount() {
+        return VERIFY_RETRY_COUNT;
     }
 
     public static String getReindexKey() {
@@ -170,6 +177,42 @@ public class Configuration {
 
     public static String getAuditDBPassword() {
         return StringUtils.defaultIfBlank(getValue("db_audit_password"), "");
+    }
+
+    public static String getSessionsApiUrl() { return StringUtils.defaultIfBlank(getValue("SESSIONS_API_URL"), SESSIONS_API_URL); }
+
+    /**
+     * Get collection keyring encryption key
+     */
+    public static SecretKey getKeyringSecretKey() {
+        String keyStr = getValue(KEYRING_SECRET_KEY);
+        if (StringUtils.isEmpty(keyStr)) {
+            throw new RuntimeException("expected keyring secret key in environment variable but was empty");
+        }
+
+        byte[] keyBytes = Base64.getDecoder().decode(keyStr);
+        SecretKey secretKey = new SecretKeySpec(keyBytes, 0, keyBytes.length, "AES");
+
+        Arrays.fill(keyBytes, (byte) 0);
+
+        return secretKey;
+    }
+
+    /**
+     * Get collection keyring vector key
+     */
+    public static IvParameterSpec getKeyringInitVector() {
+        String vectorStr = getValue(KEYRING_INIT_VECTOR);
+        if (StringUtils.isEmpty(vectorStr)) {
+            throw new RuntimeException("expected keyring init vector in environment variable but was empty");
+        }
+
+        byte[] vectorBytes = Base64.getDecoder().decode(vectorStr);
+        IvParameterSpec ivParameterSpec = new IvParameterSpec(vectorBytes);
+
+        Arrays.fill(vectorBytes, (byte) 0);
+
+        return ivParameterSpec;
     }
 
     /**

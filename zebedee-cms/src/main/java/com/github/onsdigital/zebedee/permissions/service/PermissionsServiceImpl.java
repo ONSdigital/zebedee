@@ -141,6 +141,16 @@ public class PermissionsServiceImpl implements PermissionsService {
         return keyUsers;
     }
 
+    /**
+     * @param user
+     * @return
+     * @throws IOException
+     */
+    @Override
+    public boolean hasAccessToCollection(User user, Collection collection) throws IOException {
+        return false;
+    }
+
     private boolean isCollectionKeyRecipient(AccessMapping accessMapping, List<Team> teamsList, User user, Collection collection) {
         boolean result = false;
         try {

@@ -1,10 +1,17 @@
 package com.github.onsdigital.zebedee;
 
-import com.github.onsdigital.zebedee.configuration.Configuration;
+import com.github.onsdigital.session.service.client.Http;
+import com.github.onsdigital.session.service.client.SessionClient;
+import com.github.onsdigital.session.service.client.SessionClientImpl;
 import com.github.onsdigital.zebedee.data.processing.DataIndex;
+import com.github.onsdigital.zebedee.keyring.Keyring;
+import com.github.onsdigital.zebedee.keyring.KeyringImpl;
+import com.github.onsdigital.zebedee.keyring.cache.KeyringCache;
+import com.github.onsdigital.zebedee.keyring.cache.KeyringCacheImpl;
+import com.github.onsdigital.zebedee.keyring.store.KeyringStore;
+import com.github.onsdigital.zebedee.keyring.store.KeyringStoreImpl;
 import com.github.onsdigital.zebedee.model.Collections;
 import com.github.onsdigital.zebedee.model.Content;
-import com.github.onsdigital.zebedee.model.KeyringCache;
 import com.github.onsdigital.zebedee.model.RedirectTablePartialMatch;
 import com.github.onsdigital.zebedee.model.encryption.ApplicationKeys;
 import com.github.onsdigital.zebedee.model.publishing.PublishedCollections;
@@ -17,6 +24,7 @@ import com.github.onsdigital.zebedee.service.DatasetService;
 import com.github.onsdigital.zebedee.service.ServiceStoreImpl;
 import com.github.onsdigital.zebedee.service.ZebedeeDatasetService;
 import com.github.onsdigital.zebedee.session.service.Sessions;
+import com.github.onsdigital.zebedee.session.service.SessionsAPIServiceImpl;
 import com.github.onsdigital.zebedee.session.service.SessionsServiceImpl;
 import com.github.onsdigital.zebedee.teams.service.TeamsService;
 import com.github.onsdigital.zebedee.teams.service.TeamsServiceImpl;
@@ -39,6 +47,7 @@ import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 import static com.github.onsdigital.zebedee.Zebedee.APPLICATION_KEYS;
 import static com.github.onsdigital.zebedee.Zebedee.COLLECTIONS;
+import static com.github.onsdigital.zebedee.Zebedee.KEYRING;
 import static com.github.onsdigital.zebedee.Zebedee.PERMISSIONS;
 import static com.github.onsdigital.zebedee.Zebedee.PUBLISHED;
 import static com.github.onsdigital.zebedee.Zebedee.PUBLISHED_COLLECTIONS;
@@ -47,6 +56,13 @@ import static com.github.onsdigital.zebedee.Zebedee.SESSIONS;
 import static com.github.onsdigital.zebedee.Zebedee.TEAMS;
 import static com.github.onsdigital.zebedee.Zebedee.USERS;
 import static com.github.onsdigital.zebedee.Zebedee.ZEBEDEE;
+import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
+import static com.github.onsdigital.zebedee.configuration.Configuration.getDatasetAPIAuthToken;
+import static com.github.onsdigital.zebedee.configuration.Configuration.getDatasetAPIURL;
+import static com.github.onsdigital.zebedee.configuration.Configuration.getKeyringInitVector;
+import static com.github.onsdigital.zebedee.configuration.Configuration.getKeyringSecretKey;
+import static com.github.onsdigital.zebedee.configuration.Configuration.getServiceAuthToken;
+import static com.github.onsdigital.zebedee.configuration.Configuration.getSessionsApiUrl;
 import static com.github.onsdigital.zebedee.permissions.store.PermissionsStoreFileSystemImpl.initialisePermissions;
 
 /**
@@ -67,12 +83,13 @@ public class ZebedeeConfiguration {
     private Path applicationKeysPath;
     private Path redirectPath;
     private Path servicePath;
+    private Path keyRingPath;
     private boolean useVerificationAgent;
     private ApplicationKeys applicationKeys;
     private PublishedCollections publishedCollections;
     private Collections collections;
     private Content published;
-    private KeyringCache keyringCache;
+    private com.github.onsdigital.zebedee.model.KeyringCache legacyKeyringCache;
     private PermissionsService permissionsService;
     private UsersService usersService;
     private TeamsService teamsService;
@@ -80,15 +97,10 @@ public class ZebedeeConfiguration {
     private DataIndex dataIndex;
     private PermissionsStore permissionsStore;
     private DatasetService datasetService;
+    private SessionClient sessionClient;
+    private KeyringCache keyringCache;
+    private Keyring keyring;
 
-    private static Path createDir(Path root, String dirName) throws IOException {
-        Path dir = root.resolve(dirName);
-        if (!Files.exists(dir)) {
-            info().data("path", dirName).log("creating required Zebedee directory as it does not exist.");
-            Files.createDirectory(dir);
-        }
-        return dir;
-    }
 
     /**
      * Create a new configuration object.
@@ -117,6 +129,7 @@ public class ZebedeeConfiguration {
         this.applicationKeysPath = createDir(zebedeePath, APPLICATION_KEYS);
         this.redirectPath = this.publishedContentPath.resolve(Content.REDIRECT);
         this.servicePath = createDir(zebedeePath, SERVICES);
+        this.keyRingPath = createDir(zebedeePath, KEYRING);
 
         if (!Files.exists(redirectPath)) {
             Files.createFile(redirectPath);
@@ -128,8 +141,17 @@ public class ZebedeeConfiguration {
         this.dataIndex = new DataIndex(new FileSystemContentReader(publishedContentPath));
         this.publishedCollections = new PublishedCollections(publishedCollectionsPath);
         this.applicationKeys = new ApplicationKeys(applicationKeysPath);
-        this.sessions = new SessionsServiceImpl(sessionsPath);
-        this.keyringCache = new KeyringCache(sessions);
+
+        // Configure the sessions
+        if (cmsFeatureFlags().isSessionAPIEnabled()) {
+            sessionClient = new SessionClientImpl(getSessionsApiUrl(), getServiceAuthToken(), new Http());
+            this.sessions = new SessionsAPIServiceImpl(sessionClient);
+        } else {
+            this.sessions = new SessionsServiceImpl(sessionsPath);
+        }
+
+        // Initialise legacy keyring regardless - they will dual run until we cut over to new impl.
+        this.legacyKeyringCache = new com.github.onsdigital.zebedee.model.KeyringCache(sessions);
 
         this.teamsService = new TeamsServiceImpl(
                 new TeamsStoreFileSystemImpl(teamsPath), this::getPermissionsService);
@@ -140,7 +162,19 @@ public class ZebedeeConfiguration {
         this.permissionsStore = new PermissionsStoreFileSystemImpl(permissionsPath);
 
         this.permissionsService = new PermissionsServiceImpl(permissionsStore,
-                this::getUsersService, this::getTeamsService, keyringCache);
+                this::getUsersService, this::getTeamsService, legacyKeyringCache);
+
+        // Configure the new KeyringCache if enabled
+        if (cmsFeatureFlags().isCentralisedKeyringEnabled()) {
+            KeyringStore keyStore = new KeyringStoreImpl(getKeyRingPath(), getKeyringSecretKey(),
+                    getKeyringInitVector());
+
+            KeyringCacheImpl.init(keyStore);
+            KeyringCache keyringCache = KeyringCacheImpl.getInstance();
+
+            KeyringImpl.init(keyringCache, permissionsService);
+            this.keyring = KeyringImpl.getInstance();
+        }
 
         VersionsService versionsService = new VersionsServiceImpl();
         this.collections = new Collections(collectionsPath, permissionsService, versionsService, published);
@@ -150,14 +184,11 @@ public class ZebedeeConfiguration {
                 collections,
                 permissionsService,
                 applicationKeys,
-                keyringCache);
+                legacyKeyringCache);
 
         DatasetClient datasetClient;
         try {
-            datasetClient = new DatasetAPIClient(
-                    Configuration.getDatasetAPIURL(),
-                    Configuration.getDatasetAPIAuthToken(),
-                    Configuration.getServiceAuthToken());
+            datasetClient = new DatasetAPIClient(getDatasetAPIURL(), getDatasetAPIAuthToken(), getServiceAuthToken());
         } catch (URISyntaxException e) {
             error().logException(e, "failed to initialise dataset api client - invalid URI");
             throw new RuntimeException(e);
@@ -167,6 +198,7 @@ public class ZebedeeConfiguration {
 
         info().data("root_path", rootPath.toString())
                 .data("zebedee_path", zebedeePath.toString())
+                .data("keyring_path", keyRingPath.toString())
                 .data("published_content_path", publishedContentPath.toString())
                 .data("collections_path", collectionsPath.toString())
                 .data("published_collections_path", publishedCollectionsPath.toString())
@@ -178,7 +210,9 @@ public class ZebedeeConfiguration {
                 .data("redirect_path", applicationKeysPath.toString())
                 .data("services_path", servicePath.toString())
                 .data("enable_verification_agent", useVerificationAgent)
+                .data("sessions_api_enabled", cmsFeatureFlags().isSessionAPIEnabled())
                 .log("zebedee configuration creation complete");
+
     }
 
     public boolean isUseVerificationAgent() {
@@ -225,6 +259,10 @@ public class ZebedeeConfiguration {
         return redirectPath;
     }
 
+    public Path getKeyRingPath() {
+        return keyRingPath;
+    }
+
     public Path getServicePath() {
         return servicePath;
     }
@@ -262,8 +300,8 @@ public class ZebedeeConfiguration {
         return this.publishedCollections;
     }
 
-    public KeyringCache getKeyringCache() {
-        return this.keyringCache;
+    public com.github.onsdigital.zebedee.model.KeyringCache getKeyringCache() {
+        return this.legacyKeyringCache;
     }
 
     public ApplicationKeys getApplicationKeys() {
@@ -296,5 +334,18 @@ public class ZebedeeConfiguration {
 
     public ServiceStoreImpl getServiceStore() {
         return new ServiceStoreImpl(servicePath);
+    }
+
+    public Keyring getCollectionKeyring() {
+        return this.keyring;
+    }
+
+    private Path createDir(Path root, String dirName) throws IOException {
+        Path dir = root.resolve(dirName);
+        if (!Files.exists(dir)) {
+            info().data("path", dirName).log("creating required Zebedee directory as it does not exist.");
+            Files.createDirectory(dir);
+        }
+        return dir;
     }
 }

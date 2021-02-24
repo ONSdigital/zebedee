@@ -7,6 +7,8 @@ import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.user.model.User;
 import org.junit.Test;
 
+import java.util.Date;
+
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -14,13 +16,23 @@ import static org.junit.Assert.assertTrue;
 /**
  * Test for {@link KeyringCache}.
  */
-public class KeyringCacheTest extends ZebedeeTestBaseFixture {
+public class KeyringCacheCacheTest extends ZebedeeTestBaseFixture {
 
     private KeyringCache keyringCache;
+    private Session session;
+    private User user;
 
     @Override
     public void setUp() throws Exception {
-        keyringCache = zebedee.getKeyringCache();
+        keyringCache = zebedee.getLegacyKeyringCache();
+
+        user = user();
+
+        session = new Session();
+        session.setEmail(builder.publisher1.getEmail());
+        session.setId("1234");
+        session.setLastAccess(new Date());
+        session.setStart(new Date());
     }
 
     @Test
@@ -28,16 +40,14 @@ public class KeyringCacheTest extends ZebedeeTestBaseFixture {
 
         // Given
         // A user with a session
-        User user = user();
-        Session session = builder.createSession(user);
 
         // When
         // We put the user's keyring
         keyringCache.put(user, session);
-        Keyring keyring = zebedee.getKeyringCache().get(user);
+        Keyring keyring = zebedee.getLegacyKeyringCache().get(user);
 
         // Then
-        // We sholud be able to get the user's keyring
+        // We should be able to get the user's keyring
         assertNotNull(keyring);
         assertTrue(keyring.isUnlocked());
     }
@@ -49,7 +59,7 @@ public class KeyringCacheTest extends ZebedeeTestBaseFixture {
         // A null user and missing session
         User nullUser = null;
         User noSessionUser = user();
-        Session session = null;
+        session = null;
 
         // When
         // We put the user's keyring
@@ -87,16 +97,16 @@ public class KeyringCacheTest extends ZebedeeTestBaseFixture {
         // Given
         // A keyring in the cache
         User user = user();
-        Session session = builder.createSession(user);
+
         keyringCache.put(user, session);
 
         // When
         // We remove the user's keyring
-        zebedee.getKeyringCache().remove(session);
+        zebedee.getLegacyKeyringCache().remove(session);
 
         // Then
         // The user's keyring should not be present in the cache
-        assertNull(zebedee.getKeyringCache().get(user));
+        assertNull(zebedee.getLegacyKeyringCache().get(user));
     }
 
     @Test
@@ -106,7 +116,7 @@ public class KeyringCacheTest extends ZebedeeTestBaseFixture {
         // A null session and user not in the cache
         Session nullSession = null;
         User user = user();
-        Session notInCacheSession = builder.createSession(user);
+        Session notInCacheSession = session;
 
         // When
         // We put the user's keyring

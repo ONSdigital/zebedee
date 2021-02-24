@@ -14,12 +14,13 @@ import java.io.IOException;
 /**
  * KeyringMigrationImpl is an abstraction in front of the existing keyring funtionality. This abstraction enables us to
  * decouple the existing keyring functionality from the classes that use it. It also allows us to toggle between keyring
- * implementations (legacy or new centralised keyring) with minimum discruption to the classes that depend on it.
+ * implementations (legacy or new centralised keyring) with minimum disruption to the classes that depend on it.
  * <p>
- * The intention is this class will initially use the existing keyring functionality. When the new central keyring
+ * The intention is this class will initially only use the legacy keyring functionality. When the new central keyring
  * has been built we will dual run the old a new implementations - this allows us to migrate all keys to the new
- * keyring but also given us the option to rollback if needed. Once have confidence the new keyring is working the
- * legacy functionality can be remove without any impact on the classes depending on the keyring.
+ * keyring but also gives us the option to rollback if needed. Once we have confidence the new keyring is working the
+ * legacy functionality can be removed leaving us with only the new central keyring and the classes depening on it
+ * should not be impacted
  * <p>
  * This is perhaps a slightly convoluted approach but it enables a smooth migrate to the keyring without breaking any
  * existing functionality.

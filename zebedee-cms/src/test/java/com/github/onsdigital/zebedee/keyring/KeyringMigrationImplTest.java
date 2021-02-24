@@ -530,7 +530,7 @@ public class KeyringMigrationImplTest {
 
     @Test
     public void testPopulateFromUser_userNull_shouldThrowException() {
-        // Give the user is null
+        // Given the user is null
 
         // When populate from user is called
         KeyringException ex = assertThrows(KeyringException.class, () -> keyring.populateFromUser(null));
@@ -542,7 +542,7 @@ public class KeyringMigrationImplTest {
 
     @Test
     public void testPopulateFromUser_userNullCentralKeyringEnabled_shouldThrowException() {
-        // Give the user is null
+        // Given the user is null
         // and central keyring is enabled
         keyring = new KeyringMigrationImpl(enabled, centralKeyring, legacyKeyringCache, applicationKeys, sessionsService);
 
@@ -556,7 +556,7 @@ public class KeyringMigrationImplTest {
 
     @Test
     public void testPopulateFromUser_successCentralKeyringEnabled_shouldDoNothing() throws Exception {
-        // Give central keyring is enabled
+        // Given the central keyring is enabled
         keyring = new KeyringMigrationImpl(enabled, centralKeyring, legacyKeyringCache, applicationKeys, sessionsService);
 
         // When populate from user is called
@@ -568,7 +568,7 @@ public class KeyringMigrationImplTest {
 
     @Test
     public void testPopulateFromUser_userEmailNull_shouldThrowException() throws Exception {
-        // Give get user email is null
+        // Given the user email is null
         when(user.getEmail())
                 .thenReturn(null);
 
@@ -582,7 +582,7 @@ public class KeyringMigrationImplTest {
 
     @Test
     public void testPopulateFromUser_userEmailEmpty_shouldThrowException() throws Exception {
-        // Give get user email is null
+        // Give the user email is empty
         when(user.getEmail())
                 .thenReturn("");
 
@@ -596,7 +596,7 @@ public class KeyringMigrationImplTest {
 
     @Test
     public void testPopulateFromUser_getSessionError_shouldThrowException() throws Exception {
-        // Give get user session returns an error
+        // Given get user session returns an error
         when(sessionsService.find(TEST_EMAIL))
                 .thenThrow(new IOException("Bert! Bert! You're shouting again Bert"));
 
@@ -611,7 +611,7 @@ public class KeyringMigrationImplTest {
 
     @Test
     public void testPopulateFromUser_getSessionReturnsNull_shouldThrowException() throws Exception {
-        // Give get user session returns null
+        // Given get user session returns null
         when(sessionsService.find(TEST_EMAIL))
                 .thenReturn(null);
 
@@ -626,7 +626,7 @@ public class KeyringMigrationImplTest {
 
     @Test
     public void testPopulateFromUser_legacyKeyringCacheError_shouldThrowException() throws Exception {
-        // Give get legacy keyring cache throws exception
+        // Given get legacy keyring cache throws exception
         doThrow(IOException.class)
                 .when(legacyKeyringCache)
                 .put(user, session);
@@ -643,7 +643,7 @@ public class KeyringMigrationImplTest {
 
     @Test
     public void testPopulateFromUser_userKeyringIsNull_shouldThrowException() throws Exception {
-        // Give the user keyring is null
+        // Given the user keyring is null
         when(user.keyring())
                 .thenReturn(null);
 
@@ -657,12 +657,12 @@ public class KeyringMigrationImplTest {
 
     @Test
     public void testPopulateFromUser_success_shouldPopulateLegacyKeyringCache() throws Exception {
-        // Give there are no errors
+        // Given there are no errors
 
         // When populate from user is called
         keyring.populateFromUser(user);
 
-        // Then the legacy keyring cache and application keys are populate from the user keyring
+        // Then the legacy keyring cache and application keys are populated from the user keyring
         verify(sessionsService, times(1)).find(TEST_EMAIL);
         verify(legacyKeyringCache, times(1)).put(user, session);
         verify(applicationKeys, times(1)).populateCacheFromUserKeyring(legacyKeyring);

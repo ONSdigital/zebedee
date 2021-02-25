@@ -128,10 +128,17 @@ public class Publisher {
             success &= publishDatasets(collection);
         }
 
-        if (imageFuture != null) {
+        if (CMSFeatureFlags.cmsFeatureFlags().isImagePublishingEnabled()) {
             try {
+                if (imageFuture == null) {
+                    throw new Exception("image future unexpectedly null on completion of publishing");
+                }
                 success = success && imageFuture.get();
-            } catch (InterruptedException | ExecutionException e) {
+            } catch (Exception e) {
+                error().data("collectionId", collection.getDescription().getId()).data("publishing", true)
+                        .logException(e, "Exception publishing images via image API");
+                PostMessageField msg = new PostMessageField("Error", e.getMessage(), false);
+                collectionAlarm(collection, "Exception publishing images via image API", msg);
                 success = false;
             }
         }
@@ -709,22 +716,10 @@ public class Publisher {
         return datasetsPublished;
     }
 
-    private static Future<Boolean> publishImages(Collection collection){
-        String collectionId = collection.getDescription().getId();
-
+    private static Future<Boolean> publishImages(Collection collection) {
         return apiPool.submit(() -> {
-            Boolean complete = false;
-            try {
-                imageServiceSupplier.getService().publishImagesInCollection(collection);
-                complete = true;
-            } catch (Exception e) {
-                error().data("collectionId", collectionId).data("publishing", true)
-                        .logException(e, "Exception publishing images via image API");
-
-                PostMessageField msg = new PostMessageField("Error", e.getMessage(), false);
-                collectionAlarm(collection, "Exception publishing images via image API", msg);
-            }
-            return complete;
+            imageServiceSupplier.getService().publishImagesInCollection(collection);
+            return true;  // Complete
         });
     }
 

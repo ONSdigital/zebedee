@@ -10,6 +10,8 @@ import org.apache.commons.lang3.StringUtils;
 
 import javax.crypto.SecretKey;
 import java.io.IOException;
+import java.security.Key;
+import java.util.Set;
 
 /**
  * KeyringMigrationImpl is an abstraction in front of the existing keyring funtionality. This abstraction enables us to
@@ -96,6 +98,21 @@ public class KeyringMigrationImpl implements Keyring {
         }
 
         addKeyToLegacyKeyring(user, collection, key);
+    }
+
+    /**
+     * Lists the collection IDs in the keyring.
+     *
+     * @return An unmodifiable set of the key identifiers in the keyring.
+     */
+    @Override
+    public Set<String> list(User user) throws KeyringException {
+        if (centralKeyringEnabled) {
+            return null;
+        }
+
+        validateUser(user);
+        return getUserKeyring(user).keySet();
     }
 
     private void addKeyToLegacyKeyring(User user, Collection collection, SecretKey key) throws KeyringException {

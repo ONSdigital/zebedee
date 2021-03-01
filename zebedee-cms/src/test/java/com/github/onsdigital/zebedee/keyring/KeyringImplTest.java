@@ -382,6 +382,124 @@ public class KeyringImplTest {
         verify(keyringCache, times(1)).get(TEST_COLLECTION_ID);
     }
 
+    @Test
+    public void testRemove_userIsNull_shouldThrowException()  {
+        // Given user is null
+
+        // When remove is called
+        KeyringException ex = assertThrows(KeyringException.class, () -> keyring.remove(null, collection));
+
+        // Then an exception is thrown
+        assertThat(ex.getMessage(), equalTo(USER_NULL_ERR));
+
+    }
+
+    @Test
+    public void testRemove_collectionIsNull_shouldThrowException()  {
+        // Given collection is null
+
+        // When remove is called
+        KeyringException ex = assertThrows(KeyringException.class, () -> keyring.remove(user, null));
+
+        // Then an exception is thrown
+        assertThat(ex.getMessage(), equalTo(COLLECTION_NULL_ERR));
+    }
+
+    @Test
+    public void testRemove_collectionDescriptionIsNull_shouldThrowException()  {
+        // Given collection description is null
+        when(collection.getDescription()).
+                thenReturn(null);
+
+        // When remove is called
+        KeyringException ex = assertThrows(KeyringException.class, () -> keyring.remove(user, collection));
+
+        // Then an exception is thrown
+        assertThat(ex.getMessage(), equalTo(COLLECTION_DESCRIPTION_NULL_ERR));
+    }
+
+    @Test
+    public void testRemove_collectionIdIsNull_shouldThrowException()  {
+        // Given collection Id is null
+        when(collection.getDescription())
+                .thenReturn(collDesc);
+
+        when(collection.getDescription().getId())
+                .thenReturn(null);
+
+        // When remove is called
+        KeyringException ex = assertThrows(KeyringException.class, () -> keyring.remove(user, collection));
+
+        // Then an exception is thrown
+        assertThat(ex.getMessage(), equalTo(COLLECTION_ID_NULL_OR_EMPTY_ERR));
+    }
+
+    @Test
+    public void testRemove_collectionIdIsEmpty_shouldThrowException()  {
+        // Given collection Id is null
+        when(collection.getDescription())
+                .thenReturn(collDesc);
+
+        when(collection.getDescription().getId())
+                .thenReturn("");
+
+        // When remove is called
+        KeyringException ex = assertThrows(KeyringException.class, () -> keyring.remove(user, collection));
+
+        // Then an exception is thrown
+        assertThat(ex.getMessage(), equalTo(COLLECTION_ID_NULL_OR_EMPTY_ERR));
+    }
+
+    @Test
+    public void testRemove_permissionsServiceThrowsException() throws Exception {
+        when(collection.getDescription())
+                .thenReturn(collDesc);
+
+        when(collDesc.getId())
+                .thenReturn(TEST_COLLECTION_ID);
+
+        when(permissionsService.canEdit(user, collDesc))
+                .thenThrow(new IOException("Bork"));
+
+        KeyringException ex = assertThrows(KeyringException.class, () -> keyring.remove(user, collection));
+
+        assertThat(ex.getCause().getMessage(), equalTo("Bork"));
+    }
+
+    @Test
+    public void testRemove_permissionsServiceReturnsFalse() throws Exception {
+        when(collection.getDescription())
+                .thenReturn(collDesc);
+
+        when(collDesc.getId())
+                .thenReturn(TEST_COLLECTION_ID);
+
+        when(permissionsService.canEdit(user, collDesc))
+                .thenReturn(false);
+
+        keyring.remove(user, collection);
+
+        verify(permissionsService, times(1)).canEdit(user, collDesc);
+    }
+
+    @Test
+    public void testRemove_keyringCacheRemovesCollectionKey() throws Exception {
+        when(collection.getDescription())
+                .thenReturn(collDesc);
+
+        when(collDesc.getId())
+                .thenReturn(TEST_COLLECTION_ID);
+
+        when(permissionsService.canEdit(user, collDesc))
+                .thenReturn(true);
+
+        keyring.remove(user, collection);
+
+        verify(permissionsService, times(1)).canEdit(user, collDesc);
+        verify(keyringCache, times(1)).remove(TEST_COLLECTION_ID);
+    }
+
+
     private void resetInstanceToNull() throws Exception {
         // Use some evil reflection magic to set the instance back to null for this test case.
         Field field = KeyringImpl.class.getDeclaredField("INSTANCE");

@@ -20,11 +20,13 @@ import static com.github.onsdigital.zebedee.keyring.KeyringImpl.COLLECTION_DESCR
 import static com.github.onsdigital.zebedee.keyring.KeyringImpl.COLLECTION_ID_NULL_OR_EMPTY_ERR;
 import static com.github.onsdigital.zebedee.keyring.KeyringImpl.COLLECTION_NULL_ERR;
 import static com.github.onsdigital.zebedee.keyring.KeyringImpl.KEYRING_CACHE_NULL_ERR;
-import static com.github.onsdigital.zebedee.keyring.KeyringImpl.NOT_INITALISED_ERR;
+import static com.github.onsdigital.zebedee.keyring.KeyringImpl.NOT_INITIALISED_ERR;
 import static com.github.onsdigital.zebedee.keyring.KeyringImpl.PERMISSION_SERVICE_NULL_ERR;
 import static com.github.onsdigital.zebedee.keyring.KeyringImpl.USER_KEYRING_LOCKED_ERR;
 import static com.github.onsdigital.zebedee.keyring.KeyringImpl.USER_KEYRING_NULL_ERR;
 import static com.github.onsdigital.zebedee.keyring.KeyringImpl.USER_NULL_ERR;
+import static com.github.onsdigital.zebedee.keyring.KeyringImpl.SECRET_KEY_NULL_ERR;
+
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -41,7 +43,7 @@ import static org.mockito.Mockito.when;
 public class KeyringImplTest {
 
     static final String TEST_COLLECTION_ID = "44";
-
+    static final String SECRET_KEY = "441";
     private Keyring keyring;
 
     @Mock
@@ -199,12 +201,12 @@ public class KeyringImplTest {
         // When GetInstance is called
         // Then an exception is thrown
         KeyringException ex = assertThrows(KeyringException.class, () -> KeyringImpl.getInstance());
-        assertThat(ex.getMessage(), equalTo(NOT_INITALISED_ERR));
+        assertThat(ex.getMessage(), equalTo(NOT_INITIALISED_ERR));
     }
 
     @Test
     public void testGetInstance_success() throws KeyringException {
-        // Given CollectionKeyring has been initalised
+        // Given CollectionKeyring has been initialised
 
         // When GetInstance is called
         Keyring keyring = KeyringImpl.getInstance();
@@ -497,6 +499,141 @@ public class KeyringImplTest {
 
         verify(permissionsService, times(1)).canEdit(user, collDesc);
         verify(keyringCache, times(1)).remove(TEST_COLLECTION_ID);
+    }
+
+    @Test
+    public void testAdd_userIsNull_shouldThrowException()  {
+        // Given user is null
+
+        // When Add is called
+        KeyringException ex = assertThrows(KeyringException.class, () -> keyring.add(null, collection, secretKey));
+
+        // Then an exception is thrown
+        assertThat(ex.getMessage(), equalTo(USER_NULL_ERR));
+
+    }
+
+    @Test
+    public void testAdd_collectionIsNull_shouldThrowException()  {
+        // Given collection is null
+
+        // When remove is called
+        KeyringException ex = assertThrows(KeyringException.class, () -> keyring.add(user, null, secretKey));
+
+        // Then an exception is thrown
+        assertThat(ex.getMessage(), equalTo(COLLECTION_NULL_ERR));
+    }
+
+    @Test
+    public void testAdd_collectionDescriptionIsNull_shouldThrowException()  {
+        // Given collection description is null
+        when(collection.getDescription()).
+                thenReturn(null);
+
+        // When remove is called
+        KeyringException ex = assertThrows(KeyringException.class, () -> keyring.add(user, collection, secretKey));
+
+        // Then an exception is thrown
+        assertThat(ex.getMessage(), equalTo(COLLECTION_DESCRIPTION_NULL_ERR));
+    }
+
+    @Test
+    public void testAdd_collectionIdIsNull_shouldThrowException()  {
+        // Given collection Id is null
+        when(collection.getDescription())
+                .thenReturn(collDesc);
+
+        when(collection.getDescription().getId())
+                .thenReturn(null);
+
+        // When remove is called
+        KeyringException ex = assertThrows(KeyringException.class, () -> keyring.add(user, collection, secretKey));
+
+        // Then an exception is thrown
+        assertThat(ex.getMessage(), equalTo(COLLECTION_ID_NULL_OR_EMPTY_ERR));
+    }
+
+    @Test
+    public void testAdd_collectionIdIsEmpty_shouldThrowException()  {
+        // Given collection Id is null
+        when(collection.getDescription())
+                .thenReturn(collDesc);
+
+        when(collection.getDescription().getId())
+                .thenReturn("");
+
+        // When remove is called
+        KeyringException ex = assertThrows(KeyringException.class, () -> keyring.add(user, collection, secretKey));
+
+        // Then an exception is thrown
+        assertThat(ex.getMessage(), equalTo(COLLECTION_ID_NULL_OR_EMPTY_ERR));
+    }
+
+    @Test
+    public void testAdd_secretKeyIsNull_shouldThrowException()  {
+        // Given collection Id is null
+        when(collection.getDescription())
+                .thenReturn(collDesc);
+
+        when(collection.getDescription().getId())
+                .thenReturn(TEST_COLLECTION_ID);
+
+        // When remove is called
+        KeyringException ex = assertThrows(KeyringException.class, () -> keyring.add(user, collection, null));
+
+        // Then an exception is thrown
+        assertThat(ex.getMessage(), equalTo(SECRET_KEY_NULL_ERR));
+    }
+
+    @Test
+    public void testAdd_permissionsServiceThrowsException() throws Exception {
+        when(collection.getDescription())
+                .thenReturn(collDesc);
+
+        when(collDesc.getId())
+                .thenReturn(TEST_COLLECTION_ID);
+
+        when(permissionsService.canEdit(user, collDesc))
+                .thenThrow(new IOException("Bork"));
+
+        KeyringException ex = assertThrows(KeyringException.class, () -> keyring.add(user, collection, secretKey));
+
+        assertThat(ex.getCause().getMessage(), equalTo("Bork"));
+    }
+
+    @Test
+    public void testAdd_permissionsServiceReturnsFalse() throws Exception {
+        when(collection.getDescription())
+                .thenReturn(collDesc);
+
+        when(collDesc.getId())
+                .thenReturn(TEST_COLLECTION_ID);
+
+        when(permissionsService.canEdit(user, collDesc))
+                .thenReturn(false);
+
+        keyring.add(user, collection, secretKey);
+
+        verify(permissionsService, times(1)).canEdit(user, collDesc);
+        verifyZeroInteractions(keyringCache.add(collDesc.getId(), SECRET_KEY));
+    }
+
+
+    @Test
+    public void testAdd_keyringCacheAddsCollectionKey() throws Exception {
+        when(collection.getDescription())
+                .thenReturn(collDesc);
+
+        when(collDesc.getId())
+                .thenReturn(TEST_COLLECTION_ID);
+
+        when(permissionsService.canEdit(user, collDesc))
+                .thenReturn(true);
+
+        keyring.add(user, collection, secretKey);
+
+        verify(permissionsService, times(1)).canEdit(user, collDesc);
+        verify(keyringCache, times(1)).add(TEST_COLLECTION_ID, SECRET_KEY);
     }
 
 

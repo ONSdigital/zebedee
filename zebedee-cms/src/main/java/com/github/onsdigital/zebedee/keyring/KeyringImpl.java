@@ -19,12 +19,13 @@ public class KeyringImpl implements Keyring {
     static final String USER_NULL_ERR = "user required but was null";
     static final String USER_KEYRING_NULL_ERR = "user keyring required but was null";
     static final String USER_KEYRING_LOCKED_ERR = "error user keyring is locked";
-    static final String NOT_INITALISED_ERR = "CollectionKeyring accessed but not yet initalised";
+    static final String NOT_INITIALISED_ERR = "CollectionKeyring accessed but not yet initialised";
     static final String KEYRING_CACHE_NULL_ERR = "keyringCache required but was null";
     static final String COLLECTION_NULL_ERR = "collection required but was null";
     static final String COLLECTION_DESCRIPTION_NULL_ERR = "collection description required but is null";
     static final String COLLECTION_ID_NULL_OR_EMPTY_ERR = "collection ID required but was null or empty";
     static final String PERMISSION_SERVICE_NULL_ERR = "permissionsService required but was null";
+    static final String SECRET_KEY_NULL_ERR = "secret key required but was null";
 
     /**
      * Singleton instance.
@@ -120,7 +121,23 @@ public class KeyringImpl implements Keyring {
 
     @Override
     public void add(User user, Collection collection, SecretKey key) throws KeyringException {
-        // TODO
+        validGetParams(user, collection);
+        if (key == null) {
+            throw new KeyringException(SECRET_KEY_NULL_ERR);
+        }
+
+        boolean hasAccess = false;
+        try {
+            hasAccess = permissionsService.canEdit(user, collection.getDescription());
+        } catch (IOException ex) {
+            throw new KeyringException(ex);
+        }
+
+        if (!hasAccess) {
+            return;
+        }
+
+        cache.add(collection.getId(), key);
     }
 
     /**
@@ -174,7 +191,7 @@ public class KeyringImpl implements Keyring {
      */
     public static Keyring getInstance() throws KeyringException {
         if (INSTANCE == null) {
-            throw new KeyringException(NOT_INITALISED_ERR);
+            throw new KeyringException(NOT_INITIALISED_ERR);
         }
         return INSTANCE;
     }

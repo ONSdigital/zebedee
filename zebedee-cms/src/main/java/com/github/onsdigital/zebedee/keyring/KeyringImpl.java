@@ -102,7 +102,20 @@ public class KeyringImpl implements Keyring {
 
     @Override
     public void remove(User user, Collection collection) throws KeyringException {
-        // TODO
+        validGetParams(user, collection);
+
+        boolean hasAccess = false;
+        try {
+            hasAccess = permissionsService.canEdit(user, collection.getDescription());
+        } catch (IOException ex) {
+            throw new KeyringException(ex);
+        }
+
+        if (!hasAccess) {
+            return;
+        }
+
+        cache.remove(collection.getDescription().getId());
     }
 
     @Override

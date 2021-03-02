@@ -137,7 +137,7 @@ public class KeyringImpl implements Keyring {
             return;
         }
 
-        cache.add(collection.getId(), key);
+        cache.add(collection.getDescription().getId(), key);
     }
 
     /**

@@ -34,6 +34,7 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertThrows;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -615,7 +616,7 @@ public class KeyringImplTest {
         keyring.add(user, collection, secretKey);
 
         verify(permissionsService, times(1)).canEdit(user, collDesc);
-        verifyZeroInteractions(keyringCache.add(collDesc.getId(), SECRET_KEY));
+        verifyZeroInteractions(keyringCache);
     }
 
 
@@ -633,7 +634,7 @@ public class KeyringImplTest {
         keyring.add(user, collection, secretKey);
 
         verify(permissionsService, times(1)).canEdit(user, collDesc);
-        verify(keyringCache, times(1)).add(TEST_COLLECTION_ID, SECRET_KEY);
+        verify(keyringCache, times(1)).add(TEST_COLLECTION_ID, secretKey);
     }
 
 

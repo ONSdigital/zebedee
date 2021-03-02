@@ -10,6 +10,7 @@ import org.mockito.MockitoAnnotations;
 import javax.crypto.SecretKey;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import static com.github.onsdigital.zebedee.keyring.cache.KeyringCacheImpl.INVALID_COLLECTION_ID_ERR;
 import static com.github.onsdigital.zebedee.keyring.cache.KeyringCacheImpl.INVALID_SECRET_KEY_ERR;
@@ -465,6 +466,48 @@ public class KeyringCacheImplTest {
 
         // Then the singleton instance is returned
         assertThat(actual, is(notNullValue()));
+    }
+
+    @Test
+    public void testList_keysExistsInCache_shouldReturnSetOfCollectionIDs() throws Exception {
+        cache.put(TEST_COLLECTION_ID, secretKey);
+
+        Set<String> actual = keyringCache.list();
+
+        assertTrue(actual.contains(TEST_COLLECTION_ID));
+        verifyZeroInteractions(keyStore);
+    }
+
+    @Test
+    public void testList_keysExistsInStore_shouldReturnSetOfCollectionIDs() throws Exception {
+        Map<String, SecretKey> keys = new HashMap<>();
+        keys.put(TEST_COLLECTION_ID, secretKey);
+
+        when(keyStore.readAll())
+                .thenReturn(keys);
+
+        assertTrue(cache.isEmpty());
+
+        Set<String> actual = keyringCache.list();
+
+        assertTrue(cache.containsKey(TEST_COLLECTION_ID));
+        assertTrue(actual.contains(TEST_COLLECTION_ID));
+
+        verify(keyStore, times(1)).readAll();
+    }
+
+    @Test
+    public void testList_keystoreException_shouldThrowException() throws Exception {
+        when(keyStore.readAll())
+                .thenThrow(new KeyringException("error"));
+
+        KeyringException ex = assertThrows(KeyringException.class, () -> keyringCache.list());
+
+        assertThat(ex.getMessage(), equalTo("error"));
+        assertFalse(cache.containsKey(TEST_COLLECTION_ID));
+        assertTrue(cache.isEmpty());
+
+        verify(keyStore, times(1)).readAll();
     }
 
 }

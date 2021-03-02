@@ -4,6 +4,7 @@ import com.github.onsdigital.zebedee.keyring.KeyringException;
 import com.github.onsdigital.zebedee.model.Collection;
 
 import javax.crypto.SecretKey;
+import java.util.Set;
 
 /**
  * A Keyring is an object repsonsible for holding {@link SecretKey}s used to encrypt/decrypt the content of
@@ -44,4 +45,11 @@ public interface KeyringCache {
      * @throws KeyringException problem removing the entry
      */
     void remove(final String collectionID) throws KeyringException;
+
+    /**
+     * Returns a list of collection IDs from the Keyring
+     * @return
+     * @throws KeyringException
+     */
+    Set<String> list() throws KeyringException;
 }

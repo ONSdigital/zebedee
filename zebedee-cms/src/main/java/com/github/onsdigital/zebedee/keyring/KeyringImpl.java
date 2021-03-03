@@ -148,7 +148,22 @@ public class KeyringImpl implements Keyring {
      */
     @Override
     public Set<String> list(User user) throws KeyringException {
-        return null;
+        if (user == null) {
+            throw new KeyringException(USER_NULL_ERR);
+        }
+
+        boolean hasAccess = false;
+        try {
+            hasAccess = permissionsService.canEdit(user.getEmail());
+        } catch (IOException ex) {
+            throw new KeyringException(ex);
+        }
+
+        if (!hasAccess) {
+            return null;
+        }
+
+        return cache.list();
     }
 
     private void validGetParams(User user, Collection collection) throws KeyringException {

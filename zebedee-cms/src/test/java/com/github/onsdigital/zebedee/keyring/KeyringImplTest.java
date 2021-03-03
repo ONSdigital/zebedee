@@ -15,6 +15,7 @@ import javax.crypto.SecretKey;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.HashSet;
+import java.util.Set;
 
 import static com.github.onsdigital.zebedee.keyring.KeyringImpl.COLLECTION_DESCRIPTION_NULL_ERR;
 import static com.github.onsdigital.zebedee.keyring.KeyringImpl.COLLECTION_ID_NULL_OR_EMPTY_ERR;
@@ -33,6 +34,7 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doThrow;
@@ -511,7 +513,6 @@ public class KeyringImplTest {
 
         // Then an exception is thrown
         assertThat(ex.getMessage(), equalTo(USER_NULL_ERR));
-
     }
 
     @Test
@@ -637,6 +638,55 @@ public class KeyringImplTest {
         verify(keyringCache, times(1)).add(TEST_COLLECTION_ID, secretKey);
     }
 
+    @Test
+    public void testList_userIsNull_shouldThrowException()  {
+        // Given user is null
+
+        // When list is called
+        KeyringException ex = assertThrows(KeyringException.class, () -> keyring.list(null));
+
+        // Then an exception is thrown
+        assertThat(ex.getMessage(), equalTo(USER_NULL_ERR));
+    }
+
+    @Test
+    public void testList_permissionsServiceThrowsException() throws Exception {
+        when(permissionsService.canEdit(user.getEmail()))
+                .thenThrow(new IOException("Bork"));
+
+        KeyringException ex = assertThrows(KeyringException.class, () -> keyring.list(user));
+
+        assertThat(ex.getCause().getMessage(), equalTo("Bork"));
+    }
+
+    @Test
+    public void testList_permissionsServiceReturnsFalse_shouldReturnNull() throws Exception {
+         when(permissionsService.canEdit(user.getEmail()))
+                .thenReturn(false);
+
+        Set<String> actual = keyring.list(user);
+
+        assertThat(actual, nullValue());
+        verify(permissionsService, times(1)).canEdit(user.getEmail());
+        verifyZeroInteractions(keyringCache);
+    }
+
+    @Test
+    public void testList_keyringCacheReturnsCollectionIDs() throws Exception {
+        Set<String> collectionIDs = new HashSet<>();
+        collectionIDs.add(TEST_COLLECTION_ID);
+
+        when(keyringCache.list())
+                .thenReturn(collectionIDs);
+
+        when(permissionsService.canEdit(user.getEmail()))
+                .thenReturn(true);
+
+        keyring.list(user);
+
+        verify(permissionsService, times(1)).canEdit(user.getEmail());
+        verify(keyringCache, times(1)).list();
+    }
 
     private void resetInstanceToNull() throws Exception {
         // Use some evil reflection magic to set the instance back to null for this test case.

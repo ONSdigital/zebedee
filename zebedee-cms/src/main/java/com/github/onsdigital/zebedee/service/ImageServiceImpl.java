@@ -41,20 +41,7 @@ public class ImageServiceImpl implements ImageService {
                 .log("publishing images in collection");
 
         for (Image image : images.getItems()) {
-            switch (image.getState()) {
-                case STATE_CREATED:
-                case STATE_DELETED:
-                    info().data("publishing", true).data("collectionId", collection.getId())
-                            .data("imageId", image.getId())
-                            .data("imageState",image.getState())
-                            .log("skipping publish of image");
-                    break;
-                default:
-                    info().data("publishing", true).data("collectionId", collection.getId())
-                            .data("imageId", image.getId())
-                            .log("publishing image");
-                    imageClient.publishImage(image.getId());
-            }
+            publishImage(image, collection.getId());
         }
 
         // Image API does not implement paging. Capture scenario if it is implemented unexpectedly.
@@ -63,4 +50,23 @@ public class ImageServiceImpl implements ImageService {
         }
     }
 
+    /**
+     * Publish an image unless its state is 'created' or 'cancelled'
+     */
+    private void publishImage(Image image, String collectionId) throws IOException, ImageAPIException {
+        switch (image.getState()) {
+            case STATE_CREATED:
+            case STATE_DELETED:
+                info().data("publishing", true).data("collectionId", collectionId)
+                        .data("imageId", image.getId())
+                        .data("imageState", image.getState())
+                        .log("skipping publish of image");
+                break;
+            default:
+                info().data("publishing", true).data("collectionId", collectionId)
+                        .data("imageId", image.getId())
+                        .log("publishing image");
+                imageClient.publishImage(image.getId());
+        }
+    }
 }

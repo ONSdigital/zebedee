@@ -8,11 +8,15 @@ import com.github.onsdigital.zebedee.model.Collection;
 
 import java.io.IOException;
 
+import static com.github.onsdigital.zebedee.logging.CMSLogEvent.info;
+
 /**
  * Image related services
  */
 public class ImageServiceImpl implements ImageService {
 
+    public static final String STATE_CREATED = "created";
+    public static final String STATE_DELETED = "deleted";
     private ImageClient imageClient;
 
     /**
@@ -32,9 +36,25 @@ public class ImageServiceImpl implements ImageService {
     public void publishImagesInCollection(Collection collection) throws IOException, ImageAPIException {
 
         Images images = imageClient.getImages(collection.getId());
+        info().data("publishing", true).data("collectionId", collection.getId())
+                .data("numberOfImages", images.getTotalCount())
+                .log("publishing images in collection");
 
         for (Image image : images.getItems()) {
-            imageClient.publishImage(image.getId());
+            switch (image.getState()) {
+                case STATE_CREATED:
+                case STATE_DELETED:
+                    info().data("publishing", true).data("collectionId", collection.getId())
+                            .data("imageId", image.getId())
+                            .data("imageState",image.getState())
+                            .log("skipping publish of image");
+                    break;
+                default:
+                    info().data("publishing", true).data("collectionId", collection.getId())
+                            .data("imageId", image.getId())
+                            .log("publishing image");
+                    imageClient.publishImage(image.getId());
+            }
         }
 
         // Image API does not implement paging. Capture scenario if it is implemented unexpectedly.

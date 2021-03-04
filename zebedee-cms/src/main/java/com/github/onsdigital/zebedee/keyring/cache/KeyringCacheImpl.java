@@ -211,22 +211,10 @@ public class KeyringCacheImpl implements KeyringCache {
     @Override
     public Set<String> list() throws KeyringException {
         if (!cache.isEmpty()) {
-            return getCollectionIDs();
+            return cache.keySet();
         }
-
-        for (Map.Entry<String, SecretKey> keys : keyStore.readAll().entrySet()) {
-            cache.put(keys.getKey(), keys.getValue());
-        }
-
-        return getCollectionIDs();
-    }
-
-    private Set<String> getCollectionIDs() {
-        Set<String> collectionIDs = new HashSet<>();
-        for (Map.Entry<String, SecretKey> keys : cache.entrySet()) {
-            collectionIDs.add(keys.getKey());
-        }
-        return collectionIDs;
+        load();
+        return cache.keySet();
     }
 
     /**

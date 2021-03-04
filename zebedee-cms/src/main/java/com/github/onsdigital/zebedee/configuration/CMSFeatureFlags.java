@@ -16,6 +16,7 @@ public class CMSFeatureFlags {
     private static final String ENABLE_DATASET_VERSION_VERIFICATION = "ENABLE_DATASET_VERSION_VERIFICATION";
     private static final String ENABLE_SESSIONS_API = "ENABLE_SESSIONS_API";
     private static final String ENABLE_CENTRALISED_KEYRING = "ENABLE_CENTRALISED_KEYRING";
+    private static final String ENABLE_IMAGE_PUBLISHING = "ENABLE_IMAGE_PUBLISHING";
 
     /**
      * Singleton instance
@@ -34,6 +35,8 @@ public class CMSFeatureFlags {
 
     private final boolean isCentralisedKeyringEnabled;
 
+    private final boolean isImagePublishingEnabled;
+
     /**
      * Construct a new feature flags instance.
      */
@@ -44,6 +47,7 @@ public class CMSFeatureFlags {
         this.isDatasetVersionVerificationEnabled = Boolean.valueOf(getConfigValue(ENABLE_DATASET_VERSION_VERIFICATION));
         this.isSessionAPIEnabled = Boolean.valueOf(getConfigValue(ENABLE_SESSIONS_API));
         this.isCentralisedKeyringEnabled = Boolean.valueOf(getConfigValue(ENABLE_CENTRALISED_KEYRING));
+        this.isImagePublishingEnabled = Boolean.valueOf(getConfigValue(ENABLE_IMAGE_PUBLISHING));
 
         info().data(ENABLE_DATASET_IMPORT, isDatasetImportEnabled)
                 .data(ENABLE_PERMISSIONS_AUTH, isPermissionsAuthEnabled)
@@ -51,6 +55,7 @@ public class CMSFeatureFlags {
                 .data(ENABLE_DATASET_VERSION_VERIFICATION, isDatasetVersionVerificationEnabled)
                 .data(ENABLE_SESSIONS_API, isSessionAPIEnabled)
                 .data(ENABLE_CENTRALISED_KEYRING, isCentralisedKeyringEnabled)
+                .data(ENABLE_IMAGE_PUBLISHING, isImagePublishingEnabled)
                 .log("CMS feature flags configurations");
     }
 
@@ -95,6 +100,10 @@ public class CMSFeatureFlags {
 
     public boolean isCentralisedKeyringEnabled() {
         return isCentralisedKeyringEnabled;
+    }
+
+    public boolean isImagePublishingEnabled() {
+        return isImagePublishingEnabled;
     }
 
     public static String getConfigValue(String name) {

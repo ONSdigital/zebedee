@@ -197,6 +197,12 @@
             <version>0.2.1</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.github.onsdigital</groupId>
+            <artifactId>dp-image-api-client-java</artifactId>
+            <version>0.1.0</version>
+        </dependency>
+
     </dependencies>
 
     <build>

@@ -15,6 +15,7 @@ import com.github.onsdigital.zebedee.model.encryption.ApplicationKeys;
 import com.github.onsdigital.zebedee.model.publishing.PublishedCollections;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.service.DatasetService;
+import com.github.onsdigital.zebedee.service.ImageService;
 import com.github.onsdigital.zebedee.service.ServiceStore;
 import com.github.onsdigital.zebedee.service.ServiceStoreImpl;
 import com.github.onsdigital.zebedee.session.model.Session;
@@ -79,6 +80,7 @@ public class Zebedee {
     private final Sessions sessions;
     private final DataIndex dataIndex;
     private final DatasetService datasetService;
+    private final ImageService imageService;
     private final ServiceStoreImpl serviceStoreImpl;
 
     /**
@@ -101,6 +103,7 @@ public class Zebedee {
         this.usersService = configuration.getUsersService();
         this.verificationAgent = configuration.getVerificationAgent(isVerificationEnabled(), this);
         this.datasetService = configuration.getDatasetService();
+        this.imageService = configuration.getImageService();
         this.serviceStoreImpl = configuration.getServiceStore();
 
         this.collectionsPath = configuration.getCollectionsPath();
@@ -354,6 +357,10 @@ public class Zebedee {
 
     public DatasetService getDatasetService() {
         return datasetService;
+    }
+
+    public ImageService getImageService() {
+        return imageService;
     }
 
     public ServiceStore getServiceStore() {

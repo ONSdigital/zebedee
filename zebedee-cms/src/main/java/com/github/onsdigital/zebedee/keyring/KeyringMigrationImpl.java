@@ -10,7 +10,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import javax.crypto.SecretKey;
 import java.io.IOException;
-import java.security.Key;
 import java.util.Set;
 
 /**
@@ -62,17 +61,28 @@ public class KeyringMigrationImpl implements Keyring {
         this.sessionsService = sessionsService;
     }
 
+    /**
+     * Populate the keyring from a user. If central keyring has been enabled then both the new central keyring and
+     * the legacy keyring will be populated.
+     *
+     * @param user the user that populates the keyring.
+     * @throws KeyringException problem populating the keyring.
+     */
     @Override
     public void populateFromUser(User user) throws KeyringException {
         validateUser(user);
 
         if (centralKeyringEnabled) {
-            return;
+            centralKeyring.populateFromUser(user);
         }
 
         populateLegacyKeyringCacheFromUser(user);
     }
 
+    /**
+     * This is the legacy keyring implementation of this functionality. Once we have fully migrated to the new
+     * central keyring this code can be deleted.
+     */
     private void populateLegacyKeyringCacheFromUser(User user) throws KeyringException {
         com.github.onsdigital.zebedee.json.Keyring userKeyring = getUserKeyring(user);
 

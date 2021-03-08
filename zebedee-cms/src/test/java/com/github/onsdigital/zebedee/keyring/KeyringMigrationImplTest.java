@@ -558,15 +558,34 @@ public class KeyringMigrationImplTest {
     }
 
     @Test
-    public void testPopulateFromUser_successCentralKeyringEnabled_shouldDoNothing() throws Exception {
+    public void testPopulateFromUser_successCentralKeyringEnabled_shouldPopulateBothKeyrings() throws Exception {
         // Given the central keyring is enabled
         keyring = new KeyringMigrationImpl(enabled, centralKeyring, legacyKeyringCache, applicationKeys, sessionsService);
 
         // When populate from user is called
         keyring.populateFromUser(user);
 
-        // Then no action is taken
-        verifyZeroInteractions(centralKeyring, legacyKeyringCache, applicationKeys, sessionsService);
+        // Then both the legacy and central keyrings are populated
+        verify(centralKeyring, times(1)).populateFromUser(user);
+        verify(sessionsService, times(1)).find(TEST_EMAIL);
+        verify(legacyKeyringCache, times(1)).put(user, session);
+        verify(applicationKeys, times(1)).populateCacheFromUserKeyring(legacyKeyring);
+    }
+
+    @Test
+    public void testPopulateFromUser_centralKeyringError_shouldThrowException() throws Exception {
+        // Given central keyring populateFromUser throws an exception
+        keyring = new KeyringMigrationImpl(enabled, centralKeyring, legacyKeyringCache, applicationKeys, sessionsService);
+        doThrow(KeyringException.class)
+                .when(centralKeyring)
+                .populateFromUser(user);
+
+        // When populate from user is called
+        assertThrows(KeyringException.class, () -> keyring.populateFromUser(user));
+
+        // Then both the legacy and central keyrings are populated
+        verify(centralKeyring, times(1)).populateFromUser(user);
+        verifyZeroInteractions(sessionsService, legacyKeyringCache, applicationKeys);
     }
 
     @Test

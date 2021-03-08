@@ -34,6 +34,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
@@ -317,6 +318,39 @@ public class KeyringMigrationImplTest {
     }
 
     @Test
+    public void testRemove_CentralKeyringError_throwsException() throws Exception {
+        // Given the central keyring is enabled
+        // and returns an error when remove is called.
+        keyring = new KeyringMigrationImpl(enabled, centralKeyring, legacyKeyringCache, applicationKeys, sessionsService);
+
+        doThrow(KeyringException.class)
+                .when(centralKeyring)
+                .remove(user, collection);
+
+        // When remove is called
+        assertThrows(KeyringException.class, () -> keyring.remove(user, collection));
+
+        // Then an execption is thrown
+        verify(centralKeyring, times(1)).remove(user, collection);
+        verify(user, never()).keyring();
+        verify(legacyKeyring, never()).remove(TEST_COLLECTION_ID);
+    }
+
+    @Test
+    public void testRemove_successCentralKeyringEnabled_removeKeyFromBoth() throws Exception {
+        // Given the central keyring is enabled
+        keyring = new KeyringMigrationImpl(enabled, centralKeyring, legacyKeyringCache, applicationKeys, sessionsService);
+
+        // When remove is called
+        keyring.remove(user, collection);
+
+        // Then the collection key is removed from both the new and legacy keyring implementations
+        verify(centralKeyring, times(1)).remove(user, collection);
+        verify(user, times(1)).keyring();
+        verify(legacyKeyring, times(1)).remove(TEST_COLLECTION_ID);
+    }
+
+    @Test
     public void testRemove_Success_shouldNotReturnError() throws Exception {
         // Given remove is successful
 
@@ -327,18 +361,6 @@ public class KeyringMigrationImplTest {
         verify(user, times(1)).keyring();
         verify(legacyKeyring, times(1)).remove(TEST_COLLECTION_ID);
         verifyZeroInteractions(centralKeyring);
-    }
-
-    @Test
-    public void testRemove_centralKeyringEnabled_RemoveShouldReturnNull() throws Exception {
-        // Given central keyring is enabled
-        keyring = new KeyringMigrationImpl(enabled, centralKeyring, legacyKeyringCache, applicationKeys, sessionsService);
-
-        // when remove is called
-        keyring.remove(user, collection);
-
-        // Then no action is taken
-        verifyZeroInteractions(user, centralKeyring);
     }
 
     @Test

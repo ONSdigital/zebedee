@@ -145,18 +145,29 @@ public class KeyringMigrationImpl implements Keyring {
         return getUserKeyring(user).get(collection.getDescription().getId());
     }
 
+    /**
+     * Remove a collection key from the keyring. If central keyring is enabled then the collection key will be
+     * removed from both the new central keyring and the old legacy keyring.
+     *
+     * @param user       the user performing the action.
+     * @param collection the collection the the key belongs to.
+     * @throws KeyringException problem removing key from keyring.
+     */
     @Override
     public void remove(User user, Collection collection) throws KeyringException {
         validateUser(user);
         validateCollection(collection);
 
         if (centralKeyringEnabled) {
-            return;
+            centralKeyring.remove(user, collection);
         }
 
         removeFromLegacyKeyring(user, collection);
     }
 
+    /**
+     * This is temp code and will be removed once we are confident the new central keyring is working as expected.
+     */
     private void removeFromLegacyKeyring(User user, Collection collection) throws KeyringException {
         getUserKeyring(user).remove(collection.getDescription().getId());
     }

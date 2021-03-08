@@ -25,6 +25,10 @@ public class KeyringException extends IOException {
         this.collectionID = collectionID;
     }
 
+    public KeyringException(final String message, final Throwable cause) {
+        super(message, cause);
+    }
+
     public KeyringException(final Throwable cause) {
         super(cause);
     }

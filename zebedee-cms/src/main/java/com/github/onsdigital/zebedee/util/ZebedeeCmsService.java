@@ -20,6 +20,7 @@ import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
 import com.github.onsdigital.zebedee.reader.ZebedeeReader;
 import com.github.onsdigital.zebedee.service.DatasetService;
+import com.github.onsdigital.zebedee.service.ImageService;
 import com.github.onsdigital.zebedee.session.model.Session;
 import dp.api.dataset.DatasetAPIClient;
 import dp.api.dataset.DatasetClient;
@@ -133,6 +134,10 @@ public class ZebedeeCmsService {
 
     public DatasetService getDatasetService() {
         return Root.zebedee.getDatasetService();
+    }
+
+    public ImageService getImageService() {
+        return Root.zebedee.getImageService();
     }
 
     public DatasetClient getDatasetClient() throws URISyntaxException {

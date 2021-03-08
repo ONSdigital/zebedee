@@ -4,6 +4,7 @@ import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.user.model.User;
 
 import javax.crypto.SecretKey;
+import java.util.Set;
 
 public interface Keyring {
 
@@ -43,4 +44,11 @@ public interface Keyring {
      * @throws KeyringException problem adding the key to the keyring.
      */
     void add(User user, Collection collection, SecretKey key) throws KeyringException;
+
+    /**
+     * Lists the collection IDs in the keyring.
+     *
+     * @return An unmodifiable set of the key identifiers in the keyring.
+     */
+    Set<String> list(User user) throws KeyringException;
 }

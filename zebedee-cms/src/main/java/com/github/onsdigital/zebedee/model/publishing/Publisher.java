@@ -19,6 +19,7 @@ import com.github.onsdigital.zebedee.model.publishing.verify.HashVerifierImpl;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.service.DatasetService;
+import com.github.onsdigital.zebedee.service.ImageService;
 import com.github.onsdigital.zebedee.service.ServiceSupplier;
 import com.github.onsdigital.zebedee.util.Http;
 import com.github.onsdigital.zebedee.util.SlackNotification;
@@ -63,6 +64,7 @@ public class Publisher {
 
     private static final List<Host> theTrainHosts;
     private static final ExecutorService pool = Executors.newFixedThreadPool(20);
+    private static final ExecutorService apiPool = Executors.newFixedThreadPool(5);
 
     // endpoints
     private static final String BEGIN_ENDPOINT = "begin";
@@ -77,6 +79,7 @@ public class Publisher {
     private static final String ZIP_PARAM = "zip";
 
     private static ServiceSupplier<DatasetService> datasetServiceSupplier;
+    private static ServiceSupplier<ImageService> imageServiceSupplier;
 
     static {
         theTrainHosts = Configuration.getTheTrainHosts();
@@ -84,6 +87,7 @@ public class Publisher {
 
         // lazy loaded approach for getting the datasetService.
         datasetServiceSupplier = () -> ZebedeeCmsService.getInstance().getDatasetService();
+        imageServiceSupplier = () -> ZebedeeCmsService.getInstance().getImageService();
     }
 
     /**
@@ -102,6 +106,11 @@ public class Publisher {
             throws IOException {
         boolean success = false;
 
+        Future<Boolean> imageFuture = null;
+        if (CMSFeatureFlags.cmsFeatureFlags().isImagePublishingEnabled()) {
+            imageFuture = publishImages(collection);
+        }
+
         publishFilteredCollectionFiles(collection, collectionReader);
 
         if (CMSFeatureFlags.cmsFeatureFlags().isVerifyPublishEnabled()) {
@@ -117,6 +126,21 @@ public class Publisher {
         // FIXME CMD feature
         if (cmsFeatureFlags().isEnableDatasetImport()) {
             success &= publishDatasets(collection);
+        }
+
+        if (CMSFeatureFlags.cmsFeatureFlags().isImagePublishingEnabled()) {
+            try {
+                if (imageFuture == null) {
+                    throw new Exception("image future unexpectedly null on completion of publishing");
+                }
+                success = success && imageFuture.get();
+            } catch (Exception e) {
+                error().data("collectionId", collection.getDescription().getId()).data("publishing", true)
+                        .logException(e, "Exception publishing images via image API");
+                PostMessageField msg = new PostMessageField("Error", e.getMessage(), false);
+                collectionAlarm(collection, "Exception publishing images via image API", msg);
+                success = false;
+            }
         }
 
         info().data("milliseconds", collection.getPublishTimeMilliseconds())
@@ -690,6 +714,13 @@ public class Publisher {
             saveCollection(collection, datasetsPublished);
         }
         return datasetsPublished;
+    }
+
+    private static Future<Boolean> publishImages(Collection collection) {
+        return apiPool.submit(() -> {
+            imageServiceSupplier.getService().publishImagesInCollection(collection);
+            return true;  // Complete
+        });
     }
 
     private static void saveCollection(Collection collection, boolean publishComplete) {

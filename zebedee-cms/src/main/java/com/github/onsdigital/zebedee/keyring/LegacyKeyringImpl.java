@@ -12,6 +12,10 @@ import javax.crypto.SecretKey;
 import java.io.IOException;
 import java.util.Set;
 
+/**
+ * This class duplicates the existing (legacy) keyring functionality behind a newly defined Keyring interface.
+ * Moving the keyring functionality behind an interface allows to swap implemetations more easily.
+ */
 public class LegacyKeyringImpl implements Keyring {
 
     static final String USER_NULL_ERR = "user required but was null";
@@ -25,6 +29,13 @@ public class LegacyKeyringImpl implements Keyring {
     private KeyringCache cache;
     private ApplicationKeys applicationKeys;
 
+    /**
+     * COnstruct a new instance of the Legacy keyring.
+     *
+     * @param sessionsService the {@link Sessions} service to use.
+     * @param cache           the {@link KeyringCache} to use.
+     * @param applicationKeys the {@link ApplicationKeys} to use.
+     */
     public LegacyKeyringImpl(final Sessions sessionsService, final KeyringCache cache, final ApplicationKeys applicationKeys) {
         this.sessionsService = sessionsService;
         this.cache = cache;
@@ -49,21 +60,23 @@ public class LegacyKeyringImpl implements Keyring {
 
     @Override
     public SecretKey get(User user, Collection collection) throws KeyringException {
+        // TODO
         return null;
     }
 
     @Override
     public void remove(User user, Collection collection) throws KeyringException {
-
+        // TODO
     }
 
     @Override
     public void add(User user, Collection collection, SecretKey key) throws KeyringException {
-
+        // TODO
     }
 
     @Override
     public Set<String> list(User user) throws KeyringException {
+        // TODO
         return null;
     }
 

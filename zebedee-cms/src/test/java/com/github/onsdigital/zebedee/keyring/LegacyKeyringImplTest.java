@@ -254,7 +254,7 @@ public class LegacyKeyringImplTest {
 
     @Test
     public void testGet_collecitonNull_shouldThrowException() {
-        // Given colleciton is null
+        // Given collection is null
 
         // When get is called
         KeyringException ex = assertThrows(KeyringException.class, () -> keyring.get(user, null));
@@ -265,7 +265,7 @@ public class LegacyKeyringImplTest {
 
     @Test
     public void testGet_collecitonDescriptionNull_shouldThrowException() {
-        // Given colleciton description is null
+        // Given collection description is null
         when(collection.getDescription())
                 .thenReturn(null);
 
@@ -278,7 +278,7 @@ public class LegacyKeyringImplTest {
 
     @Test
     public void testGet_collecitonIDNull_shouldThrowException() {
-        // Given colleciton ID is null
+        // Given collection ID is null
         when(collectionDescription.getId())
                 .thenReturn(null);
 
@@ -291,7 +291,7 @@ public class LegacyKeyringImplTest {
 
     @Test
     public void testGet_collecitonIDEmpty_shouldThrowException() {
-        // Given colleciton ID is null
+        // Given collection ID is empty
         when(collectionDescription.getId())
                 .thenReturn("");
 

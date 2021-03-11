@@ -202,18 +202,11 @@ public class KeyringCacheImpl implements KeyringCache {
         cache.remove(collectionID);
     }
 
-    /**
-     * Returns a list of collection IDs from the Keyring
-     *
-     * @return
-     * @throws KeyringException
-     */
     @Override
     public Set<String> list() throws KeyringException {
-        if (!cache.isEmpty()) {
-            return cache.keySet();
+        if (cache.isEmpty()) {
+            load();
         }
-        load();
         return cache.keySet();
     }
 

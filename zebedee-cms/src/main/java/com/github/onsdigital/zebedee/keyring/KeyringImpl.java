@@ -17,6 +17,7 @@ import java.util.Set;
 public class KeyringImpl implements Keyring {
 
     static final String USER_NULL_ERR = "user required but was null";
+    static final String USER_EMAIL_ERR = "user email required but was null or empty";
     static final String USER_KEYRING_NULL_ERR = "user keyring required but was null";
     static final String USER_KEYRING_LOCKED_ERR = "error user keyring is locked";
     static final String NOT_INITIALISED_ERR = "CollectionKeyring accessed but not yet initialised";
@@ -77,15 +78,12 @@ public class KeyringImpl implements Keyring {
         }
     }
 
-    /**
-     * @param user
-     * @param collection
-     * @return
-     * @throws KeyringException
-     */
+
     @Override
     public SecretKey get(User user, Collection collection) throws KeyringException {
-        validGetParams(user, collection);
+        validateUser(user);
+        validateUserEmail(user);
+        validateCollection(collection);
 
         boolean hasAccess = false;
         try {
@@ -103,11 +101,13 @@ public class KeyringImpl implements Keyring {
 
     @Override
     public void remove(User user, Collection collection) throws KeyringException {
-        validGetParams(user, collection);
+        validateUser(user);
+        validateUserEmail(user);
+        validateCollection(collection);
 
         boolean hasAccess = false;
         try {
-            hasAccess = permissionsService.canEdit(user, collection.getDescription());
+            hasAccess = permissionsService.canEdit(user.getEmail());
         } catch (IOException ex) {
             throw new KeyringException(ex);
         }
@@ -121,14 +121,14 @@ public class KeyringImpl implements Keyring {
 
     @Override
     public void add(User user, Collection collection, SecretKey key) throws KeyringException {
-        validGetParams(user, collection);
-        if (key == null) {
-            throw new KeyringException(SECRET_KEY_NULL_ERR);
-        }
+        validateUser(user);
+        validateUserEmail(user);
+        validateCollection(collection);
+        validateKey(key);
 
         boolean hasAccess = false;
         try {
-            hasAccess = permissionsService.canEdit(user, collection.getDescription());
+            hasAccess = permissionsService.canEdit(user.getEmail());
         } catch (IOException ex) {
             throw new KeyringException(ex);
         }
@@ -140,18 +140,11 @@ public class KeyringImpl implements Keyring {
         cache.add(collection.getDescription().getId(), key);
     }
 
-    /**
-     * Lists the collection IDs in the keyring.
-     *
-     * @param user
-     * @return An unmodifiable set of the key identifiers in the keyring.
-     */
+
     @Override
     public Set<String> list(User user) throws KeyringException {
-        if (user == null) {
-            throw new KeyringException(USER_NULL_ERR);
-        }
-
+        validateUser(user);
+        validateUserEmail(user);
         boolean hasAccess = false;
         try {
             hasAccess = permissionsService.canEdit(user.getEmail());
@@ -165,12 +158,27 @@ public class KeyringImpl implements Keyring {
 
         return cache.list();
     }
-
-    private void validGetParams(User user, Collection collection) throws KeyringException {
+    
+    private void validateUser(User user) throws KeyringException {
         if (user == null) {
             throw new KeyringException(USER_NULL_ERR);
         }
+    }
 
+    private void validateUserEmail(User user) throws KeyringException {
+        if (user.getEmail()== null | user.getEmail()== "") {
+            throw new KeyringException(USER_EMAIL_ERR);
+        }
+    }
+
+    private void validateKey(SecretKey key) throws KeyringException {
+        if (key == null) {
+            throw new KeyringException(SECRET_KEY_NULL_ERR);
+        }
+    }
+
+
+    private void validateCollection(Collection collection) throws KeyringException {
         if (collection == null) {
             throw new KeyringException(COLLECTION_NULL_ERR);
         }

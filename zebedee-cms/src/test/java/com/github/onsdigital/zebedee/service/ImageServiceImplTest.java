@@ -12,6 +12,7 @@ import org.mockito.ArgumentCaptor;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.mockito.Matchers.anyString;
@@ -23,6 +24,9 @@ public class ImageServiceImplTest {
     private static final String IMAGE1 = "i1";
     private static final String IMAGE2 = "i2";
     private static final String IMAGE3 = "i3";
+    public static final String STATE_IMPORTED = "imported";
+    public static final String STATE_CREATED = "created";
+    public static final String STATE_DELETED = "deleted";
 
     ImageAPIException apiException = new ImageAPIException("error", 123);
 
@@ -38,7 +42,7 @@ public class ImageServiceImplTest {
     @Test
     public void testPublishImagesInCollection_threeImages() throws Exception {
         // Given an api that returns three images
-        when(mockImageAPI.getImages(COLLECTION_ID)).thenReturn(createTestImages(IMAGE1, IMAGE2, IMAGE3));
+        when(mockImageAPI.getImages(COLLECTION_ID)).thenReturn(createImportedTestImages(IMAGE1, IMAGE2, IMAGE3));
         ImageService imageService = new ImageServiceImpl(mockImageAPI);
 
         // When publish is called on the collection
@@ -53,9 +57,28 @@ public class ImageServiceImplTest {
     }
 
     @Test
+    public void testPublishImagesInCollection_withCreatedORDeletedSkipped() throws Exception {
+        // Given an api that returns created,imported and deleted images
+        when(mockImageAPI.getImages(COLLECTION_ID)).thenReturn(createTestImages(Arrays.asList(
+                createTestImage(IMAGE1,STATE_CREATED),
+                createTestImage(IMAGE2,STATE_IMPORTED),
+                createTestImage(IMAGE3,STATE_DELETED)
+                )));
+        ImageService imageService = new ImageServiceImpl(mockImageAPI);
+
+        // When publish is called on the collection
+        imageService.publishImagesInCollection(mockCollection);
+
+        // Then publishImage should not be called on the API for the created or deleted images.
+        ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+        verify(mockImageAPI, times(1)).publishImage(captor.capture());
+        Assert.assertEquals(IMAGE2, captor.getAllValues().get(0));
+    }
+
+    @Test
     public void testPublishImagesInCollection_zeroImages() throws Exception {
         // Given an api that returns zero images
-        when(mockImageAPI.getImages(COLLECTION_ID)).thenReturn(createTestImages());
+        when(mockImageAPI.getImages(COLLECTION_ID)).thenReturn(createImportedTestImages());
         ImageService imageService = new ImageServiceImpl(mockImageAPI);
 
         // When publish is called on the collection
@@ -80,7 +103,7 @@ public class ImageServiceImplTest {
     @Test(expected = ImageAPIException.class)
     public void testPublishImagesInCollection_publishImageException() throws Exception {
         // Given an api that returns a good image but throws an exception when publishing
-        when(mockImageAPI.getImages(COLLECTION_ID)).thenReturn(createTestImages(IMAGE1));
+        when(mockImageAPI.getImages(COLLECTION_ID)).thenReturn(createImportedTestImages(IMAGE1));
         doThrow(apiException).when(mockImageAPI).publishImage(anyString());
         ImageService imageService = new ImageServiceImpl(mockImageAPI);
 
@@ -93,7 +116,7 @@ public class ImageServiceImplTest {
     @Test
     public void testPublishImagesInCollection_unexpectedPaging() throws Exception {
         // Given an api that returns one page of good images but with more pages available
-        Images testImages = createTestImages(IMAGE1, IMAGE2);
+        Images testImages = createImportedTestImages(IMAGE1, IMAGE2);
         testImages.setTotalCount(3);
         when(mockImageAPI.getImages(COLLECTION_ID)).thenReturn(testImages);
         ImageService imageService = new ImageServiceImpl(mockImageAPI);
@@ -110,22 +133,27 @@ public class ImageServiceImplTest {
         Assert.assertEquals("Not all images have been published due to API paging", ex.getMessage());
     }
 
-    private Image createTestImage(String id) {
+    private Image createTestImage(String id,String state) {
         Image image = new Image();
         image.setId(id);
+        image.setState(state);
         return image;
     }
 
-    private Images createTestImages(String... ids) {
+    private Images createTestImages(List<Image> imageItems) {
         Images images = new Images();
-        images.setCount(ids.length);
-        images.setTotalCount(ids.length);
-        List<Image> imageItems = new ArrayList<Image>();
-        for (String id : ids) {
-            imageItems.add(createTestImage(id));
-        }
+        images.setCount(imageItems.size());
+        images.setTotalCount(imageItems.size());
         images.setItems(imageItems);
         return images;
+    }
+
+    private Images createImportedTestImages(String... ids) {
+        List<Image> imageItems = new ArrayList<Image>();
+        for (String id : ids) {
+            imageItems.add(createTestImage(id, STATE_IMPORTED));
+        }
+        return createTestImages(imageItems);
     }
 }
 

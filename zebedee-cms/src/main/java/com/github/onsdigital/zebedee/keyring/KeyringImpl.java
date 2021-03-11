@@ -82,7 +82,6 @@ public class KeyringImpl implements Keyring {
     @Override
     public SecretKey get(User user, Collection collection) throws KeyringException {
         validateUser(user);
-        validateUserEmail(user);
         validateCollection(collection);
 
         boolean hasAccess = false;
@@ -102,7 +101,6 @@ public class KeyringImpl implements Keyring {
     @Override
     public void remove(User user, Collection collection) throws KeyringException {
         validateUser(user);
-        validateUserEmail(user);
         validateCollection(collection);
 
         boolean hasAccess = false;
@@ -122,7 +120,6 @@ public class KeyringImpl implements Keyring {
     @Override
     public void add(User user, Collection collection, SecretKey key) throws KeyringException {
         validateUser(user);
-        validateUserEmail(user);
         validateCollection(collection);
         validateKey(key);
 
@@ -144,7 +141,6 @@ public class KeyringImpl implements Keyring {
     @Override
     public Set<String> list(User user) throws KeyringException {
         validateUser(user);
-        validateUserEmail(user);
         boolean hasAccess = false;
         try {
             hasAccess = permissionsService.canEdit(user.getEmail());
@@ -158,14 +154,11 @@ public class KeyringImpl implements Keyring {
 
         return cache.list();
     }
-    
+
     private void validateUser(User user) throws KeyringException {
         if (user == null) {
             throw new KeyringException(USER_NULL_ERR);
         }
-    }
-
-    private void validateUserEmail(User user) throws KeyringException {
         if (user.getEmail()== null | user.getEmail()== "") {
             throw new KeyringException(USER_EMAIL_ERR);
         }

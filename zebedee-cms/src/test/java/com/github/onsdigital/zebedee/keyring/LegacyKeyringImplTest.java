@@ -21,6 +21,7 @@ import static com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl.COLLECTION
 import static com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl.COLLECTION_NULL_ERR;
 import static com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl.EMAIL_EMPTY_ERR;
 import static com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl.GET_SESSION_ERR;
+import static com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl.SECRET_KEY_NULL_ERR;
 import static com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl.SESSION_NULL_ERR;
 import static com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl.USER_KEYRING_NULL_ERR;
 import static com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl.USER_NULL_ERR;
@@ -490,5 +491,66 @@ public class LegacyKeyringImplTest {
 
         // Then an exception is thrown
         assertThat(ex.getMessage(), equalTo(USER_KEYRING_NULL_ERR));
+    }
+
+    @Test
+    public void testAdd_collectionNull_shouldThrowException() {
+        // Given collection is null
+
+        // When add is called
+        KeyringException ex = assertThrows(KeyringException.class, ()-> keyring.add(user, null, null));
+
+        // Then an exception is thrown
+        assertThat(ex.getMessage(), equalTo(COLLECTION_NULL_ERR));
+    }
+
+    @Test
+    public void testAdd_collectionDescriptionNull_shouldThrowException() {
+        // Given collection description is null
+        when(collection.getDescription())
+                .thenReturn(null);
+
+        // When add is called
+        KeyringException ex = assertThrows(KeyringException.class, ()-> keyring.add(user, collection, null));
+
+        // Then an exception is thrown
+        assertThat(ex.getMessage(), equalTo(COLLECTION_DESC_NULL_ERR));
+    }
+
+    @Test
+    public void testAdd_collectionIDNull_shouldThrowException() {
+        // Given collection ID is null
+        when(collectionDescription.getId())
+                .thenReturn(null);
+
+        // When add is called
+        KeyringException ex = assertThrows(KeyringException.class, ()-> keyring.add(user, collection, null));
+
+        // Then an exception is thrown
+        assertThat(ex.getMessage(), equalTo(COLLECTION_ID_EMPTY_ERR));
+    }
+
+    @Test
+    public void testAdd_collectionIDEmpty_shouldThrowException() {
+        // Given collection ID is empty
+        when(collectionDescription.getId())
+                .thenReturn("");
+
+        // When add is called
+        KeyringException ex = assertThrows(KeyringException.class, ()-> keyring.add(user, collection, null));
+
+        // Then an exception is thrown
+        assertThat(ex.getMessage(), equalTo(COLLECTION_ID_EMPTY_ERR));
+    }
+
+    @Test
+    public void testAdd_secretKeyNull_shouldThrowException() {
+        // Given secret key is null
+
+        // When add is called
+        KeyringException ex = assertThrows(KeyringException.class, ()-> keyring.add(user, collection, null));
+
+        // Then an exception is thrown
+        assertThat(ex.getMessage(), equalTo(SECRET_KEY_NULL_ERR));
     }
 }

@@ -27,6 +27,7 @@ public class LegacyKeyringImpl implements Keyring {
     static final String COLLECTION_NULL_ERR = "collection required but was null";
     static final String COLLECTION_DESC_NULL_ERR = "collection description required but was null";
     static final String COLLECTION_ID_EMPTY_ERR = "collection ID required but was null/empty";
+    static final String SECRET_KEY_NULL_ERR = "secret key required but was null";
 
     private Sessions sessionsService;
     private KeyringCache cache;
@@ -77,26 +78,14 @@ public class LegacyKeyringImpl implements Keyring {
     @Override
     public void add(User user, Collection collection, SecretKey key) throws KeyringException {
         validateUser(user);
+        validateCollection(collection);
+        validateSecretKey(key);
     }
 
     @Override
     public Set<String> list(User user) throws KeyringException {
         // TODO
         return null;
-    }
-
-    private void validateUser(User user) throws KeyringException {
-        if (user == null) {
-            throw new KeyringException(USER_NULL_ERR);
-        }
-
-        if (StringUtils.isEmpty(user.getEmail())) {
-            throw new KeyringException(EMAIL_EMPTY_ERR);
-        }
-
-        if (user.keyring() == null) {
-            throw new KeyringException(USER_KEYRING_NULL_ERR);
-        }
     }
 
     private Session getUserSession(User user) throws KeyringException {
@@ -114,7 +103,21 @@ public class LegacyKeyringImpl implements Keyring {
         return session;
     }
 
-    private void validateCollection(Collection collection) throws KeyringException {
+    void validateUser(User user) throws KeyringException {
+        if (user == null) {
+            throw new KeyringException(USER_NULL_ERR);
+        }
+
+        if (StringUtils.isEmpty(user.getEmail())) {
+            throw new KeyringException(EMAIL_EMPTY_ERR);
+        }
+
+        if (user.keyring() == null) {
+            throw new KeyringException(USER_KEYRING_NULL_ERR);
+        }
+    }
+
+    void validateCollection(Collection collection) throws KeyringException {
         if (collection == null) {
             throw new KeyringException(COLLECTION_NULL_ERR);
         }
@@ -125,6 +128,12 @@ public class LegacyKeyringImpl implements Keyring {
 
         if (StringUtils.isEmpty(collection.getDescription().getId())) {
             throw new KeyringException(COLLECTION_ID_EMPTY_ERR);
+        }
+    }
+
+    void validateSecretKey(SecretKey key) throws KeyringException {
+        if (key == null) {
+            throw new KeyringException(SECRET_KEY_NULL_ERR);
         }
     }
 }

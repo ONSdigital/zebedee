@@ -441,4 +441,54 @@ public class LegacyKeyringImplTest {
         verify(user, times(2)).keyring();
         verify(userKeyring, times(1)).remove(TEST_COLLECTION_ID);
     }
+
+    @Test
+    public void testAdd_userNull_shouldThrowException() {
+        // Given user is null
+
+        // When add is called
+        KeyringException ex = assertThrows(KeyringException.class, ()-> keyring.add(null, null, null));
+
+        // Then an exception is thrown
+        assertThat(ex.getMessage(), equalTo(USER_NULL_ERR));
+    }
+
+    @Test
+    public void testAdd_userEmailNull_shouldThrowException() {
+        // Given user email is null
+        when(user.getEmail())
+                .thenReturn(null);
+
+        // When add is called
+        KeyringException ex = assertThrows(KeyringException.class, ()-> keyring.add(user, null, null));
+
+        // Then an exception is thrown
+        assertThat(ex.getMessage(), equalTo(EMAIL_EMPTY_ERR));
+    }
+
+    @Test
+    public void testAdd_userEmailEmpty_shouldThrowException() {
+        // Given user email is empty
+        when(user.getEmail())
+                .thenReturn("");
+
+        // When add is called
+        KeyringException ex = assertThrows(KeyringException.class, ()-> keyring.add(user, null, null));
+
+        // Then an exception is thrown
+        assertThat(ex.getMessage(), equalTo(EMAIL_EMPTY_ERR));
+    }
+
+    @Test
+    public void testAdd_userKeyringNull_shouldThrowException() {
+        // Given user keyring is null
+        when(user.keyring())
+                .thenReturn(null);
+
+        // When add is called
+        KeyringException ex = assertThrows(KeyringException.class, ()-> keyring.add(user, null, null));
+
+        // Then an exception is thrown
+        assertThat(ex.getMessage(), equalTo(USER_KEYRING_NULL_ERR));
+    }
 }

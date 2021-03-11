@@ -76,7 +76,7 @@ public class LegacyKeyringImpl implements Keyring {
 
     @Override
     public void add(User user, Collection collection, SecretKey key) throws KeyringException {
-        // TODO
+        validateUser(user);
     }
 
     @Override

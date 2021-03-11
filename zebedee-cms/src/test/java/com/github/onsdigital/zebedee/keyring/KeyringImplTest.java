@@ -23,22 +23,18 @@ import static com.github.onsdigital.zebedee.keyring.KeyringImpl.COLLECTION_NULL_
 import static com.github.onsdigital.zebedee.keyring.KeyringImpl.KEYRING_CACHE_NULL_ERR;
 import static com.github.onsdigital.zebedee.keyring.KeyringImpl.NOT_INITIALISED_ERR;
 import static com.github.onsdigital.zebedee.keyring.KeyringImpl.PERMISSION_SERVICE_NULL_ERR;
+import static com.github.onsdigital.zebedee.keyring.KeyringImpl.SECRET_KEY_NULL_ERR;
 import static com.github.onsdigital.zebedee.keyring.KeyringImpl.USER_EMAIL_ERR;
 import static com.github.onsdigital.zebedee.keyring.KeyringImpl.USER_KEYRING_LOCKED_ERR;
 import static com.github.onsdigital.zebedee.keyring.KeyringImpl.USER_KEYRING_NULL_ERR;
 import static com.github.onsdigital.zebedee.keyring.KeyringImpl.USER_NULL_ERR;
-import static com.github.onsdigital.zebedee.keyring.KeyringImpl.SECRET_KEY_NULL_ERR;
-
-import static com.github.onsdigital.zebedee.keyring.KeyringMigrationImpl.EMAIL_EMPTY_ERR;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -100,6 +96,9 @@ public class KeyringImplTest {
     @Test
     public void testPopulateFromUser_userKeyringNull() throws Exception {
         // Given the user keyring is null
+        when(user.getEmail())
+                .thenReturn(TEST_EMAIL_ID);
+
         when(user.keyring())
                 .thenReturn(null);
 
@@ -114,6 +113,9 @@ public class KeyringImplTest {
     @Test
     public void testPopulateFromUser_userKeyringIsLocked() throws Exception {
         // Given the user keyring is locked
+        when(user.getEmail())
+                .thenReturn(TEST_EMAIL_ID);
+
         when(user.keyring())
                 .thenReturn(userKeyring);
 
@@ -131,6 +133,9 @@ public class KeyringImplTest {
     @Test
     public void testPopulateFromUser_userKeyringIsEmpty() throws Exception {
         // Given the user keyring is empty
+        when(user.getEmail())
+                .thenReturn(TEST_EMAIL_ID);
+
         when(user.keyring())
                 .thenReturn(userKeyring);
 
@@ -150,6 +155,9 @@ public class KeyringImplTest {
     @Test
     public void testPopulateFromUser_addThrowsException() throws Exception {
         // Given central keyring.add throws an exception
+        when(user.getEmail())
+                .thenReturn(TEST_EMAIL_ID);
+
         when(user.keyring())
                 .thenReturn(userKeyring);
 
@@ -178,6 +186,9 @@ public class KeyringImplTest {
     @Test
     public void testPopulateFromUser_success() throws Exception {
         // Given a populated user keyring
+        when(user.getEmail())
+                .thenReturn(TEST_EMAIL_ID);
+
         when(user.keyring())
                 .thenReturn(userKeyring);
 
@@ -344,13 +355,13 @@ public class KeyringImplTest {
         when(collDesc.getId())
                 .thenReturn(TEST_COLLECTION_ID);
 
-        when(permissionsService.hasAccessToCollection(user, collection))
+        when(permissionsService.canEdit(TEST_EMAIL_ID))
                 .thenThrow(new IOException("Bork"));
 
         KeyringException ex = assertThrows(KeyringException.class, () -> keyring.get(user, collection));
 
         assertThat(ex.getCause().getMessage(), equalTo("Bork"));
-        verify(permissionsService, times(1)).hasAccessToCollection(user, collection);
+        verify(permissionsService, times(1)).canEdit(TEST_EMAIL_ID);
     }
 
     @Test
@@ -364,13 +375,13 @@ public class KeyringImplTest {
         when(collDesc.getId())
                 .thenReturn(TEST_COLLECTION_ID);
 
-        when(permissionsService.hasAccessToCollection(user, collection))
+        when(permissionsService.canEdit(TEST_EMAIL_ID))
                 .thenReturn(false);
 
         SecretKey secretKey = keyring.get(user, collection);
 
         assertThat(secretKey, is(nullValue()));
-        verify(permissionsService, times(1)).hasAccessToCollection(user, collection);
+        verify(permissionsService, times(1)).canEdit(TEST_EMAIL_ID);
     }
 
     @Test
@@ -384,7 +395,7 @@ public class KeyringImplTest {
         when(collDesc.getId())
                 .thenReturn(TEST_COLLECTION_ID);
 
-        when(permissionsService.hasAccessToCollection(user, collection))
+        when(permissionsService.canEdit(TEST_EMAIL_ID))
                 .thenReturn(true);
 
         when(keyringCache.get(TEST_COLLECTION_ID))
@@ -393,7 +404,7 @@ public class KeyringImplTest {
         KeyringException ex = assertThrows(KeyringException.class, () -> keyring.get(user, collection));
         assertThat(ex.getMessage(), equalTo("Beep"));
 
-        verify(permissionsService, times(1)).hasAccessToCollection(user, collection);
+        verify(permissionsService, times(1)).canEdit(TEST_EMAIL_ID);
         verify(keyringCache, times(1)).get(TEST_COLLECTION_ID);
     }
 
@@ -408,7 +419,7 @@ public class KeyringImplTest {
         when(collDesc.getId())
                 .thenReturn(TEST_COLLECTION_ID);
 
-        when(permissionsService.hasAccessToCollection(user, collection))
+        when(permissionsService.canEdit(TEST_EMAIL_ID))
                 .thenReturn(true);
 
         when(keyringCache.get(TEST_COLLECTION_ID))
@@ -417,7 +428,7 @@ public class KeyringImplTest {
         SecretKey key = keyring.get(user, collection);
 
         assertThat(key, is(nullValue()));
-        verify(permissionsService, times(1)).hasAccessToCollection(user, collection);
+        verify(permissionsService, times(1)).canEdit(TEST_EMAIL_ID);
         verify(keyringCache, times(1)).get(TEST_COLLECTION_ID);
     }
 
@@ -432,7 +443,7 @@ public class KeyringImplTest {
         when(collDesc.getId())
                 .thenReturn(TEST_COLLECTION_ID);
 
-        when(permissionsService.hasAccessToCollection(user, collection))
+        when(permissionsService.canEdit(TEST_EMAIL_ID))
                 .thenReturn(true);
 
         when(keyringCache.get(TEST_COLLECTION_ID))
@@ -441,12 +452,12 @@ public class KeyringImplTest {
         SecretKey key = keyring.get(user, collection);
 
         assertThat(key, equalTo(secretKey));
-        verify(permissionsService, times(1)).hasAccessToCollection(user, collection);
+        verify(permissionsService, times(1)).canEdit(TEST_EMAIL_ID);
         verify(keyringCache, times(1)).get(TEST_COLLECTION_ID);
     }
 
     @Test
-    public void testRemove_userIsNull_shouldThrowException()  {
+    public void testRemove_userIsNull_shouldThrowException() {
         // Given user is null
 
         // When remove is called
@@ -486,7 +497,7 @@ public class KeyringImplTest {
     }
 
     @Test
-    public void testRemove_collectionIsNull_shouldThrowException()  {
+    public void testRemove_collectionIsNull_shouldThrowException() {
         // Given collection is null
         when(user.getEmail())
                 .thenReturn(TEST_EMAIL_ID);
@@ -499,7 +510,7 @@ public class KeyringImplTest {
     }
 
     @Test
-    public void testRemove_collectionDescriptionIsNull_shouldThrowException()  {
+    public void testRemove_collectionDescriptionIsNull_shouldThrowException() {
         // Given user with valid email id and collection description is null
         when(user.getEmail())
                 .thenReturn(TEST_EMAIL_ID);
@@ -515,7 +526,7 @@ public class KeyringImplTest {
     }
 
     @Test
-    public void testRemove_collectionIdIsNull_shouldThrowException()  {
+    public void testRemove_collectionIdIsNull_shouldThrowException() {
         // Given user with valid email id and collection Id  null
         when(user.getEmail())
                 .thenReturn(TEST_EMAIL_ID);
@@ -534,7 +545,7 @@ public class KeyringImplTest {
     }
 
     @Test
-    public void testRemove_collectionIdIsEmpty_shouldThrowException()  {
+    public void testRemove_collectionIdIsEmpty_shouldThrowException() {
         // Given collection Id is null
         when(user.getEmail())
                 .thenReturn(TEST_EMAIL_ID);
@@ -612,7 +623,7 @@ public class KeyringImplTest {
     }
 
     @Test
-    public void testAdd_userIsNull_shouldThrowException()  {
+    public void testAdd_userIsNull_shouldThrowException() {
         // Given user is null
 
         // When Add is called
@@ -651,7 +662,7 @@ public class KeyringImplTest {
     }
 
     @Test
-    public void testAdd_collectionIsNull_shouldThrowException()  {
+    public void testAdd_collectionIsNull_shouldThrowException() {
         // Given user with valid email and collection to be null
         when(user.getEmail())
                 .thenReturn(TEST_EMAIL_ID);
@@ -663,7 +674,7 @@ public class KeyringImplTest {
     }
 
     @Test
-    public void testAdd_collectionDescriptionIsNull_shouldThrowException()  {
+    public void testAdd_collectionDescriptionIsNull_shouldThrowException() {
         // Given collection description is null
         when(user.getEmail())
                 .thenReturn(TEST_EMAIL_ID);
@@ -679,7 +690,7 @@ public class KeyringImplTest {
     }
 
     @Test
-    public void testAdd_collectionIdIsNull_shouldThrowException()  {
+    public void testAdd_collectionIdIsNull_shouldThrowException() {
         // Given collection Id is null
         when(user.getEmail())
                 .thenReturn(TEST_EMAIL_ID);
@@ -698,7 +709,7 @@ public class KeyringImplTest {
     }
 
     @Test
-    public void testAdd_collectionIdIsEmpty_shouldThrowException()  {
+    public void testAdd_collectionIdIsEmpty_shouldThrowException() {
         // Given collection Id is empty
         when(user.getEmail())
                 .thenReturn(TEST_EMAIL_ID);
@@ -717,7 +728,7 @@ public class KeyringImplTest {
     }
 
     @Test
-    public void testAdd_secretKeyIsNull_shouldThrowException()  {
+    public void testAdd_secretKeyIsNull_shouldThrowException() {
         // Given secret key is null
         when(user.getEmail())
                 .thenReturn(TEST_EMAIL_ID);
@@ -796,7 +807,7 @@ public class KeyringImplTest {
     }
 
     @Test
-    public void testList_userIsNull_shouldThrowException()  {
+    public void testList_userIsNull_shouldThrowException() {
         // Given user is null
 
         // When list is called
@@ -807,7 +818,7 @@ public class KeyringImplTest {
     }
 
     @Test
-    public void testList_emailIsNull_shouldThrowException()  {
+    public void testList_emailIsNull_shouldThrowException() {
         // Given user is null
 
         // When list is called
@@ -863,7 +874,7 @@ public class KeyringImplTest {
     public void testList_permissionsServiceReturnsFalse_shouldReturnNull() throws Exception {
 
         when(user.getEmail())
-               .thenReturn(TEST_EMAIL_ID);
+                .thenReturn(TEST_EMAIL_ID);
 
         when(permissionsService.canEdit(user.getEmail()))
                 .thenReturn(false);

@@ -59,9 +59,7 @@ public class KeyringImpl implements Keyring {
 
     @Override
     public void populateFromUser(User user) throws KeyringException {
-        if (user == null) {
-            throw new KeyringException(USER_NULL_ERR);
-        }
+        validateUser(user);
 
         if (user.keyring() == null) {
             throw new KeyringException(USER_KEYRING_NULL_ERR);
@@ -84,14 +82,9 @@ public class KeyringImpl implements Keyring {
         validateUser(user);
         validateCollection(collection);
 
-        boolean hasAccess = false;
-        try {
-            hasAccess = permissionsService.hasAccessToCollection(user, collection);
-        } catch (IOException ex) {
-            throw new KeyringException(ex);
-        }
+        boolean hasPermission = hasEditPermissions(user);
 
-        if (!hasAccess) {
+        if (!hasPermission) {
             return null;
         }
 
@@ -103,14 +96,9 @@ public class KeyringImpl implements Keyring {
         validateUser(user);
         validateCollection(collection);
 
-        boolean hasAccess = false;
-        try {
-            hasAccess = permissionsService.canEdit(user.getEmail());
-        } catch (IOException ex) {
-            throw new KeyringException(ex);
-        }
+        boolean hasPermission = hasEditPermissions(user);
 
-        if (!hasAccess) {
+        if (!hasPermission) {
             return;
         }
 
@@ -123,14 +111,9 @@ public class KeyringImpl implements Keyring {
         validateCollection(collection);
         validateKey(key);
 
-        boolean hasAccess = false;
-        try {
-            hasAccess = permissionsService.canEdit(user.getEmail());
-        } catch (IOException ex) {
-            throw new KeyringException(ex);
-        }
+        boolean hasPermission = hasEditPermissions(user);
 
-        if (!hasAccess) {
+        if (!hasPermission) {
             return;
         }
 
@@ -141,14 +124,9 @@ public class KeyringImpl implements Keyring {
     @Override
     public Set<String> list(User user) throws KeyringException {
         validateUser(user);
-        boolean hasAccess = false;
-        try {
-            hasAccess = permissionsService.canEdit(user.getEmail());
-        } catch (IOException ex) {
-            throw new KeyringException(ex);
-        }
+        boolean hasPermission = hasEditPermissions(user);
 
-        if (!hasAccess) {
+        if (!hasPermission) {
             return null;
         }
 
@@ -159,7 +137,8 @@ public class KeyringImpl implements Keyring {
         if (user == null) {
             throw new KeyringException(USER_NULL_ERR);
         }
-        if (user.getEmail()== null | user.getEmail()== "") {
+
+        if (StringUtils.isEmpty(user.getEmail())) {
             throw new KeyringException(USER_EMAIL_ERR);
         }
     }
@@ -182,6 +161,14 @@ public class KeyringImpl implements Keyring {
 
         if (StringUtils.isEmpty(collection.getDescription().getId())) {
             throw new KeyringException(COLLECTION_ID_NULL_OR_EMPTY_ERR);
+        }
+    }
+
+    private boolean hasEditPermissions(User user) throws KeyringException {
+        try {
+            return permissionsService.canEdit(user.getEmail());
+        } catch (IOException ex) {
+            throw new KeyringException(ex);
         }
     }
 

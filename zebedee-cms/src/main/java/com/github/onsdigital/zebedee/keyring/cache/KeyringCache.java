@@ -48,8 +48,9 @@ public interface KeyringCache {
 
     /**
      * Returns a list of collection IDs from the Keyring
-     * @return
-     * @throws KeyringException
+     *
+     * @return a set of collection IDs
+     * @throws KeyringException error listing keys
      */
     Set<String> list() throws KeyringException;
 }

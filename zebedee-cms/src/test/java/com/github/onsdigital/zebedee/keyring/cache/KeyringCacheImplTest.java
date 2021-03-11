@@ -458,7 +458,7 @@ public class KeyringCacheImplTest {
 
     @Test
     public void testGetInstance_success() throws Exception {
-        // Given the KeyringCache has been initalised
+        // Given the KeyringCache has been initialised
         KeyringCacheImpl.init(keyStore);
 
         // When getInstance is called
@@ -494,6 +494,7 @@ public class KeyringCacheImplTest {
         assertTrue(actual.contains(TEST_COLLECTION_ID));
 
         verify(keyStore, times(1)).readAll();
+        assertThat(actual.size(), equalTo(1));
     }
 
     @Test

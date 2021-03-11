@@ -329,4 +329,116 @@ public class LegacyKeyringImplTest {
         assertThat(actual, equalTo(secretKey));
         verify(userKeyring, times(1)).get(TEST_COLLECTION_ID);
     }
+
+    @Test
+    public void testRemove_userNull_shouldThrowException() {
+        // Given user is null
+
+        // When remove is called
+        KeyringException ex = assertThrows(KeyringException.class, () -> keyring.remove(null, null));
+
+        // Then an exception is thrown
+        assertThat(ex.getMessage(), equalTo(USER_NULL_ERR));
+    }
+
+    @Test
+    public void testRemove_userEmailNull_shouldThrowException() {
+        // Given user email is null
+        when(user.getEmail())
+                .thenReturn(null);
+
+        // When remove is called
+        KeyringException ex = assertThrows(KeyringException.class, () -> keyring.remove(user, null));
+
+        // Then an exception is thrown
+        assertThat(ex.getMessage(), equalTo(EMAIL_EMPTY_ERR));
+    }
+
+    @Test
+    public void testRemove_userEmailEmpty_shouldThrowException() {
+        // Given user email is empty
+        when(user.getEmail())
+                .thenReturn("");
+
+        // When remove is called
+        KeyringException ex = assertThrows(KeyringException.class, () -> keyring.remove(user, null));
+
+        // Then an exception is thrown
+        assertThat(ex.getMessage(), equalTo(EMAIL_EMPTY_ERR));
+    }
+
+    @Test
+    public void testRemove_userKeyringNull_shouldThrowException() {
+        // Given user keyring is null
+        when(user.keyring())
+                .thenReturn(null);
+
+        // When remove is called
+        KeyringException ex = assertThrows(KeyringException.class, () -> keyring.remove(user, null));
+
+        // Then an exception is thrown
+        assertThat(ex.getMessage(), equalTo(USER_KEYRING_NULL_ERR));
+    }
+
+    @Test
+    public void testRemove_collectionNull_shouldThrowException() {
+        // Given collection is null
+
+        // When remove is called
+        KeyringException ex = assertThrows(KeyringException.class, () -> keyring.remove(user, null));
+
+        // Then an exception is thrown
+        assertThat(ex.getMessage(), equalTo(COLLECTION_NULL_ERR));
+    }
+
+    @Test
+    public void testRemove_collectionDescriptionNull_shouldThrowException() {
+        // Given collection description is null
+        when(collection.getDescription())
+                .thenReturn(null);
+
+        // When remove is called
+        KeyringException ex = assertThrows(KeyringException.class, () -> keyring.remove(user, collection));
+
+        // Then an exception is thrown
+        assertThat(ex.getMessage(), equalTo(COLLECTION_DESC_NULL_ERR));
+    }
+
+    @Test
+    public void testRemove_collectionIDNull_shouldThrowException() {
+        // Given collection ID is null
+        when(collectionDescription.getId())
+                .thenReturn(null);
+
+        // When remove is called
+        KeyringException ex = assertThrows(KeyringException.class, () -> keyring.remove(user, collection));
+
+        // Then an exception is thrown
+        assertThat(ex.getMessage(), equalTo(COLLECTION_ID_EMPTY_ERR));
+    }
+
+    @Test
+    public void testRemove_collectionIDEmpty_shouldThrowException() {
+        // Given collection ID is empty
+        when(collectionDescription.getId())
+                .thenReturn("");
+
+        // When remove is called
+        KeyringException ex = assertThrows(KeyringException.class, () -> keyring.remove(user, collection));
+
+        // Then an exception is thrown
+        assertThat(ex.getMessage(), equalTo(COLLECTION_ID_EMPTY_ERR));
+    }
+
+    @Test
+    public void testRemove_success_shouldCallKeyringRemove() throws Exception {
+        // Given a valid user and colleciton
+
+        // When remove is called
+        keyring.remove(user, collection);
+
+        // Then user keyring.remove is called with the expected parameters
+        verify(user, times(2)).keyring();
+        verify(userKeyring, times(1)).remove(TEST_COLLECTION_ID);
+    }
 }

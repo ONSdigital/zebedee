@@ -28,6 +28,7 @@ public class LegacyKeyringImpl implements Keyring {
     static final String COLLECTION_DESC_NULL_ERR = "collection description required but was null";
     static final String COLLECTION_ID_EMPTY_ERR = "collection ID required but was null/empty";
     static final String SECRET_KEY_NULL_ERR = "secret key required but was null";
+    static final String USER_KEYRING_LOCKED_ERR = "unable to access locked user keyring";
 
     private Sessions sessionsService;
     private KeyringCache cache;
@@ -80,6 +81,8 @@ public class LegacyKeyringImpl implements Keyring {
         validateUser(user);
         validateCollection(collection);
         validateSecretKey(key);
+
+        user.keyring().put(collection.getDescription().getId(), key);
     }
 
     @Override
@@ -114,6 +117,10 @@ public class LegacyKeyringImpl implements Keyring {
 
         if (user.keyring() == null) {
             throw new KeyringException(USER_KEYRING_NULL_ERR);
+        }
+
+        if (!user.keyring().isUnlocked()) {
+            throw new KeyringException(USER_KEYRING_LOCKED_ERR);
         }
     }
 

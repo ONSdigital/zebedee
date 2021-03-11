@@ -23,6 +23,7 @@ import static com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl.EMAIL_EMPT
 import static com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl.GET_SESSION_ERR;
 import static com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl.SECRET_KEY_NULL_ERR;
 import static com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl.SESSION_NULL_ERR;
+import static com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl.USER_KEYRING_LOCKED_ERR;
 import static com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl.USER_KEYRING_NULL_ERR;
 import static com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl.USER_NULL_ERR;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -84,6 +85,9 @@ public class LegacyKeyringImplTest {
         when(user.keyring())
                 .thenReturn(userKeyring);
 
+        when(userKeyring.isUnlocked())
+                .thenReturn(true);
+
         when(sessionsService.find(TEST_EMAIL))
                 .thenReturn(session);
 
@@ -144,6 +148,19 @@ public class LegacyKeyringImplTest {
 
         // Then an exception is thrown.
         assertThat(ex.getMessage(), equalTo(USER_KEYRING_NULL_ERR));
+    }
+
+    @Test
+    public void testPopulateFromUser_userKeyringLocked_shouldThrowException() {
+        // Given user keyring has not been unlocked
+        when(userKeyring.isUnlocked())
+                .thenReturn(false);
+
+        // When populate from user is called
+        KeyringException ex = assertThrows(KeyringException.class, () -> keyring.populateFromUser(user));
+
+        // Then an exception is thrown.
+        assertThat(ex.getMessage(), equalTo(USER_KEYRING_LOCKED_ERR));
     }
 
     @Test
@@ -251,6 +268,19 @@ public class LegacyKeyringImplTest {
 
         // Then an exception is thrown.
         assertThat(ex.getMessage(), equalTo(USER_KEYRING_NULL_ERR));
+    }
+
+    @Test
+    public void testGet_userKeyringLocked_shouldThrowException() {
+        // Given user keyring is locked
+        when(userKeyring.isUnlocked())
+                .thenReturn(false);
+
+        // When get is called
+        KeyringException ex = assertThrows(KeyringException.class, () -> keyring.get(user, null));
+
+        // Then an exception is thrown.
+        assertThat(ex.getMessage(), equalTo(USER_KEYRING_LOCKED_ERR));
     }
 
     @Test
@@ -382,6 +412,19 @@ public class LegacyKeyringImplTest {
     }
 
     @Test
+    public void testRemove_userKeyringLocked_shouldThrowException() {
+        // Given user keyring is locked
+        when(userKeyring.isUnlocked())
+                .thenReturn(false);
+
+        // When remove is called
+        KeyringException ex = assertThrows(KeyringException.class, () -> keyring.remove(user, null));
+
+        // Then an exception is thrown
+        assertThat(ex.getMessage(), equalTo(USER_KEYRING_LOCKED_ERR));
+    }
+
+    @Test
     public void testRemove_collectionNull_shouldThrowException() {
         // Given collection is null
 
@@ -439,7 +482,7 @@ public class LegacyKeyringImplTest {
         keyring.remove(user, collection);
 
         // Then user keyring.remove is called with the expected parameters
-        verify(user, times(2)).keyring();
+        verify(user, times(3)).keyring();
         verify(userKeyring, times(1)).remove(TEST_COLLECTION_ID);
     }
 
@@ -491,6 +534,19 @@ public class LegacyKeyringImplTest {
 
         // Then an exception is thrown
         assertThat(ex.getMessage(), equalTo(USER_KEYRING_NULL_ERR));
+    }
+
+    @Test
+    public void testAdd_userKeyringLocked_shouldThrowException() {
+        // Given user keyring is locked
+        when(userKeyring.isUnlocked())
+                .thenReturn(false);
+
+        // When add is called
+        KeyringException ex = assertThrows(KeyringException.class, ()-> keyring.add(user, null, null));
+
+        // Then an exception is thrown
+        assertThat(ex.getMessage(), equalTo(USER_KEYRING_LOCKED_ERR));
     }
 
     @Test
@@ -552,5 +608,17 @@ public class LegacyKeyringImplTest {
 
         // Then an exception is thrown
         assertThat(ex.getMessage(), equalTo(SECRET_KEY_NULL_ERR));
+    }
+
+    @Test
+    public void testAdd_success_shouldAddKeyToUserKeyring() throws Exception {
+        // Given a valid user, collection and secret key
+
+        // When add is called
+        keyring.add(user, collection, secretKey);
+
+        // Then the key is added to the user keyring.
+        verify(user, times(3)).keyring();
+        verify(userKeyring, times(1)).put(TEST_COLLECTION_ID, secretKey);
     }
 }

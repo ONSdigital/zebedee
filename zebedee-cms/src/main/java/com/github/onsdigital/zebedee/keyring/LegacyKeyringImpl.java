@@ -69,7 +69,9 @@ public class LegacyKeyringImpl implements Keyring {
 
     @Override
     public void remove(User user, Collection collection) throws KeyringException {
-        // TODO
+        validateUser(user);
+        validateCollection(collection);
+        user.keyring().remove(collection.getDescription().getId());
     }
 
     @Override

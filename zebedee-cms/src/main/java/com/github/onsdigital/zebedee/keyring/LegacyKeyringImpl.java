@@ -87,8 +87,8 @@ public class LegacyKeyringImpl implements Keyring {
 
     @Override
     public Set<String> list(User user) throws KeyringException {
-        // TODO
-        return null;
+        validateUser(user);
+        return user.keyring().list();
     }
 
     private Session getUserSession(User user) throws KeyringException {
@@ -106,7 +106,7 @@ public class LegacyKeyringImpl implements Keyring {
         return session;
     }
 
-    void validateUser(User user) throws KeyringException {
+    private void validateUser(User user) throws KeyringException {
         if (user == null) {
             throw new KeyringException(USER_NULL_ERR);
         }
@@ -124,7 +124,7 @@ public class LegacyKeyringImpl implements Keyring {
         }
     }
 
-    void validateCollection(Collection collection) throws KeyringException {
+    private void validateCollection(Collection collection) throws KeyringException {
         if (collection == null) {
             throw new KeyringException(COLLECTION_NULL_ERR);
         }
@@ -138,7 +138,7 @@ public class LegacyKeyringImpl implements Keyring {
         }
     }
 
-    void validateSecretKey(SecretKey key) throws KeyringException {
+    private void validateSecretKey(SecretKey key) throws KeyringException {
         if (key == null) {
             throw new KeyringException(SECRET_KEY_NULL_ERR);
         }

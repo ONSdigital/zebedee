@@ -14,6 +14,8 @@ import org.mockito.MockitoAnnotations;
 
 import javax.crypto.SecretKey;
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 import static com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl.CACHE_PUT_ERR;
 import static com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl.COLLECTION_DESC_NULL_ERR;
@@ -620,5 +622,88 @@ public class LegacyKeyringImplTest {
         // Then the key is added to the user keyring.
         verify(user, times(3)).keyring();
         verify(userKeyring, times(1)).put(TEST_COLLECTION_ID, secretKey);
+    }
+
+    @Test
+    public void testList_userNull_shouldThrowException() {
+        // Given user is null
+
+        // When list is called
+        KeyringException ex = assertThrows(KeyringException.class, () -> keyring.list(null));
+
+        // Then an exception is thrown
+        assertThat(ex.getMessage(), equalTo(USER_NULL_ERR));
+    }
+
+    @Test
+    public void testList_userEmailNull_shouldThrowException() {
+        // Given user email is null
+        when(user.getEmail())
+                .thenReturn(null);
+
+        // When list is called
+        KeyringException ex = assertThrows(KeyringException.class, () -> keyring.list(user));
+
+        // Then an exception is thrown
+        assertThat(ex.getMessage(), equalTo(EMAIL_EMPTY_ERR));
+    }
+
+    @Test
+    public void testList_userEmailEmpty_shouldThrowException() {
+        // Given user email is empty
+        when(user.getEmail())
+                .thenReturn("");
+
+        // When list is called
+        KeyringException ex = assertThrows(KeyringException.class, () -> keyring.list(user));
+
+        // Then an exception is thrown
+        assertThat(ex.getMessage(), equalTo(EMAIL_EMPTY_ERR));
+    }
+
+    @Test
+    public void testList_userKeyringNull_shouldThrowException() {
+        // Given user keyring is null
+        when(user.keyring())
+                .thenReturn(null);
+
+        // When list is called
+        KeyringException ex = assertThrows(KeyringException.class, () -> keyring.list(user));
+
+        // Then an exception is thrown
+        assertThat(ex.getMessage(), equalTo(USER_KEYRING_NULL_ERR));
+    }
+
+    @Test
+    public void testList_userKeyringLocked_shouldThrowException() {
+        // Given user keyring is locked
+        when(userKeyring.isUnlocked())
+                .thenReturn(false);
+
+        // When list is called
+        KeyringException ex = assertThrows(KeyringException.class, () -> keyring.list(user));
+
+        // Then an exception is thrown
+        assertThat(ex.getMessage(), equalTo(USER_KEYRING_LOCKED_ERR));
+    }
+
+    @Test
+    public void testList_success_shouldListKeys() throws KeyringException {
+        // Given a valid user
+        Set<String> expectedKeys = new HashSet<String>() {{
+            add("1234");
+            add("5679");
+        }};
+
+        when(userKeyring.list())
+                .thenReturn(expectedKeys);
+
+        // When list is called
+        Set<String> actual = keyring.list(user);
+
+        // Then the expected values are returned
+        assertThat(actual, equalTo(expectedKeys));
+        verify(user, times(3)).keyring();
+        verify(userKeyring, times(1)).list();
     }
 }

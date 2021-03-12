@@ -1,21 +1,33 @@
 package com.github.onsdigital.zebedee.keyring;
 
+import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.user.model.User;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import javax.crypto.SecretKey;
+
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertThrows;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.when;
 
 public class KeyringMigratorImplTest {
 
     @Mock
     private User user;
+
+    @Mock
+    private Collection collection;
+
+    @Mock
+    private SecretKey secretKey;
 
     @Mock
     private Keyring legacyKeyring;
@@ -137,5 +149,79 @@ public class KeyringMigratorImplTest {
         // And the central keyring is called 1 time
         verify(legacyKeyring, times(1)).populateFromUser(user);
         verify(centralKeyring, times(1)).populateFromUser(user);
+    }
+
+    @Test
+    public void populateFromUser_migrateDisabled_success_shouldReadFromLegacyKeyring() throws Exception {
+        // Given keyring migration is disabled
+        keyring = new KeyringMigratorImpl(disabled, legacyKeyring, centralKeyring);
+
+        when(legacyKeyring.get(user, collection))
+                .thenReturn(secretKey);
+
+        // When Get is called
+        SecretKey actual = keyring.get(user, collection);
+
+        // Then the expected key is returned
+        assertThat(actual, equalTo(secretKey));
+        verify(legacyKeyring, times(1)).get(user, collection);
+        verifyZeroInteractions(centralKeyring);
+    }
+
+    @Test
+    public void populateFromUser_migrateDisabled_keyringError_shouldThrowException() throws Exception {
+        // Given keyring migration is disabled
+        // And legacy keyring returns an error
+        keyring = new KeyringMigratorImpl(disabled, legacyKeyring, centralKeyring);
+
+        when(legacyKeyring.get(user, collection))
+                .thenThrow(KeyringException.class);
+
+        // When Get is called
+        assertThrows(KeyringException.class, () -> keyring.get(user, collection));
+
+        // Then an exception is returned
+        // And the legacy keyring is called 1 times
+        verify(legacyKeyring, times(1)).get(user, collection);
+
+        // And the central keyring is never called
+        verifyZeroInteractions(centralKeyring);
+    }
+
+    @Test
+    public void populateFromUser_migrateEnabled_success_shouldReadFromCentralKeyring() throws Exception {
+        // Given keyring migration is enabled
+        keyring = new KeyringMigratorImpl(enabled, legacyKeyring, centralKeyring);
+
+        when(centralKeyring.get(user, collection))
+                .thenReturn(secretKey);
+
+        // When Get is called
+        SecretKey actual = keyring.get(user, collection);
+
+        // Then the expected key is returned
+        assertThat(actual, equalTo(secretKey));
+        verify(centralKeyring, times(1)).get(user, collection);
+        verifyZeroInteractions(legacyKeyring);
+    }
+
+    @Test
+    public void populateFromUser_migrateEnabled_keyringError_shouldThrowException() throws Exception {
+        // Given keyring migration is enabled
+        // And central keyring returns an error
+        keyring = new KeyringMigratorImpl(enabled, legacyKeyring, centralKeyring);
+
+        when(centralKeyring.get(user, collection))
+                .thenThrow(KeyringException.class);
+
+        // When Get is called
+        assertThrows(KeyringException.class, () -> keyring.get(user, collection));
+
+        // Then an exception is returned
+        // And the central keyring is called 1 times
+        verify(centralKeyring, times(1)).get(user, collection);
+
+        // And the legacy keyring is never called
+        verifyZeroInteractions(legacyKeyring);
     }
 }

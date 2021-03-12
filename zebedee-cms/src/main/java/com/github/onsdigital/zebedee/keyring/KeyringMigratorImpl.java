@@ -6,6 +6,8 @@ import com.github.onsdigital.zebedee.user.model.User;
 import javax.crypto.SecretKey;
 import java.util.Set;
 
+import static java.text.MessageFormat.format;
+
 /**
  * KeyringMigrator serves 2 purposes:
  * <ul>
@@ -17,10 +19,24 @@ import java.util.Set;
  */
 public class KeyringMigratorImpl implements Keyring {
 
+    static final String ERR_FMT = "{0}: Migration enabled: {1}";
+
+    static final String POPULATE_FROM_USER_ERR = "error while attempting to populate keyring from user";
+    static final String GET_KEY_ERR = "error getting key from keyring";
+    static final String REMOVE_KEY_ERR = "error removing key from keyring";
+
     private boolean migrationEnabled;
     private Keyring legacyKeyring;
     private Keyring centralKeyring;
 
+    /**
+     * Construct a new instance of the Keyring.
+     *
+     * @param migrationEnabled if true uses the new central keyring implementation. Otherwise uses legacy keyring
+     *                         implemenation for reads. (Writes/Deletes will be applied to both).
+     * @param legacyKeyring    the legacy keyring implementation to use.
+     * @param centralKeyring   the new central keyring implementation to use.
+     */
     public KeyringMigratorImpl(final boolean migrationEnabled, final Keyring legacyKeyring, final Keyring centralKeyring) {
         this.migrationEnabled = migrationEnabled;
         this.legacyKeyring = legacyKeyring;
@@ -29,18 +45,31 @@ public class KeyringMigratorImpl implements Keyring {
 
     @Override
     public void populateFromUser(User user) throws KeyringException {
-        legacyKeyring.populateFromUser(user);
-        centralKeyring.populateFromUser(user);
+        try {
+            legacyKeyring.populateFromUser(user);
+            centralKeyring.populateFromUser(user);
+        } catch (KeyringException ex) {
+            throw wrappedKeyringException(ex, POPULATE_FROM_USER_ERR);
+        }
     }
 
     @Override
     public SecretKey get(User user, Collection collection) throws KeyringException {
-        return getKeyring().get(user, collection);
+        try {
+            return getKeyring().get(user, collection);
+        } catch (KeyringException ex) {
+            throw wrappedKeyringException(ex, GET_KEY_ERR);
+        }
     }
 
     @Override
     public void remove(User user, Collection collection) throws KeyringException {
-        // TODO
+        try {
+            centralKeyring.remove(user, collection);
+            legacyKeyring.remove(user, collection);
+        } catch (KeyringException ex) {
+            throw wrappedKeyringException(ex, REMOVE_KEY_ERR);
+        }
     }
 
     @Override
@@ -60,5 +89,9 @@ public class KeyringMigratorImpl implements Keyring {
         }
 
         return legacyKeyring;
+    }
+
+    KeyringException wrappedKeyringException(KeyringException cause, String msg) {
+        return new KeyringException( format(ERR_FMT, msg, migrationEnabled), cause);
     }
 }

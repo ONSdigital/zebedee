@@ -6,6 +6,8 @@ import com.github.onsdigital.zebedee.user.model.User;
 import javax.crypto.SecretKey;
 import java.util.Set;
 
+import static com.github.onsdigital.zebedee.logging.CMSLogEvent.error;
+import static com.github.onsdigital.zebedee.logging.CMSLogEvent.warn;
 import static java.text.MessageFormat.format;
 
 /**
@@ -19,11 +21,13 @@ import static java.text.MessageFormat.format;
  */
 public class KeyringMigratorImpl implements Keyring {
 
-    static final String ERR_FMT = "{0}: Migration enabled: {1}";
+    static final String WRAPPED_ERR_FMT = "{0}: Migration enabled: {1}";
 
     static final String POPULATE_FROM_USER_ERR = "error while attempting to populate keyring from user";
     static final String GET_KEY_ERR = "error getting key from keyring";
     static final String REMOVE_KEY_ERR = "error removing key from keyring";
+    static final String KEY_NULL_ERR = "get key returned null";
+    static final String REMOVE_ROLLBACK_ERR = "error while attempting to rollback remove key action";
 
     private boolean migrationEnabled;
     private Keyring legacyKeyring;
@@ -62,14 +66,78 @@ public class KeyringMigratorImpl implements Keyring {
         }
     }
 
+    /**
+     * Attempts to remove a key from both instances of the keyring. The central keyring is updated first.
+     * <ul>
+     *     <li>If centralKeyring.Remove is unsucessful the exception is thrown immediately and there no attempt to
+     *     update the legacy keyring.</li>
+     *     <li>
+     *      If legacyKeyring.Remove is unsuccessful a rollback is attempted (re-adding the key to the central
+     *      keyring) before returning the thrown exception.
+     *     </li>
+     *     <li>If the rollback fails the exception is returned</li>
+     * </ul>
+     *
+     * @param user       the user performing the action.
+     * @param collection the collection the the key belongs to.
+     * @throws KeyringException
+     */
     @Override
     public void remove(User user, Collection collection) throws KeyringException {
+        // Get the key to delete in case a rollback is required
+        SecretKey backUp = get(user, collection);
+        if (backUp == null) {
+            throw keyringException(KEY_NULL_ERR);
+        }
+
+        // try removing from the new keyring implementation first.
+        removeFromKeyring(centralKeyring, user, collection);
+
+        // Remove from the legacy keyring.
         try {
-            centralKeyring.remove(user, collection);
-            legacyKeyring.remove(user, collection);
+            removeFromKeyring(legacyKeyring, user, collection);
+        } catch (KeyringException ex){
+            // Remove failed so attempt rollback. If successful throw original exception otherwise throw the
+            // failed rollback exception.
+            attemptRemoveRollback(user, collection, backUp);
+            throw ex;
+        }
+    }
+
+    private void removeFromKeyring(Keyring instance, User user, Collection collection) throws KeyringException {
+        try {
+            instance.remove(user, collection);
         } catch (KeyringException ex) {
+            error().collectionID(collection)
+                    .data("migration_enabled", migrationEnabled)
+                    .user(user.getEmail())
+                    .exception(ex)
+                    .log("error removing key from legacy kerying");
+
             throw wrappedKeyringException(ex, REMOVE_KEY_ERR);
         }
+    }
+
+    private void attemptRemoveRollback(User user, Collection collection, SecretKey key)
+            throws KeyringException {
+        error().user(user.getEmail())
+                .collectionID(collection)
+                .log("attempting to rollback failed keyring.remove action");
+
+        try {
+            centralKeyring.add(user, collection, key);
+        } catch (KeyringException ex) {
+            error().user(user.getEmail())
+                    .collectionID(collection)
+                    .exception(ex)
+                    .log("rollback attempt for keyring.remove unsuccessful");
+
+            throw wrappedKeyringException(ex, REMOVE_ROLLBACK_ERR);
+        }
+
+        warn().user(user.getEmail())
+                .collectionID(collection)
+                .log("remove rollback completed successfully");
     }
 
     @Override
@@ -92,6 +160,10 @@ public class KeyringMigratorImpl implements Keyring {
     }
 
     KeyringException wrappedKeyringException(KeyringException cause, String msg) {
-        return new KeyringException( format(ERR_FMT, msg, migrationEnabled), cause);
+        return new KeyringException(format(WRAPPED_ERR_FMT, msg, migrationEnabled), cause);
+    }
+
+    KeyringException keyringException(String msg) {
+        return new KeyringException(format(WRAPPED_ERR_FMT, msg, migrationEnabled));
     }
 }

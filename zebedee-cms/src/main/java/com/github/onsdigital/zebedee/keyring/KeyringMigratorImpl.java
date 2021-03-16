@@ -22,12 +22,18 @@ import static java.text.MessageFormat.format;
 public class KeyringMigratorImpl implements Keyring {
 
     static final String WRAPPED_ERR_FMT = "{0}: Migration enabled: {1}";
+    static final String MIGRATE_ENABLED = "migration_enabled";
+    static final String ACTION = "action";
+    static String ADD_KEY = "add_key";
+    static String REMOVE_KEY = "remove_key";
 
     static final String POPULATE_FROM_USER_ERR = "error while attempting to populate keyring from user";
     static final String GET_KEY_ERR = "error getting key from keyring";
     static final String REMOVE_KEY_ERR = "error removing key from keyring";
     static final String KEY_NULL_ERR = "get key returned null";
-    static final String REMOVE_ROLLBACK_ERR = "error while attempting to rollback remove key action";
+    static final String ADD_KEY_ERR = "error adding key to keyring";
+    static final String ROLLBACK_FAILED_ERR = "rollback action was unsuccessful";
+    static final String LIST_KEYS_ERR = "error listing keys on keyring";
 
     private boolean migrationEnabled;
     private Keyring legacyKeyring;
@@ -96,10 +102,13 @@ public class KeyringMigratorImpl implements Keyring {
         // Remove from the legacy keyring.
         try {
             removeFromKeyring(legacyKeyring, user, collection);
-        } catch (KeyringException ex){
+        } catch (KeyringException ex) {
+
             // Remove failed so attempt rollback. If successful throw original exception otherwise throw the
             // failed rollback exception.
-            attemptRemoveRollback(user, collection, backUp);
+            Rollback rb = () -> centralKeyring.add(user, collection, backUp);
+            attemptRollback(rb, user, collection, REMOVE_KEY);
+
             throw ex;
         }
     }
@@ -108,8 +117,8 @@ public class KeyringMigratorImpl implements Keyring {
         try {
             instance.remove(user, collection);
         } catch (KeyringException ex) {
-            error().collectionID(collection)
-                    .data("migration_enabled", migrationEnabled)
+            error().data(MIGRATE_ENABLED, migrationEnabled)
+                    .collectionID(collection)
                     .user(user.getEmail())
                     .exception(ex)
                     .log("error removing key from legacy kerying");
@@ -118,37 +127,63 @@ public class KeyringMigratorImpl implements Keyring {
         }
     }
 
-    private void attemptRemoveRollback(User user, Collection collection, SecretKey key)
-            throws KeyringException {
-        error().user(user.getEmail())
-                .collectionID(collection)
-                .log("attempting to rollback failed keyring.remove action");
-
-        try {
-            centralKeyring.add(user, collection, key);
-        } catch (KeyringException ex) {
-            error().user(user.getEmail())
-                    .collectionID(collection)
-                    .exception(ex)
-                    .log("rollback attempt for keyring.remove unsuccessful");
-
-            throw wrappedKeyringException(ex, REMOVE_ROLLBACK_ERR);
-        }
-
-        warn().user(user.getEmail())
-                .collectionID(collection)
-                .log("remove rollback completed successfully");
-    }
-
+    /**
+     * Add a key to both instances of the keyring. The legacy keyring is updated first.
+     * <ul>
+     *     <li>If legacy keyring add is unsucessful an exception is thrown immediately and there no attempt to
+     *     update the central  keyring.</li>
+     *     <li>
+     *      If central keyring add is unsuccessful a rollback is attempted (removing the newly added key from the legacy
+     *      keyring) before returning the thrown exception.
+     *     </li>
+     *     <li>If the rollback fails the exception is returned</li>
+     * </ul>
+     *
+     * @param user       the user performing the action.
+     * @param collection the collection the the key belongs to.
+     * @param key        the {@link SecretKey} to add to the keyring
+     * @throws KeyringException
+     */
     @Override
     public void add(User user, Collection collection, SecretKey key) throws KeyringException {
-        // TODO
+        // try adding the key to the legacy keyring
+        addToKeyring(legacyKeyring, user, collection, key);
+
+        // Try adding the key to the central keyring
+        try {
+            addToKeyring(centralKeyring, user, collection, key);
+        } catch (KeyringException ex) {
+
+            // Add failed so attemp to rollback. If rollback fails throw rollback failed exception otherwise throw
+            // the original exception
+            Rollback rb = () -> legacyKeyring.remove(user, collection);
+            attemptRollback(rb, user, collection, ADD_KEY);
+
+            throw ex;
+        }
+    }
+
+    private void addToKeyring(Keyring instance, User user, Collection collection, SecretKey key)
+            throws KeyringException {
+        try {
+            instance.add(user, collection, key);
+        } catch (KeyringException ex) {
+            error().data(MIGRATE_ENABLED, migrationEnabled)
+                    .user(user.getEmail())
+                    .collectionID(collection)
+                    .log("error adding key to keyring");
+
+            throw wrappedKeyringException(ex, ADD_KEY_ERR);
+        }
     }
 
     @Override
     public Set<String> list(User user) throws KeyringException {
-        // TODO
-        return null;
+        try {
+            return getKeyring().list(user);
+        } catch (KeyringException ex) {
+            throw wrappedKeyringException(ex, LIST_KEYS_ERR);
+        }
     }
 
     private Keyring getKeyring() {
@@ -157,6 +192,43 @@ public class KeyringMigratorImpl implements Keyring {
         }
 
         return legacyKeyring;
+    }
+
+    /**
+     * Attempt to rollback the keyring. Throws a new {@link KeyringException} if the rollback is unsuccessful.
+     *
+     * @param rollback   the {@link Rollback} to attempt.
+     * @param user       the {@link User} executing this action.
+     * @param collection the {@link Collection} the affected key belongs to.
+     * @param action     the action being rolled back - add, remove etc.
+     * @throws KeyringException failed to rollback the action.
+     */
+    private void attemptRollback(Rollback rollback, User user, Collection collection, String action)
+            throws KeyringException {
+        error().data(MIGRATE_ENABLED, migrationEnabled)
+                .data(ACTION, action)
+                .user(user.getEmail())
+                .collectionID(collection)
+                .log("attempting rollback");
+
+        try {
+            rollback.attempt();
+        } catch (KeyringException ex) {
+            error().data(MIGRATE_ENABLED, migrationEnabled)
+                    .data(ACTION, action)
+                    .user(user.getEmail())
+                    .collectionID(collection)
+                    .exception(ex)
+                    .log("rollback unsuccessful");
+
+            throw wrappedKeyringException(ex, ROLLBACK_FAILED_ERR);
+        }
+
+        warn().data(MIGRATE_ENABLED, migrationEnabled)
+                .data(ACTION, action)
+                .user(user.getEmail())
+                .collectionID(collection)
+                .log("rollback completed successfully");
     }
 
     KeyringException wrappedKeyringException(KeyringException cause, String msg) {

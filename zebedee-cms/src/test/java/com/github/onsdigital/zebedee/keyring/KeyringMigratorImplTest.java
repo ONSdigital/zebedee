@@ -8,12 +8,16 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import javax.crypto.SecretKey;
+import java.util.HashSet;
+import java.util.Set;
 
+import static com.github.onsdigital.zebedee.keyring.KeyringMigratorImpl.ADD_KEY_ERR;
 import static com.github.onsdigital.zebedee.keyring.KeyringMigratorImpl.GET_KEY_ERR;
 import static com.github.onsdigital.zebedee.keyring.KeyringMigratorImpl.KEY_NULL_ERR;
+import static com.github.onsdigital.zebedee.keyring.KeyringMigratorImpl.LIST_KEYS_ERR;
 import static com.github.onsdigital.zebedee.keyring.KeyringMigratorImpl.POPULATE_FROM_USER_ERR;
 import static com.github.onsdigital.zebedee.keyring.KeyringMigratorImpl.REMOVE_KEY_ERR;
-import static com.github.onsdigital.zebedee.keyring.KeyringMigratorImpl.REMOVE_ROLLBACK_ERR;
+import static com.github.onsdigital.zebedee.keyring.KeyringMigratorImpl.ROLLBACK_FAILED_ERR;
 import static com.github.onsdigital.zebedee.keyring.KeyringMigratorImpl.WRAPPED_ERR_FMT;
 import static java.text.MessageFormat.format;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -458,7 +462,7 @@ public class KeyringMigratorImplTest {
         KeyringException actual = assertThrows(KeyringException.class, () -> keyring.remove(user, collection));
 
         // Then an exception is thrown
-        assertWrappedException(actual, REMOVE_ROLLBACK_ERR, disabled);
+        assertWrappedException(actual, ROLLBACK_FAILED_ERR, disabled);
         verify(legacyKeyring, times(1)).get(user, collection);
         verify(centralKeyring, times(1)).remove(user, collection);
         verify(legacyKeyring, times(1)).remove(user, collection);
@@ -487,7 +491,7 @@ public class KeyringMigratorImplTest {
         KeyringException actual = assertThrows(KeyringException.class, () -> keyring.remove(user, collection));
 
         // Then an exception is thrown
-        assertWrappedException(actual, REMOVE_ROLLBACK_ERR, enabled);
+        assertWrappedException(actual, ROLLBACK_FAILED_ERR, enabled);
         verify(centralKeyring, times(1)).get(user, collection);
         verify(centralKeyring, times(1)).remove(user, collection);
         verify(legacyKeyring, times(1)).remove(user, collection);
@@ -530,5 +534,247 @@ public class KeyringMigratorImplTest {
         verify(centralKeyring, times(1)).remove(user, collection);
         verify(legacyKeyring, times(1)).remove(user, collection);
         verify(centralKeyring, never()).add(user, collection, secretKey);
+    }
+
+    @Test
+    public void add_migrateDisabled_legacyKeyringError_shouldThrowException() throws Exception {
+        // Given migration is disabled
+        // And legacy keyring.add is unsuccessful
+        keyring = new KeyringMigratorImpl(disabled, legacyKeyring, centralKeyring);
+
+        doThrow(keyringException).
+                when(legacyKeyring)
+                .add(user, collection, secretKey);
+
+        // When add is called
+        KeyringException actual = assertThrows(KeyringException.class, () -> keyring.add(user, collection, secretKey));
+
+        // Then an exception is thrown
+        assertWrappedException(actual, ADD_KEY_ERR, disabled);
+
+        verify(legacyKeyring, times(1)).add(user, collection, secretKey);
+        verifyZeroInteractions(centralKeyring);
+    }
+
+    @Test
+    public void add_migrateEnabled_legacyKeyringError_shouldThrowException() throws Exception {
+        // Given migration is enabled
+        // And legacy keyring.add is unsuccessful
+        keyring = new KeyringMigratorImpl(enabled, legacyKeyring, centralKeyring);
+
+        doThrow(keyringException).
+                when(legacyKeyring)
+                .add(user, collection, secretKey);
+
+        // When add is called
+        KeyringException actual = assertThrows(KeyringException.class, () -> keyring.add(user, collection, secretKey));
+
+        // Then an exception is thrown
+        assertWrappedException(actual, ADD_KEY_ERR, enabled);
+
+        verify(legacyKeyring, times(1)).add(user, collection, secretKey);
+        verifyZeroInteractions(centralKeyring);
+    }
+
+    @Test
+    public void add_migrateDisabled_rollbackUnsuccessful_shouldThrowException() throws Exception {
+        // Given migration is disabled
+        // And central keyring.add is unsuccessful
+        // And rollback is unsuccessful
+        keyring = new KeyringMigratorImpl(disabled, legacyKeyring, centralKeyring);
+
+        doThrow(keyringException).
+                when(centralKeyring)
+                .add(user, collection, secretKey);
+
+        doThrow(keyringException).
+                when(legacyKeyring)
+                .remove(user, collection);
+
+        // When add is called
+        KeyringException actual = assertThrows(KeyringException.class, () -> keyring.add(user, collection, secretKey));
+
+        // Then an exception is thrown
+        assertWrappedException(actual, ROLLBACK_FAILED_ERR, disabled);
+
+        verify(legacyKeyring, times(1)).add(user, collection, secretKey);
+        verify(centralKeyring, times(1)).add(user, collection, secretKey);
+        verify(legacyKeyring, times(1)).remove(user, collection);
+    }
+
+    @Test
+    public void add_migrateEnabled_rollbackUnsuccessful_shouldThrowException() throws Exception {
+        // Given migration is enabled
+        // And central keyring.add is unsuccessful
+        // And rollback is unsuccessful
+        keyring = new KeyringMigratorImpl(enabled, legacyKeyring, centralKeyring);
+
+        doThrow(keyringException).
+                when(centralKeyring)
+                .add(user, collection, secretKey);
+
+        doThrow(keyringException).
+                when(legacyKeyring)
+                .remove(user, collection);
+
+        // When add is called
+        KeyringException actual = assertThrows(KeyringException.class, () -> keyring.add(user, collection, secretKey));
+
+        // Then an exception is thrown
+        assertWrappedException(actual, ROLLBACK_FAILED_ERR, enabled);
+
+        verify(legacyKeyring, times(1)).add(user, collection, secretKey);
+        verify(centralKeyring, times(1)).add(user, collection, secretKey);
+        verify(legacyKeyring, times(1)).remove(user, collection);
+    }
+
+    @Test
+    public void add_migrateDisabled_rollbackSuccessful_shouldThrowException() throws Exception {
+        // Given migration is disabled
+        // And central keyring.add is unsuccessful
+        // And rollback is successful
+        keyring = new KeyringMigratorImpl(disabled, legacyKeyring, centralKeyring);
+
+        doThrow(keyringException).
+                when(centralKeyring)
+                .add(user, collection, secretKey);
+
+        // When add is called
+        KeyringException actual = assertThrows(KeyringException.class, () -> keyring.add(user, collection, secretKey));
+
+        // Then an exception is thrown
+        assertWrappedException(actual, ADD_KEY_ERR, disabled);
+
+        verify(legacyKeyring, times(1)).add(user, collection, secretKey);
+        verify(centralKeyring, times(1)).add(user, collection, secretKey);
+        verify(legacyKeyring, times(1)).remove(user, collection);
+    }
+
+    @Test
+    public void add_migrateEnabled_rollbackSuccessful_shouldThrowException() throws Exception {
+        // Given migration is enabled
+        // And central keyring.add is unsuccessful
+        // And rollback is successful
+        keyring = new KeyringMigratorImpl(enabled, legacyKeyring, centralKeyring);
+
+        doThrow(keyringException).
+                when(centralKeyring)
+                .add(user, collection, secretKey);
+
+        // When add is called
+        KeyringException actual = assertThrows(KeyringException.class, () -> keyring.add(user, collection, secretKey));
+
+        // Then an exception is thrown
+        assertWrappedException(actual, ADD_KEY_ERR, enabled);
+
+        verify(legacyKeyring, times(1)).add(user, collection, secretKey);
+        verify(centralKeyring, times(1)).add(user, collection, secretKey);
+        verify(legacyKeyring, times(1)).remove(user, collection);
+    }
+
+    @Test
+    public void add_migrateDisabled_success_shouldAddKeyToBothKeyrings() throws Exception {
+        // Given migration is disabled
+        keyring = new KeyringMigratorImpl(disabled, legacyKeyring, centralKeyring);
+
+        // When add is called
+        keyring.add(user, collection, secretKey);
+
+        // Then the key is added to both keyrings
+        verify(legacyKeyring, times(1)).add(user, collection, secretKey);
+        verify(centralKeyring, times(1)).add(user, collection, secretKey);
+        verifyNoMoreInteractions(legacyKeyring, centralKeyring);
+    }
+
+    @Test
+    public void add_migrateEnabled_success_shouldAddKeyToBothKeyrings() throws Exception {
+        // Given migration is enabled
+        keyring = new KeyringMigratorImpl(enabled, legacyKeyring, centralKeyring);
+
+        // When add is called
+        keyring.add(user, collection, secretKey);
+
+        // Then the key is added to both keyrings
+        verify(legacyKeyring, times(1)).add(user, collection, secretKey);
+        verify(centralKeyring, times(1)).add(user, collection, secretKey);
+        verifyNoMoreInteractions(legacyKeyring, centralKeyring);
+    }
+
+    @Test
+    public void list_migrateDisabled_listError_shouldThrowException() throws Exception {
+        // Given migrate is disabled
+        // And legacy keyring.list throws an exception
+        keyring = new KeyringMigratorImpl(disabled, legacyKeyring, centralKeyring);
+
+        when(legacyKeyring.list(user))
+                .thenThrow(keyringException);
+
+        // When list is called
+        KeyringException actual = assertThrows(KeyringException.class, () -> keyring.list(user));
+
+        // Then an exception is thrown
+        assertWrappedException(actual, LIST_KEYS_ERR, disabled);
+        verify(legacyKeyring, times(1)).list(user);
+        verifyZeroInteractions(centralKeyring);
+    }
+
+    @Test
+    public void list_migrateEnabled_listError_shouldThrowException() throws Exception {
+        // Given migrate is enabled
+        // And legacy keyring.list throws an exception
+        keyring = new KeyringMigratorImpl(enabled, legacyKeyring, centralKeyring);
+
+        when(centralKeyring.list(user))
+                .thenThrow(keyringException);
+
+        // When list is called
+        KeyringException actual = assertThrows(KeyringException.class, () -> keyring.list(user));
+
+        // Then an exception is thrown
+        assertWrappedException(actual, LIST_KEYS_ERR, enabled);
+        verify(centralKeyring, times(1)).list(user);
+        verifyZeroInteractions(legacyKeyring);
+    }
+
+    @Test
+    public void list_migrateDisabled_success_shouldListKeys() throws Exception {
+        // Given migrate is disabled
+        keyring = new KeyringMigratorImpl(disabled, legacyKeyring, centralKeyring);
+
+        Set<String> keys = new HashSet<String>() {{
+            add("1234567890");
+        }};
+
+        when(legacyKeyring.list(user))
+                .thenReturn(keys);
+
+        // When list is called
+        Set<String> actual = keyring.list(user);
+
+        // Then the expected key list is returned
+        assertThat(actual, equalTo(keys));
+        verify(legacyKeyring, times(1)).list(user);
+        verifyZeroInteractions(centralKeyring);
+    }
+
+    @Test
+    public void list_migrateEnabled_success_shouldListKeys() throws Exception {
+        // Given migrate is disabled
+        keyring = new KeyringMigratorImpl(enabled, legacyKeyring, centralKeyring);
+
+        Set<String> keys = new HashSet<String>() {{
+            add("1234567890");
+        }};
+
+        when(centralKeyring.list(user))
+                .thenReturn(keys);
+
+        // When list is called
+        Set<String> actual = keyring.list(user);
+
+        // Then the expected key list is returned
+        assertThat(actual, equalTo(keys));
+        verify(centralKeyring, times(1)).list(user);
+        verifyZeroInteractions(legacyKeyring);
     }
 }

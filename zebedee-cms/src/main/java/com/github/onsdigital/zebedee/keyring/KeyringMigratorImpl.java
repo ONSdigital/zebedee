@@ -209,7 +209,7 @@ public class KeyringMigratorImpl implements Keyring {
                 .data(ACTION, action)
                 .user(user.getEmail())
                 .collectionID(collection)
-                .log("attempting rollback");
+                .log("attempting keyring action rollback");
 
         try {
             rollback.attempt();
@@ -219,7 +219,7 @@ public class KeyringMigratorImpl implements Keyring {
                     .user(user.getEmail())
                     .collectionID(collection)
                     .exception(ex)
-                    .log("rollback unsuccessful");
+                    .log("rollback keyring action unsuccessful");
 
             throw wrappedKeyringException(ex, ROLLBACK_FAILED_ERR);
         }

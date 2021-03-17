@@ -6,7 +6,9 @@ import liquibase.util.StringUtils;
 
 import javax.crypto.SecretKey;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * In memory {@link KeyringCache} implementation. Keyring uses a {@link KeyringStore} to persist entries to storage
@@ -198,6 +200,14 @@ public class KeyringCacheImpl implements KeyringCache {
 
         keyStore.delete(collectionID);
         cache.remove(collectionID);
+    }
+
+    @Override
+    public Set<String> list() throws KeyringException {
+        if (cache.isEmpty()) {
+            load();
+        }
+        return cache.keySet();
     }
 
     /**

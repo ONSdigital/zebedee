@@ -12,6 +12,8 @@ import javax.crypto.SecretKey;
 import java.io.IOException;
 import java.util.Set;
 
+import static com.github.onsdigital.zebedee.logging.CMSLogEvent.info;
+
 /**
  * This class duplicates the existing (legacy) keyring functionality behind a newly defined Keyring interface.
  * Moving the keyring functionality behind an interface allows to swap implemetations more easily.
@@ -30,12 +32,14 @@ public class LegacyKeyringImpl implements Keyring {
     static final String SECRET_KEY_NULL_ERR = "secret key required but was null";
     static final String USER_KEYRING_LOCKED_ERR = "unable to access locked user keyring";
 
+    static final String CACHE_GET_ERR = "error getting entry from keyringCache";
+
     private Sessions sessionsService;
     private KeyringCache cache;
     private ApplicationKeys applicationKeys;
 
     /**
-     * COnstruct a new instance of the Legacy keyring.
+     * Construct a new instance of the Legacy keyring.
      *
      * @param sessionsService the {@link Sessions} service to use.
      * @param cache           the {@link KeyringCache} to use.
@@ -66,7 +70,23 @@ public class LegacyKeyringImpl implements Keyring {
     public SecretKey get(User user, Collection collection) throws KeyringException {
         validateUser(user);
         validateCollection(collection);
-        return user.keyring().get(collection.getDescription().getId());
+
+        com.github.onsdigital.zebedee.json.Keyring userKeyring = getUnlockedKeyringFromCache(user);
+        if (userKeyring == null) {
+            info().user(user.getEmail())
+                    .collectionID(collection)
+                    .log("get key unsuccessful user keyring not found in cache");
+            return null;
+        }
+
+        if (!userKeyring.isUnlocked()) {
+            info().user(user.getEmail())
+                    .collectionID(collection)
+                    .log("get key unsuccessful cached user keyring is locked");
+            return null;
+        }
+
+        return userKeyring.get(collection.getDescription().getId());
     }
 
     @Override
@@ -82,7 +102,17 @@ public class LegacyKeyringImpl implements Keyring {
         validateCollection(collection);
         validateSecretKey(key);
 
+        // get user session
+        // error if not found
+
+        // get cached keyring
+        // error if not found
+
+        // updated cached keyring
+        // user service add key to keyring
+
         user.keyring().put(collection.getDescription().getId(), key);
+        // update cache.
     }
 
     @Override
@@ -99,10 +129,6 @@ public class LegacyKeyringImpl implements Keyring {
             throw new KeyringException(GET_SESSION_ERR, ex);
         }
 
-        if (session == null) {
-            throw new KeyringException(SESSION_NULL_ERR);
-        }
-
         return session;
     }
 
@@ -117,10 +143,6 @@ public class LegacyKeyringImpl implements Keyring {
 
         if (user.keyring() == null) {
             throw new KeyringException(USER_KEYRING_NULL_ERR);
-        }
-
-        if (!user.keyring().isUnlocked()) {
-            throw new KeyringException(USER_KEYRING_LOCKED_ERR);
         }
     }
 
@@ -141,6 +163,14 @@ public class LegacyKeyringImpl implements Keyring {
     private void validateSecretKey(SecretKey key) throws KeyringException {
         if (key == null) {
             throw new KeyringException(SECRET_KEY_NULL_ERR);
+        }
+    }
+
+    private com.github.onsdigital.zebedee.json.Keyring getUnlockedKeyringFromCache(User user) throws KeyringException {
+        try {
+            return cache.get(user);
+        } catch (IOException ex) {
+            throw new KeyringException(CACHE_GET_ERR, ex);
         }
     }
 }

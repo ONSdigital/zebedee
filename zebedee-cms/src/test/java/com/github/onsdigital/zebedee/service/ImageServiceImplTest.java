@@ -24,11 +24,11 @@ public class ImageServiceImplTest {
     private static final String IMAGE1 = "i1";
     private static final String IMAGE2 = "i2";
     private static final String IMAGE3 = "i3";
-    public static final String STATE_CREATED = "created";
-    public static final String STATE_IMPORTING = "importing";
-    public static final String STATE_FAILED_IMPORT = "failed_import";
-    public static final String STATE_IMPORTED = "imported";
-    public static final String STATE_DELETED = "deleted";
+    private static final String STATE_CREATED = "created";
+    private static final String STATE_IMPORTING = "importing";
+    private static final String STATE_FAILED_IMPORT = "failed_import";
+    private static final String STATE_IMPORTED = "imported";
+    private static final String STATE_DELETED = "deleted";
 
     ImageAPIException apiException = new ImageAPIException("error", 123);
 

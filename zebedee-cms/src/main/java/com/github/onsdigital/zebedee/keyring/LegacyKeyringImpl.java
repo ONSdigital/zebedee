@@ -52,7 +52,7 @@ public class LegacyKeyringImpl implements Keyring {
     }
 
     @Override
-    public void populateFromUser(User user) throws KeyringException {
+    public void cacheUserKeyring(User user) throws KeyringException {
         validateUser(user);
 
         Session session = getUserSession(user);

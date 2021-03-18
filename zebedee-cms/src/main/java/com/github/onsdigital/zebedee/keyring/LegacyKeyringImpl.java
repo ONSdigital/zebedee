@@ -54,16 +54,32 @@ public class LegacyKeyringImpl implements Keyring {
     @Override
     public void cacheUserKeyring(User user) throws KeyringException {
         validateUser(user);
-
         Session session = getUserSession(user);
 
+        if (session != null) {
+            addUserKeyringToCache(user, session);
+        }
+
+        applicationKeys.populateCacheFromUserKeyring(user.keyring());
+    }
+
+    private Session getUserSession(User user) throws KeyringException {
+        Session session = null;
+        try {
+            session = sessionsService.find(user.getEmail());
+        } catch (IOException ex) {
+            throw new KeyringException(GET_SESSION_ERR, ex);
+        }
+
+        return session;
+    }
+
+    private void addUserKeyringToCache(User user, Session session) throws KeyringException {
         try {
             cache.put(user, session);
         } catch (IOException ex) {
             throw new KeyringException(CACHE_PUT_ERR, ex);
         }
-
-        applicationKeys.populateCacheFromUserKeyring(user.keyring());
     }
 
     @Override
@@ -119,17 +135,6 @@ public class LegacyKeyringImpl implements Keyring {
     public Set<String> list(User user) throws KeyringException {
         validateUser(user);
         return user.keyring().list();
-    }
-
-    private Session getUserSession(User user) throws KeyringException {
-        Session session = null;
-        try {
-            session = sessionsService.find(user.getEmail());
-        } catch (IOException ex) {
-            throw new KeyringException(GET_SESSION_ERR, ex);
-        }
-
-        return session;
     }
 
     private void validateUser(User user) throws KeyringException {

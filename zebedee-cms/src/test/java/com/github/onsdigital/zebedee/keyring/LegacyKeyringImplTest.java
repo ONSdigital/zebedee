@@ -16,18 +16,23 @@ import javax.crypto.SecretKey;
 import java.io.IOException;
 
 import static com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl.CACHE_GET_ERR;
+import static com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl.CACHE_PUT_ERR;
 import static com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl.COLLECTION_DESC_NULL_ERR;
 import static com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl.COLLECTION_ID_EMPTY_ERR;
 import static com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl.COLLECTION_NULL_ERR;
 import static com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl.EMAIL_EMPTY_ERR;
+import static com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl.GET_SESSION_ERR;
+import static com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl.USER_KEYRING_NULL_ERR;
 import static com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl.USER_NULL_ERR;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertThrows;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 public class LegacyKeyringImplTest {
@@ -261,78 +266,64 @@ public class LegacyKeyringImplTest {
         verify(userKeyring, times(1)).get(TEST_COLLECTION_ID);
     }
 
-
-/*    @Test
-    public void testPopulateFromUser_userNull_shouldThrowException() {
+    @Test
+    public void testCacheUserKeyring_userNull_shouldThrowException() {
         // Given user is null
 
-        // When populate from user is called
-        KeyringException ex = assertThrows(KeyringException.class, () -> keyring.populateFromUser(null));
+        // When cache user keyring is called
+        KeyringException ex = assertThrows(KeyringException.class, () -> legacyKeyring.cacheUserKeyring(null));
 
         // Then an exception is thrown.
         assertThat(ex.getMessage(), equalTo(USER_NULL_ERR));
     }
 
     @Test
-    public void testPopulateFromUser_userEmailNull_shouldThrowException() {
+    public void testCacheUserKeyring_userEmailNull_shouldThrowException() {
         // Given user email is null
         when(user.getEmail())
                 .thenReturn(null);
 
-        // When populate from user is called
-        KeyringException ex = assertThrows(KeyringException.class, () -> keyring.populateFromUser(user));
+        // When cache user keyring is called
+        KeyringException ex = assertThrows(KeyringException.class, () -> legacyKeyring.cacheUserKeyring(user));
 
         // Then an exception is thrown.
         assertThat(ex.getMessage(), equalTo(EMAIL_EMPTY_ERR));
     }
 
     @Test
-    public void testPopulateFromUser_userEmailEmpty_shouldThrowException() {
+    public void testCacheUserKeyring_userEmailEmpty_shouldThrowException() {
         // Given user email is empty
         when(user.getEmail())
                 .thenReturn("");
 
-        // When populate from user is called
-        KeyringException ex = assertThrows(KeyringException.class, () -> keyring.populateFromUser(user));
+        // When cacheUserKeyring is called
+        KeyringException ex = assertThrows(KeyringException.class, () -> legacyKeyring.cacheUserKeyring(user));
 
         // Then an exception is thrown.
         assertThat(ex.getMessage(), equalTo(EMAIL_EMPTY_ERR));
     }
 
     @Test
-    public void testPopulateFromUser_userKeyringNull_shouldThrowException() {
+    public void testCacheUserKeyring_userKeyringNull_shouldThrowException() {
         // Given user keyring is null
         when(user.keyring())
                 .thenReturn(null);
 
-        // When populate from user is called
-        KeyringException ex = assertThrows(KeyringException.class, () -> keyring.populateFromUser(user));
+        // When cacheUserKeyring is called
+        KeyringException ex = assertThrows(KeyringException.class, () -> legacyKeyring.cacheUserKeyring(user));
 
         // Then an exception is thrown.
         assertThat(ex.getMessage(), equalTo(USER_KEYRING_NULL_ERR));
     }
 
     @Test
-    public void testPopulateFromUser_userKeyringLocked_shouldThrowException() {
-        // Given user keyring has not been unlocked
-        when(userKeyring.isUnlocked())
-                .thenReturn(false);
-
-        // When populate from user is called
-        KeyringException ex = assertThrows(KeyringException.class, () -> keyring.populateFromUser(user));
-
-        // Then an exception is thrown.
-        assertThat(ex.getMessage(), equalTo(USER_KEYRING_LOCKED_ERR));
-    }
-
-    @Test
-    public void testPopulateFromUser_getSessionError_shouldThrowException() throws IOException {
+    public void testCacheUserKeyring_getSessionError_shouldThrowException() throws IOException {
         // Given get session throws an exception
         when(sessionsService.find(TEST_EMAIL))
                 .thenThrow(expectedEx);
 
-        // When populate from user is called
-        KeyringException ex = assertThrows(KeyringException.class, () -> keyring.populateFromUser(user));
+        // When cacheUserKeyring is called
+        KeyringException ex = assertThrows(KeyringException.class, () -> legacyKeyring.cacheUserKeyring(user));
 
         // Then an exception is thrown.
         assertThat(ex.getMessage(), equalTo(GET_SESSION_ERR));
@@ -340,27 +331,31 @@ public class LegacyKeyringImplTest {
     }
 
     @Test
-    public void testPopulateFromUser_getSessionReturnsNull_shouldThrowException() throws IOException {
+    public void testCacheUserKeyring_getSessionReturnsNull_doNothing() throws IOException {
         // Given get session returns null
         when(sessionsService.find(TEST_EMAIL))
                 .thenReturn(null);
 
-        // When populate from user is called
-        KeyringException ex = assertThrows(KeyringException.class, () -> keyring.populateFromUser(user));
+        // When cacheUserKeyring is called
+       legacyKeyring.cacheUserKeyring(user);
 
-        // Then an exception is thrown.
-        assertThat(ex.getMessage(), equalTo(SESSION_NULL_ERR));
+        // Then no keying is added to the cache
+        verify(sessionsService, times(1)).find(TEST_EMAIL);
+        verifyZeroInteractions(keyringCache);
+
+        // And then applicationKeys is updated
+        verify(applicationKeys, times(1)).populateCacheFromUserKeyring(userKeyring);
     }
 
     @Test
-    public void testPopulateFromUser_cachePutError_shouldThrowException() throws IOException {
+    public void testCacheUserKeyring_cachePutError_shouldThrowException() throws IOException {
         // Given cache put throws an exception
         doThrow(expectedEx)
-                .when(cache)
+                .when(keyringCache)
                 .put(user, session);
 
-        // When populate from user is called
-        KeyringException ex = assertThrows(KeyringException.class, () -> keyring.populateFromUser(user));
+        // When cacheUserKeyring is called
+        KeyringException ex = assertThrows(KeyringException.class, () -> legacyKeyring.cacheUserKeyring(user));
 
         // Then an exception is thrown.
         assertThat(ex.getMessage(), equalTo(CACHE_PUT_ERR));
@@ -368,19 +363,20 @@ public class LegacyKeyringImplTest {
     }
 
     @Test
-    public void testPopulateFromUser_success_shouldPopulateCacheAndAppKeys() throws IOException {
+    public void testCacheUserKeyring_success_shouldPopulateCacheAndAppKeys() throws IOException {
         // Given a valid user
 
-        // When populate from user is called
-        keyring.populateFromUser(user);
+        // WhencacheUserKeyring is called
+        legacyKeyring.cacheUserKeyring(user);
 
         // Then the keyring cache is updated with the users keys
         verify(sessionsService, times(1)).find(TEST_EMAIL);
-        verify(cache, times(1)).put(user, session);
+        verify(keyringCache, times(1)).put(user, session);
 
         // And the applicate keys are updated from the user keyring
         verify(applicationKeys, times(1)).populateCacheFromUserKeyring(userKeyring);
-    }*/
+    }
+
 /*
     @Test
     public void testRemove_userNull_shouldThrowException() {

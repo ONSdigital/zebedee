@@ -59,7 +59,9 @@ public class ImageServiceImpl implements ImageService {
     }
 
     /**
-     * Publish an image unless its state is 'created' or 'cancelled'
+     * Publish an image unless…
+     *  - its state is 'created' or 'cancelled'; then skip silently
+     *  - its state is 'importing' or 'failed_import'; then skip and notify
      */
     private PublishStatus publishImage(Image image, String collectionId) throws IOException, ImageAPIException {
         PublishStatus status;

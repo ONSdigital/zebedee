@@ -5,7 +5,6 @@ import com.github.onsdigital.dp.image.api.client.exception.ImageAPIException;
 import com.github.onsdigital.dp.image.api.client.model.Image;
 import com.github.onsdigital.dp.image.api.client.model.Images;
 import com.github.onsdigital.zebedee.model.Collection;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -15,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
 
@@ -24,8 +24,10 @@ public class ImageServiceImplTest {
     private static final String IMAGE1 = "i1";
     private static final String IMAGE2 = "i2";
     private static final String IMAGE3 = "i3";
-    public static final String STATE_IMPORTED = "imported";
     public static final String STATE_CREATED = "created";
+    public static final String STATE_IMPORTING = "importing";
+    public static final String STATE_FAILED_IMPORT = "failed_import";
+    public static final String STATE_IMPORTED = "imported";
     public static final String STATE_DELETED = "deleted";
 
     ImageAPIException apiException = new ImageAPIException("error", 123);
@@ -51,9 +53,9 @@ public class ImageServiceImplTest {
         // Then publishImage should be called on the API for each image.
         ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
         verify(mockImageAPI, times(3)).publishImage(captor.capture());
-        Assert.assertEquals(IMAGE1, captor.getAllValues().get(0));
-        Assert.assertEquals(IMAGE2, captor.getAllValues().get(1));
-        Assert.assertEquals(IMAGE3, captor.getAllValues().get(2));
+        assertEquals(IMAGE1, captor.getAllValues().get(0));
+        assertEquals(IMAGE2, captor.getAllValues().get(1));
+        assertEquals(IMAGE3, captor.getAllValues().get(2));
     }
 
     @Test
@@ -67,12 +69,41 @@ public class ImageServiceImplTest {
         ImageService imageService = new ImageServiceImpl(mockImageAPI);
 
         // When publish is called on the collection
-        imageService.publishImagesInCollection(mockCollection);
+        ImageServicePublishingResult result = imageService.publishImagesInCollection(mockCollection);
+        assertNotNull(result);
+        assertEquals(3,result.getTotalImages());
 
         // Then publishImage should not be called on the API for the created or deleted images.
         ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
         verify(mockImageAPI, times(1)).publishImage(captor.capture());
-        Assert.assertEquals(IMAGE2, captor.getAllValues().get(0));
+        assertEquals(IMAGE2, captor.getAllValues().get(0));
+    }
+
+    @Test
+    public void testPublishImagesInCollection_withImportingORFailedImportUnpublished() throws Exception {
+        // Given an api that returns importing,failed_import and imported images
+        when(mockImageAPI.getImages(COLLECTION_ID)).thenReturn(createTestImages(Arrays.asList(
+                createTestImage(IMAGE1,STATE_IMPORTING),
+                createTestImage(IMAGE2,STATE_FAILED_IMPORT),
+                createTestImage(IMAGE3,STATE_IMPORTED)
+                )));
+        ImageService imageService = new ImageServiceImpl(mockImageAPI);
+
+        // When publish is called on the collection
+        ImageServicePublishingResult result = imageService.publishImagesInCollection(mockCollection);
+        assertNotNull(result);
+        assertEquals(3,result.getTotalImages());
+        assertNotNull(result.getUnpublishedImages());
+        assertEquals(2,result.getUnpublishedImages().size());
+        assertNotNull(result.getUnpublishedImages().get(0));
+        assertEquals(IMAGE1, result.getUnpublishedImages().get(0).getId());
+        assertNotNull(result.getUnpublishedImages().get(1));
+        assertEquals(IMAGE2, result.getUnpublishedImages().get(1).getId());
+
+        // Then publishImage should not be called on the API for the created or deleted images.
+        ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+        verify(mockImageAPI, times(1)).publishImage(captor.capture());
+        assertEquals(IMAGE3, captor.getAllValues().get(0));
     }
 
     @Test
@@ -121,16 +152,16 @@ public class ImageServiceImplTest {
         when(mockImageAPI.getImages(COLLECTION_ID)).thenReturn(testImages);
         ImageService imageService = new ImageServiceImpl(mockImageAPI);
 
-        Exception ex = Assert.assertThrows(IOException.class, () -> imageService.publishImagesInCollection(mockCollection));
+        Exception ex = assertThrows(IOException.class, () -> imageService.publishImagesInCollection(mockCollection));
 
         // Then publishImage should be called on the API for each image that it does have.
         ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
         verify(mockImageAPI, times(2)).publishImage(captor.capture());
-        Assert.assertEquals(IMAGE1, captor.getAllValues().get(0));
-        Assert.assertEquals(IMAGE2, captor.getAllValues().get(1));
+        assertEquals(IMAGE1, captor.getAllValues().get(0));
+        assertEquals(IMAGE2, captor.getAllValues().get(1));
 
         // Then an IOException is expected (because zebedee uses IOExceptions inappropriately)
-        Assert.assertEquals("Not all images have been published due to API paging", ex.getMessage());
+        assertEquals("Not all images have been published due to API paging", ex.getMessage());
     }
 
     private Image createTestImage(String id,String state) {

@@ -17,6 +17,8 @@ public class ImageServiceImpl implements ImageService {
 
     public static final String STATE_CREATED = "created";
     public static final String STATE_DELETED = "deleted";
+    public static final String STATE_IMPORTING = "importing";
+    public static final String STATE_FAILED_IMPORT = "failed_import";
     private ImageClient imageClient;
 
     /**
@@ -33,40 +35,64 @@ public class ImageServiceImpl implements ImageService {
      * Publish the images contained in the given collection.
      */
     @Override
-    public void publishImagesInCollection(Collection collection) throws IOException, ImageAPIException {
+    public ImageServicePublishingResult publishImagesInCollection(Collection collection) throws IOException, ImageAPIException {
 
         Images images = imageClient.getImages(collection.getId());
         info().data("publishing", true).data("collectionId", collection.getId())
                 .data("numberOfImages", images.getTotalCount())
                 .log("publishing images in collection");
 
+        ImageServicePublishingResult result = new ImageServicePublishingResult(images.getTotalCount());
         for (Image image : images.getItems()) {
-            publishImage(image, collection.getId());
+            PublishStatus status = publishImage(image, collection.getId());
+            if (PublishStatus.UNPUBLISHED.equals(status)) {
+                result.addUnpublishedImage(image.getId(), image.getState());
+            }
         }
 
         // Image API does not implement paging. Capture scenario if it is implemented unexpectedly.
         if (images.getTotalCount() > images.getCount()) {
             throw new IOException("Not all images have been published due to API paging");
         }
+
+        return result;
     }
 
     /**
      * Publish an image unless its state is 'created' or 'cancelled'
      */
-    private void publishImage(Image image, String collectionId) throws IOException, ImageAPIException {
+    private PublishStatus publishImage(Image image, String collectionId) throws IOException, ImageAPIException {
+        PublishStatus status;
         switch (image.getState()) {
             case STATE_CREATED:
             case STATE_DELETED:
                 info().data("publishing", true).data("collectionId", collectionId)
                         .data("imageId", image.getId())
                         .data("imageState", image.getState())
-                        .log("skipping publish of image");
+                        .log("silently skipping publish of image");
+                status = PublishStatus.SKIPPED;
+                break;
+            case STATE_IMPORTING:
+            case STATE_FAILED_IMPORT:
+                info().data("publishing", true).data("collectionId", collectionId)
+                        .data("imageId", image.getId())
+                        .data("imageState", image.getState())
+                        .log("skipping publish of image with warning");
+                status = PublishStatus.UNPUBLISHED;
                 break;
             default:
                 info().data("publishing", true).data("collectionId", collectionId)
                         .data("imageId", image.getId())
                         .log("publishing image");
                 imageClient.publishImage(image.getId());
+                status = PublishStatus.PUBLISHED;
         }
+        return status;
+    }
+
+    private enum PublishStatus {
+        SKIPPED,
+        UNPUBLISHED,
+        PUBLISHED
     }
 }

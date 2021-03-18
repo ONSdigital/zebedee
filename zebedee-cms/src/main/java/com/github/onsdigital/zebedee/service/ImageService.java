@@ -13,6 +13,6 @@ public interface ImageService {
     /**
      * Publish the images contained in the given collection.
      */
-    void publishImagesInCollection(Collection collection) throws IOException, ImageAPIException;
+    ImageServicePublishingResult publishImagesInCollection(Collection collection) throws IOException, ImageAPIException;
 
 }

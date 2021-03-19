@@ -136,17 +136,9 @@ public class Publisher {
                     throw new Exception("image future unexpectedly null on completion of publishing");
                 }
                 ImageServicePublishingResult result = imageFuture.get();
-                List<ImageServicePublishingResult.ImageDetails> unpublished = result.getUnpublishedImages();
-                if (unpublished != null && unpublished.size() > 0) {
-                    List<PostMessageField> msgs = new ArrayList<>();
-                    msgs.add(new PostMessageField("Collection ID", collection.getId(), false));
-                    msgs.add(new PostMessageField("Collection", collection.getDescription().getName(), true));
-                    msgs.add(new PostMessageField("Total images", String.valueOf(result.getTotalImages()), true));
-                    unpublished.stream()
-                            .map(i -> new PostMessageField("Unpublished image", String.format("%s [%s]", i.getId(), i.getStatus()), false))
-                            .forEach(msgs::add);
-                    final SlackNotifier notifier = new SlackNotifier();
-                    notifier.alarm("Some images failed to publish", msgs.stream().toArray(PostMessageField[]::new));
+
+                if (result.getUnpublishedImages() != null && result.getUnpublishedImages().size() > 0) {
+                    notifyUnpublishedImages(collection, result);
                 }
             } catch (Exception e) {
                 error().data("collectionId", collection.getDescription().getId()).data("publishing", true)
@@ -164,6 +156,24 @@ public class Publisher {
                 .log("collection publish time");
 
         return success;
+    }
+
+    /**
+     * Sends a slack notification if there are any unpublished images in the collection
+     *
+     * @param collection The collection being published
+     * @param result     The result of calling publish on the image service
+     */
+    private static void notifyUnpublishedImages(Collection collection, ImageServicePublishingResult result) {
+        List<PostMessageField> msgs = new ArrayList<>();
+        msgs.add(new PostMessageField("Collection ID", collection.getId(), false));
+        msgs.add(new PostMessageField("Collection", collection.getDescription().getName(), true));
+        msgs.add(new PostMessageField("Total images", String.valueOf(result.getTotalImages()), true));
+        result.getUnpublishedImages().stream()
+                .map(i -> new PostMessageField("Unpublished image", String.format("%s [%s]", i.getId(), i.getStatus()), false))
+                .forEach(msgs::add);
+        final SlackNotifier notifier = new SlackNotifier();
+        notifier.alarm("Some images failed to publish", msgs.stream().toArray(PostMessageField[]::new));
     }
 
     /**

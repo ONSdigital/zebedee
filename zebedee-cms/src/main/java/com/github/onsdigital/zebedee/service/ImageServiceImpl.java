@@ -17,6 +17,7 @@ public class ImageServiceImpl implements ImageService {
 
     public static final String STATE_CREATED = "created";
     public static final String STATE_DELETED = "deleted";
+    public static final String STATE_UPLOADED = "uploaded";
     public static final String STATE_IMPORTING = "importing";
     public static final String STATE_FAILED_IMPORT = "failed_import";
     private ImageClient imageClient;
@@ -74,6 +75,7 @@ public class ImageServiceImpl implements ImageService {
                         .log("silently skipping publish of image");
                 status = PublishStatus.SKIPPED;
                 break;
+            case STATE_UPLOADED:
             case STATE_IMPORTING:
             case STATE_FAILED_IMPORT:
                 info().data("publishing", true).data("collectionId", collectionId)

@@ -24,7 +24,9 @@ public class ImageServiceImplTest {
     private static final String IMAGE1 = "i1";
     private static final String IMAGE2 = "i2";
     private static final String IMAGE3 = "i3";
+    private static final String IMAGE4 = "i4";
     private static final String STATE_CREATED = "created";
+    private static final String STATE_UPLOADED = "uploaded";
     private static final String STATE_IMPORTING = "importing";
     private static final String STATE_FAILED_IMPORT = "failed_import";
     private static final String STATE_IMPORTED = "imported";
@@ -83,27 +85,30 @@ public class ImageServiceImplTest {
     public void testPublishImagesInCollection_withImportingORFailedImportUnpublished() throws Exception {
         // Given an api that returns importing,failed_import and imported images
         when(mockImageAPI.getImages(COLLECTION_ID)).thenReturn(createTestImages(Arrays.asList(
-                createTestImage(IMAGE1,STATE_IMPORTING),
-                createTestImage(IMAGE2,STATE_FAILED_IMPORT),
-                createTestImage(IMAGE3,STATE_IMPORTED)
+                createTestImage(IMAGE1,STATE_UPLOADED),
+                createTestImage(IMAGE2,STATE_IMPORTING),
+                createTestImage(IMAGE3,STATE_FAILED_IMPORT),
+                createTestImage(IMAGE4,STATE_IMPORTED)
                 )));
         ImageService imageService = new ImageServiceImpl(mockImageAPI);
 
         // When publish is called on the collection
         ImageServicePublishingResult result = imageService.publishImagesInCollection(mockCollection);
         assertNotNull(result);
-        assertEquals(3,result.getTotalImages());
+        assertEquals(4,result.getTotalImages());
         assertNotNull(result.getUnpublishedImages());
-        assertEquals(2,result.getUnpublishedImages().size());
+        assertEquals(3,result.getUnpublishedImages().size());
         assertNotNull(result.getUnpublishedImages().get(0));
         assertEquals(IMAGE1, result.getUnpublishedImages().get(0).getId());
         assertNotNull(result.getUnpublishedImages().get(1));
         assertEquals(IMAGE2, result.getUnpublishedImages().get(1).getId());
+        assertNotNull(result.getUnpublishedImages().get(2));
+        assertEquals(IMAGE3, result.getUnpublishedImages().get(2).getId());
 
         // Then publishImage should not be called on the API for the created or deleted images.
         ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
         verify(mockImageAPI, times(1)).publishImage(captor.capture());
-        assertEquals(IMAGE3, captor.getAllValues().get(0));
+        assertEquals(IMAGE4, captor.getAllValues().get(0));
     }
 
     @Test

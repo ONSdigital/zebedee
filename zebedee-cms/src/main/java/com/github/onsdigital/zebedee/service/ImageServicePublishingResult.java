@@ -8,7 +8,7 @@ import java.util.List;
  */
 public class ImageServicePublishingResult {
     private int totalImages;
-    private List<ImageDetails> unpublishedImages = new ArrayList<>();
+    private List<ImageDetails> unpublishedImages;
 
     /**
      * Construct a new instance for the given number of images
@@ -17,6 +17,7 @@ public class ImageServicePublishingResult {
      */
     public ImageServicePublishingResult(int totalImages) {
         this.totalImages = totalImages;
+        this.unpublishedImages= new ArrayList<>();
     }
 
     public int getTotalImages() {

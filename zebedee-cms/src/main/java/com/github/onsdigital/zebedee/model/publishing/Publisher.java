@@ -137,7 +137,7 @@ public class Publisher {
                 }
                 ImageServicePublishingResult result = imageFuture.get();
 
-                if (result.getUnpublishedImages() != null && result.getUnpublishedImages().size() > 0) {
+                if (result != null && result.getUnpublishedImages() != null && result.getUnpublishedImages().size() > 0) {
                     notifyUnpublishedImages(collection, result);
                 }
             } catch (Exception e) {

@@ -906,6 +906,17 @@ public class KeyringImplTest {
         verify(keyringCache, times(1)).list();
     }
 
+    @Test
+    public void testUnlock_userNull_shouldDoNothing() throws Exception {
+        // Given a user
+
+        // When unlock is called
+        keyring.unlock(null, null);
+
+        // Then no action is taken
+        verifyZeroInteractions(user, keyringCache, permissionsService);
+    }
+
     private void resetInstanceToNull() throws Exception {
         // Use some evil reflection magic to set the instance back to null for this test case.
         Field field = KeyringImpl.class.getDeclaredField("INSTANCE");

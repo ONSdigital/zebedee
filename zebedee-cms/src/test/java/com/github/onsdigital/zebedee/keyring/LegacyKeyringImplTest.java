@@ -27,8 +27,10 @@ import static com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl.COLLECTION
 import static com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl.EMAIL_EMPTY_ERR;
 import static com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl.GET_SESSION_ERR;
 import static com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl.GET_USER_ERR;
+import static com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl.PASSWORD_EMPTY_ERR;
 import static com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl.REMOVE_KEY_SAVE_ERR;
 import static com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl.SECRET_KEY_NULL_ERR;
+import static com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl.UNLOCK_KEYRING_ERR;
 import static com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl.USER_KEYRING_NULL_ERR;
 import static com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl.USER_NULL_ERR;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -47,8 +49,8 @@ import static org.mockito.Mockito.when;
 public class LegacyKeyringImplTest {
 
     static final String TEST_EMAIL = "bertandernie@sesamestreet.com";
-
     static final String TEST_COLLECTION_ID = "666";
+    static final String TEST_PASSWORD = "1234567890";
 
     @Mock
     private User user;
@@ -100,6 +102,9 @@ public class LegacyKeyringImplTest {
                 .thenReturn(userKeyring);
 
         when(userKeyring.isUnlocked())
+                .thenReturn(true);
+
+        when(userKeyring.unlock(TEST_PASSWORD))
                 .thenReturn(true);
 
         when(cachedUserKeyring.isUnlocked())
@@ -873,6 +878,94 @@ public class LegacyKeyringImplTest {
         verify(keyringCache, times(1)).get(user);
         verify(users, times(1)).getUserByEmail(TEST_EMAIL);
         verifyZeroInteractions(cachedUserKeyring);
+    }
+
+    @Test
+    public void testUnlock_userNull_shouldThrowException() {
+        // Given user is null
+
+        // When unlock is called
+        KeyringException actual = assertThrows(KeyringException.class, () -> legacyKeyring.unlock(null, null));
+
+        // Then an exception is thrown
+        assertThat(actual.getMessage(), equalTo(USER_NULL_ERR));
+    }
+
+    @Test
+    public void testUnlock_userEmailNull_shouldThrowException() {
+        // Given user email is null
+        when(user.getEmail())
+                .thenReturn(null);
+
+        // When unlock is called
+        KeyringException actual = assertThrows(KeyringException.class, () -> legacyKeyring.unlock(user, null));
+
+        // Then an exception is thrown
+        assertThat(actual.getMessage(), equalTo(EMAIL_EMPTY_ERR));
+    }
+
+    @Test
+    public void testUnlock_userEmailEmpty_shouldThrowException() {
+        // Given user email is empty
+        when(user.getEmail())
+                .thenReturn("");
+
+        // When unlock is called
+        KeyringException actual = assertThrows(KeyringException.class, () -> legacyKeyring.unlock(user, null));
+
+        // Then an exception is thrown
+        assertThat(actual.getMessage(), equalTo(EMAIL_EMPTY_ERR));
+    }
+
+    @Test
+    public void testUnlock_userKeyringNull_shouldThrowException() {
+        // Given user keyring is null
+        when(user.keyring())
+                .thenReturn(null);
+
+        // When unlock is called
+        KeyringException actual = assertThrows(KeyringException.class, () -> legacyKeyring.unlock(user, null));
+
+        // Then an exception is thrown
+        assertThat(actual.getMessage(), equalTo(USER_KEYRING_NULL_ERR));
+    }
+
+    @Test
+    public void testUnlock_passwordNull_shouldThrowException() {
+        // Given password is null
+
+        // When unlock is called
+        KeyringException actual = assertThrows(KeyringException.class, () -> legacyKeyring.unlock(user, null));
+
+        // Then an exception is thrown
+        assertThat(actual.getMessage(), equalTo(PASSWORD_EMPTY_ERR));
+        verifyZeroInteractions(userKeyring);
+    }
+
+    @Test
+    public void testUnlock_unlockFailed_shouldThrowException() {
+        // Given unlocking the user keying is unsuccessful
+        when(userKeyring.unlock(TEST_PASSWORD))
+                .thenReturn(false);
+
+        // When unlock is called
+        KeyringException actual = assertThrows(KeyringException.class, () -> legacyKeyring.unlock(user, TEST_PASSWORD));
+
+        // Then an exception is thrown
+        assertThat(actual.getMessage(), equalTo(UNLOCK_KEYRING_ERR));
+        verify(userKeyring, times(1)).unlock(TEST_PASSWORD);
+    }
+
+    @Test
+    public void testUnlock_success_shouldUnlockTheUserKeyring() throws Exception {
+        // Given unlocking the keyring is successful
+
+        // When unlock is called
+        legacyKeyring.unlock(user, TEST_PASSWORD);
+
+        // Then no error is returned
+        // And the user keyring is unlocked
+        verify(userKeyring, times(1)).unlock(TEST_PASSWORD);
     }
 
 

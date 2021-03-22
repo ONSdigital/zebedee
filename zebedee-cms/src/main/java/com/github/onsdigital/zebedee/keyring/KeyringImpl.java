@@ -133,6 +133,22 @@ public class KeyringImpl implements Keyring {
         return cache.list();
     }
 
+    /**
+     * <b>Do nothing.</b>
+     * <p>This method is defined in order to maintain backwards compatability. This functionality is not
+     * required in the new central keyring design so when called we do nothing.</p>
+     * This method will be removed once we have fully migrated to the central keyring implementation.
+     *
+     * @param user     the user the keyring belongs to.
+     * @param password the user's password.
+     * @throws KeyringException thrown if there is a problem unlocking the keyring.
+     */
+    @Override
+    public void unlock(User user, String password) throws KeyringException {
+        // This method is defined in order to maintain backwards compatability. This functionality is not required in
+        // the new central keyring design so when called we do nothing.
+    }
+
     private void validateUser(User user) throws KeyringException {
         if (user == null) {
             throw new KeyringException(USER_NULL_ERR);

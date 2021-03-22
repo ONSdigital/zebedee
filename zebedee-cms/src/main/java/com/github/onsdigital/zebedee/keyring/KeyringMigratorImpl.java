@@ -34,6 +34,7 @@ public class KeyringMigratorImpl implements Keyring {
     static final String ADD_KEY_ERR = "error adding key to keyring";
     static final String ROLLBACK_FAILED_ERR = "rollback action was unsuccessful";
     static final String LIST_KEYS_ERR = "error listing keys on keyring";
+    static final String UNLOCK_KEYRING_ERR = "error while attempting to unlock user kerying";
 
     private boolean migrationEnabled;
     private Keyring legacyKeyring;
@@ -183,6 +184,15 @@ public class KeyringMigratorImpl implements Keyring {
             return getKeyring().list(user);
         } catch (KeyringException ex) {
             throw wrappedKeyringException(ex, LIST_KEYS_ERR);
+        }
+    }
+
+    @Override
+    public void unlock(User user, String password) throws KeyringException {
+        try {
+            getKeyring().unlock(user, password);
+        } catch (KeyringException ex) {
+            throw wrappedKeyringException(ex, UNLOCK_KEYRING_ERR);
         }
     }
 

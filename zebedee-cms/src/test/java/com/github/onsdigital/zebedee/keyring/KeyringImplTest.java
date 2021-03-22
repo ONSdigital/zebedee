@@ -83,10 +83,10 @@ public class KeyringImplTest {
     }
 
     @Test
-    public void testPopulateFromUser_userNull() throws KeyringException {
+    public void testCacheUserKeyring_userNull() throws KeyringException {
         // Given the user is null
-        // when populateFromUser is called
-        KeyringException ex = assertThrows(KeyringException.class, () -> keyring.populateFromUser(null));
+        // when CacheUserKeyring is called
+        KeyringException ex = assertThrows(KeyringException.class, () -> keyring.cacheUserKeyring(null));
 
         // then a Keyring exception is thrown.
         assertThat(ex.getMessage(), equalTo(USER_NULL_ERR));
@@ -94,7 +94,7 @@ public class KeyringImplTest {
     }
 
     @Test
-    public void testPopulateFromUser_userKeyringNull() throws Exception {
+    public void testCacheUserKeyring_userKeyringNull() throws Exception {
         // Given the user keyring is null
         when(user.getEmail())
                 .thenReturn(TEST_EMAIL_ID);
@@ -102,8 +102,8 @@ public class KeyringImplTest {
         when(user.keyring())
                 .thenReturn(null);
 
-        // When populateFromUser is called
-        KeyringException ex = assertThrows(KeyringException.class, () -> keyring.populateFromUser(user));
+        // When CacheUserKeyring is called
+        KeyringException ex = assertThrows(KeyringException.class, () -> keyring.cacheUserKeyring(user));
 
         // Then a Keyring exception is thrown.
         assertThat(ex.getMessage(), equalTo(USER_KEYRING_NULL_ERR));
@@ -111,7 +111,7 @@ public class KeyringImplTest {
     }
 
     @Test
-    public void testPopulateFromUser_userKeyringIsLocked() throws Exception {
+    public void testCacheUserKeyring_userKeyringIsLocked() throws Exception {
         // Given the user keyring is locked
         when(user.getEmail())
                 .thenReturn(TEST_EMAIL_ID);
@@ -122,8 +122,8 @@ public class KeyringImplTest {
         when(userKeyring.isUnlocked())
                 .thenReturn(false);
 
-        // When populateFromUser is called
-        KeyringException ex = assertThrows(KeyringException.class, () -> keyring.populateFromUser(user));
+        // When CacheUserKeyring is called
+        KeyringException ex = assertThrows(KeyringException.class, () -> keyring.cacheUserKeyring(user));
 
         // Then a Keyring exception is thrown.
         assertThat(ex.getMessage(), equalTo(USER_KEYRING_LOCKED_ERR));
@@ -131,7 +131,7 @@ public class KeyringImplTest {
     }
 
     @Test
-    public void testPopulateFromUser_userKeyringIsEmpty() throws Exception {
+    public void testCacheUserKeyring_userKeyringIsEmpty() throws Exception {
         // Given the user keyring is empty
         when(user.getEmail())
                 .thenReturn(TEST_EMAIL_ID);
@@ -145,15 +145,15 @@ public class KeyringImplTest {
         when(userKeyring.list())
                 .thenReturn(new HashSet<>());
 
-        // When populateFromUser is called
-        keyring.populateFromUser(user);
+        // When CacheUserKeyring is called
+        keyring.cacheUserKeyring(user);
 
         // Then the central keyring is not updated.
         verifyZeroInteractions(keyringCache);
     }
 
     @Test
-    public void testPopulateFromUser_addThrowsException() throws Exception {
+    public void testCacheUserKeyring_addThrowsException() throws Exception {
         // Given central keyring.add throws an exception
         when(user.getEmail())
                 .thenReturn(TEST_EMAIL_ID);
@@ -176,15 +176,15 @@ public class KeyringImplTest {
                 .when(keyringCache)
                 .add(any(), any());
 
-        // When populateFromUser is called
-        assertThrows(KeyringException.class, () -> keyring.populateFromUser(user));
+        // When CacheUserKeyring is called
+        assertThrows(KeyringException.class, () -> keyring.cacheUserKeyring(user));
 
         // Then the central keyring is not updated.
         verify(keyringCache, times(1)).add(any(), any());
     }
 
     @Test
-    public void testPopulateFromUser_success() throws Exception {
+    public void testCacheUserKeyring_success() throws Exception {
         // Given a populated user keyring
         when(user.getEmail())
                 .thenReturn(TEST_EMAIL_ID);
@@ -203,8 +203,8 @@ public class KeyringImplTest {
         when(userKeyring.get(TEST_COLLECTION_ID))
                 .thenReturn(secretKey);
 
-        // When populateFromUser is called
-        keyring.populateFromUser(user);
+        // When CacheUserKeyring is called
+        keyring.cacheUserKeyring(user);
 
         // Then the central keyring is updated with each entry in the user keyring.
         verify(keyringCache, times(1)).add(TEST_COLLECTION_ID, secretKey);

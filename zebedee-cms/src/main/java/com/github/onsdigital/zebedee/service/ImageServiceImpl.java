@@ -9,6 +9,7 @@ import com.github.onsdigital.zebedee.model.Collection;
 import java.io.IOException;
 
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.info;
+import static com.github.onsdigital.zebedee.logging.CMSLogEvent.warn;
 
 /**
  * Image related services
@@ -69,25 +70,27 @@ public class ImageServiceImpl implements ImageService {
         switch (image.getState()) {
             case STATE_CREATED:
             case STATE_DELETED:
-                info().data("publishing", true).data("collectionId", collectionId)
+                info().data("publishing", true).collectionID(collectionId)
                         .data("imageId", image.getId())
                         .data("imageState", image.getState())
-                        .log("silently skipping publish of image");
+                        .log("skipping publish of abandoned image");
                 status = PublishStatus.SKIPPED;
                 break;
             case STATE_UPLOADED:
             case STATE_IMPORTING:
             case STATE_FAILED_IMPORT:
-                info().data("publishing", true).data("collectionId", collectionId)
+                warn().data("publishing", true).collectionID(collectionId)
                         .data("imageId", image.getId())
                         .data("imageState", image.getState())
-                        .log("skipping publish of image with warning");
+                        .log("skipping publish of un-imported image with warning");
                 status = PublishStatus.UNPUBLISHED;
                 break;
             default:
-                info().data("publishing", true).data("collectionId", collectionId)
+                info().data("publishing", true).collectionID(collectionId)
                         .data("imageId", image.getId())
                         .log("publishing image");
+
+                //Publish the image
                 imageClient.publishImage(image.getId());
                 status = PublishStatus.PUBLISHED;
         }

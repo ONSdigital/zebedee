@@ -6,6 +6,8 @@ import com.github.onsdigital.session.service.client.SessionClientImpl;
 import com.github.onsdigital.zebedee.data.processing.DataIndex;
 import com.github.onsdigital.zebedee.keyring.Keyring;
 import com.github.onsdigital.zebedee.keyring.KeyringImpl;
+import com.github.onsdigital.zebedee.keyring.KeyringMigratorImpl;
+import com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl;
 import com.github.onsdigital.zebedee.keyring.cache.KeyringCache;
 import com.github.onsdigital.zebedee.keyring.cache.KeyringCacheImpl;
 import com.github.onsdigital.zebedee.keyring.store.KeyringStore;
@@ -168,14 +170,17 @@ public class ZebedeeConfiguration {
 
         // Configure the new KeyringCache if enabled
         if (cmsFeatureFlags().isCentralisedKeyringEnabled()) {
-            KeyringStore keyStore = new KeyringStoreImpl(getKeyRingPath(), getKeyringSecretKey(),
-                    getKeyringInitVector());
+            KeyringStore keyStore = new KeyringStoreImpl(getKeyRingPath(), getKeyringSecretKey(), getKeyringInitVector());
 
             KeyringCacheImpl.init(keyStore);
             KeyringCache keyringCache = KeyringCacheImpl.getInstance();
 
             KeyringImpl.init(keyringCache, permissionsService);
-            this.keyring = KeyringImpl.getInstance();
+            Keyring centralKeyring = KeyringImpl.getInstance();
+
+            Keyring legacyKeyring = new LegacyKeyringImpl(sessions, usersService, legacyKeyringCache, applicationKeys);
+
+            this.keyring = new KeyringMigratorImpl(false, legacyKeyring, centralKeyring);
         }
 
         VersionsService versionsService = new VersionsServiceImpl();

@@ -18,6 +18,7 @@ import static com.github.onsdigital.zebedee.keyring.KeyringMigratorImpl.LIST_KEY
 import static com.github.onsdigital.zebedee.keyring.KeyringMigratorImpl.POPULATE_FROM_USER_ERR;
 import static com.github.onsdigital.zebedee.keyring.KeyringMigratorImpl.REMOVE_KEY_ERR;
 import static com.github.onsdigital.zebedee.keyring.KeyringMigratorImpl.ROLLBACK_FAILED_ERR;
+import static com.github.onsdigital.zebedee.keyring.KeyringMigratorImpl.UNLOCK_KEYRING_ERR;
 import static com.github.onsdigital.zebedee.keyring.KeyringMigratorImpl.WRAPPED_ERR_FMT;
 import static java.text.MessageFormat.format;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -759,7 +760,7 @@ public class KeyringMigratorImplTest {
 
     @Test
     public void list_migrateEnabled_success_shouldListKeys() throws Exception {
-        // Given migrate is disabled
+        // Given migrate is enabled
         keyring = new KeyringMigratorImpl(enabled, legacyKeyring, centralKeyring);
 
         Set<String> keys = new HashSet<String>() {{
@@ -775,6 +776,76 @@ public class KeyringMigratorImplTest {
         // Then the expected key list is returned
         assertThat(actual, equalTo(keys));
         verify(centralKeyring, times(1)).list(user);
+        verifyZeroInteractions(legacyKeyring);
+    }
+
+    @Test
+    public void unlock_migrateDisbaled_shouldCallLegacyKeyringUnlock() throws Exception {
+        // Given migrate is disabled
+        keyring = new KeyringMigratorImpl(disabled, legacyKeyring, centralKeyring);
+
+        // When unlocked is called
+        keyring.unlock(user, "1234");
+
+        // Then legacy keyring is unlocked
+        verify(legacyKeyring, times(1)).unlock(user, "1234");
+        verifyZeroInteractions(centralKeyring);
+    }
+
+    @Test
+    public void unlock_migrateEnabled_shouldCallCentralKeyringUnlock() throws Exception {
+        // Given migrate is enabled
+        keyring = new KeyringMigratorImpl(enabled, legacyKeyring, centralKeyring);
+
+        // When unlocked is called
+        keyring.unlock(user, "1234");
+
+        // Then central keyring is unlocked
+        verify(centralKeyring, times(1)).unlock(user, "1234");
+        verifyZeroInteractions(legacyKeyring);
+    }
+
+    @Test
+    public void unlock_migrateDisabled_unlockErrorShouldThrowException() throws Exception {
+        // Given migrate is disabled
+        // And legacy keyring unlock throws an exception
+        keyring = new KeyringMigratorImpl(disabled, legacyKeyring, centralKeyring);
+
+        String password = "1234";
+
+        doThrow(KeyringException.class)
+                .when(legacyKeyring)
+                .unlock(user, password);
+
+        // When unlocked is called
+        KeyringException actual = assertThrows(KeyringException.class, ()->keyring.unlock(user, password));
+
+        // Then an exception is thrown
+        assertWrappedException(actual, UNLOCK_KEYRING_ERR, disabled);
+
+        verify(legacyKeyring, times(1)).unlock(user, password);
+        verifyZeroInteractions(centralKeyring);
+    }
+
+    @Test
+    public void unlock_migrateEnabled_unlockErrorShouldThrowException() throws Exception {
+        // Given migrate is enabled
+        // And legacy keyring unlock throws an exception
+        keyring = new KeyringMigratorImpl(enabled, legacyKeyring, centralKeyring);
+
+        String password = "1234";
+
+        doThrow(KeyringException.class)
+                .when(centralKeyring)
+                .unlock(user, password);
+
+        // When unlocked is called
+        KeyringException actual = assertThrows(KeyringException.class, ()->keyring.unlock(user, password));
+
+        // Then an exception is thrown
+        assertWrappedException(actual, UNLOCK_KEYRING_ERR, enabled);
+
+        verify(centralKeyring, times(1)).unlock(user, password);
         verifyZeroInteractions(legacyKeyring);
     }
 }

@@ -37,6 +37,8 @@ public class LegacyKeyringImpl implements Keyring {
     static final String ADD_KEY_SAVE_ERR = "user service add key to user returned an error";
     static final String REMOVE_KEY_SAVE_ERR = "user service remove key from user returned an error";
     static final String GET_USER_ERR = "user service get user by email return an error";
+    static final String PASSWORD_EMPTY_ERR = "user password required but was null or empty";
+    static final String UNLOCK_KEYRING_ERR = "error unlocking user keyring";
 
     private Sessions sessions;
     private UsersService users;
@@ -227,6 +229,16 @@ public class LegacyKeyringImpl implements Keyring {
         return storedUser.keyring().list();
     }
 
+    @Override
+    public void unlock(User user, String password) throws KeyringException {
+        validateUser(user);
+        validatePassword(password);
+
+        if (!user.keyring().unlock(password)) {
+            throw new KeyringException(UNLOCK_KEYRING_ERR);
+        }
+    }
+
     private void validateUser(User user) throws KeyringException {
         if (user == null) {
             throw new KeyringException(USER_NULL_ERR);
@@ -290,6 +302,12 @@ public class LegacyKeyringImpl implements Keyring {
             return users.getUserByEmail(user.getEmail());
         } catch (Exception ex) {
             throw new KeyringException(GET_USER_ERR, ex);
+        }
+    }
+
+    private void validatePassword(String password) throws KeyringException {
+        if (StringUtils.isEmpty(password)) {
+            throw new KeyringException(PASSWORD_EMPTY_ERR);
         }
     }
 }

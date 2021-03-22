@@ -18,8 +18,8 @@ import static com.github.onsdigital.zebedee.keyring.KeyringMigratorImpl.LIST_KEY
 import static com.github.onsdigital.zebedee.keyring.KeyringMigratorImpl.POPULATE_FROM_USER_ERR;
 import static com.github.onsdigital.zebedee.keyring.KeyringMigratorImpl.REMOVE_KEY_ERR;
 import static com.github.onsdigital.zebedee.keyring.KeyringMigratorImpl.ROLLBACK_FAILED_ERR;
-import static com.github.onsdigital.zebedee.keyring.KeyringMigratorImpl.WRAPPED_ERR_FMT;
 import static com.github.onsdigital.zebedee.keyring.KeyringMigratorImpl.UNLOCK_KEYRING_ERR;
+import static com.github.onsdigital.zebedee.keyring.KeyringMigratorImpl.WRAPPED_ERR_FMT;
 import static java.text.MessageFormat.format;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
@@ -787,7 +787,7 @@ public class KeyringMigratorImplTest {
         // When unlocked is called
         keyring.unlock(user, "1234");
 
-        // Then lecacy keyring is unlocked
+        // Then legacy keyring is unlocked
         verify(legacyKeyring, times(1)).unlock(user, "1234");
         verifyZeroInteractions(centralKeyring);
     }
@@ -800,7 +800,7 @@ public class KeyringMigratorImplTest {
         // When unlocked is called
         keyring.unlock(user, "1234");
 
-        // Then lecacy keyring is unlocked
+        // Then legacy keyring is unlocked
         verify(centralKeyring, times(1)).unlock(user, "1234");
         verifyZeroInteractions(legacyKeyring);
     }

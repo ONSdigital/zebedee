@@ -34,8 +34,9 @@ public class LegacyKeyringImpl implements Keyring {
     static final String COLLECTION_ID_EMPTY_ERR = "collection ID required but was null/empty";
     static final String SECRET_KEY_NULL_ERR = "secret key required but was null";
     static final String CACHE_GET_ERR = "error getting entry from keyringCache";
-    static final String SAVE_USER_ERR = "error persiting user update";
-    static final String GET_USER_ERR = "error getting user";
+    static final String ADD_KEY_SAVE_ERR = "user service add key to user returned an error";
+    static final String REMOVE_KEY_SAVE_ERR = "user service remove key from user returned an error";
+    static final String GET_USER_ERR = "user service get user by email return an error";
 
     private Sessions sessions;
     private UsersService users;
@@ -193,7 +194,7 @@ public class LegacyKeyringImpl implements Keyring {
     }
 
     /**
-     * List the key held in the user's {@link com.github.onsdigital.zebedee.json.Keyring}.
+     * List the keys held in the user's {@link com.github.onsdigital.zebedee.json.Keyring}.
      * <ul>
      *     <li>Lists from a cached user keyring if it exists in the {@link KeyringCache}.</li>
      *     <li>Otherwise lists from the stored user keyring.</li>
@@ -272,7 +273,7 @@ public class LegacyKeyringImpl implements Keyring {
         try {
             users.removeKeyFromKeyring(user.getEmail(), collection.getDescription().getId());
         } catch (IOException ex) {
-            throw new KeyringException(SAVE_USER_ERR, ex);
+            throw new KeyringException(REMOVE_KEY_SAVE_ERR, ex);
         }
     }
 
@@ -280,7 +281,7 @@ public class LegacyKeyringImpl implements Keyring {
         try {
             users.addKeyToKeyring(user.getEmail(), collection.getDescription().getId(), key);
         } catch (IOException ex) {
-            throw new KeyringException(SAVE_USER_ERR, ex);
+            throw new KeyringException(ADD_KEY_SAVE_ERR, ex);
         }
     }
 

@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
+import static com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl.ADD_KEY_SAVE_ERR;
 import static com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl.CACHE_GET_ERR;
 import static com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl.CACHE_PUT_ERR;
 import static com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl.COLLECTION_DESC_NULL_ERR;
@@ -26,7 +27,7 @@ import static com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl.COLLECTION
 import static com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl.EMAIL_EMPTY_ERR;
 import static com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl.GET_SESSION_ERR;
 import static com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl.GET_USER_ERR;
-import static com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl.SAVE_USER_ERR;
+import static com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl.REMOVE_KEY_SAVE_ERR;
 import static com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl.SECRET_KEY_NULL_ERR;
 import static com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl.USER_KEYRING_NULL_ERR;
 import static com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl.USER_NULL_ERR;
@@ -158,7 +159,7 @@ public class LegacyKeyringImplTest {
     }
 
     @Test
-    public void testGet_collecitonNull_shouldThrowException() {
+    public void testGet_collectionNull_shouldThrowException() {
         // Given collection is null
 
         // When get is called
@@ -169,7 +170,7 @@ public class LegacyKeyringImplTest {
     }
 
     @Test
-    public void testGet_collecitonDescriptionNull_shouldThrowException() {
+    public void testGet_collectionDescriptionNull_shouldThrowException() {
         // Given collection description is null
         when(collection.getDescription())
                 .thenReturn(null);
@@ -182,7 +183,7 @@ public class LegacyKeyringImplTest {
     }
 
     @Test
-    public void testGet_collecitonIDNull_shouldThrowException() {
+    public void testGet_collectionIDNull_shouldThrowException() {
         // Given collection ID is null
         when(collectionDescription.getId())
                 .thenReturn(null);
@@ -195,7 +196,7 @@ public class LegacyKeyringImplTest {
     }
 
     @Test
-    public void testGet_collecitonIDEmpty_shouldThrowException() {
+    public void testGet_collectionIDEmpty_shouldThrowException() {
         // Given collection ID is empty
         when(collectionDescription.getId())
                 .thenReturn("");
@@ -497,9 +498,14 @@ public class LegacyKeyringImplTest {
         // When remove is called
         legacyKeyring.remove(user, collection);
 
-        // Then no update is made to the user keyring
-        verify(keyringCache, times(1)).get(user);
+        // Then the user record is updated and saved
         verify(users, times(1)).removeKeyFromKeyring(TEST_EMAIL, TEST_COLLECTION_ID);
+
+        // And no update is made the cached user keyring
+        verify(keyringCache, times(1)).get(user);
+        verifyZeroInteractions(cachedUserKeyring);
+
+        // And
     }
 
     @Test
@@ -516,7 +522,7 @@ public class LegacyKeyringImplTest {
         KeyringException actual = assertThrows(KeyringException.class, () -> legacyKeyring.remove(user, collection));
 
         // Then an exception is thrown
-        assertThat(actual.getMessage(), equalTo(SAVE_USER_ERR));
+        assertThat(actual.getMessage(), equalTo(REMOVE_KEY_SAVE_ERR));
         assertThat(actual.getCause(), equalTo(cause));
 
         verify(keyringCache, times(1)).get(user);
@@ -550,7 +556,7 @@ public class LegacyKeyringImplTest {
         KeyringException actual = assertThrows(KeyringException.class, () -> legacyKeyring.remove(user, collection));
 
         // Then an exception is thrown
-        assertThat(actual.getMessage(), equalTo(SAVE_USER_ERR));
+        assertThat(actual.getMessage(), equalTo(REMOVE_KEY_SAVE_ERR));
         assertThat(actual.getCause(), equalTo(cause));
 
         verify(keyringCache, times(1)).get(user);
@@ -673,14 +679,16 @@ public class LegacyKeyringImplTest {
         // When add is called
         legacyKeyring.add(user, collection, secretKey);
 
-        // Then nothing happens
+        // Then the stored user is updated
         verify(keyringCache, times(1)).get(user);
         verify(users, times(1)).addKeyToKeyring(TEST_EMAIL, TEST_COLLECTION_ID, secretKey);
+
+        // And the cached user keyring is not updated
         verifyZeroInteractions(userKeyring, cachedUserKeyring);
     }
 
     @Test
-    public void testAdd_cacheKeyringIsLocked_shouldUpdateStoredUserOnly() throws Exception {
+    public void testAdd_cacheKeyringIsLocked_shouldUpdateBothStoredUserAndCachedKeyring() throws Exception {
         // Given the users cached keyring is locked
         when(cachedUserKeyring.isUnlocked())
                 .thenReturn(false);
@@ -688,10 +696,11 @@ public class LegacyKeyringImplTest {
         // When add is called
         legacyKeyring.add(user, collection, secretKey);
 
-        // Then the keyring cache is not updated
+        // Then the keyring cache is updated
         verify(keyringCache, times(1)).get(user);
+        verify(cachedUserKeyring, times(1)).put(TEST_COLLECTION_ID, secretKey);
 
-        // And the user stored is updated
+        // And the key is added to the store user keyring
         verify(users, times(1)).addKeyToKeyring(TEST_EMAIL, TEST_COLLECTION_ID, secretKey);
     }
 
@@ -706,7 +715,7 @@ public class LegacyKeyringImplTest {
                 () -> legacyKeyring.add(user, collection, secretKey));
 
         // Then an exception is thrown
-        assertThat(actual.getMessage(), equalTo(SAVE_USER_ERR));
+        assertThat(actual.getMessage(), equalTo(ADD_KEY_SAVE_ERR));
         assertTrue(actual.getCause() instanceof IOException);
 
         verify(keyringCache, times(1)).get(user);

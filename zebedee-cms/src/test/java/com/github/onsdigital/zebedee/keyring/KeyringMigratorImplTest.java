@@ -800,7 +800,7 @@ public class KeyringMigratorImplTest {
         // When unlocked is called
         keyring.unlock(user, "1234");
 
-        // Then legacy keyring is unlocked
+        // Then central keyring is unlocked
         verify(centralKeyring, times(1)).unlock(user, "1234");
         verifyZeroInteractions(legacyKeyring);
     }

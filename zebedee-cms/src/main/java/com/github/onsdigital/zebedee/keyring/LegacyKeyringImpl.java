@@ -68,7 +68,7 @@ public class LegacyKeyringImpl implements Keyring {
      *                          could not be found.
      */
     @Override
-    public void cacheUserKeyring(User user) throws KeyringException {
+    public void cacheKeyring(User user) throws KeyringException {
         validateUser(user);
         Session session = getUserSession(user);
 

@@ -77,121 +77,121 @@ public class KeyringMigratorImplTest {
     }
 
     @Test
-    public void populateFromUser_migrateDisabled_success_shouldUpdateBothKeyrings() throws Exception {
+    public void cacheKeyring_migrateDisabled_success_shouldUpdateBothKeyrings() throws Exception {
         // Given keyring migration is disabled
         keyring = new KeyringMigratorImpl(disabled, legacyKeyring, centralKeyring);
 
-        // When populate from user is called
-        keyring.cacheUserKeyring(user);
+        // When cacheKeyring is called
+        keyring.cacheKeyring(user);
 
         // Then both the legacy and central keyrings are updated
-        verify(legacyKeyring, times(1)).cacheUserKeyring(user);
-        verify(centralKeyring, times(1)).cacheUserKeyring(user);
+        verify(legacyKeyring, times(1)).cacheKeyring(user);
+        verify(centralKeyring, times(1)).cacheKeyring(user);
     }
 
     @Test
-    public void populateFromUser_migrateEnabled_success_shouldUpdateBothKeyrings() throws Exception {
+    public void cacheKeyring_migrateEnabled_success_shouldUpdateBothKeyrings() throws Exception {
         // Given keyring migration is enabled
         keyring = new KeyringMigratorImpl(enabled, legacyKeyring, centralKeyring);
 
-        // When populate from user is called
-        keyring.cacheUserKeyring(user);
+        // When cacheKeyring is called
+        keyring.cacheKeyring(user);
 
         // Then both the legacy and central keyrings are updated
-        verify(legacyKeyring, times(1)).cacheUserKeyring(user);
-        verify(centralKeyring, times(1)).cacheUserKeyring(user);
+        verify(legacyKeyring, times(1)).cacheKeyring(user);
+        verify(centralKeyring, times(1)).cacheKeyring(user);
     }
 
     @Test
-    public void populateFromUser_migrateDisabled_legacyKeyringException_shouldThrowException() throws Exception {
+    public void cacheKeyring_migrateDisabled_legacyKeyringException_shouldThrowException() throws Exception {
         // Given keyring migration is disabled
         // And legacy keyring errors when called.
         keyring = new KeyringMigratorImpl(disabled, legacyKeyring, centralKeyring);
 
         doThrow(KeyringException.class)
                 .when(legacyKeyring)
-                .cacheUserKeyring(user);
+                .cacheKeyring(user);
 
-        // When populate from user is called
-        KeyringException actual = assertThrows(KeyringException.class, () -> keyring.cacheUserKeyring(user));
+        // When cacheKeyring is called
+        KeyringException actual = assertThrows(KeyringException.class, () -> keyring.cacheKeyring(user));
 
         // Then an exception is thrown
         assertWrappedException(actual, POPULATE_FROM_USER_ERR, disabled);
 
         // And the legacy keyring is called 1 time
-        verify(legacyKeyring, times(1)).cacheUserKeyring(user);
+        verify(legacyKeyring, times(1)).cacheKeyring(user);
 
         // And the central keyring is never called
         verifyZeroInteractions(centralKeyring);
     }
 
     @Test
-    public void populateFromUser_migrateEnabled_legacyKeyringException_shouldThrowException() throws Exception {
+    public void cacheKeyring_migrateEnabled_legacyKeyringException_shouldThrowException() throws Exception {
         // Given keyring migration is enabled
         // And legacy keyring errors when called.
         keyring = new KeyringMigratorImpl(enabled, legacyKeyring, centralKeyring);
 
         doThrow(KeyringException.class)
                 .when(legacyKeyring)
-                .cacheUserKeyring(user);
+                .cacheKeyring(user);
 
-        // When populate from user is called
-        KeyringException actual = assertThrows(KeyringException.class, () -> keyring.cacheUserKeyring(user));
+        // When cacheKeyring is called
+        KeyringException actual = assertThrows(KeyringException.class, () -> keyring.cacheKeyring(user));
 
         // Then an exception is thrown
         assertWrappedException(actual, POPULATE_FROM_USER_ERR, enabled);
 
         // And the legacy keyring is called 1 time
-        verify(legacyKeyring, times(1)).cacheUserKeyring(user);
+        verify(legacyKeyring, times(1)).cacheKeyring(user);
 
         // And the central keyring is never called
         verifyZeroInteractions(centralKeyring);
     }
 
     @Test
-    public void populateFromUser_migrateDisabled_centralKeyringException_shouldThrowException() throws Exception {
+    public void cacheKeyring_migrateDisabled_centralKeyringException_shouldThrowException() throws Exception {
         // Given keyring migration is disabled
         // And central keyring errors when called.
         keyring = new KeyringMigratorImpl(disabled, legacyKeyring, centralKeyring);
 
         doThrow(KeyringException.class)
                 .when(centralKeyring)
-                .cacheUserKeyring(user);
+                .cacheKeyring(user);
 
-        // When populate from user is called
-        KeyringException actual = assertThrows(KeyringException.class, () -> keyring.cacheUserKeyring(user));
+        // When cacheKeyring is called
+        KeyringException actual = assertThrows(KeyringException.class, () -> keyring.cacheKeyring(user));
 
         // Then an exception is thrown
         assertWrappedException(actual, POPULATE_FROM_USER_ERR, disabled);
 
         // And the legacy keyring is called 1 time
-        verify(legacyKeyring, times(1)).cacheUserKeyring(user);
+        verify(legacyKeyring, times(1)).cacheKeyring(user);
 
         // And the central keyring is called 1 time
-        verify(centralKeyring, times(1)).cacheUserKeyring(user);
+        verify(centralKeyring, times(1)).cacheKeyring(user);
     }
 
     @Test
-    public void populateFromUser_migrateEnabled_centralKeyringException_shouldThrowException() throws Exception {
+    public void cacheKeyring_migrateEnabled_centralKeyringException_shouldThrowException() throws Exception {
         // Given keyring migration is enabled
         // And central keyring errors when called.
         keyring = new KeyringMigratorImpl(enabled, legacyKeyring, centralKeyring);
 
         doThrow(KeyringException.class)
                 .when(centralKeyring)
-                .cacheUserKeyring(user);
+                .cacheKeyring(user);
 
-        // When populate from user is called
-        KeyringException actual = assertThrows(KeyringException.class, () -> keyring.cacheUserKeyring(user));
+        // When cacheKeyring is called
+        KeyringException actual = assertThrows(KeyringException.class, () -> keyring.cacheKeyring(user));
 
         // Then an exception is thrown
         assertWrappedException(actual, POPULATE_FROM_USER_ERR, enabled);
 
         // And the legacy keyring is called 1 time
-        verify(legacyKeyring, times(1)).cacheUserKeyring(user);
+        verify(legacyKeyring, times(1)).cacheKeyring(user);
 
         // And the central keyring is called 1 time
-        verify(centralKeyring, times(1)).cacheUserKeyring(user);
+        verify(centralKeyring, times(1)).cacheKeyring(user);
     }
 
     @Test

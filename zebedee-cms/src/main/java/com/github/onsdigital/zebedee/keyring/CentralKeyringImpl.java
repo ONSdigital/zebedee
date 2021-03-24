@@ -11,10 +11,10 @@ import java.io.IOException;
 import java.util.Set;
 
 /**
- * CollectionKeyringImpl adds a permissions check wrapper around a {@link KeyringCache} instance to ensure only
+ * CentralKeyringImpl adds a permissions check wrapper around a {@link KeyringCache} instance to ensure only
  * authorised users can access collection encryption keys
  */
-public class KeyringImpl implements Keyring {
+public class CentralKeyringImpl implements Keyring {
 
     static final String USER_NULL_ERR = "user required but was null";
     static final String USER_EMAIL_ERR = "user email required but was null or empty";
@@ -37,14 +37,14 @@ public class KeyringImpl implements Keyring {
     private final PermissionsService permissionsService;
 
     /**
-     * CollectionKeyringImpl is a singleton instance. Use {@link KeyringImpl#init(KeyringCache, PermissionsService)} to
-     * construct and initialise a new instance. Use {@link KeyringImpl#getInstance()} to accessed the
+     * CollectionKeyringImpl is a singleton instance. Use {@link CentralKeyringImpl#init(KeyringCache, PermissionsService)} to
+     * construct and initialise a new instance. Use {@link CentralKeyringImpl#getInstance()} to accessed the
      * singleton.
      *
      * @param cache the {@link KeyringCache} instance to use.
      * @throws KeyringException the {@link KeyringCache} was null.
      */
-    private KeyringImpl(KeyringCache cache, PermissionsService permissionsService) throws KeyringException {
+    private CentralKeyringImpl(KeyringCache cache, PermissionsService permissionsService) throws KeyringException {
         if (cache == null) {
             throw new KeyringException(KEYRING_CACHE_NULL_ERR);
         }
@@ -58,7 +58,7 @@ public class KeyringImpl implements Keyring {
     }
 
     @Override
-    public void cacheUserKeyring(User user) throws KeyringException {
+    public void cacheKeyring(User user) throws KeyringException {
         validateUser(user);
 
         if (user.keyring() == null) {
@@ -196,9 +196,9 @@ public class KeyringImpl implements Keyring {
      */
     public static void init(KeyringCache keyringCache, PermissionsService permissionsService) throws KeyringException {
         if (INSTANCE == null) {
-            synchronized (KeyringImpl.class) {
+            synchronized (CentralKeyringImpl.class) {
                 if (INSTANCE == null) {
-                    INSTANCE = new KeyringImpl(keyringCache, permissionsService);
+                    INSTANCE = new CentralKeyringImpl(keyringCache, permissionsService);
                 }
             }
         }

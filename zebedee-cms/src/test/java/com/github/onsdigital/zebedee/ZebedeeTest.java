@@ -387,7 +387,7 @@ public class ZebedeeTest extends ZebedeeTestBaseFixture {
         verify(legacyKeyring, times(1)).unlock(any());
         verify(applicationKeys, times(1)).populateCacheFromUserKeyring(legacyKeyring);
         verify(legacyKeyringCache, times(1)).put(user, userSession);
-        verify(keyring, never()).cacheUserKeyring(any());
+        verify(keyring, never()).cacheKeyring(any());
     }
 
     @Test

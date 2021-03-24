@@ -1,17 +1,16 @@
 package com.github.onsdigital.zebedee;
 
+import com.github.onsdigital.dp.image.api.client.ImageAPIClient;
+import com.github.onsdigital.dp.image.api.client.ImageClient;
 import com.github.onsdigital.session.service.client.Http;
 import com.github.onsdigital.session.service.client.SessionClient;
 import com.github.onsdigital.session.service.client.SessionClientImpl;
 import com.github.onsdigital.zebedee.data.processing.DataIndex;
 import com.github.onsdigital.zebedee.keyring.Keyring;
-import com.github.onsdigital.zebedee.keyring.KeyringImpl;
 import com.github.onsdigital.zebedee.keyring.KeyringMigratorImpl;
 import com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl;
+import com.github.onsdigital.zebedee.keyring.NoOpCentralKeyring;
 import com.github.onsdigital.zebedee.keyring.cache.KeyringCache;
-import com.github.onsdigital.zebedee.keyring.cache.KeyringCacheImpl;
-import com.github.onsdigital.zebedee.keyring.store.KeyringStore;
-import com.github.onsdigital.zebedee.keyring.store.KeyringStoreImpl;
 import com.github.onsdigital.zebedee.model.Collections;
 import com.github.onsdigital.zebedee.model.Content;
 import com.github.onsdigital.zebedee.model.RedirectTablePartialMatch;
@@ -22,7 +21,11 @@ import com.github.onsdigital.zebedee.permissions.service.PermissionsServiceImpl;
 import com.github.onsdigital.zebedee.permissions.store.PermissionsStore;
 import com.github.onsdigital.zebedee.permissions.store.PermissionsStoreFileSystemImpl;
 import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
-import com.github.onsdigital.zebedee.service.*;
+import com.github.onsdigital.zebedee.service.DatasetService;
+import com.github.onsdigital.zebedee.service.ImageService;
+import com.github.onsdigital.zebedee.service.ImageServiceImpl;
+import com.github.onsdigital.zebedee.service.ServiceStoreImpl;
+import com.github.onsdigital.zebedee.service.ZebedeeDatasetService;
 import com.github.onsdigital.zebedee.session.service.Sessions;
 import com.github.onsdigital.zebedee.session.service.SessionsAPIServiceImpl;
 import com.github.onsdigital.zebedee.session.service.SessionsServiceImpl;
@@ -37,8 +40,6 @@ import com.github.onsdigital.zebedee.util.versioning.VersionsServiceImpl;
 import com.github.onsdigital.zebedee.verification.VerificationAgent;
 import dp.api.dataset.DatasetAPIClient;
 import dp.api.dataset.DatasetClient;
-import com.github.onsdigital.dp.image.api.client.ImageAPIClient;
-import com.github.onsdigital.dp.image.api.client.ImageClient;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -62,8 +63,6 @@ import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFea
 import static com.github.onsdigital.zebedee.configuration.Configuration.getDatasetAPIAuthToken;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getDatasetAPIURL;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getImageAPIURL;
-import static com.github.onsdigital.zebedee.configuration.Configuration.getKeyringInitVector;
-import static com.github.onsdigital.zebedee.configuration.Configuration.getKeyringSecretKey;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getServiceAuthToken;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getSessionsApiUrl;
 import static com.github.onsdigital.zebedee.permissions.store.PermissionsStoreFileSystemImpl.initialisePermissions;
@@ -170,17 +169,17 @@ public class ZebedeeConfiguration {
 
         // Configure the new KeyringCache if enabled
         if (cmsFeatureFlags().isCentralisedKeyringEnabled()) {
-            KeyringStore keyStore = new KeyringStoreImpl(getKeyRingPath(), getKeyringSecretKey(), getKeyringInitVector());
+            // Uncomment when central keyring is ready.
+/*            KeyringStore keyStore = new KeyringStoreImpl(getKeyRingPath(), getKeyringSecretKey(), getKeyringInitVector());
 
             KeyringCacheImpl.init(keyStore);
             KeyringCache keyringCache = KeyringCacheImpl.getInstance();
 
-            KeyringImpl.init(keyringCache, permissionsService);
-            Keyring centralKeyring = KeyringImpl.getInstance();
+            CentralKeyringImpl.init(keyringCache, permissionsService);
+            Keyring centralKeyring = CentralKeyringImpl.getInstance();*/
 
             Keyring legacyKeyring = new LegacyKeyringImpl(sessions, usersService, legacyKeyringCache, applicationKeys);
-
-            this.keyring = new KeyringMigratorImpl(false, legacyKeyring, centralKeyring);
+            this.keyring = new KeyringMigratorImpl(false, legacyKeyring, new NoOpCentralKeyring());
         }
 
         VersionsService versionsService = new VersionsServiceImpl();

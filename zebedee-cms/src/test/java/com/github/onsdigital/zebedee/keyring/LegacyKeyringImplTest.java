@@ -290,63 +290,63 @@ public class LegacyKeyringImplTest {
     }
 
     @Test
-    public void testCacheUserKeyring_userNull_shouldThrowException() {
+    public void testCacheKeyring_userNull_shouldThrowException() {
         // Given user is null
 
-        // When cache user keyring is called
-        KeyringException ex = assertThrows(KeyringException.class, () -> legacyKeyring.cacheUserKeyring(null));
+        // When cacheKeyring is called
+        KeyringException ex = assertThrows(KeyringException.class, () -> legacyKeyring.cacheKeyring(null));
 
         // Then an exception is thrown.
         assertThat(ex.getMessage(), equalTo(USER_NULL_ERR));
     }
 
     @Test
-    public void testCacheUserKeyring_userEmailNull_shouldThrowException() {
+    public void testCacheKeyring_userEmailNull_shouldThrowException() {
         // Given user email is null
         when(user.getEmail())
                 .thenReturn(null);
 
-        // When cache user keyring is called
-        KeyringException ex = assertThrows(KeyringException.class, () -> legacyKeyring.cacheUserKeyring(user));
+        // When cacheKeyring is called
+        KeyringException ex = assertThrows(KeyringException.class, () -> legacyKeyring.cacheKeyring(user));
 
         // Then an exception is thrown.
         assertThat(ex.getMessage(), equalTo(EMAIL_EMPTY_ERR));
     }
 
     @Test
-    public void testCacheUserKeyring_userEmailEmpty_shouldThrowException() {
+    public void testCacheKeyring_userEmailEmpty_shouldThrowException() {
         // Given user email is empty
         when(user.getEmail())
                 .thenReturn("");
 
-        // When cacheUserKeyring is called
-        KeyringException ex = assertThrows(KeyringException.class, () -> legacyKeyring.cacheUserKeyring(user));
+        // When cacheKeyring is called
+        KeyringException ex = assertThrows(KeyringException.class, () -> legacyKeyring.cacheKeyring(user));
 
         // Then an exception is thrown.
         assertThat(ex.getMessage(), equalTo(EMAIL_EMPTY_ERR));
     }
 
     @Test
-    public void testCacheUserKeyring_userKeyringNull_shouldThrowException() {
+    public void testCacheKeyring_userKeyringNull_shouldThrowException() {
         // Given user keyring is null
         when(user.keyring())
                 .thenReturn(null);
 
-        // When cacheUserKeyring is called
-        KeyringException ex = assertThrows(KeyringException.class, () -> legacyKeyring.cacheUserKeyring(user));
+        // When cacheKeyring is called
+        KeyringException ex = assertThrows(KeyringException.class, () -> legacyKeyring.cacheKeyring(user));
 
         // Then an exception is thrown.
         assertThat(ex.getMessage(), equalTo(USER_KEYRING_NULL_ERR));
     }
 
     @Test
-    public void testCacheUserKeyring_getSessionError_shouldThrowException() throws IOException {
+    public void testCacheKeyring_getSessionError_shouldThrowException() throws IOException {
         // Given get session throws an exception
         when(sessionsService.find(TEST_EMAIL))
                 .thenThrow(expectedEx);
 
-        // When cacheUserKeyring is called
-        KeyringException ex = assertThrows(KeyringException.class, () -> legacyKeyring.cacheUserKeyring(user));
+        // When cacheKeyring is called
+        KeyringException ex = assertThrows(KeyringException.class, () -> legacyKeyring.cacheKeyring(user));
 
         // Then an exception is thrown.
         assertThat(ex.getMessage(), equalTo(GET_SESSION_ERR));
@@ -354,13 +354,13 @@ public class LegacyKeyringImplTest {
     }
 
     @Test
-    public void testCacheUserKeyring_getSessionReturnsNull_doNothing() throws IOException {
+    public void testCacheKeyring_getSessionReturnsNull_doNothing() throws IOException {
         // Given get session returns null
         when(sessionsService.find(TEST_EMAIL))
                 .thenReturn(null);
 
-        // When cacheUserKeyring is called
-        legacyKeyring.cacheUserKeyring(user);
+        // When cacheKeyring is called
+        legacyKeyring.cacheKeyring(user);
 
         // Then no keying is added to the cache
         verify(sessionsService, times(1)).find(TEST_EMAIL);
@@ -371,14 +371,14 @@ public class LegacyKeyringImplTest {
     }
 
     @Test
-    public void testCacheUserKeyring_cachePutError_shouldThrowException() throws IOException {
+    public void testCacheKeyring_cachePutError_shouldThrowException() throws IOException {
         // Given cache put throws an exception
         doThrow(expectedEx)
                 .when(keyringCache)
                 .put(user, session);
 
-        // When cacheUserKeyring is called
-        KeyringException ex = assertThrows(KeyringException.class, () -> legacyKeyring.cacheUserKeyring(user));
+        // When cacheKeyring is called
+        KeyringException ex = assertThrows(KeyringException.class, () -> legacyKeyring.cacheKeyring(user));
 
         // Then an exception is thrown.
         assertThat(ex.getMessage(), equalTo(CACHE_PUT_ERR));
@@ -386,11 +386,11 @@ public class LegacyKeyringImplTest {
     }
 
     @Test
-    public void testCacheUserKeyring_success_shouldPopulateCacheAndAppKeys() throws IOException {
+    public void testCacheKeyring_success_shouldPopulateCacheAndAppKeys() throws IOException {
         // Given a valid user
 
-        // WhencacheUserKeyring is called
-        legacyKeyring.cacheUserKeyring(user);
+        // When cacheKeyring is called
+        legacyKeyring.cacheKeyring(user);
 
         // Then the keyring cache is updated with the users keys
         verify(sessionsService, times(1)).find(TEST_EMAIL);

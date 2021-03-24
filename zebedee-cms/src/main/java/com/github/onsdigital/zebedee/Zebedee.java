@@ -6,6 +6,8 @@ import com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedExcept
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.Credentials;
+import com.github.onsdigital.zebedee.keyring.Keyring;
+import com.github.onsdigital.zebedee.keyring.KeyringException;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.Collections;
 import com.github.onsdigital.zebedee.model.Content;
@@ -74,6 +76,7 @@ public class Zebedee {
     private final Path publishedContentPath;
     private final Path path;
     private final PermissionsService permissionsService;
+    private final Keyring collectionKeyring;
 
     private final UsersService usersService;
     private final TeamsService teamsService;
@@ -105,6 +108,7 @@ public class Zebedee {
         this.datasetService = configuration.getDatasetService();
         this.imageService = configuration.getImageService();
         this.serviceStoreImpl = configuration.getServiceStore();
+        this.collectionKeyring = configuration.getCollectionKeyring();
 
         this.collectionsPath = configuration.getCollectionsPath();
         this.publishedCollectionsPath = configuration.getPublishedCollectionsPath();
@@ -280,26 +284,41 @@ public class Zebedee {
             return null;
         }
 
-        // Create a session
-        Session session = null;
+        Session session = createSession(user);
+
+        /**
+         * Unlock & cache keyring are required for the legacy keyring functionality. Once we've migrated to the new
+         * keyring implementation these calls will can be removed.
+         */
+        unlockKeyring(user, credentials);
+        cacheKeyring(user);
+
+        return session;
+    }
+
+    private Session createSession(User user) throws IOException {
         try {
-            session = sessions.create(user);
+            return sessions.create(user);
         } catch (Exception e) {
             error().data("user", user.getEmail()).logException(e, "error attempting to create session for user");
             throw new IOException(e);
         }
+    }
 
-        // Unlock and cache keyring
-        com.github.onsdigital.zebedee.json.Keyring legacyKeyring = user.keyring();
-        if (!legacyKeyring.unlock(credentials.getPassword())) {
-            throw new IOException("failed to unlock user keyring");
+    private void unlockKeyring(User user, Credentials credentials) throws IOException {
+        try {
+            collectionKeyring.unlock(user, credentials.getPassword());
+        } catch (KeyringException ex) {
+            throw new IOException("failed to unlock collection keyring");
         }
+    }
 
-        applicationKeys.populateCacheFromUserKeyring(user.keyring());
-        legacyKeyringCache.put(user, session);
-
-        // Return a session
-        return session;
+    private void cacheKeyring(User user) throws IOException {
+        try {
+            collectionKeyring.cacheKeyring(user);
+        } catch (KeyringException ex) {
+            throw new IOException("error while attempting to cache keyring");
+        }
     }
 
     public TeamsService getTeamsService() {

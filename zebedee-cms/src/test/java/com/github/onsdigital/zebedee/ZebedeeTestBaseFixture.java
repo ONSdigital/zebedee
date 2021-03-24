@@ -76,6 +76,9 @@ public abstract class ZebedeeTestBaseFixture {
     protected com.github.onsdigital.zebedee.json.Keyring legacyKeyring;
 
     @Mock
+    protected Keyring keyringAbstraction;
+
+    @Mock
     protected Session userSession;
 
     protected Zebedee zebedee;
@@ -163,7 +166,7 @@ public abstract class ZebedeeTestBaseFixture {
                 .thenReturn(legacyKeyringCache);
 
         when(zebCfg.getCollectionKeyring())
-                .thenReturn(keyring);
+                .thenReturn(keyringAbstraction);
     }
 
     public abstract void setUp() throws Exception;

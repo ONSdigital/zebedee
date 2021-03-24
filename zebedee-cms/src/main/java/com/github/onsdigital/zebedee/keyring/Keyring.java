@@ -14,7 +14,7 @@ public interface Keyring {
      * @param user the user that populates the keyring.
      * @throws KeyringException problem populating the keyring.
      */
-    void cacheUserKeyring(User user) throws KeyringException;
+    void cacheKeyring(User user) throws KeyringException;
 
     /**
      * Get a key from the keyring for the specified collection.

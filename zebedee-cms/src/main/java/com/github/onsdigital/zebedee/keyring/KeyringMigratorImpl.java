@@ -55,10 +55,10 @@ public class KeyringMigratorImpl implements Keyring {
     }
 
     @Override
-    public void cacheUserKeyring(User user) throws KeyringException {
+    public void cacheKeyring(User user) throws KeyringException {
         try {
-            legacyKeyring.cacheUserKeyring(user);
-            centralKeyring.cacheUserKeyring(user);
+            legacyKeyring.cacheKeyring(user);
+            centralKeyring.cacheKeyring(user);
         } catch (KeyringException ex) {
             throw wrappedKeyringException(ex, POPULATE_FROM_USER_ERR);
         }

@@ -34,7 +34,7 @@ public class Configuration {
     private static final String DATASET_API_AUTH_TOKEN = "FD0108EA-825D-411C-9B1D-41EF7727F465";
     private static final String SERVICE_AUTH_TOKEN = "15C0E4EE-777F-4C61-8CDB-2898CEB34657";
     private static final String DEFAULT_SLACK_USERNAME = "Zebedee";
-    private static final String SESSIONS_API_URL = "http://localhost:24400";
+    private static final String SESSIONS_API_URL = "http://localhost:24401";
     private static final String KEYRING_SECRET_KEY = "KEYRING_SECRET_KEY";
     private static final String KEYRING_INIT_VECTOR = "KEYRING_INIT_VECTOR";
 

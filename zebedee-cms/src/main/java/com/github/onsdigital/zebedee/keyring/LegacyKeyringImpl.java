@@ -3,6 +3,7 @@ package com.github.onsdigital.zebedee.keyring;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.KeyringCache;
 import com.github.onsdigital.zebedee.model.encryption.ApplicationKeys;
+import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.session.service.Sessions;
 import com.github.onsdigital.zebedee.user.model.User;
@@ -12,7 +13,9 @@ import org.apache.commons.lang3.StringUtils;
 import javax.crypto.SecretKey;
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.info;
 
@@ -39,9 +42,11 @@ public class LegacyKeyringImpl implements Keyring {
     static final String GET_USER_ERR = "user service get user by email return an error";
     static final String PASSWORD_EMPTY_ERR = "user password required but was null or empty";
     static final String UNLOCK_KEYRING_ERR = "error unlocking user keyring";
+    static final String GET_ACCESS_MAPPING_ERR = "error getting collection access mapping";
 
     private Sessions sessions;
     private UsersService users;
+    private PermissionsService permissions;
     private KeyringCache cache;
     private ApplicationKeys applicationKeys;
 
@@ -52,10 +57,11 @@ public class LegacyKeyringImpl implements Keyring {
      * @param cache           the {@link KeyringCache} to use.
      * @param applicationKeys the {@link ApplicationKeys} to use.
      */
-    public LegacyKeyringImpl(final Sessions sessions, final UsersService users, final KeyringCache cache,
-                             final ApplicationKeys applicationKeys) {
+    public LegacyKeyringImpl(final Sessions sessions, final UsersService users, final PermissionsService permissions,
+                             final KeyringCache cache, final ApplicationKeys applicationKeys) {
         this.sessions = sessions;
         this.users = users;
+        this.permissions = permissions;
         this.cache = cache;
         this.applicationKeys = applicationKeys;
     }
@@ -68,7 +74,7 @@ public class LegacyKeyringImpl implements Keyring {
      *                          could not be found.
      */
     @Override
-    public void cacheUserKeyring(User user) throws KeyringException {
+    public void cacheKeyring(User user) throws KeyringException {
         validateUser(user);
         Session session = getUserSession(user);
 
@@ -185,6 +191,34 @@ public class LegacyKeyringImpl implements Keyring {
         validateCollection(collection);
         validateSecretKey(key);
 
+        // Add the key to this user.
+        giveKeyToUser(user, collection, key);
+
+        List<User> keyReceivers = getUsersWithCollectionAccess(collection);
+        if (keyReceivers == null || keyReceivers.isEmpty()) {
+            return;
+        }
+
+        // Filter out the user we've already given the key too
+        keyReceivers = keyReceivers.stream()
+                .filter(usr -> !usr.getEmail().equals(user.getEmail()))
+                .collect(Collectors.toList());
+
+        // Add the key to all other users who have premission to access the collection.
+        for (User usr : keyReceivers) {
+            giveKeyToUser(usr, collection, key);
+        }
+
+        // get collection access mapping
+
+        // for each user
+        //      if has access
+        //          add to user && add to cached keyring
+        //      else
+        //          remove from stored user && cached keyring
+    }
+
+    private void giveKeyToUser(User user, Collection collection, SecretKey key) throws KeyringException {
         // Add key to users cached keyring if exists
         com.github.onsdigital.zebedee.json.Keyring cachedKeyring = getCachedUserKeyring(user);
         if (cachedKeyring != null) {
@@ -193,6 +227,14 @@ public class LegacyKeyringImpl implements Keyring {
 
         // Add the key to the stored user value.
         addKeyToStoredUser(user, collection, key);
+    }
+
+    private List<User> getUsersWithCollectionAccess(Collection collection) throws KeyringException {
+        try {
+            return permissions.getCollectionAccessMapping(collection);
+        } catch (IOException ex) {
+            throw new KeyringException(GET_ACCESS_MAPPING_ERR, ex);
+        }
     }
 
     /**

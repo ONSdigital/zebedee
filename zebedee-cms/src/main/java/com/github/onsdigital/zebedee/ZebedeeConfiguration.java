@@ -178,7 +178,9 @@ public class ZebedeeConfiguration {
             CentralKeyringImpl.init(keyringCache, permissionsService);
             Keyring centralKeyring = CentralKeyringImpl.getInstance();*/
 
-            Keyring legacyKeyring = new LegacyKeyringImpl(sessions, usersService, legacyKeyringCache, applicationKeys);
+            Keyring legacyKeyring = new LegacyKeyringImpl(
+                    sessions, usersService, permissionsService, legacyKeyringCache, applicationKeys);
+
             this.keyring = new KeyringMigratorImpl(false, legacyKeyring, new NoOpCentralKeyring());
         }
 

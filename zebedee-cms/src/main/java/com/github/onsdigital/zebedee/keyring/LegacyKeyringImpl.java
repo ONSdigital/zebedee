@@ -168,18 +168,17 @@ public class LegacyKeyringImpl implements Keyring {
     }
 
     /**
-     * Add a key to the user's {@link com.github.onsdigital.zebedee.json.Keyring}.
+     * Add the key to all users who have permission to access the collection.
      * <ul>
-     *     <li>Add key to user's cached keyring if it exists in the {@link KeyringCache}.</li>
-     *     <li>Add key to store user file and persists the change.</li>
+     *     <li>If a user's keying exists in the {@link KeyringCache} the new key is added.</li>
+     *     <li>Otherwise Add key to store user file and persists the change.</li>
      * </ul>
      *
      * @param user       the user adding the key (not required by this implementation).
      * @param collection the {@link Collection} the key belongs to.
      * @param key        the {@link SecretKey} to add.
-     * @throws KeyringException thrown if the user is null, their email is null/empty, the collection is null, the
-     *                          collection description is null, the collection ID is null/empty, the key is null, there
-     *                          is a error updating the stored user file.
+     * @throws KeyringException thrown the collection is null, the collection description is null, the collection ID
+     *                          is null/empty, the key is null, there is a error updating the stored user file.
      */
     @Override
     public void add(User user, Collection collection, SecretKey key) throws KeyringException {

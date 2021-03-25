@@ -20,11 +20,13 @@ import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.service.DatasetService;
 import com.github.onsdigital.zebedee.service.ImageService;
+import com.github.onsdigital.zebedee.service.ImageServicePublishingResult;
 import com.github.onsdigital.zebedee.service.ServiceSupplier;
 import com.github.onsdigital.zebedee.util.Http;
 import com.github.onsdigital.zebedee.util.SlackNotification;
 import com.github.onsdigital.zebedee.util.ZebedeeCmsService;
 import com.github.onsdigital.zebedee.util.slack.PostMessageField;
+import com.github.onsdigital.zebedee.util.slack.SlackNotifier;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
@@ -106,7 +108,7 @@ public class Publisher {
             throws IOException {
         boolean success = false;
 
-        Future<Boolean> imageFuture = null;
+        Future<ImageServicePublishingResult> imageFuture = null;
         if (CMSFeatureFlags.cmsFeatureFlags().isImagePublishingEnabled()) {
             imageFuture = publishImages(collection);
         }
@@ -133,7 +135,11 @@ public class Publisher {
                 if (imageFuture == null) {
                     throw new Exception("image future unexpectedly null on completion of publishing");
                 }
-                success = success && imageFuture.get();
+                ImageServicePublishingResult result = imageFuture.get();
+
+                if (result != null && result.getUnpublishedImages() != null && result.getUnpublishedImages().size() > 0) {
+                    notifyUnpublishedImages(collection, result);
+                }
             } catch (Exception e) {
                 error().data("collectionId", collection.getDescription().getId()).data("publishing", true)
                         .logException(e, "Exception publishing images via image API");
@@ -150,6 +156,24 @@ public class Publisher {
                 .log("collection publish time");
 
         return success;
+    }
+
+    /**
+     * Sends a slack notification if there are any unpublished images in the collection
+     *
+     * @param collection The collection being published
+     * @param result     The result of calling publish on the image service
+     */
+    private static void notifyUnpublishedImages(Collection collection, ImageServicePublishingResult result) {
+        List<PostMessageField> msgs = new ArrayList<>();
+        msgs.add(new PostMessageField("Collection ID", collection.getId(), false));
+        msgs.add(new PostMessageField("Collection", collection.getDescription().getName(), true));
+        msgs.add(new PostMessageField("Total images", String.valueOf(result.getTotalImages()), true));
+        result.getUnpublishedImages().stream()
+                .map(i -> new PostMessageField("Unpublished image", String.format("%s [%s]", i.getId(), i.getStatus()), false))
+                .forEach(msgs::add);
+        final SlackNotifier notifier = new SlackNotifier();
+        notifier.alarm("Some images failed to publish", msgs.stream().toArray(PostMessageField[]::new));
     }
 
     /**
@@ -716,10 +740,10 @@ public class Publisher {
         return datasetsPublished;
     }
 
-    private static Future<Boolean> publishImages(Collection collection) {
+    private static Future<ImageServicePublishingResult> publishImages(Collection collection) {
         return apiPool.submit(() -> {
-            imageServiceSupplier.getService().publishImagesInCollection(collection);
-            return true;  // Complete
+            ImageServicePublishingResult result = imageServiceSupplier.getService().publishImagesInCollection(collection);
+            return result;  // Complete
         });
     }
 

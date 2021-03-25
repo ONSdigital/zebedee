@@ -14,7 +14,7 @@ public interface Keyring {
      * @param user the user that populates the keyring.
      * @throws KeyringException problem populating the keyring.
      */
-    void populateFromUser(User user) throws KeyringException;
+    void cacheKeyring(User user) throws KeyringException;
 
     /**
      * Get a key from the keyring for the specified collection.
@@ -51,4 +51,16 @@ public interface Keyring {
      * @return An unmodifiable set of the key identifiers in the keyring.
      */
     Set<String> list(User user) throws KeyringException;
+
+    /**
+     * Unlock the user keyring.
+     *
+     * <b>Note:</b> This is to maintain backwards compatability only. This functionality is not required by the new
+     * central keyring implementation.
+     *
+     * @param user     the user the keyring belongs to.
+     * @param password the user's password.
+     * @throws KeyringException problem unlocking the keyring.
+     */
+    void unlock(User user, String password) throws KeyringException;
 }

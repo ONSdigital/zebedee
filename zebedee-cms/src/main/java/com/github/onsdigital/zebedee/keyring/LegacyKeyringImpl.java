@@ -44,7 +44,7 @@ public class LegacyKeyringImpl implements Keyring {
     static final String GET_USER_ERR = "user service get user by email return an error";
     static final String PASSWORD_EMPTY_ERR = "user password required but was null or empty";
     static final String UNLOCK_KEYRING_ERR = "error unlocking user keyring";
-    static final String GET_KEY_REIPIENTS_ERR = "error getting recipients for colleciton key";
+    static final String GET_KEY_RECIPIENTS_ERR = "error getting recipients for collection key";
     static final String LIST_USERS_ERR = "error listing all users";
 
     private Sessions sessions;
@@ -204,7 +204,7 @@ public class LegacyKeyringImpl implements Keyring {
         try {
             recipients = permissions.getCollectionAccessMapping(collection);
         } catch (IOException ex) {
-            throw new KeyringException(GET_KEY_REIPIENTS_ERR, ex);
+            throw new KeyringException(GET_KEY_RECIPIENTS_ERR, ex);
         }
 
         if (recipients == null) {

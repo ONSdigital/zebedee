@@ -12,7 +12,7 @@ import static com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl.ADD_KEY_SA
 import static com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl.COLLECTION_DESC_NULL_ERR;
 import static com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl.COLLECTION_ID_EMPTY_ERR;
 import static com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl.COLLECTION_NULL_ERR;
-import static com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl.GET_KEY_REIPIENTS_ERR;
+import static com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl.GET_KEY_RECIPIENTS_ERR;
 import static com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl.LIST_USERS_ERR;
 import static com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl.REMOVE_KEY_SAVE_ERR;
 import static com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl.SECRET_KEY_NULL_ERR;
@@ -138,7 +138,7 @@ public class LegacyKeyringImpl_AddTest extends BaseLegacyKeyringTest {
                 () -> legacyKeyring.add(null, collection, secretKey));
 
         // Then an exception is thrown
-        assertThat(ex.getMessage(), equalTo(GET_KEY_REIPIENTS_ERR));
+        assertThat(ex.getMessage(), equalTo(GET_KEY_RECIPIENTS_ERR));
         assertTrue(ex.getCause() instanceof IOException);
 
         verify(permissions, times(1)).getCollectionAccessMapping(collection);

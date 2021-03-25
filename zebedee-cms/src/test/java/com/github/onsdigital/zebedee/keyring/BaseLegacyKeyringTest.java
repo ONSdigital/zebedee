@@ -220,6 +220,14 @@ public abstract class BaseLegacyKeyringTest {
         verify(users, never()).removeKeyFromKeyring(user.getEmail(), TEST_COLLECTION_ID);
     }
 
+    protected void verifyUserKeyringNotRetrievedFromCache(User user) throws Exception {
+        verify(keyringCache, never()).get(user);
+    }
+
+    protected void verifyUserKeyringRetrievedFromCache(User user) throws Exception {
+        verify(keyringCache, times(1)).get(user);
+    }
+
     public abstract void setUpTests() throws Exception;
 
 }

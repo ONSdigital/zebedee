@@ -1,5 +1,7 @@
 package com.github.onsdigital.zebedee.keyring;
 
+import com.github.onsdigital.zebedee.user.model.User;
+import com.github.onsdigital.zebedee.user.model.UserList;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -7,12 +9,15 @@ import java.io.IOException;
 import static com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl.COLLECTION_DESC_NULL_ERR;
 import static com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl.COLLECTION_ID_EMPTY_ERR;
 import static com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl.COLLECTION_NULL_ERR;
-import static com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl.EMAIL_EMPTY_ERR;
+import static com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl.LIST_USERS_ERR;
 import static com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl.REMOVE_KEY_SAVE_ERR;
-import static com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl.USER_NULL_ERR;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
@@ -26,51 +31,11 @@ public class LegacyKeyringImpl_RemoveTest extends BaseLegacyKeyringTest {
     }
 
     @Test
-    public void testRemove_userNull_shouldThrowException() {
-        // Given user is null
-
-        // When remove is called
-        KeyringException ex = assertThrows(KeyringException.class, () -> legacyKeyring.remove(null, null));
-
-        // Then an exception is thrown
-        assertThat(ex.getMessage(), equalTo(USER_NULL_ERR));
-        verifyZeroInteractions(keyringCache, users);
-    }
-
-    @Test
-    public void testRemove_userEmailNull_shouldThrowException() {
-        // Given user email is null
-        when(bert.getEmail())
-                .thenReturn(null);
-
-        // When remove is called
-        KeyringException ex = assertThrows(KeyringException.class, () -> legacyKeyring.remove(bert, null));
-
-        // Then an exception is thrown
-        assertThat(ex.getMessage(), equalTo(EMAIL_EMPTY_ERR));
-        verifyZeroInteractions(keyringCache, users);
-    }
-
-    @Test
-    public void testRemove_userEmailEmpty_shouldThrowException() {
-        // Given user email is empty
-        when(bert.getEmail())
-                .thenReturn("");
-
-        // When remove is called
-        KeyringException ex = assertThrows(KeyringException.class, () -> legacyKeyring.remove(bert, null));
-
-        // Then an exception is thrown
-        assertThat(ex.getMessage(), equalTo(EMAIL_EMPTY_ERR));
-        verifyZeroInteractions(keyringCache, users);
-    }
-
-    @Test
     public void testRemove_collectionNull_shouldThrowException() {
         // Given collection is null
 
         // When remove is called
-        KeyringException ex = assertThrows(KeyringException.class, () -> legacyKeyring.remove(bert, null));
+        KeyringException ex = assertThrows(KeyringException.class, () -> legacyKeyring.remove(null, null));
 
         // Then an exception is thrown
         assertThat(ex.getMessage(), equalTo(COLLECTION_NULL_ERR));
@@ -84,7 +49,7 @@ public class LegacyKeyringImpl_RemoveTest extends BaseLegacyKeyringTest {
                 .thenReturn(null);
 
         // When remove is called
-        KeyringException ex = assertThrows(KeyringException.class, () -> legacyKeyring.remove(bert, collection));
+        KeyringException ex = assertThrows(KeyringException.class, () -> legacyKeyring.remove(null, collection));
 
         // Then an exception is thrown
         assertThat(ex.getMessage(), equalTo(COLLECTION_DESC_NULL_ERR));
@@ -98,7 +63,7 @@ public class LegacyKeyringImpl_RemoveTest extends BaseLegacyKeyringTest {
                 .thenReturn(null);
 
         // When remove is called
-        KeyringException ex = assertThrows(KeyringException.class, () -> legacyKeyring.remove(bert, collection));
+        KeyringException ex = assertThrows(KeyringException.class, () -> legacyKeyring.remove(null, collection));
 
         // Then an exception is thrown
         assertThat(ex.getMessage(), equalTo(COLLECTION_ID_EMPTY_ERR));
@@ -112,7 +77,7 @@ public class LegacyKeyringImpl_RemoveTest extends BaseLegacyKeyringTest {
                 .thenReturn("");
 
         // When remove is called
-        KeyringException ex = assertThrows(KeyringException.class, () -> legacyKeyring.remove(bert, collection));
+        KeyringException ex = assertThrows(KeyringException.class, () -> legacyKeyring.remove(null, collection));
 
         // Then an exception is thrown
         assertThat(ex.getMessage(), equalTo(COLLECTION_ID_EMPTY_ERR));
@@ -120,75 +85,169 @@ public class LegacyKeyringImpl_RemoveTest extends BaseLegacyKeyringTest {
     }
 
     @Test
-    public void testRemove_userKeyringNotInCache_shouldStillUpdateAndSaveUser() throws Exception {
-        // Given the keyring cache does not contain the users keyring
+    public void testRemove_listUsersError_shouldThrowException() throws Exception {
+        // Given list users throws an exception
+        when(users.list())
+                .thenThrow(IOException.class);
+
+        // When remove is called
+        KeyringException ex = assertThrows(KeyringException.class, () -> legacyKeyring.remove(null, collection));
+
+        // Then an exception is thrown
+        assertThat(ex.getMessage(), equalTo(LIST_USERS_ERR));
+        assertTrue(ex.getCause() instanceof IOException);
+
+        // And the key is not removed from any user
+        verifyKeyNotRemovedFromUser(bert, bertKeyring);
+        verifyKeyNotRemovedFromUser(ernie, ernieKeyring);
+        verifyKeyNotRemovedFromUser(theCount, theCountKeyring);
+
+        verify(users, times(1)).list();
+        verify(keyringCache, never()).get(any(User.class));
+    }
+
+    @Test
+    public void testRemove_listUsersRetunrsNull_shouldNotRemoveKeyFromAnyUser() throws Exception {
+        // Given list users rertuns null
+        when(users.list())
+                .thenReturn(null);
+
+        // When remove is called
+        legacyKeyring.remove(null, collection);
+
+        // Then the key is not removed from any user
+        verifyKeyNotRemovedFromUser(bert, bertKeyring);
+        verifyKeyNotRemovedFromUser(ernie, ernieKeyring);
+        verifyKeyNotRemovedFromUser(theCount, theCountKeyring);
+
+        verify(users, times(1)).list();
+        verify(keyringCache, never()).get(any(User.class));
+    }
+
+    @Test
+    public void testRemove_listUsersRetunrsEmpty_shouldNotRemoveKeyFromAnyUser() throws Exception {
+        // Given list users rertuns an empty userlist
+        when(users.list())
+                .thenReturn(new UserList());
+
+        // When remove is called
+        legacyKeyring.remove(null, collection);
+
+        // Then the key is not removed from any user
+        verifyKeyNotRemovedFromUser(bert, bertKeyring);
+        verifyKeyNotRemovedFromUser(ernie, ernieKeyring);
+        verifyKeyNotRemovedFromUser(theCount, theCountKeyring);
+
+        verify(users, times(1)).list();
+        verify(keyringCache, never()).get(any(User.class));
+    }
+
+    @Test
+    public void testRemove_removeKeyFromKeyringError_keyringInCache_shouldThrowException() throws Exception {
+        // Given removeKeyFromKeyring throws an exception
+        // And the user's keyring is in the cache
+        doThrow(IOException.class)
+                .when(users)
+                .removeKeyFromKeyring(EMAIL_BERT, TEST_COLLECTION_ID);
+
+        // When remove is called
+        KeyringException ex = assertThrows(KeyringException.class, () -> legacyKeyring.remove(null, collection));
+
+        // Then an exception is thrown
+        assertThat(ex.getMessage(), equalTo(REMOVE_KEY_SAVE_ERR));
+        assertTrue(ex.getCause() instanceof IOException);
+
+        verifyUserKeyringRetrievedFromCache(bert);
+        verifyKeyRemovedFromUser(bert, bertKeyring);
+
+        verifyUserKeyringNotRetrievedFromCache(ernie);
+        verifyKeyNotRemovedFromUser(ernie, ernieKeyring);
+
+        verifyUserKeyringNotRetrievedFromCache(theCount);
+        verifyKeyNotRemovedFromUser(theCount, theCountKeyring);
+
+        verify(users, times(1)).list();
+        verify(users, times(1)).removeKeyFromKeyring(EMAIL_BERT, TEST_COLLECTION_ID);
+    }
+
+    @Test
+    public void testRemove_removeKeyFromKeyringError_keyringNotInCache_shouldThrowException() throws Exception {
+        // Given removeKeyFromKeyring throws an exception
+        // And the user's keyring is not in the cache
+        doThrow(IOException.class)
+                .when(users)
+                .removeKeyFromKeyring(EMAIL_BERT, TEST_COLLECTION_ID);
+
         when(keyringCache.get(bert))
                 .thenReturn(null);
 
         // When remove is called
-        legacyKeyring.remove(bert, collection);
+        KeyringException ex = assertThrows(KeyringException.class, () -> legacyKeyring.remove(null, collection));
 
-        // Then the user record is updated and saved
+        // Then an exception is thrown
+        assertThat(ex.getMessage(), equalTo(REMOVE_KEY_SAVE_ERR));
+        assertTrue(ex.getCause() instanceof IOException);
+
+        verifyUserKeyringRetrievedFromCache(bert);
+        verify(bertKeyring, never()).remove(TEST_COLLECTION_ID);
+
+        verifyUserKeyringNotRetrievedFromCache(ernie);
+        verifyKeyNotRemovedFromUser(ernie, ernieKeyring);
+
+        verifyUserKeyringNotRetrievedFromCache(theCount);
+        verifyKeyNotRemovedFromUser(theCount, theCountKeyring);
+
+        verify(users, times(1)).list();
         verify(users, times(1)).removeKeyFromKeyring(EMAIL_BERT, TEST_COLLECTION_ID);
-
-        // And no update is made the cached user keyring
-        verify(keyringCache, times(1)).get(bert);
-        verifyZeroInteractions(bertKeyring);
     }
 
     @Test
-    public void testRemove_userKeyringNotInCacheSaveUserError_shouldThrowException() throws Exception {
-        // Given the keyring cache does not contain the users keyring
+    public void testRemove_success_userKeyringNotInCache_shouldThrowException() throws Exception {
+        // Given remove is success
+        // And the user's keyring is not in the cache
         when(keyringCache.get(bert))
                 .thenReturn(null);
 
-        IOException cause = new IOException("save user error");
-        when(users.removeKeyFromKeyring(EMAIL_BERT, TEST_COLLECTION_ID))
-                .thenThrow(cause);
-
         // When remove is called
-        KeyringException actual = assertThrows(KeyringException.class, () -> legacyKeyring.remove(bert, collection));
+        legacyKeyring.remove(null, collection);
 
-        // Then an exception is thrown
-        assertThat(actual.getMessage(), equalTo(REMOVE_KEY_SAVE_ERR));
-        assertThat(actual.getCause(), equalTo(cause));
+        // Then the key is successfully removed from the stored user
+        verifyUserKeyringRetrievedFromCache(bert);
 
-        verify(keyringCache, times(1)).get(bert);
-        verify(users, times(1)).removeKeyFromKeyring(EMAIL_BERT, TEST_COLLECTION_ID);
+        // And the keyring cache is not updated.
+        verify(bertKeyring, never()).remove(TEST_COLLECTION_ID);
+
+        // And the others users are updated
+        verifyUserKeyringRetrievedFromCache(ernie);
+        verifyKeyRemovedFromUser(ernie, ernieKeyring);
+
+        verifyUserKeyringRetrievedFromCache(theCount);
+        verifyKeyRemovedFromUser(theCount, theCountKeyring);
+
+        verify(users, times(1)).list();
+        verify(users, times(3)).removeKeyFromKeyring(any(), any());
     }
 
     @Test
-    public void testRemove_success_shouldRemoveKeyFromCacheKeyringAndSaveUser() throws Exception {
-        // Given the users cached keyring is unlocked
+    public void testRemove_success_userKeyringInCache_shouldThrowException() throws Exception {
+        // Given remove is success
+        // And the user's keyring is in the cache
 
         // When remove is called
-        legacyKeyring.remove(bert, collection);
+        legacyKeyring.remove(null, collection);
 
-        // Then the key is removed from cached keyring
-        verify(keyringCache, times(1)).get(bert);
-        verify(bertKeyring, times(1)).remove(TEST_COLLECTION_ID);
+        // Then the key is successfully removed from all cached user keyrings
+        // And the key is removed from all stored users.
+        verifyUserKeyringRetrievedFromCache(bert);
+        verifyKeyRemovedFromUser(bert, bertKeyring);
 
-        // And the user is updated and saved
-        verify(users, times(1)).removeKeyFromKeyring(EMAIL_BERT, TEST_COLLECTION_ID);
-    }
+        verifyUserKeyringRetrievedFromCache(ernie);
+        verifyKeyRemovedFromUser(ernie, ernieKeyring);
 
-    @Test
-    public void testRemove_saveChangesToUserError_shouldThrowException() throws Exception {
-        // Given removing the key from the user and saving the change throws an exception
-        IOException cause = new IOException("save user error");
+        verifyUserKeyringRetrievedFromCache(theCount);
+        verifyKeyRemovedFromUser(theCount, theCountKeyring);
 
-        when(users.removeKeyFromKeyring(EMAIL_BERT, TEST_COLLECTION_ID))
-                .thenThrow(cause);
-
-        // When remove is called
-        KeyringException actual = assertThrows(KeyringException.class, () -> legacyKeyring.remove(bert, collection));
-
-        // Then an exception is thrown
-        assertThat(actual.getMessage(), equalTo(REMOVE_KEY_SAVE_ERR));
-        assertThat(actual.getCause(), equalTo(cause));
-
-        verify(keyringCache, times(1)).get(bert);
-        verify(bertKeyring, times(1)).remove(TEST_COLLECTION_ID);
-        verify(users, times(1)).removeKeyFromKeyring(EMAIL_BERT, TEST_COLLECTION_ID);
+        verify(users, times(1)).list();
+        verify(users, times(3)).removeKeyFromKeyring(any(), any());
     }
 }

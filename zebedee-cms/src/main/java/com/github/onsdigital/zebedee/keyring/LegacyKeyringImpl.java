@@ -147,13 +147,9 @@ public class LegacyKeyringImpl implements Keyring {
     }
 
     /**
-     * Remove the key for the specified collection from the user's keyring.
-     * <ul>
-     *     <li>Removes the key from the users cached keyring if it exists in {@link KeyringCache}</li>
-     *     <li>Removed it from the stored user object (the user json file) and persists the change.</li>
-     * </ul>
+     * Remove the key for the specified collection from all user keyrings (cached and stored).
      *
-     * @param user       the user performing the action.
+     * @param user       the user performing the action. Nullable and not required by this implementation.
      * @param collection the collection the the key belongs to.
      * @throws KeyringException thrown if the user is null, their email is null/empty, the collection is null, the
      *                          collection description is null, the collection ID is null/empty, there is a error
@@ -161,10 +157,16 @@ public class LegacyKeyringImpl implements Keyring {
      */
     @Override
     public void remove(User user, Collection collection) throws KeyringException {
-        validateUser(user);
         validateCollection(collection);
+        UserList userList = listUsers();
 
-        removeKeyFromUser(user, collection);
+        if (userList == null) {
+            return;
+        }
+
+        for (User u : userList) {
+            removeKeyFromUser(u, collection);
+        }
     }
 
     /**
@@ -213,12 +215,7 @@ public class LegacyKeyringImpl implements Keyring {
     }
 
     private List<User> getKeyToRemoveFrom(Collection collection, List<User> recipients) throws KeyringException {
-        UserList allUsers = null;
-        try {
-            allUsers = users.list();
-        } catch (IOException ex) {
-            throw new KeyringException(LIST_USERS_ERR, ex);
-        }
+        UserList allUsers = listUsers();
 
         if (allUsers == null) {
             return new ArrayList<>();
@@ -227,6 +224,14 @@ public class LegacyKeyringImpl implements Keyring {
         return allUsers.stream()
                 .filter(user -> !recipients.contains(user))
                 .collect(Collectors.toList());
+    }
+
+    private UserList listUsers() throws KeyringException {
+        try {
+            return users.list();
+        } catch (IOException ex) {
+            throw new KeyringException(LIST_USERS_ERR, ex);
+        }
     }
 
     private void assignKeyToRecipient(User user, Collection collection, SecretKey key) throws KeyringException {

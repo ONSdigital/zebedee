@@ -107,7 +107,7 @@ public class LegacyKeyringImpl_RemoveTest extends BaseLegacyKeyringTest {
     }
 
     @Test
-    public void testRemove_listUsersRetunrsNull_shouldNotRemoveKeyFromAnyUser() throws Exception {
+    public void testRemove_listUsersReturnsNull_shouldNotRemoveKeyFromAnyUser() throws Exception {
         // Given list users rertuns null
         when(users.list())
                 .thenReturn(null);
@@ -125,7 +125,7 @@ public class LegacyKeyringImpl_RemoveTest extends BaseLegacyKeyringTest {
     }
 
     @Test
-    public void testRemove_listUsersRetunrsEmpty_shouldNotRemoveKeyFromAnyUser() throws Exception {
+    public void testRemove_listUsersReturnsEmpty_shouldNotRemoveKeyFromAnyUser() throws Exception {
         // Given list users rertuns an empty userlist
         when(users.list())
                 .thenReturn(new UserList());

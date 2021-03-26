@@ -1,5 +1,6 @@
 package com.github.onsdigital.zebedee.model;
 
+import com.github.davidcarboni.cryptolite.Keys;
 import com.github.onsdigital.zebedee.KeyManangerUtil;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.data.json.DirectoryListing;
@@ -13,7 +14,9 @@ import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.CollectionType;
 import com.github.onsdigital.zebedee.json.Event;
 import com.github.onsdigital.zebedee.json.EventType;
+import com.github.onsdigital.zebedee.keyring.Keyring;
 import com.github.onsdigital.zebedee.model.approval.ApproveTask;
+import com.github.onsdigital.zebedee.model.encryption.EncryptionKeyFactory;
 import com.github.onsdigital.zebedee.model.publishing.PublishNotification;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.persistence.CollectionEventType;
@@ -37,6 +40,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import javax.crypto.SecretKey;
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.IOException;
@@ -144,6 +148,12 @@ public class CollectionsTest {
     @Mock
     private Future<Boolean> futureMock;
 
+    @Mock
+    private EncryptionKeyFactory encryptionKeyFactory;
+
+    @Mock
+    private Keyring keyring;
+
     private Collections collections;
     private Path collectionsPath;
     private User testUser;
@@ -192,10 +202,21 @@ public class CollectionsTest {
                 .thenReturn(collections);
         when(zebedeeMock.getUsersService())
                 .thenReturn(usersServiceMock);
+        when(zebedeeMock.getEncryptionKeyFactory())
+                .thenReturn(encryptionKeyFactory);
+        when(zebedeeMock.getCollectionKeyring())
+                .thenReturn(keyring);
         when(usersServiceMock.getUserByEmail(anyString()))
                 .thenReturn(testUser);
         when(collectionReaderWriterFactoryMock.getWriter(zebedeeMock, collectionMock, sessionMock))
                 .thenReturn(collectionWriterMock);
+
+        SecretKey key = Keys.newSecretKey();
+        when(encryptionKeyFactory.newCollectionKey())
+                .thenReturn(key);
+
+        when(keyring.get(any(), any()))
+                .thenReturn(key);
 
         Collection created = Collection.create(desc, zebedeeMock, sessionMock);
         Collection found = collections.getCollection(created.getDescription().getId());

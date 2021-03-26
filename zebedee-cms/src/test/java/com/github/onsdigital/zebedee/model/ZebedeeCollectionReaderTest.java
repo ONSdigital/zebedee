@@ -1,5 +1,6 @@
 package com.github.onsdigital.zebedee.model;
 
+import com.github.davidcarboni.cryptolite.Keys;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.ZebedeeTestBaseFixture;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
@@ -18,6 +19,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.mockito.Mock;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import javax.crypto.SecretKey;
 import java.io.IOException;
@@ -37,6 +39,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -92,6 +96,24 @@ public class ZebedeeCollectionReaderTest extends ZebedeeTestBaseFixture {
 
         Session session = zebedee.openSession(builder.publisher1Credentials);
         Collection collection = new Collection(builder.collections.get(0), zebedee);
+
+        when(permissionsService.canView(any(Session.class), any(CollectionDescription.class)))
+                .thenReturn(true);
+
+        when(permissionsService.canEdit(any(Session.class), any(CollectionDescription.class)))
+                .thenReturn(true);
+
+        ReflectionTestUtils.setField(zebedee, "permissionsService", permissionsService);
+
+        SecretKey collectionKey = Keys.newSecretKey();
+        when(legacyKeyringCache.get(session))
+                .thenReturn(usersKeyring);
+
+        when(usersKeyring.get(anyString()))
+                .thenReturn(collectionKey);
+
+        ReflectionTestUtils.setField(zebedee, "legacyKeyringCache", legacyKeyringCache);
+
         reader = new ZebedeeCollectionReader(zebedee, collection, session);
     }
 
@@ -135,6 +157,9 @@ public class ZebedeeCollectionReaderTest extends ZebedeeTestBaseFixture {
         // A uri that defines a directory
         String uri = "/this/is/a/directory/";
         Collection collection = new Collection(builder.collections.get(0), zebedee);
+        when(permissionsService.canEdit(builder.publisher1.getEmail()))
+                .thenReturn(true);
+
         assertTrue(collection.create(builder.publisher1.getEmail(), uri + "file.json"));
 
         // When
@@ -148,6 +173,9 @@ public class ZebedeeCollectionReaderTest extends ZebedeeTestBaseFixture {
     @Test
     public void shouldReadFile()
             throws IOException, ZebedeeException {
+
+        when(permissionsService.canEdit(builder.publisher1.getEmail()))
+                .thenReturn(true);
 
         // Given
         // A nonexistent file

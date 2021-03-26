@@ -1,8 +1,7 @@
 package com.github.onsdigital.zebedee.model;
 
-import com.github.onsdigital.zebedee.Builder;
+import com.github.davidcarboni.cryptolite.Keys;
 import com.github.onsdigital.zebedee.KeyManangerUtil;
-import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.ZebedeeTestBaseFixture;
 import com.github.onsdigital.zebedee.data.framework.DataBuilder;
 import com.github.onsdigital.zebedee.data.framework.DataPagesGenerator;
@@ -14,32 +13,19 @@ import com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDao;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
-import com.github.onsdigital.zebedee.service.ServiceSupplier;
 import com.github.onsdigital.zebedee.session.model.Session;
-import com.github.onsdigital.zebedee.user.model.User;
 import com.github.onsdigital.zebedee.user.service.UsersService;
 import org.apache.commons.io.FileUtils;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import javax.crypto.SecretKey;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.when;
 
 /**
  * Created by thomasridd on 1/24/16.
@@ -54,6 +40,8 @@ public class ContentIOUtilsTest extends ZebedeeTestBaseFixture {
 
     @Mock
     private CollectionHistoryDao collectionHistoryDao;
+
+    private SecretKey secretKey;
 
     Session publisher;
     Session reviewer;
@@ -77,6 +65,11 @@ public class ContentIOUtilsTest extends ZebedeeTestBaseFixture {
      */
     @Override
     public void setUp() throws Exception {
+        setUpPermissionsServiceMockForLegacyTests(zebedee, builder.publisher1);
+
+        secretKey = Keys.newSecretKey();
+        setUpKeyringMockForLegacyTests(zebedee, builder.publisher1, secretKey);
+
         publisher = zebedee.openSession(builder.publisher1Credentials);
         reviewer = zebedee.openSession(builder.reviewer1Credentials);
 
@@ -95,8 +88,8 @@ public class ContentIOUtilsTest extends ZebedeeTestBaseFixture {
         collection = Collection.create(collectionDescription, zebedee, publisher);
 
         publishedReader = new FileSystemContentReader(zebedee.getPublished().path);
-        collectionReader = new ZebedeeCollectionReader(zebedee, collection, publisher);
-        collectionWriter = new ZebedeeCollectionWriter(zebedee, collection, publisher);
+        collectionReader = new ZebedeeCollectionReader(zebedee, collection, builder.publisher1);
+        collectionWriter = new ZebedeeCollectionWriter(zebedee, collection, builder.publisher1);
 
         // add a set of data in a collection
         encrypted = generator.generateDataPagesSet("dataprocessor", "encrypted", 2015, 2, "inreview.csdb");

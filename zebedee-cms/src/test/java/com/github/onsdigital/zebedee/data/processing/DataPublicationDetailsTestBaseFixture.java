@@ -1,5 +1,6 @@
 package com.github.onsdigital.zebedee.data.processing;
 
+import com.github.davidcarboni.cryptolite.Keys;
 import com.github.onsdigital.zebedee.ZebedeeTestBaseFixture;
 import com.github.onsdigital.zebedee.content.page.base.PageType;
 import com.github.onsdigital.zebedee.data.framework.DataBuilder;
@@ -19,6 +20,7 @@ import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
 import org.junit.After;
 import org.junit.Test;
 
+import javax.crypto.SecretKey;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.text.ParseException;
@@ -41,9 +43,15 @@ public class DataPublicationDetailsTestBaseFixture extends ZebedeeTestBaseFixtur
     CollectionWriter collectionWriter;
     DataBuilder dataBuilder;
     DataPagesGenerator generator;
+    SecretKey secretKey;
 
 
     public void setUp() throws Exception {
+        setUpPermissionsServiceMockForLegacyTests(zebedee, builder.publisher1);
+
+        secretKey = Keys.newSecretKey();
+        setUpKeyringMockForLegacyTests(zebedee, builder.publisher1, secretKey);
+
         publisher = zebedee.openSession(builder.publisher1Credentials);
         reviewer = zebedee.openSession(builder.reviewer1Credentials);
 
@@ -57,8 +65,8 @@ public class DataPublicationDetailsTestBaseFixture extends ZebedeeTestBaseFixtur
         collection = Collection.create(collectionDescription, zebedee, publisher);
 
         publishedReader = new FileSystemContentReader(zebedee.getPublished().path);
-        collectionReader = new ZebedeeCollectionReader(zebedee, collection, publisher);
-        collectionWriter = new ZebedeeCollectionWriter(zebedee, collection, publisher);
+        collectionReader = new ZebedeeCollectionReader(zebedee, collection, builder.publisher1);
+        collectionWriter = new ZebedeeCollectionWriter(zebedee, collection, builder.publisher1);
     }
 
     @After

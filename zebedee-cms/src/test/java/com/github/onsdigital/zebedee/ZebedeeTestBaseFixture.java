@@ -1,5 +1,6 @@
 package com.github.onsdigital.zebedee;
 
+import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.Credentials;
 import com.github.onsdigital.zebedee.keyring.Keyring;
 import com.github.onsdigital.zebedee.model.Collection;
@@ -192,6 +193,26 @@ public abstract class ZebedeeTestBaseFixture {
     protected void verifyKeyAddedToCollectionKeyring(Collection collection) throws Exception {
         verify(collectionKeyring, times(1)).add(any(), eq(collection), any());
     }
+
+
+    protected void setUpPermissionsServiceMockForLegacyTests(Zebedee instance, User someUser) throws Exception {
+        when(permissionsService.canView(eq(someUser), any(CollectionDescription.class)))
+                .thenReturn(true);
+
+        when(permissionsService.canEdit(eq(someUser), any(CollectionDescription.class)))
+                .thenReturn(true);
+
+        ReflectionTestUtils.setField(instance, "permissionsService", permissionsService);
+    }
+
+    protected void setUpKeyringMockForLegacyTests(Zebedee instance, User someUser, SecretKey key) throws Exception {
+        when(collectionKeyring.get(eq(someUser), any(Collection.class)))
+                .thenReturn(key);
+
+        ReflectionTestUtils.setField(zebedee, "collectionKeyring", collectionKeyring);
+    }
+
+
 
     public abstract void setUp() throws Exception;
 

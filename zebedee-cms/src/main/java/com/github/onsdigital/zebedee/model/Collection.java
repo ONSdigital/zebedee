@@ -1,7 +1,6 @@
 package com.github.onsdigital.zebedee.model;
 
 
-import com.github.davidcarboni.cryptolite.Keys;
 import com.github.davidcarboni.cryptolite.Random;
 import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.KeyManangerUtil;
@@ -40,12 +39,14 @@ import com.github.onsdigital.zebedee.service.ServiceSupplier;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.teams.model.Team;
 import com.github.onsdigital.zebedee.teams.service.TeamsService;
+import com.github.onsdigital.zebedee.user.model.User;
 import com.github.onsdigital.zebedee.util.versioning.VersionsService;
 import com.github.onsdigital.zebedee.util.versioning.VersionsServiceImpl;
 import com.google.common.annotations.VisibleForTesting;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import javax.crypto.SecretKey;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -77,7 +78,6 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
 
-import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.error;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.info;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.warn;
@@ -225,17 +225,15 @@ public class Collection {
             }
         }
 
-        // Encryption
-        // assign a key for the collection to the session user
-        keyManagerUtil.assignKeyToUser(zebedee, zebedee.getUsersService().getUserByEmail(session.getEmail()),
-                collection.getDescription().getId(), Keys.newSecretKey());
+        // Add the collection key to the keying - user is not required
+        User user = zebedee.getUsersService().getUserByEmail(session.getEmail());
+        SecretKey key = zebedee.getEncryptionKeyFactory().newCollectionKey();
 
-        // get the session user to distribute the key to all
-        keyManagerUtil.distributeCollectionKey(zebedee, session, collection, true);
+        zebedee.getCollectionKeyring().add(user, collection, key);
 
         if (release != null) {
-            collection.associateWithRelease(session.getEmail(), release, new ZebedeeCollectionWriter(zebedee,
-                    collection, session));
+            collection.associateWithRelease(session.getEmail(), release,
+                    new ZebedeeCollectionWriter(zebedee, collection, user));
             collection.save();
         }
 
@@ -1295,9 +1293,13 @@ public class Collection {
         }
 
         // Fix up links within the content
-        if (hasMoved) replaceLinksWithinCollection(session, fromUri, toUri);
+        if (hasMoved) {
+            replaceLinksWithinCollection(session, fromUri, toUri);
+        }
 
-        if (hasMoved) addEvent(fromUri, new Event(new Date(), EventType.MOVED, session.getEmail()));
+        if (hasMoved) {
+            addEvent(fromUri, new Event(new Date(), EventType.MOVED, session.getEmail()));
+        }
 
         return hasMoved;
     }

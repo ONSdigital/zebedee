@@ -5,6 +5,8 @@ import com.github.onsdigital.zebedee.keyring.Keyring;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.KeyringCache;
 import com.github.onsdigital.zebedee.model.encryption.ApplicationKeys;
+import com.github.onsdigital.zebedee.model.encryption.EncryptionKeyFactory;
+import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDao;
 import com.github.onsdigital.zebedee.service.ServiceSupplier;
 import com.github.onsdigital.zebedee.session.model.Session;
@@ -29,7 +31,10 @@ import java.util.Map;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -64,7 +69,7 @@ public abstract class ZebedeeTestBaseFixture {
     protected KeyringCache legacyKeyringCache;
 
     @Mock
-    protected Keyring keyring;
+    protected Keyring collectionKeyring;
 
     @Mock
     protected Credentials credentials;
@@ -73,10 +78,19 @@ public abstract class ZebedeeTestBaseFixture {
     protected User user;
 
     @Mock
-    protected com.github.onsdigital.zebedee.json.Keyring legacyKeyring;
+    protected com.github.onsdigital.zebedee.json.Keyring usersKeyring;
+
+    @Mock
+    protected PermissionsService permissionsService;
+
+    @Mock
+    protected SecretKey collectionKey;
 
     @Mock
     protected Session userSession;
+
+    @Mock
+    protected EncryptionKeyFactory encryptionKeyFactory;
 
     protected Zebedee zebedee;
     protected Builder builder;
@@ -96,9 +110,14 @@ public abstract class ZebedeeTestBaseFixture {
         ServiceSupplier<UsersService> usersServiceServiceSupplier = () -> usersService;
 
         ReflectionTestUtils.setField(zebedee, "usersService", usersService);
+
+        // TODO I think this is a mistake.
         ReflectionTestUtils.setField(zebedee.getPermissionsService(), "usersServiceSupplier", usersServiceServiceSupplier);
+
         ReflectionTestUtils.setField(zebedee, "sessions", sessionsService);
         ReflectionTestUtils.setField(zebedee, "legacyKeyringCache", new KeyringCache(sessionsService));
+        ReflectionTestUtils.setField(zebedee, "collectionKeyring", collectionKeyring);
+        ReflectionTestUtils.setField(zebedee, "encryptionKeyFactory", encryptionKeyFactory);
 
         ServiceSupplier<CollectionHistoryDao> collectionHistoryDaoServiceSupplier = () -> collectionHistoryDao;
 
@@ -163,7 +182,15 @@ public abstract class ZebedeeTestBaseFixture {
                 .thenReturn(legacyKeyringCache);
 
         when(zebCfg.getCollectionKeyring())
-                .thenReturn(keyring);
+                .thenReturn(collectionKeyring);
+    }
+
+    protected void verifyKeyAddedToCollectionKeyring() throws Exception {
+        verify(collectionKeyring, times(1)).add(any(), any(), any());
+    }
+
+    protected void verifyKeyAddedToCollectionKeyring(Collection collection) throws Exception {
+        verify(collectionKeyring, times(1)).add(any(), eq(collection), any());
     }
 
     public abstract void setUp() throws Exception;

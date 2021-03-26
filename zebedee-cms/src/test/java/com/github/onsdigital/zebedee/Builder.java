@@ -7,8 +7,10 @@ import com.github.onsdigital.zebedee.content.page.base.PageDescription;
 import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeries;
 import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeriesValue;
 import com.github.onsdigital.zebedee.exceptions.CollectionNotFoundException;
-import com.github.onsdigital.zebedee.json.*;
+import com.github.onsdigital.zebedee.json.CollectionDescription;
+import com.github.onsdigital.zebedee.json.Credentials;
 import com.github.onsdigital.zebedee.json.serialiser.IsoDateSerializer;
+import com.github.onsdigital.zebedee.keyring.Keyring;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.PathUtils;
 import com.github.onsdigital.zebedee.permissions.model.AccessMapping;
@@ -17,13 +19,20 @@ import com.github.onsdigital.zebedee.teams.model.Team;
 import com.github.onsdigital.zebedee.user.model.User;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.math3.distribution.NormalDistribution;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 
@@ -35,6 +44,9 @@ public class Builder {
 
     public static final String COLLECTION_ONE_NAME = "inflationq22015";
     public static final String COLLECTION_TWO_NAME = "labourmarketq22015";
+
+    @Mock
+    private Keyring collectionKeyringMock;
 
     private static int teamId;
     private static User administratorTemplate;
@@ -75,6 +87,7 @@ public class Builder {
      * @throws IOException
      */
     public Builder() throws IOException, CollectionNotFoundException {
+        MockitoAnnotations.initMocks(this);
 
         setupUsers();
 

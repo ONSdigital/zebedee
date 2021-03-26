@@ -15,6 +15,8 @@ import com.github.onsdigital.zebedee.model.Collections;
 import com.github.onsdigital.zebedee.model.Content;
 import com.github.onsdigital.zebedee.model.RedirectTablePartialMatch;
 import com.github.onsdigital.zebedee.model.encryption.ApplicationKeys;
+import com.github.onsdigital.zebedee.model.encryption.EncryptionKeyFactory;
+import com.github.onsdigital.zebedee.model.encryption.EncryptionKeyFactoryImpl;
 import com.github.onsdigital.zebedee.model.publishing.PublishedCollections;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsServiceImpl;
@@ -103,6 +105,7 @@ public class ZebedeeConfiguration {
     private SessionClient sessionClient;
     private KeyringCache keyringCache;
     private Keyring keyring;
+    private EncryptionKeyFactory encryptionKeyFactory;
 
 
     /**
@@ -144,6 +147,7 @@ public class ZebedeeConfiguration {
         this.dataIndex = new DataIndex(new FileSystemContentReader(publishedContentPath));
         this.publishedCollections = new PublishedCollections(publishedCollectionsPath);
         this.applicationKeys = new ApplicationKeys(applicationKeysPath);
+        this.encryptionKeyFactory = new EncryptionKeyFactoryImpl();
 
         // Configure the sessions
         if (cmsFeatureFlags().isSessionAPIEnabled()) {
@@ -360,6 +364,10 @@ public class ZebedeeConfiguration {
 
     public Keyring getCollectionKeyring() {
         return this.keyring;
+    }
+
+    public EncryptionKeyFactory getEncryptionKeyFactory() {
+        return this.encryptionKeyFactory;
     }
 
     private Path createDir(Path root, String dirName) throws IOException {

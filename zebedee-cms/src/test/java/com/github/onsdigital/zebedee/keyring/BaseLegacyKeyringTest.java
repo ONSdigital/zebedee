@@ -17,12 +17,14 @@ import org.mockito.MockitoAnnotations;
 import javax.crypto.SecretKey;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
@@ -76,6 +78,9 @@ public abstract class BaseLegacyKeyringTest {
     @Mock
     protected SecretKey secretKey;
 
+    @Mock
+    protected Map<String, SecretKey> schedulerCache;
+
     protected Keyring legacyKeyring;
     protected KeyringException expectedEx;
     protected List<User> usersWithCollectionAccess;
@@ -128,6 +133,9 @@ public abstract class BaseLegacyKeyringTest {
 
         when(users.list())
                 .thenReturn(allUsers);
+
+        when(keyringCache.getSchedulerCache())
+                .thenReturn(schedulerCache);
     }
 
     private void setUpMockUserBert() throws Exception {
@@ -226,6 +234,12 @@ public abstract class BaseLegacyKeyringTest {
 
     protected void verifyUserKeyringRetrievedFromCache(User user) throws Exception {
         verify(keyringCache, times(1)).get(user);
+    }
+
+    protected void verifyKeyAddedToSchedulerCache() {
+        verify(keyringCache, times(1)).getSchedulerCache();
+        verify(schedulerCache, times(1)).put(TEST_COLLECTION_ID, secretKey);
+        verifyNoMoreInteractions(schedulerCache);
     }
 
     public abstract void setUpTests() throws Exception;

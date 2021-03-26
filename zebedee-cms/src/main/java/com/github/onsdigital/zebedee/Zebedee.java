@@ -6,6 +6,7 @@ import com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedExcept
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.Credentials;
+import com.github.onsdigital.zebedee.keyring.Keyring;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.Collections;
 import com.github.onsdigital.zebedee.model.Content;
@@ -74,6 +75,7 @@ public class Zebedee {
     private final Path publishedContentPath;
     private final Path path;
     private final PermissionsService permissionsService;
+    private final Keyring collectionKeyring;
 
     private final UsersService usersService;
     private final TeamsService teamsService;
@@ -105,6 +107,7 @@ public class Zebedee {
         this.datasetService = configuration.getDatasetService();
         this.imageService = configuration.getImageService();
         this.serviceStoreImpl = configuration.getServiceStore();
+        this.collectionKeyring = configuration.getCollectionKeyring();
 
         this.collectionsPath = configuration.getCollectionsPath();
         this.publishedCollectionsPath = configuration.getPublishedCollectionsPath();
@@ -373,5 +376,9 @@ public class Zebedee {
 
     public Path getKeyRingPath() {
         return keyRingPath;
+    }
+
+    public Keyring getCollectionKeyring() {
+        return this.collectionKeyring;
     }
 }

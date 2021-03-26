@@ -120,7 +120,7 @@ public class ZebedeeCollectionWriterTest {
 
     @Test
     public void testNew_userNull_shouldThrowException() throws Exception {
-        IOException ex = assertThrows(IOException.class, () -> newCollectionWriter(zebedee, collection, null));
+        UnauthorizedException ex = assertThrows(UnauthorizedException.class, () -> newCollectionWriter(zebedee, collection, null));
 
         assertThat(ex.getMessage(), equalTo(USER_NULL_ERR));
     }
@@ -174,4 +174,3 @@ public class ZebedeeCollectionWriterTest {
         verify(keyring, times(1)).get(user, collection);
     }
 }
-

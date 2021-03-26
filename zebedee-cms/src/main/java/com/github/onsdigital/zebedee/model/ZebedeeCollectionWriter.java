@@ -39,14 +39,7 @@ public class ZebedeeCollectionWriter extends CollectionWriter {
             "error constructing ZebedeeCollectionWriter key required but keyring returned null";
 
     /**
-     * Create a new instance of CollectionWriter for the given Zebedee instance, collection, and session.
-     *
-     * @param zebedee
-     * @param collection
-     * @param session
-     * @throws BadRequestException
-     * @throws IOException
-     * @throws UnauthorizedException
+     * Deprecated do not use this constructor.
      */
     @Deprecated
     public ZebedeeCollectionWriter(Zebedee zebedee, Collection collection, Session session)
@@ -136,21 +129,29 @@ public class ZebedeeCollectionWriter extends CollectionWriter {
      * @throws UnauthorizedException
      * @throws NotFoundException
      */
-    public ZebedeeCollectionWriter(Collection collection, SecretKey key) throws BadRequestException, IOException, UnauthorizedException, NotFoundException {
+    public ZebedeeCollectionWriter(Collection collection, SecretKey key)
+            throws BadRequestException, IOException, UnauthorizedException, NotFoundException {
         init(collection, key);
     }
 
-    private void init(Collection collection, SecretKey key) throws NotFoundException, UnauthorizedException, IOException {
+    private void init(Collection collection, SecretKey key)
+            throws NotFoundException, UnauthorizedException, IOException {
 
         if (collection == null) {
             throw new NotFoundException("Please specify a collection");
         }
 
-        ReaderConfiguration config = get();
+        ReaderConfiguration cfg = get();
 
-        inProgress = new CollectionContentWriter(collection, key, collection.getPath().resolve(config.getInProgressFolderName()));
-        complete = new CollectionContentWriter(collection, key, collection.getPath().resolve(config.getCompleteFolderName()));
-        reviewed = new CollectionContentWriter(collection, key, collection.getPath().resolve(config.getReviewedFolderName()));
+        this.inProgress = new CollectionContentWriter(
+                collection, key, collection.getPath().resolve(cfg.getInProgressFolderName()));
+
+        this.complete = new CollectionContentWriter(collection, key,
+                collection.getPath().resolve(cfg.getCompleteFolderName()));
+
+        this.reviewed = new CollectionContentWriter(collection, key,
+                collection.getPath().resolve(cfg.getReviewedFolderName()));
+
         root = new CollectionContentWriter(collection, key, collection.getPath());
     }
 }

@@ -275,6 +275,9 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         CollectionDescription updatedDescription = new CollectionDescription(newName);
         updatedDescription.setType(CollectionType.scheduled);
         updatedDescription.setPublishDate(new DateTime(collectionDescription.getPublishDate()).plusHours(1).toDate());
+
+        setUpKeyringMocks();
+
         Collection.update(collection, updatedDescription, zebedee, new DummyScheduler(), publisherSession);
 
         // Then the properties of the description passed to update have been updated.
@@ -1421,12 +1424,14 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
     }
 
     @Test
-    public void moveContentShouldRenameInprogressFile() throws IOException, ZebedeeException {
+    public void moveContentShouldRenameInprogressFile() throws Exception {
 
         // Given the content already exists:
         String uri = "/economy/inflationandpriceindices/timeseries/a9er.html";
         String toUri = "/economy/inflationandpriceindices/timeseries/a9errenamed.html";
         builder.createInProgressFile(uri);
+
+        setUpKeyringMocks();
 
         // When we move content
         boolean edited = collection.moveContent(publisherSession, uri, toUri);
@@ -1442,12 +1447,14 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
     }
 
     @Test
-    public void moveContentShouldRenameCompletedFiles() throws IOException, ZebedeeException {
+    public void moveContentShouldRenameCompletedFiles() throws Exception {
 
         // Given the content already exists:
         String uri = "/economy/inflationandpriceindices/timeseries/a9er.html";
         String toUri = "/economy/inflationandpriceindices/timeseries/a9errenamed.html";
         builder.createCompleteFile(uri);
+
+        setUpKeyringMocks();
 
         // When we move content
         boolean edited = collection.moveContent(publisherSession, uri, toUri);
@@ -1471,7 +1478,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         builder.createInProgressFile(uri);
         builder.createInProgressFile(toUri);
 
-      //  setUpKeyringMocks();
+        setUpKeyringMocks();
 
         // When we move content to a URI where some content already exists.
         boolean edited = collection.moveContent(publisherSession, uri, toUri);

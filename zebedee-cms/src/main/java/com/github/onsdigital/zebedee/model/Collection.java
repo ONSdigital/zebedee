@@ -466,7 +466,23 @@ public class Collection {
 
         updatedCollection.save();
 
-        KeyManager.distributeCollectionKey(zebedee, session, collection, false);
+        /**
+         * TODO
+         * This is necessary to maintain backwards compatability but should be removed once we have fully migrated to
+         * the new keyring impl.
+         *
+         * The new keyring impl does not have a concept of update - a key is either added or removed. The key is no
+         * longer assigned directly to a user, a user can retrieve the key from the central keyring if they
+         * have the required permission for that collection.
+         *
+         * However, to maintain backwards compatability while we are in the process of migrating we still need to
+         * distribute the key. This logic is now encapsulated within
+         * {@link com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl#add(User, Collection, SecretKey)} so we
+         * invoke add again which will update all users either adding/removing the key to/from their keyring.
+         */
+        User user = zebedee.getUsersService().getUserByEmail(session.getEmail());
+        SecretKey key = zebedee.getCollectionKeyring().get(user, collection);
+        zebedee.getCollectionKeyring().add(user, collection, key);
 
         return updatedCollection;
     }
@@ -1292,12 +1308,11 @@ public class Collection {
             hasMoved = true;
         }
 
+        User user = getUserFromSession(session);
+
         // Fix up links within the content
         if (hasMoved) {
-            replaceLinksWithinCollection(session, fromUri, toUri);
-        }
-
-        if (hasMoved) {
+            replaceLinksWithinCollection(user, fromUri, toUri);
             addEvent(fromUri, new Event(new Date(), EventType.MOVED, session.getEmail()));
         }
 
@@ -1326,10 +1341,10 @@ public class Collection {
      * @throws BadRequestException
      * @throws UnauthorizedException
      */
-    private void replaceLinksWithinCollection(Session session, String oldUri, String newUri) throws IOException, ZebedeeException {
+    private void replaceLinksWithinCollection(User user, String oldUri, String newUri) throws IOException, ZebedeeException {
 
-        CollectionReader collectionReader = new ZebedeeCollectionReader(this.zebedee, this, session);
-        CollectionWriter collectionWriter = new ZebedeeCollectionWriter(this.zebedee, this, session);
+        CollectionReader collectionReader = new ZebedeeCollectionReader(this.zebedee, this, user);
+        CollectionWriter collectionWriter = new ZebedeeCollectionWriter(this.zebedee, this, user);
 
         for (String uri : inProgressUris()) {
             replaceLinksInFile(uri, oldUri, newUri, collectionReader.getInProgress(), collectionWriter.getInProgress());
@@ -1517,6 +1532,18 @@ public class Collection {
 
     public Content getInProgress() {
         return this.inProgress;
+    }
+
+    private User getUserFromSession(Session session) throws IOException {
+        if (session == null) {
+            throw new IOException("error moving content session required but was null");
+        }
+
+        try {
+            return zebedee.getUsersService().getUserByEmail(session.getEmail());
+        } catch (Exception ex) {
+            throw new IOException(ex);
+        }
     }
 }
 

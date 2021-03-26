@@ -173,3 +173,64 @@ If this is fails try again after regenerating an override key as it may have exp
 [4]: http://localhost:8081/florence/login
 [5]: https://github.com/ONSdigital/sixteens
 [6]: https://github.com/ONSdigital/dp-compose
+
+***
+#### Example curl commands for Zebedee CMS endpoints
+Here are example commands to call Zebedee endpoints directly. These are the endpoints called by Florence to create collections and add content. The host has been left as localhost with the default Zebedee port, assuming you are running them locally.
+
+##### Login to get an auth token
+Fill in the user email address and password. The auth token is returned in the response, which for the examples it is assigned to a variable for use in the other commands
+```
+ZEBEDEE_TOKEN=$(curl -d '{"email":"...", "password":"..."}' http://localhost:8082/login)
+```
+
+##### Create a collection 
+Take note of the collection ID in the response. It will be required for the next commands
+```
+curl -d '{"name":"testCollection","type":"manual","collectionOwner":"PUBLISHING_SUPPORT"}' --header "X-Florence-Token:$ZEBEDEE_TOKEN" http://localhost:8082/collection
+```
+
+##### Add content to a collection
+- Replace `{page-content}` with the JSON data for the page
+- Replace `{collection-id}` with the collection ID returned when the collection was created. This is not the same as the collection name.
+- Replace `{path-to-content}` with the location of the page. This will be the path the page gets published to, which also corresponds to the directory of the data.json file of the page.
+```
+curl -d '{page-content}' --header "X-Florence-Token:$ZEBEDEE_TOKEN" http://localhost:8082/content/{collection-id}?uri={path-to-content}/data.json&overwriteExisting=true
+```
+
+##### Set a page to complete
+This is done once changes to the page are finished and are ready to be reviewed
+```
+curl -X POST --header "X-Florence-Token:$ZEBEDEE_TOKEN" http://localhost:8082/complete/{collection-id}?uri={path-to-content}/data.json&recursive=false
+```
+
+##### Set a page to reviewed
+This cannot be done by the same user who created the content, it must be reviewed by a different user.
+```
+curl -X POST --header "X-Florence-Token:$ZEBEDEE_TOKEN" http://localhost:8082/review/{collection-id}?uri={path-to-content}/data.json&recursive=false
+```
+
+##### Approve a collection
+A collection can only be approved once all content has been reviewed.
+```
+curl -X POST --header "X-Florence-Token:$ZEBEDEE_TOKEN" http://localhost:8082/approve/{collection-id}
+```
+
+##### Unlock a collection
+Unlocking the collection reverts the approved state, allowing the content to be changed again 
+```
+curl -X POST --header "X-Florence-Token:$ZEBEDEE_TOKEN" http://localhost:8082/unlock/{collection-id}
+```
+
+##### Unlock a collection
+Unlocking the collection reverts the approved state, allowing the content to be changed again 
+```
+curl -X POST --header "X-Florence-Token:$ZEBEDEE_TOKEN" http://localhost:8082/unlock/{collection-id}
+```
+
+##### Publish a collection
+Publishing a collection makes the collection content available on the website.
+```
+curl -X POST --header "X-Florence-Token:$ZEBEDEE_TOKEN" http://localhost:8082/publish/{collection-id}
+```
+

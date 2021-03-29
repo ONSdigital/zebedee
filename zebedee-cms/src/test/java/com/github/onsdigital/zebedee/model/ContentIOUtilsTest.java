@@ -65,13 +65,13 @@ public class ContentIOUtilsTest extends ZebedeeTestBaseFixture {
      */
     @Override
     public void setUp() throws Exception {
-        setUpPermissionsServiceMockForLegacyTests(zebedee, builder.publisher1);
-
         secretKey = Keys.newSecretKey();
         setUpKeyringMockForLegacyTests(zebedee, builder.publisher1, secretKey);
 
         publisher = zebedee.openSession(builder.publisher1Credentials);
         reviewer = zebedee.openSession(builder.reviewer1Credentials);
+
+        setUpPermissionsServiceMockForLegacyTests(zebedee, publisher);
 
         // create a copy destination
         copy = Files.createTempDirectory("ContentIOUtils");
@@ -88,8 +88,8 @@ public class ContentIOUtilsTest extends ZebedeeTestBaseFixture {
         collection = Collection.create(collectionDescription, zebedee, publisher);
 
         publishedReader = new FileSystemContentReader(zebedee.getPublished().path);
-        collectionReader = new ZebedeeCollectionReader(zebedee, collection, builder.publisher1);
-        collectionWriter = new ZebedeeCollectionWriter(zebedee, collection, builder.publisher1);
+        collectionReader = new ZebedeeCollectionReader(zebedee, collection, publisher);
+        collectionWriter = new ZebedeeCollectionWriter(zebedee, collection, publisher);
 
         // add a set of data in a collection
         encrypted = generator.generateDataPagesSet("dataprocessor", "encrypted", 2015, 2, "inreview.csdb");

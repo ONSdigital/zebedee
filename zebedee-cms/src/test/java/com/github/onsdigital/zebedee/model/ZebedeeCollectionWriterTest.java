@@ -7,7 +7,9 @@ import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.keyring.Keyring;
 import com.github.onsdigital.zebedee.keyring.KeyringException;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
+import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.user.model.User;
+import com.github.onsdigital.zebedee.user.service.UsersService;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -18,10 +20,13 @@ import java.io.IOException;
 
 import static com.github.onsdigital.zebedee.model.ZebedeeCollectionWriter.COLLECTION_KEY_NULL_ERR;
 import static com.github.onsdigital.zebedee.model.ZebedeeCollectionWriter.COLLECTION_NULL_ERR;
+import static com.github.onsdigital.zebedee.model.ZebedeeCollectionWriter.GET_USER_ERR;
 import static com.github.onsdigital.zebedee.model.ZebedeeCollectionWriter.KEYRING_NULL_ERR;
 import static com.github.onsdigital.zebedee.model.ZebedeeCollectionWriter.PERMISSIONS_CHECK_ERR;
 import static com.github.onsdigital.zebedee.model.ZebedeeCollectionWriter.PERMISSIONS_SERVICE_NULL_ERR;
 import static com.github.onsdigital.zebedee.model.ZebedeeCollectionWriter.PERMISSION_DENIED_ERR;
+import static com.github.onsdigital.zebedee.model.ZebedeeCollectionWriter.SESSION_NULL_ERR;
+import static com.github.onsdigital.zebedee.model.ZebedeeCollectionWriter.USERS_SERVICE_NULL_ERR;
 import static com.github.onsdigital.zebedee.model.ZebedeeCollectionWriter.USER_NULL_ERR;
 import static com.github.onsdigital.zebedee.model.ZebedeeCollectionWriter.ZEBEDEE_NULL_ERR;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -42,6 +47,9 @@ public class ZebedeeCollectionWriterTest {
     private PermissionsService permissionsService;
 
     @Mock
+    private UsersService usersService;
+
+    @Mock
     private Keyring keyring;
 
     @Mock
@@ -52,6 +60,9 @@ public class ZebedeeCollectionWriterTest {
 
     @Mock
     private User user;
+
+    @Mock
+    private Session session;
 
     @Mock
     private SecretKey key;
@@ -67,21 +78,30 @@ public class ZebedeeCollectionWriterTest {
         when(zebedee.getPermissionsService())
                 .thenReturn(permissionsService);
 
+        when(zebedee.getUsersService())
+                .thenReturn(usersService);
+
         when(zebedee.getCollectionKeyring())
                 .thenReturn(keyring);
 
         when(collection.getDescription())
                 .thenReturn(description);
 
-        when(permissionsService.canEdit(user, description))
+        when(permissionsService.canEdit(session, description))
                 .thenReturn(true);
+
+        when(usersService.getUserByEmail(EMAIL))
+                .thenReturn(user);
 
         when(keyring.get(user, collection))
                 .thenReturn(key);
+
+        when(session.getEmail())
+                .thenReturn(EMAIL);
     }
 
-    private ZebedeeCollectionWriter newCollectionWriter(Zebedee z, Collection c, User u) throws Exception {
-        return new ZebedeeCollectionWriter(z, c, u);
+    private ZebedeeCollectionWriter newCollectionWriter(Zebedee z, Collection c, Session s) throws Exception {
+        return new ZebedeeCollectionWriter(z, c, s);
     }
 
     @Test
@@ -102,6 +122,16 @@ public class ZebedeeCollectionWriterTest {
     }
 
     @Test
+    public void testNew_usersServiceNull_shouldThrowException() throws Exception {
+        when(zebedee.getUsersService())
+                .thenReturn(null);
+
+        IOException ex = assertThrows(IOException.class, () -> newCollectionWriter(zebedee, null, null));
+
+        assertThat(ex.getMessage(), equalTo(USERS_SERVICE_NULL_ERR));
+    }
+
+    @Test
     public void testNew_keyringNull_shouldThrowException() throws Exception {
         when(zebedee.getCollectionKeyring())
                 .thenReturn(null);
@@ -119,34 +149,60 @@ public class ZebedeeCollectionWriterTest {
     }
 
     @Test
-    public void testNew_userNull_shouldThrowException() throws Exception {
+    public void testNew_sessionNull_shouldThrowException() throws Exception {
         UnauthorizedException ex = assertThrows(UnauthorizedException.class, () -> newCollectionWriter(zebedee, collection, null));
 
-        assertThat(ex.getMessage(), equalTo(USER_NULL_ERR));
+        assertThat(ex.getMessage(), equalTo(SESSION_NULL_ERR));
     }
 
     @Test
     public void testNew_permissionDenied_shouldThrowException() throws Exception {
-        when(permissionsService.canEdit(user, description))
+        when(permissionsService.canEdit(session, description))
                 .thenReturn(false);
 
         UnauthorizedException ex = assertThrows(UnauthorizedException.class,
-                () -> newCollectionWriter(zebedee, collection, user));
+                () -> newCollectionWriter(zebedee, collection, session));
 
         assertThat(ex.getMessage(), equalTo(PERMISSION_DENIED_ERR));
-        verify(permissionsService, times(1)).canEdit(user, description);
+        verify(permissionsService, times(1)).canEdit(session, description);
+    }
+
+    @Test
+    public void testNew_getUserError_shouldThrowException() throws Exception {
+        when(usersService.getUserByEmail(EMAIL))
+                .thenThrow(IOException.class);
+
+        IOException ex = assertThrows(IOException.class,
+                () -> newCollectionWriter(zebedee, collection, session));
+
+        assertThat(ex.getMessage(), equalTo(GET_USER_ERR));
+        verify(permissionsService, times(1)).canEdit(session, description);
+        verify(usersService, times(1)).getUserByEmail(EMAIL);
+    }
+
+    @Test
+    public void testNew_getUserReturnsNull_shouldThrowException() throws Exception {
+        when(usersService.getUserByEmail(EMAIL))
+                .thenReturn(null);
+
+        IOException ex = assertThrows(IOException.class,
+                () -> newCollectionWriter(zebedee, collection, session));
+
+        assertThat(ex.getMessage(), equalTo(USER_NULL_ERR));
+        verify(permissionsService, times(1)).canEdit(session, description);
+        verify(usersService, times(1)).getUserByEmail(EMAIL);
     }
 
     @Test
     public void testNew_canEditReturnsError_shouldThrowException() throws Exception {
-        when(permissionsService.canEdit(user, description))
+        when(permissionsService.canEdit(session, description))
                 .thenThrow(IOException.class);
 
         IOException ex = assertThrows(IOException.class,
-                () -> newCollectionWriter(zebedee, collection, user));
+                () -> newCollectionWriter(zebedee, collection, session));
 
         assertThat(ex.getMessage(), equalTo(PERMISSIONS_CHECK_ERR));
-        verify(permissionsService, times(1)).canEdit(user, description);
+        verify(permissionsService, times(1)).canEdit(session, description);
     }
 
     @Test
@@ -155,9 +211,10 @@ public class ZebedeeCollectionWriterTest {
                 .thenThrow(KeyringException.class);
 
         IOException ex = assertThrows(IOException.class,
-                () -> newCollectionWriter(zebedee, collection, user));
+                () -> newCollectionWriter(zebedee, collection, session));
 
-        verify(permissionsService, times(1)).canEdit(user, description);
+        verify(permissionsService, times(1)).canEdit(session, description);
+        verify(usersService, times(1)).getUserByEmail(EMAIL);
         verify(keyring, times(1)).get(user, collection);
     }
 
@@ -167,10 +224,11 @@ public class ZebedeeCollectionWriterTest {
                 .thenReturn(null);
 
         UnauthorizedException ex = assertThrows(UnauthorizedException.class,
-                () -> newCollectionWriter(zebedee, collection, user));
+                () -> newCollectionWriter(zebedee, collection, session));
 
         assertThat(ex.getMessage(), equalTo(COLLECTION_KEY_NULL_ERR));
-        verify(permissionsService, times(1)).canEdit(user, description);
+        verify(permissionsService, times(1)).canEdit(session, description);
+        verify(usersService, times(1)).getUserByEmail(EMAIL);
         verify(keyring, times(1)).get(user, collection);
     }
 }

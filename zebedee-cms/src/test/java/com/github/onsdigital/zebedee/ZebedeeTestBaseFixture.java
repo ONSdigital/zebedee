@@ -205,11 +205,21 @@ public abstract class ZebedeeTestBaseFixture {
         ReflectionTestUtils.setField(instance, "permissionsService", permissionsService);
     }
 
+    protected void setUpPermissionsServiceMockForLegacyTests(Zebedee instance, Session session) throws Exception {
+        when(permissionsService.canView(eq(session), any(CollectionDescription.class)))
+                .thenReturn(true);
+
+        when(permissionsService.canEdit(eq(session), any(CollectionDescription.class)))
+                .thenReturn(true);
+
+        ReflectionTestUtils.setField(instance, "permissionsService", permissionsService);
+    }
+
     protected void setUpKeyringMockForLegacyTests(Zebedee instance, User someUser, SecretKey key) throws Exception {
         when(collectionKeyring.get(eq(someUser), any(Collection.class)))
                 .thenReturn(key);
 
-        ReflectionTestUtils.setField(zebedee, "collectionKeyring", collectionKeyring);
+        ReflectionTestUtils.setField(instance, "collectionKeyring", collectionKeyring);
     }
 
 

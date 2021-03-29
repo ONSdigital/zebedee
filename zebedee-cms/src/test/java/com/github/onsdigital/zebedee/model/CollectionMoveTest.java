@@ -59,10 +59,10 @@ public class CollectionMoveTest extends ZebedeeTestBaseFixture {
         when(usersService.getUserByEmail(builder.publisher1Credentials.getEmail()))
                 .thenReturn(user);
 
-        when(permissionsService.canView(eq(user), any(CollectionDescription.class)))
+        when(permissionsService.canView(eq(session), any(CollectionDescription.class)))
                 .thenReturn(true);
 
-        when(permissionsService.canEdit(eq(user), any(CollectionDescription.class)))
+        when(permissionsService.canEdit(eq(session), any(CollectionDescription.class)))
                 .thenReturn(true);
 
         SecretKey key = Keys.newSecretKey();

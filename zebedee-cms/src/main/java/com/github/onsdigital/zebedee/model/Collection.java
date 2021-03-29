@@ -233,7 +233,7 @@ public class Collection {
 
         if (release != null) {
             collection.associateWithRelease(session.getEmail(), release,
-                    new ZebedeeCollectionWriter(zebedee, collection, user));
+                    new ZebedeeCollectionWriter(zebedee, collection, session));
             collection.save();
         }
 
@@ -1312,7 +1312,7 @@ public class Collection {
 
         // Fix up links within the content
         if (hasMoved) {
-            replaceLinksWithinCollection(user, fromUri, toUri);
+            replaceLinksWithinCollection(session, fromUri, toUri);
             addEvent(fromUri, new Event(new Date(), EventType.MOVED, session.getEmail()));
         }
 
@@ -1341,10 +1341,11 @@ public class Collection {
      * @throws BadRequestException
      * @throws UnauthorizedException
      */
-    private void replaceLinksWithinCollection(User user, String oldUri, String newUri) throws IOException, ZebedeeException {
+    private void replaceLinksWithinCollection(Session session, String oldUri, String newUri)
+            throws IOException, ZebedeeException {
 
-        CollectionReader collectionReader = new ZebedeeCollectionReader(this.zebedee, this, user);
-        CollectionWriter collectionWriter = new ZebedeeCollectionWriter(this.zebedee, this, user);
+        CollectionReader collectionReader = new ZebedeeCollectionReader(this.zebedee, this, session);
+        CollectionWriter collectionWriter = new ZebedeeCollectionWriter(this.zebedee, this, session);
 
         for (String uri : inProgressUris()) {
             replaceLinksInFile(uri, oldUri, newUri, collectionReader.getInProgress(), collectionWriter.getInProgress());

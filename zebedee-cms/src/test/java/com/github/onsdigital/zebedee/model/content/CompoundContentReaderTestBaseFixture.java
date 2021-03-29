@@ -74,8 +74,8 @@ public class CompoundContentReaderTestBaseFixture extends ZebedeeTestBaseFixture
         collection = Collection.create(collectionDescription, zebedee, publisher);
 
         publishedReader = new FileSystemContentReader(zebedee.getPublished().path);
-        collectionReader = new ZebedeeCollectionReader(zebedee, collection, builder.publisher1);
-        collectionWriter = new ZebedeeCollectionWriter(zebedee, collection, builder.publisher1);
+        collectionReader = new ZebedeeCollectionReader(zebedee, collection, publisher);
+        collectionWriter = new ZebedeeCollectionWriter(zebedee, collection, publisher);
 
         // add a set of data in a collection
         inProgressPage = generator.exampleTimeseries("inprogress", "abcd");

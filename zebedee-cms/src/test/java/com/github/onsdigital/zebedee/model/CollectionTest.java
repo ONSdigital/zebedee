@@ -27,7 +27,6 @@ import com.github.onsdigital.zebedee.model.content.item.ContentItemVersion;
 import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
 import com.github.onsdigital.zebedee.model.publishing.scheduled.DummyScheduler;
 import com.github.onsdigital.zebedee.session.model.Session;
-import com.github.onsdigital.zebedee.user.model.User;
 import com.github.onsdigital.zebedee.util.ContentDetailUtil;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -1252,7 +1251,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         // Given an existing release page
         ReflectionTestUtils.setField(zebedee, "permissionsService", permissionsService);
 
-        when(permissionsService.canEdit(any(User.class), any(CollectionDescription.class)))
+        when(permissionsService.canEdit(any(Session.class), any(CollectionDescription.class)))
                 .thenReturn(true);
 
         setUpKeyringMocks();
@@ -1301,7 +1300,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
 
         ReflectionTestUtils.setField(zebedee, "permissionsService", permissionsService);
 
-        when(permissionsService.canEdit(eq(builder.publisher1), any(CollectionDescription.class)))
+        when(permissionsService.canEdit(eq(publisherSession), any(CollectionDescription.class)))
                 .thenReturn(true);
 
         setUpKeyringMocks();

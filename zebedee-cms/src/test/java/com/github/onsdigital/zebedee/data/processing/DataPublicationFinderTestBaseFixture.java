@@ -62,8 +62,8 @@ public class DataPublicationFinderTestBaseFixture extends ZebedeeTestBaseFixture
         collection = Collection.create(collectionDescription, zebedee, publisher);
 
         publishedReader = new FileSystemContentReader(zebedee.getPublished().path);
-        collectionReader = new ZebedeeCollectionReader(zebedee, collection, builder.publisher1);
-        collectionWriter = new ZebedeeCollectionWriter(zebedee, collection, builder.publisher1);
+        collectionReader = new ZebedeeCollectionReader(zebedee, collection, publisher);
+        collectionWriter = new ZebedeeCollectionWriter(zebedee, collection, publisher);
     }
 
     @Test

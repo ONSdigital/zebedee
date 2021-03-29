@@ -26,7 +26,6 @@ public class Configuration {
     private static final String DEFAULT_TRAIN_URL = "http://localhost:8084";
     private static final String DEFAULT_DYLAN_URL = "http://localhost:8085";
     private static final String CONTENT_DIRECTORY = "content";
-    private static final String INFLUXDB_URL = "http://influxdb:8086";
     private static final String AUDIT_DB_ENABLED_ENV_VAR = "audit_db_enabled";
     private static final String MATHJAX_SERVICE_URL = "http://localhost:8888";
     private static final String DATASET_API_URL = "http://localhost:22000";
@@ -53,14 +52,6 @@ public class Configuration {
 
     public static boolean isVerificationEnabled() {
         return BooleanUtils.toBoolean(StringUtils.defaultIfBlank(getValue("publish_verification_enabled"), "false"));
-    }
-
-    public static boolean isInfluxReportingEnabled() {
-        return BooleanUtils.toBoolean(StringUtils.defaultIfBlank(getValue("enable_influx_reporting"), "false"));
-    }
-
-    public static String getInfluxDBHost() {
-        return StringUtils.defaultIfBlank(getValue("influxdb_url"), INFLUXDB_URL);
     }
 
     /**

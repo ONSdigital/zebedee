@@ -39,14 +39,22 @@ public class ZebedeeCollectionReader extends CollectionReader {
     static final String COLLECTION_KEY_NULL_ERR =
             "error constructing ZebedeeCollectionReader key required but keyring returned null";
 
+    public ZebedeeCollectionReader(Collection collection, SecretKey key) throws BadRequestException, IOException, UnauthorizedException, NotFoundException {
+        init(collection, key);
+    }
+
     /**
+     * Construct a new ZebedeeCollectionReader instance.
      *
-     * @param zebedee
-     * @param collection
-     * @param session
-     * @throws IOException
-     * @throws NotFoundException
-     * @throws UnauthorizedException
+     * @param zebedee    a {@link Zebedee} to provide non-null
+     *                   {@link com.github.onsdigital.zebedee.permissions.service.PermissionsService},
+     *                   {@link com.github.onsdigital.zebedee.user.service.UsersService} &
+     *                   {@link com.github.onsdigital.zebedee.keyring.Keyring}.
+     * @param collection the {@link Collection} the reader will read the content from
+     * @param session    the {@link Session} of the {@link User} who will use the reader.
+     * @throws IOException           problem creating the read.
+     * @throws NotFoundException     the collection is not found
+     * @throws UnauthorizedException the user is not authorised to read the collection content
      */
     public ZebedeeCollectionReader(Zebedee zebedee, Collection collection, Session session)
             throws IOException, NotFoundException, UnauthorizedException {
@@ -120,9 +128,7 @@ public class ZebedeeCollectionReader extends CollectionReader {
         return key;
     }
 
-    public ZebedeeCollectionReader(Collection collection, SecretKey key) throws BadRequestException, IOException, UnauthorizedException, NotFoundException {
-        init(collection, key);
-    }
+
 
     private void init(Collection collection, SecretKey key) throws NotFoundException, UnauthorizedException, IOException {
 

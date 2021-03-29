@@ -99,20 +99,6 @@
             <version>v1.1.0</version>
         </dependency>
 
-        <!-- Fasterxml Jackson dependencies - overrides vulnerable transitive dependencies
-        and declared explicitly to resolve conflicts in elasticsearch and dp-logging -->
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-core</artifactId>
-            <version>${fasterxml.jackson.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-annotations</artifactId>
-            <version>${fasterxml.jackson.version}</version>
-        </dependency>
-
         <dependency>
             <groupId>org.apache.tika</groupId>
             <artifactId>tika-core</artifactId>

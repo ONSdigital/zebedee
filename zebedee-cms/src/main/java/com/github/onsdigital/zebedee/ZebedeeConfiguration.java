@@ -110,7 +110,6 @@ public class ZebedeeConfiguration {
     private DatasetService datasetService;
     private ImageService imageService;
     private SessionClient sessionClient;
-    private KeyringCache keyringCache;
     private Keyring collectionKeyring;
     private EncryptionKeyFactory encryptionKeyFactory;
 

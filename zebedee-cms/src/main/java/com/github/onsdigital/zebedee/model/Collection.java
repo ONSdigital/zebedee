@@ -1308,8 +1308,6 @@ public class Collection {
             hasMoved = true;
         }
 
-        User user = getUserFromSession(session);
-
         // Fix up links within the content
         if (hasMoved) {
             replaceLinksWithinCollection(session, fromUri, toUri);
@@ -1533,18 +1531,6 @@ public class Collection {
 
     public Content getInProgress() {
         return this.inProgress;
-    }
-
-    private User getUserFromSession(Session session) throws IOException {
-        if (session == null) {
-            throw new IOException("error moving content session required but was null");
-        }
-
-        try {
-            return zebedee.getUsersService().getUserByEmail(session.getEmail());
-        } catch (Exception ex) {
-            throw new IOException(ex);
-        }
     }
 }
 

@@ -1,7 +1,6 @@
 package com.github.onsdigital.zebedee.model;
 
 import com.github.davidcarboni.cryptolite.Keys;
-import com.github.onsdigital.zebedee.KeyManangerUtil;
 import com.github.onsdigital.zebedee.ZebedeeTestBaseFixture;
 import com.github.onsdigital.zebedee.data.framework.DataBuilder;
 import com.github.onsdigital.zebedee.data.framework.DataPagesGenerator;
@@ -9,15 +8,12 @@ import com.github.onsdigital.zebedee.data.framework.DataPagesSet;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.CollectionType;
-import com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDao;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
 import com.github.onsdigital.zebedee.session.model.Session;
-import com.github.onsdigital.zebedee.user.service.UsersService;
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
-import org.mockito.Mock;
 
 import javax.crypto.SecretKey;
 import java.io.IOException;
@@ -31,15 +27,6 @@ import static org.junit.Assert.assertTrue;
  * Created by thomasridd on 1/24/16.
  */
 public class ContentIOUtilsTest extends ZebedeeTestBaseFixture {
-
-    @Mock
-    private UsersService usersService;
-
-    @Mock
-    private KeyManangerUtil keyManangerUtil;
-
-    @Mock
-    private CollectionHistoryDao collectionHistoryDao;
 
     private SecretKey secretKey;
 

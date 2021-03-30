@@ -85,9 +85,6 @@ public abstract class ZebedeeTestBaseFixture {
     protected PermissionsService permissionsService;
 
     @Mock
-    protected SecretKey collectionKey;
-
-    @Mock
     protected Session userSession;
 
     @Mock
@@ -189,11 +186,6 @@ public abstract class ZebedeeTestBaseFixture {
     protected void verifyKeyAddedToCollectionKeyring() throws Exception {
         verify(collectionKeyring, times(1)).add(any(), any(), any());
     }
-
-    protected void verifyKeyAddedToCollectionKeyring(Collection collection) throws Exception {
-        verify(collectionKeyring, times(1)).add(any(), eq(collection), any());
-    }
-
 
     protected void setUpPermissionsServiceMockForLegacyTests(Zebedee instance, User someUser) throws Exception {
         when(permissionsService.canView(eq(someUser), any(CollectionDescription.class)))

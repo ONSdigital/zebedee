@@ -1221,9 +1221,9 @@ public class CollectionsTest {
 
         collections.skipDatasetVersionsValidation(collectionMock, sessionMock);
 
-        assertThat(description.events.size(), equalTo(1));
+        assertThat(description.getEvents().size(), equalTo(1));
 
-        Event event = description.events.get(0);
+        Event event = description.getEvents().get(0);
         assertThat(event.getType(), equalTo(EventType.VERSION_VERIFICATION_BYPASSED));
     }
 

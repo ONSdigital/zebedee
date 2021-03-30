@@ -44,7 +44,7 @@ public class PublishTask implements Runnable {
         try {
             collection = zebedee.getCollections().getCollection(this.collectionId);
 
-            if (collection.description.approvalStatus != ApprovalStatus.COMPLETE) {
+            if (collection.getDescription().getApprovalStatus() != ApprovalStatus.COMPLETE) {
                 info().data("collectionId", collectionId).log("Scheduled collection has not been approved - switching to manual");
 
                 // Switch to manual

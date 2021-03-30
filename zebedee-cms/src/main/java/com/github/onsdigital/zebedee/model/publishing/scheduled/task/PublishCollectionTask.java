@@ -49,11 +49,11 @@ public class PublishCollectionTask implements Callable<Boolean> {
 
         try {
             info().data("collectionId", collectionId).log("PUBLISH: Running collection publish task");
-            collection.getDescription().publishStartDate = new Date();
+            collection.getDescription().setPublishStartDate(new Date());
 
             published = Publisher.executePublish(collection, collectionReader, publisherSystemEmail);
 
-            collection.getDescription().publishEndDate = new Date();
+            collection.getDescription().setPublishEndDate(new Date());
         } catch (Exception e) {
             // If an error was caught, attempt to roll back the transaction:
             Map<String, String> transactionIdMap = collection.getDescription().getPublishTransactionIds();

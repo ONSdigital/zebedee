@@ -96,7 +96,7 @@ public class Publisher {
      * Execute the prepublish steps.
      */
     public static void executePrePublish(Collection collection) throws IOException {
-        collection.getDescription().publishStartDate = new Date();
+        collection.getDescription().setPublishStartDate(new Date());
         createPublishingTransactions(collection);
         sendManifest(collection);
     }
@@ -254,7 +254,7 @@ public class Publisher {
      * Return true if the collection approval status equals {@link ApprovalStatus#COMPLETE}, return false otherwise.
      */
     private static boolean isApproved(Collection collection) {
-        if (collection.getDescription().approvalStatus != ApprovalStatus.COMPLETE) {
+        if (collection.getDescription().getApprovalStatus() != ApprovalStatus.COMPLETE) {
             info().data("publishing", true).data("collectionId", collection.getDescription().getId())
                     .log("collection cannot be published as it has not been approved");
             return false;
@@ -266,7 +266,7 @@ public class Publisher {
      * Return true if collection is already marked as publish completed, return false otherwise
      */
     private static boolean isPublished(Collection collection) {
-        if (collection.getDescription().publishComplete) {
+        if (collection.getDescription().isPublishComplete()) {
             info().data("publishing", true).data("collectionId", collection.getDescription().getId())
                     .log("collection has already been published, halting publish");
             return true;
@@ -287,12 +287,12 @@ public class Publisher {
         boolean publishComplete = false;
 
         try {
-            collection.getDescription().publishStartDate = new Date();
+            collection.getDescription().setPublishStartDate(new Date());
 
             executePrePublish(collection);
             publishComplete = executePublish(collection, collectionReader, email);
 
-            collection.getDescription().publishEndDate = new Date();
+            collection.getDescription().setPublishEndDate(new Date());
         } catch (Exception ex) {
             handlePublishingException(ex, collection);
         } finally {
@@ -521,7 +521,7 @@ public class Publisher {
         if (isSuccess) {
             Date publishedDate = new Date();
             collection.getDescription().addEvent(new Event(publishedDate, EventType.PUBLISHED, email));
-            collection.getDescription().publishComplete = true;
+            collection.getDescription().setPublishComplete(true);
 
             info().data("publishing", true).data("collectionId", collection.getDescription().getId())
                     .data("timeTaken", System.currentTimeMillis() - start)

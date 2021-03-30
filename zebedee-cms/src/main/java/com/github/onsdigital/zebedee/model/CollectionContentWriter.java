@@ -36,7 +36,7 @@ public class CollectionContentWriter extends ContentWriter {
     public OutputStream getOutputStream(String uri) throws IOException, BadRequestException {
         Path path = resolvePath(uri);
         assertNotDirectory(path);
-        if (collection.description.isEncrypted) {
+        if (collection.getDescription().isEncrypted()) {
             return EncryptionUtils.encryptionOutputStream(path, key);
         } else {
             SlackNotification.collectionWarning(collection,

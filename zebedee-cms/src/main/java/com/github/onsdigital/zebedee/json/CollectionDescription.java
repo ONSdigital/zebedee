@@ -5,6 +5,7 @@ import com.github.onsdigital.zebedee.json.publishing.Result;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -19,42 +20,39 @@ import java.util.stream.Collectors;
  */
 public class CollectionDescription extends CollectionBase {
 
-    public List<String> inProgressUris;
-    public List<String> completeUris;
-    public List<String> reviewedUris;
-    public ApprovalStatus approvalStatus = ApprovalStatus.NOT_STARTED;
-    public boolean publishComplete;
-    private Map<String, String> publishTransactionIds;
-    public Date publishStartDate; // The date the publish process was actually started
-    public Date publishEndDate; // The date the publish process ended.
-    public boolean isEncrypted;
+    private List<String> inProgressUris;
+    private List<String> completeUris;
+    private List<String> reviewedUris;
     private List<PendingDelete> pendingDeletes;
+    private List<Result> publishResults;
+    private List<String> timeseriesImportFiles;
+
+    private Map<String, String> publishTransactionIds;
+    private Map<String, Events> eventsByUri;
     private Set<CollectionDataset> datasets;
     private Set<CollectionDatasetVersion> datasetVersions;
 
-    public List<String> timeseriesImportFiles = new ArrayList<>();
-
-    /**
-     * events related to this collection
-     */
-    public Events events;
-
-    /**
-     * A List of {@link Event} for each uri in the collection.
-     */
-    public Map<String, Events> eventsByUri;
-
-    /**
-     * A list of {@link com.github.onsdigital.zebedee.json.publishing.Result} for
-     * each attempt at publishing this collection.
-     */
-    public List<Result> publishResults;
+    private ApprovalStatus approvalStatus = ApprovalStatus.NOT_STARTED;
+    private boolean publishComplete;
+    private Date publishStartDate;
+    private Date publishEndDate;
+    private boolean isEncrypted;
+    private Events events;
 
     /**
      * Default constuructor for serialisation.
      */
     public CollectionDescription() {
-        // No action.
+        this.inProgressUris = new ArrayList<>();
+        this.completeUris = new ArrayList<>();
+        this.reviewedUris = new ArrayList<>();
+        this.pendingDeletes = new ArrayList<>();
+        this.publishResults = new ArrayList<>();
+        this.timeseriesImportFiles = new ArrayList<>();
+        this.publishTransactionIds = new HashMap<>();
+        this.eventsByUri = new HashMap<>();
+        this.datasets = new HashSet<>();
+        this.datasetVersions = new HashSet<>();
     }
 
     /**
@@ -64,6 +62,16 @@ public class CollectionDescription extends CollectionBase {
      */
     public CollectionDescription(String name) {
         this.name = name;
+        this.inProgressUris = new ArrayList<>();
+        this.completeUris = new ArrayList<>();
+        this.reviewedUris = new ArrayList<>();
+        this.pendingDeletes = new ArrayList<>();
+        this.publishResults = new ArrayList<>();
+        this.timeseriesImportFiles = new ArrayList<>();
+        this.publishTransactionIds = new HashMap<>();
+        this.eventsByUri = new HashMap<>();
+        this.datasets = new HashSet<>();
+        this.datasetVersions = new HashSet<>();
     }
 
 
@@ -253,5 +261,101 @@ public class CollectionDescription extends CollectionBase {
 
     public void setPublishTransactionIds(Map<String, String> publishTransactionIds) {
         this.publishTransactionIds = publishTransactionIds;
+    }
+
+    public List<String> getInProgressUris() {
+        return this.inProgressUris;
+    }
+
+    public void setInProgressUris(final List<String> inProgressUris) {
+        this.inProgressUris = inProgressUris;
+    }
+
+    public List<String> getCompleteUris() {
+        return this.completeUris;
+    }
+
+    public void setCompleteUris(final List<String> completeUris) {
+        this.completeUris = completeUris;
+    }
+
+    public List<String> getReviewedUris() {
+        return this.reviewedUris;
+    }
+
+    public void setReviewedUris(final List<String> reviewedUris) {
+        this.reviewedUris = reviewedUris;
+    }
+
+    public boolean isPublishComplete() {
+        return this.publishComplete;
+    }
+
+    public void setPublishComplete(final boolean publishComplete) {
+        this.publishComplete = publishComplete;
+    }
+
+    public Date getPublishStartDate() {
+        return this.publishStartDate;
+    }
+
+    public void setPublishStartDate(final Date publishStartDate) {
+        this.publishStartDate = publishStartDate;
+    }
+
+    public Date getPublishEndDate() {
+        return this.publishEndDate;
+    }
+
+    public void setPublishEndDate(final Date publishEndDate) {
+        this.publishEndDate = publishEndDate;
+    }
+
+    public boolean isEncrypted() {
+        return this.isEncrypted;
+    }
+
+    public void setEncrypted(final boolean encrypted) {
+        this.isEncrypted = encrypted;
+    }
+
+    public void setDatasets(final Set<CollectionDataset> datasets) {
+        this.datasets = datasets;
+    }
+
+    public void setDatasetVersions(final Set<CollectionDatasetVersion> datasetVersions) {
+        this.datasetVersions = datasetVersions;
+    }
+
+    public List<String> getTimeseriesImportFiles() {
+        return this.timeseriesImportFiles;
+    }
+
+    public void setTimeseriesImportFiles(final List<String> timeseriesImportFiles) {
+        this.timeseriesImportFiles = timeseriesImportFiles;
+    }
+
+    public Events getEvents() {
+        return this.events;
+    }
+
+    public void setEvents(final Events events) {
+        this.events = events;
+    }
+
+    public Map<String, Events> getEventsByUri() {
+        return this.eventsByUri;
+    }
+
+    public void setEventsByUri(final Map<String, Events> eventsByUri) {
+        this.eventsByUri = eventsByUri;
+    }
+
+    public List<Result> getPublishResults() {
+        return this.publishResults;
+    }
+
+    public void setPublishResults(final List<Result> publishResults) {
+        this.publishResults = publishResults;
     }
 }

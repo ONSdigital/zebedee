@@ -26,6 +26,7 @@
     </properties>
 
     <repositories>
+
         <repository>
             <id>splunk-artifactory</id>
             <name>Splunk Releases</name>
@@ -121,7 +122,7 @@
             <dependency>
                 <groupId>com.github.onsdigital</groupId>
                 <artifactId>restolino</artifactId>
-                <version>v0.2.1</version>
+                <version>v0.2.2</version>
             </dependency>
 
             <!-- Cryptography -->
@@ -223,16 +224,6 @@
                                     <groupId>org.yaml</groupId>
                                     <artifactId>snakeyaml</artifactId>
                                     <version>1.13</version>
-                                </exlude>
-                                <exlude>
-                                    <groupId>org.eclipse.jetty</groupId>
-                                    <artifactId>jetty-http</artifactId>
-                                    <version>9.4.28.v20200408</version>
-                                </exlude>
-                                <exlude>
-                                    <groupId>org.eclipse.jetty</groupId>
-                                    <artifactId>jetty-server</artifactId>
-                                    <version>9.4.28.v20200408</version>
                                 </exlude>
                                 <exlude>
                                     <groupId>org.apache.poi</groupId>

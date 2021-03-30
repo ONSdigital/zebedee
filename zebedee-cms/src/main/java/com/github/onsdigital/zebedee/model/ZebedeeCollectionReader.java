@@ -21,11 +21,11 @@ public class ZebedeeCollectionReader extends CollectionReader {
     static final String ZEBEDEE_NULL_ERR =
             "error constructing ZebedeeCollectionReader zebedee instance required but was null";
     static final String PERMISSIONS_SERVICE_NULL_ERR =
-            "error constructing ZebedeeCollectionReader perissions service required but was null";
+            "error constructing ZebedeeCollectionReader permissions service required but was null";
     static final String USERS_SERVICE_NULL_ERR =
             "error constructing ZebedeeCollectionReader users service required but was null";
     static final String KEYRING_NULL_ERR =
-            "error constructing ZebedeeCollectionReader keyring requred but was null";
+            "error constructing ZebedeeCollectionReader keyring required but was null";
     static final String COLLECTION_NULL_ERR =
             "error constructing ZebedeeCollectionReader collection required but was null";
     static final String SESSION_NULL_ERR =

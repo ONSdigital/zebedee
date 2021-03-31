@@ -1079,19 +1079,6 @@ public class Collections {
         return now.until(midnight, MINUTES);
     }
 
-    /**
-     * Get the collection defined by the given HttpServletRequest
-     *
-     * @param request the request containing the id of the collection to get.
-     * @return
-     * @throws IOException
-     */
-/*    public Collection getCollection(HttpServletRequest request)
-            throws IOException {
-        String collectionId = getCollectionId(request);
-        return Root.zebedee.getCollections().getCollection(collectionId);
-    }*/
-
     public String getCollectionId(HttpServletRequest request) {
         com.github.davidcarboni.restolino.helpers.Path path = com.github.davidcarboni.restolino.helpers.Path.newInstance(request);
         List<String> segments = path.segments();

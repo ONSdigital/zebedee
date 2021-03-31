@@ -48,9 +48,7 @@ public class Collection {
     }
 
     /**
-     * @param sessionsService
-     * @param permissionsService
-     * @param collections
+     * Constructor for testing.
      */
     Collection(final Sessions sessionsService, final PermissionsService permissionsService,
                final com.github.onsdigital.zebedee.model.Collections collections) {

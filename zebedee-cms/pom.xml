@@ -45,12 +45,6 @@
             <artifactId>dp-cryptolite-java</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>org.influxdb</groupId>
-            <artifactId>influxdb-java</artifactId>
-            <version>2.1</version>
-        </dependency>
-
         <!-- Zebedee Reader-->
         <dependency>
             <groupId>com.github.onsdigital</groupId>

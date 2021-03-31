@@ -109,7 +109,10 @@ public class Collection {
         result.setEncrypted(collection.getDescription().isEncrypted());
         result.setReleaseUri(collection.getDescription().getReleaseUri());
 
-        info().data("user", session.getEmail()).data("collectionId", collectionID).log("get collection endpoint: request compeleted successfully");
+        info().user(session.getEmail())
+                .collectionID(collectionID)
+                .log("get collection endpoint: request compeleted successfully");
+
         return result;
     }
 

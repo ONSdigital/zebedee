@@ -13,6 +13,8 @@ import org.mockito.Mock;
 import java.io.IOException;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertThrows;
 import static org.mockito.Matchers.anyString;
@@ -53,6 +55,9 @@ public class CollectionTest extends ZebedeeAPIBaseTestCase {
 
         when(collection.getDescription())
                 .thenReturn(description);
+
+        when(permissionsService.canView(TEST_EMAIL, description))
+                .thenReturn(true);
 
         this.endpoint = new Collection(sessions, permissionsService, collections);
     }
@@ -124,13 +129,37 @@ public class CollectionTest extends ZebedeeAPIBaseTestCase {
 
     @Test
     public void testGet_checkPermissionsError_shouldThrowException() throws Exception {
-        when(permissionsService.canEdit(TEST_EMAIL, description))
+        when(permissionsService.canView(TEST_EMAIL, description))
                 .thenThrow(IOException.class);
 
         UnauthorizedException actual = assertThrows(UnauthorizedException.class,
                 () -> endpoint.get(mockRequest, mockResponse));
 
         assertThat(actual.getMessage(), equalTo("You are not authorised to view this collection"));
+        verify(sessions, times(1)).get(mockRequest);
+        verify(collections, times(1)).getCollection(COLLECTION_ID);
+        verify(permissionsService, times(1)).canView(TEST_EMAIL, description);
+    }
+
+    @Test
+    public void testGet_permissionDenied_shouldThrowException() throws Exception {
+        when(permissionsService.canView(TEST_EMAIL, description))
+                .thenReturn(false);
+
+        UnauthorizedException actual = assertThrows(UnauthorizedException.class,
+                () -> endpoint.get(mockRequest, mockResponse));
+
+        assertThat(actual.getMessage(), equalTo("You are not authorised to view this collection"));
+        verify(sessions, times(1)).get(mockRequest);
+        verify(collections, times(1)).getCollection(COLLECTION_ID);
+        verify(permissionsService, times(1)).canView(TEST_EMAIL, description);
+    }
+
+    @Test
+    public void testGet_success_shouldThrowException() throws Exception {
+        CollectionDescription actual = endpoint.get(mockRequest, mockResponse);
+
+        assertThat(actual, is(notNullValue()));
         verify(sessions, times(1)).get(mockRequest);
         verify(collections, times(1)).getCollection(COLLECTION_ID);
         verify(permissionsService, times(1)).canView(TEST_EMAIL, description);

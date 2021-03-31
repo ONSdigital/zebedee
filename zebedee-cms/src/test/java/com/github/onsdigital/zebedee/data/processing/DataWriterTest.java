@@ -1,5 +1,6 @@
 package com.github.onsdigital.zebedee.data.processing;
 
+import com.github.davidcarboni.cryptolite.Keys;
 import com.github.davidcarboni.cryptolite.Random;
 import com.github.onsdigital.zebedee.ZebedeeTestBaseFixture;
 import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeries;
@@ -22,6 +23,7 @@ import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
 import org.junit.Test;
 
+import javax.crypto.SecretKey;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.text.ParseException;
@@ -46,14 +48,22 @@ public class DataWriterTest extends ZebedeeTestBaseFixture {
     DataPagesSet unpublished;
     DataPagesSet republish;
 
+    SecretKey secretKey;
+
     /**
      * Setup generates an instance of zebedee plus a collection
      *
      * @throws Exception
      */
     public void setUp() throws Exception {
+
+        secretKey = Keys.newSecretKey();
+        setUpKeyringMockForLegacyTests(zebedee, builder.publisher1, secretKey);
+
         publisher = zebedee.openSession(builder.publisher1Credentials);
         reviewer = zebedee.openSession(builder.reviewer1Credentials);
+
+        setUpPermissionsServiceMockForLegacyTests(zebedee, publisher);
 
         dataBuilder = new DataBuilder(zebedee, publisher, reviewer);
         generator = new DataPagesGenerator();

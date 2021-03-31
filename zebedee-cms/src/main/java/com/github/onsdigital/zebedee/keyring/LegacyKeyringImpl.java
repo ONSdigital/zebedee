@@ -187,6 +187,8 @@ public class LegacyKeyringImpl implements Keyring {
         validateCollection(collection);
         validateSecretKey(key);
 
+        cache.getSchedulerCache().put(collection.getDescription().getId(), key);
+
         List<User> assignments = getKeyRecipients(collection);
         List<User> removals = getKeyToRemoveFrom(collection, assignments);
 

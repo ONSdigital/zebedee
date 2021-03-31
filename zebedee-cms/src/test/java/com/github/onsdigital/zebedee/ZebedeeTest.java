@@ -3,6 +3,7 @@ package com.github.onsdigital.zebedee;
 import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.exceptions.CollectionNotFoundException;
 import com.github.onsdigital.zebedee.json.Credentials;
+import com.github.onsdigital.zebedee.keyring.KeyringException;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.session.model.Session;
 import org.apache.commons.io.FileUtils;
@@ -27,6 +28,7 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
@@ -40,6 +42,7 @@ public class ZebedeeTest extends ZebedeeTestBaseFixture {
 
     Path expectedPath;
     Map<String, String> env;
+    private static String PASSWORD = "1234";
 
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
@@ -241,7 +244,7 @@ public class ZebedeeTest extends ZebedeeTestBaseFixture {
 
         // Then null is returned
         assertThat(actual, is(nullValue()));
-        verifyZeroInteractions(sessions, usersService, applicationKeys, legacyKeyringCache, keyring);
+        verifyZeroInteractions(sessions, usersService, applicationKeys, legacyKeyringCache, collectionKeyring);
     }
 
     @Test
@@ -263,7 +266,7 @@ public class ZebedeeTest extends ZebedeeTestBaseFixture {
         // Then an exception is thrown
         assertThat(ex.getMessage(), equalTo("boom"));
         verify(usersService, times(1)).getUserByEmail(TEST_EMAIL);
-        verifyZeroInteractions(sessions, usersService, applicationKeys, legacyKeyringCache, keyring);
+        verifyZeroInteractions(sessions, usersService, applicationKeys, legacyKeyringCache, collectionKeyring);
     }
 
     @Test
@@ -286,7 +289,7 @@ public class ZebedeeTest extends ZebedeeTestBaseFixture {
         assertThat(actual, is(nullValue()));
         verify(usersService, times(1)).getUserByEmail(TEST_EMAIL);
 
-        verifyZeroInteractions(sessions, applicationKeys, legacyKeyringCache, keyring);
+        verifyZeroInteractions(sessions, applicationKeys, legacyKeyringCache, collectionKeyring);
     }
 
     @Test
@@ -314,7 +317,7 @@ public class ZebedeeTest extends ZebedeeTestBaseFixture {
         verify(sessions, times(1)).create(user);
         verify(user, never()).keyring();
 
-        verifyZeroInteractions(applicationKeys, legacyKeyringCache, keyring);
+        verifyZeroInteractions(applicationKeys, legacyKeyringCache, collectionKeyring);
     }
 
     @Test
@@ -325,6 +328,9 @@ public class ZebedeeTest extends ZebedeeTestBaseFixture {
         when(credentials.getEmail())
                 .thenReturn(TEST_EMAIL);
 
+        when(credentials.getPassword())
+                .thenReturn(PASSWORD);
+
         when(usersService.getUserByEmail(any()))
                 .thenReturn(user);
 
@@ -332,10 +338,11 @@ public class ZebedeeTest extends ZebedeeTestBaseFixture {
                 .thenReturn(userSession);
 
         when(user.keyring())
-                .thenReturn(legacyKeyring);
+                .thenReturn(usersKeyring);
 
-        when(legacyKeyring.unlock(any()))
-                .thenReturn(false);
+        doThrow(KeyringException.class)
+                .when(collectionKeyring)
+                .unlock(user, PASSWORD);
 
         Zebedee zebedee = new Zebedee(zebCfg);
 
@@ -343,22 +350,24 @@ public class ZebedeeTest extends ZebedeeTestBaseFixture {
         IOException ex = assertThrows(IOException.class, () -> zebedee.openSession(credentials));
 
         // Then an exception is thrown
-        assertThat(ex.getMessage(), equalTo("failed to unlock user keyring"));
+        assertTrue(ex.getCause() instanceof KeyringException);
         verify(usersService, times(1)).getUserByEmail(TEST_EMAIL);
         verify(sessions, times(1)).create(user);
-        verify(user, times(1)).keyring();
-        verify(legacyKeyring, times(1)).unlock(any());
+        verify(collectionKeyring, times(1)).unlock(user, PASSWORD);
 
-        verifyZeroInteractions(applicationKeys, legacyKeyringCache, keyring);
+        verifyZeroInteractions(applicationKeys, legacyKeyringCache, usersKeyring);
     }
 
     @Test
-    public void testOpenSession_updateLegacyCacheThrowsException() throws Exception {
-        // Given keyringCache.put throws an exception
+    public void testOpenSession_cacheKeyringError_shouldThrowException() throws Exception {
+        // Given cacheKeyring throws an exception
         setUpOpenSessionsTestMocks();
 
         when(credentials.getEmail())
                 .thenReturn(TEST_EMAIL);
+
+        when(credentials.getPassword())
+                .thenReturn(PASSWORD);
 
         when(usersService.getUserByEmail(any()))
                 .thenReturn(user);
@@ -367,36 +376,37 @@ public class ZebedeeTest extends ZebedeeTestBaseFixture {
                 .thenReturn(userSession);
 
         when(user.keyring())
-                .thenReturn(legacyKeyring);
+                .thenReturn(usersKeyring);
 
-        when(legacyKeyring.unlock(any()))
-                .thenReturn(true);
-
-        doThrow(IOException.class)
-                .when(legacyKeyringCache)
-                .put(any(), any());
+        doThrow(KeyringException.class)
+                .when(collectionKeyring)
+                .cacheKeyring(user);
 
         Zebedee zebedee = new Zebedee(zebCfg);
 
         // When openSession is called
-        assertThrows(IOException.class, () -> zebedee.openSession(credentials));
+        IOException ex = assertThrows(IOException.class, () -> zebedee.openSession(credentials));
 
         // Then an exception is thrown
+        assertTrue(ex.getCause() instanceof KeyringException);
         verify(usersService, times(1)).getUserByEmail(TEST_EMAIL);
         verify(sessions, times(1)).create(user);
-        verify(legacyKeyring, times(1)).unlock(any());
-        verify(applicationKeys, times(1)).populateCacheFromUserKeyring(legacyKeyring);
-        verify(legacyKeyringCache, times(1)).put(user, userSession);
-        verify(keyring, never()).cacheKeyring(any());
+        verify(collectionKeyring, times(1)).unlock(user, PASSWORD);
+        verify(collectionKeyring, times(1)).cacheKeyring(user);
+
+        verifyZeroInteractions(applicationKeys, legacyKeyringCache, usersKeyring);
     }
 
     @Test
-    public void testOpenSession_success() throws Exception {
-        // Given valid credentials
+    public void testOpenSession_success_shouldReturnSession() throws Exception {
+        // Given open session is successful
         setUpOpenSessionsTestMocks();
 
         when(credentials.getEmail())
                 .thenReturn(TEST_EMAIL);
+
+        when(credentials.getPassword())
+                .thenReturn(PASSWORD);
 
         when(usersService.getUserByEmail(any()))
                 .thenReturn(user);
@@ -405,24 +415,21 @@ public class ZebedeeTest extends ZebedeeTestBaseFixture {
                 .thenReturn(userSession);
 
         when(user.keyring())
-                .thenReturn(legacyKeyring);
-
-        when(legacyKeyring.unlock(any()))
-                .thenReturn(true);
+                .thenReturn(usersKeyring);
 
         Zebedee zebedee = new Zebedee(zebCfg);
 
         // When openSession is called
         Session actual = zebedee.openSession(credentials);
 
-        // Then a session is returned
+        // Then the expected session is returned
         assertThat(actual, equalTo(userSession));
         verify(usersService, times(1)).getUserByEmail(TEST_EMAIL);
         verify(sessions, times(1)).create(user);
-        verify(legacyKeyring, times(1)).unlock(any());
-        verify(applicationKeys, times(1)).populateCacheFromUserKeyring(legacyKeyring);
-        verify(legacyKeyringCache, times(1)).put(user, userSession);
+        verifyZeroInteractions(applicationKeys, legacyKeyringCache, usersKeyring);
+
+        // And the keyring is unlocked and cached
+        verify(collectionKeyring, times(1)).unlock(user, PASSWORD);
+        verify(collectionKeyring, times(1)).cacheKeyring(user);
     }
-
-
 }

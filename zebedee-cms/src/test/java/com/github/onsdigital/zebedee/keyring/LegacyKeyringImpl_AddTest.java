@@ -146,7 +146,8 @@ public class LegacyKeyringImpl_AddTest extends BaseLegacyKeyringTest {
         // And no users are updated
         verifyUsersNotUpdated(bert, ernie, theCount);
         verifyZeroInteractions(bertKeyring, ernieKeyring, theCountKeyring);
-        verifyZeroInteractions(user, permissions, keyringCache);
+        verifyZeroInteractions(user, permissions);
+        verifyKeyAddedToSchedulerCache();
     }
 
     @Test
@@ -166,6 +167,7 @@ public class LegacyKeyringImpl_AddTest extends BaseLegacyKeyringTest {
         verify(users, times(1)).removeKeyFromKeyring(EMAIL_THE_COUNT, TEST_COLLECTION_ID);
         verify(keyringCache, times(1)).get(theCount);
         verify(theCountKeyring, times(1)).remove(TEST_COLLECTION_ID);
+        verifyKeyAddedToSchedulerCache();
     }
 
     @Test
@@ -185,6 +187,7 @@ public class LegacyKeyringImpl_AddTest extends BaseLegacyKeyringTest {
         verify(users, times(1)).removeKeyFromKeyring(EMAIL_THE_COUNT, TEST_COLLECTION_ID);
         verify(keyringCache, times(1)).get(theCount);
         verify(theCountKeyring, times(1)).remove(TEST_COLLECTION_ID);
+        verifyKeyAddedToSchedulerCache();
     }
 
     @Test
@@ -208,7 +211,8 @@ public class LegacyKeyringImpl_AddTest extends BaseLegacyKeyringTest {
         // And no users are updated
         verifyUsersNotUpdated(bert, ernie, theCount);
         verifyZeroInteractions(bertKeyring, ernieKeyring, theCountKeyring);
-        verifyZeroInteractions(user, permissions, keyringCache);
+        verifyZeroInteractions(user, permissions);
+        verifyKeyAddedToSchedulerCache();
     }
 
     @Test
@@ -232,6 +236,7 @@ public class LegacyKeyringImpl_AddTest extends BaseLegacyKeyringTest {
 
         verify(permissions, times(1)).getCollectionAccessMapping(collection);
         verify(users, times(1)).list();
+        verifyKeyAddedToSchedulerCache();
     }
 
     @Test
@@ -255,6 +260,7 @@ public class LegacyKeyringImpl_AddTest extends BaseLegacyKeyringTest {
 
         verify(permissions, times(1)).getCollectionAccessMapping(collection);
         verify(users, times(1)).list();
+        verifyKeyAddedToSchedulerCache();
     }
 
     @Test
@@ -277,6 +283,8 @@ public class LegacyKeyringImpl_AddTest extends BaseLegacyKeyringTest {
         verifyKeyAddedToUser(bert, bertKeyring);
 
         verifyUsersNotUpdated(ernie, theCount);
+
+        verifyKeyAddedToSchedulerCache();
     }
 
     @Test
@@ -302,6 +310,7 @@ public class LegacyKeyringImpl_AddTest extends BaseLegacyKeyringTest {
         verifyKeyRemovedFromUser(theCount, theCountKeyring);
         verifyKeyNotRemovedFromUser(bert, bertKeyring);
         verifyKeyNotRemovedFromUser(ernie, ernieKeyring);
+        verifyKeyAddedToSchedulerCache();
     }
 
     @Test
@@ -326,5 +335,6 @@ public class LegacyKeyringImpl_AddTest extends BaseLegacyKeyringTest {
 
         verify(permissions, times(1)).getCollectionAccessMapping(collection);
         verify(users, times(1)).list();
+        verifyKeyAddedToSchedulerCache();
     }
 }

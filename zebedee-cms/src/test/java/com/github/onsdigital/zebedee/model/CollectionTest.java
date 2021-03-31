@@ -1,5 +1,6 @@
 package com.github.onsdigital.zebedee.model;
 
+import com.github.davidcarboni.cryptolite.Keys;
 import com.github.davidcarboni.cryptolite.Random;
 import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.Zebedee;
@@ -33,7 +34,9 @@ import org.joda.time.DateTime;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.springframework.test.util.ReflectionTestUtils;
 
+import javax.crypto.SecretKey;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -54,8 +57,11 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.when;
 
 public class CollectionTest extends ZebedeeTestBaseFixture {
 
@@ -117,6 +123,8 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         assertEquals(collectionDescription.getName(), createdCollectionDescription.getName());
         assertEquals(collectionDescription.getPublishDate(), createdCollectionDescription.getPublishDate());
         assertEquals(ApprovalStatus.NOT_STARTED, createdCollectionDescription.approvalStatus);
+
+        verifyKeyAddedToCollectionKeyring();
     }
 
     @Test
@@ -133,6 +141,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         // When the rename function is called.
 
         Collection.create(collectionDescription, zebedee, publisherSession);
+        verifyKeyAddedToCollectionKeyring();
 
         Collection.rename(collectionDescription, newName, zebedee);
 
@@ -265,6 +274,9 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         CollectionDescription updatedDescription = new CollectionDescription(newName);
         updatedDescription.setType(CollectionType.scheduled);
         updatedDescription.setPublishDate(new DateTime(collectionDescription.getPublishDate()).plusHours(1).toDate());
+
+        setUpKeyringMocks();
+
         Collection.update(collection, updatedDescription, zebedee, new DummyScheduler(), publisherSession);
 
         // Then the properties of the description passed to update have been updated.
@@ -1236,8 +1248,14 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
 
     @Test
     public void createCollectionShouldAssociateWithReleaseIfReleaseUriIsPresent() throws Exception {
-
         // Given an existing release page
+        ReflectionTestUtils.setField(zebedee, "permissionsService", permissionsService);
+
+        when(permissionsService.canEdit(any(Session.class), any(CollectionDescription.class)))
+                .thenReturn(true);
+
+        setUpKeyringMocks();
+
         String uri = String.format("/releases/%s", Random.id());
         Release release = createRelease(uri, new DateTime().plusWeeks(4).toDate());
 
@@ -1273,7 +1291,6 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
 
     @Test(expected = ConflictException.class)
     public void createCollectionShouldThrowExceptionIfReleaseIsInAnotherCollection() throws Exception {
-
         // Given an existing release page which is associated with an existing collection
         String uri = String.format("/releases/%s", Random.id());
         Release release = createRelease(uri, new DateTime().plusWeeks(4).toDate());
@@ -1281,8 +1298,14 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         collectionDescription.setReleaseUri(release.getUri().toString());
         collectionDescription.setType(CollectionType.scheduled);
 
-        Collection.create(collectionDescription, zebedee, publisherSession);
+        ReflectionTestUtils.setField(zebedee, "permissionsService", permissionsService);
 
+        when(permissionsService.canEdit(eq(publisherSession), any(CollectionDescription.class)))
+                .thenReturn(true);
+
+        setUpKeyringMocks();
+
+        Collection.create(collectionDescription, zebedee, publisherSession);
 
         // When a new collection is created with the release uri given
         collectionDescription = new CollectionDescription(Random.id());
@@ -1400,12 +1423,14 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
     }
 
     @Test
-    public void moveContentShouldRenameInprogressFile() throws IOException, ZebedeeException {
+    public void moveContentShouldRenameInprogressFile() throws Exception {
 
         // Given the content already exists:
         String uri = "/economy/inflationandpriceindices/timeseries/a9er.html";
         String toUri = "/economy/inflationandpriceindices/timeseries/a9errenamed.html";
         builder.createInProgressFile(uri);
+
+        setUpKeyringMocks();
 
         // When we move content
         boolean edited = collection.moveContent(publisherSession, uri, toUri);
@@ -1421,12 +1446,14 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
     }
 
     @Test
-    public void moveContentShouldRenameCompletedFiles() throws IOException, ZebedeeException {
+    public void moveContentShouldRenameCompletedFiles() throws Exception {
 
         // Given the content already exists:
         String uri = "/economy/inflationandpriceindices/timeseries/a9er.html";
         String toUri = "/economy/inflationandpriceindices/timeseries/a9errenamed.html";
         builder.createCompleteFile(uri);
+
+        setUpKeyringMocks();
 
         // When we move content
         boolean edited = collection.moveContent(publisherSession, uri, toUri);
@@ -1442,13 +1469,15 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
     }
 
     @Test
-    public void moveContentShouldOverwriteExistingFiles() throws IOException, ZebedeeException {
+    public void moveContentShouldOverwriteExistingFiles() throws Exception {
 
         // Given some existing content in progress.
         String uri = "/economy/inflationandpriceindices/timeseries/a9er.html";
         String toUri = "/economy/inflationandpriceindices/timeseries/a9errenamed.html";
         builder.createInProgressFile(uri);
         builder.createInProgressFile(toUri);
+
+        setUpKeyringMocks();
 
         // When we move content to a URI where some content already exists.
         boolean edited = collection.moveContent(publisherSession, uri, toUri);
@@ -1757,5 +1786,14 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         }
 
         return new Collection(destination.resolve(filename), null);
+    }
+
+    private void setUpKeyringMocks() throws Exception {
+        SecretKey key = Keys.newSecretKey();
+        when(encryptionKeyFactory.newCollectionKey())
+                .thenReturn(key);
+
+        when(collectionKeyring.get(any(), any()))
+                .thenReturn(key);
     }
 }

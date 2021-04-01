@@ -242,6 +242,11 @@ public class LegacyKeyringImpl implements Keyring {
             cachedKeyring.put(collection.getDescription().getId(), key);
         }
 
+        if (user.keyring().get(collection.getId()) != null) {
+            // they already have the key in their keyring - so do nothing
+            return;
+        }
+
         try {
             users.addKeyToKeyring(user.getEmail(), collection.getDescription().getId(), key);
         } catch (IOException ex) {

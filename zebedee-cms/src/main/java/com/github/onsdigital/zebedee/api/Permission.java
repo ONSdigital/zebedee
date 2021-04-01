@@ -3,11 +3,14 @@ package com.github.onsdigital.zebedee.api;
 import com.github.davidcarboni.restolino.framework.Api;
 import com.github.onsdigital.zebedee.audit.Audit;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
+import com.github.onsdigital.zebedee.exceptions.InternalServerError;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.PermissionDefinition;
+import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.session.model.Session;
+import com.github.onsdigital.zebedee.session.service.Sessions;
 import org.apache.commons.lang3.BooleanUtils;
 
 import javax.servlet.http.HttpServletRequest;
@@ -21,6 +24,19 @@ import java.io.IOException;
  */
 @Api
 public class Permission {
+
+    private Sessions sessionsService;
+    private PermissionsService permissionsService;
+
+    public Permission() {
+        this.sessionsService = Root.zebedee.getSessions();
+        this.permissionsService = Root.zebedee.getPermissionsService();
+    }
+
+    Permission(final Sessions sessionsService, PermissionsService permissionsService) {
+        this.sessionsService = sessionsService;
+        this.permissionsService = permissionsService;
+    }
 
     /**
      * Grants the specified permissions.
@@ -41,35 +57,19 @@ public class Permission {
     public String grantPermission(HttpServletRequest request, HttpServletResponse response, PermissionDefinition permissionDefinition)
             throws IOException, ZebedeeException {
 
-        Session session = Root.zebedee.getSessions().get(request);
+        Session session = getSession(request);
 
-        // Administrator
-        if (BooleanUtils.isTrue(permissionDefinition.isAdmin())) {
-            Root.zebedee.getPermissionsService().addAdministrator(permissionDefinition.getEmail(), session);
-            // Admins must be publishers so update the permissions accordingly
-            permissionDefinition.isEditor(true);
-            Audit.Event.ADMIN_PERMISSION_ADDED
-                    .parameters()
-                    .host(request)
-                    .actionedByEffecting(session.getEmail(), permissionDefinition.getEmail())
-                    .log();
-        } else if (BooleanUtils.isFalse(permissionDefinition.isAdmin())) {
-            Root.zebedee.getPermissionsService().removeAdministrator(permissionDefinition.getEmail(), session);
-            Audit.Event.ADMIN_PERMISSION_REMOVED
-                    .parameters()
-                    .host(request)
-                    .actionedByEffecting(session.getEmail(), permissionDefinition.getEmail())
-                    .log();
+        // Assign / remove admin permissions
+        if (permissionDefinition.isAdmin()) {
+            assignAdminPermissionsToUser(request, permissionDefinition, session);
+            // TODO Assign keys to to new user (this was previously done inside permissions service).
+        } else {
+            removeAdminPermissionsFromUser(request, permissionDefinition, session);
         }
 
         // Digital publishing
         if (BooleanUtils.isTrue(permissionDefinition.isEditor())) {
-            Root.zebedee.getPermissionsService().addEditor(permissionDefinition.getEmail(), session);
-            Audit.Event.PUBLISHER_PERMISSION_ADDED
-                    .parameters()
-                    .host(request)
-                    .actionedByEffecting(session.getEmail(), permissionDefinition.getEmail())
-                    .log();
+            addEditorPermissionToUser(request, permissionDefinition, session);
         } else if (BooleanUtils.isFalse(permissionDefinition.isEditor())) {
             Root.zebedee.getPermissionsService().removeEditor(permissionDefinition.getEmail(), session);
             Audit.Event.PUBLISHER_PERMISSION_REMOVED
@@ -101,6 +101,59 @@ public class Permission {
         PermissionDefinition permissionDefinition = Root.zebedee.getPermissionsService().userPermissions(email, session);
 
         return permissionDefinition;
+    }
+
+    private void assignAdminPermissionsToUser(HttpServletRequest request, PermissionDefinition permissionDefinition,
+                                              Session session)
+            throws IOException, UnauthorizedException {
+        permissionsService.addAdministrator(permissionDefinition.getEmail(), session);
+
+        // Admins must be publishers so update the permissions accordingly
+        permissionDefinition.isEditor(true);
+        Audit.Event.ADMIN_PERMISSION_ADDED
+                .parameters()
+                .host(request)
+                .actionedByEffecting(session.getEmail(), permissionDefinition.getEmail())
+                .log();
+    }
+
+    private void removeAdminPermissionsFromUser(HttpServletRequest request, PermissionDefinition permissionDefinition,
+                                                Session session)
+            throws IOException, UnauthorizedException {
+        permissionsService.removeAdministrator(permissionDefinition.getEmail(), session);
+
+        Audit.Event.ADMIN_PERMISSION_REMOVED
+                .parameters()
+                .host(request)
+                .actionedByEffecting(session.getEmail(), permissionDefinition.getEmail())
+                .log();
+    }
+
+    private void addEditorPermissionToUser(HttpServletRequest request, PermissionDefinition permissionDefinition,
+                                           Session session)
+            throws IOException, UnauthorizedException, BadRequestException, NotFoundException {
+        permissionsService.addEditor(permissionDefinition.getEmail(), session);
+
+        Audit.Event.PUBLISHER_PERMISSION_ADDED
+                .parameters()
+                .host(request)
+                .actionedByEffecting(session.getEmail(), permissionDefinition.getEmail())
+                .log();
+    }
+
+    private Session getSession(HttpServletRequest request) throws InternalServerError {
+        Session session = null;
+        try {
+            session = sessionsService.get(request);
+        } catch (IOException ex) {
+            throw new InternalServerError("error getting user session", ex);
+        }
+
+        if (session == null) {
+            throw new InternalServerError("error expected user session but was null");
+        }
+
+        return session;
     }
 
 }

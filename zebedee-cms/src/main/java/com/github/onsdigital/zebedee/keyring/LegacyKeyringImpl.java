@@ -46,6 +46,9 @@ public class LegacyKeyringImpl implements Keyring {
     static final String UNLOCK_KEYRING_ERR = "error unlocking user keyring";
     static final String GET_KEY_RECIPIENTS_ERR = "error getting recipients for collection key";
     static final String LIST_USERS_ERR = "error listing all users";
+    static final String CACHE_KEYRING_NULL_ERR = "expected cached keyring but was not found";
+    static final String KEYRING_LOCKED_ERR = "cached has not been unlocked";
+    static final String SAVE_USER_KEYRING_ERR = "error saving changes to user keyring";
 
     private Sessions sessions;
     private UsersService users;
@@ -306,6 +309,35 @@ public class LegacyKeyringImpl implements Keyring {
         }
     }
 
+    @Override
+    public void populate(User src, User target, Set<String> collectionIDs) throws KeyringException {
+        validateUser(src);
+
+        com.github.onsdigital.zebedee.json.Keyring srcKeyring = getCachedUserKeyring(src);
+        if (srcKeyring == null) {
+            throw new KeyringException(CACHE_KEYRING_NULL_ERR);
+        }
+
+        if (!srcKeyring.isUnlocked()) {
+            throw new KeyringException(KEYRING_LOCKED_ERR);
+        }
+
+        validateUser(target);
+
+        if (collectionIDs == null || collectionIDs.isEmpty()) {
+            return;
+        }
+
+        for (String id : collectionIDs) {
+            SecretKey key = srcKeyring.get(id);
+            if (key != null) {
+                target.keyring().put(id, key);
+            }
+        }
+
+        saveKeyring(target);
+    }
+
     private void validateUser(User user) throws KeyringException {
         if (user == null) {
             throw new KeyringException(USER_NULL_ERR);
@@ -359,6 +391,14 @@ public class LegacyKeyringImpl implements Keyring {
     private void validatePassword(String password) throws KeyringException {
         if (StringUtils.isEmpty(password)) {
             throw new KeyringException(PASSWORD_EMPTY_ERR);
+        }
+    }
+
+    private void saveKeyring(User user) throws KeyringException {
+        try {
+            users.updateKeyring(user);
+        } catch (IOException ex) {
+            throw new KeyringException(SAVE_USER_KEYRING_ERR, ex);
         }
     }
 }

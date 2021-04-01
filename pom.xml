@@ -26,6 +26,7 @@
     </properties>
 
     <repositories>
+
         <repository>
             <id>splunk-artifactory</id>
             <name>Splunk Releases</name>
@@ -59,12 +60,12 @@
         <dependency>
             <groupId>org.apache.xmlgraphics</groupId>
             <artifactId>batik-transcoder</artifactId>
-            <version>1.12</version>
+            <version>1.14</version>
         </dependency>
         <dependency>
             <groupId>org.apache.xmlgraphics</groupId>
             <artifactId>batik-codec</artifactId>
-            <version>1.12</version>
+            <version>1.14</version>
         </dependency>
         <dependency>
             <groupId>org.apache.xmlgraphics</groupId>
@@ -121,7 +122,7 @@
             <dependency>
                 <groupId>com.github.onsdigital</groupId>
                 <artifactId>restolino</artifactId>
-                <version>v0.2.1</version>
+                <version>v0.2.2</version>
             </dependency>
 
             <!-- Cryptography -->
@@ -205,11 +206,6 @@
                                     <version>3.10.5.Final</version>
                                 </exlude>
                                 <exlude>
-                                    <groupId>org.apache.xmlgraphics</groupId>
-                                    <artifactId>batik-transcoder</artifactId>
-                                    <version>1.12</version>
-                                </exlude>
-                                <exlude>
                                     <groupId>org.elasticsearch</groupId>
                                     <artifactId>elasticsearch</artifactId>
                                     <version>2.1.1</version>
@@ -225,24 +221,9 @@
                                     <version>1.13</version>
                                 </exlude>
                                 <exlude>
-                                    <groupId>org.eclipse.jetty</groupId>
-                                    <artifactId>jetty-http</artifactId>
-                                    <version>9.4.28.v20200408</version>
-                                </exlude>
-                                <exlude>
-                                    <groupId>org.eclipse.jetty</groupId>
-                                    <artifactId>jetty-server</artifactId>
-                                    <version>9.4.28.v20200408</version>
-                                </exlude>
-                                <exlude>
                                     <groupId>org.apache.poi</groupId>
                                     <artifactId>poi</artifactId>
                                     <version>3.13</version>
-                                </exlude>
-                                <exlude>
-                                    <groupId>org.apache.xmlgraphics</groupId>
-                                    <artifactId>batik-dom</artifactId>
-                                    <version>1.12</version>
                                 </exlude>
                                 <!-- End Trello #1717 -->
                                 <exlude>

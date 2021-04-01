@@ -7,6 +7,7 @@ import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.model.Collections;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.session.service.Sessions;
+import org.apache.http.HttpStatus;
 import org.junit.Test;
 import org.mockito.Mock;
 
@@ -21,6 +22,7 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 public class CollectionTest extends ZebedeeAPIBaseTestCase {
@@ -58,6 +60,12 @@ public class CollectionTest extends ZebedeeAPIBaseTestCase {
 
         when(permissionsService.canView(TEST_EMAIL, description))
                 .thenReturn(true);
+
+        when(permissionsService.canEdit(TEST_EMAIL))
+                .thenReturn(true);
+
+        when(description.getName())
+                .thenReturn("test");
 
         this.endpoint = new Collection(sessions, permissionsService, collections);
     }
@@ -163,5 +171,79 @@ public class CollectionTest extends ZebedeeAPIBaseTestCase {
         verify(sessions, times(1)).get(mockRequest);
         verify(collections, times(1)).getCollection(COLLECTION_ID);
         verify(permissionsService, times(1)).canView(TEST_EMAIL, description);
+    }
+
+    @Test
+    public void testPost_sessionServiceError_shouldThrowException() throws Exception {
+        when(sessions.get(mockRequest))
+                .thenThrow(IOException.class);
+
+        assertThrows(IOException.class, () -> endpoint.create(mockRequest, mockResponse, description));
+
+        verify(sessions, times(1)).get(mockRequest);
+    }
+
+    @Test
+    public void testPost_sessionServiceReturnsNull_shouldThrowException() throws Exception {
+        when(sessions.get(mockRequest))
+                .thenReturn(null);
+
+        UnauthorizedException ex = assertThrows(UnauthorizedException.class,
+                () -> endpoint.create(mockRequest, mockResponse, description));
+
+        assertThat(ex.getMessage(), equalTo("You are not authorised to create collections."));
+        verify(sessions, times(1)).get(mockRequest);
+    }
+
+    @Test
+    public void testPost_collectionNameNull_shouldReturnBadRequest() throws Exception {
+        when(description.getName())
+                .thenReturn(null);
+
+        endpoint.create(mockRequest, mockResponse, description);
+
+        verify(sessions, times(1)).get(mockRequest);
+        verify(mockResponse, times(1)).setStatus(HttpStatus.SC_BAD_REQUEST);
+        verifyNoMoreInteractions(sessions, permissionsService, collections);
+    }
+
+    @Test
+    public void testPost_collectionNameEmpty_shouldReturnBadRequest() throws Exception {
+        when(description.getName())
+                .thenReturn("");
+
+        endpoint.create(mockRequest, mockResponse, description);
+
+        verify(sessions, times(1)).get(mockRequest);
+        verify(mockResponse, times(1)).setStatus(HttpStatus.SC_BAD_REQUEST);
+        verifyNoMoreInteractions(sessions, permissionsService, collections);
+    }
+
+    @Test
+    public void testPost_permissionsCheckError_shouldThrowException() throws Exception {
+        when(permissionsService.canEdit(TEST_EMAIL))
+                .thenThrow(IOException.class);
+
+        UnauthorizedException ex = assertThrows(UnauthorizedException.class,
+                () -> endpoint.create(mockRequest, mockResponse, description));
+
+        assertThat(ex.getMessage(), equalTo("You are not authorised to edit collections."));
+        verify(sessions, times(1)).get(mockRequest);
+        verify(permissionsService, times(1)).canEdit(TEST_EMAIL);
+        verifyNoMoreInteractions(sessions, permissionsService, collections);
+    }
+
+    @Test
+    public void testPost_permissionDenied_shouldThrowException() throws Exception {
+        when(permissionsService.canEdit(TEST_EMAIL))
+                .thenReturn(false);
+
+        UnauthorizedException ex = assertThrows(UnauthorizedException.class,
+                () -> endpoint.create(mockRequest, mockResponse, description));
+
+        assertThat(ex.getMessage(), equalTo("You are not authorised to edit collections."));
+        verify(sessions, times(1)).get(mockRequest);
+        verify(permissionsService, times(1)).canEdit(TEST_EMAIL);
+        verifyNoMoreInteractions(sessions, permissionsService, collections);
     }
 }

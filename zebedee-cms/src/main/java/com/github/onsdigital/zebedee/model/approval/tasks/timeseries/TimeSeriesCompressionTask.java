@@ -70,9 +70,9 @@ public class TimeSeriesCompressionTask {
     private List<TimeseriesCompressionResult> createZipFiles(Collection collection, CollectionReader collectionReader, CollectionWriter collectionWriter, int attempt, List<TimeseriesCompressionResult> failedZipFiles) throws ZebedeeException, IOException {
         List<TimeseriesCompressionResult> zipFiles;
         if (attempt == 1) { // on the first attempt we check all the files.
-            zipFiles = timeSeriesCompressor.compressFiles(collectionReader.getReviewed(), collectionWriter.getReviewed(), collection.getDescription().isEncrypted);
+            zipFiles = timeSeriesCompressor.compressFiles(collectionReader.getReviewed(), collectionWriter.getReviewed(), collection.getDescription().isEncrypted());
         } else { // on additional attempts we check only the failed files.
-            zipFiles = timeSeriesCompressor.compressFiles(collectionReader.getReviewed(), collectionWriter.getReviewed(), collection.getDescription().isEncrypted, failedZipFiles);
+            zipFiles = timeSeriesCompressor.compressFiles(collectionReader.getReviewed(), collectionWriter.getReviewed(), collection.getDescription().isEncrypted(), failedZipFiles);
         }
         return zipFiles;
     }

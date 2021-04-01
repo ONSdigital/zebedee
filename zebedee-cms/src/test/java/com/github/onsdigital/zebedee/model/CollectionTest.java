@@ -122,7 +122,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         assertNotNull(createdCollectionDescription);
         assertEquals(collectionDescription.getName(), createdCollectionDescription.getName());
         assertEquals(collectionDescription.getPublishDate(), createdCollectionDescription.getPublishDate());
-        assertEquals(ApprovalStatus.NOT_STARTED, createdCollectionDescription.approvalStatus);
+        assertEquals(ApprovalStatus.NOT_STARTED, createdCollectionDescription.getApprovalStatus());
 
         verifyKeyAddedToCollectionKeyring();
     }
@@ -300,7 +300,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         assertEquals(newName, updatedCollectionDescription.getName());
         assertEquals(updatedDescription.getType(), updatedCollectionDescription.getType());
         assertEquals(updatedDescription.getPublishDate(), updatedCollectionDescription.getPublishDate());
-        assertTrue(updatedCollectionDescription.events.hasEventForType(EventType.CREATED));
+        assertTrue(updatedCollectionDescription.getEvents().hasEventForType(EventType.CREATED));
     }
 
     @Test
@@ -338,7 +338,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         assertEquals(collectionDescription.getId(), updatedCollectionDescription.getId());
         assertEquals(newName, updatedCollectionDescription.getName());
         assertEquals(updatedDescription.getType(), updatedCollectionDescription.getType());
-        assertTrue(updatedCollectionDescription.events.hasEventForType(EventType.CREATED));
+        assertTrue(updatedCollectionDescription.getEvents().hasEventForType(EventType.CREATED));
     }
 
     @Test
@@ -418,7 +418,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         assertTrue(Files.exists(inProgress.resolve(uri.substring(1))));
 
         // check an event has been created for the content being created.
-        assertTrue(collection.description.eventsByUri.get(uri).hasEventForType(EventType.CREATED));
+        assertTrue(collection.description.getEventsByUri().get(uri).hasEventForType(EventType.CREATED));
     }
 
     @Test
@@ -507,7 +507,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         assertFalse(Files.exists(inProgress.resolve(jsonFile)));
         assertFalse(Files.exists(inProgress.resolve(csvFile)));
         // check an event has been created for the content being deleted.
-        collection.description.eventsByUri.get("/" + jsonFile).hasEventForType(EventType.DELETED);
+        collection.description.getEventsByUri().get("/" + jsonFile).hasEventForType(EventType.DELETED);
     }
 
     @Test
@@ -529,7 +529,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         assertTrue(result);
         assertFalse(Files.exists(root.resolve(jsonFile)));
         assertFalse(Files.exists(root.resolve(csvFile)));
-        collection.description.eventsByUri.get("/" + jsonFile).hasEventForType(EventType.DELETED);
+        collection.description.getEventsByUri().get("/" + jsonFile).hasEventForType(EventType.DELETED);
     }
 
     @Test
@@ -551,7 +551,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         assertTrue(result);
         assertFalse(Files.exists(root.resolve(jsonFile)));
         assertFalse(Files.exists(root.resolve(csvFile)));
-        collection.description.eventsByUri.get("/" + jsonFile).hasEventForType(EventType.DELETED);
+        collection.description.getEventsByUri().get("/" + jsonFile).hasEventForType(EventType.DELETED);
     }
 
     @Test
@@ -638,7 +638,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         assertTrue(Files.exists(content));
 
         // check an event has been created for the content being created.
-        collection.description.eventsByUri.get(uri).hasEventForType(EventType.EDITED);
+        collection.getDescription().getEventsByUri().get(uri).hasEventForType(EventType.EDITED);
     }
 
     @Test
@@ -753,7 +753,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         assertFalse(Files.exists(edited.resolve(uri.substring(1))));
 
         // check an event has been created for the content being created.
-        collection.description.eventsByUri.get(uri).hasEventForType(EventType.REVIEWED);
+        collection.description.getEventsByUri().get(uri).hasEventForType(EventType.REVIEWED);
     }
 
     @Test(expected = UnauthorizedException.class)
@@ -822,7 +822,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         assertFalse(Files.exists(edited.resolve(uri.substring(1))));
 
         // check an event has been created for the content being created.
-        collection.description.eventsByUri.get(uri).hasEventForType(EventType.COMPLETED);
+        collection.description.getEventsByUri().get(uri).hasEventForType(EventType.COMPLETED);
     }
 
     @Test
@@ -844,7 +844,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         assertTrue(Files.exists(completedPath.resolve(uri.substring(1))));
 
         // check an event has been created for the content being created.
-        collection.description.eventsByUri.get(uri).hasEventForType(EventType.COMPLETED);
+        collection.description.getEventsByUri().get(uri).hasEventForType(EventType.COMPLETED);
     }
 
     @Test
@@ -1442,7 +1442,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         assertTrue(Files.exists(inProgress.resolve(toUri.substring(1))));
 
         // check an event has been created for the content being created.
-        assertTrue(collection.description.eventsByUri.get(uri).hasEventForType(EventType.MOVED));
+        assertTrue(collection.description.getEventsByUri().get(uri).hasEventForType(EventType.MOVED));
     }
 
     @Test
@@ -1465,7 +1465,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         assertTrue(Files.exists(complete.resolve(toUri.substring(1))));
 
         // check an event has been created for the content being created.
-        assertTrue(collection.description.eventsByUri.get(uri).hasEventForType(EventType.MOVED));
+        assertTrue(collection.description.getEventsByUri().get(uri).hasEventForType(EventType.MOVED));
     }
 
     @Test
@@ -1489,7 +1489,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         assertTrue(Files.exists(inProgress.resolve(toUri.substring(1))));
 
         // check an event has been created for the content being created.
-        assertTrue(collection.description.eventsByUri.get(uri).hasEventForType(EventType.MOVED));
+        assertTrue(collection.description.getEventsByUri().get(uri).hasEventForType(EventType.MOVED));
     }
 
     @Test
@@ -1772,7 +1772,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
 
         CollectionDescription collection = new CollectionDescription(collectionName);
         collection.setType(CollectionType.manual);
-        collection.isEncrypted = false;
+        collection.setEncrypted(false);
         collection.setName(collectionName);
 
         String filename = PathUtils.toFilename(collectionName);

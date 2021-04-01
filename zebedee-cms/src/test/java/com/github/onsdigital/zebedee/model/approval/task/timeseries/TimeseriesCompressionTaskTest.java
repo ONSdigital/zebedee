@@ -42,7 +42,7 @@ public class TimeseriesCompressionTaskTest {
 
         // mock the properties required of collection.getDescription()
         CollectionDescription collectionDescription = new CollectionDescription();
-        collectionDescription.isEncrypted = isEncrypted;
+        collectionDescription.setEncrypted(isEncrypted);
         collectionDescription.setName("test collection");
         when(collection.getDescription()).thenReturn(collectionDescription);
 

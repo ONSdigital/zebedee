@@ -91,8 +91,9 @@ public class SlackNotification {
             attch.getFields().add(new PostMessageField("Publish date", slackFieldFormatVague.format(collection.getDescription().getPublishDate()), true));
         }
 
-        if (collection.getDescription().approvalStatus != null) {
-            attch.getFields().add(new PostMessageField("Approval status", collection.getDescription().approvalStatus.toString(), true));
+        if (collection.getDescription().getApprovalStatus() != null) {
+            attch.getFields().add(new PostMessageField("Approval status", collection.getDescription().getApprovalStatus().toString(),
+                    true));
         }
 
         Map<String, String> transactionIdMap = collection.getDescription().getPublishTransactionIds();

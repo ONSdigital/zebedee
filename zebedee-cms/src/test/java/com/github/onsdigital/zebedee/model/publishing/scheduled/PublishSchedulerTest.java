@@ -1,20 +1,14 @@
 package com.github.onsdigital.zebedee.model.publishing.scheduled;
 
-import com.github.onsdigital.zebedee.Builder;
-import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.ZebedeeTestBaseFixture;
-import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.ApprovalStatus;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.CollectionType;
-import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.model.Collection;
+import com.github.onsdigital.zebedee.session.model.Session;
 import org.joda.time.DateTime;
-import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -38,7 +32,7 @@ public class PublishSchedulerTest extends ZebedeeTestBaseFixture {
         // Given a scheduled collection
         CollectionDescription description = new CollectionDescription("collectionName");
         description.setType(CollectionType.scheduled);
-        description.approvalStatus = ApprovalStatus.COMPLETE;
+        description.setApprovalStatus(ApprovalStatus.COMPLETE);
         description.setPublishDate(DateTime.now().plusSeconds(2000).toDate());
         Collection collection = Collection.create(description, zebedee, session);
         Date startDate = description.getPublishDate();
@@ -68,7 +62,7 @@ public class PublishSchedulerTest extends ZebedeeTestBaseFixture {
         // Given a scheduled collection
         CollectionDescription description = new CollectionDescription("collectionName");
         description.setType(CollectionType.scheduled);
-        description.approvalStatus = ApprovalStatus.COMPLETE;
+        description.setApprovalStatus(ApprovalStatus.COMPLETE);
         description.setPublishDate(DateTime.now().plusSeconds(2000).toDate());
         Collection collection = Collection.create(description, zebedee, session);
         Date startDate = description.getPublishDate();
@@ -92,7 +86,7 @@ public class PublishSchedulerTest extends ZebedeeTestBaseFixture {
         // Given a scheduled collection that has been deleted.
         CollectionDescription description = new CollectionDescription("collectionName");
         description.setType(CollectionType.scheduled);
-        description.approvalStatus = ApprovalStatus.COMPLETE;
+        description.setApprovalStatus(ApprovalStatus.COMPLETE);
         description.setPublishDate(DateTime.now().plusSeconds(2000).toDate());
         Collection collection = Collection.create(description, zebedee, session);
         Date startDate = description.getPublishDate();
@@ -117,7 +111,7 @@ public class PublishSchedulerTest extends ZebedeeTestBaseFixture {
         // Given a scheduled collection
         CollectionDescription description = new CollectionDescription("collectionName");
         description.setType(CollectionType.scheduled);
-        description.approvalStatus = ApprovalStatus.COMPLETE;
+        description.setApprovalStatus(ApprovalStatus.COMPLETE);
         description.setPublishDate(DateTime.now().plusSeconds(2000).toDate());
         Collection collection = Collection.create(description, zebedee, session);
 
@@ -141,7 +135,7 @@ public class PublishSchedulerTest extends ZebedeeTestBaseFixture {
         // Given two scheduled collections
         CollectionDescription description = new CollectionDescription("collectionName");
         description.setType(CollectionType.scheduled);
-        description.approvalStatus = ApprovalStatus.COMPLETE;
+        description.setApprovalStatus(ApprovalStatus.COMPLETE);
         description.setPublishDate(DateTime.now().plusSeconds(2000).toDate());
         Collection collection = Collection.create(description, zebedee, session);
         Date startDate = description.getPublishDate();
@@ -150,7 +144,7 @@ public class PublishSchedulerTest extends ZebedeeTestBaseFixture {
 
         CollectionDescription description2 = new CollectionDescription("collection2");
         description2.setType(CollectionType.scheduled);
-        description.approvalStatus = ApprovalStatus.COMPLETE;
+        description.setApprovalStatus(ApprovalStatus.COMPLETE);
         description2.setPublishDate(DateTime.now().plusSeconds(3000).toDate());
         Collection collection2 = Collection.create(description2, zebedee, session);
         Date startDate2 = description2.getPublishDate();

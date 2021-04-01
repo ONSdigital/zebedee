@@ -69,7 +69,7 @@ public class ContentIOUtilsTest extends ZebedeeTestBaseFixture {
 
         CollectionDescription collectionDescription = new CollectionDescription();
         collectionDescription.setName("ContentIOUtils");
-        collectionDescription.isEncrypted = true;
+        collectionDescription.setEncrypted(true);
         collectionDescription.setType(CollectionType.scheduled);
         collectionDescription.setPublishDate(new Date());
         collection = Collection.create(collectionDescription, zebedee, publisher);

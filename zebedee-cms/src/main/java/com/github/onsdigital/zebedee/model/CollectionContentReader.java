@@ -30,7 +30,7 @@ public class CollectionContentReader extends FileSystemContentReader {
 
     @Override
     protected long calculateContentLength(Path path) throws IOException {
-        if (collection.description.isEncrypted) {
+        if (collection.getDescription().isEncrypted()) {
             try (InputStream inputStream = EncryptionUtils.encryptionInputStream(path, key);
                  OutputStream outputStream = new ByteArrayOutputStream()) {
                 return IOUtils.copy(inputStream, outputStream);
@@ -52,7 +52,7 @@ public class CollectionContentReader extends FileSystemContentReader {
 
     private InputStream getInputStream(Path path) throws IOException {
         InputStream inputStream;
-        if (collection.description.isEncrypted) {
+        if (collection.getDescription().isEncrypted()) {
             inputStream = EncryptionUtils.encryptionInputStream(path, key);
         } else {
             inputStream = Files.newInputStream(path);

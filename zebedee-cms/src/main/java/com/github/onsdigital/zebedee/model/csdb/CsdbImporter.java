@@ -201,7 +201,7 @@ public class CsdbImporter {
                         .data("CSDBIdentifier", csdbIdentifier)
                         .log("Found collection found for CSDB identifier");
 
-                if (collection.description.approvalStatus == ApprovalStatus.COMPLETE) {
+                if (collection.getDescription().getApprovalStatus() == ApprovalStatus.COMPLETE) {
                     preProcessCollection(collection);
                 } else {
                     info().data("collectionName", collection.getDescription().getName())

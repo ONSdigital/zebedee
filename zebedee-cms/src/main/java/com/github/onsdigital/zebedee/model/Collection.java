@@ -193,8 +193,8 @@ public class Collection {
     public static Collection create(CollectionDescription collectionDescription, Zebedee zebedee, Session session)
             throws IOException, ZebedeeException {
 
-        collectionDescription.isEncrypted = true; // force encryption on new collections.
-        collectionDescription.approvalStatus = ApprovalStatus.NOT_STARTED;
+        collectionDescription.setEncrypted(true); // force encryption on new collections.
+        collectionDescription.setApprovalStatus(ApprovalStatus.NOT_STARTED);
 
         Release release = checkForRelease(collectionDescription, zebedee);
 
@@ -907,11 +907,11 @@ public class Collection {
         if (!StringUtils.startsWith(uri, "/")) {
             uri = "/" + uri;
         }
-        if (this.description.eventsByUri == null) {
+        if (this.description.getEventsByUri() == null) {
             return false;
         }
 
-        Events events = this.description.eventsByUri.get(uri);
+        Events events = this.description.getEventsByUri().get(uri);
         if (events == null) {
             return false;
         }
@@ -924,11 +924,11 @@ public class Collection {
         if (!StringUtils.startsWith(uri, "/")) {
             uri = "/" + uri;
         }
-        if (this.description.eventsByUri == null) {
+        if (this.description.getEventsByUri() == null) {
             return false;
         }
 
-        Events events = this.description.eventsByUri.get(uri);
+        Events events = this.description.getEventsByUri().get(uri);
         if (events == null) {
             return false;
         }
@@ -999,13 +999,15 @@ public class Collection {
             uri = "/" + uri;
         }
 
-        if (this.description.eventsByUri == null)
-            this.description.eventsByUri = new HashMap<>();
+        if (this.description.getEventsByUri() == null) {
+            this.description.setEventsByUri(new HashMap<>());
+        }
 
-        if (!this.description.eventsByUri.containsKey(uri))
-            this.description.eventsByUri.put(uri, new Events());
+        if (!this.description.getEventsByUri().containsKey(uri)) {
+            this.description.getEventsByUri().put(uri, new Events());
+        }
 
-        this.description.eventsByUri.get(uri).add(event);
+        this.description.getEventsByUri().get(uri).add(event);
     }
 
     /**
@@ -1487,12 +1489,16 @@ public class Collection {
     }
 
     public long getPublishTimeMilliseconds() {
-        if (getDescription().publishStartDate != null && getDescription().publishEndDate != null) {
-            LocalDateTime start = LocalDateTime.ofInstant(getDescription().publishStartDate.toInstant(), ZoneId.systemDefault());
-            LocalDateTime end = LocalDateTime.ofInstant(getDescription().publishEndDate.toInstant(), ZoneId.systemDefault());
+        Date startDate = getDescription().getPublishStartDate();
+        Date endDate = getDescription().getPublishEndDate();
 
+
+        if (startDate != null && endDate != null) {
+            LocalDateTime start = LocalDateTime.ofInstant(startDate.toInstant(), ZoneId.systemDefault());
+            LocalDateTime end = LocalDateTime.ofInstant(endDate.toInstant(), ZoneId.systemDefault());
             return Duration.between(start, end).toMillis();
         }
+
         return 0;
     }
 

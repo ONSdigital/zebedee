@@ -262,7 +262,7 @@ public class PermissionsServiceImpl implements PermissionsService {
      */
     @Override
     public boolean canEdit(Session session, CollectionDescription collectionDescription) throws IOException {
-        if (collectionDescription.isEncrypted) {
+        if (collectionDescription.isEncrypted()) {
             return canEdit(session.getEmail()) && keyringCache.get(session).list().contains
                     (collectionDescription.getId());
         } else {
@@ -280,7 +280,7 @@ public class PermissionsServiceImpl implements PermissionsService {
      */
     @Override
     public boolean canEdit(User user, CollectionDescription collectionDescription) throws IOException {
-        if (collectionDescription.isEncrypted) {
+        if (collectionDescription.isEncrypted()) {
             return canEdit(user.getEmail()) && user.keyring().list().contains(collectionDescription.getId());
         } else {
             return canEdit(user.getEmail());

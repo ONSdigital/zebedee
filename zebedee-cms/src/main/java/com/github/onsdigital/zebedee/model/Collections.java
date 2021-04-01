@@ -453,7 +453,7 @@ public class Collections {
         }
 
         // Check approval status
-        if (collection.description.approvalStatus != ApprovalStatus.COMPLETE) {
+        if (collection.description.getApprovalStatus() != ApprovalStatus.COMPLETE) {
             throw new ConflictException("This collection cannot be published because it is not approved");
         }
 
@@ -1077,6 +1077,17 @@ public class Collections {
         Instant now = Instant.now();
         Instant midnight = now.plus(1, ChronoUnit.DAYS).truncatedTo(ChronoUnit.DAYS);
         return now.until(midnight, MINUTES);
+    }
+
+    public String getCollectionId(HttpServletRequest request) {
+        com.github.davidcarboni.restolino.helpers.Path path = com.github.davidcarboni.restolino.helpers.Path.newInstance(request);
+        List<String> segments = path.segments();
+
+        String collectionId = "";
+        if (segments.size() > 1) {
+            collectionId = segments.get(1);
+        }
+        return collectionId;
     }
 
 }

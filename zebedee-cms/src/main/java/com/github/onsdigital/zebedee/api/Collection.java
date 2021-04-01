@@ -2,14 +2,16 @@ package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
 import com.github.onsdigital.zebedee.audit.Audit;
+import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.ConflictException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.CollectionType;
-import com.github.onsdigital.zebedee.json.Keyring;
+import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.session.model.Session;
+import com.github.onsdigital.zebedee.session.service.Sessions;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.http.HttpStatus;
 
@@ -21,14 +23,39 @@ import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import java.io.IOException;
 
-import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
-import static com.github.onsdigital.logging.v2.event.SimpleEvent.warn;
-import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
+import static com.github.onsdigital.zebedee.logging.CMSLogEvent.error;
+import static com.github.onsdigital.zebedee.logging.CMSLogEvent.info;
+import static com.github.onsdigital.zebedee.logging.CMSLogEvent.warn;
+import static org.apache.commons.lang3.StringUtils.trim;
+
 
 @Api
 public class Collection {
 
     static final String COLLECTION_NAME = "collectionName";
+
+    private Sessions sessionsService;
+    private PermissionsService permissionsService;
+    private com.github.onsdigital.zebedee.model.Collections collections;
+
+    /**
+     * Construct a new instance of the Collection API endpoint.
+     */
+    public Collection() {
+        this.sessionsService = Root.zebedee.getSessions();
+        this.permissionsService = Root.zebedee.getPermissionsService();
+        this.collections = Root.zebedee.getCollections();
+    }
+
+    /**
+     * Constructor for testing.
+     */
+    Collection(final Sessions sessionsService, final PermissionsService permissionsService,
+               final com.github.onsdigital.zebedee.model.Collections collections) {
+        this.sessionsService = sessionsService;
+        this.permissionsService = permissionsService;
+        this.collections = collections;
+    }
 
     /**
      * Retrieves a CollectionDescription object at the endpoint /Collection/[CollectionName]
@@ -45,45 +72,45 @@ public class Collection {
             throws IOException, ZebedeeException {
         info().log("get collection endpoint: request received");
 
-        Session session = Root.zebedee.getSessions().get(request);
+        Session session = sessionsService.get(request);
         if (session == null) {
             info().log("get collection endpoint: request unsuccessful valid session for user was not found.");
             throw new UnauthorizedException("You are not authorised to view collections.");
         }
 
-        com.github.onsdigital.zebedee.model.Collection collection = Collections
-                .getCollection(request);
+        String collectionID = collections.getCollectionId(request);
+        if (StringUtils.isEmpty(collectionID)) {
+            throw new BadRequestException("collection ID required but was null/empty");
+        }
 
-        // Check whether we found the collection:
+        com.github.onsdigital.zebedee.model.Collection collection = collections.getCollection(collectionID);
         if (collection == null) {
             info().log("get collection endpoint: request unsuccessful collection not found");
             throw new NotFoundException("The collection you are trying to get was not found.");
         }
 
-        String collectionId = Collections.getCollectionId(request);
+        requireViewPermission(session.getEmail(), collection.getDescription());
 
-        boolean canView = Root.zebedee.getPermissionsService().canView(session.getEmail(), collection.getDescription());
-        if (!canView) {
-            warn().data("user", session.getEmail()).data("collectionId", collectionId).log("get collection endpoint: request unsuccessful user denied canView permission");
-            throw new UnauthorizedException("You are not authorised to view collections.");
-        }
-
+        // TODO: Question - I am not sure why it's necessary to duplicate the description instead of just returning it?
         // Collate the result:
         CollectionDescription result = new CollectionDescription();
         result.setId(collection.getDescription().getId());
         result.setName(collection.getDescription().getName());
         result.setPublishDate(collection.getDescription().getPublishDate());
-        result.inProgressUris = collection.inProgressUris();
-        result.completeUris = collection.completeUris();
-        result.reviewedUris = collection.reviewedUris();
-        result.eventsByUri = collection.getDescription().eventsByUri;
-        result.setApprovalStatus(collection.getDescription().approvalStatus);
+        result.setInProgressUris(collection.inProgressUris());
+        result.setCompleteUris(collection.completeUris());
+        result.setReviewedUris(collection.reviewedUris());
+        result.setEventsByUri(collection.getDescription().getEventsByUri());
+        result.setApprovalStatus(collection.getDescription().getApprovalStatus());
         result.setType(collection.getDescription().getType());
         result.setTeams(collection.getDescription().getTeams());
-        result.isEncrypted = collection.getDescription().isEncrypted;
+        result.setEncrypted(collection.getDescription().isEncrypted());
         result.setReleaseUri(collection.getDescription().getReleaseUri());
 
-        info().data("user", session.getEmail()).data("collectionId", collectionId).log("get collection endpoint: request compeleted successfully");
+        info().user(session.getEmail())
+                .collectionID(collectionID)
+                .log("get collection endpoint: request compeleted successfully");
+
         return result;
     }
 
@@ -103,12 +130,12 @@ public class Collection {
      * @throws IOException
      */
     @POST
-    public CollectionDescription create(HttpServletRequest request,
-                                        HttpServletResponse response,
-                                        CollectionDescription collectionDescription) throws IOException, ZebedeeException {
+    public CollectionDescription create(HttpServletRequest request, HttpServletResponse response,
+                                        CollectionDescription collectionDescription)
+            throws IOException, ZebedeeException {
         info().log("create collection endpoint: request received");
 
-        Session session = Root.zebedee.getSessions().get(request);
+        Session session = sessionsService.get(request);
         if (session == null) {
             warn().log("create collection endpoint: request unsuccessful no valid session found");
             throw new UnauthorizedException("You are not authorised to create collections.");
@@ -120,35 +147,27 @@ public class Collection {
             return null;
         }
 
-        boolean canEdit = Root.zebedee.getPermissionsService().canEdit(session.getEmail());
-        if (!canEdit) {
-            warn().data("user", session.getEmail()).log("create collection endpoint: request unsuccessful:user denied canEdit permission");
-            throw new UnauthorizedException("You are not authorised to create collections.");
-        }
+        requireEditPermission(session.getEmail());
 
-        info().data("user", session.getEmail()).log("create collection endpoint: user granted canEdit permission");
+        info().user(session.getEmail()).log("create collection endpoint: user granted canEdit permission");
 
-        Keyring keyring = Root.zebedee.getLegacyKeyringCache().get(session);
-        if (keyring == null) {
-            warn().data("user", session.getEmail()).log("create collection endpoint: request unsuccessful Keyring is not initialised");
-            throw new UnauthorizedException("Keyring is not initialised.");
-        }
-
-        collectionDescription.setName(StringUtils.trim(collectionDescription.getName()));
-        if (Root.zebedee.getCollections().list().hasCollection(
-                collectionDescription.getName())) {
-            warn().data("user", session.getEmail()).data(COLLECTION_NAME, collectionDescription.getName())
+        collectionDescription.setName(trim(collectionDescription.getName()));
+        if (collections.list().hasCollection(collectionDescription.getName())) {
+            warn().user(session.getEmail())
+                    .data(COLLECTION_NAME, collectionDescription.getName())
                     .log("create collection endpoint: request unsuccessful a collection already exists with this name");
             throw new ConflictException("Could not create collection. A collection with this name already exists.");
         }
 
-        com.github.onsdigital.zebedee.model.Collection collection = com.github.onsdigital.zebedee.model.Collection.create(
-                collectionDescription, Root.zebedee, session);
+
+        com.github.onsdigital.zebedee.model.Collection collection =
+                com.github.onsdigital.zebedee.model.Collection.create(collectionDescription, Root.zebedee, session);
 
         String collectionId = Collections.getCollectionId(request);
 
         if (collection.getDescription().getType().equals(CollectionType.scheduled)) {
-            info().data("user", session.getEmail()).data("collectionId", collectionId)
+            info().user(session.getEmail())
+                    .collectionID(collectionId)
                     .log("create collection endpoint: adding scheduled collection to publishing queue");
             Root.schedulePublish(collection);
         }
@@ -160,16 +179,17 @@ public class Collection {
                 .actionedBy(session.getEmail())
                 .log();
 
-        info().data("user", session.getEmail()).data("collectionId", collectionId).log("create collection endpoint: request completed successfully");
+        info().user(session.getEmail())
+                .collectionID(collectionId)
+                .log("create collection endpoint: request completed successfully");
+
         return collection.getDescription();
     }
 
     @PUT
-    public CollectionDescription update(
-            HttpServletRequest request,
-            HttpServletResponse response,
-            CollectionDescription collectionDescription
-    ) throws IOException, ZebedeeException {
+    public CollectionDescription update(HttpServletRequest request, HttpServletResponse response,
+                                        CollectionDescription collectionDescription)
+            throws IOException, ZebedeeException {
 
         info().log("update collection endpoint: request received");
 
@@ -181,19 +201,19 @@ public class Collection {
 
         String collectionId = Collections.getCollectionId(request);
 
-        Session session = Root.zebedee.getSessions().get(request);
+        Session session = sessionsService.get(request);
         if (session == null) {
-            warn().data("user", session.getEmail()).data("collectionId", collectionId).log("update collection endpoint: request unsuccessful no valid session found");
+            warn().user(session.getEmail())
+                    .collectionID(collectionId)
+                    .log("update collection endpoint: request unsuccessful no valid session found");
             throw new UnauthorizedException("You are not authorised to update collections.");
         }
 
-        boolean canEdit = Root.zebedee.getPermissionsService().canEdit(session.getEmail());
-        if (!canEdit) {
-            warn().data("user", session.getEmail()).data("collectionId", collectionId).log("update collection endpoint: request unsuccessful user denied canEdit permission");
-            throw new UnauthorizedException("You are not authorised to update collections.");
-        }
+        requireEditPermission(session.getEmail());
 
-        info().data("user", session.getEmail()).data("collectionId", collectionId).log("update collection endpoint: user granted canEdit permission");
+        info().user(session.getEmail())
+                .collectionID(collectionId)
+                .log("update collection endpoint: user granted canEdit permission");
 
         com.github.onsdigital.zebedee.model.Collection updatedCollection = collection.update(
                 collection,
@@ -209,7 +229,9 @@ public class Collection {
                 .actionedBy(session.getEmail())
                 .log();
 
-        info().data("user", session.getEmail()).data("collectionId", collectionId).log("update collection endpoint: request completed successfully");
+        info().user(session.getEmail())
+                .collectionID(collectionId)
+                .log("update collection endpoint: request completed successfully");
         return updatedCollection.getDescription();
     }
 
@@ -230,7 +252,7 @@ public class Collection {
             ZebedeeException {
         info().log("delete collection endpoint: request received");
 
-        Session session = Root.zebedee.getSessions().get(request);
+        Session session = sessionsService.get(request);
         if (session == null) {
             error().log("delete collection endpoint: request unsuccessful no valid session found");
             throw new UnauthorizedException("You are not authorised to delete collections.");
@@ -240,11 +262,13 @@ public class Collection {
 
         com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request);
         if (collection == null) {
-            warn().data("user", session.getEmail()).data("collectionId", collectionId).log("delete collection endpoint: request unsuccessful collection not found");
+            warn().user(session.getEmail())
+                    .collectionID(collectionId)
+                    .log("delete collection endpoint: request unsuccessful collection not found");
             throw new NotFoundException("The collection you are trying to delete was not found");
         }
 
-        Root.zebedee.getCollections().delete(collection, session);
+        collections.delete(collection, session);
 
         Root.cancelPublish(collection);
 
@@ -255,7 +279,42 @@ public class Collection {
                 .actionedBy(session.getEmail())
                 .log();
 
-        info().data("user", session.getEmail()).data("collectionId", collectionId).log("delete collection endpoint: request completed successfully");
+        info().user(session.getEmail())
+                .collectionID(collectionId)
+                .log("delete collection endpoint: request completed successfully");
         return true;
+    }
+
+    private void requireViewPermission(String email, CollectionDescription description) throws UnauthorizedException {
+        boolean canView = false;
+        try {
+            canView = permissionsService.canView(email, description);
+        } catch (IOException ex) {
+            throw new UnauthorizedException("You are not authorised to view this collection");
+        }
+
+        if (!canView) {
+            warn().user(email)
+                    .collectionID(description)
+                    .log("request unsuccessful user denied view permission");
+
+            throw new UnauthorizedException("You are not authorised to view this collection");
+        }
+    }
+
+    private void requireEditPermission(String email) throws UnauthorizedException {
+        boolean canEdit = false;
+        try {
+            canEdit = permissionsService.canEdit(email);
+        } catch (IOException ex) {
+            throw new UnauthorizedException("You are not authorised to edit collections.");
+        }
+
+        if (!canEdit) {
+            warn().user(email)
+                    .log("request unsuccessful user denied edit permission");
+
+            throw new UnauthorizedException("You are not authorised to edit collections.");
+        }
     }
 }

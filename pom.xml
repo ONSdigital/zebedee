@@ -23,17 +23,16 @@
         <project.build.sourceEncoding>${encoding}</project.build.sourceEncoding>
         <project.reporting.outputEncoding>${encoding}</project.reporting.outputEncoding>
         <fasterxml.jackson.version>2.11.0</fasterxml.jackson.version>
+        <apache.poi.version>3.17</apache.poi.version>
     </properties>
 
     <repositories>
-
         <repository>
             <id>splunk-artifactory</id>
             <name>Splunk Releases</name>
             <url>https://splunk.jfrog.io/splunk/ext-releases-local</url>
         </repository>
     </repositories>
-
 
     <dependencies>
 
@@ -219,11 +218,6 @@
                                     <groupId>org.yaml</groupId>
                                     <artifactId>snakeyaml</artifactId>
                                     <version>1.13</version>
-                                </exlude>
-                                <exlude>
-                                    <groupId>org.apache.poi</groupId>
-                                    <artifactId>poi</artifactId>
-                                    <version>3.13</version>
                                 </exlude>
                                 <!-- End Trello #1717 -->
                                 <exlude>

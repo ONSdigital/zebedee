@@ -67,16 +67,12 @@ public class Permission {
             removeAdminPermissionsFromUser(request, permissionDefinition, session);
         }
 
-        // Digital publishing
-        if (BooleanUtils.isTrue(permissionDefinition.isEditor())) {
+        // Assign / remove editor permissions
+        if (permissionDefinition.isEditor()) {
             addEditorPermissionToUser(request, permissionDefinition, session);
-        } else if (BooleanUtils.isFalse(permissionDefinition.isEditor())) {
-            Root.zebedee.getPermissionsService().removeEditor(permissionDefinition.getEmail(), session);
-            Audit.Event.PUBLISHER_PERMISSION_REMOVED
-                    .parameters()
-                    .host(request)
-                    .actionedByEffecting(session.getEmail(), permissionDefinition.getEmail())
-                    .log();
+            // TODO Assign keys to to new user.
+        } else  {
+            removeEditorPermissionToUser(request, permissionDefinition, session);
         }
 
         return "Permissions updated for " + permissionDefinition.getEmail();
@@ -135,6 +131,18 @@ public class Permission {
         permissionsService.addEditor(permissionDefinition.getEmail(), session);
 
         Audit.Event.PUBLISHER_PERMISSION_ADDED
+                .parameters()
+                .host(request)
+                .actionedByEffecting(session.getEmail(), permissionDefinition.getEmail())
+                .log();
+    }
+
+    private void removeEditorPermissionToUser(HttpServletRequest request, PermissionDefinition permissionDefinition,
+                                           Session session)
+            throws IOException, UnauthorizedException {
+        permissionsService.removeEditor(permissionDefinition.getEmail(), session);
+
+        Audit.Event.PUBLISHER_PERMISSION_REMOVED
                 .parameters()
                 .host(request)
                 .actionedByEffecting(session.getEmail(), permissionDefinition.getEmail())

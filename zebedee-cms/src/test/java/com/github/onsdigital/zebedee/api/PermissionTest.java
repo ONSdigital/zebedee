@@ -2,8 +2,10 @@ package com.github.onsdigital.zebedee.api;
 
 import com.github.onsdigital.zebedee.exceptions.InternalServerError;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
+import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.PermissionDefinition;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
+import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.session.service.Sessions;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -54,7 +56,7 @@ public class PermissionTest extends ZebedeeAPIBaseTestCase {
         InternalServerError ex = assertThrows(InternalServerError.class,
                 () -> endpoint.grantPermission(mockRequest, mockResponse, permission));
 
-        assertThat(ex.getMessage(), equalTo("internal server error"));
+        assertThat(ex.getMessage(), equalTo("error getting user session"));
         verify(sessionsService, times(1)).get(mockRequest);
     }
 
@@ -101,7 +103,6 @@ public class PermissionTest extends ZebedeeAPIBaseTestCase {
     @Test
     public void testGrant_removeAdminError_shouldAssignAdminPermissions() throws Exception {
         permission.isAdmin(false);
-        permission.isEditor(true);
 
         doThrow(UnauthorizedException.class)
                 .when(permissionsService)
@@ -115,7 +116,7 @@ public class PermissionTest extends ZebedeeAPIBaseTestCase {
     }
 
     @Test
-    public void testGrant_addEditorError_shouldAssignAdminPermissions() throws Exception {
+    public void testGrant_addEditorError_shouldAssignEditorPermissions() throws Exception {
         permission.isAdmin(false);
         permission.isEditor(true);
 
@@ -128,5 +129,37 @@ public class PermissionTest extends ZebedeeAPIBaseTestCase {
 
         verify(sessionsService, times(1)).get(mockRequest);
         verify(permissionsService, times(1)).addEditor(TEST_EMAIL, session);
+        verify(permissionsService, times(1)).removeAdministrator(TEST_EMAIL, session);
+    }
+
+    @Test
+    public void testGrant_removeEditorError_shouldAssignAdminPermissions() throws Exception {
+        permission.isAdmin(false);
+        permission.isEditor(false);
+
+        doThrow(UnauthorizedException.class)
+                .when(permissionsService)
+                .removeEditor(TEST_EMAIL, session);
+
+        assertThrows(UnauthorizedException.class,
+                () -> endpoint.grantPermission(mockRequest, mockResponse, permission));
+
+        verify(sessionsService, times(1)).get(mockRequest);
+        verify(permissionsService, times(1)).removeEditor(TEST_EMAIL, session);
+        verify(permissionsService, times(1)).removeAdministrator(TEST_EMAIL, session);
+    }
+
+    @Test
+    public void testGrant_removeEditorAndAdminSuccess_shouldRevokeEditorAndAdminPermissions() throws Exception {
+        permission.isAdmin(false);
+        permission.isEditor(false);
+
+        String actual = endpoint.grantPermission(mockRequest, mockResponse, permission);
+        String expected = "Permissions updated for " + TEST_EMAIL;
+
+        assertThat(actual, equalTo(expected));
+        verify(sessionsService, times(1)).get(mockRequest);
+        verify(permissionsService, times(1)).removeEditor(TEST_EMAIL, session);
+        verify(permissionsService, times(1)).removeAdministrator(TEST_EMAIL, session);
     }
 }

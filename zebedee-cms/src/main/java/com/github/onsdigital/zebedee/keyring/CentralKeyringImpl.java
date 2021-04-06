@@ -149,6 +149,11 @@ public class CentralKeyringImpl implements Keyring {
         // the new central keyring design so when called we do nothing.
     }
 
+    @Override
+    public void populate(User source, User target, Set<String> collectionIDs) throws KeyringException {
+
+    }
+
     private void validateUser(User user) throws KeyringException {
         if (user == null) {
             throw new KeyringException(USER_NULL_ERR);

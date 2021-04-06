@@ -196,6 +196,11 @@ public class KeyringMigratorImpl implements Keyring {
         }
     }
 
+    @Override
+    public void populate(User source, User target, Set<String> collectionIDs) throws KeyringException {
+
+    }
+
     private Keyring getKeyring() {
         if (migrationEnabled) {
             return centralKeyring;

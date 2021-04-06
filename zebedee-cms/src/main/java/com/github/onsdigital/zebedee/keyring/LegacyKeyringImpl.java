@@ -46,9 +46,12 @@ public class LegacyKeyringImpl implements Keyring {
     static final String UNLOCK_KEYRING_ERR = "error unlocking user keyring";
     static final String GET_KEY_RECIPIENTS_ERR = "error getting recipients for collection key";
     static final String LIST_USERS_ERR = "error listing all users";
+    static final String CACHE_KEYRING_NULL_ERR = "expected cached keyring but was not found";
+    static final String KEYRING_LOCKED_ERR = "cached keyring has not been unlocked";
+    static final String SAVE_USER_KEYRING_ERR = "error saving changes to user keyring";
 
     private Sessions sessions;
-    private UsersService users;
+    private UsersService usersService;
     private PermissionsService permissions;
     private KeyringCache cache;
     private ApplicationKeys applicationKeys;
@@ -60,11 +63,11 @@ public class LegacyKeyringImpl implements Keyring {
      * @param cache           the {@link KeyringCache} to use.
      * @param applicationKeys the {@link ApplicationKeys} to use.
      */
-    public LegacyKeyringImpl(final Sessions sessions, final UsersService users, PermissionsService permissions,
+    public LegacyKeyringImpl(final Sessions sessions, final UsersService usersService, PermissionsService permissions,
                              final KeyringCache cache,
                              final ApplicationKeys applicationKeys) {
         this.sessions = sessions;
-        this.users = users;
+        this.usersService = usersService;
         this.permissions = permissions;
         this.cache = cache;
         this.applicationKeys = applicationKeys;
@@ -230,7 +233,7 @@ public class LegacyKeyringImpl implements Keyring {
 
     private UserList listUsers() throws KeyringException {
         try {
-            return users.list();
+            return usersService.list();
         } catch (IOException ex) {
             throw new KeyringException(LIST_USERS_ERR, ex);
         }
@@ -243,7 +246,7 @@ public class LegacyKeyringImpl implements Keyring {
         }
 
         try {
-            users.addKeyToKeyring(user.getEmail(), collection.getDescription().getId(), key);
+            usersService.addKeyToKeyring(user.getEmail(), collection.getDescription().getId(), key);
         } catch (IOException ex) {
             throw new KeyringException(ADD_KEY_SAVE_ERR, ex);
         }
@@ -256,7 +259,7 @@ public class LegacyKeyringImpl implements Keyring {
         }
 
         try {
-            users.removeKeyFromKeyring(user.getEmail(), collection.getDescription().getId());
+            usersService.removeKeyFromKeyring(user.getEmail(), collection.getDescription().getId());
         } catch (IOException ex) {
             throw new KeyringException(REMOVE_KEY_SAVE_ERR, ex);
         }
@@ -306,6 +309,35 @@ public class LegacyKeyringImpl implements Keyring {
         }
     }
 
+    @Override
+    public void populate(User src, User target, Set<String> collectionIDs) throws KeyringException {
+        validateUser(src);
+
+        com.github.onsdigital.zebedee.json.Keyring srcKeyring = getCachedUserKeyring(src);
+        if (srcKeyring == null) {
+            throw new KeyringException(CACHE_KEYRING_NULL_ERR);
+        }
+
+        if (!srcKeyring.isUnlocked()) {
+            throw new KeyringException(KEYRING_LOCKED_ERR);
+        }
+
+        validateUser(target);
+
+        if (collectionIDs == null || collectionIDs.isEmpty()) {
+            return;
+        }
+
+        for (String id : collectionIDs) {
+            SecretKey key = srcKeyring.get(id);
+            if (key != null) {
+                target.keyring().put(id, key);
+            }
+        }
+
+        saveKeyringChanges(target);
+    }
+
     private void validateUser(User user) throws KeyringException {
         if (user == null) {
             throw new KeyringException(USER_NULL_ERR);
@@ -350,7 +382,7 @@ public class LegacyKeyringImpl implements Keyring {
 
     private User getUser(User user) throws KeyringException {
         try {
-            return users.getUserByEmail(user.getEmail());
+            return usersService.getUserByEmail(user.getEmail());
         } catch (Exception ex) {
             throw new KeyringException(GET_USER_ERR, ex);
         }
@@ -359,6 +391,14 @@ public class LegacyKeyringImpl implements Keyring {
     private void validatePassword(String password) throws KeyringException {
         if (StringUtils.isEmpty(password)) {
             throw new KeyringException(PASSWORD_EMPTY_ERR);
+        }
+    }
+
+    private void saveKeyringChanges(User user) throws KeyringException {
+        try {
+            usersService.updateKeyring(user);
+        } catch (IOException ex) {
+            throw new KeyringException(SAVE_USER_KEYRING_ERR, ex);
         }
     }
 }

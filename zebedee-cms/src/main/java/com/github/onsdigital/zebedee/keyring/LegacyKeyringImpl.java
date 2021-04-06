@@ -47,7 +47,7 @@ public class LegacyKeyringImpl implements Keyring {
     static final String GET_KEY_RECIPIENTS_ERR = "error getting recipients for collection key";
     static final String LIST_USERS_ERR = "error listing all users";
     static final String CACHE_KEYRING_NULL_ERR = "expected cached keyring but was not found";
-    static final String KEYRING_LOCKED_ERR = "cached has not been unlocked";
+    static final String KEYRING_LOCKED_ERR = "cached keyring has not been unlocked";
     static final String SAVE_USER_KEYRING_ERR = "error saving changes to user keyring";
 
     private Sessions sessions;

@@ -51,7 +51,7 @@ public class LegacyKeyringImpl implements Keyring {
     static final String SAVE_USER_KEYRING_ERR = "error saving changes to user keyring";
 
     private Sessions sessions;
-    private UsersService users;
+    private UsersService usersService;
     private PermissionsService permissions;
     private KeyringCache cache;
     private ApplicationKeys applicationKeys;
@@ -63,11 +63,11 @@ public class LegacyKeyringImpl implements Keyring {
      * @param cache           the {@link KeyringCache} to use.
      * @param applicationKeys the {@link ApplicationKeys} to use.
      */
-    public LegacyKeyringImpl(final Sessions sessions, final UsersService users, PermissionsService permissions,
+    public LegacyKeyringImpl(final Sessions sessions, final UsersService usersService, PermissionsService permissions,
                              final KeyringCache cache,
                              final ApplicationKeys applicationKeys) {
         this.sessions = sessions;
-        this.users = users;
+        this.usersService = usersService;
         this.permissions = permissions;
         this.cache = cache;
         this.applicationKeys = applicationKeys;
@@ -233,7 +233,7 @@ public class LegacyKeyringImpl implements Keyring {
 
     private UserList listUsers() throws KeyringException {
         try {
-            return users.list();
+            return usersService.list();
         } catch (IOException ex) {
             throw new KeyringException(LIST_USERS_ERR, ex);
         }
@@ -246,7 +246,7 @@ public class LegacyKeyringImpl implements Keyring {
         }
 
         try {
-            users.addKeyToKeyring(user.getEmail(), collection.getDescription().getId(), key);
+            usersService.addKeyToKeyring(user.getEmail(), collection.getDescription().getId(), key);
         } catch (IOException ex) {
             throw new KeyringException(ADD_KEY_SAVE_ERR, ex);
         }
@@ -259,7 +259,7 @@ public class LegacyKeyringImpl implements Keyring {
         }
 
         try {
-            users.removeKeyFromKeyring(user.getEmail(), collection.getDescription().getId());
+            usersService.removeKeyFromKeyring(user.getEmail(), collection.getDescription().getId());
         } catch (IOException ex) {
             throw new KeyringException(REMOVE_KEY_SAVE_ERR, ex);
         }
@@ -335,7 +335,7 @@ public class LegacyKeyringImpl implements Keyring {
             }
         }
 
-        saveKeyring(target);
+        saveKeyringChanges(target);
     }
 
     private void validateUser(User user) throws KeyringException {
@@ -382,7 +382,7 @@ public class LegacyKeyringImpl implements Keyring {
 
     private User getUser(User user) throws KeyringException {
         try {
-            return users.getUserByEmail(user.getEmail());
+            return usersService.getUserByEmail(user.getEmail());
         } catch (Exception ex) {
             throw new KeyringException(GET_USER_ERR, ex);
         }
@@ -394,9 +394,9 @@ public class LegacyKeyringImpl implements Keyring {
         }
     }
 
-    private void saveKeyring(User user) throws KeyringException {
+    private void saveKeyringChanges(User user) throws KeyringException {
         try {
-            users.updateKeyring(user);
+            usersService.updateKeyring(user);
         } catch (IOException ex) {
             throw new KeyringException(SAVE_USER_KEYRING_ERR, ex);
         }

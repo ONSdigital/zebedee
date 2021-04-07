@@ -144,6 +144,12 @@
                 <version>0.9.10</version>
             </dependency>
 
+            <!-- override the Guava version used by reflections and elasticsearch -->
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>30.1.1-jre</version>
+            </dependency>
 
             <!-- used in the Test builder project for timeseries random walk generation-->
             <dependency>

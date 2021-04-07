@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee.keyring;
 
 import com.github.onsdigital.zebedee.json.CollectionDescription;
+import com.github.onsdigital.zebedee.keyring.cache.SchedulerKeyCache;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.KeyringCache;
 import com.github.onsdigital.zebedee.model.encryption.ApplicationKeys;
@@ -17,7 +18,6 @@ import org.mockito.MockitoAnnotations;
 import javax.crypto.SecretKey;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
@@ -79,7 +79,7 @@ public abstract class BaseLegacyKeyringTest {
     protected SecretKey secretKey;
 
     @Mock
-    protected Map<String, SecretKey> schedulerCache;
+    protected SchedulerKeyCache schedulerCache;
 
     protected Keyring legacyKeyring;
     protected KeyringException expectedEx;
@@ -110,7 +110,8 @@ public abstract class BaseLegacyKeyringTest {
 
         setUpTests();
 
-        legacyKeyring = new LegacyKeyringImpl(sessionsService, users, permissions, keyringCache, applicationKeys);
+        legacyKeyring = new LegacyKeyringImpl(
+                sessionsService, users, permissions, keyringCache, schedulerCache, applicationKeys);
 
     }
 
@@ -133,9 +134,6 @@ public abstract class BaseLegacyKeyringTest {
 
         when(users.list())
                 .thenReturn(allUsers);
-
-        when(keyringCache.getSchedulerCache())
-                .thenReturn(schedulerCache);
     }
 
     private void setUpMockUserBert() throws Exception {
@@ -236,9 +234,8 @@ public abstract class BaseLegacyKeyringTest {
         verify(keyringCache, times(1)).get(user);
     }
 
-    protected void verifyKeyAddedToSchedulerCache() {
-        verify(keyringCache, times(1)).getSchedulerCache();
-        verify(schedulerCache, times(1)).put(TEST_COLLECTION_ID, secretKey);
+    protected void verifyKeyAddedToSchedulerCache() throws Exception {
+        verify(schedulerCache, times(1)).add(TEST_COLLECTION_ID, secretKey);
         verifyNoMoreInteractions(schedulerCache);
     }
 

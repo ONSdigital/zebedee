@@ -1,11 +1,11 @@
 package com.github.onsdigital.zebedee.model;
 
 import com.github.onsdigital.zebedee.json.Keyring;
+import com.github.onsdigital.zebedee.keyring.cache.SchedulerKeyCache;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.session.service.Sessions;
 import com.github.onsdigital.zebedee.user.model.User;
 
-import javax.crypto.SecretKey;
 import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -17,13 +17,15 @@ import java.util.concurrent.ConcurrentHashMap;
 public class KeyringCache {
 
     // Publisher keyring keeps all available secret keys available
-    private Map<String, SecretKey> schedulerCache = new ConcurrentHashMap<>();
-    private Map<Session, Keyring> keyringMap = new ConcurrentHashMap<>();
+    private SchedulerKeyCache schedulerCache;
+    private Map<Session, Keyring> keyringMap;
     private Sessions sessions;
 
     @Deprecated
-    public KeyringCache(Sessions sessions) {
+    public KeyringCache(Sessions sessions, SchedulerKeyCache schedulerCache) {
         this.sessions = sessions;
+        this.schedulerCache = schedulerCache;
+        this.keyringMap = new ConcurrentHashMap<>();
     }
 
     /**
@@ -41,8 +43,9 @@ public class KeyringCache {
 
                 // populate the scheduler keyring
                 for (String collectionId : user.keyring().list()) {
-                    if (!schedulerCache.containsKey(collectionId))
-                        schedulerCache.put(collectionId, user.keyring().get(collectionId));
+                    if (schedulerCache.get(collectionId) == null) {
+                        schedulerCache.add(collectionId, user.keyring().get(collectionId));
+                    }
                 }
             }
         }
@@ -100,7 +103,7 @@ public class KeyringCache {
     }
 
     @Deprecated
-    public Map<String, SecretKey> getSchedulerCache() {
+    private SchedulerKeyCache getSchedulerCache() {
         return this.schedulerCache;
     }
 }

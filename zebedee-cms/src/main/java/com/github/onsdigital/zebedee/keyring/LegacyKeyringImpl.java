@@ -1,5 +1,6 @@
 package com.github.onsdigital.zebedee.keyring;
 
+import com.github.onsdigital.zebedee.keyring.cache.SchedulerKeyCache;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.KeyringCache;
 import com.github.onsdigital.zebedee.model.encryption.ApplicationKeys;
@@ -54,6 +55,7 @@ public class LegacyKeyringImpl implements Keyring {
     private UsersService usersService;
     private PermissionsService permissions;
     private KeyringCache cache;
+    private SchedulerKeyCache schedulerKeyCache;
     private ApplicationKeys applicationKeys;
 
     /**
@@ -64,12 +66,13 @@ public class LegacyKeyringImpl implements Keyring {
      * @param applicationKeys the {@link ApplicationKeys} to use.
      */
     public LegacyKeyringImpl(final Sessions sessions, final UsersService usersService, PermissionsService permissions,
-                             final KeyringCache cache,
+                             final KeyringCache cache, final SchedulerKeyCache schedulerKeyCache,
                              final ApplicationKeys applicationKeys) {
         this.sessions = sessions;
         this.usersService = usersService;
         this.permissions = permissions;
         this.cache = cache;
+        this.schedulerKeyCache = schedulerKeyCache;
         this.applicationKeys = applicationKeys;
     }
 
@@ -190,7 +193,7 @@ public class LegacyKeyringImpl implements Keyring {
         validateCollection(collection);
         validateSecretKey(key);
 
-        cache.getSchedulerCache().put(collection.getDescription().getId(), key);
+        schedulerKeyCache.add(collection.getDescription().getId(), key);
 
         List<User> assignments = getKeyRecipients(collection);
         List<User> removals = getKeyToRemoveFrom(collection, assignments);

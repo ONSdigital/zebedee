@@ -14,6 +14,8 @@ import com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl;
 import com.github.onsdigital.zebedee.keyring.NoOpCentralKeyring;
 import com.github.onsdigital.zebedee.keyring.cache.KeyringCache;
 import com.github.onsdigital.zebedee.keyring.cache.KeyringCacheImpl;
+import com.github.onsdigital.zebedee.keyring.cache.LegacySchedulerKeyCache;
+import com.github.onsdigital.zebedee.keyring.cache.SchedulerKeyCache;
 import com.github.onsdigital.zebedee.keyring.store.KeyringStore;
 import com.github.onsdigital.zebedee.keyring.store.KeyringStoreImpl;
 import com.github.onsdigital.zebedee.model.Collections;
@@ -111,6 +113,7 @@ public class ZebedeeConfiguration {
     private ImageService imageService;
     private SessionClient sessionClient;
     private Keyring collectionKeyring;
+    private SchedulerKeyCache schedulerKeyCache;
     private EncryptionKeyFactory encryptionKeyFactory;
 
 
@@ -163,8 +166,10 @@ public class ZebedeeConfiguration {
             this.sessions = new SessionsServiceImpl(sessionsPath);
         }
 
+        this.schedulerKeyCache = new LegacySchedulerKeyCache();
+
         // Initialise legacy keyring regardless - they will dual run until we cut over to new impl.
-        this.legacyKeyringCache = new com.github.onsdigital.zebedee.model.KeyringCache(sessions);
+        this.legacyKeyringCache = new com.github.onsdigital.zebedee.model.KeyringCache(sessions, schedulerKeyCache);
 
         this.teamsService = new TeamsServiceImpl(
                 new TeamsStoreFileSystemImpl(teamsPath), this::getPermissionsService);
@@ -189,7 +194,7 @@ public class ZebedeeConfiguration {
 
         // The legacy keyring logic but behind the new keyring interface.
         Keyring legacyKeyring = new LegacyKeyringImpl(
-                sessions, usersService, permissionsService, legacyKeyringCache, applicationKeys);
+                sessions, usersService, permissionsService, legacyKeyringCache, schedulerKeyCache, applicationKeys);
 
         // The new world keyring impl - could be no op or real impl depending on config.
         Keyring centralKeyring = initCentralKeyring();
@@ -386,6 +391,10 @@ public class ZebedeeConfiguration {
 
     public EncryptionKeyFactory getEncryptionKeyFactory() {
         return this.encryptionKeyFactory;
+    }
+
+    public SchedulerKeyCache getSchedulerKeyringCache() {
+        return this.schedulerKeyCache;
     }
 
     private Path createDir(Path root, String dirName) throws IOException {

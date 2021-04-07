@@ -6,7 +6,6 @@ import liquibase.util.StringUtils;
 
 import javax.crypto.SecretKey;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -27,7 +26,7 @@ import java.util.Set;
  * However if this does become an issue consider replacing the Hashmap with some type time based cache object to
  * automatically evicted after a duration of inactivity.
  */
-public class KeyringCacheImpl implements KeyringCache {
+public class KeyringCacheImpl implements KeyringCache, SchedulerKeyCache {
 
     static final String INVALID_COLLECTION_ID_ERR = "expected collection ID but was null or empty";
     static final String INVALID_SECRET_KEY_ERR = "expected secret key but was null";

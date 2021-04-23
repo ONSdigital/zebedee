@@ -183,10 +183,10 @@ public class ApproveTaskTest {
 
         approveTask.approveCollection();
 
-        assertThat(description.approvalStatus, equalTo(ApprovalStatus.COMPLETE));
-        assertThat(description.events.size(), equalTo(1));
+        assertThat(description.getApprovalStatus(), equalTo(ApprovalStatus.COMPLETE));
+        assertThat(description.getEvents().size(), equalTo(1));
 
-        Event event = description.events.get(0);
+        Event event = description.getEvents().get(0);
         assertThat(event.getEmail(), equalTo("test@ons.gov.uk"));
         assertThat(event.getType(), equalTo(EventType.APPROVED));
 
@@ -209,14 +209,14 @@ public class ApproveTaskTest {
 
         approveTask.approveCollection();
 
-        assertThat(description.approvalStatus, equalTo(ApprovalStatus.ERROR));
-        assertThat(description.events.size(), equalTo(2));
+        assertThat(description.getApprovalStatus(), equalTo(ApprovalStatus.ERROR));
+        assertThat(description.getEvents().size(), equalTo(2));
 
-        Event event = description.events.get(0);
+        Event event = description.getEvents().get(0);
         assertThat(event.getEmail(), equalTo("test@ons.gov.uk"));
         assertThat(event.getType(), equalTo(EventType.APPROVED));
 
-        Event errorEvent = description.events.get(0);
+        Event errorEvent = description.getEvents().get(0);
         assertThat(errorEvent.getEmail(), equalTo("system"));
         assertThat(errorEvent.getType(), equalTo(EventType.APPROVAL_FAILED));
 

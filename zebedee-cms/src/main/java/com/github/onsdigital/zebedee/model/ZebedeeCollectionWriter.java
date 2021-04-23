@@ -4,14 +4,14 @@ import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
-import com.github.onsdigital.zebedee.json.Keyring;
-import com.github.onsdigital.zebedee.session.model.Session;
+import com.github.onsdigital.zebedee.keyring.KeyringException;
 import com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration;
+import com.github.onsdigital.zebedee.session.model.Session;
+import com.github.onsdigital.zebedee.user.model.User;
 
 import javax.crypto.SecretKey;
 import java.io.IOException;
 
-import static com.github.onsdigital.zebedee.configuration.Configuration.getUnauthorizedMessage;
 import static com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration.get;
 
 /**
@@ -19,32 +19,110 @@ import static com.github.onsdigital.zebedee.reader.configuration.ReaderConfigura
  */
 public class ZebedeeCollectionWriter extends CollectionWriter {
 
+    static final String ZEBEDEE_NULL_ERR =
+            "error constructing ZebedeeCollectionWriter zebedee instance required but was null";
+    static final String PERMISSIONS_SERVICE_NULL_ERR =
+            "error constructing ZebedeeCollectionWriter perissions service required but was null";
+    static final String USERS_SERVICE_NULL_ERR =
+            "error constructing ZebedeeCollectionWriter users service required but was null";
+    static final String KEYRING_NULL_ERR =
+            "error constructing ZebedeeCollectionWriter keyring requred but was null";
+    static final String SESSION_NULL_ERR =
+            "error constructing ZebedeeCollectionWriter session required but was null";
+    static final String GET_USER_ERR =
+            "error constructing ZebedeeCollectionWriter error getting user ";
+    static final String USER_NULL_ERR =
+            "error constructing ZebedeeCollectionWriter user required but was null";
+    static final String COLLECTION_NULL_ERR =
+            "error constructing ZebedeeCollectionWriter collection required but was null";
+    static final String PERMISSION_DENIED_ERR =
+            "error constructing ZebedeeCollectionWriter user does not have edit permission for collection";
+    static final String PERMISSIONS_CHECK_ERR =
+            "error constructing ZebedeeCollectionWriter error checking user collection permissions";
+    static final String COLLECTION_KEY_NULL_ERR =
+            "error constructing ZebedeeCollectionWriter key required but keyring returned null";
+
     /**
      * Create a new instance of CollectionWriter for the given Zebedee instance, collection, and session.
-     *
-     * @param zebedee
-     * @param collection
-     * @param session
-     * @throws BadRequestException
-     * @throws IOException
-     * @throws UnauthorizedException
      */
-    public ZebedeeCollectionWriter(Zebedee zebedee, Collection collection, Session session) throws BadRequestException, IOException, UnauthorizedException, NotFoundException {
+    public ZebedeeCollectionWriter(Zebedee zebedee, Collection collection, Session session)
+            throws BadRequestException, IOException, UnauthorizedException, NotFoundException {
+        validateParams(zebedee, collection, session);
+
+        checkUserAuthorisedToAccessCollection(zebedee, collection, session);
+
+        User user = getUser(zebedee, session);
+
+        SecretKey key = getCollectionKey(zebedee, collection, user);
+
+        init(collection, key);
+    }
+
+    private void validateParams(Zebedee zebedee, Collection collection, Session session)
+            throws IOException, UnauthorizedException, NotFoundException {
+        if (zebedee == null) {
+            throw new IOException(ZEBEDEE_NULL_ERR);
+        }
+
+        if (zebedee.getPermissionsService() == null) {
+            throw new IOException(PERMISSIONS_SERVICE_NULL_ERR);
+        }
+
+        if (zebedee.getUsersService() == null) {
+            throw new IOException(USERS_SERVICE_NULL_ERR);
+        }
+
+        if (zebedee.getCollectionKeyring() == null) {
+            throw new IOException(KEYRING_NULL_ERR);
+        }
 
         if (collection == null) {
-            throw new NotFoundException("Please specify a collection");
+            throw new NotFoundException(COLLECTION_NULL_ERR);
         }
 
-        // Authorisation
-        if (session == null || !zebedee.getPermissionsService().canEdit(session.getEmail(), collection.getDescription())) {
-            throw new UnauthorizedException(getUnauthorizedMessage(session));
+        if (session == null) {
+            throw new UnauthorizedException(SESSION_NULL_ERR);
+        }
+    }
+
+    private void checkUserAuthorisedToAccessCollection(Zebedee zebedee, Collection collection, Session session)
+            throws IOException, UnauthorizedException {
+        boolean isAuthorised = false;
+        try {
+            isAuthorised = zebedee.getPermissionsService().canEdit(session, collection.getDescription());
+        } catch (Exception ex) {
+            throw new IOException(PERMISSIONS_CHECK_ERR, ex);
         }
 
-        Keyring keyring = zebedee.getLegacyKeyringCache().get(session);
-        if (keyring == null) throw new UnauthorizedException("No keyring is available for " + session.getEmail());
+        if (!isAuthorised) {
+            throw new UnauthorizedException(PERMISSION_DENIED_ERR);
+        }
+    }
 
-        SecretKey key = keyring.get(collection.getDescription().getId());
-        init(collection, key);
+    private User getUser(Zebedee zebedee, Session session) throws IOException, NotFoundException, BadRequestException {
+        User user = null;
+        try {
+            user = zebedee.getUsersService().getUserByEmail(session.getEmail());
+        } catch (Exception ex) {
+            throw new IOException(GET_USER_ERR, ex);
+        }
+
+        if (user == null) {
+            throw new IOException(USER_NULL_ERR);
+        }
+
+        return user;
+    }
+
+    private SecretKey getCollectionKey(Zebedee zebedee, Collection collection, User user)
+            throws KeyringException, UnauthorizedException {
+        SecretKey key = zebedee.getCollectionKeyring().get(user, collection);
+
+        if (key == null) {
+            throw new UnauthorizedException(COLLECTION_KEY_NULL_ERR);
+        }
+
+        return key;
     }
 
     /**
@@ -57,21 +135,29 @@ public class ZebedeeCollectionWriter extends CollectionWriter {
      * @throws UnauthorizedException
      * @throws NotFoundException
      */
-    public ZebedeeCollectionWriter(Collection collection, SecretKey key) throws BadRequestException, IOException, UnauthorizedException, NotFoundException {
+    public ZebedeeCollectionWriter(Collection collection, SecretKey key)
+            throws BadRequestException, IOException, UnauthorizedException, NotFoundException {
         init(collection, key);
     }
 
-    private void init(Collection collection, SecretKey key) throws NotFoundException, UnauthorizedException, IOException {
+    private void init(Collection collection, SecretKey key)
+            throws NotFoundException, UnauthorizedException, IOException {
 
         if (collection == null) {
             throw new NotFoundException("Please specify a collection");
         }
 
-        ReaderConfiguration config = get();
+        ReaderConfiguration cfg = get();
 
-        inProgress = new CollectionContentWriter(collection, key, collection.path.resolve(config.getInProgressFolderName()));
-        complete = new CollectionContentWriter(collection, key, collection.path.resolve(config.getCompleteFolderName()));
-        reviewed = new CollectionContentWriter(collection, key, collection.path.resolve(config.getReviewedFolderName()));
-        root = new CollectionContentWriter(collection, key, collection.path);
+        this.inProgress = new CollectionContentWriter(
+                collection, key, collection.getPath().resolve(cfg.getInProgressFolderName()));
+
+        this.complete = new CollectionContentWriter(collection, key,
+                collection.getPath().resolve(cfg.getCompleteFolderName()));
+
+        this.reviewed = new CollectionContentWriter(collection, key,
+                collection.getPath().resolve(cfg.getReviewedFolderName()));
+
+        root = new CollectionContentWriter(collection, key, collection.getPath());
     }
 }

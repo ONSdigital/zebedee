@@ -3,16 +3,21 @@ package com.github.onsdigital.zebedee.keyring;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.KeyringCache;
 import com.github.onsdigital.zebedee.model.encryption.ApplicationKeys;
+import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.session.service.Sessions;
 import com.github.onsdigital.zebedee.user.model.User;
+import com.github.onsdigital.zebedee.user.model.UserList;
 import com.github.onsdigital.zebedee.user.service.UsersService;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.crypto.SecretKey;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.info;
 
@@ -39,9 +44,15 @@ public class LegacyKeyringImpl implements Keyring {
     static final String GET_USER_ERR = "user service get user by email return an error";
     static final String PASSWORD_EMPTY_ERR = "user password required but was null or empty";
     static final String UNLOCK_KEYRING_ERR = "error unlocking user keyring";
+    static final String GET_KEY_RECIPIENTS_ERR = "error getting recipients for collection key";
+    static final String LIST_USERS_ERR = "error listing all users";
+    static final String CACHE_KEYRING_NULL_ERR = "expected cached keyring but was not found";
+    static final String KEYRING_LOCKED_ERR = "cached keyring has not been unlocked";
+    static final String SAVE_USER_KEYRING_ERR = "error saving changes to user keyring";
 
     private Sessions sessions;
-    private UsersService users;
+    private UsersService usersService;
+    private PermissionsService permissions;
     private KeyringCache cache;
     private ApplicationKeys applicationKeys;
 
@@ -52,10 +63,12 @@ public class LegacyKeyringImpl implements Keyring {
      * @param cache           the {@link KeyringCache} to use.
      * @param applicationKeys the {@link ApplicationKeys} to use.
      */
-    public LegacyKeyringImpl(final Sessions sessions, final UsersService users, final KeyringCache cache,
+    public LegacyKeyringImpl(final Sessions sessions, final UsersService usersService, PermissionsService permissions,
+                             final KeyringCache cache,
                              final ApplicationKeys applicationKeys) {
         this.sessions = sessions;
-        this.users = users;
+        this.usersService = usersService;
+        this.permissions = permissions;
         this.cache = cache;
         this.applicationKeys = applicationKeys;
     }
@@ -137,13 +150,9 @@ public class LegacyKeyringImpl implements Keyring {
     }
 
     /**
-     * Remove the key for the specified collection from the user's keyring.
-     * <ul>
-     *     <li>Removes the key from the users cached keyring if it exists in {@link KeyringCache}</li>
-     *     <li>Removed it from the stored user object (the user json file) and persists the change.</li>
-     * </ul>
+     * Remove the key for the specified collection from all user keyrings (cached and stored).
      *
-     * @param user       the user performing the action.
+     * @param user       the user performing the action. Nullable and not required by this implementation.
      * @param collection the collection the the key belongs to.
      * @throws KeyringException thrown if the user is null, their email is null/empty, the collection is null, the
      *                          collection description is null, the collection ID is null/empty, there is a error
@@ -151,48 +160,109 @@ public class LegacyKeyringImpl implements Keyring {
      */
     @Override
     public void remove(User user, Collection collection) throws KeyringException {
-        validateUser(user);
         validateCollection(collection);
+        UserList userList = listUsers();
 
-        // Remove the key from the cached user keyring
-        com.github.onsdigital.zebedee.json.Keyring cachedKeyring = getCachedUserKeyring(user);
-        if (cachedKeyring != null) {
-            cachedKeyring.remove(collection.getDescription().getId());
+        if (userList == null) {
+            return;
         }
 
-        // Remove the key from the user and save the changes.
-        removeKeyFromStoredUser(user, collection);
-
+        for (User u : userList) {
+            removeKeyFromUser(u, collection);
+        }
     }
 
     /**
-     * Add a key to the user's {@link com.github.onsdigital.zebedee.json.Keyring}.
+     * Add the key to all users who have permission to access the collection.
      * <ul>
-     *     <li>Add key to user's cached keyring if it exists in the {@link KeyringCache}.</li>
-     *     <li>Add key to store user file and persists the change.</li>
+     *     <li>If a user's keying exists in the {@link KeyringCache} the new key is added.</li>
+     *     <li>Otherwise Add key to store user file and persists the change.</li>
      * </ul>
      *
-     * @param user       the user adding the key.
+     * @param user       the user adding the key (not required by this implementation).
      * @param collection the {@link Collection} the key belongs to.
      * @param key        the {@link SecretKey} to add.
-     * @throws KeyringException thrown if the user is null, their email is null/empty, the collection is null, the
-     *                          collection description is null, the collection ID is null/empty, the key is null, there
-     *                          is a error updating the stored user file.
+     * @throws KeyringException thrown the collection is null, the collection description is null, the collection ID
+     *                          is null/empty, the key is null, there is a error updating the stored user file.
      */
     @Override
     public void add(User user, Collection collection, SecretKey key) throws KeyringException {
-        validateUser(user);
         validateCollection(collection);
         validateSecretKey(key);
 
-        // Add key to users cached keyring if exists
+        cache.getSchedulerCache().put(collection.getDescription().getId(), key);
+
+        List<User> assignments = getKeyRecipients(collection);
+        List<User> removals = getKeyToRemoveFrom(collection, assignments);
+
+        for (User recipent : assignments) {
+            assignKeyToRecipient(recipent, collection, key);
+        }
+
+        for (User removeFrom : removals) {
+            removeKeyFromUser(removeFrom, collection);
+        }
+    }
+
+    private List<User> getKeyRecipients(Collection collection) throws KeyringException {
+        List<User> recipients = null;
+        try {
+            recipients = permissions.getCollectionAccessMapping(collection);
+        } catch (IOException ex) {
+            throw new KeyringException(GET_KEY_RECIPIENTS_ERR, ex);
+        }
+
+        if (recipients == null) {
+            recipients = new ArrayList<>();
+        }
+
+        return recipients;
+    }
+
+    private List<User> getKeyToRemoveFrom(Collection collection, List<User> recipients) throws KeyringException {
+        UserList allUsers = listUsers();
+
+        if (allUsers == null) {
+            return new ArrayList<>();
+        }
+
+        return allUsers.stream()
+                .filter(user -> !recipients.contains(user))
+                .collect(Collectors.toList());
+    }
+
+    private UserList listUsers() throws KeyringException {
+        try {
+            return usersService.list();
+        } catch (IOException ex) {
+            throw new KeyringException(LIST_USERS_ERR, ex);
+        }
+    }
+
+    private void assignKeyToRecipient(User user, Collection collection, SecretKey key) throws KeyringException {
         com.github.onsdigital.zebedee.json.Keyring cachedKeyring = getCachedUserKeyring(user);
         if (cachedKeyring != null) {
             cachedKeyring.put(collection.getDescription().getId(), key);
         }
 
-        // Add the key to the stored user value.
-        addKeyToStoredUser(user, collection, key);
+        try {
+            usersService.addKeyToKeyring(user.getEmail(), collection.getDescription().getId(), key);
+        } catch (IOException ex) {
+            throw new KeyringException(ADD_KEY_SAVE_ERR, ex);
+        }
+    }
+
+    private void removeKeyFromUser(User user, Collection collection) throws KeyringException {
+        com.github.onsdigital.zebedee.json.Keyring cachedKeyring = getCachedUserKeyring(user);
+        if (cachedKeyring != null) {
+            cachedKeyring.remove(collection.getDescription().getId());
+        }
+
+        try {
+            usersService.removeKeyFromKeyring(user.getEmail(), collection.getDescription().getId());
+        } catch (IOException ex) {
+            throw new KeyringException(REMOVE_KEY_SAVE_ERR, ex);
+        }
     }
 
     /**
@@ -239,6 +309,35 @@ public class LegacyKeyringImpl implements Keyring {
         }
     }
 
+    @Override
+    public void populate(User src, User target, Set<String> collectionIDs) throws KeyringException {
+        validateUser(src);
+
+        com.github.onsdigital.zebedee.json.Keyring srcKeyring = getCachedUserKeyring(src);
+        if (srcKeyring == null) {
+            throw new KeyringException(CACHE_KEYRING_NULL_ERR);
+        }
+
+        if (!srcKeyring.isUnlocked()) {
+            throw new KeyringException(KEYRING_LOCKED_ERR);
+        }
+
+        validateUser(target);
+
+        if (collectionIDs == null || collectionIDs.isEmpty()) {
+            return;
+        }
+
+        for (String id : collectionIDs) {
+            SecretKey key = srcKeyring.get(id);
+            if (key != null) {
+                target.keyring().put(id, key);
+            }
+        }
+
+        saveKeyringChanges(target);
+    }
+
     private void validateUser(User user) throws KeyringException {
         if (user == null) {
             throw new KeyringException(USER_NULL_ERR);
@@ -281,25 +380,9 @@ public class LegacyKeyringImpl implements Keyring {
         }
     }
 
-    private void removeKeyFromStoredUser(User user, Collection collection) throws KeyringException {
-        try {
-            users.removeKeyFromKeyring(user.getEmail(), collection.getDescription().getId());
-        } catch (IOException ex) {
-            throw new KeyringException(REMOVE_KEY_SAVE_ERR, ex);
-        }
-    }
-
-    private void addKeyToStoredUser(User user, Collection collection, SecretKey key) throws KeyringException {
-        try {
-            users.addKeyToKeyring(user.getEmail(), collection.getDescription().getId(), key);
-        } catch (IOException ex) {
-            throw new KeyringException(ADD_KEY_SAVE_ERR, ex);
-        }
-    }
-
     private User getUser(User user) throws KeyringException {
         try {
-            return users.getUserByEmail(user.getEmail());
+            return usersService.getUserByEmail(user.getEmail());
         } catch (Exception ex) {
             throw new KeyringException(GET_USER_ERR, ex);
         }
@@ -308,6 +391,14 @@ public class LegacyKeyringImpl implements Keyring {
     private void validatePassword(String password) throws KeyringException {
         if (StringUtils.isEmpty(password)) {
             throw new KeyringException(PASSWORD_EMPTY_ERR);
+        }
+    }
+
+    private void saveKeyringChanges(User user) throws KeyringException {
+        try {
+            usersService.updateKeyring(user);
+        } catch (IOException ex) {
+            throw new KeyringException(SAVE_USER_KEYRING_ERR, ex);
         }
     }
 }

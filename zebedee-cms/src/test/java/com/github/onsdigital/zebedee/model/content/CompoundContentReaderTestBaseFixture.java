@@ -1,5 +1,6 @@
 package com.github.onsdigital.zebedee.model.content;
 
+import com.github.davidcarboni.cryptolite.Keys;
 import com.github.onsdigital.zebedee.ZebedeeTestBaseFixture;
 import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeries;
 import com.github.onsdigital.zebedee.data.framework.DataBuilder;
@@ -18,6 +19,7 @@ import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
 import com.github.onsdigital.zebedee.session.model.Session;
 import org.junit.Test;
 
+import javax.crypto.SecretKey;
 import java.io.IOException;
 import java.util.Date;
 
@@ -43,6 +45,7 @@ public class CompoundContentReaderTestBaseFixture extends ZebedeeTestBaseFixture
     TimeSeries completePage;
     TimeSeries reviewedPage;
     TimeSeries publishedPage;
+    SecretKey secretKey;
 
     /**
      * Setup generates an instance of zebedee plus a collection
@@ -52,6 +55,11 @@ public class CompoundContentReaderTestBaseFixture extends ZebedeeTestBaseFixture
      * @throws Exception
      */
     public void setUp() throws Exception {
+        setUpPermissionsServiceMockForLegacyTests(zebedee, builder.publisher1);
+
+        secretKey = Keys.newSecretKey();
+        setUpKeyringMockForLegacyTests(zebedee, builder.publisher1, secretKey);
+
         publisher = zebedee.openSession(builder.publisher1Credentials);
         reviewer = zebedee.openSession(builder.reviewer1Credentials);
 
@@ -60,7 +68,7 @@ public class CompoundContentReaderTestBaseFixture extends ZebedeeTestBaseFixture
 
         CollectionDescription collectionDescription = new CollectionDescription();
         collectionDescription.setName("DataPublicationDetails");
-        collectionDescription.isEncrypted = true;
+        collectionDescription.setEncrypted(true);
         collectionDescription.setType(CollectionType.scheduled);
         collectionDescription.setPublishDate(new Date());
         collection = Collection.create(collectionDescription, zebedee, publisher);

@@ -45,12 +45,6 @@
             <artifactId>dp-cryptolite-java</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>org.influxdb</groupId>
-            <artifactId>influxdb-java</artifactId>
-            <version>2.1</version>
-        </dependency>
-
         <!-- Zebedee Reader-->
         <dependency>
             <groupId>com.github.onsdigital</groupId>
@@ -92,14 +86,14 @@
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi-scratchpad</artifactId>
-            <version>3.13</version>
+            <version>${apache.poi.version}</version>
         </dependency>
 
         <!-- Spreadsheet handling -->
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi-ooxml</artifactId>
-            <version>3.13</version>
+            <version>${apache.poi.version}</version>
         </dependency>
 
         <!-- CSV generator (currently in Zebedee but should end up in Brian) -->
@@ -150,7 +144,7 @@
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-core</artifactId>
-            <version>5.1.0.Final</version>
+            <version>5.4.30.Final</version>
         </dependency>
 
         <dependency>
@@ -168,27 +162,7 @@
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-c3p0</artifactId>
-            <version>5.1.0.Final</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>26.0-jre</version>
-        </dependency>
-
-        <!-- Fasterxml Jackson dependencies - overrides vulnerable transitive dependencies
-        and declared explicitly to resolve conflicts in elasticsearch and dp-logging -->
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-core</artifactId>
-            <version>${fasterxml.jackson.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-annotations</artifactId>
-            <version>${fasterxml.jackson.version}</version>
+            <version>5.4.30.Final</version>
         </dependency>
 
         <dependency>

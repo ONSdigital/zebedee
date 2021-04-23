@@ -6,15 +6,22 @@ import com.github.onsdigital.session.service.client.Http;
 import com.github.onsdigital.session.service.client.SessionClient;
 import com.github.onsdigital.session.service.client.SessionClientImpl;
 import com.github.onsdigital.zebedee.data.processing.DataIndex;
+import com.github.onsdigital.zebedee.keyring.CentralKeyringImpl;
 import com.github.onsdigital.zebedee.keyring.Keyring;
+import com.github.onsdigital.zebedee.keyring.KeyringException;
 import com.github.onsdigital.zebedee.keyring.KeyringMigratorImpl;
 import com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl;
 import com.github.onsdigital.zebedee.keyring.NoOpCentralKeyring;
 import com.github.onsdigital.zebedee.keyring.cache.KeyringCache;
+import com.github.onsdigital.zebedee.keyring.cache.KeyringCacheImpl;
+import com.github.onsdigital.zebedee.keyring.store.KeyringStore;
+import com.github.onsdigital.zebedee.keyring.store.KeyringStoreImpl;
 import com.github.onsdigital.zebedee.model.Collections;
 import com.github.onsdigital.zebedee.model.Content;
 import com.github.onsdigital.zebedee.model.RedirectTablePartialMatch;
 import com.github.onsdigital.zebedee.model.encryption.ApplicationKeys;
+import com.github.onsdigital.zebedee.model.encryption.EncryptionKeyFactory;
+import com.github.onsdigital.zebedee.model.encryption.EncryptionKeyFactoryImpl;
 import com.github.onsdigital.zebedee.model.publishing.PublishedCollections;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsServiceImpl;
@@ -63,6 +70,8 @@ import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFea
 import static com.github.onsdigital.zebedee.configuration.Configuration.getDatasetAPIAuthToken;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getDatasetAPIURL;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getImageAPIURL;
+import static com.github.onsdigital.zebedee.configuration.Configuration.getKeyringInitVector;
+import static com.github.onsdigital.zebedee.configuration.Configuration.getKeyringSecretKey;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getServiceAuthToken;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getSessionsApiUrl;
 import static com.github.onsdigital.zebedee.permissions.store.PermissionsStoreFileSystemImpl.initialisePermissions;
@@ -101,8 +110,8 @@ public class ZebedeeConfiguration {
     private DatasetService datasetService;
     private ImageService imageService;
     private SessionClient sessionClient;
-    private KeyringCache keyringCache;
-    private Keyring keyring;
+    private Keyring collectionKeyring;
+    private EncryptionKeyFactory encryptionKeyFactory;
 
 
     /**
@@ -144,6 +153,7 @@ public class ZebedeeConfiguration {
         this.dataIndex = new DataIndex(new FileSystemContentReader(publishedContentPath));
         this.publishedCollections = new PublishedCollections(publishedCollectionsPath);
         this.applicationKeys = new ApplicationKeys(applicationKeysPath);
+        this.encryptionKeyFactory = new EncryptionKeyFactoryImpl();
 
         // Configure the sessions
         if (cmsFeatureFlags().isSessionAPIEnabled()) {
@@ -167,21 +177,6 @@ public class ZebedeeConfiguration {
         this.permissionsService = new PermissionsServiceImpl(permissionsStore,
                 this::getUsersService, this::getTeamsService, legacyKeyringCache);
 
-        // Configure the new KeyringCache if enabled
-        if (cmsFeatureFlags().isCentralisedKeyringEnabled()) {
-            // Uncomment when central keyring is ready.
-/*            KeyringStore keyStore = new KeyringStoreImpl(getKeyRingPath(), getKeyringSecretKey(), getKeyringInitVector());
-
-            KeyringCacheImpl.init(keyStore);
-            KeyringCache keyringCache = KeyringCacheImpl.getInstance();
-
-            CentralKeyringImpl.init(keyringCache, permissionsService);
-            Keyring centralKeyring = CentralKeyringImpl.getInstance();*/
-
-            Keyring legacyKeyring = new LegacyKeyringImpl(sessions, usersService, legacyKeyringCache, applicationKeys);
-            this.keyring = new KeyringMigratorImpl(false, legacyKeyring, new NoOpCentralKeyring());
-        }
-
         VersionsService versionsService = new VersionsServiceImpl();
         this.collections = new Collections(collectionsPath, permissionsService, versionsService, published);
 
@@ -191,6 +186,16 @@ public class ZebedeeConfiguration {
                 permissionsService,
                 applicationKeys,
                 legacyKeyringCache);
+
+        // The legacy keyring logic but behind the new keyring interface.
+        Keyring legacyKeyring = new LegacyKeyringImpl(
+                sessions, usersService, permissionsService, legacyKeyringCache, applicationKeys);
+
+        // The new world keyring impl - could be no op or real impl depending on config.
+        Keyring centralKeyring = initCentralKeyring();
+
+        // Keyring migrator encapuslates the keyring migration logic behind the new keyring interface.
+        this.collectionKeyring = new KeyringMigratorImpl(false, legacyKeyring, centralKeyring);
 
         DatasetClient datasetClient;
         try {
@@ -204,7 +209,7 @@ public class ZebedeeConfiguration {
 
         ImageClient imageClient;
         try {
-            imageClient = new ImageAPIClient(getImageAPIURL(),getServiceAuthToken());
+            imageClient = new ImageAPIClient(getImageAPIURL(), getServiceAuthToken());
         } catch (URISyntaxException e) {
             error().logException(e, "failed to initialise image api client - invalid URI");
             throw new RuntimeException(e);
@@ -229,6 +234,25 @@ public class ZebedeeConfiguration {
                 .data("sessions_api_enabled", cmsFeatureFlags().isSessionAPIEnabled())
                 .log("zebedee configuration creation complete");
 
+    }
+
+    private Keyring initCentralKeyring() throws KeyringException {
+        // Default to the NoOp impl
+        Keyring centralKeyring = new NoOpCentralKeyring();
+
+        // If centralised keying is enabled initialize
+        if (cmsFeatureFlags().isCentralisedKeyringEnabled()) {
+
+            KeyringStore keyStore = new KeyringStoreImpl(getKeyRingPath(), getKeyringSecretKey(), getKeyringInitVector());
+
+            KeyringCacheImpl.init(keyStore);
+            KeyringCache keyringCache = KeyringCacheImpl.getInstance();
+
+            CentralKeyringImpl.init(keyringCache, permissionsService);
+            centralKeyring = CentralKeyringImpl.getInstance();
+        }
+
+        return centralKeyring;
     }
 
     public boolean isUseVerificationAgent() {
@@ -357,7 +381,11 @@ public class ZebedeeConfiguration {
     }
 
     public Keyring getCollectionKeyring() {
-        return this.keyring;
+        return this.collectionKeyring;
+    }
+
+    public EncryptionKeyFactory getEncryptionKeyFactory() {
+        return this.encryptionKeyFactory;
     }
 
     private Path createDir(Path root, String dirName) throws IOException {

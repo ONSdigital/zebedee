@@ -1,10 +1,13 @@
 package com.github.onsdigital.zebedee;
 
+import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.Credentials;
 import com.github.onsdigital.zebedee.keyring.Keyring;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.KeyringCache;
 import com.github.onsdigital.zebedee.model.encryption.ApplicationKeys;
+import com.github.onsdigital.zebedee.model.encryption.EncryptionKeyFactory;
+import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDao;
 import com.github.onsdigital.zebedee.service.ServiceSupplier;
 import com.github.onsdigital.zebedee.session.model.Session;
@@ -29,7 +32,10 @@ import java.util.Map;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -64,7 +70,7 @@ public abstract class ZebedeeTestBaseFixture {
     protected KeyringCache legacyKeyringCache;
 
     @Mock
-    protected Keyring keyring;
+    protected Keyring collectionKeyring;
 
     @Mock
     protected Credentials credentials;
@@ -73,10 +79,16 @@ public abstract class ZebedeeTestBaseFixture {
     protected User user;
 
     @Mock
-    protected com.github.onsdigital.zebedee.json.Keyring legacyKeyring;
+    protected com.github.onsdigital.zebedee.json.Keyring usersKeyring;
+
+    @Mock
+    protected PermissionsService permissionsService;
 
     @Mock
     protected Session userSession;
+
+    @Mock
+    protected EncryptionKeyFactory encryptionKeyFactory;
 
     protected Zebedee zebedee;
     protected Builder builder;
@@ -96,9 +108,14 @@ public abstract class ZebedeeTestBaseFixture {
         ServiceSupplier<UsersService> usersServiceServiceSupplier = () -> usersService;
 
         ReflectionTestUtils.setField(zebedee, "usersService", usersService);
+
+        // TODO I think this is a mistake.
         ReflectionTestUtils.setField(zebedee.getPermissionsService(), "usersServiceSupplier", usersServiceServiceSupplier);
+
         ReflectionTestUtils.setField(zebedee, "sessions", sessionsService);
         ReflectionTestUtils.setField(zebedee, "legacyKeyringCache", new KeyringCache(sessionsService));
+        ReflectionTestUtils.setField(zebedee, "collectionKeyring", collectionKeyring);
+        ReflectionTestUtils.setField(zebedee, "encryptionKeyFactory", encryptionKeyFactory);
 
         ServiceSupplier<CollectionHistoryDao> collectionHistoryDaoServiceSupplier = () -> collectionHistoryDao;
 
@@ -163,8 +180,41 @@ public abstract class ZebedeeTestBaseFixture {
                 .thenReturn(legacyKeyringCache);
 
         when(zebCfg.getCollectionKeyring())
-                .thenReturn(keyring);
+                .thenReturn(collectionKeyring);
     }
+
+    protected void verifyKeyAddedToCollectionKeyring() throws Exception {
+        verify(collectionKeyring, times(1)).add(any(), any(), any());
+    }
+
+    protected void setUpPermissionsServiceMockForLegacyTests(Zebedee instance, User someUser) throws Exception {
+        when(permissionsService.canView(eq(someUser), any(CollectionDescription.class)))
+                .thenReturn(true);
+
+        when(permissionsService.canEdit(eq(someUser), any(CollectionDescription.class)))
+                .thenReturn(true);
+
+        ReflectionTestUtils.setField(instance, "permissionsService", permissionsService);
+    }
+
+    protected void setUpPermissionsServiceMockForLegacyTests(Zebedee instance, Session session) throws Exception {
+        when(permissionsService.canView(eq(session), any(CollectionDescription.class)))
+                .thenReturn(true);
+
+        when(permissionsService.canEdit(eq(session), any(CollectionDescription.class)))
+                .thenReturn(true);
+
+        ReflectionTestUtils.setField(instance, "permissionsService", permissionsService);
+    }
+
+    protected void setUpKeyringMockForLegacyTests(Zebedee instance, User someUser, SecretKey key) throws Exception {
+        when(collectionKeyring.get(eq(someUser), any(Collection.class)))
+                .thenReturn(key);
+
+        ReflectionTestUtils.setField(instance, "collectionKeyring", collectionKeyring);
+    }
+
+
 
     public abstract void setUp() throws Exception;
 

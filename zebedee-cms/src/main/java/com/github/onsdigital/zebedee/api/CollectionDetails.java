@@ -99,9 +99,9 @@ public class CollectionDetails {
         result.complete = ContentDetailUtil.resolveDetails(collection.getComplete(), collectionReader.getComplete());
         result.reviewed = ContentDetailUtil.resolveDetails(collection.getReviewed(), collectionReader.getReviewed());
 
-        result.approvalStatus = collection.getDescription().approvalStatus;
-        result.events = collection.getDescription().events;
-        result.timeseriesImportFiles = collection.getDescription().timeseriesImportFiles;
+        result.approvalStatus = collection.getDescription().getApprovalStatus();
+        result.events = collection.getDescription().getEvents();
+        result.timeseriesImportFiles = collection.getDescription().getTimeseriesImportFiles();
 
         addEventsForDetails(result.inProgress, collection);
         addEventsForDetails(result.complete, collection);
@@ -138,8 +138,10 @@ public class CollectionDetails {
             } else {
                 language = "_" + contentDetail.description.language;
             }
-            if (collection.getDescription().eventsByUri != null) {
-                Events eventsForFile = collection.getDescription().eventsByUri.get(contentDetail.uri + "/data" + language + ".json");
+            if (collection.getDescription().getEventsByUri() != null) {
+                Events eventsForFile = collection.getDescription()
+                        .getEventsByUri()
+                        .get(contentDetail.uri + "/data" + language + ".json");
                 contentDetail.events = eventsForFile;
             } else {
                 contentDetail.events = new Events();

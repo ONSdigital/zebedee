@@ -1,7 +1,6 @@
 package com.github.onsdigital.zebedee.model;
 
-import com.github.onsdigital.zebedee.Builder;
-import com.github.onsdigital.zebedee.Zebedee;
+import com.github.davidcarboni.cryptolite.Keys;
 import com.github.onsdigital.zebedee.ZebedeeTestBaseFixture;
 import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.content.page.base.PageDescription;
@@ -10,12 +9,15 @@ import com.github.onsdigital.zebedee.content.partial.Link;
 import com.github.onsdigital.zebedee.content.partial.markdown.MarkdownSection;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
+import com.github.onsdigital.zebedee.json.CollectionDescription;
+import com.github.onsdigital.zebedee.keyring.Keyring;
 import com.github.onsdigital.zebedee.session.model.Session;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
+import com.github.onsdigital.zebedee.user.model.User;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.springframework.test.util.ReflectionTestUtils;
 
+import javax.crypto.SecretKey;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -25,12 +27,21 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.when;
 
 
 /**
  * Created by thomasridd on 16/11/15.
  */
 public class CollectionMoveTest extends ZebedeeTestBaseFixture {
+
+    @Mock
+    private Keyring keyring;
+
+    @Mock
+    private User user;
 
     Collection collection;
     Article martin;
@@ -40,6 +51,26 @@ public class CollectionMoveTest extends ZebedeeTestBaseFixture {
 
     public void setUp() throws Exception {
         session = zebedee.openSession(builder.publisher1Credentials);
+
+        ReflectionTestUtils.setField(zebedee, "usersService", usersService);
+        ReflectionTestUtils.setField(zebedee, "permissionsService", permissionsService);
+        ReflectionTestUtils.setField(zebedee, "collectionKeyring", keyring);
+
+        when(usersService.getUserByEmail(builder.publisher1Credentials.getEmail()))
+                .thenReturn(user);
+
+        when(permissionsService.canView(eq(session), any(CollectionDescription.class)))
+                .thenReturn(true);
+
+        when(permissionsService.canEdit(eq(session), any(CollectionDescription.class)))
+                .thenReturn(true);
+
+        SecretKey key = Keys.newSecretKey();
+        when(encryptionKeyFactory.newCollectionKey())
+                .thenReturn(key);
+
+        when(keyring.get(any(), any()))
+                .thenReturn(key);
 
         collection = new Collection(builder.collections.get(1), zebedee);
         martin = createArticle("/people/martin", "Martin");

@@ -1,5 +1,6 @@
 package com.github.onsdigital.zebedee.data.processing;
 
+import com.github.davidcarboni.cryptolite.Keys;
 import com.github.davidcarboni.cryptolite.Random;
 import com.github.onsdigital.zebedee.ZebedeeTestBaseFixture;
 import com.github.onsdigital.zebedee.content.page.base.Page;
@@ -24,6 +25,7 @@ import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
 import org.junit.Assert;
 import org.junit.Test;
 
+import javax.crypto.SecretKey;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -63,6 +65,7 @@ public class DataProcessorTestBaseFixture extends ZebedeeTestBaseFixture {
     DataPagesSet inReview;
 
     Date date;
+    SecretKey secretKey;
 
     private DataProcessor processor;
 
@@ -74,6 +77,11 @@ public class DataProcessorTestBaseFixture extends ZebedeeTestBaseFixture {
      * @throws Exception
      */
     public void setUp() throws Exception {
+        setUpPermissionsServiceMockForLegacyTests(zebedee, builder.publisher1);
+
+        secretKey = Keys.newSecretKey();
+        setUpKeyringMockForLegacyTests(zebedee, builder.publisher1, secretKey);
+
         processor = new DataProcessor();
         publisher = zebedee.openSession(builder.publisher1Credentials);
         reviewer = zebedee.openSession(builder.reviewer1Credentials);
@@ -83,7 +91,7 @@ public class DataProcessorTestBaseFixture extends ZebedeeTestBaseFixture {
 
         CollectionDescription collectionDescription = new CollectionDescription();
         collectionDescription.setName("DataPublicationDetails");
-        collectionDescription.isEncrypted = true;
+        collectionDescription.setEncrypted(true);
         collectionDescription.setType(CollectionType.scheduled);
         collectionDescription.setPublishDate(new Date());
 

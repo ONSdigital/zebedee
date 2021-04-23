@@ -212,11 +212,11 @@ public class ApproveTask implements Callable<Boolean> {
 
     public static List<TimeseriesUpdateCommand> ImportUpdateCommandCsvs(Collection collection, ContentReader publishedReader, CollectionReader collectionReader) throws ZebedeeException, IOException {
         List<TimeseriesUpdateCommand> updateCommands = new ArrayList<>();
-        if (collection.description.timeseriesImportFiles != null) {
+        if (collection.getDescription().getTimeseriesImportFiles() != null) {
             info().data("collectionId", collection.getDescription().getId())
                     .log("approve collection: collection contains time series data processing importing CSDB file");
 
-            for (String importFile : collection.getDescription().timeseriesImportFiles) {
+            for (String importFile : collection.getDescription().getTimeseriesImportFiles()) {
                 CompoundContentReader compoundContentReader = new CompoundContentReader(publishedReader);
                 compoundContentReader.add(collectionReader.getReviewed());
 

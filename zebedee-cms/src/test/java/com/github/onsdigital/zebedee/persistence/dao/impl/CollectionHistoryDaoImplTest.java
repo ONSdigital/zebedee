@@ -3,17 +3,17 @@ package com.github.onsdigital.zebedee.persistence.dao.impl;
 import com.github.davidcarboni.cryptolite.Random;
 import com.github.onsdigital.zebedee.exceptions.CollectionEventHistoryException;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
-import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.persistence.CollectionEventType;
 import com.github.onsdigital.zebedee.persistence.HibernateServiceImpl;
 import com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDao;
 import com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData;
 import com.github.onsdigital.zebedee.persistence.model.CollectionHistoryEvent;
+import com.github.onsdigital.zebedee.session.model.Session;
 import org.hibernate.HibernateException;
-import org.hibernate.SQLQuery;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.hibernate.query.NativeQuery;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -24,7 +24,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
 
 import static com.github.onsdigital.zebedee.persistence.dao.impl.CollectionHistoryDaoImpl.COLLECTION_ID;
 import static com.github.onsdigital.zebedee.persistence.dao.impl.CollectionHistoryDaoImpl.SELECT_BY_COLLECTION_ID;
@@ -58,13 +57,10 @@ public class CollectionHistoryDaoImplTest {
     private Transaction transactionMock;
 
     @Mock
-    private SQLQuery sqlQueryMock;
+    private NativeQuery queryMock;
 
     @Mock
     private Collection collectionMock;
-
-    @Mock
-    private ExecutorService threadPoolMock;
 
     private CollectionHistoryDaoImpl dao;
     private CollectionHistoryEvent event;
@@ -103,7 +99,6 @@ public class CollectionHistoryDaoImplTest {
         dao.saveCollectionHistoryEvent(event).get();
         saveEventSuccessVerifications();
     }
-
 
 
     /**
@@ -185,12 +180,12 @@ public class CollectionHistoryDaoImplTest {
         expectedResult.add(event);
 
         when(hibernateSessionMock.createSQLQuery(SELECT_BY_COLLECTION_ID))
-                .thenReturn(sqlQueryMock);
-        when(sqlQueryMock.addEntity(CollectionHistoryEvent.class))
-                .thenReturn(sqlQueryMock);
-        when(sqlQueryMock.setString(COLLECTION_ID, TEST_COLLECTION_ID))
-                .thenReturn(sqlQueryMock);
-        when(sqlQueryMock.list())
+                .thenReturn(queryMock);
+        when(queryMock.addEntity(CollectionHistoryEvent.class))
+                .thenReturn(queryMock);
+        when(queryMock.setString(COLLECTION_ID, TEST_COLLECTION_ID))
+                .thenReturn(queryMock);
+        when(queryMock.list())
                 .thenReturn(expectedResult);
 
         // run the test.
@@ -200,9 +195,9 @@ public class CollectionHistoryDaoImplTest {
         verify(sessionFactoryMock, times(1)).getCurrentSession();
         verify(hibernateSessionMock, times(1)).beginTransaction();
         verify(hibernateSessionMock, times(1)).createSQLQuery(SELECT_BY_COLLECTION_ID);
-        verify(sqlQueryMock, times(1)).addEntity(CollectionHistoryEvent.class);
-        verify(sqlQueryMock, times(1)).setString(COLLECTION_ID, TEST_COLLECTION_ID);
-        verify(sqlQueryMock, times(1)).list();
+        verify(queryMock, times(1)).addEntity(CollectionHistoryEvent.class);
+        verify(queryMock, times(1)).setString(COLLECTION_ID, TEST_COLLECTION_ID);
+        verify(queryMock, times(1)).list();
         verify(hibernateSessionMock, times(1)).getTransaction();
         verify(transactionMock, times(1)).commit();
     }
@@ -223,9 +218,9 @@ public class CollectionHistoryDaoImplTest {
 
             verify(hibernateSessionMock, never()).beginTransaction();
             verify(hibernateSessionMock, never()).createSQLQuery(anyString());
-            verify(sqlQueryMock, never()).addEntity(CollectionHistoryEvent.class);
-            verify(sqlQueryMock, never()).setString(any(), any());
-            verify(sqlQueryMock, never()).list();
+            verify(queryMock, never()).addEntity(CollectionHistoryEvent.class);
+            verify(queryMock, never()).setString(any(), any());
+            verify(queryMock, never()).list();
             verify(hibernateSessionMock, never()).getTransaction();
             verify(transactionMock, never()).commit();
             throw ex;

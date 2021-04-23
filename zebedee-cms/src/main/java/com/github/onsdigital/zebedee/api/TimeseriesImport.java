@@ -33,7 +33,7 @@ public class TimeseriesImport {
 
             CollectionWriter collectionWriter = new ZebedeeCollectionWriter(Root.zebedee, collection, session);
 
-            if (collection.description.approvalStatus == ApprovalStatus.COMPLETE) {
+            if (collection.description.getApprovalStatus() == ApprovalStatus.COMPLETE) {
                 throw new BadRequestException("This collection has been approved and cannot be saved to.");
             }
 
@@ -46,9 +46,9 @@ public class TimeseriesImport {
                         collectionWriter.getRoot().write(inputStream, item.getName());
 
                         // update the collection json with the file upload.
-                        if (collection.description.timeseriesImportFiles == null)
-                            collection.description.timeseriesImportFiles = new ArrayList<>();
-                        collection.description.timeseriesImportFiles.add(item.getName());
+                        if (collection.getDescription().getTimeseriesImportFiles() == null)
+                            collection.getDescription().setTimeseriesImportFiles(new ArrayList<>());
+                        collection.getDescription().getTimeseriesImportFiles().add(item.getName());
                         collectionUpdated = true;
                     }
                 }

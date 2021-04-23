@@ -6,12 +6,15 @@ import com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedExcept
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.Credentials;
+import com.github.onsdigital.zebedee.keyring.Keyring;
+import com.github.onsdigital.zebedee.keyring.KeyringException;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.Collections;
 import com.github.onsdigital.zebedee.model.Content;
 import com.github.onsdigital.zebedee.model.KeyringCache;
 import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
 import com.github.onsdigital.zebedee.model.encryption.ApplicationKeys;
+import com.github.onsdigital.zebedee.model.encryption.EncryptionKeyFactory;
 import com.github.onsdigital.zebedee.model.publishing.PublishedCollections;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.service.DatasetService;
@@ -32,12 +35,12 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
 
-import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
-import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 import static com.github.onsdigital.zebedee.configuration.Configuration.isVerificationEnabled;
 import static com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedException.beingEditedByAnotherCollectionError;
 import static com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedException.beingEditedByThisCollectionError;
 import static com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedException.markedDeleteInAnotherCollectionError;
+import static com.github.onsdigital.zebedee.logging.CMSLogEvent.error;
+import static com.github.onsdigital.zebedee.logging.CMSLogEvent.info;
 
 public class Zebedee {
 
@@ -74,6 +77,8 @@ public class Zebedee {
     private final Path publishedContentPath;
     private final Path path;
     private final PermissionsService permissionsService;
+    private final Keyring collectionKeyring;
+    private final EncryptionKeyFactory encryptionKeyFactory;
 
     private final UsersService usersService;
     private final TeamsService teamsService;
@@ -105,6 +110,8 @@ public class Zebedee {
         this.datasetService = configuration.getDatasetService();
         this.imageService = configuration.getImageService();
         this.serviceStoreImpl = configuration.getServiceStore();
+        this.collectionKeyring = configuration.getCollectionKeyring();
+        this.encryptionKeyFactory = configuration.getEncryptionKeyFactory();
 
         this.collectionsPath = configuration.getCollectionsPath();
         this.publishedCollectionsPath = configuration.getPublishedCollectionsPath();
@@ -276,30 +283,50 @@ public class Zebedee {
         User user = usersService.getUserByEmail(credentials.getEmail());
 
         if (user == null) {
-            info().data("user", credentials.getEmail()).log("user not found no session will be created");
+            info().user(credentials.getEmail()).log("user not found no session will be created");
             return null;
         }
 
-        // Create a session
-        Session session = null;
-        try {
-            session = sessions.create(user);
-        } catch (Exception e) {
-            error().data("user", user.getEmail()).logException(e, "error attempting to create session for user");
-            throw new IOException(e);
-        }
+        Session session = createSession(user);
+        unlockKeyring(user, credentials);
+        cacheKeyring(user);
 
-        // Unlock and cache keyring
-        com.github.onsdigital.zebedee.json.Keyring legacyKeyring = user.keyring();
-        if (!legacyKeyring.unlock(credentials.getPassword())) {
-            throw new IOException("failed to unlock user keyring");
-        }
-
-        applicationKeys.populateCacheFromUserKeyring(user.keyring());
-        legacyKeyringCache.put(user, session);
-
-        // Return a session
         return session;
+    }
+
+    private Session createSession(User user) throws IOException {
+        try {
+            return sessions.create(user);
+        } catch (Exception ex) {
+            error().user(user.getEmail())
+                    .exception(ex)
+                    .log("error attempting to create session for user");
+            throw new IOException(ex);
+        }
+    }
+
+    private void unlockKeyring(User user, Credentials credentials) throws IOException {
+        // TODO This is step is required to maintain backwards compatability while migrating.
+        // Once migration is complete the step can be removed completely.
+        try {
+            collectionKeyring.unlock(user, credentials.getPassword());
+        } catch (KeyringException ex) {
+            error().user(user.getEmail())
+                    .exception(ex)
+                    .log("failed to open user session error while caching collection keyring");
+            throw new IOException(ex);
+        }
+    }
+
+    private void cacheKeyring(User user) throws IOException {
+        try {
+            collectionKeyring.cacheKeyring(user);
+        } catch (KeyringException ex) {
+            error().user(user.getEmail())
+                    .exception(ex)
+                    .log("failed to open user session error while caching collection keyring");
+            throw new IOException(ex);
+        }
     }
 
     public TeamsService getTeamsService() {
@@ -373,5 +400,13 @@ public class Zebedee {
 
     public Path getKeyRingPath() {
         return keyRingPath;
+    }
+
+    public Keyring getCollectionKeyring() {
+        return this.collectionKeyring;
+    }
+
+    public EncryptionKeyFactory getEncryptionKeyFactory() {
+        return this.encryptionKeyFactory;
     }
 }

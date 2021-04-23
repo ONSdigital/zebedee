@@ -1,7 +1,6 @@
 package com.github.onsdigital.zebedee.model;
 
 
-import com.github.davidcarboni.cryptolite.Keys;
 import com.github.davidcarboni.cryptolite.Random;
 import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.KeyManangerUtil;
@@ -40,12 +39,14 @@ import com.github.onsdigital.zebedee.service.ServiceSupplier;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.teams.model.Team;
 import com.github.onsdigital.zebedee.teams.service.TeamsService;
+import com.github.onsdigital.zebedee.user.model.User;
 import com.github.onsdigital.zebedee.util.versioning.VersionsService;
 import com.github.onsdigital.zebedee.util.versioning.VersionsServiceImpl;
 import com.google.common.annotations.VisibleForTesting;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import javax.crypto.SecretKey;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -77,7 +78,6 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
 
-import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.error;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.info;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.warn;
@@ -193,8 +193,8 @@ public class Collection {
     public static Collection create(CollectionDescription collectionDescription, Zebedee zebedee, Session session)
             throws IOException, ZebedeeException {
 
-        collectionDescription.isEncrypted = true; // force encryption on new collections.
-        collectionDescription.approvalStatus = ApprovalStatus.NOT_STARTED;
+        collectionDescription.setEncrypted(true); // force encryption on new collections.
+        collectionDescription.setApprovalStatus(ApprovalStatus.NOT_STARTED);
 
         Release release = checkForRelease(collectionDescription, zebedee);
 
@@ -225,17 +225,15 @@ public class Collection {
             }
         }
 
-        // Encryption
-        // assign a key for the collection to the session user
-        keyManagerUtil.assignKeyToUser(zebedee, zebedee.getUsersService().getUserByEmail(session.getEmail()),
-                collection.getDescription().getId(), Keys.newSecretKey());
+        // Add the collection key to the keying - user is not required
+        User user = zebedee.getUsersService().getUserByEmail(session.getEmail());
+        SecretKey key = zebedee.getEncryptionKeyFactory().newCollectionKey();
 
-        // get the session user to distribute the key to all
-        keyManagerUtil.distributeCollectionKey(zebedee, session, collection, true);
+        zebedee.getCollectionKeyring().add(user, collection, key);
 
         if (release != null) {
-            collection.associateWithRelease(session.getEmail(), release, new ZebedeeCollectionWriter(zebedee,
-                    collection, session));
+            collection.associateWithRelease(session.getEmail(), release,
+                    new ZebedeeCollectionWriter(zebedee, collection, session));
             collection.save();
         }
 
@@ -468,7 +466,23 @@ public class Collection {
 
         updatedCollection.save();
 
-        KeyManager.distributeCollectionKey(zebedee, session, collection, false);
+        /**
+         * TODO
+         * This is necessary to maintain backwards compatability but should be removed once we have fully migrated to
+         * the new keyring impl.
+         *
+         * The new keyring impl does not have a concept of update - a key is either added or removed. The key is no
+         * longer assigned directly to a user, a user can retrieve the key from the central keyring if they
+         * have the required permission for that collection.
+         *
+         * However, to maintain backwards compatability while we are in the process of migrating we still need to
+         * distribute the key. This logic is now encapsulated within
+         * {@link com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl#add(User, Collection, SecretKey)} so we
+         * invoke add again which will update all users either adding/removing the key to/from their keyring.
+         */
+        User user = zebedee.getUsersService().getUserByEmail(session.getEmail());
+        SecretKey key = zebedee.getCollectionKeyring().get(user, collection);
+        zebedee.getCollectionKeyring().add(user, collection, key);
 
         return updatedCollection;
     }
@@ -893,11 +907,11 @@ public class Collection {
         if (!StringUtils.startsWith(uri, "/")) {
             uri = "/" + uri;
         }
-        if (this.description.eventsByUri == null) {
+        if (this.description.getEventsByUri() == null) {
             return false;
         }
 
-        Events events = this.description.eventsByUri.get(uri);
+        Events events = this.description.getEventsByUri().get(uri);
         if (events == null) {
             return false;
         }
@@ -910,11 +924,11 @@ public class Collection {
         if (!StringUtils.startsWith(uri, "/")) {
             uri = "/" + uri;
         }
-        if (this.description.eventsByUri == null) {
+        if (this.description.getEventsByUri() == null) {
             return false;
         }
 
-        Events events = this.description.eventsByUri.get(uri);
+        Events events = this.description.getEventsByUri().get(uri);
         if (events == null) {
             return false;
         }
@@ -985,13 +999,15 @@ public class Collection {
             uri = "/" + uri;
         }
 
-        if (this.description.eventsByUri == null)
-            this.description.eventsByUri = new HashMap<>();
+        if (this.description.getEventsByUri() == null) {
+            this.description.setEventsByUri(new HashMap<>());
+        }
 
-        if (!this.description.eventsByUri.containsKey(uri))
-            this.description.eventsByUri.put(uri, new Events());
+        if (!this.description.getEventsByUri().containsKey(uri)) {
+            this.description.getEventsByUri().put(uri, new Events());
+        }
 
-        this.description.eventsByUri.get(uri).add(event);
+        this.description.getEventsByUri().get(uri).add(event);
     }
 
     /**
@@ -1295,9 +1311,10 @@ public class Collection {
         }
 
         // Fix up links within the content
-        if (hasMoved) replaceLinksWithinCollection(session, fromUri, toUri);
-
-        if (hasMoved) addEvent(fromUri, new Event(new Date(), EventType.MOVED, session.getEmail()));
+        if (hasMoved) {
+            replaceLinksWithinCollection(session, fromUri, toUri);
+            addEvent(fromUri, new Event(new Date(), EventType.MOVED, session.getEmail()));
+        }
 
         return hasMoved;
     }
@@ -1324,7 +1341,8 @@ public class Collection {
      * @throws BadRequestException
      * @throws UnauthorizedException
      */
-    private void replaceLinksWithinCollection(Session session, String oldUri, String newUri) throws IOException, ZebedeeException {
+    private void replaceLinksWithinCollection(Session session, String oldUri, String newUri)
+            throws IOException, ZebedeeException {
 
         CollectionReader collectionReader = new ZebedeeCollectionReader(this.zebedee, this, session);
         CollectionWriter collectionWriter = new ZebedeeCollectionWriter(this.zebedee, this, session);
@@ -1471,12 +1489,16 @@ public class Collection {
     }
 
     public long getPublishTimeMilliseconds() {
-        if (getDescription().publishStartDate != null && getDescription().publishEndDate != null) {
-            LocalDateTime start = LocalDateTime.ofInstant(getDescription().publishStartDate.toInstant(), ZoneId.systemDefault());
-            LocalDateTime end = LocalDateTime.ofInstant(getDescription().publishEndDate.toInstant(), ZoneId.systemDefault());
+        Date startDate = getDescription().getPublishStartDate();
+        Date endDate = getDescription().getPublishEndDate();
 
+
+        if (startDate != null && endDate != null) {
+            LocalDateTime start = LocalDateTime.ofInstant(startDate.toInstant(), ZoneId.systemDefault());
+            LocalDateTime end = LocalDateTime.ofInstant(endDate.toInstant(), ZoneId.systemDefault());
             return Duration.between(start, end).toMillis();
         }
+
         return 0;
     }
 

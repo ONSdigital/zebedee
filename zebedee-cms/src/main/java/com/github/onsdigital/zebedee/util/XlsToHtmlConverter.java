@@ -16,6 +16,8 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.hwpf.converter.HtmlDocumentFacade;
 import org.apache.poi.ss.formula.eval.ErrorEval;
+import org.apache.poi.ss.usermodel.BorderStyle;
+import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.util.IOUtils;
@@ -78,23 +80,6 @@ public class XlsToHtmlConverter extends ExcelToHtmlConverter {
         return createTable(workbook);
     }
 
-    /**
-     * Convert the given xls file as InputStream.
-     *
-     * @param xlsInputStream
-     * @return
-     * @throws ParserConfigurationException
-     * @throws IOException
-     */
-    public static Node convertToTable(InputStream xlsInputStream) throws ParserConfigurationException, IOException {
-        try {
-            final HSSFWorkbook workbook = new HSSFWorkbook(xlsInputStream);
-            return createTable(workbook);
-        } finally {
-            IOUtils.closeQuietly(xlsInputStream);
-        }
-    }
-
     private static Node createTable(HSSFWorkbook workbook) throws ParserConfigurationException {
         XlsToHtmlConverter converter = createConverter();
         Element table = converter.createTableFromWorkbook(workbook);
@@ -119,7 +104,7 @@ public class XlsToHtmlConverter extends ExcelToHtmlConverter {
     }
 
     public static Node convertToHtmlPageWithModifications(InputStream stream, TableModifications modifications)
-            throws IOException, ParserConfigurationException, TableBuilderException {
+            throws IOException, ParserConfigurationException {
         try (HSSFWorkbook workbook = new HSSFWorkbook(stream)) {
             XlsToHtmlConverter converter = createConverter();
             converter.addTableModifications(modifications);
@@ -224,7 +209,6 @@ public class XlsToHtmlConverter extends ExcelToHtmlConverter {
         HSSFSheet sheet = workbook.getSheetAt(0);
         Element table = createTable(sheet);
         return table;
-        //htmlDocument.updateStylesheet();
     }
 
     public void addTableModifications(TableModifications modifications) {
@@ -233,14 +217,8 @@ public class XlsToHtmlConverter extends ExcelToHtmlConverter {
 
     @Override
     protected void processSheetHeader(Element htmlBody, HSSFSheet sheet) {
-
         // dont do anything with headers.
-
-//        Element h2 = htmlDocumentFacade.createHeader2();
-//        h2.appendChild(htmlDocumentFacade.createText(sheet.getSheetName()));
-//        htmlBody.appendChild( h2 );
     }
-
 
     @Override
     protected void processColumnWidths(HSSFSheet sheet, int maxSheetColumns, Element table) {
@@ -254,8 +232,6 @@ public class XlsToHtmlConverter extends ExcelToHtmlConverter {
                 continue;
 
             Element col = htmlDocument.createTableColumn();
-//            col.setAttribute( "width",
-//                    String.valueOf( getColumnWidth( sheet, c ) ) );
             columnGroup.appendChild(col);
         }
         table.appendChild(columnGroup);
@@ -265,35 +241,12 @@ public class XlsToHtmlConverter extends ExcelToHtmlConverter {
         StringBuilder style = new StringBuilder();
 
         style.append("white-space:pre-wrap;");
-        ExcelToHtmlUtils.appendAlign(style, cellStyle.getAlignment());
+        ExcelToHtmlUtils.appendAlign(style, cellStyle.getAlignmentEnum().getCode());
 
-        if (cellStyle.getFillPattern() == 0) {
-            // no fill
-        } else if (cellStyle.getFillPattern() == 1) {
-//            final HSSFColor foregroundColor = cellStyle
-//                    .getFillForegroundColorColor();
-//            if (foregroundColor != null)
-//                style.append("background-color:"
-//                        + ExcelToHtmlUtils.getColor(foregroundColor) + ";");
-        } else {
-
-            // ignore background colors
-
-//            final HSSFColor backgroundColor = cellStyle
-//                    .getFillBackgroundColorColor();
-//            if (backgroundColor != null)
-//                style.append("background-color:"
-//                        + ExcelToHtmlUtils.getColor(backgroundColor) + ";");
-        }
-
-        buildStyle_border(workbook, style, "top", cellStyle.getBorderTop(),
+        buildStyle_border(workbook, style, "top", cellStyle.getBorderTopEnum(),
                 cellStyle.getTopBorderColor());
-//        buildStyle_border( workbook, style, "right",
-//                cellStyle.getBorderRight(), cellStyle.getRightBorderColor() );
         buildStyle_border(workbook, style, "bottom",
-                cellStyle.getBorderBottom(), cellStyle.getBottomBorderColor());
-//        buildStyle_border( workbook, style, "left", cellStyle.getBorderLeft(),
-//                cellStyle.getLeftBorderColor() );
+                cellStyle.getBorderBottomEnum(), cellStyle.getBottomBorderColor());
 
         HSSFFont font = cellStyle.getFont(workbook);
         buildStyle_font(workbook, style, font);
@@ -303,9 +256,9 @@ public class XlsToHtmlConverter extends ExcelToHtmlConverter {
 
     private void buildStyle_border(
             HSSFWorkbook workbook, StringBuilder style,
-            String type, short xlsBorder, short borderColor
+            String type, BorderStyle xlsBorder, short borderColor
     ) {
-        if (xlsBorder == HSSFCellStyle.BORDER_NONE)
+        if (xlsBorder == BorderStyle.NONE)
             return;
 
         StringBuilder borderStyle = new StringBuilder();
@@ -327,14 +280,9 @@ public class XlsToHtmlConverter extends ExcelToHtmlConverter {
             HSSFWorkbook workbook, StringBuilder style,
             HSSFFont font
     ) {
-        switch (font.getBoldweight()) {
-            case HSSFFont.BOLDWEIGHT_BOLD:
-                style.append("font-weight:bold;");
-                break;
-            case HSSFFont.BOLDWEIGHT_NORMAL:
-                // by default, not not increase HTML size
-                // style.append( "font-weight: normal; " );
-                break;
+
+        if (font.getBold()) {
+            style.append("font-weight:bold;");
         }
 
         final HSSFColor fontColor = workbook.getCustomPalette().getColor(
@@ -345,7 +293,6 @@ public class XlsToHtmlConverter extends ExcelToHtmlConverter {
 
         if (font.getFontHeightInPoints() != 0)
             // ignore font size
-            //style.append("font-size:" + font.getFontHeightInPoints() + "pt;");
 
             if (font.getItalic()) {
                 style.append("font-style:italic;");
@@ -428,14 +375,14 @@ public class XlsToHtmlConverter extends ExcelToHtmlConverter {
         final HSSFCellStyle cellStyle = cell.getCellStyle();
 
         String value;
-        switch (cell.getCellType()) {
-            case HSSFCell.CELL_TYPE_STRING:
+        switch (cell.getCellTypeEnum()) {
+            case STRING:
                 // XXX: enrich
                 value = cell.getRichStringCellValue().getString();
                 break;
-            case HSSFCell.CELL_TYPE_FORMULA:
-                switch (cell.getCachedFormulaResultType()) {
-                    case HSSFCell.CELL_TYPE_STRING:
+            case FORMULA:
+                switch (cell.getCachedFormulaResultTypeEnum()) {
+                    case STRING:
                         HSSFRichTextString str = cell.getRichStringCellValue();
                         if (str != null && str.length() > 0) {
                             value = (str.toString());
@@ -443,7 +390,7 @@ public class XlsToHtmlConverter extends ExcelToHtmlConverter {
                             value = "";
                         }
                         break;
-                    case HSSFCell.CELL_TYPE_NUMERIC:
+                    case NUMERIC:
                         HSSFCellStyle style = cellStyle;
                         if (style == null) {
                             value = String.valueOf(cell.getNumericCellValue());
@@ -453,10 +400,10 @@ public class XlsToHtmlConverter extends ExcelToHtmlConverter {
                                     style.getDataFormatString()));
                         }
                         break;
-                    case HSSFCell.CELL_TYPE_BOOLEAN:
+                    case BOOLEAN:
                         value = String.valueOf(cell.getBooleanCellValue());
                         break;
-                    case HSSFCell.CELL_TYPE_ERROR:
+                    case ERROR:
                         value = ErrorEval.getText(cell.getErrorCellValue());
                         break;
                     default:
@@ -464,16 +411,16 @@ public class XlsToHtmlConverter extends ExcelToHtmlConverter {
                         break;
                 }
                 break;
-            case HSSFCell.CELL_TYPE_BLANK:
+            case BLANK:
                 value = "";
                 break;
-            case HSSFCell.CELL_TYPE_NUMERIC:
+            case NUMERIC:
                 value = _formatter.formatCellValue(cell);
                 break;
-            case HSSFCell.CELL_TYPE_BOOLEAN:
+            case BOOLEAN:
                 value = String.valueOf(cell.getBooleanCellValue());
                 break;
-            case HSSFCell.CELL_TYPE_ERROR:
+            case ERROR:
                 value = ErrorEval.getText(cell.getErrorCellValue());
                 break;
             default:
@@ -485,13 +432,9 @@ public class XlsToHtmlConverter extends ExcelToHtmlConverter {
         final short cellStyleIndex = cellStyle.getIndex();
         if (cellStyleIndex != 0) {
             HSSFWorkbook workbook = cell.getRow().getSheet().getWorkbook();
-            //String mainCssClass = getStyleClassName(workbook, cellStyle);
 
             String cssStyle = buildStyle(workbook, cellStyle);
             addStyleClass(tableCellElement, cssStyle);
-//            String cssClass = htmlDocumentFacade.getOrCreateCssClass(
-//                    cssClassPrefixCell, cssStyle);
-//            .setAttribute("class", mainCssClass);
 
             if (noText) {
                 /*
@@ -532,7 +475,7 @@ public class XlsToHtmlConverter extends ExcelToHtmlConverter {
         int toIndex = 0;
         int fromIndex = 0;
 
-        if (cell.getCellType() == HSSFCell.CELL_TYPE_STRING) {
+        if (cell.getCellTypeEnum() == CellType.STRING) {
 
             HSSFRichTextString rts = cell.getRichStringCellValue();
             HSSFCellStyle style = cell.getCellStyle();
@@ -708,8 +651,8 @@ public class XlsToHtmlConverter extends ExcelToHtmlConverter {
     /**
      * Determines the table element type of this cell.
      * <p>
-     * If {@link TableModifications#headerRows} contains the row index of this cell and the cell has a value then returns 'th'.
-     * If {@link TableModifications#headerColumns} contains the cell index of this cell and the cell has a value then returns 'th'.
+     * If {@link TableModifications#getHeaderRows()} contains the row index of this cell and the cell has a value then returns 'th'.
+     * If {@link TableModifications#getHeaderColumns()} contains the cell index of this cell and the cell has a value then returns 'th'.
      * 'td' is returned in all other cases.
      */
     private Element getTableCell(Row row, HSSFCell cell, int columnIndex) {
@@ -739,10 +682,10 @@ public class XlsToHtmlConverter extends ExcelToHtmlConverter {
     }
 
     private static boolean isEmptyCell(HSSFCell cell) {
-        switch (cell.getCellType()) {
-            case (HSSFCell.CELL_TYPE_STRING):
+        switch (cell.getCellTypeEnum()) {
+            case STRING:
                 return StringUtils.isEmpty(cell.getStringCellValue());
-            case (HSSFCell.CELL_TYPE_BLANK):
+            case BLANK:
                 return true;
             default:
                 return false;

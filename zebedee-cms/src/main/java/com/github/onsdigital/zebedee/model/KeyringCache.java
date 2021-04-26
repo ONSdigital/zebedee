@@ -101,9 +101,4 @@ public class KeyringCache {
             keyringMap.remove(session);
         }
     }
-
-    @Deprecated
-    private SchedulerKeyCache getSchedulerCache() {
-        return this.schedulerCache;
-    }
 }

@@ -14,6 +14,7 @@ import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.ApprovalStatus;
 import com.github.onsdigital.zebedee.json.EventType;
+import com.github.onsdigital.zebedee.keyring.cache.SchedulerKeyCache;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.CollectionWriter;
 import com.github.onsdigital.zebedee.model.Collections;
@@ -37,12 +38,11 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.PrivateKey;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 
 /**
  * Handles a notification when a new CSDB file is available to zebedee.
@@ -70,15 +70,15 @@ public class CsdbImporter {
      * @throws NotFoundException
      */
     private static Collection addCsdbToCollectionWithCorrectDataset(
-            String csdbIdentifier,
-            Collections collections,
-            Map<String, SecretKey> keyCache,
-            InputStream csdbData
-    ) throws IOException, BadRequestException, UnauthorizedException, NotFoundException {
+            String csdbIdentifier, Collections collections, SchedulerKeyCache keyCache, InputStream csdbData)
+            throws IOException, BadRequestException, UnauthorizedException, NotFoundException {
+
         for (Collection collection : collections.list()) {
+
             SecretKey collectionKey = keyCache.get(collection.getDescription().getId());
             CollectionReader collectionReader = new ZebedeeCollectionReader(collection, collectionKey);
             Path csdbFileUri = getCsdbPathFromCollection(csdbIdentifier, collectionReader);
+
             if (csdbFileUri != null) {
                 CollectionWriter collectionWriter = new ZebedeeCollectionWriter(collection, collectionKey);
                 collectionWriter.getReviewed().write(csdbData, csdbFileUri.toString());
@@ -183,12 +183,13 @@ public class CsdbImporter {
             String csdbIdentifier,
             DylanClient dylan,
             Collections collections,
-            Map<String, SecretKey> keyCache
+            SchedulerKeyCache keyCache
     ) throws IOException, ZebedeeException {
         executorService.submit(() -> processCsdb(privateCsdbImportKey, csdbIdentifier, dylan, collections, keyCache));
     }
 
-    private void processCsdb(PrivateKey privateCsdbImportKey, String csdbIdentifier, DylanClient dylan, Collections collections, Map<String, SecretKey> keyCache) {
+    private void processCsdb(PrivateKey privateCsdbImportKey, String csdbIdentifier, DylanClient dylan,
+                             Collections collections, SchedulerKeyCache keyCache) {
         info().data("CSDBIdentifier", csdbIdentifier).log("Processing CSDB notification");
 
         Collection collection;
@@ -226,7 +227,7 @@ public class CsdbImporter {
      * @throws ZebedeeException
      */
     public void preProcessCollection(Collection collection) throws IOException, ZebedeeException, URISyntaxException {
-        SecretKey collectionKey = Root.zebedee.getLegacyKeyringCache().getSchedulerCache().get(collection.getDescription().getId());
+        SecretKey collectionKey = Root.zebedee.getSchedulerKeyCache().get(collection.getDescription().getId());
         CollectionReader collectionReader = new ZebedeeCollectionReader(collection, collectionKey);
         CollectionWriter collectionWriter = new ZebedeeCollectionWriter(collection, collectionKey);
         ContentReader publishedReader = new FileSystemContentReader(Root.zebedee.getPublished().path);

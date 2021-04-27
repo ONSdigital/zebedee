@@ -8,6 +8,7 @@ import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.Credentials;
 import com.github.onsdigital.zebedee.keyring.Keyring;
 import com.github.onsdigital.zebedee.keyring.KeyringException;
+import com.github.onsdigital.zebedee.keyring.cache.SchedulerKeyCache;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.Collections;
 import com.github.onsdigital.zebedee.model.Content;
@@ -74,6 +75,7 @@ public class Zebedee {
     private final Collections collections;
     private final Content published;
     private final KeyringCache legacyKeyringCache;
+    private final SchedulerKeyCache schedulerKeyCache;
     private final Path publishedContentPath;
     private final Path path;
     private final PermissionsService permissionsService;
@@ -91,38 +93,39 @@ public class Zebedee {
     /**
      * Create a new instance of Zebedee setting.
      *
-     * @param configuration {@link ZebedeeConfiguration} contains the set up to use for this instance.
+     * @param cfg {@link ZebedeeConfiguration} contains the set up to use for this instance.
      */
-    public Zebedee(ZebedeeConfiguration configuration) {
-        this.path = configuration.getZebedeePath();
-        this.publishedContentPath = configuration.getPublishedContentPath();
-        this.sessions = configuration.getSessions();
-        this.legacyKeyringCache = configuration.getKeyringCache();
-        this.permissionsService = configuration.getPermissionsService();
-        this.published = configuration.getPublished();
-        this.dataIndex = configuration.getDataIndex();
-        this.collections = configuration.getCollections();
-        this.publishedCollections = configuration.getPublishCollections();
-        this.applicationKeys = configuration.getApplicationKeys();
-        this.teamsService = configuration.getTeamsService();
-        this.usersService = configuration.getUsersService();
-        this.verificationAgent = configuration.getVerificationAgent(isVerificationEnabled(), this);
-        this.datasetService = configuration.getDatasetService();
-        this.imageService = configuration.getImageService();
-        this.serviceStoreImpl = configuration.getServiceStore();
-        this.collectionKeyring = configuration.getCollectionKeyring();
-        this.encryptionKeyFactory = configuration.getEncryptionKeyFactory();
+    public Zebedee(ZebedeeConfiguration cfg) {
+        this.path = cfg.getZebedeePath();
+        this.publishedContentPath = cfg.getPublishedContentPath();
+        this.sessions = cfg.getSessions();
+        this.legacyKeyringCache = cfg.getKeyringCache();
+        this.schedulerKeyCache = cfg.getSchedulerKeyringCache();
+        this.permissionsService = cfg.getPermissionsService();
+        this.published = cfg.getPublished();
+        this.dataIndex = cfg.getDataIndex();
+        this.collections = cfg.getCollections();
+        this.publishedCollections = cfg.getPublishCollections();
+        this.applicationKeys = cfg.getApplicationKeys();
+        this.teamsService = cfg.getTeamsService();
+        this.usersService = cfg.getUsersService();
+        this.verificationAgent = cfg.getVerificationAgent(isVerificationEnabled(), this);
+        this.datasetService = cfg.getDatasetService();
+        this.imageService = cfg.getImageService();
+        this.serviceStoreImpl = cfg.getServiceStore();
+        this.collectionKeyring = cfg.getCollectionKeyring();
+        this.encryptionKeyFactory = cfg.getEncryptionKeyFactory();
 
-        this.collectionsPath = configuration.getCollectionsPath();
-        this.publishedCollectionsPath = configuration.getPublishedCollectionsPath();
-        this.usersPath = configuration.getUsersPath();
-        this.sessionsPath = configuration.getSessionsPath();
-        this.permissionsPath = configuration.getPermissionsPath();
-        this.teamsPath = configuration.getTeamsPath();
-        this.applicationKeysPath = configuration.getApplicationKeysPath();
-        this.redirectPath = configuration.getRedirectPath();
-        this.servicePath = configuration.getServicePath();
-        this.keyRingPath = configuration.getKeyRingPath();
+        this.collectionsPath = cfg.getCollectionsPath();
+        this.publishedCollectionsPath = cfg.getPublishedCollectionsPath();
+        this.usersPath = cfg.getUsersPath();
+        this.sessionsPath = cfg.getSessionsPath();
+        this.permissionsPath = cfg.getPermissionsPath();
+        this.teamsPath = cfg.getTeamsPath();
+        this.applicationKeysPath = cfg.getApplicationKeysPath();
+        this.redirectPath = cfg.getRedirectPath();
+        this.servicePath = cfg.getServicePath();
+        this.keyRingPath = cfg.getKeyRingPath();
     }
 
     /**
@@ -360,6 +363,10 @@ public class Zebedee {
     @Deprecated
     public KeyringCache getLegacyKeyringCache() {
         return this.legacyKeyringCache;
+    }
+
+    public SchedulerKeyCache getSchedulerKeyCache() {
+        return this.schedulerKeyCache;
     }
 
     public ApplicationKeys getApplicationKeys() {

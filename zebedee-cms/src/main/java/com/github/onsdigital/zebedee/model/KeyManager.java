@@ -75,9 +75,7 @@ public class KeyManager {
             assignKeyToUser(zebedee, recipient, collection.getDescription().getId(), key);
         }
 
-        zebedee.getLegacyKeyringCache()
-                .getSchedulerCache()
-                .put(collection.getDescription().getId(), key);
+        zebedee.getSchedulerKeyCache().add(collection.getDescription().getId(), key);
     }
 
     private static <T> List<T> nullSafeList(List<T> list) {
@@ -90,7 +88,7 @@ public class KeyManager {
     /**
      * Creates a {@link List} of {@link Callable} tasks to distribute/remove the collection key. For each user creates
      * either a key assignment task if they should have access to the collection, a key removal task if not and a single
-     * task to add the new key to {@link Zebedee#keyringCache}
+     * task to add the new key to {@link Zebedee#schedulerKeyCache}
      *
      * @param zebedee         the {@link Zebedee} instance to use.
      * @param collection      the {@link Collection} the key belongs too.
@@ -123,7 +121,7 @@ public class KeyManager {
 
         // Put the Key in the schedule cache.
         collectionKeyTasks.add(() -> {
-            zebedee.getLegacyKeyringCache().getSchedulerCache().put(collection.getDescription().getId(), secretKey);
+            zebedee.getSchedulerKeyCache().add(collection.getDescription().getId(), secretKey);
             return true;
         });
         return collectionKeyTasks;

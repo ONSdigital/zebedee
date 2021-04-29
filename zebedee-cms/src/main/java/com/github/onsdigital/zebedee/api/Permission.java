@@ -109,10 +109,10 @@ public class Permission {
     public PermissionDefinition getPermissions(HttpServletRequest request, HttpServletResponse response)
             throws IOException, NotFoundException, UnauthorizedException {
 
-        Session session = Root.zebedee.getSessions().get(request);
+        Session session = sessionsService.get(request);
         String email = request.getParameter("email");
 
-        PermissionDefinition permissionDefinition = Root.zebedee.getPermissionsService().userPermissions(email, session);
+        PermissionDefinition permissionDefinition = permissionsService.userPermissions(email, session);
 
         return permissionDefinition;
     }

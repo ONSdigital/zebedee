@@ -63,20 +63,4 @@ public interface Keyring {
      * @throws KeyringException problem unlocking the keyring.
      */
     void unlock(User user, String password) throws KeyringException;
-
-    /**
-     * Support for legacy keyring functionality.
-     * <p>
-     * When a new user is created their keyring needs to be populated with the appropriate keys. This method replaces
-     * this functionality which is currently handled by
-     * {@link com.github.onsdigital.zebedee.permissions.service.PermissionsServiceImpl#addEditor}. This will be
-     * removed when we move to the new keyring.
-     *
-     * @param source        the {@link User} admin user who created and is assigning permissions to the new user. This
-     *                      keyring is used as the source to populate the new keyring.
-     * @param target        the new user who's keyring needs to be populated.
-     * @param collectionIDs a set of collection IDs for which the user should be given access to.
-     * @throws KeyringException problem doing the above.
-     */
-    void populate(User source, User target, Set<String> collectionIDs) throws KeyringException;
 }

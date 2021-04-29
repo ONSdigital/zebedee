@@ -45,9 +45,4 @@ public class NoOpCentralKeyring implements Keyring {
     public void unlock(User user, String password) throws KeyringException {
         info().user(user.getEmail()).log("no-op keyring unlock");
     }
-
-    @Override
-    public void populate(User source, User target, Set<String> collectionIDs) throws KeyringException {
-
-    }
 }

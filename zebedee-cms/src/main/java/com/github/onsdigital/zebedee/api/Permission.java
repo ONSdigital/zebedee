@@ -8,11 +8,16 @@ import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.PermissionDefinition;
+import com.github.onsdigital.zebedee.keyring.Keyring;
+import com.github.onsdigital.zebedee.model.Collection;
+import com.github.onsdigital.zebedee.model.Collections;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.session.service.Sessions;
-import org.apache.commons.lang3.BooleanUtils;
+import com.github.onsdigital.zebedee.user.model.User;
+import com.github.onsdigital.zebedee.user.service.UsersService;
 
+import javax.crypto.SecretKey;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
@@ -27,15 +32,25 @@ public class Permission {
 
     private Sessions sessionsService;
     private PermissionsService permissionsService;
+    private UsersService usersService;
+    private Keyring keyring;
+    private Collections collections;
 
     public Permission() {
         this.sessionsService = Root.zebedee.getSessions();
         this.permissionsService = Root.zebedee.getPermissionsService();
+        this.usersService = Root.zebedee.getUsersService();
+        this.keyring = Root.zebedee.getCollectionKeyring();
+        this.collections = Root.zebedee.getCollections();
     }
 
-    Permission(final Sessions sessionsService, PermissionsService permissionsService) {
+    Permission(final Sessions sessionsService, PermissionsService permissionsService, UsersService usersService,
+               Collections collections, Keyring keyring) {
         this.sessionsService = sessionsService;
         this.permissionsService = permissionsService;
+        this.usersService = usersService;
+        this.collections = collections;
+        this.keyring = keyring;
     }
 
     /**
@@ -62,7 +77,9 @@ public class Permission {
         // Assign / remove admin permissions
         if (permissionDefinition.isAdmin()) {
             assignAdminPermissionsToUser(request, permissionDefinition, session);
-            // TODO Assign keys to to new user (this was previously done inside permissions service).
+
+            // Admins must be publishers so update the permissions accordingly
+            permissionDefinition.isEditor(true);
         } else {
             removeAdminPermissionsFromUser(request, permissionDefinition, session);
         }
@@ -70,11 +87,11 @@ public class Permission {
         // Assign / remove editor permissions
         if (permissionDefinition.isEditor()) {
             addEditorPermissionToUser(request, permissionDefinition, session);
-            // TODO Assign keys to to new user.
-        } else  {
+        } else {
             removeEditorPermissionToUser(request, permissionDefinition, session);
         }
 
+        updateUserKeyAssignments(session);
         return "Permissions updated for " + permissionDefinition.getEmail();
     }
 
@@ -89,7 +106,8 @@ public class Permission {
      * @throws BadRequestException   If the user specified in the {@link PermissionDefinition} is not found.
      */
     @GET
-    public PermissionDefinition getPermissions(HttpServletRequest request, HttpServletResponse response) throws IOException, NotFoundException, UnauthorizedException {
+    public PermissionDefinition getPermissions(HttpServletRequest request, HttpServletResponse response)
+            throws IOException, NotFoundException, UnauthorizedException {
 
         Session session = Root.zebedee.getSessions().get(request);
         String email = request.getParameter("email");
@@ -103,9 +121,6 @@ public class Permission {
                                               Session session)
             throws IOException, UnauthorizedException {
         permissionsService.addAdministrator(permissionDefinition.getEmail(), session);
-
-        // Admins must be publishers so update the permissions accordingly
-        permissionDefinition.isEditor(true);
         Audit.Event.ADMIN_PERMISSION_ADDED
                 .parameters()
                 .host(request)
@@ -138,7 +153,7 @@ public class Permission {
     }
 
     private void removeEditorPermissionToUser(HttpServletRequest request, PermissionDefinition permissionDefinition,
-                                           Session session)
+                                              Session session)
             throws IOException, UnauthorizedException {
         permissionsService.removeEditor(permissionDefinition.getEmail(), session);
 
@@ -162,6 +177,43 @@ public class Permission {
         }
 
         return session;
+    }
+
+    /**
+     * This step is required to maintain legacy fucntionality. It will become unnecessary and should be removed once
+     * the key migration is completed.
+     */
+    private void updateUserKeyAssignments(Session session) throws NotFoundException, BadRequestException,
+            InternalServerError, IOException {
+        User srcUser = getUser(session.getEmail());
+
+        Collections.CollectionList list = collections.list();
+        if (list == null || list.isEmpty()) {
+            return;
+        }
+
+        for (Collection c :list) {
+            SecretKey key = keyring.get(srcUser, c);
+
+            // Add manages key assignments/removals. Calling add here will add or remove a key from each user based
+            // on the latest permisisons updates.
+            keyring.add(srcUser, c, key);
+        }
+    }
+
+    private User getUser(String email) throws InternalServerError, NotFoundException, BadRequestException {
+        User user;
+        try {
+            user = usersService.getUserByEmail(email);
+        } catch (IOException ex) {
+            throw new InternalServerError("error getting user", ex);
+        }
+
+        if (user == null) {
+            throw new NotFoundException("requested user not found");
+        }
+
+        return user;
     }
 
 }

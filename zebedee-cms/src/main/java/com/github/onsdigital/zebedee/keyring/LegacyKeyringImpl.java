@@ -196,7 +196,7 @@ public class LegacyKeyringImpl implements Keyring {
         schedulerKeyCache.add(collection.getDescription().getId(), key);
 
         List<User> assignments = getKeyRecipients(collection);
-        List<User> removals = getKeyToRemoveFrom(collection, assignments);
+        List<User> removals = getKeyToRemoveFrom(assignments);
 
         for (User recipent : assignments) {
             assignKeyToRecipient(recipent, collection, key);
@@ -222,7 +222,7 @@ public class LegacyKeyringImpl implements Keyring {
         return recipients;
     }
 
-    private List<User> getKeyToRemoveFrom(Collection collection, List<User> recipients) throws KeyringException {
+    private List<User> getKeyToRemoveFrom(List<User> recipients) throws KeyringException {
         UserList allUsers = listUsers();
 
         if (allUsers == null) {
@@ -315,35 +315,6 @@ public class LegacyKeyringImpl implements Keyring {
         if (!user.keyring().unlock(password)) {
             throw new KeyringException(UNLOCK_KEYRING_ERR);
         }
-    }
-
-    @Override
-    public void populate(User src, User target, Set<String> collectionIDs) throws KeyringException {
-        validateUser(src);
-
-        com.github.onsdigital.zebedee.json.Keyring srcKeyring = getCachedUserKeyring(src);
-        if (srcKeyring == null) {
-            throw new KeyringException(CACHE_KEYRING_NULL_ERR);
-        }
-
-        if (!srcKeyring.isUnlocked()) {
-            throw new KeyringException(KEYRING_LOCKED_ERR);
-        }
-
-        validateUser(target);
-
-        if (collectionIDs == null || collectionIDs.isEmpty()) {
-            return;
-        }
-
-        for (String id : collectionIDs) {
-            SecretKey key = srcKeyring.get(id);
-            if (key != null) {
-                target.keyring().put(id, key);
-            }
-        }
-
-        saveKeyringChanges(target);
     }
 
     private void validateUser(User user) throws KeyringException {

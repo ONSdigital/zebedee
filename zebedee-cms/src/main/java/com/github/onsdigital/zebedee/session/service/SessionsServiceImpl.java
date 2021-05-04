@@ -254,7 +254,7 @@ public class SessionsServiceImpl extends TimerTask implements Sessions {
         }
 
         public static void close() {
-           error().log("Session timer has shut down, this needs to be investigated.");
+           error().log("Session timer has shut down, this needs to be investigated if it happened unexpectedly.");
         }
     }
 }

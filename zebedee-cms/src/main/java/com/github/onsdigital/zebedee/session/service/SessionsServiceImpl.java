@@ -149,11 +149,11 @@ public class SessionsServiceImpl extends TimerTask implements Sessions {
     public Session find(String email) throws IOException {
         Session session = sessionsStore.find(email);
         if (!expired(session)) {
-            info().log("Session running successfully during session find");
+            info().log("session running successfully during session find");
             updateLastAccess(session);
         }
         else{
-            warn().log("Session found expired, this is a known error during session find.");
+            warn().log("session found expired, this is a known error during session find");
         }
         return session;
     }
@@ -254,7 +254,7 @@ public class SessionsServiceImpl extends TimerTask implements Sessions {
         }
 
         public static void close() {
-           error().log("Session timer has shut down, this needs to be investigated if it happened unexpectedly.");
+           error().log("session timer has shut down, this needs to be investigated if it happened unexpectedly");
         }
     }
 }

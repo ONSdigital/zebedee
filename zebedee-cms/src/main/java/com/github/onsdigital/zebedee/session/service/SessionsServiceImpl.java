@@ -20,6 +20,8 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.warn;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
 
 /**
  * Created by david on 12/03/2015.
@@ -34,7 +36,7 @@ public class SessionsServiceImpl extends TimerTask implements Sessions {
 
     int expiryUnit = Calendar.MINUTE;
     int expiryAmount = 60;
-    Timer timer;
+    ClosableTimer timer;
     private Path sessionsPath;
 
     public SessionsServiceImpl(Path sessionsPath) {
@@ -42,8 +44,10 @@ public class SessionsServiceImpl extends TimerTask implements Sessions {
         this.sessionsStore = new SessionsStoreImpl(sessionsPath);
 
         // Run every minute after the first minute:
-        timer = new Timer("Florence sessions timer", true);
+        timer = new ClosableTimer("Florence sessions timer", true);
         timer.schedule(this, 60 * 1000, 60 * 1000);
+        Runtime.getRuntime().addShutdownHook(new Thread(ClosableTimer::close));
+
     }
 
     public void setExpiry(int expiryAmount, int expiryUnit) {
@@ -124,8 +128,12 @@ public class SessionsServiceImpl extends TimerTask implements Sessions {
             // Deserialise the json:
             Session session = sessionsStore.read(sessionPath(id));
             if (!expired(session)) {
+                info().log("Session running successfully during session get");
                 updateLastAccess(session);
                 result = session;
+            }
+            else{
+               warn().log("Session found expired, this is a known error during session get.");
             }
         }
         return result;
@@ -141,7 +149,11 @@ public class SessionsServiceImpl extends TimerTask implements Sessions {
     public Session find(String email) throws IOException {
         Session session = sessionsStore.find(email);
         if (!expired(session)) {
+            info().log("Session running successfully during session find");
             updateLastAccess(session);
+        }
+        else{
+            warn().log("Session found expired, this is a known error during session find.");
         }
         return session;
     }
@@ -234,4 +246,17 @@ public class SessionsServiceImpl extends TimerTask implements Sessions {
         }
         return expiry;
     }
+
+    static class ClosableTimer extends Timer{
+
+        public ClosableTimer(String name, boolean val){
+            super(name, val);
+        }
+
+        public static void close() {
+           error().log("Session timer has shut down, this needs to be investigated.");
+        }
+    }
 }
+
+

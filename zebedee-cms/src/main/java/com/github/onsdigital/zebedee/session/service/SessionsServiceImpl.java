@@ -21,7 +21,6 @@ import java.util.function.Supplier;
 
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.warn;
-import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
 
 /**
  * Created by david on 12/03/2015.
@@ -44,6 +43,7 @@ public class SessionsServiceImpl extends TimerTask implements Sessions {
         this.sessionsStore = new SessionsStoreImpl(sessionsPath);
 
         // Run every minute after the first minute:
+        info().log("starting sessions timer");
         timer = new ClosableTimer("Florence sessions timer", true);
         timer.schedule(this, 60 * 1000, 60 * 1000);
         Runtime.getRuntime().addShutdownHook(new Thread(ClosableTimer::close));
@@ -254,7 +254,7 @@ public class SessionsServiceImpl extends TimerTask implements Sessions {
         }
 
         public static void close() {
-           error().log("session timer has shut down, this needs to be investigated if it happened unexpectedly");
+           info().log("session timer has shut down, this needs to be investigated if it happened unexpectedly");
         }
     }
 }

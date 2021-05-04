@@ -128,12 +128,12 @@ public class SessionsServiceImpl extends TimerTask implements Sessions {
             // Deserialise the json:
             Session session = sessionsStore.read(sessionPath(id));
             if (!expired(session)) {
-                info().log("Session running successfully during session get");
+                info().log("session running successfully during session get");
                 updateLastAccess(session);
                 result = session;
             }
             else{
-               warn().log("Session found expired, this is a known error during session get.");
+               warn().log("session found expired, this is a known error during session get");
             }
         }
         return result;

@@ -8,15 +8,17 @@ public class HomeContentItem {
     private URI uri;
     private String description;
     private String image;
+    private String imageAlt;
 
     public HomeContentItem() {
     }
 
-    public HomeContentItem(String title, URI uri, String description, String image) {
+    public HomeContentItem(String title, URI uri, String description, String image, String imageAlt) {
         setTitle(title);
         setUri(uri);
         setDescription(description);
         setImage(image);
+        setImageAlt(imageAlt)
     }
 
     public String getTitle() {
@@ -49,5 +51,13 @@ public class HomeContentItem {
 
     public void setImage(String image) {
         this.image = image;
+    }
+
+    public String getImageAlt() {
+            return imageAlt;
+    }
+
+    public void setImageAlt(String imageAlt) {
+            this.imageAlt = imageAlt;
     }
 }

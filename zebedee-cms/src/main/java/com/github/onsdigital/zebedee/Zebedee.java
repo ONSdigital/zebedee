@@ -27,7 +27,6 @@ import com.github.onsdigital.zebedee.session.service.Sessions;
 import com.github.onsdigital.zebedee.teams.service.TeamsService;
 import com.github.onsdigital.zebedee.user.model.User;
 import com.github.onsdigital.zebedee.user.service.UsersService;
-import com.github.onsdigital.zebedee.util.slack.PostMessage;
 import com.github.onsdigital.zebedee.util.slack.StartUpAlerter;
 import com.github.onsdigital.zebedee.verification.VerificationAgent;
 
@@ -37,7 +36,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.github.onsdigital.zebedee.configuration.Configuration.isVerificationEnabled;
 import static com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedException.beingEditedByAnotherCollectionError;
@@ -47,10 +45,6 @@ import static com.github.onsdigital.zebedee.logging.CMSLogEvent.error;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.info;
 
 public class Zebedee {
-
-    private static final AtomicBoolean QUEUE_LOCKED = new AtomicBoolean(true);
-    private static PostMessage startupMessage = null;
-
     public static final String PUBLISHED = "master";
     public static final String COLLECTIONS = "collections";
     public static final String PUBLISHED_COLLECTIONS = "publish-log";

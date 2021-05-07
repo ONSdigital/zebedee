@@ -92,6 +92,15 @@ public class Configuration {
         return StringUtils.defaultIfBlank(getValue("SLACK_USERNAME"), DEFAULT_SLACK_USERNAME);
     }
 
+    public static List<String> slackChannelsToNotfiyOnStartUp() {
+        String val = getValue("START_UP_NOTIFY_LIST");
+        if (StringUtils.isEmpty(val)) {
+            return new ArrayList<>();
+        }
+
+        return Arrays.asList(val.split(","));
+    }
+
     public static String getMathjaxServiceUrl() {
         return StringUtils.defaultIfBlank(getValue("MATHJAX_SERVICE_URL"), MATHJAX_SERVICE_URL);
     }
@@ -175,7 +184,9 @@ public class Configuration {
         return StringUtils.defaultIfBlank(getValue("db_audit_password"), "");
     }
 
-    public static String getSessionsApiUrl() { return StringUtils.defaultIfBlank(getValue("SESSIONS_API_URL"), SESSIONS_API_URL); }
+    public static String getSessionsApiUrl() {
+        return StringUtils.defaultIfBlank(getValue("SESSIONS_API_URL"), SESSIONS_API_URL);
+    }
 
     /**
      * Get collection keyring encryption key

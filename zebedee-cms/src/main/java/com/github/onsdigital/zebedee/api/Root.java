@@ -122,7 +122,7 @@ public class Root {
         System.setProperty(ZEBEDEE_ROOT, root.toString());
 
         final SlackNotifier notifier = new SlackNotifier();
-        notifier.alarm("Zebedee has just started. Ensure an administrator has logged in.");
+        zebedee.getStartUpAlerter().queueLocked();
 
         try {
             Collections.CollectionList collections = zebedee.getCollections().list();

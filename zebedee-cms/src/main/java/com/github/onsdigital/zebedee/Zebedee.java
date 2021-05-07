@@ -273,10 +273,6 @@ public class Zebedee {
         Files.delete(path);
     }
 
-    public void notifyQueueUnlocked(Session session) throws IOException {
-
-    }
-
     /**
      * Open a user session
      * <p>

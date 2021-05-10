@@ -28,7 +28,7 @@ public class StartUpAlerterImpl implements StartUpAlerter {
     private List<String> channels;
 
     /**
-     * Create a new instabce of the alerter.
+     * Create a new instance of the alerter.
      *
      * @param slack    the {@link SlackClient} to use.
      * @param channels the Slack channels to send the alerts to.

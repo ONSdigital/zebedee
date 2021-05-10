@@ -57,7 +57,7 @@ public class StartUpAlerterImplTest {
     }
 
     @Test
-    public void testNotifyLocked_success() throws Exception {
+    public void testNotifyLocked_success_shouldSendAlerts() throws Exception {
         when(slackClient.getProfile())
                 .thenReturn(profile);
 
@@ -100,7 +100,7 @@ public class StartUpAlerterImplTest {
     }
 
     @Test
-    public void testNotifyLocked_notifyError() throws Exception {
+    public void testNotifyLocked_notifyError_shouldThrowEx() throws Exception {
         when(slackClient.getProfile())
                 .thenReturn(profile);
 
@@ -225,7 +225,7 @@ public class StartUpAlerterImplTest {
     }
 
     @Test
-    public void testNotifyUnlocked_success_shouldSendMessages() throws Exception {
+    public void testNotifyUnlocked_success_shouldSendAlerts() throws Exception {
         channels = new ArrayList<>();
         channels.add("chan-A");
         alerter = new StartUpAlerterImpl(slackClient, channels, true, true);

@@ -5,6 +5,9 @@ import com.github.onsdigital.dp.image.api.client.ImageClient;
 import com.github.onsdigital.session.service.client.Http;
 import com.github.onsdigital.session.service.client.SessionClient;
 import com.github.onsdigital.session.service.client.SessionClientImpl;
+import com.github.onsdigital.slack.Profile;
+import com.github.onsdigital.slack.client.SlackClient;
+import com.github.onsdigital.slack.client.SlackClientImpl;
 import com.github.onsdigital.zebedee.data.processing.DataIndex;
 import com.github.onsdigital.zebedee.keyring.CentralKeyringImpl;
 import com.github.onsdigital.zebedee.keyring.Keyring;
@@ -44,6 +47,8 @@ import com.github.onsdigital.zebedee.teams.store.TeamsStoreFileSystemImpl;
 import com.github.onsdigital.zebedee.user.service.UsersService;
 import com.github.onsdigital.zebedee.user.service.UsersServiceImpl;
 import com.github.onsdigital.zebedee.user.store.UserStoreFileSystemImpl;
+import com.github.onsdigital.zebedee.util.slack.StartUpAlerter;
+import com.github.onsdigital.zebedee.util.slack.StartUpAlerterImpl;
 import com.github.onsdigital.zebedee.util.versioning.VersionsService;
 import com.github.onsdigital.zebedee.util.versioning.VersionsServiceImpl;
 import com.github.onsdigital.zebedee.verification.VerificationAgent;
@@ -76,6 +81,7 @@ import static com.github.onsdigital.zebedee.configuration.Configuration.getKeyri
 import static com.github.onsdigital.zebedee.configuration.Configuration.getKeyringSecretKey;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getServiceAuthToken;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getSessionsApiUrl;
+import static com.github.onsdigital.zebedee.configuration.Configuration.slackChannelsToNotfiyOnStartUp;
 import static com.github.onsdigital.zebedee.permissions.store.PermissionsStoreFileSystemImpl.initialisePermissions;
 
 /**
@@ -115,6 +121,7 @@ public class ZebedeeConfiguration {
     private Keyring collectionKeyring;
     private SchedulerKeyCache schedulerKeyCache;
     private EncryptionKeyFactory encryptionKeyFactory;
+    private StartUpAlerter startUpAlerter;
 
 
     /**
@@ -221,6 +228,14 @@ public class ZebedeeConfiguration {
         }
 
         imageService = new ImageServiceImpl(imageClient);
+
+        SlackClient slackClient = new SlackClientImpl(new Profile.Builder()
+                .emoji(":flo:")
+                .username("Florence")
+                .authToken(System.getenv("slack_api_token"))
+                .create());
+
+        startUpAlerter = new StartUpAlerterImpl(slackClient, slackChannelsToNotfiyOnStartUp());
 
         info().data("root_path", rootPath.toString())
                 .data("zebedee_path", zebedeePath.toString())
@@ -404,5 +419,9 @@ public class ZebedeeConfiguration {
             Files.createDirectory(dir);
         }
         return dir;
+    }
+
+    public StartUpAlerter getStartUpAlerter() {
+        return this.startUpAlerter;
     }
 }

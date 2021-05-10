@@ -27,6 +27,7 @@ import com.github.onsdigital.zebedee.session.service.Sessions;
 import com.github.onsdigital.zebedee.teams.service.TeamsService;
 import com.github.onsdigital.zebedee.user.model.User;
 import com.github.onsdigital.zebedee.user.service.UsersService;
+import com.github.onsdigital.zebedee.util.slack.StartUpAlerter;
 import com.github.onsdigital.zebedee.verification.VerificationAgent;
 
 import java.io.IOException;
@@ -44,7 +45,6 @@ import static com.github.onsdigital.zebedee.logging.CMSLogEvent.error;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.info;
 
 public class Zebedee {
-
     public static final String PUBLISHED = "master";
     public static final String COLLECTIONS = "collections";
     public static final String PUBLISHED_COLLECTIONS = "publish-log";
@@ -89,6 +89,7 @@ public class Zebedee {
     private final DatasetService datasetService;
     private final ImageService imageService;
     private final ServiceStoreImpl serviceStoreImpl;
+    private StartUpAlerter startUpAlerter;
 
     /**
      * Create a new instance of Zebedee setting.
@@ -126,6 +127,7 @@ public class Zebedee {
         this.redirectPath = cfg.getRedirectPath();
         this.servicePath = cfg.getServicePath();
         this.keyRingPath = cfg.getKeyRingPath();
+        this.startUpAlerter = cfg.getStartUpAlerter();
     }
 
     /**
@@ -294,6 +296,10 @@ public class Zebedee {
         unlockKeyring(user, credentials);
         cacheKeyring(user);
 
+        if (permissionsService.isAdministrator(session)) {
+            startUpAlerter.queueUnlocked();
+        }
+
         return session;
     }
 
@@ -415,5 +421,9 @@ public class Zebedee {
 
     public EncryptionKeyFactory getEncryptionKeyFactory() {
         return this.encryptionKeyFactory;
+    }
+
+    public StartUpAlerter getStartUpAlerter() {
+        return this.startUpAlerter;
     }
 }

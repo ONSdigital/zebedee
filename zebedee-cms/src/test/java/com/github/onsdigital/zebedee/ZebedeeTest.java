@@ -417,6 +417,9 @@ public class ZebedeeTest extends ZebedeeTestBaseFixture {
         when(user.keyring())
                 .thenReturn(usersKeyring);
 
+        when(permissionsService.isAdministrator(any(Session.class)))
+                .thenReturn(true);
+
         Zebedee zebedee = new Zebedee(zebCfg);
 
         // When openSession is called
@@ -431,5 +434,7 @@ public class ZebedeeTest extends ZebedeeTestBaseFixture {
         // And the keyring is unlocked and cached
         verify(collectionKeyring, times(1)).unlock(user, PASSWORD);
         verify(collectionKeyring, times(1)).cacheKeyring(user);
+
+        verify(startUpAlerter, times(1)).queueUnlocked();
     }
 }

@@ -17,6 +17,7 @@ import com.github.onsdigital.zebedee.session.service.SessionsAPIServiceImpl;
 import com.github.onsdigital.zebedee.user.model.User;
 import com.github.onsdigital.zebedee.user.model.UserList;
 import com.github.onsdigital.zebedee.user.service.UsersService;
+import com.github.onsdigital.zebedee.util.slack.StartUpAlerter;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -93,6 +94,9 @@ public abstract class ZebedeeTestBaseFixture {
 
     @Mock
     protected EncryptionKeyFactory encryptionKeyFactory;
+
+    @Mock
+    protected StartUpAlerter startUpAlerter;
 
     protected Zebedee zebedee;
     protected Builder builder;
@@ -185,6 +189,12 @@ public abstract class ZebedeeTestBaseFixture {
 
         when(zebCfg.getCollectionKeyring())
                 .thenReturn(collectionKeyring);
+
+        when(zebCfg.getStartUpAlerter())
+                .thenReturn(startUpAlerter);
+
+        when(zebCfg.getPermissionsService())
+                .thenReturn(permissionsService);
     }
 
     protected void verifyKeyAddedToCollectionKeyring() throws Exception {

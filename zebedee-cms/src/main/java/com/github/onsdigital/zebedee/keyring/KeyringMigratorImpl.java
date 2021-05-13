@@ -1,9 +1,11 @@
 package com.github.onsdigital.zebedee.keyring;
 
+import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.user.model.User;
 
 import javax.crypto.SecretKey;
+import java.util.List;
 import java.util.Set;
 
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.error;
@@ -194,6 +196,16 @@ public class KeyringMigratorImpl implements Keyring {
         } catch (KeyringException ex) {
             throw wrappedKeyringException(ex, UNLOCK_KEYRING_ERR);
         }
+    }
+
+    @Override
+    public void assignTo(User src, User target, List<CollectionDescription> assignments) throws KeyringException {
+        legacyKeyring.assignTo(src, target, assignments);
+    }
+
+    @Override
+    public void revokeFrom(User target, List<CollectionDescription> removals) throws KeyringException {
+        legacyKeyring.revokeFrom(target, removals);
     }
 
     private Keyring getKeyring() {

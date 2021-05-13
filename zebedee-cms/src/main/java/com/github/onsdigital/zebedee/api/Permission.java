@@ -7,6 +7,7 @@ import com.github.onsdigital.zebedee.exceptions.InternalServerError;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
+import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.PermissionDefinition;
 import com.github.onsdigital.zebedee.keyring.Keyring;
 import com.github.onsdigital.zebedee.model.Collection;
@@ -17,12 +18,13 @@ import com.github.onsdigital.zebedee.session.service.Sessions;
 import com.github.onsdigital.zebedee.user.model.User;
 import com.github.onsdigital.zebedee.user.service.UsersService;
 
-import javax.crypto.SecretKey;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by david on 12/03/2015.
@@ -91,7 +93,7 @@ public class Permission {
             removeEditorPermissionToUser(request, permissionDefinition, session);
         }
 
-        updateUserKeyAssignments(session);
+        updateUserKeyAssignments(session, permissionDefinition.getEmail());
         return "Permissions updated for " + permissionDefinition.getEmail();
     }
 
@@ -179,26 +181,25 @@ public class Permission {
         return session;
     }
 
-    /**
-     * This step is required to maintain legacy fucntionality. It will become unnecessary and should be removed once
-     * the key migration is completed.
-     */
-    private void updateUserKeyAssignments(Session session) throws NotFoundException, BadRequestException,
-            InternalServerError, IOException {
+
+    private void updateUserKeyAssignments(Session session, String targetEmail) throws IOException,
+            NotFoundException, BadRequestException, InternalServerError {
         User srcUser = getUser(session.getEmail());
+        User targetUser = getUser(targetEmail);
 
-        Collections.CollectionList list = collections.list();
-        if (list == null || list.isEmpty()) {
-            return;
+        List<CollectionDescription> assignments = new ArrayList<>();
+        List<CollectionDescription> removals = new ArrayList<>();
+
+        for (Collection c : collections.list()) {
+            if (permissionsService.canView(targetUser, c.getDescription())) {
+                assignments.add(c.getDescription());
+            } else {
+                removals.add(c.getDescription());
+            }
         }
 
-        for (Collection c :list) {
-            SecretKey key = keyring.get(srcUser, c);
-
-            // Add manages key assignments/removals. Calling add here will add or remove a key from each user based
-            // on the latest permisisons updates.
-            keyring.add(srcUser, c, key);
-        }
+        keyring.revokeFrom(targetUser, removals);
+        keyring.assignTo(srcUser, targetUser, assignments);
     }
 
     private User getUser(String email) throws InternalServerError, NotFoundException, BadRequestException {

@@ -1,9 +1,11 @@
 package com.github.onsdigital.zebedee.keyring;
 
+import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.user.model.User;
 
 import javax.crypto.SecretKey;
+import java.util.List;
 import java.util.Set;
 
 public interface Keyring {
@@ -63,4 +65,14 @@ public interface Keyring {
      * @throws KeyringException problem unlocking the keyring.
      */
     void unlock(User user, String password) throws KeyringException;
+
+    /**
+     * Assign the List of keys to a user. Required to maintain backwards compatability
+     */
+    void assignTo(User src, User target, List<CollectionDescription> assignments) throws KeyringException;
+
+    /**
+     * Remove the List of keys from a user. Required to maintain backwards compatability
+     */
+    void revokeFrom(User target, List<CollectionDescription> removals) throws KeyringException;
 }

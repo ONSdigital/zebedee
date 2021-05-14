@@ -190,7 +190,8 @@ public class Permission {
         List<CollectionDescription> assignments = new ArrayList<>();
         List<CollectionDescription> removals = new ArrayList<>();
 
-        for (Collection c : collections.list()) {
+        Collections.CollectionList collectionList = listCollections();
+        for (Collection c : collectionList) {
             if (permissionsService.canView(targetUser, c.getDescription())) {
                 assignments.add(c.getDescription());
             } else {
@@ -215,6 +216,14 @@ public class Permission {
         }
 
         return user;
+    }
+
+    private Collections.CollectionList listCollections() throws InternalServerError {
+        try {
+            return collections.list();
+        } catch (IOException ex) {
+            throw new InternalServerError("error listing collections", ex);
+        }
     }
 
 }

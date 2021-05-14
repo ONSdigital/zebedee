@@ -319,9 +319,6 @@ public class PermissionsServiceImpl implements PermissionsService {
         AccessMapping accessMapping = permissionsStore.getAccessMapping();
         accessMapping.getDigitalPublishingTeam().add(PathUtils.standardise(email));
         permissionsStore.saveAccessMapping(accessMapping);
-
-        // Update keyring (assuming this is not the system initialisation)
-        //updateKeyring(session, email);
     }
 
 
@@ -552,22 +549,4 @@ public class PermissionsServiceImpl implements PermissionsService {
                 .isAdmin(isAdministrator(email))
                 .isEditor(canEdit(email));
     }
-
-    /**
-     * Add the necessary keyrings to the user.
-     *
-     * @param session The session of the user who is adding the new user.
-     * @param email   the email of the new user.
-     * @throws IOException
-     * @throws NotFoundException
-     * @throws BadRequestException
-     */
-/*    private void updateKeyring(Session session, String email)
-            throws IOException, NotFoundException, BadRequestException {
-        User user = usersServiceSupplier.getService().getUserByEmail(email);
-        if (session != null && user.keyring() != null) {
-            KeyManager.transferKeyring(user.keyring(), keyringCache.get(session));
-            usersServiceSupplier.getService().updateKeyring(user);
-        }
-    }*/
 }

@@ -363,7 +363,6 @@ public class LegacyKeyringImpl implements Keyring {
         }
 
         validateUser(target);
-
         com.github.onsdigital.zebedee.json.Keyring targetCache = getCachedUserKeyring(target);
 
         for (CollectionDescription desc : removals) {

@@ -186,8 +186,8 @@ public class ZebedeeConfiguration {
         initialisePermissions(permissionsPath);
         this.permissionsStore = new PermissionsStoreFileSystemImpl(permissionsPath);
 
-        this.permissionsService = new PermissionsServiceImpl(permissionsStore,
-                this::getUsersService, this::getTeamsService, legacyKeyringCache);
+        this.permissionsService = new PermissionsServiceImpl(permissionsStore, this::getUsersService,
+                this::getTeamsService);
 
         VersionsService versionsService = new VersionsServiceImpl();
         this.collections = new Collections(collectionsPath, permissionsService, versionsService, published);

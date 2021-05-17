@@ -109,35 +109,14 @@ public interface PermissionsService {
      */
     boolean canEdit(String email) throws IOException;
 
-/*    *//**
-     * Check if the {@link User} has permissions to edit content.
-     *
-     * @param session               the {@link Session} of the user to check.
-     * @param collectionDescription the {@link CollectionDescription} of the {@link Collection} to check.
-     * @return true if the user has edit permissions, false otherwise.
-     * @throws IOException unexpected error while checking permissions.
-     *//*
-    boolean canEdit(Session session, CollectionDescription collectionDescription) throws IOException;*/
-
-/*    *//**
+    /**
      * Check if the {@link User} has permissions to edit content.
      *
      * @param user                  the {@link User} to check.
-     * @param collectionDescription the {@link CollectionDescription} of the {@link Collection} to check.
      * @return true if the user has edit permissions, false otherwise.
      * @throws IOException unexpected error while checking permissions.
-     *//*
-    boolean canEdit(User user, CollectionDescription collectionDescription) throws IOException;*/
-
-/*    *//**
-     * Check if the {@link User} has permissions to edit content.
-     *
-     * @param email                 the email of the user to check.
-     * @param collectionDescription the {@link CollectionDescription} of the {@link Collection} to check.
-     * @return true if the user has edit permissions, false otherwise.
-     * @throws IOException unexpected error while checking permissions.
-     *//*
-    boolean canEdit(String email, CollectionDescription collectionDescription) throws IOException;*/
+     */
+    boolean canEdit(User user) throws IOException;
 
     /**
      * Grant editor permission to a user.

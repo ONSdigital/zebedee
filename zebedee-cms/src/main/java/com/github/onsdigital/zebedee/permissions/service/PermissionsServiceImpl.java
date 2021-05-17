@@ -7,7 +7,6 @@ import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.PermissionDefinition;
 import com.github.onsdigital.zebedee.model.Collection;
-import com.github.onsdigital.zebedee.model.KeyringCache;
 import com.github.onsdigital.zebedee.model.PathUtils;
 import com.github.onsdigital.zebedee.permissions.model.AccessMapping;
 import com.github.onsdigital.zebedee.permissions.store.PermissionsStore;
@@ -50,7 +49,6 @@ public class PermissionsServiceImpl implements PermissionsService {
      * @param permissionsStore
      * @param usersServiceSupplier
      * @param teamsServiceSupplier
-     * @param keyringCache
      */
     public PermissionsServiceImpl(PermissionsStore permissionsStore, ServiceSupplier<UsersService> usersServiceSupplier,
                                   ServiceSupplier<TeamsService> teamsServiceSupplier) {
@@ -234,6 +232,11 @@ public class PermissionsServiceImpl implements PermissionsService {
     public boolean canEdit(String email) throws IOException {
         AccessMapping accessMapping = permissionsStore.getAccessMapping();
         return canEdit(email, accessMapping);
+    }
+
+    @Override
+    public boolean canEdit(User user) throws IOException {
+        return user != null && canEdit(user.getEmail());
     }
 
     /**

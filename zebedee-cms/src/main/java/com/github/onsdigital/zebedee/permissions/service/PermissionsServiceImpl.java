@@ -7,7 +7,6 @@ import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.PermissionDefinition;
 import com.github.onsdigital.zebedee.model.Collection;
-import com.github.onsdigital.zebedee.model.KeyManager;
 import com.github.onsdigital.zebedee.model.KeyringCache;
 import com.github.onsdigital.zebedee.model.PathUtils;
 import com.github.onsdigital.zebedee.permissions.model.AccessMapping;
@@ -28,14 +27,13 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
 
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getUnauthorizedMessage;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_VIEWER_TEAM_ADDED;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_VIEWER_TEAM_REMOVED;
 import static com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDaoFactory.getCollectionHistoryDao;
 import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData.teamAdded;
 import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData.teamRemoved;
-
-import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
 
 /**
  * Handles permissions mapping between users and {@link com.github.onsdigital.zebedee.Zebedee} functions.
@@ -321,9 +319,6 @@ public class PermissionsServiceImpl implements PermissionsService {
         AccessMapping accessMapping = permissionsStore.getAccessMapping();
         accessMapping.getDigitalPublishingTeam().add(PathUtils.standardise(email));
         permissionsStore.saveAccessMapping(accessMapping);
-
-        // Update keyring (assuming this is not the system initialisation)
-        updateKeyring(session, email);
     }
 
 
@@ -553,23 +548,5 @@ public class PermissionsServiceImpl implements PermissionsService {
                 .setEmail(email)
                 .isAdmin(isAdministrator(email))
                 .isEditor(canEdit(email));
-    }
-
-    /**
-     * Add the necessary keyrings to the user.
-     *
-     * @param session The session of the user who is adding the new user.
-     * @param email   the email of the new user.
-     * @throws IOException
-     * @throws NotFoundException
-     * @throws BadRequestException
-     */
-    private void updateKeyring(Session session, String email)
-            throws IOException, NotFoundException, BadRequestException {
-        User user = usersServiceSupplier.getService().getUserByEmail(email);
-        if (session != null && user.keyring() != null) {
-            KeyManager.transferKeyring(user.keyring(), keyringCache.get(session));
-            usersServiceSupplier.getService().updateKeyring(user);
-        }
     }
 }

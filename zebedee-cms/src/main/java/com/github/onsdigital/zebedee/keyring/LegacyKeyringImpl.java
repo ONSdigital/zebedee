@@ -1,5 +1,6 @@
 package com.github.onsdigital.zebedee.keyring;
 
+import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.keyring.cache.SchedulerKeyCache;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.KeyringCache;
@@ -50,6 +51,7 @@ public class LegacyKeyringImpl implements Keyring {
     static final String CACHE_KEYRING_NULL_ERR = "expected cached keyring but was not found";
     static final String KEYRING_LOCKED_ERR = "cached keyring has not been unlocked";
     static final String SAVE_USER_KEYRING_ERR = "error saving changes to user keyring";
+    static final String CACHED_KEY_MISSING_ERR = "expected key but not found in cached keyring";
 
     private Sessions sessions;
     private UsersService usersService;
@@ -196,7 +198,7 @@ public class LegacyKeyringImpl implements Keyring {
         schedulerKeyCache.add(collection.getDescription().getId(), key);
 
         List<User> assignments = getKeyRecipients(collection);
-        List<User> removals = getKeyToRemoveFrom(collection, assignments);
+        List<User> removals = getKeyToRemoveFrom(assignments);
 
         for (User recipent : assignments) {
             assignKeyToRecipient(recipent, collection, key);
@@ -222,7 +224,7 @@ public class LegacyKeyringImpl implements Keyring {
         return recipients;
     }
 
-    private List<User> getKeyToRemoveFrom(Collection collection, List<User> recipients) throws KeyringException {
+    private List<User> getKeyToRemoveFrom(List<User> recipients) throws KeyringException {
         UserList allUsers = listUsers();
 
         if (allUsers == null) {
@@ -246,6 +248,11 @@ public class LegacyKeyringImpl implements Keyring {
         com.github.onsdigital.zebedee.json.Keyring cachedKeyring = getCachedUserKeyring(user);
         if (cachedKeyring != null) {
             cachedKeyring.put(collection.getDescription().getId(), key);
+        }
+
+        if (user.keyring().get(collection.getId()) != null) {
+            // they already have the key in their keyring - so do nothing
+            return;
         }
 
         try {
@@ -313,29 +320,57 @@ public class LegacyKeyringImpl implements Keyring {
     }
 
     @Override
-    public void populate(User src, User target, Set<String> collectionIDs) throws KeyringException {
-        validateUser(src);
-
-        com.github.onsdigital.zebedee.json.Keyring srcKeyring = getCachedUserKeyring(src);
-        if (srcKeyring == null) {
-            throw new KeyringException(CACHE_KEYRING_NULL_ERR);
-        }
-
-        if (!srcKeyring.isUnlocked()) {
-            throw new KeyringException(KEYRING_LOCKED_ERR);
-        }
-
-        validateUser(target);
-
-        if (collectionIDs == null || collectionIDs.isEmpty()) {
+    public void assignTo(User src, User target, List<CollectionDescription> assignments) throws KeyringException {
+        if (assignments == null || assignments.isEmpty()) {
             return;
         }
 
-        for (String id : collectionIDs) {
-            SecretKey key = srcKeyring.get(id);
-            if (key != null) {
-                target.keyring().put(id, key);
+        validateUser(src);
+        validateUser(target);
+
+        com.github.onsdigital.zebedee.json.Keyring srcCache = getCachedUserKeyring(src);
+        if (srcCache == null) {
+            throw new KeyringException(CACHE_KEYRING_NULL_ERR);
+        }
+
+        if (!srcCache.isUnlocked()) {
+            throw new KeyringException(KEYRING_LOCKED_ERR);
+        }
+
+        com.github.onsdigital.zebedee.json.Keyring targetCache = getCachedUserKeyring(target);
+
+        for (CollectionDescription desc : assignments) {
+            if (!srcCache.keySet().contains(desc.getId())) {
+                throw new KeyringException(CACHED_KEY_MISSING_ERR, desc.getId());
             }
+
+            SecretKey key = srcCache.get(desc.getId());
+
+            if (targetCache != null) {
+                targetCache.put(desc.getId(), key);
+            }
+
+            target.keyring().put(desc.getId(), key);
+        }
+
+        saveKeyringChanges(target);
+    }
+
+    @Override
+    public void revokeFrom(User target, List<CollectionDescription> removals) throws KeyringException {
+        if (removals == null || removals.isEmpty()) {
+            return;
+        }
+
+        validateUser(target);
+        com.github.onsdigital.zebedee.json.Keyring targetCache = getCachedUserKeyring(target);
+
+        for (CollectionDescription desc : removals) {
+            if (targetCache != null) {
+                targetCache.remove(desc.getId());
+            }
+
+            target.keyring().remove(desc.getId());
         }
 
         saveKeyringChanges(target);

@@ -60,6 +60,10 @@ public class StartUpAlerterImpl implements StartUpAlerter {
     public void queueUnlocked() {
         synchronized (MUTEX) {
             if (queueLocked && lockedNotificationSent) {
+                if (channels == null || channels.isEmpty()) {
+                    return;
+                }
+
                 if (messages == null || messages.isEmpty()) {
                     throw new RuntimeException("failed to send publish queue unlocked notification original message " +
                             "expected but was null");

@@ -149,8 +149,8 @@ public class StartUpAlerterImplTest {
     }
 
     @Test
-    public void testNotifylocked_originalMessageNull_shouldThrowEx() throws Exception {
-        alerter = new StartUpAlerterImpl(slackClient, null, true, true);
+    public void testNotifylocked_originalMessageNull_shouldDoNothing() throws Exception {
+        alerter = new StartUpAlerterImpl(slackClient, channels, true, true);
 
         RuntimeException ex = assertThrows(RuntimeException.class, () -> alerter.queueUnlocked());
 

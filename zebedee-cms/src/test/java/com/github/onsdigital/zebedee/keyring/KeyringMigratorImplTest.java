@@ -866,4 +866,17 @@ public class KeyringMigratorImplTest {
         verify(legacyKeyring, times(1)).assignTo(src, target, assignments);
         verifyZeroInteractions(centralKeyring);
     }
+
+    @Test
+    public void testRemoveFrom_shouldCallLegacyKeyring() throws Exception {
+        keyring = new KeyringMigratorImpl(enabled, legacyKeyring, centralKeyring);
+
+        User target = mock(User.class);
+        List<CollectionDescription> removals = mock(List.class);
+
+        keyring.revokeFrom(target, removals);
+
+        verify(legacyKeyring, times(1)).revokeFrom(target, removals);
+        verifyZeroInteractions(centralKeyring);
+    }
 }

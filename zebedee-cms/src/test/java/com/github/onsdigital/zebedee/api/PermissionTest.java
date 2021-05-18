@@ -303,10 +303,10 @@ public class PermissionTest extends ZebedeeAPIBaseTestCase {
         assertTrue(removals.isEmpty());
 
         verify(keyring, times(1)).assignTo(eq(srcUser), eq(targetUser), assignmentsCaptor.capture());
-        List<CollectionDescription> asssignments = assignmentsCaptor.getValue();
-        assertThat(asssignments, is(notNullValue()));
-        assertThat(asssignments.size(), equalTo(1));
-        assertThat(asssignments.get(0), equalTo(collectionDescription));
+        List<CollectionDescription> assignments = assignmentsCaptor.getValue();
+        assertThat(assignments, is(notNullValue()));
+        assertThat(assignments.size(), equalTo(1));
+        assertThat(assignments.get(0), equalTo(collectionDescription));
     }
 
     @Test
@@ -342,7 +342,7 @@ public class PermissionTest extends ZebedeeAPIBaseTestCase {
     }
 
     @Test
-    public void testGrant_removeEditorError_shouldAssignAdminPermissions() throws Exception {
+    public void testGrant_removeEditorError_shouldRemoveAdminAndEditorPermissions() throws Exception {
         permission.isAdmin(false);
         permission.isEditor(false);
 

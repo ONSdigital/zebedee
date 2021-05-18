@@ -57,7 +57,7 @@ public interface Keyring {
     /**
      * Unlock the user keyring.
      *
-     * <b>Note:</b> This is to maintain backwards compatability only. This functionality is not required by the new
+     * <b>Note:</b> This is to maintain backwards compatibility only. This functionality is not required by the new
      * central keyring implementation.
      *
      * @param user     the user the keyring belongs to.
@@ -67,12 +67,12 @@ public interface Keyring {
     void unlock(User user, String password) throws KeyringException;
 
     /**
-     * Assign the List of keys to a user. Required to maintain backwards compatability
+     * Assign the List of keys to a user. Required to maintain backwards compatibility
      */
     void assignTo(User src, User target, List<CollectionDescription> assignments) throws KeyringException;
 
     /**
-     * Remove the List of keys from a user. Required to maintain backwards compatability
+     * Remove the List of keys from a user. Required to maintain backwards compatibility
      */
     void revokeFrom(User target, List<CollectionDescription> removals) throws KeyringException;
 }

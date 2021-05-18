@@ -90,7 +90,7 @@ public class Permission {
         if (permissionDefinition.isEditor()) {
             addEditorPermissionToUser(request, permissionDefinition, session);
         } else {
-            removeEditorPermissionToUser(request, permissionDefinition, session);
+            removeEditorPermissionFromUser(request, permissionDefinition, session);
         }
 
         updateUserKeyAssignments(session, permissionDefinition.getEmail());
@@ -154,8 +154,8 @@ public class Permission {
                 .log();
     }
 
-    private void removeEditorPermissionToUser(HttpServletRequest request, PermissionDefinition permissionDefinition,
-                                              Session session)
+    private void removeEditorPermissionFromUser(HttpServletRequest request, PermissionDefinition permissionDefinition,
+                                                Session session)
             throws IOException, UnauthorizedException {
         permissionsService.removeEditor(permissionDefinition.getEmail(), session);
 

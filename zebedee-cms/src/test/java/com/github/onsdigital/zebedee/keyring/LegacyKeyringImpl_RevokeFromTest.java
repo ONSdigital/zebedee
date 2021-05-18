@@ -51,7 +51,6 @@ public class LegacyKeyringImpl_RevokeFromTest extends BaseLegacyKeyringTest {
     public void testRemoveFrom_userNull_shouldThrowEx() throws Exception {
         KeyringException ex = assertThrows(KeyringException.class, () -> legacyKeyring.revokeFrom(null, removals));
 
-
         assertThat(ex.getMessage(), equalTo(USER_NULL_ERR));
         verifyZeroInteractions(bertKeyring, keyringCache);
     }

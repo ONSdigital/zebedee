@@ -1,5 +1,6 @@
 package com.github.onsdigital.zebedee.keyring;
 
+import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.keyring.cache.KeyringCache;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
@@ -8,6 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import javax.crypto.SecretKey;
 import java.io.IOException;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -150,8 +152,13 @@ public class CentralKeyringImpl implements Keyring {
     }
 
     @Override
-    public void populate(User source, User target, Set<String> collectionIDs) throws KeyringException {
+    public void assignTo(User src, User target, List<CollectionDescription> assignments) throws KeyringException {
+        //Do nothing - required to maintain backwards compatability.
+    }
 
+    @Override
+    public void revokeFrom(User target, List<CollectionDescription> removals) throws KeyringException {
+        //Do nothing - required to maintain backwards compatability.
     }
 
     private void validateUser(User user) throws KeyringException {

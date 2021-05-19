@@ -3,24 +3,57 @@ package com.github.onsdigital.zebedee.api;
 import com.github.davidcarboni.restolino.framework.Api;
 import com.github.onsdigital.zebedee.audit.Audit;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
+import com.github.onsdigital.zebedee.exceptions.InternalServerError;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
+import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.PermissionDefinition;
+import com.github.onsdigital.zebedee.keyring.Keyring;
+import com.github.onsdigital.zebedee.model.Collection;
+import com.github.onsdigital.zebedee.model.Collections;
+import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.session.model.Session;
-import org.apache.commons.lang3.BooleanUtils;
+import com.github.onsdigital.zebedee.session.service.Sessions;
+import com.github.onsdigital.zebedee.user.model.User;
+import com.github.onsdigital.zebedee.user.service.UsersService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by david on 12/03/2015.
  */
 @Api
 public class Permission {
+
+    private Sessions sessionsService;
+    private PermissionsService permissionsService;
+    private UsersService usersService;
+    private Keyring keyring;
+    private Collections collections;
+
+    public Permission() {
+        this.sessionsService = Root.zebedee.getSessions();
+        this.permissionsService = Root.zebedee.getPermissionsService();
+        this.usersService = Root.zebedee.getUsersService();
+        this.keyring = Root.zebedee.getCollectionKeyring();
+        this.collections = Root.zebedee.getCollections();
+    }
+
+    Permission(final Sessions sessionsService, PermissionsService permissionsService, UsersService usersService,
+               Collections collections, Keyring keyring) {
+        this.sessionsService = sessionsService;
+        this.permissionsService = permissionsService;
+        this.usersService = usersService;
+        this.collections = collections;
+        this.keyring = keyring;
+    }
 
     /**
      * Grants the specified permissions.
@@ -41,44 +74,26 @@ public class Permission {
     public String grantPermission(HttpServletRequest request, HttpServletResponse response, PermissionDefinition permissionDefinition)
             throws IOException, ZebedeeException {
 
-        Session session = Root.zebedee.getSessions().get(request);
+        Session session = getSession(request);
 
-        // Administrator
-        if (BooleanUtils.isTrue(permissionDefinition.isAdmin())) {
-            Root.zebedee.getPermissionsService().addAdministrator(permissionDefinition.getEmail(), session);
+        // Assign / remove admin permissions
+        if (permissionDefinition.isAdmin()) {
+            assignAdminPermissionsToUser(request, permissionDefinition, session);
+
             // Admins must be publishers so update the permissions accordingly
             permissionDefinition.isEditor(true);
-            Audit.Event.ADMIN_PERMISSION_ADDED
-                    .parameters()
-                    .host(request)
-                    .actionedByEffecting(session.getEmail(), permissionDefinition.getEmail())
-                    .log();
-        } else if (BooleanUtils.isFalse(permissionDefinition.isAdmin())) {
-            Root.zebedee.getPermissionsService().removeAdministrator(permissionDefinition.getEmail(), session);
-            Audit.Event.ADMIN_PERMISSION_REMOVED
-                    .parameters()
-                    .host(request)
-                    .actionedByEffecting(session.getEmail(), permissionDefinition.getEmail())
-                    .log();
+        } else {
+            removeAdminPermissionsFromUser(request, permissionDefinition, session);
         }
 
-        // Digital publishing
-        if (BooleanUtils.isTrue(permissionDefinition.isEditor())) {
-            Root.zebedee.getPermissionsService().addEditor(permissionDefinition.getEmail(), session);
-            Audit.Event.PUBLISHER_PERMISSION_ADDED
-                    .parameters()
-                    .host(request)
-                    .actionedByEffecting(session.getEmail(), permissionDefinition.getEmail())
-                    .log();
-        } else if (BooleanUtils.isFalse(permissionDefinition.isEditor())) {
-            Root.zebedee.getPermissionsService().removeEditor(permissionDefinition.getEmail(), session);
-            Audit.Event.PUBLISHER_PERMISSION_REMOVED
-                    .parameters()
-                    .host(request)
-                    .actionedByEffecting(session.getEmail(), permissionDefinition.getEmail())
-                    .log();
+        // Assign / remove editor permissions
+        if (permissionDefinition.isEditor()) {
+            addEditorPermissionToUser(request, permissionDefinition, session);
+        } else {
+            removeEditorPermissionFromUser(request, permissionDefinition, session);
         }
 
+        updateUserKeyAssignments(session, permissionDefinition.getEmail());
         return "Permissions updated for " + permissionDefinition.getEmail();
     }
 
@@ -93,14 +108,122 @@ public class Permission {
      * @throws BadRequestException   If the user specified in the {@link PermissionDefinition} is not found.
      */
     @GET
-    public PermissionDefinition getPermissions(HttpServletRequest request, HttpServletResponse response) throws IOException, NotFoundException, UnauthorizedException {
+    public PermissionDefinition getPermissions(HttpServletRequest request, HttpServletResponse response)
+            throws IOException, NotFoundException, UnauthorizedException {
 
-        Session session = Root.zebedee.getSessions().get(request);
+        Session session = sessionsService.get(request);
         String email = request.getParameter("email");
 
-        PermissionDefinition permissionDefinition = Root.zebedee.getPermissionsService().userPermissions(email, session);
+        PermissionDefinition permissionDefinition = permissionsService.userPermissions(email, session);
 
         return permissionDefinition;
+    }
+
+    private void assignAdminPermissionsToUser(HttpServletRequest request, PermissionDefinition permissionDefinition,
+                                              Session session)
+            throws IOException, UnauthorizedException {
+        permissionsService.addAdministrator(permissionDefinition.getEmail(), session);
+        Audit.Event.ADMIN_PERMISSION_ADDED
+                .parameters()
+                .host(request)
+                .actionedByEffecting(session.getEmail(), permissionDefinition.getEmail())
+                .log();
+    }
+
+    private void removeAdminPermissionsFromUser(HttpServletRequest request, PermissionDefinition permissionDefinition,
+                                                Session session)
+            throws IOException, UnauthorizedException {
+        permissionsService.removeAdministrator(permissionDefinition.getEmail(), session);
+
+        Audit.Event.ADMIN_PERMISSION_REMOVED
+                .parameters()
+                .host(request)
+                .actionedByEffecting(session.getEmail(), permissionDefinition.getEmail())
+                .log();
+    }
+
+    private void addEditorPermissionToUser(HttpServletRequest request, PermissionDefinition permissionDefinition,
+                                           Session session)
+            throws IOException, UnauthorizedException, BadRequestException, NotFoundException {
+        permissionsService.addEditor(permissionDefinition.getEmail(), session);
+
+        Audit.Event.PUBLISHER_PERMISSION_ADDED
+                .parameters()
+                .host(request)
+                .actionedByEffecting(session.getEmail(), permissionDefinition.getEmail())
+                .log();
+    }
+
+    private void removeEditorPermissionFromUser(HttpServletRequest request, PermissionDefinition permissionDefinition,
+                                                Session session)
+            throws IOException, UnauthorizedException {
+        permissionsService.removeEditor(permissionDefinition.getEmail(), session);
+
+        Audit.Event.PUBLISHER_PERMISSION_REMOVED
+                .parameters()
+                .host(request)
+                .actionedByEffecting(session.getEmail(), permissionDefinition.getEmail())
+                .log();
+    }
+
+    private Session getSession(HttpServletRequest request) throws InternalServerError {
+        Session session = null;
+        try {
+            session = sessionsService.get(request);
+        } catch (IOException ex) {
+            throw new InternalServerError("error getting user session", ex);
+        }
+
+        if (session == null) {
+            throw new InternalServerError("error expected user session but was null");
+        }
+
+        return session;
+    }
+
+
+    private void updateUserKeyAssignments(Session session, String targetEmail) throws IOException,
+            NotFoundException, BadRequestException, InternalServerError {
+        User srcUser = getUser(session.getEmail());
+        User targetUser = getUser(targetEmail);
+
+        List<CollectionDescription> assignments = new ArrayList<>();
+        List<CollectionDescription> removals = new ArrayList<>();
+
+        Collections.CollectionList collectionList = listCollections();
+        for (Collection c : collectionList) {
+            if (permissionsService.canView(targetUser, c.getDescription())) {
+                assignments.add(c.getDescription());
+            } else {
+                removals.add(c.getDescription());
+            }
+        }
+
+        keyring.revokeFrom(targetUser, removals);
+        keyring.assignTo(srcUser, targetUser, assignments);
+    }
+
+    private User getUser(String email) throws InternalServerError, NotFoundException, BadRequestException {
+        User user;
+        try {
+            user = usersService.getUserByEmail(email);
+        } catch (IOException ex) {
+            throw new InternalServerError("error getting user", ex);
+        }
+
+        if (user == null) {
+            throw new NotFoundException("requested user not found");
+        }
+
+        return user;
+    }
+
+    private Collections.CollectionList listCollections() throws InternalServerError {
+        try {
+            return collections.list();
+        } catch (IOException ex) {
+            throw new InternalServerError("error listing collections", ex);
+        }
     }
 
 }

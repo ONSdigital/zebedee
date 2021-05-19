@@ -1,9 +1,11 @@
 package com.github.onsdigital.zebedee.keyring;
 
+import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.user.model.User;
 
 import javax.crypto.SecretKey;
+import java.util.List;
 import java.util.Set;
 
 public interface Keyring {
@@ -55,7 +57,7 @@ public interface Keyring {
     /**
      * Unlock the user keyring.
      *
-     * <b>Note:</b> This is to maintain backwards compatability only. This functionality is not required by the new
+     * <b>Note:</b> This is to maintain backwards compatibility only. This functionality is not required by the new
      * central keyring implementation.
      *
      * @param user     the user the keyring belongs to.
@@ -65,18 +67,12 @@ public interface Keyring {
     void unlock(User user, String password) throws KeyringException;
 
     /**
-     * Support for legacy keyring functionality.
-     * <p>
-     * When a new user is created their keyring needs to be populated with the appropriate keys. This method replaces
-     * this functionality which is currently handled by
-     * {@link com.github.onsdigital.zebedee.permissions.service.PermissionsServiceImpl#addEditor}. This will be
-     * removed when we move to the new keyring.
-     *
-     * @param source        the {@link User} admin user who created and is assigning permissions to the new user. This
-     *                      keyring is used as the source to populate the new keyring.
-     * @param target        the new user who's keyring needs to be populated.
-     * @param collectionIDs a set of collection IDs for which the user should be given access to.
-     * @throws KeyringException problem doing the above.
+     * Assign the List of keys to a user. Required to maintain backwards compatibility
      */
-    void populate(User source, User target, Set<String> collectionIDs) throws KeyringException;
+    void assignTo(User src, User target, List<CollectionDescription> assignments) throws KeyringException;
+
+    /**
+     * Remove the List of keys from a user. Required to maintain backwards compatibility
+     */
+    void revokeFrom(User target, List<CollectionDescription> removals) throws KeyringException;
 }

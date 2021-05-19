@@ -1,9 +1,11 @@
 package com.github.onsdigital.zebedee.keyring;
 
+import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.user.model.User;
 
 import javax.crypto.SecretKey;
+import java.util.List;
 import java.util.Set;
 
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.info;
@@ -47,7 +49,12 @@ public class NoOpCentralKeyring implements Keyring {
     }
 
     @Override
-    public void populate(User source, User target, Set<String> collectionIDs) throws KeyringException {
+    public void assignTo(User src, User target, List<CollectionDescription> assignments) throws KeyringException {
+        info().data("src", src.getEmail()).data("target", target.getEmail()).log("no-op assign keys to user");
+    }
 
+    @Override
+    public void revokeFrom(User target, List<CollectionDescription> removals) throws KeyringException {
+        info().user(target.getEmail()).log("no-op revoke keys from user");
     }
 }

@@ -1,5 +1,6 @@
 package com.github.onsdigital.zebedee.keyring;
 
+import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.user.model.User;
 import org.junit.Before;
@@ -9,6 +10,7 @@ import org.mockito.MockitoAnnotations;
 
 import javax.crypto.SecretKey;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import static com.github.onsdigital.zebedee.keyring.KeyringMigratorImpl.ADD_KEY_ERR;
@@ -27,6 +29,7 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertThrows;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -847,5 +850,33 @@ public class KeyringMigratorImplTest {
 
         verify(centralKeyring, times(1)).unlock(user, password);
         verifyZeroInteractions(legacyKeyring);
+    }
+
+
+    @Test
+    public void testAssignTo_shouldCallLegacyKeyring() throws Exception {
+        keyring = new KeyringMigratorImpl(enabled, legacyKeyring, centralKeyring);
+
+        User src = mock(User.class);
+        User target = mock(User.class);
+        List<CollectionDescription> assignments = mock(List.class);
+
+        keyring.assignTo(src, target, assignments);
+
+        verify(legacyKeyring, times(1)).assignTo(src, target, assignments);
+        verifyZeroInteractions(centralKeyring);
+    }
+
+    @Test
+    public void testRemoveFrom_shouldCallLegacyKeyring() throws Exception {
+        keyring = new KeyringMigratorImpl(enabled, legacyKeyring, centralKeyring);
+
+        User target = mock(User.class);
+        List<CollectionDescription> removals = mock(List.class);
+
+        keyring.revokeFrom(target, removals);
+
+        verify(legacyKeyring, times(1)).revokeFrom(target, removals);
+        verifyZeroInteractions(centralKeyring);
     }
 }

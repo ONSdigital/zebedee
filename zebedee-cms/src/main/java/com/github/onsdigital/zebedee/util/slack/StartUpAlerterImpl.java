@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import static com.github.onsdigital.zebedee.logging.CMSLogEvent.error;
 import static java.text.MessageFormat.format;
 
 /**
@@ -51,7 +50,7 @@ public class StartUpAlerterImpl implements StartUpAlerter {
     public void queueLocked() {
         synchronized (MUTEX) {
             if (queueLocked && !lockedNotificationSent) {
-                channels.stream().forEach(c -> publishingQueueLocked(c));
+                channels.stream().forEach(c -> messages.add(publishingQueueLocked(c)));
                 this.lockedNotificationSent = true;
             }
         }
@@ -62,8 +61,8 @@ public class StartUpAlerterImpl implements StartUpAlerter {
         synchronized (MUTEX) {
             if (queueLocked && lockedNotificationSent) {
                 if (messages == null || messages.isEmpty()) {
-                    error().log("failed to send publish queue unlocked notification original message expected but was" +
-                            " null. If this was unexpected this should be investigated");
+                    throw new RuntimeException("failed to send publish queue unlocked notification original message " +
+                            "expected but was null");
                 }
 
                 messages.stream()
@@ -73,41 +72,29 @@ public class StartUpAlerterImpl implements StartUpAlerter {
         }
     }
 
-    private void publishingQueueLocked(String channel) {
+    private PostMessage publishingQueueLocked(String channel) {
         Profile profile = slack.getProfile();
 
-        try {
-            PostMessage msg = profile
-                    .newPostMessage(channel, "Publishing system restart complete")
-                    .addAttachment(new PostMessageAttachment(
-                            "Administrator log in required",
-                            "Please log out of any existing session and log in again to unlock the publishing queue.",
-                            Colour.WARNING
-                    ));
+        PostMessage msg = profile
+                .newPostMessage(channel, "Publishing system restart complete")
+                .addAttachment(new PostMessageAttachment(
+                        "Administrator log in required",
+                        "Please log out of any existing session and log in again to unlock the publishing queue.",
+                        Colour.WARNING
+                ));
 
-            PostMessageResponse response = slack.sendMessage(msg);
-            msg.ts(response.getTs()).channel(response.getChannel());
-
-            this.messages.add(msg);
-        } catch (Exception ex) {
-            error().exception(ex)
-                    .log("error sending CMS start up Slack notification. If this was unexpected this should be " +
-                            "investigated");
-        }
+        PostMessageResponse response = slack.sendMessage(msg);
+        msg.ts(response.getTs()).channel(response.getChannel());
+        return msg;
     }
 
     private void publishingQueueUnlocked(PostMessage messageToUpdate) {
-        try {
-            messageToUpdate.getAttachments().get(0).setColor(Colour.GOOD.getColor());
+        messageToUpdate.getAttachments().get(0).setColor(Colour.GOOD.getColor());
 
-            String msg = format(("Publishing queue successfully unlocked `{0}`"), new Date().toString());
-            messageToUpdate.addAttachment(new PostMessageAttachment("Resolved", msg, Colour.GOOD));
+        String msg = format(("Publishing queue successfully unlocked `{0}`"), new Date().toString());
+        messageToUpdate.addAttachment(new PostMessageAttachment("Resolved", msg, Colour.GOOD));
 
-            slack.updateMessage(messageToUpdate);
-        } catch (Exception ex) {
-            error().exception(ex).log("error sending CMS queue unlocked Slack notification. If this was unexpected" +
-                    " this should be investigated");
-        }
+        slack.updateMessage(messageToUpdate);
     }
 
 }

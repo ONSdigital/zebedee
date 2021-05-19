@@ -30,7 +30,7 @@
     </repositories>
 
     <properties>
-        <spring.version>5.2.5.RELEASE</spring.version>
+        <spring.version>5.2.15.RELEASE</spring.version>
     </properties>
 
     <dependencies>

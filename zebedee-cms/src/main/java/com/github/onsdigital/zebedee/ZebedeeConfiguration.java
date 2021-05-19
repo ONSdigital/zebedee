@@ -64,6 +64,7 @@ import java.util.List;
 
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.warn;
 import static com.github.onsdigital.zebedee.Zebedee.APPLICATION_KEYS;
 import static com.github.onsdigital.zebedee.Zebedee.COLLECTIONS;
 import static com.github.onsdigital.zebedee.Zebedee.KEYRING;
@@ -275,6 +276,7 @@ public class ZebedeeConfiguration {
         List<String> startUpNotificationRecipients = slackChannelsToNotfiyOnStartUp();
 
         if (startUpNotificationRecipients == null || startUpNotificationRecipients.isEmpty()) {
+            warn().log("startUpNotificationRecipients was null or empty NoOpStartUpAlerter will be initialized.");
             return new NoOpStartUpAlerter();
         }
 

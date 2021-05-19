@@ -16,10 +16,10 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
@@ -100,7 +100,7 @@ public class StartUpAlerterImplTest {
     }
 
     @Test
-    public void testNotifyLocked_notifyError_shouldThrowEx() throws Exception {
+    public void testNotifyLocked_notifyError_shouldDoNothing() throws Exception {
         when(slackClient.getProfile())
                 .thenReturn(profile);
 
@@ -111,14 +111,12 @@ public class StartUpAlerterImplTest {
                 .thenReturn(postMessage);
 
         when(slackClient.sendMessage(any(PostMessage.class)))
-                .thenReturn(messageResponse);
-
-        when(slackClient.sendMessage(any()))
+                .thenReturn(messageResponse)
                 .thenThrow(RuntimeException.class);
 
-        assertThrows(RuntimeException.class, () -> alerter.queueLocked());
+        alerter.queueLocked();
 
-        verify(slackClient, times(1)).sendMessage(any());
+        verify(slackClient, times(2)).sendMessage(any());
     }
 
     @Test
@@ -152,10 +150,7 @@ public class StartUpAlerterImplTest {
     public void testNotifylocked_originalMessageNull_shouldDoNothing() throws Exception {
         alerter = new StartUpAlerterImpl(slackClient, channels, true, true);
 
-        RuntimeException ex = assertThrows(RuntimeException.class, () -> alerter.queueUnlocked());
-
-        assertThat(ex.getMessage(), equalTo("failed to send publish queue unlocked notification original message " +
-                "expected but was null"));
+        alerter.queueUnlocked();
 
         verifyZeroInteractions(slackClient);
     }
@@ -180,25 +175,17 @@ public class StartUpAlerterImplTest {
     }
 
     @Test
-    public void testNotifyUnlocked_originalMessagesNull_shouldThrowEx() throws Exception {
+    public void testNotifyUnlocked_originalMessagesNull_shouldNotSendUpdate() throws Exception {
         alerter = new StartUpAlerterImpl(slackClient, channels, true, true);
 
-        RuntimeException ex = assertThrows(RuntimeException.class, () -> alerter.queueUnlocked());
-        assertThat(ex.getMessage(), equalTo("failed to send publish queue unlocked notification original message " +
-                "expected but was null"));
+        alerter.queueUnlocked();
 
         verifyZeroInteractions(slackClient);
     }
 
     @Test
-    public void testNotifyUnlocked_sendMessageError_shouldThrowEx() throws Exception {
-        alerter = new StartUpAlerterImpl(slackClient, channels, true, true);
-
-        List<PostMessage> messages = new ArrayList<PostMessage>() {{
-            add(postMessage);
-            add(postMessage);
-        }};
-        ReflectionTestUtils.setField(alerter, "messages", messages);
+    public void testNotifyUnlocked_sendMessageError_shouldFailSilently() throws Exception {
+        StartUpAlerterImpl alerter = new StartUpAlerterImpl(slackClient, channels, true, true);
 
         when(slackClient.getProfile())
                 .thenReturn(profile);
@@ -209,11 +196,15 @@ public class StartUpAlerterImplTest {
                 }});
 
         when(slackClient.updateMessage(postMessage))
-                .thenThrow(RuntimeException.class);
+                .thenThrow(new RuntimeException("Something went wrong sending slack notification"));
 
-        assertThrows(RuntimeException.class, () -> alerter.queueUnlocked());
+        List<Callable<Void>> queueUnlockedAlerts = new ArrayList<>();
+        queueUnlockedAlerts.add(alerter.newQueueUnlockedAlertTask(postMessage));
+        ReflectionTestUtils.setField(alerter, "queueUnlockedAlerts", queueUnlockedAlerts);
 
-        verify(slackClient, times(1)).updateMessage(any(PostMessage.class));
+        alerter.queueUnlocked();
+
+        verify(slackClient, times(1)).updateMessage(postMessage);
 
         ArgumentCaptor<PostMessageAttachment> captor = ArgumentCaptor.forClass(PostMessageAttachment.class);
         verify(postMessage, times(1)).addAttachment(captor.capture());
@@ -226,21 +217,23 @@ public class StartUpAlerterImplTest {
 
     @Test
     public void testNotifyUnlocked_success_shouldSendAlerts() throws Exception {
-        channels = new ArrayList<>();
-        channels.add("chan-A");
-        alerter = new StartUpAlerterImpl(slackClient, channels, true, true);
+        StartUpAlerterImpl alerter = new StartUpAlerterImpl(slackClient, channels, true, true);
+
+        List<Callable<Void>> queueUnlockedAlerts = new ArrayList<>();
+
+        PostMessageAttachment attachment = new PostMessageAttachment();
+        attachment.setTitle("original message");
+        attachment.setColor(Colour.WARNING.toString());
 
         PostMessage originalMessage = new PostMessage();
-        List<PostMessage> messages = new ArrayList<PostMessage>() {{
-            add(originalMessage);
-        }};
-        ReflectionTestUtils.setField(alerter, "messages", messages);
+        originalMessage.addAttachment(attachment);
+
+        queueUnlockedAlerts.add(alerter.newQueueUnlockedAlertTask(originalMessage));
+
+        ReflectionTestUtils.setField(alerter, "queueUnlockedAlerts", queueUnlockedAlerts);
 
         when(slackClient.getProfile())
                 .thenReturn(profile);
-
-        PostMessageAttachment originalAttachment = new PostMessageAttachment("", "", Colour.WARNING);
-        originalMessage.addAttachment(originalAttachment);
 
         alerter.queueUnlocked();
 
@@ -249,13 +242,18 @@ public class StartUpAlerterImplTest {
 
         List<PostMessage> updatedMessages = captor.getAllValues();
         assertThat(updatedMessages.size(), equalTo(1));
+        PostMessage msg = updatedMessages.get(0);
 
-        updatedMessages.stream().forEach(msg -> {
-            assertThat(msg.getAttachments().size(), equalTo(2));
-            PostMessageAttachment attachment = msg.getAttachments().get(1);
-            assertThat(attachment.getColor(), equalTo(Colour.GOOD.getColor()));
-            assertThat(attachment.getTitle(), equalTo("Resolved"));
-            assertTrue(StringUtils.startsWith(attachment.getText(), "Publishing queue successfully unlocked `"));
-        });
+        assertThat(msg.getAttachments().size(), equalTo(2));
+
+
+        PostMessageAttachment attch1 = msg.getAttachments().get(0);
+        assertThat(attch1.getColor(), equalTo(Colour.GOOD.getColor()));
+        assertThat(attch1.getTitle(), equalTo("original message"));
+
+        PostMessageAttachment attch2 = msg.getAttachments().get(1);
+        assertThat(attch2.getColor(), equalTo(Colour.GOOD.getColor()));
+        assertThat(attch2.getTitle(), equalTo("Resolved"));
+        assertTrue(attch2.getText().startsWith("Publishing queue successfully unlocked `"));
     }
 }

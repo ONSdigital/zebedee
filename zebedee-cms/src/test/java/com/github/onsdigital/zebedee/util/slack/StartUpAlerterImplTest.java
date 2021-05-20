@@ -121,7 +121,13 @@ public class StartUpAlerterImplTest {
 
     @Test
     public void testNotifyLocked_alreadySent_shouldDoNothing() throws Exception {
-        alerter = new StartUpAlerterImpl(slackClient, channels, true, true);
+        alerter = new StartUpAlerterImpl(slackClient, channels, true);
+
+        // If queueUnlockedAlerts is not empty it means the locked notification has already been sent.
+        // Set this to a non empty value
+        List<Callable<PostMessage>> tasks = new ArrayList<>();
+        tasks.add(() -> null);
+        ReflectionTestUtils.setField(alerter, "queueUnlockedAlerts", tasks);
 
         alerter.queueLocked();
 
@@ -130,7 +136,7 @@ public class StartUpAlerterImplTest {
 
     @Test
     public void testNotifyLocked_queueNotLocked_shouldDoNothing() throws Exception {
-        alerter = new StartUpAlerterImpl(slackClient, channels, false, true);
+        alerter = new StartUpAlerterImpl(slackClient, channels, false);
 
         alerter.queueLocked();
 
@@ -139,7 +145,7 @@ public class StartUpAlerterImplTest {
 
     @Test
     public void testNotifyLocked_noChannelsConfigured_shouldDoNothing() throws Exception {
-        alerter = new StartUpAlerterImpl(slackClient, new ArrayList<>(), true, false);
+        alerter = new StartUpAlerterImpl(slackClient, new ArrayList<>(), true);
 
         alerter.queueLocked();
 
@@ -147,8 +153,18 @@ public class StartUpAlerterImplTest {
     }
 
     @Test
-    public void testNotifylocked_originalMessageNull_shouldDoNothing() throws Exception {
-        alerter = new StartUpAlerterImpl(slackClient, channels, true, true);
+    public void testNotifyUnlocked_queueUnlockedAlertsNull_shouldDoNothing() throws Exception {
+        alerter = new StartUpAlerterImpl(slackClient, channels, true);
+
+        alerter.queueUnlocked();
+
+        verifyZeroInteractions(slackClient);
+    }
+
+    @Test
+    public void testNotifyUnlocked_queueUnlockedAlertsEmpty_shouldDoNothing() throws Exception {
+        alerter = new StartUpAlerterImpl(slackClient, channels, true);
+        ReflectionTestUtils.setField(alerter, "queueUnlockedAlerts", new ArrayList<>());
 
         alerter.queueUnlocked();
 
@@ -158,25 +174,7 @@ public class StartUpAlerterImplTest {
 
     @Test
     public void testNotifyUnlocked_queueNotLocked_shouldDoNothing() throws Exception {
-        alerter = new StartUpAlerterImpl(slackClient, channels, false, true);
-
-        alerter.queueUnlocked();
-
-        verifyZeroInteractions(slackClient);
-    }
-
-    @Test
-    public void testNotifyUnlocked_lockedNotificationHasNotBeenSent_shouldDoNothing() throws Exception {
-        alerter = new StartUpAlerterImpl(slackClient, channels, true, false);
-
-        alerter.queueUnlocked();
-
-        verifyZeroInteractions(slackClient);
-    }
-
-    @Test
-    public void testNotifyUnlocked_originalMessagesNull_shouldNotSendUpdate() throws Exception {
-        alerter = new StartUpAlerterImpl(slackClient, channels, true, true);
+        alerter = new StartUpAlerterImpl(slackClient, channels, false);
 
         alerter.queueUnlocked();
 
@@ -185,7 +183,7 @@ public class StartUpAlerterImplTest {
 
     @Test
     public void testNotifyUnlocked_sendMessageError_shouldFailSilently() throws Exception {
-        StartUpAlerterImpl alerter = new StartUpAlerterImpl(slackClient, channels, true, true);
+        StartUpAlerterImpl alerter = new StartUpAlerterImpl(slackClient, channels, true);
 
         when(slackClient.getProfile())
                 .thenReturn(profile);
@@ -217,7 +215,7 @@ public class StartUpAlerterImplTest {
 
     @Test
     public void testNotifyUnlocked_success_shouldSendAlerts() throws Exception {
-        StartUpAlerterImpl alerter = new StartUpAlerterImpl(slackClient, channels, true, true);
+        StartUpAlerterImpl alerter = new StartUpAlerterImpl(slackClient, channels, true);
 
         List<Callable<Void>> queueUnlockedAlerts = new ArrayList<>();
 
@@ -255,5 +253,24 @@ public class StartUpAlerterImplTest {
         assertThat(attch2.getColor(), equalTo(Colour.GOOD.getColor()));
         assertThat(attch2.getTitle(), equalTo("Resolved"));
         assertTrue(attch2.getText().startsWith("Publishing queue successfully unlocked `"));
+    }
+
+    @Test
+    public void testNotifyUnlocked_success_shouldClearUnlockTasksOnCompletion() throws Exception {
+        StartUpAlerterImpl alerter = new StartUpAlerterImpl(slackClient, channels, true);
+
+        List<Callable<Void>> queueUnlockedAlerts = new ArrayList<>();
+        queueUnlockedAlerts.add(alerter.newQueueUnlockedAlertTask(postMessage));
+
+        ReflectionTestUtils.setField(alerter, "queueUnlockedAlerts", queueUnlockedAlerts);
+
+        alerter.queueUnlocked();
+
+        verify(slackClient, times(1)).updateMessage(any());
+
+        List<Callable<PostMessage>> unlockTasks =
+                (List<Callable<PostMessage>>)ReflectionTestUtils.getField(alerter, "queueUnlockedAlerts");
+
+        assertTrue(unlockTasks.isEmpty());
     }
 }

@@ -118,6 +118,7 @@ public class StartUpAlerterImpl implements StartUpAlerter {
     /**
      * Create a {@link Callable} task to send a Slack message advising the CMS has restarted and requires an admin
      * user to login in.
+     *
      * @param channel the channel to send the message to.
      */
     Callable<PostMessage> newQueueLockedAlertTask(String channel) {

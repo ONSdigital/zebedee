@@ -14,6 +14,6 @@ public class NoOpStartUpAlerter implements StartUpAlerter {
 
     @Override
     public void queueUnlocked() {
-        info().log("NoOpStartUpAlerter queueUnlocked invoked - - do nothing");
+        info().log("NoOpStartUpAlerter queueUnlocked invoked - do nothing");
     }
 }

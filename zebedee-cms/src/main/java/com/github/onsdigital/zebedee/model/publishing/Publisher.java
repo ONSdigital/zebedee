@@ -3,6 +3,7 @@ package com.github.onsdigital.zebedee.model.publishing;
 import com.github.davidcarboni.httpino.Endpoint;
 import com.github.davidcarboni.httpino.Host;
 import com.github.davidcarboni.httpino.Response;
+import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.configuration.CMSFeatureFlags;
 import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.json.ApprovalStatus;
@@ -25,6 +26,7 @@ import com.github.onsdigital.zebedee.service.ServiceSupplier;
 import com.github.onsdigital.zebedee.util.Http;
 import com.github.onsdigital.zebedee.util.SlackNotification;
 import com.github.onsdigital.zebedee.util.ZebedeeCmsService;
+import com.github.onsdigital.zebedee.util.slack.Notifier;
 import com.github.onsdigital.zebedee.util.slack.PostMessageField;
 import com.github.onsdigital.zebedee.util.slack.SlackNotifier;
 import org.apache.commons.lang3.StringUtils;
@@ -143,8 +145,8 @@ public class Publisher {
             } catch (Exception e) {
                 error().data("collectionId", collection.getDescription().getId()).data("publishing", true)
                         .logException(e, "Exception publishing images via image API");
-                PostMessageField msg = new PostMessageField("Error", e.getMessage(), false);
-                collectionAlarm(collection, "Exception publishing images via image API", msg);
+                String channel = Root.zebedee.getSlackCollectionAlarmChannel();
+                Root.zebedee.getSlackNotifier().callCollectionAlarm(collection, channel, "Error publishing images", e);
                 success = false;
             }
         }
@@ -172,7 +174,7 @@ public class Publisher {
         result.getUnpublishedImages().stream()
                 .map(i -> new PostMessageField("Unpublished image", String.format("%s [%s]", i.getId(), i.getStatus()), false))
                 .forEach(msgs::add);
-        final SlackNotifier notifier = new SlackNotifier();
+        Notifier notifier = Root.zebedee.getSlackNotifier();
         notifier.alarm("Some images failed to publish", msgs.stream().toArray(PostMessageField[]::new));
     }
 
@@ -303,8 +305,8 @@ public class Publisher {
     }
 
     private static void handlePublishingException(Exception ex, Collection collection) {
-        PostMessageField msg = new PostMessageField("Error", ex.getMessage(), false);
-        collectionAlarm(collection, "Exception publishAction collection", msg);
+    String channel = Root.zebedee.getSlackCollectionAlarmChannel();
+    Root.zebedee.getSlackNotifier().callCollectionAlarm(collection, channel, "Error publishing content", ex);
 
         CMSLogEvent err = error().data("publishing", true).collectionID(collection);
 

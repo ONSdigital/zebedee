@@ -1,5 +1,6 @@
 package com.github.onsdigital.zebedee.util.slack;
 
+import com.github.onsdigital.slack.messages.PostMessage;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.util.SlackNotification;
 
@@ -17,7 +18,6 @@ public interface Notifier {
      * @param args - additional arguments to add to the notification.
      */
     void collectionAlarm(Collection c, String alarm, PostMessageField... args);
-
     /**
      * Create a new alarm notification.
      *
@@ -25,4 +25,11 @@ public interface Notifier {
      * @param args - additional arguments to add to the notification.
      */
     void alarm(String alarm, PostMessageField... args);
+
+    void sendSlackMessage(PostMessage message) throws Exception;
+
+    PostMessage createPostMessage(String channel, String text);
+
+    void callCollectionAlarm(Collection c, String channel, String message, Exception ex);
 }
+

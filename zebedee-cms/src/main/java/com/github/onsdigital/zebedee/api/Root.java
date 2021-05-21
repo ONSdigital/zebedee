@@ -121,7 +121,7 @@ public class Root {
         //Setting zebedee root as system property for zebedee reader module, since zebedee root is not set as environment variable on develop environment
         System.setProperty(ZEBEDEE_ROOT, root.toString());
 
-        final SlackNotifier notifier = new SlackNotifier();
+        Notifier notifier = zebedee.getSlackNotifier();
         zebedee.getStartUpAlerter().queueLocked();
 
         try {

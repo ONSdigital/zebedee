@@ -6,8 +6,9 @@ import com.github.onsdigital.zebedee.exceptions.ConflictException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.AdminOptions;
+import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.Credentials;
-import com.github.onsdigital.zebedee.json.Keyring;
+import com.github.onsdigital.zebedee.keyring.Keyring;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.Collections;
 import com.github.onsdigital.zebedee.model.KeyringCache;
@@ -22,9 +23,11 @@ import org.apache.commons.lang3.StringUtils;
 
 import javax.crypto.SecretKey;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
@@ -50,27 +53,34 @@ public class UsersServiceImpl implements UsersService {
 
     private final ReentrantLock lock = new ReentrantLock();
 
-    // private Path users;
     private PermissionsService permissionsService;
     private KeyManangerUtil keyManangerUtil;
     private PermissionsService permissions;
     private ApplicationKeys applicationKeys;
-    private KeyringCache keyringCache;
     private Collections collections;
     private UserStore userStore;
     private UserFactory userFactory;
+
+    /**
+     * There is a circular dependency between the UserService and the new Keyring. To get around this we're using a
+     * supplier to lazy load the keyring when its not required not when constructing the UserService. Admittedly this
+     * is a bit but:
+     * - This is Zebedee.
+     * - This was a quick reasonably clean way to solve this issue.
+     */
+    private Supplier<Keyring> keyringSupplier;
 
     /**
      * Get a singleton instance of {@link UsersServiceImpl}.
      */
     public static UsersService getInstance(UserStore userStore, Collections collections,
                                            PermissionsService permissionsService, ApplicationKeys applicationKeys,
-                                           KeyringCache keyringCache) {
+                                           Supplier<Keyring> keyringSupplier) {
         if (INSTANCE == null) {
             synchronized (MUTEX) {
                 if (INSTANCE == null) {
                     INSTANCE = new UsersServiceImpl(userStore, collections, permissionsService, applicationKeys,
-                            keyringCache);
+                            keyringSupplier);
                 }
             }
         }
@@ -89,11 +99,11 @@ public class UsersServiceImpl implements UsersService {
      * @param keyringCache
      */
     UsersServiceImpl(UserStore userStore, Collections collections, PermissionsService permissionsService,
-                     ApplicationKeys applicationKeys, KeyringCache keyringCache) {
+                     ApplicationKeys applicationKeys, Supplier<Keyring> keyringSupplier) {
         this.permissionsService = permissionsService;
         this.applicationKeys = applicationKeys;
         this.collections = collections;
-        this.keyringCache = keyringCache;
+        this.keyringSupplier = keyringSupplier;
         this.userStore = userStore;
         this.userFactory = new UserFactory();
         this.keyManangerUtil = new KeyManangerUtil();
@@ -206,9 +216,9 @@ public class UsersServiceImpl implements UsersService {
 
         lock.lock();
         try {
-            User user = userStore.get(credentials.getEmail());
+            User targetUser = userStore.get(credentials.getEmail());
 
-            if (!permissionsService.isAdministrator(session) && !user.authenticate(credentials.getOldPassword())) {
+            if (!permissionsService.isAdministrator(session) && !targetUser.authenticate(credentials.getOldPassword())) {
                 throw new UnauthorizedException("Authentication failed with old password.");
             }
 
@@ -216,23 +226,28 @@ public class UsersServiceImpl implements UsersService {
                     && StringUtils.isNotBlank(credentials.password);
 
             if (settingOwnPwd) {
-                isSuccess = changePassword(user, credentials.getOldPassword(), credentials.getPassword());
+                isSuccess = changePassword(targetUser, credentials.getOldPassword(), credentials.getPassword());
             } else {
                 // Only an admin can update another users password.
                 if (permissionsService.isAdministrator(session.getEmail()) || !permissionsService.hasAdministrator()) {
 
-                    // Administrator reset, or system setup Grab current keyring (null if this is system setup)
-                    Keyring originalKeyring = null;
-                    if (user.keyring() != null) {
-                        originalKeyring = user.keyring().clone();
+                    com.github.onsdigital.zebedee.json.Keyring originalKeyring = null;
+                    if (targetUser.keyring() != null) {
+                        originalKeyring = targetUser.keyring().clone();
                     }
 
-                    user = resetPassword(user, credentials.getPassword(), session.getEmail());
-                    // Restore the user keyring (or not if this is system setup)
-                    if (originalKeyring != null) {
-                        keyManangerUtil.transferKeyring(user.keyring(), keyringCache.get(session), originalKeyring.list());
+                    targetUser = resetPassword(targetUser, credentials.getPassword(), session.getEmail());
+
+                    User assigningUser = userStore.get(session.getEmail());
+                    if (assigningUser == null) {
+                        throw new IOException("error expected user but was null");
                     }
-                    userStore.save(user);
+
+                    if (originalKeyring != null) {
+                        List<String> collectionsToAssign = new ArrayList<>(originalKeyring.keySet());
+                        assignKeysToUser(assigningUser, targetUser, collectionsToAssign);
+                    }
+
                     isSuccess = true;
                 } else {
                     // Set password unsuccessful.
@@ -539,6 +554,19 @@ public class UsersServiceImpl implements UsersService {
             return user;
         } finally {
             lock.unlock();
+        }
+    }
+
+    private void assignKeysToUser(User src, User target, List<String> collectionIdsToAssign) throws IOException {
+        if (collectionIdsToAssign != null && !collectionIdsToAssign.isEmpty()) {
+            // Get the collection descriptions for the keys that should be assigned.
+            List<CollectionDescription> assignments = collections.list()
+                    .stream()
+                    .filter(c -> collectionIdsToAssign.contains(c.getId()))
+                    .map(c -> c.getDescription())
+                    .collect(Collectors.toList());
+
+            keyringSupplier.get().assignTo(src, target, assignments);
         }
     }
 

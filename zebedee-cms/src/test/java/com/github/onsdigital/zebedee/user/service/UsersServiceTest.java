@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Supplier;
 
 import static com.github.onsdigital.zebedee.user.service.UsersServiceImpl.SYSTEM_USER;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -38,6 +39,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -87,8 +89,12 @@ public class UsersServiceTest {
     @Mock
     private UsersServiceImpl.UserFactory userFactory;
 
+    @Mock
+    private com.github.onsdigital.zebedee.keyring.Keyring centralKeyring;
+
     private UsersService service;
     private User user;
+    private Supplier<com.github.onsdigital.zebedee.keyring.Keyring> keyringSupplier;
 
     @Before
     public void setUp() throws Exception {
@@ -101,7 +107,9 @@ public class UsersServiceTest {
         user.setTemporaryPassword(false);
         user.setAdminOptions(new AdminOptions());
 
-        service = new UsersServiceImpl(userStore, collections, permissions, applicationKeys, keyringCache);
+        keyringSupplier = () -> centralKeyring;
+
+        service = new UsersServiceImpl(userStore, collections, permissions, applicationKeys, keyringSupplier);
 
         when(userMock.getEmail())
                 .thenReturn(EMAIL_2);
@@ -420,6 +428,11 @@ public class UsersServiceTest {
                 .thenReturn(userMock);
         when(userMock.authenticate(null))
                 .thenReturn(true);
+        when(session.getEmail())
+                .thenReturn("admin@ons.gov.uk");
+        User admin = mock(User.class);
+        when(userStore.get("admin@ons.gov.uk"))
+                .thenReturn(admin);
 
         service.createPublisher(userMock, password, session);
 
@@ -434,6 +447,7 @@ public class UsersServiceTest {
         verify(permissions, times(1)).addEditor(EMAIL_2, session);
         verify(lockMock, times(3)).lock();
         verify(lockMock, times(3)).unlock();
+        verify(centralKeyring, times(1)).assignTo(eq(admin), eq(userMock), any());
     }
 
     @Test(expected = UnauthorizedException.class)

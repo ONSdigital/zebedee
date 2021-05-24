@@ -134,14 +134,14 @@ public class Publisher {
 
         if (CMSFeatureFlags.cmsFeatureFlags().isImagePublishingEnabled()) {
             try {
-                if (imageFuture == null) {
-                    throw new Exception("image future unexpectedly null on completion of publishing");
-                }
-                ImageServicePublishingResult result = imageFuture.get();
+               if (imageFuture == null) {
+                   throw new Exception("image future unexpectedly null on completion of publishing");
+               }
+               ImageServicePublishingResult result = imageFuture.get();
 
-                if (result != null && result.getUnpublishedImages() != null && result.getUnpublishedImages().size() > 0) {
-                    notifyUnpublishedImages(collection, result);
-                }
+               if (result != null && result.getUnpublishedImages() != null && result.getUnpublishedImages().size() > 0) {
+                   notifyUnpublishedImages(collection, result);
+               }
             } catch (Exception e) {
                 error().data("collectionId", collection.getDescription().getId()).data("publishing", true)
                         .logException(e, "Exception publishing images via image API");

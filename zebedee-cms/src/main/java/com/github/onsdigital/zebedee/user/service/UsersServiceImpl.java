@@ -1,6 +1,5 @@
 package com.github.onsdigital.zebedee.user.service;
 
-import com.github.onsdigital.zebedee.KeyManangerUtil;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.ConflictException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
@@ -54,8 +53,6 @@ public class UsersServiceImpl implements UsersService {
     private final ReentrantLock lock = new ReentrantLock();
 
     private PermissionsService permissionsService;
-    private KeyManangerUtil keyManangerUtil;
-    private PermissionsService permissions;
     private ApplicationKeys applicationKeys;
     private Collections collections;
     private UserStore userStore;
@@ -106,7 +103,6 @@ public class UsersServiceImpl implements UsersService {
         this.keyringSupplier = keyringSupplier;
         this.userStore = userStore;
         this.userFactory = new UserFactory();
-        this.keyManangerUtil = new KeyManangerUtil();
     }
 
     @Override
@@ -238,21 +234,22 @@ public class UsersServiceImpl implements UsersService {
 
                     targetUser = resetPassword(targetUser, credentials.getPassword(), session.getEmail());
 
-                    User assigningUser = userStore.get(session.getEmail());
-                    if (assigningUser == null) {
-                        throw new IOException("error expected user but was null");
-                    }
-
                     if (originalKeyring != null) {
+                        User assigningUser = userStore.get(session.getEmail());
+                        if (assigningUser == null) {
+                            throw new IOException("error expected user but was null");
+                        }
+
                         List<String> collectionsToAssign = new ArrayList<>(originalKeyring.keySet());
                         assignKeysToUser(assigningUser, targetUser, collectionsToAssign);
                     }
 
+                    userStore.save(targetUser);
                     isSuccess = true;
                 } else {
                     // Set password unsuccessful.
                     info().data("callingUser", session.getEmail())
-                            .data("targetedUser", credentials.email)
+                            .data("targetedUser", credentials.getEmail())
                             .log("Set password unsuccessful, only admin users can set another users password.");
                 }
             }

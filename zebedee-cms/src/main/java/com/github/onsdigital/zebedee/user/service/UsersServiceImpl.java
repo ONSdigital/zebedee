@@ -59,11 +59,12 @@ public class UsersServiceImpl implements UsersService {
     private UserFactory userFactory;
 
     /**
-     * There is a circular dependency between the UserService and the new Keyring. To get around this we're using a
-     * supplier to lazy load the keyring when its not required not when constructing the UserService. Admittedly this
-     * is a bit but:
+     * There is a circular dependency between the UserService and the new Keyring they are both needed by each others
+     * constructors. To get around this we're using a supplier which returns the keying. This allows us to construct
+     * a new instance of the UserService without the actual Keyring object. When the Keyring is needed the supplier
+     * allows to lazy it load it on demand. Admittedly this is a bit of hack but:
      * - This is Zebedee.
-     * - This was a quick reasonably clean way to solve this issue.
+     * - This was a quick & reasonably clean way to solve this issue.
      */
     private Supplier<Keyring> keyringSupplier;
 

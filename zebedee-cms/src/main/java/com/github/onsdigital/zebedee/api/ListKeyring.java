@@ -23,6 +23,10 @@ import java.util.Set;
 
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.error;
 
+/**
+ * API endpoint that returns a {@link Set} of collection ID's that a user has stored in their keyring.
+ * (This is mainly for testing purposes for the keyring migration).
+ */
 @Api
 public class ListKeyring {
 
@@ -31,6 +35,9 @@ public class ListKeyring {
     private PermissionsService permissionsService;
     private UsersService usersService;
 
+    /**
+     * Construct a new instance using the default configuration.
+     */
     public ListKeyring() {
         this(Root.zebedee.getCollectionKeyring(),
                 Root.zebedee.getSessions(),
@@ -38,6 +45,9 @@ public class ListKeyring {
                 Root.zebedee.getUsersService());
     }
 
+    /**
+     * Construct a new instance using the provided configuration.
+     */
     public ListKeyring(final Keyring keyring, final Sessions sessions,
                        final PermissionsService permissionsService, final UsersService usersService) {
         this.keyring = keyring;
@@ -46,6 +56,10 @@ public class ListKeyring {
         this.usersService = usersService;
     }
 
+    /**
+     * Return a {@link Set} of collection ID's for the collection keys stored in the user keyring. Endpoint requires
+     * admin permissions.
+     */
     @GET
     public Set<String> listUserKeys(HttpServletRequest request, HttpServletResponse response) throws ZebedeeException {
         checkPermission(getSession(request));

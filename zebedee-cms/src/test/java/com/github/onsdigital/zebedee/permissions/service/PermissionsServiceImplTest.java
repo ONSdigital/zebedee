@@ -99,7 +99,7 @@ public class PermissionsServiceImplTest {
         when(userMock.getEmail())
                 .thenReturn(EMAIL);
 
-        permissions = new PermissionsServiceImpl(permissionsStore, usersServiceServiceSupplier, teamsServiceSupplier, keyringCache);
+        permissions = new PermissionsServiceImpl(permissionsStore, usersServiceServiceSupplier, teamsServiceSupplier);
     }
 
     @Test

@@ -52,6 +52,7 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.function.Supplier;
 
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.*;
 import static com.github.onsdigital.zebedee.Zebedee.*;
@@ -161,18 +162,21 @@ public class ZebedeeConfiguration {
         initialisePermissions(permissionsPath);
         this.permissionsStore = new PermissionsStoreFileSystemImpl(permissionsPath);
 
-        this.permissionsService = new PermissionsServiceImpl(permissionsStore,
-                this::getUsersService, this::getTeamsService, legacyKeyringCache);
+        this.permissionsService = new PermissionsServiceImpl(permissionsStore, this::getUsersService,
+                this::getTeamsService);
 
         VersionsService versionsService = new VersionsServiceImpl();
         this.collections = new Collections(collectionsPath, permissionsService, versionsService, published);
+
+
+        Supplier<Keyring> keyringSupplier = () -> collectionKeyring;
 
         this.usersService = UsersServiceImpl.getInstance(
                 new UserStoreFileSystemImpl(this.usersPath),
                 collections,
                 permissionsService,
                 applicationKeys,
-                legacyKeyringCache);
+                keyringSupplier);
 
         // The legacy keyring logic but behind the new keyring interface.
         Keyring legacyKeyring = new LegacyKeyringImpl(

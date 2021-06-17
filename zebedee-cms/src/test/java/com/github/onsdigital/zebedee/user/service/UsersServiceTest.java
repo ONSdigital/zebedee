@@ -5,6 +5,8 @@ import com.github.onsdigital.zebedee.exceptions.ConflictException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.AdminOptions;
+import com.github.onsdigital.zebedee.json.CollectionDescription;
+import com.github.onsdigital.zebedee.json.Credentials;
 import com.github.onsdigital.zebedee.json.Keyring;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.Collections;
@@ -30,11 +32,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Supplier;
 
 import static com.github.onsdigital.zebedee.user.service.UsersServiceImpl.SYSTEM_USER;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
@@ -87,8 +91,12 @@ public class UsersServiceTest {
     @Mock
     private UsersServiceImpl.UserFactory userFactory;
 
+    @Mock
+    private com.github.onsdigital.zebedee.keyring.Keyring centralKeyring;
+
     private UsersService service;
     private User user;
+    private Supplier<com.github.onsdigital.zebedee.keyring.Keyring> keyringSupplier;
 
     @Before
     public void setUp() throws Exception {
@@ -101,7 +109,9 @@ public class UsersServiceTest {
         user.setTemporaryPassword(false);
         user.setAdminOptions(new AdminOptions());
 
-        service = new UsersServiceImpl(userStore, collections, permissions, applicationKeys, keyringCache);
+        keyringSupplier = () -> centralKeyring;
+
+        service = new UsersServiceImpl(userStore, collections, permissions, applicationKeys, keyringSupplier);
 
         when(userMock.getEmail())
                 .thenReturn(EMAIL_2);
@@ -357,6 +367,7 @@ public class UsersServiceTest {
         verify(userStore, times(2)).exists(EMAIL);
         verify(userStore, times(1)).save(expected);
         verify(session, times(1)).getEmail();
+        verify(userStore, times(1)).save(any(User.class));
         verifyLockObtainedAndReleased();
     }
 
@@ -434,6 +445,7 @@ public class UsersServiceTest {
         verify(permissions, times(1)).addEditor(EMAIL_2, session);
         verify(lockMock, times(3)).lock();
         verify(lockMock, times(3)).unlock();
+        verifyZeroInteractions(centralKeyring);
     }
 
     @Test(expected = UnauthorizedException.class)
@@ -756,6 +768,77 @@ public class UsersServiceTest {
         verify(userStore, times(1)).save(userMock);
         verify(lockMock, times(3)).lock();
         verify(lockMock, times(3)).unlock();
+    }
+
+    @Test
+    public void setPasswod_success() throws Exception {
+        String email = "test1@ons.gov.uk";
+
+        Credentials credentials = new Credentials();
+        credentials.setEmail(email);
+        credentials.setPassword("a b c d");
+
+        when(userStore.exists(email))
+                .thenReturn(true);
+
+        when(userStore.get(email))
+                .thenReturn(userMock);
+
+        when(permissions.isAdministrator(session))
+                .thenReturn(true);
+
+        when(permissions.isAdministrator(email))
+                .thenReturn(true);
+
+        Keyring originalKeyring = mock(Keyring.class);
+        when(userMock.keyring())
+                .thenReturn(originalKeyring);
+
+        when(originalKeyring.clone())
+                .thenReturn(originalKeyring);
+
+        User adminUser = mock(User.class);
+        when(userStore.get(session.getEmail()))
+                .thenReturn(adminUser);
+
+        Set<String> collectionIds = new HashSet<>();
+        collectionIds.add("abc");
+        collectionIds.add("def");
+
+        when(originalKeyring.keySet())
+                .thenReturn(collectionIds);
+
+        Collections.CollectionList allCollections = new Collections.CollectionList();
+        Collection c1 = mock(Collection.class);
+        when(c1.getId())
+                .thenReturn("abc");
+
+        CollectionDescription desc1 = mock(CollectionDescription.class);
+        when(c1.getDescription())
+                .thenReturn(desc1);
+        allCollections.add(c1);
+
+        Collection c2 = mock(Collection.class);
+        when(c2.getId())
+                .thenReturn("def");
+
+        CollectionDescription desc2 = mock(CollectionDescription.class);
+        when(c2.getDescription())
+                .thenReturn(desc2);
+        allCollections.add(c2);
+
+        when(collections.list())
+                .thenReturn(allCollections);
+
+        boolean result = service.setPassword(session, credentials);
+
+        assertTrue(result);
+
+        List<CollectionDescription> expected = new ArrayList<>();
+        expected.add(desc1);
+        expected.add(desc2);
+        verify(centralKeyring, times(1)).assignTo(adminUser, userMock, expected);
+        verify(userStore, times(1)).save(userMock);
     }
 
 }

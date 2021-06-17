@@ -250,6 +250,13 @@ public class LegacyKeyringImpl implements Keyring {
             cachedKeyring.put(collection.getDescription().getId(), key);
         }
 
+        if (user.keyring() == null) {
+            info().user(user.getEmail())
+                    .collectionID(collection)
+                    .log("skipping key assignment as user keying is null. User may not have set their password yet");
+            return;
+        }
+
         if (user.keyring().get(collection.getId()) != null) {
             // they already have the key in their keyring - so do nothing
             return;

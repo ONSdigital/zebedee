@@ -7,7 +7,6 @@ import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.PermissionDefinition;
 import com.github.onsdigital.zebedee.model.Collection;
-import com.github.onsdigital.zebedee.model.KeyringCache;
 import com.github.onsdigital.zebedee.model.PathUtils;
 import com.github.onsdigital.zebedee.permissions.model.AccessMapping;
 import com.github.onsdigital.zebedee.permissions.store.PermissionsStore;
@@ -42,7 +41,6 @@ import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMet
 public class PermissionsServiceImpl implements PermissionsService {
 
     private PermissionsStore permissionsStore;
-    private KeyringCache keyringCache;
     private ReadWriteLock accessMappingLock = new ReentrantReadWriteLock();
     private ServiceSupplier<UsersService> usersServiceSupplier;
     private ServiceSupplier<TeamsService> teamsServiceSupplier;
@@ -51,14 +49,12 @@ public class PermissionsServiceImpl implements PermissionsService {
      * @param permissionsStore
      * @param usersServiceSupplier
      * @param teamsServiceSupplier
-     * @param keyringCache
      */
     public PermissionsServiceImpl(PermissionsStore permissionsStore, ServiceSupplier<UsersService> usersServiceSupplier,
-                                  ServiceSupplier<TeamsService> teamsServiceSupplier, KeyringCache keyringCache) {
+                                  ServiceSupplier<TeamsService> teamsServiceSupplier) {
         this.permissionsStore = permissionsStore;
         this.usersServiceSupplier = usersServiceSupplier;
         this.teamsServiceSupplier = teamsServiceSupplier;
-        this.keyringCache = keyringCache;
     }
 
     /**
@@ -137,16 +133,6 @@ public class PermissionsServiceImpl implements PermissionsService {
                 .filter(user -> isCollectionKeyRecipient(accessMapping, teamsList, user, collection))
                 .collect(Collectors.toList());
         return keyUsers;
-    }
-
-    /**
-     * @param user
-     * @return
-     * @throws IOException
-     */
-    @Override
-    public boolean hasAccessToCollection(User user, Collection collection) throws IOException {
-        return false;
     }
 
     private boolean isCollectionKeyRecipient(AccessMapping accessMapping, List<Team> teamsList, User user, Collection collection) {
@@ -248,61 +234,10 @@ public class PermissionsServiceImpl implements PermissionsService {
         return canEdit(email, accessMapping);
     }
 
-    /**
-     * Get whether a user session can edit a collection
-     * <p>
-     * Future-proofing only at present
-     *
-     * @param session               the session
-     * @param collectionDescription the collection description
-     * @return
-     * @throws IOException
-     */
     @Override
-    public boolean canEdit(Session session, CollectionDescription collectionDescription) throws IOException {
-        if (collectionDescription.isEncrypted()) {
-            return canEdit(session.getEmail()) && keyringCache.get(session).list().contains
-                    (collectionDescription.getId());
-        } else {
-            return canEdit(session.getEmail());
-        }
+    public boolean canEdit(User user) throws IOException {
+        return user != null && canEdit(user.getEmail());
     }
-
-    /**
-     * Get whether a user can edit a collection
-     *
-     * @param user                  the user
-     * @param collectionDescription
-     * @return
-     * @throws IOException
-     */
-    @Override
-    public boolean canEdit(User user, CollectionDescription collectionDescription) throws IOException {
-        if (collectionDescription.isEncrypted()) {
-            return canEdit(user.getEmail()) && user.keyring().list().contains(collectionDescription.getId());
-        } else {
-            return canEdit(user.getEmail());
-        }
-    }
-
-
-    /**
-     * Get whether a user can edit a collection
-     *
-     * @param email                 the user email
-     * @param collectionDescription
-     * @return
-     * @throws IOException
-     */
-    @Override
-    public boolean canEdit(String email, CollectionDescription collectionDescription) throws IOException {
-        try {
-            return canEdit(usersServiceSupplier.getService().getUserByEmail(email), collectionDescription);
-        } catch (BadRequestException | NotFoundException e) {
-            return false;
-        }
-    }
-
 
     /**
      * Adds the specified user to the Digital Publishing team, giving them access to read and write all content.

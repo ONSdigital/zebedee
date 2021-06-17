@@ -62,7 +62,7 @@ public class CollectionMoveTest extends ZebedeeTestBaseFixture {
         when(permissionsService.canView(eq(session), any(CollectionDescription.class)))
                 .thenReturn(true);
 
-        when(permissionsService.canEdit(eq(session), any(CollectionDescription.class)))
+        when(permissionsService.canEdit(session))
                 .thenReturn(true);
 
         SecretKey key = Keys.newSecretKey();

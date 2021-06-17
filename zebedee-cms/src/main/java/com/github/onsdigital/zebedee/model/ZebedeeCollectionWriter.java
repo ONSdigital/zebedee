@@ -49,7 +49,7 @@ public class ZebedeeCollectionWriter extends CollectionWriter {
             throws BadRequestException, IOException, UnauthorizedException, NotFoundException {
         validateParams(zebedee, collection, session);
 
-        checkUserAuthorisedToAccessCollection(zebedee, collection, session);
+        checkUserAuthorisedToAccessCollection(zebedee, session);
 
         User user = getUser(zebedee, session);
 
@@ -85,11 +85,11 @@ public class ZebedeeCollectionWriter extends CollectionWriter {
         }
     }
 
-    private void checkUserAuthorisedToAccessCollection(Zebedee zebedee, Collection collection, Session session)
+    private void checkUserAuthorisedToAccessCollection(Zebedee zebedee, Session session)
             throws IOException, UnauthorizedException {
         boolean isAuthorised = false;
         try {
-            isAuthorised = zebedee.getPermissionsService().canEdit(session, collection.getDescription());
+            isAuthorised = zebedee.getPermissionsService().canEdit(session);
         } catch (Exception ex) {
             throw new IOException(PERMISSIONS_CHECK_ERR, ex);
         }

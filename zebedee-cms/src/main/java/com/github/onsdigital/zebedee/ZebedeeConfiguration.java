@@ -47,6 +47,7 @@ import com.github.onsdigital.zebedee.teams.store.TeamsStoreFileSystemImpl;
 import com.github.onsdigital.zebedee.user.service.UsersService;
 import com.github.onsdigital.zebedee.user.service.UsersServiceImpl;
 import com.github.onsdigital.zebedee.user.store.UserStoreFileSystemImpl;
+import com.github.onsdigital.zebedee.util.slack.NoOpStartUpAlerter;
 import com.github.onsdigital.zebedee.util.slack.StartUpAlerter;
 import com.github.onsdigital.zebedee.util.slack.StartUpAlerterImpl;
 import com.github.onsdigital.zebedee.util.versioning.VersionsService;
@@ -59,9 +60,12 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
+import java.util.function.Supplier;
 
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.warn;
 import static com.github.onsdigital.zebedee.Zebedee.APPLICATION_KEYS;
 import static com.github.onsdigital.zebedee.Zebedee.COLLECTIONS;
 import static com.github.onsdigital.zebedee.Zebedee.KEYRING;
@@ -186,18 +190,21 @@ public class ZebedeeConfiguration {
         initialisePermissions(permissionsPath);
         this.permissionsStore = new PermissionsStoreFileSystemImpl(permissionsPath);
 
-        this.permissionsService = new PermissionsServiceImpl(permissionsStore,
-                this::getUsersService, this::getTeamsService, legacyKeyringCache);
+        this.permissionsService = new PermissionsServiceImpl(permissionsStore, this::getUsersService,
+                this::getTeamsService);
 
         VersionsService versionsService = new VersionsServiceImpl();
         this.collections = new Collections(collectionsPath, permissionsService, versionsService, published);
+
+
+        Supplier<Keyring> keyringSupplier = () -> collectionKeyring;
 
         this.usersService = UsersServiceImpl.getInstance(
                 new UserStoreFileSystemImpl(this.usersPath),
                 collections,
                 permissionsService,
                 applicationKeys,
-                legacyKeyringCache);
+                keyringSupplier);
 
         // The legacy keyring logic but behind the new keyring interface.
         Keyring legacyKeyring = new LegacyKeyringImpl(
@@ -229,13 +236,7 @@ public class ZebedeeConfiguration {
 
         imageService = new ImageServiceImpl(imageClient);
 
-        SlackClient slackClient = new SlackClientImpl(new Profile.Builder()
-                .emoji(":flo:")
-                .username("Florence")
-                .authToken(System.getenv("slack_api_token"))
-                .create());
-
-        startUpAlerter = new StartUpAlerterImpl(slackClient, slackChannelsToNotfiyOnStartUp());
+        this.startUpAlerter = initStartUpAlerter();
 
         info().data("root_path", rootPath.toString())
                 .data("zebedee_path", zebedeePath.toString())
@@ -273,6 +274,22 @@ public class ZebedeeConfiguration {
         }
 
         return centralKeyring;
+    }
+
+    private StartUpAlerter initStartUpAlerter() {
+        List<String> startUpNotificationRecipients = slackChannelsToNotfiyOnStartUp();
+
+        if (startUpNotificationRecipients == null || startUpNotificationRecipients.isEmpty()) {
+            warn().log("startUpNotificationRecipients was null or empty NoOpStartUpAlerter will be initialized.");
+            return new NoOpStartUpAlerter();
+        }
+
+        SlackClient slackClient = new SlackClientImpl(new Profile.Builder()
+                .emoji(":flo:")
+                .username("Florence")
+                .authToken(System.getenv("slack_api_token"))
+                .create());
+        return new StartUpAlerterImpl(slackClient, slackChannelsToNotfiyOnStartUp());
     }
 
     public boolean isUseVerificationAgent() {

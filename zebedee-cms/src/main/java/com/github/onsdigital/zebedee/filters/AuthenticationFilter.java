@@ -26,6 +26,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+import com.github.onsdigital.interfaces.JWTHandler;
+import com.github.onsdigital.JWTHandlerImpl;
+import com.github.onsdigital.impl.UserDataPayload;
+import com.github.onsdigital.exceptions.JWTDecodeException;
+import com.github.onsdigital.exceptions.JWTTokenExpiredException;
+import com.github.onsdigital.exceptions.JWTVerificationException;
 public class AuthenticationFilter implements PreFilter {
 
     /**
@@ -77,6 +83,18 @@ public class AuthenticationFilter implements PreFilter {
         boolean result = false;
         try {
             Session session = Root.zebedee.getSessions().get(request);
+
+            JWTHandler jwtHandler = new JWTHandlerImpl();
+
+            try {
+                UserDataPayload jwtObj = jwtHandler.verifyJWT(request.getHeader("Authorization"), "my-HS256-bit-secret");
+            } catch (JWTDecodeException e) {
+        
+            } catch (JWTVerificationException e) {
+
+            } catch (JWTTokenExpiredException e) {
+
+            }
 
             if (session == null) {
                 forbidden(response);

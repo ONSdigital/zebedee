@@ -78,8 +78,6 @@ public class PublishCollectionTask implements Callable<Boolean> {
                 String channel = Root.zebedee.getSlackCollectionAlarmChannel();
                 Root.zebedee.getSlackNotifier().callCollectionAlarm(collection, channel, "Scheduled collection failed to publish");
 
-               // SlackNotification.scheduledPublishFailure(collection);
-
             }
             try {
                 // Save any updates to the collection

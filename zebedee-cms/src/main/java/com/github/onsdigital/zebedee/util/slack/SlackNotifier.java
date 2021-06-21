@@ -68,11 +68,10 @@ public class SlackNotifier implements Notifier {
 
     @Override
     public void callCollectionAlarm(Collection collection, String channel, String customMessage, Exception ex) {
-        PostMessage postMessage = createPostMessage(channel,customMessage )
-                .addAttachment(new PostMessageAttachment("Exception", ex.getMessage(), Colour.DANGER)
-                        .addField("Publishing Type", collection.getDescription().getType().name(), true)
-                        .addField("CollectionID", collection.getId(), false)
-                        .addField("Collection Name", collection.getDescription().getName(), false));
+        AttachmentField exField = new AttachmentField("exception", ex.getMessage(), false);
+        PostMessage postMessage = createPostMessage(channel, customMessage)
+                .addAttachment(createCollectionAttachment("Alert", "Collection Alarm", Colour.DANGER, collection, exField));
+
         try {
             sendSlackMessage(postMessage);
         } catch (Exception e) {
@@ -82,20 +81,8 @@ public class SlackNotifier implements Notifier {
 
     @Override
     public void callCollectionWarning(Collection collection, String channel, String customMessage, AttachmentField... fields) {
-        PostMessage postMessage = createPostMessage(channel,customMessage );
-        PostMessageAttachment attachment = new PostMessageAttachment("Warning", customMessage, Colour.WARNING)
-                .addField("Publishing Type", collection.getDescription().getType().name(), true)
-                .addField("CollectionID", collection.getId(), false)
-                .addField("Collection Name", collection.getDescription().getName(), false);
-
-        postMessage.addAttachment(attachment);
-
-        if (fields != null)  {
-            for(AttachmentField field : fields) {
-                attachment.addField(field.getTitle(), field.getMessage(), field.isShort());
-            }
-        }
-
+        PostMessage postMessage = createPostMessage(channel, customMessage)
+                .addAttachment(createCollectionAttachment("Warning", "Collection Warning", Colour.WARNING, collection, fields));
         try {
             sendSlackMessage(postMessage);
         } catch (Exception e) {
@@ -104,17 +91,29 @@ public class SlackNotifier implements Notifier {
     }
 
     @Override
-    public void callCollectionAlarm(Collection collection, String channel, String customMessage) {
-        PostMessage postMessage = createPostMessage(channel,customMessage )
-                .addAttachment(new PostMessageAttachment("Advice", "Unlock the collection and re-approve to try again", Colour.WARNING)
-                        .addField("Publishing Type", collection.getDescription().getType().name(), true)
-                        .addField("CollectionID", collection.getId(), false)
-                        .addField("Collection Name", collection.getDescription().getName(), false));
+    public void callCollectionAlarm(Collection collection, String channel, String customMessage, AttachmentField... fields) {
+        PostMessage postMessage = createPostMessage(channel, customMessage)
+                .addAttachment(createCollectionAttachment("Alert", "Collection Alarm", Colour.DANGER, collection, fields));
         try {
             sendSlackMessage(postMessage);
         } catch (Exception e) {
             error().exception(e).log("unexpected error while sending slack notification");
         }
+    }
+
+    private PostMessageAttachment createCollectionAttachment(String title, String message, Colour colour, Collection collection, AttachmentField... fields) {
+        PostMessageAttachment attachment = new PostMessageAttachment(title, message, colour)
+                .addField("Publishing Type", collection.getDescription().getType().name(), true)
+                .addField("CollectionID", collection.getId(), false)
+                .addField("Collection Name", collection.getDescription().getName(), false);
+
+        if (fields != null)  {
+            for(AttachmentField field : fields) {
+                attachment.addField(field.getTitle(), field.getMessage(), field.isShort());
+            }
+        }
+
+        return attachment;
     }
 
 }

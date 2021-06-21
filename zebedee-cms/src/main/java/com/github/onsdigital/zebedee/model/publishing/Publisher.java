@@ -726,9 +726,8 @@ public class Publisher {
 
         boolean datasetsPublished = false;
         try {
-//            datasetServiceSupplier.getService().publishDatasetsInCollection(collection);
-//            datasetsPublished = true;
-            throw new RuntimeException("Borked");
+            datasetServiceSupplier.getService().publishDatasetsInCollection(collection);
+            datasetsPublished = true;
         } catch (Exception e) {
 
             error().data("collectionId", collectionId).data("publishing", true)

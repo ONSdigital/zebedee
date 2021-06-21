@@ -18,6 +18,7 @@ import com.github.onsdigital.zebedee.model.publishing.scheduled.PublishScheduler
 import com.github.onsdigital.zebedee.model.publishing.scheduled.Scheduler;
 import com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration;
 import com.github.onsdigital.zebedee.user.model.User;
+import com.github.onsdigital.zebedee.util.slack.AttachmentField;
 import com.github.onsdigital.zebedee.util.slack.Notifier;
 import com.github.onsdigital.zebedee.util.slack.SlackNotifier;
 import org.apache.commons.io.IOUtils;
@@ -189,12 +190,15 @@ public class Root {
 
     static void alertOnInProgressCollections(Collections.CollectionList collections, Notifier notifier) {
         info().log("zebedee root: checking existing collections for in progress approvals");
+
+        String channel = Root.zebedee.getSlackCollectionAlarmChannel();
+
         collections.withApprovalInProgressOrError().forEach(c -> {
             info().data("collectionId", c.getDescription().getId())
                     .data("type", c.getDescription().getType().name())
                     .log("zebedee root: collection approval is in error or in progress state on zebedee startup");
-            String channel = Root.zebedee.getSlackCollectionAlarmChannel();
-            Root.zebedee.getSlackNotifier().callCollectionAlarm(c, channel, "Collection approval is in IN_PROGRESS or ERROR state on zebedee startup. It may need to be re-approved manually.");
+            AttachmentField status = new AttachmentField("Approval Status", c.getDescription().getApprovalStatus().name(), true);
+            notifier.callCollectionAlarm(c, channel, "Collection approval is in IN_PROGRESS or ERROR state on zebedee startup. It may need to be re-approved manually.", status);
         });
     }
 

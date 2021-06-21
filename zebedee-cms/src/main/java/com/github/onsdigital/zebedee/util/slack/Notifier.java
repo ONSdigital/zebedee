@@ -32,9 +32,10 @@ public interface Notifier {
     PostMessage createPostMessage(String channel, String text);
 
     void callCollectionAlarm(Collection c, String channel, String message, Exception ex);
+
     void callCollectionWarning(Collection c, String channel, String message, AttachmentField... attachments);
 
-    void callCollectionAlarm(Collection c, String channel, String message);
+    void callCollectionAlarm(Collection c, String channel, String message, AttachmentField... attachments);
 
 }
 

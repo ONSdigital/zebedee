@@ -117,58 +117,60 @@ public class ApproveTask implements Callable<Boolean> {
     private boolean doApproval() throws Exception {
         ApprovalEventLog eventLog = null;
         try {
-            throw new RuntimeException();
-//            validate();
-//            eventLog = new ApprovalEventLog(collection.getDescription().getId(), session.getEmail());
-//
-//            info().data("collectionId", collection.getDescription().getId())
-//                    .data("user", session.getEmail()).log("approve task: beginning approval process");
-//
-//            List<ContentDetail> collectionContent = contentDetailResolver.resolve(collection.getReviewed(),
-//                    collectionReader.getReviewed());
-//            eventLog.resolvedDetails();
-//
-//            if (cmsFeatureFlags().isEnableDatasetImport()) {
-//                collectionContent.addAll(collection.getDatasetDetails());
-//                eventLog.addDatasetDetails();
-//
-//                collectionContent.addAll(collection.getDatasetVersionDetails());
-//                eventLog.addDatasetVersionDetails();
-//            }
-//
-//            populateReleasePage(collectionContent);
-//            eventLog.populatedResleasePage();
-//
-//            generateTimeseries(collection, publishedReader, collectionReader, collectionWriter, dataIndex);
-//            eventLog.generatedTimeSeries();
-//
-//            generatePdfFiles(collectionContent);
-//            eventLog.generatedPDFs();
-//
-//            List<String> uriList = collectionContent.stream().map(c -> c.uri).collect(Collectors.toList());
-//            PublishNotification publishNotification = createPublishNotification(uriList, collection);
-//            eventLog.createdPublishNotificaion();
-//
-//            compressZipFiles(collection, collectionReader, collectionWriter);
-//            eventLog.compressedZipFiles();
-//
-//            approveCollection();
-//            eventLog.approvalStateSet();
-//
-//            // Send a notification to the website with the publish date for caching.
-//            publishNotification.sendNotification(EventType.APPROVED);
-//            eventLog.sentPublishNotification();
-//
-//            eventLog.approvalCompleted();
-//            info().data("user", session.getEmail()).data("collectionId", collection.getDescription().getId())
-//                    .log("approve task: collection approve task completed successfully");
-//
-//            if (collection == null) {
-//                return false;
-//            }
-//            return true;
+            validate();
+            eventLog = new ApprovalEventLog(collection.getDescription().getId(), session.getEmail());
+
+            info().data("collectionId", collection.getDescription().getId())
+                    .data("user", session.getEmail()).log("approve task: beginning approval process");
+
+            List<ContentDetail> collectionContent = contentDetailResolver.resolve(collection.getReviewed(),
+                    collectionReader.getReviewed());
+            eventLog.resolvedDetails();
+
+            if (cmsFeatureFlags().isEnableDatasetImport()) {
+                collectionContent.addAll(collection.getDatasetDetails());
+                eventLog.addDatasetDetails();
+
+                collectionContent.addAll(collection.getDatasetVersionDetails());
+                eventLog.addDatasetVersionDetails();
+            }
+
+            populateReleasePage(collectionContent);
+            eventLog.populatedResleasePage();
+
+            generateTimeseries(collection, publishedReader, collectionReader, collectionWriter, dataIndex);
+            eventLog.generatedTimeSeries();
+
+            generatePdfFiles(collectionContent);
+            eventLog.generatedPDFs();
+
+            List<String> uriList = collectionContent.stream().map(c -> c.uri).collect(Collectors.toList());
+            PublishNotification publishNotification = createPublishNotification(uriList, collection);
+            eventLog.createdPublishNotificaion();
+
+            compressZipFiles(collection, collectionReader, collectionWriter);
+            eventLog.compressedZipFiles();
+
+            approveCollection();
+            eventLog.approvalStateSet();
+
+            // Send a notification to the website with the publish date for caching.
+            publishNotification.sendNotification(EventType.APPROVED);
+            eventLog.sentPublishNotification();
+
+            eventLog.approvalCompleted();
+            info().data("user", session.getEmail()).data("collectionId", collection.getDescription().getId())
+                    .log("approve task: collection approve task completed successfully");
+
+            if (collection == null) {
+                return false;
+            }
+            return true;
 
         } catch (Exception e) {
+            String channel = Root.zebedee.getSlackCollectionAlarmChannel();
+            Root.zebedee.getSlackNotifier().callCollectionAlarm(collection, channel, "Error approving collection", e);
+
             CMSLogEvent errorLog = error().data("collectionId", collection.getDescription().getId());
             if (session != null && StringUtils.isNotEmpty(session.getEmail())) {
                 errorLog.data("user", (session.getEmail()));
@@ -187,8 +189,6 @@ public class ApproveTask implements Callable<Boolean> {
                         .logException(e, "approve task: error writing collection to disk after approval exception, you may be " +
                                 "required to manually set the collection status to error");
             }
-            String channel = Root.zebedee.getSlackCollectionAlarmChannel();
-            Root.zebedee.getSlackNotifier().callCollectionAlarm(collection, channel, "Error writing collection to disk", e);
             return false;
         }
     }

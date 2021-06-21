@@ -100,6 +100,7 @@ public class ZebedeeConfiguration {
     private StartUpAlerter startUpAlerter;
     private SlackClient slackClient;
     private String slackCollectionAlarmChannel;
+    private String slackCollectionWarningChannel;
 
 
     /**
@@ -211,6 +212,7 @@ public class ZebedeeConfiguration {
         this.startUpAlerter = initStartUpAlerter();
 
         this.slackCollectionAlarmChannel = System.getenv("slack_default_channel");
+        this.slackCollectionWarningChannel = System.getenv("slack_default_channel");
 
         info().data("root_path", rootPath.toString())
                 .data("zebedee_path", zebedeePath.toString())
@@ -228,6 +230,7 @@ public class ZebedeeConfiguration {
                 .data("enable_verification_agent", useVerificationAgent)
                 .data("sessions_api_enabled", cmsFeatureFlags().isSessionAPIEnabled())
                 .data("slack_default_channel", slackCollectionAlarmChannel)
+                .data("slack_default_channel", slackCollectionWarningChannel)
                 .log("zebedee configuration creation complete");
 
     }
@@ -423,5 +426,9 @@ public class ZebedeeConfiguration {
 
     public String getSlackCollectionAlarmChannel() {
         return slackCollectionAlarmChannel;
+    }
+
+    public String getSlackCollectionWarningChannel() {
+        return slackCollectionWarningChannel;
     }
 }

@@ -726,15 +726,16 @@ public class Publisher {
 
         boolean datasetsPublished = false;
         try {
-            datasetServiceSupplier.getService().publishDatasetsInCollection(collection);
-            datasetsPublished = true;
+//            datasetServiceSupplier.getService().publishDatasetsInCollection(collection);
+//            datasetsPublished = true;
+            throw new RuntimeException("Borked");
         } catch (Exception e) {
 
             error().data("collectionId", collectionId).data("publishing", true)
                     .logException(e, "Exception updating API dataset to state published");
 
-            PostMessageField msg = new PostMessageField("Error", e.getMessage(), false);
-            collectionAlarm(collection, "Exception updating API dataset to state published", msg);
+            String channel = Root.zebedee.getSlackCollectionAlarmChannel();
+            Root.zebedee.getSlackNotifier().callCollectionAlarm(collection, channel, "Error updating API dataset", e);
 
         } finally {
             saveCollection(collection, datasetsPublished);

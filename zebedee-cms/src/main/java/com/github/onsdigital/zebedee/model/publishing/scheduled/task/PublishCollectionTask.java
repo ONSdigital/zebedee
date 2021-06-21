@@ -1,5 +1,6 @@
 package com.github.onsdigital.zebedee.model.publishing.scheduled.task;
 
+import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
 import com.github.onsdigital.zebedee.model.publishing.Publisher;
@@ -71,6 +72,15 @@ public class PublishCollectionTask implements Callable<Boolean> {
             }
         } finally {
             Map<String, String> transactionIdMap = collection.getDescription().getPublishTransactionIds();
+            if (!published) {
+                warn().data("collectionId", collectionId).log("Exception publishing scheduled collection");
+
+                String channel = Root.zebedee.getSlackCollectionAlarmChannel();
+                Root.zebedee.getSlackNotifier().callCollectionAlarm(collection, channel, "Scheduled collection failed to publish");
+
+               // SlackNotification.scheduledPublishFailure(collection);
+
+            }
             try {
                 // Save any updates to the collection
                 info().data("collectionId", collectionId).data("hostToTransactionId", transactionIdMap)
@@ -80,11 +90,6 @@ public class PublishCollectionTask implements Callable<Boolean> {
                 error().data("collectionId", collectionId).data("hostToTransactionId", transactionIdMap)
                         .logException(e, "PUBLISH: error while attempting to persist collection to disk");
                 throw e;
-            }
-            if (!published) {
-                warn().data("collectionId", collectionId).log("Exception publishing scheduled collection");
-
-                SlackNotification.scheduledPublishFailure(collection);
             }
             return published;
         }

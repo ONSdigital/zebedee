@@ -193,7 +193,8 @@ public class Root {
             info().data("collectionId", c.getDescription().getId())
                     .data("type", c.getDescription().getType().name())
                     .log("zebedee root: collection approval is in error or in progress state on zebedee startup");
-            notifier.collectionAlarm(c, "Collection approval is in IN_PROGRESS or ERROR state on zebedee startup. It may need to be re-approved manually.");
+            String channel = Root.zebedee.getSlackCollectionAlarmChannel();
+            Root.zebedee.getSlackNotifier().callCollectionAlarm(c, channel, "Collection approval is in IN_PROGRESS or ERROR state on zebedee startup. It may need to be re-approved manually.");
         });
     }
 

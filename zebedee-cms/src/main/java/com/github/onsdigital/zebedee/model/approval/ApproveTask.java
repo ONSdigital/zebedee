@@ -1,5 +1,6 @@
 package com.github.onsdigital.zebedee.model.approval;
 
+import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.data.DataPublisher;
 import com.github.onsdigital.zebedee.data.importing.CsvTimeseriesUpdateImporter;
 import com.github.onsdigital.zebedee.data.importing.TimeseriesUpdateCommand;
@@ -116,55 +117,56 @@ public class ApproveTask implements Callable<Boolean> {
     private boolean doApproval() throws Exception {
         ApprovalEventLog eventLog = null;
         try {
-            validate();
-            eventLog = new ApprovalEventLog(collection.getDescription().getId(), session.getEmail());
-
-            info().data("collectionId", collection.getDescription().getId())
-                    .data("user", session.getEmail()).log("approve task: beginning approval process");
-
-            List<ContentDetail> collectionContent = contentDetailResolver.resolve(collection.getReviewed(),
-                    collectionReader.getReviewed());
-            eventLog.resolvedDetails();
-
-            if (cmsFeatureFlags().isEnableDatasetImport()) {
-                collectionContent.addAll(collection.getDatasetDetails());
-                eventLog.addDatasetDetails();
-
-                collectionContent.addAll(collection.getDatasetVersionDetails());
-                eventLog.addDatasetVersionDetails();
-            }
-
-            populateReleasePage(collectionContent);
-            eventLog.populatedResleasePage();
-
-            generateTimeseries(collection, publishedReader, collectionReader, collectionWriter, dataIndex);
-            eventLog.generatedTimeSeries();
-
-            generatePdfFiles(collectionContent);
-            eventLog.generatedPDFs();
-
-            List<String> uriList = collectionContent.stream().map(c -> c.uri).collect(Collectors.toList());
-            PublishNotification publishNotification = createPublishNotification(uriList, collection);
-            eventLog.createdPublishNotificaion();
-
-            compressZipFiles(collection, collectionReader, collectionWriter);
-            eventLog.compressedZipFiles();
-
-            approveCollection();
-            eventLog.approvalStateSet();
-
-            // Send a notification to the website with the publish date for caching.
-            publishNotification.sendNotification(EventType.APPROVED);
-            eventLog.sentPublishNotification();
-
-            eventLog.approvalCompleted();
-            info().data("user", session.getEmail()).data("collectionId", collection.getDescription().getId())
-                    .log("approve task: collection approve task completed successfully");
-
-            if (collection == null) {
-                return false;
-            }
-            return true;
+            throw new RuntimeException();
+//            validate();
+//            eventLog = new ApprovalEventLog(collection.getDescription().getId(), session.getEmail());
+//
+//            info().data("collectionId", collection.getDescription().getId())
+//                    .data("user", session.getEmail()).log("approve task: beginning approval process");
+//
+//            List<ContentDetail> collectionContent = contentDetailResolver.resolve(collection.getReviewed(),
+//                    collectionReader.getReviewed());
+//            eventLog.resolvedDetails();
+//
+//            if (cmsFeatureFlags().isEnableDatasetImport()) {
+//                collectionContent.addAll(collection.getDatasetDetails());
+//                eventLog.addDatasetDetails();
+//
+//                collectionContent.addAll(collection.getDatasetVersionDetails());
+//                eventLog.addDatasetVersionDetails();
+//            }
+//
+//            populateReleasePage(collectionContent);
+//            eventLog.populatedResleasePage();
+//
+//            generateTimeseries(collection, publishedReader, collectionReader, collectionWriter, dataIndex);
+//            eventLog.generatedTimeSeries();
+//
+//            generatePdfFiles(collectionContent);
+//            eventLog.generatedPDFs();
+//
+//            List<String> uriList = collectionContent.stream().map(c -> c.uri).collect(Collectors.toList());
+//            PublishNotification publishNotification = createPublishNotification(uriList, collection);
+//            eventLog.createdPublishNotificaion();
+//
+//            compressZipFiles(collection, collectionReader, collectionWriter);
+//            eventLog.compressedZipFiles();
+//
+//            approveCollection();
+//            eventLog.approvalStateSet();
+//
+//            // Send a notification to the website with the publish date for caching.
+//            publishNotification.sendNotification(EventType.APPROVED);
+//            eventLog.sentPublishNotification();
+//
+//            eventLog.approvalCompleted();
+//            info().data("user", session.getEmail()).data("collectionId", collection.getDescription().getId())
+//                    .log("approve task: collection approve task completed successfully");
+//
+//            if (collection == null) {
+//                return false;
+//            }
+//            return true;
 
         } catch (Exception e) {
             CMSLogEvent errorLog = error().data("collectionId", collection.getDescription().getId());
@@ -185,9 +187,8 @@ public class ApproveTask implements Callable<Boolean> {
                         .logException(e, "approve task: error writing collection to disk after approval exception, you may be " +
                                 "required to manually set the collection status to error");
             }
-
-            SlackNotification.collectionAlarm(collection, "Exception approving collection",
-                    new PostMessageField("Error", e.getMessage(), false));
+            String channel = Root.zebedee.getSlackCollectionAlarmChannel();
+            Root.zebedee.getSlackNotifier().callCollectionAlarm(collection, channel, "Error writing collection to disk", e);
             return false;
         }
     }
@@ -269,10 +270,8 @@ public class ApproveTask implements Callable<Boolean> {
         boolean verified = timeSeriesCompressionTask.compressTimeseries(collection, collectionReader, collectionWriter);
 
         if (!verified) {
-            SlackNotification.collectionAlarm(collection,
-                    "Failed verification of time series zip files",
-                    new PostMessageField("Advice", "Unlock the collection and re-approve to try again", false)
-            );
+            String channel = Root.zebedee.getSlackCollectionAlarmChannel();
+            Root.zebedee.getSlackNotifier().callCollectionAlarm(collection, channel, "Failed verification of time series zip files");
             info().data("collectionId", collection.getDescription().getId())
                     .log("Failed verification of time series zip files");
         }

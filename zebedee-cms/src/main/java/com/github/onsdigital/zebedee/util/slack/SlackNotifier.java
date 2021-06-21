@@ -9,6 +9,8 @@ import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.util.SlackNotification;
 
+import java.util.Arrays;
+
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.error;
 
 
@@ -71,7 +73,43 @@ public class SlackNotifier implements Notifier {
                         .addField("Publishing Type", collection.getDescription().getType().name(), true)
                         .addField("CollectionID", collection.getId(), false)
                         .addField("Collection Name", collection.getDescription().getName(), false));
+        try {
+            sendSlackMessage(postMessage);
+        } catch (Exception e) {
+            error().exception(e).log("unexpected error while sending slack notification");
+        }
+    }
 
+    @Override
+    public void callCollectionWarning(Collection collection, String channel, String customMessage, AttachmentField... fields) {
+        PostMessage postMessage = createPostMessage(channel,customMessage );
+        PostMessageAttachment attachment = new PostMessageAttachment("Warning", customMessage, Colour.WARNING)
+                .addField("Publishing Type", collection.getDescription().getType().name(), true)
+                .addField("CollectionID", collection.getId(), false)
+                .addField("Collection Name", collection.getDescription().getName(), false);
+
+        postMessage.addAttachment(attachment);
+
+        if (fields != null)  {
+            for(AttachmentField field : fields) {
+                attachment.addField(field.getTitle(), field.getMessage(), field.isShort());
+            }
+        }
+
+        try {
+            sendSlackMessage(postMessage);
+        } catch (Exception e) {
+            error().exception(e).log("unexpected error while sending slack notification");
+        }
+    }
+
+    @Override
+    public void callCollectionAlarm(Collection collection, String channel, String customMessage) {
+        PostMessage postMessage = createPostMessage(channel,customMessage )
+                .addAttachment(new PostMessageAttachment("Advice", "Unlock the collection and re-approve to try again", Colour.WARNING)
+                        .addField("Publishing Type", collection.getDescription().getType().name(), true)
+                        .addField("CollectionID", collection.getId(), false)
+                        .addField("Collection Name", collection.getDescription().getName(), false));
         try {
             sendSlackMessage(postMessage);
         } catch (Exception e) {

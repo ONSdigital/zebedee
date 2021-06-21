@@ -1,9 +1,11 @@
 package com.github.onsdigital.zebedee.model;
 
+import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.util.EncryptionUtils;
 import com.github.onsdigital.zebedee.util.SlackNotification;
+import com.github.onsdigital.zebedee.util.slack.AttachmentField;
 import com.github.onsdigital.zebedee.util.slack.PostMessageField;
 import org.apache.commons.io.FileUtils;
 
@@ -39,10 +41,15 @@ public class CollectionContentWriter extends ContentWriter {
         if (collection.getDescription().isEncrypted()) {
             return EncryptionUtils.encryptionOutputStream(path, key);
         } else {
-            SlackNotification.collectionWarning(collection,
-                    "Writing unencrypted content in collection",
-                    new PostMessageField("URI", uri, false)
-            );
+
+            String channel = Root.zebedee.getSlackCollectionAlarmChannel();
+            AttachmentField uriField = new AttachmentField("uri",uri,false);
+            Root.zebedee.getSlackNotifier().callCollectionWarning(collection, channel, "Writing unencrypted content in collection",uriField);
+
+//            SlackNotification.collectionWarning(collection,
+//                    "Writing unencrypted content in collection",
+//                    new PostMessageField("URI", uri, false));
+
             info().data("uri", uri).data("collectionId", collection.getDescription().getId()).log("Writing unencrypted content in collection");
 
             return FileUtils.openOutputStream(path.toFile());

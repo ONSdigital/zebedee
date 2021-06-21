@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee.util.slack;
 
 import com.github.onsdigital.slack.messages.PostMessage;
+import com.github.onsdigital.slack.messages.PostMessageAttachment;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.util.SlackNotification;
 
@@ -31,5 +32,9 @@ public interface Notifier {
     PostMessage createPostMessage(String channel, String text);
 
     void callCollectionAlarm(Collection c, String channel, String message, Exception ex);
+    void callCollectionWarning(Collection c, String channel, String message, AttachmentField... attachments);
+
+    void callCollectionAlarm(Collection c, String channel, String message);
+
 }
 

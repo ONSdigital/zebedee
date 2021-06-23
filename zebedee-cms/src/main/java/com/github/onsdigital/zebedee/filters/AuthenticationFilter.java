@@ -32,7 +32,20 @@ import com.github.onsdigital.impl.UserDataPayload;
 import com.github.onsdigital.exceptions.JWTDecodeException;
 import com.github.onsdigital.exceptions.JWTTokenExpiredException;
 import com.github.onsdigital.exceptions.JWTVerificationException;
+
+import com.github.onsdigital.zebedee.session.service.Sessions;
+
 public class AuthenticationFilter implements PreFilter {
+
+    private Sessions sessions;
+
+    public AuthenticationFilter() {
+        this(Root.zebedee.getSessions());
+    }
+
+    public AuthenticationFilter(Sessions sessions) {
+        this.sessions = sessions;
+    }
 
     /**
      * Endpoints that do not require authorisation.
@@ -72,28 +85,27 @@ public class AuthenticationFilter implements PreFilter {
             return true;
         }
 
-        // Pass through without authentication for login requests:
-        // Password requests check
         Path path = Path.newInstance(request);
+    
         if (noAuthorisationRequired(path)) {
             return true;
         }
 
         // Check all other requests:
         boolean result = false;
+
         try {
-            Session session = Root.zebedee.getSessions().get(request);
-
-            JWTHandler jwtHandler = new JWTHandlerImpl();
-
+            Session session = sessions.get(request);
+            request.getHeader("Authorization");
             try {
-                UserDataPayload jwtObj = jwtHandler.verifyJWT(request.getHeader("Authorization"), "my-HS256-bit-secret");
-            } catch (JWTDecodeException e) {
-        
-            } catch (JWTVerificationException e) {
-
-            } catch (JWTTokenExpiredException e) {
-
+                // JWT library object
+                JWTHandler jwtHandler = new JWTHandlerImpl();
+                UserDataPayload jwtData = jwtHandler.verifyJWT(request.getHeader("Authorization"), "my-HS256-bit-secret");
+                // TODO: call threadlocal handler to persist jwt data
+                System.out.println("email is: "+jwtData.getEmail());
+                result = true;
+            } catch (JWTDecodeException | JWTVerificationException | JWTTokenExpiredException e ) {
+                throw new IOException("Error with Access Toekn: "+e);
             }
 
             if (session == null) {

@@ -1,6 +1,6 @@
-package com.github.onsdigital.exceptions;
+package com.github.onsdigital.zebedee.session.store.exceptions;
 
-public class SessionsDecodeException extends RuntimeException{
+public class SessionsDecodeException extends SessionsStoreException{
     public SessionsDecodeException(String message) {
         this(message, null);
     }

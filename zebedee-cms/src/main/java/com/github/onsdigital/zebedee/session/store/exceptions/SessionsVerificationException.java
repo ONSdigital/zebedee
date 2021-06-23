@@ -1,6 +1,6 @@
-package com.github.onsdigital.exceptions;
+package com.github.onsdigital.zebedee.session.store.exceptions;
 
-public class SessionsVerificationException extends RuntimeException {
+public class SessionsVerificationException extends SessionsStoreException {
     public SessionsVerificationException(String message) {
         this(message, null);
     }

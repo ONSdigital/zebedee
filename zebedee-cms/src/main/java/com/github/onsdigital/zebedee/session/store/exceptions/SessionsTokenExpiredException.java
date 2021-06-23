@@ -1,6 +1,6 @@
-package com.github.onsdigital.exceptions;
+package com.github.onsdigital.zebedee.session.store.exceptions;
 
-public class SessionsTokenExpiredException extends RuntimeException {
+public class SessionsTokenExpiredException extends SessionsStoreException {
     public SessionsTokenExpiredException(String message) {
         this(message, null);
     }

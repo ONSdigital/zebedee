@@ -1,6 +1,6 @@
 package com.github.onsdigital.zebedee.session.store.exceptions;
 
-public class SessionsRequestException extends RuntimeException {
+public class SessionsRequestException extends SessionsStoreException {
     public SessionsRequestException(String message) {
         this(message, null);
     }

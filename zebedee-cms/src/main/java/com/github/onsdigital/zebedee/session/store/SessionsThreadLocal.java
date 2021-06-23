@@ -1,8 +1,14 @@
 package com.github.onsdigital.zebedee.session.store;
 
-import com.github.onsdigital.impl.UserDataPayload;
-
 import javax.servlet.http.HttpServletRequest;
+
+
+/**
+ * This method creates a ThreadLocal for the validated jwt 
+ * from a HTTP request and appropriate key 
+ *  as part of implementing dp-identity-api
+ * 
+ */
 
 public interface SessionsThreadLocal {
 

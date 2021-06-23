@@ -58,7 +58,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
@@ -1251,7 +1250,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         // Given an existing release page
         ReflectionTestUtils.setField(zebedee, "permissionsService", permissionsService);
 
-        when(permissionsService.canEdit(any(Session.class), any(CollectionDescription.class)))
+        when(permissionsService.canEdit(any(Session.class)))
                 .thenReturn(true);
 
         setUpKeyringMocks();
@@ -1300,7 +1299,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
 
         ReflectionTestUtils.setField(zebedee, "permissionsService", permissionsService);
 
-        when(permissionsService.canEdit(eq(publisherSession), any(CollectionDescription.class)))
+        when(permissionsService.canEdit(publisherSession))
                 .thenReturn(true);
 
         setUpKeyringMocks();

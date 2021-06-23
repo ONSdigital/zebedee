@@ -87,7 +87,7 @@ public class ZebedeeCollectionWriterTest {
         when(collection.getDescription())
                 .thenReturn(description);
 
-        when(permissionsService.canEdit(session, description))
+        when(permissionsService.canEdit(session))
                 .thenReturn(true);
 
         when(usersService.getUserByEmail(EMAIL))
@@ -157,14 +157,14 @@ public class ZebedeeCollectionWriterTest {
 
     @Test
     public void testNew_permissionDenied_shouldThrowException() throws Exception {
-        when(permissionsService.canEdit(session, description))
+        when(permissionsService.canEdit(session))
                 .thenReturn(false);
 
         UnauthorizedException ex = assertThrows(UnauthorizedException.class,
                 () -> newCollectionWriter(zebedee, collection, session));
 
         assertThat(ex.getMessage(), equalTo(PERMISSION_DENIED_ERR));
-        verify(permissionsService, times(1)).canEdit(session, description);
+        verify(permissionsService, times(1)).canEdit(session);
     }
 
     @Test
@@ -176,7 +176,7 @@ public class ZebedeeCollectionWriterTest {
                 () -> newCollectionWriter(zebedee, collection, session));
 
         assertThat(ex.getMessage(), equalTo(GET_USER_ERR));
-        verify(permissionsService, times(1)).canEdit(session, description);
+        verify(permissionsService, times(1)).canEdit(session);
         verify(usersService, times(1)).getUserByEmail(EMAIL);
     }
 
@@ -189,20 +189,20 @@ public class ZebedeeCollectionWriterTest {
                 () -> newCollectionWriter(zebedee, collection, session));
 
         assertThat(ex.getMessage(), equalTo(USER_NULL_ERR));
-        verify(permissionsService, times(1)).canEdit(session, description);
+        verify(permissionsService, times(1)).canEdit(session);
         verify(usersService, times(1)).getUserByEmail(EMAIL);
     }
 
     @Test
     public void testNew_canEditReturnsError_shouldThrowException() throws Exception {
-        when(permissionsService.canEdit(session, description))
+        when(permissionsService.canEdit(session))
                 .thenThrow(IOException.class);
 
         IOException ex = assertThrows(IOException.class,
                 () -> newCollectionWriter(zebedee, collection, session));
 
         assertThat(ex.getMessage(), equalTo(PERMISSIONS_CHECK_ERR));
-        verify(permissionsService, times(1)).canEdit(session, description);
+        verify(permissionsService, times(1)).canEdit(session);
     }
 
     @Test
@@ -213,7 +213,7 @@ public class ZebedeeCollectionWriterTest {
         IOException ex = assertThrows(IOException.class,
                 () -> newCollectionWriter(zebedee, collection, session));
 
-        verify(permissionsService, times(1)).canEdit(session, description);
+        verify(permissionsService, times(1)).canEdit(session);
         verify(usersService, times(1)).getUserByEmail(EMAIL);
         verify(keyring, times(1)).get(user, collection);
     }
@@ -227,7 +227,7 @@ public class ZebedeeCollectionWriterTest {
                 () -> newCollectionWriter(zebedee, collection, session));
 
         assertThat(ex.getMessage(), equalTo(COLLECTION_KEY_NULL_ERR));
-        verify(permissionsService, times(1)).canEdit(session, description);
+        verify(permissionsService, times(1)).canEdit(session);
         verify(usersService, times(1)).getUserByEmail(EMAIL);
         verify(keyring, times(1)).get(user, collection);
     }

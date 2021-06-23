@@ -205,7 +205,7 @@ public abstract class ZebedeeTestBaseFixture {
         when(permissionsService.canView(eq(someUser), any(CollectionDescription.class)))
                 .thenReturn(true);
 
-        when(permissionsService.canEdit(eq(someUser), any(CollectionDescription.class)))
+        when(permissionsService.canEdit(someUser))
                 .thenReturn(true);
 
         ReflectionTestUtils.setField(instance, "permissionsService", permissionsService);
@@ -215,7 +215,7 @@ public abstract class ZebedeeTestBaseFixture {
         when(permissionsService.canView(eq(session), any(CollectionDescription.class)))
                 .thenReturn(true);
 
-        when(permissionsService.canEdit(eq(session), any(CollectionDescription.class)))
+        when(permissionsService.canEdit(session))
                 .thenReturn(true);
 
         ReflectionTestUtils.setField(instance, "permissionsService", permissionsService);

@@ -740,7 +740,7 @@ public class Collection {
 
 
         // Does the user have permission to edit?
-        boolean permission = zebedee.getPermissionsService().canEdit(email, description);
+        boolean permission = zebedee.getPermissionsService().canEdit(email);
         if (!permission) {
             info().data("path", uri).data("collectionId", this.getDescription().getId()).data("user", email)
                     .log("Content was not saved as user does not have EDIT permission");

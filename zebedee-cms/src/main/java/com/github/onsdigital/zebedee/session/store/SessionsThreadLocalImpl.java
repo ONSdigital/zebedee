@@ -39,7 +39,7 @@ public class SessionsThreadLocalImpl implements SessionsThreadLocal {
 
         if ( request.getHeader("Authorization") == null || 
                 request.getHeader("Authorization").isEmpty() ) {
-                    throw new SessionsRequestException("Request does not have Authorization in Header");
+                    throw new SessionsRequestException("Request does not have Authorization in Header.");
                 };
 
         /**
@@ -48,7 +48,7 @@ public class SessionsThreadLocalImpl implements SessionsThreadLocal {
         if (secretKey == null || 
                 secretKey.isEmpty()
          ) {
-            throw new SessionsKeyException("Key is invalid");
+            throw new SessionsKeyException("Secret key value expected but was null or empty.");
          }
 
         /** From the two arguments adds the result of the jwtvalidation to Threadlocal store   */

@@ -27,7 +27,6 @@ import java.util.Arrays;
 
 public class SessionThreadLocalTest {
 
-    private static final Class<SessionsKeyException> CLASS = SessionsKeyException.class;
     private SessionsThreadLocal sessionsStore;
     private String secretKey;
     private final static String SIGNED_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhYWFhYWFhYS1iYmJiLWNjY2MtZGRkZC1lZWVlZWVlZWVlZWUiLCJkZXZpY2Vfa2V5IjoiYWFhYWFhYWEtYmJiYi1jY2NjLWRkZGQtZWVlZWVlZWVlZWVlIiwiY29nbml0bzpncm91cHMiOlsiYWRtaW4iLCJwdWJsaXNoaW5nIiwiZGF0YSIsInRlc3QiXSwidG9rZW5fdXNlIjoiYWNjZXNzIiwic2NvcGUiOiJhd3MuY29nbml0by5zaWduaW4udXNlci5hZG1pbiIsImF1dGhfdGltZSI6MTU2MjE5MDUyNCwiaXNzIjoiaHR0cHM6Ly9jb2duaXRvLWlkcC51cy13ZXN0LTIuYW1hem9uYXdzLmNvbS91cy13ZXN0LTJfZXhhbXBsZSIsImV4cCI6OTk5OTk5OTk5OSwiaWF0IjoxNTYyMTkwNTI0LCJqdGkiOiJhYWFhYWFhYS1iYmJiLWNjY2MtZGRkZC1lZWVlZWVlZWVlZWUiLCJjbGllbnRfaWQiOiI1N2NiaXNoazRqMjRwYWJjMTIzNDU2Nzg5MCIsInVzZXJuYW1lIjoiamFuZWRvZUBleGFtcGxlLmNvbSJ9.fn_ojA25syD6ajJ6we_grfBpaPSUSQeVSqnQGAozkHA";
@@ -99,43 +98,26 @@ public class SessionThreadLocalTest {
     @Test 
     public void SessionThreadlocalDecodeException() throws Exception {
         when(request.getHeader("Authorization")).thenReturn(TOKEN_NO_USER);
+        
         when(jwtHandler.verifyJWT(any(),any())).thenThrow(JWTDecodeException.class);
-            
-        assertThrows(
-            SessionsDecodeException.class,
-            new ThrowingRunnable() {
-            public void run() throws Throwable {
-                sessionsStore.store(request,SECRET_KEY);
-            }
-            });
+        assertThrows(SessionsDecodeException.class, () ->  sessionsStore.store(request, SECRET_KEY));
         }
+
     @Test 
     public void SessionThreadlocalTokenExired() throws Exception {
         when(request.getHeader("Authorization")).thenReturn(TOKEN_EXPIRED_TIME);
         when(jwtHandler.verifyJWT(any(),any())).thenThrow(JWTTokenExpiredException.class);
             
-        assertThrows(
-            SessionsTokenExpiredException.class,
-            new ThrowingRunnable() {
-            public void run() throws Throwable {
-                sessionsStore.store(request,SECRET_KEY);
-            }
-            });
+        assertThrows(SessionsTokenExpiredException.class, () -> sessionsStore.store(request,SECRET_KEY));
+
         }
 
     @Test 
     public void SessionVerificationException() throws Exception {
         when(request.getHeader("Authorization")).thenReturn(INVALID_SIGNED_TOKEN);
         when(jwtHandler.verifyJWT(any(),any())).thenThrow(JWTVerificationException.class);
-            
-        assertThrows(
-            SessionsVerificationException.class,
-            new ThrowingRunnable() {
-            public void run() throws Throwable {
-                sessionsStore.store(request,SECRET_KEY);
-            }
-            });
-        }
 
+        assertThrows(SessionsVerificationException.class, () -> sessionsStore.store(request,SECRET_KEY));
+    }
 
 }

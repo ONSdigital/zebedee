@@ -10,7 +10,6 @@ import com.github.onsdigital.interfaces.JWTHandler;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.function.ThrowingRunnable;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
@@ -71,53 +70,59 @@ public class SessionThreadLocalTest {
 
     }
 
+    @SuppressWarnings("unchecked")
     @Test 
-    public void SessionThreadlocalKeyException() throws Exception {
+    public void SessionThreadlocalDecodeException() throws Exception {
+        
+        when(request.getHeader("Authorization")).thenReturn(TOKEN_NO_USER);
+        when(jwtHandler.verifyJWT(any(),any())).thenThrow(JWTDecodeException.class);
+        Exception exception = assertThrows(SessionsDecodeException.class, () ->  sessionsStore.store(request, SECRET_KEY));
+        assertThat(exception.getMessage(), is("Required JWT payload claim not found [username or cognito:groups]."));
+
+    }
+
+    @Test 
+    public void SessionThreadlocalKeyExceptionforEmpty() throws Exception {
+        String secretKey = "";
         when(request.getHeader("Authorization")).thenReturn(SIGNED_TOKEN);
-        assertThrows(
-            SessionsKeyException.class,
-            new ThrowingRunnable() {
-             public void run() throws Throwable {
-                sessionsStore.store(request,secretKey);
-             }
-            });
-         }
+        Exception exception = assertThrows(SessionsKeyException.class, () ->  sessionsStore.store(request, secretKey));
+        assertThat(exception.getMessage(), is("Secret key value expected but was null or empty."));
+
+    }
+
+    @Test 
+    public void SessionThreadlocalKeyExceptionforNull() throws Exception {
+        String secretKey = null;
+        when(request.getHeader("Authorization")).thenReturn(SIGNED_TOKEN);
+        Exception exception = assertThrows(SessionsKeyException.class, () ->  sessionsStore.store(request, secretKey));
+        assertThat(exception.getMessage(), is("Secret key value expected but was null or empty."));
+    }
 
     @Test 
     public void SessionThreadlocalRequestException() throws Exception {
+        Exception exception = assertThrows(SessionsRequestException.class, () ->  sessionsStore.store(request, SECRET_KEY));
+        assertThat(exception.getMessage(), is("Request does not have Authorization in Header."));
 
-        assertThrows(
-            SessionsRequestException.class,
-            new ThrowingRunnable() {
-            public void run() throws Throwable {
-                sessionsStore.store(request,SECRET_KEY);
-            }
-            });
-        }
-     
-    @Test 
-    public void SessionThreadlocalDecodeException() throws Exception {
-        when(request.getHeader("Authorization")).thenReturn(TOKEN_NO_USER);
-        
-        when(jwtHandler.verifyJWT(any(),any())).thenThrow(JWTDecodeException.class);
-        assertThrows(SessionsDecodeException.class, () ->  sessionsStore.store(request, SECRET_KEY));
-        }
+    }
 
+    @SuppressWarnings("unchecked")
     @Test 
     public void SessionThreadlocalTokenExired() throws Exception {
         when(request.getHeader("Authorization")).thenReturn(TOKEN_EXPIRED_TIME);
-        when(jwtHandler.verifyJWT(any(),any())).thenThrow(JWTTokenExpiredException.class);
-            
-        assertThrows(SessionsTokenExpiredException.class, () -> sessionsStore.store(request,SECRET_KEY));
+        when(jwtHandler.verifyJWT(any(),any())).thenThrow(JWTTokenExpiredException.class);   
+        Exception exception = assertThrows(SessionsTokenExpiredException.class, () -> sessionsStore.store(request,SECRET_KEY));
+        assertThat(exception.getMessage(), is("Access token has expired."));
 
-        }
-
+    }
+    
+    @SuppressWarnings("unchecked")
     @Test 
     public void SessionVerificationException() throws Exception {
         when(request.getHeader("Authorization")).thenReturn(INVALID_SIGNED_TOKEN);
         when(jwtHandler.verifyJWT(any(),any())).thenThrow(JWTVerificationException.class);
+        Exception exception = assertThrows(SessionsVerificationException.class, () -> sessionsStore.store(request,SECRET_KEY));
+        assertThat(exception.getMessage(), is("Verification of JWT token integrity failed."));
 
-        assertThrows(SessionsVerificationException.class, () -> sessionsStore.store(request,SECRET_KEY));
     }
 
 }

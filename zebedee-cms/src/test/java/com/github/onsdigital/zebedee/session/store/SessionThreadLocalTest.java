@@ -111,7 +111,7 @@ public class SessionThreadLocalTest {
         when(request.getHeader("Authorization")).thenReturn(TOKEN_EXPIRED_TIME);
         when(jwtHandler.verifyJWT(any(),any())).thenThrow(JWTTokenExpiredException.class);   
         Exception exception = assertThrows(SessionsTokenExpiredException.class, () -> sessionsStore.store(request,SECRET_KEY));
-        assertThat(exception.getMessage(), is("Access token has expired."));
+        assertThat(exception.getMessage(), is("JWT verification failed as token is expired."));
 
     }
     

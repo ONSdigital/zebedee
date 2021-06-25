@@ -35,6 +35,7 @@ import com.github.onsdigital.exceptions.JWTVerificationException;
 
 import com.github.onsdigital.zebedee.session.service.Sessions;
 
+import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
 public class AuthenticationFilter implements PreFilter {
 
     private Sessions sessions;
@@ -94,29 +95,44 @@ public class AuthenticationFilter implements PreFilter {
         // Check all other requests:
         boolean result = false;
 
-        try {
-            Session session = sessions.get(request);
-            request.getHeader("Authorization");
+        if (cmsFeatureFlags().isIdentityAuthEnabled()) {
             try {
-                // JWT library object
-                JWTHandler jwtHandler = new JWTHandlerImpl();
-                UserDataPayload jwtData = jwtHandler.verifyJWT(request.getHeader("Authorization"), "my-HS256-bit-secret");
-                // TODO: call threadlocal handler to persist jwt data
-                System.out.println("email is: "+jwtData.getEmail());
-                result = true;
-            } catch (JWTDecodeException | JWTVerificationException | JWTTokenExpiredException e ) {
-                throw new IOException("Error with Access Toekn: "+e);
+                Session session = sessions.get(request);
+                request.getHeader("Authorization");
+                try {
+                    // JWT library object
+                    JWTHandler jwtHandler = new JWTHandlerImpl();
+                    UserDataPayload jwtData = jwtHandler.verifyJWT(request.getHeader("Authorization"), "my-HS256-bit-secret");
+                    // TODO: call threadlocal handler to persist jwt data
+                    System.out.println("email is: "+jwtData.getEmail());
+                    result = true;
+                } catch (JWTDecodeException | JWTVerificationException | JWTTokenExpiredException e ) {
+                    throw new IOException("Error with Access Toekn: "+e);
+                }
+    
+                if (session == null) {
+                    forbidden(response);
+                } else {
+                    result = true;
+                }
+            } catch (IOException e) {
+                error(response);
             }
-
-            if (session == null) {
-                forbidden(response);
-            } else {
-                result = true;
+            return result;
+        } else {
+            try {
+                Session session = Root.zebedee.getSessions().get(request);
+    
+                if (session == null) {
+                    forbidden(response);
+                } else {
+                    result = true;
+                }
+            } catch (IOException e) {
+                error(response);
             }
-        } catch (IOException e) {
-            error(response);
+            return result;
         }
-        return result;
     }
 
     private void forbidden(HttpServletResponse response) throws IOException {

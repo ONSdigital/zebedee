@@ -126,6 +126,7 @@ public class ZebedeeConfiguration {
     private SchedulerKeyCache schedulerKeyCache;
     private EncryptionKeyFactory encryptionKeyFactory;
     private StartUpAlerter startUpAlerter;
+    private String publicPEMKey;
 
 
     /**
@@ -253,6 +254,7 @@ public class ZebedeeConfiguration {
                 .data("services_path", servicePath.toString())
                 .data("enable_verification_agent", useVerificationAgent)
                 .data("sessions_api_enabled", cmsFeatureFlags().isSessionAPIEnabled())
+                .data("public_PEM_key", publicPEMKey)
                 .log("zebedee configuration creation complete");
 
     }
@@ -427,6 +429,10 @@ public class ZebedeeConfiguration {
 
     public SchedulerKeyCache getSchedulerKeyringCache() {
         return this.schedulerKeyCache;
+    }
+
+    public String getPublicPEMString() {
+        return publicPEMKey;
     }
 
     private Path createDir(Path root, String dirName) throws IOException {

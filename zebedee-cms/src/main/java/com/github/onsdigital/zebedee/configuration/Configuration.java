@@ -36,6 +36,7 @@ public class Configuration {
     private static final String SESSIONS_API_URL = "http://localhost:24400";
     private static final String KEYRING_SECRET_KEY = "KEYRING_SECRET_KEY";
     private static final String KEYRING_INIT_VECTOR = "KEYRING_INIT_VECTOR";
+    private static final String PUBLIC_PEM_KEY = "PUBLIC_PEM_KEY";
 
     private static final int VERIFY_RETRY_DELAY = 5000; //milliseconds
     private static final int VERIFY_RETRY_COUNT = 10;
@@ -220,6 +221,18 @@ public class Configuration {
         Arrays.fill(vectorBytes, (byte) 0);
 
         return ivParameterSpec;
+    }
+    
+    public static String getPublicPEMKey() {
+        String publicPEMKey = getValue(PUBLIC_PEM_KEY);
+        try {
+            Jwk jwk = provider.get(kid);
+            RSAPublicKey publicKey = (RSAPublicKey) jwk.getPublicKey();
+            publicPEMKey = PEM_START_TAG+(new String(Base64.encodeBase64(publicKey.getEncoded())))+PEM_END_TAG;
+        } catch (Exception e) {
+            new Error(e);
+        }
+        return publicPEMKey;
     }
 
     /**

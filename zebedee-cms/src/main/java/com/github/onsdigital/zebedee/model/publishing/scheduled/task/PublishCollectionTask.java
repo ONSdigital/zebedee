@@ -4,7 +4,6 @@ import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
 import com.github.onsdigital.zebedee.model.publishing.Publisher;
-import com.github.onsdigital.zebedee.util.SlackNotification;
 
 import java.util.Date;
 import java.util.Map;
@@ -76,7 +75,7 @@ public class PublishCollectionTask implements Callable<Boolean> {
                 warn().data("collectionId", collectionId).log("Exception publishing scheduled collection");
 
                 String channel = Root.zebedee.getSlackCollectionAlarmChannel();
-                Root.zebedee.getSlackNotifier().callCollectionAlarm(collection, channel, "Scheduled collection failed to publish");
+                Root.zebedee.getSlackNotifier().sendCollectionAlarm(collection, channel, "Scheduled collection failed to publish");
 
             }
             try {

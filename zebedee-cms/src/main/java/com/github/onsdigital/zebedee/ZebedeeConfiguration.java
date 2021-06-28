@@ -8,8 +8,14 @@ import com.github.onsdigital.session.service.client.SessionClientImpl;
 import com.github.onsdigital.slack.Profile;
 import com.github.onsdigital.slack.client.SlackClient;
 import com.github.onsdigital.slack.client.SlackClientImpl;
+import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.data.processing.DataIndex;
-import com.github.onsdigital.zebedee.keyring.*;
+import com.github.onsdigital.zebedee.keyring.CentralKeyringImpl;
+import com.github.onsdigital.zebedee.keyring.Keyring;
+import com.github.onsdigital.zebedee.keyring.KeyringException;
+import com.github.onsdigital.zebedee.keyring.KeyringMigratorImpl;
+import com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl;
+import com.github.onsdigital.zebedee.keyring.NoOpCentralKeyring;
 import com.github.onsdigital.zebedee.keyring.cache.KeyringCache;
 import com.github.onsdigital.zebedee.keyring.cache.KeyringCacheImpl;
 import com.github.onsdigital.zebedee.keyring.cache.LegacySchedulerKeyCache;
@@ -28,7 +34,11 @@ import com.github.onsdigital.zebedee.permissions.service.PermissionsServiceImpl;
 import com.github.onsdigital.zebedee.permissions.store.PermissionsStore;
 import com.github.onsdigital.zebedee.permissions.store.PermissionsStoreFileSystemImpl;
 import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
-import com.github.onsdigital.zebedee.service.*;
+import com.github.onsdigital.zebedee.service.DatasetService;
+import com.github.onsdigital.zebedee.service.ImageService;
+import com.github.onsdigital.zebedee.service.ImageServiceImpl;
+import com.github.onsdigital.zebedee.service.ServiceStoreImpl;
+import com.github.onsdigital.zebedee.service.ZebedeeDatasetService;
 import com.github.onsdigital.zebedee.session.service.Sessions;
 import com.github.onsdigital.zebedee.session.service.SessionsAPIServiceImpl;
 import com.github.onsdigital.zebedee.session.service.SessionsServiceImpl;
@@ -54,10 +64,29 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.function.Supplier;
 
-import static com.github.onsdigital.logging.v2.event.SimpleEvent.*;
-import static com.github.onsdigital.zebedee.Zebedee.*;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.warn;
+import static com.github.onsdigital.zebedee.Zebedee.APPLICATION_KEYS;
+import static com.github.onsdigital.zebedee.Zebedee.COLLECTIONS;
+import static com.github.onsdigital.zebedee.Zebedee.KEYRING;
+import static com.github.onsdigital.zebedee.Zebedee.PERMISSIONS;
+import static com.github.onsdigital.zebedee.Zebedee.PUBLISHED;
+import static com.github.onsdigital.zebedee.Zebedee.PUBLISHED_COLLECTIONS;
+import static com.github.onsdigital.zebedee.Zebedee.SERVICES;
+import static com.github.onsdigital.zebedee.Zebedee.SESSIONS;
+import static com.github.onsdigital.zebedee.Zebedee.TEAMS;
+import static com.github.onsdigital.zebedee.Zebedee.USERS;
+import static com.github.onsdigital.zebedee.Zebedee.ZEBEDEE;
 import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
-import static com.github.onsdigital.zebedee.configuration.Configuration.*;
+import static com.github.onsdigital.zebedee.configuration.Configuration.getDatasetAPIAuthToken;
+import static com.github.onsdigital.zebedee.configuration.Configuration.getDatasetAPIURL;
+import static com.github.onsdigital.zebedee.configuration.Configuration.getImageAPIURL;
+import static com.github.onsdigital.zebedee.configuration.Configuration.getKeyringInitVector;
+import static com.github.onsdigital.zebedee.configuration.Configuration.getKeyringSecretKey;
+import static com.github.onsdigital.zebedee.configuration.Configuration.getServiceAuthToken;
+import static com.github.onsdigital.zebedee.configuration.Configuration.getSessionsApiUrl;
+import static com.github.onsdigital.zebedee.configuration.Configuration.slackChannelsToNotfiyOnStartUp;
 import static com.github.onsdigital.zebedee.permissions.store.PermissionsStoreFileSystemImpl.initialisePermissions;
 
 /**
@@ -101,7 +130,6 @@ public class ZebedeeConfiguration {
     private SlackClient slackClient;
     private String slackCollectionAlarmChannel;
     private String slackCollectionWarningChannel;
-
 
     /**
      * Create a new configuration object.
@@ -211,8 +239,8 @@ public class ZebedeeConfiguration {
 
         this.startUpAlerter = initStartUpAlerter();
 
-        this.slackCollectionAlarmChannel = System.getenv("slack_default_channel");
-        this.slackCollectionWarningChannel = System.getenv("slack_default_channel");
+        this.slackCollectionAlarmChannel = Configuration.getSlackDefaultChannel();
+        this.slackCollectionWarningChannel = Configuration.getSlackDefaultChannel();;
 
         info().data("root_path", rootPath.toString())
                 .data("zebedee_path", zebedeePath.toString())

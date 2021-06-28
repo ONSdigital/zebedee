@@ -5,11 +5,9 @@ import com.github.onsdigital.slack.client.SlackClient;
 import com.github.onsdigital.slack.messages.Colour;
 import com.github.onsdigital.slack.messages.PostMessage;
 import com.github.onsdigital.slack.messages.PostMessageAttachment;
-import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.util.SlackNotification;
-
-import java.util.Arrays;
+import org.apache.commons.lang3.StringUtils;
 
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.error;
 
@@ -31,9 +29,9 @@ public class SlackNotifier implements Notifier {
     /**
      * Send a collection specific alarm to Slack.
      *
-     * @param c - the collection the notification relates to.
+     * @param c     - the collection the notification relates to.
      * @param alarm - the string message to apply to the notification.
-     * @param args - additional arguments to add to the notification.
+     * @param args  - additional arguments to add to the notification.
      */
     @Override
     public void collectionAlarm(Collection c, String alarm, PostMessageField... args) {
@@ -44,7 +42,7 @@ public class SlackNotifier implements Notifier {
      * Send a collection specific alarm to Slack.
      *
      * @param alarm - the string message to apply to the notification.
-     * @param args - additional arguments to add to the notification.
+     * @param args  - additional arguments to add to the notification.
      */
     @Override
     public void alarm(String alarm, PostMessageField... args) {
@@ -53,7 +51,7 @@ public class SlackNotifier implements Notifier {
 
 
     @Override
-    public void sendSlackMessage(PostMessage message) throws Exception{
+    public void sendSlackMessage(PostMessage message) throws Exception {
         try {
             slackClient.sendMessage(message);
         } catch (Exception ex) {
@@ -67,7 +65,17 @@ public class SlackNotifier implements Notifier {
     }
 
     @Override
-    public void callCollectionAlarm(Collection collection, String channel, String customMessage, Exception ex) {
+    public boolean sendCollectionAlarm(Collection collection, String channel, String customMessage, Exception ex) {
+        if (StringUtils.isEmpty(channel) || StringUtils.isEmpty(customMessage) || collection == null ) {
+            error().log("error sending collection alarm. channel/customMessage/collection was empty");
+            return false;
+        }
+        if ( collection.getDescription() == null || collection.getDescription().getType() == null
+                || StringUtils.isEmpty(collection.getId()) || StringUtils.isEmpty(collection.getDescription().getName()))
+        {
+            error().log("error sending collection alarm. Collection description/id/type/name is null");
+            return false;
+        }
         AttachmentField exField = new AttachmentField("exception", ex.getMessage(), false);
         PostMessage postMessage = createPostMessage(channel, customMessage)
                 .addAttachment(createCollectionAttachment("Alert", "Collection Alarm", Colour.DANGER, collection, exField));
@@ -76,29 +84,55 @@ public class SlackNotifier implements Notifier {
             sendSlackMessage(postMessage);
         } catch (Exception e) {
             error().exception(e).log("unexpected error while sending slack notification");
+            return false;
         }
+        return true;
     }
 
     @Override
-    public void callCollectionWarning(Collection collection, String channel, String customMessage, AttachmentField... fields) {
+    public boolean sendCollectionWarning(Collection collection, String channel, String customMessage, AttachmentField... fields) {
+        if (StringUtils.isEmpty(channel) || StringUtils.isEmpty(customMessage) || collection == null ) {
+            error().log("error sending collection alarm. channel/customMessage/collection was empty");
+            return false;
+        }
+        if ( collection.getDescription() == null || collection.getDescription().getType() == null
+                || StringUtils.isEmpty(collection.getId()) || StringUtils.isEmpty(collection.getDescription().getName()))
+        {
+            error().log("error sending collection alarm. Collection description/id/type/name is null");
+            return false;
+        }
         PostMessage postMessage = createPostMessage(channel, customMessage)
                 .addAttachment(createCollectionAttachment("Warning", "Collection Warning", Colour.WARNING, collection, fields));
         try {
             sendSlackMessage(postMessage);
         } catch (Exception e) {
             error().exception(e).log("unexpected error while sending slack notification");
+            return false;
         }
+        return true;
     }
 
     @Override
-    public void callCollectionAlarm(Collection collection, String channel, String customMessage, AttachmentField... fields) {
+    public boolean sendCollectionAlarm(Collection collection, String channel, String customMessage, AttachmentField... fields) {
+        if (StringUtils.isEmpty(channel) || StringUtils.isEmpty(customMessage) || collection == null ) {
+            error().log("error sending collection alarm. channel/customMessage/collection was empty");
+            return false;
+        }
+        if ( collection.getDescription() == null || collection.getDescription().getType() == null
+                || StringUtils.isEmpty(collection.getId()) || StringUtils.isEmpty(collection.getDescription().getName()))
+        {
+            error().log("error sending collection alarm. Collection description/id/type/name is null");
+            return false;
+        }
         PostMessage postMessage = createPostMessage(channel, customMessage)
                 .addAttachment(createCollectionAttachment("Alert", "Collection Alarm", Colour.DANGER, collection, fields));
         try {
             sendSlackMessage(postMessage);
         } catch (Exception e) {
             error().exception(e).log("unexpected error while sending slack notification");
+            return false;
         }
+        return true;
     }
 
     private PostMessageAttachment createCollectionAttachment(String title, String message, Colour colour, Collection collection, AttachmentField... fields) {
@@ -107,8 +141,8 @@ public class SlackNotifier implements Notifier {
                 .addField("CollectionID", collection.getId(), false)
                 .addField("Collection Name", collection.getDescription().getName(), false);
 
-        if (fields != null)  {
-            for(AttachmentField field : fields) {
+        if (fields != null) {
+            for (AttachmentField field : fields) {
                 attachment.addField(field.getTitle(), field.getMessage(), field.isShort());
             }
         }

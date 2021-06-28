@@ -20,6 +20,7 @@ import static org.apache.commons.lang.StringUtils.defaultIfBlank;
 public class Configuration {
 
     private static final String DEFAULT_WEBSITE_URL = "http://localhost:8080";
+    private static final String DEFAULT_SLACK_CHANNEL= "slack-client-test";
     private static final String DEFAULT_PUBLIC_WEBSITE_URL = "http://localhost:8080";
     private static final String DEFAULT_FLORENCE_URL = "http://localhost:8081";
     private static final String DEFAULT_BRIAN_URL = "http://localhost:8083";
@@ -52,6 +53,10 @@ public class Configuration {
 
     public static boolean isVerificationEnabled() {
         return BooleanUtils.toBoolean(StringUtils.defaultIfBlank(getValue("publish_verification_enabled"), "false"));
+    }
+
+    public static String getSlackDefaultChannel() {
+        return StringUtils.defaultIfBlank(getValue("slack_default_channel"), DEFAULT_SLACK_CHANNEL);
     }
 
     /**

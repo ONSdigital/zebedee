@@ -27,8 +27,6 @@ import com.github.onsdigital.zebedee.service.BabbagePdfService;
 import com.github.onsdigital.zebedee.service.content.navigation.ContentTreeNavigator;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.util.ContentDetailUtil;
-import com.github.onsdigital.zebedee.util.SlackNotification;
-import com.github.onsdigital.zebedee.util.slack.PostMessageField;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
@@ -169,7 +167,7 @@ public class ApproveTask implements Callable<Boolean> {
 
         } catch (Exception e) {
             String channel = Root.zebedee.getSlackCollectionAlarmChannel();
-            Root.zebedee.getSlackNotifier().callCollectionAlarm(collection, channel, "Error approving collection", e);
+            Root.zebedee.getSlackNotifier().sendCollectionAlarm(collection, channel, "Error approving collection", e);
 
             CMSLogEvent errorLog = error().data("collectionId", collection.getDescription().getId());
             if (session != null && StringUtils.isNotEmpty(session.getEmail())) {
@@ -271,7 +269,7 @@ public class ApproveTask implements Callable<Boolean> {
 
         if (!verified) {
             String channel = Root.zebedee.getSlackCollectionAlarmChannel();
-            Root.zebedee.getSlackNotifier().callCollectionAlarm(collection, channel, "Failed verification of time series zip files");
+            Root.zebedee.getSlackNotifier().sendCollectionAlarm(collection, channel, "Failed verification of time series zip files");
             info().data("collectionId", collection.getDescription().getId())
                     .log("Failed verification of time series zip files");
         }

@@ -28,7 +28,6 @@ import com.github.onsdigital.zebedee.util.SlackNotification;
 import com.github.onsdigital.zebedee.util.ZebedeeCmsService;
 import com.github.onsdigital.zebedee.util.slack.Notifier;
 import com.github.onsdigital.zebedee.util.slack.PostMessageField;
-import com.github.onsdigital.zebedee.util.slack.SlackNotifier;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
@@ -60,7 +59,6 @@ import static com.github.onsdigital.zebedee.model.publishing.PostPublisher.getPu
 import static com.github.onsdigital.zebedee.util.SlackNotification.CollectionStage.PUBLISH;
 import static com.github.onsdigital.zebedee.util.SlackNotification.StageStatus.FAILED;
 import static com.github.onsdigital.zebedee.util.SlackNotification.StageStatus.STARTED;
-import static com.github.onsdigital.zebedee.util.SlackNotification.collectionAlarm;
 import static com.github.onsdigital.zebedee.util.SlackNotification.publishNotification;
 
 
@@ -146,7 +144,7 @@ public class Publisher {
                 error().data("collectionId", collection.getDescription().getId()).data("publishing", true)
                         .logException(e, "Exception publishing images via image API");
                 String channel = Root.zebedee.getSlackCollectionAlarmChannel();
-                Root.zebedee.getSlackNotifier().callCollectionAlarm(collection, channel, "Error publishing images", e);
+                Root.zebedee.getSlackNotifier().sendCollectionAlarm(collection, channel, "Error publishing images", e);
                 success = false;
             }
         }
@@ -306,7 +304,7 @@ public class Publisher {
 
     private static void handlePublishingException(Exception ex, Collection collection) {
     String channel = Root.zebedee.getSlackCollectionAlarmChannel();
-    Root.zebedee.getSlackNotifier().callCollectionAlarm(collection, channel, "Error publishing content", ex);
+    Root.zebedee.getSlackNotifier().sendCollectionAlarm(collection, channel, "Error publishing content", ex);
 
         CMSLogEvent err = error().data("publishing", true).collectionID(collection);
 
@@ -734,7 +732,7 @@ public class Publisher {
                     .logException(e, "Exception updating API dataset to state published");
 
             String channel = Root.zebedee.getSlackCollectionAlarmChannel();
-            Root.zebedee.getSlackNotifier().callCollectionAlarm(collection, channel, "Error updating API dataset", e);
+            Root.zebedee.getSlackNotifier().sendCollectionAlarm(collection, channel, "Error updating API dataset", e);
 
         } finally {
             saveCollection(collection, datasetsPublished);

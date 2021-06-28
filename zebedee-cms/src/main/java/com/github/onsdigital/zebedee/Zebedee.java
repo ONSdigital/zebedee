@@ -441,6 +441,7 @@ public class Zebedee {
     public SlackClient getSlackClient() {
         return this.slackClient;
     }
+
     public String getSlackCollectionAlarmChannel(){
         return this.slackCollectionAlarmChannel;
     }

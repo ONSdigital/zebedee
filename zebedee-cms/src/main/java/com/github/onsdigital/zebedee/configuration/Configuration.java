@@ -37,6 +37,8 @@ public class Configuration {
     private static final String KEYRING_SECRET_KEY = "KEYRING_SECRET_KEY";
     private static final String KEYRING_INIT_VECTOR = "KEYRING_INIT_VECTOR";
     private static final String PUBLIC_PEM_KEY = "PUBLIC_PEM_KEY";
+    private static final String AWS_REGION = "AWS_REGION";
+    private static final String USER_POOL_ID = "USER_POOL_ID";
 
     private static final int VERIFY_RETRY_DELAY = 5000; //milliseconds
     private static final int VERIFY_RETRY_COUNT = 10;
@@ -225,6 +227,8 @@ public class Configuration {
     
     public static String getPublicPEMKey() {
         String publicPEMKey = getValue(PUBLIC_PEM_KEY);
+        String awsRegion = getValue(AWS_REGION);
+        String userPoolId = getValue(USER_POOL_ID);
         try {
             Jwk jwk = provider.get(kid);
             RSAPublicKey publicKey = (RSAPublicKey) jwk.getPublicKey();

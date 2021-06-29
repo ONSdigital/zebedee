@@ -187,7 +187,7 @@ public class ZebedeeConfiguration {
 
         this.published = createPublished();
 
-        initialisePermissions(permissionsPath);
+       initialisePermissions(permissionsPath);
         this.permissionsStore = new PermissionsStoreFileSystemImpl(permissionsPath);
 
         this.permissionsService = new PermissionsServiceImpl(permissionsStore, this::getUsersService,
@@ -445,4 +445,5 @@ public class ZebedeeConfiguration {
     public StartUpAlerter getStartUpAlerter() {
         return this.startUpAlerter;
     }
+
 }

@@ -228,6 +228,7 @@ public class Configuration {
         return ivParameterSpec;
     }
     
+<<<<<<< HEAD
     public static String getJWKSRSAKeyID() {
         String jwksRSAKeyID = getValue(JWKS_RSA_KEY_ID);
         if (StringUtils.isEmpty(jwksRSAKeyID)) {
@@ -238,6 +239,12 @@ public class Configuration {
 
     public static String getPublicRSASigningKey() {
         String returnRSASigningKey = "";
+=======
+    public static String getPublicPEMKey() {
+        String publicPEMKey = getValue(PUBLIC_PEM_KEY);
+        String awsRegion = getValue(AWS_REGION);
+        String userPoolId = getValue(USER_POOL_ID);
+>>>>>>> 0f1ef149b09e21c7bf1728353c60cf50c7510226
         try {
             //TODO: Move this to config - no aws region or cognito user pool id in config
             String providerDomain = "https://cognito-idp.eu-west-1.amazonaws.com/eu-west-1_QKpqp91nJ";

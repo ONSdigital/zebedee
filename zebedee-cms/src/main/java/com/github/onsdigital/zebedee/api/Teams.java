@@ -2,16 +2,25 @@ package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
 import com.github.davidcarboni.restolino.helpers.Path;
-import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.audit.Audit;
-import com.github.onsdigital.zebedee.exceptions.*;
+import com.github.onsdigital.zebedee.exceptions.BadRequestException;
+import com.github.onsdigital.zebedee.exceptions.ConflictException;
+import com.github.onsdigital.zebedee.exceptions.ForbiddenException;
+import com.github.onsdigital.zebedee.exceptions.InternalServerError;
+import com.github.onsdigital.zebedee.exceptions.NotFoundException;
+import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
+import com.github.onsdigital.zebedee.json.CollectionDescription;
+import com.github.onsdigital.zebedee.keyring.Keyring;
+import com.github.onsdigital.zebedee.model.Collections;
+import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.session.model.Session;
+import com.github.onsdigital.zebedee.session.service.Sessions;
 import com.github.onsdigital.zebedee.teams.model.Team;
 import com.github.onsdigital.zebedee.teams.model.TeamList;
-import com.github.onsdigital.zebedee.model.Collection;
-import com.github.onsdigital.zebedee.model.KeyManager;
-import com.github.onsdigital.zebedee.service.ServiceSupplier;
+import com.github.onsdigital.zebedee.teams.service.TeamsService;
+import com.github.onsdigital.zebedee.user.model.User;
 import com.github.onsdigital.zebedee.user.service.UsersService;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -19,8 +28,12 @@ import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
+
+import static com.github.onsdigital.zebedee.keyring.KeyringUtil.getUser;
 
 /**
  * Created by thomasridd on 28/04/15.
@@ -31,17 +44,46 @@ import java.util.Set;
  * <ul><li>{@code /teams}</li>
  * <li>{@code /teams/[teamname]}</li>
  * <li>{@code /teams/[teamname]?email=user@example.com}</li>
- * </ul></p>
+ * </ul>
+ * </p>
  */
 @Api
 public class Teams {
 
-    /**
-     * Wrap static method calls to obtain service in function makes testing easier - class member can be
-     * replaced with a mocked giving control of desired behaviour.
-     */
-    private ServiceSupplier<UsersService> usersServiceSupplier = () -> Root.zebedee.getUsersService();
+    private Sessions sessionsService;
+    private TeamsService teamsService;
+    private PermissionsService permissionsService;
+    private Collections collectionsService;
+    private Keyring keyring;
+    private UsersService usersService;
 
+    /**
+     * Construct a new Teams instance using the default configuration.
+     */
+    public Teams() {
+        this.sessionsService = Root.zebedee.getSessions();
+        this.teamsService = Root.zebedee.getTeamsService();
+        this.permissionsService = Root.zebedee.getPermissionsService();
+        this.collectionsService = Root.zebedee.getCollections();
+        this.keyring = Root.zebedee.getCollectionKeyring();
+        this.usersService = Root.zebedee.getUsersService();
+    }
+
+    /**
+     * @param sessionsService
+     * @param teamsService
+     * @param permissionsService
+     */
+    public Teams(final Sessions sessionsService, final TeamsService teamsService,
+                 final PermissionsService permissionsService, final Collections collectionsService,
+                 final Keyring keyring, final UsersService usersService) {
+        this.sessionsService = sessionsService;
+        this.teamsService = teamsService;
+        this.permissionsService = permissionsService;
+        this.collectionsService = collectionsService;
+        this.keyring = keyring;
+        this.usersService = usersService;
+    }
 
     /**
      * POST {@code /teams/[teamname]} creates a team with name {@code teamname}
@@ -56,22 +98,25 @@ public class Teams {
      * @throws NotFoundException     {@value org.eclipse.jetty.http.HttpStatus#NOT_FOUND_404} if team can not be found/created
      */
     @POST
-    public boolean post(HttpServletRequest request, HttpServletResponse response) throws IOException, ConflictException, UnauthorizedException, NotFoundException, BadRequestException, ForbiddenException {
+    public boolean post(HttpServletRequest request, HttpServletResponse response)
+            throws IOException, ConflictException, UnauthorizedException, NotFoundException, BadRequestException,
+            ForbiddenException, InternalServerError {
 
         String email = request.getParameter("email");
-        if (email == null) {
+        if (StringUtils.isEmpty(email)) {
             return createTeam(request, response);
-        } else {
-            return addTeamMember(request, response);
         }
+
+        return addTeamMember(request, response);
     }
 
-    public boolean createTeam(HttpServletRequest request, HttpServletResponse response) throws IOException, ConflictException, UnauthorizedException, NotFoundException, ForbiddenException {
+    public boolean createTeam(HttpServletRequest request, HttpServletResponse response) throws IOException,
+            ConflictException, UnauthorizedException, NotFoundException, ForbiddenException {
 
-        Session session = Root.zebedee.getSessions().get(request);
+        Session session = sessionsService.get(request);
         String teamName = getTeamName(request);
 
-        Root.zebedee.getTeamsService().createTeam(teamName, session);
+        teamsService.createTeam(teamName, session);
 
         Audit.Event.TEAM_CREATED
                 .parameters()
@@ -82,17 +127,20 @@ public class Teams {
         return true;
     }
 
-    public boolean addTeamMember(HttpServletRequest request, HttpServletResponse response) throws UnauthorizedException, IOException, NotFoundException, BadRequestException, ForbiddenException {
-        Zebedee zebedee = Root.zebedee;
-        Session session = zebedee.getSessions().get(request);
+    public boolean addTeamMember(HttpServletRequest request, HttpServletResponse response) throws UnauthorizedException,
+            IOException, NotFoundException, BadRequestException, ForbiddenException, InternalServerError {
+        Session session = sessionsService.get(request);
 
         String teamName = getTeamName(request);
 
         String email = request.getParameter("email");
-        Team team = zebedee.getTeamsService().findTeam(teamName);
+        Team team = teamsService.findTeam(teamName);
 
-        Root.zebedee.getTeamsService().addTeamMember(email, team, session);
-        evaluateCollectionKeys(zebedee, session, team, email);
+        teamsService.addTeamMember(email, team, session);
+
+        User src = getUser(usersService, session.getEmail());
+        User target = getUser(usersService, email);
+        keyring.assignTo(src, target, getCollectionsAccessibleByTeam(team));
 
         Audit.Event.TEAM_MEMBER_ADDED
                 .parameters()
@@ -117,7 +165,8 @@ public class Teams {
      * @throws BadRequestException   {@value org.eclipse.jetty.http.HttpStatus#CONFLICT_409} if the team cannot be deleted for some other reason
      */
     @DELETE
-    public boolean delete(HttpServletRequest request, HttpServletResponse response) throws IOException, UnauthorizedException, NotFoundException, BadRequestException, ForbiddenException {
+    public boolean delete(HttpServletRequest request, HttpServletResponse response) throws IOException,
+            UnauthorizedException, NotFoundException, BadRequestException, ForbiddenException, InternalServerError {
 
         String email = request.getParameter("email");
         if (email == null) {
@@ -127,16 +176,19 @@ public class Teams {
         }
     }
 
-    public boolean deleteTeam(HttpServletRequest request, HttpServletResponse response) throws NotFoundException, BadRequestException, UnauthorizedException, IOException, ForbiddenException {
-
+    public boolean deleteTeam(HttpServletRequest request, HttpServletResponse response) throws NotFoundException,
+            BadRequestException, UnauthorizedException, IOException, ForbiddenException, InternalServerError {
         String teamName = getTeamName(request);
 
-        Zebedee zebedee = Root.zebedee;
-        Session session = zebedee.getSessions().get(request);
-        Team team = zebedee.getTeamsService().findTeam(teamName);
-        zebedee.getTeamsService().deleteTeam(team, session);
+        Session session = sessionsService.get(request);
+        Team team = teamsService.findTeam(teamName);
 
-        evaluateCollectionKeys(zebedee, session, team, team.getMembers().toArray(new String[team.getMembers().size()]));
+        List<CollectionDescription> removals = getCollectionsAccessibleByTeam(team);
+        for (String member : team.getMembers()) {
+            keyring.revokeFrom(getUser(usersService, member), removals);
+        }
+
+        teamsService.deleteTeam(team, session);
 
         Audit.Event.TEAM_DELETED
                 .parameters()
@@ -147,17 +199,22 @@ public class Teams {
         return true;
     }
 
-    public boolean removeTeamMember(HttpServletRequest request, HttpServletResponse response) throws UnauthorizedException, IOException, NotFoundException, BadRequestException, ForbiddenException {
-
+    public boolean removeTeamMember(HttpServletRequest request, HttpServletResponse response)
+            throws UnauthorizedException, IOException, NotFoundException, BadRequestException, ForbiddenException,
+            InternalServerError {
         String teamName = getTeamName(request);
 
-        Zebedee zebedee = Root.zebedee;
-        Session session = Root.zebedee.getSessions().get(request);
+        Session session = sessionsService.get(request);
         String email = request.getParameter("email");
-        Team team = zebedee.getTeamsService().findTeam(teamName);
+        Team team = teamsService.findTeam(teamName);
 
-        zebedee.getTeamsService().removeTeamMember(email, team, session);
-        evaluateCollectionKeys(zebedee, session, team, email);
+        teamsService.removeTeamMember(email, team, session);
+
+        if (!permissionsService.isAdministrator(email) && !permissionsService.isPublisher(email)) {
+            List<CollectionDescription> accessToRemove = getCollectionsAccessibleByTeam(team);
+            User user = getUser(usersService, email);
+            keyring.revokeFrom(user, accessToRemove);
+        }
 
         Audit.Event.TEAM_MEMBER_REMOVED
                 .parameters()
@@ -170,26 +227,19 @@ public class Teams {
     }
 
     /**
-     * For a given list of user emails, evaluate if they should have keys added or removed.
-     *
-     * @param zebedee
-     * @param session
-     * @param team
-     * @param emails
-     * @throws IOException
-     * @throws NotFoundException
-     * @throws BadRequestException
+     * Return a list of {@link CollectionDescription} the collections this team has access to.
      */
-    private void evaluateCollectionKeys(Zebedee zebedee, Session session, Team team, String... emails) throws IOException, NotFoundException, BadRequestException, UnauthorizedException {
-        for (Collection collection : zebedee.getCollections().list()) {
-            Set<Integer> teamIds = Root.zebedee.getPermissionsService().listViewerTeams(collection.description, session);
-            if (teamIds != null && teamIds.contains(team.getId())) {
-                for (String memberEmail : emails) {
-                    KeyManager.distributeKeyToUser(zebedee, collection, session,
-                            usersServiceSupplier.getService().getUserByEmail(memberEmail));
-                }
-            }
+    private List<CollectionDescription> getCollectionsAccessibleByTeam(Team team) throws IOException {
+        Set<String> accessibleByTeam = permissionsService.listCollectionsAccessibleByTeam(team);
+        if (accessibleByTeam == null || accessibleByTeam.isEmpty()) {
+            return new ArrayList<>();
         }
+
+        return collectionsService.list()
+                .stream()
+                .filter(c -> accessibleByTeam.contains(c.getId()))
+                .map(c -> c.getDescription())
+                .collect(Collectors.toList());
     }
 
     /**
@@ -206,9 +256,9 @@ public class Teams {
     public Object get(HttpServletRequest request, HttpServletResponse response) throws IOException, NotFoundException {
         Object result = null;
         if (getTeamName(request) != null) {
-            result = Root.zebedee.getTeamsService().findTeam(getTeamName(request));
+            result = teamsService.findTeam(getTeamName(request));
         } else {
-            List<Team> teams = Root.zebedee.getTeamsService().listTeams();
+            List<Team> teams = teamsService.listTeams();
             teams.sort((t1, t2) -> t1.getName().toUpperCase().compareTo(t2.getName().toUpperCase()));
             result = new TeamList(teams);
         }

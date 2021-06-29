@@ -7,6 +7,7 @@ import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.PermissionDefinition;
 import com.github.onsdigital.zebedee.model.Collection;
+import com.github.onsdigital.zebedee.model.KeyringCache;
 import com.github.onsdigital.zebedee.model.PathUtils;
 import com.github.onsdigital.zebedee.permissions.model.AccessMapping;
 import com.github.onsdigital.zebedee.permissions.store.PermissionsStore;
@@ -41,6 +42,7 @@ import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMet
 public class PermissionsServiceImpl implements PermissionsService {
 
     private PermissionsStore permissionsStore;
+    private KeyringCache keyringCache;
     private ReadWriteLock accessMappingLock = new ReentrantReadWriteLock();
     private ServiceSupplier<UsersService> usersServiceSupplier;
     private ServiceSupplier<TeamsService> teamsServiceSupplier;
@@ -483,5 +485,27 @@ public class PermissionsServiceImpl implements PermissionsService {
                 .setEmail(email)
                 .isAdmin(isAdministrator(email))
                 .isEditor(canEdit(email));
+    }
+
+    @Override
+    public Set<String> listCollectionsAccessibleByTeam(Team t) throws IOException {
+        AccessMapping accessMapping = permissionsStore.getAccessMapping();
+        if (accessMapping == null) {
+            throw new IOException("error reading accessMapping expected value but was null");
+        }
+
+        if (accessMapping.getCollections() == null) {
+            return new HashSet<>();
+        }
+
+        // AccessMapping.Collections maps CollectionID -> List of Team IDs.
+        // Filter to find all the collections who have the specified team ID assigned to them.
+        // Returns a Set of collectionIDs matching this criteria.
+        return accessMapping.getCollections()
+                .entrySet()
+                .stream()
+                .filter(entry -> entry.getValue() != null && entry.getValue().contains(t.getId()))
+                .map(entry -> entry.getKey())
+                .collect(Collectors.toSet());
     }
 }

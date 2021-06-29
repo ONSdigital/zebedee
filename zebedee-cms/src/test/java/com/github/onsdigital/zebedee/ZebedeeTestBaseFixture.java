@@ -118,7 +118,7 @@ public abstract class ZebedeeTestBaseFixture {
         ReflectionTestUtils.setField(zebedee, "usersService", usersService);
 
         // TODO I think this is a mistake.
-        ReflectionTestUtils.setField(zebedee.getPermissionsService(), "usersServiceSupplier", usersServiceServiceSupplier);
+        ReflectionTestUtils.setField(zebedee, "permissionsService", permissionsService);
 
         ReflectionTestUtils.setField(zebedee, "sessions", sessionsService);
         ReflectionTestUtils.setField(zebedee, "legacyKeyringCache", new KeyringCache(sessionsService, schedulerKeyCache));

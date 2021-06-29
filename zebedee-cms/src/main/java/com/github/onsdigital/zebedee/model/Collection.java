@@ -23,11 +23,13 @@ import com.github.onsdigital.zebedee.json.ContentStatus;
 import com.github.onsdigital.zebedee.json.Event;
 import com.github.onsdigital.zebedee.json.EventType;
 import com.github.onsdigital.zebedee.json.Events;
+import com.github.onsdigital.zebedee.keyring.Keyring;
 import com.github.onsdigital.zebedee.model.approval.tasks.ReleasePopulator;
 import com.github.onsdigital.zebedee.model.content.item.ContentItemVersion;
 import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
 import com.github.onsdigital.zebedee.model.publishing.Publisher;
 import com.github.onsdigital.zebedee.model.publishing.scheduled.Scheduler;
+import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDao;
 import com.github.onsdigital.zebedee.persistence.model.CollectionHistoryEvent;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
@@ -40,6 +42,7 @@ import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.teams.model.Team;
 import com.github.onsdigital.zebedee.teams.service.TeamsService;
 import com.github.onsdigital.zebedee.user.model.User;
+import com.github.onsdigital.zebedee.user.service.UsersService;
 import com.github.onsdigital.zebedee.util.versioning.VersionsService;
 import com.github.onsdigital.zebedee.util.versioning.VersionsServiceImpl;
 import com.google.common.annotations.VisibleForTesting;
@@ -78,6 +81,7 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
 
+import static com.github.onsdigital.zebedee.keyring.KeyringUtil.getUser;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.error;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.info;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.warn;
@@ -226,7 +230,7 @@ public class Collection {
         }
 
         // Add the collection key to the keying - user is not required
-        User user = zebedee.getUsersService().getUserByEmail(session.getEmail());
+        User user = getUser(zebedee.getUsersService(), session.getEmail());
         SecretKey key = zebedee.getEncryptionKeyFactory().newCollectionKey();
 
         zebedee.getCollectionKeyring().add(user, collection, key);
@@ -480,46 +484,101 @@ public class Collection {
          * {@link com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl#add(User, Collection, SecretKey)} so we
          * invoke add again which will update all users either adding/removing the key to/from their keyring.
          */
-        User user = zebedee.getUsersService().getUserByEmail(session.getEmail());
+        User user = getUser(zebedee.getUsersService(), session.getEmail());
         SecretKey key = zebedee.getCollectionKeyring().get(user, collection);
         zebedee.getCollectionKeyring().add(user, collection, key);
 
         return updatedCollection;
     }
 
-    private static Set<String> updateViewerTeams(CollectionDescription collectionDescription, Zebedee zebedee, Session session) throws IOException, ZebedeeException {
+    private static Set<String> updateViewerTeams(CollectionDescription desc, Zebedee zebedee, Session session)
+            throws IOException, ZebedeeException {
+        Set<String> teamsUpdated = new HashSet<>();
 
-        Set<String> updatedTeams = new HashSet<>();
+        if (desc != null && desc.getTeams() != null) {
+            UsersService users = zebedee.getUsersService();
+            PermissionsService permissions = zebedee.getPermissionsService();
+            TeamsService teams = zebedee.getTeamsService();
+            Keyring keyring = zebedee.getCollectionKeyring();
 
-        if (collectionDescription.getTeams() != null) {
-            // work out which teams need to be removed from the existing teams.
-            Set<Integer> currentTeamIds = zebedee.getPermissionsService().listViewerTeams(collectionDescription, session);
-            TeamsService teamsService = zebedee.getTeamsService();
-            for (Integer currentTeamId : currentTeamIds) { // for each current team ID
-                for (Team team : teamsService.listTeams()) { // iterate the teamsService list to find the team object
-                    if (currentTeamId.equals(team.getId())) { // if the ID's match
-                        if (!collectionDescription.getTeams().contains(team.getName())) { // if the team is not
-                            // listed in the updated list
-                            zebedee.getPermissionsService().removeViewerTeam(collectionDescription, team, session);
-                        }
-                    }
-                }
-            }
 
-            // Add all the new teams. The add is idempotent so we don't need to check if it already exists.
-            for (String teamName : collectionDescription.getTeams()) {
-                // We have already deserialised the teams list to its more efficient to iterate it again rather than
-                // deserialise by team name.
-                for (Team team : teamsService.listTeams()) {
-                    if (teamName.equals(team.getName())) {
-                        zebedee.getPermissionsService().addViewerTeam(collectionDescription, team, session);
-                        updatedTeams.add(teamName);
-                    }
-                }
+            if (desc != null && desc.getTeams() != null) {
+                removeTeamsFromCollection(teams, users, permissions, keyring, desc, session);
+
+                Set<String> updated = addTeamsToCollection(teams, users, permissions, keyring, desc, session);
+                teamsUpdated.addAll(updated);
             }
         }
 
-        return updatedTeams;
+        return teamsUpdated;
+    }
+
+    /**
+     * Remove any Teams from the collection if it is no longer assigned. For each team that is removed the collection
+     * key is revoked from each member of the team.
+     */
+    private static void removeTeamsFromCollection(TeamsService teams,
+                                                  UsersService users, PermissionsService permissions, Keyring keyring,
+                                                  CollectionDescription desc, Session session)
+            throws IOException, ZebedeeException {
+        Set<Integer> teamIDs = permissions.listViewerTeams(desc, session);
+
+        List<Team> teamsToRemove = teams.resolveTeams(teamIDs)
+                .stream()
+                .filter(t -> !desc.getTeams().contains(t.getId()))
+                .collect(Collectors.toList());
+
+        if (teamsToRemove != null && !teamsToRemove.isEmpty()) {
+
+            for (Team t : teamsToRemove) {
+
+                for (String member : t.getMembers()) {
+                    User target = getUser(users, member);
+                    keyring.revokeFrom(target, desc);
+                }
+
+                permissions.removeViewerTeam(desc, t, session);
+            }
+        }
+    }
+
+    /**
+     * Adds any teams to a collection that should have
+     * @param teams
+     * @param users
+     * @param permissions
+     * @param keyring
+     * @param desc
+     * @param session
+     * @return
+     * @throws IOException
+     * @throws ZebedeeException
+     */
+    private static Set<String> addTeamsToCollection(TeamsService teams, UsersService users,
+                                                    PermissionsService permissions, Keyring keyring,
+                                                    CollectionDescription desc, Session session)
+            throws IOException, ZebedeeException {
+
+        Set<String> teamsUpdated = new HashSet<>();
+        User srcUser = getUser(users, session.getEmail());
+
+        for (String teamName : desc.getTeams()) {
+            Team team = teams.findTeam(teamName);
+            if (team == null) {
+                throw new NotFoundException("team assigned to collection expected but does not exist");
+            }
+
+            permissions.addViewerTeam(desc, team, session);
+
+            for (String email : team.getMembers()) {
+                User targetUser = getUser(users, email);
+                keyring.assignTo(srcUser, targetUser, desc);
+            }
+
+            teamsUpdated.add(teamName);
+        }
+
+        return teamsUpdated;
     }
 
     public CollectionDescription getDescription() {

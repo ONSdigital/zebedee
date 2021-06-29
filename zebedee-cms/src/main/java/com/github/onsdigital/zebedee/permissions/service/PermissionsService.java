@@ -217,4 +217,13 @@ public interface PermissionsService {
      * @throws UnauthorizedException the requesting user does not have the required permissions.
      */
     PermissionDefinition userPermissions(String email, Session session) throws IOException, NotFoundException, UnauthorizedException;
+
+
+    /**
+     * Return a {@link Set} of collection IDs for the collections accessible by the specified {@link Team}.
+     * @param t
+     * @return
+     * @throws IOException
+     */
+    Set<String> listCollectionsAccessibleByTeam(Team t) throws IOException;
 }

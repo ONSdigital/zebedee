@@ -16,6 +16,9 @@ import java.util.stream.Collectors;
 
 import static org.apache.commons.lang.StringUtils.defaultIfBlank;
 
+import com.auth0.jwk.*;
+
+import java.security.interfaces.RSAPublicKey;
 
 public class Configuration {
 
@@ -36,7 +39,9 @@ public class Configuration {
     private static final String SESSIONS_API_URL = "http://localhost:24400";
     private static final String KEYRING_SECRET_KEY = "KEYRING_SECRET_KEY";
     private static final String KEYRING_INIT_VECTOR = "KEYRING_INIT_VECTOR";
-    private static final String PUBLIC_PEM_KEY = "PUBLIC_PEM_KEY";
+
+    private static final String JWKS_RSA_KEY_ID = "PUBLIC_RSA_KEY_ID";
+    private static final String PUBLIC_RSA_SIGNING_KEY = "PUBLIC_RSA_SIGNING_KEY";
 
     private static final int VERIFY_RETRY_DELAY = 5000; //milliseconds
     private static final int VERIFY_RETRY_COUNT = 10;
@@ -223,16 +228,28 @@ public class Configuration {
         return ivParameterSpec;
     }
     
-    public static String getPublicPEMKey() {
-        String publicPEMKey = getValue(PUBLIC_PEM_KEY);
+    public static String getJWKSRSAKeyID() {
+        String jwksRSAKeyID = getValue(JWKS_RSA_KEY_ID);
+        if (StringUtils.isEmpty(jwksRSAKeyID)) {
+            throw new RuntimeException("expected rsa key id hint in environment variable but was empty");
+        }
+        return jwksRSAKeyID;
+    }
+
+    public static String getPublicRSASigningKey() {
+        String returnRSASigningKey = "";
         try {
-            Jwk jwk = provider.get(kid);
+            //TODO: Move this to config - no aws region or cognito user pool id in config
+            String providerDomain = "https://cognito-idp.eu-west-1.amazonaws.com/eu-west-1_QKpqp91nJ";
+            JwkProvider provider = new JwkProviderBuilder(providerDomain).build();
+            String jwksRSAKeyID = getJWKSRSAKeyID();
+            Jwk jwk = provider.get(jwksRSAKeyID);
             RSAPublicKey publicKey = (RSAPublicKey) jwk.getPublicKey();
-            publicPEMKey = PEM_START_TAG+(new String(Base64.encodeBase64(publicKey.getEncoded())))+PEM_END_TAG;
+            returnRSASigningKey = new String(Base64.getEncoder().encode(publicKey.getEncoded()));
         } catch (Exception e) {
             new Error(e);
         }
-        return publicPEMKey;
+        return returnRSASigningKey;
     }
 
     /**

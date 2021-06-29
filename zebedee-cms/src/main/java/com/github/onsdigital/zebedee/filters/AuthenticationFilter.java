@@ -2,6 +2,7 @@ package com.github.onsdigital.zebedee.filters;
 
 import com.github.davidcarboni.restolino.framework.PreFilter;
 import com.github.davidcarboni.restolino.helpers.Path;
+//import com.github.davidcarboni.restolino.helpers.URL;
 import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.api.ClickEventLog;
 import com.github.onsdigital.zebedee.api.CsdbKey;
@@ -19,8 +20,16 @@ import com.github.onsdigital.zebedee.api.cmd.UserInstancePermissions;
 import com.github.onsdigital.zebedee.search.api.endpoint.ReIndex;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.google.common.collect.ImmutableList;
+
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.hwpf.model.FFDataBase;
+import org.assertj.core.api.BigIntegerAssert;
+import org.assertj.core.internal.BigIntegers;
+import org.bouncycastle.cert.X509CertificateHolder;
 import org.eclipse.jetty.http.HttpStatus;
+
+import java.security.interfaces.RSAPublicKey;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -36,6 +45,9 @@ import com.github.onsdigital.exceptions.JWTVerificationException;
 import com.github.onsdigital.zebedee.session.service.Sessions;
 
 import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
+
+import com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration;
+
 public class AuthenticationFilter implements PreFilter {
 
     private Sessions sessions;
@@ -95,28 +107,22 @@ public class AuthenticationFilter implements PreFilter {
         // Check all other requests:
         boolean result = false;
 
-        if (cmsFeatureFlags().isIdentityAuthEnabled()) {
+        // setting local feature flag for demo purposes
+        Boolean ff = false;
+
+        if (ff) {
+            ReaderConfiguration cfg = ReaderConfiguration.get();
+
+            request.getHeader("Authorization");
             try {
-                Session session = sessions.get(request);
-                request.getHeader("Authorization");
-                try {
-                    // JWT library object
-                    JWTHandler jwtHandler = new JWTHandlerImpl();
-                    UserDataPayload jwtData = jwtHandler.verifyJWT(request.getHeader("Authorization"), "my-HS256-bit-secret");
-                    // TODO: call threadlocal handler to persist jwt data
-                    System.out.println("email is: "+jwtData.getEmail());
-                    result = true;
-                } catch (JWTDecodeException | JWTVerificationException | JWTTokenExpiredException e ) {
-                    throw new IOException("Error with Access Toekn: "+e);
-                }
-    
-                if (session == null) {
-                    forbidden(response);
-                } else {
-                    result = true;
-                }
-            } catch (IOException e) {
-                error(response);
+                // JWT library object
+                JWTHandler jwtHandler = new JWTHandlerImpl();
+                UserDataPayload jwtData = jwtHandler.verifyJWT(request.getHeader("Authorization"), cfg.getPublicRSASigningKey());
+                // TODO: call threadlocal handler to persist jwt data
+                System.out.println("email is: "+jwtData.getEmail());
+                result = true;
+            } catch (JWTDecodeException | JWTVerificationException | JWTTokenExpiredException e ) {
+                throw new Exception("Error with Access Toekn: "+e);
             }
             return result;
         } else {

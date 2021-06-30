@@ -17,6 +17,7 @@ public class CMSFeatureFlags {
     private static final String ENABLE_SESSIONS_API = "ENABLE_SESSIONS_API";
     private static final String ENABLE_CENTRALISED_KEYRING = "ENABLE_CENTRALISED_KEYRING";
     private static final String ENABLE_IMAGE_PUBLISHING = "ENABLE_IMAGE_PUBLISHING";
+    private static final String ENABLE_JWT_SESSIONS = "ENABLE_JWT_SESSIONS";
 
     /**
      * Singleton instance
@@ -37,6 +38,8 @@ public class CMSFeatureFlags {
 
     private final boolean isImagePublishingEnabled;
 
+    private final boolean isJwtSessionsEnabled;
+
     /**
      * Construct a new feature flags instance.
      */
@@ -48,6 +51,7 @@ public class CMSFeatureFlags {
         this.isSessionAPIEnabled = Boolean.valueOf(getConfigValue(ENABLE_SESSIONS_API));
         this.isCentralisedKeyringEnabled = Boolean.valueOf(getConfigValue(ENABLE_CENTRALISED_KEYRING));
         this.isImagePublishingEnabled = Boolean.valueOf(getConfigValue(ENABLE_IMAGE_PUBLISHING));
+        this.isJwtSessionsEnabled = Boolean.valueOf(getConfigValue(ENABLE_JWT_SESSIONS));
 
         info().data(ENABLE_DATASET_IMPORT, isDatasetImportEnabled)
                 .data(ENABLE_PERMISSIONS_AUTH, isPermissionsAuthEnabled)
@@ -56,6 +60,7 @@ public class CMSFeatureFlags {
                 .data(ENABLE_SESSIONS_API, isSessionAPIEnabled)
                 .data(ENABLE_CENTRALISED_KEYRING, isCentralisedKeyringEnabled)
                 .data(ENABLE_IMAGE_PUBLISHING, isImagePublishingEnabled)
+                .data(ENABLE_JWT_SESSIONS, isJwtSessionsEnabled)
                 .log("CMS feature flags configurations");
     }
 
@@ -104,6 +109,10 @@ public class CMSFeatureFlags {
 
     public boolean isImagePublishingEnabled() {
         return isImagePublishingEnabled;
+    }
+
+    public boolean isJwtSessionsEnabled() {
+        return isJwtSessionsEnabled;
     }
 
     public static String getConfigValue(String name) {

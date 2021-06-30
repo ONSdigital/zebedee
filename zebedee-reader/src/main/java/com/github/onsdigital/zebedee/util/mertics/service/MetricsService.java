@@ -1,14 +1,8 @@
 package com.github.onsdigital.zebedee.util.mertics.service;
 
-import com.github.onsdigital.zebedee.util.mertics.client.SplunkClient;
-
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 
-import static com.github.onsdigital.zebedee.Configuration.SplunkConfiguration.getEventsCollectionURI;
-import static com.github.onsdigital.zebedee.Configuration.SplunkConfiguration.getServiceArgs;
-import static com.github.onsdigital.zebedee.Configuration.SplunkConfiguration.isSplunkEnabled;
-import static com.github.onsdigital.zebedee.logging.ReaderLogger.info;
 import static com.github.onsdigital.zebedee.logging.ReaderLogger.warn;
 
 /**
@@ -23,12 +17,11 @@ public abstract class MetricsService {
      */
     public static MetricsService getInstance() {
         if (service == null) {
-            if (isSplunkEnabled()) {
-                info().log("Splunk MetricsService successfully configured");
-                service = new SplunkMetricsServiceImpl(new SplunkClient(getServiceArgs()), getEventsCollectionURI());
-            } else {
-                warn().log("No MetricsService configured enabling DummyMetricsServiceImpl");
-                service = new DummyMetricsServiceImpl();
+            synchronized (MetricsService.class) {
+                if (service == null) {
+                    warn().log("No MetricsService configured enabling DummyMetricsServiceImpl");
+                    service = new NoOpMetricsServiceImpl();
+                }
             }
         }
         return service;

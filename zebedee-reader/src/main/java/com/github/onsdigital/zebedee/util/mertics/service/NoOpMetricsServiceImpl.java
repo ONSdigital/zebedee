@@ -3,8 +3,7 @@ package com.github.onsdigital.zebedee.util.mertics.service;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 
-public class DummyMetricsServiceImpl extends MetricsService {
-
+public class NoOpMetricsServiceImpl extends MetricsService {
 
     @Override
     public void captureRequest(HttpServletRequest request) {

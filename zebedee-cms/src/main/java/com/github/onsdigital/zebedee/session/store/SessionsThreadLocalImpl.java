@@ -1,54 +1,68 @@
 package com.github.onsdigital.zebedee.session.store;
 
+import com.github.onsdigital.zebedee.session.store.exceptions.*;
+import org.apache.commons.lang.StringUtils;
+import com.github.onsdigital.JWTHandlerImpl;
 import com.github.onsdigital.exceptions.*;
-
-import com.github.onsdigital.exceptions.SessionsDecodeException;
-import com.github.onsdigital.exceptions.SessionsTokenExpiredException;
-import com.github.onsdigital.exceptions.SessionsVerificationException;
 import com.github.onsdigital.impl.*;
 import com.github.onsdigital.interfaces.*;
 import javax.servlet.http.HttpServletRequest;
 
-public class SessionsThreadLocalImpl implements SessionsThreadLocal {
+/**
+ * This method creates a ThreadLocal for the validated jwt  
+ * from a HTTP request and appropriate key 
+ * as part of implementing dp-identity-api */
 
-    private static HttpServletRequest request;
-    private static String secretKey;
+public class SessionsThreadLocalImpl implements SessionsThreadLocal {
+    
     private static ThreadLocal<UserDataPayload> store =
             new ThreadLocal<>();
 
-    private JWTHandler jwtHandler;
+    private JWTHandler jwtHandler = new JWTHandlerImpl();
+    public SessionsThreadLocalImpl(JWTHandler jwtHandler) {
+        this.jwtHandler = jwtHandler;
+    }
 
-
+    private static HttpServletRequest request;
+    private static String secretKey;
     public SessionsThreadLocalImpl(HttpServletRequest request, String secretKey) {
-//  public SessionsThreadLocalImpl(HttpServletRequest request , JWTHandler jwtHandler, String secretKey) {
         this.request = request;
-//        this.jwtHandler = jwtHandler;
         this.secretKey = secretKey;
-
     }
 
     @Override
-    public void store(HttpServletRequest request, String secretKey ) throws Exception {
-
+    public void store(HttpServletRequest request, String secretKey ) throws SessionsStoreException {
+       /**
+        * Validates the Http Request header for null or empty 
+        * HttpServletRequest method for getHeader returns null if the request does not have a header of that name
+        */  
         String token = request.getHeader("Authorization");
-
-
-        UserDataPayload jwtData;
-        try {
-             jwtData = this.jwtHandler.verifyJWT(token, secretKey);
-        } catch (JWTTokenExpiredException e) {
-            throw new SessionsTokenExpiredException(e.getMessage(), e);
-        } catch (JWTVerificationException e) {
-            throw new SessionsVerificationException(e.getMessage(), e);
-        } catch (JWTDecodeException e) {
-            throw new SessionsDecodeException(e.getMessage(), e);
+        if ( StringUtils.isEmpty(token)) {
+            throw new SessionsRequestException("Request does not have Authorization in Header.");
         }
 
-        store.set(jwtData);
+        /**
+         * validates the Key argument for null or empty string
+         *  */        
+        if (StringUtils.isEmpty(secretKey)) {
+            throw new SessionsKeyException("Secret key value expected but was null or empty.");
+        }
 
+        /** From the two arguments adds the result of the jwtvalidation to Threadlocal store   */
+        try {
+            store.set(
+                jwtHandler.verifyJWT(request.getHeader("Authorization"), secretKey));
+        } catch (JWTTokenExpiredException e) {
+            throw new SessionsTokenExpiredException("JWT verification failed as token is expired.");
+        } catch (JWTVerificationException e) {
+            throw new SessionsVerificationException(e.getMessage().toString(), e);
+        } catch (JWTDecodeException e) {
+            throw new SessionsDecodeException(e.getMessage().toString(), e);
+        }
     }
 
     public static ThreadLocal<UserDataPayload> getStore() {
         return store;
     }
+
 }

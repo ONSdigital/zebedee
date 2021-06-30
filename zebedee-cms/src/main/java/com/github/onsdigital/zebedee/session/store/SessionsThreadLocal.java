@@ -3,6 +3,8 @@ package com.github.onsdigital.zebedee.session.store;
 import javax.servlet.http.HttpServletRequest;
 import com.github.onsdigital.zebedee.session.store.exceptions.SessionsStoreException;
 
+import com.github.onsdigital.zebedee.session.service.Sessions;
+
 /**
  * This method creates a ThreadLocal for the validated jwt 
  * from a HTTP request and appropriate key 
@@ -15,7 +17,6 @@ import com.github.onsdigital.zebedee.session.store.exceptions.SessionsStoreExcep
  *              SessionsVerificationException 
  */
 
-public interface SessionsThreadLocal {
-
+public interface SessionsThreadLocal extends Sessions {
     void store(HttpServletRequest request, String secretKey) throws SessionsStoreException;
 }

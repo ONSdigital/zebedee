@@ -36,6 +36,24 @@ public interface Sessions {
     Session get(String id) throws IOException;
 
     /**
+     * Get a session object.
+     *
+     * @param none,
+     * @return the {@link Session} instance if it exists and is not expired.
+     * @throws IOException for any problems getting the session.
+     */
+    Session get() throws IOException;
+
+    /**
+     * Set user's data in a threadlocal object.
+     *
+     * @param token the access token (JWT) containing user's data,
+     * @return nothing.
+     * @throws IOException for any problems getting the session.
+     */
+    String set(String token) throws IOException;
+
+    /**
      * Find a {@link Session} assocaited with the user email.
      *
      * @param email the user email address to find.

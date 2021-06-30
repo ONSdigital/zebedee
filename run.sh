@@ -11,7 +11,6 @@ export RESTOLINO_STATIC="src/main/resources/files"
 export RESTOLINO_CLASSES="zebedee-cms/target/classes"
 export PACKAGE_PREFIX=com.github.onsdigital.zebedee
 export audit_db_enabled=false
-export enable_splunk_reporting=false
 
 export FORMAT_LOGGING=true
 

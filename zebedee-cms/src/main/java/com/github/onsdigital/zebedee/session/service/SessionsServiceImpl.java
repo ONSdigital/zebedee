@@ -128,7 +128,6 @@ public class SessionsServiceImpl extends TimerTask implements Sessions {
             // Deserialise the json:
             Session session = sessionsStore.read(sessionPath(id));
             if (!expired(session)) {
-                info().log("session running successfully during session get");
                 updateLastAccess(session);
                 result = session;
             }
@@ -149,7 +148,6 @@ public class SessionsServiceImpl extends TimerTask implements Sessions {
     public Session find(String email) throws IOException {
         Session session = sessionsStore.find(email);
         if (!expired(session)) {
-            info().log("session running successfully during session find");
             updateLastAccess(session);
         }
         else{

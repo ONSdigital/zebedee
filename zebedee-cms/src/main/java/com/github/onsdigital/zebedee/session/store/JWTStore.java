@@ -1,6 +1,6 @@
 package com.github.onsdigital.zebedee.session.store;
 
-import java.util.HashMap;
+import java.util.Map;
 import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import com.github.onsdigital.zebedee.user.model.User;
@@ -18,10 +18,10 @@ import com.github.onsdigital.session.service.error.SessionClientException;
  */
 public class JWTStore implements Sessions {
 
-    public HashMap<String, String> rsaKeyMap;
+    private Map<String, String> rsaKeyMap;
 
     // class constructor - takes HashMap<String, String> as param.
-    public JWTStore(HashMap<String, String> rsaKeyMap) {
+    public JWTStore(Map<String, String> rsaKeyMap) {
         this.rsaKeyMap = rsaKeyMap;
     }
 

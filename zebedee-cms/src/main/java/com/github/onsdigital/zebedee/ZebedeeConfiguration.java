@@ -41,6 +41,7 @@ import com.github.onsdigital.zebedee.service.ZebedeeDatasetService;
 import com.github.onsdigital.zebedee.session.service.Sessions;
 import com.github.onsdigital.zebedee.session.service.SessionsAPIServiceImpl;
 import com.github.onsdigital.zebedee.session.service.SessionsServiceImpl;
+import com.github.onsdigital.zebedee.session.store.JWTStore;
 import com.github.onsdigital.zebedee.teams.service.TeamsService;
 import com.github.onsdigital.zebedee.teams.service.TeamsServiceImpl;
 import com.github.onsdigital.zebedee.teams.store.TeamsStoreFileSystemImpl;
@@ -86,6 +87,7 @@ import static com.github.onsdigital.zebedee.configuration.Configuration.getKeyri
 import static com.github.onsdigital.zebedee.configuration.Configuration.getServiceAuthToken;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getSessionsApiUrl;
 import static com.github.onsdigital.zebedee.configuration.Configuration.slackChannelsToNotfiyOnStartUp;
+import static com.github.onsdigital.zebedee.configuration.Configuration.getCognitoKeyIdPairs;
 import static com.github.onsdigital.zebedee.permissions.store.PermissionsStoreFileSystemImpl.initialisePermissions;
 
 /**
@@ -170,9 +172,8 @@ public class ZebedeeConfiguration {
         this.encryptionKeyFactory = new EncryptionKeyFactoryImpl();
 
         // Configure the sessions
-        if (cmsFeatureFlags().isSessionAPIEnabled()) {
-            sessionClient = new SessionClientImpl(getSessionsApiUrl(), getServiceAuthToken(), new Http());
-            this.sessions = new SessionsAPIServiceImpl(sessionClient);
+        if (cmsFeatureFlags().isJwtSessionsEnabled()) {
+            this.sessions = new JWTStore(getCognitoKeyIdPairs());
         } else {
             this.sessions = new SessionsServiceImpl(sessionsPath);
         }

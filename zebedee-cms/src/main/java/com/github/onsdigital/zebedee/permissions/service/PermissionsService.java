@@ -112,7 +112,7 @@ public interface PermissionsService {
     /**
      * Check if the {@link User} has permissions to edit content.
      *
-     * @param user                  the {@link User} to check.
+     * @param user the {@link User} to check.
      * @return true if the user has edit permissions, false otherwise.
      * @throws IOException unexpected error while checking permissions.
      */
@@ -221,9 +221,10 @@ public interface PermissionsService {
 
     /**
      * Return a {@link Set} of collection IDs for the collections accessible by the specified {@link Team}.
-     * @param t
-     * @return
-     * @throws IOException
+     *
+     * @param t the team to check.
+     * @return a {@link Set} of collection IDs for each collection the provided team is assigned to.
+     * @throws IOException problem filters the collections.
      */
     Set<String> listCollectionsAccessibleByTeam(Team t) throws IOException;
 }

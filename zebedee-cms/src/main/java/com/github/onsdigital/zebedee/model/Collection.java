@@ -502,12 +502,11 @@ public class Collection {
             Keyring keyring = zebedee.getCollectionKeyring();
 
 
-            if (desc != null && desc.getTeams() != null) {
-                removeTeamsFromCollection(teams, users, permissions, keyring, desc, session);
+            // Remove any teams that should no longer have access.
+            removeTeamsFromCollection(teams, users, permissions, keyring, desc, session);
 
-                Set<String> updated = addTeamsToCollection(teams, users, permissions, keyring, desc, session);
-                teamsUpdated.addAll(updated);
-            }
+            // Add any new teams that have been granted access.
+            teamsUpdated.addAll(addTeamsToCollection(teams, users, permissions, keyring, desc, session));
         }
 
         return teamsUpdated;
@@ -543,16 +542,8 @@ public class Collection {
     }
 
     /**
-     * Adds any teams to a collection that should have
-     * @param teams
-     * @param users
-     * @param permissions
-     * @param keyring
-     * @param desc
-     * @param session
-     * @return
-     * @throws IOException
-     * @throws ZebedeeException
+     * Adds teams to a collection if they should have access. Updates the members of each team assigned to the
+     * collection to assign the collection encryption key to them.
      */
     private static Set<String> addTeamsToCollection(TeamsService teams, UsersService users,
                                                     PermissionsService permissions, Keyring keyring,

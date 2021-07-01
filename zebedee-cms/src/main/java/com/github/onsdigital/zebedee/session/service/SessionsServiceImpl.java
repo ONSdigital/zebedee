@@ -22,6 +22,8 @@ import java.util.function.Supplier;
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.warn;
 
+import com.github.onsdigital.impl.UserDataPayload;
+
 /**
  * Created by david on 12/03/2015.
  */
@@ -198,7 +200,7 @@ public class SessionsServiceImpl extends TimerTask implements Sessions {
      * @throws IOException for any problem getting a session from the request.
      */
     @Override
-    public Session get() throws IOException {
+    public ThreadLocal<UserDataPayload> get() throws IOException {
         info().log("Session get() - no-Op.");
         return null;
     }
@@ -206,12 +208,12 @@ public class SessionsServiceImpl extends TimerTask implements Sessions {
     /**
      * Get a {@link Session} session object from thread local.
      *
-     * @param token/kid - the access token to be decoded, verified and stored and key id.
+     * @param token - the access token to be decoded, verified and stored.
      * @throws IOException for any problem verifying a token or storing a session in threadlocal.
      */
     @Override
-    public void set(String token, String kid) throws IOException {
-        info().log("Session set(String token, String kid) - no-Op.");
+    public void set(String token) throws IOException {
+        info().log("Session set(String token) - no-Op.");
     }
 
     /**

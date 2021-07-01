@@ -19,7 +19,7 @@ import javax.servlet.http.HttpServletRequest;
  * This method creates a ThreadLocal for the validated jwt from a HTTP request and appropriate key as part of
  * implementing dp-identity-api
  */
-public class SessionsThreadLocalImpl implements SessionsThreadLocal {
+public class SessionsThreadLocalImpl {
 
     private static ThreadLocal<UserDataPayload> store = new ThreadLocal<>();
 
@@ -34,7 +34,6 @@ public class SessionsThreadLocalImpl implements SessionsThreadLocal {
         this.jwtHandler = jwtHandler;
     }
 
-    @Override
     public void store(HttpServletRequest request, String secretKey) throws SessionsStoreException {
         String token = request.getHeader("Authorization");
         if (StringUtils.isEmpty(token)) {

@@ -3,6 +3,8 @@ package com.github.onsdigital.zebedee.session.service;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.user.model.User;
 
+import com.github.onsdigital.impl.UserDataPayload;
+
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 
@@ -51,17 +53,17 @@ public interface Sessions {
      * @return the {@link Session} instance if it exists and is not expired.
      * @throws IOException for any problems getting the session.
      */
-    Session get() throws IOException;
+    ThreadLocal<UserDataPayload> get() throws IOException;
 
     /**
      * Set user's data in a threadlocal object.
      *
-     * @param token/kid the access token and key id (user pool's jwks),
+     * @param token the access token,
      *        
      * @return nothing.
      * @throws IOException for any problems getting the session.
      */
-    void set(String token, String kid) throws IOException;
+    void set(String token) throws IOException;
 
     /**
      * Check if the provided {@link Session} is expired.

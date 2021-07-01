@@ -45,6 +45,25 @@ public interface Sessions {
     Session find(String email) throws IOException;
 
     /**
+     * Get a session object.
+     *
+     * @param none,
+     * @return the {@link Session} instance if it exists and is not expired.
+     * @throws IOException for any problems getting the session.
+     */
+    Session get() throws IOException;
+
+    /**
+     * Set user's data in a threadlocal object.
+     *
+     * @param token/kid the access token and key id (user pool's jwks),
+     *        
+     * @return nothing.
+     * @throws IOException for any problems getting the session.
+     */
+    void set(String token, String kid) throws IOException;
+
+    /**
      * Check if the provided {@link Session} is expired.
      *
      * @param session the {@link Session} to check.

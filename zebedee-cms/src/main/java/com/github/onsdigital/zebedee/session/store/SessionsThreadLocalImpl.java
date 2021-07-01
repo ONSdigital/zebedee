@@ -16,9 +16,8 @@ import org.apache.commons.lang.StringUtils;
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * This method creates a ThreadLocal for the validated jwt
- * from a HTTP request and appropriate key
- * as part of implementing dp-identity-api
+ * This method creates a ThreadLocal for the validated jwt from a HTTP request and appropriate key as part of
+ * implementing dp-identity-api
  */
 public class SessionsThreadLocalImpl implements SessionsThreadLocal {
 
@@ -37,26 +36,17 @@ public class SessionsThreadLocalImpl implements SessionsThreadLocal {
 
     @Override
     public void store(HttpServletRequest request, String secretKey) throws SessionsStoreException {
-        /**
-         * Validates the Http Request header for null or empty
-         * HttpServletRequest method for getHeader returns null if the request does not have a header of that name
-         */
         String token = request.getHeader("Authorization");
         if (StringUtils.isEmpty(token)) {
-            throw new SessionsRequestException("Request does not have Authorization in Header.");
+            throw new SessionsRequestException("Authorization Header required but none provided.");
         }
 
-        /**
-         * validates the Key argument for null or empty string
-         */
         if (StringUtils.isEmpty(secretKey)) {
             throw new SessionsKeyException("Secret key value expected but was null or empty.");
         }
 
-        /** From the two arguments adds the result of the jwtvalidation to Threadlocal store   */
         try {
-            store.set(
-                    jwtHandler.verifyJWT(request.getHeader("Authorization"), secretKey));
+            store.set(jwtHandler.verifyJWT(token, secretKey));
         } catch (JWTTokenExpiredException e) {
             throw new SessionsTokenExpiredException("JWT verification failed as token is expired.");
         } catch (JWTVerificationException e) {

@@ -95,7 +95,7 @@ public class SessionThreadLocalTest {
     @Test
     public void SessionThreadlocalRequestException() throws Exception {
         Exception exception = assertThrows(SessionsRequestException.class, () -> sessionsStore.store(request, SECRET_KEY));
-        assertThat(exception.getMessage(), is("Request does not have Authorization in Header."));
+        assertThat(exception.getMessage(), is("Authorization Header required but none provided."));
     }
 
     @SuppressWarnings("unchecked")

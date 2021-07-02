@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee.model.approval.tasks.timeseries;
 
 import com.github.onsdigital.zebedee.api.Root;
+import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.CollectionWriter;
@@ -87,7 +88,8 @@ public class TimeSeriesCompressionTask {
                 collectionReader.getReviewed(),
                 collectionReader.getRoot(),
                 collectionWriter.getRoot());
-        String channel = Root.zebedee.getSlackCollectionAlarmChannel();
+
+        String channel = Configuration.getDefaultSlackAlarmChannel();
         Notifier notifier = Root.zebedee.getSlackNotifier();
 
         for (TimeseriesCompressionResult failedZipFile : failedZipFiles) {

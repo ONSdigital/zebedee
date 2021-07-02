@@ -190,7 +190,7 @@ public class Root {
     static void alertOnInProgressCollections(Collections.CollectionList collections, Notifier notifier) {
         info().log("zebedee root: checking existing collections for in progress approvals");
 
-        String channel = zebedee.getSlackCollectionAlarmChannel();
+        String channel = Configuration.getDefaultSlackAlarmChannel();
 
         collections.withApprovalInProgressOrError().forEach(c -> {
             info().data("collectionId", c.getDescription().getId())

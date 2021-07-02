@@ -92,8 +92,6 @@ public class Zebedee {
     private final DatasetService datasetService;
     private final ImageService imageService;
     private final ServiceStoreImpl serviceStoreImpl;
-    private final String slackCollectionAlarmChannel;
-    private final String slackCollectionWarningChannel;
     private final StartUpAlerter startUpAlerter;
     private final SlackClient slackClient;
     private final Notifier slackNotifier;
@@ -136,8 +134,6 @@ public class Zebedee {
         this.keyRingPath = cfg.getKeyRingPath();
         this.startUpAlerter = cfg.getStartUpAlerter();
         this.slackClient = cfg.getSlackClient();
-        this.slackCollectionAlarmChannel = cfg.getSlackCollectionAlarmChannel();
-        this.slackCollectionWarningChannel = cfg.getSlackCollectionWarningChannel();
         this.slackNotifier = new SlackNotifier(slackClient);
     }
 
@@ -440,14 +436,6 @@ public class Zebedee {
 
     public SlackClient getSlackClient() {
         return this.slackClient;
-    }
-
-    public String getSlackCollectionAlarmChannel(){
-        return this.slackCollectionAlarmChannel;
-    }
-
-    public String getSlackCollectionWarningChannel(){
-        return this.slackCollectionWarningChannel;
     }
 
     public Notifier getSlackNotifier() {

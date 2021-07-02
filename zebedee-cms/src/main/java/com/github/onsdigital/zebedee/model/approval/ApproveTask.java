@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee.model.approval;
 
 import com.github.onsdigital.zebedee.api.Root;
+import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.data.DataPublisher;
 import com.github.onsdigital.zebedee.data.importing.CsvTimeseriesUpdateImporter;
 import com.github.onsdigital.zebedee.data.importing.TimeseriesUpdateCommand;
@@ -166,7 +167,7 @@ public class ApproveTask implements Callable<Boolean> {
             return true;
 
         } catch (Exception e) {
-            String channel = Root.zebedee.getSlackCollectionAlarmChannel();
+            String channel = Configuration.getDefaultSlackAlarmChannel();
             Root.zebedee.getSlackNotifier().sendCollectionAlarm(collection, channel, "Error approving collection", e);
 
             CMSLogEvent errorLog = error().data("collectionId", collection.getDescription().getId());
@@ -268,7 +269,7 @@ public class ApproveTask implements Callable<Boolean> {
         boolean verified = timeSeriesCompressionTask.compressTimeseries(collection, collectionReader, collectionWriter);
 
         if (!verified) {
-            String channel = Root.zebedee.getSlackCollectionAlarmChannel();
+            String channel = Configuration.getDefaultSlackAlarmChannel();
             Root.zebedee.getSlackNotifier().sendCollectionAlarm(collection, channel, "Failed verification of time series zip files");
             info().data("collectionId", collection.getDescription().getId())
                     .log("Failed verification of time series zip files");

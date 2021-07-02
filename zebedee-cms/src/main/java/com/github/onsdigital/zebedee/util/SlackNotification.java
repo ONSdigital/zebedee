@@ -3,7 +3,6 @@ package com.github.onsdigital.zebedee.util;
 import com.github.davidcarboni.httpino.Endpoint;
 import com.github.davidcarboni.httpino.Http;
 import com.github.davidcarboni.httpino.Response;
-import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.json.CollectionBase;
 import com.github.onsdigital.zebedee.json.publishing.PublishedCollection;

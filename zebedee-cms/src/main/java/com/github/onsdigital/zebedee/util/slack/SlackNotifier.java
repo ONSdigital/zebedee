@@ -7,9 +7,9 @@ import com.github.onsdigital.slack.messages.PostMessage;
 import com.github.onsdigital.slack.messages.PostMessageAttachment;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.util.SlackNotification;
-import org.apache.commons.lang3.StringUtils;
 
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.error;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 
 /**
@@ -66,24 +66,19 @@ public class SlackNotifier implements Notifier {
 
     @Override
     public boolean sendCollectionAlarm(Collection collection, String channel, String customMessage, Exception ex) {
-        if (StringUtils.isEmpty(channel) || StringUtils.isEmpty(customMessage) || collection == null ) {
-            error().log("error sending collection alarm. channel/customMessage/collection was empty");
+        boolean result = validate(collection, channel, customMessage, "alarm");
+        if (!result) {
             return false;
         }
-        if ( collection.getDescription() == null || collection.getDescription().getType() == null
-                || StringUtils.isEmpty(collection.getId()) || StringUtils.isEmpty(collection.getDescription().getName()))
-        {
-            error().log("error sending collection alarm. Collection description/id/type/name is null");
+        if (isEmpty(ex.getMessage())) {
             return false;
         }
         AttachmentField exField = new AttachmentField("exception", ex.getMessage(), false);
         PostMessage postMessage = createPostMessage(channel, customMessage)
                 .addAttachment(createCollectionAttachment("Alert", "Collection Alarm", Colour.DANGER, collection, exField));
 
-        try {
-            sendSlackMessage(postMessage);
-        } catch (Exception e) {
-            error().exception(e).log("unexpected error while sending slack notification");
+        boolean messageOutput = postMessageToSlack(postMessage);
+        if (!messageOutput) {
             return false;
         }
         return true;
@@ -91,22 +86,14 @@ public class SlackNotifier implements Notifier {
 
     @Override
     public boolean sendCollectionWarning(Collection collection, String channel, String customMessage, AttachmentField... fields) {
-        if (StringUtils.isEmpty(channel) || StringUtils.isEmpty(customMessage) || collection == null ) {
-            error().log("error sending collection alarm. channel/customMessage/collection was empty");
-            return false;
-        }
-        if ( collection.getDescription() == null || collection.getDescription().getType() == null
-                || StringUtils.isEmpty(collection.getId()) || StringUtils.isEmpty(collection.getDescription().getName()))
-        {
-            error().log("error sending collection alarm. Collection description/id/type/name is null");
+        boolean result = validate(collection, channel, customMessage, "warning");
+        if (!result) {
             return false;
         }
         PostMessage postMessage = createPostMessage(channel, customMessage)
                 .addAttachment(createCollectionAttachment("Warning", "Collection Warning", Colour.WARNING, collection, fields));
-        try {
-            sendSlackMessage(postMessage);
-        } catch (Exception e) {
-            error().exception(e).log("unexpected error while sending slack notification");
+        boolean messageOutput = postMessageToSlack(postMessage);
+        if (!messageOutput) {
             return false;
         }
         return true;
@@ -114,22 +101,14 @@ public class SlackNotifier implements Notifier {
 
     @Override
     public boolean sendCollectionAlarm(Collection collection, String channel, String customMessage, AttachmentField... fields) {
-        if (StringUtils.isEmpty(channel) || StringUtils.isEmpty(customMessage) || collection == null ) {
-            error().log("error sending collection alarm. channel/customMessage/collection was empty");
-            return false;
-        }
-        if ( collection.getDescription() == null || collection.getDescription().getType() == null
-                || StringUtils.isEmpty(collection.getId()) || StringUtils.isEmpty(collection.getDescription().getName()))
-        {
-            error().log("error sending collection alarm. Collection description/id/type/name is null");
+        boolean result = validate(collection, channel, customMessage, "alarm");
+        if (!result) {
             return false;
         }
         PostMessage postMessage = createPostMessage(channel, customMessage)
                 .addAttachment(createCollectionAttachment("Alert", "Collection Alarm", Colour.DANGER, collection, fields));
-        try {
-            sendSlackMessage(postMessage);
-        } catch (Exception e) {
-            error().exception(e).log("unexpected error while sending slack notification");
+        boolean messageOutput = postMessageToSlack(postMessage);
+        if (!messageOutput) {
             return false;
         }
         return true;
@@ -148,6 +127,31 @@ public class SlackNotifier implements Notifier {
         }
 
         return attachment;
+    }
+
+    private boolean validate(Collection collection, String channel, String customMessage, String type) {
+        String message = "error sending collection " + type + ".channel/customMessage/collection was empty";
+        String logMessage = "error sending collection " + type + ". Collection description/id/type/name is null";
+        if (isEmpty(channel) || isEmpty(customMessage) || collection == null) {
+            error().log(message);
+            return false;
+        }
+        if (collection.getDescription() == null || collection.getDescription().getType() == null
+                || isEmpty(collection.getId()) || isEmpty(collection.getDescription().getName())) {
+            error().log(logMessage);
+            return false;
+        }
+        return true;
+    }
+
+    private boolean postMessageToSlack(PostMessage postMessage) {
+        try {
+            sendSlackMessage(postMessage);
+        } catch (Exception e) {
+            error().exception(e).log("unexpected error while sending slack notification");
+            return false;
+        }
+        return true;
     }
 
 }

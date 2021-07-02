@@ -52,6 +52,25 @@ public class SlackNotifierTest {
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
+
+        when(collection.getDescription())
+                .thenReturn(description);
+        when(description.getType())
+                .thenReturn(manual);
+        when(description.getName())
+                .thenReturn("Test");
+        when(collection.getId())
+                .thenReturn("101");
+        when(slackClient.getProfile())
+                .thenReturn(profile);
+        when(profile.newPostMessage(anyString(), anyString()))
+                .thenReturn(pm);
+        when(field.getTitle())
+                .thenReturn("WarningTitle");
+        when(field.getMessage())
+                .thenReturn("Ons Warning message");
+        when(field.isShort())
+                .thenReturn(true);
     }
 
     @Test
@@ -67,8 +86,6 @@ public class SlackNotifierTest {
 
     @Test
     public void sendSlackMessageException() {
-        when(slackClient.getProfile())
-                .thenReturn(profile);
         when(slackClient.sendMessage(pm))
                 .thenThrow(RuntimeException.class);
 
@@ -82,16 +99,6 @@ public class SlackNotifierTest {
     public void sendCollectionAlarmException() {
         PostMessage pm = new PostMessage("username", "channel", ":grinning:", "yes");
 
-        when(collection.getDescription())
-                .thenReturn(description);
-        when(description.getType())
-                .thenReturn(manual);
-        when(description.getName())
-                .thenReturn("Test");
-        when(collection.getId())
-                .thenReturn("101");
-        when(slackClient.getProfile())
-                .thenReturn(profile);
         when(profile.newPostMessage(anyString(), anyString()))
                 .thenReturn(pm);
         when(slackClient.sendMessage(pm))
@@ -104,6 +111,25 @@ public class SlackNotifierTest {
         assertFalse(returnValue);
     }
 
+    @Test
+    public void sendCollectionAlarmExceptionNull() {
+        SlackNotifier sn = new SlackNotifier(slackClient);
+        boolean returnValue = sn.sendCollectionAlarm(collection, "", "message", new NullPointerException());
+
+        verify(slackClient, times(0)).sendMessage(pm);
+        assertThat(pm.getAttachments().size(), equalTo(0));
+        assertFalse(returnValue);
+    }
+
+    @Test
+    public void sendCollectionAlarmExceptionEmpty() {
+        SlackNotifier sn = new SlackNotifier(slackClient);
+        boolean returnValue = sn.sendCollectionAlarm(collection, "", "message", new Exception(""));
+
+        verify(slackClient, times(0)).sendMessage(pm);
+        assertThat(pm.getAttachments().size(), equalTo(0));
+        assertFalse(returnValue);
+    }
 
     @Test
     public void sendCollectionAlarmChannelEmpty() {
@@ -116,9 +142,30 @@ public class SlackNotifierTest {
     }
 
     @Test
+    public void sendCollectionAlarmChannelNull() {
+        SlackNotifier sn = new SlackNotifier(slackClient);
+        boolean returnValue = sn.sendCollectionAlarm(collection, null, "message", new Exception("Hello test"));
+
+        verify(slackClient, times(0)).sendMessage(pm);
+        assertThat(pm.getAttachments().size(), equalTo(0));
+        assertFalse(returnValue);
+    }
+
+    @Test
     public void sendCollectionAlarmMessageEmpty() {
         SlackNotifier sn = new SlackNotifier(slackClient);
         boolean returnValue = sn.sendCollectionAlarm(collection, "SlackChannel", "", new Exception("Hello test"));
+
+        verify(slackClient, times(0)).sendMessage(pm);
+        assertThat(pm.getAttachments().size(), equalTo(0));
+        assertFalse(returnValue);
+    }
+
+
+    @Test
+    public void sendCollectionAlarmMessageNull() {
+        SlackNotifier sn = new SlackNotifier(slackClient);
+        boolean returnValue = sn.sendCollectionAlarm(collection, "SlackChannel", null, new Exception("Hello test"));
 
         verify(slackClient, times(0)).sendMessage(pm);
         assertThat(pm.getAttachments().size(), equalTo(0));
@@ -151,14 +198,8 @@ public class SlackNotifierTest {
 
     @Test
     public void sendCollectionAlarmCollectionDescriptionTypeNull() {
-        when(collection.getDescription())
-                .thenReturn(description);
         when(description.getType())
                 .thenReturn(null);
-        when(description.getName())
-                .thenReturn("Test");
-        when(collection.getId())
-                .thenReturn("101");
 
         SlackNotifier sn = new SlackNotifier(slackClient);
         boolean returnValue = sn.sendCollectionAlarm(collection, "SlackChannel", "Ons custom message", new Exception("Hello test"));
@@ -170,14 +211,21 @@ public class SlackNotifierTest {
 
     @Test
     public void sendCollectionAlarmCollectionDescriptionNameEmpty() {
-        when(collection.getDescription())
-                .thenReturn(description);
-        when(description.getType())
-                .thenReturn(manual);
         when(description.getName())
                 .thenReturn("");
-        when(collection.getId())
-                .thenReturn("101");
+
+        SlackNotifier sn = new SlackNotifier(slackClient);
+        boolean returnValue = sn.sendCollectionAlarm(collection, "SlackChannel", "Ons custom message", new Exception("Hello test"));
+
+        verify(slackClient, times(0)).sendMessage(pm);
+        assertThat(pm.getAttachments().size(), equalTo(0));
+        assertFalse(returnValue);
+    }
+
+    @Test
+    public void sendCollectionAlarmCollectionDescriptionNameNull() {
+        when(description.getName())
+                .thenReturn(null);
 
         SlackNotifier sn = new SlackNotifier(slackClient);
         boolean returnValue = sn.sendCollectionAlarm(collection, "SlackChannel", "Ons custom message", new Exception("Hello test"));
@@ -189,12 +237,6 @@ public class SlackNotifierTest {
 
     @Test
     public void sendCollectionAlarmCollectionDescriptionIdEmpty() {
-        when(collection.getDescription())
-                .thenReturn(description);
-        when(description.getType())
-                .thenReturn(manual);
-        when(description.getName())
-                .thenReturn("Test");
         when(collection.getId())
                 .thenReturn("");
 
@@ -208,33 +250,8 @@ public class SlackNotifierTest {
 
     @Test
     public void sendCollectionAlarmCollectionDescriptionIdNull() {
-        when(collection.getDescription())
-                .thenReturn(description);
-        when(description.getType())
-                .thenReturn(manual);
-        when(description.getName())
-                .thenReturn("Test");
         when(collection.getId())
                 .thenReturn(null);
-
-        SlackNotifier sn = new SlackNotifier(slackClient);
-        boolean returnValue = sn.sendCollectionAlarm(collection, "SlackChannel", "Ons custom message", new Exception("Hello test"));
-
-        verify(slackClient, times(0)).sendMessage(pm);
-        assertThat(pm.getAttachments().size(), equalTo(0));
-        assertFalse(returnValue);
-    }
-
-    @Test
-    public void sendCollectionAlarmCollectionDescriptionNameNull() {
-        when(collection.getDescription())
-                .thenReturn(description);
-        when(description.getType())
-                .thenReturn(manual);
-        when(description.getName())
-                .thenReturn(null);
-        when(collection.getId())
-                .thenReturn("101");
 
         SlackNotifier sn = new SlackNotifier(slackClient);
         boolean returnValue = sn.sendCollectionAlarm(collection, "SlackChannel", "Ons custom message", new Exception("Hello test"));
@@ -246,16 +263,6 @@ public class SlackNotifierTest {
 
     @Test
     public void sendCollectionAlarmSuccess() {
-        when(collection.getDescription())
-                .thenReturn(description);
-        when(description.getType())
-                .thenReturn(manual);
-        when(description.getName())
-                .thenReturn("Test");
-        when(collection.getId())
-                .thenReturn("101");
-        when(slackClient.getProfile())
-                .thenReturn(profile);
         PostMessage pm = new PostMessage();
         when(profile.newPostMessage(anyString(), anyString()))
                 .thenReturn(pm);
@@ -276,22 +283,12 @@ public class SlackNotifierTest {
     }
 
 
-    @Test(expected = Exception.class)
+    @Test
     public void sendCollectionWarningException() {
         PostMessage pm = new PostMessage("username", "channel", ":grinning:", "yes");
 
         SlackNotifier sn = new SlackNotifier(slackClient);
 
-        when(collection.getDescription())
-                .thenReturn(description);
-        when(description.getType())
-                .thenReturn(manual);
-        when(description.getName())
-                .thenReturn("Test");
-        when(collection.getId())
-                .thenReturn("101");
-        when(slackClient.getProfile())
-                .thenReturn(profile);
         when(profile.newPostMessage(anyString(), anyString()))
                 .thenReturn(pm);
         when(slackClient.sendMessage(pm))
@@ -300,7 +297,7 @@ public class SlackNotifierTest {
         boolean returnValue = sn.sendCollectionWarning(collection, "Any", "custom", field);
 
         Exception actual = assertThrows(Exception.class, () -> sn.sendSlackMessage(pm));
-        verify(slackClient, times(1)).sendMessage(pm);
+        verify(slackClient, times(2)).sendMessage(pm);
         assertFalse(returnValue);
     }
 
@@ -316,9 +313,29 @@ public class SlackNotifierTest {
     }
 
     @Test
+    public void sendCollectionWarningChannelNull() {
+        SlackNotifier sn = new SlackNotifier(slackClient);
+        boolean returnValue = sn.sendCollectionWarning(collection, null, "message", field);
+
+        verify(slackClient, times(0)).sendMessage(pm);
+        assertThat(pm.getAttachments().size(), equalTo(0));
+        assertFalse(returnValue);
+    }
+
+    @Test
     public void sendCollectionWarningMessageEmpty() {
         SlackNotifier sn = new SlackNotifier(slackClient);
         boolean returnValue = sn.sendCollectionWarning(collection, "SlackChannel", "", field);
+
+        verify(slackClient, times(0)).sendMessage(pm);
+        assertThat(pm.getAttachments().size(), equalTo(0));
+        assertFalse(returnValue);
+    }
+
+    @Test
+    public void sendCollectionWarningMessageNull() {
+        SlackNotifier sn = new SlackNotifier(slackClient);
+        boolean returnValue = sn.sendCollectionWarning(collection, "SlackChannel", null, field);
 
         verify(slackClient, times(0)).sendMessage(pm);
         assertThat(pm.getAttachments().size(), equalTo(0));
@@ -352,14 +369,8 @@ public class SlackNotifierTest {
 
     @Test
     public void sendCollectionWarningCollectionDescriptionTypeNull() {
-        when(collection.getDescription())
-                .thenReturn(description);
         when(description.getType())
                 .thenReturn(null);
-        when(description.getName())
-                .thenReturn("Test");
-        when(collection.getId())
-                .thenReturn("101");
 
         SlackNotifier sn = new SlackNotifier(slackClient);
         boolean returnValue = sn.sendCollectionWarning(collection, "SlackChannel", "Ons custom message", field);
@@ -371,14 +382,8 @@ public class SlackNotifierTest {
 
     @Test
     public void sendCollectionWarningCollectionDescriptionNameEmpty() {
-        when(collection.getDescription())
-                .thenReturn(description);
-        when(description.getType())
-                .thenReturn(manual);
         when(description.getName())
                 .thenReturn("");
-        when(collection.getId())
-                .thenReturn("101");
 
         SlackNotifier sn = new SlackNotifier(slackClient);
         boolean returnValue = sn.sendCollectionWarning(collection, "SlackChannel", "Ons custom message", field);
@@ -390,12 +395,6 @@ public class SlackNotifierTest {
 
     @Test
     public void sendCollectionWarningCollectionDescriptionIdEmpty() {
-        when(collection.getDescription())
-                .thenReturn(description);
-        when(description.getType())
-                .thenReturn(manual);
-        when(description.getName())
-                .thenReturn("Test");
         when(collection.getId())
                 .thenReturn("");
 
@@ -409,12 +408,6 @@ public class SlackNotifierTest {
 
     @Test
     public void sendCollectionWarningCollectionDescriptionIdNull() {
-        when(collection.getDescription())
-                .thenReturn(description);
-        when(description.getType())
-                .thenReturn(manual);
-        when(description.getName())
-                .thenReturn("Test");
         when(collection.getId())
                 .thenReturn(null);
 
@@ -428,14 +421,8 @@ public class SlackNotifierTest {
 
     @Test
     public void sendCollectionWarningCollectionDescriptionNameNull() {
-        when(collection.getDescription())
-                .thenReturn(description);
-        when(description.getType())
-                .thenReturn(manual);
         when(description.getName())
                 .thenReturn(null);
-        when(collection.getId())
-                .thenReturn("101");
 
         SlackNotifier sn = new SlackNotifier(slackClient);
         boolean returnValue = sn.sendCollectionWarning(collection, "SlackChannel", "Ons custom message", field);
@@ -447,16 +434,6 @@ public class SlackNotifierTest {
 
     @Test
     public void sendCollectionWarningSuccess() {
-        when(collection.getDescription())
-                .thenReturn(description);
-        when(description.getType())
-                .thenReturn(manual);
-        when(description.getName())
-                .thenReturn("Test");
-        when(collection.getId())
-                .thenReturn("101");
-        when(slackClient.getProfile())
-                .thenReturn(profile);
         when(field.getTitle())
                 .thenReturn("WarningTitle");
         when(field.getMessage())
@@ -488,16 +465,6 @@ public class SlackNotifierTest {
     public void sendCollectionAlarmWithFieldsException() {
         PostMessage pm = new PostMessage("username", "channel", ":grinning:", "yes");
 
-        when(collection.getDescription())
-                .thenReturn(description);
-        when(description.getType())
-                .thenReturn(manual);
-        when(description.getName())
-                .thenReturn("Test");
-        when(collection.getId())
-                .thenReturn("101");
-        when(slackClient.getProfile())
-                .thenReturn(profile);
         when(profile.newPostMessage(anyString(), anyString()))
                 .thenReturn(pm);
         when(slackClient.sendMessage(pm))
@@ -522,24 +489,17 @@ public class SlackNotifierTest {
     }
 
     @Test
-    public void sendCollectionAlarmWithFieldsSuccess() {
-        when(collection.getDescription())
-                .thenReturn(description);
-        when(description.getType())
-                .thenReturn(manual);
-        when(description.getName())
-                .thenReturn("Test");
-        when(collection.getId())
-                .thenReturn("101");
-        when(slackClient.getProfile())
-                .thenReturn(profile);
-        when(field.getTitle())
-                .thenReturn("WarningTitle");
-        when(field.getMessage())
-                .thenReturn("Ons Warning message");
-        when(field.isShort())
-                .thenReturn(true);
+    public void sendCollectionAlarmWithFieldsChannelNull() {
+        SlackNotifier sn = new SlackNotifier(slackClient);
+        boolean returnValue = sn.sendCollectionWarning(collection, null, "message", field);
 
+        verify(slackClient, times(0)).sendMessage(pm);
+        assertThat(pm.getAttachments().size(), equalTo(0));
+        assertFalse(returnValue);
+    }
+
+    @Test
+    public void sendCollectionAlarmWithFieldsSuccess() {
         PostMessage pm = new PostMessage();
         when(profile.newPostMessage(anyString(), anyString()))
                 .thenReturn(pm);

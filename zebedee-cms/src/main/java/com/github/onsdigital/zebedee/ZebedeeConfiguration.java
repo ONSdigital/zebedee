@@ -8,7 +8,6 @@ import com.github.onsdigital.session.service.client.SessionClientImpl;
 import com.github.onsdigital.slack.Profile;
 import com.github.onsdigital.slack.client.SlackClient;
 import com.github.onsdigital.slack.client.SlackClientImpl;
-import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.data.processing.DataIndex;
 import com.github.onsdigital.zebedee.keyring.CentralKeyringImpl;
 import com.github.onsdigital.zebedee.keyring.Keyring;
@@ -128,8 +127,6 @@ public class ZebedeeConfiguration {
     private EncryptionKeyFactory encryptionKeyFactory;
     private StartUpAlerter startUpAlerter;
     private SlackClient slackClient;
-    private String slackCollectionAlarmChannel;
-    private String slackCollectionWarningChannel;
 
     /**
      * Create a new configuration object.
@@ -239,9 +236,6 @@ public class ZebedeeConfiguration {
 
         this.startUpAlerter = initStartUpAlerter();
 
-        this.slackCollectionAlarmChannel = Configuration.getSlackDefaultChannel();
-        this.slackCollectionWarningChannel = Configuration.getSlackDefaultChannel();;
-
         info().data("root_path", rootPath.toString())
                 .data("zebedee_path", zebedeePath.toString())
                 .data("keyring_path", keyRingPath.toString())
@@ -257,8 +251,6 @@ public class ZebedeeConfiguration {
                 .data("services_path", servicePath.toString())
                 .data("enable_verification_agent", useVerificationAgent)
                 .data("sessions_api_enabled", cmsFeatureFlags().isSessionAPIEnabled())
-                .data("slack_default_channel", slackCollectionAlarmChannel)
-                .data("slack_default_channel", slackCollectionWarningChannel)
                 .log("zebedee configuration creation complete");
 
     }
@@ -450,13 +442,5 @@ public class ZebedeeConfiguration {
 
     public SlackClient getSlackClient() {
         return slackClient;
-    }
-
-    public String getSlackCollectionAlarmChannel() {
-        return slackCollectionAlarmChannel;
-    }
-
-    public String getSlackCollectionWarningChannel() {
-        return slackCollectionWarningChannel;
     }
 }

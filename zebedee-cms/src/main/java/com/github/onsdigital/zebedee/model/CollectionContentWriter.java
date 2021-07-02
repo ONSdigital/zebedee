@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee.model;
 
 import com.github.onsdigital.zebedee.api.Root;
+import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.util.EncryptionUtils;
@@ -40,7 +41,7 @@ public class CollectionContentWriter extends ContentWriter {
             return EncryptionUtils.encryptionOutputStream(path, key);
         } else {
 
-            String channel = Root.zebedee.getSlackCollectionAlarmChannel();
+            String channel = Configuration.getDefaultSlackAlarmChannel();
             AttachmentField uriField = new AttachmentField("uri", uri, false);
             Root.zebedee.getSlackNotifier().sendCollectionWarning(collection, channel, "Writing unencrypted content in collection", uriField);
 

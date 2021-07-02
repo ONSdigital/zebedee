@@ -128,7 +128,6 @@ public class SessionsServiceImpl extends TimerTask implements Sessions {
             // Deserialise the json:
             Session session = sessionsStore.read(sessionPath(id));
             if (!expired(session)) {
-                info().log("session running successfully during session get");
                 updateLastAccess(session);
                 result = session;
             }
@@ -149,7 +148,6 @@ public class SessionsServiceImpl extends TimerTask implements Sessions {
     public Session find(String email) throws IOException {
         Session session = sessionsStore.find(email);
         if (!expired(session)) {
-            info().log("session running successfully during session find");
             updateLastAccess(session);
         }
         else{
@@ -192,6 +190,29 @@ public class SessionsServiceImpl extends TimerTask implements Sessions {
         return result;
     }
 
+    /**
+     * Get a {@link Session} session object from thread local.
+     *
+     * @param none.
+     * @return session object from thread local.
+     * @throws IOException for any problem getting a session from the request.
+     */
+    @Override
+    public Session get() throws IOException {
+        info().log("Session get() - no-Op.");
+        return null;
+    }
+
+    /**
+     * Get a {@link Session} session object from thread local.
+     *
+     * @param token/kid - the access token to be decoded, verified and stored and key id.
+     * @throws IOException for any problem verifying a token or storing a session in threadlocal.
+     */
+    @Override
+    public void set(String token, String kid) throws IOException {
+        info().log("Session set(String token, String kid) - no-Op.");
+    }
 
     /**
      * Updates the last access time and saves the session to disk.

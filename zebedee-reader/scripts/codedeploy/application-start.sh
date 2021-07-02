@@ -21,13 +21,8 @@ fi
 
 docker run -d                                                                           \
   --env=content_dir=/content                                                            \
-  --env=enable_splunk_reporting=$ENABLE_SPLUNK_REPORTING                                \
   --env=ELASTIC_SEARCH_CLUSTER=cluster                                                  \
   --env=ELASTIC_SEARCH_SERVER=$ELASTICSEARCH_HOST                                       \
-  --env=splunk_http_event_collection_host=$SPLUNK_HTTP_EVENT_COLLECTOR_HOST             \
-  --env=splunk_http_event_collection_port=$SPLUNK_HTTP_EVENT_COLLECTOR_PORT             \
-  --env=splunk_http_event_collection_uri=$SPLUNK_HTTP_EVENT_COLLECTOR_URI               \
-  --env=splunk_http_event_collection_auth_token=$SPLUNK_HTTP_EVENT_COLLECTOR_AUTH_TOKEN \
   --name=zebedee-reader                                                                 \
   --net=website                                                                         \
   --restart=always                                                                      \

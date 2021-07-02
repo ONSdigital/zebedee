@@ -26,6 +26,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.github.onsdigital.zebedee.keyring.KeyringUtil.getUser;
+
 /**
  * Created by david on 12/03/2015.
  */
@@ -184,8 +186,8 @@ public class Permission {
 
     private void updateUserKeyAssignments(Session session, String targetEmail) throws IOException,
             NotFoundException, BadRequestException, InternalServerError {
-        User srcUser = getUser(session.getEmail());
-        User targetUser = getUser(targetEmail);
+        User srcUser = getUser(usersService, session.getEmail());
+        User targetUser = getUser(usersService, targetEmail);
 
         List<CollectionDescription> assignments = new ArrayList<>();
         List<CollectionDescription> removals = new ArrayList<>();
@@ -201,21 +203,6 @@ public class Permission {
 
         keyring.revokeFrom(targetUser, removals);
         keyring.assignTo(srcUser, targetUser, assignments);
-    }
-
-    private User getUser(String email) throws InternalServerError, NotFoundException, BadRequestException {
-        User user;
-        try {
-            user = usersService.getUserByEmail(email);
-        } catch (IOException ex) {
-            throw new InternalServerError("error getting user", ex);
-        }
-
-        if (user == null) {
-            throw new NotFoundException("requested user not found");
-        }
-
-        return user;
     }
 
     private Collections.CollectionList listCollections() throws InternalServerError {

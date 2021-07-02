@@ -59,7 +59,8 @@ public class LegacyKeyringImpl_AssignToTest extends BaseLegacyKeyringTest {
 
     @Test
     public void testAssignTo_assignmentsNull_shouldDoNothing() throws Exception {
-        legacyKeyring.assignTo(bert, ernie, null);
+        List<CollectionDescription> assignments = null;
+        legacyKeyring.assignTo(bert, ernie, assignments);
 
         verifyZeroInteractions(bert, ernie, bertKeyring, ernieKeyring, keyringCache, users);
     }

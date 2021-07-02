@@ -157,7 +157,17 @@ public class CentralKeyringImpl implements Keyring {
     }
 
     @Override
+    public void assignTo(User src, User target, CollectionDescription... assignments) throws KeyringException {
+        //Do nothing - required to maintain backwards compatability.
+    }
+
+    @Override
     public void revokeFrom(User target, List<CollectionDescription> removals) throws KeyringException {
+        //Do nothing - required to maintain backwards compatability.
+    }
+
+    @Override
+    public void revokeFrom(User target, CollectionDescription... removals) throws KeyringException {
         //Do nothing - required to maintain backwards compatability.
     }
 

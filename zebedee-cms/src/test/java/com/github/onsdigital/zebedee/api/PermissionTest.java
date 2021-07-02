@@ -238,7 +238,7 @@ public class PermissionTest extends ZebedeeAPIBaseTestCase {
     public void testGrant_addAdminRevokeFromToError_shouldThrowException() throws Exception {
         doThrow(KeyringException.class)
                 .when(keyring)
-                .revokeFrom(any(), any());
+                .revokeFrom(any(), any(List.class));
 
         permission.isAdmin(true);
 
@@ -259,7 +259,7 @@ public class PermissionTest extends ZebedeeAPIBaseTestCase {
     public void testGrant_addAdminAssignToError_shouldThrowException() throws Exception {
         doThrow(KeyringException.class)
                 .when(keyring)
-                .assignTo(any(), any(), any());
+                .assignTo(any(User.class), any(User.class), any(List.class));
 
         when(permissionsService.canView(targetUser, collectionDescription))
                 .thenReturn(true);

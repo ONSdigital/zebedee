@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 
 import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 
 /**
  * @author Scott Morse
@@ -127,6 +128,30 @@ public class SessionsAPIServiceImpl implements Sessions {
     @Override
     public boolean expired(Session session) {
         return session == null;
+    }
+
+    /**
+     * Get a {@link Session} session object from thread local.
+     *
+     * @param none.
+     * @return session object from thread local.
+     * @throws IOException for any problem getting a session from the request.
+     */
+    @Override
+    public Session get() throws IOException {
+        info().log("Session get() - no-Op.");
+        return null;
+    }
+
+    /**
+     * Get a {@link Session} session object from thread local.
+     *
+     * @param token/kid - the access token to be decoded, verified and stored and key id.
+     * @throws IOException for any problem verifying a token or storing a session in threadlocal.
+     */
+    @Override
+    public void set(String token, String kid) throws IOException {
+        info().log("Session set(String token, String kid) - no-Op.");
     }
 
     private Session createZebedeeSession(com.github.onsdigital.session.service.Session sess) throws IOException {

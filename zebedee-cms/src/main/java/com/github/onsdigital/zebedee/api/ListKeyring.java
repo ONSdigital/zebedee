@@ -3,7 +3,6 @@ package com.github.onsdigital.zebedee.api;
 import com.github.davidcarboni.restolino.framework.Api;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.InternalServerError;
-import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.keyring.Keyring;
@@ -21,6 +20,7 @@ import javax.ws.rs.GET;
 import java.io.IOException;
 import java.util.Set;
 
+import static com.github.onsdigital.zebedee.keyring.KeyringUtil.getUser;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.error;
 
 /**
@@ -63,7 +63,7 @@ public class ListKeyring {
     @GET
     public Set<String> listUserKeys(HttpServletRequest request, HttpServletResponse response) throws ZebedeeException {
         checkPermission(getSession(request));
-        User user = getUser(getEmail(request));
+        User user = getUser(usersService, getEmail(request));
         return listKeyring(user);
     }
 
@@ -105,22 +105,6 @@ public class ListKeyring {
         }
 
         return email;
-    }
-
-    User getUser(String email) throws InternalServerError, NotFoundException, BadRequestException {
-        User user;
-        try {
-            user = usersService.getUserByEmail(email);
-        } catch (IOException ex) {
-            error().user(email).exception(ex).log("error getting user by email");
-            throw new InternalServerError("internal server error");
-        }
-
-        if (user == null) {
-            throw new NotFoundException("requested user was not found");
-        }
-
-        return user;
     }
 
     Set<String> listKeyring(User user) throws InternalServerError {

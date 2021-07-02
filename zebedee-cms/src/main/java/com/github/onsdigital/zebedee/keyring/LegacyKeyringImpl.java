@@ -16,6 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import javax.crypto.SecretKey;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -364,6 +365,11 @@ public class LegacyKeyringImpl implements Keyring {
     }
 
     @Override
+    public void assignTo(User src, User target, CollectionDescription... assignments) throws KeyringException {
+        assignTo(src, target, Arrays.asList(assignments));
+    }
+
+    @Override
     public void revokeFrom(User target, List<CollectionDescription> removals) throws KeyringException {
         if (removals == null || removals.isEmpty()) {
             return;
@@ -381,6 +387,11 @@ public class LegacyKeyringImpl implements Keyring {
         }
 
         saveKeyringChanges(target);
+    }
+
+    @Override
+    public void revokeFrom(User target, CollectionDescription... removals) throws KeyringException {
+        revokeFrom(target, Arrays.asList(removals));
     }
 
     private void validateUser(User user) throws KeyringException {

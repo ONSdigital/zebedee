@@ -6,7 +6,6 @@ import javax.servlet.http.HttpServletRequest;
 import com.github.onsdigital.zebedee.user.model.User;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.session.service.Sessions;
-import com.github.onsdigital.session.service.error.SessionClientException;
 
 /**
  * JWTStore:  class, when instantiated, will
@@ -29,7 +28,7 @@ public class JWTStore implements Sessions {
      * Find a {@link Session} associated with the user email - defaults to the NoOp impl.
      */
     @Override
-    public Session find(String email) throws IOException, SessionClientException {
+    public Session find(String email) throws IOException {
         return null;
     }
 

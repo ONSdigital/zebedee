@@ -101,15 +101,4 @@ public class Session {
                 Session.class.isAssignableFrom(obj.getClass()) &&
                 StringUtils.equals(id, ((Session) obj).id);
     }
-
-    /**
-     * Construct a Zebedee {@link Session} object from the external Session API
-     * {@link com.github.onsdigital.session.service.Session} model.
-     *
-     * @param sess the sesison to use.
-     * @return a Session with details provided.
-     */
-    public static Session fromAPIModel(com.github.onsdigital.session.service.Session sess) {
-        return new Session(sess.getId(), sess.getEmail(), sess.getStart(), sess.getLastAccess());
-    }
 }

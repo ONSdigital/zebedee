@@ -117,7 +117,7 @@ public class ListKeyringTest extends ZebedeeAPIBaseTestCase {
         InternalServerError ex = assertThrows(InternalServerError.class,
                 () -> endpoint.listUserKeys(mockRequest, mockResponse));
 
-        assertThat(ex.getMessage(), equalTo("internal server error"));
+        assertThat(ex.getMessage(), equalTo("get user returned unexpected error"));
     }
 
     @Test

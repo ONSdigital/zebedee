@@ -5,6 +5,7 @@ import com.github.onsdigital.zebedee.exceptions.ConflictException;
 import com.github.onsdigital.zebedee.exceptions.ForbiddenException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
+import com.github.onsdigital.zebedee.model.PathUtils;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.service.ServiceSupplier;
 import com.github.onsdigital.zebedee.session.model.Session;
@@ -138,7 +139,7 @@ public class TeamsServiceImpl implements TeamsService {
         updateTeam(
                 team,
                 (t) -> !StringUtils.isBlank(email) && team != null,
-                (t) -> t.addMember(email));
+                (t) -> t.addMember(standardise(email)));
     }
 
     @Override
@@ -147,7 +148,7 @@ public class TeamsServiceImpl implements TeamsService {
         updateTeam(
                 team,
                 (t) -> !StringUtils.isBlank(email) && team != null,
-                (t) -> t.removeMember(email));
+                (t) -> t.removeMember(standardise(email)));
     }
 
     @Override
@@ -199,6 +200,10 @@ public class TeamsServiceImpl implements TeamsService {
             info().log(FORBIDDEN_ERR_MSG);
             throw new ForbiddenException(FORBIDDEN_ERR_MSG);
         }
+    }
+
+    private String standardise(String email) {
+        return PathUtils.standardise(email);
     }
 
 }

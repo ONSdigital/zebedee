@@ -79,6 +79,14 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         collection = new Collection(builder.collections.get(1), zebedee);
 
         publisherSession = zebedee.openSession(builder.publisher1Credentials);
+
+        setUpPermissionsServiceMockForLegacyTests(zebedee, publisherSession);
+
+        when(permissionsService.canEdit(builder.publisher2.getEmail()))
+                .thenReturn(true);
+        when(permissionsService.canEdit(builder.publisher1.getEmail()))
+                .thenReturn(true);
+
         publisher1Email = builder.publisher1.getEmail();
         collectionWriter = new FakeCollectionWriter(zebedee.getCollections().path.toString(),
                 collection.description.getId());
@@ -1203,7 +1211,6 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
 
     @Test
     public void populateReleaseShouldAddLinksToReleasePageForCollectionContent() throws ZebedeeException, IOException {
-
         // Given a collection that is associated with a release and has an article
         String uri = String.format("/releases/%s", Random.id());
         Release release = createRelease(uri, new DateTime().plusWeeks(4).toDate());

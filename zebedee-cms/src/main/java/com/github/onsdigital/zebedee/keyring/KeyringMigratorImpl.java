@@ -204,7 +204,17 @@ public class KeyringMigratorImpl implements Keyring {
     }
 
     @Override
+    public void assignTo(User src, User target, CollectionDescription... assignments) throws KeyringException {
+        legacyKeyring.assignTo(src, target, assignments);
+    }
+
+    @Override
     public void revokeFrom(User target, List<CollectionDescription> removals) throws KeyringException {
+        legacyKeyring.revokeFrom(target, removals);
+    }
+
+    @Override
+    public void revokeFrom(User target, CollectionDescription... removals) throws KeyringException {
         legacyKeyring.revokeFrom(target, removals);
     }
 

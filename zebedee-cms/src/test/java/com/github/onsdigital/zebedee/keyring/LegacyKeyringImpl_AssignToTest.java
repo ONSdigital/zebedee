@@ -10,7 +10,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl.CACHED_KEY_MISSING_ERR;
 import static com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl.CACHE_KEYRING_NULL_ERR;
 import static com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl.EMAIL_EMPTY_ERR;
 import static com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl.KEYRING_LOCKED_ERR;
@@ -19,6 +18,7 @@ import static com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl.USER_NULL_
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertThrows;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
@@ -59,7 +59,8 @@ public class LegacyKeyringImpl_AssignToTest extends BaseLegacyKeyringTest {
 
     @Test
     public void testAssignTo_assignmentsNull_shouldDoNothing() throws Exception {
-        legacyKeyring.assignTo(bert, ernie, null);
+        List<CollectionDescription> assignments = null;
+        legacyKeyring.assignTo(bert, ernie, assignments);
 
         verifyZeroInteractions(bert, ernie, bertKeyring, ernieKeyring, keyringCache, users);
     }
@@ -197,15 +198,15 @@ public class LegacyKeyringImpl_AssignToTest extends BaseLegacyKeyringTest {
     }
 
     @Test
-    public void testAssignTo_SrcCachedKeyringDoesNotContainKey_shouldThrowEx() throws Exception {
+    public void testAssignTo_SrcCachedKeyringDoesNotContainKey_shouldCarryOn() throws Exception {
         when(bertCachedKeyring.keySet())
                 .thenReturn(new HashSet<>());
 
-        KeyringException ex = assertThrows(KeyringException.class,
-                () -> legacyKeyring.assignTo(bert, ernie, assignments));
+        legacyKeyring.assignTo(bert, ernie, assignments);
 
-        assertThat(ex.getMessage(), equalTo(CACHED_KEY_MISSING_ERR));
-        assertThat(ex.getCollectionID(), equalTo(TEST_COLLECTION_ID));
+        verify(ernieCachedKeyring, never()).put(TEST_COLLECTION_ID, secretKey);
+        verify(ernieKeyring, never()).put(TEST_COLLECTION_ID, secretKey);
+        verify(users, times(1)).updateKeyring(ernie);
     }
 
     @Test

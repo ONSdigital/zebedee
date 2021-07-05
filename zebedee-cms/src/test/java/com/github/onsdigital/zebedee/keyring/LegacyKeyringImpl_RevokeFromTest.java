@@ -35,7 +35,8 @@ public class LegacyKeyringImpl_RevokeFromTest extends BaseLegacyKeyringTest {
 
     @Test
     public void testRemoveFrom_removalsNull_shouldDoNothing() throws Exception {
-        legacyKeyring.revokeFrom(bert, null);
+        List<CollectionDescription> descriptions = null;
+        legacyKeyring.revokeFrom(bert, descriptions);
 
         verifyZeroInteractions(bertKeyring, keyringCache);
     }

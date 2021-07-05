@@ -56,13 +56,13 @@ public class DataPublicationTestBaseFixture extends ZebedeeTestBaseFixture {
      * @throws Exception
      */
     public void setUp() throws Exception {
-        setUpPermissionsServiceMockForLegacyTests(zebedee, builder.publisher1);
-
         secretKey = Keys.newSecretKey();
         setUpKeyringMockForLegacyTests(zebedee, builder.publisher1, secretKey);
 
         publisher = zebedee.openSession(builder.publisher1Credentials);
         reviewer = zebedee.openSession(builder.reviewer1Credentials);
+
+        setUpPermissionsServiceMockForLegacyTests(zebedee, publisher);
 
         dataBuilder = new DataBuilder(zebedee, publisher, reviewer);
         generator = new DataPagesGenerator();

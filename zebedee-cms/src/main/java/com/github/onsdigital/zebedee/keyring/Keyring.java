@@ -72,7 +72,17 @@ public interface Keyring {
     void assignTo(User src, User target, List<CollectionDescription> assignments) throws KeyringException;
 
     /**
+     * Assign the array of keys to a user. Required to maintain backwards compatibility
+     */
+    void assignTo(User src, User target, CollectionDescription... assignments) throws KeyringException;
+
+    /**
      * Remove the List of keys from a user. Required to maintain backwards compatibility
      */
     void revokeFrom(User target, List<CollectionDescription> removals) throws KeyringException;
+
+    /**
+     * Remove the array of keys from a user. Required to maintain backwards compatibility
+     */
+    void revokeFrom(User target, CollectionDescription... removals) throws KeyringException;
 }

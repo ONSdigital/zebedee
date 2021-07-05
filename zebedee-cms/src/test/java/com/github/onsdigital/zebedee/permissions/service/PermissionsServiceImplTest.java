@@ -1,15 +1,15 @@
 package com.github.onsdigital.zebedee.permissions.service;
 
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
-import com.github.onsdigital.zebedee.permissions.model.AccessMapping;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
-import com.github.onsdigital.zebedee.teams.model.Team;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.KeyringCache;
-import com.github.onsdigital.zebedee.teams.service.TeamsService;
+import com.github.onsdigital.zebedee.permissions.model.AccessMapping;
 import com.github.onsdigital.zebedee.permissions.store.PermissionsStore;
 import com.github.onsdigital.zebedee.service.ServiceSupplier;
 import com.github.onsdigital.zebedee.session.model.Session;
+import com.github.onsdigital.zebedee.teams.model.Team;
+import com.github.onsdigital.zebedee.teams.service.TeamsService;
 import com.github.onsdigital.zebedee.user.model.User;
 import com.github.onsdigital.zebedee.user.model.UserList;
 import com.github.onsdigital.zebedee.user.service.UsersService;
@@ -18,14 +18,20 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -616,4 +622,114 @@ public class PermissionsServiceImplTest {
         verify(permissionsStore, times(1)).getAccessMapping();
         verifyZeroInteractions(teamsService);
     }
+
+    @Test
+    public void listCollectionsAccessibleByTeam_getAccessMappingError_shouldThrowEx() throws Exception {
+        when(permissionsStore.getAccessMapping())
+                .thenThrow(IOException.class);
+
+        Team t = mock(Team.class);
+        assertThrows(IOException.class, () -> permissions.listCollectionsAccessibleByTeam(t));
+    }
+
+    @Test
+    public void listCollectionsAccessibleByTeam_accessMappingNull_shouldThrowEx() throws Exception {
+        when(permissionsStore.getAccessMapping())
+                .thenReturn(null);
+
+        Team t = mock(Team.class);
+        IOException ex = assertThrows(IOException.class, () -> permissions.listCollectionsAccessibleByTeam(t));
+
+        assertThat(ex.getMessage(), equalTo("error reading accessMapping expected value but was null"));
+    }
+
+    @Test
+    public void listCollectionsAccessibleByTeam_collectionsNull_shouldReturnEmptySet() throws Exception {
+        when(accessMapping.getCollections())
+                .thenReturn(null);
+
+        when(permissionsStore.getAccessMapping())
+                .thenReturn(accessMapping);
+
+        Team t = mock(Team.class);
+        Set<String> actual = permissions.listCollectionsAccessibleByTeam(t);
+
+        assertThat(actual, is(notNullValue()));
+        assertTrue(actual.isEmpty());
+    }
+
+    @Test
+    public void listCollectionsAccessibleByTeam_collectionsEmpty_shouldReturnEmptySet() throws Exception {
+        when(accessMapping.getCollections())
+                .thenReturn(new HashMap<>());
+
+        when(permissionsStore.getAccessMapping())
+                .thenReturn(accessMapping);
+
+        Team t = mock(Team.class);
+        Set<String> actual = permissions.listCollectionsAccessibleByTeam(t);
+
+        assertThat(actual, is(notNullValue()));
+        assertTrue(actual.isEmpty());
+    }
+
+    @Test
+    public void listCollectionsAccessibleByTeam_teamNotAssignedToAnyCollection_shouldReturnEmptySet() throws Exception {
+        Map<String, Set<Integer>> collectionMapping = new HashMap<>();
+        collectionMapping.put("1234", new HashSet<Integer>() {{
+            add(1);
+            add(2);
+        }});
+        collectionMapping.put("5678", new HashSet<Integer>() {{
+            add(2);
+            add(3);
+        }});
+
+        when(accessMapping.getCollections())
+                .thenReturn(collectionMapping);
+
+        when(permissionsStore.getAccessMapping())
+                .thenReturn(accessMapping);
+
+        Team t = new Team();
+        t.setId(6);
+
+        Set<String> actual = permissions.listCollectionsAccessibleByTeam(t);
+
+        assertThat(actual, is(notNullValue()));
+        assertTrue(actual.isEmpty());
+    }
+
+    @Test
+    public void listCollectionsAccessibleByTeam_teamAssignedToCollections_shouldReturnCollectionIDs() throws Exception {
+        Map<String, Set<Integer>> collectionMapping = new HashMap<>();
+        collectionMapping.put("aaaa", new HashSet<Integer>() {{
+            add(1);
+            add(2);
+        }});
+        collectionMapping.put("bbbb", new HashSet<>());
+        collectionMapping.put("cccc", new HashSet<Integer>() {{
+            add(2);
+            add(3);
+        }});
+
+        when(accessMapping.getCollections())
+                .thenReturn(collectionMapping);
+
+        when(permissionsStore.getAccessMapping())
+                .thenReturn(accessMapping);
+
+        Team t = new Team();
+        t.setId(2);
+
+        Set<String> actual = permissions.listCollectionsAccessibleByTeam(t);
+
+        assertThat(actual, is(notNullValue()));
+        assertThat(actual.size(), equalTo(2));
+        assertTrue(actual.contains("aaaa"));
+        assertTrue(actual.contains("cccc"));
+
+    }
+
+
 }

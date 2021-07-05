@@ -54,7 +54,17 @@ public class NoOpCentralKeyring implements Keyring {
     }
 
     @Override
+    public void assignTo(User src, User target, CollectionDescription... assignments) throws KeyringException {
+        info().data("src", src.getEmail()).data("target", target.getEmail()).log("no-op assign keys to user");
+    }
+
+    @Override
     public void revokeFrom(User target, List<CollectionDescription> removals) throws KeyringException {
+        info().user(target.getEmail()).log("no-op revoke keys from user");
+    }
+
+    @Override
+    public void revokeFrom(User target, CollectionDescription... removals) throws KeyringException {
         info().user(target.getEmail()).log("no-op revoke keys from user");
     }
 }

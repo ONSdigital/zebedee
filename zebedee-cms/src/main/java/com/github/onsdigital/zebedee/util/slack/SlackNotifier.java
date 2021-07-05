@@ -66,8 +66,7 @@ public class SlackNotifier implements Notifier {
 
     @Override
     public boolean sendCollectionAlarm(Collection collection, String channel, String customMessage, Exception ex) {
-        boolean result = validate(collection, channel, customMessage, "alarm");
-        if (!result) {
+        if (!validate(collection, channel, customMessage, "alarm")) {
             return false;
         }
         if (isEmpty(ex.getMessage())) {
@@ -76,9 +75,7 @@ public class SlackNotifier implements Notifier {
         AttachmentField exField = new AttachmentField("exception", ex.getMessage(), false);
         PostMessage postMessage = createPostMessage(channel, customMessage)
                 .addAttachment(createCollectionAttachment("Alert", "Collection Alarm", Colour.DANGER, collection, exField));
-
-        boolean messageOutput = postMessageToSlack(postMessage);
-        if (!messageOutput) {
+        if (!postMessageToSlack(postMessage)) {
             return false;
         }
         return true;
@@ -86,14 +83,12 @@ public class SlackNotifier implements Notifier {
 
     @Override
     public boolean sendCollectionWarning(Collection collection, String channel, String customMessage, AttachmentField... fields) {
-        boolean result = validate(collection, channel, customMessage, "warning");
-        if (!result) {
+        if (!validate(collection, channel, customMessage, "warning")) {
             return false;
         }
         PostMessage postMessage = createPostMessage(channel, customMessage)
                 .addAttachment(createCollectionAttachment("Warning", "Collection Warning", Colour.WARNING, collection, fields));
-        boolean messageOutput = postMessageToSlack(postMessage);
-        if (!messageOutput) {
+        if (!postMessageToSlack(postMessage)) {
             return false;
         }
         return true;
@@ -101,14 +96,12 @@ public class SlackNotifier implements Notifier {
 
     @Override
     public boolean sendCollectionAlarm(Collection collection, String channel, String customMessage, AttachmentField... fields) {
-        boolean result = validate(collection, channel, customMessage, "alarm");
-        if (!result) {
+        if (!validate(collection, channel, customMessage, "alarm")) {
             return false;
         }
         PostMessage postMessage = createPostMessage(channel, customMessage)
                 .addAttachment(createCollectionAttachment("Alert", "Collection Alarm", Colour.DANGER, collection, fields));
-        boolean messageOutput = postMessageToSlack(postMessage);
-        if (!messageOutput) {
+        if (!postMessageToSlack(postMessage)) {
             return false;
         }
         return true;

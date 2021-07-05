@@ -81,7 +81,6 @@ import static com.github.onsdigital.zebedee.configuration.Configuration.getImage
 import static com.github.onsdigital.zebedee.configuration.Configuration.getKeyringInitVector;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getKeyringSecretKey;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getServiceAuthToken;
-import static com.github.onsdigital.zebedee.configuration.Configuration.getSessionsApiUrl;
 import static com.github.onsdigital.zebedee.configuration.Configuration.slackChannelsToNotfiyOnStartUp;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getCognitoKeyIdPairs;
 import static com.github.onsdigital.zebedee.permissions.store.PermissionsStoreFileSystemImpl.initialisePermissions;

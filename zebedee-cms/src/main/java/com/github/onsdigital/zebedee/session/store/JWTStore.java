@@ -16,7 +16,6 @@ import com.github.onsdigital.zebedee.user.model.User;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.session.service.Sessions;
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
-import com.github.onsdigital.session.service.error.SessionClientException;
 import com.github.onsdigital.zebedee.session.store.exceptions.SessionsStoreException;
 import com.github.onsdigital.zebedee.session.store.exceptions.SessionsDecodeException;
 import com.github.onsdigital.zebedee.session.store.exceptions.SessionsRequestException;

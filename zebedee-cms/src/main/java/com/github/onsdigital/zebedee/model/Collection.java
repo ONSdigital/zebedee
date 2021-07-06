@@ -1175,7 +1175,7 @@ public class Collection {
 
         String visualisationZipUri = contentPath.getParent().toString();
         if (visualisationZipUri == null || StringUtils.isEmpty(visualisationZipUri)){
-            info().data("zip", visualisationZipUri).log("unable to delete visualisation")
+            info().data("zip", visualisationZipUri).log("unable to delete visualisation");
             return false;
         }
         String dataJsonUri = resolveDataVizDataJsonURI(contentPath);

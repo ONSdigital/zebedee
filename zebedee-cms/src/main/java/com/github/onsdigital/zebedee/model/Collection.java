@@ -1173,7 +1173,7 @@ public class Collection {
             return false;
         }
 
-        String visualisationZipUri = contentPath.toString();
+        String visualisationZipUri = contentPath.getParent().toString();
         String dataJsonUri = resolveDataVizDataJsonURI(contentPath);
         boolean hasDeleted = false;
 

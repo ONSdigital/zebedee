@@ -186,11 +186,11 @@
             <version>0.1.0</version>
         </dependency>
 
-      <dependency>
-        <groupId>com.github.onsdigital</groupId>
-        <artifactId>dp-jwt-verifier-java</artifactId>
-        <version>0.1.2</version>
-      </dependency>
+        <dependency>
+            <groupId>com.github.onsdigital</groupId>
+            <artifactId>dp-jwt-verifier-java</artifactId>
+            <version>0.1.2</version>
+        </dependency>
 
     </dependencies>
 

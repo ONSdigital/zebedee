@@ -2,14 +2,15 @@ package com.github.onsdigital.zebedee.session.store;
 
 import java.util.Map;
 import java.util.Base64;
-import com.google.gson.*;
+import com.google.gson.Gson;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import com.google.common.reflect.TypeToken;
-import com.github.onsdigital.exceptions.*;
+import com.github.onsdigital.exceptions.JWTDecodeException;
+import com.github.onsdigital.exceptions.JWTTokenExpiredException;
+import com.github.onsdigital.exceptions.JWTVerificationException;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
-import com.github.onsdigital.JWTHandlerImpl;
 import com.github.onsdigital.impl.UserDataPayload;
 import com.github.onsdigital.interfaces.JWTHandler;
 import com.github.onsdigital.zebedee.user.model.User;
@@ -22,6 +23,7 @@ import com.github.onsdigital.zebedee.session.store.exceptions.SessionsRequestExc
 import com.github.onsdigital.zebedee.session.store.exceptions.SessionsTokenExpiredException;
 import com.github.onsdigital.zebedee.session.store.exceptions.SessionsVerificationException;
 
+
 /**
  * JWTStore:  class, when instantiated, will
  * *********  allow for access token verification,
@@ -32,9 +34,11 @@ import com.github.onsdigital.zebedee.session.store.exceptions.SessionsVerificati
  */
 public class JWTStore implements Sessions {
 
-    private JWTHandler jwtHandler = new JWTHandlerImpl();
+    private JWTHandler jwtHandler;
 
     private Map<String, String> rsaKeyMap;
+
+    private Gson gson;
 
     private static ThreadLocal<UserDataPayload> store = new ThreadLocal<>();
 
@@ -42,14 +46,17 @@ public class JWTStore implements Sessions {
 
     public final String ACCESS_TOKEN_REQUIRED_ERROR = "Access Token required but none provided.";
     public final String ACCESS_TOKEN_EXPIRED_ERROR  = "JWT verification failed as token is expired.";
-    private static final String GET_STRING_ID_NOOP  = "Session get(String id) - no-Op.";
-    private static final String GET_REQUEST_ID_NOOP = "Session get(HttpServletRequest id) - no-Op.";
     public final String TOKEN_NOT_VALID_ERROR       = "Token format not valid.";
     public final String TOKEN_NULL_ERROR            = "Token cannot be null.";
 
+    private static final String GET_STRING_ID_NOOP  = "Session get(String id) - no-Op.";
+    private static final String GET_REQUEST_ID_NOOP = "Session get(HttpServletRequest id) - no-Op.";
+
     // class constructor - takes HashMap<String, String> as param.
-    public JWTStore(Map<String, String> rsaKeyMap) {
-        this.rsaKeyMap = rsaKeyMap;
+    public JWTStore(JWTHandler jwtHandler, Map<String, String> rsaKeyMap) {
+        this.jwtHandler = jwtHandler;
+        this.rsaKeyMap  = rsaKeyMap;
+        this.gson       = new Gson();
     }
 
     /**
@@ -106,12 +113,15 @@ public class JWTStore implements Sessions {
      * Get a {@link Session} session object from thread local.
      *  
      * @param none.
-     * @return session object from thread local.
+     * @return session object from containg datae from thread local.
      * @throws IOException for any problem getting a session from the request.
      */
     @Override
-    public ThreadLocal<UserDataPayload> get() throws IOException {
-        return store;
+    public Session get() throws IOException {
+        Session session = new Session();
+        session.setEmail(store.get().getEmail());
+        session.setGroups(store.get().getGroups());
+        return session;
     }
 
     /**
@@ -158,7 +168,7 @@ public class JWTStore implements Sessions {
             StandardCharsets.UTF_8
         );
 
-        Map<String, String> decodedResult = new Gson().fromJson(
+        Map<String, String> decodedResult = this.gson.fromJson(
             headerDecoded,
             new TypeToken<Map<String, String>>(){}.getType()
         );

@@ -22,8 +22,6 @@ import java.util.function.Supplier;
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.warn;
 
-import com.github.onsdigital.impl.UserDataPayload;
-
 /**
  * Created by david on 12/03/2015.
  */
@@ -200,7 +198,7 @@ public class SessionsServiceImpl extends TimerTask implements Sessions {
      * @throws IOException for any problem getting a session from the request.
      */
     @Override
-    public ThreadLocal<UserDataPayload> get() throws IOException {
+    public Session get() throws IOException {
         info().log("Session get() - no-Op.");
         return null;
     }

@@ -16,6 +16,11 @@ import static org.junit.Assert.assertThrows;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.CoreMatchers.notNullValue;
 
+import com.github.onsdigital.JWTHandlerImpl;
+import com.github.onsdigital.interfaces.JWTHandler;
+
+import com.github.onsdigital.zebedee.session.model.Session;
+
 import com.github.onsdigital.zebedee.session.store.exceptions.SessionsRequestException;
 import com.github.onsdigital.zebedee.session.store.exceptions.SessionsDecodeException;
 import com.github.onsdigital.zebedee.session.store.exceptions.SessionsTokenExpiredException;
@@ -57,6 +62,8 @@ public class JWTStoreTest {
 
     private Map<String, String> rsaKeyMap = new HashMap<String, String>();
 
+    private JWTHandler jwtHandler = new JWTHandlerImpl();
+
     @Mock
     private UserDataPayload userDataPayload;
 
@@ -67,21 +74,20 @@ public class JWTStoreTest {
         rsaKeyMap.put(RSA_KEY_ID_1, RSA_SIGNING_KEY_1);
         rsaKeyMap.put(RSA_KEY_ID_2, RSA_SIGNING_KEY_2);
 
-        this.jwtStore = new JWTStore(rsaKeyMap);
+        this.jwtStore = new JWTStore(jwtHandler, rsaKeyMap);
     }
 
     @Test
     public void decodeVerifyAndStoreAccessTokenData() throws Exception {
         this.jwtStore.set(SIGNED_TOKEN);
-        ThreadLocal<UserDataPayload> tokenData = this.jwtStore.get();
-        UserDataPayload localPayLoad = tokenData.get();
-        Arrays.sort(localPayLoad.getGroups());
-        assertThat(localPayLoad, is(notNullValue()));
-        assertThat(localPayLoad.getEmail(), is("\"janedoe@example.com\""));
-        assertThat(localPayLoad.getGroups()[0], is("admin"));
-        assertThat(localPayLoad.getGroups()[1], is("data"));
-        assertThat(localPayLoad.getGroups()[2], is("publishing"));
-        assertThat(localPayLoad.getGroups()[3], is("test"));
+        Session session = this.jwtStore.get();
+        Arrays.sort(session.getGroups());
+        assertThat(session, is(notNullValue()));
+        assertThat(session.getEmail(), is("\"janedoe@example.com\""));
+        assertThat(session.getGroups()[0], is("admin"));
+        assertThat(session.getGroups()[1], is("data"));
+        assertThat(session.getGroups()[2], is("publishing"));
+        assertThat(session.getGroups()[3], is("test"));
     }   
 
     @Test

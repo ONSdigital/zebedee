@@ -1169,13 +1169,13 @@ public class Collection {
     }
 
     public boolean deleteDataVisContent(Session session, Path contentPath) throws IOException {
-        if (contentPath == null || StringUtils.isEmpty(contentPath.toString())) {
+        if (StringUtils.isEmpty(contentPath.toString())) {
             return false;
         }
 
         String visualisationZipUri = contentPath.getParent().toString();
-        if (visualisationZipUri == null || StringUtils.isEmpty(visualisationZipUri)){
-            info().data("zip", visualisationZipUri).log("unable to delete visualisation");
+        if (StringUtils.isEmpty(visualisationZipUri)){
+            info().data("zip", visualisationZipUri).log("unable to delete visualisation. Path provided was null/empty");
             return false;
         }
         String dataJsonUri = resolveDataVizDataJsonURI(contentPath);

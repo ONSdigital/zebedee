@@ -206,12 +206,12 @@ public class SessionsServiceImpl extends TimerTask implements Sessions {
     /**
      * Get a {@link Session} session object from thread local.
      *
-     * @param token/kid - the access token to be decoded, verified and stored and key id.
+     * @param token - the access token to be decoded, verified and stored.
      * @throws IOException for any problem verifying a token or storing a session in threadlocal.
      */
     @Override
-    public void set(String token, String kid) throws IOException {
-        info().log("Session set(String token, String kid) - no-Op.");
+    public void set(String token) throws IOException {
+        info().log("Session set(String token) - no-Op.");
     }
 
     /**

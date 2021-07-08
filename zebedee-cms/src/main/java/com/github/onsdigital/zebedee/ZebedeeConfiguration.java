@@ -52,7 +52,8 @@ import com.github.onsdigital.zebedee.util.versioning.VersionsServiceImpl;
 import com.github.onsdigital.zebedee.verification.VerificationAgent;
 import dp.api.dataset.DatasetAPIClient;
 import dp.api.dataset.DatasetClient;
-
+import com.github.onsdigital.JWTHandlerImpl;
+import com.github.onsdigital.interfaces.JWTHandler;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
@@ -168,7 +169,8 @@ public class ZebedeeConfiguration {
 
         // Configure the sessions
         if (cmsFeatureFlags().isJwtSessionsEnabled()) {
-            this.sessions = new JWTStore(getCognitoKeyIdPairs());
+            JWTHandler jwtHandler = new JWTHandlerImpl();
+            this.sessions = new JWTStore(jwtHandler, getCognitoKeyIdPairs());
         } else {
             this.sessions = new SessionsServiceImpl(sessionsPath);
         }

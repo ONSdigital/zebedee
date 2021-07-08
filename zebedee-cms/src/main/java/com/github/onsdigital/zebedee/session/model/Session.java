@@ -30,6 +30,8 @@ public class Session {
      */
     private Date lastAccess = new Date();
 
+    private String[] groups;
+
     /**
      * Construct a new empty session.
      */
@@ -68,6 +70,10 @@ public class Session {
         return lastAccess;
     }
 
+    public String[] getGroups() {
+        return this.groups;
+    }
+
     public void setId(String id) {
 
         this.id = id;
@@ -83,6 +89,10 @@ public class Session {
 
     public void setLastAccess(Date lastAccess) {
         this.lastAccess = lastAccess;
+    }
+
+    public void setGroups(String[] groups) {
+        this.groups = groups;
     }
 
     @Override

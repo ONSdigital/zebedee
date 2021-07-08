@@ -19,6 +19,7 @@ import com.github.onsdigital.zebedee.api.cmd.UserInstancePermissions;
 import com.github.onsdigital.zebedee.search.api.endpoint.ReIndex;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.google.common.collect.ImmutableList;
+
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.http.HttpStatus;
 
@@ -26,7 +27,28 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+import com.github.onsdigital.zebedee.session.store.exceptions.SessionsStoreException;
+
+import com.github.onsdigital.zebedee.session.service.Sessions;
+
+import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
+
 public class AuthenticationFilter implements PreFilter {
+
+    private Sessions sessions;
+
+    public String NO_AUTH_HEADER_FOUND = "No authorisation header found. Exiting...";
+
+    private boolean jwtSessionsEnabled = false;
+
+    public AuthenticationFilter() {
+        this(cmsFeatureFlags().isJwtSessionsEnabled(), Root.zebedee.getSessions());
+    }
+
+    public AuthenticationFilter(Boolean jwtSessionsEnabled, Sessions sessions) {
+        this.jwtSessionsEnabled = jwtSessionsEnabled;
+        this.sessions = sessions;
+    }
 
     /**
      * Endpoints that do not require authorisation.
@@ -66,33 +88,62 @@ public class AuthenticationFilter implements PreFilter {
             return true;
         }
 
-        // Pass through without authentication for login requests:
-        // Password requests check
         Path path = Path.newInstance(request);
+    
         if (noAuthorisationRequired(path)) {
             return true;
         }
 
         // Check all other requests:
         boolean result = false;
-        try {
-            Session session = Root.zebedee.getSessions().get(request);
-
-            if (session == null) {
-                forbidden(response);
-            } else {
-                result = true;
+        if (jwtSessionsEnabled) {
+            try {
+                //ensure that authorisation header present
+                if (request.getHeader("Authorization") == null) {
+                    badRequest(response, NO_AUTH_HEADER_FOUND);
+                } else {
+                    try {
+                        sessions.set(request.getHeader("Authorization"));   
+                        result = true;
+                    } catch (SessionsStoreException e) {
+                        accessTokenError(response, e.getMessage());
+                    }
+                }
+            } catch (IOException e) {
+                error(response);
             }
-        } catch (IOException e) {
-            error(response);
+        } else {
+            try {
+                Session session = sessions.get(request);
+    
+                if (session == null) {
+                    forbidden(response);
+                } else {
+                    result = true;
+                }
+            } catch (IOException e) {
+                error(response);
+            }
         }
         return result;
+    }
+
+    private void badRequest(HttpServletResponse response, String errorMessage) throws IOException {
+        response.setContentType("application/json");
+        response.setStatus(HttpStatus.BAD_REQUEST_400);
+        Serialiser.serialise(response, errorMessage);
     }
 
     private void forbidden(HttpServletResponse response) throws IOException {
         response.setContentType("application/json");
         response.setStatus(HttpStatus.UNAUTHORIZED_401);
         Serialiser.serialise(response, "Please log in");
+    }
+
+    private void accessTokenError(HttpServletResponse response, String errorMessage) throws IOException {
+        response.setContentType("application/json");
+        response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR_500);
+        Serialiser.serialise(response, errorMessage);
     }
 
     private void error(HttpServletResponse response) {

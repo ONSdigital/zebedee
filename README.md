@@ -107,6 +107,13 @@ _Congratulations_ :tada:! Advanced to GO collect £200 :dollar:
 
 Otherwise :violin: kindly ask someone from the dev team to help troubleshoot.
 
+### Optional configuration options
+
+| Environment variable          | Default   | Description
+| ----------------------------- | --------- | -----------
+| ENABLE_KAFKA                  | false     | Feature flag to send kafka messages when a collection is published
+| KAFKA_ADDR                    | localhost:9092 | Comma seperated list of kafka brokers
+| KAFKA_CONTENT_PUBLISHED_TOPIC | content-published | Kafka topic to send content-published messages to
 
 ***
 ### :spider: :spider: :spider: :spider:

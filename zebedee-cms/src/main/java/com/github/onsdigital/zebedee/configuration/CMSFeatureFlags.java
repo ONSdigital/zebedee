@@ -18,6 +18,7 @@ public class CMSFeatureFlags {
     private static final String ENABLE_CENTRALISED_KEYRING = "ENABLE_CENTRALISED_KEYRING";
     private static final String ENABLE_IMAGE_PUBLISHING = "ENABLE_IMAGE_PUBLISHING";
     private static final String ENABLE_JWT_SESSIONS = "ENABLE_JWT_SESSIONS";
+    private static final String ENABLE_KAFKA = "ENABLE_KAFKA";
 
     /**
      * Singleton instance
@@ -40,6 +41,8 @@ public class CMSFeatureFlags {
 
     private final boolean isJwtSessionsEnabled;
 
+    private final boolean isKafkaEnabled;
+
     /**
      * Construct a new feature flags instance.
      */
@@ -52,6 +55,7 @@ public class CMSFeatureFlags {
         this.isCentralisedKeyringEnabled = Boolean.valueOf(getConfigValue(ENABLE_CENTRALISED_KEYRING));
         this.isImagePublishingEnabled = Boolean.valueOf(getConfigValue(ENABLE_IMAGE_PUBLISHING));
         this.isJwtSessionsEnabled = Boolean.valueOf(getConfigValue(ENABLE_JWT_SESSIONS));
+        this.isKafkaEnabled = Boolean.valueOf(getConfigValue(ENABLE_KAFKA));
 
         info().data(ENABLE_DATASET_IMPORT, isDatasetImportEnabled)
                 .data(ENABLE_PERMISSIONS_AUTH, isPermissionsAuthEnabled)
@@ -114,6 +118,8 @@ public class CMSFeatureFlags {
     public boolean isJwtSessionsEnabled() {
         return isJwtSessionsEnabled;
     }
+
+    public boolean isKafkaEnabled() { return isKafkaEnabled; }
 
     public static String getConfigValue(String name) {
         String value = System.getProperty(name);

@@ -1,17 +1,16 @@
 package com.github.onsdigital.zebedee;
 
+import com.github.onsdigital.JWTHandlerImpl;
 import com.github.onsdigital.dp.image.api.client.ImageAPIClient;
 import com.github.onsdigital.dp.image.api.client.ImageClient;
+import com.github.onsdigital.interfaces.JWTHandler;
 import com.github.onsdigital.slack.Profile;
 import com.github.onsdigital.slack.client.SlackClient;
 import com.github.onsdigital.slack.client.SlackClientImpl;
 import com.github.onsdigital.zebedee.data.processing.DataIndex;
-import com.github.onsdigital.zebedee.keyring.CentralKeyringImpl;
-import com.github.onsdigital.zebedee.keyring.Keyring;
-import com.github.onsdigital.zebedee.keyring.KeyringException;
-import com.github.onsdigital.zebedee.keyring.KeyringMigratorImpl;
-import com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl;
-import com.github.onsdigital.zebedee.keyring.NoOpCentralKeyring;
+import com.github.onsdigital.zebedee.kafka.KafkaClient;
+import com.github.onsdigital.zebedee.kafka.KafkaClientImpl;
+import com.github.onsdigital.zebedee.keyring.*;
 import com.github.onsdigital.zebedee.keyring.cache.KeyringCache;
 import com.github.onsdigital.zebedee.keyring.cache.KeyringCacheImpl;
 import com.github.onsdigital.zebedee.keyring.cache.LegacySchedulerKeyCache;
@@ -30,11 +29,7 @@ import com.github.onsdigital.zebedee.permissions.service.PermissionsServiceImpl;
 import com.github.onsdigital.zebedee.permissions.store.PermissionsStore;
 import com.github.onsdigital.zebedee.permissions.store.PermissionsStoreFileSystemImpl;
 import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
-import com.github.onsdigital.zebedee.service.DatasetService;
-import com.github.onsdigital.zebedee.service.ImageService;
-import com.github.onsdigital.zebedee.service.ImageServiceImpl;
-import com.github.onsdigital.zebedee.service.ServiceStoreImpl;
-import com.github.onsdigital.zebedee.service.ZebedeeDatasetService;
+import com.github.onsdigital.zebedee.service.*;
 import com.github.onsdigital.zebedee.session.service.Sessions;
 import com.github.onsdigital.zebedee.session.service.SessionsServiceImpl;
 import com.github.onsdigital.zebedee.session.store.JWTStore;
@@ -52,8 +47,7 @@ import com.github.onsdigital.zebedee.util.versioning.VersionsServiceImpl;
 import com.github.onsdigital.zebedee.verification.VerificationAgent;
 import dp.api.dataset.DatasetAPIClient;
 import dp.api.dataset.DatasetClient;
-import com.github.onsdigital.JWTHandlerImpl;
-import com.github.onsdigital.interfaces.JWTHandler;
+
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
@@ -61,30 +55,10 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.function.Supplier;
 
-import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
-import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
-import static com.github.onsdigital.logging.v2.event.SimpleEvent.warn;
-import static com.github.onsdigital.zebedee.Zebedee.APPLICATION_KEYS;
-import static com.github.onsdigital.zebedee.Zebedee.COLLECTIONS;
-import static com.github.onsdigital.zebedee.Zebedee.KEYRING;
-import static com.github.onsdigital.zebedee.Zebedee.PERMISSIONS;
-import static com.github.onsdigital.zebedee.Zebedee.PUBLISHED;
-import static com.github.onsdigital.zebedee.Zebedee.PUBLISHED_COLLECTIONS;
-import static com.github.onsdigital.zebedee.Zebedee.SERVICES;
-import static com.github.onsdigital.zebedee.Zebedee.SESSIONS;
-import static com.github.onsdigital.zebedee.Zebedee.TEAMS;
-import static com.github.onsdigital.zebedee.Zebedee.USERS;
-import static com.github.onsdigital.zebedee.Zebedee.ZEBEDEE;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.*;
+import static com.github.onsdigital.zebedee.Zebedee.*;
 import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
-import static com.github.onsdigital.zebedee.configuration.Configuration.getDatasetAPIAuthToken;
-import static com.github.onsdigital.zebedee.configuration.Configuration.getDatasetAPIURL;
-import static com.github.onsdigital.zebedee.configuration.Configuration.getImageAPIURL;
-import static com.github.onsdigital.zebedee.configuration.Configuration.getKeyringInitVector;
-import static com.github.onsdigital.zebedee.configuration.Configuration.getKeyringSecretKey;
-import static com.github.onsdigital.zebedee.configuration.Configuration.getServiceAuthToken;
-import static com.github.onsdigital.zebedee.configuration.Configuration.getSessionsApiUrl;
-import static com.github.onsdigital.zebedee.configuration.Configuration.slackChannelsToNotfiyOnStartUp;
-import static com.github.onsdigital.zebedee.configuration.Configuration.getCognitoKeyIdPairs;
+import static com.github.onsdigital.zebedee.configuration.Configuration.*;
 import static com.github.onsdigital.zebedee.permissions.store.PermissionsStoreFileSystemImpl.initialisePermissions;
 
 /**
@@ -120,6 +94,7 @@ public class ZebedeeConfiguration {
     private PermissionsStore permissionsStore;
     private DatasetService datasetService;
     private ImageService imageService;
+    private KafkaService kafkaService;
     private Keyring collectionKeyring;
     private SchedulerKeyCache schedulerKeyCache;
     private EncryptionKeyFactory encryptionKeyFactory;
@@ -233,6 +208,13 @@ public class ZebedeeConfiguration {
         }
 
         imageService = new ImageServiceImpl(imageClient);
+
+        if (cmsFeatureFlags().isKafkaEnabled()) {
+            KafkaClient kafkaClient = new KafkaClientImpl(getKafkaURL(), getKafkaContentPublishedTopic());
+            kafkaService = new KafkaServiceImpl(kafkaClient);
+        } else {
+            kafkaService = (String c, List<String> u) -> {return;}; // 'Do nothing' kafka service
+        }
 
         this.startUpAlerter = initStartUpAlerter();
 
@@ -410,6 +392,8 @@ public class ZebedeeConfiguration {
     public ImageService getImageService() {
         return imageService;
     }
+
+    public KafkaService getKafkaService() { return kafkaService; }
 
     public ServiceStoreImpl getServiceStore() {
         return new ServiceStoreImpl(servicePath);

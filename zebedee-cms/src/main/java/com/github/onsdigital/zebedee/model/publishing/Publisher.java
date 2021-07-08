@@ -18,10 +18,7 @@ import com.github.onsdigital.zebedee.model.publishing.verify.HashVerifier;
 import com.github.onsdigital.zebedee.model.publishing.verify.HashVerifierImpl;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.Resource;
-import com.github.onsdigital.zebedee.service.DatasetService;
-import com.github.onsdigital.zebedee.service.ImageService;
-import com.github.onsdigital.zebedee.service.ImageServicePublishingResult;
-import com.github.onsdigital.zebedee.service.ServiceSupplier;
+import com.github.onsdigital.zebedee.service.*;
 import com.github.onsdigital.zebedee.util.Http;
 import com.github.onsdigital.zebedee.util.SlackNotification;
 import com.github.onsdigital.zebedee.util.ZebedeeCmsService;
@@ -82,6 +79,7 @@ public class Publisher {
 
     private static ServiceSupplier<DatasetService> datasetServiceSupplier;
     private static ServiceSupplier<ImageService> imageServiceSupplier;
+    private static ServiceSupplier<KafkaService> kafkaServiceSupplier;
 
     static {
         theTrainHosts = Configuration.getTheTrainHosts();
@@ -90,6 +88,7 @@ public class Publisher {
         // lazy loaded approach for getting the datasetService.
         datasetServiceSupplier = () -> ZebedeeCmsService.getInstance().getDatasetService();
         imageServiceSupplier = () -> ZebedeeCmsService.getInstance().getImageService();
+        kafkaServiceSupplier = () -> ZebedeeCmsService.getInstance().getKafkaService();
     }
 
     /**
@@ -146,6 +145,17 @@ public class Publisher {
                 PostMessageField msg = new PostMessageField("Error", e.getMessage(), false);
                 collectionAlarm(collection, "Exception publishing images via image API", msg);
                 success = false;
+            }
+        }
+
+        if (CMSFeatureFlags.cmsFeatureFlags().isKafkaEnabled()) {
+            try {
+                sendToKafka(collection);
+            } catch (Exception e) {
+                error().data("collectionId", collection.getDescription().getId()).data("publishing", true)
+                        .logException(e, "failed to send content-published kafka events");
+                PostMessageField msg = new PostMessageField("Error", e.getMessage(), false);
+                collectionAlarm(collection, "Failed to send content-published kafka events", msg);
             }
         }
 
@@ -745,6 +755,11 @@ public class Publisher {
             ImageServicePublishingResult result = imageServiceSupplier.getService().publishImagesInCollection(collection);
             return result;  // Complete
         });
+    }
+
+    private static void sendToKafka(Collection collection) throws IOException {
+        List<String> uris = collection.getReviewed().uris();
+        kafkaServiceSupplier.getService().produceContentPublished(collection.getId(), uris);
     }
 
     private static void saveCollection(Collection collection, boolean publishComplete) {

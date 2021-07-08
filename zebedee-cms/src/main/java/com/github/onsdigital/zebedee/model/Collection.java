@@ -1173,9 +1173,10 @@ public class Collection {
             return false;
         }
 
-        String visualisationZipUri = contentPath.getParent().toString();
-        if (StringUtils.isEmpty(visualisationZipUri)){
-            info().data("zip", visualisationZipUri).log("unable to delete visualisation. Path provided was null/empty");
+        String visualisationZipUri = contentPath.toString();
+        String visualisationZipUriParent = contentPath.getParent().toString();
+        if (StringUtils.isEmpty(visualisationZipUriParent)){
+            info().data("zip", visualisationZipUriParent).log("unable to delete visualisation. Path provided was null/empty");
             return false;
         }
         String dataJsonUri = resolveDataVizDataJsonURI(contentPath);
@@ -1186,7 +1187,7 @@ public class Collection {
                 info().data("zip", visualisationZipUri).data("user", session.getEmail()).data("collectionId", this.description.getId())
                         .log("removing data viz zip from collection directory");
 
-                FileUtils.deleteDirectory(Paths.get(collectionDir.getPath().toString() + visualisationZipUri).toFile());
+                FileUtils.deleteDirectory(Paths.get(collectionDir.getPath().toString() + visualisationZipUriParent).toFile());
                 hasDeleted = true;
             }
         }

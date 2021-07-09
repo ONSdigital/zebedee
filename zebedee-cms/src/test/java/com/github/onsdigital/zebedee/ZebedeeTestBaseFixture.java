@@ -1,5 +1,7 @@
 package com.github.onsdigital.zebedee;
 
+import com.github.onsdigital.slack.Profile;
+import com.github.onsdigital.slack.client.SlackClient;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.Credentials;
 import com.github.onsdigital.zebedee.keyring.Keyring;
@@ -61,6 +63,12 @@ public abstract class ZebedeeTestBaseFixture {
 
     @Mock
     protected ZebedeeConfiguration zebCfg;
+
+    @Mock
+    protected SlackClient slackClient;
+
+    @Mock
+    protected Profile slackProfile;
 
     @Mock
     protected Sessions sessions;
@@ -195,6 +203,12 @@ public abstract class ZebedeeTestBaseFixture {
 
         when(zebCfg.getPermissionsService())
                 .thenReturn(permissionsService);
+
+        when(zebCfg.getSlackClient())
+                .thenReturn(slackClient);
+
+        when(slackClient.getProfile())
+                .thenReturn(slackProfile);
     }
 
     protected void verifyKeyAddedToCollectionKeyring() throws Exception {

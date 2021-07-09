@@ -5,15 +5,18 @@ import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.CollectionType;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.Collections;
+import com.github.onsdigital.zebedee.util.slack.AttachmentField;
 import com.github.onsdigital.zebedee.util.slack.Notifier;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -65,7 +68,7 @@ public class RootTest {
         Root.alertOnInProgressCollections(collections, notifier);
 
         // Then no notifications are sent
-        verify(notifier, never()).collectionAlarm(any(), anyString());
+        verify(notifier, never()).sendCollectionAlarm(any(), anyString(),anyString(),any(AttachmentField.class));
     }
 
     @Test
@@ -79,7 +82,7 @@ public class RootTest {
         Root.alertOnInProgressCollections(collections, notifier);
 
         // Then no notifications are sent
-        verify(notifier, never()).collectionAlarm(any(), anyString());
+        verify(notifier, never()).sendCollectionAlarm(any(), anyString(),anyString(),any(AttachmentField.class));
     }
 
     @Test
@@ -94,7 +97,7 @@ public class RootTest {
         Root.alertOnInProgressCollections(collections, notifier);
 
         // Then a notification is sent for the in progress collection
-        verify(notifier, times(1)).collectionAlarm(inProgressCollection, EXPECTED_MESSAGE);
+        verify(notifier, times(1)).sendCollectionAlarm(eq(inProgressCollection),eq("slack-client-test"),eq(EXPECTED_MESSAGE), any(AttachmentField.class));
     }
 
     @Test
@@ -109,7 +112,8 @@ public class RootTest {
         Root.alertOnInProgressCollections(collections, notifier);
 
         // Then a notification is sent for the errored collection
-        verify(notifier, times(1)).collectionAlarm(erroredCollection, EXPECTED_MESSAGE);
+        verify(notifier, times(1)).sendCollectionAlarm(eq(erroredCollection), eq("slack-client-test"),eq(EXPECTED_MESSAGE), any(AttachmentField.class));
+
     }
 
     @Test
@@ -125,10 +129,10 @@ public class RootTest {
         Root.alertOnInProgressCollections(collections, notifier);
 
         // Then a notification is sent for the errored collection
-        verify(notifier, times(1)).collectionAlarm(erroredCollection, EXPECTED_MESSAGE);
+        verify(notifier, times(1)).sendCollectionAlarm(eq(erroredCollection), eq("slack-client-test"),eq(EXPECTED_MESSAGE), any(AttachmentField.class));
 
         // Then a notification is sent for the in progress collection
-        verify(notifier, times(1)).collectionAlarm(inProgressCollection, EXPECTED_MESSAGE);
+        verify(notifier, times(1)).sendCollectionAlarm(eq(inProgressCollection),eq("slack-client-test"),eq(EXPECTED_MESSAGE), any(AttachmentField.class));
     }
 
     @Test
@@ -146,10 +150,11 @@ public class RootTest {
         // When the alertOnInProgressCollections function is called
         Root.alertOnInProgressCollections(collections, notifier);
 
+        AttachmentField a = null;
         // Then notifications is sent for each errored collection
-        verify(notifier, times(2)).collectionAlarm(erroredCollection, EXPECTED_MESSAGE);
+        verify(notifier, times(2)).sendCollectionAlarm(eq(erroredCollection), eq("slack-client-test"),eq(EXPECTED_MESSAGE), any(AttachmentField.class));
 
         // Then notifications are sent for each in progress collection
-        verify(notifier, times(2)).collectionAlarm(inProgressCollection, EXPECTED_MESSAGE);
+        verify(notifier, times(2)).sendCollectionAlarm(eq(inProgressCollection),eq("slack-client-test"),eq(EXPECTED_MESSAGE), any(AttachmentField.class));
     }
 }

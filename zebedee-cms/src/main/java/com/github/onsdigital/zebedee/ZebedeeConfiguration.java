@@ -232,6 +232,12 @@ public class ZebedeeConfiguration {
 
         imageService = new ImageServiceImpl(imageClient);
 
+        this.slackClient = new SlackClientImpl(new Profile.Builder()
+                .emoji(":flo:")
+                .username("Florence")
+                .authToken(System.getenv("slack_api_token"))
+                .create());
+
         this.startUpAlerter = initStartUpAlerter();
 
         info().data("root_path", rootPath.toString())
@@ -279,12 +285,6 @@ public class ZebedeeConfiguration {
             warn().log("startUpNotificationRecipients was null or empty NoOpStartUpAlerter will be initialized.");
             return new NoOpStartUpAlerter();
         }
-
-        this.slackClient = new SlackClientImpl(new Profile.Builder()
-                .emoji(":flo:")
-                .username("Florence")
-                .authToken(System.getenv("slack_api_token"))
-                .create());
         return new StartUpAlerterImpl(slackClient, slackChannelsToNotfiyOnStartUp());
     }
 

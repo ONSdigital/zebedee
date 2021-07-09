@@ -1,11 +1,11 @@
 package com.github.onsdigital.zebedee.model;
 
-import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.util.EncryptionUtils;
 import com.github.onsdigital.zebedee.util.slack.AttachmentField;
+import com.github.onsdigital.zebedee.util.slack.Notifier;
 import org.apache.commons.io.FileUtils;
 
 import javax.crypto.SecretKey;
@@ -21,16 +21,18 @@ import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 public class CollectionContentWriter extends ContentWriter {
     private Collection collection;
     private SecretKey key;
+    private Notifier notifier;
 
     /**
      * Create a new instance of ContentWriter to write content from the given root folder.
      *
      * @param rootFolder
      */
-    public CollectionContentWriter(Collection collection, SecretKey key, Path rootFolder) throws IOException, UnauthorizedException {
+    public CollectionContentWriter(Collection collection, SecretKey key, Path rootFolder, Notifier notifier) throws IOException, UnauthorizedException {
         super(rootFolder);
         this.collection = collection;
         this.key = key;
+        this.notifier = notifier;
     }
 
     @Override
@@ -43,7 +45,8 @@ public class CollectionContentWriter extends ContentWriter {
 
             String channel = Configuration.getDefaultSlackAlarmChannel();
             AttachmentField uriField = new AttachmentField("uri", uri, false);
-            Root.zebedee.getSlackNotifier().sendCollectionWarning(collection, channel, "Writing unencrypted content in collection", uriField);
+
+            notifier.sendCollectionWarning(collection, channel, "Writing unencrypted content in collection", uriField);
 
             info().data("uri", uri).data("collectionId", collection.getDescription().getId()).log("Writing unencrypted content in collection");
 

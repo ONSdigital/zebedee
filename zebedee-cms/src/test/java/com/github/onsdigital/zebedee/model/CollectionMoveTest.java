@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee.model;
 
 import com.github.davidcarboni.cryptolite.Keys;
+import com.github.onsdigital.slack.client.SlackClient;
 import com.github.onsdigital.zebedee.ZebedeeTestBaseFixture;
 import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.content.page.base.PageDescription;
@@ -13,6 +14,7 @@ import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.keyring.Keyring;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.user.model.User;
+import com.github.onsdigital.zebedee.util.slack.SlackNotifier;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -42,6 +44,12 @@ public class CollectionMoveTest extends ZebedeeTestBaseFixture {
 
     @Mock
     private User user;
+
+    @Mock
+    private SlackClient slackClient;
+
+    @Mock
+    private SlackNotifier slackNotifier;
 
     Collection collection;
     Article martin;
@@ -120,6 +128,7 @@ public class CollectionMoveTest extends ZebedeeTestBaseFixture {
     public void shouldChangeSubReferencesInFileOnMoveContent() throws URISyntaxException, IOException, ZebedeeException {
         // Given
         // an item of content that references a sub page
+
         martin.getRelatedArticles().add(new Link(new URI("/places/bedford/central")));
         savePages();
 

@@ -1,6 +1,5 @@
 package com.github.onsdigital.zebedee.model.approval;
 
-import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.data.DataPublisher;
 import com.github.onsdigital.zebedee.data.importing.CsvTimeseriesUpdateImporter;
@@ -28,6 +27,7 @@ import com.github.onsdigital.zebedee.service.BabbagePdfService;
 import com.github.onsdigital.zebedee.service.content.navigation.ContentTreeNavigator;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.util.ContentDetailUtil;
+import com.github.onsdigital.zebedee.util.slack.Notifier;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
@@ -56,6 +56,7 @@ public class ApproveTask implements Callable<Boolean> {
     private final ContentReader publishedReader;
     private final DataIndex dataIndex;
     private final ContentDetailResolver contentDetailResolver;
+    private final Notifier notifier;
 
     /**
      * @param collection
@@ -66,9 +67,9 @@ public class ApproveTask implements Callable<Boolean> {
      * @param dataIndex
      */
     public ApproveTask(Collection collection, Session session, CollectionReader collectionReader,
-                       CollectionWriter collectionWriter, ContentReader publishedReader, DataIndex dataIndex) {
+                       CollectionWriter collectionWriter, ContentReader publishedReader, DataIndex dataIndex, Notifier notifier) {
         this(collection, session, collectionReader, collectionWriter, publishedReader, dataIndex,
-                getDefaultContentDetailResolver());
+                getDefaultContentDetailResolver(), notifier);
     }
 
     /**
@@ -82,7 +83,7 @@ public class ApproveTask implements Callable<Boolean> {
      */
     ApproveTask(Collection collection, Session session, CollectionReader collectionReader,
                 CollectionWriter collectionWriter, ContentReader publishedReader, DataIndex dataIndex,
-                ContentDetailResolver contentDetailResolver) {
+                ContentDetailResolver contentDetailResolver, Notifier notifier) {
         this.collection = collection;
         this.session = session;
         this.collectionReader = collectionReader;
@@ -90,6 +91,7 @@ public class ApproveTask implements Callable<Boolean> {
         this.publishedReader = publishedReader;
         this.dataIndex = dataIndex;
         this.contentDetailResolver = contentDetailResolver;
+        this.notifier = notifier;
     }
 
     @Override
@@ -168,7 +170,7 @@ public class ApproveTask implements Callable<Boolean> {
 
         } catch (Exception e) {
             String channel = Configuration.getDefaultSlackAlarmChannel();
-            Root.zebedee.getSlackNotifier().sendCollectionAlarm(collection, channel, "Error approving collection", e);
+            notifier.sendCollectionAlarm(collection, channel, "Error approving collection", e);
 
             CMSLogEvent errorLog = error().data("collectionId", collection.getDescription().getId());
             if (session != null && StringUtils.isNotEmpty(session.getEmail())) {
@@ -270,7 +272,7 @@ public class ApproveTask implements Callable<Boolean> {
 
         if (!verified) {
             String channel = Configuration.getDefaultSlackAlarmChannel();
-            Root.zebedee.getSlackNotifier().sendCollectionAlarm(collection, channel, "Failed verification of time series zip files");
+            notifier.sendCollectionAlarm(collection, channel, "Failed verification of time series zip files");
             info().data("collectionId", collection.getDescription().getId())
                     .log("Failed verification of time series zip files");
         }

@@ -376,7 +376,7 @@ public class Collections {
         try {
             future = addTaskToQueue.apply(
                     new ApproveTask(collection, session, collectionReader, collectionWriter, publishedReader,
-                            zebedeeSupplier.get().getDataIndex()));
+                            zebedeeSupplier.get().getDataIndex(), zebedeeSupplier.get().getSlackNotifier()));
         } catch (Exception e) {
             error().data("collectionId", collectionId).logException(e, "approve collection: submit collection approval task failure");
         }

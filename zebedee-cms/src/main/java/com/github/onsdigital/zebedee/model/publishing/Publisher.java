@@ -51,6 +51,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static com.github.onsdigital.zebedee.api.Root.zebedee;
 import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.error;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.info;
@@ -132,19 +133,20 @@ public class Publisher {
 
         if (CMSFeatureFlags.cmsFeatureFlags().isImagePublishingEnabled()) {
             try {
-               if (imageFuture == null) {
-                   throw new Exception("image future unexpectedly null on completion of publishing");
-               }
-               ImageServicePublishingResult result = imageFuture.get();
+                if (imageFuture == null) {
+                    throw new Exception("image future unexpectedly null on completion of publishing");
+                }
+                ImageServicePublishingResult result = imageFuture.get();
 
-               if (result != null && result.getUnpublishedImages() != null && result.getUnpublishedImages().size() > 0) {
-                   notifyUnpublishedImages(collection, result);
-               }
+                if (result != null && result.getUnpublishedImages() != null && result.getUnpublishedImages().size() > 0) {
+                    notifyUnpublishedImages(collection, result);
+                }
             } catch (Exception e) {
                 error().data("collectionId", collection.getDescription().getId()).data("publishing", true)
                         .logException(e, "Exception publishing images via image API");
                 String channel = Configuration.getDefaultSlackAlarmChannel();
-                Root.zebedee.getSlackNotifier().sendCollectionAlarm(collection, channel, "Error publishing images", e);
+                Notifier notifier = zebedee.getSlackNotifier();
+                notifier.sendCollectionAlarm(collection, channel, "Error publishing images", e);
                 success = false;
             }
         }
@@ -303,8 +305,9 @@ public class Publisher {
     }
 
     private static void handlePublishingException(Exception ex, Collection collection) {
-    String channel = Configuration.getDefaultSlackAlarmChannel();
-    Root.zebedee.getSlackNotifier().sendCollectionAlarm(collection, channel, "Error publishing content", ex);
+        String channel = Configuration.getDefaultSlackAlarmChannel();
+        Notifier notifier = zebedee.getSlackNotifier();
+        notifier.sendCollectionAlarm(collection, channel, "Error publishing content", ex);
 
         CMSLogEvent err = error().data("publishing", true).collectionID(collection);
 
@@ -732,7 +735,8 @@ public class Publisher {
                     .logException(e, "Exception updating API dataset to state published");
 
             String channel = Configuration.getDefaultSlackAlarmChannel();
-            Root.zebedee.getSlackNotifier().sendCollectionAlarm(collection, channel, "Error updating API dataset", e);
+            Notifier notifier = zebedee.getSlackNotifier();
+            notifier.sendCollectionAlarm(collection, channel, "Error updating API dataset", e);
 
         } finally {
             saveCollection(collection, datasetsPublished);

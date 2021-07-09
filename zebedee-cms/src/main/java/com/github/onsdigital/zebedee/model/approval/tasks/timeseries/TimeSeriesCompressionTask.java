@@ -23,6 +23,7 @@ public class TimeSeriesCompressionTask {
 
     protected TimeSeriesCompressor timeSeriesCompressor;
     protected ZipFileVerifier zipFileVerifier;
+    protected Notifier notifier;
 
     /**
      * Initialise a new instance of TimeSeriesCompressionTask
@@ -30,14 +31,16 @@ public class TimeSeriesCompressionTask {
      * @param timeSeriesCompressor
      * @param zipFileVerifier
      */
-    public TimeSeriesCompressionTask(TimeSeriesCompressor timeSeriesCompressor, ZipFileVerifier zipFileVerifier) {
+    public TimeSeriesCompressionTask(TimeSeriesCompressor timeSeriesCompressor, ZipFileVerifier zipFileVerifier, Notifier notifier) {
         this.timeSeriesCompressor = timeSeriesCompressor;
         this.zipFileVerifier = zipFileVerifier;
+        this.notifier = notifier;
     }
 
     public TimeSeriesCompressionTask() {
         this.timeSeriesCompressor = new TimeSeriesCompressor();
         this.zipFileVerifier = new ZipFileVerifier();
+        this.notifier = Root.zebedee.getSlackNotifier();
     }
 
     /**
@@ -90,7 +93,6 @@ public class TimeSeriesCompressionTask {
                 collectionWriter.getRoot());
 
         String channel = Configuration.getDefaultSlackAlarmChannel();
-        Notifier notifier = Root.zebedee.getSlackNotifier();
 
         for (TimeseriesCompressionResult failedZipFile : failedZipFiles) {
             AttachmentField attemptField = new AttachmentField("Attempt", Integer.toString(attempt, 10), true);

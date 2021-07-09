@@ -15,6 +15,7 @@ import com.github.onsdigital.zebedee.model.publishing.PublishNotification;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.session.model.Session;
+import com.github.onsdigital.zebedee.util.slack.Notifier;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -70,6 +71,9 @@ public class ApproveTaskTest {
     @Mock
     private ContentDetailResolver contentDetailResolver;
 
+    @Mock
+    protected Notifier slackNotifier;
+
     private ExecutorService executorService;
 
     @Before
@@ -107,14 +111,14 @@ public class ApproveTaskTest {
     public void shouldReturnFalseIfCollecionNull() throws Exception {
         when(collection.getId())
                 .thenReturn("1234");
-        Future<Boolean> result = executorService.submit(new ApproveTask(collection, null, null, null, null, null, contentDetailResolver));
+        Future<Boolean> result = executorService.submit(new ApproveTask(collection, null, null, null, null, null, contentDetailResolver, slackNotifier));
         assertFalse(result.get());
     }
 
     @Test
     public void shouldReturnFalseIfCollecionDescriptionNull() throws Exception {
         Future<Boolean> result = executorService.submit(
-                new ApproveTask(collection, null, null, null, null, null, contentDetailResolver));
+                new ApproveTask(collection, null, null, null, null, null, contentDetailResolver, slackNotifier));
         assertFalse(result.get());
     }
 
@@ -126,7 +130,7 @@ public class ApproveTaskTest {
                 .thenReturn(COLLECTION_ID);
 
         Future<Boolean> result = executorService.submit(
-                new ApproveTask(collection, null, null, null, null, null, contentDetailResolver));
+                new ApproveTask(collection, null, null, null, null, null, contentDetailResolver, slackNotifier));
         assertFalse(result.get());
     }
 
@@ -140,7 +144,7 @@ public class ApproveTaskTest {
                 .thenReturn(null);
 
         Future<Boolean> result = executorService.submit(
-                new ApproveTask(collection, session, null, null, null, null, contentDetailResolver));
+                new ApproveTask(collection, session, null, null, null, null, contentDetailResolver, slackNotifier));
         assertFalse(result.get());
     }
 
@@ -161,7 +165,7 @@ public class ApproveTaskTest {
         doNothing().when(collectionDescription).addEvent(eventTypeArgumentCaptor.capture());
 
         Callable<Boolean> task = new ApproveTask(collection, session, collectionReader, collectionWriter,
-                contentReader, dataIndex, contentDetailResolver);
+                contentReader, dataIndex, contentDetailResolver, slackNotifier);
 
         Future<Boolean> result = executorService.submit(task);
         assertFalse(result.get());
@@ -179,7 +183,7 @@ public class ApproveTaskTest {
                 .thenReturn("test@ons.gov.uk");
 
         ApproveTask approveTask = new ApproveTask(collection, session, collectionReader, collectionWriter,
-                contentReader, dataIndex, contentDetailResolver);
+                contentReader, dataIndex, contentDetailResolver, slackNotifier);
 
         approveTask.approveCollection();
 
@@ -205,7 +209,7 @@ public class ApproveTaskTest {
                 .thenThrow(new RuntimeException());
 
         ApproveTask approveTask = new ApproveTask(collection, session, collectionReader, collectionWriter,
-                contentReader, dataIndex, contentDetailResolver);
+                contentReader, dataIndex, contentDetailResolver, slackNotifier);
 
         approveTask.approveCollection();
 

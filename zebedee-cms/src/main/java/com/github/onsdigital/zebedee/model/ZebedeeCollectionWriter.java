@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee.model;
 
 import com.github.onsdigital.zebedee.Zebedee;
+import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
@@ -42,12 +43,15 @@ public class ZebedeeCollectionWriter extends CollectionWriter {
     static final String COLLECTION_KEY_NULL_ERR =
             "error constructing ZebedeeCollectionWriter key required but keyring returned null";
 
+    private Zebedee zebedee;
+
     /**
      * Create a new instance of CollectionWriter for the given Zebedee instance, collection, and session.
      */
     public ZebedeeCollectionWriter(Zebedee zebedee, Collection collection, Session session)
             throws BadRequestException, IOException, UnauthorizedException, NotFoundException {
         validateParams(zebedee, collection, session);
+        this.zebedee = zebedee;
 
         checkUserAuthorisedToAccessCollection(zebedee, session);
 
@@ -55,6 +59,22 @@ public class ZebedeeCollectionWriter extends CollectionWriter {
 
         SecretKey key = getCollectionKey(zebedee, collection, user);
 
+        init(collection, key);
+    }
+
+    /**
+     * Create a new instance of CollectionWriter for the given SecretKey if you already have it.
+     *
+     * @param collection
+     * @param key
+     * @throws BadRequestException
+     * @throws IOException
+     * @throws UnauthorizedException
+     * @throws NotFoundException
+     */
+    public ZebedeeCollectionWriter(Collection collection, SecretKey key)
+            throws BadRequestException, IOException, UnauthorizedException, NotFoundException {
+        this.zebedee = Root.zebedee;
         init(collection, key);
     }
 
@@ -125,21 +145,6 @@ public class ZebedeeCollectionWriter extends CollectionWriter {
         return key;
     }
 
-    /**
-     * Create a new instance of CollectionWriter for the given SecretKey if you already have it.
-     *
-     * @param collection
-     * @param key
-     * @throws BadRequestException
-     * @throws IOException
-     * @throws UnauthorizedException
-     * @throws NotFoundException
-     */
-    public ZebedeeCollectionWriter(Collection collection, SecretKey key)
-            throws BadRequestException, IOException, UnauthorizedException, NotFoundException {
-        init(collection, key);
-    }
-
     private void init(Collection collection, SecretKey key)
             throws NotFoundException, UnauthorizedException, IOException {
 
@@ -150,14 +155,14 @@ public class ZebedeeCollectionWriter extends CollectionWriter {
         ReaderConfiguration cfg = get();
 
         this.inProgress = new CollectionContentWriter(
-                collection, key, collection.getPath().resolve(cfg.getInProgressFolderName()));
+                collection, key, collection.getPath().resolve(cfg.getInProgressFolderName()), zebedee.getSlackNotifier());
 
         this.complete = new CollectionContentWriter(collection, key,
-                collection.getPath().resolve(cfg.getCompleteFolderName()));
+                collection.getPath().resolve(cfg.getCompleteFolderName()), zebedee.getSlackNotifier());
 
         this.reviewed = new CollectionContentWriter(collection, key,
-                collection.getPath().resolve(cfg.getReviewedFolderName()));
+                collection.getPath().resolve(cfg.getReviewedFolderName()), zebedee.getSlackNotifier());
 
-        root = new CollectionContentWriter(collection, key, collection.getPath());
+        root = new CollectionContentWriter(collection, key, collection.getPath(), zebedee.getSlackNotifier());
     }
 }

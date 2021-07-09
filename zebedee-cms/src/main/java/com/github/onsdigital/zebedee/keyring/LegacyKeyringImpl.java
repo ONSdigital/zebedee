@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static com.github.onsdigital.zebedee.logging.CMSLogEvent.error;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.info;
 
 /**
@@ -349,7 +350,18 @@ public class LegacyKeyringImpl implements Keyring {
 
         for (CollectionDescription desc : assignments) {
             if (!srcCache.keySet().contains(desc.getId())) {
-                throw new KeyringException(CACHED_KEY_MISSING_ERR, desc.getId());
+                // If a key is not in the src users keyring cache then there is a potential issue with how the keys
+                // are assigned. We'll log this error instead of throwing it so user functionality isn't affected but
+                // this should be investigated if it occurs unexpectedly.
+                error().collectionID(desc)
+                        .data("src_user", src.getEmail())
+                        .data("target_user", target.getEmail())
+                        .log("error assiging collection key to target user. The src user is missing this collection key" +
+                                "in their keyring. If this is unexpected it should investigated as there could " +
+                                "be an issue with how collection keys are assigned to the expected recipients");
+
+                // Log the error a skip to the next key to assign.
+                continue;
             }
 
             SecretKey key = srcCache.get(desc.getId());

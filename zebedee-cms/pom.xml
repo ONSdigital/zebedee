@@ -176,12 +176,6 @@
 
         <dependency>
             <groupId>com.github.onsdigital</groupId>
-            <artifactId>dp-session-service-client-java</artifactId>
-            <version>0.2.1</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.github.onsdigital</groupId>
             <artifactId>dp-image-api-client-java</artifactId>
             <version>0.1.0</version>
         </dependency>
@@ -191,11 +185,11 @@
             <artifactId>dp-slack-client-java</artifactId>
             <version>0.1.0</version>
         </dependency>
-        
+
         <dependency>
             <groupId>com.github.onsdigital</groupId>
             <artifactId>dp-jwt-verifier-java</artifactId>
-            <version>0.1.1</version>
+            <version>0.1.2</version>
         </dependency>
 
     </dependencies>

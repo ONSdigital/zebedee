@@ -56,12 +56,12 @@ public interface Sessions {
     /**
      * Set user's data in a threadlocal object.
      *
-     * @param token/kid the access token and key id (user pool's jwks),
+     * @param token the access token,
      *        
      * @return nothing.
      * @throws IOException for any problems getting the session.
      */
-    void set(String token, String kid) throws IOException;
+    void set(String token) throws IOException;
 
     /**
      * Check if the provided {@link Session} is expired.

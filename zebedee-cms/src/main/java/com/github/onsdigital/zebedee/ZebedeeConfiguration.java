@@ -2,9 +2,6 @@ package com.github.onsdigital.zebedee;
 
 import com.github.onsdigital.dp.image.api.client.ImageAPIClient;
 import com.github.onsdigital.dp.image.api.client.ImageClient;
-import com.github.onsdigital.session.service.client.Http;
-import com.github.onsdigital.session.service.client.SessionClient;
-import com.github.onsdigital.session.service.client.SessionClientImpl;
 import com.github.onsdigital.slack.Profile;
 import com.github.onsdigital.slack.client.SlackClient;
 import com.github.onsdigital.slack.client.SlackClientImpl;
@@ -39,8 +36,8 @@ import com.github.onsdigital.zebedee.service.ImageServiceImpl;
 import com.github.onsdigital.zebedee.service.ServiceStoreImpl;
 import com.github.onsdigital.zebedee.service.ZebedeeDatasetService;
 import com.github.onsdigital.zebedee.session.service.Sessions;
-import com.github.onsdigital.zebedee.session.service.SessionsAPIServiceImpl;
 import com.github.onsdigital.zebedee.session.service.SessionsServiceImpl;
+import com.github.onsdigital.zebedee.session.store.JWTStore;
 import com.github.onsdigital.zebedee.teams.service.TeamsService;
 import com.github.onsdigital.zebedee.teams.service.TeamsServiceImpl;
 import com.github.onsdigital.zebedee.teams.store.TeamsStoreFileSystemImpl;
@@ -55,7 +52,8 @@ import com.github.onsdigital.zebedee.util.versioning.VersionsServiceImpl;
 import com.github.onsdigital.zebedee.verification.VerificationAgent;
 import dp.api.dataset.DatasetAPIClient;
 import dp.api.dataset.DatasetClient;
-
+import com.github.onsdigital.JWTHandlerImpl;
+import com.github.onsdigital.interfaces.JWTHandler;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
@@ -86,6 +84,7 @@ import static com.github.onsdigital.zebedee.configuration.Configuration.getKeyri
 import static com.github.onsdigital.zebedee.configuration.Configuration.getServiceAuthToken;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getSessionsApiUrl;
 import static com.github.onsdigital.zebedee.configuration.Configuration.slackChannelsToNotfiyOnStartUp;
+import static com.github.onsdigital.zebedee.configuration.Configuration.getCognitoKeyIdPairs;
 import static com.github.onsdigital.zebedee.permissions.store.PermissionsStoreFileSystemImpl.initialisePermissions;
 
 /**
@@ -121,7 +120,6 @@ public class ZebedeeConfiguration {
     private PermissionsStore permissionsStore;
     private DatasetService datasetService;
     private ImageService imageService;
-    private SessionClient sessionClient;
     private Keyring collectionKeyring;
     private SchedulerKeyCache schedulerKeyCache;
     private EncryptionKeyFactory encryptionKeyFactory;
@@ -168,9 +166,9 @@ public class ZebedeeConfiguration {
         this.encryptionKeyFactory = new EncryptionKeyFactoryImpl();
 
         // Configure the sessions
-        if (cmsFeatureFlags().isSessionAPIEnabled()) {
-            sessionClient = new SessionClientImpl(getSessionsApiUrl(), getServiceAuthToken(), new Http());
-            this.sessions = new SessionsAPIServiceImpl(sessionClient);
+        if (cmsFeatureFlags().isJwtSessionsEnabled()) {
+            JWTHandler jwtHandler = new JWTHandlerImpl();
+            this.sessions = new JWTStore(jwtHandler, getCognitoKeyIdPairs());
         } else {
             this.sessions = new SessionsServiceImpl(sessionsPath);
         }

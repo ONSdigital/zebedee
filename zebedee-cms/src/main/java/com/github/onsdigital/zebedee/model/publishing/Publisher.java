@@ -18,7 +18,11 @@ import com.github.onsdigital.zebedee.model.publishing.verify.HashVerifier;
 import com.github.onsdigital.zebedee.model.publishing.verify.HashVerifierImpl;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.Resource;
-import com.github.onsdigital.zebedee.service.*;
+import com.github.onsdigital.zebedee.service.DatasetService;
+import com.github.onsdigital.zebedee.service.ImageService;
+import com.github.onsdigital.zebedee.service.ImageServicePublishingResult;
+import com.github.onsdigital.zebedee.service.KafkaService;
+import com.github.onsdigital.zebedee.service.ServiceSupplier;
 import com.github.onsdigital.zebedee.util.Http;
 import com.github.onsdigital.zebedee.util.SlackNotification;
 import com.github.onsdigital.zebedee.util.ZebedeeCmsService;
@@ -149,14 +153,7 @@ public class Publisher {
         }
 
         if (CMSFeatureFlags.cmsFeatureFlags().isKafkaEnabled()) {
-            try {
-                sendToKafka(collection);
-            } catch (Exception e) {
-                error().data("collectionId", collection.getDescription().getId()).data("publishing", true)
-                        .logException(e, "failed to send content-published kafka events");
-                PostMessageField msg = new PostMessageField("Error", e.getMessage(), false);
-                collectionAlarm(collection, "Failed to send content-published kafka events", msg);
-            }
+            sendToKafka(collection);
         }
 
         info().data("milliseconds", collection.getPublishTimeMilliseconds())
@@ -759,7 +756,14 @@ public class Publisher {
 
     private static void sendToKafka(Collection collection) throws IOException {
         List<String> uris = collection.getReviewed().uris();
-        kafkaServiceSupplier.getService().produceContentPublished(collection.getId(), uris);
+        try {
+            kafkaServiceSupplier.getService().produceContentPublished(collection.getId(), uris);
+        } catch (Exception e) {
+            error().data("collectionId", collection.getDescription().getId()).data("publishing", true)
+                    .logException(e, "failed to send content-published kafka events");
+            PostMessageField msg = new PostMessageField("Error", e.getMessage(), false);
+            collectionAlarm(collection, "Failed to send content-published kafka events", msg);
+        }
     }
 
     private static void saveCollection(Collection collection, boolean publishComplete) {

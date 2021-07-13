@@ -5,10 +5,12 @@ import org.apache.kafka.clients.producer.RecordMetadata;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
-import static com.github.onsdigital.zebedee.logging.CMSLogEvent.*;
+import static com.github.onsdigital.zebedee.logging.CMSLogEvent.error;
+import static com.github.onsdigital.zebedee.logging.CMSLogEvent.info;
 
 public class KafkaServiceImpl implements KafkaService {
     private final KafkaClient kafkaClient;

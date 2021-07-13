@@ -233,6 +233,7 @@ public class Collection {
         User user = getUser(zebedee.getUsersService(), session.getEmail());
         SecretKey key = zebedee.getEncryptionKeyFactory().newCollectionKey();
 
+        info().collectionID(collection).log("adding new collection key to user keyrings");
         zebedee.getCollectionKeyring().add(user, collection, key);
 
         if (release != null) {

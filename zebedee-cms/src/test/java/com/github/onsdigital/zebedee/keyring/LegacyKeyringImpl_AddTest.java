@@ -282,8 +282,6 @@ public class LegacyKeyringImpl_AddTest extends BaseLegacyKeyringTest {
 
         verifyKeyAddedToUser(bert, bertKeyring);
 
-        verifyUsersNotUpdated(ernie, theCount);
-
         verifyKeyAddedToSchedulerCache();
     }
 

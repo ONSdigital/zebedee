@@ -16,7 +16,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
-import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 
 /**
  * Represents the encryption keys needed for a user account to access collections.
@@ -150,16 +149,13 @@ public class Keyring implements Cloneable {
             try {
                 // Attempt to decrypt the key
                 result = new KeyExchange().decryptKey(keyring.get(collectionId), keyPair.getPrivate());
-                if (result != null)
+                if (result != null) {
                     keys.put(collectionId, result);
+                }
             } catch (IllegalArgumentException e) {
                 // Error decrypting key
                 error().data("collectionId", collectionId).logException(e, "Error recovering encryption key for collection");
             }
-        }
-
-        if (result == null) {
-            info().data("collectionId", collectionId).log("Keyring has not been unlocked, cannot recover encryption key");
         }
 
         return result;

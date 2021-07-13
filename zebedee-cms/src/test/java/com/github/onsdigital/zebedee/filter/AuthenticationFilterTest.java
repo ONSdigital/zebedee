@@ -181,7 +181,7 @@ public class AuthenticationFilterTest extends ZebedeeTestBaseFixture {
         String responseMessage = new String(response.getContentAsByteArray(), StandardCharsets.UTF_8);
 
         assertEquals(response.getContentType(), RESP_CONTENT_TYPE); 
-        assertEquals(response.getStatus(), HttpStatus.INTERNAL_SERVER_ERROR_500);
+        assertEquals(response.getStatus(), HttpStatus.UNAUTHORIZED_401);
         assertEquals(responseMessage, SESSION_STORE_ERROR);
         assertEquals(result, false);
     }

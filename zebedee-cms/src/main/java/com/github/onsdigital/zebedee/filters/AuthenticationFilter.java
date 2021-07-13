@@ -37,9 +37,7 @@ public class AuthenticationFilter implements PreFilter {
 
     private Sessions sessions;
 
-    private final String NO_AUTH_HEADER_FOUND       = "No authorisation header found. Exiting...";
-    private final String ACCESS_TOKEN_EXPIRED_ERROR = "JWT verification failed as token is expired.";
-    private final String TOKEN_NOT_VALID_ERROR      = "Token format not valid.";
+    private final String NO_AUTH_HEADER_FOUND = "No authorisation header found. Exiting...";
 
     private boolean jwtSessionsEnabled = false;
 
@@ -94,7 +92,6 @@ public class AuthenticationFilter implements PreFilter {
      */
     @Override
     public boolean filter(HttpServletRequest request, HttpServletResponse response) {
-
         // Pass through OPTIONS request without authentication for cross-origin preflight requests:
         if (StringUtils.equalsIgnoreCase("OPTIONS", request.getMethod())) {
             return true;
@@ -125,25 +122,19 @@ public class AuthenticationFilter implements PreFilter {
      */
     private boolean verifyAndStoreAccessToken(HttpServletRequest request, HttpServletResponse response) {
         boolean result = false;
-        try {
-            //ensure that authorisation header present
-            if (request.getHeader("Authorization") == null) {
-                unauthorisedRequest(response, NO_AUTH_HEADER_FOUND);
-            } else {
-                try {
-                    sessions.set(request.getHeader("Authorization"));   
-                    result = true;
-                } catch (SessionsStoreException e) {
-                    // treat access token expired or malformed access token as unauthorised
-                    if (e.getMessage() == ACCESS_TOKEN_EXPIRED_ERROR || e.getMessage() == TOKEN_NOT_VALID_ERROR ) {
-                        unauthorisedRequest(response, e.getMessage());
-                    } else {
-                        accessTokenError(response, e.getMessage());
-                    }
-                }
+        //ensure that authorisation header present
+        if (request.getHeader("Authorization") == null) {
+            unauthorisedRequest(response, NO_AUTH_HEADER_FOUND);
+        } else {
+            try {
+                sessions.set(request.getHeader("Authorization"));   
+                result = true;
+            } catch (SessionsStoreException e) {
+                // treat access token expired or malformed access token as unauthorised
+                unauthorisedRequest(response, e.getMessage());
+            } catch (Exception e) {
+                accessTokenError(response, e.getMessage());
             }
-        } catch (IOException e) {
-            error(response);
         }
         return result;
     }
@@ -170,22 +161,34 @@ public class AuthenticationFilter implements PreFilter {
         return result;
     }
 
-    private void unauthorisedRequest(HttpServletResponse response, String errorMessage) throws IOException {
-        response.setContentType("application/json");
-        response.setStatus(HttpStatus.UNAUTHORIZED_401);
-        Serialiser.serialise(response, errorMessage);
+    private void unauthorisedRequest(HttpServletResponse response, String errorMessage) {
+        try {
+            response.setContentType("application/json");
+            response.setStatus(HttpStatus.UNAUTHORIZED_401);
+            Serialiser.serialise(response, errorMessage);
+        } catch (IOException ex) {
+            error(response);
+        }
     }
 
-    private void forbidden(HttpServletResponse response) throws IOException {
-        response.setContentType("application/json");
-        response.setStatus(HttpStatus.UNAUTHORIZED_401);
-        Serialiser.serialise(response, "Please log in");
+    private void forbidden(HttpServletResponse response) {
+        try {
+            response.setContentType("application/json");
+            response.setStatus(HttpStatus.UNAUTHORIZED_401);
+            Serialiser.serialise(response, "Please log in");
+        } catch (IOException ex) {
+            error(response);
+        }
     }
 
-    private void accessTokenError(HttpServletResponse response, String errorMessage) throws IOException {
-        response.setContentType("application/json");
-        response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR_500);
-        Serialiser.serialise(response, errorMessage);
+    private void accessTokenError(HttpServletResponse response, String errorMessage) {
+        try {
+            response.setContentType("application/json");
+            response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR_500);
+            Serialiser.serialise(response, errorMessage);
+        } catch (IOException ex) {
+            error(response);
+        }
     }
 
     private void error(HttpServletResponse response) {

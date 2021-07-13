@@ -109,38 +109,63 @@ public class AuthenticationFilter implements PreFilter {
         // Check all other requests:
         boolean result = false;
         if (jwtSessionsEnabled) {
-            try {
-                //ensure that authorisation header present
-                if (request.getHeader("Authorization") == null) {
-                    unauthorisedRequest(response, NO_AUTH_HEADER_FOUND);
-                } else {
-                    try {
-                        sessions.set(request.getHeader("Authorization"));   
-                        result = true;
-                    } catch (SessionsStoreException e) {
-                        // treat access token expired or malformed access token as unauthorised
-                        if (e.getMessage() == ACCESS_TOKEN_EXPIRED_ERROR || e.getMessage() == TOKEN_NOT_VALID_ERROR ) {
-                            unauthorisedRequest(response, e.getMessage());
-                        } else {
-                            accessTokenError(response, e.getMessage());
-                        }
+            result = verifyAndStoreAccessToken(request, response);
+        } else {
+            result = processSession(request, response);
+        }
+        return result;
+    }
+
+    /**
+     * verifyAndStoreAccessToken - decodes, verifies and stores Access Token JWT
+     *
+     * @param request
+     * @param response
+     * @return boolean 
+     */
+    private boolean verifyAndStoreAccessToken(HttpServletRequest request, HttpServletResponse response) {
+        boolean result = false;
+        try {
+            //ensure that authorisation header present
+            if (request.getHeader("Authorization") == null) {
+                unauthorisedRequest(response, NO_AUTH_HEADER_FOUND);
+            } else {
+                try {
+                    sessions.set(request.getHeader("Authorization"));   
+                    result = true;
+                } catch (SessionsStoreException e) {
+                    // treat access token expired or malformed access token as unauthorised
+                    if (e.getMessage() == ACCESS_TOKEN_EXPIRED_ERROR || e.getMessage() == TOKEN_NOT_VALID_ERROR ) {
+                        unauthorisedRequest(response, e.getMessage());
+                    } else {
+                        accessTokenError(response, e.getMessage());
                     }
                 }
-            } catch (IOException e) {
-                error(response);
             }
-        } else {
-            try {
-                Session session = sessions.get(request);
-    
-                if (session == null) {
-                    forbidden(response);
-                } else {
-                    result = true;
-                }
-            } catch (IOException e) {
-                error(response);
+        } catch (IOException e) {
+            error(response);
+        }
+        return result;
+    }
+
+    /**
+     * processSession - verifies if a session can be derived from request
+     *
+     * @param request
+     * @param response
+     * @return boolean 
+     */
+    private boolean processSession(HttpServletRequest request, HttpServletResponse response) {
+        boolean result = false;
+        try {
+            Session session = sessions.get(request);
+            if (session == null) {
+                forbidden(response);
+            } else {
+                result = true;
             }
+        } catch (IOException e) {
+            error(response);
         }
         return result;
     }

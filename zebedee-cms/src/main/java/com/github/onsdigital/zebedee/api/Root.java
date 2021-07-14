@@ -203,12 +203,12 @@ public class Root {
 
     public static void cancelPublish(Collection collection) {
         try {
-            info().data("collectionId", collection.description.getId())
+            info().data("collection_id", collection.description.getId())
                     .data("type", collection.getDescription().getType().name())
                     .log("zebedee root: cancelling scheduled collection publish");
             scheduler.cancel(collection);
         } catch (Exception e) {
-            error().data("collectionId", collection).logException(e, "zebedee root: error cancelling scheduled publish of collection");
+            error().data("collection_id", collection.getId()).logException(e, "zebedee root: error cancelling scheduled publish of collection");
         }
     }
 

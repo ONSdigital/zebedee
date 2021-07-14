@@ -30,7 +30,7 @@
     </repositories>
 
     <properties>
-        <spring.version>5.2.15.RELEASE</spring.version>
+        <spring.version>5.3.8</spring.version>
     </properties>
 
     <dependencies>
@@ -145,6 +145,13 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-test</artifactId>
+            <version>${spring.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
             <version>${spring.version}</version>
             <scope>test</scope>
         </dependency>

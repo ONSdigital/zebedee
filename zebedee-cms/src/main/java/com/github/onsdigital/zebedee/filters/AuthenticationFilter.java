@@ -6,7 +6,6 @@ import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.api.ClickEventLog;
 import com.github.onsdigital.zebedee.api.CsdbKey;
 import com.github.onsdigital.zebedee.api.CsdbNotify;
-import com.github.onsdigital.zebedee.reader.api.endpoint.Health;
 import com.github.onsdigital.zebedee.api.Identity;
 import com.github.onsdigital.zebedee.api.Login;
 import com.github.onsdigital.zebedee.api.Password;
@@ -16,20 +15,18 @@ import com.github.onsdigital.zebedee.api.cmd.ServiceDatasetPermissions;
 import com.github.onsdigital.zebedee.api.cmd.ServiceInstancePermissions;
 import com.github.onsdigital.zebedee.api.cmd.UserDatasetPermissions;
 import com.github.onsdigital.zebedee.api.cmd.UserInstancePermissions;
+import com.github.onsdigital.zebedee.reader.api.endpoint.Health;
 import com.github.onsdigital.zebedee.search.api.endpoint.ReIndex;
 import com.github.onsdigital.zebedee.session.model.Session;
+import com.github.onsdigital.zebedee.session.service.Sessions;
+import com.github.onsdigital.zebedee.session.store.exceptions.SessionsStoreException;
 import com.google.common.collect.ImmutableList;
-
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.http.HttpStatus;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-
-import com.github.onsdigital.zebedee.session.store.exceptions.SessionsStoreException;
-
-import com.github.onsdigital.zebedee.session.service.Sessions;
 
 import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
 
@@ -39,21 +36,21 @@ public class AuthenticationFilter implements PreFilter {
 
     private final String NO_AUTH_HEADER_FOUND = "No authorisation header found. Exiting...";
 
-    private boolean jwtSessionsEnabled = false;
+    private Boolean jwtSessionsEnabled;
 
     /**
      * AuthenticationFilter() - Default constructor - Creates new instance of AuthenticationFilter class
      */
     public AuthenticationFilter() {
-        this(cmsFeatureFlags().isJwtSessionsEnabled(), Root.zebedee.getSessions());
     }
 
     /**
      * AuthenticationFilter(Boolean jwtSessionsEnabled, Sessions sessions) - Creates new instance of AuthenticationFilter class
      * and initialises class variables.
      * <p/>
+     *
      * @param jwtSessionsEnabled cmsFeatureFlags().isJwtSessionsEnabled() feature flag setting
-     * @param sessions Root.zebedee.getSessions() object
+     * @param sessions           Root.zebedee.getSessions() object
      */
     public AuthenticationFilter(Boolean jwtSessionsEnabled, Sessions sessions) {
         this.jwtSessionsEnabled = jwtSessionsEnabled;
@@ -98,14 +95,14 @@ public class AuthenticationFilter implements PreFilter {
         }
 
         Path path = Path.newInstance(request);
-    
+
         if (noAuthorisationRequired(path)) {
             return true;
         }
 
         // Check all other requests:
         boolean result = false;
-        if (jwtSessionsEnabled) {
+        if (isJwtSessionsEnabled()) {
             result = verifyAndStoreAccessToken(request, response);
         } else {
             result = processSession(request, response);
@@ -118,7 +115,7 @@ public class AuthenticationFilter implements PreFilter {
      *
      * @param request
      * @param response
-     * @return boolean 
+     * @return boolean
      */
     private boolean verifyAndStoreAccessToken(HttpServletRequest request, HttpServletResponse response) {
         boolean result = false;
@@ -127,7 +124,7 @@ public class AuthenticationFilter implements PreFilter {
             unauthorisedRequest(response, NO_AUTH_HEADER_FOUND);
         } else {
             try {
-                sessions.set(request.getHeader("Authorization"));   
+                getSessions().set(request.getHeader("Authorization"));
                 result = true;
             } catch (SessionsStoreException e) {
                 // treat access token expired or malformed access token as unauthorised
@@ -144,12 +141,12 @@ public class AuthenticationFilter implements PreFilter {
      *
      * @param request
      * @param response
-     * @return boolean 
+     * @return boolean
      */
     private boolean processSession(HttpServletRequest request, HttpServletResponse response) {
         boolean result = false;
         try {
-            Session session = sessions.get(request);
+            Session session = getSessions().get(request);
             if (session == null) {
                 forbidden(response);
             } else {
@@ -202,5 +199,27 @@ public class AuthenticationFilter implements PreFilter {
                 .filter(clazzName -> clazzName.getSimpleName().toLowerCase().equals(path.lastSegment().toLowerCase()))
                 .findFirst()
                 .isPresent();
+    }
+
+    public boolean isJwtSessionsEnabled() {
+        if (jwtSessionsEnabled == null) {
+            synchronized (AuthenticationFilter.class) {
+                if (jwtSessionsEnabled == null) {
+                    this.jwtSessionsEnabled = cmsFeatureFlags().isJwtSessionsEnabled();
+                }
+            }
+        }
+        return this.jwtSessionsEnabled;
+    }
+
+    public Sessions getSessions() {
+        if (sessions == null) {
+            synchronized (AuthenticationFilter.class) {
+                if (sessions == null) {
+                    this.sessions = Root.zebedee.getSessions();
+                }
+            }
+        }
+        return this.sessions;
     }
 }

@@ -197,7 +197,10 @@ public class AuthenticationFilter implements PreFilter {
                 .isPresent();
     }
 
-    public boolean isJwtSessionsEnabled() {
+    /**
+     * Lazy load the config
+     */
+    private boolean isJwtSessionsEnabled() {
         if (jwtSessionsEnabled == null) {
             synchronized (AuthenticationFilter.class) {
                 if (jwtSessionsEnabled == null) {
@@ -208,7 +211,10 @@ public class AuthenticationFilter implements PreFilter {
         return this.jwtSessionsEnabled;
     }
 
-    public Sessions getSessions() {
+    /**
+     * Lazy load the config
+     */
+    private Sessions getSessions() {
         if (sessions == null) {
             synchronized (AuthenticationFilter.class) {
                 if (sessions == null) {

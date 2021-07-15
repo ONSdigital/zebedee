@@ -1,7 +1,6 @@
 package com.github.onsdigital.zebedee.model;
 
 import com.github.davidcarboni.cryptolite.Keys;
-import com.github.onsdigital.zebedee.KeyManangerUtil;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.data.json.DirectoryListing;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
@@ -119,9 +118,6 @@ public class CollectionsTest {
     private CollectionHistoryDao collectionHistoryDaoMock;
 
     @Mock
-    public KeyManangerUtil keyManagerUtilMock;
-
-    @Mock
     private Content publishedContentMock;
 
     @Mock
@@ -164,7 +160,6 @@ public class CollectionsTest {
     @Before
     public void setUp() throws IOException {
         MockitoAnnotations.initMocks(this);
-        Collection.setKeyManagerUtil(keyManagerUtilMock);
 
         System.setProperty("audit_db_enabled", "false");
         testUser = new User();

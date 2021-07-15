@@ -3,7 +3,6 @@ package com.github.onsdigital.zebedee.model;
 
 import com.github.davidcarboni.cryptolite.Random;
 import com.github.davidcarboni.restolino.json.Serialiser;
-import com.github.onsdigital.zebedee.KeyManangerUtil;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.content.page.base.PageType;
 import com.github.onsdigital.zebedee.content.page.release.Release;
@@ -112,7 +111,6 @@ public class Collection {
     private static final String DATASETS_URI = "/datasets/";
 
     private static ConcurrentMap<Path, ReadWriteLock> collectionLocks = new ConcurrentHashMap<>();
-    private static KeyManangerUtil keyManagerUtil = new KeyManangerUtil();
 
     public final CollectionDescription description;
     public final Path path;
@@ -126,11 +124,6 @@ public class Collection {
     private VersionsService versionsService;
 
     private static ServiceSupplier<CollectionHistoryDao> collectionHistoryDaoServiceSupplier = () -> getCollectionHistoryDao();
-
-    @VisibleForTesting
-    public static void setKeyManagerUtil(KeyManangerUtil manager) {
-        keyManagerUtil = manager;
-    }
 
     @VisibleForTesting
     public static void setCollectionHistoryDaoServiceSupplier(ServiceSupplier<CollectionHistoryDao> supplier) {

@@ -4,8 +4,6 @@ import com.github.davidcarboni.restolino.framework.PreFilter;
 import com.github.davidcarboni.restolino.helpers.Path;
 import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.api.ClickEventLog;
-import com.github.onsdigital.zebedee.api.CsdbKey;
-import com.github.onsdigital.zebedee.api.CsdbNotify;
 import com.github.onsdigital.zebedee.api.Identity;
 import com.github.onsdigital.zebedee.api.Login;
 import com.github.onsdigital.zebedee.api.Password;
@@ -63,8 +61,6 @@ public class AuthenticationFilter implements PreFilter {
     private static final ImmutableList<Class> NO_AUTH_REQUIRED = new ImmutableList.Builder<Class>()
             .add(Login.class)
             .add(Password.class)
-            .add(CsdbKey.class)
-            .add(CsdbNotify.class)
             .add(ReIndex.class)
             .add(Ping.class)
             .add(ClickEventLog.class)

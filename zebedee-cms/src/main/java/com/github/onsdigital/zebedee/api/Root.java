@@ -12,8 +12,6 @@ import com.github.onsdigital.zebedee.json.serialiser.IsoDateSerializer;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.Collections;
 import com.github.onsdigital.zebedee.model.Content;
-import com.github.onsdigital.zebedee.model.KeyManager;
-import com.github.onsdigital.zebedee.model.csdb.CsdbImporter;
 import com.github.onsdigital.zebedee.model.publishing.scheduled.PublishScheduler;
 import com.github.onsdigital.zebedee.model.publishing.scheduled.Scheduler;
 import com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration;
@@ -23,7 +21,6 @@ import com.github.onsdigital.zebedee.util.slack.Notifier;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import javax.crypto.SecretKey;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -134,8 +131,6 @@ public class Root {
             throw new RuntimeException(message, e);
         }
 
-        initialiseCsdbImportKeys();
-
         try {
             cleanupStaleCollectionKeys();
         } catch (Exception ex) {
@@ -149,6 +144,7 @@ public class Root {
     /**
      * If we have not previously generated a key for CSDB import, generate one and distribute it.
      */
+/*
     public static void initialiseCsdbImportKeys() {
         // if there is no key previously stored for CSDB import, generate a new one.
         if (!zebedee.getApplicationKeys().containsKey(CsdbImporter.APPLICATION_KEY_ID)) {
@@ -164,7 +160,7 @@ public class Root {
             }
         }
     }
-
+*/
     private static void cleanupStaleCollectionKeys() throws IOException, NotFoundException, BadRequestException {
         info().log("cms init task: removing stale collection keys from user keyrings");
         Map<String, Collection> collectionMap = zebedee.getCollections().mapByID();

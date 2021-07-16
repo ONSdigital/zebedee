@@ -199,7 +199,7 @@ public class Page {
         } catch (ZebedeeException e) {
             handleZebdeeException("page get endpoint: failed to create content", e, response, uri, session, collection);
         } catch (IOException | FileUploadException e) {
-            error().data("collectionId", collection.getDescription().getId())
+            error().data("collection_id", collection.getDescription().getId())
                     .data("user", session.getEmail())
                     .data("path", uri)
                     .logException(e, "page get endpoint: exception when calling collections.createContent");
@@ -272,7 +272,7 @@ public class Page {
         try {
             page = collectionReader.getContent(uri);
         } catch (NotFoundException ex) {
-            info().data("path", uri).data("collectionId", collection)
+            info().data("path", uri).data("collection_id", collection.getId())
                     .log("page delete endpoint: page is already deleted");
             response.setStatus(HttpStatus.SC_NO_CONTENT);
             return; // idempotent
@@ -280,7 +280,7 @@ public class Page {
             handleZebdeeException("page delete endpoint: exception when getting collection content", e, response, uri, session, collection);
             return;
         } catch (IOException e) {
-            error().data("collectionID", collection).data("user", session.getEmail()).data("path", uri)
+            error().data("collection_id", collection.getId()).data("user", session.getEmail()).data("path", uri)
                     .logException(e, "page delete endpoint: exception when attempting to get collection content");
             response.setStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR);
             return;
@@ -300,7 +300,7 @@ public class Page {
                     uri + zebedeeFileSuffix,
                     session);
         } catch (IOException e) {
-            error().data("collectionId", collection.getDescription().getId())
+            error().data("collection_id", collection.getDescription().getId())
                     .data("user", session.getEmail())
                     .data("path", uri)
                     .logException(e, "page delete endpoint: exception when deleting content");
@@ -331,7 +331,7 @@ public class Page {
             Session session,
             Collection collection) {
 
-        error().data("collectionId", collection.getDescription().getId())
+        error().data("collection_id", collection.getDescription().getId())
                 .data("user", session.getEmail())
                 .data("path", uri)
                 .logException(e, message);
@@ -340,13 +340,14 @@ public class Page {
 
     private boolean execCreationHook(com.github.onsdigital.zebedee.content.page.base.Page page, String uri,
                                      Collection collection, Session session) {
-        info().data("path", uri).data("collectionId", collection.getDescription().getId()).data("user", session.getEmail())
+        info().data("path", uri).data("collection_id", collection.getDescription().getId()).data("user",
+                session.getEmail())
                 .log("page delete endpoint: executing PageCreationHook");
         try {
             pageCreationHook.get().onPageUpdated(page, uri);
             return true;
         } catch (IOException | RuntimeException e) {
-            error().data("collectionId", collection.getDescription().getId())
+            error().data("collection_id", collection.getDescription().getId())
                     .data("user", session.getEmail())
                     .data("path", uri)
                     .logException(e, "page delete endpoint: exception when calling page creation hook");
@@ -356,13 +357,14 @@ public class Page {
 
     private boolean execDeletionHook(com.github.onsdigital.zebedee.content.page.base.Page page, String uri,
                                      Collection collection, Session session) {
-        info().data("path", uri).data("collectionId", collection.getDescription().getId()).data("user", session.getEmail())
+        info().data("path", uri).data("collection_id", collection.getDescription().getId()).data("user",
+                session.getEmail())
                 .log("page delete endpoint: executing PageDeletionHook");
         try {
             pageDeletionHook.get().onPageUpdated(page, uri);
             return true;
         } catch (IOException | RuntimeException e) {
-            error().data("collectionId", collection.getDescription().getId())
+            error().data("collection_id", collection.getDescription().getId())
                     .data("user", session.getEmail())
                     .data("path", uri)
                     .logException(e, "page delete endpoint: exception when calling page deletion hook");

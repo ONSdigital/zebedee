@@ -2,6 +2,8 @@ package com.github.onsdigital.zebedee;
 
 import com.github.davidcarboni.cryptolite.Random;
 import com.github.davidcarboni.restolino.json.Serialiser;
+import com.github.onsdigital.slack.Profile;
+import com.github.onsdigital.slack.client.SlackClient;
 import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.content.page.base.PageDescription;
 import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeries;
@@ -17,10 +19,12 @@ import com.github.onsdigital.zebedee.permissions.model.AccessMapping;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.teams.model.Team;
 import com.github.onsdigital.zebedee.user.model.User;
+import com.github.onsdigital.zebedee.util.slack.SlackNotifier;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.math3.distribution.NormalDistribution;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -35,6 +39,7 @@ import java.util.List;
 import java.util.Set;
 
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
+import static org.mockito.Mockito.when;
 
 /**
  * {@link Deprecated} Please do not use this any more.
@@ -47,6 +52,12 @@ public class Builder {
 
     @Mock
     private Keyring collectionKeyringMock;
+
+    @Mock
+    private SlackClient slackClient;
+
+    @Mock
+    private Profile slackProfile;
 
     private static int teamId;
     private static User administratorTemplate;
@@ -88,6 +99,9 @@ public class Builder {
      */
     public Builder() throws IOException, CollectionNotFoundException {
         MockitoAnnotations.initMocks(this);
+
+        when(slackClient.getProfile())
+                .thenReturn(slackProfile);
 
         setupUsers();
 
@@ -192,6 +206,7 @@ public class Builder {
 
 
         ZebedeeConfiguration configuration = new ZebedeeConfiguration(parent, false);
+        ReflectionTestUtils.setField(configuration,"slackClient",slackClient);
         this.zebedee = new Zebedee(configuration);
 
         inflationTeam = createTeam(reviewer1, teamNames[0], teams);

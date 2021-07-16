@@ -66,10 +66,31 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.function.Supplier;
 
-import static com.github.onsdigital.logging.v2.event.SimpleEvent.*;
-import static com.github.onsdigital.zebedee.Zebedee.*;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.warn;
+import static com.github.onsdigital.zebedee.Zebedee.APPLICATION_KEYS;
+import static com.github.onsdigital.zebedee.Zebedee.COLLECTIONS;
+import static com.github.onsdigital.zebedee.Zebedee.KEYRING;
+import static com.github.onsdigital.zebedee.Zebedee.PERMISSIONS;
+import static com.github.onsdigital.zebedee.Zebedee.PUBLISHED;
+import static com.github.onsdigital.zebedee.Zebedee.PUBLISHED_COLLECTIONS;
+import static com.github.onsdigital.zebedee.Zebedee.SERVICES;
+import static com.github.onsdigital.zebedee.Zebedee.SESSIONS;
+import static com.github.onsdigital.zebedee.Zebedee.TEAMS;
+import static com.github.onsdigital.zebedee.Zebedee.USERS;
+import static com.github.onsdigital.zebedee.Zebedee.ZEBEDEE;
 import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
-import static com.github.onsdigital.zebedee.configuration.Configuration.*;
+import static com.github.onsdigital.zebedee.configuration.Configuration.getCognitoKeyIdPairs;
+import static com.github.onsdigital.zebedee.configuration.Configuration.getDatasetAPIAuthToken;
+import static com.github.onsdigital.zebedee.configuration.Configuration.getDatasetAPIURL;
+import static com.github.onsdigital.zebedee.configuration.Configuration.getImageAPIURL;
+import static com.github.onsdigital.zebedee.configuration.Configuration.getKafkaContentPublishedTopic;
+import static com.github.onsdigital.zebedee.configuration.Configuration.getKafkaURL;
+import static com.github.onsdigital.zebedee.configuration.Configuration.getKeyringInitVector;
+import static com.github.onsdigital.zebedee.configuration.Configuration.getKeyringSecretKey;
+import static com.github.onsdigital.zebedee.configuration.Configuration.getServiceAuthToken;
+import static com.github.onsdigital.zebedee.configuration.Configuration.slackChannelsToNotfiyOnStartUp;
 import static com.github.onsdigital.zebedee.permissions.store.PermissionsStoreFileSystemImpl.initialisePermissions;
 
 /**
@@ -110,7 +131,7 @@ public class ZebedeeConfiguration {
     private SchedulerKeyCache schedulerKeyCache;
     private EncryptionKeyFactory encryptionKeyFactory;
     private StartUpAlerter startUpAlerter;
-
+    private SlackClient slackClient;
 
     /**
      * Create a new configuration object.
@@ -140,11 +161,9 @@ public class ZebedeeConfiguration {
         this.redirectPath = this.publishedContentPath.resolve(Content.REDIRECT);
         this.servicePath = createDir(zebedeePath, SERVICES);
         this.keyRingPath = createDir(zebedeePath, KEYRING);
-
         if (!Files.exists(redirectPath)) {
             Files.createFile(redirectPath);
         }
-
         this.useVerificationAgent = enableVerificationAgent;
 
         // Create the services and objects...
@@ -220,6 +239,12 @@ public class ZebedeeConfiguration {
 
         imageService = new ImageServiceImpl(imageClient);
 
+        this.slackClient = new SlackClientImpl(new Profile.Builder()
+                .emoji(":flo:")
+                .username("Florence")
+                .authToken(System.getenv("slack_api_token"))
+                .create());
+
         if (cmsFeatureFlags().isKafkaEnabled()) {
             KafkaClient kafkaClient = new KafkaClientImpl(getKafkaURL(), getKafkaContentPublishedTopic());
             kafkaService = new KafkaServiceImpl(kafkaClient);
@@ -274,12 +299,6 @@ public class ZebedeeConfiguration {
             warn().log("startUpNotificationRecipients was null or empty NoOpStartUpAlerter will be initialized.");
             return new NoOpStartUpAlerter();
         }
-
-        SlackClient slackClient = new SlackClientImpl(new Profile.Builder()
-                .emoji(":flo:")
-                .username("Florence")
-                .authToken(System.getenv("slack_api_token"))
-                .create());
         return new StartUpAlerterImpl(slackClient, slackChannelsToNotfiyOnStartUp());
     }
 
@@ -433,5 +452,9 @@ public class ZebedeeConfiguration {
 
     public StartUpAlerter getStartUpAlerter() {
         return this.startUpAlerter;
+    }
+
+    public SlackClient getSlackClient() {
+        return slackClient;
     }
 }

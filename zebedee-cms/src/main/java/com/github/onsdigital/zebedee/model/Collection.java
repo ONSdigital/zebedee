@@ -3,7 +3,6 @@ package com.github.onsdigital.zebedee.model;
 
 import com.github.davidcarboni.cryptolite.Random;
 import com.github.davidcarboni.restolino.json.Serialiser;
-import com.github.onsdigital.zebedee.KeyManangerUtil;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.content.page.base.PageType;
 import com.github.onsdigital.zebedee.content.page.release.Release;
@@ -112,7 +111,6 @@ public class Collection {
     private static final String DATASETS_URI = "/datasets/";
 
     private static ConcurrentMap<Path, ReadWriteLock> collectionLocks = new ConcurrentHashMap<>();
-    private static KeyManangerUtil keyManagerUtil = new KeyManangerUtil();
 
     public final CollectionDescription description;
     public final Path path;
@@ -126,11 +124,6 @@ public class Collection {
     private VersionsService versionsService;
 
     private static ServiceSupplier<CollectionHistoryDao> collectionHistoryDaoServiceSupplier = () -> getCollectionHistoryDao();
-
-    @VisibleForTesting
-    public static void setKeyManagerUtil(KeyManangerUtil manager) {
-        keyManagerUtil = manager;
-    }
 
     @VisibleForTesting
     public static void setCollectionHistoryDaoServiceSupplier(ServiceSupplier<CollectionHistoryDao> supplier) {
@@ -233,6 +226,7 @@ public class Collection {
         User user = getUser(zebedee.getUsersService(), session.getEmail());
         SecretKey key = zebedee.getEncryptionKeyFactory().newCollectionKey();
 
+        info().collectionID(collection).log("adding new collection key to user keyrings");
         zebedee.getCollectionKeyring().add(user, collection, key);
 
         if (release != null) {
@@ -1169,15 +1163,11 @@ public class Collection {
     }
 
     public boolean deleteDataVisContent(Session session, Path contentPath) throws IOException {
-        if (StringUtils.isEmpty(contentPath.toString())) {
+        if (contentPath == null || StringUtils.isEmpty(contentPath.toString())) {
             return false;
         }
 
-        String visualisationZipUri = contentPath.getParent().toString();
-        if (StringUtils.isEmpty(visualisationZipUri)){
-            info().data("zip", visualisationZipUri).log("unable to delete visualisation. Path provided was null/empty");
-            return false;
-        }
+        String visualisationZipUri = contentPath.toString();
         String dataJsonUri = resolveDataVizDataJsonURI(contentPath);
         boolean hasDeleted = false;
 

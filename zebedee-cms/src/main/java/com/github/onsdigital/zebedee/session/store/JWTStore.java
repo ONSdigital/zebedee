@@ -1,27 +1,29 @@
 package com.github.onsdigital.zebedee.session.store;
 
-import java.util.Map;
-import java.util.Base64;
-import com.google.gson.Gson;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import com.google.common.reflect.TypeToken;
 import com.github.onsdigital.exceptions.JWTDecodeException;
 import com.github.onsdigital.exceptions.JWTTokenExpiredException;
 import com.github.onsdigital.exceptions.JWTVerificationException;
-import javax.servlet.http.HttpServletRequest;
-import org.apache.commons.lang3.StringUtils;
 import com.github.onsdigital.impl.UserDataPayload;
 import com.github.onsdigital.interfaces.JWTHandler;
-import com.github.onsdigital.zebedee.user.model.User;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.session.service.Sessions;
-import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
-import com.github.onsdigital.zebedee.session.store.exceptions.SessionsStoreException;
 import com.github.onsdigital.zebedee.session.store.exceptions.SessionsDecodeException;
 import com.github.onsdigital.zebedee.session.store.exceptions.SessionsRequestException;
+import com.github.onsdigital.zebedee.session.store.exceptions.SessionsStoreException;
 import com.github.onsdigital.zebedee.session.store.exceptions.SessionsTokenExpiredException;
 import com.github.onsdigital.zebedee.session.store.exceptions.SessionsVerificationException;
+import com.github.onsdigital.zebedee.user.model.User;
+import com.google.common.reflect.TypeToken;
+import com.google.gson.Gson;
+import org.apache.commons.lang3.StringUtils;
+
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+import java.util.Map;
+
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 
 
 /**
@@ -111,9 +113,8 @@ public class JWTStore implements Sessions {
 
     /**
      * Get a {@link Session} session object from thread local.
-     *  
-     * @param none.
-     * @return session object from containg datae from thread local.
+     *
+     * @return session object from containg data from thread local.
      * @throws IOException for any problem getting a session from the request.
      */
     @Override
@@ -150,9 +151,7 @@ public class JWTStore implements Sessions {
         String publicSigningKey = getPublicSigningKey(chunks[0]);
 
         try {
-            store.set(
-                this.jwtHandler.verifyJWT(token, publicSigningKey)
-            );
+            store.set(jwtHandler.verifyJWT(token, publicSigningKey));
         } catch (JWTTokenExpiredException e) {
             throw new SessionsTokenExpiredException(ACCESS_TOKEN_EXPIRED_ERROR);
         } catch (JWTVerificationException e) {

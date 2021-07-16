@@ -1,7 +1,6 @@
 package com.github.onsdigital.zebedee.model;
 
 import com.github.davidcarboni.cryptolite.Keys;
-import com.github.onsdigital.zebedee.KeyManangerUtil;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.data.json.DirectoryListing;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
@@ -119,9 +118,6 @@ public class CollectionsTest {
     private CollectionHistoryDao collectionHistoryDaoMock;
 
     @Mock
-    public KeyManangerUtil keyManagerUtilMock;
-
-    @Mock
     private Content publishedContentMock;
 
     @Mock
@@ -164,7 +160,6 @@ public class CollectionsTest {
     @Before
     public void setUp() throws IOException {
         MockitoAnnotations.initMocks(this);
-        Collection.setKeyManagerUtil(keyManagerUtilMock);
 
         System.setProperty("audit_db_enabled", "false");
         testUser = new User();
@@ -638,7 +633,7 @@ public class CollectionsTest {
 
         when(permissionsServiceMock.canEdit(TEST_EMAIL))
                 .thenReturn(true);
-        when(collectionMock.isAllContentReviewed(false))
+        when(collectionMock.isAllContentReviewed(anyBoolean()))
                 .thenReturn(true);
         when(collectionReaderWriterFactoryMock.getReader(zebedeeMock, collectionMock, sessionMock))
                 .thenReturn(collectionReaderMock);
@@ -650,7 +645,7 @@ public class CollectionsTest {
         assertThat(futureMock, equalTo(collections.approve(collectionMock, sessionMock)));
 
         verify(permissionsServiceMock, times(1)).canEdit(TEST_EMAIL);
-        verify(collectionMock, times(1)).isAllContentReviewed(false);
+        verify(collectionMock, times(1)).isAllContentReviewed(anyBoolean());
         verify(collectionReaderWriterFactoryMock, times(1)).getReader(zebedeeMock, collectionMock, sessionMock);
         verify(collectionReaderWriterFactoryMock, times(1)).getWriter(zebedeeMock, collectionMock, sessionMock);
         verify(collectionHistoryDaoMock, times(1)).saveCollectionHistoryEvent(any(), any(), any());

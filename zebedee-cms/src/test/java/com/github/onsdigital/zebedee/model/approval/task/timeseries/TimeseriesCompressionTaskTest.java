@@ -11,8 +11,11 @@ import com.github.onsdigital.zebedee.model.approval.tasks.timeseries.TimeseriesC
 import com.github.onsdigital.zebedee.model.approval.tasks.timeseries.ZipFileVerifier;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
+import com.github.onsdigital.zebedee.util.slack.Notifier;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -27,8 +30,13 @@ import static org.mockito.Mockito.when;
 
 public class TimeseriesCompressionTaskTest {
 
-    ContentReader contentReader = mock(ContentReader.class);
-    ContentWriter contentWriter = mock(ContentWriter.class);
+    @Mock
+    private ContentReader contentReader;
+    @Mock
+    private ContentWriter contentWriter;
+    @Mock
+    private Notifier notifier;
+
     boolean isEncrypted = false;
     Collection collection = mock(Collection.class);
     private CollectionWriter collectionWriter = mock(CollectionWriter.class);
@@ -40,6 +48,7 @@ public class TimeseriesCompressionTaskTest {
     @Before
     public void setUp() throws Exception {
 
+        MockitoAnnotations.initMocks(this);
         // mock the properties required of collection.getDescription()
         CollectionDescription collectionDescription = new CollectionDescription();
         collectionDescription.setEncrypted(isEncrypted);
@@ -65,7 +74,7 @@ public class TimeseriesCompressionTaskTest {
                 .thenReturn(new ArrayList<>());
 
         // When the compress time series task is run.
-        TimeSeriesCompressionTask task = new TimeSeriesCompressionTask(timeSeriesCompressor, zipFileVerifier);
+        TimeSeriesCompressionTask task = new TimeSeriesCompressionTask(timeSeriesCompressor, zipFileVerifier, notifier);
         boolean result = task.compressTimeseries(collection, collectionReader, collectionWriter);
 
         // Then the method returns true with no exceptions thrown
@@ -85,7 +94,7 @@ public class TimeseriesCompressionTaskTest {
                 .thenReturn(new ArrayList<>()); // attempt 1
 
         // When the compress time series task is run.
-        TimeSeriesCompressionTask task = new TimeSeriesCompressionTask(timeSeriesCompressor, zipFileVerifier);
+        TimeSeriesCompressionTask task = new TimeSeriesCompressionTask(timeSeriesCompressor, zipFileVerifier, notifier);
         boolean result = task.compressTimeseries(collection, collectionReader, collectionWriter);
 
         // Then the method returns true
@@ -104,7 +113,7 @@ public class TimeseriesCompressionTaskTest {
                 .thenReturn(zipFiles);
 
         // When the compress time series task is run.
-        TimeSeriesCompressionTask task = new TimeSeriesCompressionTask(timeSeriesCompressor, zipFileVerifier);
+        TimeSeriesCompressionTask task = new TimeSeriesCompressionTask(timeSeriesCompressor, zipFileVerifier, notifier);
         boolean result = task.compressTimeseries(collection, collectionReader, collectionWriter);
 
         // Then the method returns false
@@ -125,7 +134,7 @@ public class TimeseriesCompressionTaskTest {
                 .thenReturn(new ArrayList<>());  // attempt 5
 
         // When the compress time series task is run.
-        TimeSeriesCompressionTask task = new TimeSeriesCompressionTask(timeSeriesCompressor, zipFileVerifier);
+        TimeSeriesCompressionTask task = new TimeSeriesCompressionTask(timeSeriesCompressor, zipFileVerifier, notifier);
         boolean result = task.compressTimeseries(collection, collectionReader, collectionWriter);
 
         // Then the method returns true

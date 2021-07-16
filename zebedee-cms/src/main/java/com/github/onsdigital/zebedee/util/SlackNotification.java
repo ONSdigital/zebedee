@@ -252,7 +252,6 @@ public class SlackNotification {
             info().log("scheduledPublishFailure collection description is null");
             return;
         }
-
         collectionAlarm(c, "Scheduled collection failed to publish");
     }
 

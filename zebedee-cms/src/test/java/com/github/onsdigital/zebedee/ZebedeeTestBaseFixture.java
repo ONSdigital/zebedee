@@ -1,5 +1,7 @@
 package com.github.onsdigital.zebedee;
 
+import com.github.onsdigital.slack.Profile;
+import com.github.onsdigital.slack.client.SlackClient;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.Credentials;
 import com.github.onsdigital.zebedee.keyring.Keyring;
@@ -23,8 +25,6 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import javax.crypto.SecretKey;
@@ -35,7 +35,6 @@ import java.util.Map;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -51,9 +50,6 @@ public abstract class ZebedeeTestBaseFixture {
     protected UsersService usersService;
 
     @Mock
-    private KeyManangerUtil keyManangerUtil;
-
-    @Mock
     private CollectionHistoryDao collectionHistoryDao;
 
     @Mock
@@ -61,6 +57,12 @@ public abstract class ZebedeeTestBaseFixture {
 
     @Mock
     protected ZebedeeConfiguration zebCfg;
+
+    @Mock
+    protected SlackClient slackClient;
+
+    @Mock
+    protected Profile slackProfile;
 
     @Mock
     protected Sessions sessions;
@@ -128,7 +130,6 @@ public abstract class ZebedeeTestBaseFixture {
         ServiceSupplier<CollectionHistoryDao> collectionHistoryDaoServiceSupplier = () -> collectionHistoryDao;
 
         Collection.setCollectionHistoryDaoServiceSupplier(collectionHistoryDaoServiceSupplier);
-        Collection.setKeyManagerUtil(keyManangerUtil);
 
         usersMap = new HashMap<>();
         usersMap.put(builder.publisher1.getEmail(), builder.publisher1);
@@ -155,22 +156,6 @@ public abstract class ZebedeeTestBaseFixture {
         Map<String, String> emailToCreds = new HashMap<>();
         emailToCreds.put(builder.publisher1.getEmail(), builder.publisher1Credentials.password);
 
-        // UsersService is now mocked so needs to add this manually.
-        doAnswer(new Answer() {
-            @Override
-            public Object answer(InvocationOnMock invocationOnMock) throws Throwable {
-                User u = invocationOnMock.getArgumentAt(1, User.class);
-                String id = invocationOnMock.getArgumentAt(2, String.class);
-                SecretKey key = invocationOnMock.getArgumentAt(3, SecretKey.class);
-
-                if (emailToCreds.containsKey(u.getEmail())) {
-                    u.keyring().unlock(emailToCreds.get(u.getEmail()));
-                    u.keyring().put(id, key);
-                }
-                return null;
-            }
-        }).when(keyManangerUtil).assignKeyToUser(any(), any(), any(), any());
-
         setUp();
     }
 
@@ -195,6 +180,12 @@ public abstract class ZebedeeTestBaseFixture {
 
         when(zebCfg.getPermissionsService())
                 .thenReturn(permissionsService);
+
+        when(zebCfg.getSlackClient())
+                .thenReturn(slackClient);
+
+        when(slackClient.getProfile())
+                .thenReturn(slackProfile);
     }
 
     protected void verifyKeyAddedToCollectionKeyring() throws Exception {

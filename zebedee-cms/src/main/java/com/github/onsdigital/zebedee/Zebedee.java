@@ -1,5 +1,6 @@
 package com.github.onsdigital.zebedee;
 
+import com.github.onsdigital.slack.client.SlackClient;
 import com.github.onsdigital.zebedee.data.processing.DataIndex;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedException;
@@ -24,6 +25,8 @@ import com.github.onsdigital.zebedee.session.service.Sessions;
 import com.github.onsdigital.zebedee.teams.service.TeamsService;
 import com.github.onsdigital.zebedee.user.model.User;
 import com.github.onsdigital.zebedee.user.service.UsersService;
+import com.github.onsdigital.zebedee.util.slack.Notifier;
+import com.github.onsdigital.zebedee.util.slack.SlackNotifier;
 import com.github.onsdigital.zebedee.util.slack.StartUpAlerter;
 import com.github.onsdigital.zebedee.verification.VerificationAgent;
 
@@ -87,7 +90,9 @@ public class Zebedee {
     private final ImageService imageService;
     private final KafkaService kafkaService;
     private final ServiceStoreImpl serviceStoreImpl;
-    private StartUpAlerter startUpAlerter;
+    private final StartUpAlerter startUpAlerter;
+    private final SlackClient slackClient;
+    private final Notifier slackNotifier;
 
     /**
      * Create a new instance of Zebedee setting.
@@ -127,6 +132,8 @@ public class Zebedee {
         this.servicePath = cfg.getServicePath();
         this.keyRingPath = cfg.getKeyRingPath();
         this.startUpAlerter = cfg.getStartUpAlerter();
+        this.slackClient = cfg.getSlackClient();
+        this.slackNotifier = new SlackNotifier(slackClient);
     }
 
     /**
@@ -427,4 +434,13 @@ public class Zebedee {
     public StartUpAlerter getStartUpAlerter() {
         return this.startUpAlerter;
     }
+
+    public SlackClient getSlackClient() {
+        return this.slackClient;
+    }
+
+    public Notifier getSlackNotifier() {
+        return slackNotifier;
+    }
 }
+

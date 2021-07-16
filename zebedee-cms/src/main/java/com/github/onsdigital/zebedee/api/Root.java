@@ -12,18 +12,15 @@ import com.github.onsdigital.zebedee.json.serialiser.IsoDateSerializer;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.Collections;
 import com.github.onsdigital.zebedee.model.Content;
-import com.github.onsdigital.zebedee.model.KeyManager;
-import com.github.onsdigital.zebedee.model.csdb.CsdbImporter;
 import com.github.onsdigital.zebedee.model.publishing.scheduled.PublishScheduler;
 import com.github.onsdigital.zebedee.model.publishing.scheduled.Scheduler;
 import com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration;
 import com.github.onsdigital.zebedee.user.model.User;
+import com.github.onsdigital.zebedee.util.slack.AttachmentField;
 import com.github.onsdigital.zebedee.util.slack.Notifier;
-import com.github.onsdigital.zebedee.util.slack.SlackNotifier;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import javax.crypto.SecretKey;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -121,7 +118,7 @@ public class Root {
         //Setting zebedee root as system property for zebedee reader module, since zebedee root is not set as environment variable on develop environment
         System.setProperty(ZEBEDEE_ROOT, root.toString());
 
-        final SlackNotifier notifier = new SlackNotifier();
+        Notifier notifier = zebedee.getSlackNotifier();
         zebedee.getStartUpAlerter().queueLocked();
 
         try {
@@ -133,8 +130,6 @@ public class Root {
             error().logException(e, message);
             throw new RuntimeException(message, e);
         }
-
-        initialiseCsdbImportKeys();
 
         try {
             cleanupStaleCollectionKeys();
@@ -149,6 +144,7 @@ public class Root {
     /**
      * If we have not previously generated a key for CSDB import, generate one and distribute it.
      */
+/*
     public static void initialiseCsdbImportKeys() {
         // if there is no key previously stored for CSDB import, generate a new one.
         if (!zebedee.getApplicationKeys().containsKey(CsdbImporter.APPLICATION_KEY_ID)) {
@@ -164,7 +160,7 @@ public class Root {
             }
         }
     }
-
+*/
     private static void cleanupStaleCollectionKeys() throws IOException, NotFoundException, BadRequestException {
         info().log("cms init task: removing stale collection keys from user keyrings");
         Map<String, Collection> collectionMap = zebedee.getCollections().mapByID();
@@ -189,22 +185,26 @@ public class Root {
 
     static void alertOnInProgressCollections(Collections.CollectionList collections, Notifier notifier) {
         info().log("zebedee root: checking existing collections for in progress approvals");
+
+        String channel = Configuration.getDefaultSlackAlarmChannel();
+
         collections.withApprovalInProgressOrError().forEach(c -> {
             info().data("collectionId", c.getDescription().getId())
                     .data("type", c.getDescription().getType().name())
                     .log("zebedee root: collection approval is in error or in progress state on zebedee startup");
-            notifier.collectionAlarm(c, "Collection approval is in IN_PROGRESS or ERROR state on zebedee startup. It may need to be re-approved manually.");
+            AttachmentField status = new AttachmentField("Approval Status", c.getDescription().getApprovalStatus().name(), true);
+            notifier.sendCollectionAlarm(c, channel, "Collection approval is in IN_PROGRESS or ERROR state on zebedee startup. It may need to be re-approved manually.", status);
         });
     }
 
     public static void cancelPublish(Collection collection) {
         try {
-            info().data("collectionId", collection.description.getId())
+            info().data("collection_id", collection.description.getId())
                     .data("type", collection.getDescription().getType().name())
                     .log("zebedee root: cancelling scheduled collection publish");
             scheduler.cancel(collection);
         } catch (Exception e) {
-            error().data("collectionId", collection).logException(e, "zebedee root: error cancelling scheduled publish of collection");
+            error().data("collection_id", collection.getId()).logException(e, "zebedee root: error cancelling scheduled publish of collection");
         }
     }
 

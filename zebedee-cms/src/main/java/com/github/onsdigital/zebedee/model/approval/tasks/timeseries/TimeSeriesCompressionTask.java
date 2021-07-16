@@ -1,11 +1,13 @@
 package com.github.onsdigital.zebedee.model.approval.tasks.timeseries;
 
+import com.github.onsdigital.zebedee.api.Root;
+import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.CollectionWriter;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
-import com.github.onsdigital.zebedee.util.SlackNotification;
-import com.github.onsdigital.zebedee.util.slack.PostMessageField;
+import com.github.onsdigital.zebedee.util.slack.AttachmentField;
+import com.github.onsdigital.zebedee.util.slack.Notifier;
 
 import java.io.IOException;
 import java.util.List;
@@ -21,6 +23,7 @@ public class TimeSeriesCompressionTask {
 
     protected TimeSeriesCompressor timeSeriesCompressor;
     protected ZipFileVerifier zipFileVerifier;
+    protected Notifier notifier;
 
     /**
      * Initialise a new instance of TimeSeriesCompressionTask
@@ -28,14 +31,16 @@ public class TimeSeriesCompressionTask {
      * @param timeSeriesCompressor
      * @param zipFileVerifier
      */
-    public TimeSeriesCompressionTask(TimeSeriesCompressor timeSeriesCompressor, ZipFileVerifier zipFileVerifier) {
+    public TimeSeriesCompressionTask(TimeSeriesCompressor timeSeriesCompressor, ZipFileVerifier zipFileVerifier, Notifier notifier) {
         this.timeSeriesCompressor = timeSeriesCompressor;
         this.zipFileVerifier = zipFileVerifier;
+        this.notifier = notifier;
     }
 
     public TimeSeriesCompressionTask() {
         this.timeSeriesCompressor = new TimeSeriesCompressor();
         this.zipFileVerifier = new ZipFileVerifier();
+        this.notifier = Root.zebedee.getSlackNotifier();
     }
 
     /**
@@ -87,12 +92,13 @@ public class TimeSeriesCompressionTask {
                 collectionReader.getRoot(),
                 collectionWriter.getRoot());
 
+        String channel = Configuration.getDefaultSlackAlarmChannel();
+
         for (TimeseriesCompressionResult failedZipFile : failedZipFiles) {
-            SlackNotification.collectionWarning(collection,
-                    "Failed verification of time series zip file",
-                    new PostMessageField("Attempt", Integer.toString(attempt, 10), true),
-                    new PostMessageField("Zip path", failedZipFile.zipPath.toString(), false)
-            );
+            AttachmentField attemptField = new AttachmentField("Attempt", Integer.toString(attempt, 10), true);
+            AttachmentField zipPath = new AttachmentField("Zip path", failedZipFile.zipPath.toString(), false);
+
+            notifier.sendCollectionWarning(collection, channel, "Failed verification of time series zip file", attemptField, zipPath);
             info().data("attempt", attempt).data("zipPath", failedZipFile.zipPath.toString())
                     .log("Failed verification of time series zip file");
         }

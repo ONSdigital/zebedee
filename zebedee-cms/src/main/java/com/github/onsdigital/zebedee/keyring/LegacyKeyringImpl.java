@@ -202,10 +202,21 @@ public class LegacyKeyringImpl implements Keyring {
         List<User> assignments = getKeyRecipients(collection);
         List<User> removals = getKeyToRemoveFrom(assignments);
 
+        info().collectionID(collection)
+                .data("assigning_to", assignments.stream()
+                        .map(u -> u.getEmail())
+                        .collect(Collectors.toList()))
+                .log("legacy keyring assigning new collection key to authorised users");
+
         for (User recipent : assignments) {
             assignKeyToRecipient(recipent, collection, key);
         }
 
+        info().collectionID(collection)
+                .data("revoked_from",  removals.stream()
+                        .map(u -> u.getEmail())
+                        .collect(Collectors.toList()))
+                .log("legacy keyring revoking new collection key from unauthorised users");
         for (User removeFrom : removals) {
             removeKeyFromUser(removeFrom, collection);
         }
@@ -260,7 +271,9 @@ public class LegacyKeyringImpl implements Keyring {
         }
 
         if (user.keyring().get(collection.getId()) != null) {
-            // they already have the key in their keyring - so do nothing
+            info().user(user.getEmail())
+                    .collectionID(collection)
+                    .log("skipping key assignment as user keying already contains entry for collection ID");
             return;
         }
 

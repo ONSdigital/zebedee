@@ -11,9 +11,9 @@ import javax.crypto.spec.SecretKeySpec;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.HashMap;
 import java.util.stream.Collectors;
 
 import static org.apache.commons.lang.StringUtils.defaultIfBlank;
@@ -22,6 +22,8 @@ import static org.apache.commons.lang.StringUtils.defaultIfBlank;
 public class Configuration {
 
     private static final String DEFAULT_WEBSITE_URL = "http://localhost:8080";
+    private static final String DEFAULT_SLACK_WARNING_CHANNEL = "slack-client-test";
+    private static final String DEFAULT_SLACK_ALARM_CHANNEL = "slack-client-test";
     private static final String DEFAULT_PUBLIC_WEBSITE_URL = "http://localhost:8080";
     private static final String DEFAULT_FLORENCE_URL = "http://localhost:8081";
     private static final String DEFAULT_BRIAN_URL = "http://localhost:8083";
@@ -56,6 +58,14 @@ public class Configuration {
 
     public static boolean isVerificationEnabled() {
         return BooleanUtils.toBoolean(StringUtils.defaultIfBlank(getValue("publish_verification_enabled"), "false"));
+    }
+
+    public static String getDefaultSlackWarningChannel() {
+        return StringUtils.defaultIfBlank(getValue("slack_default_channel"), DEFAULT_SLACK_WARNING_CHANNEL);
+    }
+
+    public static String getDefaultSlackAlarmChannel() {
+        return StringUtils.defaultIfBlank(getValue("slack_default_channel"), DEFAULT_SLACK_ALARM_CHANNEL);
     }
 
     /**

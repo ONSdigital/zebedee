@@ -39,6 +39,7 @@ import com.github.onsdigital.zebedee.service.ImageService;
 import com.github.onsdigital.zebedee.service.ImageServiceImpl;
 import com.github.onsdigital.zebedee.service.KafkaService;
 import com.github.onsdigital.zebedee.service.KafkaServiceImpl;
+import com.github.onsdigital.zebedee.service.NoOpKafkaService;
 import com.github.onsdigital.zebedee.service.ServiceStoreImpl;
 import com.github.onsdigital.zebedee.service.ZebedeeDatasetService;
 import com.github.onsdigital.zebedee.session.service.Sessions;
@@ -249,7 +250,7 @@ public class ZebedeeConfiguration {
             KafkaClient kafkaClient = new KafkaClientImpl(getKafkaURL(), getKafkaContentPublishedTopic());
             kafkaService = new KafkaServiceImpl(kafkaClient);
         } else {
-            kafkaService = (String c, List<String> u) -> {return;}; // 'Do nothing' kafka service
+            kafkaService = new NoOpKafkaService();
         }
 
         this.startUpAlerter = initStartUpAlerter();

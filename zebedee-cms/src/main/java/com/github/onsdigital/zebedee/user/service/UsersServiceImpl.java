@@ -10,7 +10,6 @@ import com.github.onsdigital.zebedee.json.Credentials;
 import com.github.onsdigital.zebedee.keyring.Keyring;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.Collections;
-import com.github.onsdigital.zebedee.model.KeyringCache;
 import com.github.onsdigital.zebedee.model.encryption.ApplicationKeys;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.session.model.Session;
@@ -87,7 +86,7 @@ public class UsersServiceImpl implements UsersService {
 
     /**
      * Create a new instance. Callers from outside of this package should use
-     * {@link UsersServiceImpl#getInstance(Collections, Permissions, ApplicationKeys, KeyringCache, UserStore)} to
+     * {@link UsersServiceImpl#getInstance(Collections, Permissions, ApplicationKeys,UserStore)} to
      * obatin a singleton instance of this service.
      *
      * @param users

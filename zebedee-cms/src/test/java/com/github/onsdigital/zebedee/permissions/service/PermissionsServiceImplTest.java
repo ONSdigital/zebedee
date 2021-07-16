@@ -3,7 +3,6 @@ package com.github.onsdigital.zebedee.permissions.service;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.model.Collection;
-import com.github.onsdigital.zebedee.model.KeyringCache;
 import com.github.onsdigital.zebedee.permissions.model.AccessMapping;
 import com.github.onsdigital.zebedee.permissions.store.PermissionsStore;
 import com.github.onsdigital.zebedee.service.ServiceSupplier;
@@ -55,9 +54,6 @@ public class PermissionsServiceImplTest {
 
     @Mock
     private TeamsService teamsService;
-
-    @Mock
-    private KeyringCache keyringCache;
 
     @Mock
     private AccessMapping accessMapping;
@@ -113,7 +109,7 @@ public class PermissionsServiceImplTest {
         session = null;
 
         assertThat(permissions.isPublisher(session), is(false));
-        verifyZeroInteractions(permissionsStore, usersService, teamsService, keyringCache);
+        verifyZeroInteractions(permissionsStore, usersService, teamsService);
     }
 
     @Test
@@ -121,7 +117,7 @@ public class PermissionsServiceImplTest {
         session.setEmail(null);
 
         assertThat(permissions.isPublisher(session), is(false));
-        verifyZeroInteractions(permissionsStore, usersService, teamsService, keyringCache);
+        verifyZeroInteractions(permissionsStore, usersService, teamsService);
     }
 
     @Test
@@ -134,7 +130,7 @@ public class PermissionsServiceImplTest {
         assertThat(permissions.isPublisher(session), is(false));
         verify(permissionsStore, times(1)).getAccessMapping();
         verify(accessMapping, times(1)).getDigitalPublishingTeam();
-        verifyZeroInteractions(usersService, teamsService, keyringCache);
+        verifyZeroInteractions(usersService, teamsService);
     }
 
     @Test
@@ -147,7 +143,7 @@ public class PermissionsServiceImplTest {
         assertThat(permissions.isPublisher(session), is(false));
         verify(permissionsStore, times(1)).getAccessMapping();
         verify(accessMapping, times(2)).getDigitalPublishingTeam();
-        verifyZeroInteractions(usersService, teamsService, keyringCache);
+        verifyZeroInteractions(usersService, teamsService);
     }
 
     @Test
@@ -162,20 +158,20 @@ public class PermissionsServiceImplTest {
         assertThat(permissions.isPublisher(session), is(true));
         verify(permissionsStore, times(1)).getAccessMapping();
         verify(accessMapping, times(2)).getDigitalPublishingTeam();
-        verifyZeroInteractions(usersService, teamsService, keyringCache);
+        verifyZeroInteractions(usersService, teamsService);
     }
 
     @Test
     public void isPublisherByEmail_ShouldReturnFalseIfEmailIsNull() throws Exception {
         String email = null;
         assertThat(permissions.isPublisher(email), is(false));
-        verifyZeroInteractions(permissionsStore, usersService, accessMapping, teamsService, keyringCache);
+        verifyZeroInteractions(permissionsStore, usersService, accessMapping, teamsService);
     }
 
     @Test
     public void isPublisherByEmail_ShouldReturnFalseIfEmailIsEmpty() throws Exception {
         assertThat(permissions.isPublisher(""), is(false));
-        verifyZeroInteractions(permissionsStore, usersService, accessMapping, teamsService, keyringCache);
+        verifyZeroInteractions(permissionsStore, usersService, accessMapping, teamsService);
     }
 
     @Test
@@ -188,7 +184,7 @@ public class PermissionsServiceImplTest {
         assertThat(permissions.isPublisher(EMAIL), is(false));
         verify(permissionsStore, times(1)).getAccessMapping();
         verify(accessMapping, times(1)).getDigitalPublishingTeam();
-        verifyZeroInteractions(usersService, teamsService, keyringCache);
+        verifyZeroInteractions(usersService, teamsService);
     }
 
     @Test
@@ -201,7 +197,7 @@ public class PermissionsServiceImplTest {
         assertThat(permissions.isPublisher(EMAIL), is(false));
         verify(permissionsStore, times(1)).getAccessMapping();
         verify(accessMapping, times(2)).getDigitalPublishingTeam();
-        verifyZeroInteractions(usersService, teamsService, keyringCache);
+        verifyZeroInteractions(usersService, teamsService);
     }
 
     @Test
@@ -216,21 +212,21 @@ public class PermissionsServiceImplTest {
         assertThat(permissions.isPublisher(EMAIL), is(true));
         verify(permissionsStore, times(1)).getAccessMapping();
         verify(accessMapping, times(2)).getDigitalPublishingTeam();
-        verifyZeroInteractions(usersService, teamsService, keyringCache);
+        verifyZeroInteractions(usersService, teamsService);
     }
 
     @Test
     public void isAdministratorBySession_ShouldReturnFalseIsSessionNull() throws Exception {
         session = null;
         assertThat(permissions.isAdministrator(session), is(false));
-        verifyZeroInteractions(permissionsStore, usersService, accessMapping, teamsService, keyringCache);
+        verifyZeroInteractions(permissionsStore, usersService, accessMapping, teamsService);
     }
 
     @Test
     public void isAdministratorBySession_ShouldReturnFalseIsSessionEmailNull() throws Exception {
         session.setEmail(null);
         assertThat(permissions.isAdministrator(session), is(false));
-        verifyZeroInteractions(permissionsStore, usersService, accessMapping, teamsService, keyringCache);
+        verifyZeroInteractions(permissionsStore, usersService, accessMapping, teamsService);
     }
 
     @Test
@@ -243,7 +239,7 @@ public class PermissionsServiceImplTest {
         assertThat(permissions.isAdministrator(session), is(false));
         verify(permissionsStore, times(1)).getAccessMapping();
         verify(accessMapping, times(1)).getAdministrators();
-        verifyZeroInteractions(usersService, teamsService, keyringCache);
+        verifyZeroInteractions(usersService, teamsService);
     }
 
     @Test
@@ -256,7 +252,7 @@ public class PermissionsServiceImplTest {
         assertThat(permissions.isAdministrator(session), is(false));
         verify(permissionsStore, times(1)).getAccessMapping();
         verify(accessMapping, times(2)).getAdministrators();
-        verifyZeroInteractions(usersService, teamsService, keyringCache);
+        verifyZeroInteractions(usersService, teamsService);
     }
 
     @Test
@@ -271,14 +267,14 @@ public class PermissionsServiceImplTest {
         assertThat(permissions.isAdministrator(session), is(true));
         verify(permissionsStore, times(1)).getAccessMapping();
         verify(accessMapping, times(2)).getAdministrators();
-        verifyZeroInteractions(usersService, teamsService, keyringCache);
+        verifyZeroInteractions(usersService, teamsService);
     }
 
     @Test
     public void isAdministratorByEmail_ShouldReturnFalseIsEmailNull() throws Exception {
         String email = null;
         assertThat(permissions.isAdministrator(email), is(false));
-        verifyZeroInteractions(permissionsStore, usersService, accessMapping, teamsService, keyringCache);
+        verifyZeroInteractions(permissionsStore, usersService, accessMapping, teamsService);
     }
 
     @Test
@@ -291,7 +287,7 @@ public class PermissionsServiceImplTest {
         assertThat(permissions.isAdministrator(EMAIL), is(false));
         verify(permissionsStore, times(1)).getAccessMapping();
         verify(accessMapping, times(1)).getAdministrators();
-        verifyZeroInteractions(usersService, teamsService, keyringCache);
+        verifyZeroInteractions(usersService, teamsService);
     }
 
     @Test
@@ -304,7 +300,7 @@ public class PermissionsServiceImplTest {
         assertThat(permissions.isAdministrator(EMAIL), is(false));
         verify(permissionsStore, times(1)).getAccessMapping();
         verify(accessMapping, times(2)).getAdministrators();
-        verifyZeroInteractions(usersService, teamsService, keyringCache);
+        verifyZeroInteractions(usersService, teamsService);
     }
 
     @Test
@@ -319,7 +315,7 @@ public class PermissionsServiceImplTest {
         assertThat(permissions.isAdministrator(EMAIL), is(true));
         verify(permissionsStore, times(1)).getAccessMapping();
         verify(accessMapping, times(2)).getAdministrators();
-        verifyZeroInteractions(usersService, teamsService, keyringCache);
+        verifyZeroInteractions(usersService, teamsService);
     }
 
     @Test
@@ -332,7 +328,7 @@ public class PermissionsServiceImplTest {
         assertThat(permissions.hasAdministrator(), is(false));
         verify(permissionsStore, times(1)).getAccessMapping();
         verify(accessMapping, times(1)).getAdministrators();
-        verifyZeroInteractions(usersService, teamsService, keyringCache);
+        verifyZeroInteractions(usersService, teamsService);
     }
 
     @Test
@@ -345,7 +341,7 @@ public class PermissionsServiceImplTest {
         assertThat(permissions.hasAdministrator(), is(false));
         verify(permissionsStore, times(1)).getAccessMapping();
         verify(accessMapping, times(2)).getAdministrators();
-        verifyZeroInteractions(usersService, teamsService, keyringCache);
+        verifyZeroInteractions(usersService, teamsService);
     }
 
     @Test
@@ -360,7 +356,7 @@ public class PermissionsServiceImplTest {
         assertThat(permissions.hasAdministrator(), is(true));
         verify(permissionsStore, times(1)).getAccessMapping();
         verify(accessMapping, times(2)).getAdministrators();
-        verifyZeroInteractions(usersService, teamsService, keyringCache);
+        verifyZeroInteractions(usersService, teamsService);
     }
 
 
@@ -369,7 +365,7 @@ public class PermissionsServiceImplTest {
         try {
             permissions.removeAdministrator(EMAIL, null);
         } catch (UnauthorizedException e) {
-            verifyZeroInteractions(permissionsStore, accessMapping, usersService, teamsService, keyringCache);
+            verifyZeroInteractions(permissionsStore, accessMapping, usersService, teamsService);
             throw e;
         }
     }
@@ -379,7 +375,7 @@ public class PermissionsServiceImplTest {
         try {
             permissions.removeAdministrator(null, session);
         } catch (UnauthorizedException e) {
-            verifyZeroInteractions(permissionsStore, accessMapping, usersService, teamsService, keyringCache);
+            verifyZeroInteractions(permissionsStore, accessMapping, usersService, teamsService);
             throw e;
         }
     }
@@ -396,7 +392,7 @@ public class PermissionsServiceImplTest {
         } catch (UnauthorizedException e) {
             verify(permissionsStore, times(1)).getAccessMapping();
             verify(accessMapping, times(2)).getAdministrators();
-            verifyZeroInteractions(accessMapping, usersService, teamsService, keyringCache);
+            verifyZeroInteractions(accessMapping, usersService, teamsService);
             throw e;
         }
     }
@@ -414,7 +410,7 @@ public class PermissionsServiceImplTest {
         verify(permissionsStore, times(2)).getAccessMapping();
         verify(accessMapping, times(4)).getAdministrators();
         verify(permissionsStore, times(1)).saveAccessMapping(accessMapping);
-        verifyZeroInteractions(usersService, teamsService, keyringCache);
+        verifyZeroInteractions(usersService, teamsService);
     }
 
 
@@ -423,7 +419,7 @@ public class PermissionsServiceImplTest {
         try {
             permissions.removeEditor(EMAIL, null);
         } catch (UnauthorizedException e) {
-            verifyZeroInteractions(permissionsStore, accessMapping, usersService, teamsService, keyringCache);
+            verifyZeroInteractions(permissionsStore, accessMapping, usersService, teamsService);
             throw e;
         }
     }
@@ -433,7 +429,7 @@ public class PermissionsServiceImplTest {
         try {
             permissions.removeEditor(null, session);
         } catch (UnauthorizedException e) {
-            verifyZeroInteractions(permissionsStore, accessMapping, usersService, teamsService, keyringCache);
+            verifyZeroInteractions(permissionsStore, accessMapping, usersService, teamsService);
             throw e;
         }
     }
@@ -450,7 +446,7 @@ public class PermissionsServiceImplTest {
         } catch (UnauthorizedException e) {
             verify(permissionsStore, times(1)).getAccessMapping();
             verify(accessMapping, times(2)).getAdministrators();
-            verifyZeroInteractions(accessMapping, usersService, teamsService, keyringCache);
+            verifyZeroInteractions(accessMapping, usersService, teamsService);
             throw e;
         }
     }
@@ -471,7 +467,7 @@ public class PermissionsServiceImplTest {
         verify(permissionsStore, times(2)).getAccessMapping();
         verify(accessMapping, times(2)).getAdministrators();
         verify(permissionsStore, times(1)).saveAccessMapping(accessMapping);
-        verifyZeroInteractions(usersService, teamsService, keyringCache);
+        verifyZeroInteractions(usersService, teamsService);
     }
 
     @Test

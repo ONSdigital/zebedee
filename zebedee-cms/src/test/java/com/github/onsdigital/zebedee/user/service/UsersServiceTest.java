@@ -10,7 +10,6 @@ import com.github.onsdigital.zebedee.json.Credentials;
 import com.github.onsdigital.zebedee.json.Keyring;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.Collections;
-import com.github.onsdigital.zebedee.model.KeyringCache;
 import com.github.onsdigital.zebedee.model.encryption.ApplicationKeys;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.session.model.Session;
@@ -69,9 +68,6 @@ public class UsersServiceTest {
 
     @Mock
     private ApplicationKeys applicationKeys;
-
-    @Mock
-    private KeyringCache keyringCache;
 
     @Mock
     private UserStore userStore;

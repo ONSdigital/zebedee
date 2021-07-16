@@ -7,7 +7,6 @@ import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.PermissionDefinition;
 import com.github.onsdigital.zebedee.model.Collection;
-import com.github.onsdigital.zebedee.model.KeyringCache;
 import com.github.onsdigital.zebedee.model.PathUtils;
 import com.github.onsdigital.zebedee.permissions.model.AccessMapping;
 import com.github.onsdigital.zebedee.permissions.store.PermissionsStore;
@@ -42,7 +41,6 @@ import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMet
 public class PermissionsServiceImpl implements PermissionsService {
 
     private PermissionsStore permissionsStore;
-    private KeyringCache keyringCache;
     private ReadWriteLock accessMappingLock = new ReentrantReadWriteLock();
     private ServiceSupplier<UsersService> usersServiceSupplier;
     private ServiceSupplier<TeamsService> teamsServiceSupplier;

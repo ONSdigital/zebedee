@@ -71,9 +71,6 @@ public abstract class ZebedeeTestBaseFixture {
     protected ApplicationKeys applicationKeys;
 
     @Mock
-    protected KeyringCache legacyKeyringCache;
-
-    @Mock
     protected SchedulerKeyCache schedulerKeyCache;
 
     @Mock
@@ -168,9 +165,6 @@ public abstract class ZebedeeTestBaseFixture {
 
         when(zebCfg.getApplicationKeys())
                 .thenReturn(applicationKeys);
-
-        when(zebCfg.getKeyringCache())
-                .thenReturn(legacyKeyringCache);
 
         when(zebCfg.getCollectionKeyring())
                 .thenReturn(collectionKeyring);

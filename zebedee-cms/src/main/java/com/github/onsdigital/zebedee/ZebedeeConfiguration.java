@@ -25,7 +25,6 @@ import com.github.onsdigital.zebedee.keyring.store.KeyringStoreImpl;
 import com.github.onsdigital.zebedee.model.Collections;
 import com.github.onsdigital.zebedee.model.Content;
 import com.github.onsdigital.zebedee.model.RedirectTablePartialMatch;
-import com.github.onsdigital.zebedee.model.encryption.ApplicationKeys;
 import com.github.onsdigital.zebedee.model.encryption.EncryptionKeyFactory;
 import com.github.onsdigital.zebedee.model.encryption.EncryptionKeyFactoryImpl;
 import com.github.onsdigital.zebedee.model.publishing.PublishedCollections;
@@ -70,7 +69,6 @@ import java.util.function.Supplier;
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.warn;
-import static com.github.onsdigital.zebedee.Zebedee.APPLICATION_KEYS;
 import static com.github.onsdigital.zebedee.Zebedee.COLLECTIONS;
 import static com.github.onsdigital.zebedee.Zebedee.KEYRING;
 import static com.github.onsdigital.zebedee.Zebedee.PERMISSIONS;
@@ -109,12 +107,10 @@ public class ZebedeeConfiguration {
     private Path sessionsPath;
     private Path permissionsPath;
     private Path teamsPath;
-    private Path applicationKeysPath;
     private Path redirectPath;
     private Path servicePath;
     private Path keyRingPath;
     private boolean useVerificationAgent;
-    private ApplicationKeys applicationKeys;
     private PublishedCollections publishedCollections;
     private Collections collections;
     private Content published;
@@ -158,7 +154,6 @@ public class ZebedeeConfiguration {
         this.sessionsPath = createDir(zebedeePath, SESSIONS);
         this.permissionsPath = createDir(zebedeePath, PERMISSIONS);
         this.teamsPath = createDir(zebedeePath, TEAMS);
-        this.applicationKeysPath = createDir(zebedeePath, APPLICATION_KEYS);
         this.redirectPath = this.publishedContentPath.resolve(Content.REDIRECT);
         this.servicePath = createDir(zebedeePath, SERVICES);
         this.keyRingPath = createDir(zebedeePath, KEYRING);
@@ -170,7 +165,6 @@ public class ZebedeeConfiguration {
         // Create the services and objects...
         this.dataIndex = new DataIndex(new FileSystemContentReader(publishedContentPath));
         this.publishedCollections = new PublishedCollections(publishedCollectionsPath);
-        this.applicationKeys = new ApplicationKeys(applicationKeysPath);
         this.encryptionKeyFactory = new EncryptionKeyFactoryImpl();
 
         // Configure the sessions
@@ -204,15 +198,11 @@ public class ZebedeeConfiguration {
         Supplier<Keyring> keyringSupplier = () -> collectionKeyring;
 
         this.usersService = UsersServiceImpl.getInstance(
-                new UserStoreFileSystemImpl(this.usersPath),
-                collections,
-                permissionsService,
-                applicationKeys,
-                keyringSupplier);
+                new UserStoreFileSystemImpl(this.usersPath), collections, permissionsService, keyringSupplier);
 
         // The legacy keyring logic but behind the new keyring interface.
         Keyring legacyKeyring = new LegacyKeyringImpl(
-                sessions, usersService, permissionsService, legacyKeyringCache, schedulerKeyCache, applicationKeys);
+                sessions, usersService, permissionsService, legacyKeyringCache, schedulerKeyCache);
 
         // The new world keyring impl - could be no op or real impl depending on config.
         Keyring centralKeyring = initCentralKeyring();
@@ -265,8 +255,6 @@ public class ZebedeeConfiguration {
                 .data("sessions_path", sessionsPath.toString())
                 .data("permissions_path", permissionsPath.toString())
                 .data("teams_path", teamsPath.toString())
-                .data("application_keys_path", applicationKeysPath.toString())
-                .data("redirect_path", applicationKeysPath.toString())
                 .data("services_path", servicePath.toString())
                 .data("enable_verification_agent", useVerificationAgent)
                 .data("sessions_api_enabled", cmsFeatureFlags().isSessionAPIEnabled())
@@ -339,10 +327,6 @@ public class ZebedeeConfiguration {
         return teamsPath;
     }
 
-    public Path getApplicationKeysPath() {
-        return applicationKeysPath;
-    }
-
     public Path getRedirectPath() {
         return redirectPath;
     }
@@ -392,10 +376,6 @@ public class ZebedeeConfiguration {
         return this.legacyKeyringCache;
     }
 
-    public ApplicationKeys getApplicationKeys() {
-        return this.applicationKeys;
-    }
-
     public Sessions getSessions() {
         return this.sessions;
     }
@@ -424,7 +404,9 @@ public class ZebedeeConfiguration {
         return imageService;
     }
 
-    public KafkaService getKafkaService() { return kafkaService; }
+    public KafkaService getKafkaService() {
+        return kafkaService;
+    }
 
     public ServiceStoreImpl getServiceStore() {
         return new ServiceStoreImpl(servicePath);

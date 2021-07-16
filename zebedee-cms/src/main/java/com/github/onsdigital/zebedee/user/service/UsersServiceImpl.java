@@ -10,7 +10,6 @@ import com.github.onsdigital.zebedee.json.Credentials;
 import com.github.onsdigital.zebedee.keyring.Keyring;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.Collections;
-import com.github.onsdigital.zebedee.model.encryption.ApplicationKeys;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.user.model.User;
@@ -52,7 +51,6 @@ public class UsersServiceImpl implements UsersService {
     private final ReentrantLock lock = new ReentrantLock();
 
     private PermissionsService permissionsService;
-    private ApplicationKeys applicationKeys;
     private Collections collections;
     private UserStore userStore;
     private UserFactory userFactory;
@@ -71,13 +69,11 @@ public class UsersServiceImpl implements UsersService {
      * Get a singleton instance of {@link UsersServiceImpl}.
      */
     public static UsersService getInstance(UserStore userStore, Collections collections,
-                                           PermissionsService permissionsService, ApplicationKeys applicationKeys,
-                                           Supplier<Keyring> keyringSupplier) {
+                                           PermissionsService permissionsService, Supplier<Keyring> keyringSupplier) {
         if (INSTANCE == null) {
             synchronized (MUTEX) {
                 if (INSTANCE == null) {
-                    INSTANCE = new UsersServiceImpl(userStore, collections, permissionsService, applicationKeys,
-                            keyringSupplier);
+                    INSTANCE = new UsersServiceImpl(userStore, collections, permissionsService, keyringSupplier);
                 }
             }
         }
@@ -85,20 +81,12 @@ public class UsersServiceImpl implements UsersService {
     }
 
     /**
-     * Create a new instance. Callers from outside of this package should use
-     * {@link UsersServiceImpl#getInstance(Collections, Permissions, ApplicationKeys,UserStore)} to
-     * obatin a singleton instance of this service.
-     *
-     * @param users
-     * @param collections
-     * @param permissionsServiceImpl
-     * @param applicationKeys
-     * @param keyringCache
+     * Create a new instance or the user service. Callers outside this package should use getInstance() to obtain the
+     * singleton instance.
      */
     UsersServiceImpl(UserStore userStore, Collections collections, PermissionsService permissionsService,
-                     ApplicationKeys applicationKeys, Supplier<Keyring> keyringSupplier) {
+                     Supplier<Keyring> keyringSupplier) {
         this.permissionsService = permissionsService;
-        this.applicationKeys = applicationKeys;
         this.collections = collections;
         this.keyringSupplier = keyringSupplier;
         this.userStore = userStore;
@@ -331,9 +319,6 @@ public class UsersServiceImpl implements UsersService {
 
     private boolean isStale(String key, Map<String, Collection> collectionMap, List<String> orphanedCollections,
                             String userEmail) {
-        if (applicationKeys.containsKey(key)) {
-            return false;
-        }
 
         String collectionName = key.split("-")[0];
         if (orphanedCollections.contains(collectionName)) {

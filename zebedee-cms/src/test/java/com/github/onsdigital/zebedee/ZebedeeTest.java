@@ -244,7 +244,7 @@ public class ZebedeeTest extends ZebedeeTestBaseFixture {
 
         // Then null is returned
         assertThat(actual, is(nullValue()));
-        verifyZeroInteractions(sessions, usersService, applicationKeys, collectionKeyring);
+        verifyZeroInteractions(sessions, usersService, collectionKeyring);
     }
 
     @Test
@@ -266,7 +266,7 @@ public class ZebedeeTest extends ZebedeeTestBaseFixture {
         // Then an exception is thrown
         assertThat(ex.getMessage(), equalTo("boom"));
         verify(usersService, times(1)).getUserByEmail(TEST_EMAIL);
-        verifyZeroInteractions(sessions, usersService, applicationKeys, collectionKeyring);
+        verifyZeroInteractions(sessions, usersService, collectionKeyring);
     }
 
     @Test
@@ -289,7 +289,7 @@ public class ZebedeeTest extends ZebedeeTestBaseFixture {
         assertThat(actual, is(nullValue()));
         verify(usersService, times(1)).getUserByEmail(TEST_EMAIL);
 
-        verifyZeroInteractions(sessions, applicationKeys, collectionKeyring);
+        verifyZeroInteractions(sessions, collectionKeyring);
     }
 
     @Test
@@ -317,7 +317,7 @@ public class ZebedeeTest extends ZebedeeTestBaseFixture {
         verify(sessions, times(1)).create(user);
         verify(user, never()).keyring();
 
-        verifyZeroInteractions(applicationKeys, collectionKeyring);
+        verifyZeroInteractions(collectionKeyring);
     }
 
     @Test
@@ -355,7 +355,7 @@ public class ZebedeeTest extends ZebedeeTestBaseFixture {
         verify(sessions, times(1)).create(user);
         verify(collectionKeyring, times(1)).unlock(user, PASSWORD);
 
-        verifyZeroInteractions(applicationKeys, usersKeyring);
+        verifyZeroInteractions(usersKeyring);
     }
 
     @Test
@@ -394,7 +394,7 @@ public class ZebedeeTest extends ZebedeeTestBaseFixture {
         verify(collectionKeyring, times(1)).unlock(user, PASSWORD);
         verify(collectionKeyring, times(1)).cacheKeyring(user);
 
-        verifyZeroInteractions(applicationKeys, usersKeyring);
+        verifyZeroInteractions(usersKeyring);
     }
 
     @Test
@@ -429,7 +429,7 @@ public class ZebedeeTest extends ZebedeeTestBaseFixture {
         assertThat(actual, equalTo(userSession));
         verify(usersService, times(1)).getUserByEmail(TEST_EMAIL);
         verify(sessions, times(1)).create(user);
-        verifyZeroInteractions(applicationKeys, usersKeyring);
+        verifyZeroInteractions(usersKeyring);
 
         // And the keyring is unlocked and cached
         verify(collectionKeyring, times(1)).unlock(user, PASSWORD);

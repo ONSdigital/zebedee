@@ -15,11 +15,14 @@ import com.github.onsdigital.zebedee.model.Collections;
 import com.github.onsdigital.zebedee.model.Content;
 import com.github.onsdigital.zebedee.model.KeyringCache;
 import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
-import com.github.onsdigital.zebedee.model.encryption.ApplicationKeys;
 import com.github.onsdigital.zebedee.model.encryption.EncryptionKeyFactory;
 import com.github.onsdigital.zebedee.model.publishing.PublishedCollections;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
-import com.github.onsdigital.zebedee.service.*;
+import com.github.onsdigital.zebedee.service.DatasetService;
+import com.github.onsdigital.zebedee.service.ImageService;
+import com.github.onsdigital.zebedee.service.KafkaService;
+import com.github.onsdigital.zebedee.service.ServiceStore;
+import com.github.onsdigital.zebedee.service.ServiceStoreImpl;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.session.service.Sessions;
 import com.github.onsdigital.zebedee.teams.service.TeamsService;
@@ -64,13 +67,11 @@ public class Zebedee {
     private final Path sessionsPath;
     private final Path permissionsPath;
     private final Path teamsPath;
-    private final Path applicationKeysPath;
     private final Path redirectPath;
     private final Path servicePath;
     private final Path keyRingPath;
 
     private final VerificationAgent verificationAgent;
-    private final ApplicationKeys applicationKeys;
     private final PublishedCollections publishedCollections;
     private final Collections collections;
     private final Content published;
@@ -110,7 +111,6 @@ public class Zebedee {
         this.dataIndex = cfg.getDataIndex();
         this.collections = cfg.getCollections();
         this.publishedCollections = cfg.getPublishCollections();
-        this.applicationKeys = cfg.getApplicationKeys();
         this.teamsService = cfg.getTeamsService();
         this.usersService = cfg.getUsersService();
         this.verificationAgent = cfg.getVerificationAgent(isVerificationEnabled(), this);
@@ -127,7 +127,6 @@ public class Zebedee {
         this.sessionsPath = cfg.getSessionsPath();
         this.permissionsPath = cfg.getPermissionsPath();
         this.teamsPath = cfg.getTeamsPath();
-        this.applicationKeysPath = cfg.getApplicationKeysPath();
         this.redirectPath = cfg.getRedirectPath();
         this.servicePath = cfg.getServicePath();
         this.keyRingPath = cfg.getKeyRingPath();
@@ -379,10 +378,6 @@ public class Zebedee {
 
     public SchedulerKeyCache getSchedulerKeyCache() {
         return this.schedulerKeyCache;
-    }
-
-    public ApplicationKeys getApplicationKeys() {
-        return this.applicationKeys;
     }
 
     public Sessions getSessions() {

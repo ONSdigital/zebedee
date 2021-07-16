@@ -4,7 +4,6 @@ import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.keyring.cache.SchedulerKeyCache;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.KeyringCache;
-import com.github.onsdigital.zebedee.model.encryption.ApplicationKeys;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.session.service.Sessions;
@@ -60,24 +59,20 @@ public class LegacyKeyringImpl implements Keyring {
     private PermissionsService permissions;
     private KeyringCache cache;
     private SchedulerKeyCache schedulerKeyCache;
-    private ApplicationKeys applicationKeys;
 
     /**
      * Construct a new instance of the Legacy keyring.
      *
-     * @param sessions        the {@link Sessions} service to use.
-     * @param cache           the {@link KeyringCache} to use.
-     * @param applicationKeys the {@link ApplicationKeys} to use.
+     * @param sessions the {@link Sessions} service to use.
+     * @param cache    the {@link KeyringCache} to use.
      */
     public LegacyKeyringImpl(final Sessions sessions, final UsersService usersService, PermissionsService permissions,
-                             final KeyringCache cache, final SchedulerKeyCache schedulerKeyCache,
-                             final ApplicationKeys applicationKeys) {
+                             final KeyringCache cache, final SchedulerKeyCache schedulerKeyCache) {
         this.sessions = sessions;
         this.usersService = usersService;
         this.permissions = permissions;
         this.cache = cache;
         this.schedulerKeyCache = schedulerKeyCache;
-        this.applicationKeys = applicationKeys;
     }
 
     /**
@@ -95,8 +90,6 @@ public class LegacyKeyringImpl implements Keyring {
         if (session != null) {
             addUserKeyringToCache(user, session);
         }
-
-        applicationKeys.populateCacheFromUserKeyring(user.keyring());
     }
 
     private Session getUserSession(User user) throws KeyringException {
@@ -213,7 +206,7 @@ public class LegacyKeyringImpl implements Keyring {
         }
 
         info().collectionID(collection)
-                .data("revoked_from",  removals.stream()
+                .data("revoked_from", removals.stream()
                         .map(u -> u.getEmail())
                         .collect(Collectors.toList()))
                 .log("legacy keyring revoking new collection key from unauthorised users");

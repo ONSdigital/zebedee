@@ -10,7 +10,6 @@ import com.github.onsdigital.zebedee.json.Credentials;
 import com.github.onsdigital.zebedee.json.Keyring;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.Collections;
-import com.github.onsdigital.zebedee.model.encryption.ApplicationKeys;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.user.model.User;
@@ -67,9 +66,6 @@ public class UsersServiceTest {
     private PermissionsService permissions;
 
     @Mock
-    private ApplicationKeys applicationKeys;
-
-    @Mock
     private UserStore userStore;
 
     @Mock
@@ -107,7 +103,7 @@ public class UsersServiceTest {
 
         keyringSupplier = () -> centralKeyring;
 
-        service = new UsersServiceImpl(userStore, collections, permissions, applicationKeys, keyringSupplier);
+        service = new UsersServiceImpl(userStore, collections, permissions, keyringSupplier);
 
         when(userMock.getEmail())
                 .thenReturn(EMAIL_2);
@@ -697,8 +693,6 @@ public class UsersServiceTest {
                 .thenReturn(keyringAsList);
         when(collections.mapByID())
                 .thenReturn(mapping);
-        when(applicationKeys.containsKey("12345"))
-                .thenReturn(false);
         when(userMock.getAdminOptions())
                 .thenReturn(new AdminOptions());
 
@@ -708,7 +702,6 @@ public class UsersServiceTest {
         verify(userStore, times(1)).get(EMAIL);
         verify(userMock, times(3)).keyring();
         verify(collections, times(1)).mapByID();
-        verify(applicationKeys, times(1)).containsKey("12345");
         verify(keyring, times(1)).remove("12345");
         verify(userStore, times(1)).save(userMock);
         verify(lockMock, times(3)).lock();
@@ -741,8 +734,6 @@ public class UsersServiceTest {
                 .thenReturn(mapping);
         when(collections.listOrphaned())
                 .thenReturn(orphanedCollections);
-        when(applicationKeys.containsKey("collectionABC"))
-                .thenReturn(false);
         when(userMock.getAdminOptions())
                 .thenReturn(new AdminOptions());
 
@@ -754,11 +745,9 @@ public class UsersServiceTest {
         verify(collections, times(1)).mapByID();
         verify(collections, times(1)).listOrphaned();
 
-        verify(applicationKeys, times(1)).containsKey("collectionABC");
         verify(keyring, times(1)).remove("collectionABC");
 
         // important bit - never remove an orphan if it exists
-        verify(applicationKeys, times(1)).containsKey("orphan");
         verify(keyring, never()).remove("orphan");
 
         verify(userStore, times(1)).save(userMock);

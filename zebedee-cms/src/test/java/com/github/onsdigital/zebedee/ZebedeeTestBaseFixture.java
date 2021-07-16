@@ -8,7 +8,6 @@ import com.github.onsdigital.zebedee.keyring.Keyring;
 import com.github.onsdigital.zebedee.keyring.cache.SchedulerKeyCache;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.KeyringCache;
-import com.github.onsdigital.zebedee.model.encryption.ApplicationKeys;
 import com.github.onsdigital.zebedee.model.encryption.EncryptionKeyFactory;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDao;
@@ -66,9 +65,6 @@ public abstract class ZebedeeTestBaseFixture {
 
     @Mock
     protected Sessions sessions;
-
-    @Mock
-    protected ApplicationKeys applicationKeys;
 
     @Mock
     protected SchedulerKeyCache schedulerKeyCache;
@@ -162,9 +158,6 @@ public abstract class ZebedeeTestBaseFixture {
 
         when(zebCfg.getUsersService())
                 .thenReturn(usersService);
-
-        when(zebCfg.getApplicationKeys())
-                .thenReturn(applicationKeys);
 
         when(zebCfg.getCollectionKeyring())
                 .thenReturn(collectionKeyring);

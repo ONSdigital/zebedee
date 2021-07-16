@@ -4,7 +4,6 @@ import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.keyring.cache.SchedulerKeyCache;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.KeyringCache;
-import com.github.onsdigital.zebedee.model.encryption.ApplicationKeys;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.session.service.Sessions;
@@ -64,9 +63,6 @@ public abstract class BaseLegacyKeyringTest {
     protected Sessions sessionsService;
 
     @Mock
-    protected ApplicationKeys applicationKeys;
-
-    @Mock
     protected KeyringCache keyringCache;
 
     @Mock
@@ -110,8 +106,7 @@ public abstract class BaseLegacyKeyringTest {
 
         setUpTests();
 
-        legacyKeyring = new LegacyKeyringImpl(
-                sessionsService, users, permissions, keyringCache, schedulerCache, applicationKeys);
+        legacyKeyring = new LegacyKeyringImpl(sessionsService, users, permissions, keyringCache, schedulerCache);
 
     }
 

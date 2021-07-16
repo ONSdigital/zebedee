@@ -100,9 +100,6 @@ public class LegacyKeyringImpl_CacheKeyringTest extends BaseLegacyKeyringTest {
         // Then no keying is added to the cache
         verify(sessionsService, times(1)).find(EMAIL_BERT);
         verifyZeroInteractions(keyringCache);
-
-        // And then applicationKeys is updated
-        verify(applicationKeys, times(1)).populateCacheFromUserKeyring(bertKeyring);
     }
 
     @Test
@@ -130,8 +127,5 @@ public class LegacyKeyringImpl_CacheKeyringTest extends BaseLegacyKeyringTest {
         // Then the keyring cache is updated with the users keys
         verify(sessionsService, times(1)).find(EMAIL_BERT);
         verify(keyringCache, times(1)).put(bert, session);
-
-        // And the applicate keys are updated from the user keyring
-        verify(applicationKeys, times(1)).populateCacheFromUserKeyring(bertKeyring);
     }
 }

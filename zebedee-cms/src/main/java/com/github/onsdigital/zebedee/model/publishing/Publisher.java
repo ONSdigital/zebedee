@@ -765,8 +765,10 @@ public class Publisher {
         } catch (Exception e) {
             error().data("collectionId", collection.getDescription().getId()).data("publishing", true)
                     .logException(e, "failed to send content-published kafka events");
-            PostMessageField msg = new PostMessageField("Error", e.getMessage(), false);
-            collectionAlarm(collection, "Failed to send content-published kafka events", msg);
+
+            String channel = Configuration.getDefaultSlackAlarmChannel();
+            Notifier notifier = zebedee.getSlackNotifier();
+            notifier.sendCollectionAlarm(collection, channel, "Failed to send content-published kafka events", e);
         }
     }
 

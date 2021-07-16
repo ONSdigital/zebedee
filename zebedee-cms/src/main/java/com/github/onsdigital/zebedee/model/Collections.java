@@ -17,7 +17,6 @@ import com.github.onsdigital.zebedee.json.ApprovalStatus;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.Event;
 import com.github.onsdigital.zebedee.json.EventType;
-import com.github.onsdigital.zebedee.json.Keyring;
 import com.github.onsdigital.zebedee.logging.CMSLogEvent;
 import com.github.onsdigital.zebedee.model.approval.ApprovalQueue;
 import com.github.onsdigital.zebedee.model.approval.ApproveTask;
@@ -461,11 +460,6 @@ public class Collections {
         if (breakBeforePublish) {
             info().log("Breaking before publish");
             return true;
-        }
-
-        Keyring keyring = zebedeeSupplier.get().getLegacyKeyringCache().get(session);
-        if (keyring == null) {
-            throw new UnauthorizedException("No keyring is available for " + session.getEmail());
         }
 
         ZebedeeCollectionReader collectionReader = new ZebedeeCollectionReader(zebedeeSupplier.get(), collection, session);

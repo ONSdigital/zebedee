@@ -141,26 +141,6 @@ public class Root {
         info().data(ZEBEDEE_ROOT, rootDir).log("zebedee cmd initialization completed successfully");
     }
 
-    /**
-     * If we have not previously generated a key for CSDB import, generate one and distribute it.
-     */
-/*
-    public static void initialiseCsdbImportKeys() {
-        // if there is no key previously stored for CSDB import, generate a new one.
-        if (!zebedee.getApplicationKeys().containsKey(CsdbImporter.APPLICATION_KEY_ID)) {
-            // create new key pair
-            info().log("zebedee root: No key pair found for CSDB import. Generating and saving a new key.");
-            try {
-                SecretKey secretKey = zebedee.getApplicationKeys().generateNewKey(CsdbImporter.APPLICATION_KEY_ID);
-
-                // distribute private key to all users.
-                KeyManager.distributeApplicationKey(zebedee, CsdbImporter.APPLICATION_KEY_ID, secretKey);
-            } catch (IOException e) {
-                error().logException(e, "zebedee root: failed to generate and save new application key for CSDB import.");
-            }
-        }
-    }
-*/
     private static void cleanupStaleCollectionKeys() throws IOException, NotFoundException, BadRequestException {
         info().log("cms init task: removing stale collection keys from user keyrings");
         Map<String, Collection> collectionMap = zebedee.getCollections().mapByID();

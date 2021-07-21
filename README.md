@@ -180,3 +180,9 @@ If this is fails try again after regenerating an override key as it may have exp
 [4]: http://localhost:8081/florence/login
 [5]: https://github.com/ONSdigital/sixteens
 [6]: https://github.com/ONSdigital/dp-compose
+
+#### SERVICE_AUTH_TOKEN creation for Production
+
+Please see document in dp-operations:
+
+[dp-operations/guides SERVICE_AUTH_TOKEN-for-Production](https://github.com/ONSdigital/dp-operations/blob/main/guides/SERVICE_AUTH_TOKEN-for-Production.md)

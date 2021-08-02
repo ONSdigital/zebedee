@@ -40,15 +40,18 @@ public class ImageServiceImpl implements ImageService {
     public ImageServicePublishingResult publishImagesInCollection(Collection collection) throws IOException, ImageAPIException {
 
         Images images = imageClient.getImages(collection.getId());
-        info().data("publishing", true).data("collectionId", collection.getId())
-                .data("numberOfImages", images.getTotalCount())
+        info().data("publishing", true)
+                .collectionID(collection)
+                .data("number_of_images", images.getTotalCount())
                 .log("publishing images in collection");
 
         ImageServicePublishingResult result = new ImageServicePublishingResult(images.getTotalCount());
-        for (Image image : images.getItems()) {
-            PublishStatus status = publishImage(image, collection.getId());
-            if (PublishStatus.UNPUBLISHED.equals(status)) {
-                result.addUnpublishedImage(image.getId(), image.getState());
+        if (images != null && images.getTotalCount() > 0) {
+            for (Image image : images.getItems()) {
+                PublishStatus status = publishImage(image, collection.getId());
+                if (PublishStatus.UNPUBLISHED.equals(status)) {
+                    result.addUnpublishedImage(image.getId(), image.getState());
+                }
             }
         }
 
@@ -70,24 +73,26 @@ public class ImageServiceImpl implements ImageService {
         switch (image.getState()) {
             case STATE_CREATED:
             case STATE_DELETED:
-                info().data("publishing", true).collectionID(collectionId)
-                        .data("imageId", image.getId())
-                        .data("imageState", image.getState())
+                info().data("publishing", true)
+                        .collectionID(collectionId)
+                        .data("image_id", image.getId())
+                        .data("image_state", image.getState())
                         .log("skipping publish of abandoned image");
                 status = PublishStatus.SKIPPED;
                 break;
             case STATE_UPLOADED:
             case STATE_IMPORTING:
             case STATE_FAILED_IMPORT:
-                warn().data("publishing", true).collectionID(collectionId)
-                        .data("imageId", image.getId())
-                        .data("imageState", image.getState())
+                warn().data("publishing", true)
+                        .collectionID(collectionId)
+                        .data("image_id", image.getId())
+                        .data("image_state", image.getState())
                         .log("skipping publish of un-imported image with warning");
                 status = PublishStatus.UNPUBLISHED;
                 break;
             default:
                 info().data("publishing", true).collectionID(collectionId)
-                        .data("imageId", image.getId())
+                        .data("image_id", image.getId())
                         .log("publishing image");
 
                 //Publish the image

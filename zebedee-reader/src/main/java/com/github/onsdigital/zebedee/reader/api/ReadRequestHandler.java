@@ -74,6 +74,32 @@ public class ReadRequestHandler {
         }
     }
 
+    /**
+     * Finds requested published content
+     * <p>
+     * If requested uri ends in "latest" it will return latest edition of bulletin or article content, throws BadRequestException given uri is not a bulletin or article content
+     *
+     * @param request
+     * @param dataFilter
+     * @return Content
+     * @throws ZebedeeException
+     * @throws IOException
+     */
+    public Content findPublishedContent(HttpServletRequest request, DataFilter dataFilter) throws ZebedeeException, IOException {
+        String uri = extractUri(request);
+        return findPublished(request, dataFilter, uri);
+    }
+
+    private Content findPublished(HttpServletRequest request, DataFilter dataFilter, String uri) throws IOException, ZebedeeException {
+        String lastSegment = getLastSegment(uri);
+        info().data("uri", uri).log("finding requested published content");
+        if (LATEST.equalsIgnoreCase(lastSegment)) {
+            return getLatestContent(request, null, dataFilter, removeLastSegment(uri));
+        } else {
+            return getContent(request, null, dataFilter, uri);
+        }
+    }
+
     public Content getContent(String uri, HttpServletRequest request) throws ZebedeeException, IOException {
         String sessionId = RequestUtils.getSessionId(request);
         String collectionId = getCollectionId(request);

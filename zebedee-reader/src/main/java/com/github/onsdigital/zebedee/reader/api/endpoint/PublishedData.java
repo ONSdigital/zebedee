@@ -23,10 +23,10 @@ import static com.github.onsdigital.zebedee.reader.util.ReaderRequestUtils.getRe
  */
 
 @Api
-public class Data {
+public class PublishedData {
 
     /**
-     * Retrieves content for endpoint <code>/data[/collectionId]?uri=[uri]</code>
+     * Retrieves content for endpoint <code>/data?uri=[uri]</code>
      * <p>
      * <p>
      * This endpoint retrieves and serves json from either a collection or published data.
@@ -51,7 +51,7 @@ public class Data {
         try {
             ReaderResponseResponseUtils.sendResponse(
                     new ReadRequestHandler(getRequestedLanguage(request))
-                            .findContent(request, extractFilter(request)), response);
+                            .findPublishedContent(request, extractFilter(request)), response);
         } catch (NotFoundException exception) {
             ReaderResponseResponseUtils.sendNotFound(exception, request, response);
         }

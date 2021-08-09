@@ -4,20 +4,25 @@ import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
+import com.github.onsdigital.zebedee.keyring.Keyring;
 import com.github.onsdigital.zebedee.model.Collections;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.session.service.Sessions;
+import com.github.onsdigital.zebedee.user.model.User;
+import com.github.onsdigital.zebedee.user.service.UsersService;
 import org.apache.http.HttpStatus;
 import org.junit.Test;
 import org.mockito.Mock;
 
 import java.io.IOException;
+import java.util.function.Consumer;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -41,6 +46,18 @@ public class CollectionTest extends ZebedeeAPIBaseTestCase {
 
     @Mock
     private CollectionDescription description;
+
+    @Mock
+    private Keyring keyring;
+
+    @Mock
+    private Collection.ScheduleCanceller scheduleCanceller;
+
+    @Mock
+    private UsersService usersService;
+
+    @Mock
+    private User user;
 
     private Collection endpoint;
 
@@ -67,7 +84,8 @@ public class CollectionTest extends ZebedeeAPIBaseTestCase {
         when(description.getName())
                 .thenReturn("test");
 
-        this.endpoint = new Collection(sessions, permissionsService, collections);
+        this.endpoint = new Collection(sessions, permissionsService, collections, usersService, keyring,
+                scheduleCanceller);
     }
 
     @Override
@@ -245,5 +263,27 @@ public class CollectionTest extends ZebedeeAPIBaseTestCase {
         verify(sessions, times(1)).get(mockRequest);
         verify(permissionsService, times(1)).canEdit(TEST_EMAIL);
         verifyNoMoreInteractions(sessions, permissionsService, collections);
+    }
+
+    @Test
+    public void testDelete_success_shouldDeleteCollection() throws Exception {
+        when(sessions.get(mockRequest))
+                .thenReturn(session);
+
+        when(mockRequest.getPathInfo())
+                .thenReturn("collections/1234");
+
+        when(collections.getCollection("1234"))
+                .thenReturn(collection);
+
+        when(usersService.getUserByEmail(TEST_EMAIL))
+                .thenReturn(user);
+
+        boolean result = endpoint.deleteCollection(mockRequest, mockResponse);
+
+        assertTrue(result);
+        verify(collections, times(1)).delete(collection, session);
+        verify(scheduleCanceller, times(1)).cancel(collection);
+        verify(keyring, times(1)).remove(user, collection);
     }
 }

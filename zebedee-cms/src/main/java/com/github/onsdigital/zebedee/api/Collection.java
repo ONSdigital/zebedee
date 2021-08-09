@@ -9,9 +9,13 @@ import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.CollectionType;
+import com.github.onsdigital.zebedee.keyring.Keyring;
+import com.github.onsdigital.zebedee.keyring.KeyringUtil;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.session.service.Sessions;
+import com.github.onsdigital.zebedee.user.model.User;
+import com.github.onsdigital.zebedee.user.service.UsersService;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.http.HttpStatus;
 
@@ -37,6 +41,9 @@ public class Collection {
     private Sessions sessionsService;
     private PermissionsService permissionsService;
     private com.github.onsdigital.zebedee.model.Collections collections;
+    private UsersService usersService;
+    private Keyring keyring;
+    private ScheduleCanceller scheduleCanceller;
 
     /**
      * Construct a new instance of the Collection API endpoint.
@@ -45,16 +52,24 @@ public class Collection {
         this.sessionsService = Root.zebedee.getSessions();
         this.permissionsService = Root.zebedee.getPermissionsService();
         this.collections = Root.zebedee.getCollections();
+        this.usersService = Root.zebedee.getUsersService();
+        this.keyring = Root.zebedee.getCollectionKeyring();
+        this.scheduleCanceller = (c) -> Root.cancelPublish(c);
     }
 
     /**
      * Constructor for testing.
      */
     Collection(final Sessions sessionsService, final PermissionsService permissionsService,
-               final com.github.onsdigital.zebedee.model.Collections collections) {
+               final com.github.onsdigital.zebedee.model.Collections collections,
+               final UsersService usersService, final Keyring keyring,
+               final ScheduleCanceller scheduleCanceller) {
         this.sessionsService = sessionsService;
         this.permissionsService = permissionsService;
         this.collections = collections;
+        this.usersService = usersService;
+        this.keyring = keyring;
+        this.scheduleCanceller = scheduleCanceller;
     }
 
     /**
@@ -260,7 +275,7 @@ public class Collection {
 
         String collectionId = Collections.getCollectionId(request);
 
-        com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request);
+        com.github.onsdigital.zebedee.model.Collection collection = collections.getCollection(collectionId);
         if (collection == null) {
             warn().user(session.getEmail())
                     .collectionID(collectionId)
@@ -270,7 +285,10 @@ public class Collection {
 
         collections.delete(collection, session);
 
-        Root.cancelPublish(collection);
+        scheduleCanceller.cancel(collection);
+
+        User user = KeyringUtil.getUser(usersService, session.getEmail());
+        keyring.remove(user, collection);
 
         Audit.Event.COLLECTION_DELETED
                 .parameters()
@@ -316,5 +334,10 @@ public class Collection {
 
             throw new UnauthorizedException("You are not authorised to edit collections.");
         }
+    }
+
+    public static interface ScheduleCanceller {
+
+        void cancel(com.github.onsdigital.zebedee.model.Collection collection);
     }
 }

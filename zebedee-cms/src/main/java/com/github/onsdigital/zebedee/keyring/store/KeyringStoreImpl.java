@@ -46,7 +46,7 @@ public class KeyringStoreImpl implements KeyringStore {
     static final String KEYRING_DIR_DOES_NOT_EXIST_ERR = "error reading collectionKey keyring dir not found";
     static final String ENCRYPTION_ALGORITHM = "AES";
     static final String CIPHER_ALGORITHM = "AES/CBC/PKCS5Padding";
-    static final String KEY_EXT = ".cek"; // Collection Encryption Key obviously...
+    static final String KEY_EXT = ".txt";
 
     private Path keyringDir;
     private SecretKey masterKey;

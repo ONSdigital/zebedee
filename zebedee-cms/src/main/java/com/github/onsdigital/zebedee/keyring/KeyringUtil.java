@@ -8,7 +8,12 @@ import com.github.onsdigital.zebedee.user.service.UsersService;
 
 import java.io.IOException;
 
+import static java.text.MessageFormat.format;
+
 public class KeyringUtil {
+
+    public static final String GET_USER_ERR_FMT = "get user returned unexpected error: {0}";
+    public static final String USER_NOT_FOUND_ERR_FMT = "requested user was not found: {0}";
 
     private KeyringUtil() {
         // Utility class with static only methods so hide constructor.
@@ -35,11 +40,12 @@ public class KeyringUtil {
         try {
             user = usersService.getUserByEmail(email);
         } catch (IOException ex) {
-            throw new InternalServerError("get user returned unexpected error", ex);
+            String message = format(GET_USER_ERR_FMT, email);
+            throw new InternalServerError(message, ex);
         }
 
         if (user == null) {
-            throw new NotFoundException("requested user was not found");
+            throw new NotFoundException(format(USER_NOT_FOUND_ERR_FMT, email));
         }
 
         return user;

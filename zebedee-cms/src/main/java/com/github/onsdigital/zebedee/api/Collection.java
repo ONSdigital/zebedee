@@ -4,12 +4,14 @@ import com.github.davidcarboni.restolino.framework.Api;
 import com.github.onsdigital.zebedee.audit.Audit;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.ConflictException;
+import com.github.onsdigital.zebedee.exceptions.InternalServerError;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.CollectionType;
 import com.github.onsdigital.zebedee.keyring.Keyring;
+import com.github.onsdigital.zebedee.keyring.KeyringException;
 import com.github.onsdigital.zebedee.keyring.KeyringUtil;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.session.model.Session;
@@ -30,6 +32,7 @@ import java.io.IOException;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.error;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.info;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.warn;
+import static java.text.MessageFormat.format;
 import static org.apache.commons.lang3.StringUtils.trim;
 
 
@@ -283,12 +286,7 @@ public class Collection {
             throw new NotFoundException("The collection you are trying to delete was not found");
         }
 
-        collections.delete(collection, session);
-
-        scheduleCanceller.cancel(collection);
-
-        User user = KeyringUtil.getUser(usersService, session.getEmail());
-        keyring.remove(user, collection);
+        deleteCollection(collection, session);
 
         Audit.Event.COLLECTION_DELETED
                 .parameters()
@@ -301,6 +299,29 @@ public class Collection {
                 .collectionID(collectionId)
                 .log("delete collection endpoint: request completed successfully");
         return true;
+    }
+
+    private void deleteCollection(com.github.onsdigital.zebedee.model.Collection c, Session s)
+            throws InternalServerError, NotFoundException, BadRequestException {
+        // Delete the collection.
+        try {
+            collections.delete(c, s);
+        } catch (Exception ex) {
+            String message = format("error attempting to delete collection: {0}", c.getId());
+            throw new InternalServerError(message, ex);
+        }
+
+        // Cancel any scheduled publish for this collection.
+        scheduleCanceller.cancel(c);
+
+        // Remove the collection encryption key from the keyring
+        User user = KeyringUtil.getUser(usersService, s.getEmail());
+        try {
+            keyring.remove(user, c);
+        } catch (KeyringException ex) {
+            String message = format("error attempting to remove collection key from keyring: {0}", c.getId());
+            throw new InternalServerError(message, ex);
+        }
     }
 
     private void requireViewPermission(String email, CollectionDescription description) throws UnauthorizedException {
@@ -336,8 +357,16 @@ public class Collection {
         }
     }
 
+    /**
+     * ScheduleCanceller is an abstraction wrapper for functionality to cancel a scheduled publish.
+     */
     public static interface ScheduleCanceller {
 
+        /**
+         * Cancel a scheduled publish for the provided collection.
+         *
+         * @param collection the collection to cancel.
+         */
         void cancel(com.github.onsdigital.zebedee.model.Collection collection);
     }
 }

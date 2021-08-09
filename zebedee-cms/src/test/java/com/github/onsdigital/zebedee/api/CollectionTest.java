@@ -1,10 +1,12 @@
 package com.github.onsdigital.zebedee.api;
 
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
+import com.github.onsdigital.zebedee.exceptions.InternalServerError;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.keyring.Keyring;
+import com.github.onsdigital.zebedee.keyring.KeyringException;
 import com.github.onsdigital.zebedee.model.Collections;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.session.service.Sessions;
@@ -14,16 +16,19 @@ import org.apache.http.HttpStatus;
 import org.junit.Test;
 import org.mockito.Mock;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.util.function.Consumer;
 
+import static java.text.MessageFormat.format;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -263,6 +268,177 @@ public class CollectionTest extends ZebedeeAPIBaseTestCase {
         verify(sessions, times(1)).get(mockRequest);
         verify(permissionsService, times(1)).canEdit(TEST_EMAIL);
         verifyNoMoreInteractions(sessions, permissionsService, collections);
+    }
+
+    @Test
+    public void testDelete_sessionNull_shouldThrowEx() throws Exception {
+        when(sessions.get(any(HttpServletRequest.class)))
+                .thenReturn(null);
+
+        UnauthorizedException ex = assertThrows(UnauthorizedException.class,
+                () -> endpoint.deleteCollection(mockRequest, mockResponse));
+
+        assertThat(ex.getMessage(), equalTo("You are not authorised to delete collections."));
+        verify(sessions, times(1)).get(mockRequest);
+    }
+
+    @Test
+    public void testDelete_getSessionError_shouldThrowEx() throws Exception {
+        when(sessions.get(any(HttpServletRequest.class)))
+                .thenThrow(IOException.class);
+
+        assertThrows(IOException.class, () -> endpoint.deleteCollection(mockRequest, mockResponse));
+
+        verify(sessions, times(1)).get(mockRequest);
+    }
+
+    @Test
+    public void testDelete_getCollectionError_shouldThrowEx() throws Exception {
+        when(sessions.get(mockRequest))
+                .thenReturn(session);
+
+        when(mockRequest.getPathInfo())
+                .thenReturn("collections/1234");
+
+        when(collections.getCollection("1234"))
+                .thenThrow(IOException.class);
+
+        assertThrows(IOException.class, () -> endpoint.deleteCollection(mockRequest, mockResponse));
+
+        verify(sessions, times(1)).get(mockRequest);
+        verify(collections, times(1)).getCollection("1234");
+    }
+
+    @Test
+    public void testDelete_collectionNotFound_shouldThrowEx() throws Exception {
+        when(sessions.get(mockRequest))
+                .thenReturn(session);
+
+        when(mockRequest.getPathInfo())
+                .thenReturn("collections/1234");
+
+        when(collections.getCollection("1234"))
+                .thenReturn(null);
+
+        NotFoundException ex = assertThrows(NotFoundException.class,
+                () -> endpoint.deleteCollection(mockRequest, mockResponse));
+
+        assertThat(ex.getMessage(), equalTo("The collection you are trying to delete was not found"));
+        verify(sessions, times(1)).get(mockRequest);
+        verify(collections, times(1)).getCollection("1234");
+    }
+
+    @Test
+    public void testDelete_deleteCollectionError_shouldThrowEx() throws Exception {
+        when(sessions.get(mockRequest))
+                .thenReturn(session);
+
+        when(mockRequest.getPathInfo())
+                .thenReturn("collections/" + COLLECTION_ID);
+
+        when(collections.getCollection(COLLECTION_ID))
+                .thenReturn(collection);
+
+        when(collection.getId())
+                .thenReturn(COLLECTION_ID);
+
+        doThrow(IOException.class)
+                .when(collections)
+                .delete(collection, session);
+
+        InternalServerError ex = assertThrows(InternalServerError.class,
+                () -> endpoint.deleteCollection(mockRequest, mockResponse));
+
+        assertThat(ex.getMessage(), equalTo(format("error attempting to delete collection: {0}", COLLECTION_ID)));
+        verify(sessions, times(1)).get(mockRequest);
+        verify(collections, times(1)).getCollection(COLLECTION_ID);
+        verify(collections, times(1)).delete(collection, session);
+    }
+
+    @Test
+    public void testDelete_getUserError_shouldThrowEx() throws Exception {
+        when(sessions.get(mockRequest))
+                .thenReturn(session);
+
+        when(mockRequest.getPathInfo())
+                .thenReturn("collections/" + COLLECTION_ID);
+
+        when(collections.getCollection(COLLECTION_ID))
+                .thenReturn(collection);
+
+        when(collection.getId())
+                .thenReturn(COLLECTION_ID);
+
+        when(usersService.getUserByEmail(TEST_EMAIL))
+                .thenThrow(IOException.class);
+
+        InternalServerError ex = assertThrows(InternalServerError.class,
+                () -> endpoint.deleteCollection(mockRequest, mockResponse));
+
+        assertThat(ex.getMessage(), equalTo(format("get user returned unexpected error: {0}", TEST_EMAIL)));
+        verify(sessions, times(1)).get(mockRequest);
+        verify(collections, times(1)).getCollection(COLLECTION_ID);
+        verify(collections, times(1)).delete(collection, session);
+        verify(usersService, times(1)).getUserByEmail(TEST_EMAIL);
+    }
+
+    @Test
+    public void testDelete_getUserReturnsNull_shouldThrowEx() throws Exception {
+        when(sessions.get(mockRequest))
+                .thenReturn(session);
+
+        when(mockRequest.getPathInfo())
+                .thenReturn("collections/" + COLLECTION_ID);
+
+        when(collections.getCollection(COLLECTION_ID))
+                .thenReturn(collection);
+
+        when(collection.getId())
+                .thenReturn(COLLECTION_ID);
+
+        when(usersService.getUserByEmail(TEST_EMAIL))
+                .thenReturn(null);
+
+        NotFoundException ex = assertThrows(NotFoundException.class,
+                () -> endpoint.deleteCollection(mockRequest, mockResponse));
+
+        assertThat(ex.getMessage(), equalTo(format("requested user was not found: {0}", TEST_EMAIL)));
+        verify(sessions, times(1)).get(mockRequest);
+        verify(collections, times(1)).getCollection(COLLECTION_ID);
+        verify(collections, times(1)).delete(collection, session);
+        verify(usersService, times(1)).getUserByEmail(TEST_EMAIL);
+    }
+
+    @Test
+    public void testDelete_keyringRemoveError_shouldThrowEx() throws Exception {
+        when(sessions.get(mockRequest))
+                .thenReturn(session);
+
+        when(mockRequest.getPathInfo())
+                .thenReturn("collections/" + COLLECTION_ID);
+
+        when(collections.getCollection(COLLECTION_ID))
+                .thenReturn(collection);
+
+        when(collection.getId())
+                .thenReturn(COLLECTION_ID);
+
+        when(usersService.getUserByEmail(TEST_EMAIL))
+                .thenReturn(user);
+
+        doThrow(KeyringException.class)
+                .when(keyring)
+                .remove(user, collection);
+
+        InternalServerError ex = assertThrows(InternalServerError.class,
+                () -> endpoint.deleteCollection(mockRequest, mockResponse));
+
+        assertThat(ex.getMessage(), equalTo(format("error attempting to remove collection key from keyring: {0}", COLLECTION_ID)));
+        verify(sessions, times(1)).get(mockRequest);
+        verify(collections, times(1)).getCollection(COLLECTION_ID);
+        verify(collections, times(1)).delete(collection, session);
+        verify(usersService, times(1)).getUserByEmail(TEST_EMAIL);
+        verify(keyring, times(1)).remove(user, collection);
     }
 
     @Test

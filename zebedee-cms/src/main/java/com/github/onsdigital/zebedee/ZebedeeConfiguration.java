@@ -7,6 +7,7 @@ import com.github.onsdigital.interfaces.JWTHandler;
 import com.github.onsdigital.slack.Profile;
 import com.github.onsdigital.slack.client.SlackClient;
 import com.github.onsdigital.slack.client.SlackClientImpl;
+import com.github.onsdigital.zebedee.configuration.CMSFeatureFlags;
 import com.github.onsdigital.zebedee.data.processing.DataIndex;
 import com.github.onsdigital.zebedee.kafka.KafkaClient;
 import com.github.onsdigital.zebedee.kafka.KafkaClientImpl;
@@ -274,7 +275,7 @@ public class ZebedeeConfiguration {
             KeyringCacheImpl.init(keyStore);
             KeyringCache keyringCache = KeyringCacheImpl.getInstance();
 
-            CentralKeyringImpl.init(keyringCache, permissionsService);
+            CentralKeyringImpl.init(keyringCache, permissionsService, collections);
             centralKeyring = CentralKeyringImpl.getInstance();
         }
 

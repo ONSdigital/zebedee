@@ -192,7 +192,9 @@ public class KeyringMigratorImpl implements Keyring {
     @Override
     public void unlock(User user, String password) throws KeyringException {
         try {
-            getKeyring().unlock(user, password);
+            // The central keyring does not need to be unlocked. While migrating we only need to unlock the legacy
+            // keyring.
+            legacyKeyring.unlock(user, password);
         } catch (KeyringException ex) {
             throw wrappedKeyringException(ex, UNLOCK_KEYRING_ERR);
         }

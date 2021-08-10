@@ -17,10 +17,13 @@ public class HomePage extends TaxonomyNode {
 
     private List<HomeContentItem> featuredContent;
 
+    private List<HomeContentItem> aroundONS;
+
     private String serviceMessage;
 
     public HomePage() {
         this.featuredContent = new ArrayList<HomeContentItem>();
+        this.aroundONS = new ArrayList<HomeContentItem>();
     }
 
     @Override
@@ -34,6 +37,14 @@ public class HomePage extends TaxonomyNode {
 
     public void setFeaturedContent(List<HomeContentItem> featuredContent) {
         this.featuredContent = featuredContent;
+    }
+
+    public List<HomeContentItem> getAroundONS() {
+        return aroundONS;
+    }
+
+    public void setAroundONS(List<HomeContentItem> aroundONS) {
+        this.aroundONS = aroundONS;
     }
 
     public String getServiceMessage() {

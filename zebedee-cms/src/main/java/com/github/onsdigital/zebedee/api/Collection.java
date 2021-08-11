@@ -315,7 +315,14 @@ public class Collection {
         scheduleCanceller.cancel(c);
 
         // Remove the collection encryption key from the keyring
-        User user = KeyringUtil.getUser(usersService, s.getEmail());
+        User user = null;
+        try {
+            user = KeyringUtil.getUser(usersService, s.getEmail());
+        } catch (Exception ex) {
+            String message = format("error attempting to get user from session details: {0}", s.getEmail());
+            throw new InternalServerError(message, ex);
+        }
+
         try {
             keyring.remove(user, c);
         } catch (KeyringException ex) {

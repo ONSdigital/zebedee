@@ -375,7 +375,8 @@ public class CollectionTest extends ZebedeeAPIBaseTestCase {
         InternalServerError ex = assertThrows(InternalServerError.class,
                 () -> endpoint.deleteCollection(mockRequest, mockResponse));
 
-        assertThat(ex.getMessage(), equalTo(format("get user returned unexpected error: {0}", TEST_EMAIL)));
+        assertThat(ex.getMessage(),
+                equalTo(format("error attempting to get user from session details: {0}", TEST_EMAIL)));
         verify(sessions, times(1)).get(mockRequest);
         verify(collections, times(1)).getCollection(COLLECTION_ID);
         verify(collections, times(1)).delete(collection, session);
@@ -399,10 +400,11 @@ public class CollectionTest extends ZebedeeAPIBaseTestCase {
         when(usersService.getUserByEmail(TEST_EMAIL))
                 .thenReturn(null);
 
-        NotFoundException ex = assertThrows(NotFoundException.class,
+        InternalServerError ex = assertThrows(InternalServerError.class,
                 () -> endpoint.deleteCollection(mockRequest, mockResponse));
 
-        assertThat(ex.getMessage(), equalTo(format("requested user was not found: {0}", TEST_EMAIL)));
+        assertThat(ex.getMessage(),
+                equalTo(format("error attempting to get user from session details: {0}", TEST_EMAIL)));
         verify(sessions, times(1)).get(mockRequest);
         verify(collections, times(1)).getCollection(COLLECTION_ID);
         verify(collections, times(1)).delete(collection, session);

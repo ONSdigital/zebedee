@@ -209,7 +209,7 @@ public class ZebedeeConfiguration {
         Keyring centralKeyring = initCentralKeyring();
 
         // Keyring migrator encapuslates the keyring migration logic behind the new keyring interface.
-        this.collectionKeyring = new KeyringMigratorImpl(false, legacyKeyring, centralKeyring);
+        this.collectionKeyring = new KeyringMigratorImpl(CMSFeatureFlags.cmsFeatureFlags().isCentralisedKeyringEnabled(), legacyKeyring, centralKeyring);
 
         DatasetClient datasetClient;
         try {

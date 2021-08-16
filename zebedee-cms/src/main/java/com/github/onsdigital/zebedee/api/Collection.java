@@ -4,14 +4,20 @@ import com.github.davidcarboni.restolino.framework.Api;
 import com.github.onsdigital.zebedee.audit.Audit;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.ConflictException;
+import com.github.onsdigital.zebedee.exceptions.InternalServerError;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.CollectionType;
+import com.github.onsdigital.zebedee.keyring.Keyring;
+import com.github.onsdigital.zebedee.keyring.KeyringException;
+import com.github.onsdigital.zebedee.keyring.KeyringUtil;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.session.service.Sessions;
+import com.github.onsdigital.zebedee.user.model.User;
+import com.github.onsdigital.zebedee.user.service.UsersService;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.http.HttpStatus;
 
@@ -26,6 +32,7 @@ import java.io.IOException;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.error;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.info;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.warn;
+import static java.text.MessageFormat.format;
 import static org.apache.commons.lang3.StringUtils.trim;
 
 
@@ -37,6 +44,9 @@ public class Collection {
     private Sessions sessionsService;
     private PermissionsService permissionsService;
     private com.github.onsdigital.zebedee.model.Collections collections;
+    private UsersService usersService;
+    private Keyring keyring;
+    private ScheduleCanceller scheduleCanceller;
 
     /**
      * Construct a new instance of the Collection API endpoint.
@@ -45,16 +55,24 @@ public class Collection {
         this.sessionsService = Root.zebedee.getSessions();
         this.permissionsService = Root.zebedee.getPermissionsService();
         this.collections = Root.zebedee.getCollections();
+        this.usersService = Root.zebedee.getUsersService();
+        this.keyring = Root.zebedee.getCollectionKeyring();
+        this.scheduleCanceller = (c) -> Root.cancelPublish(c);
     }
 
     /**
      * Constructor for testing.
      */
     Collection(final Sessions sessionsService, final PermissionsService permissionsService,
-               final com.github.onsdigital.zebedee.model.Collections collections) {
+               final com.github.onsdigital.zebedee.model.Collections collections,
+               final UsersService usersService, final Keyring keyring,
+               final ScheduleCanceller scheduleCanceller) {
         this.sessionsService = sessionsService;
         this.permissionsService = permissionsService;
         this.collections = collections;
+        this.usersService = usersService;
+        this.keyring = keyring;
+        this.scheduleCanceller = scheduleCanceller;
     }
 
     /**
@@ -260,7 +278,7 @@ public class Collection {
 
         String collectionId = Collections.getCollectionId(request);
 
-        com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request);
+        com.github.onsdigital.zebedee.model.Collection collection = collections.getCollection(collectionId);
         if (collection == null) {
             warn().user(session.getEmail())
                     .collectionID(collectionId)
@@ -268,9 +286,7 @@ public class Collection {
             throw new NotFoundException("The collection you are trying to delete was not found");
         }
 
-        collections.delete(collection, session);
-
-        Root.cancelPublish(collection);
+        deleteCollection(collection, session);
 
         Audit.Event.COLLECTION_DELETED
                 .parameters()
@@ -283,6 +299,36 @@ public class Collection {
                 .collectionID(collectionId)
                 .log("delete collection endpoint: request completed successfully");
         return true;
+    }
+
+    private void deleteCollection(com.github.onsdigital.zebedee.model.Collection c, Session s)
+            throws InternalServerError, NotFoundException, BadRequestException {
+        // Delete the collection.
+        try {
+            collections.delete(c, s);
+        } catch (Exception ex) {
+            String message = format("error attempting to delete collection: {0}", c.getId());
+            throw new InternalServerError(message, ex);
+        }
+
+        // Cancel any scheduled publish for this collection.
+        scheduleCanceller.cancel(c);
+
+        // Remove the collection encryption key from the keyring
+        User user = null;
+        try {
+            user = KeyringUtil.getUser(usersService, s.getEmail());
+        } catch (Exception ex) {
+            String message = format("error attempting to get user from session details: {0}", s.getEmail());
+            throw new InternalServerError(message, ex);
+        }
+
+        try {
+            keyring.remove(user, c);
+        } catch (KeyringException ex) {
+            String message = format("error attempting to remove collection key from keyring: {0}", c.getId());
+            throw new InternalServerError(message, ex);
+        }
     }
 
     private void requireViewPermission(String email, CollectionDescription description) throws UnauthorizedException {
@@ -316,5 +362,18 @@ public class Collection {
 
             throw new UnauthorizedException("You are not authorised to edit collections.");
         }
+    }
+
+    /**
+     * ScheduleCanceller is an abstraction wrapper for functionality to cancel a scheduled publish.
+     */
+    public static interface ScheduleCanceller {
+
+        /**
+         * Cancel a scheduled publish for the provided collection.
+         *
+         * @param collection the collection to cancel.
+         */
+        void cancel(com.github.onsdigital.zebedee.model.Collection collection);
     }
 }

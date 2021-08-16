@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
@@ -154,7 +155,8 @@ public class Root {
     private static void loadExistingCollectionsIntoScheduler(Collections.CollectionList collections) {
         if (Configuration.isSchedulingEnabled()) {
 
-            info().log("zebedee root: adding existing collections to the scheduler.");
+            info().data("collections", collections.stream().map(c -> c.getId()).collect(Collectors.toList()))
+                            .log("zebedee root: adding existing collections to the scheduler.");
             for (Collection collection : collections) {
                 schedulePublish(collection);
             }

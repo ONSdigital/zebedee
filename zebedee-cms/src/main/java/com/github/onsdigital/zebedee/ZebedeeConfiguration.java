@@ -7,7 +7,6 @@ import com.github.onsdigital.interfaces.JWTHandler;
 import com.github.onsdigital.slack.Profile;
 import com.github.onsdigital.slack.client.SlackClient;
 import com.github.onsdigital.slack.client.SlackClientImpl;
-import com.github.onsdigital.zebedee.configuration.CMSFeatureFlags;
 import com.github.onsdigital.zebedee.data.processing.DataIndex;
 import com.github.onsdigital.zebedee.kafka.KafkaClient;
 import com.github.onsdigital.zebedee.kafka.KafkaClientImpl;
@@ -16,10 +15,10 @@ import com.github.onsdigital.zebedee.keyring.Keyring;
 import com.github.onsdigital.zebedee.keyring.KeyringException;
 import com.github.onsdigital.zebedee.keyring.KeyringMigratorImpl;
 import com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl;
-import com.github.onsdigital.zebedee.keyring.NoOpCentralKeyring;
 import com.github.onsdigital.zebedee.keyring.cache.KeyringCache;
 import com.github.onsdigital.zebedee.keyring.cache.KeyringCacheImpl;
 import com.github.onsdigital.zebedee.keyring.cache.LegacySchedulerKeyCache;
+import com.github.onsdigital.zebedee.keyring.cache.MigrationSchedulerKeyCache;
 import com.github.onsdigital.zebedee.keyring.cache.SchedulerKeyCache;
 import com.github.onsdigital.zebedee.keyring.store.KeyringStore;
 import com.github.onsdigital.zebedee.keyring.store.KeyringStoreImpl;
@@ -51,7 +50,10 @@ import com.github.onsdigital.zebedee.teams.store.TeamsStoreFileSystemImpl;
 import com.github.onsdigital.zebedee.user.service.UsersService;
 import com.github.onsdigital.zebedee.user.service.UsersServiceImpl;
 import com.github.onsdigital.zebedee.user.store.UserStoreFileSystemImpl;
+import com.github.onsdigital.zebedee.util.slack.NoOpSlackNotifier;
 import com.github.onsdigital.zebedee.util.slack.NoOpStartUpAlerter;
+import com.github.onsdigital.zebedee.util.slack.Notifier;
+import com.github.onsdigital.zebedee.util.slack.SlackNotifier;
 import com.github.onsdigital.zebedee.util.slack.StartUpAlerter;
 import com.github.onsdigital.zebedee.util.slack.StartUpAlerterImpl;
 import com.github.onsdigital.zebedee.util.versioning.VersionsService;
@@ -59,6 +61,7 @@ import com.github.onsdigital.zebedee.util.versioning.VersionsServiceImpl;
 import com.github.onsdigital.zebedee.verification.VerificationAgent;
 import dp.api.dataset.DatasetAPIClient;
 import dp.api.dataset.DatasetClient;
+import liquibase.util.StringUtils;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -92,6 +95,7 @@ import static com.github.onsdigital.zebedee.configuration.Configuration.getKeyri
 import static com.github.onsdigital.zebedee.configuration.Configuration.getServiceAuthToken;
 import static com.github.onsdigital.zebedee.configuration.Configuration.slackChannelsToNotfiyOnStartUp;
 import static com.github.onsdigital.zebedee.permissions.store.PermissionsStoreFileSystemImpl.initialisePermissions;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 /**
  * Object encapsulating the set up configuration required by {@link Zebedee}. Set paths to & create relevant
@@ -129,7 +133,7 @@ public class ZebedeeConfiguration {
     private SchedulerKeyCache schedulerKeyCache;
     private EncryptionKeyFactory encryptionKeyFactory;
     private StartUpAlerter startUpAlerter;
-    private SlackClient slackClient;
+    private Notifier slackNotifier;
 
     /**
      * Create a new configuration object.
@@ -176,8 +180,6 @@ public class ZebedeeConfiguration {
             this.sessions = new SessionsServiceImpl(sessionsPath);
         }
 
-        this.schedulerKeyCache = new LegacySchedulerKeyCache();
-
         // Initialise legacy keyring regardless - they will dual run until we cut over to new impl.
         this.legacyKeyringCache = new com.github.onsdigital.zebedee.model.KeyringCache(sessions, schedulerKeyCache);
 
@@ -201,15 +203,11 @@ public class ZebedeeConfiguration {
         this.usersService = UsersServiceImpl.getInstance(
                 new UserStoreFileSystemImpl(this.usersPath), collections, permissionsService, keyringSupplier);
 
-        // The legacy keyring logic but behind the new keyring interface.
-        Keyring legacyKeyring = new LegacyKeyringImpl(
-                sessions, usersService, permissionsService, legacyKeyringCache, schedulerKeyCache);
-
-        // The new world keyring impl - could be no op or real impl depending on config.
-        Keyring centralKeyring = initCentralKeyring();
-
-        // Keyring migrator encapuslates the keyring migration logic behind the new keyring interface.
-        this.collectionKeyring = new KeyringMigratorImpl(CMSFeatureFlags.cmsFeatureFlags().isCentralisedKeyringEnabled(), legacyKeyring, centralKeyring);
+        if (cmsFeatureFlags().isCentralisedKeyringEnabled()) {
+            initMigrationKeyring();
+        } else {
+            initLegacyKeyring();
+        }
 
         DatasetClient datasetClient;
         try {
@@ -231,11 +229,7 @@ public class ZebedeeConfiguration {
 
         imageService = new ImageServiceImpl(imageClient);
 
-        this.slackClient = new SlackClientImpl(new Profile.Builder()
-                .emoji(":flo:")
-                .username("Florence")
-                .authToken(System.getenv("slack_api_token"))
-                .create());
+        this.slackNotifier = initSlackNotifier();
 
         if (cmsFeatureFlags().isKafkaEnabled()) {
             KafkaClient kafkaClient = new KafkaClientImpl(getKafkaURL(), getKafkaContentPublishedTopic());
@@ -263,7 +257,33 @@ public class ZebedeeConfiguration {
 
     }
 
-    private Keyring initCentralKeyring() throws KeyringException {
+    private void initMigrationKeyring() throws KeyringException {
+        KeyringStore keyStore = new KeyringStoreImpl(getKeyRingPath(), getKeyringSecretKey(), getKeyringInitVector());
+
+        KeyringCacheImpl.init(keyStore);
+        KeyringCache keyringCache = KeyringCacheImpl.getInstance();
+
+        SchedulerKeyCache centralSchedulerCache = (KeyringCacheImpl) keyringCache;
+        this.schedulerKeyCache = new MigrationSchedulerKeyCache(
+                new LegacySchedulerKeyCache(), centralSchedulerCache, true);
+
+        CentralKeyringImpl.init(keyringCache, permissionsService, collections);
+        Keyring centralKeyring = CentralKeyringImpl.getInstance();
+
+        Keyring legacyKeyring = new LegacyKeyringImpl(
+                sessions, usersService, permissionsService, legacyKeyringCache, centralSchedulerCache);
+
+        this.collectionKeyring = new KeyringMigratorImpl(true, legacyKeyring, centralKeyring);
+    }
+
+    private void initLegacyKeyring() {
+        this.schedulerKeyCache = new MigrationSchedulerKeyCache(new LegacySchedulerKeyCache(), null, false);
+
+        this.collectionKeyring = new LegacyKeyringImpl(
+                sessions, usersService, permissionsService, legacyKeyringCache, schedulerKeyCache);
+    }
+
+/*    private Keyring initCentralKeyring() throws KeyringException {
         // Default to the NoOp impl
         Keyring centralKeyring = new NoOpCentralKeyring();
 
@@ -280,16 +300,42 @@ public class ZebedeeConfiguration {
         }
 
         return centralKeyring;
-    }
+    }*/
 
     private StartUpAlerter initStartUpAlerter() {
         List<String> startUpNotificationRecipients = slackChannelsToNotfiyOnStartUp();
+        String slackToken = System.getenv("slack_api_token");
 
-        if (startUpNotificationRecipients == null || startUpNotificationRecipients.isEmpty()) {
-            warn().log("startUpNotificationRecipients was null or empty NoOpStartUpAlerter will be initialized.");
+        if (isEmpty(slackToken) || startUpNotificationRecipients == null || startUpNotificationRecipients.isEmpty()) {
+            warn().log("configuring NoOpStartUpAlerter");
             return new NoOpStartUpAlerter();
         }
-        return new StartUpAlerterImpl(slackClient, slackChannelsToNotfiyOnStartUp());
+
+        SlackClient client = new SlackClientImpl(new Profile.Builder()
+                .emoji(":flo:")
+                .username("Florence")
+                .authToken(slackToken)
+                .create());
+
+
+        return new StartUpAlerterImpl(client, startUpNotificationRecipients);
+    }
+
+
+    private Notifier initSlackNotifier() {
+        String slackToken = System.getenv("slack_api_token");
+        if (StringUtils.isEmpty(slackToken)) {
+            info().log("env var slack_api_token not found configuring NoOpSlackNotifier");
+            return new NoOpSlackNotifier();
+        }
+
+        SlackClient client = new SlackClientImpl(new Profile.Builder()
+                .emoji(":flo:")
+                .username("Florence")
+                .authToken(slackToken)
+                .create());
+
+        return new SlackNotifier(client);
     }
 
     public boolean isUseVerificationAgent() {
@@ -438,7 +484,7 @@ public class ZebedeeConfiguration {
         return this.startUpAlerter;
     }
 
-    public SlackClient getSlackClient() {
-        return slackClient;
+    public Notifier getSlackNotifier() {
+        return this.slackNotifier;
     }
 }

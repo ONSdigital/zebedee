@@ -54,9 +54,6 @@ public class Builder {
     private Keyring collectionKeyringMock;
 
     @Mock
-    private SlackClient slackClient;
-
-    @Mock
     private Profile slackProfile;
 
     private static int teamId;
@@ -99,9 +96,6 @@ public class Builder {
      */
     public Builder() throws IOException, CollectionNotFoundException {
         MockitoAnnotations.initMocks(this);
-
-        when(slackClient.getProfile())
-                .thenReturn(slackProfile);
 
         setupUsers();
 
@@ -206,7 +200,6 @@ public class Builder {
 
 
         ZebedeeConfiguration configuration = new ZebedeeConfiguration(parent, false);
-        ReflectionTestUtils.setField(configuration,"slackClient",slackClient);
         this.zebedee = new Zebedee(configuration);
 
         inflationTeam = createTeam(reviewer1, teamNames[0], teams);

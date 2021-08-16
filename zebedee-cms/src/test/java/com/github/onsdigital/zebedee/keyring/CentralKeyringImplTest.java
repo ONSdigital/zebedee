@@ -3,6 +3,7 @@ package com.github.onsdigital.zebedee.keyring;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.keyring.cache.KeyringCache;
 import com.github.onsdigital.zebedee.model.Collection;
+import com.github.onsdigital.zebedee.model.Collections;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.user.model.User;
 import org.junit.After;
@@ -14,12 +15,16 @@ import org.mockito.MockitoAnnotations;
 import javax.crypto.SecretKey;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
+import static com.github.onsdigital.zebedee.keyring.CentralKeyringImpl.COLLECTIONS_NULL_ERR;
 import static com.github.onsdigital.zebedee.keyring.CentralKeyringImpl.COLLECTION_DESCRIPTION_NULL_ERR;
 import static com.github.onsdigital.zebedee.keyring.CentralKeyringImpl.COLLECTION_ID_NULL_OR_EMPTY_ERR;
 import static com.github.onsdigital.zebedee.keyring.CentralKeyringImpl.COLLECTION_NULL_ERR;
+import static com.github.onsdigital.zebedee.keyring.CentralKeyringImpl.FILTER_COLLECTIONS_ERR;
 import static com.github.onsdigital.zebedee.keyring.CentralKeyringImpl.KEYRING_CACHE_NULL_ERR;
 import static com.github.onsdigital.zebedee.keyring.CentralKeyringImpl.NOT_INITIALISED_ERR;
 import static com.github.onsdigital.zebedee.keyring.CentralKeyringImpl.PERMISSION_SERVICE_NULL_ERR;
@@ -34,8 +39,10 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
@@ -64,6 +71,9 @@ public class CentralKeyringImplTest {
     private Collection collection;
 
     @Mock
+    private Collections collections;
+
+    @Mock
     private CollectionDescription collDesc;
 
     @Mock
@@ -73,7 +83,7 @@ public class CentralKeyringImplTest {
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
 
-        CentralKeyringImpl.init(keyringCache, permissionsService);
+        CentralKeyringImpl.init(keyringCache, permissionsService, collections);
         keyring = CentralKeyringImpl.getInstance();
     }
 
@@ -237,7 +247,7 @@ public class CentralKeyringImplTest {
         resetInstanceToNull();
 
         // When init is called
-        KeyringException ex = assertThrows(KeyringException.class, () -> CentralKeyringImpl.init(null, null));
+        KeyringException ex = assertThrows(KeyringException.class, () -> CentralKeyringImpl.init(null, null, null));
 
         // Then an exception is thrown
         assertThat(ex.getMessage(), equalTo(KEYRING_CACHE_NULL_ERR));
@@ -248,10 +258,23 @@ public class CentralKeyringImplTest {
         resetInstanceToNull();
 
         // When init is called
-        KeyringException ex = assertThrows(KeyringException.class, () -> CentralKeyringImpl.init(keyringCache, null));
+        KeyringException ex = assertThrows(KeyringException.class,
+                () -> CentralKeyringImpl.init(keyringCache, null, null));
 
         // Then an exception is thrown
         assertThat(ex.getMessage(), equalTo(PERMISSION_SERVICE_NULL_ERR));
+    }
+
+    @Test
+    public void testInit_collectionsNull() throws Exception {
+        resetInstanceToNull();
+
+        // When init is called
+        KeyringException ex = assertThrows(KeyringException.class,
+                () -> CentralKeyringImpl.init(keyringCache, permissionsService, null));
+
+        // Then an exception is thrown
+        assertThat(ex.getMessage(), equalTo(COLLECTIONS_NULL_ERR));
     }
 
     @Test
@@ -871,39 +894,115 @@ public class CentralKeyringImplTest {
     }
 
     @Test
-    public void testList_permissionsServiceReturnsFalse_shouldReturnNull() throws Exception {
+    public void testList_userHasAdminPermission() throws Exception {
+        when(user.getEmail())
+                .thenReturn(TEST_EMAIL_ID);
 
+        when(permissionsService.canEdit(user.getEmail()))
+                .thenReturn(true);
+
+        Set<String> expected = new HashSet<String>() {{
+            add("111");
+            add("222");
+            add("333");
+        }};
+
+        when(keyringCache.list())
+                .thenReturn(expected);
+
+        Set<String> actual = keyring.list(user);
+
+        assertThat(actual, equalTo(expected));
+        verifyZeroInteractions(collections);
+        verify(permissionsService, times(1)).canEdit(TEST_EMAIL_ID);
+    }
+
+    @Test
+    public void testList_filterCollectionsException() throws Exception {
         when(user.getEmail())
                 .thenReturn(TEST_EMAIL_ID);
 
         when(permissionsService.canEdit(user.getEmail()))
                 .thenReturn(false);
 
-        Set<String> actual = keyring.list(user);
+        when(collections.filterBy(any()))
+                .thenThrow(IOException.class);
 
-        assertThat(actual, nullValue());
-        verify(permissionsService, times(1)).canEdit(user.getEmail());
-        verifyZeroInteractions(keyringCache);
+        KeyringException ex = assertThrows(KeyringException.class, () -> keyring.list(user));
+
+        assertThat(ex.getMessage(), equalTo(FILTER_COLLECTIONS_ERR));
+        verify(permissionsService, times(1)).canEdit(TEST_EMAIL_ID);
+        verify(collections, times(1)).filterBy(any());
     }
 
     @Test
-    public void testList_keyringCacheReturnsCollectionIDs() throws Exception {
-        Set<String> collectionIDs = new HashSet<>();
-        collectionIDs.add(TEST_COLLECTION_ID);
-
+    public void testList_filterCollectionsReturnsEmptyList() throws Exception {
         when(user.getEmail())
                 .thenReturn(TEST_EMAIL_ID);
 
-        when(keyringCache.list())
-                .thenReturn(collectionIDs);
+        when(permissionsService.canEdit(user.getEmail()))
+                .thenReturn(false);
+
+        when(collections.filterBy(any()))
+                .thenReturn(new ArrayList<>());
+
+        Set<String> actual = keyring.list(user);
+        assertTrue(actual.isEmpty());
+    }
+
+    @Test
+    public void testList_filterCollectionsReturnsNull() throws Exception {
+        when(user.getEmail())
+                .thenReturn(TEST_EMAIL_ID);
 
         when(permissionsService.canEdit(user.getEmail()))
-                .thenReturn(true);
+                .thenReturn(false);
 
-        keyring.list(user);
+        when(collections.filterBy(any()))
+                .thenReturn(null);
 
-        verify(permissionsService, times(1)).canEdit(user.getEmail());
-        verify(keyringCache, times(1)).list();
+        KeyringException ex = assertThrows(KeyringException.class, () -> keyring.list(user));
+
+        assertThat(ex.getMessage(), equalTo(FILTER_COLLECTIONS_ERR));
+        verify(permissionsService, times(1)).canEdit(TEST_EMAIL_ID);
+        verify(collections, times(1)).filterBy(any());
+    }
+
+    @Test
+    public void testList_shouldReturnExpectedValuesForViewerUser() throws Exception {
+        when(user.getEmail())
+                .thenReturn(TEST_EMAIL_ID);
+
+        when(permissionsService.canEdit(user.getEmail()))
+                .thenReturn(false);
+
+        // All collections held in the cache.
+        Set<String> cacheValues = new HashSet<String>() {{
+            add("111");
+            add("222");
+            add(TEST_COLLECTION_ID);
+            add("333");
+        }};
+        when(keyringCache.list())
+                .thenReturn(cacheValues);
+
+        when(collection.getId())
+                .thenReturn(TEST_COLLECTION_ID);
+
+        // Collections the user has view permission for.
+        List<Collection> accessibleToUser = new ArrayList<Collection>() {{
+            add(collection);
+        }};
+        when(collections.filterBy(any()))
+                .thenReturn(accessibleToUser);
+
+        Set<String> actual = keyring.list(user);
+
+        assertThat(actual.size(), equalTo(1));
+        assertThat(actual.iterator().next(), equalTo(TEST_COLLECTION_ID));
+
+        verify(collections, times(1)).filterBy(any());
+        verify(permissionsService, times(1)).canEdit(TEST_EMAIL_ID);
     }
 
     @Test

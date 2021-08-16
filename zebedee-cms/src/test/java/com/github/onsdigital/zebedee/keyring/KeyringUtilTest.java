@@ -11,6 +11,9 @@ import org.mockito.MockitoAnnotations;
 
 import java.io.IOException;
 
+import static com.github.onsdigital.zebedee.keyring.KeyringUtil.GET_USER_ERR_FMT;
+import static com.github.onsdigital.zebedee.keyring.KeyringUtil.USER_NOT_FOUND_ERR_FMT;
+import static java.text.MessageFormat.format;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertThrows;
@@ -48,7 +51,7 @@ public class KeyringUtilTest {
         InternalServerError ex = assertThrows(InternalServerError.class,
                 () -> KeyringUtil.getUser(usersService, EMAIL));
 
-        assertThat(ex.getMessage(), equalTo("get user returned unexpected error"));
+        assertThat(ex.getMessage(), equalTo(format(GET_USER_ERR_FMT, EMAIL)));
         verify(usersService, times(1)).getUserByEmail(EMAIL);
     }
 
@@ -59,7 +62,7 @@ public class KeyringUtilTest {
 
         NotFoundException ex = assertThrows(NotFoundException.class, () -> KeyringUtil.getUser(usersService, EMAIL));
 
-        assertThat(ex.getMessage(), equalTo("requested user was not found"));
+        assertThat(ex.getMessage(), equalTo(format(USER_NOT_FOUND_ERR_FMT, EMAIL)));
         verify(usersService, times(1)).getUserByEmail(EMAIL);
     }
 

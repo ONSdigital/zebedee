@@ -29,6 +29,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -149,7 +150,7 @@ public class DataVisualisationZip {
             throw new BadRequestException(NO_ZIP_PATH_ERROR_MSG);
         }
 
-        info().data("zipPath", zipPath).log(DELETING_ZIP_DEBUG);
+        info().data("zipPath", zipPath).log(UNZIP_DEBUG);
 
         Session session = zebedeeCmsService.getSession(request);
         com.github.onsdigital.zebedee.model.Collection collection = zebedeeCmsService.getCollection(request);
@@ -180,15 +181,18 @@ public class DataVisualisationZip {
             ZipEntry zipEntry = zipInputStream.getNextEntry();
             Path filePath;
 
+            List<String> filesWritten = new ArrayList<>();
             while (zipEntry != null) {
 
                 if (isValidDataVisContentFile.test(zipEntry)) {
                     filePath = zipDir.resolve(zipEntry.getName());
                     contentWriter.write(zipInputStream, filePath.toString());
-                    info().data("zipPath", zipPath).log(DELETING_ZIP_DEBUG);
+                    filesWritten.add(filePath.toString());
                 }
                 zipEntry = zipInputStream.getNextEntry();
             }
+
+            info().data("files", filesWritten).log(UNZIP_SUCCESS_DEBUG);
 
         } catch (IOException e) {
             error().data("zipPath", zipPath).logException(e, UNZIPPING_ERROR_MSG);

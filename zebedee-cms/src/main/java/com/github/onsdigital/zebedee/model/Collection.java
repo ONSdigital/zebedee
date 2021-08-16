@@ -1167,7 +1167,7 @@ public class Collection {
             return false;
         }
 
-        String visualisationZipUri = resolveDataVizZipURI(contentPath);
+        String visualisationZipUri = resolveParentURI(contentPath);
         String dataJsonUri = resolveDataVizDataJsonURI(contentPath);
         boolean hasDeleted = false;
 
@@ -1208,13 +1208,8 @@ public class Collection {
     }
 
     /**
-     * Get the path of the data viz zip file to delete.
-     * Deleteing a data viz zip is a different process to deleting standard CMS content. Deleting standard CMS
-     * content means deleteing a file so the path to delete will always be a path to a data.json file. However, when
-     * deleteing a data viz zip we have to delete the page (data.json file) and the directory containig the data viz
-     * zip content. We therefore need a path to the parent directory of the data.json file.
+     * Returns the parent path of a URI if the provided URI is a data.json file, otherwise returns the input URI.
      * <p>
-     * This method will return a path to the parent dir if the uri is a data.json file.
      * Example:
      * If uri is "a/b/c/data.json" then it will return "a/b/c".
      *
@@ -1222,7 +1217,7 @@ public class Collection {
      *
      * @param uri the file path to check.
      */
-    private String resolveDataVizZipURI(Path uri) {
+    private String resolveParentURI(Path uri) {
         String zipPath = uri.toString();
         if (DATA_JSON.equals(uri.getFileName().toString()) && uri.getParent() != null && !uri.getParent().equals("/")) {
             zipPath = uri.getParent().toString();

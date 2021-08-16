@@ -150,7 +150,7 @@ public class DataVisualisationZip {
             throw new BadRequestException(NO_ZIP_PATH_ERROR_MSG);
         }
 
-        info().data("zipPath", zipPath).log(DELETING_ZIP_DEBUG);
+        info().data("zipPath", zipPath).log(UNZIP_DEBUG);
 
         Session session = zebedeeCmsService.getSession(request);
         com.github.onsdigital.zebedee.model.Collection collection = zebedeeCmsService.getCollection(request);

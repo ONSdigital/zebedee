@@ -53,4 +53,11 @@ public interface KeyringCache {
      * @throws KeyringException error listing keys
      */
     Set<String> list() throws KeyringException;
+
+    /**
+     *
+     * @return
+     * @throws KeyringException
+     */
+    SchedulerKeyCache getSchedulerKeyCache() throws KeyringException;
 }

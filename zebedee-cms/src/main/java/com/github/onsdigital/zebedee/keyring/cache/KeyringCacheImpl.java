@@ -209,6 +209,11 @@ public class KeyringCacheImpl implements KeyringCache, SchedulerKeyCache {
         return cache.keySet();
     }
 
+    @Override
+    public SchedulerKeyCache getSchedulerKeyCache() throws KeyringException {
+        return this;
+    }
+
     /**
      * Construct and initialise a new singleton instance of the keyring.
      *

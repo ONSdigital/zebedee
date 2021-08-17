@@ -180,9 +180,6 @@ public class ZebedeeConfiguration {
             this.sessions = new SessionsServiceImpl(sessionsPath);
         }
 
-        // Initialise legacy keyring regardless - they will dual run until we cut over to new impl.
-        this.legacyKeyringCache = new com.github.onsdigital.zebedee.model.KeyringCache(sessions, schedulerKeyCache);
-
         this.teamsService = new TeamsServiceImpl(
                 new TeamsStoreFileSystemImpl(teamsPath), this::getPermissionsService);
 
@@ -198,7 +195,7 @@ public class ZebedeeConfiguration {
         this.collections = new Collections(collectionsPath, permissionsService, versionsService, published);
 
 
-        Supplier<Keyring> keyringSupplier = () -> collectionKeyring;
+        Supplier<Keyring> keyringSupplier = () -> this.collectionKeyring;
 
         this.usersService = UsersServiceImpl.getInstance(
                 new UserStoreFileSystemImpl(this.usersPath), collections, permissionsService, keyringSupplier);
@@ -257,50 +254,46 @@ public class ZebedeeConfiguration {
 
     }
 
+    /**
+     * Configure the CMS to use the "migration" implementations of the {@link Keyring}, {@link KeyringCache} and
+     * {@link SchedulerKeyCache}. These are wrapper classes around the new/legacy implementations which will run both in
+     * parallel. This enables to smoothly and gradually transition to the new central keyring implementation while
+     * maintain backward compatibility.
+     *
+     * Once we have confidence the new Central keyring is working and all existing collections have been migrated we
+     * will swap this out to use the "Central" version directly and the Migration implementations can be deleted.
+     */
     private void initMigrationKeyring() throws KeyringException {
-        KeyringStore keyStore = new KeyringStoreImpl(getKeyRingPath(), getKeyringSecretKey(), getKeyringInitVector());
+        KeyringStore centralKeyStore = new KeyringStoreImpl(
+                getKeyRingPath(), getKeyringSecretKey(), getKeyringInitVector());
 
-        KeyringCacheImpl.init(keyStore);
-        KeyringCache keyringCache = KeyringCacheImpl.getInstance();
+        KeyringCacheImpl.init(centralKeyStore);
+        KeyringCache centralKeyringCache = KeyringCacheImpl.getInstance();
 
-        SchedulerKeyCache centralSchedulerCache = (KeyringCacheImpl) keyringCache;
         this.schedulerKeyCache = new MigrationSchedulerKeyCache(
-                new LegacySchedulerKeyCache(), centralSchedulerCache, true);
+                new LegacySchedulerKeyCache(), centralKeyringCache.getSchedulerKeyCache(), true);
 
-        CentralKeyringImpl.init(keyringCache, permissionsService, collections);
-        Keyring centralKeyring = CentralKeyringImpl.getInstance();
+        this.legacyKeyringCache = new com.github.onsdigital.zebedee.model.KeyringCache(
+                this.sessions, this.schedulerKeyCache);
 
         Keyring legacyKeyring = new LegacyKeyringImpl(
-                sessions, usersService, permissionsService, legacyKeyringCache, centralSchedulerCache);
+                sessions, usersService, permissionsService, legacyKeyringCache, schedulerKeyCache);
 
-        this.collectionKeyring = new KeyringMigratorImpl(true, legacyKeyring, centralKeyring);
+        CentralKeyringImpl.init(centralKeyringCache, permissionsService, collections);
+
+        this.collectionKeyring = new KeyringMigratorImpl(true, legacyKeyring, CentralKeyringImpl.getInstance());
     }
 
+    /**
+     * Configure the CMS to use the legacy {@link Keyring}, {@link KeyringCache} and {@link SchedulerKeyCache}
+     * implementations.
+     */
     private void initLegacyKeyring() {
         this.schedulerKeyCache = new MigrationSchedulerKeyCache(new LegacySchedulerKeyCache(), null, false);
 
         this.collectionKeyring = new LegacyKeyringImpl(
                 sessions, usersService, permissionsService, legacyKeyringCache, schedulerKeyCache);
     }
-
-/*    private Keyring initCentralKeyring() throws KeyringException {
-        // Default to the NoOp impl
-        Keyring centralKeyring = new NoOpCentralKeyring();
-
-        // If centralised keying is enabled initialize
-        if (cmsFeatureFlags().isCentralisedKeyringEnabled()) {
-
-            KeyringStore keyStore = new KeyringStoreImpl(getKeyRingPath(), getKeyringSecretKey(), getKeyringInitVector());
-
-            KeyringCacheImpl.init(keyStore);
-            KeyringCache keyringCache = KeyringCacheImpl.getInstance();
-
-            CentralKeyringImpl.init(keyringCache, permissionsService, collections);
-            centralKeyring = CentralKeyringImpl.getInstance();
-        }
-
-        return centralKeyring;
-    }*/
 
     private StartUpAlerter initStartUpAlerter() {
         List<String> startUpNotificationRecipients = slackChannelsToNotfiyOnStartUp();

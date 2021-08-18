@@ -3,6 +3,7 @@ package com.github.onsdigital.zebedee.keyring;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.keyring.cache.KeyringCache;
 import com.github.onsdigital.zebedee.model.Collection;
+import com.github.onsdigital.zebedee.model.Collections;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.user.model.User;
 import org.apache.commons.lang3.StringUtils;
@@ -11,6 +12,8 @@ import javax.crypto.SecretKey;
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * CentralKeyringImpl adds a permissions check wrapper around a {@link KeyringCache} instance to ensure only
@@ -28,7 +31,9 @@ public class CentralKeyringImpl implements Keyring {
     static final String COLLECTION_DESCRIPTION_NULL_ERR = "collection description required but is null";
     static final String COLLECTION_ID_NULL_OR_EMPTY_ERR = "collection ID required but was null or empty";
     static final String PERMISSION_SERVICE_NULL_ERR = "permissionsService required but was null";
+    static final String COLLECTIONS_NULL_ERR = "collections service required but was null";
     static final String SECRET_KEY_NULL_ERR = "secret key required but was null";
+    static final String FILTER_COLLECTIONS_ERR = "error filtering collections";
 
     /**
      * Singleton instance.
@@ -37,6 +42,7 @@ public class CentralKeyringImpl implements Keyring {
 
     private final KeyringCache cache;
     private final PermissionsService permissionsService;
+    private final Collections collections;
 
     /**
      * CollectionKeyringImpl is a singleton instance. Use {@link CentralKeyringImpl#init(KeyringCache, PermissionsService)} to
@@ -46,7 +52,7 @@ public class CentralKeyringImpl implements Keyring {
      * @param cache the {@link KeyringCache} instance to use.
      * @throws KeyringException the {@link KeyringCache} was null.
      */
-    private CentralKeyringImpl(KeyringCache cache, PermissionsService permissionsService) throws KeyringException {
+    private CentralKeyringImpl(KeyringCache cache, PermissionsService permissionsService, Collections collections) throws KeyringException {
         if (cache == null) {
             throw new KeyringException(KEYRING_CACHE_NULL_ERR);
         }
@@ -55,8 +61,13 @@ public class CentralKeyringImpl implements Keyring {
             throw new KeyringException(PERMISSION_SERVICE_NULL_ERR);
         }
 
+        if (collections == null) {
+            throw new KeyringException(COLLECTIONS_NULL_ERR);
+        }
+
         this.permissionsService = permissionsService;
         this.cache = cache;
+        this.collections = collections;
     }
 
     @Override
@@ -126,13 +137,18 @@ public class CentralKeyringImpl implements Keyring {
     @Override
     public Set<String> list(User user) throws KeyringException {
         validateUser(user);
-        boolean hasPermission = hasEditPermissions(user);
-
-        if (!hasPermission) {
-            return null;
+        // if admin or editor return all.
+        if (hasEditPermissions(user)) {
+            return cache.list();
         }
 
-        return cache.list();
+        List<String> accessibleCollectionIDs = getCollectionIDsAccessibleByUser(user);
+
+        // Return only the entries the user has access to.
+        return cache.list()
+                .stream()
+                .filter(c -> accessibleCollectionIDs.contains(c))
+                .collect(Collectors.toSet());
     }
 
     /**
@@ -211,16 +227,42 @@ public class CentralKeyringImpl implements Keyring {
     }
 
     /**
+     * Returns a list of collection IDs that the user has view permission for.
+     */
+    private List<String> getCollectionIDsAccessibleByUser(User u) throws KeyringException {
+        try {
+            // Filter the full list of collections to only those the user has view permisison for. Then Create a list of
+            // collection ID strings from this output using the stream.map function.
+            return collections.filterBy(userHasViewPermission(u))
+                    .stream()
+                    .map(c -> c.getId())
+                    .collect(Collectors.toList());
+        } catch (Exception ex) {
+            throw new KeyringException(FILTER_COLLECTIONS_ERR, ex);
+        }
+    }
+
+    private Predicate<Collection> userHasViewPermission(User user) {
+        return (c) -> {
+            try {
+                return permissionsService.canView(user, c.getDescription());
+            } catch (Exception ex) {
+                throw new RuntimeException("error checking user view permission for collection " + c.getId());
+            }
+        };
+    }
+
+    /**
      * Initailise the CollectionKeyring.
      *
      * @param keyringCache the {@link KeyringCache} instance to use.
      * @throws KeyringException failed to initialise instance.
      */
-    public static void init(KeyringCache keyringCache, PermissionsService permissionsService) throws KeyringException {
+    public static void init(KeyringCache keyringCache, PermissionsService permissionsService, Collections collections) throws KeyringException {
         if (INSTANCE == null) {
             synchronized (CentralKeyringImpl.class) {
                 if (INSTANCE == null) {
-                    INSTANCE = new CentralKeyringImpl(keyringCache, permissionsService);
+                    INSTANCE = new CentralKeyringImpl(keyringCache, permissionsService, collections);
                 }
             }
         }

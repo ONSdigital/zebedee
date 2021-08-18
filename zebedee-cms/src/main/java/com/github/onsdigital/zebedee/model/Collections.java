@@ -63,6 +63,7 @@ import java.util.Optional;
 import java.util.concurrent.Future;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -251,6 +252,17 @@ public class Collections {
         }
 
         return result;
+    }
+
+    /**
+     * Returns a {@link List} of {@link Collection} matching the provided {@link Predicate} filter criteria.
+     *
+     * @param f the filter to apply
+     * @return
+     * @throws IOException problem listing the collections
+     */
+    public List<Collection> filterBy(Predicate<Collection> f) throws IOException {
+        return list().stream().filter(f).collect(Collectors.toList());
     }
 
     public List<String> listOrphaned() throws IOException {

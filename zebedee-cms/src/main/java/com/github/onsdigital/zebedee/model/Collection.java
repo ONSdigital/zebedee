@@ -1167,16 +1167,20 @@ public class Collection {
             return false;
         }
 
-        String visualisationZipUri = contentPath.toString();
+        String visualisationZipUri = resolveParentURI(contentPath);
         String dataJsonUri = resolveDataVizDataJsonURI(contentPath);
         boolean hasDeleted = false;
 
         for (Content collectionDir : new Content[]{inProgress, complete, reviewed}) {
-            if (collectionDir.exists(visualisationZipUri)) {
-                info().data("zip", visualisationZipUri).data("user", session.getEmail()).data("collectionId", this.description.getId())
+            if (collectionDir.exists(visualisationZipUri.toString())) {
+                File targetDir = new File(collectionDir.getPath().toString() + visualisationZipUri);
+
+                info().data("zip_path", targetDir.toString())
+                        .data("user", session.getEmail())
+                        .data("collection_id", this.description.getId())
                         .log("removing data viz zip from collection directory");
 
-                FileUtils.deleteDirectory(Paths.get(collectionDir.getPath().toString() + visualisationZipUri).toFile());
+                FileUtils.deleteDirectory(targetDir);
                 hasDeleted = true;
             }
         }
@@ -1201,6 +1205,25 @@ public class Collection {
             return null;
         }
         return contentPath.getParent().resolve(DATA_JSON).toString();
+    }
+
+    /**
+     * Returns the parent path of a URI if the provided URI is a data.json file, otherwise returns the input URI.
+     * <p>
+     * Example:
+     * If uri is "a/b/c/data.json" then it will return "a/b/c".
+     *
+     * If uri is "a/b/c" then it will return "a/b/c".
+     *
+     * @param uri the file path to check.
+     */
+    private String resolveParentURI(Path uri) {
+        String zipPath = uri.toString();
+        if (DATA_JSON.equals(uri.getFileName().toString()) && uri.getParent() != null && !uri.getParent().equals("/")) {
+            zipPath = uri.getParent().toString();
+        }
+
+        return zipPath;
     }
 
     /**

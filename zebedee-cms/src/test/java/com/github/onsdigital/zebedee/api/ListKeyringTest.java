@@ -17,6 +17,9 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
+import static com.github.onsdigital.zebedee.keyring.KeyringUtil.GET_USER_ERR_FMT;
+import static com.github.onsdigital.zebedee.keyring.KeyringUtil.USER_NOT_FOUND_ERR_FMT;
+import static java.text.MessageFormat.format;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertThrows;
@@ -117,7 +120,7 @@ public class ListKeyringTest extends ZebedeeAPIBaseTestCase {
         InternalServerError ex = assertThrows(InternalServerError.class,
                 () -> endpoint.listUserKeys(mockRequest, mockResponse));
 
-        assertThat(ex.getMessage(), equalTo("get user returned unexpected error"));
+        assertThat(ex.getMessage(), equalTo(format(GET_USER_ERR_FMT, email)));
     }
 
     @Test
@@ -128,7 +131,7 @@ public class ListKeyringTest extends ZebedeeAPIBaseTestCase {
         NotFoundException ex = assertThrows(NotFoundException.class,
                 () -> endpoint.listUserKeys(mockRequest, mockResponse));
 
-        assertThat(ex.getMessage(), equalTo("requested user was not found"));
+        assertThat(ex.getMessage(), equalTo(format(USER_NOT_FOUND_ERR_FMT, email)));
     }
 
     @Test

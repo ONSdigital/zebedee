@@ -1,6 +1,7 @@
-package com.github.onsdigital.zebedee.keyring.cache;
+package com.github.onsdigital.zebedee.keyring.legacy;
 
 import com.github.onsdigital.zebedee.keyring.KeyringException;
+import com.github.onsdigital.zebedee.keyring.SchedulerKeyCache;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.crypto.SecretKey;
@@ -9,7 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Encapsulate legacy scheduler cache implementation behind interface.
  */
-public class LegacySchedulerKeyCache implements SchedulerKeyCache {
+public class LegacySchedulerKeyCacheImpl implements SchedulerKeyCache {
 
     static final String COLLECTION_ID_EMPTY = "collection ID required but was null/empty";
     static final String SECRET_KEY_EMPTY = "secret key required but was null";
@@ -21,14 +22,14 @@ public class LegacySchedulerKeyCache implements SchedulerKeyCache {
      *
      * @param cache the {@link ConcurrentHashMap} to use for the internal cache.
      */
-    LegacySchedulerKeyCache(final ConcurrentHashMap<String, SecretKey> cache) {
+    LegacySchedulerKeyCacheImpl(final ConcurrentHashMap<String, SecretKey> cache) {
         this.cache = cache;
     }
 
     /**
      * Construct a new LegacySchedulerKeyringCache with the default configuration.
      */
-    public LegacySchedulerKeyCache() {
+    public LegacySchedulerKeyCacheImpl() {
         this.cache = new ConcurrentHashMap<>();
     }
 

@@ -11,18 +11,18 @@ import com.github.onsdigital.zebedee.configuration.CMSFeatureFlags;
 import com.github.onsdigital.zebedee.data.processing.DataIndex;
 import com.github.onsdigital.zebedee.kafka.KafkaClient;
 import com.github.onsdigital.zebedee.kafka.KafkaClientImpl;
-import com.github.onsdigital.zebedee.keyring.CentralKeyringImpl;
+import com.github.onsdigital.zebedee.keyring.central.CentralKeyringImpl;
 import com.github.onsdigital.zebedee.keyring.Keyring;
 import com.github.onsdigital.zebedee.keyring.KeyringException;
-import com.github.onsdigital.zebedee.keyring.KeyringMigratorImpl;
-import com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl;
-import com.github.onsdigital.zebedee.keyring.NoOpCentralKeyring;
-import com.github.onsdigital.zebedee.keyring.cache.KeyringCache;
-import com.github.onsdigital.zebedee.keyring.cache.KeyringCacheImpl;
-import com.github.onsdigital.zebedee.keyring.cache.LegacySchedulerKeyCache;
-import com.github.onsdigital.zebedee.keyring.cache.SchedulerKeyCache;
-import com.github.onsdigital.zebedee.keyring.store.KeyringStore;
-import com.github.onsdigital.zebedee.keyring.store.KeyringStoreImpl;
+import com.github.onsdigital.zebedee.keyring.migration.MigrationKeyringImpl;
+import com.github.onsdigital.zebedee.keyring.legacy.LegacyKeyringImpl;
+import com.github.onsdigital.zebedee.keyring.central.NoOpCentralKeyring;
+import com.github.onsdigital.zebedee.keyring.KeyringCache;
+import com.github.onsdigital.zebedee.keyring.central.CentralKeyringCacheImpl;
+import com.github.onsdigital.zebedee.keyring.legacy.LegacySchedulerKeyCacheImpl;
+import com.github.onsdigital.zebedee.keyring.SchedulerKeyCache;
+import com.github.onsdigital.zebedee.keyring.KeyringStore;
+import com.github.onsdigital.zebedee.keyring.central.CentralKeyringStoreImpl;
 import com.github.onsdigital.zebedee.model.Collections;
 import com.github.onsdigital.zebedee.model.Content;
 import com.github.onsdigital.zebedee.model.RedirectTablePartialMatch;
@@ -176,7 +176,7 @@ public class ZebedeeConfiguration {
             this.sessions = new SessionsServiceImpl(sessionsPath);
         }
 
-        this.schedulerKeyCache = new LegacySchedulerKeyCache();
+        this.schedulerKeyCache = new LegacySchedulerKeyCacheImpl();
 
         // Initialise legacy keyring regardless - they will dual run until we cut over to new impl.
         this.legacyKeyringCache = new com.github.onsdigital.zebedee.model.KeyringCache(sessions, schedulerKeyCache);
@@ -209,7 +209,7 @@ public class ZebedeeConfiguration {
         Keyring centralKeyring = initCentralKeyring();
 
         // Keyring migrator encapuslates the keyring migration logic behind the new keyring interface.
-        this.collectionKeyring = new KeyringMigratorImpl(CMSFeatureFlags.cmsFeatureFlags().isCentralisedKeyringEnabled(), legacyKeyring, centralKeyring);
+        this.collectionKeyring = new MigrationKeyringImpl(CMSFeatureFlags.cmsFeatureFlags().isCentralisedKeyringEnabled(), legacyKeyring, centralKeyring);
 
         DatasetClient datasetClient;
         try {
@@ -270,10 +270,10 @@ public class ZebedeeConfiguration {
         // If centralised keying is enabled initialize
         if (cmsFeatureFlags().isCentralisedKeyringEnabled()) {
 
-            KeyringStore keyStore = new KeyringStoreImpl(getKeyRingPath(), getKeyringSecretKey(), getKeyringInitVector());
+            KeyringStore keyStore = new CentralKeyringStoreImpl(getKeyRingPath(), getKeyringSecretKey(), getKeyringInitVector());
 
-            KeyringCacheImpl.init(keyStore);
-            KeyringCache keyringCache = KeyringCacheImpl.getInstance();
+            CentralKeyringCacheImpl.init(keyStore);
+            KeyringCache keyringCache = CentralKeyringCacheImpl.getInstance();
 
             CentralKeyringImpl.init(keyringCache, permissionsService, collections);
             centralKeyring = CentralKeyringImpl.getInstance();

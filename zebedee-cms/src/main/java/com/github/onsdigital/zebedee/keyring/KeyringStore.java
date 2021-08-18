@@ -1,4 +1,4 @@
-package com.github.onsdigital.zebedee.keyring.store;
+package com.github.onsdigital.zebedee.keyring;
 
 import com.github.onsdigital.zebedee.keyring.KeyringException;
 

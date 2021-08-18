@@ -1,6 +1,9 @@
-package com.github.onsdigital.zebedee.keyring;
+package com.github.onsdigital.zebedee.keyring.migration;
 
 import com.github.onsdigital.zebedee.json.CollectionDescription;
+import com.github.onsdigital.zebedee.keyring.Keyring;
+import com.github.onsdigital.zebedee.keyring.KeyringException;
+import com.github.onsdigital.zebedee.keyring.migration.Rollback;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.user.model.User;
 
@@ -21,7 +24,7 @@ import static java.text.MessageFormat.format;
  *     without losing any keys.</li>
  * </ul>
  */
-public class KeyringMigratorImpl implements Keyring {
+public class MigrationKeyringImpl implements Keyring {
 
     static final String WRAPPED_ERR_FMT = "{0}: Migration enabled: {1}";
     static final String MIGRATE_ENABLED = "migration_enabled";
@@ -50,7 +53,7 @@ public class KeyringMigratorImpl implements Keyring {
      * @param legacyKeyring    the legacy keyring implementation to use.
      * @param centralKeyring   the new central keyring implementation to use.
      */
-    public KeyringMigratorImpl(final boolean migrationEnabled, final Keyring legacyKeyring, final Keyring centralKeyring) {
+    public MigrationKeyringImpl(final boolean migrationEnabled, final Keyring legacyKeyring, final Keyring centralKeyring) {
         this.migrationEnabled = migrationEnabled;
         this.legacyKeyring = legacyKeyring;
         this.centralKeyring = centralKeyring;

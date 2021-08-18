@@ -23,6 +23,7 @@ import com.github.onsdigital.zebedee.json.Event;
 import com.github.onsdigital.zebedee.json.EventType;
 import com.github.onsdigital.zebedee.json.Events;
 import com.github.onsdigital.zebedee.keyring.Keyring;
+import com.github.onsdigital.zebedee.keyring.legacy.LegacyKeyringImpl;
 import com.github.onsdigital.zebedee.model.approval.tasks.ReleasePopulator;
 import com.github.onsdigital.zebedee.model.content.item.ContentItemVersion;
 import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
@@ -475,7 +476,7 @@ public class Collection {
          *
          * However, to maintain backwards compatability while we are in the process of migrating we still need to
          * distribute the key. This logic is now encapsulated within
-         * {@link com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl#add(User, Collection, SecretKey)} so we
+         * {@link LegacyKeyringImpl#add(User, Collection, SecretKey)} so we
          * invoke add again which will update all users either adding/removing the key to/from their keyring.
          */
         User user = getUser(zebedee.getUsersService(), session.getEmail());

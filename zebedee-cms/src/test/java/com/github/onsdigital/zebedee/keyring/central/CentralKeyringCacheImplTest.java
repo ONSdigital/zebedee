@@ -1,8 +1,8 @@
 package com.github.onsdigital.zebedee.keyring.central;
 
 import com.github.onsdigital.zebedee.keyring.KeyringCache;
+import com.github.onsdigital.zebedee.keyring.KeyNotFoundException;
 import com.github.onsdigital.zebedee.keyring.KeyringException;
-import com.github.onsdigital.zebedee.keyring.central.CentralKeyringCacheImpl;
 import com.github.onsdigital.zebedee.keyring.KeyringStore;
 import org.junit.Before;
 import org.junit.Test;
@@ -213,7 +213,7 @@ public class CentralKeyringCacheImplTest {
         when(keyStore.exists(TEST_COLLECTION_ID))
                 .thenReturn(false);
 
-        KeyringException ex = assertThrows(KeyringException.class, () -> keyringCache.get(TEST_COLLECTION_ID));
+        KeyNotFoundException ex = assertThrows(KeyNotFoundException.class, () -> keyringCache.get(TEST_COLLECTION_ID));
 
         assertThat(ex.getMessage(), equalTo(KEY_NOT_FOUND_ERR));
         assertThat(ex.getCollectionID(), equalTo(TEST_COLLECTION_ID));
@@ -280,7 +280,7 @@ public class CentralKeyringCacheImplTest {
         when(keyStore.exists(TEST_COLLECTION_ID))
                 .thenReturn(false);
 
-        KeyringException ex = assertThrows(KeyringException.class, () -> keyringCache.remove(TEST_COLLECTION_ID));
+        KeyNotFoundException ex = assertThrows(KeyNotFoundException.class, () -> keyringCache.remove(TEST_COLLECTION_ID));
 
         assertThat(ex.getMessage(), equalTo(KEY_NOT_FOUND_ERR));
 

@@ -1,5 +1,7 @@
 package com.github.onsdigital.zebedee.keyring.cache;
 
+import com.github.onsdigital.zebedee.keyring.SchedulerKeyCache;
+import com.github.onsdigital.zebedee.keyring.KeyNotFoundException;
 import com.github.onsdigital.zebedee.keyring.KeyringException;
 
 import javax.crypto.SecretKey;
@@ -37,12 +39,23 @@ public class MigrationSchedulerKeyCache implements SchedulerKeyCache {
     @Override
     public SecretKey get(String collectionID) throws KeyringException {
         if (migrationEnabled) {
-            SecretKey key = centralCache.get(collectionID);
-            if (key != null) {
+            SecretKey key = getFromCentralKeyringCache(collectionID);
+            if (key == null) {
                 return key;
             }
         }
         return legacyCache.get(collectionID);
+    }
+
+    private SecretKey getFromCentralKeyringCache(String collectionID) throws KeyringException {
+        try {
+            return centralCache.get(collectionID);
+        } catch (KeyNotFoundException ex) {
+            // keyringCache.get() throws an exception if the key is not found. In this use case key not found is a
+            // valid response so we catch the specific exception class for this case and return null. Any other
+            // keyring exception should be thrown & considered an error.
+            return null;
+        }
     }
 
     @Override

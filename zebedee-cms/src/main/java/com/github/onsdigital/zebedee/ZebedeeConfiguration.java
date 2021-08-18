@@ -7,22 +7,21 @@ import com.github.onsdigital.interfaces.JWTHandler;
 import com.github.onsdigital.slack.Profile;
 import com.github.onsdigital.slack.client.SlackClient;
 import com.github.onsdigital.slack.client.SlackClientImpl;
-import com.github.onsdigital.zebedee.configuration.CMSFeatureFlags;
 import com.github.onsdigital.zebedee.data.processing.DataIndex;
 import com.github.onsdigital.zebedee.kafka.KafkaClient;
 import com.github.onsdigital.zebedee.kafka.KafkaClientImpl;
-import com.github.onsdigital.zebedee.keyring.central.CentralKeyringImpl;
 import com.github.onsdigital.zebedee.keyring.Keyring;
-import com.github.onsdigital.zebedee.keyring.KeyringException;
-import com.github.onsdigital.zebedee.keyring.migration.MigrationKeyringImpl;
-import com.github.onsdigital.zebedee.keyring.legacy.LegacyKeyringImpl;
-import com.github.onsdigital.zebedee.keyring.central.NoOpCentralKeyring;
 import com.github.onsdigital.zebedee.keyring.KeyringCache;
-import com.github.onsdigital.zebedee.keyring.central.CentralKeyringCacheImpl;
-import com.github.onsdigital.zebedee.keyring.legacy.LegacySchedulerKeyCacheImpl;
-import com.github.onsdigital.zebedee.keyring.SchedulerKeyCache;
+import com.github.onsdigital.zebedee.keyring.KeyringException;
 import com.github.onsdigital.zebedee.keyring.KeyringStore;
+import com.github.onsdigital.zebedee.keyring.SchedulerKeyCache;
+import com.github.onsdigital.zebedee.keyring.central.CentralKeyringCacheImpl;
+import com.github.onsdigital.zebedee.keyring.central.CentralKeyringImpl;
 import com.github.onsdigital.zebedee.keyring.central.CentralKeyringStoreImpl;
+import com.github.onsdigital.zebedee.keyring.legacy.LegacyKeyringImpl;
+import com.github.onsdigital.zebedee.keyring.legacy.LegacySchedulerKeyCacheImpl;
+import com.github.onsdigital.zebedee.keyring.migration.MigrationKeyringImpl;
+import com.github.onsdigital.zebedee.keyring.cache.MigrationSchedulerKeyCache;
 import com.github.onsdigital.zebedee.model.Collections;
 import com.github.onsdigital.zebedee.model.Content;
 import com.github.onsdigital.zebedee.model.RedirectTablePartialMatch;
@@ -96,6 +95,7 @@ import static com.github.onsdigital.zebedee.configuration.Configuration.getKeyri
 import static com.github.onsdigital.zebedee.configuration.Configuration.getServiceAuthToken;
 import static com.github.onsdigital.zebedee.configuration.Configuration.slackChannelsToNotfiyOnStartUp;
 import static com.github.onsdigital.zebedee.permissions.store.PermissionsStoreFileSystemImpl.initialisePermissions;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 /**
  * Object encapsulating the set up configuration required by {@link Zebedee}. Set paths to & create relevant
@@ -270,7 +270,7 @@ public class ZebedeeConfiguration {
         CentralKeyringCacheImpl.init(centralKeyStore);
         KeyringCache centralKeyringCache = CentralKeyringCacheImpl.getInstance();
 
-        this.schedulerKeyCache = new MigrationSchedulerKeyCacheImpl(
+        this.schedulerKeyCache = new MigrationSchedulerKeyCache(
                 new LegacySchedulerKeyCacheImpl(), centralKeyringCache.getSchedulerKeyCache(), true);
 
         this.legacyKeyringCache = new com.github.onsdigital.zebedee.model.KeyringCache(
@@ -280,8 +280,9 @@ public class ZebedeeConfiguration {
                 sessions, usersService, permissionsService, legacyKeyringCache, schedulerKeyCache);
 
         CentralKeyringImpl.init(centralKeyringCache, permissionsService, collections);
+        Keyring centralKeyring = CentralKeyringImpl.getInstance();
 
-        this.collectionKeyring = new MigrationKeyringImpl(true, legacyKeyring, CentralKeyringImpl.getInstance());
+        this.collectionKeyring = new MigrationKeyringImpl(true, legacyKeyring, centralKeyring);
     }
 
     /**
@@ -289,7 +290,10 @@ public class ZebedeeConfiguration {
      * implementations.
      */
     private void initLegacyKeyring() {
-        this.schedulerKeyCache = new MigrationSchedulerKeyCache(new LegacySchedulerKeyCacheImpl(), null, false);
+        this.schedulerKeyCache = new LegacySchedulerKeyCacheImpl();
+
+        this.legacyKeyringCache = new com.github.onsdigital.zebedee.model.KeyringCache(
+                this.sessions, this.schedulerKeyCache);
 
         this.collectionKeyring = new LegacyKeyringImpl(
                 sessions, usersService, permissionsService, legacyKeyringCache, schedulerKeyCache);

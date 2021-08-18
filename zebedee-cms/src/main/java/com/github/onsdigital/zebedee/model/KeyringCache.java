@@ -7,8 +7,12 @@ import com.github.onsdigital.zebedee.session.service.Sessions;
 import com.github.onsdigital.zebedee.user.model.User;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static com.github.onsdigital.zebedee.logging.CMSLogEvent.info;
 
 /**
  * Provides an basic in-memory cache for {@link Keyring} instances.
@@ -42,10 +46,15 @@ public class KeyringCache {
                 keyringMap.put(session, user.keyring());
 
                 // populate the scheduler keyring
+                List<String> cached = new ArrayList<>();
                 for (String collectionId : user.keyring().list()) {
                     if (schedulerCache.get(collectionId) == null) {
+                        cached.add(collectionId);
                         schedulerCache.add(collectionId, user.keyring().get(collectionId));
                     }
+                }
+                if (!cached.isEmpty()) {
+                    info().data("collections", cached).log("added collections to publish scheduler cache");
                 }
             }
         }

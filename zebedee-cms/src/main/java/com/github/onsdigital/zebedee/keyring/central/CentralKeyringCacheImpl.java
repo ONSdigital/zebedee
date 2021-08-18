@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee.keyring.central;
 
 import com.github.onsdigital.zebedee.keyring.KeyringCache;
+import com.github.onsdigital.zebedee.keyring.KeyNotFoundException;
 import com.github.onsdigital.zebedee.keyring.KeyringException;
 import com.github.onsdigital.zebedee.keyring.SchedulerKeyCache;
 import com.github.onsdigital.zebedee.keyring.KeyringStore;
@@ -180,7 +181,7 @@ public class CentralKeyringCacheImpl implements KeyringCache, SchedulerKeyCache 
         }
 
         if (!keyStore.exists(collectionID)) {
-            throw new KeyringException(KEY_NOT_FOUND_ERR, collectionID);
+            throw new KeyNotFoundException(KEY_NOT_FOUND_ERR, collectionID);
         }
 
         SecretKey key = keyStore.read(collectionID);
@@ -196,7 +197,7 @@ public class CentralKeyringCacheImpl implements KeyringCache, SchedulerKeyCache 
         }
 
         if (!keyStore.exists(collectionID)) {
-            throw new KeyringException(KEY_NOT_FOUND_ERR);
+            throw new KeyNotFoundException(KEY_NOT_FOUND_ERR);
         }
 
         keyStore.delete(collectionID);

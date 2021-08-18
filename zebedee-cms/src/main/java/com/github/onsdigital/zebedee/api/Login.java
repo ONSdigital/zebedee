@@ -46,7 +46,6 @@ public class Login {
      */
     @POST
     public String authenticate(HttpServletRequest request, HttpServletResponse response, Credentials credentials) throws IOException, NotFoundException, BadRequestException {
-        info().log("login endpoint: request received");
         if (credentials == null || StringUtils.isBlank(credentials.getEmail())) {
             info().log("login endpoint: request unsuccessful no credentials provided");
             response.setStatus(HttpStatus.BAD_REQUEST_400);
@@ -80,11 +79,8 @@ public class Login {
             response.setStatus(HttpStatus.OK_200);
         }
 
-        info().data("user", credentials.getEmail()).log("login endpoint: attempting to open session for user");
         String sessionId = Root.zebedee.openSession(credentials).getId();
         info().data("user", user.getEmail()).log("login endpoint: user session opened successfully");
-
-        info().data("user", credentials.getEmail()).log("login endpoint: request completed successfully");
         return sessionId;
     }
 

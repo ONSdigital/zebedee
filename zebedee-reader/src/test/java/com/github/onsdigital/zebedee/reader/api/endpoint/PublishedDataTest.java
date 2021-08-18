@@ -1,4 +1,4 @@
-package com.github.onsdigital.zebedee.reader.api;
+package com.github.onsdigital.zebedee.reader.api.endpoint;
 
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;

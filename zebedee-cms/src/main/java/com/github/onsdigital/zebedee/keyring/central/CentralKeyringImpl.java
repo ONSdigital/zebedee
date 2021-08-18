@@ -1,7 +1,9 @@
-package com.github.onsdigital.zebedee.keyring;
+package com.github.onsdigital.zebedee.keyring.central;
 
 import com.github.onsdigital.zebedee.json.CollectionDescription;
-import com.github.onsdigital.zebedee.keyring.cache.KeyringCache;
+import com.github.onsdigital.zebedee.keyring.Keyring;
+import com.github.onsdigital.zebedee.keyring.KeyringCache;
+import com.github.onsdigital.zebedee.keyring.KeyringException;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.Collections;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;

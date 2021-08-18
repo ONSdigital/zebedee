@@ -1,16 +1,18 @@
-package com.github.onsdigital.zebedee.keyring;
+package com.github.onsdigital.zebedee.keyring.legacy;
 
+import com.github.onsdigital.zebedee.keyring.KeyringException;
+import com.github.onsdigital.zebedee.keyring.legacy.BaseLegacyKeyringTest;
 import com.github.onsdigital.zebedee.user.model.User;
 import com.github.onsdigital.zebedee.user.model.UserList;
 import org.junit.Test;
 
 import java.io.IOException;
 
-import static com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl.COLLECTION_DESC_NULL_ERR;
-import static com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl.COLLECTION_ID_EMPTY_ERR;
-import static com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl.COLLECTION_NULL_ERR;
-import static com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl.LIST_USERS_ERR;
-import static com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl.REMOVE_KEY_SAVE_ERR;
+import static com.github.onsdigital.zebedee.keyring.legacy.LegacyKeyringImpl.COLLECTION_DESC_NULL_ERR;
+import static com.github.onsdigital.zebedee.keyring.legacy.LegacyKeyringImpl.COLLECTION_ID_EMPTY_ERR;
+import static com.github.onsdigital.zebedee.keyring.legacy.LegacyKeyringImpl.COLLECTION_NULL_ERR;
+import static com.github.onsdigital.zebedee.keyring.legacy.LegacyKeyringImpl.LIST_USERS_ERR;
+import static com.github.onsdigital.zebedee.keyring.legacy.LegacyKeyringImpl.REMOVE_KEY_SAVE_ERR;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertThrows;

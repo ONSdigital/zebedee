@@ -1,5 +1,7 @@
-package com.github.onsdigital.zebedee.keyring;
+package com.github.onsdigital.zebedee.keyring.legacy;
 
+import com.github.onsdigital.zebedee.keyring.KeyringException;
+import com.github.onsdigital.zebedee.keyring.legacy.BaseLegacyKeyringTest;
 import com.github.onsdigital.zebedee.user.model.User;
 import org.junit.Test;
 
@@ -7,9 +9,9 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
-import static com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl.EMAIL_EMPTY_ERR;
-import static com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl.GET_USER_ERR;
-import static com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl.USER_NULL_ERR;
+import static com.github.onsdigital.zebedee.keyring.legacy.LegacyKeyringImpl.EMAIL_EMPTY_ERR;
+import static com.github.onsdigital.zebedee.keyring.legacy.LegacyKeyringImpl.GET_USER_ERR;
+import static com.github.onsdigital.zebedee.keyring.legacy.LegacyKeyringImpl.USER_NULL_ERR;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertThrows;

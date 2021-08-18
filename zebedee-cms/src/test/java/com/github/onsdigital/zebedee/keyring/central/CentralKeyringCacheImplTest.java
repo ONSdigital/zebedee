@@ -1,7 +1,9 @@
-package com.github.onsdigital.zebedee.keyring.cache;
+package com.github.onsdigital.zebedee.keyring.central;
 
+import com.github.onsdigital.zebedee.keyring.KeyringCache;
 import com.github.onsdigital.zebedee.keyring.KeyringException;
-import com.github.onsdigital.zebedee.keyring.store.KeyringStore;
+import com.github.onsdigital.zebedee.keyring.central.CentralKeyringCacheImpl;
+import com.github.onsdigital.zebedee.keyring.KeyringStore;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -12,14 +14,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import static com.github.onsdigital.zebedee.keyring.cache.KeyringCacheImpl.INVALID_COLLECTION_ID_ERR;
-import static com.github.onsdigital.zebedee.keyring.cache.KeyringCacheImpl.INVALID_SECRET_KEY_ERR;
-import static com.github.onsdigital.zebedee.keyring.cache.KeyringCacheImpl.KEYSTORE_NULL_ERR;
-import static com.github.onsdigital.zebedee.keyring.cache.KeyringCacheImpl.KEY_MISMATCH_ERR;
-import static com.github.onsdigital.zebedee.keyring.cache.KeyringCacheImpl.KEY_NOT_FOUND_ERR;
-import static com.github.onsdigital.zebedee.keyring.cache.KeyringCacheImpl.LOAD_KEYS_NULL_ERR;
-import static com.github.onsdigital.zebedee.keyring.cache.KeyringCacheImpl.NOT_INITIALISED_ERR;
-import static com.github.onsdigital.zebedee.keyring.cache.KeyringCacheImpl.getInstance;
+import static com.github.onsdigital.zebedee.keyring.central.CentralKeyringCacheImpl.INVALID_COLLECTION_ID_ERR;
+import static com.github.onsdigital.zebedee.keyring.central.CentralKeyringCacheImpl.INVALID_SECRET_KEY_ERR;
+import static com.github.onsdigital.zebedee.keyring.central.CentralKeyringCacheImpl.KEYSTORE_NULL_ERR;
+import static com.github.onsdigital.zebedee.keyring.central.CentralKeyringCacheImpl.KEY_MISMATCH_ERR;
+import static com.github.onsdigital.zebedee.keyring.central.CentralKeyringCacheImpl.KEY_NOT_FOUND_ERR;
+import static com.github.onsdigital.zebedee.keyring.central.CentralKeyringCacheImpl.LOAD_KEYS_NULL_ERR;
+import static com.github.onsdigital.zebedee.keyring.central.CentralKeyringCacheImpl.NOT_INITIALISED_ERR;
+import static com.github.onsdigital.zebedee.keyring.central.CentralKeyringCacheImpl.getInstance;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -36,7 +38,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
-public class KeyringCacheImplTest {
+public class CentralKeyringCacheImplTest {
 
     private static final String TEST_COLLECTION_ID = "138"; // We are 138! We are 138 \m/
 
@@ -54,7 +56,7 @@ public class KeyringCacheImplTest {
         MockitoAnnotations.initMocks(this);
 
         this.cache = new HashMap<>();
-        this.keyringCache = new KeyringCacheImpl(keyStore, cache);
+        this.keyringCache = new CentralKeyringCacheImpl(keyStore, cache);
     }
 
     @Test
@@ -403,7 +405,7 @@ public class KeyringCacheImplTest {
 
     @Test
     public void testInit_keystoreNull_shouldThrowException() {
-        KeyringException ex = assertThrows(KeyringException.class, () -> KeyringCacheImpl.init(null));
+        KeyringException ex = assertThrows(KeyringException.class, () -> CentralKeyringCacheImpl.init(null));
 
         assertThat(ex.getMessage(), equalTo(KEYSTORE_NULL_ERR));
     }
@@ -413,7 +415,7 @@ public class KeyringCacheImplTest {
         when(keyStore.readAll())
                 .thenThrow(new KeyringException("boom"));
 
-        KeyringException ex = assertThrows(KeyringException.class, () -> KeyringCacheImpl.init(keyStore));
+        KeyringException ex = assertThrows(KeyringException.class, () -> CentralKeyringCacheImpl.init(keyStore));
 
         assertThat(ex.getMessage(), equalTo("boom"));
         verify(keyStore, times(1)).readAll();
@@ -424,7 +426,7 @@ public class KeyringCacheImplTest {
         when(keyStore.readAll())
                 .thenReturn(null);
 
-        KeyringException ex = assertThrows(KeyringException.class, () -> KeyringCacheImpl.init(keyStore));
+        KeyringException ex = assertThrows(KeyringException.class, () -> CentralKeyringCacheImpl.init(keyStore));
 
         assertThat(ex.getMessage(), equalTo(LOAD_KEYS_NULL_ERR));
         verify(keyStore, times(1)).readAll();
@@ -438,7 +440,7 @@ public class KeyringCacheImplTest {
         when(keyStore.readAll())
                 .thenReturn(keys);
 
-        KeyringCacheImpl.init(keyStore);
+        CentralKeyringCacheImpl.init(keyStore);
         KeyringCache keyringCache = getInstance();
 
         assertThat(keyringCache.get(TEST_COLLECTION_ID), equalTo(secretKey));
@@ -450,7 +452,7 @@ public class KeyringCacheImplTest {
         // Given the KeyringCache has not been initalised
 
         // When getInstance is called
-        KeyringException ex = assertThrows(KeyringException.class, () -> KeyringCacheImpl.getInstance());
+        KeyringException ex = assertThrows(KeyringException.class, () -> CentralKeyringCacheImpl.getInstance());
 
         // Then an exception is thrown
         assertThat(ex.getMessage(), equalTo(NOT_INITIALISED_ERR));
@@ -459,10 +461,10 @@ public class KeyringCacheImplTest {
     @Test
     public void testGetInstance_success() throws Exception {
         // Given the KeyringCache has been initialised
-        KeyringCacheImpl.init(keyStore);
+        CentralKeyringCacheImpl.init(keyStore);
 
         // When getInstance is called
-        KeyringCache actual = KeyringCacheImpl.getInstance();
+        KeyringCache actual = CentralKeyringCacheImpl.getInstance();
 
         // Then the singleton instance is returned
         assertThat(actual, is(notNullValue()));

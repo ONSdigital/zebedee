@@ -31,6 +31,7 @@
 
     <properties>
         <spring.version>5.3.8</spring.version>
+        <dp.logging.version>v2.0.0-beta</dp.logging.version>
     </properties>
 
     <dependencies>
@@ -108,7 +109,7 @@
         <dependency>
             <groupId>com.github.onsdigital</groupId>
             <artifactId>dp-logging</artifactId>
-            <version>v1.7.0</version>
+            <version>${dp.logging.version}</version>
         </dependency>
 
         <!-- Http -->

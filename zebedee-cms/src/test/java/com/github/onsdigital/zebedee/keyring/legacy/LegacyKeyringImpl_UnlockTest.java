@@ -1,7 +1,6 @@
 package com.github.onsdigital.zebedee.keyring.legacy;
 
 import com.github.onsdigital.zebedee.keyring.KeyringException;
-import com.github.onsdigital.zebedee.keyring.legacy.BaseLegacyKeyringTest;
 import org.junit.Test;
 
 import static com.github.onsdigital.zebedee.keyring.legacy.LegacyKeyringImpl.EMAIL_EMPTY_ERR;

@@ -1,7 +1,6 @@
 package com.github.onsdigital.zebedee.keyring.legacy;
 
 import com.github.onsdigital.zebedee.keyring.KeyringException;
-import com.github.onsdigital.zebedee.keyring.legacy.BaseLegacyKeyringTest;
 import com.github.onsdigital.zebedee.user.model.User;
 import org.junit.Test;
 
@@ -178,6 +177,6 @@ public class LegacyKeyringImpl_ListTest extends BaseLegacyKeyringTest {
         assertThat(actual, equalTo(expected));
         verify(keyringCache, times(1)).get(bert);
         verify(users, times(1)).getUserByEmail(EMAIL_BERT);
-        verify(bertKeyring,times(1)).list();
+        verify(bertKeyring, times(1)).list();
     }
 }

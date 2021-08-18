@@ -1,7 +1,6 @@
 package com.github.onsdigital.zebedee.keyring.legacy;
 
 import com.github.onsdigital.zebedee.keyring.KeyringException;
-import com.github.onsdigital.zebedee.keyring.legacy.BaseLegacyKeyringTest;
 import com.github.onsdigital.zebedee.user.model.User;
 import com.github.onsdigital.zebedee.user.model.UserList;
 import org.junit.Test;

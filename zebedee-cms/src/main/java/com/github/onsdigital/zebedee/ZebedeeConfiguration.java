@@ -15,13 +15,13 @@ import com.github.onsdigital.zebedee.keyring.KeyringCache;
 import com.github.onsdigital.zebedee.keyring.KeyringException;
 import com.github.onsdigital.zebedee.keyring.KeyringStore;
 import com.github.onsdigital.zebedee.keyring.SchedulerKeyCache;
+import com.github.onsdigital.zebedee.keyring.cache.MigrationSchedulerKeyCache;
 import com.github.onsdigital.zebedee.keyring.central.CentralKeyringCacheImpl;
 import com.github.onsdigital.zebedee.keyring.central.CentralKeyringImpl;
 import com.github.onsdigital.zebedee.keyring.central.CentralKeyringStoreImpl;
 import com.github.onsdigital.zebedee.keyring.legacy.LegacyKeyringImpl;
 import com.github.onsdigital.zebedee.keyring.legacy.LegacySchedulerKeyCacheImpl;
 import com.github.onsdigital.zebedee.keyring.migration.MigrationKeyringImpl;
-import com.github.onsdigital.zebedee.keyring.cache.MigrationSchedulerKeyCache;
 import com.github.onsdigital.zebedee.model.Collections;
 import com.github.onsdigital.zebedee.model.Content;
 import com.github.onsdigital.zebedee.model.RedirectTablePartialMatch;
@@ -259,7 +259,7 @@ public class ZebedeeConfiguration {
      * {@link SchedulerKeyCache}. These are wrapper classes around the new/legacy implementations which will run both in
      * parallel. This enables to smoothly and gradually transition to the new central keyring implementation while
      * maintain backward compatibility.
-     *
+     * <p>
      * Once we have confidence the new Central keyring is working and all existing collections have been migrated we
      * will swap this out to use the "Central" version directly and the Migration implementations can be deleted.
      */
@@ -271,7 +271,7 @@ public class ZebedeeConfiguration {
         KeyringCache centralKeyringCache = CentralKeyringCacheImpl.getInstance();
 
         this.schedulerKeyCache = new MigrationSchedulerKeyCache(
-                new LegacySchedulerKeyCacheImpl(), centralKeyringCache.getSchedulerKeyCache(), true);
+                new LegacySchedulerKeyCacheImpl(), centralKeyringCache, true);
 
         this.legacyKeyringCache = new com.github.onsdigital.zebedee.model.KeyringCache(
                 this.sessions, this.schedulerKeyCache);

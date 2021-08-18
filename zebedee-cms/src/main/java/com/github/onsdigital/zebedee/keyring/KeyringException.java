@@ -1,6 +1,4 @@
-package com.github.onsdigital.zebedee.keyring.exceptions;
-
-import com.github.onsdigital.zebedee.keyring.KeyringCache;
+package com.github.onsdigital.zebedee.keyring;
 
 import java.io.IOException;
 

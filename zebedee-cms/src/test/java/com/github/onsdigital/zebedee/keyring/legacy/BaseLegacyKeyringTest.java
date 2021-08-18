@@ -4,7 +4,6 @@ import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.keyring.Keyring;
 import com.github.onsdigital.zebedee.keyring.KeyringException;
 import com.github.onsdigital.zebedee.keyring.SchedulerKeyCache;
-import com.github.onsdigital.zebedee.keyring.legacy.LegacyKeyringImpl;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.KeyringCache;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;

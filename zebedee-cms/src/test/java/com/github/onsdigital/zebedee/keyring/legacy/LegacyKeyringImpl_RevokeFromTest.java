@@ -3,7 +3,6 @@ package com.github.onsdigital.zebedee.keyring.legacy;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.Keyring;
 import com.github.onsdigital.zebedee.keyring.KeyringException;
-import com.github.onsdigital.zebedee.keyring.legacy.BaseLegacyKeyringTest;
 import org.junit.Test;
 import org.mockito.Mock;
 

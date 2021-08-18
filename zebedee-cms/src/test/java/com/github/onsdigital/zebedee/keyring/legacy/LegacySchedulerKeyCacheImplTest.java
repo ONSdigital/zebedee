@@ -1,7 +1,6 @@
 package com.github.onsdigital.zebedee.keyring.legacy;
 
 import com.github.onsdigital.zebedee.keyring.KeyringException;
-import com.github.onsdigital.zebedee.keyring.legacy.LegacySchedulerKeyCacheImpl;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;

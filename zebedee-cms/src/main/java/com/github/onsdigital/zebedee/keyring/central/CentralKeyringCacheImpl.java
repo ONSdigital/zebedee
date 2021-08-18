@@ -1,10 +1,10 @@
 package com.github.onsdigital.zebedee.keyring.central;
 
-import com.github.onsdigital.zebedee.keyring.KeyringCache;
 import com.github.onsdigital.zebedee.keyring.KeyNotFoundException;
+import com.github.onsdigital.zebedee.keyring.KeyringCache;
 import com.github.onsdigital.zebedee.keyring.KeyringException;
-import com.github.onsdigital.zebedee.keyring.SchedulerKeyCache;
 import com.github.onsdigital.zebedee.keyring.KeyringStore;
+import com.github.onsdigital.zebedee.keyring.SchedulerKeyCache;
 import liquibase.util.StringUtils;
 
 import javax.crypto.SecretKey;
@@ -210,11 +210,6 @@ public class CentralKeyringCacheImpl implements KeyringCache, SchedulerKeyCache 
             load();
         }
         return cache.keySet();
-    }
-
-    @Override
-    public SchedulerKeyCache getSchedulerKeyCache() throws KeyringException {
-        return this;
     }
 
     /**

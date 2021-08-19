@@ -5,7 +5,7 @@ import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.InternalServerError;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
-import com.github.onsdigital.zebedee.keyring.Keyring;
+import com.github.onsdigital.zebedee.keyring.CollectionKeyring;
 import com.github.onsdigital.zebedee.keyring.KeyringException;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.session.model.Session;
@@ -30,7 +30,7 @@ import static com.github.onsdigital.zebedee.logging.CMSLogEvent.error;
 @Api
 public class ListKeyring {
 
-    private Keyring keyring;
+    private CollectionKeyring collectionKeyring;
     private Sessions sessions;
     private PermissionsService permissionsService;
     private UsersService usersService;
@@ -48,9 +48,9 @@ public class ListKeyring {
     /**
      * Construct a new instance using the provided configuration.
      */
-    public ListKeyring(final Keyring keyring, final Sessions sessions,
+    public ListKeyring(final CollectionKeyring collectionKeyring, final Sessions sessions,
                        final PermissionsService permissionsService, final UsersService usersService) {
-        this.keyring = keyring;
+        this.collectionKeyring = collectionKeyring;
         this.sessions = sessions;
         this.permissionsService = permissionsService;
         this.usersService = usersService;
@@ -109,7 +109,7 @@ public class ListKeyring {
 
     Set<String> listKeyring(User user) throws InternalServerError {
         try {
-            return keyring.list(user);
+            return collectionKeyring.list(user);
         } catch (KeyringException ex) {
             error().user(user.getEmail()).exception(ex).log("error listing user keyring");
             throw new InternalServerError("internal server error");

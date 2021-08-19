@@ -1,7 +1,6 @@
 package com.github.onsdigital.zebedee.keyring.legacy;
 
 import com.github.onsdigital.zebedee.keyring.KeyringException;
-import com.github.onsdigital.zebedee.keyring.legacy.BaseLegacyKeyringTest;
 import com.github.onsdigital.zebedee.user.model.User;
 import org.junit.Test;
 
@@ -34,7 +33,7 @@ public class LegacyKeyringImpl_ListTest extends BaseLegacyKeyringTest {
         // Given user is null
 
         // When list is called
-        KeyringException actual = assertThrows(KeyringException.class, () -> legacyKeyring.list(null));
+        KeyringException actual = assertThrows(KeyringException.class, () -> legacyCollectionKeyring.list(null));
 
         // Then an exception is thrown
         assertThat(actual.getMessage(), equalTo(USER_NULL_ERR));
@@ -48,7 +47,7 @@ public class LegacyKeyringImpl_ListTest extends BaseLegacyKeyringTest {
                 .thenReturn(null);
 
         // When list is called
-        KeyringException actual = assertThrows(KeyringException.class, () -> legacyKeyring.list(bert));
+        KeyringException actual = assertThrows(KeyringException.class, () -> legacyCollectionKeyring.list(bert));
 
         // Then an exception is thrown
         assertThat(actual.getMessage(), equalTo(EMAIL_EMPTY_ERR));
@@ -62,7 +61,7 @@ public class LegacyKeyringImpl_ListTest extends BaseLegacyKeyringTest {
                 .thenReturn("");
 
         // When list is called
-        KeyringException actual = assertThrows(KeyringException.class, () -> legacyKeyring.list(bert));
+        KeyringException actual = assertThrows(KeyringException.class, () -> legacyCollectionKeyring.list(bert));
 
         // Then an exception is thrown
         assertThat(actual.getMessage(), equalTo(EMAIL_EMPTY_ERR));
@@ -80,7 +79,7 @@ public class LegacyKeyringImpl_ListTest extends BaseLegacyKeyringTest {
                 .thenReturn(expected);
 
         // When list is called
-        Set<String> actual = legacyKeyring.list(bert);
+        Set<String> actual = legacyCollectionKeyring.list(bert);
 
         // Then the expected set is returned
         assertThat(actual, equalTo(expected));
@@ -100,7 +99,7 @@ public class LegacyKeyringImpl_ListTest extends BaseLegacyKeyringTest {
                 .thenThrow(IOException.class);
 
         // When list is called
-        KeyringException actual = assertThrows(KeyringException.class, () -> legacyKeyring.list(bert));
+        KeyringException actual = assertThrows(KeyringException.class, () -> legacyCollectionKeyring.list(bert));
 
         // Then an exception is thrown
         assertThat(actual.getMessage(), equalTo(GET_USER_ERR));
@@ -119,7 +118,7 @@ public class LegacyKeyringImpl_ListTest extends BaseLegacyKeyringTest {
                 .thenReturn(null);
 
         // When list is called
-        KeyringException actual = assertThrows(KeyringException.class, () -> legacyKeyring.list(bert));
+        KeyringException actual = assertThrows(KeyringException.class, () -> legacyCollectionKeyring.list(bert));
 
         // Then an exception is thrown
         assertThat(actual.getMessage(), equalTo(USER_NULL_ERR));
@@ -142,7 +141,7 @@ public class LegacyKeyringImpl_ListTest extends BaseLegacyKeyringTest {
                 .thenReturn(null);
 
         // When list is called
-        Set<String> actual = legacyKeyring.list(bert);
+        Set<String> actual = legacyCollectionKeyring.list(bert);
 
         // Then an empty set is returned
         assertTrue(actual.isEmpty());
@@ -172,7 +171,7 @@ public class LegacyKeyringImpl_ListTest extends BaseLegacyKeyringTest {
                 .thenReturn(expected);
 
         // When list is called
-        Set<String> actual = legacyKeyring.list(bert);
+        Set<String> actual = legacyCollectionKeyring.list(bert);
 
         // Then the expected result is returned
         assertThat(actual, equalTo(expected));

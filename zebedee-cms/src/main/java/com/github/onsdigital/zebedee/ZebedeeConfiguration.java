@@ -12,7 +12,7 @@ import com.github.onsdigital.zebedee.data.processing.DataIndex;
 import com.github.onsdigital.zebedee.kafka.KafkaClient;
 import com.github.onsdigital.zebedee.kafka.KafkaClientImpl;
 import com.github.onsdigital.zebedee.keyring.central.CentralKeyringImpl;
-import com.github.onsdigital.zebedee.keyring.Keyring;
+import com.github.onsdigital.zebedee.keyring.CollectionKeyring;
 import com.github.onsdigital.zebedee.keyring.KeyringException;
 import com.github.onsdigital.zebedee.keyring.migration.MigrationKeyringImpl;
 import com.github.onsdigital.zebedee.keyring.legacy.LegacyKeyringImpl;
@@ -125,7 +125,7 @@ public class ZebedeeConfiguration {
     private DatasetService datasetService;
     private ImageService imageService;
     private KafkaService kafkaService;
-    private Keyring collectionKeyring;
+    private CollectionKeyring collectionKeyring;
     private SchedulerKeyCache schedulerKeyCache;
     private EncryptionKeyFactory encryptionKeyFactory;
     private StartUpAlerter startUpAlerter;
@@ -196,17 +196,17 @@ public class ZebedeeConfiguration {
         this.collections = new Collections(collectionsPath, permissionsService, versionsService, published);
 
 
-        Supplier<Keyring> keyringSupplier = () -> collectionKeyring;
+        Supplier<CollectionKeyring> keyringSupplier = () -> collectionKeyring;
 
         this.usersService = UsersServiceImpl.getInstance(
                 new UserStoreFileSystemImpl(this.usersPath), collections, permissionsService, keyringSupplier);
 
         // The legacy keyring logic but behind the new keyring interface.
-        Keyring legacyKeyring = new LegacyKeyringImpl(
+        CollectionKeyring legacyKeyring = new LegacyKeyringImpl(
                 sessions, usersService, permissionsService, legacyKeyringCache, schedulerKeyCache);
 
         // The new world keyring impl - could be no op or real impl depending on config.
-        Keyring centralKeyring = initCentralKeyring();
+        CollectionKeyring centralKeyring = initCentralKeyring();
 
         // Keyring migrator encapuslates the keyring migration logic behind the new keyring interface.
         this.collectionKeyring = new MigrationKeyringImpl(CMSFeatureFlags.cmsFeatureFlags().isCentralisedKeyringEnabled(), legacyKeyring, centralKeyring);
@@ -263,9 +263,9 @@ public class ZebedeeConfiguration {
 
     }
 
-    private Keyring initCentralKeyring() throws KeyringException {
+    private CollectionKeyring initCentralKeyring() throws KeyringException {
         // Default to the NoOp impl
-        Keyring centralKeyring = new NoOpCentralKeyring();
+        CollectionKeyring centralKeyring = new NoOpCentralKeyring();
 
         // If centralised keying is enabled initialize
         if (cmsFeatureFlags().isCentralisedKeyringEnabled()) {
@@ -413,7 +413,7 @@ public class ZebedeeConfiguration {
         return new ServiceStoreImpl(servicePath);
     }
 
-    public Keyring getCollectionKeyring() {
+    public CollectionKeyring getCollectionKeyring() {
         return this.collectionKeyring;
     }
 

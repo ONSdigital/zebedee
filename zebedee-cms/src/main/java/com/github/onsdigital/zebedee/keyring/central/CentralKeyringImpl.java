@@ -1,7 +1,7 @@
 package com.github.onsdigital.zebedee.keyring.central;
 
 import com.github.onsdigital.zebedee.json.CollectionDescription;
-import com.github.onsdigital.zebedee.keyring.Keyring;
+import com.github.onsdigital.zebedee.keyring.CollectionKeyring;
 import com.github.onsdigital.zebedee.keyring.KeyringCache;
 import com.github.onsdigital.zebedee.keyring.KeyringException;
 import com.github.onsdigital.zebedee.model.Collection;
@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
  * CentralKeyringImpl adds a permissions check wrapper around a {@link KeyringCache} instance to ensure only
  * authorised users can access collection encryption keys
  */
-public class CentralKeyringImpl implements Keyring {
+public class CentralKeyringImpl implements CollectionKeyring {
 
     static final String USER_NULL_ERR = "user required but was null";
     static final String USER_EMAIL_ERR = "user email required but was null or empty";
@@ -40,7 +40,7 @@ public class CentralKeyringImpl implements Keyring {
     /**
      * Singleton instance.
      */
-    private static Keyring INSTANCE = null;
+    private static CollectionKeyring INSTANCE = null;
 
     private final KeyringCache cache;
     private final PermissionsService permissionsService;
@@ -274,7 +274,7 @@ public class CentralKeyringImpl implements Keyring {
      * @return a singleton instance of the CollectionKeyring
      * @throws KeyringException CollectionKeyring has not been initalised before being accessed.
      */
-    public static Keyring getInstance() throws KeyringException {
+    public static CollectionKeyring getInstance() throws KeyringException {
         if (INSTANCE == null) {
             throw new KeyringException(NOT_INITIALISED_ERR);
         }

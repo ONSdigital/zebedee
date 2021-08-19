@@ -13,7 +13,7 @@ import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.CollectionType;
 import com.github.onsdigital.zebedee.json.Event;
 import com.github.onsdigital.zebedee.json.EventType;
-import com.github.onsdigital.zebedee.keyring.Keyring;
+import com.github.onsdigital.zebedee.keyring.CollectionKeyring;
 import com.github.onsdigital.zebedee.model.approval.ApproveTask;
 import com.github.onsdigital.zebedee.model.encryption.EncryptionKeyFactory;
 import com.github.onsdigital.zebedee.model.publishing.PublishNotification;
@@ -148,7 +148,7 @@ public class CollectionsTest {
     private EncryptionKeyFactory encryptionKeyFactory;
 
     @Mock
-    private Keyring keyring;
+    private CollectionKeyring collectionKeyring;
 
     private Collections collections;
     private Path collectionsPath;
@@ -200,7 +200,7 @@ public class CollectionsTest {
         when(zebedeeMock.getEncryptionKeyFactory())
                 .thenReturn(encryptionKeyFactory);
         when(zebedeeMock.getCollectionKeyring())
-                .thenReturn(keyring);
+                .thenReturn(collectionKeyring);
         when(usersServiceMock.getUserByEmail(anyString()))
                 .thenReturn(testUser);
         when(collectionReaderWriterFactoryMock.getWriter(zebedeeMock, collectionMock, sessionMock))
@@ -210,7 +210,7 @@ public class CollectionsTest {
         when(encryptionKeyFactory.newCollectionKey())
                 .thenReturn(key);
 
-        when(keyring.get(any(), any()))
+        when(collectionKeyring.get(any(), any()))
                 .thenReturn(key);
 
         Collection created = Collection.create(desc, zebedeeMock, sessionMock);

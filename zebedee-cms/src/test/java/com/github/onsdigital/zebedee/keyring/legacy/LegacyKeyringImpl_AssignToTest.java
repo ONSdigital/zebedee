@@ -3,7 +3,6 @@ package com.github.onsdigital.zebedee.keyring.legacy;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.Keyring;
 import com.github.onsdigital.zebedee.keyring.KeyringException;
-import com.github.onsdigital.zebedee.keyring.legacy.BaseLegacyKeyringTest;
 import org.junit.Test;
 import org.mockito.Mock;
 
@@ -62,14 +61,14 @@ public class LegacyKeyringImpl_AssignToTest extends BaseLegacyKeyringTest {
     @Test
     public void testAssignTo_assignmentsNull_shouldDoNothing() throws Exception {
         List<CollectionDescription> assignments = null;
-        legacyKeyring.assignTo(bert, ernie, assignments);
+        legacyCollectionKeyring.assignTo(bert, ernie, assignments);
 
         verifyZeroInteractions(bert, ernie, bertKeyring, ernieKeyring, keyringCache, users);
     }
 
     @Test
     public void testAssignTo_assignmentsEmpty_shouldDoNothing() throws Exception {
-        legacyKeyring.assignTo(bert, ernie, new ArrayList<>());
+        legacyCollectionKeyring.assignTo(bert, ernie, new ArrayList<>());
 
         verifyZeroInteractions(bert, ernie, bertKeyring, ernieKeyring, keyringCache, users);
     }
@@ -77,7 +76,7 @@ public class LegacyKeyringImpl_AssignToTest extends BaseLegacyKeyringTest {
     @Test
     public void testAssignTo_srcUserNull_shouldThrowEx() throws Exception {
         KeyringException ex = assertThrows(KeyringException.class,
-                () -> legacyKeyring.assignTo(null, ernie, assignments));
+                () -> legacyCollectionKeyring.assignTo(null, ernie, assignments));
 
         assertThat(ex.getMessage(), equalTo(USER_NULL_ERR));
         verifyZeroInteractions(ernie, bertKeyring, ernieKeyring, keyringCache, users);
@@ -89,7 +88,7 @@ public class LegacyKeyringImpl_AssignToTest extends BaseLegacyKeyringTest {
                 .thenReturn(null);
 
         KeyringException ex = assertThrows(KeyringException.class,
-                () -> legacyKeyring.assignTo(bert, ernie, assignments));
+                () -> legacyCollectionKeyring.assignTo(bert, ernie, assignments));
 
         assertThat(ex.getMessage(), equalTo(EMAIL_EMPTY_ERR));
         verifyZeroInteractions(ernie, bertKeyring, ernieKeyring, keyringCache, users);
@@ -101,7 +100,7 @@ public class LegacyKeyringImpl_AssignToTest extends BaseLegacyKeyringTest {
                 .thenReturn("");
 
         KeyringException ex = assertThrows(KeyringException.class,
-                () -> legacyKeyring.assignTo(bert, ernie, assignments));
+                () -> legacyCollectionKeyring.assignTo(bert, ernie, assignments));
 
         assertThat(ex.getMessage(), equalTo(EMAIL_EMPTY_ERR));
         verifyZeroInteractions(ernie, bertKeyring, ernieKeyring, keyringCache, users);
@@ -113,7 +112,7 @@ public class LegacyKeyringImpl_AssignToTest extends BaseLegacyKeyringTest {
                 .thenReturn(null);
 
         KeyringException ex = assertThrows(KeyringException.class,
-                () -> legacyKeyring.assignTo(bert, ernie, assignments));
+                () -> legacyCollectionKeyring.assignTo(bert, ernie, assignments));
 
         assertThat(ex.getMessage(), equalTo(USER_KEYRING_NULL_ERR));
         verifyZeroInteractions(ernie, bertKeyring, ernieKeyring, keyringCache, users);
@@ -122,7 +121,7 @@ public class LegacyKeyringImpl_AssignToTest extends BaseLegacyKeyringTest {
     @Test
     public void testAssignTo_targetUserNull_shouldThrowEx() throws Exception {
         KeyringException ex = assertThrows(KeyringException.class,
-                () -> legacyKeyring.assignTo(bert, null, assignments));
+                () -> legacyCollectionKeyring.assignTo(bert, null, assignments));
 
         assertThat(ex.getMessage(), equalTo(USER_NULL_ERR));
         verifyZeroInteractions(ernie, bertKeyring, ernieKeyring, keyringCache, users);
@@ -134,7 +133,7 @@ public class LegacyKeyringImpl_AssignToTest extends BaseLegacyKeyringTest {
                 .thenReturn(null);
 
         KeyringException ex = assertThrows(KeyringException.class,
-                () -> legacyKeyring.assignTo(bert, ernie, assignments));
+                () -> legacyCollectionKeyring.assignTo(bert, ernie, assignments));
 
         assertThat(ex.getMessage(), equalTo(EMAIL_EMPTY_ERR));
         verifyZeroInteractions(bertKeyring, ernieKeyring, keyringCache, users);
@@ -146,7 +145,7 @@ public class LegacyKeyringImpl_AssignToTest extends BaseLegacyKeyringTest {
                 .thenReturn("");
 
         KeyringException ex = assertThrows(KeyringException.class,
-                () -> legacyKeyring.assignTo(bert, ernie, assignments));
+                () -> legacyCollectionKeyring.assignTo(bert, ernie, assignments));
 
         assertThat(ex.getMessage(), equalTo(EMAIL_EMPTY_ERR));
         verifyZeroInteractions(bertKeyring, ernieKeyring, keyringCache, users);
@@ -158,7 +157,7 @@ public class LegacyKeyringImpl_AssignToTest extends BaseLegacyKeyringTest {
                 .thenReturn(null);
 
         KeyringException ex = assertThrows(KeyringException.class,
-                () -> legacyKeyring.assignTo(bert, ernie, assignments));
+                () -> legacyCollectionKeyring.assignTo(bert, ernie, assignments));
 
         assertThat(ex.getMessage(), equalTo(USER_KEYRING_NULL_ERR));
         verifyZeroInteractions(bertKeyring, ernieKeyring, keyringCache, users);
@@ -170,7 +169,7 @@ public class LegacyKeyringImpl_AssignToTest extends BaseLegacyKeyringTest {
                 .thenThrow(KeyringException.class);
 
         assertThrows(KeyringException.class,
-                () -> legacyKeyring.assignTo(bert, ernie, assignments));
+                () -> legacyCollectionKeyring.assignTo(bert, ernie, assignments));
 
         verify(keyringCache, times(1)).get(bert);
     }
@@ -181,7 +180,7 @@ public class LegacyKeyringImpl_AssignToTest extends BaseLegacyKeyringTest {
                 .thenReturn(null);
 
         KeyringException ex = assertThrows(KeyringException.class,
-                () -> legacyKeyring.assignTo(bert, ernie, assignments));
+                () -> legacyCollectionKeyring.assignTo(bert, ernie, assignments));
 
         assertThat(ex.getMessage(), equalTo(CACHE_KEYRING_NULL_ERR));
         verify(keyringCache, times(1)).get(bert);
@@ -193,7 +192,7 @@ public class LegacyKeyringImpl_AssignToTest extends BaseLegacyKeyringTest {
                 .thenReturn(false);
 
         KeyringException ex = assertThrows(KeyringException.class,
-                () -> legacyKeyring.assignTo(bert, ernie, assignments));
+                () -> legacyCollectionKeyring.assignTo(bert, ernie, assignments));
 
         assertThat(ex.getMessage(), equalTo(KEYRING_LOCKED_ERR));
         verify(keyringCache, times(1)).get(bert);
@@ -204,7 +203,7 @@ public class LegacyKeyringImpl_AssignToTest extends BaseLegacyKeyringTest {
         when(bertCachedKeyring.keySet())
                 .thenReturn(new HashSet<>());
 
-        legacyKeyring.assignTo(bert, ernie, assignments);
+        legacyCollectionKeyring.assignTo(bert, ernie, assignments);
 
         verify(ernieCachedKeyring, never()).put(TEST_COLLECTION_ID, secretKey);
         verify(ernieKeyring, never()).put(TEST_COLLECTION_ID, secretKey);
@@ -213,7 +212,7 @@ public class LegacyKeyringImpl_AssignToTest extends BaseLegacyKeyringTest {
 
     @Test
     public void testAssignTo_success_shouldAddKeysToCachedKeyAndUserKeyring() throws Exception {
-        legacyKeyring.assignTo(bert, ernie, assignments);
+        legacyCollectionKeyring.assignTo(bert, ernie, assignments);
 
         verify(ernieCachedKeyring, times(1)).put(TEST_COLLECTION_ID, secretKey);
         verify(ernieKeyring, times(1)).put(TEST_COLLECTION_ID, secretKey);

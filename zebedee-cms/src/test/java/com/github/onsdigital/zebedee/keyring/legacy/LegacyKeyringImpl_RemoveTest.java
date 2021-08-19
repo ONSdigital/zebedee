@@ -1,7 +1,6 @@
 package com.github.onsdigital.zebedee.keyring.legacy;
 
 import com.github.onsdigital.zebedee.keyring.KeyringException;
-import com.github.onsdigital.zebedee.keyring.legacy.BaseLegacyKeyringTest;
 import com.github.onsdigital.zebedee.user.model.User;
 import com.github.onsdigital.zebedee.user.model.UserList;
 import org.junit.Test;
@@ -37,7 +36,7 @@ public class LegacyKeyringImpl_RemoveTest extends BaseLegacyKeyringTest {
         // Given collection is null
 
         // When remove is called
-        KeyringException ex = assertThrows(KeyringException.class, () -> legacyKeyring.remove(null, null));
+        KeyringException ex = assertThrows(KeyringException.class, () -> legacyCollectionKeyring.remove(null, null));
 
         // Then an exception is thrown
         assertThat(ex.getMessage(), equalTo(COLLECTION_NULL_ERR));
@@ -51,7 +50,7 @@ public class LegacyKeyringImpl_RemoveTest extends BaseLegacyKeyringTest {
                 .thenReturn(null);
 
         // When remove is called
-        KeyringException ex = assertThrows(KeyringException.class, () -> legacyKeyring.remove(null, collection));
+        KeyringException ex = assertThrows(KeyringException.class, () -> legacyCollectionKeyring.remove(null, collection));
 
         // Then an exception is thrown
         assertThat(ex.getMessage(), equalTo(COLLECTION_DESC_NULL_ERR));
@@ -65,7 +64,7 @@ public class LegacyKeyringImpl_RemoveTest extends BaseLegacyKeyringTest {
                 .thenReturn(null);
 
         // When remove is called
-        KeyringException ex = assertThrows(KeyringException.class, () -> legacyKeyring.remove(null, collection));
+        KeyringException ex = assertThrows(KeyringException.class, () -> legacyCollectionKeyring.remove(null, collection));
 
         // Then an exception is thrown
         assertThat(ex.getMessage(), equalTo(COLLECTION_ID_EMPTY_ERR));
@@ -79,7 +78,7 @@ public class LegacyKeyringImpl_RemoveTest extends BaseLegacyKeyringTest {
                 .thenReturn("");
 
         // When remove is called
-        KeyringException ex = assertThrows(KeyringException.class, () -> legacyKeyring.remove(null, collection));
+        KeyringException ex = assertThrows(KeyringException.class, () -> legacyCollectionKeyring.remove(null, collection));
 
         // Then an exception is thrown
         assertThat(ex.getMessage(), equalTo(COLLECTION_ID_EMPTY_ERR));
@@ -93,7 +92,7 @@ public class LegacyKeyringImpl_RemoveTest extends BaseLegacyKeyringTest {
                 .thenThrow(IOException.class);
 
         // When remove is called
-        KeyringException ex = assertThrows(KeyringException.class, () -> legacyKeyring.remove(null, collection));
+        KeyringException ex = assertThrows(KeyringException.class, () -> legacyCollectionKeyring.remove(null, collection));
 
         // Then an exception is thrown
         assertThat(ex.getMessage(), equalTo(LIST_USERS_ERR));
@@ -115,7 +114,7 @@ public class LegacyKeyringImpl_RemoveTest extends BaseLegacyKeyringTest {
                 .thenReturn(null);
 
         // When remove is called
-        legacyKeyring.remove(null, collection);
+        legacyCollectionKeyring.remove(null, collection);
 
         // Then the key is not removed from any user
         verifyKeyNotRemovedFromUser(bert, bertKeyring);
@@ -133,7 +132,7 @@ public class LegacyKeyringImpl_RemoveTest extends BaseLegacyKeyringTest {
                 .thenReturn(new UserList());
 
         // When remove is called
-        legacyKeyring.remove(null, collection);
+        legacyCollectionKeyring.remove(null, collection);
 
         // Then the key is not removed from any user
         verifyKeyNotRemovedFromUser(bert, bertKeyring);
@@ -153,7 +152,8 @@ public class LegacyKeyringImpl_RemoveTest extends BaseLegacyKeyringTest {
                 .removeKeyFromKeyring(EMAIL_BERT, TEST_COLLECTION_ID);
 
         // When remove is called
-        KeyringException ex = assertThrows(KeyringException.class, () -> legacyKeyring.remove(null, collection));
+        KeyringException ex = assertThrows(KeyringException.class,
+                () -> legacyCollectionKeyring.remove(null, collection));
 
         // Then an exception is thrown
         assertThat(ex.getMessage(), equalTo(REMOVE_KEY_SAVE_ERR));
@@ -184,7 +184,8 @@ public class LegacyKeyringImpl_RemoveTest extends BaseLegacyKeyringTest {
                 .thenReturn(null);
 
         // When remove is called
-        KeyringException ex = assertThrows(KeyringException.class, () -> legacyKeyring.remove(null, collection));
+        KeyringException ex = assertThrows(KeyringException.class,
+                () -> legacyCollectionKeyring.remove(null, collection));
 
         // Then an exception is thrown
         assertThat(ex.getMessage(), equalTo(REMOVE_KEY_SAVE_ERR));
@@ -211,7 +212,7 @@ public class LegacyKeyringImpl_RemoveTest extends BaseLegacyKeyringTest {
                 .thenReturn(null);
 
         // When remove is called
-        legacyKeyring.remove(null, collection);
+        legacyCollectionKeyring.remove(null, collection);
 
         // Then the key is successfully removed from the stored user
         verifyUserKeyringRetrievedFromCache(bert);
@@ -236,7 +237,7 @@ public class LegacyKeyringImpl_RemoveTest extends BaseLegacyKeyringTest {
         // And the user's keyring is in the cache
 
         // When remove is called
-        legacyKeyring.remove(null, collection);
+        legacyCollectionKeyring.remove(null, collection);
 
         // Then the key is successfully removed from all cached user keyrings
         // And the key is removed from all stored users.

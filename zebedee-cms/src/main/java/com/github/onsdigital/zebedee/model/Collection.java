@@ -22,7 +22,7 @@ import com.github.onsdigital.zebedee.json.ContentStatus;
 import com.github.onsdigital.zebedee.json.Event;
 import com.github.onsdigital.zebedee.json.EventType;
 import com.github.onsdigital.zebedee.json.Events;
-import com.github.onsdigital.zebedee.keyring.Keyring;
+import com.github.onsdigital.zebedee.keyring.CollectionKeyring;
 import com.github.onsdigital.zebedee.keyring.legacy.LegacyKeyringImpl;
 import com.github.onsdigital.zebedee.model.approval.tasks.ReleasePopulator;
 import com.github.onsdigital.zebedee.model.content.item.ContentItemVersion;
@@ -494,14 +494,14 @@ public class Collection {
             UsersService users = zebedee.getUsersService();
             PermissionsService permissions = zebedee.getPermissionsService();
             TeamsService teams = zebedee.getTeamsService();
-            Keyring keyring = zebedee.getCollectionKeyring();
+            CollectionKeyring collectionKeyring = zebedee.getCollectionKeyring();
 
 
             // Remove any teams that should no longer have access.
-            removeTeamsFromCollection(teams, users, permissions, keyring, desc, session);
+            removeTeamsFromCollection(teams, users, permissions, collectionKeyring, desc, session);
 
             // Add any new teams that have been granted access.
-            teamsUpdated.addAll(addTeamsToCollection(teams, users, permissions, keyring, desc, session));
+            teamsUpdated.addAll(addTeamsToCollection(teams, users, permissions, collectionKeyring, desc, session));
         }
 
         return teamsUpdated;
@@ -512,7 +512,7 @@ public class Collection {
      * key is revoked from each member of the team.
      */
     private static void removeTeamsFromCollection(TeamsService teams,
-                                                  UsersService users, PermissionsService permissions, Keyring keyring,
+                                                  UsersService users, PermissionsService permissions, CollectionKeyring collectionKeyring,
                                                   CollectionDescription desc, Session session)
             throws IOException, ZebedeeException {
         Set<Integer> teamIDs = permissions.listViewerTeams(desc, session);
@@ -528,7 +528,7 @@ public class Collection {
 
                 for (String member : t.getMembers()) {
                     User target = getUser(users, member);
-                    keyring.revokeFrom(target, desc);
+                    collectionKeyring.revokeFrom(target, desc);
                 }
 
                 permissions.removeViewerTeam(desc, t, session);
@@ -541,7 +541,7 @@ public class Collection {
      * collection to assign the collection encryption key to them.
      */
     private static Set<String> addTeamsToCollection(TeamsService teams, UsersService users,
-                                                    PermissionsService permissions, Keyring keyring,
+                                                    PermissionsService permissions, CollectionKeyring collectionKeyring,
                                                     CollectionDescription desc, Session session)
             throws IOException, ZebedeeException {
 
@@ -558,7 +558,7 @@ public class Collection {
 
             for (String email : team.getMembers()) {
                 User targetUser = getUser(users, email);
-                keyring.assignTo(srcUser, targetUser, desc);
+                collectionKeyring.assignTo(srcUser, targetUser, desc);
             }
 
             teamsUpdated.add(teamName);

@@ -7,7 +7,7 @@ import com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedExcept
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.Credentials;
-import com.github.onsdigital.zebedee.keyring.Keyring;
+import com.github.onsdigital.zebedee.keyring.CollectionKeyring;
 import com.github.onsdigital.zebedee.keyring.KeyringException;
 import com.github.onsdigital.zebedee.keyring.SchedulerKeyCache;
 import com.github.onsdigital.zebedee.model.Collection;
@@ -80,7 +80,7 @@ public class Zebedee {
     private final Path publishedContentPath;
     private final Path path;
     private final PermissionsService permissionsService;
-    private final Keyring collectionKeyring;
+    private final CollectionKeyring collectionKeyring;
     private final EncryptionKeyFactory encryptionKeyFactory;
 
     private final UsersService usersService;
@@ -418,7 +418,7 @@ public class Zebedee {
         return keyRingPath;
     }
 
-    public Keyring getCollectionKeyring() {
+    public CollectionKeyring getCollectionKeyring() {
         return this.collectionKeyring;
     }
 

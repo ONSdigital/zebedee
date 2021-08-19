@@ -1,7 +1,6 @@
 package com.github.onsdigital.zebedee.keyring.legacy;
 
 import com.github.onsdigital.zebedee.keyring.KeyringException;
-import com.github.onsdigital.zebedee.keyring.legacy.BaseLegacyKeyringTest;
 import org.junit.Test;
 
 import static com.github.onsdigital.zebedee.keyring.legacy.LegacyKeyringImpl.EMAIL_EMPTY_ERR;
@@ -28,7 +27,8 @@ public class LegacyKeyringImpl_UnlockTest extends BaseLegacyKeyringTest {
         // Given user is null
 
         // When unlock is called
-        KeyringException actual = assertThrows(KeyringException.class, () -> legacyKeyring.unlock(null, null));
+        KeyringException actual = assertThrows(KeyringException.class,
+                () -> legacyCollectionKeyring.unlock(null, null));
 
         // Then an exception is thrown
         assertThat(actual.getMessage(), equalTo(USER_NULL_ERR));
@@ -41,7 +41,8 @@ public class LegacyKeyringImpl_UnlockTest extends BaseLegacyKeyringTest {
                 .thenReturn(null);
 
         // When unlock is called
-        KeyringException actual = assertThrows(KeyringException.class, () -> legacyKeyring.unlock(bert, null));
+        KeyringException actual = assertThrows(KeyringException.class,
+                () -> legacyCollectionKeyring.unlock(bert, null));
 
         // Then an exception is thrown
         assertThat(actual.getMessage(), equalTo(EMAIL_EMPTY_ERR));
@@ -54,7 +55,8 @@ public class LegacyKeyringImpl_UnlockTest extends BaseLegacyKeyringTest {
                 .thenReturn("");
 
         // When unlock is called
-        KeyringException actual = assertThrows(KeyringException.class, () -> legacyKeyring.unlock(bert, null));
+        KeyringException actual = assertThrows(KeyringException.class,
+                () -> legacyCollectionKeyring.unlock(bert, null));
 
         // Then an exception is thrown
         assertThat(actual.getMessage(), equalTo(EMAIL_EMPTY_ERR));
@@ -67,7 +69,8 @@ public class LegacyKeyringImpl_UnlockTest extends BaseLegacyKeyringTest {
                 .thenReturn(null);
 
         // When unlock is called
-        KeyringException actual = assertThrows(KeyringException.class, () -> legacyKeyring.unlock(bert, null));
+        KeyringException actual = assertThrows(KeyringException.class,
+                () -> legacyCollectionKeyring.unlock(bert, null));
 
         // Then an exception is thrown
         assertThat(actual.getMessage(), equalTo(USER_KEYRING_NULL_ERR));
@@ -78,7 +81,8 @@ public class LegacyKeyringImpl_UnlockTest extends BaseLegacyKeyringTest {
         // Given password is null
 
         // When unlock is called
-        KeyringException actual = assertThrows(KeyringException.class, () -> legacyKeyring.unlock(bert, null));
+        KeyringException actual = assertThrows(KeyringException.class,
+                () -> legacyCollectionKeyring.unlock(bert, null));
 
         // Then an exception is thrown
         assertThat(actual.getMessage(), equalTo(PASSWORD_EMPTY_ERR));
@@ -92,7 +96,8 @@ public class LegacyKeyringImpl_UnlockTest extends BaseLegacyKeyringTest {
                 .thenReturn(false);
 
         // When unlock is called
-        KeyringException actual = assertThrows(KeyringException.class, () -> legacyKeyring.unlock(bert, TEST_PASSWORD));
+        KeyringException actual = assertThrows(KeyringException.class,
+                () -> legacyCollectionKeyring.unlock(bert, TEST_PASSWORD));
 
         // Then an exception is thrown
         assertThat(actual.getMessage(), equalTo(UNLOCK_KEYRING_ERR));
@@ -104,7 +109,7 @@ public class LegacyKeyringImpl_UnlockTest extends BaseLegacyKeyringTest {
         // Given unlocking the keyring is successful
 
         // When unlock is called
-        legacyKeyring.unlock(bert, TEST_PASSWORD);
+        legacyCollectionKeyring.unlock(bert, TEST_PASSWORD);
 
         // Then no error is returned
         // And the user keyring is unlocked

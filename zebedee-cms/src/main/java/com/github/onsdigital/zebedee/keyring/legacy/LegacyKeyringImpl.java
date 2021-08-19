@@ -1,7 +1,7 @@
 package com.github.onsdigital.zebedee.keyring.legacy;
 
 import com.github.onsdigital.zebedee.json.CollectionDescription;
-import com.github.onsdigital.zebedee.keyring.Keyring;
+import com.github.onsdigital.zebedee.keyring.CollectionKeyring;
 import com.github.onsdigital.zebedee.keyring.KeyringException;
 import com.github.onsdigital.zebedee.keyring.SchedulerKeyCache;
 import com.github.onsdigital.zebedee.model.Collection;
@@ -29,10 +29,10 @@ import static com.github.onsdigital.zebedee.logging.CMSLogEvent.info;
 /**
  * This class duplicates the existing (legacy) {@link com.github.onsdigital.zebedee.json.Keyring} and {@link KeyringCache}
  * functionality behind a newly defined Keyring interface. Doing so allows to start the process of migrating to
- * the new {@link Keyring} abstraction while maintaing backwards compatability and the ability to swicth back if
+ * the new {@link CollectionKeyring} abstraction while maintaing backwards compatability and the ability to swicth back if
  * necessary.
  */
-public class LegacyKeyringImpl implements Keyring {
+public class LegacyKeyringImpl implements CollectionKeyring {
 
     static final String USER_NULL_ERR = "user required but was null";
     static final String EMAIL_EMPTY_ERR = "user email required but was empty";

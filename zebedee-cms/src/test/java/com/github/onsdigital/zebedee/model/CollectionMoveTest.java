@@ -11,7 +11,7 @@ import com.github.onsdigital.zebedee.content.partial.markdown.MarkdownSection;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
-import com.github.onsdigital.zebedee.keyring.Keyring;
+import com.github.onsdigital.zebedee.keyring.CollectionKeyring;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.user.model.User;
 import com.github.onsdigital.zebedee.util.slack.SlackNotifier;
@@ -40,7 +40,7 @@ import static org.mockito.Mockito.when;
 public class CollectionMoveTest extends ZebedeeTestBaseFixture {
 
     @Mock
-    private Keyring keyring;
+    private CollectionKeyring keyring;
 
     @Mock
     private User user;

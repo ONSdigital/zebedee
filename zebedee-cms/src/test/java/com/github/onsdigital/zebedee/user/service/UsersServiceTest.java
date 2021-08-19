@@ -8,6 +8,7 @@ import com.github.onsdigital.zebedee.json.AdminOptions;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.Credentials;
 import com.github.onsdigital.zebedee.json.Keyring;
+import com.github.onsdigital.zebedee.keyring.CollectionKeyring;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.Collections;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
@@ -84,11 +85,11 @@ public class UsersServiceTest {
     private UsersServiceImpl.UserFactory userFactory;
 
     @Mock
-    private com.github.onsdigital.zebedee.keyring.Keyring centralKeyring;
+    private CollectionKeyring collectionKeyring;
 
     private UsersService service;
     private User user;
-    private Supplier<com.github.onsdigital.zebedee.keyring.Keyring> keyringSupplier;
+    private Supplier<CollectionKeyring> keyringSupplier;
 
     @Before
     public void setUp() throws Exception {
@@ -101,7 +102,7 @@ public class UsersServiceTest {
         user.setTemporaryPassword(false);
         user.setAdminOptions(new AdminOptions());
 
-        keyringSupplier = () -> centralKeyring;
+        keyringSupplier = () -> collectionKeyring;
 
         service = new UsersServiceImpl(userStore, collections, permissions, keyringSupplier);
 
@@ -437,7 +438,7 @@ public class UsersServiceTest {
         verify(permissions, times(1)).addEditor(EMAIL_2, session);
         verify(lockMock, times(3)).lock();
         verify(lockMock, times(3)).unlock();
-        verifyZeroInteractions(centralKeyring);
+        verifyZeroInteractions(collectionKeyring);
     }
 
     @Test(expected = UnauthorizedException.class)
@@ -822,7 +823,7 @@ public class UsersServiceTest {
         List<CollectionDescription> expected = new ArrayList<>();
         expected.add(desc1);
         expected.add(desc2);
-        verify(centralKeyring, times(1)).assignTo(adminUser, userMock, expected);
+        verify(collectionKeyring, times(1)).assignTo(adminUser, userMock, expected);
         verify(userStore, times(1)).save(userMock);
     }
 

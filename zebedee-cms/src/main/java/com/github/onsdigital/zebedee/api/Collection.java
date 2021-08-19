@@ -10,7 +10,7 @@ import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.CollectionType;
-import com.github.onsdigital.zebedee.keyring.Keyring;
+import com.github.onsdigital.zebedee.keyring.CollectionKeyring;
 import com.github.onsdigital.zebedee.keyring.KeyringException;
 import com.github.onsdigital.zebedee.keyring.KeyringUtil;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
@@ -45,7 +45,7 @@ public class Collection {
     private PermissionsService permissionsService;
     private com.github.onsdigital.zebedee.model.Collections collections;
     private UsersService usersService;
-    private Keyring keyring;
+    private CollectionKeyring collectionKeyring;
     private ScheduleCanceller scheduleCanceller;
 
     /**
@@ -56,7 +56,7 @@ public class Collection {
         this.permissionsService = Root.zebedee.getPermissionsService();
         this.collections = Root.zebedee.getCollections();
         this.usersService = Root.zebedee.getUsersService();
-        this.keyring = Root.zebedee.getCollectionKeyring();
+        this.collectionKeyring = Root.zebedee.getCollectionKeyring();
         this.scheduleCanceller = (c) -> Root.cancelPublish(c);
     }
 
@@ -65,13 +65,13 @@ public class Collection {
      */
     Collection(final Sessions sessionsService, final PermissionsService permissionsService,
                final com.github.onsdigital.zebedee.model.Collections collections,
-               final UsersService usersService, final Keyring keyring,
+               final UsersService usersService, final CollectionKeyring collectionKeyring,
                final ScheduleCanceller scheduleCanceller) {
         this.sessionsService = sessionsService;
         this.permissionsService = permissionsService;
         this.collections = collections;
         this.usersService = usersService;
-        this.keyring = keyring;
+        this.collectionKeyring = collectionKeyring;
         this.scheduleCanceller = scheduleCanceller;
     }
 
@@ -324,7 +324,7 @@ public class Collection {
         }
 
         try {
-            keyring.remove(user, c);
+            collectionKeyring.remove(user, c);
         } catch (KeyringException ex) {
             String message = format("error attempting to remove collection key from keyring: {0}", c.getId());
             throw new InternalServerError(message, ex);

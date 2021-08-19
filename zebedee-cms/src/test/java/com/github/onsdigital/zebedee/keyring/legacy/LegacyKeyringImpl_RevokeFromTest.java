@@ -3,7 +3,6 @@ package com.github.onsdigital.zebedee.keyring.legacy;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.Keyring;
 import com.github.onsdigital.zebedee.keyring.KeyringException;
-import com.github.onsdigital.zebedee.keyring.legacy.BaseLegacyKeyringTest;
 import org.junit.Test;
 import org.mockito.Mock;
 
@@ -38,21 +37,22 @@ public class LegacyKeyringImpl_RevokeFromTest extends BaseLegacyKeyringTest {
     @Test
     public void testRemoveFrom_removalsNull_shouldDoNothing() throws Exception {
         List<CollectionDescription> descriptions = null;
-        legacyKeyring.revokeFrom(bert, descriptions);
+        legacyCollectionKeyring.revokeFrom(bert, descriptions);
 
         verifyZeroInteractions(bertKeyring, keyringCache);
     }
 
     @Test
     public void testRemoveFrom_removalsEmpty_shouldDoNothing() throws Exception {
-        legacyKeyring.revokeFrom(bert, new ArrayList<>());
+        legacyCollectionKeyring.revokeFrom(bert, new ArrayList<>());
 
         verifyZeroInteractions(bertKeyring, keyringCache);
     }
 
     @Test
     public void testRemoveFrom_userNull_shouldThrowEx() throws Exception {
-        KeyringException ex = assertThrows(KeyringException.class, () -> legacyKeyring.revokeFrom(null, removals));
+        KeyringException ex = assertThrows(KeyringException.class,
+                () -> legacyCollectionKeyring.revokeFrom(null, removals));
 
         assertThat(ex.getMessage(), equalTo(USER_NULL_ERR));
         verifyZeroInteractions(bertKeyring, keyringCache);
@@ -64,7 +64,7 @@ public class LegacyKeyringImpl_RevokeFromTest extends BaseLegacyKeyringTest {
                 .thenReturn(null);
 
         KeyringException ex = assertThrows(KeyringException.class,
-                () -> legacyKeyring.revokeFrom(bert, removals));
+                () -> legacyCollectionKeyring.revokeFrom(bert, removals));
 
         assertThat(ex.getMessage(), equalTo(EMAIL_EMPTY_ERR));
         verifyZeroInteractions(bertKeyring, keyringCache);
@@ -76,7 +76,7 @@ public class LegacyKeyringImpl_RevokeFromTest extends BaseLegacyKeyringTest {
                 .thenReturn("");
 
         KeyringException ex = assertThrows(KeyringException.class,
-                () -> legacyKeyring.revokeFrom(bert, removals));
+                () -> legacyCollectionKeyring.revokeFrom(bert, removals));
 
         assertThat(ex.getMessage(), equalTo(EMAIL_EMPTY_ERR));
         verifyZeroInteractions(bertKeyring, keyringCache);
@@ -88,7 +88,7 @@ public class LegacyKeyringImpl_RevokeFromTest extends BaseLegacyKeyringTest {
                 .thenReturn(null);
 
         KeyringException ex = assertThrows(KeyringException.class,
-                () -> legacyKeyring.revokeFrom(bert, removals));
+                () -> legacyCollectionKeyring.revokeFrom(bert, removals));
 
         assertThat(ex.getMessage(), equalTo(USER_KEYRING_NULL_ERR));
         verifyZeroInteractions(bertKeyring, keyringCache);
@@ -100,7 +100,7 @@ public class LegacyKeyringImpl_RevokeFromTest extends BaseLegacyKeyringTest {
                 .thenThrow(KeyringException.class);
 
         KeyringException ex = assertThrows(KeyringException.class,
-                () -> legacyKeyring.revokeFrom(bert, removals));
+                () -> legacyCollectionKeyring.revokeFrom(bert, removals));
 
         assertThat(ex.getMessage(), equalTo(CACHE_GET_ERR));
         verify(keyringCache, times(1)).get(bert);
@@ -112,7 +112,7 @@ public class LegacyKeyringImpl_RevokeFromTest extends BaseLegacyKeyringTest {
         when(keyringCache.get(bert))
                 .thenReturn(bertCachedKeyring);
 
-        legacyKeyring.revokeFrom(bert, removals);
+        legacyCollectionKeyring.revokeFrom(bert, removals);
 
         verify(keyringCache, times(1)).get(bert);
         verify(bertCachedKeyring, times(1)).remove(TEST_COLLECTION_ID);

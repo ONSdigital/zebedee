@@ -1,7 +1,6 @@
 package com.github.onsdigital.zebedee.keyring.legacy;
 
 import com.github.onsdigital.zebedee.keyring.KeyringException;
-import com.github.onsdigital.zebedee.keyring.legacy.BaseLegacyKeyringTest;
 import com.github.onsdigital.zebedee.user.model.User;
 import com.github.onsdigital.zebedee.user.model.UserList;
 import org.junit.Test;
@@ -47,7 +46,8 @@ public class LegacyKeyringImpl_AddTest extends BaseLegacyKeyringTest {
         // Given collection is null
 
         // When add is called
-        KeyringException actual = assertThrows(KeyringException.class, () -> legacyKeyring.add(null, null, null));
+        KeyringException actual = assertThrows(KeyringException.class,
+                () -> legacyCollectionKeyring.add(null, null, null));
 
         // Then an exception is thrown
         assertThat(actual.getMessage(), equalTo(COLLECTION_NULL_ERR));
@@ -66,7 +66,7 @@ public class LegacyKeyringImpl_AddTest extends BaseLegacyKeyringTest {
 
         // When add is called
         KeyringException actual = assertThrows(KeyringException.class,
-                () -> legacyKeyring.add(null, collection, null));
+                () -> legacyCollectionKeyring.add(null, collection, null));
 
         // Then an exception is thrown
         assertThat(actual.getMessage(), equalTo(COLLECTION_DESC_NULL_ERR));
@@ -84,7 +84,8 @@ public class LegacyKeyringImpl_AddTest extends BaseLegacyKeyringTest {
                 .thenReturn(null);
 
         // When add is called
-        KeyringException actual = assertThrows(KeyringException.class, () -> legacyKeyring.add(null, collection, null));
+        KeyringException actual = assertThrows(KeyringException.class,
+                () -> legacyCollectionKeyring.add(null, collection, null));
 
         // Then an exception is thrown
         assertThat(actual.getMessage(), equalTo(COLLECTION_ID_EMPTY_ERR));
@@ -102,7 +103,8 @@ public class LegacyKeyringImpl_AddTest extends BaseLegacyKeyringTest {
                 .thenReturn("");
 
         // When add is called
-        KeyringException actual = assertThrows(KeyringException.class, () -> legacyKeyring.add(null, collection, null));
+        KeyringException actual = assertThrows(KeyringException.class,
+                () -> legacyCollectionKeyring.add(null, collection, null));
 
         // Then an exception is thrown
         assertThat(actual.getMessage(), equalTo(COLLECTION_ID_EMPTY_ERR));
@@ -118,7 +120,8 @@ public class LegacyKeyringImpl_AddTest extends BaseLegacyKeyringTest {
         // Given key is null
 
         // When add is called
-        KeyringException actual = assertThrows(KeyringException.class, () -> legacyKeyring.add(null, collection, null));
+        KeyringException actual = assertThrows(KeyringException.class,
+                () -> legacyCollectionKeyring.add(null, collection, null));
 
         // Then an exception is thrown
         assertThat(actual.getMessage(), equalTo(SECRET_KEY_NULL_ERR));
@@ -137,7 +140,7 @@ public class LegacyKeyringImpl_AddTest extends BaseLegacyKeyringTest {
 
         // When add is called
         KeyringException ex = assertThrows(KeyringException.class,
-                () -> legacyKeyring.add(null, collection, secretKey));
+                () -> legacyCollectionKeyring.add(null, collection, secretKey));
 
         // Then an exception is thrown
         assertThat(ex.getMessage(), equalTo(GET_KEY_RECIPIENTS_ERR));
@@ -159,7 +162,7 @@ public class LegacyKeyringImpl_AddTest extends BaseLegacyKeyringTest {
                 .thenReturn(null);
 
         // When add is called
-        legacyKeyring.add(null, collection, secretKey);
+        legacyCollectionKeyring.add(null, collection, secretKey);
 
         // Then the key is not assigned to any users
         verify(permissions, times(1)).getCollectionAccessMapping(collection);
@@ -179,7 +182,7 @@ public class LegacyKeyringImpl_AddTest extends BaseLegacyKeyringTest {
                 .thenReturn(new ArrayList<>());
 
         // When add is called
-        legacyKeyring.add(null, collection, secretKey);
+        legacyCollectionKeyring.add(null, collection, secretKey);
 
         // Then the key is not assigned to any users
         verify(permissions, times(1)).getCollectionAccessMapping(collection);
@@ -200,7 +203,7 @@ public class LegacyKeyringImpl_AddTest extends BaseLegacyKeyringTest {
 
         // When add is called
         KeyringException ex = assertThrows(KeyringException.class,
-                () -> legacyKeyring.add(null, collection, secretKey));
+                () -> legacyCollectionKeyring.add(null, collection, secretKey));
 
         // Then an exception is thrown
         assertThat(ex.getMessage(), equalTo(LIST_USERS_ERR));
@@ -224,7 +227,7 @@ public class LegacyKeyringImpl_AddTest extends BaseLegacyKeyringTest {
                 .thenReturn(null);
 
         // When add is called
-        legacyKeyring.add(null, collection, secretKey);
+        legacyCollectionKeyring.add(null, collection, secretKey);
 
         // Then the key is assigned to the expected users
         verifyKeyAddedToUser(bert, bertKeyring);
@@ -248,7 +251,7 @@ public class LegacyKeyringImpl_AddTest extends BaseLegacyKeyringTest {
                 .thenReturn(new UserList());
 
         // When add is called
-        legacyKeyring.add(null, collection, secretKey);
+        legacyCollectionKeyring.add(null, collection, secretKey);
 
         // Then the key is assigned to the expected users
         verifyKeyAddedToUser(bert, bertKeyring);
@@ -273,7 +276,7 @@ public class LegacyKeyringImpl_AddTest extends BaseLegacyKeyringTest {
 
         // When add is called
         KeyringException actual = assertThrows(KeyringException.class,
-                () -> legacyKeyring.add(null, collection, secretKey));
+                () -> legacyCollectionKeyring.add(null, collection, secretKey));
 
         // Then an exception is thrown
         assertThat(actual.getMessage(), equalTo(ADD_KEY_SAVE_ERR));
@@ -295,7 +298,7 @@ public class LegacyKeyringImpl_AddTest extends BaseLegacyKeyringTest {
 
         // When add is called
         KeyringException actual = assertThrows(KeyringException.class,
-                () -> legacyKeyring.add(null, collection, secretKey));
+                () -> legacyCollectionKeyring.add(null, collection, secretKey));
 
         // Then an exception is thrown
         assertThat(actual.getMessage(), equalTo(REMOVE_KEY_SAVE_ERR));
@@ -318,7 +321,7 @@ public class LegacyKeyringImpl_AddTest extends BaseLegacyKeyringTest {
         // Given add is successfull
 
         // When add key is called
-        legacyKeyring.add(null, collection, secretKey);
+        legacyCollectionKeyring.add(null, collection, secretKey);
 
         // Then the key is assigned to the expected users only
         verifyKeyAddedToUser(bert, bertKeyring);

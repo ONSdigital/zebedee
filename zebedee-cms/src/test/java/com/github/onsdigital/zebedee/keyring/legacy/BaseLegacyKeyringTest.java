@@ -1,10 +1,9 @@
 package com.github.onsdigital.zebedee.keyring.legacy;
 
 import com.github.onsdigital.zebedee.json.CollectionDescription;
-import com.github.onsdigital.zebedee.keyring.Keyring;
+import com.github.onsdigital.zebedee.keyring.CollectionKeyring;
 import com.github.onsdigital.zebedee.keyring.KeyringException;
 import com.github.onsdigital.zebedee.keyring.SchedulerKeyCache;
-import com.github.onsdigital.zebedee.keyring.legacy.LegacyKeyringImpl;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.KeyringCache;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
@@ -80,7 +79,7 @@ public abstract class BaseLegacyKeyringTest {
     @Mock
     protected SchedulerKeyCache schedulerCache;
 
-    protected Keyring legacyKeyring;
+    protected CollectionKeyring legacyCollectionKeyring;
     protected KeyringException expectedEx;
     protected List<User> usersWithCollectionAccess;
     protected UserList allUsers;
@@ -109,7 +108,7 @@ public abstract class BaseLegacyKeyringTest {
 
         setUpTests();
 
-        legacyKeyring = new LegacyKeyringImpl(sessionsService, users, permissions, keyringCache, schedulerCache);
+        legacyCollectionKeyring = new LegacyKeyringImpl(sessionsService, users, permissions, keyringCache, schedulerCache);
 
     }
 

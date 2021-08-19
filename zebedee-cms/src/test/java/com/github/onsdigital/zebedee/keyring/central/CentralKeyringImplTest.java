@@ -1,10 +1,9 @@
 package com.github.onsdigital.zebedee.keyring.central;
 
 import com.github.onsdigital.zebedee.json.CollectionDescription;
-import com.github.onsdigital.zebedee.keyring.Keyring;
+import com.github.onsdigital.zebedee.keyring.CollectionKeyring;
 import com.github.onsdigital.zebedee.keyring.KeyringCache;
 import com.github.onsdigital.zebedee.keyring.KeyringException;
-import com.github.onsdigital.zebedee.keyring.central.CentralKeyringImpl;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.Collections;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
@@ -55,7 +54,7 @@ public class CentralKeyringImplTest {
     static final String TEST_COLLECTION_ID = "44";
     static final String SECRET_KEY = "441";
     static final String TEST_EMAIL_ID = "testid@ons.gov.uk";
-    private Keyring keyring;
+    private CollectionKeyring keyring;
 
     @Mock
     private KeyringCache keyringCache;
@@ -238,7 +237,7 @@ public class CentralKeyringImplTest {
         // Given CollectionKeyring has been initialised
 
         // When GetInstance is called
-        Keyring keyring = CentralKeyringImpl.getInstance();
+        CollectionKeyring keyring = CentralKeyringImpl.getInstance();
 
         // Then a non null instance is returned
         assertThat(keyring, is(notNullValue()));

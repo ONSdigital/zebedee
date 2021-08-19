@@ -5,7 +5,7 @@ import com.github.onsdigital.zebedee.exceptions.InternalServerError;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
-import com.github.onsdigital.zebedee.keyring.Keyring;
+import com.github.onsdigital.zebedee.keyring.CollectionKeyring;
 import com.github.onsdigital.zebedee.keyring.KeyringException;
 import com.github.onsdigital.zebedee.model.Collections;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
@@ -53,7 +53,7 @@ public class CollectionTest extends ZebedeeAPIBaseTestCase {
     private CollectionDescription description;
 
     @Mock
-    private Keyring keyring;
+    private CollectionKeyring collectionKeyring;
 
     @Mock
     private Collection.ScheduleCanceller scheduleCanceller;
@@ -89,7 +89,7 @@ public class CollectionTest extends ZebedeeAPIBaseTestCase {
         when(description.getName())
                 .thenReturn("test");
 
-        this.endpoint = new Collection(sessions, permissionsService, collections, usersService, keyring,
+        this.endpoint = new Collection(sessions, permissionsService, collections, usersService, collectionKeyring,
                 scheduleCanceller);
     }
 
@@ -429,7 +429,7 @@ public class CollectionTest extends ZebedeeAPIBaseTestCase {
                 .thenReturn(user);
 
         doThrow(KeyringException.class)
-                .when(keyring)
+                .when(collectionKeyring)
                 .remove(user, collection);
 
         InternalServerError ex = assertThrows(InternalServerError.class,
@@ -440,7 +440,7 @@ public class CollectionTest extends ZebedeeAPIBaseTestCase {
         verify(collections, times(1)).getCollection(COLLECTION_ID);
         verify(collections, times(1)).delete(collection, session);
         verify(usersService, times(1)).getUserByEmail(TEST_EMAIL);
-        verify(keyring, times(1)).remove(user, collection);
+        verify(collectionKeyring, times(1)).remove(user, collection);
     }
 
     @Test
@@ -462,6 +462,6 @@ public class CollectionTest extends ZebedeeAPIBaseTestCase {
         assertTrue(result);
         verify(collections, times(1)).delete(collection, session);
         verify(scheduleCanceller, times(1)).cancel(collection);
-        verify(keyring, times(1)).remove(user, collection);
+        verify(collectionKeyring, times(1)).remove(user, collection);
     }
 }

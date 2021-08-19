@@ -1,11 +1,9 @@
 package com.github.onsdigital.zebedee.keyring;
 
-import com.github.onsdigital.zebedee.keyring.KeyringException;
-
 import javax.crypto.SecretKey;
 
 /**
- * Defines a {@link com.github.onsdigital.zebedee.keyring.Keyring} cache used for scheduled publishing tasks (i.e.
+ * Defines a {@link CollectionKeyring} cache used for scheduled publishing tasks (i.e.
  * non user driven actions).
  */
 public interface SchedulerKeyCache {

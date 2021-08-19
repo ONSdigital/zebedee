@@ -17,8 +17,8 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
-import static com.github.onsdigital.zebedee.keyring.KeyringUtil.GET_USER_ERR_FMT;
-import static com.github.onsdigital.zebedee.keyring.KeyringUtil.USER_NOT_FOUND_ERR_FMT;
+import static com.github.onsdigital.zebedee.keyring.CollectionKeyringUtil.GET_USER_ERR_FMT;
+import static com.github.onsdigital.zebedee.keyring.CollectionKeyringUtil.USER_NOT_FOUND_ERR_FMT;
 import static java.text.MessageFormat.format;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;

@@ -10,12 +10,12 @@ import java.io.IOException;
 
 import static java.text.MessageFormat.format;
 
-public class KeyringUtil {
+public class CollectionKeyringUtil {
 
     public static final String GET_USER_ERR_FMT = "get user returned unexpected error: {0}";
     public static final String USER_NOT_FOUND_ERR_FMT = "requested user was not found: {0}";
 
-    private KeyringUtil() {
+    private CollectionKeyringUtil() {
         // Utility class with static only methods so hide constructor.
     }
 

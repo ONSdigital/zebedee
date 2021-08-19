@@ -1,9 +1,9 @@
 package com.github.onsdigital.zebedee.keyring.central;
 
-import com.github.onsdigital.zebedee.keyring.KeyringCache;
+import com.github.onsdigital.zebedee.keyring.CollectionKeyCache;
 import com.github.onsdigital.zebedee.keyring.KeyringException;
 import com.github.onsdigital.zebedee.keyring.SchedulerKeyCache;
-import com.github.onsdigital.zebedee.keyring.KeyringStore;
+import com.github.onsdigital.zebedee.keyring.CollectionKeyStore;
 import liquibase.util.StringUtils;
 
 import javax.crypto.SecretKey;
@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * In memory {@link KeyringCache} implementation. Keyring uses a {@link KeyringStore} to persist entries to storage
+ * In memory {@link CollectionKeyCache} implementation. Keyring uses a {@link CollectionKeyStore} to persist entries to storage
  * whilst maintaining a copy of the data in an in-memory cache for speedy retrieval. If an attempt is made to add a
  * duplicate key the Keyring will compare the new & existing {@link SecretKey} values. If the keys are not equal then a
  * {@link KeyringException} is thrown. This aims to prevent collection key values being overwritten as this will
@@ -28,7 +28,7 @@ import java.util.Set;
  * However if this does become an issue consider replacing the Hashmap with some type time based cache object to
  * automatically evicted after a duration of inactivity.
  */
-public class CentralKeyringCacheImpl implements KeyringCache, SchedulerKeyCache {
+public class CollectionKeyCacheImpl implements CollectionKeyCache, SchedulerKeyCache {
 
     static final String INVALID_COLLECTION_ID_ERR = "expected collection ID but was null or empty";
     static final String INVALID_SECRET_KEY_ERR = "expected secret key but was null";
@@ -39,26 +39,26 @@ public class CentralKeyringCacheImpl implements KeyringCache, SchedulerKeyCache 
     static final String KEYSTORE_NULL_ERR = "collection key store required but was null";
     static final String NOT_INITIALISED_ERR = "keyringCache accessed but not yet initialised";
 
-    private KeyringStore keyStore;
+    private CollectionKeyStore keyStore;
     private Map<String, SecretKey> cache;
 
-    private static KeyringCache INSTANCE = null;
+    private static CollectionKeyCache INSTANCE = null;
 
     /**
-     * KeyringCache is a singleton instance. Use {@link CentralKeyringCacheImpl#init(KeyringStore)} to initialise and
-     * {@link CentralKeyringCacheImpl#getInstance()} to access the singleton.
+     * KeyringCache is a singleton instance. Use {@link CollectionKeyCacheImpl#init(CollectionKeyStore)} to initialise and
+     * {@link CollectionKeyCacheImpl#getInstance()} to access the singleton.
      */
-    private CentralKeyringCacheImpl() {
+    private CollectionKeyCacheImpl() {
         // private constructor to force use of static get instance method.
     }
 
     /**
-     * Create a new instance of the Keyring. Use {@link CentralKeyringCacheImpl#init(KeyringStore)} to constuct a new
+     * Create a new instance of the Keyring. Use {@link CollectionKeyCacheImpl#init(CollectionKeyStore)} to constuct a new
      * instance.
      *
-     * @param keyStore {@link KeyringStore} to use to read/write entries to/from persistent storage.
+     * @param keyStore {@link CollectionKeyStore} to use to read/write entries to/from persistent storage.
      */
-    CentralKeyringCacheImpl(final KeyringStore keyStore) throws KeyringException {
+    CollectionKeyCacheImpl(final CollectionKeyStore keyStore) throws KeyringException {
         if (keyStore == null) {
             throw new KeyringException(KEYSTORE_NULL_ERR);
         }
@@ -68,7 +68,7 @@ public class CentralKeyringCacheImpl implements KeyringCache, SchedulerKeyCache 
         this.load();
     }
 
-    CentralKeyringCacheImpl(final KeyringStore keyStore, final Map<String, SecretKey> cache) {
+    CollectionKeyCacheImpl(final CollectionKeyStore keyStore, final Map<String, SecretKey> cache) {
         this.keyStore = keyStore;
         this.cache = cache;
     }
@@ -76,7 +76,7 @@ public class CentralKeyringCacheImpl implements KeyringCache, SchedulerKeyCache 
     /**
      * {@inheritDoc}
      * <b>WARNING: This action is destructive</b>. Calling load on a populated keyring will clear all existing values
-     * from it before repopulating it with the the values returned by {@link KeyringStore#readAll()}. It is
+     * from it before repopulating it with the the values returned by {@link CollectionKeyStore#readAll()}. It is
      * strongly advised to only use this method when the keyring is initialised on start up.
      *
      * @throws KeyringException problem loading the keyring.
@@ -146,7 +146,7 @@ public class CentralKeyringCacheImpl implements KeyringCache, SchedulerKeyCache 
     }
 
     /**
-     * Check if an entry for this collection ID already exists in the {@link KeyringStore}. If so retieve the entry from the
+     * Check if an entry for this collection ID already exists in the {@link CollectionKeyStore}. If so retieve the entry from the
      * store and check the existing key matches the key being added.
      *
      * @param collectionID the collection ID the entry is being added against.
@@ -214,25 +214,25 @@ public class CentralKeyringCacheImpl implements KeyringCache, SchedulerKeyCache 
     /**
      * Construct and initialise a new singleton instance of the keyring.
      *
-     * @param keystore the {@link KeyringStore} to use.
-     * @return a new {@link KeyringCache} instance.
+     * @param keystore the {@link CollectionKeyStore} to use.
+     * @return a new {@link CollectionKeyCache} instance.
      * @throws KeyringException problem initalising the keyring.
      */
-    public static void init(KeyringStore keystore) throws KeyringException {
+    public static void init(CollectionKeyStore keystore) throws KeyringException {
         if (INSTANCE == null) {
-            synchronized (CentralKeyringCacheImpl.class) {
+            synchronized (CollectionKeyCacheImpl.class) {
                 if (INSTANCE == null) {
-                    INSTANCE = new CentralKeyringCacheImpl(keystore);
+                    INSTANCE = new CollectionKeyCacheImpl(keystore);
                 }
             }
         }
     }
 
     /**
-     * @return a singleton instance of the {@link KeyringCache}
+     * @return a singleton instance of the {@link CollectionKeyCache}
      * @throws KeyringException the instance has not been initalised before being accessed.
      */
-    public static KeyringCache getInstance() throws KeyringException {
+    public static CollectionKeyCache getInstance() throws KeyringException {
         if (INSTANCE == null) {
             throw new KeyringException(NOT_INITIALISED_ERR);
         }

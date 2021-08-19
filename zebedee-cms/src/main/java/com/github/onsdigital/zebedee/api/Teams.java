@@ -33,7 +33,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.github.onsdigital.zebedee.keyring.KeyringUtil.getUser;
+import static com.github.onsdigital.zebedee.keyring.CollectionKeyringUtil.getUser;
 
 /**
  * Created by thomasridd on 28/04/15.

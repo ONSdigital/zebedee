@@ -40,3 +40,5 @@ xcuserdata/
 *.xcscmblueprint
 
 \.vscode/
+
+run.sh

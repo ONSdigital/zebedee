@@ -11,7 +11,7 @@ import java.util.Set;
  * {@link com.github.onsdigital.zebedee.model.Collection}s. Provides methods to add, retrieve and remove keys to/from
  * the keyring.
  */
-public interface KeyringCache {
+public interface CollectionKeyCache {
 
     /**
      * Populate the keyring.

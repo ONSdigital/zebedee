@@ -108,7 +108,8 @@ public abstract class BaseLegacyKeyringTest {
 
         setUpTests();
 
-        legacyCollectionKeyring = new LegacyKeyringImpl(sessionsService, users, permissions, keyringCache, schedulerCache);
+        legacyCollectionKeyring = new LegacyCollectionKeyringImpl(
+                sessionsService, users, permissions, keyringCache, schedulerCache);
 
     }
 

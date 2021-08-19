@@ -6,12 +6,12 @@ import org.junit.Test;
 import javax.crypto.SecretKey;
 import java.io.IOException;
 
-import static com.github.onsdigital.zebedee.keyring.legacy.LegacyKeyringImpl.CACHE_GET_ERR;
-import static com.github.onsdigital.zebedee.keyring.legacy.LegacyKeyringImpl.COLLECTION_DESC_NULL_ERR;
-import static com.github.onsdigital.zebedee.keyring.legacy.LegacyKeyringImpl.COLLECTION_ID_EMPTY_ERR;
-import static com.github.onsdigital.zebedee.keyring.legacy.LegacyKeyringImpl.COLLECTION_NULL_ERR;
-import static com.github.onsdigital.zebedee.keyring.legacy.LegacyKeyringImpl.EMAIL_EMPTY_ERR;
-import static com.github.onsdigital.zebedee.keyring.legacy.LegacyKeyringImpl.USER_NULL_ERR;
+import static com.github.onsdigital.zebedee.keyring.legacy.LegacyCollectionKeyringImpl.CACHE_GET_ERR;
+import static com.github.onsdigital.zebedee.keyring.legacy.LegacyCollectionKeyringImpl.COLLECTION_DESC_NULL_ERR;
+import static com.github.onsdigital.zebedee.keyring.legacy.LegacyCollectionKeyringImpl.COLLECTION_ID_EMPTY_ERR;
+import static com.github.onsdigital.zebedee.keyring.legacy.LegacyCollectionKeyringImpl.COLLECTION_NULL_ERR;
+import static com.github.onsdigital.zebedee.keyring.legacy.LegacyCollectionKeyringImpl.EMAIL_EMPTY_ERR;
+import static com.github.onsdigital.zebedee.keyring.legacy.LegacyCollectionKeyringImpl.USER_NULL_ERR;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -21,7 +21,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class LegacyKeyringImpl_GetTest extends BaseLegacyKeyringTest {
+public class LegacyCollectionKeyringImpl_GetTest extends BaseLegacyKeyringTest {
 
     @Override
     public void setUpTests() throws Exception {

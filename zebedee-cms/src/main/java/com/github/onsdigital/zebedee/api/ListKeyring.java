@@ -20,7 +20,7 @@ import javax.ws.rs.GET;
 import java.io.IOException;
 import java.util.Set;
 
-import static com.github.onsdigital.zebedee.keyring.KeyringUtil.getUser;
+import static com.github.onsdigital.zebedee.keyring.CollectionKeyringUtil.getUser;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.error;
 
 /**

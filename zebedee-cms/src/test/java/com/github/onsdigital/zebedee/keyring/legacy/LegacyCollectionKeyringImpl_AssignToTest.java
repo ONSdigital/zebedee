@@ -11,11 +11,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static com.github.onsdigital.zebedee.keyring.legacy.LegacyKeyringImpl.CACHE_KEYRING_NULL_ERR;
-import static com.github.onsdigital.zebedee.keyring.legacy.LegacyKeyringImpl.EMAIL_EMPTY_ERR;
-import static com.github.onsdigital.zebedee.keyring.legacy.LegacyKeyringImpl.KEYRING_LOCKED_ERR;
-import static com.github.onsdigital.zebedee.keyring.legacy.LegacyKeyringImpl.USER_KEYRING_NULL_ERR;
-import static com.github.onsdigital.zebedee.keyring.legacy.LegacyKeyringImpl.USER_NULL_ERR;
+import static com.github.onsdigital.zebedee.keyring.legacy.LegacyCollectionKeyringImpl.CACHE_KEYRING_NULL_ERR;
+import static com.github.onsdigital.zebedee.keyring.legacy.LegacyCollectionKeyringImpl.EMAIL_EMPTY_ERR;
+import static com.github.onsdigital.zebedee.keyring.legacy.LegacyCollectionKeyringImpl.KEYRING_LOCKED_ERR;
+import static com.github.onsdigital.zebedee.keyring.legacy.LegacyCollectionKeyringImpl.USER_KEYRING_NULL_ERR;
+import static com.github.onsdigital.zebedee.keyring.legacy.LegacyCollectionKeyringImpl.USER_NULL_ERR;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertThrows;
@@ -25,7 +25,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
-public class LegacyKeyringImpl_AssignToTest extends BaseLegacyKeyringTest {
+public class LegacyCollectionKeyringImpl_AssignToTest extends BaseLegacyKeyringTest {
 
     @Mock
     private Keyring bertCachedKeyring, ernieCachedKeyring;

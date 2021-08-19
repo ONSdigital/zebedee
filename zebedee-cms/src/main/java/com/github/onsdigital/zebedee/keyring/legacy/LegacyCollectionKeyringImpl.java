@@ -32,7 +32,7 @@ import static com.github.onsdigital.zebedee.logging.CMSLogEvent.info;
  * the new {@link CollectionKeyring} abstraction while maintaing backwards compatability and the ability to swicth back if
  * necessary.
  */
-public class LegacyKeyringImpl implements CollectionKeyring {
+public class LegacyCollectionKeyringImpl implements CollectionKeyring {
 
     static final String USER_NULL_ERR = "user required but was null";
     static final String EMAIL_EMPTY_ERR = "user email required but was empty";
@@ -68,8 +68,9 @@ public class LegacyKeyringImpl implements CollectionKeyring {
      * @param sessions the {@link Sessions} service to use.
      * @param cache    the {@link KeyringCache} to use.
      */
-    public LegacyKeyringImpl(final Sessions sessions, final UsersService usersService, PermissionsService permissions,
-                             final KeyringCache cache, final SchedulerKeyCache schedulerKeyCache) {
+    public LegacyCollectionKeyringImpl(final Sessions sessions, final UsersService usersService,
+                                       PermissionsService permissions, final KeyringCache cache,
+                                       final SchedulerKeyCache schedulerKeyCache) {
         this.sessions = sessions;
         this.usersService = usersService;
         this.permissions = permissions;

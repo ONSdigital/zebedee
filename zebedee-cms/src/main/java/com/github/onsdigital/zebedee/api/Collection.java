@@ -12,7 +12,7 @@ import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.CollectionType;
 import com.github.onsdigital.zebedee.keyring.CollectionKeyring;
 import com.github.onsdigital.zebedee.keyring.KeyringException;
-import com.github.onsdigital.zebedee.keyring.KeyringUtil;
+import com.github.onsdigital.zebedee.keyring.CollectionKeyringUtil;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.session.service.Sessions;
@@ -317,7 +317,7 @@ public class Collection {
         // Remove the collection encryption key from the keyring
         User user = null;
         try {
-            user = KeyringUtil.getUser(usersService, s.getEmail());
+            user = CollectionKeyringUtil.getUser(usersService, s.getEmail());
         } catch (Exception ex) {
             String message = format("error attempting to get user from session details: {0}", s.getEmail());
             throw new InternalServerError(message, ex);

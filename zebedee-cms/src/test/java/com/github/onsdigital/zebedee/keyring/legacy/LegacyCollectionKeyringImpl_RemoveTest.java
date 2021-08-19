@@ -7,11 +7,11 @@ import org.junit.Test;
 
 import java.io.IOException;
 
-import static com.github.onsdigital.zebedee.keyring.legacy.LegacyKeyringImpl.COLLECTION_DESC_NULL_ERR;
-import static com.github.onsdigital.zebedee.keyring.legacy.LegacyKeyringImpl.COLLECTION_ID_EMPTY_ERR;
-import static com.github.onsdigital.zebedee.keyring.legacy.LegacyKeyringImpl.COLLECTION_NULL_ERR;
-import static com.github.onsdigital.zebedee.keyring.legacy.LegacyKeyringImpl.LIST_USERS_ERR;
-import static com.github.onsdigital.zebedee.keyring.legacy.LegacyKeyringImpl.REMOVE_KEY_SAVE_ERR;
+import static com.github.onsdigital.zebedee.keyring.legacy.LegacyCollectionKeyringImpl.COLLECTION_DESC_NULL_ERR;
+import static com.github.onsdigital.zebedee.keyring.legacy.LegacyCollectionKeyringImpl.COLLECTION_ID_EMPTY_ERR;
+import static com.github.onsdigital.zebedee.keyring.legacy.LegacyCollectionKeyringImpl.COLLECTION_NULL_ERR;
+import static com.github.onsdigital.zebedee.keyring.legacy.LegacyCollectionKeyringImpl.LIST_USERS_ERR;
+import static com.github.onsdigital.zebedee.keyring.legacy.LegacyCollectionKeyringImpl.REMOVE_KEY_SAVE_ERR;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertThrows;
@@ -24,7 +24,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
-public class LegacyKeyringImpl_RemoveTest extends BaseLegacyKeyringTest {
+public class LegacyCollectionKeyringImpl_RemoveTest extends BaseLegacyKeyringTest {
 
     @Override
     public void setUpTests() throws Exception {

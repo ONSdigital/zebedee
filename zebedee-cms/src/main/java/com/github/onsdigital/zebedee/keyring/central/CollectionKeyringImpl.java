@@ -2,7 +2,7 @@ package com.github.onsdigital.zebedee.keyring.central;
 
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.keyring.CollectionKeyring;
-import com.github.onsdigital.zebedee.keyring.KeyringCache;
+import com.github.onsdigital.zebedee.keyring.CollectionKeyCache;
 import com.github.onsdigital.zebedee.keyring.KeyringException;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.Collections;
@@ -18,10 +18,10 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
- * CentralKeyringImpl adds a permissions check wrapper around a {@link KeyringCache} instance to ensure only
+ * CollectionKeyringImpl adds a permissions check wrapper around a {@link CollectionKeyCache} instance to ensure only
  * authorised users can access collection encryption keys
  */
-public class CentralKeyringImpl implements CollectionKeyring {
+public class CollectionKeyringImpl implements CollectionKeyring {
 
     static final String USER_NULL_ERR = "user required but was null";
     static final String USER_EMAIL_ERR = "user email required but was null or empty";
@@ -42,20 +42,21 @@ public class CentralKeyringImpl implements CollectionKeyring {
      */
     private static CollectionKeyring INSTANCE = null;
 
-    private final KeyringCache cache;
+    private final CollectionKeyCache keyCache;
     private final PermissionsService permissionsService;
     private final Collections collections;
 
     /**
-     * CollectionKeyringImpl is a singleton instance. Use {@link CentralKeyringImpl#init(KeyringCache, PermissionsService)} to
-     * construct and initialise a new instance. Use {@link CentralKeyringImpl#getInstance()} to accessed the
-     * singleton.
+     * CollectionKeyringImpl is a singleton instance. Use
+     * {@link CollectionKeyringImpl#init(CollectionKeyCache, PermissionsService)} to construct and initialise a new
+     * instance. Use {@link CollectionKeyringImpl#getInstance()} to accessed the singleton.
      *
-     * @param cache the {@link KeyringCache} instance to use.
-     * @throws KeyringException the {@link KeyringCache} was null.
+     * @param keyCache the {@link CollectionKeyCache} instance to use.
+     * @throws KeyringException the {@link CollectionKeyCache} was null.
      */
-    private CentralKeyringImpl(KeyringCache cache, PermissionsService permissionsService, Collections collections) throws KeyringException {
-        if (cache == null) {
+    private CollectionKeyringImpl(CollectionKeyCache keyCache, PermissionsService permissionsService,
+                                  Collections collections) throws KeyringException {
+        if (keyCache == null) {
             throw new KeyringException(KEYRING_CACHE_NULL_ERR);
         }
 
@@ -68,7 +69,7 @@ public class CentralKeyringImpl implements CollectionKeyring {
         }
 
         this.permissionsService = permissionsService;
-        this.cache = cache;
+        this.keyCache = keyCache;
         this.collections = collections;
     }
 
@@ -86,11 +87,10 @@ public class CentralKeyringImpl implements CollectionKeyring {
 
         if (!user.keyring().list().isEmpty()) {
             for (String collectionID : user.keyring().list()) {
-                cache.add(collectionID, user.keyring().get(collectionID));
+                keyCache.add(collectionID, user.keyring().get(collectionID));
             }
         }
     }
-
 
     @Override
     public SecretKey get(User user, Collection collection) throws KeyringException {
@@ -103,7 +103,7 @@ public class CentralKeyringImpl implements CollectionKeyring {
             return null;
         }
 
-        return cache.get(collection.getDescription().getId());
+        return keyCache.get(collection.getDescription().getId());
     }
 
     @Override
@@ -117,7 +117,7 @@ public class CentralKeyringImpl implements CollectionKeyring {
             return;
         }
 
-        cache.remove(collection.getDescription().getId());
+        keyCache.remove(collection.getDescription().getId());
     }
 
     @Override
@@ -132,7 +132,7 @@ public class CentralKeyringImpl implements CollectionKeyring {
             return;
         }
 
-        cache.add(collection.getDescription().getId(), key);
+        keyCache.add(collection.getDescription().getId(), key);
     }
 
 
@@ -141,13 +141,13 @@ public class CentralKeyringImpl implements CollectionKeyring {
         validateUser(user);
         // if admin or editor return all.
         if (hasEditPermissions(user)) {
-            return cache.list();
+            return keyCache.list();
         }
 
         List<String> accessibleCollectionIDs = getCollectionIDsAccessibleByUser(user);
 
         // Return only the entries the user has access to.
-        return cache.list()
+        return keyCache.list()
                 .stream()
                 .filter(c -> accessibleCollectionIDs.contains(c))
                 .collect(Collectors.toSet());
@@ -257,14 +257,15 @@ public class CentralKeyringImpl implements CollectionKeyring {
     /**
      * Initailise the CollectionKeyring.
      *
-     * @param keyringCache the {@link KeyringCache} instance to use.
+     * @param collectionKeyCache the {@link CollectionKeyCache} instance to use.
      * @throws KeyringException failed to initialise instance.
      */
-    public static void init(KeyringCache keyringCache, PermissionsService permissionsService, Collections collections) throws KeyringException {
+    public static void init(CollectionKeyCache collectionKeyCache, PermissionsService permissionsService,
+                            Collections collections) throws KeyringException {
         if (INSTANCE == null) {
-            synchronized (CentralKeyringImpl.class) {
+            synchronized (CollectionKeyringImpl.class) {
                 if (INSTANCE == null) {
-                    INSTANCE = new CentralKeyringImpl(keyringCache, permissionsService, collections);
+                    INSTANCE = new CollectionKeyringImpl(collectionKeyCache, permissionsService, collections);
                 }
             }
         }

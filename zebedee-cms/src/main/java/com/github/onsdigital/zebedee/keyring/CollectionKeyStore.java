@@ -8,7 +8,7 @@ import java.util.Map;
 /**
  * Defines the behaviour of a class for storing {@link SecretKey}s.
  */
-public interface KeyringStore {
+public interface CollectionKeyStore {
 
     /**
      * Read and decrypt all collection key files into a {@link java.util.HashMap}.

@@ -15,15 +15,15 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static com.github.onsdigital.zebedee.keyring.migration.MigrationKeyringImpl.ADD_KEY_ERR;
-import static com.github.onsdigital.zebedee.keyring.migration.MigrationKeyringImpl.GET_KEY_ERR;
-import static com.github.onsdigital.zebedee.keyring.migration.MigrationKeyringImpl.KEY_NULL_ERR;
-import static com.github.onsdigital.zebedee.keyring.migration.MigrationKeyringImpl.LIST_KEYS_ERR;
-import static com.github.onsdigital.zebedee.keyring.migration.MigrationKeyringImpl.POPULATE_FROM_USER_ERR;
-import static com.github.onsdigital.zebedee.keyring.migration.MigrationKeyringImpl.REMOVE_KEY_ERR;
-import static com.github.onsdigital.zebedee.keyring.migration.MigrationKeyringImpl.ROLLBACK_FAILED_ERR;
-import static com.github.onsdigital.zebedee.keyring.migration.MigrationKeyringImpl.UNLOCK_KEYRING_ERR;
-import static com.github.onsdigital.zebedee.keyring.migration.MigrationKeyringImpl.WRAPPED_ERR_FMT;
+import static com.github.onsdigital.zebedee.keyring.migration.MigrationCollectionKeyringImpl.ADD_KEY_ERR;
+import static com.github.onsdigital.zebedee.keyring.migration.MigrationCollectionKeyringImpl.GET_KEY_ERR;
+import static com.github.onsdigital.zebedee.keyring.migration.MigrationCollectionKeyringImpl.KEY_NULL_ERR;
+import static com.github.onsdigital.zebedee.keyring.migration.MigrationCollectionKeyringImpl.LIST_KEYS_ERR;
+import static com.github.onsdigital.zebedee.keyring.migration.MigrationCollectionKeyringImpl.POPULATE_FROM_USER_ERR;
+import static com.github.onsdigital.zebedee.keyring.migration.MigrationCollectionKeyringImpl.REMOVE_KEY_ERR;
+import static com.github.onsdigital.zebedee.keyring.migration.MigrationCollectionKeyringImpl.ROLLBACK_FAILED_ERR;
+import static com.github.onsdigital.zebedee.keyring.migration.MigrationCollectionKeyringImpl.UNLOCK_KEYRING_ERR;
+import static com.github.onsdigital.zebedee.keyring.migration.MigrationCollectionKeyringImpl.WRAPPED_ERR_FMT;
 import static java.text.MessageFormat.format;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
@@ -39,7 +39,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
-public class MigrationKeyringImplTest {
+public class MigrationCollectionKeyringImplTest {
 
     @Mock
     private User user;
@@ -84,7 +84,7 @@ public class MigrationKeyringImplTest {
     @Test
     public void cacheKeyring_migrateDisabled_success_shouldUpdateBothKeyrings() throws Exception {
         // Given keyring migration is disabled
-        keyring = new MigrationKeyringImpl(disabled, legacyCollectionKeyring, collectionKeyring);
+        keyring = new MigrationCollectionKeyringImpl(disabled, legacyCollectionKeyring, collectionKeyring);
 
         // When cacheKeyring is called
         keyring.cacheKeyring(user);
@@ -97,7 +97,7 @@ public class MigrationKeyringImplTest {
     @Test
     public void cacheKeyring_migrateEnabled_success_shouldUpdateBothKeyrings() throws Exception {
         // Given keyring migration is enabled
-        keyring = new MigrationKeyringImpl(enabled, legacyCollectionKeyring, collectionKeyring);
+        keyring = new MigrationCollectionKeyringImpl(enabled, legacyCollectionKeyring, collectionKeyring);
 
         // When cacheKeyring is called
         keyring.cacheKeyring(user);
@@ -111,7 +111,7 @@ public class MigrationKeyringImplTest {
     public void cacheKeyring_migrateDisabled_legacyKeyringException_shouldThrowException() throws Exception {
         // Given keyring migration is disabled
         // And legacy keyring errors when called.
-        keyring = new MigrationKeyringImpl(disabled, legacyCollectionKeyring, collectionKeyring);
+        keyring = new MigrationCollectionKeyringImpl(disabled, legacyCollectionKeyring, collectionKeyring);
 
         doThrow(KeyringException.class)
                 .when(legacyCollectionKeyring)
@@ -134,7 +134,7 @@ public class MigrationKeyringImplTest {
     public void cacheKeyring_migrateEnabled_legacyKeyringException_shouldThrowException() throws Exception {
         // Given keyring migration is enabled
         // And legacy keyring errors when called.
-        keyring = new MigrationKeyringImpl(enabled, legacyCollectionKeyring, collectionKeyring);
+        keyring = new MigrationCollectionKeyringImpl(enabled, legacyCollectionKeyring, collectionKeyring);
 
         doThrow(KeyringException.class)
                 .when(legacyCollectionKeyring)
@@ -157,7 +157,7 @@ public class MigrationKeyringImplTest {
     public void cacheKeyring_migrateDisabled_centralKeyringException_shouldThrowException() throws Exception {
         // Given keyring migration is disabled
         // And central keyring errors when called.
-        keyring = new MigrationKeyringImpl(disabled, legacyCollectionKeyring, collectionKeyring);
+        keyring = new MigrationCollectionKeyringImpl(disabled, legacyCollectionKeyring, collectionKeyring);
 
         doThrow(KeyringException.class)
                 .when(collectionKeyring)
@@ -180,7 +180,7 @@ public class MigrationKeyringImplTest {
     public void cacheKeyring_migrateEnabled_centralKeyringException_shouldThrowException() throws Exception {
         // Given keyring migration is enabled
         // And central keyring errors when called.
-        keyring = new MigrationKeyringImpl(enabled, legacyCollectionKeyring, collectionKeyring);
+        keyring = new MigrationCollectionKeyringImpl(enabled, legacyCollectionKeyring, collectionKeyring);
 
         doThrow(KeyringException.class)
                 .when(collectionKeyring)
@@ -202,7 +202,7 @@ public class MigrationKeyringImplTest {
     @Test
     public void get_migrateDisabled_success_shouldReadFromLegacyKeyring() throws Exception {
         // Given keyring migration is disabled
-        keyring = new MigrationKeyringImpl(disabled, legacyCollectionKeyring, collectionKeyring);
+        keyring = new MigrationCollectionKeyringImpl(disabled, legacyCollectionKeyring, collectionKeyring);
 
         when(legacyCollectionKeyring.get(user, collection))
                 .thenReturn(secretKey);
@@ -220,7 +220,7 @@ public class MigrationKeyringImplTest {
     public void get_migrateDisabled_keyringError_shouldThrowException() throws Exception {
         // Given keyring migration is disabled
         // And legacy keyring returns an error
-        keyring = new MigrationKeyringImpl(disabled, legacyCollectionKeyring, collectionKeyring);
+        keyring = new MigrationCollectionKeyringImpl(disabled, legacyCollectionKeyring, collectionKeyring);
 
         when(legacyCollectionKeyring.get(user, collection))
                 .thenThrow(KeyringException.class);
@@ -241,7 +241,7 @@ public class MigrationKeyringImplTest {
     @Test
     public void get_migrateEnabled_success_shouldReadFromCentralKeyring() throws Exception {
         // Given keyring migration is enabled
-        keyring = new MigrationKeyringImpl(enabled, legacyCollectionKeyring, collectionKeyring);
+        keyring = new MigrationCollectionKeyringImpl(enabled, legacyCollectionKeyring, collectionKeyring);
 
         when(collectionKeyring.get(user, collection))
                 .thenReturn(secretKey);
@@ -259,7 +259,7 @@ public class MigrationKeyringImplTest {
     public void get_migrateEnabled_keyringError_shouldThrowException() throws Exception {
         // Given keyring migration is enabled
         // And central keyring returns an error
-        keyring = new MigrationKeyringImpl(enabled, legacyCollectionKeyring, collectionKeyring);
+        keyring = new MigrationCollectionKeyringImpl(enabled, legacyCollectionKeyring, collectionKeyring);
 
         when(collectionKeyring.get(user, collection))
                 .thenThrow(KeyringException.class);
@@ -281,7 +281,7 @@ public class MigrationKeyringImplTest {
     public void remove_migrateDisabled_getKeyError_shouldThrownException() throws Exception {
         // Given migration is disabled
         // And get key returns an error
-        keyring = new MigrationKeyringImpl(disabled, legacyCollectionKeyring, collectionKeyring);
+        keyring = new MigrationCollectionKeyringImpl(disabled, legacyCollectionKeyring, collectionKeyring);
 
         when(legacyCollectionKeyring.get(user, collection))
                 .thenThrow(keyringException);
@@ -300,7 +300,7 @@ public class MigrationKeyringImplTest {
     public void remove_migrateEnabled_getKeyError_shouldThrownException() throws Exception {
         // Given migration is enabled
         // And get key returns an error
-        keyring = new MigrationKeyringImpl(enabled, legacyCollectionKeyring, collectionKeyring);
+        keyring = new MigrationCollectionKeyringImpl(enabled, legacyCollectionKeyring, collectionKeyring);
 
         when(collectionKeyring.get(user, collection))
                 .thenThrow(keyringException);
@@ -319,7 +319,7 @@ public class MigrationKeyringImplTest {
     public void remove_migrateDisabled_keyNull_shouldThrowException() throws Exception {
         // Given migration is disabled
         // And get key returns null
-        keyring = new MigrationKeyringImpl(disabled, legacyCollectionKeyring, collectionKeyring);
+        keyring = new MigrationCollectionKeyringImpl(disabled, legacyCollectionKeyring, collectionKeyring);
 
         when(legacyCollectionKeyring.get(user, collection))
                 .thenReturn(null);
@@ -338,7 +338,7 @@ public class MigrationKeyringImplTest {
     public void remove_migrateEnabled_keyNull_shouldThrowException() throws Exception {
         // Given migration is enabled
         // And get key returns null
-        keyring = new MigrationKeyringImpl(enabled, legacyCollectionKeyring, collectionKeyring);
+        keyring = new MigrationCollectionKeyringImpl(enabled, legacyCollectionKeyring, collectionKeyring);
 
         when(collectionKeyring.get(user, collection))
                 .thenReturn(null);
@@ -357,7 +357,7 @@ public class MigrationKeyringImplTest {
     public void remove_migrateDisabled_centralKeyringRemoveException_shouldThrowException() throws KeyringException {
         // Given migration is disabled
         // And central keyring returns an error
-        keyring = new MigrationKeyringImpl(disabled, legacyCollectionKeyring, collectionKeyring);
+        keyring = new MigrationCollectionKeyringImpl(disabled, legacyCollectionKeyring, collectionKeyring);
 
         when(legacyCollectionKeyring.get(user, collection))
                 .thenReturn(secretKey);
@@ -380,7 +380,7 @@ public class MigrationKeyringImplTest {
     public void remove_migrateEnabled_centralKeyringRemoveException_shouldThrowException() throws KeyringException {
         // Given migration is enabled
         // And central keyring returns an error
-        keyring = new MigrationKeyringImpl(enabled, legacyCollectionKeyring, collectionKeyring);
+        keyring = new MigrationCollectionKeyringImpl(enabled, legacyCollectionKeyring, collectionKeyring);
 
         when(collectionKeyring.get(user, collection))
                 .thenReturn(secretKey);
@@ -403,7 +403,7 @@ public class MigrationKeyringImplTest {
     public void remove_migrateDisabled_legacyKeyringRemoveException_shouldThrowException() throws KeyringException {
         // Given migration is disabled
         // And legacy keyring returns an error
-        keyring = new MigrationKeyringImpl(disabled, legacyCollectionKeyring, collectionKeyring);
+        keyring = new MigrationCollectionKeyringImpl(disabled, legacyCollectionKeyring, collectionKeyring);
 
         when(legacyCollectionKeyring.get(user, collection))
                 .thenReturn(secretKey);
@@ -426,7 +426,7 @@ public class MigrationKeyringImplTest {
     public void remove_migrateEnabled_legacyKeyringRemoveException_shouldThrowException() throws KeyringException {
         // Given migration is enabled
         // And legacy keyring returns an error
-        keyring = new MigrationKeyringImpl(enabled, legacyCollectionKeyring, collectionKeyring);
+        keyring = new MigrationCollectionKeyringImpl(enabled, legacyCollectionKeyring, collectionKeyring);
 
         when(collectionKeyring.get(user, collection))
                 .thenReturn(secretKey);
@@ -451,7 +451,7 @@ public class MigrationKeyringImplTest {
         // Given migration is disabled
         // And legacy keyring returns an error
         // And remove rollback fails
-        keyring = new MigrationKeyringImpl(disabled, legacyCollectionKeyring, collectionKeyring);
+        keyring = new MigrationCollectionKeyringImpl(disabled, legacyCollectionKeyring, collectionKeyring);
 
         when(legacyCollectionKeyring.get(user, collection))
                 .thenReturn(secretKey);
@@ -480,7 +480,7 @@ public class MigrationKeyringImplTest {
         // Given migration is enabled
         // And legacy keyring returns an error
         // And remove rollback fails
-        keyring = new MigrationKeyringImpl(enabled, legacyCollectionKeyring, collectionKeyring);
+        keyring = new MigrationCollectionKeyringImpl(enabled, legacyCollectionKeyring, collectionKeyring);
 
         when(collectionKeyring.get(user, collection))
                 .thenReturn(secretKey);
@@ -508,7 +508,7 @@ public class MigrationKeyringImplTest {
     public void remove_migrateDisabled_success_shouldRemoveKeyFromBothKeyrings() throws Exception {
         // Given migration is disabled
         // And remove is successful
-        keyring = new MigrationKeyringImpl(disabled, legacyCollectionKeyring, collectionKeyring);
+        keyring = new MigrationCollectionKeyringImpl(disabled, legacyCollectionKeyring, collectionKeyring);
 
         when(legacyCollectionKeyring.get(user, collection))
                 .thenReturn(secretKey);
@@ -527,7 +527,7 @@ public class MigrationKeyringImplTest {
     public void remove_migrateEnabled_success_shouldRemoveKeyFromBothKeyrings() throws Exception {
         // Given migration is enabled
         // And remove is successful
-        keyring = new MigrationKeyringImpl(enabled, legacyCollectionKeyring, collectionKeyring);
+        keyring = new MigrationCollectionKeyringImpl(enabled, legacyCollectionKeyring, collectionKeyring);
 
         when(collectionKeyring.get(user, collection))
                 .thenReturn(secretKey);
@@ -546,7 +546,7 @@ public class MigrationKeyringImplTest {
     public void add_migrateDisabled_legacyKeyringError_shouldThrowException() throws Exception {
         // Given migration is disabled
         // And legacy keyring.add is unsuccessful
-        keyring = new MigrationKeyringImpl(disabled, legacyCollectionKeyring, collectionKeyring);
+        keyring = new MigrationCollectionKeyringImpl(disabled, legacyCollectionKeyring, collectionKeyring);
 
         doThrow(keyringException).
                 when(legacyCollectionKeyring)
@@ -566,7 +566,7 @@ public class MigrationKeyringImplTest {
     public void add_migrateEnabled_legacyKeyringError_shouldThrowException() throws Exception {
         // Given migration is enabled
         // And legacy keyring.add is unsuccessful
-        keyring = new MigrationKeyringImpl(enabled, legacyCollectionKeyring, collectionKeyring);
+        keyring = new MigrationCollectionKeyringImpl(enabled, legacyCollectionKeyring, collectionKeyring);
 
         doThrow(keyringException).
                 when(legacyCollectionKeyring)
@@ -587,7 +587,7 @@ public class MigrationKeyringImplTest {
         // Given migration is disabled
         // And central keyring.add is unsuccessful
         // And rollback is unsuccessful
-        keyring = new MigrationKeyringImpl(disabled, legacyCollectionKeyring, collectionKeyring);
+        keyring = new MigrationCollectionKeyringImpl(disabled, legacyCollectionKeyring, collectionKeyring);
 
         doThrow(keyringException).
                 when(collectionKeyring)
@@ -613,7 +613,7 @@ public class MigrationKeyringImplTest {
         // Given migration is enabled
         // And central keyring.add is unsuccessful
         // And rollback is unsuccessful
-        keyring = new MigrationKeyringImpl(enabled, legacyCollectionKeyring, collectionKeyring);
+        keyring = new MigrationCollectionKeyringImpl(enabled, legacyCollectionKeyring, collectionKeyring);
 
         doThrow(keyringException).
                 when(collectionKeyring)
@@ -639,7 +639,7 @@ public class MigrationKeyringImplTest {
         // Given migration is disabled
         // And central keyring.add is unsuccessful
         // And rollback is successful
-        keyring = new MigrationKeyringImpl(disabled, legacyCollectionKeyring, collectionKeyring);
+        keyring = new MigrationCollectionKeyringImpl(disabled, legacyCollectionKeyring, collectionKeyring);
 
         doThrow(keyringException).
                 when(collectionKeyring)
@@ -661,7 +661,7 @@ public class MigrationKeyringImplTest {
         // Given migration is enabled
         // And central keyring.add is unsuccessful
         // And rollback is successful
-        keyring = new MigrationKeyringImpl(enabled, legacyCollectionKeyring, collectionKeyring);
+        keyring = new MigrationCollectionKeyringImpl(enabled, legacyCollectionKeyring, collectionKeyring);
 
         doThrow(keyringException).
                 when(collectionKeyring)
@@ -681,7 +681,7 @@ public class MigrationKeyringImplTest {
     @Test
     public void add_migrateDisabled_success_shouldAddKeyToBothKeyrings() throws Exception {
         // Given migration is disabled
-        keyring = new MigrationKeyringImpl(disabled, legacyCollectionKeyring, collectionKeyring);
+        keyring = new MigrationCollectionKeyringImpl(disabled, legacyCollectionKeyring, collectionKeyring);
 
         // When add is called
         keyring.add(user, collection, secretKey);
@@ -695,7 +695,7 @@ public class MigrationKeyringImplTest {
     @Test
     public void add_migrateEnabled_success_shouldAddKeyToBothKeyrings() throws Exception {
         // Given migration is enabled
-        keyring = new MigrationKeyringImpl(enabled, legacyCollectionKeyring, collectionKeyring);
+        keyring = new MigrationCollectionKeyringImpl(enabled, legacyCollectionKeyring, collectionKeyring);
 
         // When add is called
         keyring.add(user, collection, secretKey);
@@ -710,7 +710,7 @@ public class MigrationKeyringImplTest {
     public void list_migrateDisabled_listError_shouldThrowException() throws Exception {
         // Given migrate is disabled
         // And legacy keyring.list throws an exception
-        keyring = new MigrationKeyringImpl(disabled, legacyCollectionKeyring, collectionKeyring);
+        keyring = new MigrationCollectionKeyringImpl(disabled, legacyCollectionKeyring, collectionKeyring);
 
         when(legacyCollectionKeyring.list(user))
                 .thenThrow(keyringException);
@@ -728,7 +728,7 @@ public class MigrationKeyringImplTest {
     public void list_migrateEnabled_listError_shouldThrowException() throws Exception {
         // Given migrate is enabled
         // And legacy keyring.list throws an exception
-        keyring = new MigrationKeyringImpl(enabled, legacyCollectionKeyring, collectionKeyring);
+        keyring = new MigrationCollectionKeyringImpl(enabled, legacyCollectionKeyring, collectionKeyring);
 
         when(collectionKeyring.list(user))
                 .thenThrow(keyringException);
@@ -745,7 +745,7 @@ public class MigrationKeyringImplTest {
     @Test
     public void list_migrateDisabled_success_shouldListKeys() throws Exception {
         // Given migrate is disabled
-        keyring = new MigrationKeyringImpl(disabled, legacyCollectionKeyring, collectionKeyring);
+        keyring = new MigrationCollectionKeyringImpl(disabled, legacyCollectionKeyring, collectionKeyring);
 
         Set<String> keys = new HashSet<String>() {{
             add("1234567890");
@@ -766,7 +766,7 @@ public class MigrationKeyringImplTest {
     @Test
     public void list_migrateEnabled_success_shouldListKeys() throws Exception {
         // Given migrate is enabled
-        keyring = new MigrationKeyringImpl(enabled, legacyCollectionKeyring, collectionKeyring);
+        keyring = new MigrationCollectionKeyringImpl(enabled, legacyCollectionKeyring, collectionKeyring);
 
         Set<String> keys = new HashSet<String>() {{
             add("1234567890");
@@ -787,7 +787,7 @@ public class MigrationKeyringImplTest {
     @Test
     public void unlock_migrateDisbaled_shouldCallLegacyKeyringUnlock() throws Exception {
         // Given migrate is disabled
-        keyring = new MigrationKeyringImpl(disabled, legacyCollectionKeyring, collectionKeyring);
+        keyring = new MigrationCollectionKeyringImpl(disabled, legacyCollectionKeyring, collectionKeyring);
 
         // When unlocked is called
         keyring.unlock(user, "1234");
@@ -800,7 +800,7 @@ public class MigrationKeyringImplTest {
     @Test
     public void unlock_migrateEnabled_shouldCallLegacyKeyringOnly() throws Exception {
         // Given migrate is enabled
-        keyring = new MigrationKeyringImpl(enabled, legacyCollectionKeyring, collectionKeyring);
+        keyring = new MigrationCollectionKeyringImpl(enabled, legacyCollectionKeyring, collectionKeyring);
 
         // When unlocked is called
         keyring.unlock(user, "1234");
@@ -814,7 +814,7 @@ public class MigrationKeyringImplTest {
     public void unlock_migrateDisabled_unlockErrorShouldThrowException() throws Exception {
         // Given migrate is disabled
         // And legacy keyring unlock throws an exception
-        keyring = new MigrationKeyringImpl(disabled, legacyCollectionKeyring, collectionKeyring);
+        keyring = new MigrationCollectionKeyringImpl(disabled, legacyCollectionKeyring, collectionKeyring);
 
         String password = "1234";
 
@@ -836,7 +836,7 @@ public class MigrationKeyringImplTest {
     public void unlock_migrateEnabled_unlockErrorShouldThrowException() throws Exception {
         // Given migrate is enabled
         // And legacy keyring unlock throws an exception
-        keyring = new MigrationKeyringImpl(enabled, legacyCollectionKeyring, collectionKeyring);
+        keyring = new MigrationCollectionKeyringImpl(enabled, legacyCollectionKeyring, collectionKeyring);
 
         String password = "1234";
 
@@ -857,7 +857,7 @@ public class MigrationKeyringImplTest {
 
     @Test
     public void testAssignTo_shouldCallLegacyKeyring() throws Exception {
-        keyring = new MigrationKeyringImpl(enabled, legacyCollectionKeyring, collectionKeyring);
+        keyring = new MigrationCollectionKeyringImpl(enabled, legacyCollectionKeyring, collectionKeyring);
 
         User src = mock(User.class);
         User target = mock(User.class);
@@ -871,7 +871,7 @@ public class MigrationKeyringImplTest {
 
     @Test
     public void testRemoveFrom_shouldCallLegacyKeyring() throws Exception {
-        keyring = new MigrationKeyringImpl(enabled, legacyCollectionKeyring, collectionKeyring);
+        keyring = new MigrationCollectionKeyringImpl(enabled, legacyCollectionKeyring, collectionKeyring);
 
         User target = mock(User.class);
         List<CollectionDescription> removals = mock(List.class);

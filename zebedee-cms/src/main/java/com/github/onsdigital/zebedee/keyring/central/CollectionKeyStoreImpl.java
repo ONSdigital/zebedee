@@ -1,7 +1,7 @@
 package com.github.onsdigital.zebedee.keyring.central;
 
 import com.github.onsdigital.zebedee.keyring.KeyringException;
-import com.github.onsdigital.zebedee.keyring.KeyringStore;
+import com.github.onsdigital.zebedee.keyring.CollectionKeyStore;
 import org.apache.commons.io.IOUtils;
 
 import javax.crypto.Cipher;
@@ -27,7 +27,7 @@ import static org.apache.commons.io.FilenameUtils.removeExtension;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 /**
- * {@link java.io.File} based implementation of {@link KeyringStore}. Reads and writes
+ * {@link java.io.File} based implementation of {@link CollectionKeyStore}. Reads and writes
  * {@link SecretKey} objects to/from encrypted files on disk. Each method employs a synchronized block to prevent
  * race conditions whilst accessing the key files. This negative performance impact is a necessary and unavoidable
  * drawback to using files on disk instead of database.
@@ -35,7 +35,7 @@ import static org.apache.commons.lang3.StringUtils.isEmpty;
  * <p><b>We strongly advised against using/extending this code for anything other than maintaining legacy
  * functionality in Zebedee CMS.</b></p>For all other purposes it should be considered deprecated. Use at your own risk.
  */
-public class CentralKeyringStoreImpl implements KeyringStore {
+public class CollectionKeyStoreImpl implements CollectionKeyStore {
 
     static final String INVALID_COLLECTION_ID_ERR = "collectionID required but was null or empty";
     static final String COLLECTION_KEY_NULL_ERR = "collectionKey required but was null";
@@ -78,7 +78,7 @@ public class CentralKeyringStoreImpl implements KeyringStore {
      * @param masterKey  the {@link SecretKey} to use when decrypting the collection key files.
      * @param masterIv   the {@link IvParameterSpec} to use when initializing the encryption {@link Cipher}.
      */
-    public CentralKeyringStoreImpl(final Path keyringDir, final SecretKey masterKey, final IvParameterSpec masterIv) {
+    public CollectionKeyStoreImpl(final Path keyringDir, final SecretKey masterKey, final IvParameterSpec masterIv) {
         this.keyringDir = keyringDir;
         this.masterKey = masterKey;
         this.masterIv = masterIv;

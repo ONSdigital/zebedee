@@ -2,7 +2,7 @@ package com.github.onsdigital.zebedee.keyring.central;
 
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.keyring.CollectionKeyring;
-import com.github.onsdigital.zebedee.keyring.KeyringCache;
+import com.github.onsdigital.zebedee.keyring.CollectionKeyCache;
 import com.github.onsdigital.zebedee.keyring.KeyringException;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.Collections;
@@ -22,19 +22,19 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static com.github.onsdigital.zebedee.keyring.central.CentralKeyringImpl.COLLECTIONS_NULL_ERR;
-import static com.github.onsdigital.zebedee.keyring.central.CentralKeyringImpl.COLLECTION_DESCRIPTION_NULL_ERR;
-import static com.github.onsdigital.zebedee.keyring.central.CentralKeyringImpl.COLLECTION_ID_NULL_OR_EMPTY_ERR;
-import static com.github.onsdigital.zebedee.keyring.central.CentralKeyringImpl.COLLECTION_NULL_ERR;
-import static com.github.onsdigital.zebedee.keyring.central.CentralKeyringImpl.FILTER_COLLECTIONS_ERR;
-import static com.github.onsdigital.zebedee.keyring.central.CentralKeyringImpl.KEYRING_CACHE_NULL_ERR;
-import static com.github.onsdigital.zebedee.keyring.central.CentralKeyringImpl.NOT_INITIALISED_ERR;
-import static com.github.onsdigital.zebedee.keyring.central.CentralKeyringImpl.PERMISSION_SERVICE_NULL_ERR;
-import static com.github.onsdigital.zebedee.keyring.central.CentralKeyringImpl.SECRET_KEY_NULL_ERR;
-import static com.github.onsdigital.zebedee.keyring.central.CentralKeyringImpl.USER_EMAIL_ERR;
-import static com.github.onsdigital.zebedee.keyring.central.CentralKeyringImpl.USER_KEYRING_LOCKED_ERR;
-import static com.github.onsdigital.zebedee.keyring.central.CentralKeyringImpl.USER_KEYRING_NULL_ERR;
-import static com.github.onsdigital.zebedee.keyring.central.CentralKeyringImpl.USER_NULL_ERR;
+import static com.github.onsdigital.zebedee.keyring.central.CollectionKeyringImpl.COLLECTIONS_NULL_ERR;
+import static com.github.onsdigital.zebedee.keyring.central.CollectionKeyringImpl.COLLECTION_DESCRIPTION_NULL_ERR;
+import static com.github.onsdigital.zebedee.keyring.central.CollectionKeyringImpl.COLLECTION_ID_NULL_OR_EMPTY_ERR;
+import static com.github.onsdigital.zebedee.keyring.central.CollectionKeyringImpl.COLLECTION_NULL_ERR;
+import static com.github.onsdigital.zebedee.keyring.central.CollectionKeyringImpl.FILTER_COLLECTIONS_ERR;
+import static com.github.onsdigital.zebedee.keyring.central.CollectionKeyringImpl.KEYRING_CACHE_NULL_ERR;
+import static com.github.onsdigital.zebedee.keyring.central.CollectionKeyringImpl.NOT_INITIALISED_ERR;
+import static com.github.onsdigital.zebedee.keyring.central.CollectionKeyringImpl.PERMISSION_SERVICE_NULL_ERR;
+import static com.github.onsdigital.zebedee.keyring.central.CollectionKeyringImpl.SECRET_KEY_NULL_ERR;
+import static com.github.onsdigital.zebedee.keyring.central.CollectionKeyringImpl.USER_EMAIL_ERR;
+import static com.github.onsdigital.zebedee.keyring.central.CollectionKeyringImpl.USER_KEYRING_LOCKED_ERR;
+import static com.github.onsdigital.zebedee.keyring.central.CollectionKeyringImpl.USER_KEYRING_NULL_ERR;
+import static com.github.onsdigital.zebedee.keyring.central.CollectionKeyringImpl.USER_NULL_ERR;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -49,7 +49,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
-public class CentralKeyringImplTest {
+public class CollectionKeyringImplTest {
 
     static final String TEST_COLLECTION_ID = "44";
     static final String SECRET_KEY = "441";
@@ -57,7 +57,7 @@ public class CentralKeyringImplTest {
     private CollectionKeyring keyring;
 
     @Mock
-    private KeyringCache keyringCache;
+    private CollectionKeyCache keyCache;
 
     @Mock
     private User user;
@@ -84,8 +84,8 @@ public class CentralKeyringImplTest {
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
 
-        CentralKeyringImpl.init(keyringCache, permissionsService, collections);
-        keyring = CentralKeyringImpl.getInstance();
+        CollectionKeyringImpl.init(keyCache, permissionsService, collections);
+        keyring = CollectionKeyringImpl.getInstance();
     }
 
     @After
@@ -101,7 +101,7 @@ public class CentralKeyringImplTest {
 
         // then a Keyring exception is thrown.
         assertThat(ex.getMessage(), equalTo(USER_NULL_ERR));
-        verifyZeroInteractions(keyringCache);
+        verifyZeroInteractions(keyCache);
     }
 
     @Test
@@ -118,7 +118,7 @@ public class CentralKeyringImplTest {
 
         // Then a Keyring exception is thrown.
         assertThat(ex.getMessage(), equalTo(USER_KEYRING_NULL_ERR));
-        verifyZeroInteractions(keyringCache);
+        verifyZeroInteractions(keyCache);
     }
 
     @Test
@@ -138,7 +138,7 @@ public class CentralKeyringImplTest {
 
         // Then a Keyring exception is thrown.
         assertThat(ex.getMessage(), equalTo(USER_KEYRING_LOCKED_ERR));
-        verifyZeroInteractions(keyringCache);
+        verifyZeroInteractions(keyCache);
     }
 
     @Test
@@ -160,7 +160,7 @@ public class CentralKeyringImplTest {
         keyring.cacheKeyring(user);
 
         // Then the central keyring is not updated.
-        verifyZeroInteractions(keyringCache);
+        verifyZeroInteractions(keyCache);
     }
 
     @Test
@@ -184,14 +184,14 @@ public class CentralKeyringImplTest {
                 .thenReturn(secretKey);
 
         doThrow(KeyringException.class)
-                .when(keyringCache)
+                .when(keyCache)
                 .add(any(), any());
 
         // When cacheKeyring is called
         assertThrows(KeyringException.class, () -> keyring.cacheKeyring(user));
 
         // Then the central keyring is not updated.
-        verify(keyringCache, times(1)).add(any(), any());
+        verify(keyCache, times(1)).add(any(), any());
     }
 
     @Test
@@ -218,7 +218,7 @@ public class CentralKeyringImplTest {
         keyring.cacheKeyring(user);
 
         // Then the central keyring is updated with each entry in the user keyring.
-        verify(keyringCache, times(1)).add(TEST_COLLECTION_ID, secretKey);
+        verify(keyCache, times(1)).add(TEST_COLLECTION_ID, secretKey);
     }
 
     @Test
@@ -228,7 +228,7 @@ public class CentralKeyringImplTest {
 
         // When GetInstance is called
         // Then an exception is thrown
-        KeyringException ex = assertThrows(KeyringException.class, () -> CentralKeyringImpl.getInstance());
+        KeyringException ex = assertThrows(KeyringException.class, () -> CollectionKeyringImpl.getInstance());
         assertThat(ex.getMessage(), equalTo(NOT_INITIALISED_ERR));
     }
 
@@ -237,7 +237,7 @@ public class CentralKeyringImplTest {
         // Given CollectionKeyring has been initialised
 
         // When GetInstance is called
-        CollectionKeyring keyring = CentralKeyringImpl.getInstance();
+        CollectionKeyring keyring = CollectionKeyringImpl.getInstance();
 
         // Then a non null instance is returned
         assertThat(keyring, is(notNullValue()));
@@ -248,7 +248,7 @@ public class CentralKeyringImplTest {
         resetInstanceToNull();
 
         // When init is called
-        KeyringException ex = assertThrows(KeyringException.class, () -> CentralKeyringImpl.init(null, null, null));
+        KeyringException ex = assertThrows(KeyringException.class, () -> CollectionKeyringImpl.init(null, null, null));
 
         // Then an exception is thrown
         assertThat(ex.getMessage(), equalTo(KEYRING_CACHE_NULL_ERR));
@@ -260,7 +260,7 @@ public class CentralKeyringImplTest {
 
         // When init is called
         KeyringException ex = assertThrows(KeyringException.class,
-                () -> CentralKeyringImpl.init(keyringCache, null, null));
+                () -> CollectionKeyringImpl.init(keyCache, null, null));
 
         // Then an exception is thrown
         assertThat(ex.getMessage(), equalTo(PERMISSION_SERVICE_NULL_ERR));
@@ -272,7 +272,7 @@ public class CentralKeyringImplTest {
 
         // When init is called
         KeyringException ex = assertThrows(KeyringException.class,
-                () -> CentralKeyringImpl.init(keyringCache, permissionsService, null));
+                () -> CollectionKeyringImpl.init(keyCache, permissionsService, null));
 
         // Then an exception is thrown
         assertThat(ex.getMessage(), equalTo(COLLECTIONS_NULL_ERR));
@@ -422,14 +422,14 @@ public class CentralKeyringImplTest {
         when(permissionsService.canEdit(TEST_EMAIL_ID))
                 .thenReturn(true);
 
-        when(keyringCache.get(TEST_COLLECTION_ID))
+        when(keyCache.get(TEST_COLLECTION_ID))
                 .thenThrow(new KeyringException("Beep"));
 
         KeyringException ex = assertThrows(KeyringException.class, () -> keyring.get(user, collection));
         assertThat(ex.getMessage(), equalTo("Beep"));
 
         verify(permissionsService, times(1)).canEdit(TEST_EMAIL_ID);
-        verify(keyringCache, times(1)).get(TEST_COLLECTION_ID);
+        verify(keyCache, times(1)).get(TEST_COLLECTION_ID);
     }
 
     @Test
@@ -446,14 +446,14 @@ public class CentralKeyringImplTest {
         when(permissionsService.canEdit(TEST_EMAIL_ID))
                 .thenReturn(true);
 
-        when(keyringCache.get(TEST_COLLECTION_ID))
+        when(keyCache.get(TEST_COLLECTION_ID))
                 .thenReturn(null);
 
         SecretKey key = keyring.get(user, collection);
 
         assertThat(key, is(nullValue()));
         verify(permissionsService, times(1)).canEdit(TEST_EMAIL_ID);
-        verify(keyringCache, times(1)).get(TEST_COLLECTION_ID);
+        verify(keyCache, times(1)).get(TEST_COLLECTION_ID);
     }
 
     @Test
@@ -470,14 +470,14 @@ public class CentralKeyringImplTest {
         when(permissionsService.canEdit(TEST_EMAIL_ID))
                 .thenReturn(true);
 
-        when(keyringCache.get(TEST_COLLECTION_ID))
+        when(keyCache.get(TEST_COLLECTION_ID))
                 .thenReturn(secretKey);
 
         SecretKey key = keyring.get(user, collection);
 
         assertThat(key, equalTo(secretKey));
         verify(permissionsService, times(1)).canEdit(TEST_EMAIL_ID);
-        verify(keyringCache, times(1)).get(TEST_COLLECTION_ID);
+        verify(keyCache, times(1)).get(TEST_COLLECTION_ID);
     }
 
     @Test
@@ -643,7 +643,7 @@ public class CentralKeyringImplTest {
         keyring.remove(user, collection);
 
         verify(permissionsService, times(1)).canEdit(user.getEmail());
-        verify(keyringCache, times(1)).remove(TEST_COLLECTION_ID);
+        verify(keyCache, times(1)).remove(TEST_COLLECTION_ID);
     }
 
     @Test
@@ -807,7 +807,7 @@ public class CentralKeyringImplTest {
         keyring.add(user, collection, secretKey);
 
         verify(permissionsService, times(1)).canEdit(user.getEmail());
-        verifyZeroInteractions(keyringCache);
+        verifyZeroInteractions(keyCache);
     }
 
     @Test
@@ -827,7 +827,7 @@ public class CentralKeyringImplTest {
         keyring.add(user, collection, secretKey);
 
         verify(permissionsService, times(1)).canEdit(user.getEmail());
-        verify(keyringCache, times(1)).add(TEST_COLLECTION_ID, secretKey);
+        verify(keyCache, times(1)).add(TEST_COLLECTION_ID, secretKey);
     }
 
     @Test
@@ -908,7 +908,7 @@ public class CentralKeyringImplTest {
             add("333");
         }};
 
-        when(keyringCache.list())
+        when(keyCache.list())
                 .thenReturn(expected);
 
         Set<String> actual = keyring.list(user);
@@ -984,7 +984,7 @@ public class CentralKeyringImplTest {
             add(TEST_COLLECTION_ID);
             add("333");
         }};
-        when(keyringCache.list())
+        when(keyCache.list())
                 .thenReturn(cacheValues);
 
         when(collection.getId())
@@ -1014,12 +1014,12 @@ public class CentralKeyringImplTest {
         keyring.unlock(null, null);
 
         // Then no action is taken
-        verifyZeroInteractions(user, keyringCache, permissionsService);
+        verifyZeroInteractions(user, keyCache, permissionsService);
     }
 
     private void resetInstanceToNull() throws Exception {
         // Use some evil reflection magic to set the instance back to null for this test case.
-        Field field = CentralKeyringImpl.class.getDeclaredField("INSTANCE");
+        Field field = CollectionKeyringImpl.class.getDeclaredField("INSTANCE");
         field.setAccessible(true);
         field.set(null, null);
     }

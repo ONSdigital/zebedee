@@ -11,8 +11,8 @@ import org.mockito.MockitoAnnotations;
 
 import java.io.IOException;
 
-import static com.github.onsdigital.zebedee.keyring.KeyringUtil.GET_USER_ERR_FMT;
-import static com.github.onsdigital.zebedee.keyring.KeyringUtil.USER_NOT_FOUND_ERR_FMT;
+import static com.github.onsdigital.zebedee.keyring.CollectionKeyringUtil.GET_USER_ERR_FMT;
+import static com.github.onsdigital.zebedee.keyring.CollectionKeyringUtil.USER_NOT_FOUND_ERR_FMT;
 import static java.text.MessageFormat.format;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -22,7 +22,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class KeyringUtilTest {
+public class CollectionKeyringUtilTest {
 
     static String EMAIL = "robertBobby@test.com";
 
@@ -39,7 +39,8 @@ public class KeyringUtilTest {
 
     @Test
     public void getUser_userServiceNull_shouldThrowException() {
-        InternalServerError ex = assertThrows(InternalServerError.class, () -> KeyringUtil.getUser(null, null));
+        InternalServerError ex = assertThrows(InternalServerError.class,
+                () -> CollectionKeyringUtil.getUser(null, null));
         assertThat(ex.getMessage(), equalTo("get user requires non null userService"));
     }
 
@@ -49,7 +50,7 @@ public class KeyringUtilTest {
                 .thenThrow(IOException.class);
 
         InternalServerError ex = assertThrows(InternalServerError.class,
-                () -> KeyringUtil.getUser(usersService, EMAIL));
+                () -> CollectionKeyringUtil.getUser(usersService, EMAIL));
 
         assertThat(ex.getMessage(), equalTo(format(GET_USER_ERR_FMT, EMAIL)));
         verify(usersService, times(1)).getUserByEmail(EMAIL);
@@ -60,7 +61,8 @@ public class KeyringUtilTest {
         when(usersService.getUserByEmail(any()))
                 .thenReturn(null);
 
-        NotFoundException ex = assertThrows(NotFoundException.class, () -> KeyringUtil.getUser(usersService, EMAIL));
+        NotFoundException ex = assertThrows(NotFoundException.class,
+                () -> CollectionKeyringUtil.getUser(usersService, EMAIL));
 
         assertThat(ex.getMessage(), equalTo(format(USER_NOT_FOUND_ERR_FMT, EMAIL)));
         verify(usersService, times(1)).getUserByEmail(EMAIL);
@@ -71,7 +73,7 @@ public class KeyringUtilTest {
         when(usersService.getUserByEmail(EMAIL))
                 .thenReturn(user);
 
-        User actual = KeyringUtil.getUser(usersService, EMAIL);
+        User actual = CollectionKeyringUtil.getUser(usersService, EMAIL);
 
         assertThat(actual, equalTo(user));
         verify(usersService, times(1)).getUserByEmail(EMAIL);

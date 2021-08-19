@@ -9,14 +9,14 @@ import org.mockito.Mock;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import static com.github.onsdigital.zebedee.keyring.legacy.LegacyKeyringImpl.ADD_KEY_SAVE_ERR;
-import static com.github.onsdigital.zebedee.keyring.legacy.LegacyKeyringImpl.COLLECTION_DESC_NULL_ERR;
-import static com.github.onsdigital.zebedee.keyring.legacy.LegacyKeyringImpl.COLLECTION_ID_EMPTY_ERR;
-import static com.github.onsdigital.zebedee.keyring.legacy.LegacyKeyringImpl.COLLECTION_NULL_ERR;
-import static com.github.onsdigital.zebedee.keyring.legacy.LegacyKeyringImpl.GET_KEY_RECIPIENTS_ERR;
-import static com.github.onsdigital.zebedee.keyring.legacy.LegacyKeyringImpl.LIST_USERS_ERR;
-import static com.github.onsdigital.zebedee.keyring.legacy.LegacyKeyringImpl.REMOVE_KEY_SAVE_ERR;
-import static com.github.onsdigital.zebedee.keyring.legacy.LegacyKeyringImpl.SECRET_KEY_NULL_ERR;
+import static com.github.onsdigital.zebedee.keyring.legacy.LegacyCollectionKeyringImpl.ADD_KEY_SAVE_ERR;
+import static com.github.onsdigital.zebedee.keyring.legacy.LegacyCollectionKeyringImpl.COLLECTION_DESC_NULL_ERR;
+import static com.github.onsdigital.zebedee.keyring.legacy.LegacyCollectionKeyringImpl.COLLECTION_ID_EMPTY_ERR;
+import static com.github.onsdigital.zebedee.keyring.legacy.LegacyCollectionKeyringImpl.COLLECTION_NULL_ERR;
+import static com.github.onsdigital.zebedee.keyring.legacy.LegacyCollectionKeyringImpl.GET_KEY_RECIPIENTS_ERR;
+import static com.github.onsdigital.zebedee.keyring.legacy.LegacyCollectionKeyringImpl.LIST_USERS_ERR;
+import static com.github.onsdigital.zebedee.keyring.legacy.LegacyCollectionKeyringImpl.REMOVE_KEY_SAVE_ERR;
+import static com.github.onsdigital.zebedee.keyring.legacy.LegacyCollectionKeyringImpl.SECRET_KEY_NULL_ERR;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertThrows;
@@ -31,7 +31,7 @@ import static org.mockito.Mockito.when;
 /**
  * Tests to verify LegacyKeyringImpl#Add().
  */
-public class LegacyKeyringImpl_AddTest extends BaseLegacyKeyringTest {
+public class LegacyCollectionKeyringImpl_AddTest extends BaseLegacyKeyringTest {
 
     @Mock
     private User user;

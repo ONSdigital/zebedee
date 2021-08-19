@@ -26,7 +26,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.github.onsdigital.zebedee.keyring.KeyringUtil.getUser;
+import static com.github.onsdigital.zebedee.keyring.CollectionKeyringUtil.getUser;
 
 /**
  * Created by david on 12/03/2015.

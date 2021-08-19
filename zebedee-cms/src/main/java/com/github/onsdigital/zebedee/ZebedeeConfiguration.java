@@ -11,18 +11,18 @@ import com.github.onsdigital.zebedee.configuration.CMSFeatureFlags;
 import com.github.onsdigital.zebedee.data.processing.DataIndex;
 import com.github.onsdigital.zebedee.kafka.KafkaClient;
 import com.github.onsdigital.zebedee.kafka.KafkaClientImpl;
-import com.github.onsdigital.zebedee.keyring.central.CentralKeyringImpl;
+import com.github.onsdigital.zebedee.keyring.central.CollectionKeyringImpl;
 import com.github.onsdigital.zebedee.keyring.CollectionKeyring;
 import com.github.onsdigital.zebedee.keyring.KeyringException;
-import com.github.onsdigital.zebedee.keyring.migration.MigrationKeyringImpl;
-import com.github.onsdigital.zebedee.keyring.legacy.LegacyKeyringImpl;
-import com.github.onsdigital.zebedee.keyring.central.NoOpCentralKeyring;
-import com.github.onsdigital.zebedee.keyring.KeyringCache;
-import com.github.onsdigital.zebedee.keyring.central.CentralKeyringCacheImpl;
+import com.github.onsdigital.zebedee.keyring.migration.MigrationCollectionKeyringImpl;
+import com.github.onsdigital.zebedee.keyring.legacy.LegacyCollectionKeyringImpl;
+import com.github.onsdigital.zebedee.keyring.central.NopCollectionKeyringImpl;
+import com.github.onsdigital.zebedee.keyring.CollectionKeyCache;
+import com.github.onsdigital.zebedee.keyring.central.CollectionKeyCacheImpl;
 import com.github.onsdigital.zebedee.keyring.legacy.LegacySchedulerKeyCacheImpl;
 import com.github.onsdigital.zebedee.keyring.SchedulerKeyCache;
-import com.github.onsdigital.zebedee.keyring.KeyringStore;
-import com.github.onsdigital.zebedee.keyring.central.CentralKeyringStoreImpl;
+import com.github.onsdigital.zebedee.keyring.CollectionKeyStore;
+import com.github.onsdigital.zebedee.keyring.central.CollectionKeyStoreImpl;
 import com.github.onsdigital.zebedee.model.Collections;
 import com.github.onsdigital.zebedee.model.Content;
 import com.github.onsdigital.zebedee.model.RedirectTablePartialMatch;
@@ -202,14 +202,15 @@ public class ZebedeeConfiguration {
                 new UserStoreFileSystemImpl(this.usersPath), collections, permissionsService, keyringSupplier);
 
         // The legacy keyring logic but behind the new keyring interface.
-        CollectionKeyring legacyKeyring = new LegacyKeyringImpl(
+        CollectionKeyring legacyKeyring = new LegacyCollectionKeyringImpl(
                 sessions, usersService, permissionsService, legacyKeyringCache, schedulerKeyCache);
 
         // The new world keyring impl - could be no op or real impl depending on config.
         CollectionKeyring centralKeyring = initCentralKeyring();
 
         // Keyring migrator encapuslates the keyring migration logic behind the new keyring interface.
-        this.collectionKeyring = new MigrationKeyringImpl(CMSFeatureFlags.cmsFeatureFlags().isCentralisedKeyringEnabled(), legacyKeyring, centralKeyring);
+        this.collectionKeyring = new MigrationCollectionKeyringImpl(
+                CMSFeatureFlags.cmsFeatureFlags().isCentralisedKeyringEnabled(), legacyKeyring, centralKeyring);
 
         DatasetClient datasetClient;
         try {
@@ -265,18 +266,19 @@ public class ZebedeeConfiguration {
 
     private CollectionKeyring initCentralKeyring() throws KeyringException {
         // Default to the NoOp impl
-        CollectionKeyring centralKeyring = new NoOpCentralKeyring();
+        CollectionKeyring centralKeyring = new NopCollectionKeyringImpl();
 
         // If centralised keying is enabled initialize
         if (cmsFeatureFlags().isCentralisedKeyringEnabled()) {
 
-            KeyringStore keyStore = new CentralKeyringStoreImpl(getKeyRingPath(), getKeyringSecretKey(), getKeyringInitVector());
+            CollectionKeyStore keyStore = new CollectionKeyStoreImpl(
+                    getKeyRingPath(), getKeyringSecretKey(), getKeyringInitVector());
 
-            CentralKeyringCacheImpl.init(keyStore);
-            KeyringCache keyringCache = CentralKeyringCacheImpl.getInstance();
+            CollectionKeyCacheImpl.init(keyStore);
+            CollectionKeyCache collectionKeyCache = CollectionKeyCacheImpl.getInstance();
 
-            CentralKeyringImpl.init(keyringCache, permissionsService, collections);
-            centralKeyring = CentralKeyringImpl.getInstance();
+            CollectionKeyringImpl.init(collectionKeyCache, permissionsService, collections);
+            centralKeyring = CollectionKeyringImpl.getInstance();
         }
 
         return centralKeyring;

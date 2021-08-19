@@ -3,7 +3,7 @@ package com.github.onsdigital.zebedee.keyring;
 import java.io.IOException;
 
 /**
- * Exception type for errors while accessing/storing collection keys in the {@link KeyringCache}
+ * Exception type for errors while accessing/storing collection keys in the {@link CollectionKeyCache}
  */
 public class KeyringException extends IOException {
 

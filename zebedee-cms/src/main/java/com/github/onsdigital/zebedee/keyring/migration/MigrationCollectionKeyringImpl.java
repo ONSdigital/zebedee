@@ -15,7 +15,7 @@ import static com.github.onsdigital.zebedee.logging.CMSLogEvent.warn;
 import static java.text.MessageFormat.format;
 
 /**
- * KeyringMigrator serves 2 purposes:
+ * MigrationCollectionKeyringImpl serves 2 purposes:
  * <ul>
  *     <li>It uses a feature flag to determine which {@link CollectionKeyring} implementation to use (legacy or new central).</li>
  *     <li>If the central keyring feature is disabled keys are read from the legacy keyring but adds/removes are
@@ -23,7 +23,7 @@ import static java.text.MessageFormat.format;
  *     without losing any keys.</li>
  * </ul>
  */
-public class MigrationKeyringImpl implements CollectionKeyring {
+public class MigrationCollectionKeyringImpl implements CollectionKeyring {
 
     static final String WRAPPED_ERR_FMT = "{0}: Migration enabled: {1}";
     static final String MIGRATE_ENABLED = "migration_enabled";
@@ -52,8 +52,9 @@ public class MigrationKeyringImpl implements CollectionKeyring {
      * @param legacyCollectionKeyring    the legacy keyring implementation to use.
      * @param collectionKeyring   the new central keyring implementation to use.
      */
-    public MigrationKeyringImpl(final boolean migrationEnabled, final CollectionKeyring legacyCollectionKeyring,
-                                final CollectionKeyring collectionKeyring) {
+    public MigrationCollectionKeyringImpl(final boolean migrationEnabled,
+                                          final CollectionKeyring legacyCollectionKeyring,
+                                          final CollectionKeyring collectionKeyring) {
         this.migrationEnabled = migrationEnabled;
         this.legacyCollectionKeyring = legacyCollectionKeyring;
         this.collectionKeyring = collectionKeyring;

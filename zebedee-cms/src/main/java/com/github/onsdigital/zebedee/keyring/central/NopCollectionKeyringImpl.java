@@ -13,10 +13,10 @@ import java.util.Set;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.info;
 
 /**
- * No-op implementation of the keyring interface - empty keyring stubbed placeholder for the new cenral keyring. DO
- * NOTHING JUST LOOK PRETTY.
+ * No-op implementation of the CollectionKeyring interface - empty keyring stubbed placeholder for the new cenral
+ * keyring. DO NOTHING JUST LOOK PRETTY.
  */
-public class NoOpCentralKeyring implements CollectionKeyring {
+public class NopCollectionKeyringImpl implements CollectionKeyring {
 
     @Override
     public void cacheKeyring(User user) throws KeyringException {

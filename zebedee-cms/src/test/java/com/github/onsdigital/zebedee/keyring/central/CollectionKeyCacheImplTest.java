@@ -1,9 +1,8 @@
 package com.github.onsdigital.zebedee.keyring.central;
 
-import com.github.onsdigital.zebedee.keyring.KeyringCache;
+import com.github.onsdigital.zebedee.keyring.CollectionKeyCache;
 import com.github.onsdigital.zebedee.keyring.KeyringException;
-import com.github.onsdigital.zebedee.keyring.central.CentralKeyringCacheImpl;
-import com.github.onsdigital.zebedee.keyring.KeyringStore;
+import com.github.onsdigital.zebedee.keyring.CollectionKeyStore;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -14,14 +13,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import static com.github.onsdigital.zebedee.keyring.central.CentralKeyringCacheImpl.INVALID_COLLECTION_ID_ERR;
-import static com.github.onsdigital.zebedee.keyring.central.CentralKeyringCacheImpl.INVALID_SECRET_KEY_ERR;
-import static com.github.onsdigital.zebedee.keyring.central.CentralKeyringCacheImpl.KEYSTORE_NULL_ERR;
-import static com.github.onsdigital.zebedee.keyring.central.CentralKeyringCacheImpl.KEY_MISMATCH_ERR;
-import static com.github.onsdigital.zebedee.keyring.central.CentralKeyringCacheImpl.KEY_NOT_FOUND_ERR;
-import static com.github.onsdigital.zebedee.keyring.central.CentralKeyringCacheImpl.LOAD_KEYS_NULL_ERR;
-import static com.github.onsdigital.zebedee.keyring.central.CentralKeyringCacheImpl.NOT_INITIALISED_ERR;
-import static com.github.onsdigital.zebedee.keyring.central.CentralKeyringCacheImpl.getInstance;
+import static com.github.onsdigital.zebedee.keyring.central.CollectionKeyCacheImpl.INVALID_COLLECTION_ID_ERR;
+import static com.github.onsdigital.zebedee.keyring.central.CollectionKeyCacheImpl.INVALID_SECRET_KEY_ERR;
+import static com.github.onsdigital.zebedee.keyring.central.CollectionKeyCacheImpl.KEYSTORE_NULL_ERR;
+import static com.github.onsdigital.zebedee.keyring.central.CollectionKeyCacheImpl.KEY_MISMATCH_ERR;
+import static com.github.onsdigital.zebedee.keyring.central.CollectionKeyCacheImpl.KEY_NOT_FOUND_ERR;
+import static com.github.onsdigital.zebedee.keyring.central.CollectionKeyCacheImpl.LOAD_KEYS_NULL_ERR;
+import static com.github.onsdigital.zebedee.keyring.central.CollectionKeyCacheImpl.NOT_INITIALISED_ERR;
+import static com.github.onsdigital.zebedee.keyring.central.CollectionKeyCacheImpl.getInstance;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -38,15 +37,15 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
-public class CentralKeyringCacheImplTest {
+public class CollectionKeyCacheImplTest {
 
     private static final String TEST_COLLECTION_ID = "138"; // We are 138! We are 138 \m/
 
-    private KeyringCache keyringCache;
+    private CollectionKeyCache keyCache;
     private Map<String, SecretKey> cache;
 
     @Mock
-    private KeyringStore keyStore;
+    private CollectionKeyStore keyStore;
 
     @Mock
     private SecretKey secretKey;
@@ -56,12 +55,12 @@ public class CentralKeyringCacheImplTest {
         MockitoAnnotations.initMocks(this);
 
         this.cache = new HashMap<>();
-        this.keyringCache = new CentralKeyringCacheImpl(keyStore, cache);
+        this.keyCache = new CollectionKeyCacheImpl(keyStore, cache);
     }
 
     @Test
     public void testAdd_collectionIDNull_shouldThrowException() {
-        KeyringException ex = assertThrows(KeyringException.class, () -> keyringCache.add(null, null));
+        KeyringException ex = assertThrows(KeyringException.class, () -> keyCache.add(null, null));
 
         assertThat(ex.getMessage(), equalTo(INVALID_COLLECTION_ID_ERR));
         assertTrue(cache.isEmpty());
@@ -69,7 +68,7 @@ public class CentralKeyringCacheImplTest {
 
     @Test
     public void testAdd_collectionIDEmpty_shouldThrowException() throws Exception {
-        KeyringException ex = assertThrows(KeyringException.class, () -> keyringCache.add("", null));
+        KeyringException ex = assertThrows(KeyringException.class, () -> keyCache.add("", null));
 
         assertThat(ex.getMessage(), equalTo(INVALID_COLLECTION_ID_ERR));
         assertTrue(cache.isEmpty());
@@ -77,7 +76,7 @@ public class CentralKeyringCacheImplTest {
 
     @Test
     public void testAdd_secretKeyNull_shouldThrowException() throws Exception {
-        KeyringException ex = assertThrows(KeyringException.class, () -> keyringCache.add(TEST_COLLECTION_ID, null));
+        KeyringException ex = assertThrows(KeyringException.class, () -> keyCache.add(TEST_COLLECTION_ID, null));
 
         assertThat(ex.getMessage(), equalTo(INVALID_SECRET_KEY_ERR));
         assertThat(ex.getCollectionID(), equalTo(TEST_COLLECTION_ID));
@@ -89,7 +88,7 @@ public class CentralKeyringCacheImplTest {
         cache.put(TEST_COLLECTION_ID, secretKey);
         assertThat(cache.size(), equalTo(1));
 
-        keyringCache.add(TEST_COLLECTION_ID, secretKey);
+        keyCache.add(TEST_COLLECTION_ID, secretKey);
 
         assertThat(cache.size(), equalTo(1));
         assertTrue(cache.containsKey(TEST_COLLECTION_ID));
@@ -102,7 +101,7 @@ public class CentralKeyringCacheImplTest {
         SecretKey key2 = mock(SecretKey.class);
         cache.put(TEST_COLLECTION_ID, key2);
 
-        KeyringException ex = assertThrows(KeyringException.class, () -> keyringCache.add(TEST_COLLECTION_ID, secretKey));
+        KeyringException ex = assertThrows(KeyringException.class, () -> keyCache.add(TEST_COLLECTION_ID, secretKey));
 
         verifyZeroInteractions(keyStore);
         assertThat(cache.size(), equalTo(1));
@@ -116,7 +115,7 @@ public class CentralKeyringCacheImplTest {
                 .when(keyStore)
                 .write(TEST_COLLECTION_ID, secretKey);
 
-        KeyringException ex = assertThrows(KeyringException.class, () -> keyringCache.add(TEST_COLLECTION_ID, secretKey));
+        KeyringException ex = assertThrows(KeyringException.class, () -> keyCache.add(TEST_COLLECTION_ID, secretKey));
 
         verify(keyStore, times(1)).write(TEST_COLLECTION_ID, secretKey);
         assertTrue(cache.isEmpty());
@@ -130,7 +129,7 @@ public class CentralKeyringCacheImplTest {
         when(keyStore.read(TEST_COLLECTION_ID))
                 .thenReturn(secretKey);
 
-        keyringCache.add(TEST_COLLECTION_ID, secretKey);
+        keyCache.add(TEST_COLLECTION_ID, secretKey);
 
         assertTrue(cache.containsKey(TEST_COLLECTION_ID));
         assertThat(cache.get(TEST_COLLECTION_ID), equalTo(secretKey));
@@ -144,7 +143,7 @@ public class CentralKeyringCacheImplTest {
         when(keyStore.read(TEST_COLLECTION_ID))
                 .thenThrow(new KeyringException("unexpected error"));
 
-        KeyringException ex = assertThrows(KeyringException.class, () -> keyringCache.add(TEST_COLLECTION_ID, secretKey));
+        KeyringException ex = assertThrows(KeyringException.class, () -> keyCache.add(TEST_COLLECTION_ID, secretKey));
 
         assertTrue(cache.isEmpty());
         assertThat(ex.getMessage(), equalTo("unexpected error"));
@@ -162,7 +161,7 @@ public class CentralKeyringCacheImplTest {
         when(keyStore.read(TEST_COLLECTION_ID))
                 .thenReturn(mock(SecretKey.class));
 
-        KeyringException ex = assertThrows(KeyringException.class, () -> keyringCache.add(TEST_COLLECTION_ID, secretKey));
+        KeyringException ex = assertThrows(KeyringException.class, () -> keyCache.add(TEST_COLLECTION_ID, secretKey));
 
         assertThat(ex.getMessage(), equalTo(KEY_MISMATCH_ERR));
         assertThat(ex.getCollectionID(), equalTo(TEST_COLLECTION_ID));
@@ -174,7 +173,7 @@ public class CentralKeyringCacheImplTest {
 
     @Test
     public void testAdd_success_shouldWriteKeyToStoreAndCache() throws Exception {
-        keyringCache.add(TEST_COLLECTION_ID, secretKey);
+        keyCache.add(TEST_COLLECTION_ID, secretKey);
 
         verify(keyStore, times(1)).write(TEST_COLLECTION_ID, secretKey);
         assertThat(cache.size(), equalTo(1));
@@ -184,7 +183,7 @@ public class CentralKeyringCacheImplTest {
 
     @Test
     public void testGet_collectionIDNull_shouldThrowException() throws Exception {
-        KeyringException ex = assertThrows(KeyringException.class, () -> keyringCache.get(null));
+        KeyringException ex = assertThrows(KeyringException.class, () -> keyCache.get(null));
 
         assertThat(ex.getMessage(), equalTo(INVALID_COLLECTION_ID_ERR));
         verifyZeroInteractions(keyStore);
@@ -192,7 +191,7 @@ public class CentralKeyringCacheImplTest {
 
     @Test
     public void testGet_collectionIDEmpty_shouldThrowException() throws Exception {
-        KeyringException ex = assertThrows(KeyringException.class, () -> keyringCache.get(null));
+        KeyringException ex = assertThrows(KeyringException.class, () -> keyCache.get(null));
 
         assertThat(ex.getMessage(), equalTo(INVALID_COLLECTION_ID_ERR));
         verifyZeroInteractions(keyStore);
@@ -202,7 +201,7 @@ public class CentralKeyringCacheImplTest {
     public void testGet_keyExistsInCache_shouldReturnKey() throws Exception {
         cache.put(TEST_COLLECTION_ID, secretKey);
 
-        SecretKey actual = keyringCache.get(TEST_COLLECTION_ID);
+        SecretKey actual = keyCache.get(TEST_COLLECTION_ID);
 
         assertThat(actual, equalTo(secretKey));
         verifyZeroInteractions(keyStore);
@@ -213,7 +212,7 @@ public class CentralKeyringCacheImplTest {
         when(keyStore.exists(TEST_COLLECTION_ID))
                 .thenReturn(false);
 
-        KeyringException ex = assertThrows(KeyringException.class, () -> keyringCache.get(TEST_COLLECTION_ID));
+        KeyringException ex = assertThrows(KeyringException.class, () -> keyCache.get(TEST_COLLECTION_ID));
 
         assertThat(ex.getMessage(), equalTo(KEY_NOT_FOUND_ERR));
         assertThat(ex.getCollectionID(), equalTo(TEST_COLLECTION_ID));
@@ -229,7 +228,7 @@ public class CentralKeyringCacheImplTest {
         when(keyStore.read(TEST_COLLECTION_ID))
                 .thenReturn(secretKey);
 
-        SecretKey actual = keyringCache.get(TEST_COLLECTION_ID);
+        SecretKey actual = keyCache.get(TEST_COLLECTION_ID);
 
         assertTrue(cache.containsKey(TEST_COLLECTION_ID));
         assertThat(cache.get(TEST_COLLECTION_ID), equalTo(actual));
@@ -247,7 +246,7 @@ public class CentralKeyringCacheImplTest {
         when(keyStore.read(TEST_COLLECTION_ID))
                 .thenThrow(new KeyringException("error"));
 
-        KeyringException ex = assertThrows(KeyringException.class, () -> keyringCache.get(TEST_COLLECTION_ID));
+        KeyringException ex = assertThrows(KeyringException.class, () -> keyCache.get(TEST_COLLECTION_ID));
 
         assertThat(ex.getMessage(), equalTo("error"));
         assertFalse(cache.containsKey(TEST_COLLECTION_ID));
@@ -259,7 +258,7 @@ public class CentralKeyringCacheImplTest {
 
     @Test
     public void testRemove_collectionIDNull_shouldThrowException() {
-        KeyringException ex = assertThrows(KeyringException.class, () -> keyringCache.remove(null));
+        KeyringException ex = assertThrows(KeyringException.class, () -> keyCache.remove(null));
 
         assertThat(ex.getMessage(), equalTo(INVALID_COLLECTION_ID_ERR));
 
@@ -268,7 +267,7 @@ public class CentralKeyringCacheImplTest {
 
     @Test
     public void testRemove_collectionIDEmpty_shouldThrowException() {
-        KeyringException ex = assertThrows(KeyringException.class, () -> keyringCache.remove(""));
+        KeyringException ex = assertThrows(KeyringException.class, () -> keyCache.remove(""));
 
         assertThat(ex.getMessage(), equalTo(INVALID_COLLECTION_ID_ERR));
 
@@ -280,7 +279,7 @@ public class CentralKeyringCacheImplTest {
         when(keyStore.exists(TEST_COLLECTION_ID))
                 .thenReturn(false);
 
-        KeyringException ex = assertThrows(KeyringException.class, () -> keyringCache.remove(TEST_COLLECTION_ID));
+        KeyringException ex = assertThrows(KeyringException.class, () -> keyCache.remove(TEST_COLLECTION_ID));
 
         assertThat(ex.getMessage(), equalTo(KEY_NOT_FOUND_ERR));
 
@@ -297,7 +296,7 @@ public class CentralKeyringCacheImplTest {
                 .when(keyStore)
                 .delete(TEST_COLLECTION_ID);
 
-        KeyringException ex = assertThrows(KeyringException.class, () -> keyringCache.remove(TEST_COLLECTION_ID));
+        KeyringException ex = assertThrows(KeyringException.class, () -> keyCache.remove(TEST_COLLECTION_ID));
 
         assertThat(ex.getMessage(), equalTo("pr review me"));
 
@@ -310,7 +309,7 @@ public class CentralKeyringCacheImplTest {
         when(keyStore.exists(TEST_COLLECTION_ID))
                 .thenReturn(true);
 
-        keyringCache.remove(TEST_COLLECTION_ID);
+        keyCache.remove(TEST_COLLECTION_ID);
 
         verify(keyStore, times(1)).exists(TEST_COLLECTION_ID);
         verify(keyStore, times(1)).delete(TEST_COLLECTION_ID);
@@ -325,7 +324,7 @@ public class CentralKeyringCacheImplTest {
         when(keyStore.exists(TEST_COLLECTION_ID))
                 .thenReturn(true);
 
-        keyringCache.remove(TEST_COLLECTION_ID);
+        keyCache.remove(TEST_COLLECTION_ID);
 
         assertFalse(cache.containsKey(TEST_COLLECTION_ID));
 
@@ -337,7 +336,7 @@ public class CentralKeyringCacheImplTest {
     public void testLoad_keystoreException_shouldThrowException() throws Exception {
         when(keyStore.readAll()).thenThrow(new KeyringException("boom"));
 
-        KeyringException ex = assertThrows(KeyringException.class, () -> keyringCache.load());
+        KeyringException ex = assertThrows(KeyringException.class, () -> keyCache.load());
 
         assertThat(ex.getMessage(), equalTo("boom"));
         verify(keyStore, times(1)).readAll();
@@ -348,7 +347,7 @@ public class CentralKeyringCacheImplTest {
         when(keyStore.readAll())
                 .thenReturn(null);
 
-        KeyringException ex = assertThrows(KeyringException.class, () -> keyringCache.load());
+        KeyringException ex = assertThrows(KeyringException.class, () -> keyCache.load());
 
         assertThat(ex.getMessage(), equalTo(LOAD_KEYS_NULL_ERR));
         verify(keyStore, times(1)).readAll();
@@ -359,7 +358,7 @@ public class CentralKeyringCacheImplTest {
         when(keyStore.readAll())
                 .thenReturn(new HashMap<>());
 
-        keyringCache.load();
+        keyCache.load();
 
         assertTrue(cache.isEmpty());
         verify(keyStore, times(1)).readAll();
@@ -374,7 +373,7 @@ public class CentralKeyringCacheImplTest {
         when(keyStore.readAll())
                 .thenReturn(keysInStore);
 
-        keyringCache.load();
+        keyCache.load();
 
         assertThat(cache.size(), equalTo(1));
         assertTrue(cache.containsKey(TEST_COLLECTION_ID));
@@ -394,7 +393,7 @@ public class CentralKeyringCacheImplTest {
         when(keyStore.readAll())
                 .thenReturn(keysInStore);
 
-        keyringCache.load();
+        keyCache.load();
 
         assertThat(cache.size(), equalTo(1));
         assertTrue(cache.containsKey(TEST_COLLECTION_ID));
@@ -405,7 +404,7 @@ public class CentralKeyringCacheImplTest {
 
     @Test
     public void testInit_keystoreNull_shouldThrowException() {
-        KeyringException ex = assertThrows(KeyringException.class, () -> CentralKeyringCacheImpl.init(null));
+        KeyringException ex = assertThrows(KeyringException.class, () -> CollectionKeyCacheImpl.init(null));
 
         assertThat(ex.getMessage(), equalTo(KEYSTORE_NULL_ERR));
     }
@@ -415,7 +414,7 @@ public class CentralKeyringCacheImplTest {
         when(keyStore.readAll())
                 .thenThrow(new KeyringException("boom"));
 
-        KeyringException ex = assertThrows(KeyringException.class, () -> CentralKeyringCacheImpl.init(keyStore));
+        KeyringException ex = assertThrows(KeyringException.class, () -> CollectionKeyCacheImpl.init(keyStore));
 
         assertThat(ex.getMessage(), equalTo("boom"));
         verify(keyStore, times(1)).readAll();
@@ -426,7 +425,7 @@ public class CentralKeyringCacheImplTest {
         when(keyStore.readAll())
                 .thenReturn(null);
 
-        KeyringException ex = assertThrows(KeyringException.class, () -> CentralKeyringCacheImpl.init(keyStore));
+        KeyringException ex = assertThrows(KeyringException.class, () -> CollectionKeyCacheImpl.init(keyStore));
 
         assertThat(ex.getMessage(), equalTo(LOAD_KEYS_NULL_ERR));
         verify(keyStore, times(1)).readAll();
@@ -440,10 +439,10 @@ public class CentralKeyringCacheImplTest {
         when(keyStore.readAll())
                 .thenReturn(keys);
 
-        CentralKeyringCacheImpl.init(keyStore);
-        KeyringCache keyringCache = getInstance();
+        CollectionKeyCacheImpl.init(keyStore);
+        CollectionKeyCache collectionKeyCache = getInstance();
 
-        assertThat(keyringCache.get(TEST_COLLECTION_ID), equalTo(secretKey));
+        assertThat(collectionKeyCache.get(TEST_COLLECTION_ID), equalTo(secretKey));
         verify(keyStore, times(1)).readAll();
     }
 
@@ -452,7 +451,7 @@ public class CentralKeyringCacheImplTest {
         // Given the KeyringCache has not been initalised
 
         // When getInstance is called
-        KeyringException ex = assertThrows(KeyringException.class, () -> CentralKeyringCacheImpl.getInstance());
+        KeyringException ex = assertThrows(KeyringException.class, () -> CollectionKeyCacheImpl.getInstance());
 
         // Then an exception is thrown
         assertThat(ex.getMessage(), equalTo(NOT_INITIALISED_ERR));
@@ -461,10 +460,10 @@ public class CentralKeyringCacheImplTest {
     @Test
     public void testGetInstance_success() throws Exception {
         // Given the KeyringCache has been initialised
-        CentralKeyringCacheImpl.init(keyStore);
+        CollectionKeyCacheImpl.init(keyStore);
 
         // When getInstance is called
-        KeyringCache actual = CentralKeyringCacheImpl.getInstance();
+        CollectionKeyCache actual = CollectionKeyCacheImpl.getInstance();
 
         // Then the singleton instance is returned
         assertThat(actual, is(notNullValue()));
@@ -474,7 +473,7 @@ public class CentralKeyringCacheImplTest {
     public void testList_keysExistsInCache_shouldReturnSetOfCollectionIDs() throws Exception {
         cache.put(TEST_COLLECTION_ID, secretKey);
 
-        Set<String> actual = keyringCache.list();
+        Set<String> actual = keyCache.list();
 
         assertTrue(actual.contains(TEST_COLLECTION_ID));
         verifyZeroInteractions(keyStore);
@@ -490,7 +489,7 @@ public class CentralKeyringCacheImplTest {
 
         assertTrue(cache.isEmpty());
 
-        Set<String> actual = keyringCache.list();
+        Set<String> actual = keyCache.list();
 
         assertTrue(cache.containsKey(TEST_COLLECTION_ID));
         assertTrue(actual.contains(TEST_COLLECTION_ID));
@@ -504,7 +503,7 @@ public class CentralKeyringCacheImplTest {
         when(keyStore.readAll())
                 .thenThrow(new KeyringException("error"));
 
-        KeyringException ex = assertThrows(KeyringException.class, () -> keyringCache.list());
+        KeyringException ex = assertThrows(KeyringException.class, () -> keyCache.list());
 
         assertThat(ex.getMessage(), equalTo("error"));
         assertFalse(cache.containsKey(TEST_COLLECTION_ID));

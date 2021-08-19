@@ -79,14 +79,13 @@ public class PublishedDataTest {
         when(response.getOutputStream()).thenReturn(mockOutput);
 
         //when
-        Exception exception = assertThrows(BadRequestException.class, () -> {
-            publishedData.read(request, response);
-        });
+        Exception exception = assertThrows(BadRequestException.class, () ->
+                publishedData.read(request, response)
+        );
 
         //then
         String expectedMessage = "Please specify uri";
         String actualMessage = exception.getMessage();
         assertTrue(actualMessage.contains(expectedMessage));
-        verify(response, times(0)).setStatus(HttpStatus.SC_OK);
     }
 }

@@ -1,7 +1,9 @@
-package com.github.onsdigital.zebedee.keyring;
+package com.github.onsdigital.zebedee.keyring.central;
 
 import com.github.onsdigital.zebedee.json.CollectionDescription;
-import com.github.onsdigital.zebedee.keyring.cache.KeyringCache;
+import com.github.onsdigital.zebedee.keyring.CollectionKeyring;
+import com.github.onsdigital.zebedee.keyring.KeyringCache;
+import com.github.onsdigital.zebedee.keyring.KeyringException;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.Collections;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
@@ -20,19 +22,19 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static com.github.onsdigital.zebedee.keyring.CentralKeyringImpl.COLLECTIONS_NULL_ERR;
-import static com.github.onsdigital.zebedee.keyring.CentralKeyringImpl.COLLECTION_DESCRIPTION_NULL_ERR;
-import static com.github.onsdigital.zebedee.keyring.CentralKeyringImpl.COLLECTION_ID_NULL_OR_EMPTY_ERR;
-import static com.github.onsdigital.zebedee.keyring.CentralKeyringImpl.COLLECTION_NULL_ERR;
-import static com.github.onsdigital.zebedee.keyring.CentralKeyringImpl.FILTER_COLLECTIONS_ERR;
-import static com.github.onsdigital.zebedee.keyring.CentralKeyringImpl.KEYRING_CACHE_NULL_ERR;
-import static com.github.onsdigital.zebedee.keyring.CentralKeyringImpl.NOT_INITIALISED_ERR;
-import static com.github.onsdigital.zebedee.keyring.CentralKeyringImpl.PERMISSION_SERVICE_NULL_ERR;
-import static com.github.onsdigital.zebedee.keyring.CentralKeyringImpl.SECRET_KEY_NULL_ERR;
-import static com.github.onsdigital.zebedee.keyring.CentralKeyringImpl.USER_EMAIL_ERR;
-import static com.github.onsdigital.zebedee.keyring.CentralKeyringImpl.USER_KEYRING_LOCKED_ERR;
-import static com.github.onsdigital.zebedee.keyring.CentralKeyringImpl.USER_KEYRING_NULL_ERR;
-import static com.github.onsdigital.zebedee.keyring.CentralKeyringImpl.USER_NULL_ERR;
+import static com.github.onsdigital.zebedee.keyring.central.CentralKeyringImpl.COLLECTIONS_NULL_ERR;
+import static com.github.onsdigital.zebedee.keyring.central.CentralKeyringImpl.COLLECTION_DESCRIPTION_NULL_ERR;
+import static com.github.onsdigital.zebedee.keyring.central.CentralKeyringImpl.COLLECTION_ID_NULL_OR_EMPTY_ERR;
+import static com.github.onsdigital.zebedee.keyring.central.CentralKeyringImpl.COLLECTION_NULL_ERR;
+import static com.github.onsdigital.zebedee.keyring.central.CentralKeyringImpl.FILTER_COLLECTIONS_ERR;
+import static com.github.onsdigital.zebedee.keyring.central.CentralKeyringImpl.KEYRING_CACHE_NULL_ERR;
+import static com.github.onsdigital.zebedee.keyring.central.CentralKeyringImpl.NOT_INITIALISED_ERR;
+import static com.github.onsdigital.zebedee.keyring.central.CentralKeyringImpl.PERMISSION_SERVICE_NULL_ERR;
+import static com.github.onsdigital.zebedee.keyring.central.CentralKeyringImpl.SECRET_KEY_NULL_ERR;
+import static com.github.onsdigital.zebedee.keyring.central.CentralKeyringImpl.USER_EMAIL_ERR;
+import static com.github.onsdigital.zebedee.keyring.central.CentralKeyringImpl.USER_KEYRING_LOCKED_ERR;
+import static com.github.onsdigital.zebedee.keyring.central.CentralKeyringImpl.USER_KEYRING_NULL_ERR;
+import static com.github.onsdigital.zebedee.keyring.central.CentralKeyringImpl.USER_NULL_ERR;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -42,7 +44,6 @@ import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
@@ -53,7 +54,7 @@ public class CentralKeyringImplTest {
     static final String TEST_COLLECTION_ID = "44";
     static final String SECRET_KEY = "441";
     static final String TEST_EMAIL_ID = "testid@ons.gov.uk";
-    private Keyring keyring;
+    private CollectionKeyring keyring;
 
     @Mock
     private KeyringCache keyringCache;
@@ -236,7 +237,7 @@ public class CentralKeyringImplTest {
         // Given CollectionKeyring has been initialised
 
         // When GetInstance is called
-        Keyring keyring = CentralKeyringImpl.getInstance();
+        CollectionKeyring keyring = CentralKeyringImpl.getInstance();
 
         // Then a non null instance is returned
         assertThat(keyring, is(notNullValue()));

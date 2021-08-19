@@ -1,6 +1,8 @@
-package com.github.onsdigital.zebedee.keyring;
+package com.github.onsdigital.zebedee.keyring.central;
 
 import com.github.onsdigital.zebedee.json.CollectionDescription;
+import com.github.onsdigital.zebedee.keyring.CollectionKeyring;
+import com.github.onsdigital.zebedee.keyring.KeyringException;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.user.model.User;
 
@@ -14,7 +16,7 @@ import static com.github.onsdigital.zebedee.logging.CMSLogEvent.info;
  * No-op implementation of the keyring interface - empty keyring stubbed placeholder for the new cenral keyring. DO
  * NOTHING JUST LOOK PRETTY.
  */
-public class NoOpCentralKeyring implements Keyring {
+public class NoOpCentralKeyring implements CollectionKeyring {
 
     @Override
     public void cacheKeyring(User user) throws KeyringException {

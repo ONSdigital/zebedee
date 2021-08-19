@@ -1,14 +1,15 @@
-package com.github.onsdigital.zebedee.keyring;
+package com.github.onsdigital.zebedee.keyring.legacy;
 
+import com.github.onsdigital.zebedee.keyring.KeyringException;
 import org.junit.Test;
 
 import java.io.IOException;
 
-import static com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl.CACHE_PUT_ERR;
-import static com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl.EMAIL_EMPTY_ERR;
-import static com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl.GET_SESSION_ERR;
-import static com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl.USER_KEYRING_NULL_ERR;
-import static com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl.USER_NULL_ERR;
+import static com.github.onsdigital.zebedee.keyring.legacy.LegacyKeyringImpl.CACHE_PUT_ERR;
+import static com.github.onsdigital.zebedee.keyring.legacy.LegacyKeyringImpl.EMAIL_EMPTY_ERR;
+import static com.github.onsdigital.zebedee.keyring.legacy.LegacyKeyringImpl.GET_SESSION_ERR;
+import static com.github.onsdigital.zebedee.keyring.legacy.LegacyKeyringImpl.USER_KEYRING_NULL_ERR;
+import static com.github.onsdigital.zebedee.keyring.legacy.LegacyKeyringImpl.USER_NULL_ERR;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertThrows;
@@ -29,7 +30,7 @@ public class LegacyKeyringImpl_CacheKeyringTest extends BaseLegacyKeyringTest {
         // Given user is null
 
         // When cacheKeyring is called
-        KeyringException ex = assertThrows(KeyringException.class, () -> legacyKeyring.cacheKeyring(null));
+        KeyringException ex = assertThrows(KeyringException.class, () -> legacyCollectionKeyring.cacheKeyring(null));
 
         // Then an exception is thrown.
         assertThat(ex.getMessage(), equalTo(USER_NULL_ERR));
@@ -42,7 +43,7 @@ public class LegacyKeyringImpl_CacheKeyringTest extends BaseLegacyKeyringTest {
                 .thenReturn(null);
 
         // When cacheKeyring is called
-        KeyringException ex = assertThrows(KeyringException.class, () -> legacyKeyring.cacheKeyring(bert));
+        KeyringException ex = assertThrows(KeyringException.class, () -> legacyCollectionKeyring.cacheKeyring(bert));
 
         // Then an exception is thrown.
         assertThat(ex.getMessage(), equalTo(EMAIL_EMPTY_ERR));
@@ -55,7 +56,7 @@ public class LegacyKeyringImpl_CacheKeyringTest extends BaseLegacyKeyringTest {
                 .thenReturn("");
 
         // When cacheKeyring is called
-        KeyringException ex = assertThrows(KeyringException.class, () -> legacyKeyring.cacheKeyring(bert));
+        KeyringException ex = assertThrows(KeyringException.class, () -> legacyCollectionKeyring.cacheKeyring(bert));
 
         // Then an exception is thrown.
         assertThat(ex.getMessage(), equalTo(EMAIL_EMPTY_ERR));
@@ -68,7 +69,7 @@ public class LegacyKeyringImpl_CacheKeyringTest extends BaseLegacyKeyringTest {
                 .thenReturn(null);
 
         // When cacheKeyring is called
-        KeyringException ex = assertThrows(KeyringException.class, () -> legacyKeyring.cacheKeyring(bert));
+        KeyringException ex = assertThrows(KeyringException.class, () -> legacyCollectionKeyring.cacheKeyring(bert));
 
         // Then an exception is thrown.
         assertThat(ex.getMessage(), equalTo(USER_KEYRING_NULL_ERR));
@@ -81,7 +82,7 @@ public class LegacyKeyringImpl_CacheKeyringTest extends BaseLegacyKeyringTest {
                 .thenThrow(expectedEx);
 
         // When cacheKeyring is called
-        KeyringException ex = assertThrows(KeyringException.class, () -> legacyKeyring.cacheKeyring(bert));
+        KeyringException ex = assertThrows(KeyringException.class, () -> legacyCollectionKeyring.cacheKeyring(bert));
 
         // Then an exception is thrown.
         assertThat(ex.getMessage(), equalTo(GET_SESSION_ERR));
@@ -95,7 +96,7 @@ public class LegacyKeyringImpl_CacheKeyringTest extends BaseLegacyKeyringTest {
                 .thenReturn(null);
 
         // When cacheKeyring is called
-        legacyKeyring.cacheKeyring(bert);
+        legacyCollectionKeyring.cacheKeyring(bert);
 
         // Then no keying is added to the cache
         verify(sessionsService, times(1)).find(EMAIL_BERT);
@@ -110,7 +111,7 @@ public class LegacyKeyringImpl_CacheKeyringTest extends BaseLegacyKeyringTest {
                 .put(bert, session);
 
         // When cacheKeyring is called
-        KeyringException ex = assertThrows(KeyringException.class, () -> legacyKeyring.cacheKeyring(bert));
+        KeyringException ex = assertThrows(KeyringException.class, () -> legacyCollectionKeyring.cacheKeyring(bert));
 
         // Then an exception is thrown.
         assertThat(ex.getMessage(), equalTo(CACHE_PUT_ERR));
@@ -122,7 +123,7 @@ public class LegacyKeyringImpl_CacheKeyringTest extends BaseLegacyKeyringTest {
         // Given a valid user
 
         // When cacheKeyring is called
-        legacyKeyring.cacheKeyring(bert);
+        legacyCollectionKeyring.cacheKeyring(bert);
 
         // Then the keyring cache is updated with the users keys
         verify(sessionsService, times(1)).find(EMAIL_BERT);

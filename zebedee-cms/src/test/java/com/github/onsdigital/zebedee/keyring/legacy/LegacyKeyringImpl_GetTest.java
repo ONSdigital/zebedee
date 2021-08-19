@@ -1,16 +1,17 @@
-package com.github.onsdigital.zebedee.keyring;
+package com.github.onsdigital.zebedee.keyring.legacy;
 
+import com.github.onsdigital.zebedee.keyring.KeyringException;
 import org.junit.Test;
 
 import javax.crypto.SecretKey;
 import java.io.IOException;
 
-import static com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl.CACHE_GET_ERR;
-import static com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl.COLLECTION_DESC_NULL_ERR;
-import static com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl.COLLECTION_ID_EMPTY_ERR;
-import static com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl.COLLECTION_NULL_ERR;
-import static com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl.EMAIL_EMPTY_ERR;
-import static com.github.onsdigital.zebedee.keyring.LegacyKeyringImpl.USER_NULL_ERR;
+import static com.github.onsdigital.zebedee.keyring.legacy.LegacyKeyringImpl.CACHE_GET_ERR;
+import static com.github.onsdigital.zebedee.keyring.legacy.LegacyKeyringImpl.COLLECTION_DESC_NULL_ERR;
+import static com.github.onsdigital.zebedee.keyring.legacy.LegacyKeyringImpl.COLLECTION_ID_EMPTY_ERR;
+import static com.github.onsdigital.zebedee.keyring.legacy.LegacyKeyringImpl.COLLECTION_NULL_ERR;
+import static com.github.onsdigital.zebedee.keyring.legacy.LegacyKeyringImpl.EMAIL_EMPTY_ERR;
+import static com.github.onsdigital.zebedee.keyring.legacy.LegacyKeyringImpl.USER_NULL_ERR;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -20,7 +21,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class LegacyKeyringImpl_GetTest extends BaseLegacyKeyringTest{
+public class LegacyKeyringImpl_GetTest extends BaseLegacyKeyringTest {
 
     @Override
     public void setUpTests() throws Exception {
@@ -31,7 +32,7 @@ public class LegacyKeyringImpl_GetTest extends BaseLegacyKeyringTest{
         // Given user is null
 
         // When get is called
-        KeyringException ex = assertThrows(KeyringException.class, () -> legacyKeyring.get(null, null));
+        KeyringException ex = assertThrows(KeyringException.class, () -> legacyCollectionKeyring.get(null, null));
 
         // Then an exception is thrown.
         assertThat(ex.getMessage(), equalTo(USER_NULL_ERR));
@@ -44,7 +45,7 @@ public class LegacyKeyringImpl_GetTest extends BaseLegacyKeyringTest{
                 .thenReturn(null);
 
         // When get is called
-        KeyringException ex = assertThrows(KeyringException.class, () -> legacyKeyring.get(bert, null));
+        KeyringException ex = assertThrows(KeyringException.class, () -> legacyCollectionKeyring.get(bert, null));
 
         // Then an exception is thrown.
         assertThat(ex.getMessage(), equalTo(EMAIL_EMPTY_ERR));
@@ -57,7 +58,7 @@ public class LegacyKeyringImpl_GetTest extends BaseLegacyKeyringTest{
                 .thenReturn("");
 
         // When get is called
-        KeyringException ex = assertThrows(KeyringException.class, () -> legacyKeyring.get(bert, null));
+        KeyringException ex = assertThrows(KeyringException.class, () -> legacyCollectionKeyring.get(bert, null));
 
         // Then an exception is thrown.
         assertThat(ex.getMessage(), equalTo(EMAIL_EMPTY_ERR));
@@ -68,7 +69,7 @@ public class LegacyKeyringImpl_GetTest extends BaseLegacyKeyringTest{
         // Given collection is null
 
         // When get is called
-        KeyringException ex = assertThrows(KeyringException.class, () -> legacyKeyring.get(bert, null));
+        KeyringException ex = assertThrows(KeyringException.class, () -> legacyCollectionKeyring.get(bert, null));
 
         // Then an exception is thrown.
         assertThat(ex.getMessage(), equalTo(COLLECTION_NULL_ERR));
@@ -81,7 +82,7 @@ public class LegacyKeyringImpl_GetTest extends BaseLegacyKeyringTest{
                 .thenReturn(null);
 
         // When get is called
-        KeyringException ex = assertThrows(KeyringException.class, () -> legacyKeyring.get(bert, collection));
+        KeyringException ex = assertThrows(KeyringException.class, () -> legacyCollectionKeyring.get(bert, collection));
 
         // Then an exception is thrown.
         assertThat(ex.getMessage(), equalTo(COLLECTION_DESC_NULL_ERR));
@@ -94,7 +95,7 @@ public class LegacyKeyringImpl_GetTest extends BaseLegacyKeyringTest{
                 .thenReturn(null);
 
         // When get is called
-        KeyringException ex = assertThrows(KeyringException.class, () -> legacyKeyring.get(bert, collection));
+        KeyringException ex = assertThrows(KeyringException.class, () -> legacyCollectionKeyring.get(bert, collection));
 
         // Then an exception is thrown.
         assertThat(ex.getMessage(), equalTo(COLLECTION_ID_EMPTY_ERR));
@@ -107,7 +108,7 @@ public class LegacyKeyringImpl_GetTest extends BaseLegacyKeyringTest{
                 .thenReturn("");
 
         // When get is called
-        KeyringException ex = assertThrows(KeyringException.class, () -> legacyKeyring.get(bert, collection));
+        KeyringException ex = assertThrows(KeyringException.class, () -> legacyCollectionKeyring.get(bert, collection));
 
         // Then an exception is thrown.
         assertThat(ex.getMessage(), equalTo(COLLECTION_ID_EMPTY_ERR));
@@ -120,7 +121,8 @@ public class LegacyKeyringImpl_GetTest extends BaseLegacyKeyringTest{
                 .thenThrow(IOException.class);
 
         // When get is called
-        KeyringException actual = assertThrows(KeyringException.class, () -> legacyKeyring.get(bert, collection));
+        KeyringException actual = assertThrows(KeyringException.class,
+                () -> legacyCollectionKeyring.get(bert, collection));
 
         // Then null is returned
         assertThat(actual.getMessage(), equalTo(CACHE_GET_ERR));
@@ -134,7 +136,7 @@ public class LegacyKeyringImpl_GetTest extends BaseLegacyKeyringTest{
                 .thenReturn(null);
 
         // When get is called
-        SecretKey actual = legacyKeyring.get(bert, collection);
+        SecretKey actual = legacyCollectionKeyring.get(bert, collection);
 
         // Then null is returned
         assertThat(actual, is(nullValue()));
@@ -148,7 +150,7 @@ public class LegacyKeyringImpl_GetTest extends BaseLegacyKeyringTest{
                 .thenReturn(false);
 
         // When get is called
-        SecretKey actual = legacyKeyring.get(bert, collection);
+        SecretKey actual = legacyCollectionKeyring.get(bert, collection);
 
         // Then null is returned
         assertThat(actual, is(nullValue()));
@@ -163,7 +165,7 @@ public class LegacyKeyringImpl_GetTest extends BaseLegacyKeyringTest{
                 .thenReturn(null);
 
         // When get is called
-        SecretKey actual = legacyKeyring.get(ernie, collection);
+        SecretKey actual = legacyCollectionKeyring.get(ernie, collection);
 
         // Then null is returned
         assertThat(actual, is(nullValue()));
@@ -180,7 +182,7 @@ public class LegacyKeyringImpl_GetTest extends BaseLegacyKeyringTest{
                 .thenReturn(secretKey);
 
         // When get is called
-        SecretKey actual = legacyKeyring.get(bert, collection);
+        SecretKey actual = legacyCollectionKeyring.get(bert, collection);
 
         // Then the expected key is returned
         assertThat(actual, equalTo(secretKey));

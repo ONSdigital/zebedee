@@ -7,7 +7,7 @@ import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.AdminOptions;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.Credentials;
-import com.github.onsdigital.zebedee.keyring.Keyring;
+import com.github.onsdigital.zebedee.keyring.CollectionKeyring;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.Collections;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
@@ -63,13 +63,13 @@ public class UsersServiceImpl implements UsersService {
      * - This is Zebedee.
      * - This was a quick & reasonably clean way to solve this issue.
      */
-    private Supplier<Keyring> keyringSupplier;
+    private Supplier<CollectionKeyring> keyringSupplier;
 
     /**
      * Get a singleton instance of {@link UsersServiceImpl}.
      */
     public static UsersService getInstance(UserStore userStore, Collections collections,
-                                           PermissionsService permissionsService, Supplier<Keyring> keyringSupplier) {
+                                           PermissionsService permissionsService, Supplier<CollectionKeyring> keyringSupplier) {
         if (INSTANCE == null) {
             synchronized (MUTEX) {
                 if (INSTANCE == null) {
@@ -85,7 +85,7 @@ public class UsersServiceImpl implements UsersService {
      * singleton instance.
      */
     UsersServiceImpl(UserStore userStore, Collections collections, PermissionsService permissionsService,
-                     Supplier<Keyring> keyringSupplier) {
+                     Supplier<CollectionKeyring> keyringSupplier) {
         this.permissionsService = permissionsService;
         this.collections = collections;
         this.keyringSupplier = keyringSupplier;

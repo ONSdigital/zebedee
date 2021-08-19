@@ -8,7 +8,7 @@ import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
-import com.github.onsdigital.zebedee.keyring.Keyring;
+import com.github.onsdigital.zebedee.keyring.CollectionKeyring;
 import com.github.onsdigital.zebedee.keyring.KeyringException;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
@@ -59,7 +59,7 @@ public class ZebedeeCollectionReaderTest extends ZebedeeTestBaseFixture {
     private PermissionsService permissionsService;
 
     @Mock
-    private Keyring keyring;
+    private CollectionKeyring keyring;
 
     @Mock
     private Collection collection;

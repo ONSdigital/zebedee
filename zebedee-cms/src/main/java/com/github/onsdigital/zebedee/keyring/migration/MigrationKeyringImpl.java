@@ -1,6 +1,8 @@
-package com.github.onsdigital.zebedee.keyring;
+package com.github.onsdigital.zebedee.keyring.migration;
 
 import com.github.onsdigital.zebedee.json.CollectionDescription;
+import com.github.onsdigital.zebedee.keyring.CollectionKeyring;
+import com.github.onsdigital.zebedee.keyring.KeyringException;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.user.model.User;
 
@@ -15,13 +17,13 @@ import static java.text.MessageFormat.format;
 /**
  * KeyringMigrator serves 2 purposes:
  * <ul>
- *     <li>It uses a feature flag to determine which {@link Keyring} implementation to use (legacy or new central).</li>
+ *     <li>It uses a feature flag to determine which {@link CollectionKeyring} implementation to use (legacy or new central).</li>
  *     <li>If the central keyring feature is disabled keys are read from the legacy keyring but adds/removes are
  *     applied to both legacy and central keyrings. This enables us to migrate smoothly from the old keyring
  *     without losing any keys.</li>
  * </ul>
  */
-public class KeyringMigratorImpl implements Keyring {
+public class MigrationKeyringImpl implements CollectionKeyring {
 
     static final String WRAPPED_ERR_FMT = "{0}: Migration enabled: {1}";
     static final String MIGRATE_ENABLED = "migration_enabled";
@@ -39,28 +41,29 @@ public class KeyringMigratorImpl implements Keyring {
     static final String UNLOCK_KEYRING_ERR = "error while attempting to unlock user kerying";
 
     private boolean migrationEnabled;
-    private Keyring legacyKeyring;
-    private Keyring centralKeyring;
+    private CollectionKeyring legacyCollectionKeyring;
+    private CollectionKeyring collectionKeyring;
 
     /**
      * Construct a new instance of the Keyring.
      *
      * @param migrationEnabled if true uses the new central keyring implementation. Otherwise uses legacy keyring
      *                         implemenation for reads. (Writes/Deletes will be applied to both).
-     * @param legacyKeyring    the legacy keyring implementation to use.
-     * @param centralKeyring   the new central keyring implementation to use.
+     * @param legacyCollectionKeyring    the legacy keyring implementation to use.
+     * @param collectionKeyring   the new central keyring implementation to use.
      */
-    public KeyringMigratorImpl(final boolean migrationEnabled, final Keyring legacyKeyring, final Keyring centralKeyring) {
+    public MigrationKeyringImpl(final boolean migrationEnabled, final CollectionKeyring legacyCollectionKeyring,
+                                final CollectionKeyring collectionKeyring) {
         this.migrationEnabled = migrationEnabled;
-        this.legacyKeyring = legacyKeyring;
-        this.centralKeyring = centralKeyring;
+        this.legacyCollectionKeyring = legacyCollectionKeyring;
+        this.collectionKeyring = collectionKeyring;
     }
 
     @Override
     public void cacheKeyring(User user) throws KeyringException {
         try {
-            legacyKeyring.cacheKeyring(user);
-            centralKeyring.cacheKeyring(user);
+            legacyCollectionKeyring.cacheKeyring(user);
+            collectionKeyring.cacheKeyring(user);
         } catch (KeyringException ex) {
             throw wrappedKeyringException(ex, POPULATE_FROM_USER_ERR);
         }
@@ -100,23 +103,24 @@ public class KeyringMigratorImpl implements Keyring {
         }
 
         // try removing from the new keyring implementation first.
-        removeFromKeyring(centralKeyring, user, collection);
+        removeFromKeyring(collectionKeyring, user, collection);
 
         // Remove from the legacy keyring.
         try {
-            removeFromKeyring(legacyKeyring, user, collection);
+            removeFromKeyring(legacyCollectionKeyring, user, collection);
         } catch (KeyringException ex) {
 
             // Remove failed so attempt rollback. If successful throw original exception otherwise throw the
             // failed rollback exception.
-            Rollback rb = () -> centralKeyring.add(user, collection, backUp);
+            Rollback rb = () -> collectionKeyring.add(user, collection, backUp);
             attemptRollback(rb, user, collection, REMOVE_KEY);
 
             throw ex;
         }
     }
 
-    private void removeFromKeyring(Keyring instance, User user, Collection collection) throws KeyringException {
+    private void removeFromKeyring(CollectionKeyring instance, User user, Collection collection)
+            throws KeyringException {
         try {
             instance.remove(user, collection);
         } catch (KeyringException ex) {
@@ -150,23 +154,23 @@ public class KeyringMigratorImpl implements Keyring {
     @Override
     public void add(User user, Collection collection, SecretKey key) throws KeyringException {
         // try adding the key to the legacy keyring
-        addToKeyring(legacyKeyring, user, collection, key);
+        addToKeyring(legacyCollectionKeyring, user, collection, key);
 
         // Try adding the key to the central keyring
         try {
-            addToKeyring(centralKeyring, user, collection, key);
+            addToKeyring(collectionKeyring, user, collection, key);
         } catch (KeyringException ex) {
 
             // Add failed so attemp to rollback. If rollback fails throw rollback failed exception otherwise throw
             // the original exception
-            Rollback rb = () -> legacyKeyring.remove(user, collection);
+            Rollback rb = () -> legacyCollectionKeyring.remove(user, collection);
             attemptRollback(rb, user, collection, ADD_KEY);
 
             throw ex;
         }
     }
 
-    private void addToKeyring(Keyring instance, User user, Collection collection, SecretKey key)
+    private void addToKeyring(CollectionKeyring instance, User user, Collection collection, SecretKey key)
             throws KeyringException {
         try {
             instance.add(user, collection, key);
@@ -194,7 +198,7 @@ public class KeyringMigratorImpl implements Keyring {
         try {
             // The central keyring does not need to be unlocked. While migrating we only need to unlock the legacy
             // keyring.
-            legacyKeyring.unlock(user, password);
+            legacyCollectionKeyring.unlock(user, password);
         } catch (KeyringException ex) {
             throw wrappedKeyringException(ex, UNLOCK_KEYRING_ERR);
         }
@@ -202,30 +206,30 @@ public class KeyringMigratorImpl implements Keyring {
 
     @Override
     public void assignTo(User src, User target, List<CollectionDescription> assignments) throws KeyringException {
-        legacyKeyring.assignTo(src, target, assignments);
+        legacyCollectionKeyring.assignTo(src, target, assignments);
     }
 
     @Override
     public void assignTo(User src, User target, CollectionDescription... assignments) throws KeyringException {
-        legacyKeyring.assignTo(src, target, assignments);
+        legacyCollectionKeyring.assignTo(src, target, assignments);
     }
 
     @Override
     public void revokeFrom(User target, List<CollectionDescription> removals) throws KeyringException {
-        legacyKeyring.revokeFrom(target, removals);
+        legacyCollectionKeyring.revokeFrom(target, removals);
     }
 
     @Override
     public void revokeFrom(User target, CollectionDescription... removals) throws KeyringException {
-        legacyKeyring.revokeFrom(target, removals);
+        legacyCollectionKeyring.revokeFrom(target, removals);
     }
 
-    private Keyring getKeyring() {
+    private CollectionKeyring getKeyring() {
         if (migrationEnabled) {
-            return centralKeyring;
+            return collectionKeyring;
         }
 
-        return legacyKeyring;
+        return legacyCollectionKeyring;
     }
 
     /**

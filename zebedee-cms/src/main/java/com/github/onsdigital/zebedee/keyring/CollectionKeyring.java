@@ -8,7 +8,7 @@ import javax.crypto.SecretKey;
 import java.util.List;
 import java.util.Set;
 
-public interface Keyring {
+public interface CollectionKeyring {
 
     /**
      * Populate the Keyring from an unlocked {@link User#keyring()}

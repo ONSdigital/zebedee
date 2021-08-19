@@ -12,14 +12,13 @@ import com.github.onsdigital.zebedee.exceptions.CollectionNotFoundException;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.Credentials;
 import com.github.onsdigital.zebedee.json.serialiser.IsoDateSerializer;
-import com.github.onsdigital.zebedee.keyring.Keyring;
+import com.github.onsdigital.zebedee.keyring.CollectionKeyring;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.PathUtils;
 import com.github.onsdigital.zebedee.permissions.model.AccessMapping;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.teams.model.Team;
 import com.github.onsdigital.zebedee.user.model.User;
-import com.github.onsdigital.zebedee.util.slack.SlackNotifier;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.math3.distribution.NormalDistribution;
 import org.mockito.Mock;
@@ -51,7 +50,7 @@ public class Builder {
     public static final String COLLECTION_TWO_NAME = "labourmarketq22015";
 
     @Mock
-    private Keyring collectionKeyringMock;
+    private CollectionKeyring collectionKeyringMock;
 
     @Mock
     private SlackClient slackClient;

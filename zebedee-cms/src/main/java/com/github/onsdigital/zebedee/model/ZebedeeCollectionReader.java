@@ -4,6 +4,7 @@ import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
+import com.github.onsdigital.zebedee.keyring.CollectionKeyring;
 import com.github.onsdigital.zebedee.keyring.KeyringException;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
@@ -49,7 +50,7 @@ public class ZebedeeCollectionReader extends CollectionReader {
      * @param zebedee    a {@link Zebedee} to provide non-null
      *                   {@link com.github.onsdigital.zebedee.permissions.service.PermissionsService},
      *                   {@link com.github.onsdigital.zebedee.user.service.UsersService} &
-     *                   {@link com.github.onsdigital.zebedee.keyring.Keyring}.
+     *                   {@link CollectionKeyring}.
      * @param collection the {@link Collection} the reader will read the content from
      * @param session    the {@link Session} of the {@link User} who will use the reader.
      * @throws IOException           problem creating the read.

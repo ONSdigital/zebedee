@@ -9,7 +9,7 @@ import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.PermissionDefinition;
-import com.github.onsdigital.zebedee.keyring.Keyring;
+import com.github.onsdigital.zebedee.keyring.CollectionKeyring;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.Collections;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
@@ -37,24 +37,24 @@ public class Permission {
     private Sessions sessionsService;
     private PermissionsService permissionsService;
     private UsersService usersService;
-    private Keyring keyring;
+    private CollectionKeyring collectionKeyring;
     private Collections collections;
 
     public Permission() {
         this.sessionsService = Root.zebedee.getSessions();
         this.permissionsService = Root.zebedee.getPermissionsService();
         this.usersService = Root.zebedee.getUsersService();
-        this.keyring = Root.zebedee.getCollectionKeyring();
+        this.collectionKeyring = Root.zebedee.getCollectionKeyring();
         this.collections = Root.zebedee.getCollections();
     }
 
     Permission(final Sessions sessionsService, PermissionsService permissionsService, UsersService usersService,
-               Collections collections, Keyring keyring) {
+               Collections collections, CollectionKeyring collectionKeyring) {
         this.sessionsService = sessionsService;
         this.permissionsService = permissionsService;
         this.usersService = usersService;
         this.collections = collections;
-        this.keyring = keyring;
+        this.collectionKeyring = collectionKeyring;
     }
 
     /**
@@ -73,8 +73,8 @@ public class Permission {
      * @throws BadRequestException   If the user specified in the {@link PermissionDefinition} is not found.
      */
     @POST
-    public String grantPermission(HttpServletRequest request, HttpServletResponse response, PermissionDefinition permissionDefinition)
-            throws IOException, ZebedeeException {
+    public String grantPermission(HttpServletRequest request, HttpServletResponse response,
+                                  PermissionDefinition permissionDefinition) throws IOException, ZebedeeException {
 
         Session session = getSession(request);
 
@@ -201,8 +201,8 @@ public class Permission {
             }
         }
 
-        keyring.revokeFrom(targetUser, removals);
-        keyring.assignTo(srcUser, targetUser, assignments);
+        collectionKeyring.revokeFrom(targetUser, removals);
+        collectionKeyring.assignTo(srcUser, targetUser, assignments);
     }
 
     private Collections.CollectionList listCollections() throws InternalServerError {

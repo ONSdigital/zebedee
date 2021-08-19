@@ -4,7 +4,7 @@ import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
-import com.github.onsdigital.zebedee.keyring.Keyring;
+import com.github.onsdigital.zebedee.keyring.CollectionKeyring;
 import com.github.onsdigital.zebedee.keyring.KeyringException;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.session.model.Session;
@@ -50,7 +50,7 @@ public class ZebedeeCollectionWriterTest {
     private UsersService usersService;
 
     @Mock
-    private Keyring keyring;
+    private CollectionKeyring collectionKeyring;
 
     @Mock
     private Collection collection;
@@ -82,7 +82,7 @@ public class ZebedeeCollectionWriterTest {
                 .thenReturn(usersService);
 
         when(zebedee.getCollectionKeyring())
-                .thenReturn(keyring);
+                .thenReturn(collectionKeyring);
 
         when(collection.getDescription())
                 .thenReturn(description);
@@ -93,7 +93,7 @@ public class ZebedeeCollectionWriterTest {
         when(usersService.getUserByEmail(EMAIL))
                 .thenReturn(user);
 
-        when(keyring.get(user, collection))
+        when(collectionKeyring.get(user, collection))
                 .thenReturn(key);
 
         when(session.getEmail())
@@ -207,7 +207,7 @@ public class ZebedeeCollectionWriterTest {
 
     @Test
     public void testNew_getKeyThrowsException_shouldThrowException() throws Exception {
-        when(keyring.get(user, collection))
+        when(collectionKeyring.get(user, collection))
                 .thenThrow(KeyringException.class);
 
         IOException ex = assertThrows(IOException.class,
@@ -215,12 +215,12 @@ public class ZebedeeCollectionWriterTest {
 
         verify(permissionsService, times(1)).canEdit(session);
         verify(usersService, times(1)).getUserByEmail(EMAIL);
-        verify(keyring, times(1)).get(user, collection);
+        verify(collectionKeyring, times(1)).get(user, collection);
     }
 
     @Test
     public void testNew_getKeyReturnsNull_shouldThrowException() throws Exception {
-        when(keyring.get(user, collection))
+        when(collectionKeyring.get(user, collection))
                 .thenReturn(null);
 
         UnauthorizedException ex = assertThrows(UnauthorizedException.class,
@@ -229,6 +229,6 @@ public class ZebedeeCollectionWriterTest {
         assertThat(ex.getMessage(), equalTo(COLLECTION_KEY_NULL_ERR));
         verify(permissionsService, times(1)).canEdit(session);
         verify(usersService, times(1)).getUserByEmail(EMAIL);
-        verify(keyring, times(1)).get(user, collection);
+        verify(collectionKeyring, times(1)).get(user, collection);
     }
 }

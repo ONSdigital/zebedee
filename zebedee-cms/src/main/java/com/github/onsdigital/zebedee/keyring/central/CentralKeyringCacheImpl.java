@@ -1,7 +1,9 @@
-package com.github.onsdigital.zebedee.keyring.cache;
+package com.github.onsdigital.zebedee.keyring.central;
 
+import com.github.onsdigital.zebedee.keyring.KeyringCache;
 import com.github.onsdigital.zebedee.keyring.KeyringException;
-import com.github.onsdigital.zebedee.keyring.store.KeyringStore;
+import com.github.onsdigital.zebedee.keyring.SchedulerKeyCache;
+import com.github.onsdigital.zebedee.keyring.KeyringStore;
 import liquibase.util.StringUtils;
 
 import javax.crypto.SecretKey;
@@ -26,7 +28,7 @@ import java.util.Set;
  * However if this does become an issue consider replacing the Hashmap with some type time based cache object to
  * automatically evicted after a duration of inactivity.
  */
-public class KeyringCacheImpl implements KeyringCache, SchedulerKeyCache {
+public class CentralKeyringCacheImpl implements KeyringCache, SchedulerKeyCache {
 
     static final String INVALID_COLLECTION_ID_ERR = "expected collection ID but was null or empty";
     static final String INVALID_SECRET_KEY_ERR = "expected secret key but was null";
@@ -43,20 +45,20 @@ public class KeyringCacheImpl implements KeyringCache, SchedulerKeyCache {
     private static KeyringCache INSTANCE = null;
 
     /**
-     * KeyringCache is a singleton instance. Use {@link KeyringCacheImpl#init(KeyringStore)} to initialise and
-     * {@link KeyringCacheImpl#getInstance()} to access the singleton.
+     * KeyringCache is a singleton instance. Use {@link CentralKeyringCacheImpl#init(KeyringStore)} to initialise and
+     * {@link CentralKeyringCacheImpl#getInstance()} to access the singleton.
      */
-    private KeyringCacheImpl() {
+    private CentralKeyringCacheImpl() {
         // private constructor to force use of static get instance method.
     }
 
     /**
-     * Create a new instance of the Keyring. Use {@link KeyringCacheImpl#init(KeyringStore)} to constuct a new
+     * Create a new instance of the Keyring. Use {@link CentralKeyringCacheImpl#init(KeyringStore)} to constuct a new
      * instance.
      *
      * @param keyStore {@link KeyringStore} to use to read/write entries to/from persistent storage.
      */
-    KeyringCacheImpl(final KeyringStore keyStore) throws KeyringException {
+    CentralKeyringCacheImpl(final KeyringStore keyStore) throws KeyringException {
         if (keyStore == null) {
             throw new KeyringException(KEYSTORE_NULL_ERR);
         }
@@ -66,7 +68,7 @@ public class KeyringCacheImpl implements KeyringCache, SchedulerKeyCache {
         this.load();
     }
 
-    KeyringCacheImpl(final KeyringStore keyStore, final Map<String, SecretKey> cache) {
+    CentralKeyringCacheImpl(final KeyringStore keyStore, final Map<String, SecretKey> cache) {
         this.keyStore = keyStore;
         this.cache = cache;
     }
@@ -218,9 +220,9 @@ public class KeyringCacheImpl implements KeyringCache, SchedulerKeyCache {
      */
     public static void init(KeyringStore keystore) throws KeyringException {
         if (INSTANCE == null) {
-            synchronized (KeyringCacheImpl.class) {
+            synchronized (CentralKeyringCacheImpl.class) {
                 if (INSTANCE == null) {
-                    INSTANCE = new KeyringCacheImpl(keystore);
+                    INSTANCE = new CentralKeyringCacheImpl(keystore);
                 }
             }
         }

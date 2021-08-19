@@ -5,7 +5,7 @@ import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.PermissionDefinition;
-import com.github.onsdigital.zebedee.keyring.Keyring;
+import com.github.onsdigital.zebedee.keyring.CollectionKeyring;
 import com.github.onsdigital.zebedee.keyring.KeyringException;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.Collections;
@@ -59,7 +59,7 @@ public class PermissionTest extends ZebedeeAPIBaseTestCase {
     private CollectionDescription collectionDescription;
 
     @Mock
-    private Keyring keyring;
+    private CollectionKeyring collectionKeyring;
 
     @Mock
     private User srcUser, targetUser;
@@ -94,7 +94,7 @@ public class PermissionTest extends ZebedeeAPIBaseTestCase {
         when(collections.list())
                 .thenReturn(collectionList);
 
-        when(keyring.get(any(), any()))
+        when(collectionKeyring.get(any(), any()))
                 .thenReturn(key);
 
         when(collectionMock.getDescription())
@@ -103,7 +103,7 @@ public class PermissionTest extends ZebedeeAPIBaseTestCase {
         permission = new PermissionDefinition();
         permission.setEmail(USER_EMAIL);
 
-        endpoint = new Permission(sessionsService, permissionsService, usersService, collections, keyring);
+        endpoint = new Permission(sessionsService, permissionsService, usersService, collections, collectionKeyring);
     }
 
     @Override
@@ -179,7 +179,7 @@ public class PermissionTest extends ZebedeeAPIBaseTestCase {
         verify(sessionsService, times(1)).get(mockRequest);
         verify(permissionsService, times(1)).addAdministrator(USER_EMAIL, session);
         verify(usersService, times(1)).getUserByEmail(TEST_EMAIL);
-        verifyZeroInteractions(keyring);
+        verifyZeroInteractions(collectionKeyring);
     }
 
     @Test
@@ -199,7 +199,7 @@ public class PermissionTest extends ZebedeeAPIBaseTestCase {
         verify(permissionsService, times(1)).addAdministrator(USER_EMAIL, session);
         verify(usersService, times(1)).getUserByEmail(TEST_EMAIL);
         verify(usersService, times(1)).getUserByEmail(USER_EMAIL);
-        verifyZeroInteractions(keyring);
+        verifyZeroInteractions(collectionKeyring);
     }
 
     @Test
@@ -216,7 +216,7 @@ public class PermissionTest extends ZebedeeAPIBaseTestCase {
         verify(sessionsService, times(1)).get(mockRequest);
         verify(permissionsService, times(1)).addAdministrator(USER_EMAIL, session);
         verify(collections, times(1)).list();
-        verifyZeroInteractions(keyring);
+        verifyZeroInteractions(collectionKeyring);
     }
 
     @Test
@@ -231,13 +231,13 @@ public class PermissionTest extends ZebedeeAPIBaseTestCase {
         verify(sessionsService, times(1)).get(mockRequest);
         verify(permissionsService, times(1)).addAdministrator(USER_EMAIL, session);
         verify(permissionsService, times(1)).canView(eq(targetUser), any());
-        verifyZeroInteractions(keyring);
+        verifyZeroInteractions(collectionKeyring);
     }
 
     @Test
     public void testGrant_addAdminRevokeFromToError_shouldThrowException() throws Exception {
         doThrow(KeyringException.class)
-                .when(keyring)
+                .when(collectionKeyring)
                 .revokeFrom(any(), any(List.class));
 
         permission.isAdmin(true);
@@ -248,7 +248,7 @@ public class PermissionTest extends ZebedeeAPIBaseTestCase {
         verify(permissionsService, times(1)).addAdministrator(USER_EMAIL, session);
         verify(permissionsService, times(1)).canView(eq(targetUser), any());
 
-        verify(keyring, times(1)).revokeFrom(eq(targetUser), removalsCaptor.capture());
+        verify(collectionKeyring, times(1)).revokeFrom(eq(targetUser), removalsCaptor.capture());
         List<CollectionDescription> removals = removalsCaptor.getValue();
         assertThat(removals, is(notNullValue()));
         assertThat(removals.size(), equalTo(1));
@@ -258,7 +258,7 @@ public class PermissionTest extends ZebedeeAPIBaseTestCase {
     @Test
     public void testGrant_addAdminAssignToError_shouldThrowException() throws Exception {
         doThrow(KeyringException.class)
-                .when(keyring)
+                .when(collectionKeyring)
                 .assignTo(any(User.class), any(User.class), any(List.class));
 
         when(permissionsService.canView(targetUser, collectionDescription))
@@ -272,12 +272,12 @@ public class PermissionTest extends ZebedeeAPIBaseTestCase {
         verify(permissionsService, times(1)).addAdministrator(USER_EMAIL, session);
         verify(permissionsService, times(1)).canView(eq(targetUser), any());
 
-        verify(keyring, times(1)).revokeFrom(eq(targetUser), removalsCaptor.capture());
+        verify(collectionKeyring, times(1)).revokeFrom(eq(targetUser), removalsCaptor.capture());
         List<CollectionDescription> removals = removalsCaptor.getValue();
         assertThat(removals, is(notNullValue()));
         assertTrue(removals.isEmpty());
 
-        verify(keyring, times(1)).assignTo(eq(srcUser), eq(targetUser), assignmentsCaptor.capture());
+        verify(collectionKeyring, times(1)).assignTo(eq(srcUser), eq(targetUser), assignmentsCaptor.capture());
         List<CollectionDescription> asssignments = assignmentsCaptor.getValue();
         assertThat(asssignments, is(notNullValue()));
         assertThat(asssignments.size(), equalTo(1));
@@ -297,12 +297,12 @@ public class PermissionTest extends ZebedeeAPIBaseTestCase {
         verify(permissionsService, times(1)).addAdministrator(USER_EMAIL, session);
         verify(permissionsService, times(1)).canView(eq(targetUser), any());
 
-        verify(keyring, times(1)).revokeFrom(eq(targetUser), removalsCaptor.capture());
+        verify(collectionKeyring, times(1)).revokeFrom(eq(targetUser), removalsCaptor.capture());
         List<CollectionDescription> removals = removalsCaptor.getValue();
         assertThat(removals, is(notNullValue()));
         assertTrue(removals.isEmpty());
 
-        verify(keyring, times(1)).assignTo(eq(srcUser), eq(targetUser), assignmentsCaptor.capture());
+        verify(collectionKeyring, times(1)).assignTo(eq(srcUser), eq(targetUser), assignmentsCaptor.capture());
         List<CollectionDescription> assignments = assignmentsCaptor.getValue();
         assertThat(assignments, is(notNullValue()));
         assertThat(assignments.size(), equalTo(1));
@@ -371,13 +371,13 @@ public class PermissionTest extends ZebedeeAPIBaseTestCase {
         verify(permissionsService, times(1)).removeEditor(USER_EMAIL, session);
         verify(permissionsService, times(1)).removeAdministrator(USER_EMAIL, session);
 
-        verify(keyring, times(1)).revokeFrom(eq(targetUser), removalsCaptor.capture());
+        verify(collectionKeyring, times(1)).revokeFrom(eq(targetUser), removalsCaptor.capture());
         List<CollectionDescription> removals = removalsCaptor.getValue();
         assertThat(removals, is(notNullValue()));
         assertThat(removals.size(), equalTo(1));
         assertThat(removals.get(0), equalTo(collectionDescription));
 
-        verify(keyring, times(1)).assignTo(eq(srcUser), eq(targetUser), assignmentsCaptor.capture());
+        verify(collectionKeyring, times(1)).assignTo(eq(srcUser), eq(targetUser), assignmentsCaptor.capture());
         List<CollectionDescription> asssignments = assignmentsCaptor.getValue();
         assertThat(asssignments, is(notNullValue()));
         assertThat(asssignments.size(), equalTo(0));

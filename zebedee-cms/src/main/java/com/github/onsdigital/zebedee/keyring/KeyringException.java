@@ -1,7 +1,5 @@
 package com.github.onsdigital.zebedee.keyring;
 
-import com.github.onsdigital.zebedee.keyring.cache.KeyringCache;
-
 import java.io.IOException;
 
 /**

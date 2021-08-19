@@ -10,7 +10,7 @@ import com.github.onsdigital.zebedee.exceptions.InternalServerError;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
-import com.github.onsdigital.zebedee.keyring.Keyring;
+import com.github.onsdigital.zebedee.keyring.CollectionKeyring;
 import com.github.onsdigital.zebedee.model.Collections;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.session.model.Session;
@@ -54,7 +54,7 @@ public class Teams {
     private TeamsService teamsService;
     private PermissionsService permissionsService;
     private Collections collectionsService;
-    private Keyring keyring;
+    private CollectionKeyring collectionKeyring;
     private UsersService usersService;
 
     /**
@@ -65,7 +65,7 @@ public class Teams {
         this.teamsService = Root.zebedee.getTeamsService();
         this.permissionsService = Root.zebedee.getPermissionsService();
         this.collectionsService = Root.zebedee.getCollections();
-        this.keyring = Root.zebedee.getCollectionKeyring();
+        this.collectionKeyring = Root.zebedee.getCollectionKeyring();
         this.usersService = Root.zebedee.getUsersService();
     }
 
@@ -76,12 +76,12 @@ public class Teams {
      */
     public Teams(final Sessions sessionsService, final TeamsService teamsService,
                  final PermissionsService permissionsService, final Collections collectionsService,
-                 final Keyring keyring, final UsersService usersService) {
+                 final CollectionKeyring collectionKeyring, final UsersService usersService) {
         this.sessionsService = sessionsService;
         this.teamsService = teamsService;
         this.permissionsService = permissionsService;
         this.collectionsService = collectionsService;
-        this.keyring = keyring;
+        this.collectionKeyring = collectionKeyring;
         this.usersService = usersService;
     }
 
@@ -140,7 +140,7 @@ public class Teams {
 
         User src = getUser(usersService, session.getEmail());
         User target = getUser(usersService, email);
-        keyring.assignTo(src, target, getCollectionsAccessibleByTeam(team));
+        collectionKeyring.assignTo(src, target, getCollectionsAccessibleByTeam(team));
 
         Audit.Event.TEAM_MEMBER_ADDED
                 .parameters()
@@ -185,7 +185,7 @@ public class Teams {
 
         List<CollectionDescription> removals = getCollectionsAccessibleByTeam(team);
         for (String member : team.getMembers()) {
-            keyring.revokeFrom(getUser(usersService, member), removals);
+            collectionKeyring.revokeFrom(getUser(usersService, member), removals);
         }
 
         teamsService.deleteTeam(team, session);
@@ -213,7 +213,7 @@ public class Teams {
         if (!permissionsService.isAdministrator(email) && !permissionsService.isPublisher(email)) {
             List<CollectionDescription> accessToRemove = getCollectionsAccessibleByTeam(team);
             User user = getUser(usersService, email);
-            keyring.revokeFrom(user, accessToRemove);
+            collectionKeyring.revokeFrom(user, accessToRemove);
         }
 
         Audit.Event.TEAM_MEMBER_REMOVED

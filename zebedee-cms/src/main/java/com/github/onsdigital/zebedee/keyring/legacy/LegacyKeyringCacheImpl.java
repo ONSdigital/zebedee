@@ -1,16 +1,18 @@
 package com.github.onsdigital.zebedee.keyring.legacy;
 
+import com.github.onsdigital.zebedee.keyring.KeyringCache;
 import com.github.onsdigital.zebedee.keyring.KeyringException;
-import com.github.onsdigital.zebedee.keyring.SchedulerKeyCache;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.crypto.SecretKey;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Encapsulate legacy scheduler cache implementation behind interface.
  */
-public class LegacySchedulerKeyCacheImpl implements SchedulerKeyCache {
+public class LegacyKeyringCacheImpl implements KeyringCache {
 
     static final String COLLECTION_ID_EMPTY = "collection ID required but was null/empty";
     static final String SECRET_KEY_EMPTY = "secret key required but was null";
@@ -22,14 +24,14 @@ public class LegacySchedulerKeyCacheImpl implements SchedulerKeyCache {
      *
      * @param cache the {@link ConcurrentHashMap} to use for the internal cache.
      */
-    LegacySchedulerKeyCacheImpl(final ConcurrentHashMap<String, SecretKey> cache) {
+    LegacyKeyringCacheImpl(final ConcurrentHashMap<String, SecretKey> cache) {
         this.cache = cache;
     }
 
     /**
      * Construct a new LegacySchedulerKeyringCache with the default configuration.
      */
-    public LegacySchedulerKeyCacheImpl() {
+    public LegacyKeyringCacheImpl() {
         this.cache = new ConcurrentHashMap<>();
     }
 
@@ -53,5 +55,26 @@ public class LegacySchedulerKeyCacheImpl implements SchedulerKeyCache {
         }
 
         cache.put(collectionID, key);
+    }
+
+    @Override
+    public void load() throws KeyringException {
+        // Load only applies to new keyring implementation. Load should never be invoked unless the new keyring
+        // feature flag is enabled - throw an exception here to flag up something is wrong.
+        throw new UnsupportedOperationException("LegacyKeyringCacheImpl does not support load");
+    }
+
+    @Override
+    public void remove(String collectionID) throws KeyringException {
+        this.cache.remove(collectionID);
+    }
+
+    @Override
+    public Set<String> list() throws KeyringException {
+        if (cache == null) {
+            return new HashSet<>();
+        }
+
+        return cache.keySet();
     }
 }

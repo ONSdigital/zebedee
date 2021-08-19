@@ -14,13 +14,10 @@ import com.github.onsdigital.zebedee.keyring.Keyring;
 import com.github.onsdigital.zebedee.keyring.KeyringCache;
 import com.github.onsdigital.zebedee.keyring.KeyringException;
 import com.github.onsdigital.zebedee.keyring.KeyringStore;
-import com.github.onsdigital.zebedee.keyring.SchedulerKeyCache;
-import com.github.onsdigital.zebedee.keyring.cache.MigrationSchedulerKeyCache;
 import com.github.onsdigital.zebedee.keyring.central.CentralKeyringCacheImpl;
 import com.github.onsdigital.zebedee.keyring.central.CentralKeyringImpl;
 import com.github.onsdigital.zebedee.keyring.central.CentralKeyringStoreImpl;
 import com.github.onsdigital.zebedee.keyring.legacy.LegacyKeyringImpl;
-import com.github.onsdigital.zebedee.keyring.legacy.LegacySchedulerKeyCacheImpl;
 import com.github.onsdigital.zebedee.keyring.migration.MigrationKeyringImpl;
 import com.github.onsdigital.zebedee.model.Collections;
 import com.github.onsdigital.zebedee.model.Content;
@@ -130,7 +127,7 @@ public class ZebedeeConfiguration {
     private ImageService imageService;
     private KafkaService kafkaService;
     private Keyring collectionKeyring;
-    private SchedulerKeyCache schedulerKeyCache;
+    private KeyringCache schedulerCache;
     private EncryptionKeyFactory encryptionKeyFactory;
     private StartUpAlerter startUpAlerter;
     private Notifier slackNotifier;
@@ -256,7 +253,7 @@ public class ZebedeeConfiguration {
 
     /**
      * Configure the CMS to use the "migration" implementations of the {@link Keyring}, {@link KeyringCache} and
-     * {@link SchedulerKeyCache}. These are wrapper classes around the new/legacy implementations which will run both in
+     * {@link SchedulerCache}. These are wrapper classes around the new/legacy implementations which will run both in
      * parallel. This enables to smoothly and gradually transition to the new central keyring implementation while
      * maintain backward compatibility.
      * <p>
@@ -270,14 +267,14 @@ public class ZebedeeConfiguration {
         CentralKeyringCacheImpl.init(centralKeyStore);
         KeyringCache centralKeyringCache = CentralKeyringCacheImpl.getInstance();
 
-        this.schedulerKeyCache = new MigrationSchedulerKeyCache(
-                new LegacySchedulerKeyCacheImpl(), centralKeyringCache, true);
+        this.schedulerCache = null;
+        //new MigrationKeyringCacheImpl(new LegacyKeyringCacheImpl(), centralKeyringCache, true);
 
         this.legacyKeyringCache = new com.github.onsdigital.zebedee.model.KeyringCache(
-                this.sessions, this.schedulerKeyCache);
+                this.sessions, this.schedulerCache);
 
         Keyring legacyKeyring = new LegacyKeyringImpl(
-                sessions, usersService, permissionsService, legacyKeyringCache, schedulerKeyCache);
+                sessions, usersService, permissionsService, legacyKeyringCache, schedulerCache);
 
         CentralKeyringImpl.init(centralKeyringCache, permissionsService, collections);
         Keyring centralKeyring = CentralKeyringImpl.getInstance();
@@ -286,17 +283,17 @@ public class ZebedeeConfiguration {
     }
 
     /**
-     * Configure the CMS to use the legacy {@link Keyring}, {@link KeyringCache} and {@link SchedulerKeyCache}
+     * Configure the CMS to use the legacy {@link Keyring}, {@link KeyringCache} and {@link SchedulerCache}
      * implementations.
      */
     private void initLegacyKeyring() {
-        this.schedulerKeyCache = new LegacySchedulerKeyCacheImpl();
+        this.schedulerCache = null;// new LegacyKeyringCacheImpl();
 
         this.legacyKeyringCache = new com.github.onsdigital.zebedee.model.KeyringCache(
-                this.sessions, this.schedulerKeyCache);
+                this.sessions, this.schedulerCache);
 
         this.collectionKeyring = new LegacyKeyringImpl(
-                sessions, usersService, permissionsService, legacyKeyringCache, schedulerKeyCache);
+                sessions, usersService, permissionsService, legacyKeyringCache, schedulerCache);
     }
 
     private StartUpAlerter initStartUpAlerter() {
@@ -464,8 +461,8 @@ public class ZebedeeConfiguration {
         return this.encryptionKeyFactory;
     }
 
-    public SchedulerKeyCache getSchedulerKeyringCache() {
-        return this.schedulerKeyCache;
+    public KeyringCache getSchedulerCache() {
+        return this.schedulerCache;
     }
 
     private Path createDir(Path root, String dirName) throws IOException {

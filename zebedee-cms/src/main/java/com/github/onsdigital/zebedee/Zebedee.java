@@ -1,6 +1,5 @@
 package com.github.onsdigital.zebedee;
 
-import com.github.onsdigital.slack.client.SlackClient;
 import com.github.onsdigital.zebedee.data.processing.DataIndex;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedException;
@@ -9,7 +8,6 @@ import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.Credentials;
 import com.github.onsdigital.zebedee.keyring.Keyring;
 import com.github.onsdigital.zebedee.keyring.KeyringException;
-import com.github.onsdigital.zebedee.keyring.SchedulerKeyCache;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.Collections;
 import com.github.onsdigital.zebedee.model.Content;
@@ -29,7 +27,6 @@ import com.github.onsdigital.zebedee.teams.service.TeamsService;
 import com.github.onsdigital.zebedee.user.model.User;
 import com.github.onsdigital.zebedee.user.service.UsersService;
 import com.github.onsdigital.zebedee.util.slack.Notifier;
-import com.github.onsdigital.zebedee.util.slack.SlackNotifier;
 import com.github.onsdigital.zebedee.util.slack.StartUpAlerter;
 import com.github.onsdigital.zebedee.verification.VerificationAgent;
 
@@ -76,7 +73,7 @@ public class Zebedee {
     private final Collections collections;
     private final Content published;
     private final KeyringCache legacyKeyringCache;
-    private final SchedulerKeyCache schedulerKeyCache;
+    private final com.github.onsdigital.zebedee.keyring.KeyringCache schedulerCache;
     private final Path publishedContentPath;
     private final Path path;
     private final PermissionsService permissionsService;
@@ -104,7 +101,7 @@ public class Zebedee {
         this.publishedContentPath = cfg.getPublishedContentPath();
         this.sessions = cfg.getSessions();
         this.legacyKeyringCache = cfg.getKeyringCache();
-        this.schedulerKeyCache = cfg.getSchedulerKeyringCache();
+        this.schedulerCache = cfg.getSchedulerCache();
         this.permissionsService = cfg.getPermissionsService();
         this.published = cfg.getPublished();
         this.dataIndex = cfg.getDataIndex();
@@ -374,8 +371,8 @@ public class Zebedee {
         return this.legacyKeyringCache;
     }
 
-    public SchedulerKeyCache getSchedulerKeyCache() {
-        return this.schedulerKeyCache;
+    public com.github.onsdigital.zebedee.keyring.KeyringCache getSchedulerCache() {
+        return this.schedulerCache;
     }
 
     public Sessions getSessions() {

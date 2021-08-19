@@ -4,7 +4,6 @@ import com.github.onsdigital.zebedee.keyring.KeyNotFoundException;
 import com.github.onsdigital.zebedee.keyring.KeyringCache;
 import com.github.onsdigital.zebedee.keyring.KeyringException;
 import com.github.onsdigital.zebedee.keyring.KeyringStore;
-import com.github.onsdigital.zebedee.keyring.SchedulerKeyCache;
 import liquibase.util.StringUtils;
 
 import javax.crypto.SecretKey;
@@ -29,7 +28,7 @@ import java.util.Set;
  * However if this does become an issue consider replacing the Hashmap with some type time based cache object to
  * automatically evicted after a duration of inactivity.
  */
-public class CentralKeyringCacheImpl implements KeyringCache, SchedulerKeyCache {
+public class CentralKeyringCacheImpl implements KeyringCache {
 
     static final String INVALID_COLLECTION_ID_ERR = "expected collection ID but was null or empty";
     static final String INVALID_SECRET_KEY_ERR = "expected secret key but was null";

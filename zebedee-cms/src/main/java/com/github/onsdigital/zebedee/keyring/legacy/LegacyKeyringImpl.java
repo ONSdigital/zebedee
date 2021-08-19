@@ -3,7 +3,6 @@ package com.github.onsdigital.zebedee.keyring.legacy;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.keyring.Keyring;
 import com.github.onsdigital.zebedee.keyring.KeyringException;
-import com.github.onsdigital.zebedee.keyring.SchedulerKeyCache;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.KeyringCache;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
@@ -59,22 +58,34 @@ public class LegacyKeyringImpl implements Keyring {
     private Sessions sessions;
     private UsersService usersService;
     private PermissionsService permissions;
-    private KeyringCache cache;
-    private SchedulerKeyCache schedulerKeyCache;
+
+    /**
+     * Cache of User keyrings. When a users authenticates successfully their keyring is unlocked and added to the
+     * cache. Entries can then be retrieved later without requiring the user's credentials each time.
+     */
+    private KeyringCache legacyUserKeyringCache;
+
+    /**
+     * The publishing scheduler key cache. When a scheduled publish is in progress the CMS uses this cache get the
+     * encryption key for the collection being published. This cache allows the service to get keys without user
+     * details being present.
+     */
+    private com.github.onsdigital.zebedee.keyring.KeyringCache schedulerCache;
 
     /**
      * Construct a new instance of the Legacy keyring.
      *
      * @param sessions the {@link Sessions} service to use.
-     * @param cache    the {@link KeyringCache} to use.
+     * @param legacyUserKeyringCache    the {@link KeyringCache} to use.
      */
-    public LegacyKeyringImpl(final Sessions sessions, final UsersService usersService, PermissionsService permissions,
-                             final KeyringCache cache, final SchedulerKeyCache schedulerKeyCache) {
+    public LegacyKeyringImpl(final Sessions sessions, final UsersService usersService,
+                             PermissionsService permissions, final KeyringCache legacyUserKeyringCache,
+                             final com.github.onsdigital.zebedee.keyring.KeyringCache schedulerCache) {
         this.sessions = sessions;
         this.usersService = usersService;
         this.permissions = permissions;
-        this.cache = cache;
-        this.schedulerKeyCache = schedulerKeyCache;
+        this.legacyUserKeyringCache = legacyUserKeyringCache;
+        this.schedulerCache = schedulerCache;
     }
 
     /**
@@ -107,7 +118,7 @@ public class LegacyKeyringImpl implements Keyring {
 
     private void addUserKeyringToCache(User user, Session session) throws KeyringException {
         try {
-            cache.put(user, session);
+            legacyUserKeyringCache.put(user, session);
         } catch (IOException ex) {
             throw new KeyringException(CACHE_PUT_ERR, ex);
         }
@@ -192,7 +203,7 @@ public class LegacyKeyringImpl implements Keyring {
         validateCollection(collection);
         validateSecretKey(key);
 
-        schedulerKeyCache.add(collection.getDescription().getId(), key);
+        schedulerCache.add(collection.getDescription().getId(), key);
 
         List<User> assignments = getKeyRecipients(collection);
         List<User> removals = getKeyToRemoveFrom(assignments);
@@ -450,7 +461,7 @@ public class LegacyKeyringImpl implements Keyring {
 
     private com.github.onsdigital.zebedee.json.Keyring getCachedUserKeyring(User user) throws KeyringException {
         try {
-            return cache.get(user);
+            return legacyUserKeyringCache.get(user);
         } catch (IOException ex) {
             throw new KeyringException(CACHE_GET_ERR, ex);
         }

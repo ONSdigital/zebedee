@@ -1,11 +1,9 @@
 package com.github.onsdigital.zebedee;
 
 import com.github.onsdigital.slack.Profile;
-import com.github.onsdigital.slack.client.SlackClient;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.Credentials;
 import com.github.onsdigital.zebedee.keyring.Keyring;
-import com.github.onsdigital.zebedee.keyring.SchedulerKeyCache;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.KeyringCache;
 import com.github.onsdigital.zebedee.model.encryption.EncryptionKeyFactory;
@@ -68,7 +66,7 @@ public abstract class ZebedeeTestBaseFixture {
     protected Sessions sessions;
 
     @Mock
-    protected SchedulerKeyCache schedulerKeyCache;
+    protected com.github.onsdigital.zebedee.keyring.KeyringCache schedulerCache;
 
     @Mock
     protected Keyring collectionKeyring;
@@ -117,7 +115,7 @@ public abstract class ZebedeeTestBaseFixture {
         ReflectionTestUtils.setField(zebedee, "permissionsService", permissionsService);
 
         ReflectionTestUtils.setField(zebedee, "sessions", sessionsService);
-        ReflectionTestUtils.setField(zebedee, "legacyKeyringCache", new KeyringCache(sessionsService, schedulerKeyCache));
+        ReflectionTestUtils.setField(zebedee, "legacyKeyringCache", new KeyringCache(sessionsService, schedulerCache));
         ReflectionTestUtils.setField(zebedee, "collectionKeyring", collectionKeyring);
         ReflectionTestUtils.setField(zebedee, "encryptionKeyFactory", encryptionKeyFactory);
 

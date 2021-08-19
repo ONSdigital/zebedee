@@ -1,10 +1,11 @@
-package com.github.onsdigital.zebedee.keyring.cache;
+package com.github.onsdigital.zebedee.keyring.migration;
 
-import com.github.onsdigital.zebedee.keyring.SchedulerKeyCache;
+import com.github.onsdigital.zebedee.keyring.KeyringCache;
 import com.github.onsdigital.zebedee.keyring.KeyNotFoundException;
 import com.github.onsdigital.zebedee.keyring.KeyringException;
 
 import javax.crypto.SecretKey;
+import java.util.Set;
 
 /**
  * MigrationSchedulerKeyCache is a SchedulerKeyCache implementation that wraps around the legacy and
@@ -16,10 +17,10 @@ import javax.crypto.SecretKey;
  * <p>
  * This is a temp class that will be deleted once the migration to new world keyring is complete.
  */
-public class MigrationSchedulerKeyCache implements SchedulerKeyCache {
+public class MigrationKeyringCacheImpl implements KeyringCache {
 
-    private SchedulerKeyCache legacyCache;
-    private SchedulerKeyCache centralCache;
+    private KeyringCache legacyCache;
+    private KeyringCache centralCache;
     private boolean migrationEnabled;
 
     /**
@@ -29,8 +30,8 @@ public class MigrationSchedulerKeyCache implements SchedulerKeyCache {
      * @param centralCache     the central SchedulerKeyCache to use.
      * @param migrationEnabled enable/disable migration.
      */
-    public MigrationSchedulerKeyCache(SchedulerKeyCache legacyCache, SchedulerKeyCache centralCache,
-                                      boolean migrationEnabled) {
+    public MigrationKeyringCacheImpl(KeyringCache legacyCache, KeyringCache centralCache,
+                                     boolean migrationEnabled) {
         this.legacyCache = legacyCache;
         this.centralCache = centralCache;
         this.migrationEnabled = migrationEnabled;
@@ -61,8 +62,24 @@ public class MigrationSchedulerKeyCache implements SchedulerKeyCache {
     @Override
     public void add(String collectionID, SecretKey key) throws KeyringException {
         legacyCache.add(collectionID, key);
+
         if (migrationEnabled) {
             centralCache.add(collectionID, key);
         }
+    }
+
+    @Override
+    public void load() throws KeyringException {
+
+    }
+
+    @Override
+    public void remove(String collectionID) throws KeyringException {
+
+    }
+
+    @Override
+    public Set<String> list() throws KeyringException {
+        return null;
     }
 }

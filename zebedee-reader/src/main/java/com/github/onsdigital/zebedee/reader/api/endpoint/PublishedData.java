@@ -16,20 +16,14 @@ import java.io.IOException;
 import static com.github.onsdigital.zebedee.reader.util.ReaderRequestUtils.extractFilter;
 import static com.github.onsdigital.zebedee.reader.util.ReaderRequestUtils.getRequestedLanguage;
 
-/**
- * Created by bren on 29/07/15.
- * <p>
- * Endpoint to read content json
- */
-
 @Api
-public class Data {
+public class PublishedData {
 
     /**
-     * Retrieves content for endpoint <code>/data[/collectionId]?uri=[uri]</code>
+     * Retrieves content for endpoint <code>/publisheddata?uri=[uri]</code>
      * <p>
      * <p>
-     * This endpoint retrieves and serves json from either a collection or published data.
+     * This endpoint retrieves and serves json from published data only.
      * <p>
      * It is possible to filter only certain bits of data using filters.
      * <p>
@@ -51,7 +45,7 @@ public class Data {
         try {
             ReaderResponseResponseUtils.sendResponse(
                     new ReadRequestHandler(getRequestedLanguage(request))
-                            .findContent(request, extractFilter(request)), response);
+                            .findPublishedContent(request, extractFilter(request)), response);
         } catch (NotFoundException exception) {
             ReaderResponseResponseUtils.sendNotFound(exception, request, response);
         }

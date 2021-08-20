@@ -74,6 +74,21 @@ public class ReadRequestHandler {
         }
     }
 
+    public Content findPublishedContent(HttpServletRequest request, DataFilter dataFilter) throws ZebedeeException, IOException {
+        String uri = extractUri(request);
+        return findPublished(request, dataFilter, uri);
+    }
+
+    private Content findPublished(HttpServletRequest request, DataFilter dataFilter, String uri) throws IOException, ZebedeeException {
+        String lastSegment = getLastSegment(uri);
+        info().data("uri", uri).log("finding requested published content");
+        if (LATEST.equalsIgnoreCase(lastSegment)) {
+            return getLatestContent(request, null, dataFilter, removeLastSegment(uri));
+        } else {
+            return getContent(request, null, dataFilter, uri);
+        }
+    }
+
     public Content getContent(String uri, HttpServletRequest request) throws ZebedeeException, IOException {
         String sessionId = RequestUtils.getSessionId(request);
         String collectionId = getCollectionId(request);

@@ -1,7 +1,7 @@
 package com.github.onsdigital.zebedee.model;
 
 import com.github.onsdigital.zebedee.json.Keyring;
-import com.github.onsdigital.zebedee.keyring.SchedulerKeyCache;
+import com.github.onsdigital.zebedee.keyring.CollectionKeyCache;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.session.service.Sessions;
 import com.github.onsdigital.zebedee.user.model.User;
@@ -17,12 +17,12 @@ import java.util.concurrent.ConcurrentHashMap;
 public class KeyringCache {
 
     // Publisher keyring keeps all available secret keys available
-    private SchedulerKeyCache schedulerCache;
+    private CollectionKeyCache schedulerCache;
     private Map<Session, Keyring> keyringMap;
     private Sessions sessions;
 
     @Deprecated
-    public KeyringCache(Sessions sessions, SchedulerKeyCache schedulerCache) {
+    public KeyringCache(Sessions sessions, CollectionKeyCache schedulerCache) {
         this.sessions = sessions;
         this.schedulerCache = schedulerCache;
         this.keyringMap = new ConcurrentHashMap<>();

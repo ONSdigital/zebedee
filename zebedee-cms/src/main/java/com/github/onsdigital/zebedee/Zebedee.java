@@ -7,9 +7,9 @@ import com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedExcept
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.Credentials;
+import com.github.onsdigital.zebedee.keyring.CollectionKeyCache;
 import com.github.onsdigital.zebedee.keyring.CollectionKeyring;
 import com.github.onsdigital.zebedee.keyring.KeyringException;
-import com.github.onsdigital.zebedee.keyring.SchedulerKeyCache;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.Collections;
 import com.github.onsdigital.zebedee.model.Content;
@@ -76,7 +76,7 @@ public class Zebedee {
     private final Collections collections;
     private final Content published;
     private final KeyringCache legacyKeyringCache;
-    private final SchedulerKeyCache schedulerKeyCache;
+    private final CollectionKeyCache schedulerKeyCache;
     private final Path publishedContentPath;
     private final Path path;
     private final PermissionsService permissionsService;
@@ -376,7 +376,7 @@ public class Zebedee {
         return this.legacyKeyringCache;
     }
 
-    public SchedulerKeyCache getSchedulerKeyCache() {
+    public CollectionKeyCache getSchedulerKeyCache() {
         return this.schedulerKeyCache;
     }
 
@@ -404,7 +404,9 @@ public class Zebedee {
         return imageService;
     }
 
-    public KafkaService getKafkaService() { return kafkaService; }
+    public KafkaService getKafkaService() {
+        return kafkaService;
+    }
 
     public ServiceStore getServiceStore() {
         return serviceStoreImpl;

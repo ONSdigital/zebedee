@@ -1,16 +1,20 @@
 package com.github.onsdigital.zebedee.keyring.legacy;
 
+import com.github.onsdigital.zebedee.keyring.CollectionKeyCache;
 import com.github.onsdigital.zebedee.keyring.KeyringException;
-import com.github.onsdigital.zebedee.keyring.SchedulerKeyCache;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.crypto.SecretKey;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static java.text.MessageFormat.format;
 
 /**
  * Encapsulate legacy scheduler cache implementation behind interface.
  */
-public class LegacySchedulerKeyCacheImpl implements SchedulerKeyCache {
+public class LegacySchedulerKeyCacheImpl implements CollectionKeyCache {
 
     static final String COLLECTION_ID_EMPTY = "collection ID required but was null/empty";
     static final String SECRET_KEY_EMPTY = "secret key required but was null";
@@ -40,6 +44,29 @@ public class LegacySchedulerKeyCacheImpl implements SchedulerKeyCache {
         }
 
         return cache.get(collectionID);
+    }
+
+    @Override
+    public void remove(String collectionID) throws KeyringException {
+        if (cache != null) {
+            cache.remove(collectionID);
+        }
+    }
+
+    @Override
+    public Set<String> list() throws KeyringException {
+        if (cache == null) {
+            return new HashSet<>();
+        }
+        return cache.keySet();
+    }
+
+    @Override
+    public void load() throws KeyringException {
+        // Load is required for the new keyring implementation but not supported by the legacy keyring functionality
+        // and shouldn't be called. Throw exception here to flag up that it's being used when it shouldn't be.
+        String msg = format("load functionality is not supported by {0}", this.getClass().getSimpleName());
+        throw new UnsupportedOperationException(msg);
     }
 
     @Override

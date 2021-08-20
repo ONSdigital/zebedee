@@ -1,9 +1,9 @@
 package com.github.onsdigital.zebedee.keyring.legacy;
 
 import com.github.onsdigital.zebedee.json.CollectionDescription;
+import com.github.onsdigital.zebedee.keyring.CollectionKeyCache;
 import com.github.onsdigital.zebedee.keyring.CollectionKeyring;
 import com.github.onsdigital.zebedee.keyring.KeyringException;
-import com.github.onsdigital.zebedee.keyring.SchedulerKeyCache;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.KeyringCache;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
@@ -60,7 +60,7 @@ public class LegacyCollectionKeyringImpl implements CollectionKeyring {
     private UsersService usersService;
     private PermissionsService permissions;
     private KeyringCache cache;
-    private SchedulerKeyCache schedulerKeyCache;
+    private CollectionKeyCache schedulerKeyCache;
 
     /**
      * Construct a new instance of the Legacy keyring.
@@ -70,7 +70,7 @@ public class LegacyCollectionKeyringImpl implements CollectionKeyring {
      */
     public LegacyCollectionKeyringImpl(final Sessions sessions, final UsersService usersService,
                                        PermissionsService permissions, final KeyringCache cache,
-                                       final SchedulerKeyCache schedulerKeyCache) {
+                                       final CollectionKeyCache schedulerKeyCache) {
         this.sessions = sessions;
         this.usersService = usersService;
         this.permissions = permissions;

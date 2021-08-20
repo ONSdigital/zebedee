@@ -4,8 +4,8 @@ import com.github.onsdigital.slack.Profile;
 import com.github.onsdigital.slack.client.SlackClient;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.Credentials;
+import com.github.onsdigital.zebedee.keyring.CollectionKeyCache;
 import com.github.onsdigital.zebedee.keyring.CollectionKeyring;
-import com.github.onsdigital.zebedee.keyring.SchedulerKeyCache;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.KeyringCache;
 import com.github.onsdigital.zebedee.model.encryption.EncryptionKeyFactory;
@@ -67,7 +67,7 @@ public abstract class ZebedeeTestBaseFixture {
     protected Sessions sessions;
 
     @Mock
-    protected SchedulerKeyCache schedulerKeyCache;
+    protected CollectionKeyCache schedulerKeyCache;
 
     @Mock
     protected CollectionKeyring collectionKeyring;
@@ -205,7 +205,6 @@ public abstract class ZebedeeTestBaseFixture {
 
         ReflectionTestUtils.setField(instance, "collectionKeyring", collectionKeyring);
     }
-
 
 
     public abstract void setUp() throws Exception;

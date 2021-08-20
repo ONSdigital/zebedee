@@ -24,6 +24,7 @@ import java.security.SecureRandom;
 import java.util.Base64;
 import java.util.Map;
 
+import static com.github.onsdigital.zebedee.keyring.KeyringException.formatExceptionMsg;
 import static com.github.onsdigital.zebedee.keyring.central.CollectionKeyStoreImpl.COLLECTION_KEY_NOT_FOUND_ERR;
 import static com.github.onsdigital.zebedee.keyring.central.CollectionKeyStoreImpl.COLLECTION_KEY_NULL_ERR;
 import static com.github.onsdigital.zebedee.keyring.central.CollectionKeyStoreImpl.INVALID_COLLECTION_ID_ERR;
@@ -78,7 +79,7 @@ public class CollectionKeyStoreImplTest {
 
         KeyringException ex = assertThrows(KeyringException.class, () -> store.read(TEST_COLLECTION_ID));
 
-        assertThat(ex.getMessage(), equalTo(COLLECTION_KEY_NOT_FOUND_ERR));
+        assertThat(ex.getMessage(), equalTo(formatExceptionMsg(COLLECTION_KEY_NOT_FOUND_ERR, TEST_COLLECTION_ID)));
         assertThat(ex.getCollectionID(), equalTo(TEST_COLLECTION_ID));
     }
 
@@ -93,7 +94,7 @@ public class CollectionKeyStoreImplTest {
 
         KeyringException ex = assertThrows(KeyringException.class, () -> store.read(TEST_COLLECTION_ID));
 
-        assertThat(ex.getMessage(), equalTo(KEY_DECRYPTION_ERR));
+        assertThat(ex.getMessage(), equalTo(formatExceptionMsg(KEY_DECRYPTION_ERR, TEST_COLLECTION_ID)));
         assertThat(ex.getCollectionID(), equalTo(TEST_COLLECTION_ID));
     }
 
@@ -153,7 +154,7 @@ public class CollectionKeyStoreImplTest {
 
         KeyringException ex = assertThrows(KeyringException.class, () -> store.write(TEST_COLLECTION_ID, null));
 
-        assertThat(ex.getMessage(), equalTo(COLLECTION_KEY_NULL_ERR));
+        assertThat(ex.getMessage(), equalTo(formatExceptionMsg(COLLECTION_KEY_NULL_ERR, TEST_COLLECTION_ID)));
         assertThat(ex.getCollectionID(), equalTo(TEST_COLLECTION_ID));
     }
 
@@ -169,7 +170,7 @@ public class CollectionKeyStoreImplTest {
         KeyringException ex = assertThrows(KeyringException.class,
                 () -> store.write(TEST_COLLECTION_ID, createNewSecretKey()));
 
-        assertThat(ex.getMessage(), equalTo(KEY_ALREADY_EXISTS_ERR));
+        assertThat(ex.getMessage(), equalTo(formatExceptionMsg(KEY_ALREADY_EXISTS_ERR, TEST_COLLECTION_ID)));
         assertThat(ex.getCollectionID(), equalTo(TEST_COLLECTION_ID));
     }
 
@@ -257,7 +258,7 @@ public class CollectionKeyStoreImplTest {
         createPlainTextCollectionKeyFile(TEST_COLLECTION_ID);
 
         KeyringException ex = assertThrows(KeyringException.class, () -> store.readAll());
-        assertThat(ex.getMessage(), equalTo(KEY_DECRYPTION_ERR));
+        assertThat(ex.getMessage(), equalTo(formatExceptionMsg(KEY_DECRYPTION_ERR, TEST_COLLECTION_ID)));
         assertThat(ex.getCollectionID(), equalTo(TEST_COLLECTION_ID));
     }
 
@@ -274,7 +275,7 @@ public class CollectionKeyStoreImplTest {
         // When the unencrypted key file is read it should fail to decrypt and throw exception.
         KeyringException ex = assertThrows(KeyringException.class, () -> store.readAll());
 
-        assertThat(ex.getMessage(), equalTo(KEY_DECRYPTION_ERR));
+        assertThat(ex.getMessage(), equalTo(formatExceptionMsg(KEY_DECRYPTION_ERR, "abc123")));
         assertThat(ex.getCollectionID(), equalTo("abc123"));
     }
 
@@ -328,7 +329,7 @@ public class CollectionKeyStoreImplTest {
 
         KeyringException ex = assertThrows(KeyringException.class, () -> store.delete(TEST_COLLECTION_ID));
 
-        assertThat(ex.getMessage(), equalTo(COLLECTION_KEY_NOT_FOUND_ERR));
+        assertThat(ex.getMessage(), equalTo(formatExceptionMsg(COLLECTION_KEY_NOT_FOUND_ERR, TEST_COLLECTION_ID)));
         assertThat(ex.getCollectionID(), equalTo(TEST_COLLECTION_ID));
     }
 

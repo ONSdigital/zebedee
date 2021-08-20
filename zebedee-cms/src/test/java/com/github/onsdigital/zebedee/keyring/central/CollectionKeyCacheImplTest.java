@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee.keyring.central;
 
 import com.github.onsdigital.zebedee.keyring.CollectionKeyCache;
+import com.github.onsdigital.zebedee.keyring.KeyNotFoundException;
 import com.github.onsdigital.zebedee.keyring.KeyringException;
 import com.github.onsdigital.zebedee.keyring.CollectionKeyStore;
 import org.junit.Before;
@@ -13,6 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import static com.github.onsdigital.zebedee.keyring.KeyringException.formatExceptionMsg;
 import static com.github.onsdigital.zebedee.keyring.central.CollectionKeyCacheImpl.INVALID_COLLECTION_ID_ERR;
 import static com.github.onsdigital.zebedee.keyring.central.CollectionKeyCacheImpl.INVALID_SECRET_KEY_ERR;
 import static com.github.onsdigital.zebedee.keyring.central.CollectionKeyCacheImpl.KEYSTORE_NULL_ERR;
@@ -78,7 +80,7 @@ public class CollectionKeyCacheImplTest {
     public void testAdd_secretKeyNull_shouldThrowException() throws Exception {
         KeyringException ex = assertThrows(KeyringException.class, () -> keyCache.add(TEST_COLLECTION_ID, null));
 
-        assertThat(ex.getMessage(), equalTo(INVALID_SECRET_KEY_ERR));
+        assertThat(ex.getMessage(), equalTo(formatExceptionMsg(INVALID_SECRET_KEY_ERR, TEST_COLLECTION_ID)));
         assertThat(ex.getCollectionID(), equalTo(TEST_COLLECTION_ID));
         assertTrue(cache.isEmpty());
     }
@@ -105,7 +107,7 @@ public class CollectionKeyCacheImplTest {
 
         verifyZeroInteractions(keyStore);
         assertThat(cache.size(), equalTo(1));
-        assertThat(ex.getMessage(), equalTo(KEY_MISMATCH_ERR));
+        assertThat(ex.getMessage(), equalTo(formatExceptionMsg(KEY_MISMATCH_ERR, TEST_COLLECTION_ID)));
         assertThat(ex.getCollectionID(), equalTo(TEST_COLLECTION_ID));
     }
 
@@ -163,7 +165,7 @@ public class CollectionKeyCacheImplTest {
 
         KeyringException ex = assertThrows(KeyringException.class, () -> keyCache.add(TEST_COLLECTION_ID, secretKey));
 
-        assertThat(ex.getMessage(), equalTo(KEY_MISMATCH_ERR));
+        assertThat(ex.getMessage(), equalTo(formatExceptionMsg(KEY_MISMATCH_ERR, TEST_COLLECTION_ID)));
         assertThat(ex.getCollectionID(), equalTo(TEST_COLLECTION_ID));
 
         verify(keyStore, times(1)).exists(TEST_COLLECTION_ID);
@@ -212,9 +214,10 @@ public class CollectionKeyCacheImplTest {
         when(keyStore.exists(TEST_COLLECTION_ID))
                 .thenReturn(false);
 
-        KeyringException ex = assertThrows(KeyringException.class, () -> keyCache.get(TEST_COLLECTION_ID));
+        KeyNotFoundException ex = assertThrows(KeyNotFoundException.class,
+                () -> keyCache.get(TEST_COLLECTION_ID));
 
-        assertThat(ex.getMessage(), equalTo(KEY_NOT_FOUND_ERR));
+        assertThat(ex.getMessage(), equalTo(formatExceptionMsg(KEY_NOT_FOUND_ERR, TEST_COLLECTION_ID)));
         assertThat(ex.getCollectionID(), equalTo(TEST_COLLECTION_ID));
         verify(keyStore, times(1)).exists(TEST_COLLECTION_ID);
         verifyNoMoreInteractions(keyStore);

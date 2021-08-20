@@ -1,13 +1,13 @@
 package com.github.onsdigital.zebedee.keyring.legacy;
 
 import com.github.onsdigital.zebedee.keyring.KeyringException;
-import com.github.onsdigital.zebedee.keyring.legacy.LegacySchedulerKeyCacheImpl;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import javax.crypto.SecretKey;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static com.github.onsdigital.zebedee.keyring.legacy.LegacySchedulerKeyCacheImpl.COLLECTION_ID_EMPTY;
@@ -15,10 +15,13 @@ import static com.github.onsdigital.zebedee.keyring.legacy.LegacySchedulerKeyCac
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 public class LegacySchedulerKeyCacheImplTest {
 
@@ -125,5 +128,58 @@ public class LegacySchedulerKeyCacheImplTest {
 
         assertThat(secretKey, equalTo(cache.get(COLLECTION_ID)));
         assertThat(cache.size(), equalTo(1));
+    }
+
+    @Test
+    public void testLoad_shouldThrowUnsupportedOperationException() throws Exception {
+        schedulerCache = new LegacySchedulerKeyCacheImpl();
+
+        assertThrows(UnsupportedOperationException.class, () -> schedulerCache.load());
+    }
+
+    @Test
+    public void testRemove_shouldRemoveItemFromCache() throws Exception {
+        ConcurrentHashMap cache = mock(ConcurrentHashMap.class);
+        schedulerCache = new LegacySchedulerKeyCacheImpl(cache);
+
+        schedulerCache.remove(COLLECTION_ID);
+
+        verify(cache, times(1)).remove(COLLECTION_ID);
+    }
+
+    @Test
+    public void testRemove_cacheNull_shouldDoNothing() throws Exception {
+        schedulerCache = new LegacySchedulerKeyCacheImpl(null);
+        schedulerCache.remove(COLLECTION_ID);
+    }
+
+    @Test
+    public void testList_cacheNullShouldReturnEmpty() throws Exception {
+        schedulerCache = new LegacySchedulerKeyCacheImpl(null);
+
+        Set<String> actual = schedulerCache.list();
+
+        assertThat(actual, is(notNullValue()));
+        assertTrue(actual.isEmpty());
+    }
+
+    @Test
+    public void testList_successShouldReturnExpectedValues() throws Exception {
+        SecretKey k1 = mock(SecretKey.class);
+        SecretKey k2 = mock(SecretKey.class);
+
+        cache = new ConcurrentHashMap<String, SecretKey>() {{
+            put("1", k1);
+            put("2", k2);
+        }};
+
+        schedulerCache = new LegacySchedulerKeyCacheImpl(cache);
+
+        Set<String> actual = schedulerCache.list();
+
+        assertThat(actual, is(notNullValue()));
+        assertThat(actual.size(), equalTo(2));
+        assertTrue(actual.contains("1"));
+        assertTrue(actual.contains("2"));
     }
 }

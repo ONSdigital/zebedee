@@ -11,18 +11,18 @@ import com.github.onsdigital.zebedee.configuration.CMSFeatureFlags;
 import com.github.onsdigital.zebedee.data.processing.DataIndex;
 import com.github.onsdigital.zebedee.kafka.KafkaClient;
 import com.github.onsdigital.zebedee.kafka.KafkaClientImpl;
-import com.github.onsdigital.zebedee.keyring.central.CollectionKeyringImpl;
+import com.github.onsdigital.zebedee.keyring.CollectionKeyCache;
+import com.github.onsdigital.zebedee.keyring.CollectionKeyStore;
 import com.github.onsdigital.zebedee.keyring.CollectionKeyring;
 import com.github.onsdigital.zebedee.keyring.KeyringException;
-import com.github.onsdigital.zebedee.keyring.migration.MigrationCollectionKeyringImpl;
-import com.github.onsdigital.zebedee.keyring.legacy.LegacyCollectionKeyringImpl;
-import com.github.onsdigital.zebedee.keyring.central.NopCollectionKeyringImpl;
-import com.github.onsdigital.zebedee.keyring.CollectionKeyCache;
 import com.github.onsdigital.zebedee.keyring.central.CollectionKeyCacheImpl;
-import com.github.onsdigital.zebedee.keyring.legacy.LegacySchedulerKeyCacheImpl;
-import com.github.onsdigital.zebedee.keyring.SchedulerKeyCache;
-import com.github.onsdigital.zebedee.keyring.CollectionKeyStore;
 import com.github.onsdigital.zebedee.keyring.central.CollectionKeyStoreImpl;
+import com.github.onsdigital.zebedee.keyring.central.CollectionKeyringImpl;
+import com.github.onsdigital.zebedee.keyring.central.NopCollectionKeyringImpl;
+import com.github.onsdigital.zebedee.keyring.legacy.LegacyCollectionKeyringImpl;
+import com.github.onsdigital.zebedee.keyring.legacy.LegacySchedulerKeyCacheImpl;
+import com.github.onsdigital.zebedee.keyring.migration.MigrationCollectionKeyCacheImpl;
+import com.github.onsdigital.zebedee.keyring.migration.MigrationCollectionKeyringImpl;
 import com.github.onsdigital.zebedee.model.Collections;
 import com.github.onsdigital.zebedee.model.Content;
 import com.github.onsdigital.zebedee.model.RedirectTablePartialMatch;
@@ -126,7 +126,7 @@ public class ZebedeeConfiguration {
     private ImageService imageService;
     private KafkaService kafkaService;
     private CollectionKeyring collectionKeyring;
-    private SchedulerKeyCache schedulerKeyCache;
+    private CollectionKeyCache schedulerKeyCache;
     private EncryptionKeyFactory encryptionKeyFactory;
     private StartUpAlerter startUpAlerter;
     private SlackClient slackClient;
@@ -176,7 +176,7 @@ public class ZebedeeConfiguration {
             this.sessions = new SessionsServiceImpl(sessionsPath);
         }
 
-        this.schedulerKeyCache = new LegacySchedulerKeyCacheImpl();
+        this.schedulerKeyCache = new MigrationCollectionKeyCacheImpl(new LegacySchedulerKeyCacheImpl(), null, false);
 
         // Initialise legacy keyring regardless - they will dual run until we cut over to new impl.
         this.legacyKeyringCache = new com.github.onsdigital.zebedee.model.KeyringCache(sessions, schedulerKeyCache);
@@ -423,7 +423,7 @@ public class ZebedeeConfiguration {
         return this.encryptionKeyFactory;
     }
 
-    public SchedulerKeyCache getSchedulerKeyringCache() {
+    public CollectionKeyCache getSchedulerKeyringCache() {
         return this.schedulerKeyCache;
     }
 

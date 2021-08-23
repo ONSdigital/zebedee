@@ -18,6 +18,7 @@ import com.github.onsdigital.zebedee.session.store.JWTStore;
 import com.github.onsdigital.zebedee.user.model.User;
 import com.github.onsdigital.zebedee.user.model.UserList;
 import com.github.onsdigital.zebedee.user.service.UsersService;
+import com.github.onsdigital.zebedee.util.slack.Notifier;
 import com.github.onsdigital.zebedee.util.slack.StartUpAlerter;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -58,10 +59,7 @@ public abstract class ZebedeeTestBaseFixture {
     protected ZebedeeConfiguration zebCfg;
 
     @Mock
-    protected SlackClient slackClient;
-
-    @Mock
-    protected Profile slackProfile;
+    protected Notifier slackNotifier;
 
     @Mock
     protected Sessions sessions;
@@ -168,11 +166,8 @@ public abstract class ZebedeeTestBaseFixture {
         when(zebCfg.getPermissionsService())
                 .thenReturn(permissionsService);
 
-        when(zebCfg.getSlackClient())
-                .thenReturn(slackClient);
-
-        when(slackClient.getProfile())
-                .thenReturn(slackProfile);
+        when(zebCfg.getSlackNotifier())
+                .thenReturn(slackNotifier);
     }
 
     protected void verifyKeyAddedToCollectionKeyring() throws Exception {

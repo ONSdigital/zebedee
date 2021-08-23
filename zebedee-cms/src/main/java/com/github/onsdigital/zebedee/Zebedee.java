@@ -92,7 +92,6 @@ public class Zebedee {
     private final KafkaService kafkaService;
     private final ServiceStoreImpl serviceStoreImpl;
     private final StartUpAlerter startUpAlerter;
-    private final SlackClient slackClient;
     private final Notifier slackNotifier;
 
     /**
@@ -131,8 +130,7 @@ public class Zebedee {
         this.servicePath = cfg.getServicePath();
         this.keyRingPath = cfg.getKeyRingPath();
         this.startUpAlerter = cfg.getStartUpAlerter();
-        this.slackClient = cfg.getSlackClient();
-        this.slackNotifier = new SlackNotifier(slackClient);
+        this.slackNotifier = cfg.getSlackNotifier();
     }
 
     /**
@@ -430,10 +428,6 @@ public class Zebedee {
 
     public StartUpAlerter getStartUpAlerter() {
         return this.startUpAlerter;
-    }
-
-    public SlackClient getSlackClient() {
-        return this.slackClient;
     }
 
     public Notifier getSlackNotifier() {

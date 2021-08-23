@@ -26,7 +26,6 @@ import com.github.onsdigital.zebedee.keyring.migration.MigrationCollectionKeyCac
 import com.github.onsdigital.zebedee.keyring.migration.MigrationCollectionKeyringImpl;
 import com.github.onsdigital.zebedee.model.Collections;
 import com.github.onsdigital.zebedee.model.Content;
-import com.github.onsdigital.zebedee.model.KeyringCache;
 import com.github.onsdigital.zebedee.model.RedirectTablePartialMatch;
 import com.github.onsdigital.zebedee.model.encryption.EncryptionKeyFactory;
 import com.github.onsdigital.zebedee.model.encryption.EncryptionKeyFactoryImpl;
@@ -54,6 +53,10 @@ import com.github.onsdigital.zebedee.user.service.UsersService;
 import com.github.onsdigital.zebedee.user.service.UsersServiceImpl;
 import com.github.onsdigital.zebedee.user.store.UserStoreFileSystemImpl;
 import com.github.onsdigital.zebedee.util.slack.NoOpStartUpAlerter;
+import com.github.onsdigital.zebedee.util.slack.NopNotifierImpl;
+import com.github.onsdigital.zebedee.util.slack.NopSlackClientImpl;
+import com.github.onsdigital.zebedee.util.slack.Notifier;
+import com.github.onsdigital.zebedee.util.slack.SlackNotifier;
 import com.github.onsdigital.zebedee.util.slack.StartUpAlerter;
 import com.github.onsdigital.zebedee.util.slack.StartUpAlerterImpl;
 import com.github.onsdigital.zebedee.util.versioning.VersionsService;
@@ -61,6 +64,7 @@ import com.github.onsdigital.zebedee.util.versioning.VersionsServiceImpl;
 import com.github.onsdigital.zebedee.verification.VerificationAgent;
 import dp.api.dataset.DatasetAPIClient;
 import dp.api.dataset.DatasetClient;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -94,6 +98,7 @@ import static com.github.onsdigital.zebedee.configuration.Configuration.getKeyri
 import static com.github.onsdigital.zebedee.configuration.Configuration.getServiceAuthToken;
 import static com.github.onsdigital.zebedee.configuration.Configuration.slackChannelsToNotfiyOnStartUp;
 import static com.github.onsdigital.zebedee.permissions.store.PermissionsStoreFileSystemImpl.initialisePermissions;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 /**
  * Object encapsulating the set up configuration required by {@link Zebedee}. Set paths to & create relevant
@@ -132,6 +137,7 @@ public class ZebedeeConfiguration {
     private EncryptionKeyFactory encryptionKeyFactory;
     private StartUpAlerter startUpAlerter;
     private SlackClient slackClient;
+    private Notifier slackNotifier;
 
     /**
      * Create a new configuration object.
@@ -224,12 +230,6 @@ public class ZebedeeConfiguration {
 
         imageService = new ImageServiceImpl(imageClient);
 
-        this.slackClient = new SlackClientImpl(new Profile.Builder()
-                .emoji(":flo:")
-                .username("Florence")
-                .authToken(System.getenv("slack_api_token"))
-                .create());
-
         if (cmsFeatureFlags().isKafkaEnabled()) {
             KafkaClient kafkaClient = new KafkaClientImpl(getKafkaURL(), getKafkaContentPublishedTopic());
             kafkaService = new KafkaServiceImpl(kafkaClient);
@@ -237,7 +237,7 @@ public class ZebedeeConfiguration {
             kafkaService = new NoOpKafkaService();
         }
 
-        this.startUpAlerter = initStartUpAlerter();
+        initSlackIntegration();
 
         info().data("root_path", rootPath.toString())
                 .data("zebedee_path", zebedeePath.toString())
@@ -290,14 +290,43 @@ public class ZebedeeConfiguration {
                 false, legacyCollectionKeyring, nopCollectionKeyring);
     }
 
-    private StartUpAlerter initStartUpAlerter() {
+    /**
+     * Initalise the CMS's Slack integration. If the required configuration values are not available the CMS will
+     * default to No Op implementation - slack messages will be logged but sent to the Slack API.
+     */
+    private void initSlackIntegration() {
+        String slackToken = System.getenv("slack_api_token");
         List<String> startUpNotificationRecipients = slackChannelsToNotfiyOnStartUp();
 
-        if (startUpNotificationRecipients == null || startUpNotificationRecipients.isEmpty()) {
-            warn().log("startUpNotificationRecipients was null or empty NoOpStartUpAlerter will be initialized.");
-            return new NoOpStartUpAlerter();
+        boolean validConfig = true;
+        if (isEmpty(slackToken)) {
+            warn().log("env var slack_api_token is null or empty");
+            validConfig = false;
         }
-        return new StartUpAlerterImpl(slackClient, slackChannelsToNotfiyOnStartUp());
+
+        if (startUpNotificationRecipients == null || startUpNotificationRecipients.isEmpty()) {
+            warn().log("env var START_UP_NOTIFY_LIST is null or empty");
+            validConfig = false;
+        }
+
+        if (validConfig) {
+            info().log("valid Slack configuation found for CMS/Slack integration");
+
+            this.slackClient = new SlackClientImpl(new Profile.Builder()
+                    .emoji(":flo:")
+                    .username("Florence")
+                    .authToken(slackToken)
+                    .create());
+
+            this.slackNotifier = new SlackNotifier(this.slackClient);
+            this.startUpAlerter = new StartUpAlerterImpl(slackClient, startUpNotificationRecipients);
+        } else {
+            warn().log("slack configuration missing/empty defaulting to No op implementation");
+
+            this.slackClient = new NopSlackClientImpl();
+            this.slackNotifier = new NopNotifierImpl();
+            this.startUpAlerter = new NoOpStartUpAlerter();
+        }
     }
 
     public boolean isUseVerificationAgent() {
@@ -446,7 +475,7 @@ public class ZebedeeConfiguration {
         return this.startUpAlerter;
     }
 
-    public SlackClient getSlackClient() {
-        return slackClient;
+    public Notifier getSlackNotifier() {
+        return slackNotifier;
     }
 }

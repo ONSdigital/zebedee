@@ -18,6 +18,7 @@ import com.github.onsdigital.zebedee.keyring.KeyringException;
 import com.github.onsdigital.zebedee.keyring.central.CollectionKeyCacheImpl;
 import com.github.onsdigital.zebedee.keyring.central.CollectionKeyStoreImpl;
 import com.github.onsdigital.zebedee.keyring.central.CollectionKeyringImpl;
+import com.github.onsdigital.zebedee.keyring.central.NopCollectionKeyCacheImpl;
 import com.github.onsdigital.zebedee.keyring.central.NopCollectionKeyringImpl;
 import com.github.onsdigital.zebedee.keyring.legacy.LegacyCollectionKeyringImpl;
 import com.github.onsdigital.zebedee.keyring.legacy.LegacySchedulerKeyCacheImpl;
@@ -25,6 +26,7 @@ import com.github.onsdigital.zebedee.keyring.migration.MigrationCollectionKeyCac
 import com.github.onsdigital.zebedee.keyring.migration.MigrationCollectionKeyringImpl;
 import com.github.onsdigital.zebedee.model.Collections;
 import com.github.onsdigital.zebedee.model.Content;
+import com.github.onsdigital.zebedee.model.KeyringCache;
 import com.github.onsdigital.zebedee.model.RedirectTablePartialMatch;
 import com.github.onsdigital.zebedee.model.encryption.EncryptionKeyFactory;
 import com.github.onsdigital.zebedee.model.encryption.EncryptionKeyFactoryImpl;
@@ -176,11 +178,6 @@ public class ZebedeeConfiguration {
             this.sessions = new SessionsServiceImpl(sessionsPath);
         }
 
-        this.schedulerKeyCache = new MigrationCollectionKeyCacheImpl(new LegacySchedulerKeyCacheImpl(), null, false);
-
-        // Initialise legacy keyring regardless - they will dual run until we cut over to new impl.
-        this.legacyKeyringCache = new com.github.onsdigital.zebedee.model.KeyringCache(sessions, schedulerKeyCache);
-
         this.teamsService = new TeamsServiceImpl(
                 new TeamsStoreFileSystemImpl(teamsPath), this::getPermissionsService);
 
@@ -195,22 +192,17 @@ public class ZebedeeConfiguration {
         VersionsService versionsService = new VersionsServiceImpl();
         this.collections = new Collections(collectionsPath, permissionsService, versionsService, published);
 
-
         Supplier<CollectionKeyring> keyringSupplier = () -> collectionKeyring;
 
         this.usersService = UsersServiceImpl.getInstance(
                 new UserStoreFileSystemImpl(this.usersPath), collections, permissionsService, keyringSupplier);
 
-        // The legacy keyring logic but behind the new keyring interface.
-        CollectionKeyring legacyKeyring = new LegacyCollectionKeyringImpl(
-                sessions, usersService, permissionsService, legacyKeyringCache, schedulerKeyCache);
-
-        // The new world keyring impl - could be no op or real impl depending on config.
-        CollectionKeyring centralKeyring = initCentralKeyring();
-
-        // Keyring migrator encapuslates the keyring migration logic behind the new keyring interface.
-        this.collectionKeyring = new MigrationCollectionKeyringImpl(
-                CMSFeatureFlags.cmsFeatureFlags().isCentralisedKeyringEnabled(), legacyKeyring, centralKeyring);
+        // Init the collection keyring and scheduler cache.
+        if (CMSFeatureFlags.cmsFeatureFlags().isCentralisedKeyringEnabled()) {
+            initCollectionKeyring();
+        } else {
+            initLegacyKeyring();
+        }
 
         DatasetClient datasetClient;
         try {
@@ -264,24 +256,38 @@ public class ZebedeeConfiguration {
 
     }
 
-    private CollectionKeyring initCentralKeyring() throws KeyringException {
-        // Default to the NoOp impl
-        CollectionKeyring centralKeyring = new NopCollectionKeyringImpl();
+    private void initCollectionKeyring() throws KeyringException {
+        CollectionKeyStore keyStore = new CollectionKeyStoreImpl(
+                getKeyRingPath(), getKeyringSecretKey(), getKeyringInitVector());
 
-        // If centralised keying is enabled initialize
-        if (cmsFeatureFlags().isCentralisedKeyringEnabled()) {
+        CollectionKeyCacheImpl.init(keyStore);
+        CollectionKeyCache collectionKeyCache = CollectionKeyCacheImpl.getInstance();
 
-            CollectionKeyStore keyStore = new CollectionKeyStoreImpl(
-                    getKeyRingPath(), getKeyringSecretKey(), getKeyringInitVector());
+        this.schedulerKeyCache = collectionKeyCache;
 
-            CollectionKeyCacheImpl.init(keyStore);
-            CollectionKeyCache collectionKeyCache = CollectionKeyCacheImpl.getInstance();
+        // Initialise legacy keyring regardless - they will dual run until we cut over to new impl.
+        this.legacyKeyringCache = new com.github.onsdigital.zebedee.model.KeyringCache(sessions, schedulerKeyCache);
 
-            CollectionKeyringImpl.init(collectionKeyCache, permissionsService, collections);
-            centralKeyring = CollectionKeyringImpl.getInstance();
-        }
+        CollectionKeyring legacyKeyring = new LegacyCollectionKeyringImpl(
+                sessions, usersService, permissionsService, legacyKeyringCache, schedulerKeyCache);
 
-        return centralKeyring;
+        CollectionKeyringImpl.init(collectionKeyCache, permissionsService, collections);
+        CollectionKeyring centralKeyring = CollectionKeyringImpl.getInstance();
+
+        this.collectionKeyring = new MigrationCollectionKeyringImpl(true, legacyKeyring, centralKeyring);
+    }
+
+    private void initLegacyKeyring() throws KeyringException {
+        this.schedulerKeyCache = new MigrationCollectionKeyCacheImpl(
+                new LegacySchedulerKeyCacheImpl(), new NopCollectionKeyCacheImpl(), false);
+
+        CollectionKeyring legacyCollectionKeyring = new LegacyCollectionKeyringImpl(
+                sessions, usersService, permissionsService, this.legacyKeyringCache, schedulerKeyCache);
+
+        CollectionKeyring nopCollectionKeyring = new NopCollectionKeyringImpl();
+
+        this.collectionKeyring = new MigrationCollectionKeyringImpl(
+                false, legacyCollectionKeyring, nopCollectionKeyring);
     }
 
     private StartUpAlerter initStartUpAlerter() {

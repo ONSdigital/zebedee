@@ -286,6 +286,8 @@ public class ZebedeeConfiguration {
         this.schedulerKeyCache = new MigrationCollectionKeyCacheImpl(
                 new LegacySchedulerKeyCacheImpl(), new NopCollectionKeyCacheImpl(), false);
 
+        this.legacyKeyringCache = new com.github.onsdigital.zebedee.model.KeyringCache(sessions, schedulerKeyCache);
+
         CollectionKeyring legacyCollectionKeyring = new LegacyCollectionKeyringImpl(
                 sessions, usersService, permissionsService, this.legacyKeyringCache, schedulerKeyCache);
 

@@ -62,9 +62,6 @@ public abstract class ZebedeeTestBaseFixture {
     protected Notifier slackNotifier;
 
     @Mock
-    protected Profile slackProfile;
-
-    @Mock
     protected Sessions sessions;
 
     @Mock

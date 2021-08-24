@@ -12,16 +12,22 @@ import static com.github.onsdigital.zebedee.logging.CMSLogEvent.info;
  */
 public class NopSlackClientImpl implements SlackClient {
 
+    /**
+     * No op implementation - returns hardcoded {@link PostMessageResponse} stub.
+     */
     @Override
     public PostMessageResponse sendMessage(PostMessage postMessage) {
         info().data("message", postMessage.getText()).log("NopSlackClientImpl.sendMessage");
-        return null;
+        return new PostMessageResponse(true, "stubbed response","");
     }
 
+    /**
+     * No op implementation - returns hardcoded {@link PostMessageResponse} stub.
+     */
     @Override
     public PostMessageResponse updateMessage(PostMessage postMessage) {
         info().data("message", postMessage.getText()).log("NopSlackClientImpl.updateMessage");
-        return null;
+        return new PostMessageResponse(true, "stubbed response","");
     }
 
     @Override

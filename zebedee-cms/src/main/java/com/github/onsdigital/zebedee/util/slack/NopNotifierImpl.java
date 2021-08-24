@@ -27,24 +27,24 @@ public class NopNotifierImpl implements Notifier {
 
     @Override
     public PostMessage createPostMessage(String channel, String text) {
-        return null;
+        return new PostMessage("NopNotifierImpl", channel, text);
     }
 
     @Override
     public boolean sendCollectionAlarm(Collection c, String channel, String message, Exception ex) {
         info().collectionID(c).data("message", message).log("NopNotifierImpl sendCollectionAlarm");
-        return false;
+        return true;
     }
 
     @Override
     public boolean sendCollectionWarning(Collection c, String channel, String message, AttachmentField... attachments) {
         info().collectionID(c).data("message", message).log("NopNotifierImpl sendCollectionWarning");
-        return false;
+        return true;
     }
 
     @Override
     public boolean sendCollectionAlarm(Collection c, String channel, String message, AttachmentField... attachments) {
         info().collectionID(c).data("message", message).log("NopNotifierImpl sendCollectionAlarm");
-        return false;
+        return true;
     }
 }

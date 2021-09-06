@@ -67,7 +67,9 @@ public class KeyringCache {
         try {
             key = schedulerCache.get(collectionID);
         } catch (KeyNotFoundException ex) {
-            // TODO
+            // KeyNotFoundException means the requested key was not found in the cache. In this context that is valid
+            // scenario so we swallow the exception and return null. Any other exception is an error and should be
+            // thrown.
         }
         return key;
     }

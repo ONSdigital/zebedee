@@ -97,14 +97,6 @@ public class LegacyCollectionKeyringImpl implements CollectionKeyring {
         if (session != null) {
             addUserKeyringToCache(user, session);
         }
-
-        try {
-            if (permissions.isAdministrator(user.getEmail())) {
-
-            }
-        } catch (IOException ex) {
-
-        }
     }
 
     private Session getUserSession(User user) throws KeyringException {

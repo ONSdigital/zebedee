@@ -2,6 +2,7 @@ package com.github.onsdigital.zebedee.keyring.migration;
 
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.keyring.CollectionKeyring;
+import com.github.onsdigital.zebedee.keyring.KeyNotFoundException;
 import com.github.onsdigital.zebedee.keyring.KeyringException;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.user.model.User;
@@ -47,10 +48,10 @@ public class MigrationCollectionKeyringImpl implements CollectionKeyring {
     /**
      * Construct a new instance of the Keyring.
      *
-     * @param migrationEnabled if true uses the new central keyring implementation. Otherwise uses legacy keyring
-     *                         implemenation for reads. (Writes/Deletes will be applied to both).
-     * @param legacyCollectionKeyring    the legacy keyring implementation to use.
-     * @param collectionKeyring   the new central keyring implementation to use.
+     * @param migrationEnabled        if true uses the new central keyring implementation. Otherwise uses legacy keyring
+     *                                implemenation for reads. (Writes/Deletes will be applied to both).
+     * @param legacyCollectionKeyring the legacy keyring implementation to use.
+     * @param collectionKeyring       the new central keyring implementation to use.
      */
     public MigrationCollectionKeyringImpl(final boolean migrationEnabled,
                                           final CollectionKeyring legacyCollectionKeyring,
@@ -72,12 +73,47 @@ public class MigrationCollectionKeyringImpl implements CollectionKeyring {
 
     @Override
     public SecretKey get(User user, Collection collection) throws KeyringException {
+        SecretKey key = null;
+
+        if (migrationEnabled) {
+            key = getCentralKeyQuiet(user, collection);
+        }
+
+        if (key != null) {
+            return key;
+        }
+
         try {
-            return getKeyring().get(user, collection);
+            key = legacyCollectionKeyring.get(user, collection);
         } catch (KeyringException ex) {
             throw wrappedKeyringException(ex, GET_KEY_ERR);
         }
+
+        return key;
     }
+
+    /**
+     * Get a key from the central keyring. Returns null if a key for the requested collection ID is not found.
+     *
+     * @param user       the user requesting the key.
+     * @param collection the colleciton key to get.
+     * @return a {@link SecretKey} for the collection if exists, returns null if not found or if a
+     * {@link KeyNotFoundException} is thrown.
+     * @throws KeyringException problem getting the key.
+     */
+    private SecretKey getCentralKeyQuiet(User user, Collection collection) throws KeyringException {
+        SecretKey key = null;
+        try {
+            key = collectionKeyring.get(user, collection);
+        } catch (KeyNotFoundException ex) {
+            // If KeyNotFoundException then return null
+        } catch (KeyringException ex) {
+            // Treat any other exception as an error
+            throw wrappedKeyringException(ex, GET_KEY_ERR);
+        }
+        return key;
+    }
+
 
     /**
      * Attempts to remove a key from both instances of the keyring. The central keyring is updated first.

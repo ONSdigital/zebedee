@@ -1,10 +1,14 @@
 package com.github.onsdigital.zebedee.keyring.legacy;
 
+import com.github.onsdigital.zebedee.keyring.KeyNotFoundException;
 import com.github.onsdigital.zebedee.keyring.KeyringException;
 import org.junit.Test;
 
 import javax.crypto.SecretKey;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 import static com.github.onsdigital.zebedee.keyring.legacy.LegacyCollectionKeyringImpl.CACHE_GET_ERR;
 import static com.github.onsdigital.zebedee.keyring.legacy.LegacyCollectionKeyringImpl.COLLECTION_DESC_NULL_ERR;
@@ -17,6 +21,9 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertThrows;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -159,25 +166,31 @@ public class LegacyCollectionKeyringImpl_GetTest extends BaseLegacyKeyringTest {
     }
 
     @Test
-    public void testGet_keyNotInUserKeyring_shouldReturnNull() throws Exception {
+    public void testGet_keyNotInUserKeyring_shouldThrowEx() throws Exception {
         // Given the user keyring does not contain the requested collection key
-        when(ernieKeyring.get(TEST_COLLECTION_ID))
-                .thenReturn(null);
+        when(ernieKeyring.list())
+                .thenReturn(new HashSet<>());
 
         // When get is called
-        SecretKey actual = legacyCollectionKeyring.get(ernie, collection);
+        assertThrows(KeyNotFoundException.class,
+                () -> legacyCollectionKeyring.get(ernie, collection));
 
-        // Then null is returned
-        assertThat(actual, is(nullValue()));
+        // Then an exception is thrown
         verify(keyringCache, times(1)).get(ernie);
         verify(ernieKeyring, times(1)).isUnlocked();
-        verify(ernieKeyring, times(1)).get(TEST_COLLECTION_ID);
+        verify(ernieKeyring, times(1)).list();
+        verify(ernieKeyring, never()).get(anyString());
     }
 
     @Test
     public void testGet_success_shouldReturnKey() throws Exception {
         // Given an unlocked user keyring exists in the cache
         // and contains the requested key
+        when(bertKeyring.list())
+                .thenReturn(new HashSet<String>() {{
+                    add(TEST_COLLECTION_ID);
+                }});
+
         when(bertKeyring.get(TEST_COLLECTION_ID))
                 .thenReturn(secretKey);
 

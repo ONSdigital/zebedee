@@ -124,6 +124,9 @@ public abstract class BaseLegacyKeyringTest {
         when(collection.getDescription())
                 .thenReturn(collectionDescription);
 
+        when(collection.getId())
+                .thenReturn(TEST_COLLECTION_ID);
+
         when(collectionDescription.getId())
                 .thenReturn(TEST_COLLECTION_ID);
 

@@ -1,12 +1,15 @@
 package com.github.onsdigital.zebedee;
 
-import com.github.onsdigital.slack.client.SlackClient;
+import com.github.onsdigital.slack.messages.PostMessage;
+import com.github.onsdigital.slack.messages.PostMessageAttachment;
 import com.github.onsdigital.zebedee.data.processing.DataIndex;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.Credentials;
+import com.github.onsdigital.zebedee.json.Event;
+import com.github.onsdigital.zebedee.json.EventType;
 import com.github.onsdigital.zebedee.keyring.CollectionKeyCache;
 import com.github.onsdigital.zebedee.keyring.CollectionKeyring;
 import com.github.onsdigital.zebedee.keyring.KeyringException;
@@ -29,7 +32,6 @@ import com.github.onsdigital.zebedee.teams.service.TeamsService;
 import com.github.onsdigital.zebedee.user.model.User;
 import com.github.onsdigital.zebedee.user.service.UsersService;
 import com.github.onsdigital.zebedee.util.slack.Notifier;
-import com.github.onsdigital.zebedee.util.slack.SlackNotifier;
 import com.github.onsdigital.zebedee.util.slack.StartUpAlerter;
 import com.github.onsdigital.zebedee.verification.VerificationAgent;
 
@@ -38,8 +40,14 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
+import static com.github.onsdigital.slack.messages.Colour.DANGER;
+import static com.github.onsdigital.zebedee.configuration.Configuration.getDefaultSlackAlarmChannel;
+import static com.github.onsdigital.zebedee.configuration.Configuration.getSlackUsername;
 import static com.github.onsdigital.zebedee.configuration.Configuration.isVerificationEnabled;
 import static com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedException.beingEditedByAnotherCollectionError;
 import static com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedException.beingEditedByThisCollectionError;

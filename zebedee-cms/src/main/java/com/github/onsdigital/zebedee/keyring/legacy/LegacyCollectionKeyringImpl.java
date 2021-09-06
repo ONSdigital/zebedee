@@ -3,6 +3,7 @@ package com.github.onsdigital.zebedee.keyring.legacy;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.keyring.CollectionKeyCache;
 import com.github.onsdigital.zebedee.keyring.CollectionKeyring;
+import com.github.onsdigital.zebedee.keyring.KeyNotFoundException;
 import com.github.onsdigital.zebedee.keyring.KeyringException;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.KeyringCache;
@@ -25,6 +26,7 @@ import java.util.stream.Collectors;
 
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.error;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.info;
+import static java.text.MessageFormat.format;
 
 /**
  * This class duplicates the existing (legacy) {@link com.github.onsdigital.zebedee.json.Keyring} and {@link KeyringCache}
@@ -55,6 +57,8 @@ public class LegacyCollectionKeyringImpl implements CollectionKeyring {
     static final String KEYRING_LOCKED_ERR = "cached keyring has not been unlocked";
     static final String SAVE_USER_KEYRING_ERR = "error saving changes to user keyring";
     static final String CACHED_KEY_MISSING_ERR = "expected key but not found in cached keyring";
+    static final String KEY_NOT_FOUND_ERR_FMT = "the requested collection key does not exist in the users " +
+            "legacy keyring user: {0}";
 
     private Sessions sessions;
     private UsersService usersService;
@@ -92,6 +96,14 @@ public class LegacyCollectionKeyringImpl implements CollectionKeyring {
 
         if (session != null) {
             addUserKeyringToCache(user, session);
+        }
+
+        try {
+            if (permissions.isAdministrator(user.getEmail())) {
+
+            }
+        } catch (IOException ex) {
+
         }
     }
 
@@ -147,6 +159,10 @@ public class LegacyCollectionKeyringImpl implements CollectionKeyring {
                     .collectionID(collection)
                     .log("get key unsuccessful cached user keyring is locked");
             return null;
+        }
+
+        if (!userKeyring.list().contains(collection.getId())) {
+            throw new KeyNotFoundException(format(KEY_NOT_FOUND_ERR_FMT, user.getEmail()), collection.getId());
         }
 
         return userKeyring.get(collection.getDescription().getId());

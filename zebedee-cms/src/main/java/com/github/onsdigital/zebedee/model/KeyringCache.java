@@ -2,10 +2,13 @@ package com.github.onsdigital.zebedee.model;
 
 import com.github.onsdigital.zebedee.json.Keyring;
 import com.github.onsdigital.zebedee.keyring.CollectionKeyCache;
+import com.github.onsdigital.zebedee.keyring.KeyNotFoundException;
+import com.github.onsdigital.zebedee.keyring.KeyringException;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.session.service.Sessions;
 import com.github.onsdigital.zebedee.user.model.User;
 
+import javax.crypto.SecretKey;
 import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -43,12 +46,30 @@ public class KeyringCache {
 
                 // populate the scheduler keyring
                 for (String collectionId : user.keyring().list()) {
-                    if (schedulerCache.get(collectionId) == null) {
+                    if (getKeyQuiet(collectionId) == null) {
                         schedulerCache.add(collectionId, user.keyring().get(collectionId));
                     }
                 }
             }
         }
+    }
+
+    /**
+     * Get the requested key from the cache.
+     *
+     * @param collectionID the collection ID of the key to get.
+     * @return null if the key is not found or if {@link CollectionKeyCache#get(String)} throws a
+     * {@link KeyNotFoundException}.
+     * @throws KeyringException problem getting the key.
+     */
+    private SecretKey getKeyQuiet(String collectionID) throws KeyringException {
+        SecretKey key = null;
+        try {
+            key = schedulerCache.get(collectionID);
+        } catch (KeyNotFoundException ex) {
+            // TODO
+        }
+        return key;
     }
 
     /**

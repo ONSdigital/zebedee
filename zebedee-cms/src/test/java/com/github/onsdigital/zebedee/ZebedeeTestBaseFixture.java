@@ -6,6 +6,7 @@ import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.Credentials;
 import com.github.onsdigital.zebedee.keyring.CollectionKeyCache;
 import com.github.onsdigital.zebedee.keyring.CollectionKeyring;
+import com.github.onsdigital.zebedee.keyring.migration.KeyringHealthChecker;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.KeyringCache;
 import com.github.onsdigital.zebedee.model.encryption.EncryptionKeyFactory;
@@ -69,6 +70,9 @@ public abstract class ZebedeeTestBaseFixture {
 
     @Mock
     protected CollectionKeyring collectionKeyring;
+
+    @Mock
+    protected KeyringHealthChecker keyringHealthChecker;
 
     @Mock
     protected Credentials credentials;
@@ -168,6 +172,9 @@ public abstract class ZebedeeTestBaseFixture {
 
         when(zebCfg.getSlackNotifier())
                 .thenReturn(slackNotifier);
+
+        when(zebCfg.getKeyringHealthChecker())
+                .thenReturn(keyringHealthChecker);
     }
 
     protected void verifyKeyAddedToCollectionKeyring() throws Exception {

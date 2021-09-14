@@ -22,6 +22,8 @@ import com.github.onsdigital.zebedee.keyring.central.NopCollectionKeyCacheImpl;
 import com.github.onsdigital.zebedee.keyring.central.NopCollectionKeyringImpl;
 import com.github.onsdigital.zebedee.keyring.legacy.LegacyCollectionKeyringImpl;
 import com.github.onsdigital.zebedee.keyring.legacy.LegacySchedulerKeyCacheImpl;
+import com.github.onsdigital.zebedee.keyring.migration.KeyringHealthChecker;
+import com.github.onsdigital.zebedee.keyring.migration.KeyringHealthCheckerImpl;
 import com.github.onsdigital.zebedee.keyring.migration.MigrationCollectionKeyCacheImpl;
 import com.github.onsdigital.zebedee.keyring.migration.MigrationCollectionKeyringImpl;
 import com.github.onsdigital.zebedee.model.Collections;
@@ -138,6 +140,7 @@ public class ZebedeeConfiguration {
     private StartUpAlerter startUpAlerter;
     private SlackClient slackClient;
     private Notifier slackNotifier;
+    private KeyringHealthChecker keyringHealthChecker;
 
     /**
      * Create a new configuration object.
@@ -238,6 +241,9 @@ public class ZebedeeConfiguration {
         }
 
         initSlackIntegration();
+
+        this.keyringHealthChecker = new KeyringHealthCheckerImpl(
+                permissionsService, collections, schedulerKeyCache, slackNotifier);
 
         info().data("root_path", rootPath.toString())
                 .data("zebedee_path", zebedeePath.toString())
@@ -479,5 +485,9 @@ public class ZebedeeConfiguration {
 
     public Notifier getSlackNotifier() {
         return slackNotifier;
+    }
+
+    public KeyringHealthChecker getKeyringHealthChecker() {
+        return keyringHealthChecker;
     }
 }

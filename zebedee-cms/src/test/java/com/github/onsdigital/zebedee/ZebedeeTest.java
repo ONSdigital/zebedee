@@ -436,5 +436,6 @@ public class ZebedeeTest extends ZebedeeTestBaseFixture {
         verify(collectionKeyring, times(1)).cacheKeyring(user);
 
         verify(startUpAlerter, times(1)).queueUnlocked();
+        verify(keyringHealthChecker, times(1)).check(userSession);
     }
 }

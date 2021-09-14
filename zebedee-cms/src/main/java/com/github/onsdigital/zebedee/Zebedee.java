@@ -1,18 +1,15 @@
 package com.github.onsdigital.zebedee;
 
-import com.github.onsdigital.slack.messages.PostMessage;
-import com.github.onsdigital.slack.messages.PostMessageAttachment;
 import com.github.onsdigital.zebedee.data.processing.DataIndex;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.Credentials;
-import com.github.onsdigital.zebedee.json.Event;
-import com.github.onsdigital.zebedee.json.EventType;
 import com.github.onsdigital.zebedee.keyring.CollectionKeyCache;
 import com.github.onsdigital.zebedee.keyring.CollectionKeyring;
 import com.github.onsdigital.zebedee.keyring.KeyringException;
+import com.github.onsdigital.zebedee.keyring.migration.KeyringHealthChecker;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.Collections;
 import com.github.onsdigital.zebedee.model.Content;
@@ -40,14 +37,8 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 import java.util.Optional;
 
-import static com.github.onsdigital.slack.messages.Colour.DANGER;
-import static com.github.onsdigital.zebedee.configuration.Configuration.getDefaultSlackAlarmChannel;
-import static com.github.onsdigital.zebedee.configuration.Configuration.getSlackUsername;
 import static com.github.onsdigital.zebedee.configuration.Configuration.isVerificationEnabled;
 import static com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedException.beingEditedByAnotherCollectionError;
 import static com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedException.beingEditedByThisCollectionError;
@@ -101,6 +92,7 @@ public class Zebedee {
     private final ServiceStoreImpl serviceStoreImpl;
     private final StartUpAlerter startUpAlerter;
     private final Notifier slackNotifier;
+    private final KeyringHealthChecker keyringHealthChecker;
 
     /**
      * Create a new instance of Zebedee setting.
@@ -139,6 +131,7 @@ public class Zebedee {
         this.keyRingPath = cfg.getKeyRingPath();
         this.startUpAlerter = cfg.getStartUpAlerter();
         this.slackNotifier = cfg.getSlackNotifier();
+        this.keyringHealthChecker = cfg.getKeyringHealthChecker();
     }
 
     /**
@@ -309,6 +302,7 @@ public class Zebedee {
 
         if (permissionsService.isAdministrator(session)) {
             startUpAlerter.queueUnlocked();
+            keyringHealthChecker.check(session);
         }
 
         return session;

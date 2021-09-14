@@ -26,7 +26,7 @@ import static com.github.onsdigital.zebedee.configuration.Configuration.getSlack
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.warn;
 
 /**
- * Run a health check that verifies an Admin user's colelction keyring contains all collection keys.
+ * Run a health check that verifies an Admin user's collection keyring contains all collection keys.
  * If any collection keys are missing a Slack notification is sent with details of the affected collections. This is
  * a temp class to help identify issues with the new keyring migration work. It will be deleted once the migration is
  * fully completed.
@@ -34,7 +34,7 @@ import static com.github.onsdigital.zebedee.logging.CMSLogEvent.warn;
 public class KeyringHealthCheckerImpl implements KeyringHealthChecker {
 
     static final String MESSAGE = "Keyring health check failure: Identified 1 or more collection keys missing from " +
-            "an Admin colleciton keyring.\n\n" +
+            "an Admin collection keyring.\n\n" +
             ":warning: It is *strongly* recommended this is investigated to rule out any issues with the" +
             " new keyring migration functionality. :warning:\n";
 
@@ -154,8 +154,8 @@ public class KeyringHealthCheckerImpl implements KeyringHealthChecker {
         List<PostMessageAttachment> attachments = new ArrayList<>();
 
         for (Collection c : missing) {
-            PostMessageAttachment attch = new PostMessageAttachment("Collection ID", c.getId(), DANGER);
-            attch.addField("Collection Name", c.getDescription().getName(), false)
+            PostMessageAttachment attachment = new PostMessageAttachment("Collection ID", c.getId(), DANGER);
+            attachment.addField("Collection Name", c.getDescription().getName(), false)
                     .addField("Missing from", session.getEmail(), true)
                     .addField("Publish Type", c.getDescription().getType().name(), true);
 
@@ -166,11 +166,11 @@ public class KeyringHealthCheckerImpl implements KeyringHealthChecker {
                     .findFirst();
 
             if (createdEvent.isPresent()) {
-                attch.addField("Creation Date", createdEvent.get().getDate().toString(), true);
-                attch.addField("Created By", createdEvent.get().getEmail(), true);
+                attachment.addField("Creation Date", createdEvent.get().getDate().toString(), true);
+                attachment.addField("Created By", createdEvent.get().getEmail(), true);
             }
 
-            attachments.add(attch);
+            attachments.add(attachment);
         }
 
         return attachments;

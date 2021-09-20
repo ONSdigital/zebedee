@@ -93,6 +93,8 @@ public class Zebedee {
     private final StartUpAlerter startUpAlerter;
     private final Notifier slackNotifier;
     private final KeyringHealthChecker keyringHealthChecker;
+    private final CollectionKeyring legacyCollCollectionKeyring;
+    private final CollectionKeyring centralCollectinKeying;
 
     /**
      * Create a new instance of Zebedee setting.
@@ -132,6 +134,9 @@ public class Zebedee {
         this.startUpAlerter = cfg.getStartUpAlerter();
         this.slackNotifier = cfg.getSlackNotifier();
         this.keyringHealthChecker = cfg.getKeyringHealthChecker();
+
+        this.legacyCollCollectionKeyring = cfg.getLegacyCollectionKeyring();
+        this.centralCollectinKeying = cfg.getCentralCollectionKeyring();
     }
 
     /**
@@ -434,6 +439,14 @@ public class Zebedee {
 
     public Notifier getSlackNotifier() {
         return slackNotifier;
+    }
+
+    public CollectionKeyring getLegacyCollCollectionKeyring() {
+        return legacyCollCollectionKeyring;
+    }
+
+    public CollectionKeyring getCentralCollectinKeying() {
+        return centralCollectinKeying;
     }
 }
 

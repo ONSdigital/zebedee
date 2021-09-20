@@ -7,7 +7,6 @@ import com.github.onsdigital.interfaces.JWTHandler;
 import com.github.onsdigital.slack.Profile;
 import com.github.onsdigital.slack.client.SlackClient;
 import com.github.onsdigital.slack.client.SlackClientImpl;
-import com.github.onsdigital.zebedee.configuration.CMSFeatureFlags;
 import com.github.onsdigital.zebedee.data.processing.DataIndex;
 import com.github.onsdigital.zebedee.kafka.KafkaClient;
 import com.github.onsdigital.zebedee.kafka.KafkaClientImpl;
@@ -66,7 +65,6 @@ import com.github.onsdigital.zebedee.util.versioning.VersionsServiceImpl;
 import com.github.onsdigital.zebedee.verification.VerificationAgent;
 import dp.api.dataset.DatasetAPIClient;
 import dp.api.dataset.DatasetClient;
-import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -142,6 +140,9 @@ public class ZebedeeConfiguration {
     private Notifier slackNotifier;
     private KeyringHealthChecker keyringHealthChecker;
 
+    private CollectionKeyring legacyCollectionKeyring;
+    private CollectionKeyring centralCollectionKeyring;
+
     /**
      * Create a new configuration object.
      *
@@ -207,11 +208,8 @@ public class ZebedeeConfiguration {
                 new UserStoreFileSystemImpl(this.usersPath), collections, permissionsService, keyringSupplier);
 
         // Init the collection keyring and scheduler cache.
-        if (CMSFeatureFlags.cmsFeatureFlags().isCentralisedKeyringEnabled()) {
-            initCollectionKeyring();
-        } else {
-            initLegacyKeyring();
-        }
+        boolean enableKeyringMigration = cmsFeatureFlags().isCentralisedKeyringEnabled();
+        initNewCollectionKeyring(enableKeyringMigration);
 
         DatasetClient datasetClient;
         try {
@@ -262,40 +260,52 @@ public class ZebedeeConfiguration {
 
     }
 
-    private void initCollectionKeyring() throws KeyringException {
+    /**
+     * Configure the migration keyring. If enable is true keys will be added/removed from both legacy and central
+     * keyring implementations. All get requests will attempt to retieve the requested key from the central keyring
+     * and fall back to the legacy keyring if the key is not found.
+     * <p>
+     * If enable is false then the migration keyring will write to both the legacy and central keyrings keeping them
+     * in sync. Get key requests will only read from the legacy keyring.
+     */
+    private void initNewCollectionKeyring(final boolean enableMigration) throws KeyringException {
         CollectionKeyStore keyStore = new CollectionKeyStoreImpl(
                 getKeyRingPath(), getKeyringSecretKey(), getKeyringInitVector());
 
         CollectionKeyCacheImpl.init(keyStore);
         CollectionKeyCache collectionKeyCache = CollectionKeyCacheImpl.getInstance();
 
-        this.schedulerKeyCache = collectionKeyCache;
+        this.schedulerKeyCache = new MigrationCollectionKeyCacheImpl(
+                new LegacySchedulerKeyCacheImpl(), collectionKeyCache, enableMigration);
 
         // Initialise legacy keyring regardless - they will dual run until we cut over to new impl.
         this.legacyKeyringCache = new com.github.onsdigital.zebedee.model.KeyringCache(sessions, schedulerKeyCache);
 
-        CollectionKeyring legacyKeyring = new LegacyCollectionKeyringImpl(
+        this.legacyCollectionKeyring = new LegacyCollectionKeyringImpl(
                 sessions, usersService, permissionsService, legacyKeyringCache, schedulerKeyCache);
 
         CollectionKeyringImpl.init(collectionKeyCache, permissionsService, collections);
-        CollectionKeyring centralKeyring = CollectionKeyringImpl.getInstance();
+        this.centralCollectionKeyring = CollectionKeyringImpl.getInstance();
 
-        this.collectionKeyring = new MigrationCollectionKeyringImpl(true, legacyKeyring, centralKeyring);
+        this.collectionKeyring = new MigrationCollectionKeyringImpl(
+                enableMigration, legacyCollectionKeyring, centralCollectionKeyring);
     }
 
+    // Set up for the original legacy keyring. Keep this until we have deployed the central keyring changes to prod -
+    // this allows to rollback easily should the need arise.
     private void initLegacyKeyring() throws KeyringException {
         this.schedulerKeyCache = new MigrationCollectionKeyCacheImpl(
                 new LegacySchedulerKeyCacheImpl(), new NopCollectionKeyCacheImpl(), false);
 
         this.legacyKeyringCache = new com.github.onsdigital.zebedee.model.KeyringCache(sessions, schedulerKeyCache);
 
-        CollectionKeyring legacyCollectionKeyring = new LegacyCollectionKeyringImpl(
+        this.legacyCollectionKeyring = new LegacyCollectionKeyringImpl(
                 sessions, usersService, permissionsService, this.legacyKeyringCache, schedulerKeyCache);
 
-        CollectionKeyring nopCollectionKeyring = new NopCollectionKeyringImpl();
+        this.centralCollectionKeyring = new NopCollectionKeyringImpl();
 
         this.collectionKeyring = new MigrationCollectionKeyringImpl(
-                false, legacyCollectionKeyring, nopCollectionKeyring);
+                false, legacyCollectionKeyring, centralCollectionKeyring);
     }
 
     /**
@@ -489,5 +499,13 @@ public class ZebedeeConfiguration {
 
     public KeyringHealthChecker getKeyringHealthChecker() {
         return keyringHealthChecker;
+    }
+
+    public CollectionKeyring getLegacyCollectionKeyring() {
+        return legacyCollectionKeyring;
+    }
+
+    public CollectionKeyring getCentralCollectionKeyring() {
+        return centralCollectionKeyring;
     }
 }

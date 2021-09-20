@@ -7,6 +7,7 @@ import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.user.model.User;
 
 import javax.crypto.SecretKey;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -42,7 +43,7 @@ public class NopCollectionKeyringImpl implements CollectionKeyring {
     @Override
     public Set<String> list(User user) throws KeyringException {
         info().user(user.getEmail()).log("no-op keyring list keys");
-        return null;
+        return new HashSet<>();
     }
 
     @Override

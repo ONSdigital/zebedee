@@ -228,6 +228,23 @@ public class Configuration {
     }
 
     /**
+     * Get collection keyring vector key
+     */
+    public static IvParameterSpec getKeyringInitVector() {
+        String vectorStr = getValue(KEYRING_INIT_VECTOR);
+        if (StringUtils.isEmpty(vectorStr)) {
+            throw new RuntimeException("expected keyring init vector in environment variable but was empty");
+        }
+
+        byte[] vectorBytes = Base64.getDecoder().decode(vectorStr);
+        IvParameterSpec ivParameterSpec = new IvParameterSpec(vectorBytes);
+
+        Arrays.fill(vectorBytes, (byte) 0);
+
+        return ivParameterSpec;
+    }
+
+    /**
      * Get a map of cognito id and signing key pairs
      */
     public static Map<String, String> getCognitoKeyIdPairs() {
@@ -253,23 +270,6 @@ public class Configuration {
         idKeyPairMap.put(awsCognitoKeyIdTwo, awsCognitoSigningKeyTwo);
 
         return idKeyPairMap;
-    }
-
-    /**
-     * Get collection keyring vector key
-     */
-    public static IvParameterSpec getKeyringInitVector() {
-        String vectorStr = getValue(KEYRING_INIT_VECTOR);
-        if (StringUtils.isEmpty(vectorStr)) {
-            throw new RuntimeException("expected keyring init vector in environment variable but was empty");
-        }
-
-        byte[] vectorBytes = Base64.getDecoder().decode(vectorStr);
-        IvParameterSpec ivParameterSpec = new IvParameterSpec(vectorBytes);
-
-        Arrays.fill(vectorBytes, (byte) 0);
-
-        return ivParameterSpec;
     }
 
     /**

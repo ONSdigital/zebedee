@@ -1,15 +1,19 @@
 package com.github.onsdigital.zebedee.keyring.central;
 
 import com.github.onsdigital.zebedee.keyring.CollectionKeyCache;
+import com.github.onsdigital.zebedee.keyring.CollectionKeyStore;
 import com.github.onsdigital.zebedee.keyring.KeyNotFoundException;
 import com.github.onsdigital.zebedee.keyring.KeyringException;
-import com.github.onsdigital.zebedee.keyring.CollectionKeyStore;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import javax.crypto.SecretKey;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -51,6 +55,21 @@ public class CollectionKeyCacheImplTest {
 
     @Mock
     private SecretKey secretKey;
+
+    /**
+     * Ensure that the instance is null before each test with the reflection magic.
+     */
+    @BeforeClass
+    public static void clear() throws Exception {
+        Field f = CollectionKeyCacheImpl.class.getDeclaredField("INSTANCE");
+        f.setAccessible(true);
+
+        Field modifiersField = Field.class.getDeclaredField("modifiers");
+        modifiersField.setAccessible(true);
+        modifiersField.setInt(f, f.getModifiers() & ~Modifier.FINAL);
+
+        f.set(null, null);
+    }
 
     @Before
     public void setUp() throws Exception {

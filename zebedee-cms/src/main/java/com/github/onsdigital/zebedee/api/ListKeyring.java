@@ -72,7 +72,7 @@ public class ListKeyring {
         checkPermission(getSession(request));
         String src = request.getParameter("src");
 
-        CollectionKeyring keyringSrc = "central".equalsIgnoreCase(src) ? legacyKeyring : centralKeyring;
+        CollectionKeyring keyringSrc = "central".equalsIgnoreCase(src) ? centralKeyring : legacyKeyring;
 
         User user = getUser(usersService, getEmail(request));
         return listKeyring(user, keyringSrc);

@@ -1,7 +1,5 @@
 package com.github.onsdigital.zebedee;
 
-import com.github.onsdigital.slack.Profile;
-import com.github.onsdigital.slack.client.SlackClient;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.Credentials;
 import com.github.onsdigital.zebedee.keyring.CollectionKeyCache;
@@ -24,11 +22,16 @@ import com.github.onsdigital.zebedee.util.slack.StartUpAlerter;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
+import javax.crypto.spec.IvParameterSpec;
+import java.security.SecureRandom;
+import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -98,6 +101,18 @@ public abstract class ZebedeeTestBaseFixture {
     protected Zebedee zebedee;
     protected Builder builder;
     protected Map<String, User> usersMap;
+
+    @BeforeClass
+    public static void setUpKeyringEnvVars() throws Exception {
+        System.setProperty("KEYRING_SECRET_KEY", createCollectionKeyStoreKey());
+        System.setProperty("KEYRING_INIT_VECTOR", createCollectionKeyStoreIV());
+    }
+
+    @AfterClass
+    public static void tearDownKeyringEnvVars() {
+        System.clearProperty("KEYRING_SECRET_KEY");
+        System.clearProperty("KEYRING_INIT_VECTOR");
+    }
 
     @Before
     public void init() throws Exception {
@@ -206,6 +221,20 @@ public abstract class ZebedeeTestBaseFixture {
                 .thenReturn(key);
 
         ReflectionTestUtils.setField(instance, "collectionKeyring", collectionKeyring);
+    }
+
+    private static String createCollectionKeyStoreKey() throws Exception {
+        KeyGenerator keyGen = KeyGenerator.getInstance("AES");
+        SecretKey secretKey = keyGen.generateKey();
+        return Base64.getEncoder().encodeToString(secretKey.getEncoded());
+    }
+
+    private static String createCollectionKeyStoreIV() throws Exception {
+        byte[] iv = new byte[16];
+        SecureRandom random = new SecureRandom();
+        random.nextBytes(iv);
+
+        return Base64.getEncoder().encodeToString(new IvParameterSpec(iv).getIV());
     }
 
 

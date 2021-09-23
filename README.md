@@ -126,8 +126,8 @@ unsuccessful.
 - If disabled Zebedee will add/remove keys from both legacy and central keyring implementations but will 
 only read from the legacy keyring.
 
-The central keyring requires encryption config to be provided the app secrets. These secrets can be generated using 
-the [collection-keyring-secrets-generator][7].
+The central keyring requires encryption config to be provided in app configutation. These secrets can be generated 
+using the [collection-keyring-secrets-generator][7].
 
 ***
 ### :spider: :spider: :spider: :spider:

@@ -1,5 +1,6 @@
 package com.github.onsdigital.zebedee.session.model;
 
+import com.github.onsdigital.impl.UserDataPayload;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Date;
@@ -39,6 +40,13 @@ public class Session {
         // default constructor required to maintain existing functionality
     }
 
+    public Session(UserDataPayload jwtDetails) {
+        if (jwtDetails != null) {
+            this.email = jwtDetails.getEmail();
+            this.groups = jwtDetails.getGroups();
+        }
+    }
+
     /**
      * Construct a new Session from the details provided.
      *
@@ -52,6 +60,7 @@ public class Session {
         this.email = email;
         this.start = start;
         this.lastAccess = lastAccess;
+        this.groups = new String[0];
     }
 
     public String getId() {

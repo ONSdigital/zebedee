@@ -29,10 +29,10 @@ import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 /**
  * JWTStore:  class, when instantiated, will
  * *********  allow for access token verification,
- *            storage (set()) and retrieval (get())
- *            from threadlocal.
- *           
- *            Implements Sessions interface.
+ * storage (set()) and retrieval (get())
+ * from threadlocal.
+ * <p>
+ * Implements Sessions interface.
  */
 public class JWTStore implements Sessions {
 
@@ -46,19 +46,20 @@ public class JWTStore implements Sessions {
 
     private final static int JWT_CHUNK_SIZE = 3;
 
-    public final String ACCESS_TOKEN_REQUIRED_ERROR = "Access Token required but none provided.";
-    public final String ACCESS_TOKEN_EXPIRED_ERROR  = "JWT verification failed as token is expired.";
-    public final String TOKEN_NOT_VALID_ERROR       = "Token format not valid.";
-    public final String TOKEN_NULL_ERROR            = "Token cannot be null.";
+    public static final String ACCESS_TOKEN_REQUIRED_ERROR = "Access Token required but none provided.";
+    public static final String ACCESS_TOKEN_EXPIRED_ERROR = "JWT verification failed as token is expired.";
+    public static final String TOKEN_NOT_VALID_ERROR = "Token format not valid.";
+    public static final String TOKEN_NULL_ERROR = "Token cannot be null.";
+    public static final String SESSION_NOT_FOUND = "user session expected in store but none found";
 
-    private static final String GET_STRING_ID_NOOP  = "Session get(String id) - no-Op.";
+    private static final String GET_STRING_ID_NOOP = "Session get(String id) - no-Op.";
     private static final String GET_REQUEST_ID_NOOP = "Session get(HttpServletRequest id) - no-Op.";
 
     // class constructor - takes HashMap<String, String> as param.
     public JWTStore(JWTHandler jwtHandler, Map<String, String> rsaKeyMap) {
         this.jwtHandler = jwtHandler;
-        this.rsaKeyMap  = rsaKeyMap;
-        this.gson       = new Gson();
+        this.rsaKeyMap = rsaKeyMap;
+        this.gson = new Gson();
     }
 
     /**
@@ -94,21 +95,19 @@ public class JWTStore implements Sessions {
      */
     @Override
     public Session get(String id) throws IOException {
-        info().log(GET_STRING_ID_NOOP);
-        return null;
+        return get();
     }
 
     /**
      * Get a {@link Session} session object from thread local.
      *
-     * @param id the {@link HttpServletRequest} to get the session object from thread local for.
-     * @return session object from thread local.
+     * @param req the {@link HttpServletRequest} to get the session object from thread local for.
+     * @return session object from thread local if it exists, return null if no session exists.
      * @throws IOException for any problem getting a session from the request.
      */
     @Override
-    public Session get(HttpServletRequest id) throws IOException {
-        info().log(GET_REQUEST_ID_NOOP);
-        return null;
+    public Session get(HttpServletRequest req) throws IOException {
+        return get();
     }
 
     /**
@@ -119,10 +118,13 @@ public class JWTStore implements Sessions {
      */
     @Override
     public Session get() throws IOException {
-        Session session = new Session();
-        session.setEmail(store.get().getEmail());
-        session.setGroups(store.get().getGroups());
-        return session;
+        UserDataPayload jwtDetails = store.get();
+        if (jwtDetails == null) {
+            info().log("no user session not found in Threadload session store");
+            return null;
+        }
+
+        return new Session(jwtDetails);
     }
 
     /**
@@ -163,19 +165,23 @@ public class JWTStore implements Sessions {
 
     private String getPublicSigningKey(String tokenHeader) {
         String headerDecoded = new String(
-            Base64.getDecoder().decode(tokenHeader),
-            StandardCharsets.UTF_8
+                Base64.getDecoder().decode(tokenHeader),
+                StandardCharsets.UTF_8
         );
 
         Map<String, String> decodedResult = this.gson.fromJson(
-            headerDecoded,
-            new TypeToken<Map<String, String>>(){}.getType()
+                headerDecoded,
+                new TypeToken<Map<String, String>>() {
+                }.getType()
         );
 
         // return rsa public signing key from this.rsaKeyMap
         return this.rsaKeyMap.get(
-            decodedResult.get("kid")
+                decodedResult.get("kid")
         );
     }
 
+    static void setStore(ThreadLocal<UserDataPayload> store) {
+        JWTStore.store = store;
+    }
 }

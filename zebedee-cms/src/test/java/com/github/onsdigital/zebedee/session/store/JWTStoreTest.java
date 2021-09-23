@@ -1,9 +1,12 @@
 package com.github.onsdigital.zebedee.session.store;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.Arrays;
 import java.util.HashMap;
 
+import org.apache.poi.ss.formula.functions.T;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.Before;
 import org.mockito.Mock;
@@ -11,10 +14,14 @@ import org.mockito.MockitoAnnotations;
 
 import com.github.onsdigital.impl.UserDataPayload;
 
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThrows;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.mockito.Matchers.notNull;
+import static org.mockito.Mockito.mock;
 
 import com.github.onsdigital.JWTHandlerImpl;
 import com.github.onsdigital.interfaces.JWTHandler;
@@ -25,6 +32,8 @@ import com.github.onsdigital.zebedee.session.store.exceptions.SessionsRequestExc
 import com.github.onsdigital.zebedee.session.store.exceptions.SessionsDecodeException;
 import com.github.onsdigital.zebedee.session.store.exceptions.SessionsTokenExpiredException;
 import com.github.onsdigital.zebedee.session.store.exceptions.SessionsVerificationException;
+
+import javax.servlet.http.HttpServletRequest;
 
 public class JWTStoreTest {
 
@@ -66,6 +75,11 @@ public class JWTStoreTest {
 
     @Mock
     private UserDataPayload userDataPayload;
+
+    @BeforeClass
+    public static void staticSetUp() {
+        JWTStore.setStore(new ThreadLocal<>());
+    }
 
     @Before
     public void setUp() {
@@ -124,5 +138,54 @@ public class JWTStoreTest {
     public void invalidlyFormattedAccessTokenPassedtoSetterThrowsSessionsDecodeException() throws Exception {
         Exception exception = assertThrows(SessionsDecodeException.class, () -> this.jwtStore.set(UNSIGNED_TOKEN));
         assertThat(exception.getMessage(), is(this.jwtStore.TOKEN_NOT_VALID_ERROR));
+    }
+
+    @Test
+    public void getByRequest_sessionDoesNotExist_shouldReturnNull() throws Exception {
+        HttpServletRequest request = mock(HttpServletRequest.class);
+
+        Session actual = jwtStore.get(request);
+
+        assertThat(actual, is(nullValue()));
+    }
+
+    @Test
+    public void getByRequest_success_shouldReturnSession() throws Exception {
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        UserDataPayload payload = new UserDataPayload("admin@ons.gov.uk", new String[]{"admin"});
+        Session expected = new Session(payload);
+
+        ThreadLocal<UserDataPayload> threadLocal = new ThreadLocal<UserDataPayload>();
+        threadLocal.set(payload);
+
+        JWTStore.setStore(threadLocal);
+
+        Session actual = jwtStore.get(request);
+
+        assertThat(actual, is(notNullValue()));
+        assertThat(actual.getEmail(), equalTo(expected.getEmail()));
+        assertThat(actual.getGroups(), equalTo(expected.getGroups()));
+    }
+
+    @Test
+    public void getByIDsessionDoesNotExist_shouldReturnNull() throws Exception {
+        assertThat(jwtStore.get("ID"), is(nullValue()));
+    }
+
+    @Test
+    public void getByID_success_shouldReturnSession() throws Exception {
+        UserDataPayload payload = new UserDataPayload("admin@ons.gov.uk", new String[]{"admin"});
+        Session expected = new Session(payload);
+
+        ThreadLocal<UserDataPayload> threadLocal = new ThreadLocal<UserDataPayload>();
+        threadLocal.set(payload);
+
+        JWTStore.setStore(threadLocal);
+
+        Session actual = jwtStore.get("666");
+
+        assertThat(actual, is(notNullValue()));
+        assertThat(actual.getEmail(), equalTo(expected.getEmail()));
+        assertThat(actual.getGroups(), equalTo(expected.getGroups()));
     }
 }

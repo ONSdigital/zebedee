@@ -120,7 +120,7 @@ public class JWTStore implements Sessions {
     public Session get() throws IOException {
         UserDataPayload jwtDetails = store.get();
         if (jwtDetails == null) {
-            info().log("no user session not found in Threadload session store");
+            info().log("no user session found in Threadload session store");
             return null;
         }
 

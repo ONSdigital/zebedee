@@ -115,6 +115,19 @@ Otherwise :violin: kindly ask someone from the dev team to help troubleshoot.
 | KAFKA_ADDR                    | localhost:9092 | Comma seperated list of kafka brokers
 | KAFKA_CONTENT_PUBLISHED_TOPIC | content-published | Kafka topic to send content-published messages to
 
+### New Central Keyring configuration
+The new central keyring feature is currently behind a feature flag:
+```bash
+export ENABLE_CENTRALISED_KEYRING=true/false
+```
+- If enabled Zebedee will attempt to read/write from the new central keyring and default to the legacy keyring if 
+unsuccessful. 
+- If disabled Zebedee will add/remove keys from both legacy and central keyring implementations but will 
+only read from the legacy keyring.
+
+The central keyring requires encryption config to be provided in app configutation. These secrets can be generated 
+using the [collection-keyring-secrets-generator][7].
+
 ***
 ### :spider: :spider: :spider: :spider:
 ### Legacy dataset versions defect
@@ -180,6 +193,7 @@ If this is fails try again after regenerating an override key as it may have exp
 [4]: http://localhost:8081/florence/login
 [5]: https://github.com/ONSdigital/sixteens
 [6]: https://github.com/ONSdigital/dp-compose
+[7]: collection-keyring-secrets-generator/README.md
 
 #### SERVICE_AUTH_TOKEN creation for Production
 

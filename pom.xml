@@ -10,6 +10,7 @@
     <modules>
         <module>zebedee-cms</module>
         <module>zebedee-reader</module>
+        <module>collection-keyring-secrets-generator</module>
     </modules>
 
     <organization>

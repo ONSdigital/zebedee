@@ -11,7 +11,7 @@ for dev/prod environments.
 ### Generating secrets
 From the root of the Zebedee project:
 ```bash
-cd zebedee/collection-keyring-secrets-generator
+cd collection-keyring-secrets-generator
 ```
 For local dev set up:
 ```bash

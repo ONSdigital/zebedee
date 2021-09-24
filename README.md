@@ -114,7 +114,6 @@ Otherwise :violin: kindly ask someone from the dev team to help troubleshoot.
 | ENABLE_KAFKA                  | false     | Feature flag to send kafka messages when a collection is published
 | KAFKA_ADDR                    | localhost:9092 | Comma seperated list of kafka brokers
 | KAFKA_CONTENT_PUBLISHED_TOPIC | content-published | Kafka topic to send content-published messages to
-| ENABLE_CENTRALISED_KEYRING    | false     | Enabled the new central keyring. If fas
 
 ### New Central Keyring configuration
 The new central keyring feature is currently behind a feature flag:

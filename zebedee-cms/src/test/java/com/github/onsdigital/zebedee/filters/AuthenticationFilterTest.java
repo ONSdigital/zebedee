@@ -1,4 +1,4 @@
-package com.github.onsdigital.zebedee.filter;
+package com.github.onsdigital.zebedee.filters;
 
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.session.service.Sessions;
@@ -7,6 +7,10 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import static com.github.onsdigital.zebedee.filters.AuthenticationFilter.AUTH_HEADER;
+import static com.github.onsdigital.zebedee.filters.AuthenticationFilter.BEARER_PREFIX;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
 
@@ -14,7 +18,6 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
 import java.io.IOException;
-import com.github.onsdigital.zebedee.filters.AuthenticationFilter;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -35,6 +38,7 @@ import com.github.davidcarboni.restolino.json.Serialiser;
 
 import org.eclipse.jetty.http.HttpStatus;
 
+import javax.servlet.http.HttpServletRequest;
 import java.nio.charset.StandardCharsets;
 
 public class AuthenticationFilterTest extends ZebedeeTestBaseFixture {
@@ -89,7 +93,10 @@ public class AuthenticationFilterTest extends ZebedeeTestBaseFixture {
     private Session session;
 
     @Mock
-    private Serialiser Serialiser = new Serialiser(); 
+    private Serialiser Serialiser = new Serialiser();
+
+    @Mock
+    private HttpServletRequest mockRequest;
 
     @Before
     public void setUp() throws Exception {
@@ -145,7 +152,7 @@ public class AuthenticationFilterTest extends ZebedeeTestBaseFixture {
 
     @Test
     public void authorisationFilterUsingThreadLocalSessionsModelTest() throws IOException {      
-        request.addHeader("Authorization", SIGNED_TOKEN);
+        request.addHeader("Authorization", BEARER_PREFIX + SIGNED_TOKEN);
         
         result = authFilterNewModel.filter(request, response);
 
@@ -174,7 +181,7 @@ public class AuthenticationFilterTest extends ZebedeeTestBaseFixture {
 
     @Test
     public void authorisationFilterUsingThreadLocalSessionsVerificationErrorTest() throws IOException {      
-        request.addHeader("Authorization", TOKEN_NO_USER);
+        request.addHeader("Authorization", BEARER_PREFIX + TOKEN_NO_USER);
 
         result = authFilterNewModel.filter(request, response);
 
@@ -188,7 +195,7 @@ public class AuthenticationFilterTest extends ZebedeeTestBaseFixture {
     
     @Test
     public void authorisationFilterUsingThreadLocalTokenExpiredErrorTest() throws IOException {      
-        request.addHeader("Authorization", TOKEN_EXPIRED_TIME);
+        request.addHeader("Authorization", BEARER_PREFIX + TOKEN_EXPIRED_TIME);
 
         result = authFilterNewModel.filter(request, response);
 
@@ -202,7 +209,7 @@ public class AuthenticationFilterTest extends ZebedeeTestBaseFixture {
 
     @Test
     public void authorisationFilterUsingThreadLocalMalformedTokenErrorTest() throws IOException {      
-        request.addHeader("Authorization", MALFORMED_TOKEN);
+        request.addHeader("Authorization", BEARER_PREFIX + MALFORMED_TOKEN);
 
         result = authFilterNewModel.filter(request, response);
 
@@ -212,5 +219,42 @@ public class AuthenticationFilterTest extends ZebedeeTestBaseFixture {
         assertEquals(response.getStatus(), HttpStatus.UNAUTHORIZED_401);
         assertEquals(responseMessage, TOKEN_NOT_VALID_ERROR);
         assertEquals(result, false);
+    }
+
+    @Test
+    public void getAuthTokenFrom_requestNull_shouldReturnNull() {
+        assertThat(authFilterNewModel.getTokenFrom(null), is(nullValue()));
+    }
+
+    @Test
+    public void getAuthTokenFrom_headerNull_shouldReturnNull() {
+        when(mockRequest.getHeader(AUTH_HEADER))
+                .thenReturn(null);
+
+        assertThat(authFilterNewModel.getTokenFrom(mockRequest), is(nullValue()));
+    }
+
+    @Test
+    public void getAuthTokenFrom_headerEmpty_shouldReturnNull() {
+        when(mockRequest.getHeader(AUTH_HEADER))
+                .thenReturn("");
+
+        assertThat(authFilterNewModel.getTokenFrom(mockRequest), is(nullValue()));
+    }
+
+    @Test
+    public void getAuthTokenFrom_NoBearerPrefix_shouldReturnTokenValue() {
+        when(mockRequest.getHeader(AUTH_HEADER))
+                .thenReturn("1234567890");
+
+        assertThat(authFilterNewModel.getTokenFrom(mockRequest), equalTo("1234567890"));
+    }
+
+    @Test
+    public void getAuthTokenFrom_BearerPrefix_shouldReturnTokenValue() {
+        when(mockRequest.getHeader(AUTH_HEADER))
+                .thenReturn("Bearer 1234567890");
+
+        assertThat(authFilterNewModel.getTokenFrom(mockRequest), equalTo("1234567890"));
     }
 }

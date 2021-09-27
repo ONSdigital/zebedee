@@ -31,9 +31,11 @@ import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFea
 
 public class AuthenticationFilter implements PreFilter {
 
+    static final String AUTH_HEADER = "Authorization";
+    static final String BEARER_PREFIX = "Bearer ";
+    private final String NO_AUTH_HEADER_FOUND = "No authorisation header found. Exiting...";
     private Sessions sessions;
 
-    private final String NO_AUTH_HEADER_FOUND = "No authorisation header found. Exiting...";
 
     private Boolean jwtSessionsEnabled;
 
@@ -118,11 +120,12 @@ public class AuthenticationFilter implements PreFilter {
     private boolean verifyAndStoreAccessToken(HttpServletRequest request, HttpServletResponse response) {
         boolean result = false;
         //ensure that authorisation header present
-        if (request.getHeader("Authorization") == null) {
+        String authToken = getTokenFrom(request);
+        if (StringUtils.isEmpty(authToken)) {
             unauthorisedRequest(response, NO_AUTH_HEADER_FOUND);
         } else {
             try {
-                getSessions().set(request.getHeader("Authorization"));
+                getSessions().set(authToken);
                 result = true;
             } catch (SessionsStoreException e) {
                 // treat access token expired or malformed access token as unauthorised
@@ -225,5 +228,34 @@ public class AuthenticationFilter implements PreFilter {
             }
         }
         return this.sessions;
+    }
+
+    /**
+     * Get the Auth token from the request headers if it exists. Removes "Bearer " prefix if present in token value.
+     * e.g
+     * <ul>
+     *     <li>No "Authorization" header -> return null.</li>
+     *     <li>"Authorization: Bearer 1234567890" -> "1234567890"</li>
+     *     <li>"Authorization: 1234567890" -> "1234567890"</li>
+     * </ul>
+     *
+     * @param request the request to inspect.
+     * @return the token value if it exists, with any Bearer prefix removed.
+     */
+    String getTokenFrom(HttpServletRequest request) {
+        if (request == null) {
+            return null;
+        }
+
+        String token = request.getHeader(AUTH_HEADER);
+        if (StringUtils.isEmpty(token)) {
+            return null;
+        }
+
+        if (StringUtils.startsWith(token, BEARER_PREFIX)) {
+            return StringUtils.replace(token, BEARER_PREFIX, "");
+        }
+
+        return token;
     }
 }

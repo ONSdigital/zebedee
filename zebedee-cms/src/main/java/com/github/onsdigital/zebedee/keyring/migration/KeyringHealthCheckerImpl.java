@@ -2,6 +2,7 @@ package com.github.onsdigital.zebedee.keyring.migration;
 
 import com.github.onsdigital.slack.messages.PostMessage;
 import com.github.onsdigital.slack.messages.PostMessageAttachment;
+import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.Event;
 import com.github.onsdigital.zebedee.json.EventType;
 import com.github.onsdigital.zebedee.keyring.CollectionKeyCache;
@@ -23,6 +24,7 @@ import java.util.stream.Collectors;
 import static com.github.onsdigital.slack.messages.Colour.DANGER;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getDefaultSlackAlarmChannel;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getSlackUsername;
+import static com.github.onsdigital.zebedee.logging.CMSLogEvent.error;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.warn;
 
 /**
@@ -61,6 +63,15 @@ public class KeyringHealthCheckerImpl implements KeyringHealthChecker {
 
     @Override
     public void check(Session session) {
+        try {
+            runHealthCheck(session);
+        } catch (Exception ex) {
+            // Any errors should be handled quietly so catch and swallow the error and log it out.
+            warn().exception(ex).user(session).log("unexpected error running user keyring healthcheck");
+        }
+    }
+
+    private void runHealthCheck(Session session) {
         if (!isValidSession(session)) {
             return;
         }
@@ -154,27 +165,55 @@ public class KeyringHealthCheckerImpl implements KeyringHealthChecker {
         List<PostMessageAttachment> attachments = new ArrayList<>();
 
         for (Collection c : missing) {
-            PostMessageAttachment attachment = new PostMessageAttachment("Collection ID", c.getId(), DANGER);
-            attachment.addField("Collection Name", c.getDescription().getName(), false)
-                    .addField("Missing from", session.getEmail(), true)
-                    .addField("Publish Type", c.getDescription().getType().name(), true);
-
-            Optional<Event> createdEvent = c.getDescription()
-                    .getEvents()
-                    .stream()
-                    .filter(e -> e.type.equals(EventType.CREATED))
-                    .findFirst();
-
-            if (createdEvent.isPresent()) {
-                attachment.addField("Creation Date", createdEvent.get().getDate().toString(), true);
-                attachment.addField("Created By", createdEvent.get().getEmail(), true);
-            }
-
-            attachments.add(attachment);
+            attachments.add(createMsgAttatchment(c, session));
         }
 
         return attachments;
     }
+
+    private PostMessageAttachment createMsgAttatchment(Collection c, Session session) {
+        if (c == null) {
+            throw new IllegalArgumentException("collection expected but was null");
+        }
+
+        if (c.getDescription() == null) {
+            throw new IllegalArgumentException("collection.description expected but was null");
+        }
+
+        CollectionDescription desc = c.getDescription();
+
+        PostMessageAttachment attachment = new PostMessageAttachment("Collection ID", c.getId(), DANGER)
+                .addField("Collection Name",desc.getName(), false)
+                .addField("Missing from", session.getEmail(), true);
+
+        if (desc.getType() != null) {
+            attachment.addField("Publish Type", desc.getType().name(), true);
+        }
+
+        Optional<Event> createdEvent = getCollectionCreatedEvent(desc);
+
+        if (createdEvent.isPresent() && createdEvent.get().getDate() != null) {
+            attachment.addField("Creation Date", createdEvent.get().getDate().toString(), true);
+        }
+
+        if (createdEvent.isPresent() && StringUtils.isNoneEmpty(createdEvent.get().getEmail())) {
+            attachment.addField("Created By", createdEvent.get().getEmail(), true);
+        }
+
+        return attachment;
+    }
+
+    private Optional<Event> getCollectionCreatedEvent(CollectionDescription desc) {
+        if (desc.getEvents() == null) {
+            return Optional.empty();
+        }
+
+        return desc.getEvents()
+                .stream()
+                .filter(e -> EventType.CREATED.equals(e.type))
+                .findFirst();
+    }
+
 
     private PostMessage createSlackMessage(List<PostMessageAttachment> attachments) {
         PostMessage msg = new PostMessage(getSlackUsername(), getDefaultSlackAlarmChannel(), ":flo:", MESSAGE);

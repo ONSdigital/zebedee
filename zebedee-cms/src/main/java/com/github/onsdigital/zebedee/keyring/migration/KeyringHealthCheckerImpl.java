@@ -24,7 +24,6 @@ import java.util.stream.Collectors;
 import static com.github.onsdigital.slack.messages.Colour.DANGER;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getDefaultSlackAlarmChannel;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getSlackUsername;
-import static com.github.onsdigital.zebedee.logging.CMSLogEvent.error;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.warn;
 
 /**
@@ -165,13 +164,13 @@ public class KeyringHealthCheckerImpl implements KeyringHealthChecker {
         List<PostMessageAttachment> attachments = new ArrayList<>();
 
         for (Collection c : missing) {
-            attachments.add(createMsgAttatchment(c, session));
+            attachments.add(createMsgAttachment(c, session));
         }
 
         return attachments;
     }
 
-    private PostMessageAttachment createMsgAttatchment(Collection c, Session session) {
+    private PostMessageAttachment createMsgAttachment(Collection c, Session session) {
         if (c == null) {
             throw new IllegalArgumentException("collection expected but was null");
         }

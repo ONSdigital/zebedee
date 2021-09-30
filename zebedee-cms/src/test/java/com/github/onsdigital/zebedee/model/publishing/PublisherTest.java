@@ -5,11 +5,11 @@ import org.junit.Test;
 
 import java.io.IOException;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class PublisherTest {
 
-    private final String TEST_DIR_NAME = "src/test/resources/bpTestFolder";
     private Publisher publisher;
 
     @Before
@@ -24,13 +24,13 @@ public class PublisherTest {
         String testUri = "/testUri0/data.json";
 
         //When {sending a uris to kafka}
-        String actuals = publisher.convertUriForEvent(testUri);
+        String actual = publisher.convertUriForEvent(testUri);
 
-        System.out.println(actuals);
+        System.out.println(actual);
 
         //Then {uri does not have "data.json" string}
-        assertTrue(!actuals.contains("/testUri0/data.json"));
-        assertTrue(actuals.contains("/testUri0"));
+        assertFalse(actual.contains("/testUri0/data.json"));
+        assertTrue(actual.contains("/testUri0"));
     }
 
     @Test
@@ -40,11 +40,9 @@ public class PublisherTest {
         String testUri1 = "/testUri1";
 
         //When {sending a uri to kafka}
-        String actuals = publisher.convertUriForEvent(testUri1);
-
-        System.out.println(actuals);
+        String actual = publisher.convertUriForEvent(testUri1);
 
         //Then {uris returns the original string}
-        assertTrue(actuals.contains("/testUri1"));
+        assertTrue(actual.contains("/testUri1"));
     }
 }

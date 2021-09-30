@@ -759,14 +759,16 @@ public class Publisher {
     }
 
     private static void sendToKafka(Collection collection) throws IOException {
-        List<String> uris = collection.getReviewed().uris();
-        List<String> validUris = uris.stream().map (temp -> {
-            convertUriForEvent(temp);
-            return temp;
-        }).collect(Collectors.toList());
+        List<String> uris = collection.getReviewed().uris()
+                .stream().map((temp) -> convertUriForEvent(temp))
+                .collect(Collectors.toList());
+
+        info().data("collectionId", collection.getId())
+                .data("publishing", true)
+                .data("kafka-uris", uris).log("converted URIs for kafka event");
 
         try {
-            kafkaServiceSupplier.getService().produceContentPublished(collection.getId(), validUris);
+            kafkaServiceSupplier.getService().produceContentPublished(collection.getId(), uris);
         } catch (Exception e) {
             error().data("collectionId", collection.getDescription().getId()).data("publishing", true)
                     .logException(e, "failed to send content-published kafka events");

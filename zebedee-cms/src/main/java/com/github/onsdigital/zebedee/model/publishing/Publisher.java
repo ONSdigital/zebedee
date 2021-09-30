@@ -760,8 +760,9 @@ public class Publisher {
 
     private static void sendToKafka(Collection collection) throws IOException {
         List<String> uris = collection.getReviewed().uris();
+        List<String> validUris = getUrlsConverted(uris);
         try {
-            kafkaServiceSupplier.getService().produceContentPublished(collection.getId(), uris);
+            kafkaServiceSupplier.getService().produceContentPublished(collection.getId(), validUris);
         } catch (Exception e) {
             error().data("collectionId", collection.getDescription().getId()).data("publishing", true)
                     .logException(e, "failed to send content-published kafka events");
@@ -770,6 +771,18 @@ public class Publisher {
             Notifier notifier = zebedee.getSlackNotifier();
             notifier.sendCollectionAlarm(collection, channel, "Failed to send content-published kafka events", e);
         }
+    }
+
+    //Removing data.json from uris, if exists
+    public static List<String> getUrlsConverted(List<String> uris) {
+
+        List<String> uriToKafka = uris.stream().map (temp -> {
+            temp = temp.replaceAll("/data.json", "");
+            temp.trim();
+            return temp;
+        }).collect(Collectors.toList());
+
+        return uriToKafka;
     }
 
     private static void saveCollection(Collection collection, boolean publishComplete) {

@@ -760,7 +760,11 @@ public class Publisher {
 
     private static void sendToKafka(Collection collection) throws IOException {
         List<String> uris = collection.getReviewed().uris();
-        List<String> validUris = getUrlsConverted(uris);
+        List<String> validUris = uris.stream().map (temp -> {
+            convertUriForEvent(temp);
+            return temp;
+        }).collect(Collectors.toList());
+
         try {
             kafkaServiceSupplier.getService().produceContentPublished(collection.getId(), validUris);
         } catch (Exception e) {
@@ -773,16 +777,10 @@ public class Publisher {
         }
     }
 
-    //Removing data.json from uris, if exists
-    public static List<String> getUrlsConverted(List<String> uris) {
-
-        List<String> uriToKafka = uris.stream().map (temp -> {
-            temp = temp.replaceAll("/data.json", "");
-            temp.trim();
-            return temp;
-        }).collect(Collectors.toList());
-
-        return uriToKafka;
+    public static String convertUriForEvent(String uri){
+        uri = uri.replaceAll("/data.json", "");
+        uri.trim();
+        return uri;
     }
 
     private static void saveCollection(Collection collection, boolean publishComplete) {

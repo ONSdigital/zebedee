@@ -11,7 +11,7 @@ public interface KafkaClient {
 
     /**
      * Produce a 'content-published' kafka message for the given parameters
-     * @param url The url of the published resource
+     * @param uri The url of the published resource
      * @param dataType The data type of the published resource
      * @param collectionID the ID of the collection being published
      * @return

@@ -4,10 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class PublisherTest {
@@ -21,23 +18,33 @@ public class PublisherTest {
     }
 
     @Test
-    public void testGetUrisConverted() {
+    public void testConvertUriWithJsonForEvent() {
 
-        //Given {a list of uris ready to be sent to kafka}
-        List<String> testUris = new ArrayList<>();
-        testUris.add("/testUris0/data.json");
-        testUris.add("/testUri1");
-        testUris.add("/testUris2/data.json");
-        testUris.add("/testUris3");
+        //Given {a single uri with data.json ready to be sent to kafka}
+        String testUri = "/testUri0/data.json";
 
-        //When {sending a list of uris to kafka}
-        List<String> actuals = publisher.getUrlsConverted(testUris);
+        //When {sending a uris to kafka}
+        String actuals = publisher.convertUriForEvent(testUri);
 
-        //Then {size of the list unchanged}.
-        assertEquals(actuals.size(), testUris.size());
-        //And {none of the uris have "data.json" string}
-        assertTrue(!actuals.contains("/testUris0/data.json"));
-        assertTrue(actuals.contains("/testUris0"));
-        assertTrue(actuals.contains("/testUris2"));
+        System.out.println(actuals);
+
+        //Then {uri does not have "data.json" string}
+        assertTrue(!actuals.contains("/testUri0/data.json"));
+        assertTrue(actuals.contains("/testUri0"));
+    }
+
+    @Test
+    public void testConvertUriWithOutJsonForEvent() {
+
+        //Given {a single uri without data.json ready to be sent to kafka}
+        String testUri1 = "/testUri1";
+
+        //When {sending a uri to kafka}
+        String actuals = publisher.convertUriForEvent(testUri1);
+
+        System.out.println(actuals);
+
+        //Then {uris returns the original string}
+        assertTrue(actuals.contains("/testUri1"));
     }
 }

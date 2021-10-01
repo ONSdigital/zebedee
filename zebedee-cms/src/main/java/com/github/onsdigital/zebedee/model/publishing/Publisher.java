@@ -779,6 +779,12 @@ public class Publisher {
         }
     }
 
+
+    /**
+     * Prepare a uri for a kafka event
+     * @param uri The uri of the published content
+     * @return String
+     */
     public static String convertUriForEvent(String uri){
         uri = uri.replaceAll("/data.json", "");
         uri.trim();

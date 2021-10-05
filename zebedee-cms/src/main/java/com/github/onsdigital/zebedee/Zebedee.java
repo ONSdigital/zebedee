@@ -307,8 +307,7 @@ public class Zebedee {
 
         if (permissionsService.isAdministrator(session)) {
             startUpAlerter.queueUnlocked();
-            // Disable hotfix
-            //keyringHealthChecker.check(session);
+            keyringHealthChecker.check(session);
         }
 
         return session;

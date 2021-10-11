@@ -36,6 +36,9 @@ public class Configuration {
     private static final String IMAGE_API_URL = "http://localhost:24700";
     private static final String KAFKA_ADDR = "localhost:9092";
     private static final String KAFKA_CONTENT_PUBLISHED_TOPIC = "content-published";
+    private static final String KAFKA_SEC_PROTO = "";
+    private static final String KAFKA_SEC_CLIENT_KEY_P12 = "";
+    private static final String KAFKA_SEC_CLIENT_KEY = "";
     private static final String DATASET_API_AUTH_TOKEN = "FD0108EA-825D-411C-9B1D-41EF7727F465";
     private static final String SERVICE_AUTH_TOKEN = "15C0E4EE-777F-4C61-8CDB-2898CEB34657";
     private static final String DEFAULT_SLACK_USERNAME = "Zebedee";
@@ -133,6 +136,20 @@ public class Configuration {
 
     public static String getKafkaContentPublishedTopic() {
         return StringUtils.defaultIfBlank(getValue("KAFKA_CONTENT_PUBLISHED_TOPIC"), KAFKA_CONTENT_PUBLISHED_TOPIC);
+    }
+
+    public static String getKafkaSecProtocol() {
+        return StringUtils.defaultIfBlank(getValue("KAFKA_SEC_PROTO"), KAFKA_SEC_PROTO);
+    }
+
+    // base64-encoded key in PKCS12 format (if blank, use KAFKA_SEC_CLIENT_KEY)
+    public static String getKafkaSecClientKeyP12() {
+        return StringUtils.defaultIfBlank(getValue("KAFKA_SEC_CLIENT_KEY_P12"), KAFKA_SEC_CLIENT_KEY_P12);
+    }
+
+    // filepath for key (not used if KAFKA_SEC_CLIENT_KEY_P12 set)
+    public static String getKafkaSecClientKey() {
+        return StringUtils.defaultIfBlank(getValue("KAFKA_SEC_CLIENT_KEY"), KAFKA_SEC_CLIENT_KEY);
     }
 
     public static String getDatasetAPIAuthToken() {

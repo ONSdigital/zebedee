@@ -3,11 +3,11 @@ package com.github.onsdigital.zebedee.kafka;
 import com.github.onsdigital.zebedee.avro.ContentPublished;
 import com.github.onsdigital.zebedee.kafka.avro.AvroSerializer;
 import org.apache.kafka.clients.CommonClientConfigs;
-import org.apache.kafka.clients.admin.AdminClientConfig;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
+
 import org.apache.kafka.common.config.SslConfigs;
 import org.apache.kafka.common.serialization.StringSerializer;
 
@@ -33,7 +33,7 @@ public class KafkaClientImpl implements KafkaClient {
         this.topic = topic;
 
         Properties props = new Properties();
-        props.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG,kafkaAddr);
+        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG,kafkaAddr);
 
         if (getKafkaSecProtocol().equals("TLS")) {
             props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, "SSL");
@@ -45,8 +45,8 @@ public class KafkaClientImpl implements KafkaClient {
                 // key already in file
                 props.put(SslConfigs.SSL_KEYSTORE_LOCATION_DOC, getKafkaSecClientKey());
             }
-            props.put("ssl.keystore.password", "");
-            props.put("ssl.keystore.type", "PKCS12");
+            props.put("SslConfigs.SSL_KEYSTORE_PASSWORD_CONFIG", "");
+            props.put("SslConfigs.SSL_KEYSTORE_TYPE_CONFIG", "PKCS12");
         }
 
         AvroSerializer<ContentPublished> avroSerializer = new AvroSerializer<>(ContentPublished.class);

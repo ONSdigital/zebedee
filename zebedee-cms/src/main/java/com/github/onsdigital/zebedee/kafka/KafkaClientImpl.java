@@ -2,25 +2,23 @@ package com.github.onsdigital.zebedee.kafka;
 
 import com.github.onsdigital.zebedee.avro.ContentPublished;
 import com.github.onsdigital.zebedee.kafka.avro.AvroSerializer;
-import org.apache.commons.io.FileUtils;
+import org.apache.kafka.clients.CommonClientConfigs;
+import org.apache.kafka.clients.admin.AdminClientConfig;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
+import org.apache.kafka.common.config.SslConfigs;
 import org.apache.kafka.common.serialization.StringSerializer;
 
-import static com.github.onsdigital.zebedee.configuration.Configuration.getKafkaSecProtocol;
-import static com.github.onsdigital.zebedee.configuration.Configuration.getKafkaSecClientKeyP12;
-import static com.github.onsdigital.zebedee.configuration.Configuration.getKafkaSecClientKey;
-import static com.amazonaws.util.Base64.decode;
-import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
-
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.util.Properties;
 import java.util.concurrent.Future;
 
+import static com.amazonaws.util.Base64.decode;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
+import static com.github.onsdigital.zebedee.configuration.Configuration.getKafkaSecClientKeyP12;
+import static com.github.onsdigital.zebedee.configuration.Configuration.getKafkaSecClientKey;
+import static com.github.onsdigital.zebedee.configuration.Configuration.getKafkaSecProtocol;
 /**
  * This class represents a client that actually interfaces with Kafka and creates a producer that allows sending of
  * kafka messages. The class initiates the producer on initialisation.
@@ -35,26 +33,17 @@ public class KafkaClientImpl implements KafkaClient {
         this.topic = topic;
 
         Properties props = new Properties();
-        props.put("bootstrap.servers",kafkaAddr);
+        props.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG,kafkaAddr);
 
         if (getKafkaSecProtocol().equals("TLS")) {
-            props.put("security.protocol", "SSL");
+            props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, "SSL");
             if (!getKafkaSecClientKeyP12().isEmpty()) {
+                info().log("key info not used if KAFKA_SEC_CLIENT_KEY_P12 set)");
                 byte[] kafkaSecClientKeyBytes  = decode(getKafkaSecClientKeyP12());
-                // Kafka versions before 2.7 needs the above to be in files
-                File keyFile;
-                try {
-                    keyFile  = new File(Files.createTempFile(KEY_FILE_PREFIX, ".p12").toString());
-                    FileUtils.writeByteArrayToFile(keyFile, kafkaSecClientKeyBytes);
-                } catch (IOException e) {
-                    error().logException(e, "failed to create file using AWS-MSK kafka protocol");
-                    throw new RuntimeException(e);
-                }
-                props.put("ssl.keystore.location",   keyFile.toString());
-
+                props.put(SslConfigs.SSL_KEYSTORE_KEY_CONFIG, kafkaSecClientKeyBytes);
             } else {
                 // key already in file
-                props.put("ssl.keystore.location", getKafkaSecClientKey());
+                props.put(SslConfigs.SSL_KEYSTORE_LOCATION_DOC, getKafkaSecClientKey());
             }
             props.put("ssl.keystore.password", "");
             props.put("ssl.keystore.type", "PKCS12");

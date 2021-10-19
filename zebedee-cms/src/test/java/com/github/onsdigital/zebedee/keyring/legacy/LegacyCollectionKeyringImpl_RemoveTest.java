@@ -253,4 +253,35 @@ public class LegacyCollectionKeyringImpl_RemoveTest extends BaseLegacyKeyringTes
         verify(users, times(1)).list();
         verify(users, times(3)).removeKeyFromKeyring(any(), any());
     }
+
+    @Test
+    public void testRemove_success_shouldUpdateUsersWhoHaveKey() throws Exception {
+        // Given remove is success
+        // And the user's keyring is in the cache
+
+        when(bertKeyring.get(TEST_COLLECTION_ID))
+                .thenReturn(secretKey);
+
+        when(ernieKeyring.get(TEST_COLLECTION_ID))
+                .thenReturn(null);
+
+        when(theCountKeyring.get(TEST_COLLECTION_ID))
+                .thenReturn(secretKey);
+
+        // When remove is called
+        legacyCollectionKeyring.remove(null, collection);
+
+        // Then the key is successfully removed from only users who have the key in their keyring.
+        verifyUserKeyringRetrievedFromCache(bert);
+        verifyKeyRemovedFromUser(bert, bertKeyring);
+
+        verifyKeyNotRemovedFromUser(ernie, ernieKeyring);
+        verifyUserKeyringNotRetrievedFromCache(ernie);
+
+        verifyUserKeyringRetrievedFromCache(theCount);
+        verifyKeyRemovedFromUser(theCount, theCountKeyring);
+
+        verify(users, times(1)).list();
+        verify(users, times(2)).removeKeyFromKeyring(any(), any());
+    }
 }

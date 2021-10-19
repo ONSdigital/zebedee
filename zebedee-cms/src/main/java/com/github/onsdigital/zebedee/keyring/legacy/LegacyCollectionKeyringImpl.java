@@ -178,7 +178,16 @@ public class LegacyCollectionKeyringImpl implements CollectionKeyring {
             return;
         }
 
-        for (User u : userList) {
+        // Performance optimisation:
+        // The thread safe measures implemented in the Userservice have a pretty negative impact on performance and
+        // throughput. Updating a large number of users in 1 operation can be very slow so we reduce the list of
+        // updates to only user who currently have the key in their keyring - another victim of Files on Disk.
+        List<User> toRemove  = userList.stream()
+                .filter(u -> hasKeyInKeyring(u, collection))
+                .collect(Collectors.toList());
+
+        for (User u : toRemove) {
+            info().user(u.getEmail()).collectionID(collection).log("removing collection key from user");
             removeKeyFromUser(u, collection);
         }
     }
@@ -204,25 +213,26 @@ public class LegacyCollectionKeyringImpl implements CollectionKeyring {
         schedulerKeyCache.add(collection.getDescription().getId(), key);
 
         List<User> assignments = getKeyRecipients(collection);
-        List<User> removals = getKeyToRemoveFrom(assignments);
+        List<User> withdrawals = getKeyWithdrawals(collection);
 
-        info().collectionID(collection)
-                .data("assigning_to", assignments.stream()
-                        .map(u -> u.getEmail())
-                        .collect(Collectors.toList()))
-                .log("legacy keyring assigning new collection key to authorised users");
+        if (!assignments.isEmpty()) {
+            for (User recipent : assignments) {
+                assignKeyToRecipient(recipent, collection, key);
+            }
 
-        for (User recipent : assignments) {
-            assignKeyToRecipient(recipent, collection, key);
+            info().collectionID(collection)
+                    .data("assigning_to", assignments.stream().map(u -> u.getEmail()).collect(Collectors.toList()))
+                    .log("legacy keyring assigning new collection key to authorised users");
         }
 
-        info().collectionID(collection)
-                .data("revoked_from", removals.stream()
-                        .map(u -> u.getEmail())
-                        .collect(Collectors.toList()))
-                .log("legacy keyring revoking new collection key from unauthorised users");
-        for (User removeFrom : removals) {
-            removeKeyFromUser(removeFrom, collection);
+        if (!withdrawals.isEmpty()) {
+            for (User removeFrom : withdrawals) {
+                removeKeyFromUser(removeFrom, collection);
+            }
+
+            info().collectionID(collection)
+                    .data("withdrawn_from", withdrawals.stream().map(u -> u.getEmail()).collect(Collectors.toList()))
+                    .log("legacy keyring revoking new collection key from unauthorised users");
         }
     }
 
@@ -238,19 +248,36 @@ public class LegacyCollectionKeyringImpl implements CollectionKeyring {
             recipients = new ArrayList<>();
         }
 
-        return recipients;
+        return recipients.stream()
+                .filter(user -> !hasKeyInKeyring(user, collection))
+                .collect(Collectors.toList());
     }
 
-    private List<User> getKeyToRemoveFrom(List<User> recipients) throws KeyringException {
-        UserList allUsers = listUsers();
+    private List<User> getKeyWithdrawals(Collection c) throws KeyringException {
+        List<User> withdrawals = new ArrayList<>();
+        for (User u : listUsers()) {
+            // If the user doesn't have view permission but they have the key in their keyring we need to withdraw it.
+            if (!hasCollectionViewPermission(u, c.getDescription()) && hasKeyInKeyring(u, c)) {
+                withdrawals.add(u);
+            }
+        }
+        return withdrawals;
+    }
 
-        if (allUsers == null) {
-            return new ArrayList<>();
+    private boolean hasCollectionViewPermission(User user, CollectionDescription desc) throws KeyringException {
+        try {
+            return permissions.canView(user, desc);
+        } catch (IOException ex) {
+            throw new KeyringException(ex);
+        }
+    }
+
+    private boolean hasKeyInKeyring(User u, Collection c) {
+        if (u == null || u.keyring() == null || !u.keyring().isUnlocked()) {
+            return false;
         }
 
-        return allUsers.stream()
-                .filter(user -> !recipients.contains(user))
-                .collect(Collectors.toList());
+        return u.keyring().get(c.getId()) != null;
     }
 
     private UserList listUsers() throws KeyringException {

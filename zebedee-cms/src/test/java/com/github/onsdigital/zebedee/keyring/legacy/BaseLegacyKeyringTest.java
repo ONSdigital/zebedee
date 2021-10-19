@@ -150,6 +150,9 @@ public abstract class BaseLegacyKeyringTest {
         when(bertKeyring.unlock(TEST_PASSWORD))
                 .thenReturn(true);
 
+        when(bertKeyring.get(TEST_COLLECTION_ID))
+                .thenReturn(secretKey);
+
         when(keyringCache.get(bert))
                 .thenReturn(bertKeyring);
     }
@@ -167,6 +170,9 @@ public abstract class BaseLegacyKeyringTest {
         when(ernieKeyring.unlock(TEST_PASSWORD))
                 .thenReturn(true);
 
+        when(ernieKeyring.get(TEST_COLLECTION_ID))
+                .thenReturn(secretKey);
+
         when(keyringCache.get(ernie))
                 .thenReturn(ernieKeyring);
     }
@@ -183,6 +189,9 @@ public abstract class BaseLegacyKeyringTest {
 
         when(theCountKeyring.unlock(TEST_PASSWORD))
                 .thenReturn(true);
+
+        when(theCountKeyring.get(TEST_COLLECTION_ID))
+                .thenReturn(secretKey);
 
         when(keyringCache.get(theCount))
                 .thenReturn(theCountKeyring);

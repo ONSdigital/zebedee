@@ -11,8 +11,8 @@ import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.CollectionType;
 import com.github.onsdigital.zebedee.keyring.CollectionKeyring;
-import com.github.onsdigital.zebedee.keyring.KeyringException;
 import com.github.onsdigital.zebedee.keyring.CollectionKeyringUtil;
+import com.github.onsdigital.zebedee.keyring.KeyringException;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.session.service.Sessions;
@@ -323,6 +323,7 @@ public class Collection {
             throw new InternalServerError(message, ex);
         }
 
+        info().collectionID(c).log("collection deleted removing key from keyring");
         try {
             collectionKeyring.remove(user, c);
         } catch (KeyringException ex) {

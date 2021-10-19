@@ -125,10 +125,8 @@ Otherwise :violin: kindly ask someone from the dev team to help troubleshoot.
 | MATHJAX_SERVICE_URL                               | "http://localhost:8888"                     | Mathjax service URL
 | DATASET_API_URL                                   | "http://localhost:22000"                    | Dataset API URL
 | IMAGE_API_URL                                     | "http://localhost:24700"                    | Image API URL
-| KAFKA_ADDR                                        | "localhost:9092"                            | The address of Kafka
-| KAFKA_CONTENT_PUBLISHED_TOPIC                     | "content-published";                        | Topic for endpoint /publisheddata
 | ENABLE_KAFKA                                      | false                                       | Feature flag to send kafka messages when a collection is published
-| KAFKA_ADDR                                        | localhost:9092                              | Comma seperated list of kafka brokers
+| KAFKA_ADDR                                        | "localhost:9092"                            | Comma seperated list of kafka brokers
 | KAFKA_CONTENT_PUBLISHED_TOPIC                     | content-published                           | Kafka topic to send content pubished event to
 | DATASET_API_AUTH_TOKEN                            | "FD0108EA-825D-411C-9B1D-41EF7727F465"      | Dataset API authentication token
 | SERVICE_AUTH_TOKEN                                | "15C0E4EE-777F-4C61-8CDB-2898CEB34657"      | Service API authentication token

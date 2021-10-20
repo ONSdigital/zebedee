@@ -256,7 +256,8 @@ public class LegacyCollectionKeyringImpl implements CollectionKeyring {
     private List<User> getKeyWithdrawals(Collection c) throws KeyringException {
         List<User> withdrawals = new ArrayList<>();
         for (User u : listUsers()) {
-            // If the user doesn't have view permission but they have the key in their keyring we need to withdraw it.
+            // If the user doesn't have view permission but they have the key in their keyring we need to withdraw it
+            // from them.
             if (!hasCollectionViewPermission(u, c.getDescription()) && hasKeyInKeyring(u, c)) {
                 withdrawals.add(u);
             }

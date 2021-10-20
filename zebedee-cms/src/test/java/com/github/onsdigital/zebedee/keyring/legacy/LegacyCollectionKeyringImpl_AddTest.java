@@ -22,6 +22,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -210,13 +211,15 @@ public class LegacyCollectionKeyringImpl_AddTest extends BaseLegacyKeyringTest {
         assertTrue(ex.getCause() instanceof IOException);
 
         // And the key is not assigned to anyone
+        verify(bertKeyring, never()).put(anyString(), any());
+        verify(ernieKeyring, never()).put(anyString(), any());
+        verify(theCountKeyring, never()).put(anyString(), any());
+
         verify(permissions, times(1)).getCollectionAccessMapping(collection);
         verify(users, times(1)).list();
+        verify(users, never()).addKeyToKeyring(any(), any(), any());
 
         // And no users are updated
-        verifyUsersNotUpdated(bert, ernie, theCount);
-        verifyZeroInteractions(bertKeyring, ernieKeyring, theCountKeyring);
-        verifyZeroInteractions(user, permissions);
         verifyKeyAddedToSchedulerCache();
     }
 
@@ -230,10 +233,8 @@ public class LegacyCollectionKeyringImpl_AddTest extends BaseLegacyKeyringTest {
         legacyCollectionKeyring.add(null, collection, secretKey);
 
         // Then the key is assigned to the expected users
-        verifyKeyAddedToUser(bert, bertKeyring);
-        verifyKeyAddedToUser(ernie, ernieKeyring);
-
-        verifyUsersNotUpdated(theCount);
+        verifyKeyNotAddedToUser(bert, bertKeyring);
+        verifyKeyNotAddedToUser(ernie, ernieKeyring);
         verifyKeyNotAddedToUser(theCount, theCountKeyring);
 
         // And the key is not removed from any users
@@ -249,6 +250,12 @@ public class LegacyCollectionKeyringImpl_AddTest extends BaseLegacyKeyringTest {
         // Given get users returns null
         when(users.list())
                 .thenReturn(new UserList());
+
+        when(bertKeyring.get(TEST_COLLECTION_ID))
+                .thenReturn(null);
+
+        when(ernieKeyring.get(TEST_COLLECTION_ID))
+                .thenReturn(null);
 
         // When add is called
         legacyCollectionKeyring.add(null, collection, secretKey);
@@ -274,6 +281,9 @@ public class LegacyCollectionKeyringImpl_AddTest extends BaseLegacyKeyringTest {
         when(users.addKeyToKeyring(EMAIL_BERT, TEST_COLLECTION_ID, secretKey))
                 .thenThrow(IOException.class);
 
+        when(bertKeyring.get(anyString()))
+                .thenReturn(null);
+
         // When add is called
         KeyringException actual = assertThrows(KeyringException.class,
                 () -> legacyCollectionKeyring.add(null, collection, secretKey));
@@ -296,6 +306,12 @@ public class LegacyCollectionKeyringImpl_AddTest extends BaseLegacyKeyringTest {
         when(users.removeKeyFromKeyring(EMAIL_THE_COUNT, TEST_COLLECTION_ID))
                 .thenThrow(IOException.class);
 
+        when(bertKeyring.get(anyString()))
+                .thenReturn(null);
+
+        when(ernieKeyring.get(anyString()))
+                .thenReturn(null);
+
         // When add is called
         KeyringException actual = assertThrows(KeyringException.class,
                 () -> legacyCollectionKeyring.add(null, collection, secretKey));
@@ -305,6 +321,7 @@ public class LegacyCollectionKeyringImpl_AddTest extends BaseLegacyKeyringTest {
         assertTrue(actual.getCause() instanceof IOException);
 
         verify(permissions, times(1)).getCollectionAccessMapping(collection);
+        verify(permissions, times(1)).canView(theCount, collectionDescription);
         verify(users, times(1)).list();
 
         verifyKeyAddedToUser(bert, bertKeyring);
@@ -319,6 +336,20 @@ public class LegacyCollectionKeyringImpl_AddTest extends BaseLegacyKeyringTest {
     @Test
     public void testAdd_success_shouldAssignAndRemoveKeyFromTheExpectedUsers() throws Exception {
         // Given add is successfull
+
+        // Neither Bert or Ernine currently has the the key in their keyring so we it should be assigned to them.
+        when(bertKeyring.get(anyString()))
+                .thenReturn(null);
+        when(ernieKeyring.get(anyString()))
+                .thenReturn(null);
+
+        // The count currently has the key in his keyring...
+        when(theCountKeyring.get(TEST_COLLECTION_ID))
+                .thenReturn(secretKey);
+
+        //...but he no longer has permission to access the collection so the key should be removed from him.
+        when(permissions.canView(theCount, collectionDescription))
+                .thenReturn(false);
 
         // When add key is called
         legacyCollectionKeyring.add(null, collection, secretKey);
@@ -337,6 +368,7 @@ public class LegacyCollectionKeyringImpl_AddTest extends BaseLegacyKeyringTest {
         verify(users, times(1)).removeKeyFromKeyring(EMAIL_THE_COUNT, TEST_COLLECTION_ID);
 
         verify(permissions, times(1)).getCollectionAccessMapping(collection);
+        verify(permissions, times(1)).canView(theCount, collectionDescription);
         verify(users, times(1)).list();
         verifyKeyAddedToSchedulerCache();
     }

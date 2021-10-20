@@ -337,7 +337,7 @@ public class LegacyCollectionKeyringImpl_AddTest extends BaseLegacyKeyringTest {
     public void testAdd_success_shouldAssignAndRemoveKeyFromTheExpectedUsers() throws Exception {
         // Given add is successfull
 
-        // Neither Bert or Ernine currently has the the key in their keyring so we it should be assigned to them.
+        // Neither Bert or Ernie currently has the the key in their keyring so we it should be assigned to them.
         when(bertKeyring.get(anyString()))
                 .thenReturn(null);
         when(ernieKeyring.get(anyString()))

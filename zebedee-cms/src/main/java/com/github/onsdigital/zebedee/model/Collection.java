@@ -526,12 +526,22 @@ public class Collection {
 
             for (Team t : teamsToRemove) {
 
+                // Remove the team from the collection first...
+                permissions.removeViewerTeam(desc, t, session);
+
                 for (String member : t.getMembers()) {
                     User target = getUser(users, member);
-                    collectionKeyring.revokeFrom(target, desc);
-                }
 
-                permissions.removeViewerTeam(desc, t, session);
+                    // ...then use the permissions check to work out if members of the team being removed should
+                    // retain the key for this collection.
+                    // Example: A user is in 2 teams assigned to the same collection. If 1 team is removed they
+                    // should still retain the key until the other team is also removed.
+                    // This check also prevents the key being removed from Admin/Publisher users who might be team
+                    // members.
+                    if (!permissions.canView(target, desc)) {
+                        collectionKeyring.revokeFrom(target, desc);
+                    }
+                }
             }
         }
     }
@@ -1213,7 +1223,7 @@ public class Collection {
      * <p>
      * Example:
      * If uri is "a/b/c/data.json" then it will return "a/b/c".
-     *
+     * <p>
      * If uri is "a/b/c" then it will return "a/b/c".
      *
      * @param uri the file path to check.

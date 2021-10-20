@@ -397,11 +397,6 @@ public class UsersServiceImpl implements UsersService {
                     withoutKeyring++;
             }
         }
-
-        info().data("numberOfUsers", users.size())
-                .data("withKeyRing", withKeyring)
-                .data("withoutKeyRing", withoutKeyring)
-                .log("User info");
     }
 
     @Override

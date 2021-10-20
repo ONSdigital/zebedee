@@ -410,12 +410,13 @@ public class PermissionsServiceImpl implements PermissionsService {
             accessMapping.getCollections().put(collectionDescription.getId(), collectionTeams);
         }
 
+        boolean teamRemoved = false;
+        if (collectionTeams.contains(team.getId())) {
+            collectionTeams.remove(team.getId());
+            permissionsStore.saveAccessMapping(accessMapping);
+        }
 
-        Team teamRemoved = collectionTeams.contains(team.getId()) ? team : null;
-        collectionTeams.remove(team.getId());
-        permissionsStore.saveAccessMapping(accessMapping);
-
-        if (teamRemoved != null) {
+        if (teamRemoved) {
             getCollectionHistoryDao().saveCollectionHistoryEvent(collectionDescription.getId(), collectionDescription.getName(),
                     session, COLLECTION_VIEWER_TEAM_REMOVED, teamRemoved(collectionDescription, session, team));
         }

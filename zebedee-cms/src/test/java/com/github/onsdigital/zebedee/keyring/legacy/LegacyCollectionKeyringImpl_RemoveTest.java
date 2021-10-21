@@ -6,6 +6,7 @@ import com.github.onsdigital.zebedee.user.model.UserList;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.util.HashSet;
 
 import static com.github.onsdigital.zebedee.keyring.legacy.LegacyCollectionKeyringImpl.COLLECTION_DESC_NULL_ERR;
 import static com.github.onsdigital.zebedee.keyring.legacy.LegacyCollectionKeyringImpl.COLLECTION_ID_EMPTY_ERR;
@@ -232,7 +233,7 @@ public class LegacyCollectionKeyringImpl_RemoveTest extends BaseLegacyKeyringTes
     }
 
     @Test
-    public void testRemove_success_userKeyringInCache_shouldThrowException() throws Exception {
+    public void testRemove_success_userKeyringInCache_shouldRemoveKeyFromUsers() throws Exception {
         // Given remove is success
         // And the user's keyring is in the cache
 
@@ -259,19 +260,22 @@ public class LegacyCollectionKeyringImpl_RemoveTest extends BaseLegacyKeyringTes
         // Given remove is success
         // And the user's keyring is in the cache
 
-        when(bertKeyring.get(TEST_COLLECTION_ID))
-                .thenReturn(secretKey);
+        // Bert has the key
+        when(bertKeyring.keySet())
+                .thenReturn(keyringKeyset);
 
-        when(ernieKeyring.get(TEST_COLLECTION_ID))
-                .thenReturn(null);
+        // Ernie doesn't have the key
+        when(ernieKeyring.keySet())
+                .thenReturn(new HashSet<>());
 
-        when(theCountKeyring.get(TEST_COLLECTION_ID))
-                .thenReturn(secretKey);
+        // The Count has the key
+        when(theCountKeyring.keySet())
+                .thenReturn(keyringKeyset);
 
         // When remove is called
         legacyCollectionKeyring.remove(null, collection);
 
-        // Then the key is successfully removed from only users who have the key in their keyring.
+        // Then the key is successfully removed from only users who have the key in their keyring - Bert and The Count.
         verifyUserKeyringRetrievedFromCache(bert);
         verifyKeyRemovedFromUser(bert, bertKeyring);
 

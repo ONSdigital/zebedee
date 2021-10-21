@@ -18,7 +18,9 @@ import org.mockito.MockitoAnnotations;
 
 import javax.crypto.SecretKey;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
@@ -83,6 +85,7 @@ public abstract class BaseLegacyKeyringTest {
     protected KeyringException expectedEx;
     protected List<User> usersWithCollectionAccess;
     protected UserList allUsers;
+    protected Set<String> keyringKeyset;
 
     @Before
     public void setUp() throws Exception {
@@ -101,12 +104,17 @@ public abstract class BaseLegacyKeyringTest {
             add(theCount);
         }};
 
+        keyringKeyset = new HashSet<String>() {{
+            add(TEST_COLLECTION_ID);
+        }};
+
         setUpMockUserBert();
         setUpMockUserErnie();
         setUpMockUserTheCount();
         setUpServiceMocksWithHappyPathBehaviour();
 
         setUpTests();
+
 
         legacyCollectionKeyring = new LegacyCollectionKeyringImpl(
                 sessionsService, users, permissions, keyringCache, schedulerCache);
@@ -153,6 +161,9 @@ public abstract class BaseLegacyKeyringTest {
         when(bertKeyring.get(TEST_COLLECTION_ID))
                 .thenReturn(secretKey);
 
+        when(bertKeyring.keySet())
+                .thenReturn(keyringKeyset);
+
         when(keyringCache.get(bert))
                 .thenReturn(bertKeyring);
     }
@@ -173,6 +184,9 @@ public abstract class BaseLegacyKeyringTest {
         when(ernieKeyring.get(TEST_COLLECTION_ID))
                 .thenReturn(secretKey);
 
+        when(ernieKeyring.keySet())
+                .thenReturn(keyringKeyset);
+
         when(keyringCache.get(ernie))
                 .thenReturn(ernieKeyring);
     }
@@ -192,6 +206,9 @@ public abstract class BaseLegacyKeyringTest {
 
         when(theCountKeyring.get(TEST_COLLECTION_ID))
                 .thenReturn(secretKey);
+
+        when(theCountKeyring.keySet())
+                .thenReturn(keyringKeyset);
 
         when(keyringCache.get(theCount))
                 .thenReturn(theCountKeyring);

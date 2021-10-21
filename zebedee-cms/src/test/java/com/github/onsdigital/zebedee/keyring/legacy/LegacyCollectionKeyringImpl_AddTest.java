@@ -8,6 +8,7 @@ import org.mockito.Mock;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 
 import static com.github.onsdigital.zebedee.keyring.legacy.LegacyCollectionKeyringImpl.ADD_KEY_SAVE_ERR;
 import static com.github.onsdigital.zebedee.keyring.legacy.LegacyCollectionKeyringImpl.COLLECTION_DESC_NULL_ERR;
@@ -251,11 +252,11 @@ public class LegacyCollectionKeyringImpl_AddTest extends BaseLegacyKeyringTest {
         when(users.list())
                 .thenReturn(new UserList());
 
-        when(bertKeyring.get(TEST_COLLECTION_ID))
-                .thenReturn(null);
+        when(bertKeyring.keySet())
+                .thenReturn(new HashSet<>());
 
-        when(ernieKeyring.get(TEST_COLLECTION_ID))
-                .thenReturn(null);
+        when(ernieKeyring.keySet())
+                .thenReturn(new HashSet<>());
 
         // When add is called
         legacyCollectionKeyring.add(null, collection, secretKey);
@@ -281,8 +282,8 @@ public class LegacyCollectionKeyringImpl_AddTest extends BaseLegacyKeyringTest {
         when(users.addKeyToKeyring(EMAIL_BERT, TEST_COLLECTION_ID, secretKey))
                 .thenThrow(IOException.class);
 
-        when(bertKeyring.get(anyString()))
-                .thenReturn(null);
+        when(bertKeyring.keySet())
+                .thenReturn(new HashSet<>());
 
         // When add is called
         KeyringException actual = assertThrows(KeyringException.class,
@@ -306,11 +307,11 @@ public class LegacyCollectionKeyringImpl_AddTest extends BaseLegacyKeyringTest {
         when(users.removeKeyFromKeyring(EMAIL_THE_COUNT, TEST_COLLECTION_ID))
                 .thenThrow(IOException.class);
 
-        when(bertKeyring.get(anyString()))
-                .thenReturn(null);
+        when(bertKeyring.keySet())
+                .thenReturn(new HashSet<>());
 
-        when(ernieKeyring.get(anyString()))
-                .thenReturn(null);
+        when(ernieKeyring.keySet())
+                .thenReturn(new HashSet<>());
 
         // When add is called
         KeyringException actual = assertThrows(KeyringException.class,
@@ -338,10 +339,11 @@ public class LegacyCollectionKeyringImpl_AddTest extends BaseLegacyKeyringTest {
         // Given add is successfull
 
         // Neither Bert or Ernie currently has the the key in their keyring so we it should be assigned to them.
-        when(bertKeyring.get(anyString()))
-                .thenReturn(null);
-        when(ernieKeyring.get(anyString()))
-                .thenReturn(null);
+        when(bertKeyring.keySet())
+                .thenReturn(new HashSet<>());
+
+        when(ernieKeyring.keySet())
+                .thenReturn(new HashSet<>());
 
         // The count currently has the key in his keyring...
         when(theCountKeyring.get(TEST_COLLECTION_ID))

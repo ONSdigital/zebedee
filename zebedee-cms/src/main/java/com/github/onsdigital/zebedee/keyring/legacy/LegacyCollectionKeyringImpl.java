@@ -249,7 +249,7 @@ public class LegacyCollectionKeyringImpl implements CollectionKeyring {
         }
 
         return recipients.stream()
-                .filter(user -> doesNotHaveKey(user, collection))
+                .filter(user -> !hasKey(user, collection))
                 .collect(Collectors.toList());
     }
 
@@ -287,15 +287,6 @@ public class LegacyCollectionKeyringImpl implements CollectionKeyring {
         return u.keyring().keySet().contains(c.getId());
     }
 
-    private boolean doesNotHaveKey(User u, Collection c) {
-        if (u == null || u.keyring() == null) {
-            return false;
-        }
-
-        return u.keyring().get(c.getId()) == null;
-    }
-
-
     private UserList listUsers() throws KeyringException {
         try {
             return usersService.list();
@@ -317,7 +308,7 @@ public class LegacyCollectionKeyringImpl implements CollectionKeyring {
             return;
         }
 
-        if (user.keyring().get(collection.getId()) != null) {
+        if (user.keyring().keySet().contains(collection.getId())) {
             info().user(user.getEmail())
                     .collectionID(collection)
                     .log("skipping key assignment as user keying already contains entry for collection ID");

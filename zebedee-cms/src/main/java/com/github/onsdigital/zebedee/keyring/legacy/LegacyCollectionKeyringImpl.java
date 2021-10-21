@@ -183,7 +183,7 @@ public class LegacyCollectionKeyringImpl implements CollectionKeyring {
         // throughput. Updating a large number of users in 1 operation can be very slow so we reduce the list of
         // updates to only user who currently have the key in their keyring - another victim of Files on Disk.
         List<User> toRemove  = userList.stream()
-                .filter(u -> hasKeyInKeyring(u, collection))
+                .filter(u -> hasKey(u, collection))
                 .collect(Collectors.toList());
 
         for (User u : toRemove) {
@@ -249,7 +249,7 @@ public class LegacyCollectionKeyringImpl implements CollectionKeyring {
         }
 
         return recipients.stream()
-                .filter(user -> !hasKeyInKeyring(user, collection))
+                .filter(user -> doesNotHaveKey(user, collection))
                 .collect(Collectors.toList());
     }
 
@@ -264,7 +264,7 @@ public class LegacyCollectionKeyringImpl implements CollectionKeyring {
         for (User u : uList) {
             // If the user doesn't have view permission but they have the key in their keyring we need to withdraw it
             // from them.
-            if (!hasCollectionViewPermission(u, c.getDescription()) && hasKeyInKeyring(u, c)) {
+            if (!hasCollectionViewPermission(u, c.getDescription()) && hasKey(u, c)) {
                 withdrawals.add(u);
             }
         }
@@ -279,13 +279,22 @@ public class LegacyCollectionKeyringImpl implements CollectionKeyring {
         }
     }
 
-    private boolean hasKeyInKeyring(User u, Collection c) {
-        if (u == null || u.keyring() == null || !u.keyring().isUnlocked()) {
+    private boolean hasKey(User u, Collection c) {
+        if (u == null || u.keyring() == null) {
             return false;
         }
 
-        return u.keyring().get(c.getId()) != null;
+        return u.keyring().keySet().contains(c.getId());
     }
+
+    private boolean doesNotHaveKey(User u, Collection c) {
+        if (u == null || u.keyring() == null) {
+            return false;
+        }
+
+        return u.keyring().get(c.getId()) == null;
+    }
+
 
     private UserList listUsers() throws KeyringException {
         try {

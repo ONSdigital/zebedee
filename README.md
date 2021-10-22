@@ -113,11 +113,9 @@ Otherwise :violin: kindly ask someone from the dev team to help troubleshoot.
 | --------------------------------------| ----------------  | -----------
 | ENABLE_KAFKA                          | false             | Feature flag to send kafka messages when a collection is published
 | KAFKA_ADDR                            | localhost:9092    | Comma seperated list of kafka brokers
-| KAFKA_CONTENT_PUBLISHED_TOPIC         | content-published | Kafka topic to send content-published messages to
+| KAFKA_CONTENT_PUBLISHED_TOPIC         | content-published | The name of the topic to send event to
 | KAFKA_SEC_PROTO                       | _unset_           | if set to "TLS", kafka connections will use TLS
 | KAFKA_SEC_CLIENT_KEY_P12              | _unset_           | if using TLS (see above), this is a base64-encoded PKCS12 keystore (optional, used for client auth)
-| KAFKA_SEC_SKIP_VERIFY                 | false             | ignore server certificate issues if set to `true`
-| KAFKA_CONTENT_PUBLISHED_TOPIC         | false             |  The name of the topic to send event to
 
 ### New Central Keyring configuration
 The new central keyring feature is currently behind a feature flag:

@@ -27,7 +27,6 @@ public class KafkaClientImpl implements KafkaClient {
 
     private final Producer<String, ContentPublished> producer;
     private String topic;
-    private static final String KEY_FILE_PREFIX = "client-key";
 
     public KafkaClientImpl(String kafkaAddr, String topic) {
         this.topic = topic;
@@ -38,12 +37,12 @@ public class KafkaClientImpl implements KafkaClient {
         if (getKafkaSecProtocol().equals("TLS")) {
             props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, "SSL");
             if (!getKafkaSecClientKeyP12().isEmpty()) {
-                info().log("key info not used if KAFKA_SEC_CLIENT_KEY_P12 set)");
+                info().log("key info KAFKA_SEC_CLIENT_KEY_P12 used");
                 byte[] kafkaSecClientKeyBytes  = decode(getKafkaSecClientKeyP12());
                 props.put(SslConfigs.SSL_KEYSTORE_KEY_CONFIG, kafkaSecClientKeyBytes);
+                props.put("SslConfigs.SSL_KEYSTORE_PASSWORD_CONFIG", "");
+                props.put("SslConfigs.SSL_KEYSTORE_TYPE_CONFIG", "PKCS12");
             }
-            props.put("SslConfigs.SSL_KEYSTORE_PASSWORD_CONFIG", "");
-            props.put("SslConfigs.SSL_KEYSTORE_TYPE_CONFIG", "PKCS12");
         }
 
         AvroSerializer<ContentPublished> avroSerializer = new AvroSerializer<>(ContentPublished.class);

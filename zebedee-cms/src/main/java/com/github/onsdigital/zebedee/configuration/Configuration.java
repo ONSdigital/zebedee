@@ -135,6 +135,15 @@ public class Configuration {
         return StringUtils.defaultIfBlank(getValue("KAFKA_CONTENT_PUBLISHED_TOPIC"), KAFKA_CONTENT_PUBLISHED_TOPIC);
     }
 
+    public static String getKafkaSecProtocol() {
+        return StringUtils.defaultIfBlank(getValue("KAFKA_SEC_PROTO"), "");
+    }
+
+    // base64-encoded key in PKCS12 format
+    public static String getKafkaSecClientKeyP12() {
+        return StringUtils.defaultIfBlank(getValue("KAFKA_SEC_CLIENT_KEY_P12"), "");
+    }
+
     public static String getDatasetAPIAuthToken() {
         return StringUtils.defaultIfBlank(getValue("DATASET_API_AUTH_TOKEN"), DATASET_API_AUTH_TOKEN);
     }

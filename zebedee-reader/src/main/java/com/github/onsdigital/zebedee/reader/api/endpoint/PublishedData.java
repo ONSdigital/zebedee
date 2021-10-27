@@ -29,8 +29,7 @@ public class PublishedData {
      * <p>
      * e.g. ?uri=/economy/environmentalaccounts/articles/greenhousegasemissions/2015-06-02&title will only return title of the requested content
      *
-     * @param request  This should contain a X-Florence-Token header for the current session and the collection id being worked on
-     *                 If no collection id is given published contents will be served
+     * @param request  No authentication headers are required due to this only serving published content
      * @param response Servlet response
      * @return
      * @throws IOException           If an error occurs in processing data, typically to the filesystem, but also on the HTTP connection.

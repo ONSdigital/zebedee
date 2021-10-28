@@ -232,6 +232,7 @@ public class ZebedeeConfiguration {
         imageService = new ImageServiceImpl(imageClient);
 
         if (cmsFeatureFlags().isKafkaEnabled()) {
+
             KafkaClient kafkaClient = new KafkaClientImpl(getKafkaURL(), getKafkaContentPublishedTopic());
             kafkaService = new KafkaServiceImpl(kafkaClient);
         } else {

@@ -182,12 +182,16 @@ public class LegacyCollectionKeyringImpl implements CollectionKeyring {
         // The thread safe measures implemented in the Userservice have a pretty negative impact on performance and
         // throughput. Updating a large number of users in 1 operation can be very slow so we reduce the list of
         // updates to only user who currently have the key in their keyring - another victim of Files on Disk.
-        List<User> toRemove  = userList.stream()
+        List<User> toRemove = userList.stream()
                 .filter(u -> hasKey(u, collection))
                 .collect(Collectors.toList());
 
+
+        if (toRemove != null) {
+            info().data("users", toRemove.stream().map(u -> u.getEmail()).collect(Collectors.toList()))
+                    .collectionID(collection).log("removing collection from users");
+        }
         for (User u : toRemove) {
-            info().user(u.getEmail()).collectionID(collection).log("removing collection key from user");
             removeKeyFromUser(u, collection);
         }
     }
@@ -256,7 +260,7 @@ public class LegacyCollectionKeyringImpl implements CollectionKeyring {
     private List<User> getKeyWithdrawals(Collection c) throws KeyringException {
         List<User> withdrawals = new ArrayList<>();
 
-        UserList uList= listUsers();
+        UserList uList = listUsers();
         if (uList == null) {
             return withdrawals;
         }

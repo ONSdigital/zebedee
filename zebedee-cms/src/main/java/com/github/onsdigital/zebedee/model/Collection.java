@@ -62,6 +62,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -76,6 +77,7 @@ import java.util.Scanner;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -454,7 +456,11 @@ public class Collection {
             scheduler.cancel(collection);
         }
 
+        LocalTime start = LocalTime.now();
         Set<String> updatesTeams = updateViewerTeams(collectionDescription, zebedee, session);
+        long ms = TimeUnit.MILLISECONDS.convert(Duration.between(start, LocalTime.now()).getNano(), TimeUnit.NANOSECONDS);
+
+        warn().data("duration_ms", ms).log("collection update viewer teams completed");
 
         if (updatedCollection.getDescription().getTeams() != null) {
             updatedCollection.getDescription().getTeams().clear();
@@ -479,9 +485,16 @@ public class Collection {
          * {@link LegacyCollectionKeyringImpl#add(User, Collection, SecretKey)} so we
          * invoke add again which will update all users either adding/removing the key to/from their keyring.
          */
-        User user = getUser(zebedee.getUsersService(), session.getEmail());
+
+        // TODO testing is this is necessary before deleting.
+/*        User user = getUser(zebedee.getUsersService(), session.getEmail());
         SecretKey key = zebedee.getCollectionKeyring().get(user, collection);
+
+        start = LocalTime.now();
         zebedee.getCollectionKeyring().add(user, collection, key);
+        ms = TimeUnit.MILLISECONDS.convert(Duration.between(start, LocalTime.now()).getNano(), TimeUnit.NANOSECONDS);
+
+        warn().data("duration_ms", ms).log("collection update add collection key completed");*/
 
         return updatedCollection;
     }

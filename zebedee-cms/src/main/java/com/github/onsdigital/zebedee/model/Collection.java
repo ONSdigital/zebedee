@@ -486,16 +486,6 @@ public class Collection {
          * invoke add again which will update all users either adding/removing the key to/from their keyring.
          */
 
-        // TODO testing is this is necessary before deleting.
-/*        User user = getUser(zebedee.getUsersService(), session.getEmail());
-        SecretKey key = zebedee.getCollectionKeyring().get(user, collection);
-
-        start = LocalTime.now();
-        zebedee.getCollectionKeyring().add(user, collection, key);
-        ms = TimeUnit.MILLISECONDS.convert(Duration.between(start, LocalTime.now()).getNano(), TimeUnit.NANOSECONDS);
-
-        warn().data("duration_ms", ms).log("collection update add collection key completed");*/
-
         return updatedCollection;
     }
 

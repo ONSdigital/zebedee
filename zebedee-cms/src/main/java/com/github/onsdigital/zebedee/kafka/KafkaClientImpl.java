@@ -38,10 +38,9 @@ public class KafkaClientImpl implements KafkaClient {
             props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, "SSL");
             if (!getKafkaSecClientKeyP12().isEmpty()) {
                 info().log("key info KAFKA_SEC_CLIENT_KEY_P12 used");
-                byte[] kafkaSecClientKeyBytes  = decode(getKafkaSecClientKeyP12());
-                props.put(SslConfigs.SSL_KEYSTORE_KEY_CONFIG, kafkaSecClientKeyBytes);
-                props.put("SslConfigs.SSL_KEYSTORE_PASSWORD_CONFIG", "");
-                props.put("SslConfigs.SSL_KEYSTORE_TYPE_CONFIG", "PKCS12");
+                props.put(SslConfigs.SSL_KEYSTORE_KEY_CONFIG, getKafkaSecClientKeyP12());
+                props.put(SslConfigs.SSL_KEYSTORE_PASSWORD_CONFIG, "");
+                props.put(SslConfigs.SSL_KEYSTORE_TYPE_CONFIG, "PKCS12");
             }
         }
 

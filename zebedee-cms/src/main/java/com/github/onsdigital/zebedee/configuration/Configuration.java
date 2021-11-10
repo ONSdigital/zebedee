@@ -139,9 +139,14 @@ public class Configuration {
         return StringUtils.defaultIfBlank(getValue("KAFKA_SEC_PROTO"), "");
     }
 
-    // base64-encoded key in PKCS12 format
-    public static String getKafkaSecClientKeyP12() {
-        return StringUtils.defaultIfBlank(getValue("KAFKA_SEC_CLIENT_KEY_P12"), "");
+    // base64-encoded key in PEM format
+    public static String getKafkaSecClientKey() {
+        return StringUtils.defaultIfBlank(getValue("KAFKA_SEC_CLIENT_KEY"), "");
+    }
+
+    // base64-encoded cert in PEM format
+    public static String getKafkaSecClientCert() {
+        return StringUtils.defaultIfBlank(getValue("KAFKA_SEC_CLIENT_CERT"), "");
     }
 
     public static String getDatasetAPIAuthToken() {

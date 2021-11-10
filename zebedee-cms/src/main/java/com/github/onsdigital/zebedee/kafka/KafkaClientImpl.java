@@ -15,9 +15,9 @@ import org.apache.kafka.common.serialization.StringSerializer;
 import java.util.Properties;
 import java.util.concurrent.Future;
 
-import static com.amazonaws.util.Base64.decode;
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
-import static com.github.onsdigital.zebedee.configuration.Configuration.getKafkaSecClientKeyP12;
+import static com.github.onsdigital.zebedee.configuration.Configuration.getKafkaSecClientKey;
+import static com.github.onsdigital.zebedee.configuration.Configuration.getKafkaSecClientCert;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getKafkaSecProtocol;
 /**
  * This class represents a client that actually interfaces with Kafka and creates a producer that allows sending of
@@ -32,16 +32,15 @@ public class KafkaClientImpl implements KafkaClient {
         this.topic = topic;
 
         Properties props = new Properties();
-        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG,kafkaAddr);
+        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaAddr);
 
         if (getKafkaSecProtocol().equals("TLS")) {
             props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, "SSL");
-            if (!getKafkaSecClientKeyP12().isEmpty()) {
-                info().log("key info KAFKA_SEC_CLIENT_KEY_P12 used");
-                byte[] kafkaSecClientKeyBytes  = decode(getKafkaSecClientKeyP12());
-                props.put(SslConfigs.SSL_KEYSTORE_KEY_CONFIG, kafkaSecClientKeyBytes);
-                props.put("SslConfigs.SSL_KEYSTORE_PASSWORD_CONFIG", "");
-                props.put("SslConfigs.SSL_KEYSTORE_TYPE_CONFIG", "PKCS12");
+            if (!getKafkaSecClientKey().isEmpty()) {
+                info().log("key info KAFKA_SEC_CLIENT_KEY used");
+                props.put(SslConfigs.SSL_KEYSTORE_KEY_CONFIG, getKafkaSecClientKey());
+                props.put(SslConfigs.SSL_KEYSTORE_TYPE_CONFIG, "PEM");
+                props.put(SslConfigs.SSL_KEYSTORE_CERTIFICATE_CHAIN_CONFIG, getKafkaSecClientCert());
             }
         }
 

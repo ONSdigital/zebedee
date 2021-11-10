@@ -46,15 +46,4 @@ public interface CollectionKeyring {
      */
     Set<String> list(User user) throws KeyringException;
 
-/*    *//**
-     * Unlock the user keyring.
-     *
-     * <b>Note:</b> This is to maintain backwards compatibility only. This functionality is not required by the new
-     * central keyring implementation.
-     *
-     * @param user     the user the keyring belongs to.
-     * @param password the user's password.
-     * @throws KeyringException problem unlocking the keyring.
-     *//*
-    void unlock(User user, String password) throws KeyringException;*/
 }

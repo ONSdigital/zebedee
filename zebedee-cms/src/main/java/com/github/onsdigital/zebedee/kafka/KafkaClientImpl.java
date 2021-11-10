@@ -32,7 +32,7 @@ public class KafkaClientImpl implements KafkaClient {
         this.topic = topic;
 
         Properties props = new Properties();
-        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG,kafkaAddr);
+        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaAddr);
 
         if (getKafkaSecProtocol().equals("TLS")) {
             props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, "SSL");
@@ -40,7 +40,6 @@ public class KafkaClientImpl implements KafkaClient {
                 info().log("key info KAFKA_SEC_CLIENT_KEY used");
                 props.put(SslConfigs.SSL_KEYSTORE_KEY_CONFIG, getKafkaSecClientKey());
                 props.put(SslConfigs.SSL_KEYSTORE_TYPE_CONFIG, "PEM");
-                props.put(SslConfigs.SSL_KEY_PASSWORD_CONFIG, "");
                 props.put(SslConfigs.SSL_KEYSTORE_CERTIFICATE_CHAIN_CONFIG, getKafkaSecClientCert());
             }
         }

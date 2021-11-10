@@ -46,44 +46,6 @@ public class Keyring implements Cloneable {
         return result;
     }
 
-/*    public Keyring emptyClone() {
-        Keyring keyring = new Keyring();
-        keyring.privateKey = this.privateKey;
-        keyring.publicKey = this.publicKey;
-        keyring.privateKeySalt = this.privateKeySalt;
-
-        return keyring;
-    }
-
-    @Override
-    public Keyring clone() {
-        Keyring keyring = new Keyring();
-        keyring.privateKey = this.privateKey;
-        keyring.publicKey = this.publicKey;
-        keyring.privateKeySalt = this.privateKeySalt;
-        return keyring;
-    }*/
-
-/*    *//**
-     * Unwraps (decrypts) the private key so that keys in the keyring can be accessed.
-     *
-     * @param password The password for the key.
-     *//*
-    public boolean unlock(String password) {
-        boolean result;
-
-        try {
-            keyPair = new KeyWrapper(password, privateKeySalt).unwrapKeyPair(privateKey, publicKey);
-            result = true;
-        } catch (IllegalArgumentException e) {
-            // Seems the private key could not be unwrapped, so return false
-            error().logException(e, "Error unlocking keyring");
-            result = false;
-        }
-
-        return result;
-    }*/
-
     /**
      * Changes the {@link java.security.PrivateKey PrivateKey} password.
      * NB it's not possible to "reset" a key password because you can't decrypt the key
@@ -109,23 +71,6 @@ public class Keyring implements Cloneable {
             result = false;
         }
 
-        return result;
-    }
-
-    /**
-     * @return The {@link PublicKey} for this keyring.
-     */
-    public PublicKey getPublicKey() {
-        PublicKey result;
-        if (keyPair != null) {
-            // Return the cached copy
-            result = keyPair.getPublic();
-        } else {
-            // Decode from serialised data
-            // NB it's not necessary to unlock a keyring
-            // to access the public key
-            result = KeyWrapper.decodePublicKey(publicKey);
-        }
         return result;
     }
 

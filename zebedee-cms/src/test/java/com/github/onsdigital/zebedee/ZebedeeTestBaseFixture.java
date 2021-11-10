@@ -6,7 +6,6 @@ import com.github.onsdigital.zebedee.keyring.CollectionKeyCache;
 import com.github.onsdigital.zebedee.keyring.CollectionKeyring;
 import com.github.onsdigital.zebedee.keyring.migration.KeyringHealthChecker;
 import com.github.onsdigital.zebedee.model.Collection;
-import com.github.onsdigital.zebedee.model.KeyringCache;
 import com.github.onsdigital.zebedee.model.encryption.EncryptionKeyFactory;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDao;
@@ -133,7 +132,6 @@ public abstract class ZebedeeTestBaseFixture {
         ReflectionTestUtils.setField(zebedee, "permissionsService", permissionsService);
 
         ReflectionTestUtils.setField(zebedee, "sessions", sessionsService);
-        ReflectionTestUtils.setField(zebedee, "legacyKeyringCache", new KeyringCache(sessionsService, schedulerKeyCache));
         ReflectionTestUtils.setField(zebedee, "collectionKeyring", collectionKeyring);
         ReflectionTestUtils.setField(zebedee, "encryptionKeyFactory", encryptionKeyFactory);
 

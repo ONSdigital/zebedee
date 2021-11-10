@@ -22,12 +22,11 @@ import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
  */
 public class Keyring implements Cloneable {
 
-    private transient Map<String, SecretKey> keys = new ConcurrentHashMap<>();
     // Key storage:
     private String privateKeySalt;
     private String privateKey;
     private String publicKey;
-    private Map<String, String> keyring = new ConcurrentHashMap<>();
+
     // Runtime cache of decrypted keys:
     private transient KeyPair keyPair;
 
@@ -44,25 +43,14 @@ public class Keyring implements Cloneable {
         result.keyPair = Keys.newKeyPair();
         result.storeKeyPair(result.keyPair, password);
 
-        // Initialise the keyring
-        result.keyring = new HashMap<>();
-        result.keys = new HashMap<>();
-
         return result;
     }
 
-    public int size() {
-        return keyring.size();
-    }
-
-    public Keyring emptyClone() {
+/*    public Keyring emptyClone() {
         Keyring keyring = new Keyring();
         keyring.privateKey = this.privateKey;
         keyring.publicKey = this.publicKey;
         keyring.privateKeySalt = this.privateKeySalt;
-
-        Map<String, String> clonedKeyring = new ConcurrentHashMap<>();
-        keyring.keyring = clonedKeyring;
 
         return keyring;
     }
@@ -73,21 +61,14 @@ public class Keyring implements Cloneable {
         keyring.privateKey = this.privateKey;
         keyring.publicKey = this.publicKey;
         keyring.privateKeySalt = this.privateKeySalt;
-
-        Map<String, String> clonedKeyring = new ConcurrentHashMap<>();
-        for (String key : this.keyring.keySet()) {
-            clonedKeyring.put(key, this.keyring.get(key));
-        }
-        keyring.keyring = clonedKeyring;
-
         return keyring;
-    }
+    }*/
 
-    /**
+/*    *//**
      * Unwraps (decrypts) the private key so that keys in the keyring can be accessed.
      *
      * @param password The password for the key.
-     */
+     *//*
     public boolean unlock(String password) {
         boolean result;
 
@@ -101,7 +82,7 @@ public class Keyring implements Cloneable {
         }
 
         return result;
-    }
+    }*/
 
     /**
      * Changes the {@link java.security.PrivateKey PrivateKey} password.
@@ -131,55 +112,6 @@ public class Keyring implements Cloneable {
         return result;
     }
 
-    public void put(String collectionId, SecretKey collectionKey) {
-
-        // Encrypt the key for storage
-        KeyExchange keyExchange = new KeyExchange();
-        String encryptedKey = keyExchange.encryptKey(collectionKey, getPublicKey());
-        keyring.put(collectionId, encryptedKey);
-
-        // Cache the key for speed
-        keys.put(collectionId, collectionKey);
-    }
-
-    public SecretKey get(String collectionId) {
-        SecretKey result = keys.get(collectionId);
-
-        if (result == null && keyPair != null) {
-            try {
-                // Attempt to decrypt the key
-                result = new KeyExchange().decryptKey(keyring.get(collectionId), keyPair.getPrivate());
-                if (result != null) {
-                    keys.put(collectionId, result);
-                }
-            } catch (IllegalArgumentException e) {
-                // Error decrypting key
-                error().data("collectionId", collectionId).logException(e, "Error recovering encryption key for collection");
-            }
-        }
-
-        return result;
-    }
-
-    /**
-     * Removes a key from the keyring (and the in-memory cache).
-     *
-     * @param collectionId The collection to remove the key for.
-     */
-    public void remove(String collectionId) {
-        keys.remove(collectionId);
-        keyring.remove(collectionId);
-    }
-
-    /**
-     * Lists the collection IDs in the keyring.
-     *
-     * @return An unmodifiable set of the key identifiers in the keyring.
-     */
-    public Set<String> list() {
-        return java.util.Collections.unmodifiableSet(keyring.keySet());
-    }
-
     /**
      * @return The {@link PublicKey} for this keyring.
      */
@@ -195,10 +127,6 @@ public class Keyring implements Cloneable {
             result = KeyWrapper.decodePublicKey(publicKey);
         }
         return result;
-    }
-
-    public boolean isUnlocked() {
-        return keyPair != null;
     }
 
     /**
@@ -218,17 +146,5 @@ public class Keyring implements Cloneable {
         KeyWrapper keyWrapper = new KeyWrapper(password, privateKeySalt);
         privateKey = keyWrapper.wrapPrivateKey(keyPair.getPrivate());
         publicKey = KeyWrapper.encodePublicKey(keyPair.getPublic());
-    }
-
-    @Override
-    public String toString() {
-        return keyring.keySet().toString();
-    }
-
-    public Set<String> keySet() {
-        if (keyring != null) {
-            return keyring.keySet();
-        }
-        return null;
     }
 }

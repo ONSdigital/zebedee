@@ -321,83 +321,6 @@ public class ZebedeeTest extends ZebedeeTestBaseFixture {
     }
 
     @Test
-    public void testOpenSession_failToUnlockUserKeyring() throws Exception {
-        // Given user.keyring fails to unlock
-        setUpOpenSessionsTestMocks();
-
-        when(credentials.getEmail())
-                .thenReturn(TEST_EMAIL);
-
-        when(credentials.getPassword())
-                .thenReturn(PASSWORD);
-
-        when(usersService.getUserByEmail(any()))
-                .thenReturn(user);
-
-        when(sessions.create(user))
-                .thenReturn(userSession);
-
-        when(user.keyring())
-                .thenReturn(usersKeyring);
-
-        doThrow(KeyringException.class)
-                .when(collectionKeyring)
-                .unlock(user, PASSWORD);
-
-        Zebedee zebedee = new Zebedee(zebCfg);
-
-        // When openSession is called
-        IOException ex = assertThrows(IOException.class, () -> zebedee.openSession(credentials));
-
-        // Then an exception is thrown
-        assertTrue(ex.getCause() instanceof KeyringException);
-        verify(usersService, times(1)).getUserByEmail(TEST_EMAIL);
-        verify(sessions, times(1)).create(user);
-        verify(collectionKeyring, times(1)).unlock(user, PASSWORD);
-
-        verifyZeroInteractions(usersKeyring);
-    }
-
-    @Test
-    public void testOpenSession_cacheKeyringError_shouldThrowException() throws Exception {
-        // Given cacheKeyring throws an exception
-        setUpOpenSessionsTestMocks();
-
-        when(credentials.getEmail())
-                .thenReturn(TEST_EMAIL);
-
-        when(credentials.getPassword())
-                .thenReturn(PASSWORD);
-
-        when(usersService.getUserByEmail(any()))
-                .thenReturn(user);
-
-        when(sessions.create(user))
-                .thenReturn(userSession);
-
-        when(user.keyring())
-                .thenReturn(usersKeyring);
-
-        doThrow(KeyringException.class)
-                .when(collectionKeyring)
-                .cacheKeyring(user);
-
-        Zebedee zebedee = new Zebedee(zebCfg);
-
-        // When openSession is called
-        IOException ex = assertThrows(IOException.class, () -> zebedee.openSession(credentials));
-
-        // Then an exception is thrown
-        assertTrue(ex.getCause() instanceof KeyringException);
-        verify(usersService, times(1)).getUserByEmail(TEST_EMAIL);
-        verify(sessions, times(1)).create(user);
-        verify(collectionKeyring, times(1)).unlock(user, PASSWORD);
-        verify(collectionKeyring, times(1)).cacheKeyring(user);
-
-        verifyZeroInteractions(usersKeyring);
-    }
-
-    @Test
     public void testOpenSession_success_shouldReturnSession() throws Exception {
         // Given open session is successful
         setUpOpenSessionsTestMocks();
@@ -430,10 +353,6 @@ public class ZebedeeTest extends ZebedeeTestBaseFixture {
         verify(usersService, times(1)).getUserByEmail(TEST_EMAIL);
         verify(sessions, times(1)).create(user);
         verifyZeroInteractions(usersKeyring);
-
-        // And the keyring is unlocked and cached
-        verify(collectionKeyring, times(1)).unlock(user, PASSWORD);
-        verify(collectionKeyring, times(1)).cacheKeyring(user);
 
         verify(startUpAlerter, times(1)).queueUnlocked();
         verify(keyringHealthChecker, times(1)).check(userSession);

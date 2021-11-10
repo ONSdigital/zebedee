@@ -95,7 +95,6 @@ public class Permission {
             removeEditorPermissionFromUser(request, permissionDefinition, session);
         }
 
-        updateUserKeyAssignments(session, permissionDefinition.getEmail());
         return "Permissions updated for " + permissionDefinition.getEmail();
     }
 
@@ -181,28 +180,6 @@ public class Permission {
         }
 
         return session;
-    }
-
-
-    private void updateUserKeyAssignments(Session session, String targetEmail) throws IOException,
-            NotFoundException, BadRequestException, InternalServerError {
-        User srcUser = getUser(usersService, session.getEmail());
-        User targetUser = getUser(usersService, targetEmail);
-
-        List<CollectionDescription> assignments = new ArrayList<>();
-        List<CollectionDescription> removals = new ArrayList<>();
-
-        Collections.CollectionList collectionList = listCollections();
-        for (Collection c : collectionList) {
-            if (permissionsService.canView(targetUser, c.getDescription())) {
-                assignments.add(c.getDescription());
-            } else {
-                removals.add(c.getDescription());
-            }
-        }
-
-        collectionKeyring.revokeFrom(targetUser, removals);
-        collectionKeyring.assignTo(srcUser, targetUser, assignments);
     }
 
     private Collections.CollectionList listCollections() throws InternalServerError {

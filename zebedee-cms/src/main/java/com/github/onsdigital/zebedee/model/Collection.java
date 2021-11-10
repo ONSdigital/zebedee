@@ -23,7 +23,6 @@ import com.github.onsdigital.zebedee.json.Event;
 import com.github.onsdigital.zebedee.json.EventType;
 import com.github.onsdigital.zebedee.json.Events;
 import com.github.onsdigital.zebedee.keyring.CollectionKeyring;
-import com.github.onsdigital.zebedee.keyring.legacy.LegacyCollectionKeyringImpl;
 import com.github.onsdigital.zebedee.model.approval.tasks.ReleasePopulator;
 import com.github.onsdigital.zebedee.model.content.item.ContentItemVersion;
 import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
@@ -531,20 +530,6 @@ public class Collection {
 
                 // Remove the team from the collection first...
                 permissions.removeViewerTeam(desc, t, session);
-
-                for (String member : t.getMembers()) {
-                    User target = getUser(users, member);
-
-                    // ...then use the permissions check to work out if members of the team being removed should
-                    // retain the key for this collection.
-                    // Example: A user is in 2 teams assigned to the same collection. If 1 team is removed they
-                    // should still retain the key until the other team is also removed.
-                    // This check also prevents the key being removed from Admin/Publisher users who might be team
-                    // members.
-                    if (!permissions.canView(target, desc)) {
-                        collectionKeyring.revokeFrom(target, desc);
-                    }
-                }
             }
         }
     }
@@ -568,12 +553,6 @@ public class Collection {
             }
 
             permissions.addViewerTeam(desc, team, session);
-
-            for (String email : team.getMembers()) {
-                User targetUser = getUser(users, email);
-                collectionKeyring.assignTo(srcUser, targetUser, desc);
-            }
-
             teamsUpdated.add(teamName);
         }
 

@@ -131,24 +131,7 @@ public class Root {
             throw new RuntimeException(message, e);
         }
 
-        try {
-            cleanupStaleCollectionKeys();
-        } catch (Exception ex) {
-            // TODO should we exit at this point?
-            error().logException(ex, "error cleaning stale collection keys from users exiting application");
-        }
-
         info().data(ZEBEDEE_ROOT, rootDir).log("zebedee cmd initialization completed successfully");
-    }
-
-    private static void cleanupStaleCollectionKeys() throws IOException, NotFoundException, BadRequestException {
-        info().log("cms init task: removing stale collection keys from user keyrings");
-        Map<String, Collection> collectionMap = zebedee.getCollections().mapByID();
-        List<String> orphanedCollections = zebedee.getCollections().listOrphaned();
-        for (User user : zebedee.getUsersService().list()) {
-            zebedee.getUsersService()
-                    .removeStaleCollectionKeys(collectionMap, orphanedCollections, user.getEmail());
-        }
     }
 
     private static void loadExistingCollectionsIntoScheduler(Collections.CollectionList collections) {

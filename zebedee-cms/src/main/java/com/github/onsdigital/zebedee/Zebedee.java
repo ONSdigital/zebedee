@@ -8,12 +8,10 @@ import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.Credentials;
 import com.github.onsdigital.zebedee.keyring.CollectionKeyCache;
 import com.github.onsdigital.zebedee.keyring.CollectionKeyring;
-import com.github.onsdigital.zebedee.keyring.KeyringException;
 import com.github.onsdigital.zebedee.keyring.migration.KeyringHealthChecker;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.Collections;
 import com.github.onsdigital.zebedee.model.Content;
-import com.github.onsdigital.zebedee.model.KeyringCache;
 import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
 import com.github.onsdigital.zebedee.model.encryption.EncryptionKeyFactory;
 import com.github.onsdigital.zebedee.model.publishing.PublishedCollections;
@@ -74,7 +72,6 @@ public class Zebedee {
     private final PublishedCollections publishedCollections;
     private final Collections collections;
     private final Content published;
-    private final KeyringCache legacyKeyringCache;
     private final CollectionKeyCache schedulerKeyCache;
     private final Path publishedContentPath;
     private final Path path;
@@ -93,8 +90,6 @@ public class Zebedee {
     private final StartUpAlerter startUpAlerter;
     private final Notifier slackNotifier;
     private final KeyringHealthChecker keyringHealthChecker;
-    private final CollectionKeyring legacyCollCollectionKeyring;
-    private final CollectionKeyring centralCollectinKeying;
 
     /**
      * Create a new instance of Zebedee setting.
@@ -105,7 +100,6 @@ public class Zebedee {
         this.path = cfg.getZebedeePath();
         this.publishedContentPath = cfg.getPublishedContentPath();
         this.sessions = cfg.getSessions();
-        this.legacyKeyringCache = cfg.getKeyringCache();
         this.schedulerKeyCache = cfg.getSchedulerKeyringCache();
         this.permissionsService = cfg.getPermissionsService();
         this.published = cfg.getPublished();
@@ -134,9 +128,6 @@ public class Zebedee {
         this.startUpAlerter = cfg.getStartUpAlerter();
         this.slackNotifier = cfg.getSlackNotifier();
         this.keyringHealthChecker = cfg.getKeyringHealthChecker();
-
-        this.legacyCollCollectionKeyring = cfg.getLegacyCollectionKeyring();
-        this.centralCollectinKeying = cfg.getCentralCollectionKeyring();
     }
 
     /**
@@ -302,8 +293,6 @@ public class Zebedee {
         }
 
         Session session = createSession(user);
-        unlockKeyring(user, credentials);
-        cacheKeyring(user);
 
         if (permissionsService.isAdministrator(session)) {
             startUpAlerter.queueUnlocked();
@@ -320,30 +309,6 @@ public class Zebedee {
             error().user(user.getEmail())
                     .exception(ex)
                     .log("error attempting to create session for user");
-            throw new IOException(ex);
-        }
-    }
-
-    private void unlockKeyring(User user, Credentials credentials) throws IOException {
-        // TODO This is step is required to maintain backwards compatability while migrating.
-        // Once migration is complete the step can be removed completely.
-        try {
-            collectionKeyring.unlock(user, credentials.getPassword());
-        } catch (KeyringException ex) {
-            error().user(user.getEmail())
-                    .exception(ex)
-                    .log("failed to open user session error while caching collection keyring");
-            throw new IOException(ex);
-        }
-    }
-
-    private void cacheKeyring(User user) throws IOException {
-        try {
-            collectionKeyring.cacheKeyring(user);
-        } catch (KeyringException ex) {
-            error().user(user.getEmail())
-                    .exception(ex)
-                    .log("failed to open user session error while caching collection keyring");
             throw new IOException(ex);
         }
     }
@@ -374,11 +339,6 @@ public class Zebedee {
 
     public PublishedCollections getPublishedCollections() {
         return this.publishedCollections;
-    }
-
-    @Deprecated
-    public KeyringCache getLegacyKeyringCache() {
-        return this.legacyKeyringCache;
     }
 
     public CollectionKeyCache getSchedulerKeyCache() {
@@ -439,14 +399,6 @@ public class Zebedee {
 
     public Notifier getSlackNotifier() {
         return slackNotifier;
-    }
-
-    public CollectionKeyring getLegacyCollCollectionKeyring() {
-        return legacyCollCollectionKeyring;
-    }
-
-    public CollectionKeyring getCentralCollectinKeying() {
-        return centralCollectinKeying;
     }
 }
 

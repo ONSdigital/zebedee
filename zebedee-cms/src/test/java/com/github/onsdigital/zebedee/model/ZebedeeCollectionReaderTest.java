@@ -116,9 +116,6 @@ public class ZebedeeCollectionReaderTest extends ZebedeeTestBaseFixture {
         when(keyring.get(any(), any()))
                 .thenReturn(collectionKey);
 
-        when(usersKeyring.get(anyString()))
-                .thenReturn(collectionKey);
-
         reader = new ZebedeeCollectionReader(zebedee, collection, session);
     }
 

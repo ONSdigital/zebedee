@@ -74,25 +74,6 @@ public class CollectionKeyringImpl implements CollectionKeyring {
     }
 
     @Override
-    public void cacheKeyring(User user) throws KeyringException {
-        validateUser(user);
-
-        if (user.keyring() == null) {
-            throw new KeyringException(USER_KEYRING_NULL_ERR);
-        }
-
-        if (!user.keyring().isUnlocked()) {
-            throw new KeyringException(USER_KEYRING_LOCKED_ERR);
-        }
-
-        if (!user.keyring().list().isEmpty()) {
-            for (String collectionID : user.keyring().list()) {
-                keyCache.add(collectionID, user.keyring().get(collectionID));
-            }
-        }
-    }
-
-    @Override
     public SecretKey get(User user, Collection collection) throws KeyringException {
         validateUser(user);
         validateCollection(collection);
@@ -151,42 +132,6 @@ public class CollectionKeyringImpl implements CollectionKeyring {
                 .stream()
                 .filter(c -> accessibleCollectionIDs.contains(c))
                 .collect(Collectors.toSet());
-    }
-
-    /**
-     * <b>Do nothing.</b>
-     * <p>This method is defined in order to maintain backwards compatability. This functionality is not
-     * required in the new central keyring design so when called we do nothing.</p>
-     * This method will be removed once we have fully migrated to the central keyring implementation.
-     *
-     * @param user     the user the keyring belongs to.
-     * @param password the user's password.
-     * @throws KeyringException thrown if there is a problem unlocking the keyring.
-     */
-    @Override
-    public void unlock(User user, String password) throws KeyringException {
-        // This method is defined in order to maintain backwards compatability. This functionality is not required in
-        // the new central keyring design so when called we do nothing.
-    }
-
-    @Override
-    public void assignTo(User src, User target, List<CollectionDescription> assignments) throws KeyringException {
-        //Do nothing - required to maintain backwards compatability.
-    }
-
-    @Override
-    public void assignTo(User src, User target, CollectionDescription... assignments) throws KeyringException {
-        //Do nothing - required to maintain backwards compatability.
-    }
-
-    @Override
-    public void revokeFrom(User target, List<CollectionDescription> removals) throws KeyringException {
-        //Do nothing - required to maintain backwards compatability.
-    }
-
-    @Override
-    public void revokeFrom(User target, CollectionDescription... removals) throws KeyringException {
-        //Do nothing - required to maintain backwards compatability.
     }
 
     private void validateUser(User user) throws KeyringException {

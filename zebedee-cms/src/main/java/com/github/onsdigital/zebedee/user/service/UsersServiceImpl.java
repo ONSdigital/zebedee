@@ -94,19 +94,6 @@ public class UsersServiceImpl implements UsersService {
     }
 
     @Override
-    public User addKeyToKeyring(String email, String keyIdentifier, SecretKey key) throws IOException {
-        lock.lock();
-        try {
-            User user = userStore.get(email);
-            user.keyring().put(keyIdentifier, key);
-            userStore.save(user);
-            return user;
-        } finally {
-            lock.unlock();
-        }
-    }
-
-    @Override
     public User getUserByEmail(String email) throws IOException, NotFoundException, BadRequestException {
         lock.lock();
         try {
@@ -215,23 +202,7 @@ public class UsersServiceImpl implements UsersService {
                 // Only an admin can update another users password.
                 if (permissionsService.isAdministrator(session.getEmail()) || !permissionsService.hasAdministrator()) {
 
-                    com.github.onsdigital.zebedee.json.Keyring originalKeyring = null;
-                    if (targetUser.keyring() != null) {
-                        originalKeyring = targetUser.keyring().clone();
-                    }
-
                     targetUser = resetPassword(targetUser, credentials.getPassword(), session.getEmail());
-
-                    if (originalKeyring != null) {
-                        User assigningUser = userStore.get(session.getEmail());
-                        if (assigningUser == null) {
-                            throw new IOException("error expected user but was null");
-                        }
-
-                        List<String> collectionsToAssign = new ArrayList<>(originalKeyring.keySet());
-                        assignKeysToUser(assigningUser, targetUser, collectionsToAssign);
-                    }
-
                     userStore.save(targetUser);
                     isSuccess = true;
                 } else {
@@ -251,95 +222,6 @@ public class UsersServiceImpl implements UsersService {
     public UserList list() throws IOException {
         return userStore.list();
     }
-
-    @Override
-    public void removeStaleCollectionKeys(String userEmail) throws
-            IOException, NotFoundException, BadRequestException {
-        lock.lock();
-        try {
-            User user = getUserByEmail(userEmail);
-
-            if (user.keyring() != null) {
-                Map<String, Collection> collectionMap = collections.mapByID();
-                List<String> orphanedCollections = collections.listOrphaned();
-
-                List<String> keysToRemove = user.keyring()
-                        .list()
-                        .stream()
-                        .filter(key -> isStale(key, collectionMap, orphanedCollections, userEmail))
-                        .collect(Collectors.toList());
-
-
-                keysToRemove.stream().forEach(staleKey -> {
-                    info().data("user", userEmail)
-                            .data("collection_id", staleKey)
-                            .log(REMOVING_STALE_KEY_LOG_MSG);
-                    user.keyring().remove(staleKey);
-                });
-
-                if (!keysToRemove.isEmpty()) {
-                    update(user, user, user.getLastAdmin());
-                }
-            }
-        } finally {
-            lock.unlock();
-        }
-    }
-
-    @Override
-    public void removeStaleCollectionKeys(Map<String, Collection> collectionMap, List<String> orphanedCollections,
-                                          String userEmail) throws IOException, NotFoundException, BadRequestException {
-        lock.lock();
-        try {
-            User user = getUserByEmail(userEmail);
-
-            if (user.keyring() != null) {
-                List<String> keysToRemove = user.keyring()
-                        .list()
-                        .stream()
-                        .filter(key -> isStale(key, collectionMap, orphanedCollections, userEmail))
-                        .collect(Collectors.toList());
-
-
-                keysToRemove.stream().forEach(staleKey -> {
-                    info().data("user", userEmail)
-                            .data("collection_id", staleKey)
-                            .log(REMOVING_STALE_KEY_LOG_MSG);
-                    user.keyring().remove(staleKey);
-                });
-
-                if (!keysToRemove.isEmpty()) {
-                    update(user, user, user.getLastAdmin());
-                }
-            }
-        } finally {
-            lock.unlock();
-        }
-    }
-
-    private boolean isStale(String key, Map<String, Collection> collectionMap, List<String> orphanedCollections,
-                            String userEmail) {
-
-        String collectionName = key.split("-")[0];
-        if (orphanedCollections.contains(collectionName)) {
-            return false;
-        }
-        return !collectionMap.containsKey(key);
-    }
-
-    @Override
-    public User removeKeyFromKeyring(String email, String keyIdentifier) throws IOException {
-        lock.lock();
-        try {
-            User user = userStore.get(email);
-            user.keyring().remove(keyIdentifier);
-            userStore.save(user);
-            return user;
-        } finally {
-            lock.unlock();
-        }
-    }
-
 
     @Override
     public User update(Session session, User user, User updatedUser) throws IOException, UnauthorizedException,
@@ -375,55 +257,6 @@ public class UsersServiceImpl implements UsersService {
         }
     }
 
-    // TODO don't think this is required anymore.
-    @Override
-    public void migrateToEncryption(User user, String password) throws IOException {
-
-        // Update this user if necessary:
-        migrateUserToEncryption(user, password);
-
-        int withKeyring = 0;
-        int withoutKeyring = 0;
-        // TODO Was listAll
-        UserList users = list();
-        for (User otherUser : users) {
-            if (user.keyring() != null) {
-                withKeyring++;
-            } else {
-                // Migrate test users automatically:
-                if (migrateUserToEncryption(otherUser, "Dou4gl") || migrateUserToEncryption(otherUser, "password"))
-                    withKeyring++;
-                else
-                    withoutKeyring++;
-            }
-        }
-    }
-
-    @Override
-    public User updateKeyring(User user) throws IOException {
-        lock.lock();
-        try {
-            User updated = userStore.get(user.getEmail());
-            if (updated != null) {
-
-                if (updated.keyring() == null) {
-                    info().data("user", updated.getEmail())
-                            .log("User keyring not updated as it is currently null.");
-                    return updated;
-                }
-
-                updated.setKeyring(user.keyring().clone());
-
-                // Only set this to true if explicitly set:
-                updated.setInactive(BooleanUtils.isTrue(user.getInactive()));
-                userStore.save(updated);
-            }
-            return updated;
-        } finally {
-            lock.unlock();
-        }
-    }
-
     User create(User user, String lastAdmin) throws IOException {
         User result = null;
         lock.lock();
@@ -431,28 +264,6 @@ public class UsersServiceImpl implements UsersService {
             if (valid(user) && !userStore.exists(user.getEmail())) {
                 result = userFactory.newUserWithDefaultSettings(user.getEmail(), user.getName(), lastAdmin);
                 userStore.save(result);
-            }
-            return result;
-        } finally {
-            lock.unlock();
-        }
-    }
-
-    private boolean migrateUserToEncryption(User user, String password) throws IOException {
-        boolean result = false;
-        lock.lock();
-        try {
-            if (user.keyring() == null && user.authenticate(password)) {
-
-                System.out.println("\nUSER KEYRING IS NULL GENERATING NEW KEYRING\n");
-
-                user = userStore.get(user.getEmail());
-                // The keyring has not been generated yet,
-                // so reset the password to the current password
-                // in order to generate a keyring and associated key pair:
-                info().data("user", user.getEmail()).log("Generating keyring");
-                user.resetPassword(password);
-                update(user, user, "Encryption migration");
             }
             return result;
         } finally {
@@ -486,10 +297,6 @@ public class UsersServiceImpl implements UsersService {
         } finally {
             lock.unlock();
         }
-    }
-
-    private String normalise(String email) {
-        return StringUtils.lowerCase(StringUtils.trim(email));
     }
 
     private boolean valid(User user) {
@@ -531,19 +338,6 @@ public class UsersServiceImpl implements UsersService {
             return user;
         } finally {
             lock.unlock();
-        }
-    }
-
-    private void assignKeysToUser(User src, User target, List<String> collectionIdsToAssign) throws IOException {
-        if (collectionIdsToAssign != null && !collectionIdsToAssign.isEmpty()) {
-            // Get the collection descriptions for the keys that should be assigned.
-            List<CollectionDescription> assignments = collections.list()
-                    .stream()
-                    .filter(c -> collectionIdsToAssign.contains(c.getId()))
-                    .map(c -> c.getDescription())
-                    .collect(Collectors.toList());
-
-            keyringSupplier.get().assignTo(src, target, assignments);
         }
     }
 

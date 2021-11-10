@@ -222,6 +222,33 @@ public class KeyringHealthCheckerImplTest {
     }
 
     @Test
+    public void check_collectionDescriptionNull_shouldDoNothing() throws Exception {
+        when(permissionsService.isAdministrator(session))
+                .thenReturn(true);
+
+        when(collection.getId())
+                .thenReturn("12345");
+
+        Collections.CollectionList collectionList = new Collections.CollectionList() {{
+            add(collection);
+        }};
+
+        when(keyCache.list())
+                .thenReturn(new HashSet<>());
+
+        when(collections.list())
+                .thenReturn(collectionList);
+
+        when(collection.getDescription())
+                .thenReturn(null);
+
+        when(keyCache.list())
+                .thenThrow(IOException.class);
+
+        healthChecker.check(session);
+    }
+
+    @Test
     public void check_noAbsentKeys_shouldDoNothing() throws Exception {
         when(permissionsService.isAdministrator(session))
                 .thenReturn(true);
@@ -388,6 +415,75 @@ public class KeyringHealthCheckerImplTest {
         assertThat(fields.get(2).getTitle(), equalTo("Publish Type"));
         assertThat(fields.get(2).getValue(), equalTo(manual.name()));
         assertThat(fields.get(2).isShort(), equalTo(true));
+    }
+
+    @Test
+    public void check_collectionEventsNull_shouldSendMessageWithExpectedFields() throws Exception {
+        when(permissionsService.isAdministrator(session))
+                .thenReturn(true);
+
+        when(collection.getId())
+                .thenReturn("12345");
+
+        when(description.getEvents())
+                .thenReturn(null);
+
+        Collections.CollectionList collectionList = new Collections.CollectionList() {{
+            add(collection);
+        }};
+
+        when(collections.list())
+                .thenReturn(collectionList);
+
+        Set<String> schedulerKeys = new HashSet<>() ;
+
+        when(keyCache.list())
+                .thenReturn(schedulerKeys);
+
+        ArgumentCaptor<PostMessage> captor = ArgumentCaptor.forClass(PostMessage.class);
+        doNothing()
+                .when(slackNotifier)
+                .sendSlackMessage(captor.capture());
+
+        healthChecker.check(session);
+
+        verify(permissionsService, times(1)).isAdministrator(session);
+        verify(collections, times(1)).list();
+        verify(keyCache, times(1)).list();
+        verify(slackNotifier, times(1)).sendSlackMessage(any());
+
+        PostMessage msg = captor.getValue();
+        assertThat(msg, is(notNullValue()));
+        assertThat(msg.getText(), equalTo(MESSAGE));
+        assertThat(msg.getEmoji(), equalTo(":flo:"));
+        assertThat(msg.getAttachments(), is(notNullValue()));
+        assertThat(msg.getAttachments().size(), equalTo(1));
+
+        PostMessageAttachment attch = msg.getAttachments().get(0);
+        assertThat(attch.getText(), equalTo("12345"));
+        assertThat(attch.getTitle(), equalTo("Collection ID"));
+        assertThat(attch.getColor(), equalTo(DANGER.getColor()));
+        assertThat(attch.getFields(), is(notNullValue()));
+
+        // 3 fields: Colleciton name, affected user, publish type
+        assertThat(attch.getFields().size(), equalTo(3));
+
+        int i = 0;
+        List<PostMessageField> fields = attch.getFields();
+        assertThat(fields.get(i).getTitle(), equalTo("Collection Name"));
+        assertThat(fields.get(i).getValue(), equalTo("col1"));
+        assertThat(fields.get(i).isShort(), equalTo(false));
+        i++;
+
+        assertThat(fields.get(i).getTitle(), equalTo("Missing from"));
+        assertThat(fields.get(i).getValue(), equalTo(TEST_EMAIL));
+        assertThat(fields.get(i).isShort(), equalTo(true));
+        i++;
+
+        assertThat(fields.get(i).getTitle(), equalTo("Publish Type"));
+        assertThat(fields.get(i).getValue(), equalTo(manual.name()));
+        assertThat(fields.get(i).isShort(), equalTo(true));
+        i++;
     }
 
     void assertPostMessage(PostMessage msg) {

@@ -78,7 +78,7 @@ public class CollectionKeyringImpl implements CollectionKeyring {
         validateUser(user);
         validateCollection(collection);
 
-        boolean hasPermission = hasEditPermissions(user);
+        boolean hasPermission = hasViewPermissions(user, collection.getDescription());
 
         if (!hasPermission) {
             return null;
@@ -162,6 +162,14 @@ public class CollectionKeyringImpl implements CollectionKeyring {
 
         if (StringUtils.isEmpty(collection.getDescription().getId())) {
             throw new KeyringException(COLLECTION_ID_NULL_OR_EMPTY_ERR);
+        }
+    }
+
+    private boolean hasViewPermissions(User user, CollectionDescription desc) throws KeyringException {
+        try {
+            return permissionsService.canView(user.getEmail(), desc);
+        } catch (IOException ex) {
+            throw new KeyringException(ex);
         }
     }
 

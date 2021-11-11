@@ -251,13 +251,13 @@ public class CollectionKeyringImplTest {
         when(collDesc.getId())
                 .thenReturn(TEST_COLLECTION_ID);
 
-        when(permissionsService.canEdit(TEST_EMAIL_ID))
+        when(permissionsService.canView(TEST_EMAIL_ID, collDesc))
                 .thenThrow(new IOException("Bork"));
 
         KeyringException ex = assertThrows(KeyringException.class, () -> keyring.get(user, collection));
 
         assertThat(ex.getCause().getMessage(), equalTo("Bork"));
-        verify(permissionsService, times(1)).canEdit(TEST_EMAIL_ID);
+        verify(permissionsService, times(1)).canView(TEST_EMAIL_ID, collDesc);
     }
 
     @Test
@@ -271,13 +271,13 @@ public class CollectionKeyringImplTest {
         when(collDesc.getId())
                 .thenReturn(TEST_COLLECTION_ID);
 
-        when(permissionsService.canEdit(TEST_EMAIL_ID))
+        when(permissionsService.canView(TEST_EMAIL_ID, collDesc))
                 .thenReturn(false);
 
         SecretKey secretKey = keyring.get(user, collection);
 
         assertThat(secretKey, is(nullValue()));
-        verify(permissionsService, times(1)).canEdit(TEST_EMAIL_ID);
+        verify(permissionsService, times(1)).canView(TEST_EMAIL_ID, collDesc);
     }
 
     @Test
@@ -291,7 +291,7 @@ public class CollectionKeyringImplTest {
         when(collDesc.getId())
                 .thenReturn(TEST_COLLECTION_ID);
 
-        when(permissionsService.canEdit(TEST_EMAIL_ID))
+        when(permissionsService.canView(TEST_EMAIL_ID, collDesc))
                 .thenReturn(true);
 
         when(keyCache.get(TEST_COLLECTION_ID))
@@ -300,7 +300,7 @@ public class CollectionKeyringImplTest {
         KeyringException ex = assertThrows(KeyringException.class, () -> keyring.get(user, collection));
         assertThat(ex.getMessage(), equalTo("Beep"));
 
-        verify(permissionsService, times(1)).canEdit(TEST_EMAIL_ID);
+        verify(permissionsService, times(1)).canView(TEST_EMAIL_ID, collDesc);
         verify(keyCache, times(1)).get(TEST_COLLECTION_ID);
     }
 
@@ -315,7 +315,7 @@ public class CollectionKeyringImplTest {
         when(collDesc.getId())
                 .thenReturn(TEST_COLLECTION_ID);
 
-        when(permissionsService.canEdit(TEST_EMAIL_ID))
+        when(permissionsService.canView(TEST_EMAIL_ID, collDesc))
                 .thenReturn(true);
 
         when(keyCache.get(TEST_COLLECTION_ID))
@@ -324,7 +324,7 @@ public class CollectionKeyringImplTest {
         SecretKey key = keyring.get(user, collection);
 
         assertThat(key, is(nullValue()));
-        verify(permissionsService, times(1)).canEdit(TEST_EMAIL_ID);
+        verify(permissionsService, times(1)).canView(TEST_EMAIL_ID, collDesc);
         verify(keyCache, times(1)).get(TEST_COLLECTION_ID);
     }
 
@@ -339,7 +339,7 @@ public class CollectionKeyringImplTest {
         when(collDesc.getId())
                 .thenReturn(TEST_COLLECTION_ID);
 
-        when(permissionsService.canEdit(TEST_EMAIL_ID))
+        when(permissionsService.canView(TEST_EMAIL_ID, collDesc))
                 .thenReturn(true);
 
         when(keyCache.get(TEST_COLLECTION_ID))
@@ -348,7 +348,7 @@ public class CollectionKeyringImplTest {
         SecretKey key = keyring.get(user, collection);
 
         assertThat(key, equalTo(secretKey));
-        verify(permissionsService, times(1)).canEdit(TEST_EMAIL_ID);
+        verify(permissionsService, times(1)).canView(TEST_EMAIL_ID, collDesc);
         verify(keyCache, times(1)).get(TEST_COLLECTION_ID);
     }
 

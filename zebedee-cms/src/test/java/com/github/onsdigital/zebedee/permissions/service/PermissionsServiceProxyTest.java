@@ -34,7 +34,7 @@ import static org.mockito.Mockito.when;
 /**
  * Created by dave on 31/05/2017.
  */
-public class JWTPermissionsServiceImplTest {
+public class PermissionsServiceProxyTest {
 
     private static final String EMAIL = "admin@ons.gov.uk";
 
@@ -106,7 +106,7 @@ public class JWTPermissionsServiceImplTest {
     public void isPublisher_Session_JWTNotEnabled() throws Exception {
         session = null;
         jwtSessionsEnabled = false;
-        permissions = new JWTPermissionsServiceImpl(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService, usersServiceSupplier, teamsServiceSupplier);
+        permissions = new PermissionsServiceProxy(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService);
         assertThat(permissions.isPublisher(session), is(false));
         verifyZeroInteractions(jwtPermissionsService, usersService, teamsService);
         verify(legacyPermissionsService, times(1)).isPublisher(session);
@@ -117,7 +117,7 @@ public class JWTPermissionsServiceImplTest {
     public void isPublisher_Session_JWEnabled() throws Exception {
         session = null;
         jwtSessionsEnabled = true;
-        permissions = new JWTPermissionsServiceImpl(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService, usersServiceSupplier, teamsServiceSupplier);
+        permissions = new PermissionsServiceProxy(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService);
         assertThat(permissions.isPublisher(session), is(false));
         verifyZeroInteractions(legacyPermissionsService, usersService, teamsService);
         verify(jwtPermissionsService, times(1)).isPublisher(session);
@@ -128,7 +128,7 @@ public class JWTPermissionsServiceImplTest {
     public void isPublisher_Email_JWTNotEnabled() throws Exception {
         String email = null;
         jwtSessionsEnabled = false;
-        permissions = new JWTPermissionsServiceImpl(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService, usersServiceSupplier, teamsServiceSupplier);
+        permissions = new PermissionsServiceProxy(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService);
         assertThat(permissions.isPublisher(email), is(false));
         verifyZeroInteractions(jwtPermissionsService, usersService, teamsService);
         verify(legacyPermissionsService, times(1)).isPublisher(email);
@@ -139,7 +139,7 @@ public class JWTPermissionsServiceImplTest {
     public void isPublisher_Email_JWEnabled() throws Exception {
         String email = null;
         jwtSessionsEnabled = true;
-        permissions = new JWTPermissionsServiceImpl(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService, usersServiceSupplier, teamsServiceSupplier);
+        permissions = new PermissionsServiceProxy(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService);
         assertThat(permissions.isPublisher(email), is(false));
         verifyZeroInteractions(legacyPermissionsService, usersService, teamsService);
         verify(jwtPermissionsService, times(1)).isPublisher(email);
@@ -150,7 +150,7 @@ public class JWTPermissionsServiceImplTest {
     public void isAdministrator_Session_JWTNotEnabled() throws Exception {
         session = null;
         jwtSessionsEnabled = false;
-        permissions = new JWTPermissionsServiceImpl(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService, usersServiceSupplier, teamsServiceSupplier);
+        permissions = new PermissionsServiceProxy(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService);
         assertThat(permissions.isAdministrator(session), is(false));
         verifyZeroInteractions(jwtPermissionsService, usersService, teamsService);
         verify(legacyPermissionsService, times(1)).isAdministrator(session);
@@ -161,7 +161,7 @@ public class JWTPermissionsServiceImplTest {
     public void isAdministrator_Session_JWEnabled() throws Exception {
         session = null;
         jwtSessionsEnabled = true;
-        permissions = new JWTPermissionsServiceImpl(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService, usersServiceSupplier, teamsServiceSupplier);
+        permissions = new PermissionsServiceProxy(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService);
         assertThat(permissions.isAdministrator(session), is(false));
         verifyZeroInteractions(legacyPermissionsService, usersService, teamsService);
         verify(jwtPermissionsService, times(1)).isAdministrator(session);
@@ -172,7 +172,7 @@ public class JWTPermissionsServiceImplTest {
     public void isAdministrator_Email_JWTNotEnabled() throws Exception {
         String email = null;
         jwtSessionsEnabled = false;
-        permissions = new JWTPermissionsServiceImpl(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService, usersServiceSupplier, teamsServiceSupplier);
+        permissions = new PermissionsServiceProxy(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService);
         assertThat(permissions.isAdministrator(email), is(false));
         verifyZeroInteractions(jwtPermissionsService, usersService, teamsService);
         verify(legacyPermissionsService, times(1)).isAdministrator(email);
@@ -183,7 +183,7 @@ public class JWTPermissionsServiceImplTest {
     public void isAdministrator_Email_JWEnabled() throws Exception {
         String email = null;
         jwtSessionsEnabled = true;
-        permissions = new JWTPermissionsServiceImpl(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService, usersServiceSupplier, teamsServiceSupplier);
+        permissions = new PermissionsServiceProxy(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService);
         assertThat(permissions.isAdministrator(email), is(false));
         verifyZeroInteractions(legacyPermissionsService, usersService, teamsService);
         verify(jwtPermissionsService, times(1)).isAdministrator(email);
@@ -204,7 +204,7 @@ public class JWTPermissionsServiceImplTest {
                 .thenReturn(admins);
 
         jwtSessionsEnabled = false;
-        permissions = new JWTPermissionsServiceImpl(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService, usersServiceSupplier, teamsServiceSupplier);
+        permissions = new PermissionsServiceProxy(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService);
         List<User> result = permissions.getCollectionAccessMapping(collectionMock);
 
         verifyZeroInteractions(jwtPermissionsService, usersService, teamsService);
@@ -227,7 +227,7 @@ public class JWTPermissionsServiceImplTest {
                 .thenReturn(admins);
 
         jwtSessionsEnabled = true;
-        permissions = new JWTPermissionsServiceImpl(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService, usersServiceSupplier, teamsServiceSupplier);
+        permissions = new PermissionsServiceProxy(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService);
         List<User> result = permissions.getCollectionAccessMapping(collectionMock);
 
         verifyZeroInteractions(legacyPermissionsService, usersService, teamsService);
@@ -240,7 +240,7 @@ public class JWTPermissionsServiceImplTest {
         session = null;
 
         jwtSessionsEnabled = false;
-        permissions = new JWTPermissionsServiceImpl(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService, usersServiceSupplier, teamsServiceSupplier);
+        permissions = new PermissionsServiceProxy(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService);
         List<User> result = permissions.getCollectionAccessMapping(collectionMock);
 
         verifyZeroInteractions(jwtPermissionsService, usersService, teamsService);
@@ -253,7 +253,7 @@ public class JWTPermissionsServiceImplTest {
         session = null;
 
         jwtSessionsEnabled = true;
-        permissions = new JWTPermissionsServiceImpl(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService, usersServiceSupplier, teamsServiceSupplier);
+        permissions = new PermissionsServiceProxy(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService);
         List<User> result = permissions.getCollectionAccessMapping(collectionMock);
         verifyZeroInteractions(legacyPermissionsService, usersService, teamsService);
         verify(jwtPermissionsService, times(1)).getCollectionAccessMapping(collectionMock);
@@ -268,7 +268,7 @@ public class JWTPermissionsServiceImplTest {
                 .thenReturn(null);
 
         jwtSessionsEnabled = false;
-        permissions = new JWTPermissionsServiceImpl(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService, usersServiceSupplier, teamsServiceSupplier);
+        permissions = new PermissionsServiceProxy(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService);
         
         assertThat(permissions.hasAdministrator(), is(false));
         verifyZeroInteractions(jwtPermissionsService, usersService, teamsService);
@@ -283,7 +283,7 @@ public class JWTPermissionsServiceImplTest {
                 .thenReturn(null);
 
         jwtSessionsEnabled = true;
-        permissions = new JWTPermissionsServiceImpl(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService, usersServiceSupplier, teamsServiceSupplier);
+        permissions = new PermissionsServiceProxy(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService);
         
         assertThat(permissions.hasAdministrator(), is(false));
         verifyZeroInteractions(legacyPermissionsService, usersService, teamsService);
@@ -294,7 +294,7 @@ public class JWTPermissionsServiceImplTest {
     @Test
     public void addAdministrator_JWTNotEnabled() throws Exception {
         jwtSessionsEnabled = false;
-        permissions = new JWTPermissionsServiceImpl(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService, usersServiceSupplier, teamsServiceSupplier);
+        permissions = new PermissionsServiceProxy(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService);
 
         admins.add(EMAIL);
         String email2 = "test2@ons.gov.uk";
@@ -308,7 +308,7 @@ public class JWTPermissionsServiceImplTest {
     @Test
     public void addAdministrator_JWTEnabled() throws Exception {
         jwtSessionsEnabled = true;
-        permissions = new JWTPermissionsServiceImpl(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService, usersServiceSupplier, teamsServiceSupplier);
+        permissions = new PermissionsServiceProxy(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService);
 
         admins.add(EMAIL);
         String email2 = "test2@ons.gov.uk";
@@ -323,7 +323,7 @@ public class JWTPermissionsServiceImplTest {
     @Test
     public void canView_User_JWTNotEnabled() throws Exception {
         jwtSessionsEnabled = false;
-        permissions = new JWTPermissionsServiceImpl(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService, usersServiceSupplier, teamsServiceSupplier);
+        permissions = new PermissionsServiceProxy(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService);
 
         when(permissionsStore.getAccessMapping())
                 .thenReturn(new AccessMapping());
@@ -337,7 +337,7 @@ public class JWTPermissionsServiceImplTest {
     @Test
     public void canView_User_JWTEnabled() throws Exception {
         jwtSessionsEnabled = true;
-        permissions = new JWTPermissionsServiceImpl(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService, usersServiceSupplier, teamsServiceSupplier);
+        permissions = new PermissionsServiceProxy(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService);
 
         when(permissionsStore.getAccessMapping())
                 .thenReturn(new AccessMapping());
@@ -351,7 +351,7 @@ public class JWTPermissionsServiceImplTest {
     public void canView_Sessions_JWTNotEnabled() throws Exception {
         jwtSessionsEnabled = false;
         session = null;
-        permissions = new JWTPermissionsServiceImpl(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService, usersServiceSupplier, teamsServiceSupplier);
+        permissions = new PermissionsServiceProxy(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService);
 
         when(permissionsStore.getAccessMapping())
                 .thenReturn(new AccessMapping());
@@ -366,7 +366,7 @@ public class JWTPermissionsServiceImplTest {
     public void canView_Sessions_JWTEnabled() throws Exception {
         jwtSessionsEnabled = true;
         session = null;
-        permissions = new JWTPermissionsServiceImpl(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService, usersServiceSupplier, teamsServiceSupplier);
+        permissions = new PermissionsServiceProxy(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService);
 
         when(permissionsStore.getAccessMapping())
                 .thenReturn(new AccessMapping());
@@ -379,7 +379,7 @@ public class JWTPermissionsServiceImplTest {
     public void canView_Email_JWTNotEnabled() throws Exception {
         jwtSessionsEnabled = false;
         String email = null;
-        permissions = new JWTPermissionsServiceImpl(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService, usersServiceSupplier, teamsServiceSupplier);
+        permissions = new PermissionsServiceProxy(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService);
 
         when(permissionsStore.getAccessMapping())
                 .thenReturn(new AccessMapping());
@@ -394,7 +394,7 @@ public class JWTPermissionsServiceImplTest {
     public void canView_Email_JWTEnabled() throws Exception {
         jwtSessionsEnabled = true;
         String email = null;
-        permissions = new JWTPermissionsServiceImpl(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService, usersServiceSupplier, teamsServiceSupplier);
+        permissions = new PermissionsServiceProxy(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService);
 
         when(permissionsStore.getAccessMapping())
                 .thenReturn(new AccessMapping());
@@ -408,7 +408,7 @@ public class JWTPermissionsServiceImplTest {
     public void canEdit_Session_JWTNotEnabled() throws Exception {
         session = null;
         jwtSessionsEnabled = false;
-        permissions = new JWTPermissionsServiceImpl(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService, usersServiceSupplier, teamsServiceSupplier);
+        permissions = new PermissionsServiceProxy(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService);
 
         when(permissionsStore.getAccessMapping())
                 .thenReturn(new AccessMapping());
@@ -423,7 +423,7 @@ public class JWTPermissionsServiceImplTest {
     public void canEdit_Session_JWTEnabled() throws Exception {
         jwtSessionsEnabled = true;
         session = null;
-        permissions = new JWTPermissionsServiceImpl(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService, usersServiceSupplier, teamsServiceSupplier);
+        permissions = new PermissionsServiceProxy(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService);
 
         when(permissionsStore.getAccessMapping())
                 .thenReturn(new AccessMapping());
@@ -436,7 +436,7 @@ public class JWTPermissionsServiceImplTest {
     @Test
     public void canEdit_User_JWTNotEnabled() throws Exception {
         jwtSessionsEnabled = false;
-        permissions = new JWTPermissionsServiceImpl(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService, usersServiceSupplier, teamsServiceSupplier);
+        permissions = new PermissionsServiceProxy(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService);
 
         when(permissionsStore.getAccessMapping())
                 .thenReturn(new AccessMapping());
@@ -450,7 +450,7 @@ public class JWTPermissionsServiceImplTest {
     @Test
     public void canEdit_User_JWTEnabled() throws Exception {
         jwtSessionsEnabled = true;
-        permissions = new JWTPermissionsServiceImpl(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService, usersServiceSupplier, teamsServiceSupplier);
+        permissions = new PermissionsServiceProxy(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService);
 
         when(permissionsStore.getAccessMapping())
                 .thenReturn(new AccessMapping());
@@ -464,7 +464,7 @@ public class JWTPermissionsServiceImplTest {
     public void canEdit_Email_JWTNotEnabled() throws Exception {
         jwtSessionsEnabled = false;
         String email = null;
-        permissions = new JWTPermissionsServiceImpl(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService, usersServiceSupplier, teamsServiceSupplier);
+        permissions = new PermissionsServiceProxy(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService);
 
         when(permissionsStore.getAccessMapping())
                 .thenReturn(new AccessMapping());
@@ -479,7 +479,7 @@ public class JWTPermissionsServiceImplTest {
     public void canEdit_Email_JWTEnabled() throws Exception {
         jwtSessionsEnabled = true;
         String email = null;
-        permissions = new JWTPermissionsServiceImpl(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService, usersServiceSupplier, teamsServiceSupplier);
+        permissions = new PermissionsServiceProxy(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService);
 
         when(permissionsStore.getAccessMapping())
                 .thenReturn(new AccessMapping());
@@ -493,7 +493,7 @@ public class JWTPermissionsServiceImplTest {
     public void listCollectionsAccessibleByTeam_JWTNotEnabled() throws Exception {
 
         jwtSessionsEnabled = false;
-        permissions = new JWTPermissionsServiceImpl(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService, usersServiceSupplier, teamsServiceSupplier);
+        permissions = new PermissionsServiceProxy(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService);
 
         Map<String, Set<Integer>> collectionMapping = new HashMap<>();
         collectionMapping.put("1234", new HashSet<Integer>() {{
@@ -523,7 +523,7 @@ public class JWTPermissionsServiceImplTest {
     @Test
     public void listCollectionsAccessibleByTeam_JWTEnabled() throws Exception {
         jwtSessionsEnabled = true;
-        permissions = new JWTPermissionsServiceImpl(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService, usersServiceSupplier, teamsServiceSupplier);
+        permissions = new PermissionsServiceProxy(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService);
 
         Map<String, Set<Integer>> collectionMapping = new HashMap<>();
         collectionMapping.put("1234", new HashSet<Integer>() {{
@@ -553,7 +553,7 @@ public class JWTPermissionsServiceImplTest {
     @Test
     public void removeEditor_JWTNotEnabled() throws Exception {
         jwtSessionsEnabled = false;
-        permissions = new JWTPermissionsServiceImpl(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService, usersServiceSupplier, teamsServiceSupplier);
+        permissions = new PermissionsServiceProxy(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService);
 
         digitalPublishingTeam.add(EMAIL);
         admins.add(EMAIL);
@@ -573,7 +573,7 @@ public class JWTPermissionsServiceImplTest {
     @Test
     public void removeEditor_JWTEnabled() throws Exception {
         jwtSessionsEnabled = true;
-        permissions = new JWTPermissionsServiceImpl(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService, usersServiceSupplier, teamsServiceSupplier);
+        permissions = new PermissionsServiceProxy(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService);
 
         digitalPublishingTeam.add(EMAIL);
         admins.add(EMAIL);
@@ -593,7 +593,7 @@ public class JWTPermissionsServiceImplTest {
     @Test
     public void removeAdministrator_JWTNotEnabled() throws Exception {
         jwtSessionsEnabled = false;
-        permissions = new JWTPermissionsServiceImpl(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService, usersServiceSupplier, teamsServiceSupplier);
+        permissions = new PermissionsServiceProxy(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService);
 
         admins.add(EMAIL);
 
@@ -611,7 +611,7 @@ public class JWTPermissionsServiceImplTest {
     @Test
     public void removeAdministrator_JWTEnabled() throws Exception {
         jwtSessionsEnabled = true;
-        permissions = new JWTPermissionsServiceImpl(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService, usersServiceSupplier, teamsServiceSupplier);
+        permissions = new PermissionsServiceProxy(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService);
 
         admins.add(EMAIL);
 
@@ -630,7 +630,7 @@ public class JWTPermissionsServiceImplTest {
     public void listViewerTeams_JWTNotEnabled() throws Exception {
 
         jwtSessionsEnabled = false;
-        permissions = new JWTPermissionsServiceImpl(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService, usersServiceSupplier, teamsServiceSupplier);
+        permissions = new PermissionsServiceProxy(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService);
         Team t = new Team();
         t.setId(6);
         session = null;
@@ -644,7 +644,7 @@ public class JWTPermissionsServiceImplTest {
     @Test
     public void listViewerTeams_JWTEnabled() throws Exception {
         jwtSessionsEnabled = true;
-        permissions = new JWTPermissionsServiceImpl(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService, usersServiceSupplier, teamsServiceSupplier);
+        permissions = new PermissionsServiceProxy(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService);
         Team t = new Team();
         t.setId(6);
         session = null;
@@ -658,7 +658,7 @@ public class JWTPermissionsServiceImplTest {
     @Test
     public void userPermissions_JWTNotEnabled() throws Exception {
         jwtSessionsEnabled = false;
-        permissions = new JWTPermissionsServiceImpl(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService, usersServiceSupplier, teamsServiceSupplier);
+        permissions = new PermissionsServiceProxy(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService);
 
         admins.add(EMAIL);
         String email2 = "test2@ons.gov.uk";
@@ -672,7 +672,7 @@ public class JWTPermissionsServiceImplTest {
     @Test
     public void userPermissions_JWTEnabled() throws Exception {
         jwtSessionsEnabled = true;
-        permissions = new JWTPermissionsServiceImpl(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService, usersServiceSupplier, teamsServiceSupplier);
+        permissions = new PermissionsServiceProxy(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService);
 
         admins.add(EMAIL);
         String email2 = "test2@ons.gov.uk";
@@ -686,7 +686,7 @@ public class JWTPermissionsServiceImplTest {
     @Test
     public void addEditor_JWTNotEnabled() throws Exception {
         jwtSessionsEnabled = false;
-        permissions = new JWTPermissionsServiceImpl(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService, usersServiceSupplier, teamsServiceSupplier);
+        permissions = new PermissionsServiceProxy(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService);
 
         String email2 = "test2@ons.gov.uk";
         session = null;
@@ -701,7 +701,7 @@ public class JWTPermissionsServiceImplTest {
     @Test
     public void addEditor_JWTEnabled() throws Exception {
         jwtSessionsEnabled = true;
-        permissions = new JWTPermissionsServiceImpl(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService, usersServiceSupplier, teamsServiceSupplier);
+        permissions = new PermissionsServiceProxy(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService);
 
         String email2 = "test2@ons.gov.uk";
         session = null;
@@ -715,7 +715,7 @@ public class JWTPermissionsServiceImplTest {
     @Test
     public void addViewerTeam_JWTNotEnabled() throws Exception {
         jwtSessionsEnabled = false;
-        permissions = new JWTPermissionsServiceImpl(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService, usersServiceSupplier, teamsServiceSupplier);
+        permissions = new PermissionsServiceProxy(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService);
 
         session = null;
         Team t = new Team();
@@ -730,7 +730,7 @@ public class JWTPermissionsServiceImplTest {
     @Test
     public void addViewerTeam_JWTEnabled() throws Exception {
         jwtSessionsEnabled = true;
-        permissions = new JWTPermissionsServiceImpl(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService, usersServiceSupplier, teamsServiceSupplier);
+        permissions = new PermissionsServiceProxy(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService);
 
         session = null;
         Team t = new Team();
@@ -744,7 +744,7 @@ public class JWTPermissionsServiceImplTest {
     @Test
     public void removeViewerTeam_JWTNotEnabled() throws Exception {
         jwtSessionsEnabled = false;
-        permissions = new JWTPermissionsServiceImpl(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService, usersServiceSupplier, teamsServiceSupplier);
+        permissions = new PermissionsServiceProxy(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService);
 
         String email2 = "test2@ons.gov.uk";
         session = null;
@@ -760,7 +760,7 @@ public class JWTPermissionsServiceImplTest {
     @Test
     public void removeViewerTeam_JWTEnabled() throws Exception {
         jwtSessionsEnabled = true;
-        permissions = new JWTPermissionsServiceImpl(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService, usersServiceSupplier, teamsServiceSupplier);
+        permissions = new PermissionsServiceProxy(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService);
 
         session = null;
         Team t = new Team();

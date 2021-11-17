@@ -1,7 +1,6 @@
 package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
-import com.github.onsdigital.zebedee.configuration.CMSFeatureFlags;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.InternalServerError;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
@@ -21,7 +20,6 @@ import javax.ws.rs.GET;
 import java.io.IOException;
 import java.util.Set;
 
-import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
 import static com.github.onsdigital.zebedee.keyring.CollectionKeyringUtil.getUser;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.error;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.info;
@@ -33,8 +31,7 @@ import static com.github.onsdigital.zebedee.logging.CMSLogEvent.info;
 @Api
 public class ListKeyring {
 
-    private CollectionKeyring legacyKeyring;
-    private CollectionKeyring centralKeyring;
+    private CollectionKeyring collectionKeyring;
     private Sessions sessions;
     private PermissionsService permissionsService;
     private UsersService usersService;
@@ -43,8 +40,8 @@ public class ListKeyring {
      * Construct a new instance using the default configuration.
      */
     public ListKeyring() {
-        this(Root.zebedee.getLegacyCollCollectionKeyring(),
-                Root.zebedee.getCentralCollectinKeying(),
+        this(
+                Root.zebedee.getCollectionKeyring(),
                 Root.zebedee.getSessions(),
                 Root.zebedee.getPermissionsService(),
                 Root.zebedee.getUsersService());
@@ -53,11 +50,9 @@ public class ListKeyring {
     /**
      * Construct a new instance using the provided configuration.
      */
-    public ListKeyring(final CollectionKeyring legacyKeyring, final CollectionKeyring centralKeyring,
-                       final Sessions sessions, final PermissionsService permissionsService,
-                       final UsersService usersService) {
-        this.legacyKeyring = legacyKeyring;
-        this.centralKeyring = centralKeyring;
+    public ListKeyring(final CollectionKeyring collectionKeyring, final Sessions sessions,
+                       final PermissionsService permissionsService, final UsersService usersService) {
+        this.collectionKeyring = collectionKeyring;
         this.sessions = sessions;
         this.permissionsService = permissionsService;
         this.usersService = usersService;
@@ -70,12 +65,14 @@ public class ListKeyring {
     @GET
     public Set<String> listUserKeys(HttpServletRequest request, HttpServletResponse response) throws ZebedeeException {
         checkPermission(getSession(request));
-        String src = request.getParameter("src");
-
-        CollectionKeyring keyringSrc = "central".equalsIgnoreCase(src) ? centralKeyring : legacyKeyring;
 
         User user = getUser(usersService, getEmail(request));
-        return listKeyring(user, keyringSrc);
+        try {
+            return collectionKeyring.list(user);
+        } catch (KeyringException ex) {
+            error().user(user.getEmail()).exception(ex).log("error listing user keyring");
+            throw new InternalServerError("internal server error");
+        }
     }
 
     Session getSession(HttpServletRequest request) throws UnauthorizedException, InternalServerError {

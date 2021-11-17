@@ -94,134 +94,6 @@ public class CollectionKeyringImplTest {
     }
 
     @Test
-    public void testCacheKeyring_userNull() throws KeyringException {
-        // Given the user is null
-        // when cacheKeyring is called
-        KeyringException ex = assertThrows(KeyringException.class, () -> keyring.cacheKeyring(null));
-
-        // then a Keyring exception is thrown.
-        assertThat(ex.getMessage(), equalTo(USER_NULL_ERR));
-        verifyZeroInteractions(keyCache);
-    }
-
-    @Test
-    public void testCacheKeyring_userKeyringNull() throws Exception {
-        // Given the user keyring is null
-        when(user.getEmail())
-                .thenReturn(TEST_EMAIL_ID);
-
-        when(user.keyring())
-                .thenReturn(null);
-
-        // When cacheKeyring is called
-        KeyringException ex = assertThrows(KeyringException.class, () -> keyring.cacheKeyring(user));
-
-        // Then a Keyring exception is thrown.
-        assertThat(ex.getMessage(), equalTo(USER_KEYRING_NULL_ERR));
-        verifyZeroInteractions(keyCache);
-    }
-
-    @Test
-    public void testCacheKeyring_userKeyringIsLocked() throws Exception {
-        // Given the user keyring is locked
-        when(user.getEmail())
-                .thenReturn(TEST_EMAIL_ID);
-
-        when(user.keyring())
-                .thenReturn(userKeyring);
-
-        when(userKeyring.isUnlocked())
-                .thenReturn(false);
-
-        // When cacheKeyring is called
-        KeyringException ex = assertThrows(KeyringException.class, () -> keyring.cacheKeyring(user));
-
-        // Then a Keyring exception is thrown.
-        assertThat(ex.getMessage(), equalTo(USER_KEYRING_LOCKED_ERR));
-        verifyZeroInteractions(keyCache);
-    }
-
-    @Test
-    public void testCacheKeyring_userKeyringIsEmpty() throws Exception {
-        // Given the user keyring is empty
-        when(user.getEmail())
-                .thenReturn(TEST_EMAIL_ID);
-
-        when(user.keyring())
-                .thenReturn(userKeyring);
-
-        when(userKeyring.isUnlocked())
-                .thenReturn(true);
-
-        when(userKeyring.list())
-                .thenReturn(new HashSet<>());
-
-        // When cacheKeyring is called
-        keyring.cacheKeyring(user);
-
-        // Then the central keyring is not updated.
-        verifyZeroInteractions(keyCache);
-    }
-
-    @Test
-    public void testCacheKeyring_addThrowsException() throws Exception {
-        // Given central keyring.add throws an exception
-        when(user.getEmail())
-                .thenReturn(TEST_EMAIL_ID);
-
-        when(user.keyring())
-                .thenReturn(userKeyring);
-
-        when(userKeyring.isUnlocked())
-                .thenReturn(true);
-
-        when(userKeyring.list())
-                .thenReturn(new HashSet<String>() {{
-                    add(TEST_COLLECTION_ID);
-                }});
-
-        when(userKeyring.get(TEST_COLLECTION_ID))
-                .thenReturn(secretKey);
-
-        doThrow(KeyringException.class)
-                .when(keyCache)
-                .add(any(), any());
-
-        // When cacheKeyring is called
-        assertThrows(KeyringException.class, () -> keyring.cacheKeyring(user));
-
-        // Then the central keyring is not updated.
-        verify(keyCache, times(1)).add(any(), any());
-    }
-
-    @Test
-    public void testCacheKeyring_success() throws Exception {
-        // Given a populated user keyring
-        when(user.getEmail())
-                .thenReturn(TEST_EMAIL_ID);
-
-        when(user.keyring())
-                .thenReturn(userKeyring);
-
-        when(userKeyring.isUnlocked())
-                .thenReturn(true);
-
-        when(userKeyring.list())
-                .thenReturn(new HashSet<String>() {{
-                    add(TEST_COLLECTION_ID);
-                }});
-
-        when(userKeyring.get(TEST_COLLECTION_ID))
-                .thenReturn(secretKey);
-
-        // When cacheKeyring is called
-        keyring.cacheKeyring(user);
-
-        // Then the central keyring is updated with each entry in the user keyring.
-        verify(keyCache, times(1)).add(TEST_COLLECTION_ID, secretKey);
-    }
-
-    @Test
     public void testGetInstance_notInitialised() throws Exception {
         // Given CollectionKeyring has not been initalised
         resetInstanceToNull();
@@ -379,13 +251,13 @@ public class CollectionKeyringImplTest {
         when(collDesc.getId())
                 .thenReturn(TEST_COLLECTION_ID);
 
-        when(permissionsService.canEdit(TEST_EMAIL_ID))
+        when(permissionsService.canView(TEST_EMAIL_ID, collDesc))
                 .thenThrow(new IOException("Bork"));
 
         KeyringException ex = assertThrows(KeyringException.class, () -> keyring.get(user, collection));
 
         assertThat(ex.getCause().getMessage(), equalTo("Bork"));
-        verify(permissionsService, times(1)).canEdit(TEST_EMAIL_ID);
+        verify(permissionsService, times(1)).canView(TEST_EMAIL_ID, collDesc);
     }
 
     @Test
@@ -399,13 +271,13 @@ public class CollectionKeyringImplTest {
         when(collDesc.getId())
                 .thenReturn(TEST_COLLECTION_ID);
 
-        when(permissionsService.canEdit(TEST_EMAIL_ID))
+        when(permissionsService.canView(TEST_EMAIL_ID, collDesc))
                 .thenReturn(false);
 
         SecretKey secretKey = keyring.get(user, collection);
 
         assertThat(secretKey, is(nullValue()));
-        verify(permissionsService, times(1)).canEdit(TEST_EMAIL_ID);
+        verify(permissionsService, times(1)).canView(TEST_EMAIL_ID, collDesc);
     }
 
     @Test
@@ -419,7 +291,7 @@ public class CollectionKeyringImplTest {
         when(collDesc.getId())
                 .thenReturn(TEST_COLLECTION_ID);
 
-        when(permissionsService.canEdit(TEST_EMAIL_ID))
+        when(permissionsService.canView(TEST_EMAIL_ID, collDesc))
                 .thenReturn(true);
 
         when(keyCache.get(TEST_COLLECTION_ID))
@@ -428,7 +300,7 @@ public class CollectionKeyringImplTest {
         KeyringException ex = assertThrows(KeyringException.class, () -> keyring.get(user, collection));
         assertThat(ex.getMessage(), equalTo("Beep"));
 
-        verify(permissionsService, times(1)).canEdit(TEST_EMAIL_ID);
+        verify(permissionsService, times(1)).canView(TEST_EMAIL_ID, collDesc);
         verify(keyCache, times(1)).get(TEST_COLLECTION_ID);
     }
 
@@ -443,7 +315,7 @@ public class CollectionKeyringImplTest {
         when(collDesc.getId())
                 .thenReturn(TEST_COLLECTION_ID);
 
-        when(permissionsService.canEdit(TEST_EMAIL_ID))
+        when(permissionsService.canView(TEST_EMAIL_ID, collDesc))
                 .thenReturn(true);
 
         when(keyCache.get(TEST_COLLECTION_ID))
@@ -452,7 +324,7 @@ public class CollectionKeyringImplTest {
         SecretKey key = keyring.get(user, collection);
 
         assertThat(key, is(nullValue()));
-        verify(permissionsService, times(1)).canEdit(TEST_EMAIL_ID);
+        verify(permissionsService, times(1)).canView(TEST_EMAIL_ID, collDesc);
         verify(keyCache, times(1)).get(TEST_COLLECTION_ID);
     }
 
@@ -467,7 +339,7 @@ public class CollectionKeyringImplTest {
         when(collDesc.getId())
                 .thenReturn(TEST_COLLECTION_ID);
 
-        when(permissionsService.canEdit(TEST_EMAIL_ID))
+        when(permissionsService.canView(TEST_EMAIL_ID, collDesc))
                 .thenReturn(true);
 
         when(keyCache.get(TEST_COLLECTION_ID))
@@ -476,7 +348,7 @@ public class CollectionKeyringImplTest {
         SecretKey key = keyring.get(user, collection);
 
         assertThat(key, equalTo(secretKey));
-        verify(permissionsService, times(1)).canEdit(TEST_EMAIL_ID);
+        verify(permissionsService, times(1)).canView(TEST_EMAIL_ID, collDesc);
         verify(keyCache, times(1)).get(TEST_COLLECTION_ID);
     }
 
@@ -1004,17 +876,6 @@ public class CollectionKeyringImplTest {
 
         verify(collections, times(1)).filterBy(any());
         verify(permissionsService, times(1)).canEdit(TEST_EMAIL_ID);
-    }
-
-    @Test
-    public void testUnlock_userNull_shouldDoNothing() throws Exception {
-        // Given a user
-
-        // When unlock is called
-        keyring.unlock(null, null);
-
-        // Then no action is taken
-        verifyZeroInteractions(user, keyCache, permissionsService);
     }
 
     private void resetInstanceToNull() throws Exception {

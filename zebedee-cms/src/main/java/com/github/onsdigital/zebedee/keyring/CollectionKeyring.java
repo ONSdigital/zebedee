@@ -11,14 +11,6 @@ import java.util.Set;
 public interface CollectionKeyring {
 
     /**
-     * Populate the Keyring from an unlocked {@link User#keyring()}
-     *
-     * @param user the user that populates the keyring.
-     * @throws KeyringException problem populating the keyring.
-     */
-    void cacheKeyring(User user) throws KeyringException;
-
-    /**
      * Get a key from the keyring for the specified collection.
      *
      * @param user       the user requesting the key.
@@ -54,35 +46,4 @@ public interface CollectionKeyring {
      */
     Set<String> list(User user) throws KeyringException;
 
-    /**
-     * Unlock the user keyring.
-     *
-     * <b>Note:</b> This is to maintain backwards compatibility only. This functionality is not required by the new
-     * central keyring implementation.
-     *
-     * @param user     the user the keyring belongs to.
-     * @param password the user's password.
-     * @throws KeyringException problem unlocking the keyring.
-     */
-    void unlock(User user, String password) throws KeyringException;
-
-    /**
-     * Assign the List of keys to a user. Required to maintain backwards compatibility
-     */
-    void assignTo(User src, User target, List<CollectionDescription> assignments) throws KeyringException;
-
-    /**
-     * Assign the array of keys to a user. Required to maintain backwards compatibility
-     */
-    void assignTo(User src, User target, CollectionDescription... assignments) throws KeyringException;
-
-    /**
-     * Remove the List of keys from a user. Required to maintain backwards compatibility
-     */
-    void revokeFrom(User target, List<CollectionDescription> removals) throws KeyringException;
-
-    /**
-     * Remove the array of keys from a user. Required to maintain backwards compatibility
-     */
-    void revokeFrom(User target, CollectionDescription... removals) throws KeyringException;
 }

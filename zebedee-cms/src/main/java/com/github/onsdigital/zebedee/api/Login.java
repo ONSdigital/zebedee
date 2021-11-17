@@ -64,11 +64,6 @@ public class Login {
             return "Authentication failed.";
         }
 
-        // Temponary whilst encryption is being put in place.
-        // This can be removed once all users have keyrings.
-        usersServiceSupplier.getService().migrateToEncryption(user, credentials.getPassword());
-        usersServiceSupplier.getService().removeStaleCollectionKeys(user.getEmail());
-
         if (BooleanUtils.isTrue(user.getTemporaryPassword())) {
             info().data("user", user.getEmail())
                     .log("login endpoint: request unsuccessful user is required to change their password");

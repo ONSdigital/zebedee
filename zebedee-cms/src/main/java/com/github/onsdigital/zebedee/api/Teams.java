@@ -138,10 +138,6 @@ public class Teams {
 
         teamsService.addTeamMember(email, team, session);
 
-        User src = getUser(usersService, session.getEmail());
-        User target = getUser(usersService, email);
-        collectionKeyring.assignTo(src, target, getCollectionsAccessibleByTeam(team));
-
         Audit.Event.TEAM_MEMBER_ADDED
                 .parameters()
                 .host(request)
@@ -182,12 +178,6 @@ public class Teams {
 
         Session session = sessionsService.get(request);
         Team team = teamsService.findTeam(teamName);
-
-        List<CollectionDescription> removals = getCollectionsAccessibleByTeam(team);
-        for (String member : team.getMembers()) {
-            collectionKeyring.revokeFrom(getUser(usersService, member), removals);
-        }
-
         teamsService.deleteTeam(team, session);
 
         Audit.Event.TEAM_DELETED
@@ -209,12 +199,6 @@ public class Teams {
         Team team = teamsService.findTeam(teamName);
 
         teamsService.removeTeamMember(email, team, session);
-
-        if (!permissionsService.isAdministrator(email) && !permissionsService.isPublisher(email)) {
-            List<CollectionDescription> accessToRemove = getCollectionsAccessibleByTeam(team);
-            User user = getUser(usersService, email);
-            collectionKeyring.revokeFrom(user, accessToRemove);
-        }
 
         Audit.Event.TEAM_MEMBER_REMOVED
                 .parameters()

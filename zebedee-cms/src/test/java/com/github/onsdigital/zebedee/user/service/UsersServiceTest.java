@@ -203,70 +203,6 @@ public class UsersServiceTest {
         verify(userStore, never()).exists(EMAIL);
     }
 
-    @Test
-    public void addKeyToKeyring_Success() throws Exception {
-        User userMock = mock(User.class);
-        SecretKey secretKeyMock = mock(SecretKey.class);
-
-        when(userStore.get(EMAIL))
-                .thenReturn(userMock);
-        when(userMock.keyring())
-                .thenReturn(keyring);
-
-        User result = service.addKeyToKeyring(EMAIL, KEY_IDENTIFIER, secretKeyMock);
-
-        assertThat(result, equalTo(userMock));
-        verify(userStore, times(1)).get(EMAIL);
-        verify(userMock, times(1)).keyring();
-        verify(keyring, times(1)).put(KEY_IDENTIFIER, secretKeyMock);
-        verify(userStore, times(1)).save(userMock);
-        verifyLockObtainedAndReleased();
-    }
-
-    @Test(expected = IOException.class)
-    public void addKeyToKeyring_ShoudNotAddKeyToKeyringIfUserDoesNotExist() throws Exception {
-        User userMock = mock(User.class);
-        SecretKey secretKeyMock = mock(SecretKey.class);
-
-        when(userStore.get(EMAIL))
-                .thenThrow(new IOException());
-
-        try {
-            service.addKeyToKeyring(EMAIL, KEY_IDENTIFIER, secretKeyMock);
-        } catch (IOException e) {
-            verify(userStore, times(1)).get(EMAIL);
-            verify(userMock, never()).keyring();
-            verify(keyring, never()).put(anyString(), any(SecretKey.class));
-            verify(userStore, never()).save(any(User.class));
-            verifyLockObtainedAndReleased();
-            throw e;
-        }
-    }
-
-    @Test(expected = IOException.class)
-    public void addKeyToKeyring_ShouldReleaseLockIfStoreUserThrowsError() throws Exception {
-        User userMock = mock(User.class);
-        SecretKey secretKeyMock = mock(SecretKey.class);
-
-        when(userStore.get(EMAIL))
-                .thenReturn(userMock);
-        when(userMock.keyring())
-                .thenReturn(keyring);
-        doThrow(new IOException())
-                .when(userStore).save(userMock);
-
-        try {
-            service.addKeyToKeyring(EMAIL, KEY_IDENTIFIER, secretKeyMock);
-        } catch (IOException e) {
-            verify(userStore, times(1)).get(EMAIL);
-            verify(userMock, times(1)).keyring();
-            verify(keyring, times(1)).put(KEY_IDENTIFIER, secretKeyMock);
-            verify(userStore, times(1)).save(userMock);
-            verifyLockObtainedAndReleased();
-            throw e;
-        }
-    }
-
     @Test(expected = UnauthorizedException.class)
     public void create_ShouldNotCreateUserIfIsNotAdmin() throws Exception {
         when(permissions.isAdministrator(session))
@@ -374,40 +310,6 @@ public class UsersServiceTest {
 
         assertThat(ul, equalTo(service.list()));
         verify(userStore, times(1)).list();
-    }
-
-    @Test
-    public void removeKeyFromKeyring_Success() throws Exception {
-        User userMock = mock(User.class);
-
-        when(userStore.get(EMAIL))
-                .thenReturn(userMock);
-        when(userMock.keyring())
-                .thenReturn(keyring);
-
-        User result = service.removeKeyFromKeyring(EMAIL, KEY_IDENTIFIER);
-        assertThat(result, equalTo(userMock));
-        verify(userStore, times(1)).get(EMAIL);
-        verify(userMock, times(1)).keyring();
-        verify(keyring, times(1)).remove(KEY_IDENTIFIER);
-        verify(userStore, times(1)).save(userMock);
-        verifyLockObtainedAndReleased();
-    }
-
-    @Test(expected = IOException.class)
-    public void removeKetFromKeyring_ShouldNotRemoveKeyIfGetUserThrowsError() throws Exception {
-        when(userStore.get(EMAIL))
-                .thenThrow(new IOException());
-
-        try {
-            service.removeKeyFromKeyring(EMAIL, KEY_IDENTIFIER);
-        } catch (IOException e) {
-            verify(userStore, times(1)).get(EMAIL);
-            verifyZeroInteractions(userMock, keyring);
-            verify(userStore, never()).save(any(User.class));
-            verifyLockObtainedAndReleased();
-            throw e;
-        }
     }
 
     @Test
@@ -570,58 +472,6 @@ public class UsersServiceTest {
         verify(userStore, times(1)).delete(user);
     }
 
-    @Test(expected = IOException.class)
-    public void updateKeyring_ShouldNotUpdateIfUserStoreThrowsException() throws Exception {
-        when(userStore.get(EMAIL))
-                .thenThrow(new IOException());
-        try {
-            service.updateKeyring(user);
-        } catch (IOException e) {
-            verify(userStore, times(1)).get(EMAIL);
-            verify(userStore, never()).save(any(User.class));
-            verifyLockObtainedAndReleased();
-            throw e;
-        }
-    }
-
-    @Test
-    public void updateKeyring_ShouldNotUpdateIfUserStoreReturnsNull() throws Exception {
-        when(userStore.get(EMAIL))
-                .thenReturn(null);
-
-        service.updateKeyring(user);
-
-        verify(userStore, times(1)).get(EMAIL);
-        verify(userStore, never()).save(any(User.class));
-        verifyLockObtainedAndReleased();
-    }
-
-    @Test
-    public void updateKeyring_ShouldNotUpdateIfCurrentKeyringIsNull() throws Exception {
-        when(userStore.get(EMAIL))
-                .thenReturn(user);
-
-        service.updateKeyring(user);
-
-        verify(userStore, times(1)).get(EMAIL);
-        verify(userStore, never()).save(any(User.class));
-        verifyLockObtainedAndReleased();
-    }
-
-    @Test
-    public void updateKeyring_Success() throws Exception {
-        user.setKeyring(new Keyring());
-
-        when(userStore.get(EMAIL))
-                .thenReturn(user);
-
-        service.updateKeyring(user);
-
-        verify(userStore, times(1)).get(EMAIL);
-        verify(userStore, times(1)).save(user);
-        verifyLockObtainedAndReleased();
-    }
-
     @Test
     public void createSystemUser_Success() throws Exception {
         String password = "Valar morghulis";
@@ -678,85 +528,6 @@ public class UsersServiceTest {
     }
 
     @Test
-    public void removeStaleCollectionKeys_Success() throws Exception {
-        Collection collectionMock = mock(Collection.class);
-        Map<String, Collection> mapping = new HashMap<>();
-        Set<String> keyringAsList = new HashSet<>();
-        keyringAsList.add("12345");
-
-        when(userStore.exists(EMAIL))
-                .thenReturn(true);
-        when(userStore.get(EMAIL))
-                .thenReturn(userMock);
-        when(userMock.keyring())
-                .thenReturn(keyring);
-        when(keyring.list())
-                .thenReturn(keyringAsList);
-        when(collections.mapByID())
-                .thenReturn(mapping);
-        when(userMock.getAdminOptions())
-                .thenReturn(new AdminOptions());
-
-        service.removeStaleCollectionKeys(EMAIL);
-
-        verify(userStore, times(1)).exists(EMAIL);
-        verify(userStore, times(1)).get(EMAIL);
-        verify(userMock, times(3)).keyring();
-        verify(collections, times(1)).mapByID();
-        verify(keyring, times(1)).remove("12345");
-        verify(userStore, times(1)).save(userMock);
-        verify(lockMock, times(3)).lock();
-        verify(lockMock, times(3)).unlock();
-    }
-
-    @Test
-    public void removeStaleCollectionKeys_ShouldNotRemoveOrphanedCollections() throws Exception {
-        Collection collectionMock = mock(Collection.class);
-        Map<String, Collection> mapping = new HashMap<>();
-
-        List<String> orphanedCollections = new ArrayList() {{
-            add("orphan");
-        }};
-
-        Set<String> keyringAsList = new HashSet() {{
-            add("collectionABC");
-            add("orphan");
-        }};
-
-        when(userStore.exists(EMAIL))
-                .thenReturn(true);
-        when(userStore.get(EMAIL))
-                .thenReturn(userMock);
-        when(userMock.keyring())
-                .thenReturn(keyring);
-        when(keyring.list())
-                .thenReturn(keyringAsList);
-        when(collections.mapByID())
-                .thenReturn(mapping);
-        when(collections.listOrphaned())
-                .thenReturn(orphanedCollections);
-        when(userMock.getAdminOptions())
-                .thenReturn(new AdminOptions());
-
-        service.removeStaleCollectionKeys(EMAIL);
-
-        verify(userStore, times(1)).exists(EMAIL);
-        verify(userStore, times(1)).get(EMAIL);
-        verify(userMock, times(3)).keyring();
-        verify(collections, times(1)).mapByID();
-        verify(collections, times(1)).listOrphaned();
-
-        verify(keyring, times(1)).remove("collectionABC");
-
-        // important bit - never remove an orphan if it exists
-        verify(keyring, never()).remove("orphan");
-
-        verify(userStore, times(1)).save(userMock);
-        verify(lockMock, times(3)).lock();
-        verify(lockMock, times(3)).unlock();
-    }
-
-    @Test
     public void setPasswod_success() throws Exception {
         String email = "test1@ons.gov.uk";
 
@@ -780,9 +551,6 @@ public class UsersServiceTest {
         when(userMock.keyring())
                 .thenReturn(originalKeyring);
 
-        when(originalKeyring.clone())
-                .thenReturn(originalKeyring);
-
         User adminUser = mock(User.class);
         when(userStore.get(session.getEmail()))
                 .thenReturn(adminUser);
@@ -790,9 +558,6 @@ public class UsersServiceTest {
         Set<String> collectionIds = new HashSet<>();
         collectionIds.add("abc");
         collectionIds.add("def");
-
-        when(originalKeyring.keySet())
-                .thenReturn(collectionIds);
 
         Collections.CollectionList allCollections = new Collections.CollectionList();
         Collection c1 = mock(Collection.class);
@@ -823,7 +588,6 @@ public class UsersServiceTest {
         List<CollectionDescription> expected = new ArrayList<>();
         expected.add(desc1);
         expected.add(desc2);
-        verify(collectionKeyring, times(1)).assignTo(adminUser, userMock, expected);
         verify(userStore, times(1)).save(userMock);
     }
 

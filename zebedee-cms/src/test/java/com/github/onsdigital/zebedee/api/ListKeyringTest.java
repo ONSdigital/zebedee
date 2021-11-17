@@ -28,7 +28,6 @@ import static org.mockito.Mockito.when;
 public class ListKeyringTest extends ZebedeeAPIBaseTestCase {
 
     @Mock
-    private CollectionKeyring legacyKeyring;
     private CollectionKeyring centralKeyring;
 
     @Mock
@@ -49,7 +48,7 @@ public class ListKeyringTest extends ZebedeeAPIBaseTestCase {
 
     @Override
     protected void customSetUp() throws Exception {
-        endpoint = new ListKeyring(legacyKeyring, centralKeyring, sessions, permissionsService, usersService);
+        endpoint = new ListKeyring(centralKeyring, sessions, permissionsService, usersService);
         email = "123@test.com";
 
         when(sessions.get(mockRequest))
@@ -137,7 +136,7 @@ public class ListKeyringTest extends ZebedeeAPIBaseTestCase {
 
     @Test
     public void testGet_keyringListError_shouldThrowInternalServerErrorException() throws Exception {
-        when(legacyKeyring.list(user))
+        when(centralKeyring.list(user))
                 .thenThrow(KeyringException.class);
 
         InternalServerError ex = assertThrows(InternalServerError.class,
@@ -151,7 +150,7 @@ public class ListKeyringTest extends ZebedeeAPIBaseTestCase {
         Set<String> userKeys = new HashSet<>();
         userKeys.add("666");
 
-        when(legacyKeyring.list(user))
+        when(centralKeyring.list(user))
                 .thenReturn(userKeys);
 
         Set<String> actual = endpoint.listUserKeys(mockRequest, mockResponse);

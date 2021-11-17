@@ -41,49 +41,6 @@ public interface UsersService {
     User getUserByEmail(String email) throws IOException, NotFoundException, BadRequestException;
 
     /**
-     * Remove collecton encryption keys from the {@link User} for collections that no longer exist.
-     *
-     * @param userEmail the email address of the {@link User} to clean up.
-     * @throws IOException         unexpected problem
-     * @throws NotFoundException
-     * @throws BadRequestException
-     */
-    void removeStaleCollectionKeys(String userEmail) throws IOException, NotFoundException, BadRequestException;
-
-    /**
-     *
-     * @param collectionMap
-     * @param orphanedCollections
-     * @param userEmail
-     * @throws IOException
-     * @throws NotFoundException
-     * @throws BadRequestException
-     */
-    void removeStaleCollectionKeys(Map<String, Collection> collectionMap, List<String> orphanedCollections,
-                                   String userEmail) throws IOException, NotFoundException, BadRequestException;
-
-    /**
-     * Add a collection key to a {@link User#keyring}
-     *
-     * @param email         the email of the user to add the key to.
-     * @param keyIdentifier the collection ID the key is for.
-     * @param key           the key to add.
-     * @return the updated user.
-     * @throws IOException unexpected problem adding key to user.
-     */
-    User addKeyToKeyring(String email, String keyIdentifier, SecretKey key) throws IOException;
-
-    /**
-     * Remove a collection key from a {@link User#keyring}.
-     *
-     * @param email         the email of the user to remove the key from.
-     * @param keyIdentifier the ID of the collection of the key to remove.
-     * @return the updated user.
-     * @throws IOException unexpected problem removing the key from the user.
-     */
-    User removeKeyFromKeyring(String email, String keyIdentifier) throws IOException;
-
-    /**
      * Check if a user exists for the email address provided.
      *
      * @param email the email address of the user to search for.
@@ -190,19 +147,4 @@ public interface UsersService {
      */
     boolean delete(Session session, User user) throws IOException, UnauthorizedException, NotFoundException,
             BadRequestException;
-
-    /**
-     * Migrate the {@link User} to use collection key encryption. WE THINK THIS IS NO LONGER REQUIRED.
-     */
-    void migrateToEncryption(User user, String password) throws IOException;
-
-    /**
-     * Update a {@link User#keyring}.
-     *
-     * @param user the {@link User} to update.
-     * @return the updated user.
-     * @throws IOException unexpected problem updating the user keyring.
-     */
-    User updateKeyring(User user) throws IOException;
-
 }

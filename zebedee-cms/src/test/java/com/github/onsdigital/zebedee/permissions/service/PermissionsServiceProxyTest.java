@@ -191,7 +191,7 @@ public class PermissionsServiceProxyTest {
     }
 
     @Test
-    public void getCollectionAccessMapping_Eamil_JWTNotEnabled() throws Exception {
+    public void getCollectionAccessMapping_Email_JWTNotEnabled() throws Exception {
         admins.add(EMAIL);
 
         when(permissionsStore.getAccessMapping())
@@ -238,7 +238,6 @@ public class PermissionsServiceProxyTest {
     @Test
     public void getCollectionAccessMapping_Sessions_JWTNotEnabled() throws Exception {
         session = null;
-
         jwtSessionsEnabled = false;
         permissions = new PermissionsServiceProxy(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService);
         List<User> result = permissions.getCollectionAccessMapping(collectionMock);
@@ -251,7 +250,6 @@ public class PermissionsServiceProxyTest {
     @Test 
     public void getCollectionAccessMapping_Sessions_JWEnabled() throws Exception {
         session = null;
-
         jwtSessionsEnabled = true;
         permissions = new PermissionsServiceProxy(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService);
         List<User> result = permissions.getCollectionAccessMapping(collectionMock);

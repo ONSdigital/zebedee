@@ -17,36 +17,44 @@ import com.github.onsdigital.zebedee.session.service.Sessions;
 import com.github.onsdigital.zebedee.teams.model.Team;
 import com.github.onsdigital.zebedee.user.model.User;
 
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.StringUtils;
+import java.util.Arrays;
+
 public class JWTPermissionsServiceImpl implements PermissionsService {
+    private Sessions sessionsService;
+    static final String PUBLISHER_PERMISSIONS       = "publisher";
+    static final String ADMIN_PERMISSIONS           = "admin";
     static final String JWTPERMISSIONSSERVICE_ERROR =
             "error accessing JWTPermissions Service";
-    private Session session;
-    private Sessions sessions;
 
     /**
      *
-     * @param sessions
+     * @param sessionsService
      */
-    public JWTPermissionsServiceImpl(Session session) {
-        this.session = session;
+    public JWTPermissionsServiceImpl(Sessions sessionService) {
+        this.sessionsService = sessionsService;
     }
 
     @Override
     public boolean isPublisher(Session session) throws IOException {
         // Get JWT from JWT session service and check if the user has the 'Publisher' permission in their groups.
-        throw new IOException(JWTPERMISSIONSSERVICE_ERROR);
-    }
-
-    @Override
-    public boolean isPublisher(String email) throws IOException {
-        // Get JWT from JWT session service and check if the user has the 'Publisher' permission in their groups.
-        throw new IOException(JWTPERMISSIONSSERVICE_ERROR);
+        if (session == null || StringUtils.isEmpty(session.getEmail()) ||
+            !hasPermission(session, PUBLISHER_PERMISSIONS )) {
+            return false;
+        }
+            return true;
     }
 
     @Override
     public boolean isAdministrator(Session session) throws IOException {
-        // Get JWT from JWT session service and check if the user has the 'Admin' permission in their groups.
-        throw new IOException(JWTPERMISSIONSSERVICE_ERROR);
+        // Get JWT from JWT session service and check if the user has the 'Publisher' permission in their groups.
+        if (session == null || StringUtils.isEmpty(session.getEmail()) ||
+                !hasPermission(session, ADMIN_PERMISSIONS )) {
+            return false;
+        }
+        return true;
     }
 
     @Override
@@ -141,5 +149,19 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
         throw new IOException( JWTPERMISSIONSSERVICE_ERROR );
     }
 
+
+    private boolean hasPermission(Session session, String permission ) {
+        try {
+            return ArrayUtils.contains(session.getGroups(), permission);
+        } catch (Exception exception) {
+            return false;
+        }
+    }
+
+    @Override
+    public boolean isPublisher(String email) throws IOException {
+        throw new IOException( JWTPERMISSIONSSERVICE_ERROR );
+       
+    }
 
 }

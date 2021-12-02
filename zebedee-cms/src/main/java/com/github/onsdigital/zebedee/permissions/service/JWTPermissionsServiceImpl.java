@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Set;
 
 import com.github.onsdigital.exceptions.JWTVerificationException;
+import com.github.onsdigital.impl.UserDataPayload;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
@@ -14,13 +15,13 @@ import com.github.onsdigital.zebedee.json.PermissionDefinition;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.session.service.Sessions;
+import com.github.onsdigital.zebedee.session.service.SessionsServiceImpl;
+import com.github.onsdigital.zebedee.session.store.SessionsStoreImpl;
 import com.github.onsdigital.zebedee.teams.model.Team;
 import com.github.onsdigital.zebedee.user.model.User;
 
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
-import java.util.Arrays;
 
 public class JWTPermissionsServiceImpl implements PermissionsService {
     private Sessions sessionsService;
@@ -28,7 +29,8 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
     static final String ADMIN_PERMISSIONS           = "admin";
     static final String JWTPERMISSIONSSERVICE_ERROR =
             "error accessing JWTPermissions Service";
-
+            
+    private static ThreadLocal<UserDataPayload> store = new ThreadLocal<>();
     /**
      *
      * @param sessionsService
@@ -38,7 +40,7 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
     }
 
     @Override
-    public boolean isPublisher(Session session) throws IOException {
+    public boolean isPublisher(Session session) throws JWTVerificationException {
         // Get JWT from JWT session service and check if the user has the 'Publisher' permission in their groups.
         if (session == null || StringUtils.isEmpty(session.getEmail()) ||
             !hasPermission(session, PUBLISHER_PERMISSIONS )) {
@@ -48,8 +50,14 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
     }
 
     @Override
-    public boolean isAdministrator(Session session) throws IOException {
-        // Get JWT from JWT session service and check if the user has the 'Publisher' permission in their groups.
+    public boolean isPublisher(String email) throws JWTVerificationException {
+        throw new JWTVerificationException( JWTPERMISSIONSSERVICE_ERROR );
+       
+    }
+
+    @Override
+    public boolean isAdministrator(Session session) throws JWTVerificationException {
+        // Get JWT from JWT session service and check if the user has the 'Admin' permission in their groups.
         if (session == null || StringUtils.isEmpty(session.getEmail()) ||
                 !hasPermission(session, ADMIN_PERMISSIONS )) {
             return false;
@@ -57,100 +65,112 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
         return true;
     }
 
-    @Override
-    public boolean isAdministrator(String email) throws IOException {
-        // Get JWT from JWT session service and check if the user has the 'Admin' permission in their groups.
-        throw new IOException( JWTPERMISSIONSSERVICE_ERROR );
+    public boolean isAdministrator(String email) throws JWTVerificationException {
+        if (StringUtils.isEmpty(email)) {
+            return false;
+        }
+
+        try {
+            Session s = sessionsService.get(email);
+            if ( !hasPermission(s, ADMIN_PERMISSIONS)){
+                return false;
+            }
+
+        } catch (Exception exception) {
+            return false;
+        }
+        
+        return true;
     }
 
     @Override
-    public List<User> getCollectionAccessMapping(Collection collection) throws IOException {
+    public List<User> getCollectionAccessMapping(Collection collection) throws JWTVerificationException {
         // Copy and past from legacy impl
-        throw new IOException( JWTPERMISSIONSSERVICE_ERROR );
+        throw new JWTVerificationException( JWTPERMISSIONSSERVICE_ERROR );
     }
 
     @Override
-    public boolean hasAdministrator() throws IOException {
-        throw new IOException( JWTPERMISSIONSSERVICE_ERROR );
+    public boolean hasAdministrator() throws JWTVerificationException {
+        throw new JWTVerificationException( JWTPERMISSIONSSERVICE_ERROR );
     }
 
     @Override
-    public void addAdministrator(String email, Session session) throws IOException, UnauthorizedException {
-        throw new IOException( JWTPERMISSIONSSERVICE_ERROR );
+    public void addAdministrator(String email, Session session) throws JWTVerificationException, UnauthorizedException {
+        throw new JWTVerificationException( JWTPERMISSIONSSERVICE_ERROR );
     }
 
     @Override
-    public void removeAdministrator(String email, Session session) throws IOException, UnauthorizedException {
-        throw new IOException( JWTPERMISSIONSSERVICE_ERROR );
+    public void removeAdministrator(String email, Session session) throws JWTVerificationException, UnauthorizedException {
+        throw new JWTVerificationException( JWTPERMISSIONSSERVICE_ERROR );
     }
 
     @Override
-    public boolean canEdit(Session session) throws IOException {
-        throw new IOException( JWTPERMISSIONSSERVICE_ERROR );
+    public boolean canEdit(Session session) throws JWTVerificationException {
+        throw new JWTVerificationException( JWTPERMISSIONSSERVICE_ERROR );
     }
 
     @Override
-    public boolean canEdit(String email) throws IOException {
-        throw new IOException( JWTPERMISSIONSSERVICE_ERROR );
+    public boolean canEdit(String email) throws JWTVerificationException {
+        throw new JWTVerificationException( JWTPERMISSIONSSERVICE_ERROR );
     }
 
     @Override
-    public boolean canEdit(User user) throws IOException {
-        throw new IOException( JWTPERMISSIONSSERVICE_ERROR );
+    public boolean canEdit(User user) throws JWTVerificationException {
+        throw new JWTVerificationException( JWTPERMISSIONSSERVICE_ERROR );
     }
 
     @Override
-    public void addEditor(String email, Session session) throws IOException, UnauthorizedException, NotFoundException, BadRequestException {
-        throw new IOException( JWTPERMISSIONSSERVICE_ERROR );
+    public void addEditor(String email, Session session) throws JWTVerificationException {
+        throw new JWTVerificationException( JWTPERMISSIONSSERVICE_ERROR );
     }
 
     @Override
-    public void removeEditor(String email, Session session) throws IOException, UnauthorizedException {
-        throw new IOException( JWTPERMISSIONSSERVICE_ERROR );
+    public void removeEditor(String email, Session session) throws JWTVerificationException {
+        throw new JWTVerificationException( JWTPERMISSIONSSERVICE_ERROR );
     }
 
     @Override
-    public boolean canView(Session session, CollectionDescription collectionDescription) throws IOException {
-        throw new IOException( JWTPERMISSIONSSERVICE_ERROR );
+    public boolean canView(Session session, CollectionDescription collectionDescription) throws JWTVerificationException {
+        throw new JWTVerificationException( JWTPERMISSIONSSERVICE_ERROR );
     }
 
     @Override
-    public boolean canView(User user, CollectionDescription collectionDescription) throws IOException {
-        throw new IOException( JWTPERMISSIONSSERVICE_ERROR );
+    public boolean canView(User user, CollectionDescription collectionDescription) throws JWTVerificationException {
+        throw new JWTVerificationException( JWTPERMISSIONSSERVICE_ERROR );
     }
 
     @Override
-    public boolean canView(String email, CollectionDescription collectionDescription) throws IOException {
-        throw new IOException( JWTPERMISSIONSSERVICE_ERROR );
+    public boolean canView(String email, CollectionDescription collectionDescription) throws JWTVerificationException {
+        throw new JWTVerificationException( JWTPERMISSIONSSERVICE_ERROR );
     }
 
     @Override
-    public void addViewerTeam(CollectionDescription collectionDescription, Team team, Session session) throws IOException, ZebedeeException {
-        throw new IOException( JWTPERMISSIONSSERVICE_ERROR );
+    public void addViewerTeam(CollectionDescription collectionDescription, Team team, Session session) throws JWTVerificationException {
+        throw new JWTVerificationException( JWTPERMISSIONSSERVICE_ERROR );
     }
 
     @Override
-    public Set<Integer> listViewerTeams(CollectionDescription collectionDescription, Session session) throws IOException, UnauthorizedException {
-        throw new IOException( JWTPERMISSIONSSERVICE_ERROR );
+    public Set<Integer> listViewerTeams(CollectionDescription collectionDescription, Session session) throws JWTVerificationException {
+        throw new JWTVerificationException( JWTPERMISSIONSSERVICE_ERROR );
     }
 
     @Override
-    public void removeViewerTeam(CollectionDescription collectionDescription, Team team, Session session) throws IOException, ZebedeeException {
-        throw new IOException( JWTPERMISSIONSSERVICE_ERROR );
+    public void removeViewerTeam(CollectionDescription collectionDescription, Team team, Session session) throws JWTVerificationException {
+        throw new JWTVerificationException( JWTPERMISSIONSSERVICE_ERROR );
     }
 
     @Override
-    public PermissionDefinition userPermissions(String email, Session session) throws IOException, NotFoundException, UnauthorizedException {
-        throw new IOException( JWTPERMISSIONSSERVICE_ERROR );
+    public PermissionDefinition userPermissions(String email, Session session) throws JWTVerificationException {
+        throw new JWTVerificationException( JWTPERMISSIONSSERVICE_ERROR );
     }
 
     @Override
-    public Set<String> listCollectionsAccessibleByTeam(Team t) throws IOException {
-        throw new IOException( JWTPERMISSIONSSERVICE_ERROR );
+    public Set<String> listCollectionsAccessibleByTeam(Team t) throws JWTVerificationException {
+        throw new JWTVerificationException( JWTPERMISSIONSSERVICE_ERROR );
     }
 
 
-    private boolean hasPermission(Session session, String permission ) {
+    public boolean hasPermission(Session session, String permission ) {
         try {
             return ArrayUtils.contains(session.getGroups(), permission);
         } catch (Exception exception) {
@@ -158,10 +178,14 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
         }
     }
 
-    @Override
-    public boolean isPublisher(String email) throws IOException {
-        throw new IOException( JWTPERMISSIONSSERVICE_ERROR );
-       
-    }
 
+    public Session getSessionfromEmail(String email) {
+        try {
+            return sessionsService.get(email);
+
+        } catch (Exception exception) {
+            
+            return  null;
+        }
+    }
 }

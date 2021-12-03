@@ -228,7 +228,7 @@ public class Collection {
         User user = getUser(zebedee.getUsersService(), session.getEmail());
         SecretKey key = zebedee.getEncryptionKeyFactory().newCollectionKey();
 
-        info().collectionID(collection).log("adding new collection key to user keyrings");
+        info().collectionID(collection).log("adding new collection key to master keyring");
         zebedee.getCollectionKeyring().add(user, collection, key);
 
         if (release != null) {
@@ -469,21 +469,6 @@ public class Collection {
         updatedCollection.getDescription().getTeams().addAll(updatesTeams);
 
         updatedCollection.save();
-
-        /**
-         * TODO
-         * This is necessary to maintain backwards compatability but should be removed once we have fully migrated to
-         * the new keyring impl.
-         *
-         * The new keyring impl does not have a concept of update - a key is either added or removed. The key is no
-         * longer assigned directly to a user, a user can retrieve the key from the central keyring if they
-         * have the required permission for that collection.
-         *
-         * However, to maintain backwards compatability while we are in the process of migrating we still need to
-         * distribute the key. This logic is now encapsulated within
-         * {@link LegacyCollectionKeyringImpl#add(User, Collection, SecretKey)} so we
-         * invoke add again which will update all users either adding/removing the key to/from their keyring.
-         */
 
         return updatedCollection;
     }

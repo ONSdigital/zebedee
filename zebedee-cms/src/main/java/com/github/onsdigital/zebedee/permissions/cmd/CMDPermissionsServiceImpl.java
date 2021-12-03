@@ -13,6 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 
+import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.error;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.info;
 import static com.github.onsdigital.zebedee.permissions.cmd.CRUD.grantServiceAccountDatasetCreateReadUpdateDelete;
@@ -140,10 +141,16 @@ public class CMDPermissionsServiceImpl implements CMDPermissionsService {
             throw sessionNotFoundException();
         }
 
-        // todo - remove this deprecated call once the migration to the sessions API is complete.
-        if (sessions.expired(session)) {
-            info().log("user dataset permissions request denied session expired");
-            throw sessionExpiredException();
+        /*
+        Since the JWT sessions are only stored in the SessionsService if they are still valid (i.e. not expired) this
+        check is redundant when JWT sessions are enabled
+        TODO: remove this deprecated call once the migration to the identity API is complete.
+         */
+        if (! cmsFeatureFlags().isJwtSessionsEnabled()) {
+            if (sessions.expired(session)) {
+                info().log("user dataset permissions request denied session expired");
+                throw sessionExpiredException();
+            }
         }
         return session;
     }

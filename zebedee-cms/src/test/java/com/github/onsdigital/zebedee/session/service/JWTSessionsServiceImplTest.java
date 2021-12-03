@@ -1,11 +1,9 @@
-package com.github.onsdigital.zebedee.session.store;
+package com.github.onsdigital.zebedee.session.service;
 
-import java.io.IOException;
 import java.util.Map;
 import java.util.Arrays;
 import java.util.HashMap;
 
-import org.apache.poi.ss.formula.functions.T;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.Before;
@@ -28,14 +26,14 @@ import com.github.onsdigital.interfaces.JWTHandler;
 
 import com.github.onsdigital.zebedee.session.model.Session;
 
-import com.github.onsdigital.zebedee.session.store.exceptions.SessionsRequestException;
-import com.github.onsdigital.zebedee.session.store.exceptions.SessionsDecodeException;
-import com.github.onsdigital.zebedee.session.store.exceptions.SessionsTokenExpiredException;
-import com.github.onsdigital.zebedee.session.store.exceptions.SessionsVerificationException;
+import com.github.onsdigital.zebedee.session.service.exceptions.SessionsRequestException;
+import com.github.onsdigital.zebedee.session.service.exceptions.SessionsDecodeException;
+import com.github.onsdigital.zebedee.session.service.exceptions.SessionsTokenExpiredException;
+import com.github.onsdigital.zebedee.session.service.exceptions.SessionsVerificationException;
 
 import javax.servlet.http.HttpServletRequest;
 
-public class JWTStoreTest {
+public class JWTSessionsServiceImplTest {
 
     private static final String REQUIRED_CLAIM_PAYLOAD_ERROR = "Required JWT payload claim not found [username or cognito:groups].";
     private static final String ACCESS_TOKEN_INTEGRITY_ERROR = "Verification of JWT token integrity failed.";
@@ -67,7 +65,7 @@ public class JWTStoreTest {
     +"V6L11BWkpzGXSW4Hv43qa+GSYOD2QU68Mb59oSk2OB+BtOLpJofmbGEGgvmwyCI9"
     +"MwIDAQAB";
 
-    private JWTStore jwtStore;
+    private JWTSessionsServiceImpl jwtSessionsServiceImpl;
 
     private Map<String, String> rsaKeyMap = new HashMap<String, String>();
 
@@ -78,7 +76,7 @@ public class JWTStoreTest {
 
     @BeforeClass
     public static void staticSetUp() {
-        JWTStore.setStore(new ThreadLocal<>());
+        JWTSessionsServiceImpl.setStore(new ThreadLocal<>());
     }
 
     @Before
@@ -88,13 +86,13 @@ public class JWTStoreTest {
         rsaKeyMap.put(RSA_KEY_ID_1, RSA_SIGNING_KEY_1);
         rsaKeyMap.put(RSA_KEY_ID_2, RSA_SIGNING_KEY_2);
 
-        this.jwtStore = new JWTStore(jwtHandler, rsaKeyMap);
+        this.jwtSessionsServiceImpl = new JWTSessionsServiceImpl(jwtHandler, rsaKeyMap);
     }
 
     @Test
     public void decodeVerifyAndStoreAccessTokenData() throws Exception {
-        this.jwtStore.set(SIGNED_TOKEN);
-        Session session = this.jwtStore.get();
+        this.jwtSessionsServiceImpl.set(SIGNED_TOKEN);
+        Session session = this.jwtSessionsServiceImpl.get();
         Arrays.sort(session.getGroups());
         assertThat(session, is(notNullValue()));
         assertThat(session.getEmail(), is("\"janedoe@example.com\""));
@@ -106,45 +104,45 @@ public class JWTStoreTest {
 
     @Test
     public void decodeVerifyAndStoreAccessTokenDataThrowsTokenExcpetion() throws Exception {
-        Exception exception = assertThrows(SessionsRequestException.class, () -> this.jwtStore.set(""));
-        assertThat(exception.getMessage(), is(this.jwtStore.ACCESS_TOKEN_REQUIRED_ERROR));
+        Exception exception = assertThrows(SessionsRequestException.class, () -> this.jwtSessionsServiceImpl.set(""));
+        assertThat(exception.getMessage(), is(this.jwtSessionsServiceImpl.ACCESS_TOKEN_REQUIRED_ERROR));
     }
 
     @Test
     public void decodingAccessTokenWithNoUsernameInClaimsThrowsDecodeExcpetion() throws Exception {
-        Exception exception = assertThrows(SessionsDecodeException.class, () -> this.jwtStore.set(TOKEN_NO_USER));
+        Exception exception = assertThrows(SessionsDecodeException.class, () -> this.jwtSessionsServiceImpl.set(TOKEN_NO_USER));
         assertThat(exception.getMessage(), is(REQUIRED_CLAIM_PAYLOAD_ERROR));
     }
 
     @Test
     public void decodedTokenIsExiredThrowsSessionsTokenExpiredException() throws Exception {
-        Exception exception = assertThrows(SessionsTokenExpiredException.class, () -> this.jwtStore.set(TOKEN_EXPIRED_TIME));
-        assertThat(exception.getMessage(), is(this.jwtStore.ACCESS_TOKEN_EXPIRED_ERROR));
+        Exception exception = assertThrows(SessionsTokenExpiredException.class, () -> this.jwtSessionsServiceImpl.set(TOKEN_EXPIRED_TIME));
+        assertThat(exception.getMessage(), is(this.jwtSessionsServiceImpl.ACCESS_TOKEN_EXPIRED_ERROR));
     }
 
     @Test
     public void decodedTokenIsInvalidThrowsSessionVerificationException() throws Exception {
-        Exception exception = assertThrows(SessionsVerificationException.class, () -> this.jwtStore.set(INVALID_SIGNED_TOKEN));
+        Exception exception = assertThrows(SessionsVerificationException.class, () -> this.jwtSessionsServiceImpl.set(INVALID_SIGNED_TOKEN));
         assertThat(exception.getMessage(), is(ACCESS_TOKEN_INTEGRITY_ERROR));
     }
 
     @Test
     public void decodedTokenHeaderContainsKIDNotFoundInMapThrowsSessionsDecodeException() throws Exception {
-        Exception exception = assertThrows(SessionsDecodeException.class, () -> this.jwtStore.set(HEADER_KID_NOT_FOUND));
+        Exception exception = assertThrows(SessionsDecodeException.class, () -> this.jwtSessionsServiceImpl.set(HEADER_KID_NOT_FOUND));
         assertThat(exception.getMessage(), is(RSA_PUBLIC_KEY_INALID_ERROR));
     }
 
     @Test
     public void invalidlyFormattedAccessTokenPassedtoSetterThrowsSessionsDecodeException() throws Exception {
-        Exception exception = assertThrows(SessionsDecodeException.class, () -> this.jwtStore.set(UNSIGNED_TOKEN));
-        assertThat(exception.getMessage(), is(this.jwtStore.TOKEN_NOT_VALID_ERROR));
+        Exception exception = assertThrows(SessionsDecodeException.class, () -> this.jwtSessionsServiceImpl.set(UNSIGNED_TOKEN));
+        assertThat(exception.getMessage(), is(this.jwtSessionsServiceImpl.TOKEN_NOT_VALID_ERROR));
     }
 
     @Test
     public void getByRequest_sessionDoesNotExist_shouldReturnNull() throws Exception {
         HttpServletRequest request = mock(HttpServletRequest.class);
 
-        Session actual = jwtStore.get(request);
+        Session actual = jwtSessionsServiceImpl.get(request);
 
         assertThat(actual, is(nullValue()));
     }
@@ -158,9 +156,9 @@ public class JWTStoreTest {
         ThreadLocal<UserDataPayload> threadLocal = new ThreadLocal<UserDataPayload>();
         threadLocal.set(payload);
 
-        JWTStore.setStore(threadLocal);
+        JWTSessionsServiceImpl.setStore(threadLocal);
 
-        Session actual = jwtStore.get(request);
+        Session actual = jwtSessionsServiceImpl.get(request);
 
         assertThat(actual, is(notNullValue()));
         assertThat(actual.getEmail(), equalTo(expected.getEmail()));
@@ -169,7 +167,7 @@ public class JWTStoreTest {
 
     @Test
     public void getByIDsessionDoesNotExist_shouldReturnNull() throws Exception {
-        assertThat(jwtStore.get("ID"), is(nullValue()));
+        assertThat(jwtSessionsServiceImpl.get("ID"), is(nullValue()));
     }
 
     @Test
@@ -180,9 +178,9 @@ public class JWTStoreTest {
         ThreadLocal<UserDataPayload> threadLocal = new ThreadLocal<UserDataPayload>();
         threadLocal.set(payload);
 
-        JWTStore.setStore(threadLocal);
+        JWTSessionsServiceImpl.setStore(threadLocal);
 
-        Session actual = jwtStore.get("666");
+        Session actual = jwtSessionsServiceImpl.get("666");
 
         assertThat(actual, is(notNullValue()));
         assertThat(actual.getEmail(), equalTo(expected.getEmail()));

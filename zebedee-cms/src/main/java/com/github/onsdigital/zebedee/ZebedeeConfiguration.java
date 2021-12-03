@@ -40,7 +40,7 @@ import com.github.onsdigital.zebedee.service.ServiceStoreImpl;
 import com.github.onsdigital.zebedee.service.ZebedeeDatasetService;
 import com.github.onsdigital.zebedee.session.service.Sessions;
 import com.github.onsdigital.zebedee.session.service.SessionsServiceImpl;
-import com.github.onsdigital.zebedee.session.store.JWTStore;
+import com.github.onsdigital.zebedee.session.service.JWTSessionsServiceImpl;
 import com.github.onsdigital.zebedee.teams.service.TeamsService;
 import com.github.onsdigital.zebedee.teams.service.TeamsServiceImpl;
 import com.github.onsdigital.zebedee.teams.store.TeamsStoreFileSystemImpl;
@@ -81,16 +81,7 @@ import static com.github.onsdigital.zebedee.Zebedee.TEAMS;
 import static com.github.onsdigital.zebedee.Zebedee.USERS;
 import static com.github.onsdigital.zebedee.Zebedee.ZEBEDEE;
 import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
-import static com.github.onsdigital.zebedee.configuration.Configuration.getCognitoKeyIdPairs;
-import static com.github.onsdigital.zebedee.configuration.Configuration.getDatasetAPIAuthToken;
-import static com.github.onsdigital.zebedee.configuration.Configuration.getDatasetAPIURL;
-import static com.github.onsdigital.zebedee.configuration.Configuration.getImageAPIURL;
-import static com.github.onsdigital.zebedee.configuration.Configuration.getKafkaContentPublishedTopic;
-import static com.github.onsdigital.zebedee.configuration.Configuration.getKafkaURL;
-import static com.github.onsdigital.zebedee.configuration.Configuration.getKeyringInitVector;
-import static com.github.onsdigital.zebedee.configuration.Configuration.getKeyringSecretKey;
-import static com.github.onsdigital.zebedee.configuration.Configuration.getServiceAuthToken;
-import static com.github.onsdigital.zebedee.configuration.Configuration.slackChannelsToNotfiyOnStartUp;
+import static com.github.onsdigital.zebedee.configuration.Configuration.*;
 import static com.github.onsdigital.zebedee.permissions.store.PermissionsStoreFileSystemImpl.initialisePermissions;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
@@ -173,7 +164,7 @@ public class ZebedeeConfiguration {
         // Configure the sessions
         if (cmsFeatureFlags().isJwtSessionsEnabled()) {
             JWTHandler jwtHandler = new JWTHandlerImpl();
-            this.sessions = new JWTStore(jwtHandler, getCognitoKeyIdPairs());
+            this.sessions = new JWTSessionsServiceImpl(jwtHandler, getCognitoKeyIdPairs());
         } else {
             this.sessions = new SessionsServiceImpl(sessionsPath);
         }

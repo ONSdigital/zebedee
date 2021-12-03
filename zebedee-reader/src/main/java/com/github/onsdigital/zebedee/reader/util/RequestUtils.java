@@ -19,17 +19,25 @@ import static com.github.onsdigital.zebedee.reader.util.ReaderRequestUtils.getRe
  */
 public class RequestUtils {
 
-    public static final String TOKEN_HEADER = "X-Florence-Token";
+    public static final String BEARER_PREFIX = "Bearer ";
+    public static final String AUTH_HEADER = "Authorization";
+    public static final String FLORENCE_TOKEN_HEADER = "X-Florence-Token";
 
     /**
      * Get the zebedee session id from the given HttpServletRequest.
-     * The session ID will be retrieved from the {@value #TOKEN_HEADER} header.
+     * The session ID will be retrieved from the auth headers.
      *
      * @param request
      * @return
      */
     public static String getSessionId(HttpServletRequest request) {
-        return request.getHeader(TOKEN_HEADER);
+        String sessionId = request.getHeader(FLORENCE_TOKEN_HEADER);
+        String authHeader = request.getHeader(AUTH_HEADER);
+        // If the Authorization header contains a '.' then it is a JWT session token rather than a service token
+        if (StringUtils.isBlank(sessionId) && authHeader != null && authHeader.contains(".")) {
+            sessionId = removeBearerPrefixIfPresent(authHeader);
+        }
+        return sessionId;
     }
 
     /**
@@ -79,5 +87,16 @@ public class RequestUtils {
             return Optional.empty();
         }
        return Optional.ofNullable(uri);
+    }
+
+    private static String removeBearerPrefixIfPresent(String accessToken) {
+        if (StringUtils.isEmpty(accessToken)) {
+            return accessToken;
+        }
+
+        if (accessToken.startsWith(BEARER_PREFIX)) {
+            accessToken = accessToken.replaceFirst(BEARER_PREFIX, "");
+        }
+        return accessToken;
     }
 }

@@ -11,11 +11,7 @@ import org.apache.commons.lang3.StringUtils;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
@@ -24,11 +20,14 @@ import static com.github.onsdigital.logging.v2.event.SimpleEvent.warn;
 
 /**
  * Created by david on 12/03/2015.
+ *
+ * @deprecated In favour of the new JWT based sessions. Once the migration to the dp-identity-api is complete this class
+ *             will be removed.
  */
+@Deprecated
 public class SessionsServiceImpl extends TimerTask implements Sessions {
 
     private static final String DELETING_SESSION_MSG = "Deleting expired session";
-    private static final String SESSION_ID_PARAM = "sessionId";
 
     private Supplier<String> randomIdGenerator = () -> Random.id();
     private SessionsStoreImpl sessionsStore;
@@ -193,7 +192,6 @@ public class SessionsServiceImpl extends TimerTask implements Sessions {
     /**
      * Get a {@link Session} session object from thread local.
      *
-     * @param none.
      * @return session object from thread local.
      * @throws IOException for any problem getting a session from the request.
      */

@@ -1,9 +1,6 @@
 package com.github.onsdigital.zebedee.permissions.service;
 
-import com.github.onsdigital.zebedee.exceptions.BadRequestException;
-import com.github.onsdigital.zebedee.exceptions.NotFoundException;
-import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
-import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
+import com.github.onsdigital.zebedee.exceptions.*;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.PermissionDefinition;
 import com.github.onsdigital.zebedee.model.Collection;
@@ -16,7 +13,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Interface definding the api of a permissions service.
+ * Interface defining the api of a permissions service.
  */
 public interface PermissionsService {
 

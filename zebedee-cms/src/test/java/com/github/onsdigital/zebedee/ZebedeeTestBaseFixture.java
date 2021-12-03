@@ -12,7 +12,7 @@ import com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDao;
 import com.github.onsdigital.zebedee.service.ServiceSupplier;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.session.service.Sessions;
-import com.github.onsdigital.zebedee.session.store.JWTStore;
+import com.github.onsdigital.zebedee.session.service.JWTSessionsServiceImpl;
 import com.github.onsdigital.zebedee.user.model.User;
 import com.github.onsdigital.zebedee.user.model.UserList;
 import com.github.onsdigital.zebedee.user.service.UsersService;
@@ -56,7 +56,7 @@ public abstract class ZebedeeTestBaseFixture {
     private CollectionHistoryDao collectionHistoryDao;
 
     @Mock
-    private JWTStore sessionsService;
+    private JWTSessionsServiceImpl sessionsService;
 
     @Mock
     protected ZebedeeConfiguration zebCfg;

@@ -1,7 +1,5 @@
 package com.github.onsdigital.zebedee.keyring;
 
-import com.github.onsdigital.zebedee.keyring.KeyringException;
-
 import javax.crypto.SecretKey;
 import java.util.Map;
 

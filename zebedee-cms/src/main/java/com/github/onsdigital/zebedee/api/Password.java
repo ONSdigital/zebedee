@@ -18,7 +18,11 @@ import java.io.IOException;
 
 /**
  * API for resetting or changing a password.
+ *
+ * @deprecated The user management in zebedee is deprecated in favour of the dp-identity-api with its JWT based auth
+ *             and will be removed after migration of users and teams to the new service.
  */
+@Deprecated
 @Api
 public class Password {
 

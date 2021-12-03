@@ -64,7 +64,7 @@ public class Identity {
             return;
         }
 
-        if (request.getHeader(RequestUtils.TOKEN_HEADER) != null) {
+        if (request.getHeader(RequestUtils.FLORENCE_TOKEN_HEADER) != null) {
             findUser(request, response);
             return;
         }

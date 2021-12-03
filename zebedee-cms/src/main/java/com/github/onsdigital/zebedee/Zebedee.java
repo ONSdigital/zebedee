@@ -16,11 +16,7 @@ import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
 import com.github.onsdigital.zebedee.model.encryption.EncryptionKeyFactory;
 import com.github.onsdigital.zebedee.model.publishing.PublishedCollections;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
-import com.github.onsdigital.zebedee.service.DatasetService;
-import com.github.onsdigital.zebedee.service.ImageService;
-import com.github.onsdigital.zebedee.service.KafkaService;
-import com.github.onsdigital.zebedee.service.ServiceStore;
-import com.github.onsdigital.zebedee.service.ServiceStoreImpl;
+import com.github.onsdigital.zebedee.service.*;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.session.service.Sessions;
 import com.github.onsdigital.zebedee.teams.service.TeamsService;
@@ -38,9 +34,7 @@ import java.nio.file.Paths;
 import java.util.Optional;
 
 import static com.github.onsdigital.zebedee.configuration.Configuration.isVerificationEnabled;
-import static com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedException.beingEditedByAnotherCollectionError;
-import static com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedException.beingEditedByThisCollectionError;
-import static com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedException.markedDeleteInAnotherCollectionError;
+import static com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedException.*;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.error;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.info;
 
@@ -277,7 +271,12 @@ public class Zebedee {
      * @throws IOException
      * @throws NotFoundException
      * @throws BadRequestException
+     *
+     * @deprecated Using the new JWT based sessions, sessions are never created within zebedee as the JWT token
+     *             issued by the dp-identity-api replaces the sessions in zebedee. Once migration to the dp-identity-api
+     *             is completed this method will be removed.
      */
+    @Deprecated
     public Session openSession(Credentials credentials) throws IOException, NotFoundException, BadRequestException {
         if (credentials == null) {
             error().log("provided credentials are null no session will be opened");
@@ -302,6 +301,12 @@ public class Zebedee {
         return session;
     }
 
+    /**
+     * @deprecated Using the new JWT based sessions, sessions are never created within zebedee as the JWT token
+     *             issued by the dp-identity-api replaces the sessions in zebedee. Once migration to the dp-identity-api
+     *             is completed this method will be removed.
+     */
+    @Deprecated
     private Session createSession(User user) throws IOException {
         try {
             return sessions.create(user);

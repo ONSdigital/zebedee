@@ -18,7 +18,7 @@ import com.github.onsdigital.zebedee.reader.api.endpoint.PublishedData;
 import com.github.onsdigital.zebedee.search.api.endpoint.ReIndex;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.session.service.Sessions;
-import com.github.onsdigital.zebedee.session.store.exceptions.SessionsStoreException;
+import com.github.onsdigital.zebedee.session.service.exceptions.SessionsException;
 import com.google.common.collect.ImmutableList;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.http.HttpStatus;
@@ -127,7 +127,7 @@ public class AuthenticationFilter implements PreFilter {
             try {
                 getSessions().set(authToken);
                 result = true;
-            } catch (SessionsStoreException e) {
+            } catch (SessionsException e) {
                 // treat access token expired or malformed access token as unauthorised
                 unauthorisedRequest(response, e.getMessage());
             } catch (Exception e) {

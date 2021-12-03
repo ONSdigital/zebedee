@@ -47,6 +47,7 @@ public class Ping {
         try {
             Sessions sessions = Root.zebedee.getSessions();
             token = RequestUtils.getSessionId(request);
+            // TODO: Update with sessions.get() after migration to JWT sessions is enabled
             Session session = sessions.get(token);
             if (session != null) {
                 pingResponse.hasSession = true;

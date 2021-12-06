@@ -8,7 +8,6 @@ import com.github.onsdigital.zebedee.session.service.Sessions;
 import com.github.onsdigital.zebedee.session.store.JWTStore;
 import com.github.onsdigital.zebedee.session.store.SessionsStore;
 import com.github.onsdigital.zebedee.session.store.SessionsStoreImpl;
-import com.github.onsdigital.zebedee.teams.model.Team;
 import org.hamcrest.MatcherAssert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -106,7 +105,7 @@ public class JWTPermissionsServiceImplTest {
     }
 
     @Test
-    public void hasPermission_ShouldTrue() {
+    public void hasPermission_Admin_ShouldTrue() {
         Session sessionTest02 = new Session();
         sessionTest02.setId(TEST_SESSION_ID);
         sessionTest02.setEmail(TEST_USER_EMAIL);
@@ -128,7 +127,6 @@ public class JWTPermissionsServiceImplTest {
         Session sessionTest02 = null;
         assertFalse(jwtPSI_Mock.hasPermission(sessionTest02, ADMIN));
     }
-
 
     /**
      * @throws Exception

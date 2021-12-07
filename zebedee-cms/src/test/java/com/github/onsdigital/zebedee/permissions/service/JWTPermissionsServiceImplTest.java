@@ -184,9 +184,7 @@ public class JWTPermissionsServiceImplTest {
     @Test
     public void isPublisher_Email_ShouldError() throws Exception {
         String email = null;
-        doThrow(new JWTVerificationException(JWTPERMISSIONSSERVICE_ERROR)).when(jwtPSI_Mock).isPublisher(email);
-        JWTVerificationException ex = assertThrows(JWTVerificationException.class, () -> jwtPermissionsService.isPublisher(email));
-        MatcherAssert.assertThat(ex.getMessage(), equalTo(JWTPERMISSIONSSERVICE_ERROR));
+        assertFalse(jwtPermissionsService.isPublisher(email));
         verifyZeroInteractions(sessionsService);
     }
 

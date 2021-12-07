@@ -50,7 +50,6 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
      * @param email the email of the user to check.
      * @return boolean
      * @throws IOException
-     * @deprecated not used
      */
     @Override
     public boolean isPublisher(String email) throws IOException {

@@ -449,4 +449,5 @@ public class JWTPermissionsServiceImplTest {
         MatcherAssert.assertThat(ex.getMessage(), equalTo(JWTPERMISSIONSSERVICE_ERROR));
         verify(jwtPSI_Mock, times(1)).listCollectionsAccessibleByTeam(team_mock);
     }
+
 }

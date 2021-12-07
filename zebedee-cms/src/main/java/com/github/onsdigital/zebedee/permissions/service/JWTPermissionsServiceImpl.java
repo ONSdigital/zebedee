@@ -123,7 +123,6 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
      * @param collection the collection to check users against.
      * @return
      * @throws JWTVerificationException
-     * @deprecated not used
      */
 
     @Override

@@ -5,23 +5,13 @@ import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.session.service.Sessions;
-import com.github.onsdigital.zebedee.session.store.JWTStore;
-import com.github.onsdigital.zebedee.session.store.SessionsStore;
-import com.github.onsdigital.zebedee.session.store.SessionsStoreImpl;
+import com.github.onsdigital.zebedee.teams.model.Team;
+import com.github.onsdigital.zebedee.user.model.User;
 import org.hamcrest.MatcherAssert;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-
-import javax.servlet.http.HttpServletRequest;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Path;
-import java.util.Date;
-import java.util.UUID;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.*;
@@ -36,31 +26,24 @@ public class JWTPermissionsServiceImplTest {
     private static final String PUBLISHER = "publisher";
     private static final String ADMIN = "admin";
     private static final String JWTPERMISSIONSSERVICE_ERROR = "error accessing JWTPermissions Service";
-    @Rule
-    public TemporaryFolder root = new TemporaryFolder();
-    @Mock
-    protected HttpServletRequest mockRequest;
-    @Mock
-    private PermissionsService jwtPermissionsService;
+
     @Mock
     private Session session;
-    @Mock
-    private JWTStore jwtStore;
+
     @Mock
     private Sessions sessionsService;
+
+
+    @Mock
+    private PermissionsService jwtPermissionsService;
+
     @Mock
     private Collection collectionMock;
     @Mock
     private CollectionDescription collectionDescriptionMock;
+
     @Mock
     private JWTPermissionsServiceImpl jwtPSI_Mock;
-    @Mock
-    private Team team_mock;
-    private SessionsStore sessionsStore;
-    private File sessionsDir;
-    private Date lastAccessed;
-    private Date startDate;
-    private Path sessionFile;
 
     /**
      * @throws Exception
@@ -69,20 +52,11 @@ public class JWTPermissionsServiceImplTest {
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
         jwtPermissionsService = new JWTPermissionsServiceImpl(sessionsService);
-        root.create();
-        sessionsDir = root.newFolder("sessions");
-        lastAccessed = new Date();
-        startDate = new Date();
-
         session = new Session();
         session.setEmail("test@ons.gov.co.uk");
         session.setId("666");
         session.setLastAccess(null);
         session.setStart(null);
-
-        String fileName = UUID.randomUUID().toString();
-        sessionFile = sessionsDir.toPath().resolve(fileName + ".json");
-        sessionsStore = new SessionsStoreImpl(sessionsDir.toPath());
     }
 
     @Test
@@ -96,30 +70,47 @@ public class JWTPermissionsServiceImplTest {
         assertEquals(expectedSession.getEmail(), TEST_USER_EMAIL);
         assertArrayEquals(GROUP_1, expectedSession.getGroups());
         assertEquals(expectedSession.getId(), TEST_SESSION_ID);
+        verify(jwtPSI_Mock, atLeastOnce()).getSessionfromEmail(TEST_USER_EMAIL);
     }
 
     @Test
-    public void getSessionfromEmail_ShouldReturnNull() {
+    public void getSessionfromEmail_SessionNull_ShouldReturnNull() {
         when(jwtPSI_Mock.getSessionfromEmail(TEST_USER_EMAIL)).thenReturn(null);
         assertNull(jwtPSI_Mock.getSessionfromEmail(TEST_USER_EMAIL));
+        verify(jwtPSI_Mock, atLeastOnce()).getSessionfromEmail(TEST_USER_EMAIL);
+
     }
 
     @Test
     public void hasPermission_Admin_ShouldTrue() {
-        Session sessionTest02 = new Session();
-        sessionTest02.setId(TEST_SESSION_ID);
-        sessionTest02.setEmail(TEST_USER_EMAIL);
-        sessionTest02.setGroups(GROUP_0);
-        assertTrue(jwtPSI_Mock.hasPermission(sessionTest02, ADMIN));
+        Session sessionService = new Session();
+        sessionService.setId(TEST_SESSION_ID);
+        sessionService.setEmail(TEST_USER_EMAIL);
+        sessionService.setGroups(GROUP_0);
+        when(jwtPSI_Mock.hasPermission(sessionService, ADMIN)).thenReturn(true);
+        assertTrue(jwtPSI_Mock.hasPermission(sessionService, ADMIN));
+        verify(jwtPSI_Mock, atLeastOnce()).hasPermission(sessionService, ADMIN);
     }
 
     @Test
-    public void hasPermission_ShouldFalse() {
-        Session sessionTest02 = new Session();
-        sessionTest02.setId(TEST_SESSION_ID);
-        sessionTest02.setEmail(TEST_USER_EMAIL);
-        sessionTest02.setGroups(GROUP_1);
-        assertFalse(jwtPSI_Mock.hasPermission(sessionTest02, ADMIN));
+    public void hasPermission_Publisher_ShouldTrue() {
+        Session sessionService = new Session();
+        sessionService.setId(TEST_SESSION_ID);
+        sessionService.setEmail(TEST_USER_EMAIL);
+        sessionService.setGroups(GROUP_0);
+        when(jwtPSI_Mock.hasPermission(sessionService, PUBLISHER)).thenReturn(true);
+        assertTrue(jwtPSI_Mock.hasPermission(sessionService, PUBLISHER));
+        verify(jwtPSI_Mock, atLeastOnce()).hasPermission(sessionService, PUBLISHER);
+    }
+
+    @Test
+    public void hasPermission_PublishNotInGroup_ShouldFalse() {
+        Session sessionService = new Session();
+        sessionService.setId(TEST_SESSION_ID);
+        sessionService.setEmail(TEST_USER_EMAIL);
+        sessionService.setGroups(GROUP_1);
+        when(jwtPSI_Mock.hasPermission(sessionService, PUBLISHER)).thenReturn(false);
+        assertFalse(jwtPSI_Mock.hasPermission(sessionService, PUBLISHER));
     }
 
     @Test
@@ -193,11 +184,12 @@ public class JWTPermissionsServiceImplTest {
     @Test
     public void isPublisher_Email_ShouldError() throws Exception {
         String email = null;
-        doThrow(new IOException(JWTPERMISSIONSSERVICE_ERROR)).when(jwtPSI_Mock).isPublisher(email);
+        doThrow(new JWTVerificationException(JWTPERMISSIONSSERVICE_ERROR)).when(jwtPSI_Mock).isPublisher(email);
         JWTVerificationException ex = assertThrows(JWTVerificationException.class, () -> jwtPermissionsService.isPublisher(email));
         MatcherAssert.assertThat(ex.getMessage(), equalTo(JWTPERMISSIONSSERVICE_ERROR));
         verifyZeroInteractions(sessionsService);
     }
+
 
     /**
      * @throws Exception
@@ -259,17 +251,15 @@ public class JWTPermissionsServiceImplTest {
      */
     @Test
     public void isAdministrator_Email_ShouldReturnTrue() throws Exception {
-        Session testsession11 = new Session();
-        testsession11.setId(TEST_SESSION_ID);
-        testsession11.setEmail(TEST_USER_EMAIL);
-        testsession11.setGroups(GROUP_1);
-        when(sessionsService.find(TEST_USER_EMAIL))
-                .thenReturn(testsession11);
-        when(jwtPSI_Mock.hasPermission(null, ADMIN))
-                .thenReturn(true);
-        assertTrue(jwtPermissionsService.isAdministrator(TEST_USER_EMAIL));
+        session.setId(TEST_SESSION_ID);
+        session.setEmail(TEST_USER_EMAIL);
+        session.setGroups(GROUP_0);
+        when(sessionsService.find(anyString())).thenReturn(session);
+        when(jwtPSI_Mock.hasPermission(session, ADMIN)).thenReturn(true);
+        when(jwtPSI_Mock.isAdministrator(TEST_USER_EMAIL)).thenReturn(true);
+        assertTrue(jwtPSI_Mock.isAdministrator(TEST_USER_EMAIL));
         verifyZeroInteractions(sessionsService);
-        verify(jwtPermissionsService, times(1)).getCollectionAccessMapping(collectionMock);
+        verify(jwtPSI_Mock, atLeastOnce()).isAdministrator(TEST_USER_EMAIL);
     }
 
     @Test
@@ -288,188 +278,175 @@ public class JWTPermissionsServiceImplTest {
 
     @Test
     public void getCollectionAccessMapping_Collection_ShouldError() throws Exception {
-        doThrow(new IOException(JWTPERMISSIONSSERVICE_ERROR)).when(jwtPSI_Mock).getCollectionAccessMapping(collectionMock);
-        IOException ex = assertThrows(IOException.class, () -> jwtPermissionsService.getCollectionAccessMapping(collectionMock));
+        doThrow(new JWTVerificationException(JWTPERMISSIONSSERVICE_ERROR)).when(jwtPSI_Mock).getCollectionAccessMapping(collectionMock);
+        JWTVerificationException ex = assertThrows(JWTVerificationException.class, () -> jwtPSI_Mock.getCollectionAccessMapping(collectionMock));
         MatcherAssert.assertThat(ex.getMessage(), equalTo(JWTPERMISSIONSSERVICE_ERROR));
-        verify(jwtPermissionsService, times(1)).getCollectionAccessMapping(collectionMock);
+        verify(jwtPSI_Mock, atLeastOnce()).getCollectionAccessMapping(collectionMock);
     }
 
-    // @Test
-    // public void hasAdministrator_ShouldError() throws Exception {
-    //     doThrow(new IOException(JWTPERMISSIONSSERVICE_ERROR))
-    //         .when(jwtPermissionsService)
-    //         .hasAdministrator();
-    //     IOException ex = assertThrows(IOException.class, () -> jwtPermissionsService.hasAdministrator());
-    //     MatcherAssert.assertThat(ex.getMessage(), equalTo(JWTPERMISSIONSSERVICE_ERROR));
-    //     verify(jwtPermissionsService, times(1)).hasAdministrator();
-    // }
+    @Test
+    public void hasAdministrator_ShouldError() throws Exception {
+        doThrow(new JWTVerificationException(JWTPERMISSIONSSERVICE_ERROR))
+                .when(jwtPSI_Mock)
+                .hasAdministrator();
+        JWTVerificationException ex = assertThrows(JWTVerificationException.class, () -> jwtPSI_Mock.hasAdministrator());
+        MatcherAssert.assertThat(ex.getMessage(), equalTo(JWTPERMISSIONSSERVICE_ERROR));
+        verify(jwtPSI_Mock, atLeastOnce()).hasAdministrator();
+    }
 
-//     @Test
-//     public void addAdministrator_Email_Sessions_ShouldError() throws Exception {
-//         String email = null;
-//         doThrow(new IOException(JWTPERMISSIONSSERVICE_ERROR))
-//             .when(jwtPermissionsService)
-//             .addAdministrator(email, session);
-//         IOException ex = assertThrows(IOException.class, () -> jwtPermissionsService.addAdministrator(email,session));
-//         MatcherAssert.assertThat(ex.getMessage(), equalTo(JWTPERMISSIONSSERVICE_ERROR));
-//         verify(jwtPermissionsService, times(1)).addAdministrator(email,session);
-//     }
+    @Test
+    public void addAdministrator_Email_Sessions_ShouldError() throws Exception {
+        String email = null;
+        doThrow(new JWTVerificationException(JWTPERMISSIONSSERVICE_ERROR)).when(jwtPSI_Mock).addAdministrator(email, session);
+        JWTVerificationException ex = assertThrows(JWTVerificationException.class, () -> jwtPSI_Mock.addAdministrator(email, session));
+        MatcherAssert.assertThat(ex.getMessage(), equalTo(JWTPERMISSIONSSERVICE_ERROR));
+        verify(jwtPSI_Mock, atLeastOnce()).addAdministrator(email, session);
+    }
 
-//     @Test
-//     public void removeAdministrator_EMail_Sessions_ShouldError() throws IOException, UnauthorizedException {
-//         String email = null;
-//         doThrow(new IOException(JWTPERMISSIONSSERVICE_ERROR))
-//             .when(jwtPermissionsService)
-//             .removeAdministrator(email, session);
+    @Test
+    public void removeAdministrator_EMail_Sessions_ShouldError() throws Exception {
+        String email = null;
+        doThrow(new JWTVerificationException(JWTPERMISSIONSSERVICE_ERROR)).when(jwtPSI_Mock).removeAdministrator(email, session);
+        JWTVerificationException ex = assertThrows(JWTVerificationException.class, () -> jwtPSI_Mock.removeAdministrator(email, session));
+        MatcherAssert.assertThat(ex.getMessage(), equalTo(JWTPERMISSIONSSERVICE_ERROR));
+        verify(jwtPSI_Mock, atLeastOnce()).removeAdministrator(email, session);
+    }
 
-//         IOException ex = assertThrows(IOException.class, () -> jwtPermissionsService.removeAdministrator(email, session));
-//         MatcherAssert.assertThat(ex.getMessage(), equalTo(JWTPERMISSIONSSERVICE_ERROR));
-//         verify(jwtPermissionsService, times(1)).removeAdministrator(email, session);
-//     }
+    @Test
+    public void canEdit_Session_ShouldError() throws Exception {
+        Session session = null;
+        doThrow(new JWTVerificationException(JWTPERMISSIONSSERVICE_ERROR)).when(jwtPSI_Mock).canEdit(session);
+        JWTVerificationException ex = assertThrows(JWTVerificationException.class, () -> jwtPSI_Mock.canEdit(session));
+        MatcherAssert.assertThat(ex.getMessage(), equalTo(JWTPERMISSIONSSERVICE_ERROR));
+        verify(jwtPSI_Mock, atLeastOnce()).canEdit(session);
+    }
 
-//     @Test
-//     public void canEdit_Session_ShouldError() throws IOException {
-//         doThrow(new IOException(JWTPERMISSIONSSERVICE_ERROR))
-//             .when(jwtPermissionsService)
-//             .canEdit(session);
-//         IOException ex = assertThrows(IOException.class, () -> jwtPermissionsService.canEdit(session));
-//         MatcherAssert.assertThat(ex.getMessage(), equalTo(JWTPERMISSIONSSERVICE_ERROR));
-//         verify(jwtPermissionsService, times(1)).canEdit(session);
-//     }
+    @Test
+    public void canEdit_email_ShouldError() throws Exception {
+        String email = null;
+        doThrow(new JWTVerificationException(JWTPERMISSIONSSERVICE_ERROR)).when(jwtPSI_Mock).canEdit(email);
+        JWTVerificationException ex = assertThrows(JWTVerificationException.class, () -> jwtPSI_Mock.canEdit(email));
+        MatcherAssert.assertThat(ex.getMessage(), equalTo(JWTPERMISSIONSSERVICE_ERROR));
+        verify(jwtPSI_Mock, atLeastOnce()).canEdit(email);
+    }
 
-//     @Test
-//     public void canEdit_EMail_ShouldError() throws IOException {
-//         String email = null;
-//         doThrow(new IOException(JWTPERMISSIONSSERVICE_ERROR))
-//             .when(jwtPermissionsService)
-//             .canEdit(email);
-//         IOException ex = assertThrows(IOException.class, () -> jwtPermissionsService.canEdit(email));
-//         MatcherAssert.assertThat(ex.getMessage(), equalTo(JWTPERMISSIONSSERVICE_ERROR));
-//         verify(jwtPermissionsService, times(1)).canEdit(email);
-//     }
+    @Test
+    public void canEdit_User_ShouldError() throws Exception {
+        User user = new User();
+        doThrow(new JWTVerificationException(JWTPERMISSIONSSERVICE_ERROR)).when(jwtPSI_Mock).canEdit(user);
+        JWTVerificationException ex = assertThrows(JWTVerificationException.class, () -> jwtPSI_Mock.canEdit(user));
+        MatcherAssert.assertThat(ex.getMessage(), equalTo(JWTPERMISSIONSSERVICE_ERROR));
+        verify(jwtPSI_Mock, atLeastOnce()).canEdit(user);
+    }
 
-//     @Test
-//     public void canEdit_User_ShouldError() throws IOException {
-//         String email = null;
-//         doThrow(new IOException(JWTPERMISSIONSSERVICE_ERROR))
-//             .when(jwtPermissionsService)
-//             .canEdit(email);
-//         IOException ex = assertThrows(IOException.class, () -> jwtPermissionsService.canEdit(email));
-//         MatcherAssert.assertThat(ex.getMessage(), equalTo(JWTPERMISSIONSSERVICE_ERROR));
-//         verify(jwtPermissionsService, times(1)).canEdit(email);
-//     }
+    @Test
+    public void addEditor_EMail_Sessions_ShouldError() throws Exception {
+        String email = null;
+        Session session = new Session();
+        doThrow(new JWTVerificationException(JWTPERMISSIONSSERVICE_ERROR)).when(jwtPSI_Mock).addEditor(email, session);
+        JWTVerificationException ex = assertThrows(JWTVerificationException.class, () -> jwtPSI_Mock.addEditor(email, session));
+        MatcherAssert.assertThat(ex.getMessage(), equalTo(JWTPERMISSIONSSERVICE_ERROR));
+        verify(jwtPSI_Mock, atLeastOnce()).addEditor(email, session);
+    }
 
-//     @Test
-//     public void addEditor_EMail_Sessions_ShouldError() throws IOException, UnauthorizedException, NotFoundException, BadRequestException {
-//         String email = null;
-//         doThrow(new IOException(JWTPERMISSIONSSERVICE_ERROR))
-//             .when(jwtPermissionsService)
-//             .addEditor(email, session);
+    @Test
+    public void removeEditor_EMail_Sessions_ShouldError() throws Exception {
+        String email = null;
+        doThrow(new JWTVerificationException(JWTPERMISSIONSSERVICE_ERROR))
+                .when(jwtPSI_Mock)
+                .removeEditor(email, session);
+        JWTVerificationException ex = assertThrows(JWTVerificationException.class, () -> jwtPSI_Mock.removeEditor(email, session));
+        MatcherAssert.assertThat(ex.getMessage(), equalTo(JWTPERMISSIONSSERVICE_ERROR));
+        verify(jwtPSI_Mock, times(1)).removeEditor(email, session);
+    }
 
-//         IOException ex = assertThrows(IOException.class, () -> jwtPermissionsService.addEditor(email,session));
-//         MatcherAssert.assertThat(ex.getMessage(), equalTo(JWTPERMISSIONSSERVICE_ERROR));
-//         verify(jwtPermissionsService, times(1)).addEditor(email,session);
-//     }
+    @Test
+    public void canView_Session_ShouldError() throws Exception {
+        Session session = new Session();
+        doThrow(new JWTVerificationException(JWTPERMISSIONSSERVICE_ERROR))
+                .when(jwtPSI_Mock)
+                .canView(session, collectionDescriptionMock);
+        JWTVerificationException ex = assertThrows(JWTVerificationException.class, () -> jwtPSI_Mock.canView(session, collectionDescriptionMock));
+        MatcherAssert.assertThat(ex.getMessage(), equalTo(JWTPERMISSIONSSERVICE_ERROR));
+        verify(jwtPSI_Mock, times(1)).canView(session, collectionDescriptionMock);
+    }
 
-//     @Test
-//     public void removeEditor_EMail_Sessions_ShouldError() throws IOException, UnauthorizedException {
-//         String email = null;
-//         doThrow(new IOException(JWTPERMISSIONSSERVICE_ERROR))
-//             .when(jwtPermissionsService)
-//             .removeEditor(email,session);
-//         IOException ex = assertThrows(IOException.class, () -> jwtPermissionsService.removeEditor(email,session));
-//         MatcherAssert.assertThat(ex.getMessage(), equalTo(JWTPERMISSIONSSERVICE_ERROR));
-//         verify(jwtPermissionsService, times(1)).removeEditor(email,session);
-//     }
+    @Test
+    public void canView_EMail_ShouldError() throws Exception {
+        String email = null;
+        doThrow(new JWTVerificationException(JWTPERMISSIONSSERVICE_ERROR))
+                .when(jwtPSI_Mock)
+                .canView(email, collectionDescriptionMock);
+        JWTVerificationException ex = assertThrows(JWTVerificationException.class, () -> jwtPSI_Mock.canView(email, collectionDescriptionMock));
+        MatcherAssert.assertThat(ex.getMessage(), equalTo(JWTPERMISSIONSSERVICE_ERROR));
+        verify(jwtPSI_Mock, times(1)).canView(email, collectionDescriptionMock);
+    }
 
-//   @Test
-//     public void canView_Session_ShouldError() throws IOException {
+    @Test
+    public void canView_User_ShouldError() throws Exception {
+        User user = new User();
+        String email = null;
+        doThrow(new JWTVerificationException(JWTPERMISSIONSSERVICE_ERROR))
+                .when(jwtPSI_Mock)
+                .canView(email, collectionDescriptionMock);
+        JWTVerificationException ex = assertThrows(JWTVerificationException.class, () -> jwtPSI_Mock.canView(email, collectionDescriptionMock));
+        MatcherAssert.assertThat(ex.getMessage(), equalTo(JWTPERMISSIONSSERVICE_ERROR));
+        verify(jwtPSI_Mock, times(1)).canView(email, collectionDescriptionMock);
+    }
 
-//         doThrow(new IOException(JWTPERMISSIONSSERVICE_ERROR))
-//             .when(jwtPermissionsService)
-//             .canView(session, collectionDescriptionMock);
-//         IOException ex = assertThrows(IOException.class, () -> jwtPermissionsService.canView(session, collectionDescriptionMock));
-//         MatcherAssert.assertThat(ex.getMessage(), equalTo(JWTPERMISSIONSSERVICE_ERROR));
-//         verify(jwtPermissionsService, times(1)).canView(session, collectionDescriptionMock);
-//     }
+    @Test
+    public void addViewerTeam_CollectionDescription_Team_Session_ShouldError() throws Exception {
+        Team team_mock = new Team();
+        doThrow(new JWTVerificationException(JWTPERMISSIONSSERVICE_ERROR))
+                .when(jwtPSI_Mock)
+                .addViewerTeam(collectionDescriptionMock, team_mock, session);
+        JWTVerificationException ex = assertThrows(JWTVerificationException.class, () -> jwtPSI_Mock.addViewerTeam(collectionDescriptionMock, team_mock, session));
+        MatcherAssert.assertThat(ex.getMessage(), equalTo(JWTPERMISSIONSSERVICE_ERROR));
+        verify(jwtPSI_Mock, times(1)).addViewerTeam(collectionDescriptionMock, team_mock, session);
+    }
 
-//     @Test
-//     public void canView_EMail_ShouldError() throws IOException {
-//         String email = null;
-//         doThrow(new IOException(JWTPERMISSIONSSERVICE_ERROR))
-//             .when(jwtPermissionsService)
-//             .canView(email, collectionDescriptionMock);
-//         IOException ex = assertThrows(IOException.class, () -> jwtPermissionsService.canView(email, collectionDescriptionMock));
-//         MatcherAssert.assertThat(ex.getMessage(), equalTo(JWTPERMISSIONSSERVICE_ERROR));
-//         verify(jwtPermissionsService, times(1)).canView(email, collectionDescriptionMock);
-//     }
+    @Test
+    public void listViewerTeams_collectionDescription_session() throws Exception {
+        doThrow(new JWTVerificationException(JWTPERMISSIONSSERVICE_ERROR))
+                .when(jwtPSI_Mock)
+                .listViewerTeams(collectionDescriptionMock, session);
+        JWTVerificationException ex = assertThrows(JWTVerificationException.class, () -> jwtPSI_Mock.listViewerTeams(collectionDescriptionMock, session));
+        MatcherAssert.assertThat(ex.getMessage(), equalTo(JWTPERMISSIONSSERVICE_ERROR));
+        verify(jwtPSI_Mock, times(1)).listViewerTeams(collectionDescriptionMock, session);
+    }
 
-//     @Test
-//     public void canView_User_ShouldError() throws IOException {
-//         String email = null;
-//         doThrow(new IOException(JWTPERMISSIONSSERVICE_ERROR))
-//             .when(jwtPermissionsService)
-//             .canView(email, collectionDescriptionMock);
+    @Test
+    public void removeViewerTeam_CollectionDescription_Team_Session_ShouldError() throws Exception {
+        Team team_mock = new Team();
+        doThrow(new JWTVerificationException(JWTPERMISSIONSSERVICE_ERROR))
+                .when(jwtPSI_Mock)
+                .removeViewerTeam(collectionDescriptionMock, team_mock, session);
+        JWTVerificationException ex = assertThrows(JWTVerificationException.class, () -> jwtPSI_Mock.removeViewerTeam(collectionDescriptionMock, team_mock, session));
+        MatcherAssert.assertThat(ex.getMessage(), equalTo(JWTPERMISSIONSSERVICE_ERROR));
+        verify(jwtPSI_Mock, times(1)).removeViewerTeam(collectionDescriptionMock, team_mock, session);
+    }
 
-//         IOException ex = assertThrows(IOException.class, () -> jwtPermissionsService.canView(email, collectionDescriptionMock));
-//         MatcherAssert.assertThat(ex.getMessage(), equalTo(JWTPERMISSIONSSERVICE_ERROR));
-//         verify(jwtPermissionsService, times(1)).canView(email, collectionDescriptionMock);
-//     }
+    @Test
+    public void userPermissions_EMail_Sessions_ShouldError() throws Exception {
+        String email = null;
 
-//     @Test
-//     public void addViewerTeam_CollectionDescription_Team_Session_ShouldError() throws IOException, ZebedeeException {
+        doThrow(new JWTVerificationException(JWTPERMISSIONSSERVICE_ERROR))
+                .when(jwtPSI_Mock)
+                .userPermissions(email, session);
 
-//         doThrow(new IOException(JWTPERMISSIONSSERVICE_ERROR))
-//             .when(jwtPermissionsService)
-//             .addViewerTeam(collectionDescriptionMock,team_mock, session);
-//         IOException ex = assertThrows(IOException.class, () -> jwtPermissionsService.addViewerTeam(collectionDescriptionMock,team_mock, session));
-//         MatcherAssert.assertThat(ex.getMessage(), equalTo(JWTPERMISSIONSSERVICE_ERROR));
-//         verify(jwtPermissionsService, times(1)).addViewerTeam(collectionDescriptionMock,team_mock, session);
-//     }
+        JWTVerificationException ex = assertThrows(JWTVerificationException.class, () -> jwtPSI_Mock.userPermissions(email, session));
+        MatcherAssert.assertThat(ex.getMessage(), equalTo(JWTPERMISSIONSSERVICE_ERROR));
+        verify(jwtPSI_Mock, times(1)).userPermissions(email, session);
+    }
 
-//     @Test
-//     public void listViewerTeams_collectionDescription_session() throws IOException, UnauthorizedException {
-//             doThrow(new IOException(JWTPERMISSIONSSERVICE_ERROR))
-//                 .when(jwtPermissionsService)
-//                 .listViewerTeams(collectionDescriptionMock,session);
-//             IOException ex = assertThrows(IOException.class, () -> jwtPermissionsService.listViewerTeams(collectionDescriptionMock,session));
-//             MatcherAssert.assertThat(ex.getMessage(), equalTo(JWTPERMISSIONSSERVICE_ERROR));
-//             verify(jwtPermissionsService, times(1)).listViewerTeams(collectionDescriptionMock,session);
-//     }
-
-//     @Test
-//     public void removeViewerTeam_CollectionDescription_Team_Session_ShouldError() throws IOException, ZebedeeException {
-//             doThrow(new IOException(JWTPERMISSIONSSERVICE_ERROR))
-//                 .when(jwtPermissionsService)
-//                 .removeViewerTeam(collectionDescriptionMock,team_mock, session);
-
-//             IOException ex = assertThrows(IOException.class, () -> jwtPermissionsService.removeViewerTeam(collectionDescriptionMock,team_mock, session));
-//             MatcherAssert.assertThat(ex.getMessage(), equalTo(JWTPERMISSIONSSERVICE_ERROR));
-//             verify(jwtPermissionsService, times(1)).removeViewerTeam(collectionDescriptionMock,team_mock, session);
-//     }
-
-//     @Test
-//     public void userPermissions_EMail_Sessions_ShouldError() throws IOException, NotFoundException, UnauthorizedException {
-//         String email = null;
-
-//         doThrow(new IOException(JWTPERMISSIONSSERVICE_ERROR))
-//             .when(jwtPermissionsService)
-//             .userPermissions(email, session);
-
-//         IOException ex = assertThrows(IOException.class, () -> jwtPermissionsService.userPermissions(email, session));
-//         MatcherAssert.assertThat(ex.getMessage(), equalTo(JWTPERMISSIONSSERVICE_ERROR));
-//         verify(jwtPermissionsService, times(1)).userPermissions(email, session);
-//     }
-
-//     @Test
-//     public void listCollectionsAccessibleByTeam_ShouldError() throws IOException {
-//             doThrow(new IOException(JWTPERMISSIONSSERVICE_ERROR))
-//                 .when(jwtPermissionsService)
-//                 .listCollectionsAccessibleByTeam(team_mock);
-
-//             IOException ex = assertThrows(IOException.class, () -> jwtPermissionsService.listCollectionsAccessibleByTeam(team_mock));
-//             MatcherAssert.assertThat(ex.getMessage(), equalTo(JWTPERMISSIONSSERVICE_ERROR));
-//             verify(jwtPermissionsService, times(1)).listCollectionsAccessibleByTeam(team_mock);
-//     }
-
+    @Test
+    public void listCollectionsAccessibleByTeam_ShouldError() throws Exception {
+        Team team_mock = new Team();
+        doThrow(new JWTVerificationException(JWTPERMISSIONSSERVICE_ERROR))
+                .when(jwtPSI_Mock)
+                .listCollectionsAccessibleByTeam(team_mock);
+        JWTVerificationException ex = assertThrows(JWTVerificationException.class, () -> jwtPSI_Mock.listCollectionsAccessibleByTeam(team_mock));
+        MatcherAssert.assertThat(ex.getMessage(), equalTo(JWTPERMISSIONSSERVICE_ERROR));
+        verify(jwtPSI_Mock, times(1)).listCollectionsAccessibleByTeam(team_mock);
+    }
 }

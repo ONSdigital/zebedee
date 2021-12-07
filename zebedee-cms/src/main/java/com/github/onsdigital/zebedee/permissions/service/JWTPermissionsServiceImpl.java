@@ -1,7 +1,6 @@
 package com.github.onsdigital.zebedee.permissions.service;
 
 import com.github.onsdigital.exceptions.JWTVerificationException;
-import com.github.onsdigital.impl.UserDataPayload;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.PermissionDefinition;
@@ -16,13 +15,16 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.List;
 import java.util.Set;
 
+import static com.github.onsdigital.zebedee.logging.CMSLogEvent.warn;
+
 public class JWTPermissionsServiceImpl implements PermissionsService {
     static final String PUBLISHER_PERMISSIONS = "publisher";
     static final String ADMIN_PERMISSIONS = "admin";
     static final String JWTPERMISSIONSSERVICE_ERROR =
             "error accessing JWTPermissions Service";
-    private static final ThreadLocal<UserDataPayload> store = new ThreadLocal<>();
     private Sessions sessionsService;
+    private Session session;
+
 
     public JWTPermissionsServiceImpl(Sessions sessionService) {
         this.sessionsService = sessionsService;
@@ -38,28 +40,33 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
     @Override
     public boolean isPublisher(String email) throws JWTVerificationException {
         throw new JWTVerificationException(JWTPERMISSIONSSERVICE_ERROR);
-
     }
+
 
     @Override
     public boolean isAdministrator(Session session) throws JWTVerificationException {
-        // Get JWT from JWT session service and check if the user has the 'Admin' permission in their groups.
         return session != null && !StringUtils.isEmpty(session.getEmail()) &&
                 hasPermission(session, ADMIN_PERMISSIONS);
     }
 
     public boolean isAdministrator(String email) throws JWTVerificationException {
         if (StringUtils.isEmpty(email)) {
+            warn().user(email)
+                    .log("request for isAdministrator unsucessful empty email");
             return false;
         }
 
         try {
             Session s = getSessionfromEmail(email);
             if (!hasPermission(s, ADMIN_PERMISSIONS)) {
+                warn().user(email)
+                        .log("request for admin privilages check unsuccessful");
                 return false;
             }
 
         } catch (Exception exception) {
+            warn().user(email)
+                    .log("request for admin privilages exception caught");
             return false;
         }
 

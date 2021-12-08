@@ -60,20 +60,6 @@ public class JWTSessionsServiceImpl implements Sessions {
     }
 
     /**
-     * Find a {@link Session} associated with the user email - defaults to the NoOp impl.
-     *
-     * @deprecated The JWT based session lookup can only look up the session of the current user. Any code still
-     *             referencing this method needs to be reworked so that the current users' session is used. Once the
-     *             migration to the dp-identity-api is complete this method will be removed.
-     */
-    @Deprecated
-    @Override
-    public Session find(String email) throws IOException {
-        error().log(UNSUPPORTED_METHOD);
-        throw new UnsupportedOperationException(UNSUPPORTED_METHOD);
-    }
-
-    /**
      * Create a new {@link Session} for the user - defaults to the NoOp impl.
      *
      * @deprecated Using the new JWT based sessions, sessions are never created within zebedee as the JWT token

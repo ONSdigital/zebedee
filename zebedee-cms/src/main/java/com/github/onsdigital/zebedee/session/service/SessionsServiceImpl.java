@@ -144,7 +144,7 @@ public class SessionsServiceImpl extends TimerTask implements Sessions {
      * @return An existing session, if found.
      * @throws IOException If a filesystem error occurs.
      */
-    public Session find(String email) throws IOException {
+    private Session find(String email) throws IOException {
         Session session = sessionsStore.find(email);
         if (!expired(session)) {
             updateLastAccess(session);

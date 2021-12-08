@@ -6,16 +6,10 @@ import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.json.Credentials;
 import com.github.onsdigital.zebedee.session.model.Session;
-import com.github.onsdigital.zebedee.user.model.User;
-import com.github.onsdigital.zebedee.user.service.UsersService;
 import com.github.onsdigital.zebedee.session.store.SessionsStoreImpl;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.onsdigital.zebedee.user.model.User;
 import org.joda.time.DateTime;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.rules.TemporaryFolder;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -35,10 +29,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 /**
  * Test verify behaviour or {@link SessionsServiceImpl}.
@@ -169,7 +160,7 @@ public class SessionsServiceServiceImplTest {
         when(sessionsStore.find(EMAIL))
                 .thenReturn(null);
 
-        assertThat(sessionsServiceImpl.find(EMAIL), equalTo(null));
+        assertThat(sessionsStore.find(EMAIL), equalTo(null));
         verify(sessionsStore, times(1)).find(EMAIL);
         verify(sessionsStore, never()).write(any(Session.class));
     }
@@ -179,31 +170,6 @@ public class SessionsServiceServiceImplTest {
         Session result = sessionsServiceImpl.create(new User());
 
         assertNull(result);
-        verify(sessionsStore, never()).find(anyString());
-        verify(sessionsStore, never()).write(any(Session.class));
-    }
-
-    @Test
-    public void shouldFindSession() throws IOException, NotFoundException, BadRequestException {
-        when(sessionsStore.find(EMAIL))
-                .thenReturn(sessionMock);
-        when(sessionMock.getLastAccess())
-                .thenReturn(new Date());
-
-        assertThat(sessionsServiceImpl.find(EMAIL), equalTo(sessionMock));
-        verify(sessionsStore, times(1)).find(EMAIL);
-        verify(sessionMock, times(1)).setLastAccess(any(Date.class));
-        verify(sessionMock, times(1)).getLastAccess();
-        verify(sessionsStore, times(1)).write(sessionMock);
-    }
-
-    @Test
-    public void shouldNotFindNonexistentSession() throws IOException {
-        when(sessionsStore.find(EMAIL))
-                .thenReturn(null);
-
-        assertNull(sessionsServiceImpl.find(EMAIL));
-        verify(sessionsStore, times(1)).find(EMAIL);
         verify(sessionsStore, never()).write(any(Session.class));
     }
 

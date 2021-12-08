@@ -18,6 +18,8 @@ public interface Sessions {
      * @deprecated Using the new JWT based sessions, sessions are never created within zebedee as the JWT token
      *             issued by the dp-identity-api replaces the sessions in zebedee. Once migration to the dp-identity-api
      *             is completed this method will be removed.
+     *
+     * TODO: Remove this method once the migration to JWT based sessions is complete
      */
     @Deprecated
     Session create(User user) throws IOException;
@@ -35,6 +37,8 @@ public interface Sessions {
      *             {@link com.github.onsdigital.zebedee.filters.AuthenticationFilter} should be should be updated to
      *             use {@link this#get()} instead. If the call is duplicating the filter, then it should be removed
      *             so as not to waste compute and request latency.
+     *
+     * TODO: remove all usage of this method after migration to JWT based sessions is complete
      */
     @Deprecated
     Session get(HttpServletRequest request) throws IOException;
@@ -49,23 +53,12 @@ public interface Sessions {
      * @deprecated Since the new JWT sessions implementation can only get the session of the current user, a single
      *             {@link this#get()} method is provided. Once migration to the new JWT sessions is completed all
      *             references to this method should be updated to use the {@link this#get()} instead.
+     *
+     * TODO: Replace all calls to this method with `Sessions.get()` instead after migration to the JWT based sessions
+     *       is complete
      */
     @Deprecated
     Session get(String id) throws IOException;
-
-    /**
-     * Find a {@link Session} assocaited with the user email.
-     *
-     * @param email the user email address to find.
-     * @return a {@link Session} for the requested email if it exists and is not expired. Return null otherwise.
-     * @throws IOException for any problems getting the session.
-     *
-     * @deprecated The JWT based session lookup can only look up the session of the current user. Any code still
-     *             referencing this method needs to be reworked so that the current users' session is used. Once the
-     *             migration to the dp-identity-api is complete this method will be removed.
-     */
-    @Deprecated
-    Session find(String email) throws IOException;
 
     /**
      * Get a session object.
@@ -76,7 +69,7 @@ public interface Sessions {
     Session get() throws IOException;
 
     /**
-     * Set user's data in a threadlocal object.
+     * Set user's data in a ThreadLocal object.
      *
      * @param token the access token,
      *        

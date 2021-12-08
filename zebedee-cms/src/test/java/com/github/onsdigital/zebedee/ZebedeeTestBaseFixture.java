@@ -2,9 +2,7 @@ package com.github.onsdigital.zebedee;
 
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.Credentials;
-import com.github.onsdigital.zebedee.keyring.CollectionKeyCache;
 import com.github.onsdigital.zebedee.keyring.CollectionKeyring;
-import com.github.onsdigital.zebedee.keyring.migration.KeyringHealthChecker;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.encryption.EncryptionKeyFactory;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
@@ -35,12 +33,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 
 /**
  * Common set up required by tests using {@link Builder} (Hide some of the nastiness).
@@ -68,13 +62,7 @@ public abstract class ZebedeeTestBaseFixture {
     protected Sessions sessions;
 
     @Mock
-    protected CollectionKeyCache schedulerKeyCache;
-
-    @Mock
     protected CollectionKeyring collectionKeyring;
-
-    @Mock
-    protected KeyringHealthChecker keyringHealthChecker;
 
     @Mock
     protected Credentials credentials;
@@ -182,9 +170,6 @@ public abstract class ZebedeeTestBaseFixture {
 
         when(zebCfg.getSlackNotifier())
                 .thenReturn(slackNotifier);
-
-        when(zebCfg.getKeyringHealthChecker())
-                .thenReturn(keyringHealthChecker);
     }
 
     protected void verifyKeyAddedToCollectionKeyring() throws Exception {

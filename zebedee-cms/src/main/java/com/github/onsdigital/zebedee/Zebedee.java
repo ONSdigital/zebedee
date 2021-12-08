@@ -8,7 +8,6 @@ import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.Credentials;
 import com.github.onsdigital.zebedee.keyring.CollectionKeyCache;
 import com.github.onsdigital.zebedee.keyring.CollectionKeyring;
-import com.github.onsdigital.zebedee.keyring.migration.KeyringHealthChecker;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.Collections;
 import com.github.onsdigital.zebedee.model.Content;
@@ -89,7 +88,6 @@ public class Zebedee {
     private final ServiceStoreImpl serviceStoreImpl;
     private final StartUpAlerter startUpAlerter;
     private final Notifier slackNotifier;
-    private final KeyringHealthChecker keyringHealthChecker;
 
     /**
      * Create a new instance of Zebedee setting.
@@ -127,7 +125,6 @@ public class Zebedee {
         this.keyRingPath = cfg.getKeyRingPath();
         this.startUpAlerter = cfg.getStartUpAlerter();
         this.slackNotifier = cfg.getSlackNotifier();
-        this.keyringHealthChecker = cfg.getKeyringHealthChecker();
     }
 
     /**
@@ -301,7 +298,6 @@ public class Zebedee {
 
         if (permissionsService.isAdministrator(session)) {
             startUpAlerter.queueUnlocked();
-            keyringHealthChecker.check(session);
         }
 
         return session;

@@ -347,6 +347,5 @@ public class ZebedeeTest extends ZebedeeTestBaseFixture {
         verifyZeroInteractions(usersKeyring);
 
         verify(startUpAlerter, times(1)).queueUnlocked();
-        verify(keyringHealthChecker, times(1)).check(userSession);
     }
 }

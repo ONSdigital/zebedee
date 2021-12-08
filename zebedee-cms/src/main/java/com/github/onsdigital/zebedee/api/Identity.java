@@ -16,60 +16,49 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
 import java.io.IOException;
 
-import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.error;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.warn;
-import static com.github.onsdigital.zebedee.service.ServiceTokenUtils.extractServiceAccountTokenFromAuthHeader;
-import static com.github.onsdigital.zebedee.service.ServiceTokenUtils.isValidServiceAuthorizationHeader;
-import static com.github.onsdigital.zebedee.service.ServiceTokenUtils.isValidServiceToken;
+import static com.github.onsdigital.zebedee.service.ServiceTokenUtils.*;
 import static com.github.onsdigital.zebedee.util.JsonUtils.writeResponseEntity;
-import static org.apache.http.HttpStatus.SC_NOT_FOUND;
 import static org.apache.http.HttpStatus.SC_OK;
 import static org.apache.http.HttpStatus.SC_UNAUTHORIZED;
 
+@Deprecated
 @Api
 public class Identity {
 
     private AuthorisationService authorisationService;
     private ServiceStore serviceStore;
-    private boolean datasetImportEnabled = false;
 
     static final String AUTHORIZATION_HEADER = "Authorization";
-    static final String BEARER_PREFIX_UC = "Bearer";
-    static final Error NOT_FOUND_ERROR = new Error("Not found");
 
     /**
      * Construct the default Identity api endpoint.
      */
     public Identity() {
-        this(cmsFeatureFlags().isEnableDatasetImport(), Root.zebedee.getServiceStore(), new AuthorisationServiceImpl());
+        this(Root.zebedee.getServiceStore(), new AuthorisationServiceImpl());
     }
 
     /**
      * Construct and Identity api endpoint explicitly enabling/disabling the datasetImportEnabled feature.
      */
-    public Identity(boolean datasetImportEnabled, ServiceStore serviceStore, AuthorisationService authorisationService) {
-        this.datasetImportEnabled = datasetImportEnabled;
+    public Identity(ServiceStore serviceStore, AuthorisationService authorisationService) {
         this.serviceStore = serviceStore;
         this.authorisationService = authorisationService;
     }
 
     @GET
     public void identifyUser(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        // FIXME CMD feature
-        if (!datasetImportEnabled) {
-            warn().data("responseStatus", SC_NOT_FOUND)
-                    .log("Identity endpoint is not supported as feature EnableDatasetImport is disabled");
-            writeResponseEntity(response, NOT_FOUND_ERROR, SC_NOT_FOUND);
-            return;
-        }
-
-        if (request.getHeader(RequestUtils.FLORENCE_TOKEN_HEADER) != null) {
+        // TODO: Remove after migration from X-Florence-Token to Authorization header is complete
+        String florenceHeader = request.getHeader(RequestUtils.FLORENCE_TOKEN_HEADER);
+        String authHeader = request.getHeader(AUTHORIZATION_HEADER);
+        if (florenceHeader != null || (StringUtils.isNotBlank(authHeader) && authHeader.contains("."))) {
             findUser(request, response);
             return;
         }
 
-        if (StringUtils.isNotBlank(request.getHeader(AUTHORIZATION_HEADER))) {
+        // TODO: Remove after new service user JWT auth is implemented
+        if (StringUtils.isNotBlank(authHeader)) {
             ServiceAccount serviceAccount = handleServiceAccountRequest(request);
             if (serviceAccount != null) {
                 writeResponseEntity(response, new UserIdentity(serviceAccount.getID()), SC_OK);

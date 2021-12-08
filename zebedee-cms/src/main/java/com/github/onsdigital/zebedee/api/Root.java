@@ -35,7 +35,6 @@ import java.util.Map;
 
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
-import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
 
 public class Root {
 

@@ -177,7 +177,7 @@ public class SessionsServiceImpl extends TimerTask implements Sessions {
      * @return If the session is not null and the last access time is
      * more than 60 minutes in the past, true.
      */
-    public boolean expired(Session session) {
+    private boolean expired(Session session) {
         boolean result = false;
 
         if (session != null) {

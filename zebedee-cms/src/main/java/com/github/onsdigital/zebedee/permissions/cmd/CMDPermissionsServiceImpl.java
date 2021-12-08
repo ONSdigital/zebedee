@@ -28,7 +28,6 @@ import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException
 import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.internalServerErrorException;
 import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.serviceAccountNotFoundException;
 import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.serviceTokenNotProvidedException;
-import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.sessionExpiredException;
 import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.sessionIDNotProvidedException;
 import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.sessionNotFoundException;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
@@ -128,7 +127,7 @@ public class CMDPermissionsServiceImpl implements CMDPermissionsService {
             throw sessionIDNotProvidedException();
         }
 
-        Session session = null;
+        Session session;
         try {
             session = sessions.get(sessionID);
         } catch (IOException ex) {
@@ -141,17 +140,6 @@ public class CMDPermissionsServiceImpl implements CMDPermissionsService {
             throw sessionNotFoundException();
         }
 
-        /*
-        Since the JWT sessions are only stored in the SessionsService if they are still valid (i.e. not expired) this
-        check is redundant when JWT sessions are enabled
-        TODO: remove this deprecated call once the migration to the identity API is complete.
-         */
-        if (! cmsFeatureFlags().isJwtSessionsEnabled()) {
-            if (sessions.expired(session)) {
-                info().log("user dataset permissions request denied session expired");
-                throw sessionExpiredException();
-            }
-        }
         return session;
     }
 

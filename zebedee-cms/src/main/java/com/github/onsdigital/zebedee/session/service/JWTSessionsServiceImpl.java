@@ -88,22 +88,6 @@ public class JWTSessionsServiceImpl implements Sessions {
     }
 
     /**
-     * Check if the provided {@link Session} is expired - defaults to the NoOp impl.
-     *
-     * @deprecated This method is deprecated as it becomes redundant once we migrate to the JWT sessions. Once this
-     *             migration has been completed the users' JWT (which is essentially the new session) is validated
-     *             by the {@link com.github.onsdigital.zebedee.filters.AuthenticationFilter}. If the JWT is found to be
-     *             expired by the {@link com.github.onsdigital.zebedee.filters.AuthenticationFilter} returns a 401
-     *             unauthorised to the user so we would never get far enough in the execution to actually call this.
-     */
-    @Deprecated
-    @Override
-    public boolean expired(Session session) {
-        error().log(UNSUPPORTED_METHOD);
-        throw new UnsupportedOperationException(UNSUPPORTED_METHOD);
-    }
-
-    /**
      * Get a {@link Session} session object from thread local.
      *
      * @param id the {@link String} to get the session object from thread local for.

@@ -27,10 +27,6 @@ public class PermissionsException extends ZebedeeException {
         return new PermissionsException(ERROR_PREFIX + "session not found", SC_UNAUTHORIZED);
     }
 
-    public static PermissionsException sessionExpiredException() {
-        return new PermissionsException(ERROR_PREFIX + "session expired", SC_UNAUTHORIZED);
-    }
-
     public static PermissionsException collectionIDNotProvidedException() {
         return new PermissionsException(ERROR_PREFIX + "collection ID required but was empty", SC_BAD_REQUEST);
     }

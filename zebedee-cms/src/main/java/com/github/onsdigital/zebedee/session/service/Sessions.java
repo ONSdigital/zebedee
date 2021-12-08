@@ -84,19 +84,4 @@ public interface Sessions {
      * @throws IOException for any problems getting the session.
      */
     void set(String token) throws IOException;
-
-    /**
-     * Check if the provided {@link Session} is expired.
-     *
-     * @param session the {@link Session} to check.
-     * @return true if expired, false otherwise.
-     *
-     * @deprecated This method is deprecated as it becomes redundant once we migrate to the JWT sessions. Once this
-     *             migration has been completed the users' JWT (which is essentially the new session) is validated
-     *             by the {@link com.github.onsdigital.zebedee.filters.AuthenticationFilter}. If the JWT is found to be
-     *             expired by the {@link com.github.onsdigital.zebedee.filters.AuthenticationFilter} returns a 401
-     *             unauthorised to the user so we would never get far enough in the execution to actually call this.
-     */
-    @Deprecated
-    boolean expired(Session session);
 }

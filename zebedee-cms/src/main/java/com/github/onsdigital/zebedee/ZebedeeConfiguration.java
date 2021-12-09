@@ -45,6 +45,7 @@ import com.github.onsdigital.zebedee.teams.service.StubbedTeamsServiceImpl;
 import com.github.onsdigital.zebedee.teams.service.TeamsService;
 import com.github.onsdigital.zebedee.teams.service.TeamsServiceImpl;
 import com.github.onsdigital.zebedee.teams.store.TeamsStoreFileSystemImpl;
+import com.github.onsdigital.zebedee.user.service.StubbedUsersServiceImpl;
 import com.github.onsdigital.zebedee.user.service.UsersService;
 import com.github.onsdigital.zebedee.user.service.UsersServiceImpl;
 import com.github.onsdigital.zebedee.user.store.UserStoreFileSystemImpl;
@@ -200,8 +201,13 @@ public class ZebedeeConfiguration {
 
         Supplier<CollectionKeyring> keyringSupplier = () -> collectionKeyring;
 
-        this.usersService = UsersServiceImpl.getInstance(
-                new UserStoreFileSystemImpl(this.usersPath), collections, permissionsService, keyringSupplier);
+        // TODO: Remove after migration to JWT sessions is complete
+        if (cmsFeatureFlags().isJwtSessionsEnabled()) {
+            this.usersService = StubbedUsersServiceImpl.getInstance();
+        } else {
+            this.usersService = UsersServiceImpl.getInstance(
+                    new UserStoreFileSystemImpl(this.usersPath), collections, permissionsService, keyringSupplier);
+        }
 
         // Init the collection keyring and scheduler cache.
         initCollectionKeyring();

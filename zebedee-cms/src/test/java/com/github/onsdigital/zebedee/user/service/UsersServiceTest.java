@@ -22,13 +22,10 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import javax.crypto.SecretKey;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
@@ -41,7 +38,6 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -187,22 +183,6 @@ public class UsersServiceTest {
         verify(userStore, times(1)).exists(EMAIL);
     }
 
-    @Test
-    public void exists_ShouldCheckIfUserExistsByUserObject() throws Exception {
-        when(userStore.exists(EMAIL))
-                .thenReturn(true);
-
-        assertThat(service.exists(user), is(true));
-        verify(userStore, times(1)).exists(EMAIL);
-    }
-
-    @Test
-    public void exists_ShouldReturnFalseIfUserNull() throws Exception {
-        User u = null;
-        assertThat(service.exists(u), is(false));
-        verify(userStore, never()).exists(EMAIL);
-    }
-
     @Test(expected = UnauthorizedException.class)
     public void create_ShouldNotCreateUserIfIsNotAdmin() throws Exception {
         when(permissions.isAdministrator(session))
@@ -310,37 +290,6 @@ public class UsersServiceTest {
 
         assertThat(ul, equalTo(service.list()));
         verify(userStore, times(1)).list();
-    }
-
-    @Test
-    public void createPublisher_Success() throws Exception {
-        String password = "P455W0RD";
-
-        when(permissions.isAdministrator(session))
-                .thenReturn(true);
-        when(userStore.exists(EMAIL_2))
-                .thenReturn(false)
-                .thenReturn(false)
-                .thenReturn(true);
-        when(userStore.get(EMAIL_2))
-                .thenReturn(userMock);
-        when(userMock.authenticate(null))
-                .thenReturn(true);
-
-        service.createPublisher(userMock, password, session);
-
-        verify(permissions, times(2)).isAdministrator(session);
-        verify(session, times(4)).getEmail();
-        verify(userStore, times(3)).exists(EMAIL_2);
-        verify(userStore, times(2)).save(any(User.class));
-        verify(userMock, times(1)).resetPassword(password);
-        verify(userMock, times(1)).setInactive(false);
-        verify(userMock, times(1)).setLastAdmin(null);
-        verify(userMock, times(1)).setTemporaryPassword(true);
-        verify(permissions, times(1)).addEditor(EMAIL_2, session);
-        verify(lockMock, times(3)).lock();
-        verify(lockMock, times(3)).unlock();
-        verifyZeroInteractions(collectionKeyring);
     }
 
     @Test(expected = UnauthorizedException.class)
@@ -548,8 +497,7 @@ public class UsersServiceTest {
                 .thenReturn(true);
 
         Keyring originalKeyring = mock(Keyring.class);
-        when(userMock.keyring())
-                .thenReturn(originalKeyring);
+        ReflectionTestUtils.setField(userMock, "keyring", originalKeyring);
 
         User adminUser = mock(User.class);
         when(userStore.get(session.getEmail()))

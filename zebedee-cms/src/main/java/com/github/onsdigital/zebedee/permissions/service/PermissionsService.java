@@ -26,17 +26,11 @@ public interface PermissionsService {
      * @param session {@link Session} to get the user details from.
      * @return true if the {@link User} is a publisher, false otherwise.
      * @throws IOException unexpected error checking the user permissions.
+     *
+     * // TODO: Replace with a isPublisher() method after the migration to JWT sessions and the thread local sessions
+     *          implementation
      */
     boolean isPublisher(Session session) throws IOException;
-
-    /**
-     * Return true if the {@link User} is a publisher, false otherwise.
-     *
-     * @param email the email of the user to check.
-     * @return true if the {@link User} is a publisher, false otherwise.
-     * @throws IOException unexpected error checking the user permissions.
-     */
-    boolean isPublisher(String email) throws IOException;
 
     /**
      * Return true if the {@link User} is an Admin, false otherwise.
@@ -44,22 +38,22 @@ public interface PermissionsService {
      * @param session {@link Session} to get the user details from.
      * @return true if the user is an admin, false otherwise.
      * @throws IOException unexpected error checking the user permissions.
+     *
+     * // TODO: Replace with a isAdministrator() method after the migration to JWT sessions and the thread local sessions
+     *          implementation
      */
     boolean isAdministrator(Session session) throws IOException;
 
     /**
-     * Return true if the {@link User} is an Admin, false otherwise.
-     *
-     * @param email the email of the user to check.
-     * @return true if the user is an admin, false otherwise.
-     * @throws IOException unexpected error checking the user permissions.
-     */
-    boolean isAdministrator(String email) throws IOException;
-
-    /**
      * @return true if an Admin user exists, false otherwise.
      * @throws IOException unexpected error accessing users.
+     *
+     * @deprecated since this method is only used by the users service that will be removed shortly in favour of the
+     *             dp-identity-api and JWT sessions implementation.
+     *
+     * TODO: Remove this method once the JWT session migration is complete.
      */
+    @Deprecated
     boolean hasAdministrator() throws IOException;
 
     /**
@@ -69,7 +63,13 @@ public interface PermissionsService {
      * @param session the {@link Session} of the user granting the permission.
      * @throws IOException           unexpected error granting the permission.
      * @throws UnauthorizedException user does not have the required permissions to permit admin permissions.
+     *
+     * @deprecated as the dp-identity-api groups management will supersede this when we complete the migration to JWT
+     *             sessions
+     *
+     * TODO: Remove this method once the JWT session migration is complete
      */
+    @Deprecated
     void addAdministrator(String email, Session session) throws IOException, UnauthorizedException;
 
     /**
@@ -79,7 +79,13 @@ public interface PermissionsService {
      * @param session the {@link Session} of the user revoking the permission.
      * @throws IOException           unexpected error revoking the permission.
      * @throws UnauthorizedException user revoking the permission does not have the required permissions.
+     *
+     * @deprecated as the dp-identity-api groups management will supersede this when we complete the migration to JWT
+     *             sessions
+     *
+     * TODO: Remove this method once the JWT session migration is complete
      */
+    @Deprecated
     void removeAdministrator(String email, Session session) throws IOException, UnauthorizedException;
 
     /**
@@ -88,26 +94,11 @@ public interface PermissionsService {
      * @param session the {@link Session} of the user to check.
      * @return true if the user can edit content, false otherwise.
      * @throws IOException unexpected error while checking permissions.
+     *
+     * // TODO: Replace with a canEdit() method after the migration to JWT sessions and the thread local sessions
+     *          implementation
      */
     boolean canEdit(Session session) throws IOException;
-
-    /**
-     * Check if the {@link User} has permissions to edit content.
-     *
-     * @param email the email of the user to check.
-     * @return true if the user can edit content, false otherwise.
-     * @throws IOException unexpected error while checking permissions.
-     */
-    boolean canEdit(String email) throws IOException;
-
-    /**
-     * Check if the {@link User} has permissions to edit content.
-     *
-     * @param user the {@link User} to check.
-     * @return true if the user has edit permissions, false otherwise.
-     * @throws IOException unexpected error while checking permissions.
-     */
-    boolean canEdit(User user) throws IOException;
 
     /**
      * Grant editor permission to a user.
@@ -118,7 +109,13 @@ public interface PermissionsService {
      * @throws UnauthorizedException the user granting the permission is not authorised to do so.
      * @throws NotFoundException     unexpected error while granting the permission.
      * @throws BadRequestException   unexpected error while granting the permission.
+     *
+     * @deprecated as the dp-identity-api groups management will supersede this when we complete the migration to JWT
+     *             sessions
+     *
+     * TODO: Remove this method once the JWT session migration is complete
      */
+    @Deprecated
     void addEditor(String email, Session session) throws IOException, UnauthorizedException, NotFoundException, BadRequestException;
 
     /**
@@ -130,7 +127,13 @@ public interface PermissionsService {
      * @throws UnauthorizedException the user revoking the permission is not authorised to do so.
      * @throws NotFoundException     unexpected error while granting the permission.
      * @throws BadRequestException   unexpected error while granting the permission.
+     *
+     * @deprecated as the dp-identity-api groups management will supersede this when we complete the migration to JWT
+     *             sessions
+     *
+     * TODO: Remove this method once the JWT session migration is complete
      */
+    @Deprecated
     void removeEditor(String email, Session session) throws IOException, UnauthorizedException;
 
     /**
@@ -144,26 +147,6 @@ public interface PermissionsService {
     boolean canView(Session session, CollectionDescription collectionDescription) throws IOException;
 
     /**
-     * Check if a {@link User} can view unpublished content.
-     *
-     * @param user                  the {@link User} to check.
-     * @param collectionDescription the {@link CollectionDescription} of the {@link Collection} to check.
-     * @return true of the user has view permission for the content, false otherwise.
-     * @throws IOException unexpected error while checking permissions.
-     */
-    boolean canView(User user, CollectionDescription collectionDescription) throws IOException;
-
-    /**
-     * Check if a {@link User} can view unpublished content.
-     *
-     * @param email                 the email of the user to check.
-     * @param collectionDescription the {@link CollectionDescription} of the {@link Collection} to check.
-     * @return true of the user has view permission for the content, false otherwise.
-     * @throws IOException unexpected error while checking permissions.
-     */
-    boolean canView(String email, CollectionDescription collectionDescription) throws IOException;
-
-    /**
      * Grant view permissions to a team.
      *
      * @param collectionDescription The {@link CollectionDescription} of the collection to give the team access to.
@@ -171,7 +154,10 @@ public interface PermissionsService {
      * @param session               the {@link Session} of the user granting the permission. Only editors can permit a team access to a collection.
      * @throws IOException If a filesystem error occurs.
      * @throws ZebedeeException if the user is not authorised to add view team permissions.
+     *
+     * TODO: Remove this method once the migration to the new dp-permissions-api is completed
      */
+    @Deprecated
     void addViewerTeam(CollectionDescription collectionDescription, Integer teamId, Session session) throws IOException, ZebedeeException;
 
     /**
@@ -183,7 +169,10 @@ public interface PermissionsService {
      * @return Returns a {@link List} of {@link Team}s that have viewer permissions on the specified collection.
      * @throws IOException           unexpected error while checking permissions.
      * @throws UnauthorizedException unexpected error while checking permissions.
+     *
+     * TODO: Remove this method once the migration to the new dp-permissions-api is completed
      */
+    @Deprecated
     Set<Integer> listViewerTeams(CollectionDescription collectionDescription, Session session) throws IOException, UnauthorizedException;
 
     /**
@@ -194,7 +183,10 @@ public interface PermissionsService {
      * @param session               the {@link Session} of the user revoking view permission.
      * @throws IOException      unexpected error while revoking permissions.
      * @throws ZebedeeException unexpected error while revoking permissions.
+     *
+     * TODO: Remove this method once the migration to the new dp-permissions-api is completed
      */
+    @Deprecated
     void removeViewerTeam(CollectionDescription collectionDescription, Integer teamId, Session session) throws IOException, ZebedeeException;
 
     /**
@@ -206,16 +198,8 @@ public interface PermissionsService {
      * @throws IOException           unexpected error while getting the user {@link PermissionDefinition}.
      * @throws NotFoundException     user with the specified email was not found.
      * @throws UnauthorizedException the requesting user does not have the required permissions.
+     *
+     * // TODO: need to review the /permissions endpoint use in order to determine where it is used
      */
     PermissionDefinition userPermissions(String email, Session session) throws IOException, NotFoundException, UnauthorizedException;
-
-
-    /**
-     * Return a {@link Set} of collection IDs for the collections accessible by the specified {@link Team}.
-     *
-     * @param t the team to check.
-     * @return a {@link Set} of collection IDs for each collection the provided team is assigned to.
-     * @throws IOException problem filters the collections.
-     */
-    Set<String> listCollectionsAccessibleByTeam(Team t) throws IOException;
 }

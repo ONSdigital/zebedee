@@ -296,13 +296,13 @@ public class UsersServiceTest {
     public void update_ShouldThrowExceptionIfNotAuthorized() throws Exception {
         when(session.getEmail())
                 .thenReturn(EMAIL);
-        when(permissions.isAdministrator(EMAIL))
+        when(permissions.isAdministrator(session))
                 .thenReturn(false);
 
         try {
             service.update(session, null, null);
         } catch (UnauthorizedException e) {
-            verify(permissions, times(1)).isAdministrator(EMAIL);
+            verify(permissions, times(1)).isAdministrator(session);
             verifyZeroInteractions(lockMock, userStore);
             throw e;
         }
@@ -310,9 +310,7 @@ public class UsersServiceTest {
 
     @Test(expected = NotFoundException.class)
     public void update_ShouldThrowExceptionIfUserDoesNotExist() throws Exception {
-        when(session.getEmail())
-                .thenReturn(EMAIL);
-        when(permissions.isAdministrator(EMAIL))
+        when(permissions.isAdministrator(session))
                 .thenReturn(true);
         when(userStore.exists(EMAIL_2))
                 .thenReturn(false);
@@ -320,8 +318,7 @@ public class UsersServiceTest {
         try {
             service.update(session, userMock, null);
         } catch (NotFoundException e) {
-            verify(permissions, times(1)).isAdministrator(EMAIL);
-            verify(session, times(1)).getEmail();
+            verify(permissions, times(1)).isAdministrator(session);
             verify(userStore, times(1)).exists(EMAIL_2);
             verifyNoMoreInteractions(userStore);
             verifyZeroInteractions(lockMock);
@@ -331,12 +328,12 @@ public class UsersServiceTest {
 
     @Test
     public void update_Success() throws Exception {
-        when(session.getEmail())
-                .thenReturn(EMAIL);
-        when(permissions.isAdministrator(EMAIL))
+        when(permissions.isAdministrator(session))
                 .thenReturn(true);
         when(userStore.exists(EMAIL))
                 .thenReturn(true);
+        when(session.getEmail())
+                .thenReturn(EMAIL);
 
         User updated = new User();
         updated.setEmail(EMAIL);
@@ -348,8 +345,7 @@ public class UsersServiceTest {
 
         User result = service.update(session, user, updated);
 
-        verify(permissions, times(1)).isAdministrator(EMAIL);
-        verify(session, times(2)).getEmail();
+        verify(permissions, times(1)).isAdministrator(session);
         verify(userStore, times(1)).exists(EMAIL);
         verify(userStore, times(1)).save(updated);
         verifyLockObtainedAndReleased();
@@ -357,16 +353,13 @@ public class UsersServiceTest {
 
     @Test(expected = UnauthorizedException.class)
     public void delete_ShouldThrowExceptionIfNotAuthorized() throws Exception {
-        when(session.getEmail())
-                .thenReturn(EMAIL);
-        when(permissions.isAdministrator(EMAIL))
+        when(permissions.isAdministrator(session))
                 .thenReturn(false);
 
         try {
             service.delete(session, user);
         } catch (UnauthorizedException e) {
-            verify(session, times(1)).getEmail();
-            verify(permissions, times(1)).isAdministrator(EMAIL);
+            verify(permissions, times(1)).isAdministrator(session);
             verifyZeroInteractions(userStore, lockMock);
             throw e;
         }
@@ -384,9 +377,7 @@ public class UsersServiceTest {
 
     @Test(expected = NotFoundException.class)
     public void delete_ShouldThrowExceptionIfUserDoesNotExist() throws Exception {
-        when(session.getEmail())
-                .thenReturn(EMAIL);
-        when(permissions.isAdministrator(EMAIL))
+        when(permissions.isAdministrator(session))
                 .thenReturn(true);
         when(userStore.exists(user.getEmail()))
                 .thenReturn(false);
@@ -394,8 +385,7 @@ public class UsersServiceTest {
         try {
             service.delete(session, user);
         } catch (NotFoundException e) {
-            verify(session, times(1)).getEmail();
-            verify(permissions, times(1)).isAdministrator(EMAIL);
+            verify(permissions, times(1)).isAdministrator(session);
             verify(userStore, times(1)).exists(user.getEmail());
             verify(userStore, never()).delete(any(User.class));
             verifyZeroInteractions(lockMock);
@@ -405,9 +395,7 @@ public class UsersServiceTest {
 
     @Test
     public void delete_Success() throws Exception {
-        when(session.getEmail())
-                .thenReturn(EMAIL);
-        when(permissions.isAdministrator(EMAIL))
+        when(permissions.isAdministrator(session))
                 .thenReturn(true);
         when(userStore.exists(user.getEmail()))
                 .thenReturn(true);
@@ -415,8 +403,7 @@ public class UsersServiceTest {
                 .thenReturn(true);
 
         assertThat(service.delete(session, user), is(true));
-        verify(session, times(1)).getEmail();
-        verify(permissions, times(1)).isAdministrator(EMAIL);
+        verify(permissions, times(1)).isAdministrator(session);
         verify(userStore, times(1)).exists(user.getEmail());
         verify(userStore, times(1)).delete(user);
     }
@@ -493,7 +480,7 @@ public class UsersServiceTest {
         when(permissions.isAdministrator(session))
                 .thenReturn(true);
 
-        when(permissions.isAdministrator(email))
+        when(permissions.isAdministrator(session))
                 .thenReturn(true);
 
         Keyring originalKeyring = mock(Keyring.class);

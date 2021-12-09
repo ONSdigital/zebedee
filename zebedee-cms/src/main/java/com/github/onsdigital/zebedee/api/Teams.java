@@ -212,22 +212,6 @@ public class Teams {
     }
 
     /**
-     * Return a list of {@link CollectionDescription} the collections this team has access to.
-     */
-    private List<CollectionDescription> getCollectionsAccessibleByTeam(Team team) throws IOException {
-        Set<String> accessibleByTeam = permissionsService.listCollectionsAccessibleByTeam(team);
-        if (accessibleByTeam == null || accessibleByTeam.isEmpty()) {
-            return new ArrayList<>();
-        }
-
-        return collectionsService.list()
-                .stream()
-                .filter(c -> accessibleByTeam.contains(c.getId()))
-                .map(c -> c.getDescription())
-                .collect(Collectors.toList());
-    }
-
-    /**
      * GET {@code /teams} returns the full json {@link Teams} details
      * <p>GET {@code /teams/[teamname]} returns the json {@link Team} details</p>
      *

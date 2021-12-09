@@ -13,7 +13,6 @@ import com.github.onsdigital.zebedee.service.ServiceSupplier;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.teams.model.Team;
 import com.github.onsdigital.zebedee.teams.service.TeamsService;
-import com.github.onsdigital.zebedee.user.model.User;
 import com.github.onsdigital.zebedee.user.service.UsersService;
 import org.apache.commons.lang3.StringUtils;
 
@@ -22,7 +21,6 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.util.stream.Collectors;
 
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getUnauthorizedMessage;
@@ -70,23 +68,8 @@ public class PermissionsServiceImpl implements PermissionsService {
         return isPublisher(session.getEmail());
     }
 
-    /**
-     * Determines whether the specified user has publisher permissions.
-     *
-     * @param email The user's email.
-     * @return If the user is an publisher, true.
-     * @throws IOException If a filesystem error occurs.
-     */
-    @Override
-    public boolean isPublisher(String email) throws IOException {
-        if (StringUtils.isEmpty(email)) {
-            return false;
-        }
+    private boolean isPublisher(String email) throws IOException {
         AccessMapping accessMapping = permissionsStore.getAccessMapping();
-        return isPublisher(email, accessMapping);
-    }
-
-    private boolean isPublisher(String email, AccessMapping accessMapping) {
         return accessMapping.getDigitalPublishingTeam() != null && accessMapping.getDigitalPublishingTeam()
                 .contains(standardise(email));
     }
@@ -112,16 +95,15 @@ public class PermissionsServiceImpl implements PermissionsService {
      * @return If the user is an administrator, true.
      * @throws IOException If a filesystem error occurs.
      */
-    @Override
-    public boolean isAdministrator(String email) throws IOException {
+    private boolean isAdministrator(String email) throws IOException {
         if (StringUtils.isEmpty(email)) {
             return false;
         }
-        return isAdministrator(email, permissionsStore.getAccessMapping());
-    }
 
-    private boolean isAdministrator(String email, AccessMapping accessMapping) {
-        return accessMapping.getAdministrators() != null && accessMapping.getAdministrators().contains(standardise(email));
+        AccessMapping accessMapping = permissionsStore.getAccessMapping();
+
+        return accessMapping.getAdministrators() != null && accessMapping.getAdministrators()
+                .contains(standardise(email));
     }
 
     /**
@@ -200,15 +182,9 @@ public class PermissionsServiceImpl implements PermissionsService {
      * @return If the user is a member of the Digital Publishing team, true.
      * @throws IOException If a filesystem error occurs.
      */
-    @Override
-    public boolean canEdit(String email) throws IOException {
+    private boolean canEdit(String email) throws IOException {
         AccessMapping accessMapping = permissionsStore.getAccessMapping();
         return canEdit(email, accessMapping);
-    }
-
-    @Override
-    public boolean canEdit(User user) throws IOException {
-        return user != null && canEdit(user.getEmail());
     }
 
     /**
@@ -266,23 +242,6 @@ public class PermissionsServiceImpl implements PermissionsService {
 
     /**
      * Determines whether the specified user has viewing rights.
-     * *
-     *
-     * @param user                  The user. Can be null.
-     * @param collectionDescription The collection to check access for.
-     * @return True if the user is a member of the Digital Publishing team or
-     * the user is a content owner with access to the given path or any parent path.
-     * @throws IOException If a filesystem error occurs.
-     */
-    @Override
-    public boolean canView(User user, CollectionDescription collectionDescription) throws IOException {
-        AccessMapping accessMapping = permissionsStore.getAccessMapping();
-        return user != null && (
-                canEdit(user.getEmail(), accessMapping) || canView(user.getEmail(), collectionDescription, accessMapping));
-    }
-
-    /**
-     * Determines whether the specified user has viewing rights.
      *
      * @param email                 The email of the user
      * @param collectionDescription The collection to check access for.
@@ -290,18 +249,11 @@ public class PermissionsServiceImpl implements PermissionsService {
      * the user is a content owner with access to the given path or any parent path.
      * @throws IOException If a filesystem error occurs.
      */
-    @Override
-    public boolean canView(String email, CollectionDescription collectionDescription) throws IOException {
-        boolean canView = false;
+    private boolean canView(String email, CollectionDescription collectionDescription) throws IOException {
         try {
-            return canView(usersServiceSupplier.getService().getUserByEmail(email), collectionDescription);
-        } catch (NotFoundException nf) {
-            error().data("collectionId", collectionDescription.getId()).data("user", email)
-                    .logException(nf, "canView permission denied - user not found");
-        } catch (BadRequestException br) {
-            error().data("collectionId", collectionDescription.getId()).data("user", email)
-                    .logException(br, "canView permission request denied - user details invalid");
-        } catch (Exception e) {
+            AccessMapping accessMapping = permissionsStore.getAccessMapping();
+            return canEdit(email, accessMapping) || canView(email, collectionDescription, accessMapping);
+        } catch (IOException e) {
             error().data("collectionId", collectionDescription.getId()).data("user", email)
                     .logException(e, "canView permission request denied: unexpected error");
         }
@@ -429,15 +381,12 @@ public class PermissionsServiceImpl implements PermissionsService {
      * @param email the user email
      * @return a {@link PermissionDefinition} object
      * @throws IOException
-     * @throws NotFoundException     If the user cannot be found
      * @throws UnauthorizedException If the request is not from an admin or publisher
      */
     @Override
-    public PermissionDefinition userPermissions(String email, Session session) throws IOException, NotFoundException,
+    public PermissionDefinition userPermissions(String email, Session session) throws IOException,
             UnauthorizedException {
-        AccessMapping accessMapping = permissionsStore.getAccessMapping();
-
-        if ((session == null) || (!isAdministrator(session.getEmail(), accessMapping) && !isPublisher(session.getEmail(), accessMapping)
+        if ((session == null) || (!isAdministrator(session.getEmail()) && !isPublisher(session.getEmail())
                 && !session.getEmail().equalsIgnoreCase(email))) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
@@ -446,27 +395,5 @@ public class PermissionsServiceImpl implements PermissionsService {
                 .setEmail(email)
                 .isAdmin(isAdministrator(email))
                 .isEditor(canEdit(email));
-    }
-
-    @Override
-    public Set<String> listCollectionsAccessibleByTeam(Team t) throws IOException {
-        AccessMapping accessMapping = permissionsStore.getAccessMapping();
-        if (accessMapping == null) {
-            throw new IOException("error reading accessMapping expected value but was null");
-        }
-
-        if (accessMapping.getCollections() == null) {
-            return new HashSet<>();
-        }
-
-        // AccessMapping.Collections maps CollectionID -> List of Team IDs.
-        // Filter to find all the collections who have the specified team ID assigned to them.
-        // Returns a Set of collectionIDs matching this criteria.
-        return accessMapping.getCollections()
-                .entrySet()
-                .stream()
-                .filter(entry -> entry.getValue() != null && entry.getValue().contains(t.getId()))
-                .map(entry -> entry.getKey())
-                .collect(Collectors.toSet());
     }
 }

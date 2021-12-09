@@ -177,7 +177,7 @@ public class UsersServiceImpl implements UsersService {
                 isSuccess = changePassword(targetUser, credentials.getOldPassword(), credentials.getPassword());
             } else {
                 // Only an admin can update another users password.
-                if (permissionsService.isAdministrator(session.getEmail()) || !permissionsService.hasAdministrator()) {
+                if (permissionsService.isAdministrator(session) || !permissionsService.hasAdministrator()) {
 
                     targetUser = resetPassword(targetUser, credentials.getPassword(), session.getEmail());
                     userStore.save(targetUser);
@@ -203,14 +203,14 @@ public class UsersServiceImpl implements UsersService {
     @Override
     public User update(Session session, User user, User updatedUser) throws IOException, UnauthorizedException,
             NotFoundException, BadRequestException {
-        if (!permissionsService.isAdministrator(session.getEmail())) {
+        if (!permissionsService.isAdministrator(session)) {
             throw new UnauthorizedException("Administrator permissionsServiceImpl required");
         }
 
         if (!userStore.exists(user.getEmail())) {
             throw new NotFoundException("User " + user.getEmail() + " could not be found");
         }
-        return update(user, updatedUser, session.getEmail());
+        return update(user, updatedUser, session);
     }
 
     @Override
@@ -218,7 +218,7 @@ public class UsersServiceImpl implements UsersService {
         if (session == null) {
             throw new BadRequestException("A session is required to delete a user.");
         }
-        if (permissionsService.isAdministrator(session.getEmail()) == false) {
+        if (permissionsService.isAdministrator(session) == false) {
             throw new UnauthorizedException("Administrator permissionsServiceImpl required");
         }
 
@@ -248,7 +248,7 @@ public class UsersServiceImpl implements UsersService {
         }
     }
 
-    private User update(User user, User updatedUser, String lastAdmin) throws IOException {
+    private User update(User user, User updatedUser, Session session) throws IOException {
         lock.lock();
         try {
             if (user != null) {
@@ -267,7 +267,7 @@ public class UsersServiceImpl implements UsersService {
                     }
                 }
 
-                user.setLastAdmin(lastAdmin);
+                user.setLastAdmin(session.getEmail());
                 userStore.save(user);
             }
             return user;

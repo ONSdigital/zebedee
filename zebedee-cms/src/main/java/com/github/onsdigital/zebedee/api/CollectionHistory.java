@@ -57,7 +57,7 @@ public class CollectionHistory {
 
     private void checkPermission(Session session) throws ZebedeeException {
         try {
-            if (session == null || !zebedeeCmsService.getPermissions().canEdit(session.getEmail())) {
+            if (session == null || !zebedeeCmsService.getPermissions().canEdit(session)) {
                 throw new UnauthorizedException("You are not authorised to create collections.");
             }
         } catch (IOException io) {

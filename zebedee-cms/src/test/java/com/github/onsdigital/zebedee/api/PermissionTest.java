@@ -146,7 +146,7 @@ public class PermissionTest extends ZebedeeAPIBaseTestCase {
 
     @Test
     public void testGrant_addAdminAssignSuccess_shouldAssignPermissionsAndKeys() throws Exception {
-        when(permissionsService.canView(targetUser, collectionDescription))
+        when(permissionsService.canView(session, collectionDescription))
                 .thenReturn(true);
 
         permission.isAdmin(true);

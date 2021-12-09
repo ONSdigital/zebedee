@@ -80,10 +80,10 @@ public class CollectionTest extends ZebedeeAPIBaseTestCase {
         when(collection.getDescription())
                 .thenReturn(description);
 
-        when(permissionsService.canView(TEST_EMAIL, description))
+        when(permissionsService.canView(session, description))
                 .thenReturn(true);
 
-        when(permissionsService.canEdit(TEST_EMAIL))
+        when(permissionsService.canEdit(session))
                 .thenReturn(true);
 
         when(description.getName())
@@ -160,7 +160,7 @@ public class CollectionTest extends ZebedeeAPIBaseTestCase {
 
     @Test
     public void testGet_checkPermissionsError_shouldThrowException() throws Exception {
-        when(permissionsService.canView(TEST_EMAIL, description))
+        when(permissionsService.canView(session, description))
                 .thenThrow(IOException.class);
 
         UnauthorizedException actual = assertThrows(UnauthorizedException.class,
@@ -169,12 +169,12 @@ public class CollectionTest extends ZebedeeAPIBaseTestCase {
         assertThat(actual.getMessage(), equalTo("You are not authorised to view this collection"));
         verify(sessions, times(1)).get(mockRequest);
         verify(collections, times(1)).getCollection(COLLECTION_ID);
-        verify(permissionsService, times(1)).canView(TEST_EMAIL, description);
+        verify(permissionsService, times(1)).canView(session, description);
     }
 
     @Test
     public void testGet_permissionDenied_shouldThrowException() throws Exception {
-        when(permissionsService.canView(TEST_EMAIL, description))
+        when(permissionsService.canView(session, description))
                 .thenReturn(false);
 
         UnauthorizedException actual = assertThrows(UnauthorizedException.class,
@@ -183,7 +183,7 @@ public class CollectionTest extends ZebedeeAPIBaseTestCase {
         assertThat(actual.getMessage(), equalTo("You are not authorised to view this collection"));
         verify(sessions, times(1)).get(mockRequest);
         verify(collections, times(1)).getCollection(COLLECTION_ID);
-        verify(permissionsService, times(1)).canView(TEST_EMAIL, description);
+        verify(permissionsService, times(1)).canView(session, description);
     }
 
     @Test
@@ -193,7 +193,7 @@ public class CollectionTest extends ZebedeeAPIBaseTestCase {
         assertThat(actual, is(notNullValue()));
         verify(sessions, times(1)).get(mockRequest);
         verify(collections, times(1)).getCollection(COLLECTION_ID);
-        verify(permissionsService, times(1)).canView(TEST_EMAIL, description);
+        verify(permissionsService, times(1)).canView(session, description);
     }
 
     @Test
@@ -244,7 +244,7 @@ public class CollectionTest extends ZebedeeAPIBaseTestCase {
 
     @Test
     public void testPost_permissionsCheckError_shouldThrowException() throws Exception {
-        when(permissionsService.canEdit(TEST_EMAIL))
+        when(permissionsService.canEdit(session))
                 .thenThrow(IOException.class);
 
         UnauthorizedException ex = assertThrows(UnauthorizedException.class,
@@ -252,13 +252,13 @@ public class CollectionTest extends ZebedeeAPIBaseTestCase {
 
         assertThat(ex.getMessage(), equalTo("You are not authorised to edit collections."));
         verify(sessions, times(1)).get(mockRequest);
-        verify(permissionsService, times(1)).canEdit(TEST_EMAIL);
+        verify(permissionsService, times(1)).canEdit(session);
         verifyNoMoreInteractions(sessions, permissionsService, collections);
     }
 
     @Test
     public void testPost_permissionDenied_shouldThrowException() throws Exception {
-        when(permissionsService.canEdit(TEST_EMAIL))
+        when(permissionsService.canEdit(session))
                 .thenReturn(false);
 
         UnauthorizedException ex = assertThrows(UnauthorizedException.class,
@@ -266,7 +266,7 @@ public class CollectionTest extends ZebedeeAPIBaseTestCase {
 
         assertThat(ex.getMessage(), equalTo("You are not authorised to edit collections."));
         verify(sessions, times(1)).get(mockRequest);
-        verify(permissionsService, times(1)).canEdit(TEST_EMAIL);
+        verify(permissionsService, times(1)).canEdit(session);
         verifyNoMoreInteractions(sessions, permissionsService, collections);
     }
 

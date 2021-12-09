@@ -340,7 +340,7 @@ public class Collections {
         }
 
         // User has permission
-        if (session == null || !permissionsService.canEdit(session.getEmail())) {
+        if (session == null || !permissionsService.canEdit(session)) {
             error().log("approve collection: user permission check failed");
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
@@ -419,7 +419,7 @@ public class Collections {
         }
 
         // User has permission
-        if (session == null || !permissionsService.canEdit(session.getEmail())) {
+        if (session == null || !permissionsService.canEdit(session)) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
@@ -459,7 +459,7 @@ public class Collections {
         }
 
         // User has permission
-        if (session == null || !permissionsService.canEdit(session.getEmail())) {
+        if (session == null || !permissionsService.canEdit(session)) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
@@ -741,7 +741,7 @@ public class Collections {
         }
 
         // Authorisation
-        if (session == null || !permissionsService.canEdit(session.getEmail())) {
+        if (session == null || !permissionsService.canEdit(session)) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
@@ -877,7 +877,7 @@ public class Collections {
         }
 
         // Authorisation
-        if (session == null || !permissionsService.canEdit(session.getEmail())) {
+        if (session == null || !permissionsService.canEdit(session)) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
@@ -907,7 +907,7 @@ public class Collections {
         }
 
         // Authorisation
-        if (session == null || !permissionsService.canEdit(session.getEmail())) {
+        if (session == null || !permissionsService.canEdit(session)) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 

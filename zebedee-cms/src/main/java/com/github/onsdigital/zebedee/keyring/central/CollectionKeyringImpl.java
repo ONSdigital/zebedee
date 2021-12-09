@@ -165,7 +165,7 @@ public class CollectionKeyringImpl implements CollectionKeyring {
 
     private boolean hasViewPermissions(Session session, CollectionDescription desc) throws KeyringException {
         try {
-            return permissionsService.canView(session.getEmail(), desc);
+            return permissionsService.canView(session, desc);
         } catch (IOException ex) {
             throw new KeyringException(ex);
         }

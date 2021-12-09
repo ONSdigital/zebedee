@@ -16,7 +16,11 @@ import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
 import com.github.onsdigital.zebedee.model.encryption.EncryptionKeyFactory;
 import com.github.onsdigital.zebedee.model.publishing.PublishedCollections;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
-import com.github.onsdigital.zebedee.service.*;
+import com.github.onsdigital.zebedee.service.DatasetService;
+import com.github.onsdigital.zebedee.service.ImageService;
+import com.github.onsdigital.zebedee.service.KafkaService;
+import com.github.onsdigital.zebedee.service.ServiceStore;
+import com.github.onsdigital.zebedee.service.ServiceStoreImpl;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.session.service.Sessions;
 import com.github.onsdigital.zebedee.teams.service.TeamsService;
@@ -34,7 +38,9 @@ import java.nio.file.Paths;
 import java.util.Optional;
 
 import static com.github.onsdigital.zebedee.configuration.Configuration.isVerificationEnabled;
-import static com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedException.*;
+import static com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedException.beingEditedByAnotherCollectionError;
+import static com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedException.beingEditedByThisCollectionError;
+import static com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedException.markedDeleteInAnotherCollectionError;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.error;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.info;
 

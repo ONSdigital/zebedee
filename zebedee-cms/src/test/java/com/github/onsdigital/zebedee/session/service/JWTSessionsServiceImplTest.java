@@ -1,37 +1,27 @@
 package com.github.onsdigital.zebedee.session.service;
 
-import java.util.Map;
-import java.util.Arrays;
-import java.util.HashMap;
-
+import com.github.onsdigital.JWTHandlerImpl;
+import com.github.onsdigital.impl.UserDataPayload;
+import com.github.onsdigital.interfaces.JWTHandler;
+import com.github.onsdigital.zebedee.session.model.Session;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.junit.Before;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import com.github.onsdigital.impl.UserDataPayload;
+import javax.servlet.http.HttpServletRequest;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.assertThrows;
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.mockito.Matchers.notNull;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.Mockito.mock;
-
-import com.github.onsdigital.JWTHandlerImpl;
-import com.github.onsdigital.interfaces.JWTHandler;
-
-import com.github.onsdigital.zebedee.session.model.Session;
-
-import com.github.onsdigital.zebedee.session.service.exceptions.SessionsRequestException;
-import com.github.onsdigital.zebedee.session.service.exceptions.SessionsDecodeException;
-import com.github.onsdigital.zebedee.session.service.exceptions.SessionsTokenExpiredException;
-import com.github.onsdigital.zebedee.session.service.exceptions.SessionsVerificationException;
-
-import javax.servlet.http.HttpServletRequest;
 
 public class JWTSessionsServiceImplTest {
 
@@ -104,37 +94,37 @@ public class JWTSessionsServiceImplTest {
 
     @Test
     public void decodeVerifyAndStoreAccessTokenDataThrowsTokenExcpetion() throws Exception {
-        Exception exception = assertThrows(SessionsRequestException.class, () -> this.jwtSessionsServiceImpl.set(""));
+        Exception exception = assertThrows(SessionsException.class, () -> this.jwtSessionsServiceImpl.set(""));
         assertThat(exception.getMessage(), is(this.jwtSessionsServiceImpl.ACCESS_TOKEN_REQUIRED_ERROR));
     }
 
     @Test
     public void decodingAccessTokenWithNoUsernameInClaimsThrowsDecodeExcpetion() throws Exception {
-        Exception exception = assertThrows(SessionsDecodeException.class, () -> this.jwtSessionsServiceImpl.set(TOKEN_NO_USER));
+        Exception exception = assertThrows(SessionsException.class, () -> this.jwtSessionsServiceImpl.set(TOKEN_NO_USER));
         assertThat(exception.getMessage(), is(REQUIRED_CLAIM_PAYLOAD_ERROR));
     }
 
     @Test
     public void decodedTokenIsExiredThrowsSessionsTokenExpiredException() throws Exception {
-        Exception exception = assertThrows(SessionsTokenExpiredException.class, () -> this.jwtSessionsServiceImpl.set(TOKEN_EXPIRED_TIME));
+        Exception exception = assertThrows(SessionsException.class, () -> this.jwtSessionsServiceImpl.set(TOKEN_EXPIRED_TIME));
         assertThat(exception.getMessage(), is(this.jwtSessionsServiceImpl.ACCESS_TOKEN_EXPIRED_ERROR));
     }
 
     @Test
     public void decodedTokenIsInvalidThrowsSessionVerificationException() throws Exception {
-        Exception exception = assertThrows(SessionsVerificationException.class, () -> this.jwtSessionsServiceImpl.set(INVALID_SIGNED_TOKEN));
+        Exception exception = assertThrows(SessionsException.class, () -> this.jwtSessionsServiceImpl.set(INVALID_SIGNED_TOKEN));
         assertThat(exception.getMessage(), is(ACCESS_TOKEN_INTEGRITY_ERROR));
     }
 
     @Test
     public void decodedTokenHeaderContainsKIDNotFoundInMapThrowsSessionsDecodeException() throws Exception {
-        Exception exception = assertThrows(SessionsDecodeException.class, () -> this.jwtSessionsServiceImpl.set(HEADER_KID_NOT_FOUND));
+        Exception exception = assertThrows(SessionsException.class, () -> this.jwtSessionsServiceImpl.set(HEADER_KID_NOT_FOUND));
         assertThat(exception.getMessage(), is(RSA_PUBLIC_KEY_INALID_ERROR));
     }
 
     @Test
     public void invalidlyFormattedAccessTokenPassedtoSetterThrowsSessionsDecodeException() throws Exception {
-        Exception exception = assertThrows(SessionsDecodeException.class, () -> this.jwtSessionsServiceImpl.set(UNSIGNED_TOKEN));
+        Exception exception = assertThrows(SessionsException.class, () -> this.jwtSessionsServiceImpl.set(UNSIGNED_TOKEN));
         assertThat(exception.getMessage(), is(this.jwtSessionsServiceImpl.TOKEN_NOT_VALID_ERROR));
     }
 

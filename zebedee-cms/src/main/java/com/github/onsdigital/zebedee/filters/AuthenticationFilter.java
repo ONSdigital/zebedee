@@ -18,7 +18,7 @@ import com.github.onsdigital.zebedee.reader.api.endpoint.PublishedData;
 import com.github.onsdigital.zebedee.search.api.endpoint.ReIndex;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.session.service.Sessions;
-import com.github.onsdigital.zebedee.session.service.exceptions.SessionsException;
+import com.github.onsdigital.zebedee.session.service.SessionsException;
 import com.google.common.collect.ImmutableList;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.http.HttpStatus;

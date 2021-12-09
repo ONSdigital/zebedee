@@ -18,7 +18,9 @@ import java.io.IOException;
 
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.error;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.warn;
-import static com.github.onsdigital.zebedee.service.ServiceTokenUtils.*;
+import static com.github.onsdigital.zebedee.service.ServiceTokenUtils.extractServiceAccountTokenFromAuthHeader;
+import static com.github.onsdigital.zebedee.service.ServiceTokenUtils.isValidServiceAuthorizationHeader;
+import static com.github.onsdigital.zebedee.service.ServiceTokenUtils.isValidServiceToken;
 import static com.github.onsdigital.zebedee.util.JsonUtils.writeResponseEntity;
 import static org.apache.http.HttpStatus.SC_OK;
 import static org.apache.http.HttpStatus.SC_UNAUTHORIZED;

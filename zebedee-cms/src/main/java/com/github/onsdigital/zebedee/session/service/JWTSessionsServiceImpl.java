@@ -6,11 +6,6 @@ import com.github.onsdigital.exceptions.JWTVerificationException;
 import com.github.onsdigital.impl.UserDataPayload;
 import com.github.onsdigital.interfaces.JWTHandler;
 import com.github.onsdigital.zebedee.session.model.Session;
-import com.github.onsdigital.zebedee.session.service.exceptions.SessionsDecodeException;
-import com.github.onsdigital.zebedee.session.service.exceptions.SessionsRequestException;
-import com.github.onsdigital.zebedee.session.service.exceptions.SessionsException;
-import com.github.onsdigital.zebedee.session.service.exceptions.SessionsTokenExpiredException;
-import com.github.onsdigital.zebedee.session.service.exceptions.SessionsVerificationException;
 import com.github.onsdigital.zebedee.user.model.User;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
@@ -136,18 +131,18 @@ public class JWTSessionsServiceImpl implements Sessions {
     @Override
     public void set(String token) throws SessionsException {
         if (StringUtils.isEmpty(token)) {
-            throw new SessionsRequestException(ACCESS_TOKEN_REQUIRED_ERROR);
+            throw new SessionsException(ACCESS_TOKEN_REQUIRED_ERROR);
         }
 
         String[] chunks;
         try {
             chunks = token.split("\\.");
         } catch (NullPointerException e) {
-            throw new SessionsDecodeException(TOKEN_NULL_ERROR, e);
+            throw new SessionsException(TOKEN_NULL_ERROR, e);
         }
         // check token validity; throw error if []chunks doesn't contain 3 elements
         if (chunks.length != JWT_CHUNK_SIZE) {
-            throw new SessionsDecodeException(TOKEN_NOT_VALID_ERROR);
+            throw new SessionsException(TOKEN_NOT_VALID_ERROR);
         }
 
         String publicSigningKey = getPublicSigningKey(chunks[0]);
@@ -155,11 +150,11 @@ public class JWTSessionsServiceImpl implements Sessions {
         try {
             store.set(jwtHandler.verifyJWT(token, publicSigningKey));
         } catch (JWTTokenExpiredException e) {
-            throw new SessionsTokenExpiredException(ACCESS_TOKEN_EXPIRED_ERROR);
+            throw new SessionsException(ACCESS_TOKEN_EXPIRED_ERROR);
         } catch (JWTVerificationException e) {
-            throw new SessionsVerificationException(e.getMessage(), e);
+            throw new SessionsException(e.getMessage(), e);
         } catch (JWTDecodeException e) {
-            throw new SessionsDecodeException(e.getMessage(), e);
+            throw new SessionsException(e.getMessage(), e);
         }
     }
 

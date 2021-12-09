@@ -15,7 +15,9 @@ import java.io.IOException;
 import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.error;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.warn;
-import static org.apache.http.HttpStatus.*;
+import static org.apache.http.HttpStatus.SC_INTERNAL_SERVER_ERROR;
+import static org.apache.http.HttpStatus.SC_NOT_FOUND;
+import static org.apache.http.HttpStatus.SC_UNAUTHORIZED;
 
 public class AuthorisationServiceImpl implements AuthorisationService {
 

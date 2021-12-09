@@ -15,8 +15,20 @@ import java.io.IOException;
 
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.error;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.info;
-import static com.github.onsdigital.zebedee.permissions.cmd.CRUD.*;
-import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.*;
+import static com.github.onsdigital.zebedee.permissions.cmd.CRUD.grantServiceAccountDatasetCreateReadUpdateDelete;
+import static com.github.onsdigital.zebedee.permissions.cmd.CRUD.grantServiceAccountInstanceCreateReadUpdateDelete;
+import static com.github.onsdigital.zebedee.permissions.cmd.CRUD.grantUserDatasetCreateReadUpdateDelete;
+import static com.github.onsdigital.zebedee.permissions.cmd.CRUD.grantUserDatasetRead;
+import static com.github.onsdigital.zebedee.permissions.cmd.CRUD.grantUserInstanceCreateReadUpdateDelete;
+import static com.github.onsdigital.zebedee.permissions.cmd.CRUD.grantUserNone;
+import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.collectionIDNotProvidedException;
+import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.collectionNotFoundException;
+import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.datasetIDNotProvidedException;
+import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.internalServerErrorException;
+import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.serviceAccountNotFoundException;
+import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.serviceTokenNotProvidedException;
+import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.sessionIDNotProvidedException;
+import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.sessionNotFoundException;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 public class CMDPermissionsServiceImpl implements CMDPermissionsService {

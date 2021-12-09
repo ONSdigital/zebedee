@@ -1,4 +1,4 @@
-package com.github.onsdigital.zebedee.session.service.exceptions;
+package com.github.onsdigital.zebedee.session.service;
 
 public class SessionsException extends RuntimeException {
     public SessionsException(String message) {

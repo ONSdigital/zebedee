@@ -89,6 +89,12 @@ public class RequestUtils {
        return Optional.ofNullable(uri);
     }
 
+    /**
+     * Removes the Bearer prefix from the Authorization header value if presents.
+     *
+     * @param accessToken the token value from the Authorization header
+     * @return the access token with the prefix removed
+     */
     private static String removeBearerPrefixIfPresent(String accessToken) {
         if (StringUtils.isEmpty(accessToken)) {
             return accessToken;

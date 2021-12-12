@@ -8,6 +8,7 @@ import com.github.onsdigital.zebedee.service.ServiceSupplier;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.session.service.Sessions;
 import com.github.onsdigital.zebedee.teams.service.TeamsService;
+import org.apache.http.HttpStatus;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFFont;
@@ -15,7 +16,6 @@ import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
-import org.apache.http.HttpStatus;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -33,8 +33,12 @@ import static java.text.MessageFormat.format;
 
 /**
  * API endpoint for generating Team members XLS report.
+ *
+ * @deprecated The teams management in zebedee is deprecated in favour of the dp-identity-api with its JWT based auth
+ *             and will be removed after migration of users and teams to the new service.
  */
 @Api
+@Deprecated
 public class TeamsReport {
 
     private static final String CONTENT_DISPOSITION_VALUE = "attachment;filename=teams-report-{0}.xls";

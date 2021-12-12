@@ -57,15 +57,6 @@ public interface PermissionsService {
     boolean isAdministrator(String email) throws IOException;
 
     /**
-     * Return a list of {@link User} who have access to the specified collection.
-     *
-     * @param collection the collection to check users against.
-     * @return {@link List} of {@link User} who have access to the collection.
-     * @throws IOException unexpected error checking the users against the collection.
-     */
-    List<User> getCollectionAccessMapping(Collection collection) throws IOException;
-
-    /**
      * @return true if an Admin user exists, false otherwise.
      * @throws IOException unexpected error accessing users.
      */
@@ -173,15 +164,15 @@ public interface PermissionsService {
     boolean canView(String email, CollectionDescription collectionDescription) throws IOException;
 
     /**
-     * Grant view permissions to a {@link Team}.
+     * Grant view permissions to a team.
      *
-     * @param collectionDescription the {@link CollectionDescription} of the {@link Collection} in question.
-     * @param team                  the {@link Team} to permit view permission to.
-     * @param session               the {@link Session} of the user granting the permission.
-     * @throws IOException      unexpected error while checking permissions.
-     * @throws ZebedeeException unexpected error while checking permissions.
+     * @param collectionDescription The {@link CollectionDescription} of the collection to give the team access to.
+     * @param teamId                the ID of the team to permit view permission to.
+     * @param session               the {@link Session} of the user granting the permission. Only editors can permit a team access to a collection.
+     * @throws IOException If a filesystem error occurs.
+     * @throws ZebedeeException if the user is not authorised to add view team permissions.
      */
-    void addViewerTeam(CollectionDescription collectionDescription, Team team, Session session) throws IOException, ZebedeeException;
+    void addViewerTeam(CollectionDescription collectionDescription, Integer teamId, Session session) throws IOException, ZebedeeException;
 
     /**
      * Returns a {@link List} of {@link Team}s that have viewer permissions on the specified collection.
@@ -199,12 +190,12 @@ public interface PermissionsService {
      * Revoke view permission from a {@link Team} for the specified {@link Collection}.
      *
      * @param collectionDescription the {@link CollectionDescription} of the {@link Collection} to remove the team.
-     * @param team                  the {@link Team} to remove.
+     * @param teamId                the ID of the {@link Team} to remove.
      * @param session               the {@link Session} of the user revoking view permission.
      * @throws IOException      unexpected error while revoking permissions.
      * @throws ZebedeeException unexpected error while revoking permissions.
      */
-    void removeViewerTeam(CollectionDescription collectionDescription, Team team, Session session) throws IOException, ZebedeeException;
+    void removeViewerTeam(CollectionDescription collectionDescription, Integer teamId, Session session) throws IOException, ZebedeeException;
 
     /**
      * Return {@link PermissionDefinition} for the specified {@link User}.

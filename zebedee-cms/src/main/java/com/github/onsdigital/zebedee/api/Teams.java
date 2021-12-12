@@ -43,8 +43,12 @@ import java.util.stream.Collectors;
  * <li>{@code /teams/[teamname]?email=user@example.com}</li>
  * </ul>
  * </p>
+ *
+ * @deprecated The teams management in zebedee is deprecated in favour of the dp-identity-api with its JWT based auth
+ *             and will be removed after migration of users and teams to the new service.
  */
 @Api
+@Deprecated
 public class Teams {
 
     private Sessions sessionsService;

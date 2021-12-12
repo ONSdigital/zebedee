@@ -41,6 +41,7 @@ import com.github.onsdigital.zebedee.service.ZebedeeDatasetService;
 import com.github.onsdigital.zebedee.session.service.JWTSessionsServiceImpl;
 import com.github.onsdigital.zebedee.session.service.Sessions;
 import com.github.onsdigital.zebedee.session.service.SessionsServiceImpl;
+import com.github.onsdigital.zebedee.teams.service.StubbedTeamsServiceImpl;
 import com.github.onsdigital.zebedee.teams.service.TeamsService;
 import com.github.onsdigital.zebedee.teams.service.TeamsServiceImpl;
 import com.github.onsdigital.zebedee.teams.store.TeamsStoreFileSystemImpl;
@@ -178,8 +179,13 @@ public class ZebedeeConfiguration {
             this.sessions = new SessionsServiceImpl(sessionsPath);
         }
 
-        this.teamsService = new TeamsServiceImpl(
-                new TeamsStoreFileSystemImpl(teamsPath), this::getPermissionsService);
+        // TODO: Remove after migration to JWT sessions is complete
+        if (cmsFeatureFlags().isJwtSessionsEnabled()) {
+            this.teamsService = new StubbedTeamsServiceImpl();
+        } else {
+            this.teamsService = new TeamsServiceImpl(
+                    new TeamsStoreFileSystemImpl(teamsPath), this::getPermissionsService);
+        }
 
         this.published = createPublished();
 

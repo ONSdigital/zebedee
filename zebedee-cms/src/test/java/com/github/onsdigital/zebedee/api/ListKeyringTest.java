@@ -1,8 +1,6 @@
 package com.github.onsdigital.zebedee.api;
 
-import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.InternalServerError;
-import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.keyring.CollectionKeyring;
 import com.github.onsdigital.zebedee.keyring.KeyringException;
@@ -17,9 +15,6 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
-import static com.github.onsdigital.zebedee.keyring.CollectionKeyringUtil.GET_USER_ERR_FMT;
-import static com.github.onsdigital.zebedee.keyring.CollectionKeyringUtil.USER_NOT_FOUND_ERR_FMT;
-import static java.text.MessageFormat.format;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertThrows;
@@ -102,41 +97,8 @@ public class ListKeyringTest extends ZebedeeAPIBaseTestCase {
     }
 
     @Test
-    public void testGet_emailNull_shouldThrowBadRequestException() throws Exception {
-        when(mockRequest.getParameter("email"))
-                .thenReturn(null);
-
-        BadRequestException ex = assertThrows(BadRequestException.class,
-                () -> endpoint.listUserKeys(mockRequest, mockResponse));
-
-        assertThat(ex.getMessage(), equalTo("user email required but was null/empty"));
-    }
-
-    @Test
-    public void testGet_getUserError_shouldThrowInternalServerErrorException() throws Exception {
-        when(usersService.getUserByEmail(email))
-                .thenThrow(IOException.class);
-
-        InternalServerError ex = assertThrows(InternalServerError.class,
-                () -> endpoint.listUserKeys(mockRequest, mockResponse));
-
-        assertThat(ex.getMessage(), equalTo(format(GET_USER_ERR_FMT, email)));
-    }
-
-    @Test
-    public void testGet_getUserReturnsNull_shouldThrowNotFoundException() throws Exception {
-        when(usersService.getUserByEmail(email))
-                .thenReturn(null);
-
-        NotFoundException ex = assertThrows(NotFoundException.class,
-                () -> endpoint.listUserKeys(mockRequest, mockResponse));
-
-        assertThat(ex.getMessage(), equalTo(format(USER_NOT_FOUND_ERR_FMT, email)));
-    }
-
-    @Test
     public void testGet_keyringListError_shouldThrowInternalServerErrorException() throws Exception {
-        when(centralKeyring.list(user))
+        when(centralKeyring.list(session))
                 .thenThrow(KeyringException.class);
 
         InternalServerError ex = assertThrows(InternalServerError.class,
@@ -150,7 +112,7 @@ public class ListKeyringTest extends ZebedeeAPIBaseTestCase {
         Set<String> userKeys = new HashSet<>();
         userKeys.add("666");
 
-        when(centralKeyring.list(user))
+        when(centralKeyring.list(session))
                 .thenReturn(userKeys);
 
         Set<String> actual = endpoint.listUserKeys(mockRequest, mockResponse);

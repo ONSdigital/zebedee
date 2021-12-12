@@ -25,19 +25,10 @@ import java.util.Base64;
 import java.util.Map;
 
 import static com.github.onsdigital.zebedee.keyring.KeyringException.formatExceptionMsg;
-import static com.github.onsdigital.zebedee.keyring.central.CollectionKeyStoreImpl.COLLECTION_KEY_NOT_FOUND_ERR;
-import static com.github.onsdigital.zebedee.keyring.central.CollectionKeyStoreImpl.COLLECTION_KEY_NULL_ERR;
-import static com.github.onsdigital.zebedee.keyring.central.CollectionKeyStoreImpl.INVALID_COLLECTION_ID_ERR;
-import static com.github.onsdigital.zebedee.keyring.central.CollectionKeyStoreImpl.KEY_ALREADY_EXISTS_ERR;
-import static com.github.onsdigital.zebedee.keyring.central.CollectionKeyStoreImpl.KEY_DECRYPTION_ERR;
-import static com.github.onsdigital.zebedee.keyring.central.CollectionKeyStoreImpl.KEY_EXT;
+import static com.github.onsdigital.zebedee.keyring.central.CollectionKeyStoreImpl.*;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.*;
 
 public class CollectionKeyStoreImplTest {
 

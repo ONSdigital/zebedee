@@ -10,7 +10,6 @@ import com.github.onsdigital.zebedee.keyring.KeyringException;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.session.service.Sessions;
-import com.github.onsdigital.zebedee.user.model.User;
 import com.github.onsdigital.zebedee.user.service.UsersService;
 import org.apache.commons.lang3.StringUtils;
 
@@ -20,7 +19,6 @@ import javax.ws.rs.GET;
 import java.io.IOException;
 import java.util.Set;
 
-import static com.github.onsdigital.zebedee.keyring.CollectionKeyringUtil.getUser;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.error;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.info;
 
@@ -64,13 +62,13 @@ public class ListKeyring {
      */
     @GET
     public Set<String> listUserKeys(HttpServletRequest request, HttpServletResponse response) throws ZebedeeException {
-        checkPermission(getSession(request));
+        Session session = getSession(request);
+        checkPermission(session);
 
-        User user = getUser(usersService, getEmail(request));
         try {
-            return collectionKeyring.list(user);
+            return collectionKeyring.list(session);
         } catch (KeyringException ex) {
-            error().user(user.getEmail()).exception(ex).log("error listing user keyring");
+            error().user(session.getEmail()).exception(ex).log("error listing user keyring");
             throw new InternalServerError("internal server error");
         }
     }
@@ -105,6 +103,7 @@ public class ListKeyring {
         }
     }
 
+    // TODO: check if we can delete
     String getEmail(HttpServletRequest request) throws BadRequestException {
         String email = request.getParameter("email");
 
@@ -115,12 +114,13 @@ public class ListKeyring {
         return email;
     }
 
-    Set<String> listKeyring(User user, CollectionKeyring keyring) throws InternalServerError {
+    // TODO: check if we can delete
+    Set<String> listKeyring(Session session, CollectionKeyring keyring) throws InternalServerError {
         try {
             info().log("keyring source " + keyring.getClass().getSimpleName());
-            return keyring.list(user);
+            return keyring.list(session);
         } catch (KeyringException ex) {
-            error().user(user.getEmail()).exception(ex).log("error listing user keyring");
+            error().user(session.getEmail()).exception(ex).log("error listing user keyring");
             throw new InternalServerError("internal server error");
         }
     }

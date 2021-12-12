@@ -1,6 +1,5 @@
 package com.github.onsdigital.zebedee.keyring;
 
-import com.github.onsdigital.zebedee.keyring.KeyringException;
 import com.github.onsdigital.zebedee.model.Collection;
 
 import javax.crypto.SecretKey;

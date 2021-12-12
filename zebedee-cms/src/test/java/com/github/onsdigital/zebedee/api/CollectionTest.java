@@ -356,62 +356,6 @@ public class CollectionTest extends ZebedeeAPIBaseTestCase {
     }
 
     @Test
-    public void testDelete_getUserError_shouldThrowEx() throws Exception {
-        when(sessions.get(mockRequest))
-                .thenReturn(session);
-
-        when(mockRequest.getPathInfo())
-                .thenReturn("collections/" + COLLECTION_ID);
-
-        when(collections.getCollection(COLLECTION_ID))
-                .thenReturn(collection);
-
-        when(collection.getId())
-                .thenReturn(COLLECTION_ID);
-
-        when(usersService.getUserByEmail(TEST_EMAIL))
-                .thenThrow(IOException.class);
-
-        InternalServerError ex = assertThrows(InternalServerError.class,
-                () -> endpoint.deleteCollection(mockRequest, mockResponse));
-
-        assertThat(ex.getMessage(),
-                equalTo(format("error attempting to get user from session details: {0}", TEST_EMAIL)));
-        verify(sessions, times(1)).get(mockRequest);
-        verify(collections, times(1)).getCollection(COLLECTION_ID);
-        verify(collections, times(1)).delete(collection, session);
-        verify(usersService, times(1)).getUserByEmail(TEST_EMAIL);
-    }
-
-    @Test
-    public void testDelete_getUserReturnsNull_shouldThrowEx() throws Exception {
-        when(sessions.get(mockRequest))
-                .thenReturn(session);
-
-        when(mockRequest.getPathInfo())
-                .thenReturn("collections/" + COLLECTION_ID);
-
-        when(collections.getCollection(COLLECTION_ID))
-                .thenReturn(collection);
-
-        when(collection.getId())
-                .thenReturn(COLLECTION_ID);
-
-        when(usersService.getUserByEmail(TEST_EMAIL))
-                .thenReturn(null);
-
-        InternalServerError ex = assertThrows(InternalServerError.class,
-                () -> endpoint.deleteCollection(mockRequest, mockResponse));
-
-        assertThat(ex.getMessage(),
-                equalTo(format("error attempting to get user from session details: {0}", TEST_EMAIL)));
-        verify(sessions, times(1)).get(mockRequest);
-        verify(collections, times(1)).getCollection(COLLECTION_ID);
-        verify(collections, times(1)).delete(collection, session);
-        verify(usersService, times(1)).getUserByEmail(TEST_EMAIL);
-    }
-
-    @Test
     public void testDelete_keyringRemoveError_shouldThrowEx() throws Exception {
         when(sessions.get(mockRequest))
                 .thenReturn(session);
@@ -425,12 +369,9 @@ public class CollectionTest extends ZebedeeAPIBaseTestCase {
         when(collection.getId())
                 .thenReturn(COLLECTION_ID);
 
-        when(usersService.getUserByEmail(TEST_EMAIL))
-                .thenReturn(user);
-
         doThrow(KeyringException.class)
                 .when(collectionKeyring)
-                .remove(user, collection);
+                .remove(session, collection);
 
         InternalServerError ex = assertThrows(InternalServerError.class,
                 () -> endpoint.deleteCollection(mockRequest, mockResponse));
@@ -439,8 +380,7 @@ public class CollectionTest extends ZebedeeAPIBaseTestCase {
         verify(sessions, times(1)).get(mockRequest);
         verify(collections, times(1)).getCollection(COLLECTION_ID);
         verify(collections, times(1)).delete(collection, session);
-        verify(usersService, times(1)).getUserByEmail(TEST_EMAIL);
-        verify(collectionKeyring, times(1)).remove(user, collection);
+        verify(collectionKeyring, times(1)).remove(session, collection);
     }
 
     @Test
@@ -462,6 +402,6 @@ public class CollectionTest extends ZebedeeAPIBaseTestCase {
         assertTrue(result);
         verify(collections, times(1)).delete(collection, session);
         verify(scheduleCanceller, times(1)).cancel(collection);
-        verify(collectionKeyring, times(1)).remove(user, collection);
+        verify(collectionKeyring, times(1)).remove(session, collection);
     }
 }

@@ -127,10 +127,6 @@ public abstract class ZebedeeTestBaseFixture {
         ServiceSupplier<UsersService> usersServiceServiceSupplier = () -> usersService;
 
         ReflectionTestUtils.setField(zebedee, "usersService", usersService);
-
-        // TODO I think this is a mistake.
-        ReflectionTestUtils.setField(zebedee, "permissionsService", permissionsService);
-
         ReflectionTestUtils.setField(zebedee, "sessions", sessionsService);
         ReflectionTestUtils.setField(zebedee, "collectionKeyring", collectionKeyring);
         ReflectionTestUtils.setField(zebedee, "encryptionKeyFactory", encryptionKeyFactory);
@@ -144,6 +140,8 @@ public abstract class ZebedeeTestBaseFixture {
 
         when(usersService.getUserByEmail(builder.publisher1.getEmail()))
                 .thenReturn(builder.publisher1);
+        when(usersService.getUserByEmail(builder.publisher2.getEmail()))
+                .thenReturn(builder.publisher2);
         when(usersService.getUserByEmail(builder.reviewer1.getEmail()))
                 .thenReturn(builder.reviewer1);
         when(usersService.getUserByEmail(builder.administrator.getEmail()))
@@ -193,16 +191,6 @@ public abstract class ZebedeeTestBaseFixture {
         verify(collectionKeyring, times(1)).add(any(), any(), any());
     }
 
-    protected void setUpPermissionsServiceMockForLegacyTests(Zebedee instance, User someUser) throws Exception {
-        when(permissionsService.canView(eq(someUser), any(CollectionDescription.class)))
-                .thenReturn(true);
-
-        when(permissionsService.canEdit(someUser))
-                .thenReturn(true);
-
-        ReflectionTestUtils.setField(instance, "permissionsService", permissionsService);
-    }
-
     protected void setUpPermissionsServiceMockForLegacyTests(Zebedee instance, Session session) throws Exception {
         when(permissionsService.canView(eq(session), any(CollectionDescription.class)))
                 .thenReturn(true);
@@ -213,8 +201,8 @@ public abstract class ZebedeeTestBaseFixture {
         ReflectionTestUtils.setField(instance, "permissionsService", permissionsService);
     }
 
-    protected void setUpKeyringMockForLegacyTests(Zebedee instance, User someUser, SecretKey key) throws Exception {
-        when(collectionKeyring.get(eq(someUser), any(Collection.class)))
+    protected void setUpKeyringMockForLegacyTests(Zebedee instance, Session someSession, SecretKey key) throws Exception {
+        when(collectionKeyring.get(eq(someSession), any(Collection.class)))
                 .thenReturn(key);
 
         ReflectionTestUtils.setField(instance, "collectionKeyring", collectionKeyring);

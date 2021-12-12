@@ -314,18 +314,9 @@ public class Collection {
         // Cancel any scheduled publish for this collection.
         scheduleCanceller.cancel(c);
 
-        // Remove the collection encryption key from the keyring
-        User user = null;
-        try {
-            user = CollectionKeyringUtil.getUser(usersService, s.getEmail());
-        } catch (Exception ex) {
-            String message = format("error attempting to get user from session details: {0}", s.getEmail());
-            throw new InternalServerError(message, ex);
-        }
-
         info().collectionID(c).log("collection deleted removing key from keyring");
         try {
-            collectionKeyring.remove(user, c);
+            collectionKeyring.remove(s, c);
         } catch (KeyringException ex) {
             String message = format("error attempting to remove collection key from keyring: {0}", c.getId());
             throw new InternalServerError(message, ex);

@@ -9,7 +9,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import javax.crypto.SecretKey;
 import java.lang.reflect.Field;
@@ -19,29 +18,11 @@ import java.util.Map;
 import java.util.Set;
 
 import static com.github.onsdigital.zebedee.keyring.KeyringException.formatExceptionMsg;
-import static com.github.onsdigital.zebedee.keyring.central.CollectionKeyCacheImpl.INVALID_COLLECTION_ID_ERR;
-import static com.github.onsdigital.zebedee.keyring.central.CollectionKeyCacheImpl.INVALID_SECRET_KEY_ERR;
-import static com.github.onsdigital.zebedee.keyring.central.CollectionKeyCacheImpl.KEYSTORE_NULL_ERR;
-import static com.github.onsdigital.zebedee.keyring.central.CollectionKeyCacheImpl.KEY_MISMATCH_ERR;
-import static com.github.onsdigital.zebedee.keyring.central.CollectionKeyCacheImpl.KEY_NOT_FOUND_ERR;
-import static com.github.onsdigital.zebedee.keyring.central.CollectionKeyCacheImpl.LOAD_KEYS_NULL_ERR;
-import static com.github.onsdigital.zebedee.keyring.central.CollectionKeyCacheImpl.NOT_INITIALISED_ERR;
-import static com.github.onsdigital.zebedee.keyring.central.CollectionKeyCacheImpl.getInstance;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
+import static com.github.onsdigital.zebedee.keyring.central.CollectionKeyCacheImpl.*;
+import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.verifyZeroInteractions;
-import static org.mockito.Mockito.when;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 public class CollectionKeyCacheImplTest {
 

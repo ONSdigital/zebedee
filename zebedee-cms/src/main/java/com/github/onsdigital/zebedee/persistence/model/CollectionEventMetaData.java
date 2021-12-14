@@ -20,8 +20,8 @@ import java.nio.file.Paths;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -90,11 +90,9 @@ public class CollectionEventMetaData {
      * Create a {@link CollectionEventMetaData} for viewer team removed event.
      */
     public static CollectionEventMetaData[] teamRemoved(CollectionDescription collectionDescription,
-                                                        Session session, Integer teamId) throws IOException, ZebedeeException {
+                                                        Session session, int teamId) throws IOException, ZebedeeException {
         List<CollectionEventMetaData> list = new ArrayList<>();
-        if (teamId != null) {
-            list.add(new CollectionEventMetaData(TEAM_REMOVED_KEY, Integer.toString(teamId)));
-        }
+        list.add(new CollectionEventMetaData(TEAM_REMOVED_KEY, Integer.toString(teamId)));
 
         if (collectionDescription != null && session != null) {
             list.add(new CollectionEventMetaData(VIEWER_TEAMS_KEY, viewerTeamsAsStr(collectionDescription,
@@ -124,13 +122,8 @@ public class CollectionEventMetaData {
     private static String viewerTeamsAsStr(CollectionDescription collectionDescription, Session session)
             throws
             IOException, ZebedeeException {
-        Iterator<Integer> iterator = Root.zebedee.getPermissionsService().listViewerTeams(collectionDescription, session).iterator();
-        StringBuilder teamsListStr = new StringBuilder();
-
-        while (iterator.hasNext()) {
-            teamsListStr.append(iterator.next()).append(iterator.hasNext() ? ", " : "");
-        }
-        return teamsListStr.toString();
+        Set<Integer> teams = Root.zebedee.getPermissionsService().listViewerTeams(collectionDescription, session);
+        return StringUtils.join(teams, ",");
     }
 
     /**

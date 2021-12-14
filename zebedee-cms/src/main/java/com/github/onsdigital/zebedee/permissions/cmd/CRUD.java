@@ -13,6 +13,11 @@ import static com.github.onsdigital.zebedee.permissions.cmd.PermissionType.DELET
 import static com.github.onsdigital.zebedee.permissions.cmd.PermissionType.READ;
 import static com.github.onsdigital.zebedee.permissions.cmd.PermissionType.UPDATE;
 
+/**
+ * @deprecated in favour of the dp-permissions-api. Once all dataset related APIs have been updated to use the
+ *             dp-authorisation v2 library and JWT sessions are in use, this service will be removed.
+ */
+@Deprecated
 public class CRUD {
 
     private Set<PermissionType> permissions;

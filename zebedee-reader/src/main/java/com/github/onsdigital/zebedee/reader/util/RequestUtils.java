@@ -31,6 +31,7 @@ public class RequestUtils {
      * @return
      */
     public static String getSessionId(HttpServletRequest request) {
+        // TODO: Simplify after migration from X-Florence-Token to Authorization header is complete
         String sessionId = request.getHeader(FLORENCE_TOKEN_HEADER);
         String authHeader = request.getHeader(AUTH_HEADER);
         // If the Authorization header contains a '.' then it is a JWT session token rather than a service token
@@ -95,7 +96,7 @@ public class RequestUtils {
      * @param accessToken the token value from the Authorization header
      * @return the access token with the prefix removed
      */
-    private static String removeBearerPrefixIfPresent(String accessToken) {
+    public static String removeBearerPrefixIfPresent(String accessToken) {
         if (StringUtils.isEmpty(accessToken)) {
             return accessToken;
         }

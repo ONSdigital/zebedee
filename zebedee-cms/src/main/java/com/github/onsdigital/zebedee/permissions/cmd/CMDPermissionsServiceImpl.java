@@ -31,6 +31,11 @@ import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException
 import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.sessionNotFoundException;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
+/**
+ * @deprecated in favour of the dp-permissions-api. Once all dataset related APIs have been updated to use the
+ *             dp-authorisation v2 library and JWT sessions are in use, this service will be removed.
+ */
+@Deprecated
 public class CMDPermissionsServiceImpl implements CMDPermissionsService {
 
     private static final String DATASET_NOT_IN_COLLECTION = "no permissions granted to viewer user as the requested " +

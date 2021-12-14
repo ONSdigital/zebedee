@@ -1,8 +1,9 @@
-package com.github.onsdigital.zebedee.reader.util;
+package com.github.onsdigital.zebedee.util;
 
-import com.github.onsdigital.zebedee.util.VariableUtils;
 import org.junit.Test;
-import static org.junit.Assert.*;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * Created by bren on 31/07/15.

@@ -17,22 +17,11 @@ public class StubbedUsersServiceImpl implements UsersService {
 
     private static final String UNSUPPORTED_METHOD = "unsupported attempt to call pre-JWT user service when JWT sessions are enabled";
 
-    private static UsersService INSTANCE = null;
-    private static final Object MUTEX = new Object();
-
-
     /**
      * Get a singleton instance of {@link StubbedUsersServiceImpl}.
      */
     public static UsersService getInstance() {
-        if (INSTANCE == null) {
-            synchronized (MUTEX) {
-                if (INSTANCE == null) {
-                    INSTANCE = new StubbedUsersServiceImpl();
-                }
-            }
-        }
-        return INSTANCE;
+        return new StubbedUsersServiceImpl();
     }
 
     /**

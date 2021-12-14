@@ -42,9 +42,9 @@ public class User extends UserSanitised {
         if (cmsFeatureFlags().isJwtSessionsEnabled()) {
             error().log(UNSUPPORTED_METHOD);
             throw new UnsupportedOperationException(UNSUPPORTED_METHOD);
-        } else {
-            return Password.verify(password, passwordHash);
         }
+
+        return Password.verify(password, passwordHash);
     }
 
     /**
@@ -60,26 +60,26 @@ public class User extends UserSanitised {
         if (cmsFeatureFlags().isJwtSessionsEnabled()) {
             error().log(UNSUPPORTED_METHOD);
             throw new UnsupportedOperationException(UNSUPPORTED_METHOD);
-        } else {
-            boolean result = true;
-
-            if (authenticate(oldPassword)) {
-                if (keyring.changePassword(oldPassword, newPassword)) {
-                    passwordHash = Password.hash(newPassword);
-                    result = true;
-                } else {
-                    info().log("Unable to change keyring password");
-                }
-            } else {
-                info().log("Could not authenticate with the old password");
-            }
-
-            /*
-             FIXME: this always returns true regardless of whether the password change succeeds. Not fixing now since
-                    this method will be removed shortly once the JWT session migration is complete.
-             */
-            return result;
         }
+
+        boolean result = true;
+
+        if (authenticate(oldPassword)) {
+            if (keyring.changePassword(oldPassword, newPassword)) {
+                passwordHash = Password.hash(newPassword);
+                result = true;
+            } else {
+                info().log("Unable to change keyring password");
+            }
+        } else {
+            info().log("Could not authenticate with the old password");
+        }
+
+        /*
+         FIXME: this always returns true regardless of whether the password change succeeds. Not fixing now since
+                this method will be removed shortly once the JWT session migration is complete.
+         */
+        return result;
     }
 
     /**
@@ -93,13 +93,13 @@ public class User extends UserSanitised {
         if (cmsFeatureFlags().isJwtSessionsEnabled()) {
             error().log(UNSUPPORTED_METHOD);
             throw new UnsupportedOperationException(UNSUPPORTED_METHOD);
-        } else {
-            // Update the password hash
-            passwordHash = Password.hash(password);
-
-            // Generate a new key pair and wipe out any stored keys.
-            // Without the original password none of the stored keys can be recovered.
-            keyring = Keyring.generate(password);
         }
+
+        // Update the password hash
+        passwordHash = Password.hash(password);
+
+        // Generate a new key pair and wipe out any stored keys.
+        // Without the original password none of the stored keys can be recovered.
+        keyring = Keyring.generate(password);
     }
 }

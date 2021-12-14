@@ -8,10 +8,6 @@ import com.github.onsdigital.zebedee.permissions.cmd.GetPermissionsRequest;
 import com.github.onsdigital.zebedee.permissions.cmd.PermissionsException;
 import com.github.onsdigital.zebedee.util.HttpResponseWriter;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
 import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.collectionIDNotProvidedException;
 import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.datasetIDNotProvidedException;
 import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.internalServerErrorException;
@@ -19,27 +15,30 @@ import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException
 import static com.github.onsdigital.zebedee.util.JsonUtils.writeResponseEntity;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
+/**
+ * @deprecated the permissions APIs are deprecated in favour of the new dp-permissions-api. Once the migration of all
+ *             dataset services to the new dp-authorisation v2 library has been completed these endpoints should be
+ *             removed.
+ */
+@Deprecated
 @Api
 public class UserDatasetPermissions extends PermissionsAPIBase {
 
     public UserDatasetPermissions() {
-        this(cmsFeatureFlags().isPermissionsAuthEnabled(),
-                CMDPermissionsServiceImpl.getInstance(),
+        this(CMDPermissionsServiceImpl.getInstance(),
                 (r, b, s) -> writeResponseEntity(r, b, s));
     }
 
-    public UserDatasetPermissions(boolean enabled, CMDPermissionsService cmdPermissionsService,
+    public UserDatasetPermissions(CMDPermissionsService cmdPermissionsService,
                                   HttpResponseWriter responseWriter) {
-        super(enabled, cmdPermissionsService, responseWriter);
+        super(cmdPermissionsService, responseWriter);
     }
 
     @Override
-    public CRUD getPermissions(HttpServletRequest request, HttpServletResponse response) throws PermissionsException {
-        GetPermissionsRequest getPermissionsRequest = new GetPermissionsRequest(request);
+    public CRUD getPermissions(GetPermissionsRequest request) throws PermissionsException {
+        validateGetPermissionsRequest(request);
 
-        validateGetPermissionsRequest(getPermissionsRequest);
-
-        return permissionsService.getUserDatasetPermissions(getPermissionsRequest);
+        return permissionsService.getUserDatasetPermissions(request);
     }
 
     void validateGetPermissionsRequest(GetPermissionsRequest request) throws PermissionsException {

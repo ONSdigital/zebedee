@@ -24,14 +24,12 @@ import static com.github.onsdigital.zebedee.permissions.cmd.PermissionType.READ;
 import static com.github.onsdigital.zebedee.permissions.cmd.PermissionType.UPDATE;
 import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.collectionIDNotProvidedException;
 import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.datasetIDNotProvidedException;
-import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.invalidPermissionsRequestException;
 import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.sessionIDNotProvidedException;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
@@ -64,17 +62,7 @@ public class UserDatasetPermissionsTest {
 
         getPermissionsRequest = new GetPermissionsRequest("111", "222", "333", "444");
 
-        api = new UserDatasetPermissions(true, cmdPermissionsService, httpResponseWriter);
-    }
-
-    @Test
-    public void testGetDatasetPermissions_featureDisabled() throws Exception {
-        api = new UserDatasetPermissions(false, cmdPermissionsService, httpResponseWriter);
-
-        api.handle(req, resp);
-
-        verifyZeroInteractions(cmdPermissionsService);
-        verify(httpResponseWriter, times(1)).writeJSONResponse(resp, null, 404);
+        api = new UserDatasetPermissions(cmdPermissionsService, httpResponseWriter);
     }
 
     @Test

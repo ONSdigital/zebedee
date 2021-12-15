@@ -37,54 +37,62 @@ public class PermissionsServiceProxy implements PermissionsService {
 
     /**
      * @param session {@link Session} to get the user details from.
-     * @return
-     * @throws IOException
+     * @return the required module on jwtSessionsEnabled
+     * @throws IOException from required module
      */
     @Override
     public boolean isPublisher(Session session) throws IOException {
-        if (jwtSessionsEnabled) return jwtPermissionsService.isPublisher(session);
+        if (jwtSessionsEnabled) {
+            return jwtPermissionsService.isPublisher(session);
+        }
         return legacyPermissionsService.isPublisher(session);
     }
 
     /**
      * @param email the email of the user to check.
-     * @return
-     * @throws IOException
+     * @return the required module on jwtSessionsEnabled
+     * @throws IOException from required module
      */
     @Override
     public boolean isPublisher(String email) throws IOException {
-        if (jwtSessionsEnabled) return jwtPermissionsService.isPublisher(email);
+        if (jwtSessionsEnabled) {
+            return jwtPermissionsService.isPublisher(email);
+        }
         return legacyPermissionsService.isPublisher(email);
 
     }
 
     /**
      * @param session {@link Session} to get the user details from.
-     * @return
-     * @throws IOException
+     * @return the required module on jwtSessionsEnabled
+     * @throws IOException from required module
      */
     @Override
     public boolean isAdministrator(Session session) throws IOException {
-        if (jwtSessionsEnabled) return jwtPermissionsService.isAdministrator(session);
+        if (jwtSessionsEnabled) {
+            return jwtPermissionsService.isAdministrator(session);
+        }
         return legacyPermissionsService.isAdministrator(session);
 
     }
 
     /**
      * @param email the email of the user to check.
-     * @return
-     * @throws IOException
+     * @return the required module on jwtSessionsEnabled
+     * @throws IOException from required module
      */
     @Override
     public boolean isAdministrator(String email) throws IOException {
-        if (jwtSessionsEnabled) return jwtPermissionsService.isAdministrator(email);
+        if (jwtSessionsEnabled) {
+            return jwtPermissionsService.isAdministrator(email);
+        }
         return legacyPermissionsService.isAdministrator(email);
     }
 
     /**
      * @param collection the collection to check users against. not used will always use legacy Permissions service
-     * @return
-     * @throws IOException
+     * @return the required module on jwtSessionsEnabled
+     * @throws IOException from required module
      */
     @Override
     public List<User> getCollectionAccessMapping(Collection collection) throws IOException {
@@ -93,11 +101,13 @@ public class PermissionsServiceProxy implements PermissionsService {
 
     /**
      * @return
-     * @throws IOException
+     * @throws IOException the required module on jwtSessionsEnabled
      */
     @Override
     public boolean hasAdministrator() throws IOException {
-        if (jwtSessionsEnabled) return jwtPermissionsService.hasAdministrator();
+        if (jwtSessionsEnabled) {
+            return jwtPermissionsService.hasAdministrator();
+        }
         return legacyPermissionsService.hasAdministrator();
 
     }
@@ -105,12 +115,14 @@ public class PermissionsServiceProxy implements PermissionsService {
     /**
      * @param email   the email of the user to permit the permission to.
      * @param session the {@link Session} of the user granting the permission.
-     * @throws IOException
+     * @throws IOException           the required module on jwtSessionsEnabled
      * @throws UnauthorizedException
      */
     @Override
     public void addAdministrator(String email, Session session) throws IOException, UnauthorizedException {
-        if (jwtSessionsEnabled) jwtPermissionsService.addAdministrator(email, session);
+        if (jwtSessionsEnabled) {
+            jwtPermissionsService.addAdministrator(email, session);
+        }
         legacyPermissionsService.addAdministrator(email, session);
 
     }
@@ -130,7 +142,7 @@ public class PermissionsServiceProxy implements PermissionsService {
 
     /**
      * @param session the {@link Session} of the user to check.
-     * @return
+     * @return the required module on jwtSessionsEnabled
      * @throws IOException
      */
     @Override
@@ -142,7 +154,7 @@ public class PermissionsServiceProxy implements PermissionsService {
 
     /**
      * @param email the email of the user to check.
-     * @return
+     * @return the required module on jwtSessionsEnabled
      * @throws IOException
      */
     @Override
@@ -154,7 +166,7 @@ public class PermissionsServiceProxy implements PermissionsService {
 
     /**
      * @param user the {@link User} to check.
-     * @return
+     * @return the required module on jwtSessionsEnabled
      * @throws IOException
      */
     @Override

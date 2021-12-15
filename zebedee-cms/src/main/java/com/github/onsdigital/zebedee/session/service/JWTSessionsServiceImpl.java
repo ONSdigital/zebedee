@@ -6,7 +6,6 @@ import com.github.onsdigital.exceptions.JWTVerificationException;
 import com.github.onsdigital.impl.UserDataPayload;
 import com.github.onsdigital.interfaces.JWTHandler;
 import com.github.onsdigital.zebedee.session.model.Session;
-import com.github.onsdigital.zebedee.user.model.User;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import org.apache.commons.lang3.StringUtils;
@@ -18,7 +17,6 @@ import java.util.Base64;
 import java.util.Map;
 
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
-import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 
 
 /**
@@ -39,7 +37,7 @@ public class JWTSessionsServiceImpl implements Sessions {
 
     private static ThreadLocal<UserDataPayload> store = new ThreadLocal<>();
 
-    private final static int JWT_CHUNK_SIZE = 3;
+    private static final int JWT_CHUNK_SIZE = 3;
 
     public static final String ACCESS_TOKEN_REQUIRED_ERROR = "Access Token required but none provided.";
     public static final String ACCESS_TOKEN_EXPIRED_ERROR = "JWT verification failed as token is expired.";
@@ -63,7 +61,7 @@ public class JWTSessionsServiceImpl implements Sessions {
      */
     @Deprecated
     @Override
-    public Session create(User user) throws IOException {
+    public Session create(String email) throws IOException {
         error().log(UNSUPPORTED_METHOD);
         throw new UnsupportedOperationException(UNSUPPORTED_METHOD);
     }
@@ -72,8 +70,7 @@ public class JWTSessionsServiceImpl implements Sessions {
      * Get a {@link Session} session object from thread local.
      *
      * @param id the {@link String} to get the session object from thread local for.
-     * @return session object from thread local.
-     * @throws IOException for any problem getting a session from the request.
+     * @return the {@link Session} from thread local or <code>null</code> if no session is found.
      *
      * @deprecated Since the new JWT sessions implementation can only get the session of the current user, a single
      *             {@link this#get()} method is provided. Once migration to the new JWT sessions is completed all
@@ -81,7 +78,7 @@ public class JWTSessionsServiceImpl implements Sessions {
      */
     @Deprecated
     @Override
-    public Session get(String id) throws IOException {
+    public Session get(String id) {
         return get();
     }
 
@@ -89,8 +86,7 @@ public class JWTSessionsServiceImpl implements Sessions {
      * Get a {@link Session} session object from thread local.
      *
      * @param req the {@link HttpServletRequest} to get the session object from thread local for.
-     * @return session object from thread local if it exists, return null if no session exists.
-     * @throws IOException for any problem getting a session from the request.
+     * @return the {@link Session} from thread local or <code>null</code> if no session is found.
      *
      * @deprecated Since the new JWT sessions implementation can only get the session of the current user, a single
      *             {@link this#get()} method is provided. Once migration to the new JWT sessions is completed all
@@ -101,21 +97,19 @@ public class JWTSessionsServiceImpl implements Sessions {
      */
     @Deprecated
     @Override
-    public Session get(HttpServletRequest req) throws IOException {
+    public Session get(HttpServletRequest req) {
         return get();
     }
 
     /**
      * Get a {@link Session} session object from thread local.
      *
-     * @return session object from containg data from thread local.
-     * @throws IOException for any problem getting a session from the request.
+     * @return the {@link Session} from thread local or <code>null</code> if no session is found.
      */
     @Override
-    public Session get() throws IOException {
+    public Session get() {
         UserDataPayload jwtDetails = store.get();
         if (jwtDetails == null) {
-            info().log("no user session found in Threadload session store");
             return null;
         }
 
@@ -123,13 +117,16 @@ public class JWTSessionsServiceImpl implements Sessions {
     }
 
     /**
-     * Get a {@link Session} session object from thread local.
+     * Verify the session token and store in ThreadLocal store.
      *
-     * @param token - the access token to be decoded.
-     * @throws IOException for any problem verifying a token or storing a session in threadlocal.
+     * @param token - the access token to be verified and stored.
+     * @throws SessionsException for any problem verifying a token or storing a session in ThreadLocal.
      */
     @Override
     public void set(String token) throws SessionsException {
+        // Ensure that any existing session is clear in case this is a recycled thread
+        resetThread();
+
         if (StringUtils.isEmpty(token)) {
             throw new SessionsException(ACCESS_TOKEN_REQUIRED_ERROR);
         }
@@ -151,11 +148,19 @@ public class JWTSessionsServiceImpl implements Sessions {
             store.set(jwtHandler.verifyJWT(token, publicSigningKey));
         } catch (JWTTokenExpiredException e) {
             throw new SessionsException(ACCESS_TOKEN_EXPIRED_ERROR);
-        } catch (JWTVerificationException e) {
-            throw new SessionsException(e.getMessage(), e);
-        } catch (JWTDecodeException e) {
+        } catch (JWTVerificationException | JWTDecodeException e) {
             throw new SessionsException(e.getMessage(), e);
         }
+    }
+
+    /**
+     * Reset the thread by removing the current {@link ThreadLocal} value. If threads are being recycled to serve new
+     * requests then this method must be called on each new request to ensure that sessions do not leak from one request
+     * to the next causing potential for privilege excalation.
+     */
+    @Override
+    public void resetThread() {
+        store.remove();
     }
 
     private String getPublicSigningKey(String tokenHeader) {

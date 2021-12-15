@@ -42,6 +42,9 @@ import com.github.onsdigital.zebedee.service.ZebedeeDatasetService;
 import com.github.onsdigital.zebedee.session.service.JWTSessionsServiceImpl;
 import com.github.onsdigital.zebedee.session.service.Sessions;
 import com.github.onsdigital.zebedee.session.service.SessionsServiceImpl;
+import com.github.onsdigital.zebedee.session.service.ThreadLocalSessionsServiceImpl;
+import com.github.onsdigital.zebedee.session.store.SessionsStore;
+import com.github.onsdigital.zebedee.session.store.SessionsStoreImpl;
 import com.github.onsdigital.zebedee.teams.service.StubbedTeamsServiceImpl;
 import com.github.onsdigital.zebedee.teams.service.TeamsService;
 import com.github.onsdigital.zebedee.teams.service.TeamsServiceImpl;
@@ -171,14 +174,6 @@ public class ZebedeeConfiguration {
         this.publishedCollections = new PublishedCollections(publishedCollectionsPath);
         this.encryptionKeyFactory = new EncryptionKeyFactoryImpl();
 
-        // Configure the sessions
-        if (cmsFeatureFlags().isJwtSessionsEnabled()) {
-            JWTHandler jwtHandler = new JWTHandlerImpl();
-            this.sessions = new JWTSessionsServiceImpl(jwtHandler, getCognitoKeyIdPairs());
-        } else {
-            this.sessions = new SessionsServiceImpl(sessionsPath);
-        }
-
         // TODO: Remove after migration to JWT sessions is complete
         if (cmsFeatureFlags().isJwtSessionsEnabled()) {
             this.teamsService = new StubbedTeamsServiceImpl();
@@ -208,6 +203,15 @@ public class ZebedeeConfiguration {
         } else {
             this.usersService = UsersServiceImpl.getInstance(
                     new UserStoreFileSystemImpl(this.usersPath), collections, permissionsService, keyringSupplier);
+        }
+
+        // Configure the sessions
+        if (cmsFeatureFlags().isJwtSessionsEnabled()) {
+            JWTHandler jwtHandler = new JWTHandlerImpl();
+            this.sessions = new JWTSessionsServiceImpl(jwtHandler, getCognitoKeyIdPairs());
+        } else {
+            SessionsStore sessionsStore = new SessionsStoreImpl(sessionsPath);
+            this.sessions = new ThreadLocalSessionsServiceImpl(sessionsStore, permissionsService, teamsService);
         }
 
         // Init the collection keyring and scheduler cache.

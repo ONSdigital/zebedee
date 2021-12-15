@@ -18,7 +18,7 @@ public class PermissionDefinition {
         return this;
     }
 
-    public Boolean isAdmin() {
+    public boolean isAdmin() {
         return admin;
     }
 
@@ -27,7 +27,7 @@ public class PermissionDefinition {
         return this;
     }
 
-    public Boolean isEditor() {
+    public boolean isEditor() {
         return editor;
     }
 

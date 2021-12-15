@@ -153,7 +153,7 @@ public class UsersServiceImpl implements UsersService {
         boolean isSuccess = false;
 
         if (session == null) {
-            new UnauthorizedException("Cannot set password as user is not authenticated.");
+            throw new UnauthorizedException("Cannot set password as user is not authenticated.");
         }
         if (credentials == null) {
             throw new BadRequestException("Cannot set password for user as credentials is null.");

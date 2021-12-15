@@ -13,14 +13,16 @@ import com.github.onsdigital.zebedee.api.cmd.ServiceDatasetPermissions;
 import com.github.onsdigital.zebedee.api.cmd.ServiceInstancePermissions;
 import com.github.onsdigital.zebedee.api.cmd.UserDatasetPermissions;
 import com.github.onsdigital.zebedee.api.cmd.UserInstancePermissions;
+import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.reader.api.endpoint.Health;
 import com.github.onsdigital.zebedee.reader.api.endpoint.PublishedData;
 import com.github.onsdigital.zebedee.reader.api.endpoint.PublishedIndex;
+import com.github.onsdigital.zebedee.reader.util.RequestUtils;
 import com.github.onsdigital.zebedee.search.api.endpoint.ReIndex;
-import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.session.service.Sessions;
 import com.github.onsdigital.zebedee.session.service.SessionsException;
 import com.google.common.collect.ImmutableList;
+import com.google.common.net.MediaType;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.http.HttpStatus;
 
@@ -28,34 +30,27 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
 
 public class AuthenticationFilter implements PreFilter {
 
     static final String AUTH_HEADER = "Authorization";
     static final String BEARER_PREFIX = "Bearer ";
-    private final String NO_AUTH_HEADER_FOUND = "No authorisation header found. Exiting...";
     private Sessions sessions;
-
-
-    private Boolean jwtSessionsEnabled;
 
     /**
      * AuthenticationFilter() - Default constructor - Creates new instance of AuthenticationFilter class
      */
-    public AuthenticationFilter() {
-    }
+    public AuthenticationFilter() {}
 
     /**
-     * AuthenticationFilter(Boolean jwtSessionsEnabled, Sessions sessions) - Creates new instance of AuthenticationFilter class
+     * AuthenticationFilter(Sessions sessions) - Creates new instance of AuthenticationFilter class
      * and initialises class variables.
      * <p/>
      *
-     * @param jwtSessionsEnabled cmsFeatureFlags().isJwtSessionsEnabled() feature flag setting
      * @param sessions           Root.zebedee.getSessions() object
      */
-    public AuthenticationFilter(Boolean jwtSessionsEnabled, Sessions sessions) {
-        this.jwtSessionsEnabled = jwtSessionsEnabled;
+    public AuthenticationFilter(Sessions sessions) {
         this.sessions = sessions;
     }
 
@@ -79,147 +74,107 @@ public class AuthenticationFilter implements PreFilter {
             .build();
 
     /**
-     * This filter protects all resources except {@link com.github.onsdigital.zebedee.api.Login}.
+     * This filter ensures API requests are appropriately authenticated.
      *
-     * @param request
-     * @param response
-     * @return <ul>
-     * <li>If the first path segment is login, true.</li>
-     * <li>Otherwise, if a {@link Session} can be found for the login token, true.</li>
-     * <li>Otherwise false.</li>
-     * </ul>
+     * For paths included in the <code>NO_AUTH_REQUIRED</code> list above, if a valid session token is provided it is
+     * validated and stored on the thread, but any invalid token errors are ignored. Any internal IO exceptions from the
+     * sessions service will always result in an internal server error because for some of the endpoints in the list the
+     * session is optional and still used in some cases (e.g. /password requires the session when called by an admin,
+     * but not when changing a temporary password). If we ignored all errors it would lead to unexpected behaviour in
+     * these cases.
+     *
+     * @param request  the http request
+     * @param response the http response
+     * @return <code>true</code> if the request is authorised and the session was validated and stored successfully,
+     *         otherwise return <code>false</code>
      */
     @Override
     public boolean filter(HttpServletRequest request, HttpServletResponse response) {
+        /*
+        Ensure that any existing session is clear in case this is a recycled thread
+        Do not remove this line unless we are no longer using ThreadLocal for passing session information as it can
+        result in privilege escalation. It is crucial that the session is removed from the thread upon each new request.
+         */
+        getSessions().resetThread();
+
         // Pass through OPTIONS request without authentication for cross-origin preflight requests:
         if (StringUtils.equalsIgnoreCase("OPTIONS", request.getMethod())) {
             return true;
         }
 
         Path path = Path.newInstance(request);
+        String authToken = RequestUtils.getSessionId(request);
 
-        if (noAuthorisationRequired(path)) {
+        try {
+            verifyAndStoreAccessToken(authToken, path);
             return true;
+        } catch (UnauthorizedException e) {
+            unauthorisedRequestResponse(response, e.getMessage());
+        } catch (Exception e) {
+            error().exception(e).log(e.getMessage());
+            internalServerErrorResponse(response);
         }
-
-        // Check all other requests:
-        boolean result = false;
-        if (isJwtSessionsEnabled()) {
-            result = verifyAndStoreAccessToken(request, response);
-        } else {
-            result = processSession(request, response);
-        }
-        return result;
+        return false;
     }
 
     /**
-     * verifyAndStoreAccessToken - decodes, verifies and stores Access Token JWT
      *
-     * @param request
-     * @param response
-     * @return boolean
+     * @param authToken the auth token to verify
+     * @param path      the request API path
+     * @throws UnauthorizedException if an authenticated API path is requested, but no valid auth token was provided
+     * @throws IOException if any
      */
-    private boolean verifyAndStoreAccessToken(HttpServletRequest request, HttpServletResponse response) {
-        boolean result = false;
-        //ensure that authorisation header present
-        String authToken = getTokenFrom(request);
-        if (StringUtils.isEmpty(authToken)) {
-            unauthorisedRequest(response, NO_AUTH_HEADER_FOUND);
-        } else {
+    private void verifyAndStoreAccessToken(String authToken, Path path) throws UnauthorizedException, IOException {
+        // If an path is an unathenticated endpoint, try to set the session if it exists
+        if (noAuthorisationRequired(path)) {
             try {
                 getSessions().set(authToken);
-                result = true;
+            } catch (SessionsException ignore) {
+                // Ignore
+            }
+        } else {
+            // Otherwise validate the token and store the session details
+            try {
+                getSessions().set(authToken);
             } catch (SessionsException e) {
                 // treat access token expired or malformed access token as unauthorised
-                unauthorisedRequest(response, e.getMessage());
-            } catch (Exception e) {
-                accessTokenError(response, e.getMessage());
+                throw new UnauthorizedException(e.getMessage());
             }
         }
-        return result;
     }
 
-    /**
-     * processSession - verifies if a session can be derived from request
-     *
-     * @param request
-     * @param response
-     * @return boolean
-     */
-    private boolean processSession(HttpServletRequest request, HttpServletResponse response) {
-        boolean result = false;
+    private void unauthorisedRequestResponse(HttpServletResponse response, String errorMessage) {
         try {
-            Session session = getSessions().get(request);
-            if (session == null) {
-                forbidden(response);
-            } else {
-                result = true;
-            }
-        } catch (IOException e) {
-            error(response);
-        }
-        return result;
-    }
-
-    private void unauthorisedRequest(HttpServletResponse response, String errorMessage) {
-        try {
-            response.setContentType("application/json");
-            response.setStatus(HttpStatus.UNAUTHORIZED_401);
             Serialiser.serialise(response, errorMessage);
-        } catch (IOException ex) {
-            error(response);
-        }
-    }
-
-    private void forbidden(HttpServletResponse response) {
-        try {
-            response.setContentType("application/json");
+            response.setContentType(MediaType.JSON_UTF_8.toString());
             response.setStatus(HttpStatus.UNAUTHORIZED_401);
-            Serialiser.serialise(response, "Please log in");
         } catch (IOException ex) {
-            error(response);
+            fallbackErrorResponse(response);
         }
     }
 
-    private void accessTokenError(HttpServletResponse response, String errorMessage) {
+    private void internalServerErrorResponse(HttpServletResponse response) {
         try {
-            response.setContentType("application/json");
+            Serialiser.serialise(response, "Internal Server Error");
+            response.setContentType(MediaType.JSON_UTF_8.toString());
             response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR_500);
-            Serialiser.serialise(response, errorMessage);
         } catch (IOException ex) {
-            error(response);
+            fallbackErrorResponse(response);
         }
     }
 
-    private void error(HttpServletResponse response) {
-        response.setContentType("application/json");
+    private void fallbackErrorResponse(HttpServletResponse response) {
+        response.setContentType(MediaType.JSON_UTF_8.toString());
         response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR_500);
     }
 
-    public boolean noAuthorisationRequired(Path path) {
-        return NO_AUTH_REQUIRED
-                .stream()
-                .filter(clazzName -> clazzName.getSimpleName().toLowerCase().equals(path.lastSegment().toLowerCase()))
-                .findFirst()
-                .isPresent();
+    private boolean noAuthorisationRequired(Path path) {
+        return NO_AUTH_REQUIRED.stream()
+                .anyMatch(clazzName -> clazzName.getSimpleName().equalsIgnoreCase(path.lastSegment()));
     }
 
     /**
-     * Lazy load the config
-     */
-    private boolean isJwtSessionsEnabled() {
-        if (jwtSessionsEnabled == null) {
-            synchronized (AuthenticationFilter.class) {
-                if (jwtSessionsEnabled == null) {
-                    this.jwtSessionsEnabled = cmsFeatureFlags().isJwtSessionsEnabled();
-                }
-            }
-        }
-        return this.jwtSessionsEnabled;
-    }
-
-    /**
-     * Lazy load the config
+     * Lazy load the sessions service
      */
     private Sessions getSessions() {
         if (sessions == null) {
@@ -230,34 +185,5 @@ public class AuthenticationFilter implements PreFilter {
             }
         }
         return this.sessions;
-    }
-
-    /**
-     * Get the Auth token from the request headers if it exists. Removes "Bearer " prefix if present in token value.
-     * e.g
-     * <ul>
-     *     <li>No "Authorization" header -> return null.</li>
-     *     <li>"Authorization: Bearer 1234567890" -> "1234567890"</li>
-     *     <li>"Authorization: 1234567890" -> "1234567890"</li>
-     * </ul>
-     *
-     * @param request the request to inspect.
-     * @return the token value if it exists, with any Bearer prefix removed.
-     */
-    String getTokenFrom(HttpServletRequest request) {
-        if (request == null) {
-            return null;
-        }
-
-        String token = request.getHeader(AUTH_HEADER);
-        if (StringUtils.isEmpty(token)) {
-            return null;
-        }
-
-        if (StringUtils.startsWith(token, BEARER_PREFIX)) {
-            return StringUtils.replace(token, BEARER_PREFIX, "");
-        }
-
-        return token;
     }
 }

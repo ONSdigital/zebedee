@@ -62,8 +62,7 @@ public class User extends UserSanitised {
             throw new UnsupportedOperationException(UNSUPPORTED_METHOD);
         }
 
-        boolean result = true;
-
+        boolean result = false;
         if (authenticate(oldPassword)) {
             if (keyring.changePassword(oldPassword, newPassword)) {
                 passwordHash = Password.hash(newPassword);
@@ -75,10 +74,6 @@ public class User extends UserSanitised {
             info().log("Could not authenticate with the old password");
         }
 
-        /*
-         FIXME: this always returns true regardless of whether the password change succeeds. Not fixing now since
-                this method will be removed shortly once the JWT session migration is complete.
-         */
         return result;
     }
 

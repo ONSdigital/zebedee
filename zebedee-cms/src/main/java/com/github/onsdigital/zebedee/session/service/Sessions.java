@@ -1,7 +1,6 @@
 package com.github.onsdigital.zebedee.session.service;
 
 import com.github.onsdigital.zebedee.session.model.Session;
-import com.github.onsdigital.zebedee.user.model.User;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
@@ -11,7 +10,7 @@ public interface Sessions {
     /**
      * Create a new {@link Session} for the user.
      *
-     * @param user the {@link User} the session is being created for.
+     * @param email the email of the user the session is being created for.
      * @return a {@link Session} instance for the user.
      * @throws IOException problem creating a session.
      *
@@ -22,7 +21,7 @@ public interface Sessions {
      * TODO: Remove this method once the migration to JWT based sessions is complete
      */
     @Deprecated
-    Session create(User user) throws IOException;
+    Session create(String email) throws IOException;
 
     /**
      * Get a {@link Session} from the provided {@link HttpServletRequest}.
@@ -77,4 +76,11 @@ public interface Sessions {
      * @throws IOException for any problems getting the session.
      */
     void set(String token) throws IOException;
+
+    /**
+     * Reset the thread by removing the current {@link ThreadLocal} value. If threads are being recycled to serve new
+     * requests then this method must be called on each new request to ensure that sessions do not leak from one request
+     * to the next causing potential for privilege excalation.
+     */
+    void resetThread();
 }

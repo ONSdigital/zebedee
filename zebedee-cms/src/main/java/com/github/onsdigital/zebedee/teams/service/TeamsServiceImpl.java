@@ -174,6 +174,14 @@ public class TeamsServiceImpl implements TeamsService {
         return membersReport;
     }
 
+    @Override
+    public List<String> listTeamsForUser(Session session) throws IOException {
+        return listTeams().parallelStream()
+                .filter(t -> t.getMembers().contains(session.getEmail()))
+                .map(t -> Integer.toString(t.getId()))
+                .collect(Collectors.toList());
+    }
+
     private void updateTeam(Team target, Predicate<Team> validator, Function<Team, Team> updateTask) throws IOException, NotFoundException {
         if (validator.test(target)) {
             teamLock.writeLock().lock();

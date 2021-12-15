@@ -82,7 +82,7 @@ public class Password {
                     .host(request)
                     .user(session.getEmail())
                     .log();
-            return "Password not updated for " + credentials.email + " (there may be an issue with the user's keyring password).";
+            return "Password not updated for " + credentials.email + " (there may be an issue with the user's password).";
         }
     }
 }

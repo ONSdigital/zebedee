@@ -63,7 +63,7 @@ public class Login {
         }
 
         User user = usersServiceSupplier.getService().getUserByEmail(credentials.getEmail());
-        boolean result = user.authenticate(credentials.password);
+        boolean result = user.authenticate(credentials.getPassword());
 
         if (!result) {
             response.setStatus(HttpStatus.UNAUTHORIZED_401);

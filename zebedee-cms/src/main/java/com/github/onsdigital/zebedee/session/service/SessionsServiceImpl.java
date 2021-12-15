@@ -1,16 +1,13 @@
 package com.github.onsdigital.zebedee.session.service;
 
 import com.github.davidcarboni.cryptolite.Random;
-import com.github.onsdigital.zebedee.model.PathUtils;
 import com.github.onsdigital.zebedee.reader.util.RequestUtils;
 import com.github.onsdigital.zebedee.session.model.Session;
-import com.github.onsdigital.zebedee.session.store.SessionsStoreImpl;
-import com.github.onsdigital.zebedee.user.model.User;
+import com.github.onsdigital.zebedee.session.store.SessionsStore;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -21,29 +18,27 @@ import java.util.function.Supplier;
 
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.warn;
+import static com.github.onsdigital.zebedee.logging.CMSLogEvent.error;
 
 /**
  * Created by david on 12/03/2015.
  *
- * @deprecated In favour of the new JWT based sessions. Once the migration to the dp-identity-api is complete this class
- *             will be removed.
+ * @deprecated In favour of the transition ThreadLocalSessionsServiceImpl. The ThreadLocalSessionsServiceImpl should be
+ *             used in all cases. This calss
  */
 @Deprecated
 public class SessionsServiceImpl extends TimerTask implements Sessions {
 
+    static final int EXPIRY_UNIT = Calendar.MINUTE;
+    static final int EXPIRY_AMOUNT = 60;
     private static final String DELETING_SESSION_MSG = "Deleting expired session";
 
-    private Supplier<String> randomIdGenerator = () -> Random.id();
-    private SessionsStoreImpl sessionsStore;
+    private Supplier<String> randomIdGenerator = Random::id;
+    private ClosableTimer timer;
+    protected SessionsStore sessionsStore;
 
-    int expiryUnit = Calendar.MINUTE;
-    int expiryAmount = 60;
-    ClosableTimer timer;
-    private Path sessionsPath;
-
-    public SessionsServiceImpl(Path sessionsPath) {
-        this.sessionsPath = sessionsPath;
-        this.sessionsStore = new SessionsStoreImpl(sessionsPath);
+    public SessionsServiceImpl(SessionsStore sessionsStore) {
+        this.sessionsStore = sessionsStore;
 
         // Run every minute after the first minute:
         info().log("starting sessions timer");
@@ -51,11 +46,6 @@ public class SessionsServiceImpl extends TimerTask implements Sessions {
         timer.schedule(this, 60 * 1000, 60 * 1000);
         Runtime.getRuntime().addShutdownHook(new Thread(ClosableTimer::close));
 
-    }
-
-    public void setExpiry(int expiryAmount, int expiryUnit) {
-        this.expiryAmount = expiryAmount;
-        this.expiryUnit = expiryUnit;
     }
 
     /**
@@ -66,35 +56,33 @@ public class SessionsServiceImpl extends TimerTask implements Sessions {
         try {
             deleteExpiredSessions();
         } catch (IOException e) {
-            // Not much we can do.
-            // This could periodically spam the logs
-            // so need to review at some point.
-            e.printStackTrace();
+            error().exception(e).log("deleting expired sessions failed due to unexpected error");
         }
     }
 
     /**
      * Creates a new session.
      *
-     * @param user the user to create a session for
+     * @param email the email of the user the session is being created for.
      * @return A session for the email. If one exists it returns that else it
      * creates a new one. If the supplied email is blank then null will
      * be returned.
      * @throws java.io.IOException If a filesystem error occurs.
      */
-    public Session create(User user) throws IOException {
+    @Override
+    public Session create(String email) throws IOException {
         Session session = null;
 
-        if (StringUtils.isNotBlank(user.getEmail())) {
+        if (StringUtils.isNotBlank(email)) {
 
             // Check for an existing session:
-            session = find(user.getEmail());
+            session = find(email);
 
             // Otherwise go ahead and create
-            if (session == null) {
+            if (session == null || expired(session)) {
                 session = new Session();
                 session.setId(randomIdGenerator.get());
-                session.setEmail(user.getEmail());
+                session.setEmail(email);
                 sessionsStore.write(session);
             }
         }
@@ -110,6 +98,7 @@ public class SessionsServiceImpl extends TimerTask implements Sessions {
      * for this ID.
      * @throws java.io.IOException If a filesystem error occurs.
      */
+    @Override
     public Session get(HttpServletRequest request) throws IOException {
         String token = RequestUtils.getSessionId(request);
         return get(token);
@@ -123,13 +112,14 @@ public class SessionsServiceImpl extends TimerTask implements Sessions {
      * for this ID.
      * @throws java.io.IOException If a filesystem error occurs.
      */
+    @Override
     public Session get(String id) throws IOException {
         Session result = null;
 
         // Check the session record exists:
         if (sessionsStore.exists(id)) {
             // Deserialise the json:
-            Session session = sessionsStore.read(sessionPath(id));
+            Session session = sessionsStore.read(id);
             if (!expired(session)) {
                 updateLastAccess(session);
                 result = session;
@@ -165,12 +155,12 @@ public class SessionsServiceImpl extends TimerTask implements Sessions {
      * @throws IOException If a filesystem error occurs.
      */
     void deleteExpiredSessions() throws IOException {
-        Predicate<Session> isExpired = (session) -> expired(session);
+        Predicate<Session> isExpired = this::expired;
         List<Session> expired = sessionsStore.filterSessions(isExpired);
 
         for (Session s : expired) {
             info().data("user", s.getEmail()).log(DELETING_SESSION_MSG);
-            sessionsStore.delete(sessionPath(s.getId()));
+            sessionsStore.delete(s.getId());
         }
     }
 
@@ -181,12 +171,12 @@ public class SessionsServiceImpl extends TimerTask implements Sessions {
      * @return If the session is not null and the last access time is
      * more than 60 minutes in the past, true.
      */
-    private boolean expired(Session session) {
+    boolean expired(Session session) {
         boolean result = false;
 
         if (session != null) {
             Calendar expiry = Calendar.getInstance();
-            expiry.add(expiryUnit, -expiryAmount);
+            expiry.add(EXPIRY_UNIT, -EXPIRY_AMOUNT);
             result = session.getLastAccess().before(expiry.getTime());
         }
 
@@ -217,57 +207,26 @@ public class SessionsServiceImpl extends TimerTask implements Sessions {
     }
 
     /**
+     * Reset the thread by removing the current {@link ThreadLocal} value. If threads are being recycled to serve new
+     * requests then this method must be called on each new request to ensure that sessions do not leak from one request
+     * to the next causing potential for privilege excalation.
+     */
+    @Override
+    public void resetThread() {
+        info().log("Session resetThread() - no-Op.");
+    }
+
+    /**
      * Updates the last access time and saves the session to disk.
      *
      * @param session The session to update.
      * @throws IOException If a filesystem error occurs.
      */
-    public void updateLastAccess(Session session) throws IOException {
+    private void updateLastAccess(Session session) throws IOException {
         if (session != null) {
             session.setLastAccess(new Date());
             sessionsStore.write(session);
         }
-    }
-
-    /**
-     * Determines the filesystem path for the given session ID.
-     *
-     * @param id The ID to get a path for.
-     * @return The path, or null if the ID is blank.
-     */
-    private Path sessionPath(String id) {
-        Path result = null;
-
-        if (StringUtils.isNotBlank(id)) {
-            String sessionFileName = PathUtils.toFilename(id);
-            sessionFileName += ".json";
-            result = sessionsPath.resolve(sessionFileName);
-        }
-
-        return result;
-    }
-
-    /**
-     * Reads the session with the given ID from disk.
-     *
-     * @param id The ID to be read.
-     * @return The session, or
-     * @throws IOException
-     */
-    public Session read(String id) throws IOException {
-        return sessionsStore.read(sessionPath(id));
-    }
-
-    Date getExpiryDate(Session session) {
-        Date expiry = null;
-
-        if (session != null) {
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTime(session.getLastAccess());
-            calendar.add(expiryUnit, expiryAmount);
-            expiry = calendar.getTime();
-        }
-        return expiry;
     }
 
     static class ClosableTimer extends Timer{

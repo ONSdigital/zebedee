@@ -3,16 +3,22 @@ package com.github.onsdigital.zebedee.session.service;
 import com.github.onsdigital.JWTHandlerImpl;
 import com.github.onsdigital.impl.UserDataPayload;
 import com.github.onsdigital.interfaces.JWTHandler;
+import com.github.onsdigital.zebedee.junit4.rules.RunInThread;
+import com.github.onsdigital.zebedee.junit4.rules.RunInThreadRule;
 import com.github.onsdigital.zebedee.session.model.Session;
+import com.github.onsdigital.zebedee.teams.model.Team;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -28,7 +34,6 @@ public class JWTSessionsServiceImplTest {
     private static final String REQUIRED_CLAIM_PAYLOAD_ERROR = "Required JWT payload claim not found [username or cognito:groups].";
     private static final String ACCESS_TOKEN_INTEGRITY_ERROR = "Verification of JWT token integrity failed.";
     private static final String RSA_PUBLIC_KEY_INALID_ERROR  = "Public Key cannot be empty or null.";
-
 
     private static final String SIGNED_TOKEN         = "eyJhbGciOiJSUzI1NiIsImtpZCI6IjUxR3BvdHBTVGxtK3FjNXhOWUhzSko2S2tlT2JSZjlYSDQxYkhIS0JJOE09In0.eyJzdWIiOiJhYWFhYWFhYS1iYmJiLWNjY2MtZGRkZC1lZWVlZWVlZWVlZWUiLCJkZXZpY2Vfa2V5IjoiYWFhYWFhYWEtYmJiYi1jY2NjLWRkZGQtZWVlZWVlZWVlZWVlIiwiY29nbml0bzpncm91cHMiOlsiYWRtaW4iLCJwdWJsaXNoaW5nIiwiZGF0YSIsInRlc3QiXSwidG9rZW5fdXNlIjoiYWNjZXNzIiwic2NvcGUiOiJhd3MuY29nbml0by5zaWduaW4udXNlci5hZG1pbiIsImF1dGhfdGltZSI6MTU2MjE5MDUyNCwiaXNzIjoiaHR0cHM6Ly9jb2duaXRvLWlkcC51cy13ZXN0LTIuYW1hem9uYXdzLmNvbS91cy13ZXN0LTJfZXhhbXBsZSIsImV4cCI6OTk5OTk5OTk5OSwiaWF0IjoxNTYyMTkwNTI0LCJqdGkiOiJhYWFhYWFhYS1iYmJiLWNjY2MtZGRkZC1lZWVlZWVlZWVlZWUiLCJjbGllbnRfaWQiOiI1N2NiaXNoazRqMjRwYWJjMTIzNDU2Nzg5MCIsInVzZXJuYW1lIjoiamFuZWRvZUBleGFtcGxlLmNvbSJ9.fC3P6jnpnhmOxdlw0u4nOhehz7dCXsqX7RvqI1gEC4wrJoE6rlKH1mo7lR16K-EXWdXRoeN0_z0PZQzo__xOprAsY2XSNOexOcIo3hoydx6CkGWGmNNsLp35iGY3DgW6SLpQsdGF8HicJ9D9KCTPXKAGmOrkX3t92WSCLiQXXuER9gndzC6oLMU0akvKDstoTfwLWeSsogOQBn7_lUqGaHC8T06ZR37n_eOgUGSXwSFuYbg1zcY2xK3tMh4Wo8TOrADOrfLg660scpXuu-oDf0PNdgpXGU318IK1R0A2LiqqJWIV1sDE88uuPcX9-xgKc0eUn6qABXM9qhEyr6MS6g";
     private static final String UNSIGNED_TOKEN       = "eyJhbGciOiJSUzI1NiIsImtpZCI6IjUxR3BvdHBTVGxtK3FjNXhOWUhzSko2S2tlT2JSZjlYSDQxYkhIS0JJOE09In0.eyJzdWIiOiJhYWFhYWFhYS1iYmJiLWNjY2MtZGRkZC1lZWVlZWVlZWVlZWUiLCJkZXZpY2Vfa2V5IjoiYWFhYWFhYWEtYmJiYi1jY2NjLWRkZGQtZWVlZWVlZWVlZWVlIiwiY29nbml0bzpncm91cHMiOlsiYWRtaW4iLCJwdWJsaXNoaW5nIiwiZGF0YSIsInRlc3QiXSwidG9rZW5fdXNlIjoiYWNjZXNzIiwic2NvcGUiOiJhd3MuY29nbml0by5zaWduaW4udXNlci5hZG1pbiIsImF1dGhfdGltZSI6MTU2MjE5MDUyNCwiaXNzIjoiaHR0cHM6Ly9jb2duaXRvLWlkcC51cy13ZXN0LTIuYW1hem9uYXdzLmNvbS91cy13ZXN0LTJfZXhhbXBsZSIsImV4cCI6OTk5OTk5OTk5OSwiaWF0IjoxNTYyMTkwNTI0LCJqdGkiOiJhYWFhYWFhYS1iYmJiLWNjY2MtZGRkZC1lZWVlZWVlZWVlZWUiLCJjbGllbnRfaWQiOiI1N2NiaXNoazRqMjRwYWJjMTIzNDU2Nzg5MCIsInVzZXJuYW1lIjoiamFuZWRvZUBleGFtcGxlLmNvbSJ9";
@@ -55,18 +60,30 @@ public class JWTSessionsServiceImplTest {
     +"V6L11BWkpzGXSW4Hv43qa+GSYOD2QU68Mb59oSk2OB+BtOLpJofmbGEGgvmwyCI9"
     +"MwIDAQAB";
 
+    private final static String EMAIL = "janedoe@example.com";
+
     private JWTSessionsServiceImpl jwtSessionsServiceImpl;
 
     private Map<String, String> rsaKeyMap = new HashMap<String, String>();
 
     private JWTHandler jwtHandler = new JWTHandlerImpl();
 
+    private List<Team> teams;
+    private String[] teamIDs;
+    private Team team1;
+    private Team team2;
+
     @Mock
     private UserDataPayload userDataPayload;
 
+    private static ThreadLocal<UserDataPayload> store = new ThreadLocal<>();
+
+    @Rule
+    public RunInThreadRule runInThread = new RunInThreadRule();
+
     @BeforeClass
     public static void staticSetUp() {
-        JWTSessionsServiceImpl.setStore(new ThreadLocal<>());
+        JWTSessionsServiceImpl.setStore(store);
     }
 
     @Before
@@ -76,59 +93,91 @@ public class JWTSessionsServiceImplTest {
         rsaKeyMap.put(RSA_KEY_ID_1, RSA_SIGNING_KEY_1);
         rsaKeyMap.put(RSA_KEY_ID_2, RSA_SIGNING_KEY_2);
 
+        this.teams = new ArrayList<>();
+
+        this.team1 = new Team();
+        this.team1.setId(10);
+        this.teams.add(team1);
+
+        this.team2 = new Team();
+        this.team2.setId(20);
+        this.team2.addMember(EMAIL);
+        this.teams.add(team2);
+
+        this.teamIDs = teams.stream().map(t -> Integer.toString(t.getId())).toArray(String[]::new);
+
+        this.userDataPayload = new UserDataPayload(EMAIL, teamIDs);
+
         this.jwtSessionsServiceImpl = new JWTSessionsServiceImpl(jwtHandler, rsaKeyMap);
     }
 
     @Test
+    @RunInThread
     public void decodeVerifyAndStoreAccessTokenData() throws Exception {
         this.jwtSessionsServiceImpl.set(SIGNED_TOKEN);
-        Session session = this.jwtSessionsServiceImpl.get();
-        Arrays.sort(session.getGroups());
-        assertThat(session, is(notNullValue()));
-        assertThat(session.getEmail(), is("\"janedoe@example.com\""));
-        assertThat(session.getGroups()[0], is("admin"));
-        assertThat(session.getGroups()[1], is("data"));
-        assertThat(session.getGroups()[2], is("publishing"));
-        assertThat(session.getGroups()[3], is("test"));
+
+        UserDataPayload actual = this.store.get();
+
+        assertThat(actual, is(notNullValue()));
+        assertThat(actual.getEmail(), is(String.format("\"%s\"", EMAIL)));
+
+        Arrays.sort(actual.getGroups());
+        assertThat(actual.getGroups()[0], is("admin"));
+        assertThat(actual.getGroups()[1], is("data"));
+        assertThat(actual.getGroups()[2], is("publishing"));
+        assertThat(actual.getGroups()[3], is("test"));
     }   
 
     @Test
+    @RunInThread
     public void decodeVerifyAndStoreAccessTokenDataThrowsTokenExcpetion() throws Exception {
         Exception exception = assertThrows(SessionsException.class, () -> this.jwtSessionsServiceImpl.set(""));
         assertThat(exception.getMessage(), is(this.jwtSessionsServiceImpl.ACCESS_TOKEN_REQUIRED_ERROR));
+        assertThat(this.store.get(), is(nullValue()));
     }
 
     @Test
+    @RunInThread
     public void decodingAccessTokenWithNoUsernameInClaimsThrowsDecodeExcpetion() throws Exception {
         Exception exception = assertThrows(SessionsException.class, () -> this.jwtSessionsServiceImpl.set(TOKEN_NO_USER));
         assertThat(exception.getMessage(), is(REQUIRED_CLAIM_PAYLOAD_ERROR));
+        assertThat(this.store.get(), is(nullValue()));
     }
 
     @Test
+    @RunInThread
     public void decodedTokenIsExiredThrowsSessionsTokenExpiredException() throws Exception {
         Exception exception = assertThrows(SessionsException.class, () -> this.jwtSessionsServiceImpl.set(TOKEN_EXPIRED_TIME));
         assertThat(exception.getMessage(), is(this.jwtSessionsServiceImpl.ACCESS_TOKEN_EXPIRED_ERROR));
+        assertThat(this.store.get(), is(nullValue()));
     }
 
     @Test
+    @RunInThread
     public void decodedTokenIsInvalidThrowsSessionVerificationException() throws Exception {
         Exception exception = assertThrows(SessionsException.class, () -> this.jwtSessionsServiceImpl.set(INVALID_SIGNED_TOKEN));
         assertThat(exception.getMessage(), is(ACCESS_TOKEN_INTEGRITY_ERROR));
+        assertThat(this.store.get(), is(nullValue()));
     }
 
     @Test
+    @RunInThread
     public void decodedTokenHeaderContainsKIDNotFoundInMapThrowsSessionsDecodeException() throws Exception {
         Exception exception = assertThrows(SessionsException.class, () -> this.jwtSessionsServiceImpl.set(HEADER_KID_NOT_FOUND));
         assertThat(exception.getMessage(), is(RSA_PUBLIC_KEY_INALID_ERROR));
+        assertThat(this.store.get(), is(nullValue()));
     }
 
     @Test
+    @RunInThread
     public void invalidlyFormattedAccessTokenPassedtoSetterThrowsSessionsDecodeException() throws Exception {
         Exception exception = assertThrows(SessionsException.class, () -> this.jwtSessionsServiceImpl.set(UNSIGNED_TOKEN));
         assertThat(exception.getMessage(), is(this.jwtSessionsServiceImpl.TOKEN_NOT_VALID_ERROR));
+        assertThat(this.store.get(), is(nullValue()));
     }
 
     @Test
+    @RunInThread
     public void getByRequest_sessionDoesNotExist_shouldReturnNull() throws Exception {
         HttpServletRequest request = mock(HttpServletRequest.class);
 
@@ -138,42 +187,34 @@ public class JWTSessionsServiceImplTest {
     }
 
     @Test
+    @RunInThread
     public void getByRequest_success_shouldReturnSession() throws Exception {
         HttpServletRequest request = mock(HttpServletRequest.class);
-        UserDataPayload payload = new UserDataPayload("admin@ons.gov.uk", new String[]{"admin"});
-        Session expected = new Session(payload);
 
-        ThreadLocal<UserDataPayload> threadLocal = new ThreadLocal<UserDataPayload>();
-        threadLocal.set(payload);
-
-        JWTSessionsServiceImpl.setStore(threadLocal);
+        this.store.set(userDataPayload);
 
         Session actual = jwtSessionsServiceImpl.get(request);
 
         assertThat(actual, is(notNullValue()));
-        assertThat(actual.getEmail(), equalTo(expected.getEmail()));
-        assertThat(actual.getGroups(), equalTo(expected.getGroups()));
+        assertThat(actual.getEmail(), equalTo(EMAIL));
+        assertThat(actual.getGroups(), equalTo(teamIDs));
     }
 
     @Test
-    public void getByIDsessionDoesNotExist_shouldReturnNull() throws Exception {
+    @RunInThread
+    public void getByIDSessionDoesNotExist_shouldReturnNull() throws Exception {
         assertThat(jwtSessionsServiceImpl.get("ID"), is(nullValue()));
     }
 
     @Test
+    @RunInThread
     public void getByID_success_shouldReturnSession() throws Exception {
-        UserDataPayload payload = new UserDataPayload("admin@ons.gov.uk", new String[]{"admin"});
-        Session expected = new Session(payload);
-
-        ThreadLocal<UserDataPayload> threadLocal = new ThreadLocal<UserDataPayload>();
-        threadLocal.set(payload);
-
-        JWTSessionsServiceImpl.setStore(threadLocal);
+        this.store.set(userDataPayload);
 
         Session actual = jwtSessionsServiceImpl.get("666");
 
         assertThat(actual, is(notNullValue()));
-        assertThat(actual.getEmail(), equalTo(expected.getEmail()));
-        assertThat(actual.getGroups(), equalTo(expected.getGroups()));
+        assertThat(actual.getEmail(), equalTo(EMAIL));
+        assertThat(actual.getGroups(), equalTo(teamIDs));
     }
 }

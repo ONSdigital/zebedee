@@ -299,7 +299,10 @@ public class ZebedeeTest extends ZebedeeTestBaseFixture {
         when(usersService.getUserByEmail(any()))
                 .thenReturn(user);
 
-        when(sessions.create(user))
+        when(user.getEmail())
+                .thenReturn(TEST_EMAIL);
+
+        when(sessions.create(TEST_EMAIL))
                 .thenThrow(new IOException("boom"));
 
         Zebedee zebedee = new Zebedee(zebCfg);
@@ -310,7 +313,7 @@ public class ZebedeeTest extends ZebedeeTestBaseFixture {
         // Then an exception is thrown
         assertThat(ex.getCause().getMessage(), equalTo("boom"));
         verify(usersService, times(1)).getUserByEmail(TEST_EMAIL);
-        verify(sessions, times(1)).create(user);
+        verify(sessions, times(1)).create(TEST_EMAIL);
 
         verifyZeroInteractions(collectionKeyring);
     }
@@ -326,10 +329,13 @@ public class ZebedeeTest extends ZebedeeTestBaseFixture {
         when(credentials.getPassword())
                 .thenReturn(PASSWORD);
 
-        when(usersService.getUserByEmail(any()))
+        when(usersService.getUserByEmail(TEST_EMAIL))
                 .thenReturn(user);
 
-        when(sessions.create(user))
+        when(user.getEmail())
+                .thenReturn(TEST_EMAIL);
+
+        when(sessions.create(TEST_EMAIL))
                 .thenReturn(userSession);
 
         when(permissionsService.isAdministrator(any(Session.class)))
@@ -343,7 +349,6 @@ public class ZebedeeTest extends ZebedeeTestBaseFixture {
         // Then the expected session is returned
         assertThat(actual, equalTo(userSession));
         verify(usersService, times(1)).getUserByEmail(TEST_EMAIL);
-        verify(sessions, times(1)).create(user);
-        verifyZeroInteractions(usersKeyring);
+        verify(sessions, times(1)).create(TEST_EMAIL);
     }
 }

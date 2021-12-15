@@ -293,7 +293,7 @@ public class Zebedee {
             return null;
         }
 
-        return createSession(user);
+        return createSession(user.getEmail());
     }
 
     /**
@@ -302,11 +302,11 @@ public class Zebedee {
      * is completed this method will be removed.
      */
     @Deprecated
-    private Session createSession(User user) throws IOException {
+    private Session createSession(String email) throws IOException {
         try {
-            return sessions.create(user);
+            return sessions.create(email);
         } catch (Exception ex) {
-            error().user(user.getEmail())
+            error().user(email)
                     .exception(ex)
                     .log("error attempting to create session for user");
             throw new IOException(ex);

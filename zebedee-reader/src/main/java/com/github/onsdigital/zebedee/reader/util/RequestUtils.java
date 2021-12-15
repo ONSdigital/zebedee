@@ -27,16 +27,23 @@ public class RequestUtils {
      * Get the zebedee session id from the given HttpServletRequest.
      * The session ID will be retrieved from the auth headers.
      *
-     * @param request
-     * @return
+     * @param request the http request object
+     * @return the access token/session ID or null if it was not provided
      */
     public static String getSessionId(HttpServletRequest request) {
+        if (request == null) {
+            return null;
+        }
         // TODO: Simplify after migration from X-Florence-Token to Authorization header is complete
         String sessionId = request.getHeader(FLORENCE_TOKEN_HEADER);
         String authHeader = request.getHeader(AUTH_HEADER);
         // If the Authorization header contains a '.' then it is a JWT session token rather than a service token
         if (StringUtils.isBlank(sessionId) && authHeader != null && authHeader.contains(".")) {
             sessionId = removeBearerPrefixIfPresent(authHeader);
+        }
+
+        if (StringUtils.isBlank(sessionId)) {
+            sessionId = null;
         }
         return sessionId;
     }

@@ -227,7 +227,6 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
      * @param email   the email of the user to revoke the permission from.
      * @param session the {@link Session} of the {@link User} revoking the permissison.
      * @throws UnsupportedOperationExceptions
-     * @deprecated with dp-identity-api
      */
     @Override
     public void removeEditor(String email, Session session) throws UnsupportedOperationExceptions {
@@ -249,9 +248,8 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
         try {
             accessMapping = permissionsStore.getAccessMapping();
         } catch (IOException e) {
-            e.printStackTrace();
         }
-        assert accessMapping != null;
+
         Set<Integer> collectionTeams = accessMapping.getCollections().get(collectionDescription.getId());
         if (collectionTeams == null || collectionTeams.isEmpty()) {
             return false;
@@ -299,14 +297,25 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
      */
     @Override
     public void addViewerTeam(CollectionDescription collectionDescription, Team team, Session session) throws
-            JWTVerificationException {
-        throw new JWTVerificationException("JWT Permissions service error for CollectionDescription no longer required");
+            UnsupportedOperationExceptions {
+        throw new UnsupportedOperationExceptions("JWT Permissions service error for CollectionDescription no longer required");
     }
 
+    /**
+     * this method is being migrated to the dp-identity-api
+     *
+     * @param collectionDescription the {@link CollectionDescription} of the {@link Collection} to get the viewer
+     *                              teams for.
+     * @param session               the {@link Session} of the {@link User} requesting this information.
+     * @return
+     * @throws UnsupportedOperationExceptions
+     */
     @Override
     public Set<Integer> listViewerTeams(CollectionDescription collectionDescription, Session session) throws
-            JWTVerificationException {
-        throw new JWTVerificationException("JWT Permissions service error for CollectionDescription no longer required");
+            UnsupportedOperationExceptions {
+//        throw new UnsupportedOperationExceptions("JWT Permissions service error for listViewerTeams no longer required");
+        // TODO: 16/12/2021
+        return null;
     }
 
     /**
@@ -318,31 +327,30 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
      */
     @Override
     public void removeViewerTeam(CollectionDescription collectionDescription, Team team, Session session) throws
-            JWTVerificationException {
-        throw new JWTVerificationException("JWT Permissions service error for CollectionDescription no longer required");
+            UnsupportedOperationExceptions {
+        throw new UnsupportedOperationExceptions("JWT Permissions service error for removeViewerTeam no longer required");
     }
 
     @Override
-    public PermissionDefinition userPermissions(String email, Session session) throws JWTVerificationException {
-        throw new JWTVerificationException("JWT Permissions service error for CollectionDescription no longer required");
+    public PermissionDefinition userPermissions(String email, Session session) throws UnsupportedOperationExceptions {
+        throw new UnsupportedOperationExceptions("JWT Permissions service error for userPermissions no longer required");
     }
 
     @Override
-    public Set<String> listCollectionsAccessibleByTeam(Team t) throws JWTVerificationException {
-        throw new JWTVerificationException("JWT Permissions service error for CollectionDescription no longer required");
+    public Set<String> listCollectionsAccessibleByTeam(Team t) throws IOException {
+        // TODO: 16/12/2021
+//        AccessMapping accessMapping = permissionsStore.getAccessMapping();
+//        if (accessMapping == null) {
+//            throw new IOException("error reading accessMapping expected value but was null");
+//        }
+//
+//        if (accessMapping.getCollections() == null) {
+//            return new HashSet<>();
     }
 
-    /**
-     * @param session
-     * @param permission
-     * @return
-     */
+
     public boolean hasPermission(Session session, String permission) {
-        try {
-            return ArrayUtils.contains(session.getGroups(), permission);
-        } catch (Exception exception) {
-            return false;
-        }
+        return ArrayUtils.contains(session.getGroups(), permission);
     }
 
 }

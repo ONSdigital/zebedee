@@ -120,7 +120,6 @@ public class PermissionsServiceProxyTest {
         assertThat(permissions.isPublisher(session), is(false));
         verifyZeroInteractions(legacyPermissionsService, usersService, teamsService);
         verify(jwtPermissionsService, times(1)).isPublisher(session);
-
     }
 
     /**

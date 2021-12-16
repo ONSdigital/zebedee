@@ -100,7 +100,7 @@ public class PermissionsServiceProxy implements PermissionsService {
     }
 
     /**
-     * @return
+     * @return hasAdmin
      * @throws IOException the required module on jwtSessionsEnabled
      */
     @Override

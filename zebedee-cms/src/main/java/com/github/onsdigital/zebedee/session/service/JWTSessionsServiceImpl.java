@@ -1,4 +1,4 @@
-package com.github.onsdigital.zebedee.session.store;
+package com.github.onsdigital.zebedee.session.service;
 
 import com.github.onsdigital.exceptions.JWTDecodeException;
 import com.github.onsdigital.exceptions.JWTTokenExpiredException;
@@ -6,12 +6,6 @@ import com.github.onsdigital.exceptions.JWTVerificationException;
 import com.github.onsdigital.impl.UserDataPayload;
 import com.github.onsdigital.interfaces.JWTHandler;
 import com.github.onsdigital.zebedee.session.model.Session;
-import com.github.onsdigital.zebedee.session.service.Sessions;
-import com.github.onsdigital.zebedee.session.store.exceptions.SessionsDecodeException;
-import com.github.onsdigital.zebedee.session.store.exceptions.SessionsRequestException;
-import com.github.onsdigital.zebedee.session.store.exceptions.SessionsStoreException;
-import com.github.onsdigital.zebedee.session.store.exceptions.SessionsTokenExpiredException;
-import com.github.onsdigital.zebedee.session.store.exceptions.SessionsVerificationException;
 import com.github.onsdigital.zebedee.user.model.User;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
@@ -23,6 +17,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Map;
 
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 
 
@@ -34,7 +29,7 @@ import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
  * <p>
  * Implements Sessions interface.
  */
-public class JWTStore implements Sessions {
+public class JWTSessionsServiceImpl implements Sessions {
 
     private JWTHandler jwtHandler;
 
@@ -50,40 +45,27 @@ public class JWTStore implements Sessions {
     public static final String ACCESS_TOKEN_EXPIRED_ERROR = "JWT verification failed as token is expired.";
     public static final String TOKEN_NOT_VALID_ERROR = "Token format not valid.";
     public static final String TOKEN_NULL_ERROR = "Token cannot be null.";
-    public static final String SESSION_NOT_FOUND = "user session expected in store but none found";
-
-    private static final String GET_STRING_ID_NOOP = "Session get(String id) - no-Op.";
-    private static final String GET_REQUEST_ID_NOOP = "Session get(HttpServletRequest id) - no-Op.";
+    private static final String UNSUPPORTED_METHOD = "forbidden attempt to call sessions method that is not supported JWT sessions are enabled";
 
     // class constructor - takes HashMap<String, String> as param.
-    public JWTStore(JWTHandler jwtHandler, Map<String, String> rsaKeyMap) {
+    public JWTSessionsServiceImpl(JWTHandler jwtHandler, Map<String, String> rsaKeyMap) {
         this.jwtHandler = jwtHandler;
         this.rsaKeyMap = rsaKeyMap;
         this.gson = new Gson();
     }
 
     /**
-     * Find a {@link Session} associated with the user email - defaults to the NoOp impl.
-     */
-    @Override
-    public Session find(String email) throws IOException {
-        return null;
-    }
-
-    /**
      * Create a new {@link Session} for the user - defaults to the NoOp impl.
+     *
+     * @deprecated Using the new JWT based sessions, sessions are never created within zebedee as the JWT token
+     *             issued by the dp-identity-api replaces the sessions in zebedee. Once migration to the dp-identity-api
+     *             is completed this method will be removed.
      */
+    @Deprecated
     @Override
     public Session create(User user) throws IOException {
-        return null;
-    }
-
-    /**
-     * Check if the provided {@link Session} is expired - defaults to the NoOp impl.
-     */
-    @Override
-    public boolean expired(Session session) {
-        return session == null;
+        error().log(UNSUPPORTED_METHOD);
+        throw new UnsupportedOperationException(UNSUPPORTED_METHOD);
     }
 
     /**
@@ -92,7 +74,12 @@ public class JWTStore implements Sessions {
      * @param id the {@link String} to get the session object from thread local for.
      * @return session object from thread local.
      * @throws IOException for any problem getting a session from the request.
+     *
+     * @deprecated Since the new JWT sessions implementation can only get the session of the current user, a single
+     *             {@link this#get()} method is provided. Once migration to the new JWT sessions is completed all
+     *             references to this method should be updated to use the {@link this#get()} instead.
      */
+    @Deprecated
     @Override
     public Session get(String id) throws IOException {
         return get();
@@ -104,7 +91,15 @@ public class JWTStore implements Sessions {
      * @param req the {@link HttpServletRequest} to get the session object from thread local for.
      * @return session object from thread local if it exists, return null if no session exists.
      * @throws IOException for any problem getting a session from the request.
+     *
+     * @deprecated Since the new JWT sessions implementation can only get the session of the current user, a single
+     *             {@link this#get()} method is provided. Once migration to the new JWT sessions is completed all
+     *             references to this method that are not simply repeating the
+     *             {@link com.github.onsdigital.zebedee.filters.AuthenticationFilter} should be should be updated to
+     *             use {@link this#get()} instead. If the call is duplicating the filter, then it should be removed
+     *             so as not to waste compute and request latency.
      */
+    @Deprecated
     @Override
     public Session get(HttpServletRequest req) throws IOException {
         return get();
@@ -134,20 +129,20 @@ public class JWTStore implements Sessions {
      * @throws IOException for any problem verifying a token or storing a session in threadlocal.
      */
     @Override
-    public void set(String token) throws SessionsStoreException {
+    public void set(String token) throws SessionsException {
         if (StringUtils.isEmpty(token)) {
-            throw new SessionsRequestException(ACCESS_TOKEN_REQUIRED_ERROR);
+            throw new SessionsException(ACCESS_TOKEN_REQUIRED_ERROR);
         }
 
         String[] chunks;
         try {
             chunks = token.split("\\.");
         } catch (NullPointerException e) {
-            throw new SessionsDecodeException(TOKEN_NULL_ERROR, e);
+            throw new SessionsException(TOKEN_NULL_ERROR, e);
         }
         // check token validity; throw error if []chunks doesn't contain 3 elements
         if (chunks.length != JWT_CHUNK_SIZE) {
-            throw new SessionsDecodeException(TOKEN_NOT_VALID_ERROR);
+            throw new SessionsException(TOKEN_NOT_VALID_ERROR);
         }
 
         String publicSigningKey = getPublicSigningKey(chunks[0]);
@@ -155,11 +150,11 @@ public class JWTStore implements Sessions {
         try {
             store.set(jwtHandler.verifyJWT(token, publicSigningKey));
         } catch (JWTTokenExpiredException e) {
-            throw new SessionsTokenExpiredException(ACCESS_TOKEN_EXPIRED_ERROR);
+            throw new SessionsException(ACCESS_TOKEN_EXPIRED_ERROR);
         } catch (JWTVerificationException e) {
-            throw new SessionsVerificationException(e.getMessage(), e);
+            throw new SessionsException(e.getMessage(), e);
         } catch (JWTDecodeException e) {
-            throw new SessionsDecodeException(e.getMessage(), e);
+            throw new SessionsException(e.getMessage(), e);
         }
     }
 
@@ -182,6 +177,6 @@ public class JWTStore implements Sessions {
     }
 
     static void setStore(ThreadLocal<UserDataPayload> store) {
-        JWTStore.store = store;
+        JWTSessionsServiceImpl.store = store;
     }
 }

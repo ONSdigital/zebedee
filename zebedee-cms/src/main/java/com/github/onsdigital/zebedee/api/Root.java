@@ -35,6 +35,7 @@ import java.util.Map;
 
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
+import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
 
 public class Root {
 
@@ -131,24 +132,7 @@ public class Root {
             throw new RuntimeException(message, e);
         }
 
-        try {
-            cleanupStaleCollectionKeys();
-        } catch (Exception ex) {
-            // TODO should we exit at this point?
-            error().logException(ex, "error cleaning stale collection keys from users exiting application");
-        }
-
         info().data(ZEBEDEE_ROOT, rootDir).log("zebedee cmd initialization completed successfully");
-    }
-
-    private static void cleanupStaleCollectionKeys() throws IOException, NotFoundException, BadRequestException {
-        info().log("cms init task: removing stale collection keys from user keyrings");
-        Map<String, Collection> collectionMap = zebedee.getCollections().mapByID();
-        List<String> orphanedCollections = zebedee.getCollections().listOrphaned();
-        for (User user : zebedee.getUsersService().list()) {
-            zebedee.getUsersService()
-                    .removeStaleCollectionKeys(collectionMap, orphanedCollections, user.getEmail());
-        }
     }
 
     private static void loadExistingCollectionsIntoScheduler(Collections.CollectionList collections) {
@@ -225,7 +209,11 @@ public class Root {
     private static Zebedee initialiseZebedee(Path root) throws IOException, NotFoundException, BadRequestException,
             UnauthorizedException {
         zebedee = new Zebedee(new ZebedeeConfiguration(root, true));
-        createSystemUser();
+
+        // TODO: Remove this logic after migration to using the dp-identity-api
+        if (! cmsFeatureFlags().isJwtSessionsEnabled()) {
+            createSystemUser();
+        }
         return zebedee;
     }
 

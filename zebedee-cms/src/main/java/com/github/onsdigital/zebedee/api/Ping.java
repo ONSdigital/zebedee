@@ -7,7 +7,6 @@ import com.github.onsdigital.zebedee.reader.util.RequestUtils;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.session.service.Sessions;
 import com.github.onsdigital.zebedee.util.mertics.service.MetricsService;
-import org.apache.commons.lang.time.DateUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -47,6 +46,7 @@ public class Ping {
         try {
             Sessions sessions = Root.zebedee.getSessions();
             token = RequestUtils.getSessionId(request);
+            // TODO: Update with sessions.get() after migration to JWT sessions is enabled
             Session session = sessions.get(token);
             if (session != null) {
                 pingResponse.hasSession = true;

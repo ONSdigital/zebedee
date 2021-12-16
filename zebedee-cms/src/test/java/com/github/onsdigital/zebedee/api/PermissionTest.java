@@ -67,12 +67,6 @@ public class PermissionTest extends ZebedeeAPIBaseTestCase {
     @Mock
     private SecretKey key;
 
-    @Captor
-    private ArgumentCaptor<List<CollectionDescription>> removalsCaptor;
-
-    @Captor
-    private ArgumentCaptor<List<CollectionDescription>> assignmentsCaptor;
-
     private PermissionDefinition permission;
 
     private Permission endpoint;
@@ -151,140 +145,6 @@ public class PermissionTest extends ZebedeeAPIBaseTestCase {
     }
 
     @Test
-    public void testGrant_addAdminGetUserError_shouldThrowException() throws Exception {
-        doThrow(IOException.class)
-                .when(usersService)
-                .getUserByEmail(any());
-
-        permission.isAdmin(true);
-
-        assertThrows(InternalServerError.class,
-                () -> endpoint.grantPermission(mockRequest, mockResponse, permission));
-
-        verify(sessionsService, times(1)).get(mockRequest);
-        verify(permissionsService, times(1)).addAdministrator(USER_EMAIL, session);
-        verify(usersService, times(1)).getUserByEmail(any());
-    }
-
-    @Test
-    public void testGrant_addAdminSrcUserNull_shouldThrowException() throws Exception {
-        when(usersService.getUserByEmail(any()))
-                .thenReturn(null);
-
-        permission.isAdmin(true);
-
-        assertThrows(NotFoundException.class,
-                () -> endpoint.grantPermission(mockRequest, mockResponse, permission));
-
-        verify(sessionsService, times(1)).get(mockRequest);
-        verify(permissionsService, times(1)).addAdministrator(USER_EMAIL, session);
-        verify(usersService, times(1)).getUserByEmail(TEST_EMAIL);
-        verifyZeroInteractions(collectionKeyring);
-    }
-
-    @Test
-    public void testGrant_addAdminTargetUserNull_shouldThrowException() throws Exception {
-        when(usersService.getUserByEmail(TEST_EMAIL))
-                .thenReturn(srcUser);
-
-        when(usersService.getUserByEmail(USER_EMAIL))
-                .thenReturn(null);
-
-        permission.isAdmin(true);
-
-        assertThrows(NotFoundException.class,
-                () -> endpoint.grantPermission(mockRequest, mockResponse, permission));
-
-        verify(sessionsService, times(1)).get(mockRequest);
-        verify(permissionsService, times(1)).addAdministrator(USER_EMAIL, session);
-        verify(usersService, times(1)).getUserByEmail(TEST_EMAIL);
-        verify(usersService, times(1)).getUserByEmail(USER_EMAIL);
-        verifyZeroInteractions(collectionKeyring);
-    }
-
-    @Test
-    public void testGrant_addAdminCollectionListError_shouldThrowException() throws Exception {
-        when(collections.list())
-                .thenThrow(IOException.class);
-
-        permission.isAdmin(true);
-
-        InternalServerError ex = assertThrows(InternalServerError.class,
-                () -> endpoint.grantPermission(mockRequest, mockResponse, permission));
-
-        assertThat(ex.getMessage(), equalTo("error listing collections"));
-        verify(sessionsService, times(1)).get(mockRequest);
-        verify(permissionsService, times(1)).addAdministrator(USER_EMAIL, session);
-        verify(collections, times(1)).list();
-        verifyZeroInteractions(collectionKeyring);
-    }
-
-    @Test
-    public void testGrant_addAdminCanViewError_shouldThrowException() throws Exception {
-        when(permissionsService.canView(eq(targetUser), any()))
-                .thenThrow(IOException.class);
-
-        permission.isAdmin(true);
-
-        assertThrows(IOException.class, () -> endpoint.grantPermission(mockRequest, mockResponse, permission));
-
-        verify(sessionsService, times(1)).get(mockRequest);
-        verify(permissionsService, times(1)).addAdministrator(USER_EMAIL, session);
-        verify(permissionsService, times(1)).canView(eq(targetUser), any());
-        verifyZeroInteractions(collectionKeyring);
-    }
-
-    @Test
-    public void testGrant_addAdminRevokeFromToError_shouldThrowException() throws Exception {
-        doThrow(KeyringException.class)
-                .when(collectionKeyring)
-                .revokeFrom(any(), any(List.class));
-
-        permission.isAdmin(true);
-
-        assertThrows(KeyringException.class, () -> endpoint.grantPermission(mockRequest, mockResponse, permission));
-
-        verify(sessionsService, times(1)).get(mockRequest);
-        verify(permissionsService, times(1)).addAdministrator(USER_EMAIL, session);
-        verify(permissionsService, times(1)).canView(eq(targetUser), any());
-
-        verify(collectionKeyring, times(1)).revokeFrom(eq(targetUser), removalsCaptor.capture());
-        List<CollectionDescription> removals = removalsCaptor.getValue();
-        assertThat(removals, is(notNullValue()));
-        assertThat(removals.size(), equalTo(1));
-        assertThat(removals.get(0), equalTo(collectionDescription));
-    }
-
-    @Test
-    public void testGrant_addAdminAssignToError_shouldThrowException() throws Exception {
-        doThrow(KeyringException.class)
-                .when(collectionKeyring)
-                .assignTo(any(User.class), any(User.class), any(List.class));
-
-        when(permissionsService.canView(targetUser, collectionDescription))
-                .thenReturn(true);
-
-        permission.isAdmin(true);
-
-        assertThrows(KeyringException.class, () -> endpoint.grantPermission(mockRequest, mockResponse, permission));
-
-        verify(sessionsService, times(1)).get(mockRequest);
-        verify(permissionsService, times(1)).addAdministrator(USER_EMAIL, session);
-        verify(permissionsService, times(1)).canView(eq(targetUser), any());
-
-        verify(collectionKeyring, times(1)).revokeFrom(eq(targetUser), removalsCaptor.capture());
-        List<CollectionDescription> removals = removalsCaptor.getValue();
-        assertThat(removals, is(notNullValue()));
-        assertTrue(removals.isEmpty());
-
-        verify(collectionKeyring, times(1)).assignTo(eq(srcUser), eq(targetUser), assignmentsCaptor.capture());
-        List<CollectionDescription> asssignments = assignmentsCaptor.getValue();
-        assertThat(asssignments, is(notNullValue()));
-        assertThat(asssignments.size(), equalTo(1));
-        assertThat(asssignments.get(0), equalTo(collectionDescription));
-    }
-
-    @Test
     public void testGrant_addAdminAssignSuccess_shouldAssignPermissionsAndKeys() throws Exception {
         when(permissionsService.canView(targetUser, collectionDescription))
                 .thenReturn(true);
@@ -295,18 +155,6 @@ public class PermissionTest extends ZebedeeAPIBaseTestCase {
 
         verify(sessionsService, times(1)).get(mockRequest);
         verify(permissionsService, times(1)).addAdministrator(USER_EMAIL, session);
-        verify(permissionsService, times(1)).canView(eq(targetUser), any());
-
-        verify(collectionKeyring, times(1)).revokeFrom(eq(targetUser), removalsCaptor.capture());
-        List<CollectionDescription> removals = removalsCaptor.getValue();
-        assertThat(removals, is(notNullValue()));
-        assertTrue(removals.isEmpty());
-
-        verify(collectionKeyring, times(1)).assignTo(eq(srcUser), eq(targetUser), assignmentsCaptor.capture());
-        List<CollectionDescription> assignments = assignmentsCaptor.getValue();
-        assertThat(assignments, is(notNullValue()));
-        assertThat(assignments.size(), equalTo(1));
-        assertThat(assignments.get(0), equalTo(collectionDescription));
     }
 
     @Test
@@ -370,16 +218,5 @@ public class PermissionTest extends ZebedeeAPIBaseTestCase {
         verify(sessionsService, times(1)).get(mockRequest);
         verify(permissionsService, times(1)).removeEditor(USER_EMAIL, session);
         verify(permissionsService, times(1)).removeAdministrator(USER_EMAIL, session);
-
-        verify(collectionKeyring, times(1)).revokeFrom(eq(targetUser), removalsCaptor.capture());
-        List<CollectionDescription> removals = removalsCaptor.getValue();
-        assertThat(removals, is(notNullValue()));
-        assertThat(removals.size(), equalTo(1));
-        assertThat(removals.get(0), equalTo(collectionDescription));
-
-        verify(collectionKeyring, times(1)).assignTo(eq(srcUser), eq(targetUser), assignmentsCaptor.capture());
-        List<CollectionDescription> asssignments = assignmentsCaptor.getValue();
-        assertThat(asssignments, is(notNullValue()));
-        assertThat(asssignments.size(), equalTo(0));
     }
 }

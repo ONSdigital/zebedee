@@ -6,9 +6,9 @@ import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.Credentials;
+import com.github.onsdigital.zebedee.service.ServiceSupplier;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.user.model.User;
-import com.github.onsdigital.zebedee.service.ServiceSupplier;
 import com.github.onsdigital.zebedee.user.service.UsersService;
 
 import javax.servlet.http.HttpServletRequest;
@@ -18,7 +18,11 @@ import java.io.IOException;
 
 /**
  * API for resetting or changing a password.
+ *
+ * @deprecated The user management in zebedee is deprecated in favour of the dp-identity-api with its JWT based auth
+ *             and will be removed after migration of users and teams to the new service.
  */
+@Deprecated
 @Api
 public class Password {
 

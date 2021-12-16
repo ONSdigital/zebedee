@@ -2,7 +2,6 @@ package com.github.onsdigital.zebedee.user.store;
 
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
-import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.user.model.User;
 import com.github.onsdigital.zebedee.user.model.UserList;
 
@@ -11,6 +10,7 @@ import java.io.IOException;
 /**
  * Created by dave on 30/05/2017.
  */
+@Deprecated
 public interface UserStore {
 
     /**

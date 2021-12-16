@@ -7,15 +7,12 @@ import com.github.onsdigital.zebedee.exceptions.InternalServerError;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
-import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.PermissionDefinition;
 import com.github.onsdigital.zebedee.keyring.CollectionKeyring;
-import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.Collections;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.session.service.Sessions;
-import com.github.onsdigital.zebedee.user.model.User;
 import com.github.onsdigital.zebedee.user.service.UsersService;
 
 import javax.servlet.http.HttpServletRequest;
@@ -23,10 +20,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-import static com.github.onsdigital.zebedee.keyring.CollectionKeyringUtil.getUser;
 
 /**
  * Created by david on 12/03/2015.
@@ -95,7 +88,6 @@ public class Permission {
             removeEditorPermissionFromUser(request, permissionDefinition, session);
         }
 
-        updateUserKeyAssignments(session, permissionDefinition.getEmail());
         return "Permissions updated for " + permissionDefinition.getEmail();
     }
 
@@ -181,28 +173,6 @@ public class Permission {
         }
 
         return session;
-    }
-
-
-    private void updateUserKeyAssignments(Session session, String targetEmail) throws IOException,
-            NotFoundException, BadRequestException, InternalServerError {
-        User srcUser = getUser(usersService, session.getEmail());
-        User targetUser = getUser(usersService, targetEmail);
-
-        List<CollectionDescription> assignments = new ArrayList<>();
-        List<CollectionDescription> removals = new ArrayList<>();
-
-        Collections.CollectionList collectionList = listCollections();
-        for (Collection c : collectionList) {
-            if (permissionsService.canView(targetUser, c.getDescription())) {
-                assignments.add(c.getDescription());
-            } else {
-                removals.add(c.getDescription());
-            }
-        }
-
-        collectionKeyring.revokeFrom(targetUser, removals);
-        collectionKeyring.assignTo(srcUser, targetUser, assignments);
     }
 
     private Collections.CollectionList listCollections() throws InternalServerError {

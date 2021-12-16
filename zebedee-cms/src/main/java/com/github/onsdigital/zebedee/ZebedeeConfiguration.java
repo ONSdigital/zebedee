@@ -17,14 +17,8 @@ import com.github.onsdigital.zebedee.keyring.KeyringException;
 import com.github.onsdigital.zebedee.keyring.central.CollectionKeyCacheImpl;
 import com.github.onsdigital.zebedee.keyring.central.CollectionKeyStoreImpl;
 import com.github.onsdigital.zebedee.keyring.central.CollectionKeyringImpl;
-import com.github.onsdigital.zebedee.keyring.central.NopCollectionKeyCacheImpl;
-import com.github.onsdigital.zebedee.keyring.central.NopCollectionKeyringImpl;
-import com.github.onsdigital.zebedee.keyring.legacy.LegacyCollectionKeyringImpl;
-import com.github.onsdigital.zebedee.keyring.legacy.LegacySchedulerKeyCacheImpl;
 import com.github.onsdigital.zebedee.keyring.migration.KeyringHealthChecker;
 import com.github.onsdigital.zebedee.keyring.migration.KeyringHealthCheckerImpl;
-import com.github.onsdigital.zebedee.keyring.migration.MigrationCollectionKeyCacheImpl;
-import com.github.onsdigital.zebedee.keyring.migration.MigrationCollectionKeyringImpl;
 import com.github.onsdigital.zebedee.model.Collections;
 import com.github.onsdigital.zebedee.model.Content;
 import com.github.onsdigital.zebedee.model.RedirectTablePartialMatch;
@@ -44,12 +38,14 @@ import com.github.onsdigital.zebedee.service.KafkaServiceImpl;
 import com.github.onsdigital.zebedee.service.NoOpKafkaService;
 import com.github.onsdigital.zebedee.service.ServiceStoreImpl;
 import com.github.onsdigital.zebedee.service.ZebedeeDatasetService;
+import com.github.onsdigital.zebedee.session.service.JWTSessionsServiceImpl;
 import com.github.onsdigital.zebedee.session.service.Sessions;
 import com.github.onsdigital.zebedee.session.service.SessionsServiceImpl;
-import com.github.onsdigital.zebedee.session.store.JWTStore;
+import com.github.onsdigital.zebedee.teams.service.StubbedTeamsServiceImpl;
 import com.github.onsdigital.zebedee.teams.service.TeamsService;
 import com.github.onsdigital.zebedee.teams.service.TeamsServiceImpl;
 import com.github.onsdigital.zebedee.teams.store.TeamsStoreFileSystemImpl;
+import com.github.onsdigital.zebedee.user.service.StubbedUsersServiceImpl;
 import com.github.onsdigital.zebedee.user.service.UsersService;
 import com.github.onsdigital.zebedee.user.service.UsersServiceImpl;
 import com.github.onsdigital.zebedee.user.store.UserStoreFileSystemImpl;
@@ -122,7 +118,6 @@ public class ZebedeeConfiguration {
     private PublishedCollections publishedCollections;
     private Collections collections;
     private Content published;
-    private com.github.onsdigital.zebedee.model.KeyringCache legacyKeyringCache;
     private PermissionsService permissionsService;
     private UsersService usersService;
     private TeamsService teamsService;
@@ -139,9 +134,6 @@ public class ZebedeeConfiguration {
     private SlackClient slackClient;
     private Notifier slackNotifier;
     private KeyringHealthChecker keyringHealthChecker;
-
-    private CollectionKeyring legacyCollectionKeyring;
-    private CollectionKeyring centralCollectionKeyring;
 
     /**
      * Create a new configuration object.
@@ -183,13 +175,18 @@ public class ZebedeeConfiguration {
         // Configure the sessions
         if (cmsFeatureFlags().isJwtSessionsEnabled()) {
             JWTHandler jwtHandler = new JWTHandlerImpl();
-            this.sessions = new JWTStore(jwtHandler, getCognitoKeyIdPairs());
+            this.sessions = new JWTSessionsServiceImpl(jwtHandler, getCognitoKeyIdPairs());
         } else {
             this.sessions = new SessionsServiceImpl(sessionsPath);
         }
 
-        this.teamsService = new TeamsServiceImpl(
-                new TeamsStoreFileSystemImpl(teamsPath), this::getPermissionsService);
+        // TODO: Remove after migration to JWT sessions is complete
+        if (cmsFeatureFlags().isJwtSessionsEnabled()) {
+            this.teamsService = new StubbedTeamsServiceImpl();
+        } else {
+            this.teamsService = new TeamsServiceImpl(
+                    new TeamsStoreFileSystemImpl(teamsPath), this::getPermissionsService);
+        }
 
         this.published = createPublished();
 
@@ -204,12 +201,16 @@ public class ZebedeeConfiguration {
 
         Supplier<CollectionKeyring> keyringSupplier = () -> collectionKeyring;
 
-        this.usersService = UsersServiceImpl.getInstance(
-                new UserStoreFileSystemImpl(this.usersPath), collections, permissionsService, keyringSupplier);
+        // TODO: Remove after migration to JWT sessions is complete
+        if (cmsFeatureFlags().isJwtSessionsEnabled()) {
+            this.usersService = StubbedUsersServiceImpl.getInstance();
+        } else {
+            this.usersService = UsersServiceImpl.getInstance(
+                    new UserStoreFileSystemImpl(this.usersPath), collections, permissionsService, keyringSupplier);
+        }
 
         // Init the collection keyring and scheduler cache.
-        boolean enableKeyringMigration = cmsFeatureFlags().isCentralisedKeyringEnabled();
-        initNewCollectionKeyring(enableKeyringMigration);
+        initCollectionKeyring();
 
         DatasetClient datasetClient;
         try {
@@ -261,52 +262,17 @@ public class ZebedeeConfiguration {
 
     }
 
-    /**
-     * Configure the migration keyring. If enable is true keys will be added/removed from both legacy and central
-     * keyring implementations. All get requests will attempt to retieve the requested key from the central keyring
-     * and fall back to the legacy keyring if the key is not found.
-     * <p>
-     * If enable is false then the migration keyring will write to both the legacy and central keyrings keeping them
-     * in sync. Get key requests will only read from the legacy keyring.
-     */
-    private void initNewCollectionKeyring(final boolean enableMigration) throws KeyringException {
+    private void initCollectionKeyring() throws KeyringException {
         CollectionKeyStore keyStore = new CollectionKeyStoreImpl(
                 getKeyRingPath(), getKeyringSecretKey(), getKeyringInitVector());
 
         CollectionKeyCacheImpl.init(keyStore);
         CollectionKeyCache collectionKeyCache = CollectionKeyCacheImpl.getInstance();
 
-        this.schedulerKeyCache = new MigrationCollectionKeyCacheImpl(
-                new LegacySchedulerKeyCacheImpl(), collectionKeyCache, enableMigration);
-
-        // Initialise legacy keyring regardless - they will dual run until we cut over to new impl.
-        this.legacyKeyringCache = new com.github.onsdigital.zebedee.model.KeyringCache(sessions, schedulerKeyCache);
-
-        this.legacyCollectionKeyring = new LegacyCollectionKeyringImpl(
-                sessions, usersService, permissionsService, legacyKeyringCache, schedulerKeyCache);
+        this.schedulerKeyCache = collectionKeyCache;
 
         CollectionKeyringImpl.init(collectionKeyCache, permissionsService, collections);
-        this.centralCollectionKeyring = CollectionKeyringImpl.getInstance();
-
-        this.collectionKeyring = new MigrationCollectionKeyringImpl(
-                enableMigration, legacyCollectionKeyring, centralCollectionKeyring);
-    }
-
-    // Set up for the original legacy keyring. Keep this until we have deployed the central keyring changes to prod -
-    // this allows to rollback easily should the need arise.
-    private void initLegacyKeyring() throws KeyringException {
-        this.schedulerKeyCache = new MigrationCollectionKeyCacheImpl(
-                new LegacySchedulerKeyCacheImpl(), new NopCollectionKeyCacheImpl(), false);
-
-        this.legacyKeyringCache = new com.github.onsdigital.zebedee.model.KeyringCache(sessions, schedulerKeyCache);
-
-        this.legacyCollectionKeyring = new LegacyCollectionKeyringImpl(
-                sessions, usersService, permissionsService, this.legacyKeyringCache, schedulerKeyCache);
-
-        this.centralCollectionKeyring = new NopCollectionKeyringImpl();
-
-        this.collectionKeyring = new MigrationCollectionKeyringImpl(
-                false, legacyCollectionKeyring, centralCollectionKeyring);
+        this.collectionKeyring = CollectionKeyringImpl.getInstance();
     }
 
     /**
@@ -429,10 +395,6 @@ public class ZebedeeConfiguration {
         return this.publishedCollections;
     }
 
-    public com.github.onsdigital.zebedee.model.KeyringCache getKeyringCache() {
-        return this.legacyKeyringCache;
-    }
-
     public Sessions getSessions() {
         return this.sessions;
     }
@@ -500,13 +462,5 @@ public class ZebedeeConfiguration {
 
     public KeyringHealthChecker getKeyringHealthChecker() {
         return keyringHealthChecker;
-    }
-
-    public CollectionKeyring getLegacyCollectionKeyring() {
-        return legacyCollectionKeyring;
-    }
-
-    public CollectionKeyring getCentralCollectionKeyring() {
-        return centralCollectionKeyring;
     }
 }

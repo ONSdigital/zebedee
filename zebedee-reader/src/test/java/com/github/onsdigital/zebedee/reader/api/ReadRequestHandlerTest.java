@@ -124,7 +124,7 @@ public class ReadRequestHandlerTest {
     }
 
     private void shouldOverlayCollectionPaths() throws IOException, ZebedeeException {
-        when(request.getHeader(RequestUtils.TOKEN_HEADER)).thenReturn("any token is fine in test");
+        when(request.getHeader(RequestUtils.FLORENCE_TOKEN_HEADER)).thenReturn("any token is fine in test");
         when(request.getParameter("uri")).thenReturn("employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions");
         when(request.getRequestURI()).thenReturn("/breadcrumb/testcollection-testid/employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions");
         Collection<ContentNode> parents = readRequestHandler.getParents(request);

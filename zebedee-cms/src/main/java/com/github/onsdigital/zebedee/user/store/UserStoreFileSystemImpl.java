@@ -19,6 +19,7 @@ import java.util.stream.StreamSupport;
 /**
  * Created by dave on 30/05/2017.
  */
+@Deprecated
 public class UserStoreFileSystemImpl implements UserStore {
 
     private static final String JSON_EXT = ".json";

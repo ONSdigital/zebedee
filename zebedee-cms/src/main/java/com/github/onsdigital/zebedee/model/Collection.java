@@ -22,8 +22,6 @@ import com.github.onsdigital.zebedee.json.ContentStatus;
 import com.github.onsdigital.zebedee.json.Event;
 import com.github.onsdigital.zebedee.json.EventType;
 import com.github.onsdigital.zebedee.json.Events;
-import com.github.onsdigital.zebedee.keyring.CollectionKeyring;
-import com.github.onsdigital.zebedee.keyring.legacy.LegacyCollectionKeyringImpl;
 import com.github.onsdigital.zebedee.model.approval.tasks.ReleasePopulator;
 import com.github.onsdigital.zebedee.model.content.item.ContentItemVersion;
 import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
@@ -42,7 +40,6 @@ import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.teams.model.Team;
 import com.github.onsdigital.zebedee.teams.service.TeamsService;
 import com.github.onsdigital.zebedee.user.model.User;
-import com.github.onsdigital.zebedee.user.service.UsersService;
 import com.github.onsdigital.zebedee.util.versioning.VersionsService;
 import com.github.onsdigital.zebedee.util.versioning.VersionsServiceImpl;
 import com.google.common.annotations.VisibleForTesting;
@@ -62,6 +59,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -76,6 +74,7 @@ import java.util.Scanner;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -217,17 +216,15 @@ public class Collection {
                 collectionCreated(collectionDescription));
 
         if (collectionDescription.getTeams() != null) {
-            for (String teamName : collectionDescription.getTeams()) {
-                Team team = zebedee.getTeamsService().findTeam(teamName);
-                zebedee.getPermissionsService().addViewerTeam(collectionDescription, team, session);
-            }
+            // TODO: Remove dependency on the deprecated {@link TeamsService}. See addTeamsToCollection below for more details.
+            addTeamsToCollection(zebedee.getTeamsService(), zebedee.getPermissionsService(), collectionDescription, session);
         }
 
         // Add the collection key to the keying - user is not required
         User user = getUser(zebedee.getUsersService(), session.getEmail());
         SecretKey key = zebedee.getEncryptionKeyFactory().newCollectionKey();
 
-        info().collectionID(collection).log("adding new collection key to user keyrings");
+        info().collectionID(collection).log("adding new collection key to master keyring");
         zebedee.getCollectionKeyring().add(user, collection, key);
 
         if (release != null) {
@@ -454,7 +451,11 @@ public class Collection {
             scheduler.cancel(collection);
         }
 
+        LocalTime start = LocalTime.now();
         Set<String> updatesTeams = updateViewerTeams(collectionDescription, zebedee, session);
+        long ms = TimeUnit.MILLISECONDS.convert(Duration.between(start, LocalTime.now()).getNano(), TimeUnit.NANOSECONDS);
+
+        warn().data("duration_ms", ms).log("collection update viewer teams completed");
 
         if (updatedCollection.getDescription().getTeams() != null) {
             updatedCollection.getDescription().getTeams().clear();
@@ -465,24 +466,6 @@ public class Collection {
 
         updatedCollection.save();
 
-        /**
-         * TODO
-         * This is necessary to maintain backwards compatability but should be removed once we have fully migrated to
-         * the new keyring impl.
-         *
-         * The new keyring impl does not have a concept of update - a key is either added or removed. The key is no
-         * longer assigned directly to a user, a user can retrieve the key from the central keyring if they
-         * have the required permission for that collection.
-         *
-         * However, to maintain backwards compatability while we are in the process of migrating we still need to
-         * distribute the key. This logic is now encapsulated within
-         * {@link LegacyCollectionKeyringImpl#add(User, Collection, SecretKey)} so we
-         * invoke add again which will update all users either adding/removing the key to/from their keyring.
-         */
-        User user = getUser(zebedee.getUsersService(), session.getEmail());
-        SecretKey key = zebedee.getCollectionKeyring().get(user, collection);
-        zebedee.getCollectionKeyring().add(user, collection, key);
-
         return updatedCollection;
     }
 
@@ -491,72 +474,49 @@ public class Collection {
         Set<String> teamsUpdated = new HashSet<>();
 
         if (desc != null && desc.getTeams() != null) {
-            UsersService users = zebedee.getUsersService();
             PermissionsService permissions = zebedee.getPermissionsService();
-            TeamsService teams = zebedee.getTeamsService();
-            CollectionKeyring collectionKeyring = zebedee.getCollectionKeyring();
-
 
             // Remove any teams that should no longer have access.
-            removeTeamsFromCollection(teams, users, permissions, collectionKeyring, desc, session);
+            removeTeamsFromCollection(permissions, desc, session);
 
             // Add any new teams that have been granted access.
-            teamsUpdated.addAll(addTeamsToCollection(teams, users, permissions, collectionKeyring, desc, session));
+            // TODO: Remove dependency on the deprecated {@link TeamsService}. See addTeamsToCollection below for more details.
+            teamsUpdated.addAll(addTeamsToCollection(zebedee.getTeamsService(), permissions, desc, session));
         }
 
         return teamsUpdated;
     }
 
     /**
-     * Remove any Teams from the collection if it is no longer assigned. For each team that is removed the collection
-     * key is revoked from each member of the team.
+     * Remove any Teams from the collection if it is no longer assigned.
      */
-    private static void removeTeamsFromCollection(TeamsService teams,
-                                                  UsersService users, PermissionsService permissions, CollectionKeyring collectionKeyring,
-                                                  CollectionDescription desc, Session session)
+    private static void removeTeamsFromCollection(PermissionsService permissions, CollectionDescription desc,
+                                                  Session session)
             throws IOException, ZebedeeException {
         Set<Integer> teamIDs = permissions.listViewerTeams(desc, session);
 
-        List<Team> teamsToRemove = teams.resolveTeams(teamIDs)
-                .stream()
-                .filter(t -> !desc.getTeams().contains(t.getId()))
+        List<Integer> teamsToRemove = teamIDs.stream().filter(t -> !desc.getTeams().contains(t))
                 .collect(Collectors.toList());
 
         if (teamsToRemove != null && !teamsToRemove.isEmpty()) {
 
-            for (Team t : teamsToRemove) {
-
-                // Remove the team from the collection first...
+            for (int t : teamsToRemove) {
                 permissions.removeViewerTeam(desc, t, session);
-
-                for (String member : t.getMembers()) {
-                    User target = getUser(users, member);
-
-                    // ...then use the permissions check to work out if members of the team being removed should
-                    // retain the key for this collection.
-                    // Example: A user is in 2 teams assigned to the same collection. If 1 team is removed they
-                    // should still retain the key until the other team is also removed.
-                    // This check also prevents the key being removed from Admin/Publisher users who might be team
-                    // members.
-                    if (!permissions.canView(target, desc)) {
-                        collectionKeyring.revokeFrom(target, desc);
-                    }
-                }
             }
         }
     }
 
     /**
-     * Adds teams to a collection if they should have access. Updates the members of each team assigned to the
-     * collection to assign the collection encryption key to them.
+     * Adds teams to a collection if they should have access.
+     *
+     * TODO: Remove dependency on the deprecated {@link TeamsService#findTeam} by updating the logic to pass in the
+     *       team ID from florence rather than the team name.
      */
-    private static Set<String> addTeamsToCollection(TeamsService teams, UsersService users,
-                                                    PermissionsService permissions, CollectionKeyring collectionKeyring,
+    private static Set<String> addTeamsToCollection(TeamsService teams, PermissionsService permissions,
                                                     CollectionDescription desc, Session session)
             throws IOException, ZebedeeException {
 
         Set<String> teamsUpdated = new HashSet<>();
-        User srcUser = getUser(users, session.getEmail());
 
         for (String teamName : desc.getTeams()) {
             Team team = teams.findTeam(teamName);
@@ -564,13 +524,7 @@ public class Collection {
                 throw new NotFoundException("team assigned to collection expected but does not exist");
             }
 
-            permissions.addViewerTeam(desc, team, session);
-
-            for (String email : team.getMembers()) {
-                User targetUser = getUser(users, email);
-                collectionKeyring.assignTo(srcUser, targetUser, desc);
-            }
-
+            permissions.addViewerTeam(desc, team.getId(), session);
             teamsUpdated.add(teamName);
         }
 

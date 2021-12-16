@@ -3,6 +3,7 @@ package com.github.onsdigital.zebedee.session.store;
 import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.model.PathUtils;
 import com.github.onsdigital.zebedee.session.model.Session;
+import com.github.onsdigital.zebedee.session.service.JWTSessionsServiceImpl;
 import com.github.onsdigital.zebedee.util.serialiser.JSONSerialiser;
 import org.apache.commons.lang3.StringUtils;
 
@@ -18,7 +19,10 @@ import java.util.function.Predicate;
 
 /**
  * Created by dave on 23/05/2017.
+ *
+ * @deprecated in favour of {@link JWTSessionsServiceImpl} and will be removed after migration to dp-identity-api is complete.
  */
+@Deprecated
 public class SessionsStoreImpl implements SessionsStore {
 
     private static final String DS_STORE_FILE = ".DS_Store";

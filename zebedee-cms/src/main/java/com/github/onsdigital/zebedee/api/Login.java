@@ -21,7 +21,11 @@ import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 
 /**
  * API for processing login requests.
+ *
+ * @deprecated The zebedee session based login is deprecated in favour of the new JWT login using the dp-identity-api
+ *             and will be removed after migration to the new auth services.
  */
+@Deprecated
 @Api
 public class Login {
 
@@ -41,7 +45,7 @@ public class Login {
      *                    <li>If authentication fails:  {@link HttpStatus#UNAUTHORIZED_401}</li>
      *                    </ul>
      * @param credentials The user email and password.
-     * @return A session ID to be passed in the {@value SessionsService#TOKEN_HEADER} header.
+     * @return A session ID to be passed in the header.
      * @throws IOException
      */
     @POST
@@ -63,11 +67,6 @@ public class Login {
                     .log("login endpoint: request unsuccessful credentials were not authenticated successfully");
             return "Authentication failed.";
         }
-
-        // Temponary whilst encryption is being put in place.
-        // This can be removed once all users have keyrings.
-        usersServiceSupplier.getService().migrateToEncryption(user, credentials.getPassword());
-        usersServiceSupplier.getService().removeStaleCollectionKeys(user.getEmail());
 
         if (BooleanUtils.isTrue(user.getTemporaryPassword())) {
             info().data("user", user.getEmail())

@@ -26,14 +26,16 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import static com.github.onsdigital.zebedee.configuration.Configuration.getUnauthorizedMessage;
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
+import static com.github.onsdigital.zebedee.configuration.Configuration.getUnauthorizedMessage;
 import static com.github.onsdigital.zebedee.teams.model.Team.teamIDComparator;
 
 /**
  * Handles permissions mapping between users and {@link com.github.onsdigital.zebedee.Zebedee} functions.
- * Created by david on 12/03/2015.
+ *
+ * @deprecated in favour of the dp-identity-api and will be removed after the migration to JWT sessions is complete.
  */
+@Deprecated
 public class TeamsServiceImpl implements TeamsService {
 
     private static final String FORBIDDEN_ERR_MSG = "User does not have the required admin permission to perform " +

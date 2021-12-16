@@ -7,8 +7,9 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * Created by dave on 08/06/2017.
+ * @deprecated in favour of the dp-identity-api and will be removed after the migration to JWT sessions is complete.
  */
+@Deprecated
 public interface TeamsStore {
 
     /**

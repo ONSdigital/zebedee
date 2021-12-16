@@ -12,7 +12,7 @@ public class GetPermissionsRequest {
     private static final String DATASET_ID_PARAM = "dataset_id";
     private static final String COLLECTION_ID_PARAM = "collection_id";
     private static final String SERVICE_AUTH_HEADER = "Authorization";
-    private static final String FLORENCE_AUTH_HEATHER = "X-Florence-Token";
+    private static final String FLORENCE_AUTH_HEADER = "X-Florence-Token";
 
     private String collectionID;
     private String datasetID;
@@ -20,10 +20,17 @@ public class GetPermissionsRequest {
     private String serviceToken;
 
     public GetPermissionsRequest(HttpServletRequest req) {
-        this.sessionID = req.getHeader(FLORENCE_AUTH_HEATHER);
+        // TODO: Remove after migration from X-Florence-Token to Authorization header is complete
+        this.sessionID = req.getHeader(FLORENCE_AUTH_HEADER);
 
-        String serviceTokenHeader = req.getHeader(SERVICE_AUTH_HEADER);
-        this.serviceToken = removeBearerPrefixIfPresent(serviceTokenHeader);
+        String authHeader = req.getHeader(SERVICE_AUTH_HEADER);
+        // If the Authorization header contains a '.' then it is an JWT rather than a service token
+        // TODO: Remove this conditional after migration of service users to JWTs is complete
+        if (StringUtils.isBlank(sessionID) && authHeader != null && authHeader.contains(".")) {
+            this.sessionID = removeBearerPrefixIfPresent(authHeader);
+        } else {
+            this.serviceToken = removeBearerPrefixIfPresent(authHeader);
+        }
 
         this.datasetID = req.getParameter(DATASET_ID_PARAM);
         this.collectionID = req.getParameter(COLLECTION_ID_PARAM);

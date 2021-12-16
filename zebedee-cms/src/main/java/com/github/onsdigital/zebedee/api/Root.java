@@ -35,6 +35,7 @@ import java.util.Map;
 
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
+import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
 
 public class Root {
 
@@ -208,7 +209,11 @@ public class Root {
     private static Zebedee initialiseZebedee(Path root) throws IOException, NotFoundException, BadRequestException,
             UnauthorizedException {
         zebedee = new Zebedee(new ZebedeeConfiguration(root, true));
-        createSystemUser();
+
+        // TODO: Remove this logic after migration to using the dp-identity-api
+        if (! cmsFeatureFlags().isJwtSessionsEnabled()) {
+            createSystemUser();
+        }
         return zebedee;
     }
 

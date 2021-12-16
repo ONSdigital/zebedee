@@ -141,38 +141,15 @@ public class CMDPermissionsServiceImplTest {
         }
     }
 
-    @Test(expected = PermissionsException.class)
-    public void testGetSession_expired() throws Exception {
-        when(sessions.get(SESSION_ID))
-                .thenReturn(session);
-
-        when(sessions.expired(session))
-                .thenReturn(true);
-
-        try {
-            service.getSessionByID(SESSION_ID);
-        } catch (PermissionsException ex) {
-            assertThat(ex.statusCode, equalTo(HttpStatus.SC_UNAUTHORIZED));
-
-            verify(sessions, times(1)).get(SESSION_ID);
-            verify(sessions, times(1)).expired(session);
-            throw ex;
-        }
-    }
-
     @Test
     public void testGetSession_success() throws Exception {
         when(sessions.get(SESSION_ID))
                 .thenReturn(session);
 
-        when(sessions.expired(session))
-                .thenReturn(false);
-
         Session result = service.getSessionByID(SESSION_ID);
         assertThat(result, equalTo(session));
 
         verify(sessions, times(1)).get(SESSION_ID);
-        verify(sessions, times(1)).expired(session);
     }
 
     @Test(expected = PermissionsException.class)
@@ -410,7 +387,6 @@ public class CMDPermissionsServiceImplTest {
 
         assertThat(actual, equalTo(fullPermissions));
         verify(sessions, times(1)).get(SESSION_ID);
-        verify(sessions, times(1)).expired(session);
         verify(permissionsService, times(1)).canEdit(session);
     }
 
@@ -433,7 +409,6 @@ public class CMDPermissionsServiceImplTest {
 
         assertThat(actual, equalTo(readOnly));
         verify(sessions, times(1)).get(SESSION_ID);
-        verify(sessions, times(1)).expired(session);
         verify(collectionsService, times(1)).getCollection(COLLECTION_ID);
         verify(permissionsService, times(1)).canEdit(session);
         verify(permissionsService, times(1)).canView(session, description);
@@ -453,7 +428,6 @@ public class CMDPermissionsServiceImplTest {
         } catch (PermissionsException ex) {
             assertThat(ex.statusCode, equalTo(HttpStatus.SC_BAD_REQUEST));
             verify(sessions, times(1)).get(SESSION_ID);
-            verify(sessions, times(1)).expired(session);
             verify(collectionsService, never()).getCollection(anyString());
             throw ex;
         }
@@ -476,7 +450,6 @@ public class CMDPermissionsServiceImplTest {
 
         assertThat(actual, equalTo(none));
         verify(sessions, times(1)).get(SESSION_ID);
-        verify(sessions, times(1)).expired(session);
         verify(collectionsService, times(1)).getCollection(COLLECTION_ID);
         verify(permissionsService, times(1)).canEdit(session);
         verify(permissionsService, times(1)).canView(session, description);
@@ -501,7 +474,6 @@ public class CMDPermissionsServiceImplTest {
 
         assertThat(actual, equalTo(none));
         verify(sessions, times(1)).get(SESSION_ID);
-        verify(sessions, times(1)).expired(session);
         verify(collectionsService, times(1)).getCollection(COLLECTION_ID);
         verify(permissionsService, times(1)).canEdit(session);
         verify(permissionsService, times(1)).canView(session, description);

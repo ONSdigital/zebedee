@@ -12,6 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 
+import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.error;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.warn;
 import static org.apache.http.HttpStatus.SC_INTERNAL_SERVER_ERROR;
@@ -39,6 +40,7 @@ public class AuthorisationServiceImpl implements AuthorisationService {
 
         Session session;
         try {
+            // TODO: replace with sessionsSupplier.getService().get() once migration to JWT sessions is complete
             session = sessionsSupplier.getService().get(sessionID);
         } catch (IOException e) {
             error().logException(e, "identify user error, unexpected error while attempting to get user session");
@@ -50,15 +52,24 @@ public class AuthorisationServiceImpl implements AuthorisationService {
             throw new UserIdentityException(AUTHENTICATED_ERROR, SC_UNAUTHORIZED);
         }
 
-        // The session might exist but ensure the user still exists in the system before confirming their identity
-        try {
-            if (!userServiceSupplier.getService().exists(session.getEmail())) {
-                warn().log("identify user error, valid user session found but user no longer exists");
-                throw new UserIdentityException(USER_NOT_FOUND, SC_NOT_FOUND);
+        /*
+        If JWT sessions are enabled we are no longer able to complete this check. The need for this check is mitigated
+        when using the JWTs by the short validity duration of the JWT and the risk of a user continuing to perform
+        for a few minutes after their user has been deactivated has been accepted.
+
+        TODO: Remove the following block after migration to the dp-identity-api and JWT login.
+         */
+        if (! cmsFeatureFlags().isJwtSessionsEnabled()) {
+            // The session might exist but ensure the user still exists in the system before confirming their identity
+            try {
+                if (!userServiceSupplier.getService().exists(session.getEmail())) {
+                    warn().log("identify user error, valid user session found but user no longer exists");
+                    throw new UserIdentityException(USER_NOT_FOUND, SC_NOT_FOUND);
+                }
+            } catch (IOException e) {
+                error().logException(e, "identify user error, unexpected error while checking if user exists");
+                throw new UserIdentityException(INTERNAL_ERROR, SC_INTERNAL_SERVER_ERROR);
             }
-        } catch (IOException e) {
-            error().logException(e, "identify user error, unexpected error while checking if user exists");
-            throw new UserIdentityException(INTERNAL_ERROR, SC_INTERNAL_SERVER_ERROR);
         }
         return new UserIdentity(session);
     }

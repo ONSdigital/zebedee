@@ -29,6 +29,8 @@ public class CollectionKeyringUtil {
      * @throws InternalServerError unexpected error getting user.
      * @throws NotFoundException   thrown if user not found.
      * @throws BadRequestException thrown of the user email is invalid.
+     *
+     * //TODO: Review usage of this method and see if it can be written out or updated to use the JWT session to get the user
      */
     public static User getUser(UsersService usersService, String email) throws InternalServerError,
             NotFoundException, BadRequestException {

@@ -1,7 +1,6 @@
 package com.github.onsdigital.zebedee.session.store;
 
 import com.github.onsdigital.zebedee.session.model.Session;
-import com.github.onsdigital.zebedee.user.model.User;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -10,7 +9,11 @@ import java.util.function.Predicate;
 
 /**
  * Created by dave on 25/05/2017.
+ *
+ * @deprecated as zebedee will no longer need a persistent store for sessions after migration to JWT sessions and the
+ *             dp-identity-api. Once the migration is complete this will be removed.
  */
+@Deprecated
 public interface SessionsStore {
 
     /**

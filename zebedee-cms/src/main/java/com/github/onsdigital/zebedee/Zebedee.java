@@ -277,7 +277,12 @@ public class Zebedee {
      * @throws IOException
      * @throws NotFoundException
      * @throws BadRequestException
+     *
+     * @deprecated Using the new JWT based sessions, sessions are never created within zebedee as the JWT token
+     *             issued by the dp-identity-api replaces the sessions in zebedee. Once migration to the dp-identity-api
+     *             is completed this method will be removed.
      */
+    @Deprecated
     public Session openSession(Credentials credentials) throws IOException, NotFoundException, BadRequestException {
         if (credentials == null) {
             error().log("provided credentials are null no session will be opened");
@@ -302,6 +307,12 @@ public class Zebedee {
         return session;
     }
 
+    /**
+     * @deprecated Using the new JWT based sessions, sessions are never created within zebedee as the JWT token
+     *             issued by the dp-identity-api replaces the sessions in zebedee. Once migration to the dp-identity-api
+     *             is completed this method will be removed.
+     */
+    @Deprecated
     private Session createSession(User user) throws IOException {
         try {
             return sessions.create(user);

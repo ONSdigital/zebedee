@@ -38,12 +38,14 @@ import com.github.onsdigital.zebedee.service.KafkaServiceImpl;
 import com.github.onsdigital.zebedee.service.NoOpKafkaService;
 import com.github.onsdigital.zebedee.service.ServiceStoreImpl;
 import com.github.onsdigital.zebedee.service.ZebedeeDatasetService;
+import com.github.onsdigital.zebedee.session.service.JWTSessionsServiceImpl;
 import com.github.onsdigital.zebedee.session.service.Sessions;
 import com.github.onsdigital.zebedee.session.service.SessionsServiceImpl;
-import com.github.onsdigital.zebedee.session.store.JWTStore;
+import com.github.onsdigital.zebedee.teams.service.StubbedTeamsServiceImpl;
 import com.github.onsdigital.zebedee.teams.service.TeamsService;
 import com.github.onsdigital.zebedee.teams.service.TeamsServiceImpl;
 import com.github.onsdigital.zebedee.teams.store.TeamsStoreFileSystemImpl;
+import com.github.onsdigital.zebedee.user.service.StubbedUsersServiceImpl;
 import com.github.onsdigital.zebedee.user.service.UsersService;
 import com.github.onsdigital.zebedee.user.service.UsersServiceImpl;
 import com.github.onsdigital.zebedee.user.store.UserStoreFileSystemImpl;
@@ -173,13 +175,18 @@ public class ZebedeeConfiguration {
         // Configure the sessions
         if (cmsFeatureFlags().isJwtSessionsEnabled()) {
             JWTHandler jwtHandler = new JWTHandlerImpl();
-            this.sessions = new JWTStore(jwtHandler, getCognitoKeyIdPairs());
+            this.sessions = new JWTSessionsServiceImpl(jwtHandler, getCognitoKeyIdPairs());
         } else {
             this.sessions = new SessionsServiceImpl(sessionsPath);
         }
 
-        this.teamsService = new TeamsServiceImpl(
-                new TeamsStoreFileSystemImpl(teamsPath), this::getPermissionsService);
+        // TODO: Remove after migration to JWT sessions is complete
+        if (cmsFeatureFlags().isJwtSessionsEnabled()) {
+            this.teamsService = new StubbedTeamsServiceImpl();
+        } else {
+            this.teamsService = new TeamsServiceImpl(
+                    new TeamsStoreFileSystemImpl(teamsPath), this::getPermissionsService);
+        }
 
         this.published = createPublished();
 
@@ -194,8 +201,13 @@ public class ZebedeeConfiguration {
 
         Supplier<CollectionKeyring> keyringSupplier = () -> collectionKeyring;
 
-        this.usersService = UsersServiceImpl.getInstance(
-                new UserStoreFileSystemImpl(this.usersPath), collections, permissionsService, keyringSupplier);
+        // TODO: Remove after migration to JWT sessions is complete
+        if (cmsFeatureFlags().isJwtSessionsEnabled()) {
+            this.usersService = StubbedUsersServiceImpl.getInstance();
+        } else {
+            this.usersService = UsersServiceImpl.getInstance(
+                    new UserStoreFileSystemImpl(this.usersPath), collections, permissionsService, keyringSupplier);
+        }
 
         // Init the collection keyring and scheduler cache.
         initCollectionKeyring();

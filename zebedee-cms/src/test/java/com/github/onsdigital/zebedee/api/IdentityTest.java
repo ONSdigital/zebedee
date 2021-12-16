@@ -23,7 +23,6 @@ import java.nio.charset.StandardCharsets;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static org.apache.http.HttpStatus.SC_FORBIDDEN;
-import static org.apache.http.HttpStatus.SC_NOT_FOUND;
 import static org.apache.http.HttpStatus.SC_OK;
 import static org.apache.http.HttpStatus.SC_UNAUTHORIZED;
 import static org.mockito.Mockito.times;
@@ -57,7 +56,7 @@ public class IdentityTest {
 
     @Before
     public void setUp() throws Exception {
-        api = new Identity(true, serviceStore, authorisationService); // enable feature by default
+        api = new Identity(serviceStore, authorisationService); // enable feature by default
 
         MockitoAnnotations.initMocks(this);
 
@@ -182,24 +181,6 @@ public class IdentityTest {
     }
 
     @Test
-    public void shouldReturnNotFoundIfCMDFeatureNotEnabled() throws Exception {
-        Session session = new Session();
-        session.setEmail("dartagnan@strangerThings.com");
-        session.setId(FLORENCE_TOKEN);
-
-        when(mockResponse.getWriter())
-                .thenReturn(printWriterMock);
-
-        UserIdentity identity = new UserIdentity(session);
-
-        api = new Identity(false, serviceStore, authorisationService); //disable feature for this test case.
-        api.identifyUser(mockRequest, mockResponse);
-
-        verifyZeroInteractions(serviceStore, authorisationService);
-        verifyResponseInteractions(new Error("Not found"), SC_NOT_FOUND);
-    }
-
-    @Test
     public void shouldReturnUnauthorizedIfBearPrefixMissing() throws Exception {
         when(mockRequest.getHeader(Identity.AUTHORIZATION_HEADER))
                 .thenReturn("123");
@@ -207,7 +188,7 @@ public class IdentityTest {
         when(mockResponse.getWriter())
                 .thenReturn(printWriterMock);
 
-        api = new Identity(true, serviceStore, authorisationService);
+        api = new Identity(serviceStore, authorisationService);
         api.identifyUser(mockRequest, mockResponse);
 
         verifyZeroInteractions(serviceStore, authorisationService);

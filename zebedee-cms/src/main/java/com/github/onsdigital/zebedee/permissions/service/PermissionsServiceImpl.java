@@ -6,7 +6,6 @@ import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.PermissionDefinition;
-import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.PathUtils;
 import com.github.onsdigital.zebedee.permissions.model.AccessMapping;
 import com.github.onsdigital.zebedee.permissions.store.PermissionsStore;
@@ -20,7 +19,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -120,32 +118,6 @@ public class PermissionsServiceImpl implements PermissionsService {
             return false;
         }
         return isAdministrator(email, permissionsStore.getAccessMapping());
-    }
-
-    @Override
-    public List<User> getCollectionAccessMapping(Collection collection) throws IOException {
-        AccessMapping accessMapping = permissionsStore.getAccessMapping();
-        List<Team> teamsList = teamsServiceSupplier.getService().listTeams();
-        List<User> keyUsers = usersServiceSupplier
-                .getService()
-                .list()
-                .stream()
-                .filter(user -> isCollectionKeyRecipient(accessMapping, teamsList, user, collection))
-                .collect(Collectors.toList());
-        return keyUsers;
-    }
-
-    private boolean isCollectionKeyRecipient(AccessMapping accessMapping, List<Team> teamsList, User user, Collection collection) {
-        boolean result = false;
-        try {
-            result = isAdministrator(user.getEmail(), accessMapping)
-                    || canEdit(user.getEmail())
-                    || canView(user.getEmail(), collection.getDescription(), accessMapping, teamsList);
-        } catch (IOException e) {
-            error().logException(e, "PermissionsServiceImpl: unexpected error encountered.");
-            throw new RuntimeException(e);
-        }
-        return result;
     }
 
     private boolean isAdministrator(String email, AccessMapping accessMapping) {
@@ -337,15 +309,16 @@ public class PermissionsServiceImpl implements PermissionsService {
     }
 
     /**
-     * Grants the given team access to the given collection.
+     * Grant view permissions to a team.
      *
-     * @param collectionDescription The collection to give the team access to.
-     * @param team                  The team to be granted access.
-     * @param session               Only editors can permit a team access to a collection.
+     * @param collectionDescription The {@link CollectionDescription} of the collection to give the team access to.
+     * @param teamId                the ID of the team to permit view permission to.
+     * @param session               the {@link Session} of the user granting the permission. Only editors can permit a team access to a collection.
      * @throws IOException If a filesystem error occurs.
+     * @throws ZebedeeException if the user is not authorised to add view team permissions.
      */
     @Override
-    public void addViewerTeam(CollectionDescription collectionDescription, Team team, Session session) throws IOException, ZebedeeException {
+    public void addViewerTeam(CollectionDescription collectionDescription, Integer teamId, Session session) throws IOException, ZebedeeException {
         if (session == null || !canEdit(session.getEmail())) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
@@ -357,11 +330,13 @@ public class PermissionsServiceImpl implements PermissionsService {
             accessMapping.getCollections().put(collectionDescription.getId(), collectionTeams);
         }
 
-        Team teamAdded = !collectionTeams.contains(team.getId()) ? team : null;
-        collectionTeams.add(team.getId());
-        permissionsStore.saveAccessMapping(accessMapping);
 
-        if (teamAdded != null) {
+        if (!collectionTeams.contains(teamId)) {
+            collectionTeams.add(teamId);
+            permissionsStore.saveAccessMapping(accessMapping);
+
+            Team team = new Team();
+            team.setId(teamId);
             getCollectionHistoryDao().saveCollectionHistoryEvent(collectionDescription.getId(), collectionDescription
                     .getName(), session, COLLECTION_VIEWER_TEAM_ADDED, teamAdded(collectionDescription, session, team));
         }
@@ -393,12 +368,12 @@ public class PermissionsServiceImpl implements PermissionsService {
      * Revokes access for given team to the given collection.
      *
      * @param collectionDescription The collection to revoke team access to.
-     * @param team                  The team to be revoked access.
+     * @param teamId                The id of the team to be revoked access.
      * @param session               Only editors can revoke team access to a collection.
      * @throws IOException If a filesystem error occurs.
      */
     @Override
-    public void removeViewerTeam(CollectionDescription collectionDescription, Team team, Session session) throws IOException, ZebedeeException {
+    public void removeViewerTeam(CollectionDescription collectionDescription, Integer teamId, Session session) throws IOException, ZebedeeException {
         if (session == null || !canEdit(session.getEmail())) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
@@ -410,15 +385,11 @@ public class PermissionsServiceImpl implements PermissionsService {
             accessMapping.getCollections().put(collectionDescription.getId(), collectionTeams);
         }
 
-        boolean teamRemoved = false;
-        if (collectionTeams.contains(team.getId())) {
-            collectionTeams.remove(team.getId());
+        if (collectionTeams.contains(teamId)) {
+            collectionTeams.remove(teamId);
             permissionsStore.saveAccessMapping(accessMapping);
-        }
-
-        if (teamRemoved) {
             getCollectionHistoryDao().saveCollectionHistoryEvent(collectionDescription.getId(), collectionDescription.getName(),
-                    session, COLLECTION_VIEWER_TEAM_REMOVED, teamRemoved(collectionDescription, session, team));
+                    session, COLLECTION_VIEWER_TEAM_REMOVED, teamRemoved(collectionDescription, session, teamId));
         }
     }
 
@@ -427,34 +398,25 @@ public class PermissionsServiceImpl implements PermissionsService {
         return (digitalPublishingTeam != null && digitalPublishingTeam.contains(standardise(email)));
     }
 
-
+    /**
+     * @deprecated this method is deprecated and needs to be reimplemented to use the JWT session to determine the
+     *             groups/teams a user is a member of.
+     *
+     * TODO: Add an implementation of this method that will use the groups stored in the JWT session rather than using
+     *       the Teams service
+     */
+    @Deprecated
     private boolean canView(String email, CollectionDescription collectionDescription, AccessMapping accessMapping)
             throws IOException {
 
         // Check to see if the email is a member of a team associated with the given collection:
-        Set<Integer> teams = accessMapping.getCollections().get(collectionDescription.getId());
-        if (teams == null) {
+        Set<Integer> teamIds = accessMapping.getCollections().get(collectionDescription.getId());
+        if (teamIds == null) {
             return false;
         }
 
-        return teamsServiceSupplier.getService()
-                .listTeams()
-                .stream()
-                .filter(team -> teams.contains(team.getId()) && team.getMembers().contains(standardise(email)))
-                .findFirst()
-                .isPresent();
-    }
-
-    private boolean canView(String email, CollectionDescription collectionDescription,
-                            AccessMapping accessMapping, List<Team> teamsList) throws IOException {
-        Set<Integer> collectionTeams = accessMapping.getCollections().get(collectionDescription.getId());
-        if (collectionTeams == null || collectionTeams.isEmpty()) {
-            return false;
-        }
-        return teamsList.stream()
-                .filter(t -> collectionTeams.contains(t.getId()) && t.getMembers().contains(standardise(email)))
-                .findFirst()
-                .isPresent();
+        return teamsServiceSupplier.getService().resolveTeams(teamIds).stream()
+                .anyMatch(team -> team.getMembers().contains(standardise(email)));
     }
 
     private String standardise(String email) {

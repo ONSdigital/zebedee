@@ -5,27 +5,19 @@ import com.github.onsdigital.zebedee.exceptions.ConflictException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.AdminOptions;
-import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.Credentials;
 import com.github.onsdigital.zebedee.keyring.CollectionKeyring;
-import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.Collections;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.user.model.User;
 import com.github.onsdigital.zebedee.user.model.UserList;
 import com.github.onsdigital.zebedee.user.store.UserStore;
-import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import javax.crypto.SecretKey;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 import static java.text.MessageFormat.format;
@@ -40,6 +32,7 @@ import static java.text.MessageFormat.format;
  * overwridden by subsequent updates - leading to data missing from user.<br/> The obvious performance implications
  * are outweighed by the correctness of data. The long term plan is to use a database.
  */
+@Deprecated
 public class UsersServiceImpl implements UsersService {
 
     private static final Object MUTEX = new Object();
@@ -117,11 +110,6 @@ public class UsersServiceImpl implements UsersService {
     }
 
     @Override
-    public boolean exists(User user) throws IOException {
-        return user != null && userStore.exists(user.getEmail());
-    }
-
-    @Override
     public void createSystemUser(User user, String password) throws IOException, UnauthorizedException,
             NotFoundException, BadRequestException {
         if (permissionsService.hasAdministrator()) {
@@ -139,17 +127,6 @@ public class UsersServiceImpl implements UsersService {
         } finally {
             lock.unlock();
         }
-    }
-
-    @Override
-    public void createPublisher(User user, String password, Session session) throws IOException,
-            UnauthorizedException, ConflictException, BadRequestException, NotFoundException {
-        create(session, user);
-        Credentials credentials = new Credentials();
-        credentials.setEmail(user.getEmail());
-        credentials.setPassword(password);
-        setPassword(session, credentials);
-        permissionsService.addEditor(user.getEmail(), session);
     }
 
     @Override

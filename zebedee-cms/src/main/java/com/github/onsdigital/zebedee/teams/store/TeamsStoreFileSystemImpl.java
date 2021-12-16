@@ -24,7 +24,10 @@ import java.util.stream.StreamSupport;
 
 import static org.apache.commons.io.FilenameUtils.isExtension;
 
-
+/**
+ * @deprecated in favour of the dp-identity-api and will be removed after the migration to JWT sessions is complete.
+ */
+@Deprecated
 public class TeamsStoreFileSystemImpl implements TeamsStore {
 
     private static final String JSON_EXT = ".json";

@@ -32,7 +32,7 @@ import com.github.onsdigital.zebedee.ZebedeeTestBaseFixture;
 import com.github.onsdigital.JWTHandlerImpl;
 import com.github.onsdigital.interfaces.JWTHandler;
 
-import com.github.onsdigital.zebedee.session.store.JWTStore;
+import com.github.onsdigital.zebedee.session.service.JWTSessionsServiceImpl;
 
 import com.github.davidcarboni.restolino.json.Serialiser;
 
@@ -76,7 +76,7 @@ public class AuthenticationFilterTest extends ZebedeeTestBaseFixture {
 
     private boolean result;
 
-    private JWTStore jwtStore;
+    private JWTSessionsServiceImpl jwtSessionsServiceImpl;
 
     private JWTHandler jwtHandler;
 
@@ -114,10 +114,10 @@ public class AuthenticationFilterTest extends ZebedeeTestBaseFixture {
         request.setPathInfo(DUMMY_PATH);
 
         authFilterOldModel = new AuthenticationFilter(false, this.sessions);
-        authFilterNewModel = new AuthenticationFilter(true, jwtStore);
+        authFilterNewModel = new AuthenticationFilter(true, jwtSessionsServiceImpl);
 
         rsaKeyMap.put(RSA_KEY_ID_1, RSA_SIGNING_KEY_1);
-        jwtStore = new JWTStore(jwtHandler, rsaKeyMap);
+        jwtSessionsServiceImpl = new JWTSessionsServiceImpl(jwtHandler, rsaKeyMap);
     }
 
     @Test
@@ -156,7 +156,7 @@ public class AuthenticationFilterTest extends ZebedeeTestBaseFixture {
         
         result = authFilterNewModel.filter(request, response);
 
-        Session session = jwtStore.get();
+        Session session = jwtSessionsServiceImpl.get();
         Arrays.sort(session.getGroups());
         assertThat(session, is(notNullValue()));
         assertThat(session.getEmail(), is(TEST_JWT_EMAIL));

@@ -470,58 +470,6 @@ public class PermissionsServiceImplTest {
         verifyZeroInteractions(usersService, teamsService);
     }
 
-    @Test
-    public void getCollectionAccessMapping_ForAdminUserSuccess() throws Exception {
-        admins.add(EMAIL);
-
-        when(permissionsStore.getAccessMapping())
-                .thenReturn(accessMapping);
-        when(teamsService.listTeams())
-                .thenReturn(teamsList);
-        when(usersService.list())
-                .thenReturn(userList);
-        when(accessMapping.getAdministrators())
-                .thenReturn(admins);
-
-        List<User> result = permissions.getCollectionAccessMapping(collectionMock);
-
-        verify(permissionsStore, times(1)).getAccessMapping();
-        verify(teamsService, times(1)).listTeams();
-        verify(usersService, times(1)).list();
-        verify(userMock, times(1)).getEmail();
-        verify(accessMapping, times(2)).getAdministrators();
-    }
-
-    @Test
-    public void getCollectionAccessMapping_ForPublisherUserSuccess() throws Exception {
-        digitalPublishingTeam.add(EMAIL);
-
-        List<User> expected = new ArrayList<>();
-        expected.add(userMock);
-
-        when(permissionsStore.getAccessMapping())
-                .thenReturn(accessMapping);
-        when(teamsService.listTeams())
-                .thenReturn(teamsList);
-        when(usersService.list())
-                .thenReturn(userList);
-        when(accessMapping.getAdministrators())
-                .thenReturn(admins);
-        when(accessMapping.getDigitalPublishingTeam())
-                .thenReturn(digitalPublishingTeam);
-        when(collectionMock.getDescription())
-                .thenReturn(collectionDescription);
-
-        List<User> result = permissions.getCollectionAccessMapping(collectionMock);
-
-        assertThat(result, equalTo(expected));
-        verify(permissionsStore, times(2)).getAccessMapping();
-        verify(teamsService, times(1)).listTeams();
-        verify(usersService, times(1)).list();
-        verify(userMock, times(2)).getEmail();
-        verify(accessMapping, times(2)).getAdministrators();
-    }
-
     @Test(expected = UnauthorizedException.class)
     public void addAdministrator_ShouldThrowErrorSessionNull() throws Exception {
         admins.add(EMAIL);

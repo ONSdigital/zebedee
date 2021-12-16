@@ -1,7 +1,5 @@
 package com.github.onsdigital.zebedee.util;
 
-import com.github.onsdigital.zebedee.user.model.User;
-import com.github.onsdigital.zebedee.user.model.UserList;
 import com.google.common.collect.ImmutableList;
 
 import java.util.EnumSet;
@@ -14,7 +12,7 @@ import java.util.stream.Collector;
 
 /**
  * Abstract custom {@link Collector} - If you want to use {@link java.util.stream.Stream} to iterate over the custom
- * collection types in the code base i.e. {@link UserList}.
+ * collection types in the code base.
  */
 public abstract class CustomListCollector<T, R> implements Collector<T, ImmutableList.Builder<T>, R> {
 

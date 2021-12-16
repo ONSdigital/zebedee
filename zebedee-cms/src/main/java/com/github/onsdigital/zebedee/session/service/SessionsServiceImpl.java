@@ -24,11 +24,14 @@ import static com.github.onsdigital.logging.v2.event.SimpleEvent.warn;
 
 /**
  * Created by david on 12/03/2015.
+ *
+ * @deprecated In favour of the new JWT based sessions. Once the migration to the dp-identity-api is complete this class
+ *             will be removed.
  */
+@Deprecated
 public class SessionsServiceImpl extends TimerTask implements Sessions {
 
     private static final String DELETING_SESSION_MSG = "Deleting expired session";
-    private static final String SESSION_ID_PARAM = "sessionId";
 
     private Supplier<String> randomIdGenerator = () -> Random.id();
     private SessionsStoreImpl sessionsStore;
@@ -145,7 +148,7 @@ public class SessionsServiceImpl extends TimerTask implements Sessions {
      * @return An existing session, if found.
      * @throws IOException If a filesystem error occurs.
      */
-    public Session find(String email) throws IOException {
+    private Session find(String email) throws IOException {
         Session session = sessionsStore.find(email);
         if (!expired(session)) {
             updateLastAccess(session);
@@ -178,7 +181,7 @@ public class SessionsServiceImpl extends TimerTask implements Sessions {
      * @return If the session is not null and the last access time is
      * more than 60 minutes in the past, true.
      */
-    public boolean expired(Session session) {
+    private boolean expired(Session session) {
         boolean result = false;
 
         if (session != null) {
@@ -193,7 +196,6 @@ public class SessionsServiceImpl extends TimerTask implements Sessions {
     /**
      * Get a {@link Session} session object from thread local.
      *
-     * @param none.
      * @return session object from thread local.
      * @throws IOException for any problem getting a session from the request.
      */

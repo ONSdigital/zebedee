@@ -18,7 +18,6 @@ import com.github.onsdigital.zebedee.session.service.Sessions;
 import com.github.onsdigital.zebedee.teams.model.Team;
 import com.github.onsdigital.zebedee.teams.model.TeamList;
 import com.github.onsdigital.zebedee.teams.service.TeamsService;
-import com.github.onsdigital.zebedee.user.model.User;
 import com.github.onsdigital.zebedee.user.service.UsersService;
 import org.apache.commons.lang3.StringUtils;
 
@@ -33,8 +32,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.github.onsdigital.zebedee.keyring.CollectionKeyringUtil.getUser;
-
 /**
  * Created by thomasridd on 28/04/15.
  * <p>
@@ -46,8 +43,12 @@ import static com.github.onsdigital.zebedee.keyring.CollectionKeyringUtil.getUse
  * <li>{@code /teams/[teamname]?email=user@example.com}</li>
  * </ul>
  * </p>
+ *
+ * @deprecated The teams management in zebedee is deprecated in favour of the dp-identity-api with its JWT based auth
+ *             and will be removed after migration of users and teams to the new service.
  */
 @Api
+@Deprecated
 public class Teams {
 
     private Sessions sessionsService;

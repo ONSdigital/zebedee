@@ -268,7 +268,9 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
      */
     @Override
     public boolean canView(User user, CollectionDescription collectionDescription) throws UnsupportedOperationExceptions {
-        throw new UnsupportedOperationExceptions("JWT Permissions service error for canView no longer required");
+//        throw new UnsupportedOperationExceptions("JWT Permissions service error for canView no longer required");
+        // TODO: 16/12/2021
+        return false;
     }
 
     /**
@@ -280,12 +282,16 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
     @Override
     public boolean canView(String email, CollectionDescription collectionDescription) throws
             UnsupportedOperationExceptions {
-        throw new UnsupportedOperationExceptions("JWT Permissions service error for canView no longer required");
+//        throw new UnsupportedOperationExceptions("JWT Permissions service error for canView no longer required");
+        // TODO: 16/12/2021
+        return false;
     }
 
     private boolean canView(String email, CollectionDescription collectionDescription, AccessMapping accessMapping) throws
             UnsupportedOperationExceptions {
-        throw new UnsupportedOperationExceptions("JWT Permissions service error for canView no longer required");
+//        throw new UnsupportedOperationExceptions("JWT Permissions service error for canView no longer required");
+        // TODO: 16/12/2021
+        return false;
     }
 
 
@@ -298,7 +304,8 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
     @Override
     public void addViewerTeam(CollectionDescription collectionDescription, Team team, Session session) throws
             UnsupportedOperationExceptions {
-        throw new UnsupportedOperationExceptions("JWT Permissions service error for CollectionDescription no longer required");
+        // TODO: 16/12/2021
+//        throw new UnsupportedOperationExceptions("JWT Permissions service error for CollectionDescription no longer required");
     }
 
     /**
@@ -346,11 +353,11 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
 //
 //        if (accessMapping.getCollections() == null) {
 //            return new HashSet<>();
+        return null;
     }
 
 
     public boolean hasPermission(Session session, String permission) {
         return ArrayUtils.contains(session.getGroups(), permission);
     }
-
 }

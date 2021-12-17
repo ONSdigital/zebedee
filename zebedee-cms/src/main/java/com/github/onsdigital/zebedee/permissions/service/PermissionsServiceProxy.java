@@ -12,7 +12,6 @@ import com.github.onsdigital.zebedee.teams.model.Team;
 import com.github.onsdigital.zebedee.user.model.User;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -94,10 +93,10 @@ public class PermissionsServiceProxy implements PermissionsService {
      * @return the required module on jwtSessionsEnabled
      * @throws IOException from required module
      */
-    @Override
-    public List<User> getCollectionAccessMapping(Collection collection) throws IOException {
-        return legacyPermissionsService.getCollectionAccessMapping(collection);
-    }
+//    @Override
+//    public List<User> getCollectionAccessMapping(Collection collection) throws IOException {
+//        return legacyPermissionsService.getCollectionAccessMapping(collection);
+//    }
 
     /**
      * @return hasAdmin
@@ -137,7 +136,6 @@ public class PermissionsServiceProxy implements PermissionsService {
     public void removeAdministrator(String email, Session session) throws IOException, UnauthorizedException {
         if (jwtSessionsEnabled) jwtPermissionsService.removeAdministrator(email, session);
         legacyPermissionsService.removeAdministrator(email, session);
-
     }
 
     /**
@@ -241,6 +239,7 @@ public class PermissionsServiceProxy implements PermissionsService {
         return legacyPermissionsService.canView(email, collectionDescription);
     }
 
+
     /**
      * @param collectionDescription the {@link CollectionDescription} of the {@link Collection} in question.
      * @param team                  the {@link Team} to permit view permission to.
@@ -249,10 +248,10 @@ public class PermissionsServiceProxy implements PermissionsService {
      * @throws ZebedeeException
      */
     @Override
-    public void addViewerTeam(CollectionDescription collectionDescription, Team team, Session session)
+    public void addViewerTeam(CollectionDescription collectionDescription, Integer teamId, Session session)
             throws IOException, ZebedeeException {
-        if (jwtSessionsEnabled) jwtPermissionsService.addViewerTeam(collectionDescription, team, session);
-        legacyPermissionsService.addViewerTeam(collectionDescription, team, session);
+        if (jwtSessionsEnabled) jwtPermissionsService.addViewerTeam(collectionDescription, teamId, session);
+        legacyPermissionsService.addViewerTeam(collectionDescription, teamId, session);
 
     }
 
@@ -278,10 +277,10 @@ public class PermissionsServiceProxy implements PermissionsService {
      * @throws ZebedeeException
      */
     @Override
-    public void removeViewerTeam(CollectionDescription collectionDescription, Team team, Session session)
+    public void removeViewerTeam(CollectionDescription collectionDescription, Integer teamId, Session session)
             throws IOException, ZebedeeException {
-        if (jwtSessionsEnabled) jwtPermissionsService.removeViewerTeam(collectionDescription, team, session);
-        legacyPermissionsService.removeViewerTeam(collectionDescription, team, session);
+        if (jwtSessionsEnabled) jwtPermissionsService.removeViewerTeam(collectionDescription, teamId, session);
+        legacyPermissionsService.removeViewerTeam(collectionDescription, teamId, session);
 
     }
 

@@ -118,19 +118,19 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
         throw new UnsupportedOperationExceptions("JWT Permissions service error for isAdministrator no longer required");
     }
 
-    /**
-     * implemented as part of session migration to JWT
-     * will not be required once jwt has been migrated but will error if envoked
-     *
-     * @param collection the collection to check users against.
-     * @return
-     * @throws JWTVerificationException
-     */
-
-    @Override
-    public List<User> getCollectionAccessMapping(Collection collection) throws UnsupportedOperationExceptions {
-        throw new UnsupportedOperationExceptions("JWT Permissions service error for getCollectionAccessMapping no longer required");
-    }
+//    /**
+//     * implemented as part of session migration to JWT
+//     * will not be required once jwt has been migrated but will error if envoked
+//     *
+//     * @param collection the collection to check users against.
+//     * @return
+//     * @throws JWTVerificationException
+//     */
+//
+//    @Override
+//    public List<User> getCollectionAccessMapping(Collection collection) throws UnsupportedOperationExceptions {
+//        throw new UnsupportedOperationExceptions("JWT Permissions service error for getCollectionAccessMapping no longer required");
+//    }
 
     /**
      * implemented as part of session migration to JWT
@@ -302,7 +302,7 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
      * @throws JWTVerificationException
      */
     @Override
-    public void addViewerTeam(CollectionDescription collectionDescription, Team team, Session session) throws
+    public void addViewerTeam(CollectionDescription collectionDescription, Integer teamId, Session session) throws
             UnsupportedOperationExceptions {
         // TODO: 16/12/2021
 //        throw new UnsupportedOperationExceptions("JWT Permissions service error for CollectionDescription no longer required");
@@ -333,7 +333,7 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
      * @deprecated with dp-identity-api
      */
     @Override
-    public void removeViewerTeam(CollectionDescription collectionDescription, Team team, Session session) throws
+    public void removeViewerTeam(CollectionDescription collectionDescription, Integer teamId, Session session) throws
             UnsupportedOperationExceptions {
         throw new UnsupportedOperationExceptions("JWT Permissions service error for removeViewerTeam no longer required");
     }

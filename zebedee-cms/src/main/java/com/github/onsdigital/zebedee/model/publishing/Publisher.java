@@ -759,14 +759,23 @@ public class Publisher {
     }
 
     private static void sendToKafka(Collection collection) throws IOException {
-        List<String> uris = collection.getReviewed().uris()
-                .stream().map((temp) -> convertUriForEvent(temp))
-                .collect(Collectors.toList());
+
+        List<String> uris;
+        if ((collection.getDatasetDetails() != null) && !collection.getDatasetDetails().isEmpty()) {
+            uris = collection.getDatasetDetails()
+                    .stream().map(temp -> convertUriForEvent(temp.uri))
+                    .collect(Collectors.toList());
+            info().data("uris", uris).log("uris for dataset change scenario");
+        } else {
+            uris = collection.getReviewed().uris()
+                    .stream().map((temp) -> convertUriForEvent(temp))
+                    .collect(Collectors.toList());
+            info().data("uris", uris).log("uris for other change scenario");
+        }
 
         info().data("collectionId", collection.getId())
                 .data("publishing", true)
                 .data("kafka-uris", uris).log("converted URIs for kafka event");
-
         try {
             kafkaServiceSupplier.getService().produceContentPublished(collection.getId(), uris);
         } catch (Exception e) {

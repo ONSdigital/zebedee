@@ -4,13 +4,13 @@ import java.net.URI;
 
 public class EmergencyBanner {
 
-    private String type;
+    private EmergencyBannerType type;
     private String title;
     private String description;
     private String linkText;
     private URI uri;
 
-    public EmergencyBanner(String type, String title, String description, String linkText, URI uri) {
+    public EmergencyBanner(EmergencyBannerType type, String title, String description, String linkText, URI uri) {
         this.type = type;
         this.title = title;
         this.description = description;
@@ -18,11 +18,11 @@ public class EmergencyBanner {
         this.uri = uri;
     }
 
-    public String getType() {
+    public EmergencyBannerType getType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(EmergencyBannerType type) {
         this.type = type;
     }
 

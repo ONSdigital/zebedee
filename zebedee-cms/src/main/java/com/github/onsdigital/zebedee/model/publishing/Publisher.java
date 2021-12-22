@@ -760,9 +760,9 @@ public class Publisher {
 
     private static void sendToKafka(Collection collection) throws IOException {
 
-        if ((collection.getDatasetVersionDetails() != null) && !collection.getDatasetVersionDetails().isEmpty()) {
+        if (collection.getDatasetVersionDetails() != null && !collection.getDatasetVersionDetails().isEmpty()) {
             List<String> datasetUris = collection.getDatasetVersionDetails()
-                    .stream().map(temp -> convertUriForEvent(temp.uri))
+                    .stream().map(content -> convertUriForEvent(content.uri))
                     .collect(Collectors.toList());
             info().data("collectionId", collection.getId())
                     .data("Dataset-uris", datasetUris)
@@ -772,7 +772,7 @@ public class Publisher {
         }
 
         List<String> reviewedUris = collection.getReviewed().uris()
-               .stream().map((temp) -> convertUriForEvent(temp))
+               .stream().map(temp -> convertUriForEvent(temp))
                 .collect(Collectors.toList());
         info().data("collectionId", collection.getId())
                 .data("Reviewed-uris", reviewedUris)

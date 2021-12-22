@@ -35,7 +35,7 @@ public class PublishedIndexResponse {
                 .map(d -> new Item(d.getUri()))
                 .forEach(d -> this.items.add(d));
 
-        count += docs.size();
+        count = this.items.size();
     }
 
     public int getCount() {

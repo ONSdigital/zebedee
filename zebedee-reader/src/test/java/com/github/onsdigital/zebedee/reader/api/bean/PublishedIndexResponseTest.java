@@ -21,7 +21,7 @@ public class PublishedIndexResponseTest {
     @Test
     public void testSerialisation() {
         PublishedIndexResponse publishedIndexResponse = new PublishedIndexResponse();
-        publishedIndexResponse.setTotalCount(20);
+        publishedIndexResponse.setTotalCount(TOTAL_COUNT);
 
         Gson gson = new GsonBuilder()
                 .setPrettyPrinting()

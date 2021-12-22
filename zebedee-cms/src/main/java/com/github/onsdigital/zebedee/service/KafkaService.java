@@ -14,5 +14,5 @@ public interface KafkaService {
      * @param collectionID The id of the collection being published
      * @param uris A list of uris modified/created in the collection
      */
-    void produceContentPublished(String collectionID, List<String> uris) throws IOException;
+    void produceContentPublished(String collectionID, List<String> uris, String dataType) throws IOException;
 }

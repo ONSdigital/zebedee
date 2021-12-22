@@ -760,24 +760,32 @@ public class Publisher {
 
     private static void sendToKafka(Collection collection) throws IOException {
 
-        List<String> uris;
-        if ((collection.getDatasetDetails() != null) && !collection.getDatasetDetails().isEmpty()) {
-            uris = collection.getDatasetDetails()
+        if ((collection.getDatasetVersionDetails() != null) && !collection.getDatasetVersionDetails().isEmpty()) {
+            List<String> datasetUris = collection.getDatasetVersionDetails()
                     .stream().map(temp -> convertUriForEvent(temp.uri))
                     .collect(Collectors.toList());
-            info().data("uris", uris).log("uris for dataset change scenario");
-        } else {
-            uris = collection.getReviewed().uris()
-                    .stream().map((temp) -> convertUriForEvent(temp))
-                    .collect(Collectors.toList());
-            info().data("uris", uris).log("uris for other change scenario");
+            info().data("collectionId", collection.getId())
+                    .data("Dataset-uris", datasetUris)
+                    .data("publishing", true)
+                    .log("converted dataset URIs for kafka event");
+            sendMessage (collection, datasetUris, "Dataset-uris");
         }
 
+        List<String> reviewedUris = collection.getReviewed().uris()
+               .stream().map((temp) -> convertUriForEvent(temp))
+                .collect(Collectors.toList());
         info().data("collectionId", collection.getId())
+                .data("Reviewed-uris", reviewedUris)
                 .data("publishing", true)
-                .data("kafka-uris", uris).log("converted URIs for kafka event");
+                .log("converted reviewed URIs for kafka event");
+        sendMessage (collection, reviewedUris, "Reviewed-uris");
+    }
+
+    // Putting message on kafka
+    private static void sendMessage (Collection collection, List<String> uris, String dataType) {
+
         try {
-            kafkaServiceSupplier.getService().produceContentPublished(collection.getId(), uris);
+            kafkaServiceSupplier.getService().produceContentPublished(collection.getId(), uris, dataType);
         } catch (Exception e) {
             error().data("collectionId", collection.getDescription().getId()).data("publishing", true)
                     .logException(e, "failed to send content-published kafka events");

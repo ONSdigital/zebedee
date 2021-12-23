@@ -110,7 +110,7 @@ Otherwise :violin: kindly ask someone from the dev team to help troubleshoot.
 ### Optional configuration options
 
 | Environment variable                              | Default                                     | Description
-| --------------------------------------------------| --------------------------------------------| -----------
+|---------------------------------------------------| --------------------------------------------| -----------
 | DEFAULT_WEBSITE_URL                               | "http://localhost:8080"                     | Service URL
 | DEFAULT_SLACK_WARNING_CHANNEL                     | "slack-client-test"                         | Slack channel
 | DEFAULT_SLACK_ALARM_CHANNEL                       | "slack-client-test"                         | Slack alarm channel
@@ -122,7 +122,8 @@ Otherwise :violin: kindly ask someone from the dev team to help troubleshoot.
 | DEFAULT_DYLAN_URL                                 | "http://localhost:8085"                     | Dylan URL
 | CONTENT_DIRECTORY                                 | "content"                                   | Content directory
 | KAFKA_SEC_PROTO                                   | _unset_                                     | if set to "TLS", kafka connections will use TLS
-| KAFKA_SEC_CLIENT_KEY_P12                          | _unset_                                     | if using TLS (see above), this is a base64-encoded PKCS12 keystore (optional, used for client auth)
+| KAFKA_SEC_CLIENT_CERT                             | _unset_                                     | PEM for the client certificate [1]
+| KAFKA_SEC_CLIENT_KEY                              | _unset_                                     | PEM for the client key [1]
 | AUDIT_DB_ENABLED_ENV_VAR                          | "audit_db_enabled"                          | Audit DB
 | MATHJAX_SERVICE_URL                               | "http://localhost:8888"                     | Mathjax service URL
 | DATASET_API_URL                                   | "http://localhost:22000"                    | Dataset API URL

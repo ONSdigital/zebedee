@@ -29,9 +29,9 @@ public class PublishedIndex {
 
         List<Document> docs = new FileScanner().scan();
 
-        /* TODO paging is not currently implemented (there would be complications involving ensuring that
-            duplicates or omissions of documents added or removed between pages) so for now the endpoint always
-            returns all published documents and ignores any supplied parameters
+        /*  Paging is not currently implemented (there would be complications involving ensuring that duplicates or
+            omissions of documents added or removed between pages) so for now the endpoint always returns all published
+            documents and ignores any supplied parameters
         */
         PublishedIndexResponse publishedIndexResponse = new PublishedIndexResponse();
         publishedIndexResponse.addDocuments(docs);

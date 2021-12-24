@@ -19,6 +19,14 @@ import static org.apache.http.HttpStatus.SC_INTERNAL_SERVER_ERROR;
 import static org.apache.http.HttpStatus.SC_NOT_FOUND;
 import static org.apache.http.HttpStatus.SC_UNAUTHORIZED;
 
+/**
+ * @deprecated The AuthorisationService is deprecated in favour of the new JWT sessions. Validating the JWT signature
+ *             accomplishes the same functionality as this implementation, but in a more distributed fashion.
+ *
+ * TODO: Once the migration to JWT sessions has been completed and all microservices have been updated to use the new
+ *       dp-authorisation implementation that includes JWT validation, then this service should be removed
+ */
+@Deprecated
 public class AuthorisationServiceImpl implements AuthorisationService {
 
     private ServiceSupplier<Sessions> sessionsSupplier = () -> Root.zebedee.getSessions();

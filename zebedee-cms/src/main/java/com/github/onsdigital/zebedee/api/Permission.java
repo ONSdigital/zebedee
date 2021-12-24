@@ -22,8 +22,11 @@ import javax.ws.rs.POST;
 import java.io.IOException;
 
 /**
- * Created by david on 12/03/2015.
+ * @deprecated by the move to the dp-identity-api
+ *
+ * // TODO: Remove these endpoints once the migration to the JWT based sessions is complete
  */
+@Deprecated
 @Api
 public class Permission {
 
@@ -64,6 +67,11 @@ public class Permission {
      * @throws IOException           If an error occurs accessing data.
      * @throws UnauthorizedException If the logged in user is not an administrator.
      * @throws BadRequestException   If the user specified in the {@link PermissionDefinition} is not found.
+     *
+     * This endpoint is used by the user management screens to manage the role of the users.
+     *
+     * // TODO: Remove this endpoint once the JWT sessions have been enabled as this will mean user management has moved
+     *          to the dp-identity-api
      */
     @POST
     public String grantPermission(HttpServletRequest request, HttpServletResponse response,
@@ -100,6 +108,14 @@ public class Permission {
      * @throws IOException           If an error occurs accessing data.
      * @throws UnauthorizedException If the user is not an administrator.
      * @throws BadRequestException   If the user specified in the {@link PermissionDefinition} is not found.
+     *
+     * This endpoint is called by florence in two places:
+     *    - On login to determine whether the calling user is a viewer, publisher or admin
+     *    - When editing a user, this endpoint is called to load whether they are a viewer, publisher or admin to display
+     *      on the user admin screens
+     *
+     * // TODO: Remove this endpoint once the JWT sessions have been enabled and a new endpoint has been created on the
+     *          florence server component that will supersede this
      */
     @GET
     public PermissionDefinition getPermissions(HttpServletRequest request, HttpServletResponse response)
@@ -174,13 +190,4 @@ public class Permission {
 
         return session;
     }
-
-    private Collections.CollectionList listCollections() throws InternalServerError {
-        try {
-            return collections.list();
-        } catch (IOException ex) {
-            throw new InternalServerError("error listing collections", ex);
-        }
-    }
-
 }

@@ -119,7 +119,7 @@ public interface PermissionsService {
     void addEditor(String email, Session session) throws IOException, UnauthorizedException, NotFoundException, BadRequestException;
 
     /**
-     * Remoke editor permission from a user.
+     * Remove editor permission from a user.
      *
      * @param email   the email of the user to revoke the permission from.
      * @param session the {@link Session} of the {@link User} revoking the permissison.
@@ -155,6 +155,9 @@ public interface PermissionsService {
      * @throws IOException If a filesystem error occurs.
      * @throws ZebedeeException if the user is not authorised to add view team permissions.
      *
+     * @deprecated as the dp-permissions-api policy management will supersede this when we complete the authorisation
+     *             migration
+     *
      * TODO: Remove this method once the migration to the new dp-permissions-api is completed
      */
     @Deprecated
@@ -170,6 +173,9 @@ public interface PermissionsService {
      * @throws IOException           unexpected error while checking permissions.
      * @throws UnauthorizedException unexpected error while checking permissions.
      *
+     * @deprecated as the dp-permissions-api policy management will supersede this when we complete the authorisation
+     *             migration
+     *
      * TODO: Remove this method once the migration to the new dp-permissions-api is completed
      */
     @Deprecated
@@ -183,6 +189,9 @@ public interface PermissionsService {
      * @param session               the {@link Session} of the user revoking view permission.
      * @throws IOException      unexpected error while revoking permissions.
      * @throws ZebedeeException unexpected error while revoking permissions.
+     *
+     * @deprecated as the dp-permissions-api policy management will supersede this when we complete the authorisation
+     *             migration
      *
      * TODO: Remove this method once the migration to the new dp-permissions-api is completed
      */
@@ -199,7 +208,12 @@ public interface PermissionsService {
      * @throws NotFoundException     user with the specified email was not found.
      * @throws UnauthorizedException the requesting user does not have the required permissions.
      *
-     * // TODO: need to review the /permissions endpoint use in order to determine where it is used
+     * @deprecated this will be removed after the creation of the new florence server endpoint for returning user
+     *             permissions and once the migration to JWT sessions has been completed
+     *
+     * TODO: Remove this method once the migration to JWT sessions is complete AND there is a new endpoint in Florence
+     *       server that returns the permissions information required by the Florence web application
      */
+    @Deprecated
     PermissionDefinition userPermissions(String email, Session session) throws IOException, NotFoundException, UnauthorizedException;
 }

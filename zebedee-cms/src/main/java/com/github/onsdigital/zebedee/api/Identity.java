@@ -25,6 +25,14 @@ import static com.github.onsdigital.zebedee.util.JsonUtils.writeResponseEntity;
 import static org.apache.http.HttpStatus.SC_OK;
 import static org.apache.http.HttpStatus.SC_UNAUTHORIZED;
 
+/**
+ * @deprecated The GET /identity endpoint is deprecated in favour of the new JWT sessions. Validating the JWT signature
+ *             accomplishes the same functionality as this implementation, but in a more distributed and performant
+ *             fashion.
+ *
+ * TODO: Once the migration to JWT sessions has been completed and all microservices have been updated to use the new
+ *       dp-authorisation implementation that includes JWT validation, then these API endpoints should be removed
+ */
 @Deprecated
 @Api
 public class Identity {
@@ -49,6 +57,15 @@ public class Identity {
         this.authorisationService = authorisationService;
     }
 
+    /**
+     * Endpoint validates user session token (provided via X-Florence-Token or Authorization header) and returns the
+     * user's email for human users or the user's service name (e.g. dp-dataset-exporter) for automated users.
+     *
+     * This is currently used by dp-api-clients-go/identity client which is in turn used by dp-net/handlers/Identity.
+     *
+     * @deprecated usage of this endpoint is deprecated in favour of JWT validation provided via the dp-authorisation library.
+     */
+    @Deprecated
     @GET
     public void identifyUser(HttpServletRequest request, HttpServletResponse response) throws IOException {
         // TODO: Remove after migration from X-Florence-Token to Authorization header is complete

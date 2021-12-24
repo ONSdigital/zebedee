@@ -2,8 +2,6 @@ package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.cryptolite.Random;
 import com.github.davidcarboni.restolino.framework.Api;
-import com.github.onsdigital.zebedee.exceptions.NotFoundException;
-import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.response.Error;
 import com.github.onsdigital.zebedee.model.ServiceAccount;
 import com.github.onsdigital.zebedee.model.ServiceAccountWithToken;
@@ -18,12 +16,14 @@ import javax.ws.rs.POST;
 import java.io.IOException;
 import java.util.function.Supplier;
 
-import static com.github.onsdigital.logging.v2.event.SimpleEvent.warn;
-import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
 import static com.github.onsdigital.zebedee.util.JsonUtils.writeResponseEntity;
 import static org.apache.http.HttpStatus.SC_CREATED;
-import static org.apache.http.HttpStatus.SC_NOT_FOUND;
 
+/**
+ * @deprecated The POST /service endpoint is deprecated in favour of the dp-identity-api. Once the migration of all
+ *             automated service users to the dp-identity-api, this endpoint will be removed.
+ */
+@Deprecated
 @Api
 public class Service {
 
@@ -33,34 +33,9 @@ public class Service {
     private ServiceStore serviceStore;
     private Sessions sessions;
     private PermissionsService permissionsService;
-    private boolean datasetImportEnabled;
-
-    /**
-     * Construct a default Service API endpoint.
-     */
-    public Service() {
-        this(cmsFeatureFlags().isEnableDatasetImport());
-    }
-
-    /**
-     * Construct a Service API endpoint specifying if the dataset import feature is enabled.
-     *
-     * @param datasetImportEnabled
-     */
-    public Service(boolean datasetImportEnabled) {
-        this.datasetImportEnabled = datasetImportEnabled;
-    }
 
     @POST
-    public void createService(HttpServletRequest request, HttpServletResponse response) throws IOException,
-            NotFoundException, UnauthorizedException {
-        // FIXME CMD feature.
-        if (!datasetImportEnabled) {
-            warn().data("responseStatus", SC_NOT_FOUND)
-                    .log("service post endpoint: endpoint is not supported as feature EnableDatasetImport is disabled");
-            writeResponseEntity(response, NOT_FOUND_ERR, SC_NOT_FOUND);
-            return;
-        }
+    public void createService(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
         final Session session = getSessions().get(request);
         if (session != null && getPermissionsService().isAdministrator(session)) {

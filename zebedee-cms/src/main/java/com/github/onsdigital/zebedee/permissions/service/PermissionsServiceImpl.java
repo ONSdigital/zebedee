@@ -31,9 +31,11 @@ import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMet
 import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData.teamRemoved;
 
 /**
- * Handles permissions mapping between users and {@link com.github.onsdigital.zebedee.Zebedee} functions.
- * Created by david on 12/03/2015.
+ * @deprecated this implementation is deprecated and will be removed once the JWT session migration has been completed
+ *
+ * // TODO: remove this class once the migration to JWT sessions has been completed
  */
+@Deprecated
 public class PermissionsServiceImpl implements PermissionsService {
 
     private PermissionsStore permissionsStore;

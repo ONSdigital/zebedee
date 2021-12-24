@@ -8,19 +8,17 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 
 /**
- * A File system implementation of {@link PermissionsStore}. Provides functionality for reading / writing
- * {@link AccessMapping} objects to/from json files on disk.
+ * @deprecated the files-on-disk access mapping is deprecated and will be removed once the migration of policy management
+ *             to the dp-permissions-api has been completed
+ *
+ * // TODO: remove this implementation once the authorisation migration to using the dp-permissions-api been completed
  */
 public class PermissionsStoreFileSystemImpl implements PermissionsStore {
 

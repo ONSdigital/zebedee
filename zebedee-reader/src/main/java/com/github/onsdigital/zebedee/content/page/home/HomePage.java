@@ -18,6 +18,8 @@ public class HomePage extends TaxonomyNode {
     private List<HomeContentItem> featuredContent;
 
     private List<HomeContentItem> aroundONS;
+    
+    private EmergencyBanner emergencyBanner;
 
     private String serviceMessage;
 
@@ -53,5 +55,13 @@ public class HomePage extends TaxonomyNode {
 
     public void setServiceMessage(String serviceMessage) {
         this.serviceMessage = serviceMessage;
+    }
+    
+    public EmergencyBanner getEmergencyBanner() {
+        return emergencyBanner;
+    }
+    
+    public void setEmergencyBanner(EmergencyBanner emergencyBanner) {
+        this.emergencyBanner = emergencyBanner;
     }
 }

@@ -45,4 +45,31 @@ public class PublisherTest {
         //Then {uris returns the original string}
         assertTrue(actual.contains("/testUri1"));
     }
+
+    @Test
+    public void testIsValidUriSuccess() {
+
+        //Gien {A valid uri is passed}
+        String testUri = "/dataset/cpih01/editions/timeseries/versions/version/metadata";
+
+        //When {Check for uri validity}
+        boolean actual = publisher.isValidUris(testUri);
+
+        //Then {The uri is valid}
+        assertTrue(actual);
+    }
+
+    @Test
+    public void testIsValidUriFailure() {
+
+        //Gien {An invalid uri is passed}
+        String testUri = "/dataset/cpih/editions/timeseries/";
+
+        //When {Check for uri validity}
+        boolean actual = publisher.isValidUris(testUri);
+
+        //Then {The uri is not valid}
+        assertFalse(actual);
+    }
+
 }

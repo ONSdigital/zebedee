@@ -762,21 +762,16 @@ public class Publisher {
 
         if (collection.getDatasetVersionDetails() != null && !collection.getDatasetVersionDetails().isEmpty()) {
             List<String> datasetUris = collection.getDatasetVersionDetails()
-                    .stream().map(content -> convertUriForEvent(content.uri))
+                    .stream()
+                    .map(content -> convertUriForEvent(content.uri))
+                    .filter (Publisher::isValidUris)
                     .collect(Collectors.toList());
 
-            // valid uris for published CMD versions of a dataset (edition) - /dataset/{datatsetId}/editions/{edition}/versions/{version}/metadata
-            List<String> validDatasetUris = new ArrayList<>();
-            for (String  actualuri: datasetUris){
-                String[] validUris = actualuri.split("/");
-                if (validUris.length > 6)
-                    validDatasetUris.add(actualuri);
-            }
             info().data("collectionId", collection.getId())
-                    .data("valid-Dataset-uris", validDatasetUris)
+                    .data("Dataset-uris", datasetUris)
                     .data("publishing", true)
                     .log("converted dataset valid URIs ready for kafka event");
-            sendMessage (collection, validDatasetUris, "Dataset-uris");
+            sendMessage (collection, datasetUris, "Dataset-uris");
         }
 
         List<String> reviewedUris = collection.getReviewed().uris()
@@ -787,6 +782,11 @@ public class Publisher {
                 .data("publishing", true)
                 .log("converted reviewed URIs for kafka event");
         sendMessage (collection, reviewedUris, "Reviewed-uris");
+    }
+
+    // valid uris for published CMD versions of a dataset (edition) - /dataset/{datatsetId}/editions/{edition}/versions/{version}/metadata
+    protected static boolean isValidUris (String uri){
+        return uri.split("/").length > 6;
     }
 
     // Putting message on kafka

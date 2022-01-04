@@ -764,7 +764,7 @@ public class Publisher {
             List<String> datasetUris = collection.getDatasetVersionDetails()
                     .stream()
                     .map(content -> convertUriForEvent(content.uri))
-                    .filter (Publisher::isValidUris)
+                    .filter (Publisher::isValidCMDDatasetURI)
                     .collect(Collectors.toList());
 
             info().data("collectionId", collection.getId())
@@ -784,9 +784,10 @@ public class Publisher {
         sendMessage (collection, reviewedUris, "Reviewed-uris");
     }
 
-    // valid uris for published CMD versions of a dataset (edition) - /dataset/{datatsetId}/editions/{edition}/versions/{version}/metadata
-    protected static boolean isValidUris (String uri){
-        return uri.split("/").length > 6;
+    // Valid CMDDataset uris for published CMD versions of a dataset (edition) - /dataset/{datatsetId}/editions/{edition}/versions/{version}/metadata
+    protected static boolean isValidCMDDatasetURI (String uri){
+
+        return uri.chars().filter(ch -> ch == '/').count() > 6;
     }
 
     // Putting message on kafka

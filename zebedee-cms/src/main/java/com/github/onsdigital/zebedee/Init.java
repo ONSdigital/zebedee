@@ -16,7 +16,8 @@ import com.github.onsdigital.zebedee.model.ZebedeeCollectionReaderFactory;
 import com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDaoFactory;
 import com.github.onsdigital.zebedee.reader.ZebedeeReader;
 
-import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
+import static com.github.onsdigital.zebedee.logging.CMSLogEvent.error;
+import static com.github.onsdigital.zebedee.logging.CMSLogEvent.info;
 
 /**
  * Created by bren on 31/07/15.
@@ -45,11 +46,16 @@ public class Init implements Startup {
         info().log("loading CMS feature flags");
         CMSFeatureFlags.cmsFeatureFlags();
 
-        Root.init();
-        ZebedeeReader.setCollectionReaderFactory(new ZebedeeCollectionReaderFactory(Root.zebedee));
+        try {
+            Root.init();
+            ZebedeeReader.setCollectionReaderFactory(new ZebedeeCollectionReaderFactory(Root.zebedee));
+            CollectionHistoryDaoFactory.initialise();
+        } catch (Exception ex) {
+            error().exception(ex).log("CMS start up failed with error, exiting application");
+            System.exit(1);
+        }
 
-        CollectionHistoryDaoFactory.initialise();
-        info().log("zebedee cms start up completed");
+        info().log("zebedee cms start up completed successfully");
     }
 
     private LogSerialiser getLogSerialiser() {

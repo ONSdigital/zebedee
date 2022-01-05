@@ -50,7 +50,7 @@ public class PublisherTest {
     public void testisValidCMDDatasetURISuccess() {
 
         //Gien {A valid uri is passed}
-        String testUri = "/dataset/cpih01/editions/timeseries/versions/version/metadata";
+        String testUri = "/dataset/cpih01/editions/timeseries/versions/version";
 
         //When {Check for uri validity}
         boolean actual = publisher.isValidCMDDatasetURI(testUri);

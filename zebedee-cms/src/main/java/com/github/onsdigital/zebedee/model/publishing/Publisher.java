@@ -787,7 +787,7 @@ public class Publisher {
     // Valid CMDDataset uris for published CMD versions of a dataset (edition) - /dataset/{datatsetId}/editions/{edition}/versions/{version}/metadata
     protected static boolean isValidCMDDatasetURI (String uri){
 
-        return uri.chars().filter(ch -> ch == '/').count() > 6;
+        return uri.chars().filter(ch -> ch == '/').count() > 5;
     }
 
     // Putting message on kafka

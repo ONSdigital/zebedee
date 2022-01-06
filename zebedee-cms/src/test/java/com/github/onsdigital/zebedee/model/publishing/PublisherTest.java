@@ -49,7 +49,7 @@ public class PublisherTest {
     @Test
     public void testisValidCMDDatasetURISuccess() {
 
-        //Gien {A valid uri is passed}
+        //Given {A valid uri is passed}
         String testUri = "/dataset/cpih01/editions/timeseries/versions/version";
 
         //When {Check for uri validity}

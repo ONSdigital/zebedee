@@ -62,7 +62,7 @@ public class PublisherTest {
     @Test
     public void testisValidCMDDatasetURIFailure() {
 
-        //Gien {An invalid uri is passed}
+        //Given {An invalid uri is passed}
         String testUri = "/dataset/cpih/editions/timeseries/";
 
         //When {Check for uri validity}
@@ -71,5 +71,4 @@ public class PublisherTest {
         //Then {The uri is not valid}
         assertFalse(actual);
     }
-
 }

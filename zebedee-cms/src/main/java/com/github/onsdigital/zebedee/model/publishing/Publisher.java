@@ -50,7 +50,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.locks.Lock;
 import java.util.function.Function;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -761,7 +760,6 @@ public class Publisher {
     }
 
     private static void sendToKafka(Collection collection) throws IOException {
-
         if (collection.getDatasetVersionDetails() != null && !collection.getDatasetVersionDetails().isEmpty()) {
             List<String> datasetUris = collection.getDatasetVersionDetails()
                     .stream()
@@ -788,16 +786,7 @@ public class Publisher {
 
     // Valid CMDDataset uris for published CMD versions of a dataset (edition) - /dataset/{datatsetId}/editions/{edition}/versions/{version}/metadata
     protected static boolean isValidCMDDatasetURI (String uri){
-
-        int matches = 0;
-        Matcher matcher = Pattern.compile("/").matcher(uri);
-        while(matcher.find()) {
-            matches++;
-        }
-        if (matches>5)
-            return true;
-
-        return false;
+        return Pattern.compile("^/dataset/\\w+/editions/\\w+/versions/\\w+").matcher(uri).matches();
     }
 
     // Putting message on kafka

@@ -62,7 +62,7 @@ public class PublisherTest {
     @Test
     public void testisValidCMDDatasetURIFailure() {
 
-        //Given {An invalid uri with hypen is passed}
+        //Given {An invalid uri is passed}
         String testUri = "/dataset/cpih/editions/timeseries/";
 
         //When {Check for uri validity}
@@ -75,7 +75,7 @@ public class PublisherTest {
     @Test
     public void testisValidCMDDatasetURISuccessWithHyphen() {
 
-        //Given {A valid uri is passed}
+        //Given {A valid uri with hypen is passed}
         String testUri = "/datasets/cpih01-test-7/editions/time-series/versions/8";
 
         //When {Check for uri validity}

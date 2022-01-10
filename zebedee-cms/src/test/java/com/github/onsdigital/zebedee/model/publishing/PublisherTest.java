@@ -50,7 +50,7 @@ public class PublisherTest {
     public void testisValidCMDDatasetURISuccess() {
 
         //Given {A valid uri is passed}
-        String testUri = "/dataset/cpih01/editions/timeseries/versions/version";
+        String testUri = "/datasets/cpih01/editions/timeseries/versions/version";
 
         //When {Check for uri validity}
         boolean actual = publisher.isValidCMDDatasetURI(testUri);
@@ -62,7 +62,7 @@ public class PublisherTest {
     @Test
     public void testisValidCMDDatasetURIFailure() {
 
-        //Given {An invalid uri is passed}
+        //Given {An invalid uri with hypen is passed}
         String testUri = "/dataset/cpih/editions/timeseries/";
 
         //When {Check for uri validity}
@@ -71,4 +71,18 @@ public class PublisherTest {
         //Then {The uri is not valid}
         assertFalse(actual);
     }
+
+    @Test
+    public void testisValidCMDDatasetURISuccessWithHyphen() {
+
+        //Given {A valid uri is passed}
+        String testUri = "/datasets/cpih01-test-7/editions/time-series/versions/8";
+
+        //When {Check for uri validity}
+        boolean actual = publisher.isValidCMDDatasetURI(testUri);
+
+        //Then {The uri is valid}
+        assertTrue(actual);
+    }
+
 }

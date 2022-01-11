@@ -50,6 +50,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.locks.Lock;
 import java.util.function.Function;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static com.github.onsdigital.zebedee.api.Root.zebedee;
@@ -759,15 +760,17 @@ public class Publisher {
     }
 
     private static void sendToKafka(Collection collection) throws IOException {
-
         if (collection.getDatasetVersionDetails() != null && !collection.getDatasetVersionDetails().isEmpty()) {
             List<String> datasetUris = collection.getDatasetVersionDetails()
-                    .stream().map(content -> convertUriForEvent(content.uri))
+                    .stream()
+                    .map(content -> convertUriForEvent(content.uri))
+                    .filter (Publisher::isValidCMDDatasetURI)
                     .collect(Collectors.toList());
+
             info().data("collectionId", collection.getId())
                     .data("Dataset-uris", datasetUris)
                     .data("publishing", true)
-                    .log("converted dataset URIs for kafka event");
+                    .log("converted dataset valid URIs ready for kafka event");
             sendMessage (collection, datasetUris, "Dataset-uris");
         }
 
@@ -779,6 +782,11 @@ public class Publisher {
                 .data("publishing", true)
                 .log("converted reviewed URIs for kafka event");
         sendMessage (collection, reviewedUris, "Reviewed-uris");
+    }
+
+    // Valid CMDDataset uris for published CMD versions of a dataset (edition) - /dataset/{datatsetId}/editions/{edition}/versions/{version}/metadata
+    protected static boolean isValidCMDDatasetURI (String uri){
+        return Pattern.compile("^/datasets/[a-zA-Z0-9_\\._-]+/editions/[a-zA-Z0-9_\\._-]+/versions/\\w+").matcher(uri).matches();
     }
 
     // Putting message on kafka

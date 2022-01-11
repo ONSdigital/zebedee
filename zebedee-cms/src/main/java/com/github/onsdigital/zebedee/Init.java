@@ -1,5 +1,6 @@
 package com.github.onsdigital.zebedee;
 
+import com.github.davidcarboni.restolino.framework.Priority;
 import com.github.davidcarboni.restolino.framework.Startup;
 import com.github.onsdigital.logging.v2.DPLogger;
 import com.github.onsdigital.logging.v2.Logger;
@@ -22,6 +23,7 @@ import static com.github.onsdigital.zebedee.logging.CMSLogEvent.info;
 /**
  * Created by bren on 31/07/15.
  */
+@Priority(2)
 public class Init implements Startup {
 
     private static final String FORMAT_LOGS_KEY = "FORMAT_LOGGING";
@@ -42,6 +44,8 @@ public class Init implements Startup {
             System.err.println(ex);
             System.exit(1);
         }
+
+        info().log("initialising Zebedee CMS");
 
         info().log("loading CMS feature flags");
         CMSFeatureFlags.cmsFeatureFlags();

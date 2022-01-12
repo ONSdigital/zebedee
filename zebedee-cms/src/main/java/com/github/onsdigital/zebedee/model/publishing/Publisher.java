@@ -50,6 +50,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.locks.Lock;
 import java.util.function.Function;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static com.github.onsdigital.zebedee.api.Root.zebedee;
@@ -759,7 +760,6 @@ public class Publisher {
     }
 
     private static void sendToKafka(Collection collection) throws IOException {
-
         if (collection.getDatasetVersionDetails() != null && !collection.getDatasetVersionDetails().isEmpty()) {
             List<String> datasetUris = collection.getDatasetVersionDetails()
                     .stream()
@@ -786,8 +786,7 @@ public class Publisher {
 
     // Valid CMDDataset uris for published CMD versions of a dataset (edition) - /dataset/{datatsetId}/editions/{edition}/versions/{version}/metadata
     protected static boolean isValidCMDDatasetURI (String uri){
-
-        return uri.chars().filter(ch -> ch == '/').count() > 6;
+        return Pattern.compile("^/datasets/[a-zA-Z0-9_\\._-]+/editions/[a-zA-Z0-9_\\._-]+/versions/\\w+").matcher(uri).matches();
     }
 
     // Putting message on kafka

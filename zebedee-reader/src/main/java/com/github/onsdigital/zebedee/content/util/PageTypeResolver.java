@@ -3,6 +3,7 @@ package com.github.onsdigital.zebedee.content.util;
 import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.content.page.base.PageType;
 import com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration;
+import com.google.gson.Gson;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
@@ -23,7 +24,6 @@ import java.util.stream.Collectors;
 import static com.github.onsdigital.zebedee.logging.ReaderLogger.error;
 import static com.github.onsdigital.zebedee.logging.ReaderLogger.info;
 import static com.github.onsdigital.zebedee.logging.ReaderLogger.warn;
-import static com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration.get;
 
 /**
  * Created by bren on 09/06/15.
@@ -35,7 +35,6 @@ class PageTypeResolver implements JsonDeserializer<Page> {
     private static PageTypeResolver instance = null;
 
     private boolean datasetImportEnabled;
-    private Set<PageType> datasetImportPageTypes;
     private Predicate<PageType> isDatasetImportPageType;
 
     private PageTypeResolver(boolean datasetImportEnabled, Predicate<PageType> isDatasetImportPageType) {
@@ -52,10 +51,8 @@ class PageTypeResolver implements JsonDeserializer<Page> {
             return null;
         }
 
-        String type = jsonType.getAsString();
-
         try {
-            PageType contentType = PageType.valueOf(type.toUpperCase());
+            PageType contentType = new Gson().fromJson(jsonType, PageType.class);
 
             // FIXME CMD feature
             if (!datasetImportEnabled && isDatasetImportPageType.test(contentType)) {
@@ -66,7 +63,7 @@ class PageTypeResolver implements JsonDeserializer<Page> {
 
             Class<Page> pageClass = contentClasses.get(contentType);
             if (pageClass == null) {
-                throw new RuntimeException("Could find content object for " + type);
+                throw new RuntimeException("Could find content object for " + jsonType.getAsString());
             }
             Page content = context.deserialize(json, pageClass);
             return content;

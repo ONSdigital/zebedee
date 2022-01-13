@@ -1,6 +1,5 @@
 package com.github.onsdigital.zebedee.model.approval.tasks;
 
-import com.github.onsdigital.zebedee.content.page.base.PageType;
 import com.github.onsdigital.zebedee.content.page.release.Release;
 import com.github.onsdigital.zebedee.content.partial.Link;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
@@ -40,44 +39,40 @@ public class ReleasePopulator {
     }
 
     private static void addPageDetailToRelease(Release release, ContentDetail contentDetail) {
-        if (contentDetail.getType().equals(PageType.ARTICLE)
-                || contentDetail.getType().equals(PageType.ARTICLE_DOWNLOAD)
-                || contentDetail.getType().equals(PageType.BULLETIN)
-                || contentDetail.getType().equals(PageType.COMPENDIUM_LANDING_PAGE)) {
-
+        switch (contentDetail.getType()) {
+        case ARTICLE:
+        case ARTICLE_DOWNLOAD:
+        case BULLETIN:
+        case COMPENDIUM_LANDING_PAGE:
             info().data("contentTitle", contentDetail.description.title).data("releaseTitle", release.getDescription().getTitle())
                     .log("Adding document as a link to release");
 
             addRelatedDocument(release, contentDetail);
-        }
-
-        if (contentDetail.getType().equals(PageType.DATASET_LANDING_PAGE)
-                || contentDetail.getType().equals(PageType.API_DATASET_LANDING_PAGE)) {
-
+            break;
+        case DATASET_LANDING_PAGE:
+        case API_DATASET_LANDING_PAGE:
             info().data("contentTitle", contentDetail.description.title)
                     .data("releaseTitle", release.getDescription().getTitle())
                     .log("Adding dataset as a link to release");
 
             addRelatedDataset(release, contentDetail);
-        }
-
-        if (contentDetail.getType().equals(PageType.STATIC_QMI)) {
-
+            break;
+        case STATIC_QMI:
             info().data("contentTitle", contentDetail.description.title)
                     .data("releaseTitle", release.getDescription().getTitle())
                     .log("Adding qmi as a link to release");
 
             addRelatedQMI(release, contentDetail);
-        }
-
-        if (contentDetail.getType().equals(PageType.STATIC_METHODOLOGY)
-                || contentDetail.getType().equals(PageType.STATIC_METHODOLOGY_DOWNLOAD)) {
-
+            break;
+        case STATIC_METHODOLOGY:
+        case STATIC_METHODOLOGY_DOWNLOAD:
             info().data("contentTitle", contentDetail.description.title)
                     .data("releaseTitle", release.getDescription().getTitle())
                     .log("Adding methodology article as a link to release");
 
             addRelatedMethodologyArticle(release, contentDetail);
+            break;
+        default: // Do nothing fot other types
         }
     }
 

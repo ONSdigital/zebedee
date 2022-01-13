@@ -77,6 +77,7 @@ public class Publisher {
     private static final String PUBLISH_ENDPOINT = "publish";
     private static final String COMMIT_ENDPOINT = "commit";
     private static final String ROLLBACK_ENDPOINT = "rollback";
+    private static final Pattern CMD_DATASET_URI_REGEX = Pattern.compile("^/datasets/[a-zA-Z0-9_\\._-]+/editions/[a-zA-Z0-9_\\._-]+/versions/\\w+");
 
     // parameters
     private static final String TRANSACTION_ID_PARAM = "transactionId";
@@ -786,7 +787,7 @@ public class Publisher {
 
     // Valid CMDDataset uris for published CMD versions of a dataset (edition) - /dataset/{datatsetId}/editions/{edition}/versions/{version}/metadata
     protected static boolean isValidCMDDatasetURI (String uri){
-        return Pattern.compile("^/datasets/[a-zA-Z0-9_\\._-]+/editions/[a-zA-Z0-9_\\._-]+/versions/\\w+").matcher(uri).matches();
+        return CMD_DATASET_URI_REGEX.matcher(uri).matches();
     }
 
     // Putting message on kafka

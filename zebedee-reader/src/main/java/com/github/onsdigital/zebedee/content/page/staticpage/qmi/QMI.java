@@ -16,7 +16,7 @@ public class QMI extends BaseStaticPage {
 
     @Override
     public PageType getType() {
-        return PageType.static_qmi;
+        return PageType.STATIC_QMI;
     }
 
     public List<Link> getRelatedDocuments() {

@@ -32,7 +32,7 @@ public class StaticArticle extends Page {
 
     @Override
     public PageType getType() {
-        return PageType.static_article;
+        return PageType.STATIC_ARTICLE;
     }
 
     public List<Link> getRelatedData() {

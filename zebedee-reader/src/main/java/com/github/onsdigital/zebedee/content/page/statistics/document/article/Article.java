@@ -37,7 +37,7 @@ public class Article extends StatisticalDocument {
 
     @Override
     public PageType getType() {
-        return PageType.article;
+        return PageType.ARTICLE;
     }
 
     public void setRelatedArticles(List<Link> relatedArticles) {

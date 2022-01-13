@@ -49,7 +49,7 @@ public class CollectionReaderTest {
     public void testGetAvailableContent() throws ZebedeeException, IOException {
         Page content = collectionReader.getContent("employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/articles/labourdisputes/2015-07-16");
         assertNotNull(content);
-        assertEquals(content.getType(), PageType.article);
+        assertEquals(content.getType(), PageType.ARTICLE);
         assertTrue(content instanceof Article);
     }
 
@@ -59,7 +59,7 @@ public class CollectionReaderTest {
         collectionReader.setLanguage(ContentLanguage.cy);
         Page content = collectionReader.getContent("employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/articles/labourdisputes/2015-07-16");
         assertNotNull(content);
-        assertEquals(content.getType(), PageType.article);
+        assertEquals(content.getType(), PageType.ARTICLE);
         assertTrue(content instanceof Article);
         assertEquals("prif bwyntiau", content.getDescription().getTitle());
     }
@@ -69,7 +69,7 @@ public class CollectionReaderTest {
         collectionReader.setLanguage(ContentLanguage.cy);
         Page content = collectionReader.getContent("employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/datasets/labourdisputesbysectorlabd02/");
         assertNotNull(content);
-        assertEquals(content.getType(), PageType.dataset_landing_page);
+        assertEquals(content.getType(), PageType.DATASET_LANDING_PAGE);
         assertTrue(content instanceof DatasetLandingPage);
     }
 
@@ -135,7 +135,7 @@ public class CollectionReaderTest {
         assertTrue(children.size() == 1);
         Map.Entry<URI, ContentNode> contentNode = children.entrySet().iterator().next();
         assertEquals("Labour disputes by sector: LABD02", contentNode.getValue().getDescription().getTitle());
-        assertEquals(PageType.dataset_landing_page, contentNode.getValue().getType());//type is null for directories with no data.json
+        assertEquals(PageType.DATASET_LANDING_PAGE, contentNode.getValue().getType());//type is null for directories with no data.json
         assertEquals("/employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/datasets/labourdisputesbysectorlabd02", contentNode.getKey().toString());
     }
 

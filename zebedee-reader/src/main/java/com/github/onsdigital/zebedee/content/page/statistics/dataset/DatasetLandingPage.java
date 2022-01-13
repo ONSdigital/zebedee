@@ -27,7 +27,7 @@ public class DatasetLandingPage extends Statistics {
 
     @Override
     public PageType getType() {
-        return PageType.dataset_landing_page;
+        return PageType.DATASET_LANDING_PAGE;
     }
 
     public List<DownloadSection> getDownloads() {

@@ -168,7 +168,7 @@ public class DataProcessorTestBaseFixture extends ZebedeeTestBaseFixture {
 
         // Then
         // we expect it to be a skeleton timeseries
-        assertEquals(PageType.timeseries, initial.getType());
+        assertEquals(PageType.TIMESERIES, initial.getType());
         assertEquals(0, initial.years.size());
         assertEquals(0, initial.months.size());
         assertEquals(0, initial.quarters.size());
@@ -190,7 +190,7 @@ public class DataProcessorTestBaseFixture extends ZebedeeTestBaseFixture {
 
         // Then
         // we expect it to be the published timeseries complete with existing data
-        assertEquals(PageType.timeseries, initial.getType());
+        assertEquals(PageType.TIMESERIES, initial.getType());
         assertEquals(republish.timeSeriesList.get(0).getUri(), initial.getUri());
         assertNotEquals(0, initial.years.size());
         assertNotEquals(0, initial.months.size());

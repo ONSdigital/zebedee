@@ -186,7 +186,7 @@ public class Indexer {
                 //TODO: optimize resolving latest flag, only update elastic search for existing releases rather than reindexing
                 //Load old releases as well to get latest flag re-calculated
                 index(getSearchAlias(), new FileScanner().scan(URIUtils.removeLastSegment(uri)));
-            } else if (page.getType() == PageType.timeseries) {
+            } else if (page.getType() == PageType.TIMESERIES) {
                 index(getSearchAlias(), new FileScanner().scan(uri));
             } else {
                 indexSingleContent(getSearchAlias(), page);
@@ -351,9 +351,9 @@ public class Indexer {
 
     private boolean isPeriodic(PageType type) {
         switch (type) {
-            case bulletin:
-            case article:
-            case compendium_landing_page:
+            case BULLETIN:
+            case ARTICLE:
+            case COMPENDIUM_LANDING_PAGE:
                 return true;
             default:
                 return false;

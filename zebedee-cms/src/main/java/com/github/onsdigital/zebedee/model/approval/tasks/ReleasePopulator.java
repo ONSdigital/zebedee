@@ -41,10 +41,10 @@ public class ReleasePopulator {
 
     private static void addPageDetailToRelease(Release release, ContentDetail contentDetail) {
 
-        if (contentDetail.type.equals(PageType.article.toString())
-                || contentDetail.type.equals(PageType.article_download.toString())
-                || contentDetail.type.equals(PageType.bulletin.toString())
-                || contentDetail.type.equals(PageType.compendium_landing_page.toString())) {
+        if (contentDetail.type.equals(PageType.ARTICLE.toString())
+                || contentDetail.type.equals(PageType.ARTICLE_DOWNLOAD.toString())
+                || contentDetail.type.equals(PageType.BULLETIN.toString())
+                || contentDetail.type.equals(PageType.COMPENDIUM_LANDING_PAGE.toString())) {
 
             info().data("contentTitle", contentDetail.description.title).data("releaseTitle", release.getDescription().getTitle())
                     .log("Adding document as a link to release");
@@ -52,8 +52,8 @@ public class ReleasePopulator {
             addRelatedDocument(release, contentDetail);
         }
 
-        if (contentDetail.type.equals(PageType.dataset_landing_page.toString())
-                || contentDetail.type.equals(PageType.api_dataset_landing_page.toString())) {
+        if (contentDetail.type.equals(PageType.DATASET_LANDING_PAGE.toString())
+                || contentDetail.type.equals(PageType.API_DATASET_LANDING_PAGE.toString())) {
 
             info().data("contentTitle", contentDetail.description.title)
                     .data("releaseTitle", release.getDescription().getTitle())
@@ -62,7 +62,7 @@ public class ReleasePopulator {
             addRelatedDataset(release, contentDetail);
         }
 
-        if (contentDetail.type.equals(PageType.static_qmi.toString())) {
+        if (contentDetail.type.equals(PageType.STATIC_QMI.toString())) {
 
             info().data("contentTitle", contentDetail.description.title)
                     .data("releaseTitle", release.getDescription().getTitle())
@@ -71,8 +71,8 @@ public class ReleasePopulator {
             addRelatedQMI(release, contentDetail);
         }
 
-        if (contentDetail.type.equals(PageType.static_methodology.toString())
-                || contentDetail.type.equals(PageType.static_methodology_download.toString())) {
+        if (contentDetail.type.equals(PageType.STATIC_METHODOLOGY.toString())
+                || contentDetail.type.equals(PageType.STATIC_METHODOLOGY_DOWNLOAD.toString())) {
 
             info().data("contentTitle", contentDetail.description.title)
                     .data("releaseTitle", release.getDescription().getTitle())

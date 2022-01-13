@@ -13,7 +13,7 @@ public class CompendiumData extends DatasetLandingPage {
 
     @Override
     public PageType getType() {
-        return PageType.compendium_data;
+        return PageType.COMPENDIUM_DATA;
     }
 
     public Link getParent() {

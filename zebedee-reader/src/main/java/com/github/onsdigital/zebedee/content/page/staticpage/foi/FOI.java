@@ -9,6 +9,6 @@ import com.github.onsdigital.zebedee.content.page.staticpage.base.BaseStaticPage
 public class FOI extends BaseStaticPage {
     @Override
     public PageType getType() {
-        return PageType.static_foi;
+        return PageType.STATIC_FOI;
     }
 }

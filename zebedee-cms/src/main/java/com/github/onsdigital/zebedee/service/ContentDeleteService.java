@@ -33,9 +33,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-import static com.github.onsdigital.zebedee.content.page.base.PageType.home_page;
-import static com.github.onsdigital.zebedee.content.page.base.PageType.product_page;
-import static com.github.onsdigital.zebedee.content.page.base.PageType.taxonomy_landing_page;
+import static com.github.onsdigital.zebedee.content.page.base.PageType.HOME_PAGE;
+import static com.github.onsdigital.zebedee.content.page.base.PageType.PRODUCT_PAGE;
+import static com.github.onsdigital.zebedee.content.page.base.PageType.TAXONOMY_LANDING_PAGE;
 import static com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedException.alreadyMarkedDeleteInCurrentCollectionError;
 import static com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedException.deleteForbiddenForPageTypeError;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.DELETE_MARKED_ADDED;
@@ -61,7 +61,7 @@ public class ContentDeleteService {
             DELETE_MARKED_REMOVED, EventType.DELETE_MARKER_REMOVED);
 
     private static final ImmutableList<PageType> NON_DELETABLE_PAGE_TYPES =
-            ImmutableList.of(home_page, taxonomy_landing_page, product_page);
+            ImmutableList.of(HOME_PAGE, TAXONOMY_LANDING_PAGE, PRODUCT_PAGE);
 
     public static ContentDeleteService instance = null;
 

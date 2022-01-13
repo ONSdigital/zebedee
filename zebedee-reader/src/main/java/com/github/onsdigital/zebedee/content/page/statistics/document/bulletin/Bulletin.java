@@ -27,7 +27,7 @@ public class Bulletin extends StatisticalDocument {
 
     @Override
     public PageType getType() {
-        return PageType.bulletin;
+        return PageType.BULLETIN;
     }
 
     public List<Link> getRelatedBulletins() {

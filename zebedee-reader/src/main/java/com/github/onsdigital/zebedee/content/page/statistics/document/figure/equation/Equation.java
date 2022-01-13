@@ -26,6 +26,6 @@ public class Equation extends FigureBase {
 
     @Override
     public PageType getType() {
-        return PageType.equation;
+        return PageType.EQUATION;
     }
 }

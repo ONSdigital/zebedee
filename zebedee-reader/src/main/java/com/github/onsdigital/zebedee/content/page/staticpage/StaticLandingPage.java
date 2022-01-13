@@ -17,7 +17,7 @@ public class StaticLandingPage extends BaseStaticPage {
 
     @Override
     public PageType getType() {
-        return PageType.static_landing_page;
+        return PageType.STATIC_LANDING_PAGE;
     }
 
     public List<StaticPageSection> getSections() {

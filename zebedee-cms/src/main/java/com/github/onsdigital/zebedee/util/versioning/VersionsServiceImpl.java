@@ -136,7 +136,7 @@ public class VersionsServiceImpl implements VersionsService {
             Path parent = Paths.get(uri).getParent();
             Page page = reader.getReviewed().getContent(parent.toString());
 
-            if (PageType.dataset.equals(page.getType())) {
+            if (PageType.DATASET.equals(page.getType())) {
                 datasets.add((Dataset) page);
             }
         }

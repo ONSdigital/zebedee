@@ -100,7 +100,7 @@ public class ResolveDatasets {
         Content c = handler.findContent(request, extractFilter(request));
 
         Page p = (Page) c;
-        if (p.getType() != PageType.product_page) {
+        if (p.getType() != PageType.PRODUCT_PAGE) {
             throw new BadRequestException("invalid page type for getDatasetSummaries datasets");
         }
         return (ProductPage) p;

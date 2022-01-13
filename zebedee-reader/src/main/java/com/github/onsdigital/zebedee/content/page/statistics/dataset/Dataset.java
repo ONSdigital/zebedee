@@ -16,7 +16,7 @@ public class Dataset extends Page {
 
     @Override
     public PageType getType() {
-        return PageType.dataset;
+        return PageType.DATASET;
     }
 
     public List<DownloadSection> getDownloads() {

@@ -55,7 +55,7 @@ class PageTypeResolver implements JsonDeserializer<Page> {
         String type = jsonType.getAsString();
 
         try {
-            PageType contentType = PageType.valueOf(type);
+            PageType contentType = PageType.valueOf(type.toUpperCase());
 
             // FIXME CMD feature
             if (!datasetImportEnabled && isDatasetImportPageType.test(contentType)) {

@@ -1,5 +1,6 @@
 package com.github.onsdigital.zebedee.content.page.base;
 
+import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 
 /**
@@ -89,4 +90,9 @@ public enum PageType {
     public String getDisplayName() {
         return displayName;
     }
+
+    public String getSerializedName() {
+        return new Gson().toJson(this);
+    }
+
 }

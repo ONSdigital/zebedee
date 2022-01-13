@@ -54,7 +54,7 @@ public class CollectionPdfGenerator {
 
     private PdfService pdfService;
 
-    private Predicate<ContentDetail> isPDFPage = (c -> PDF_GENERATING_PAGES.contains(PageType.valueOf(c.type.toUpperCase())));
+    private Predicate<ContentDetail> isPDFPage = (c -> PDF_GENERATING_PAGES.contains(c.getType()));
 
     /**
      * Create a new instance to use the provided PdfService.

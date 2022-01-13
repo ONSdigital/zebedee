@@ -40,11 +40,10 @@ public class ReleasePopulator {
     }
 
     private static void addPageDetailToRelease(Release release, ContentDetail contentDetail) {
-
-        if (contentDetail.type.equals(PageType.ARTICLE.toString())
-                || contentDetail.type.equals(PageType.ARTICLE_DOWNLOAD.toString())
-                || contentDetail.type.equals(PageType.BULLETIN.toString())
-                || contentDetail.type.equals(PageType.COMPENDIUM_LANDING_PAGE.toString())) {
+        if (contentDetail.getType().equals(PageType.ARTICLE)
+                || contentDetail.getType().equals(PageType.ARTICLE_DOWNLOAD)
+                || contentDetail.getType().equals(PageType.BULLETIN)
+                || contentDetail.getType().equals(PageType.COMPENDIUM_LANDING_PAGE)) {
 
             info().data("contentTitle", contentDetail.description.title).data("releaseTitle", release.getDescription().getTitle())
                     .log("Adding document as a link to release");
@@ -52,8 +51,8 @@ public class ReleasePopulator {
             addRelatedDocument(release, contentDetail);
         }
 
-        if (contentDetail.type.equals(PageType.DATASET_LANDING_PAGE.toString())
-                || contentDetail.type.equals(PageType.API_DATASET_LANDING_PAGE.toString())) {
+        if (contentDetail.getType().equals(PageType.DATASET_LANDING_PAGE)
+                || contentDetail.getType().equals(PageType.API_DATASET_LANDING_PAGE)) {
 
             info().data("contentTitle", contentDetail.description.title)
                     .data("releaseTitle", release.getDescription().getTitle())
@@ -62,7 +61,7 @@ public class ReleasePopulator {
             addRelatedDataset(release, contentDetail);
         }
 
-        if (contentDetail.type.equals(PageType.STATIC_QMI.toString())) {
+        if (contentDetail.getType().equals(PageType.STATIC_QMI)) {
 
             info().data("contentTitle", contentDetail.description.title)
                     .data("releaseTitle", release.getDescription().getTitle())
@@ -71,8 +70,8 @@ public class ReleasePopulator {
             addRelatedQMI(release, contentDetail);
         }
 
-        if (contentDetail.type.equals(PageType.STATIC_METHODOLOGY.toString())
-                || contentDetail.type.equals(PageType.STATIC_METHODOLOGY_DOWNLOAD.toString())) {
+        if (contentDetail.getType().equals(PageType.STATIC_METHODOLOGY)
+                || contentDetail.getType().equals(PageType.STATIC_METHODOLOGY_DOWNLOAD)) {
 
             info().data("contentTitle", contentDetail.description.title)
                     .data("releaseTitle", release.getDescription().getTitle())

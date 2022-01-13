@@ -84,7 +84,7 @@ public class ContentDeleteService {
         deletes.stream().forEach(delete -> {
             LeafCounter leafCounter = new LeafCounter();
             contentTreeNavigator.applyAndPropagate(delete.getRoot(), (node -> {
-                if (StringUtils.isNotEmpty(node.uri) && node.type != null) {
+                if (StringUtils.isNotEmpty(node.uri) && node.getType() != null) {
                     leafCounter.increment();
                 }
             }));
@@ -189,7 +189,7 @@ public class ContentDeleteService {
         List<String> uris = new ArrayList<>();
         collection.getDescription().getPendingDeletes().forEach(pendingDelete -> {
             contentTreeNavigator.applyAndPropagate(pendingDelete.getRoot(), (node) -> {
-                if (node.type != null && StringUtils.isNotEmpty(node.uri)) {
+                if (node.getType() != null && StringUtils.isNotEmpty(node.uri)) {
                     uris.add(node.uri);
                 }
             });

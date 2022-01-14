@@ -33,7 +33,7 @@ public class ReaderResponseResponseUtils {
 
         if (content instanceof Page) {
             Page page = (Page) content;
-            response.setHeader("ONS-Page-Type", page.getType().toString());
+            response.setHeader("ONS-Page-Type", page.getType().getSerializedName());
         }
 
         IOUtils.copy(new StringReader(ContentUtil.serialise(content)), response.getOutputStream());

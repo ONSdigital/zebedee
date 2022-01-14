@@ -1,14 +1,9 @@
 package com.github.onsdigital.zebedee.content.page.base;
 
-import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 
 /**
  * Enumerates the different types of pages on the website.
- * <p>
- * Strictly these would be uppercase, but "shouty caps" looks wrong when
- * serialised to Json. There are ways around it, but the simplest solution is to
- * use lowercase - it's not worth the complexity.
  *
  * @author david
  * @author bren
@@ -91,8 +86,11 @@ public enum PageType {
         return displayName;
     }
 
-    public String getSerializedName() {
-        return new Gson().toJson(this);
+    public String getLabel() {
+        try {
+            return PageType.class.getField(this.name()).getAnnotation(SerializedName.class).value();
+        } catch (NoSuchFieldException | SecurityException e) {
+            throw new RuntimeException("error getting page type label", e);
+        }
     }
-
 }

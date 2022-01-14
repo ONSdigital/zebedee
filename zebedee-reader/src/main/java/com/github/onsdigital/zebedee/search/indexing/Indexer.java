@@ -284,7 +284,7 @@ public class Indexer {
 
     private void indexSingleContent(String indexName, Page page) throws IOException {
         List<String> terms = resolveSearchTerms(page.getUri().toString());
-        searchUtils.createDocument(indexName, page.getType().getSerializedName(), page.getUri().toString(), serialise(toSearchDocument(page, terms)));
+        searchUtils.createDocument(indexName, page.getType().getLabel(), page.getUri().toString(), serialise(toSearchDocument(page, terms)));
     }
 
     private SearchDocument toSearchDocument(Page page, List<String> searchTerms) {

@@ -332,7 +332,7 @@ public class PostPublisher {
                     info().data("uri", node.uri).log("Deleting index from publishing search ");
                     pool.submit(() -> {
                         try {
-                            Indexer.getInstance().deleteContentIndex(node.getType().getSerializedName(), node.uri);
+                            Indexer.getInstance().deleteContentIndex(node.getType().getLabel(), node.uri);
                         } catch (Exception e) {
                             error().logException(e, "Exception reloading search index:");
                         }

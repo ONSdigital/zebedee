@@ -26,9 +26,6 @@ public interface PermissionsService {
      * @param session {@link Session} to get the user details from.
      * @return true if the {@link User} is a publisher, false otherwise.
      * @throws IOException unexpected error checking the user permissions.
-     *
-     * // TODO: Replace with a isPublisher() method after the migration to JWT sessions and the thread local sessions
-     *          implementation
      */
     boolean isPublisher(Session session) throws IOException;
 
@@ -38,9 +35,6 @@ public interface PermissionsService {
      * @param session {@link Session} to get the user details from.
      * @return true if the user is an admin, false otherwise.
      * @throws IOException unexpected error checking the user permissions.
-     *
-     * // TODO: Replace with a isAdministrator() method after the migration to JWT sessions and the thread local sessions
-     *          implementation
      */
     boolean isAdministrator(Session session) throws IOException;
 
@@ -94,9 +88,6 @@ public interface PermissionsService {
      * @param session the {@link Session} of the user to check.
      * @return true if the user can edit content, false otherwise.
      * @throws IOException unexpected error while checking permissions.
-     *
-     * // TODO: Replace with a canEdit() method after the migration to JWT sessions and the thread local sessions
-     *          implementation
      */
     boolean canEdit(Session session) throws IOException;
 

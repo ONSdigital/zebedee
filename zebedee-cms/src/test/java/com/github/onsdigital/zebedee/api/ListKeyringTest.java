@@ -6,8 +6,6 @@ import com.github.onsdigital.zebedee.keyring.CollectionKeyring;
 import com.github.onsdigital.zebedee.keyring.KeyringException;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.session.service.Sessions;
-import com.github.onsdigital.zebedee.user.model.User;
-import com.github.onsdigital.zebedee.user.service.UsersService;
 import org.junit.Test;
 import org.mockito.Mock;
 
@@ -29,12 +27,6 @@ public class ListKeyringTest extends ZebedeeAPIBaseTestCase {
     private Sessions sessions;
 
     @Mock
-    private UsersService usersService;
-
-    @Mock
-    private User user;
-
-    @Mock
     private PermissionsService permissionsService;
 
     private ListKeyring endpoint;
@@ -43,7 +35,7 @@ public class ListKeyringTest extends ZebedeeAPIBaseTestCase {
 
     @Override
     protected void customSetUp() throws Exception {
-        endpoint = new ListKeyring(centralKeyring, sessions, permissionsService, usersService);
+        endpoint = new ListKeyring(centralKeyring, sessions, permissionsService);
         email = "123@test.com";
 
         when(sessions.get(mockRequest))
@@ -54,9 +46,6 @@ public class ListKeyringTest extends ZebedeeAPIBaseTestCase {
 
         when(permissionsService.isAdministrator(session))
                 .thenReturn(true);
-
-        when(usersService.getUserByEmail(email))
-                .thenReturn(user);
     }
 
     @Override
@@ -78,22 +67,6 @@ public class ListKeyringTest extends ZebedeeAPIBaseTestCase {
                 .thenReturn(null);
 
         assertThrows(UnauthorizedException.class, () -> endpoint.listUserKeys(mockRequest, mockResponse));
-    }
-
-    @Test
-    public void testGet_insufficientPermissions_shouldThrowUnauthorisedException() throws Exception {
-        when(permissionsService.isAdministrator(session))
-                .thenReturn(false);
-
-        assertThrows(UnauthorizedException.class, () -> endpoint.listUserKeys(mockRequest, mockResponse));
-    }
-
-    @Test
-    public void testGet_checkPermissionsError_shouldThrowInternalServerErrorException() throws Exception {
-        when(permissionsService.isAdministrator(session))
-                .thenThrow(IOException.class);
-
-        assertThrows(InternalServerError.class, () -> endpoint.listUserKeys(mockRequest, mockResponse));
     }
 
     @Test

@@ -14,7 +14,6 @@ import com.github.onsdigital.zebedee.model.Collections;
 import com.github.onsdigital.zebedee.model.Content;
 import com.github.onsdigital.zebedee.model.publishing.scheduled.PublishScheduler;
 import com.github.onsdigital.zebedee.model.publishing.scheduled.Scheduler;
-import com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration;
 import com.github.onsdigital.zebedee.user.model.User;
 import com.github.onsdigital.zebedee.util.slack.AttachmentField;
 import com.github.onsdigital.zebedee.util.slack.Notifier;
@@ -33,9 +32,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
-import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
+import static com.github.onsdigital.zebedee.logging.CMSLogEvent.error;
+import static com.github.onsdigital.zebedee.logging.CMSLogEvent.info;
+import static java.text.MessageFormat.format;
 
 public class Root {
 
@@ -49,6 +49,76 @@ public class Root {
     public static Zebedee zebedee;
     static Path root;
     private static Scheduler scheduler = new PublishScheduler();
+
+    /**
+     * Initalise the CMS.
+     */
+    public static void init() {
+        info().log("initalizing zebedee-cms");
+
+        // Set ISO date formatting in Gson to match Javascript Date.toISODate()
+        Serialiser.getBuilder().registerTypeAdapter(Date.class, new IsoDateSerializer());
+
+        // Set the class that will be used to determine a ClassLoader when loading resources:
+        ResourceUtils.classLoaderClass = Root.class;
+
+        // If we have an environment variable and it is
+        String rootDir = env.get(ZEBEDEE_ROOT);
+
+        root = validateZebedeeRootConfig(rootDir);
+        try {
+            zebedee = initialiseZebedee(root);
+            info().data(ZEBEDEE_ROOT, rootDir)
+                    .log("successfully initalized zebedeed cms using the specified environment config");
+        } catch (Exception ex) {
+            throw new RuntimeException("error attempting to initalize zebedee cms", ex);
+        }
+
+        // Setting zebedee root as system property for zebedee reader module, since zebedee root is not set as
+        // environment variable on develop environment
+        System.setProperty(ZEBEDEE_ROOT, root.toString());
+
+        Notifier notifier = zebedee.getSlackNotifier();
+        zebedee.getStartUpAlerter().queueLocked();
+
+        try {
+            Collections.CollectionList collections = zebedee.getCollections().list();
+            alertOnInProgressCollections(collections, notifier);
+            loadExistingCollectionsIntoScheduler(collections);
+        } catch (IOException ex) {
+            throw new RuntimeException("failed to load collections list on startup", ex);
+        }
+
+        info().data(ZEBEDEE_ROOT, rootDir).log("zebedee cmd initialization completed successfully");
+    }
+
+    /**
+     * Validate the zebedee root path meets the requirements - not null/empty, the file exists and is a directory.
+     * Throws {@link RuntimeException} if any of the checks fail.
+     *
+     * @param rootDir the path to validate.
+     * @return the root dir value as a {@link Path} object.
+     */
+    private static Path validateZebedeeRootConfig(String rootDir) {
+        if (StringUtils.isEmpty(rootDir)) {
+            throw new RuntimeException("zebedee_root env var required but none provided");
+        }
+
+        Path p = Paths.get(rootDir);
+        if (Files.notExists(p)) {
+            throw new RuntimeException(
+                    format("invalid zebedee_root config: {0} directory does not exist", rootDir));
+        }
+
+        if (!Files.isDirectory(p)) {
+            throw new RuntimeException(
+                    format("invalid zebedee_root config:{0} the specified path is not a directory", rootDir));
+        }
+
+        info().data(ZEBEDEE_ROOT, rootDir)
+                .log("successfully validated zebedee_root config proceeding beginning CMS initialization");
+        return p;
+    }
 
     /**
      * Recursively lists all files within this {@link Content}.
@@ -68,71 +138,6 @@ public class Root {
                 }
             }
         }
-    }
-
-    public static void init() {
-        info().log("initalizing zebedee-cms");
-
-        // Set ISO date formatting in Gson to match Javascript Date.toISODate()
-        Serialiser.getBuilder().registerTypeAdapter(Date.class, new IsoDateSerializer());
-
-        // Set the class that will be used to determine a ClassLoader when loading resources:
-        ResourceUtils.classLoaderClass = Root.class;
-
-        // If we have an environment variable and it is
-        String rootDir = env.get(ZEBEDEE_ROOT);
-        boolean zebedeeCreated = false;
-
-        boolean validZebRoot = StringUtils.isNotEmpty(rootDir) && Files.exists(Paths.get(rootDir));
-
-        if (validZebRoot) {
-            info().data(ZEBEDEE_ROOT, rootDir)
-                    .log("a valid zebedee root dir was found in the environment variables proceeding to initialize zebedee cms");
-            root = Paths.get(rootDir);
-            try {
-                zebedee = initialiseZebedee(root);
-                zebedeeCreated = true;
-                info().data(ZEBEDEE_ROOT, rootDir).log("successfully initalized zebedeed cms using the specified environment config");
-            } catch (Exception e) {
-                error().exception(e)
-                        .data(ZEBEDEE_ROOT, rootDir)
-                        .log("error attempting to initalize zebedee cms from env config settings");
-            }
-        }
-        if (!zebedeeCreated) {
-            try {
-                // Create a Zebedee folder:
-                root = Files.createTempDirectory("generated");
-                zebedee = initialiseZebedee(root);
-                info().data(ZEBEDEE_ROOT, root.toString()).log("zebedee root: zebedee root created");
-                ReaderConfiguration.init(root.toString());
-
-                // Initialise content folders from bundle
-                Path taxonomy = Paths.get(".").resolve(Configuration.getContentDirectory());
-                List<Path> content = listContent(taxonomy);
-                copyContent(content, taxonomy);
-            } catch (IOException | UnauthorizedException | BadRequestException | NotFoundException e) {
-                throw new RuntimeException("Error initializing Zebedee ", e);
-            }
-        }
-
-        //Setting zebedee root as system property for zebedee reader module, since zebedee root is not set as environment variable on develop environment
-        System.setProperty(ZEBEDEE_ROOT, root.toString());
-
-        Notifier notifier = zebedee.getSlackNotifier();
-        zebedee.getStartUpAlerter().queueLocked();
-
-        try {
-            Collections.CollectionList collections = zebedee.getCollections().list();
-            alertOnInProgressCollections(collections, notifier);
-            loadExistingCollectionsIntoScheduler(collections);
-        } catch (IOException e) {
-            final String message = "failed to load collections list on startup";
-            error().logException(e, message);
-            throw new RuntimeException(message, e);
-        }
-
-        info().data(ZEBEDEE_ROOT, rootDir).log("zebedee cmd initialization completed successfully");
     }
 
     private static void loadExistingCollectionsIntoScheduler(Collections.CollectionList collections) {
@@ -211,9 +216,10 @@ public class Root {
         zebedee = new Zebedee(new ZebedeeConfiguration(root, true));
 
         // TODO: Remove this logic after migration to using the dp-identity-api
-        if (! cmsFeatureFlags().isJwtSessionsEnabled()) {
+        if (!cmsFeatureFlags().isJwtSessionsEnabled()) {
             createSystemUser();
         }
+
         return zebedee;
     }
 
@@ -222,13 +228,5 @@ public class Root {
         user.setEmail(DEFAULT_SYS_USER_EMAIL);
         user.setName(DEFAULT_SYS_USER_NAME);
         zebedee.getUsersService().createSystemUser(user, DEFAULT_SYS_USER_PASSWORD);
-    }
-
-    /**
-     * Cleans up
-     */
-    @Override
-    protected void finalize() throws Throwable {
-
     }
 }

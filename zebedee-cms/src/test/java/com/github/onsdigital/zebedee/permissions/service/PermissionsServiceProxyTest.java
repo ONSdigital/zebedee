@@ -91,8 +91,6 @@ public class PermissionsServiceProxyTest {
 
         when(userMock.getEmail())
                 .thenReturn(EMAIL);
-
-
     }
 
     /**
@@ -106,7 +104,6 @@ public class PermissionsServiceProxyTest {
         assertThat(permissions.isPublisher(session), is(false));
         verifyZeroInteractions(jwtPermissionsService, usersService, teamsService);
         verify(legacyPermissionsService, times(1)).isPublisher(session);
-
     }
 
     /**
@@ -206,43 +203,6 @@ public class PermissionsServiceProxyTest {
 
     }
 
-//    /**
-//     * @throws Exception
-//     */
-//    @Test
-//    public void getCollectionAccessMapping_Email_JWTNotEnabled() throws Exception {
-//        admins.add(EMAIL);
-//
-//        when(permissionsStore.getAccessMapping())
-//                .thenReturn(accessMapping);
-//        when(teamsService.listTeams())
-//                .thenReturn(teamsList);
-//        when(usersService.list())
-//                .thenReturn(userList);
-//        when(accessMapping.getAdministrators())
-//                .thenReturn(admins);
-//
-//        jwtSessionsEnabled = false;
-//        permissions = new PermissionsServiceProxy(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService);
-//        List<User> result = permissions.getCollectionAccessMapping(collectionMock);
-//
-//        verifyZeroInteractions(jwtPermissionsService, usersService, teamsService);
-//        verify(legacyPermissionsService, times(1)).getCollectionAccessMapping(collectionMock);
-//
-//    }
-
-//    /**
-//     * @throws Exception
-//     */
-//    @Test
-//    public void getCollectionAccessMapping_Sessions_JWTNotEnabled() throws Exception {
-//        session = null;
-//        jwtSessionsEnabled = false;
-//        permissions = new PermissionsServiceProxy(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService);
-//        List<User> result = permissions.getCollectionAccessMapping(collectionMock);
-//        verifyZeroInteractions(jwtPermissionsService, usersService, teamsService);
-//        verify(legacyPermissionsService, times(1)).getCollectionAccessMapping(collectionMock);
-//    }
 
     /**
      * @throws Exception

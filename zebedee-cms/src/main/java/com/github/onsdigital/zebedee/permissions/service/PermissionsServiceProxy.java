@@ -89,16 +89,6 @@ public class PermissionsServiceProxy implements PermissionsService {
     }
 
     /**
-     * @param collection the collection to check users against. not used will always use legacy Permissions service
-     * @return the required module on jwtSessionsEnabled
-     * @throws IOException from required module
-     */
-//    @Override
-//    public List<User> getCollectionAccessMapping(Collection collection) throws IOException {
-//        return legacyPermissionsService.getCollectionAccessMapping(collection);
-//    }
-
-    /**
      * @return hasAdmin
      * @throws IOException the required module on jwtSessionsEnabled
      */

@@ -16,6 +16,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
@@ -131,6 +132,13 @@ public class JWTPermissionsServiceImplTest {
         assertFalse(jwtPSI_Mock.hasPermission(session, ADMIN));
     }
 
+
+
+
+
+
+    
+
     @Test
     public void isPublisher_Session_Publisher_ShouldReturnTrue() throws Exception {
         Session session = new Session();
@@ -226,13 +234,6 @@ public class JWTPermissionsServiceImplTest {
         assertEquals("JWT Permissions service error for isAdministrator no longer required", exception.getMessage());
     }
 
-//    @Test
-//    public void getCollectionAccessMapping_Collection_ShouldError() throws Exception {
-//        Exception exception = assertThrows(UnsupportedOperationExceptions.class, () ->
-//                jwtPermissionsService.getCollectionAccessMapping(collectionMock));
-//        assertEquals("JWT Permissions service error for getCollectionAccessMapping no longer required", exception.getMessage());
-//    }
-
     @Test
     public void hasAdministrator_ShouldError() throws Exception {
         Exception exception = assertThrows(UnsupportedOperationExceptions.class, () ->
@@ -325,58 +326,27 @@ public class JWTPermissionsServiceImplTest {
         assertEquals("JWT Permissions service error for removeEditor no longer required", exception.getMessage());
     }
 
-    @Test
-    public void canView_Session_() throws Exception {
-//        Map<String, Set<Integer>>
-        String collectionMappingIds = "aaaa";
-        Session session = new Session();
-        session.setId(TEST_SESSION_ID);
-        session.setEmail(TEST_USER_EMAIL);
-        session.setGroups(GROUP_1);
-
-        List<Integer> teams = JWTPermissionsServiceImpl.convertGroupsToTeams(session);
-        digitalPublishingTeam.add(TEST_USER_EMAIL);
-        when(permissionsStore.getAccessMapping())
-                .thenReturn(accessMapping);
-        when(accessMapping.getCollections())
-                .thenReturn(new HashMap<>());
-        when(accessMapping.getCollections().get(collectionDescriptionMock.getId()))
-                .thenReturn(null);
-
-
-        assertThat(jwtPermissionsService.canView(session, collectionDescriptionMock), is(true));
-        verify(permissionsStore, atLeastOnce()).getAccessMapping();
-        verify(accessMapping, atLeastOnce()).getDigitalPublishingTeam();
-//
-//        Set<Integer> collectionTeams = accessMapping.getCollections().get(collectionDescription.getId());
-//        if (collectionTeams == null || collectionTeams.isEmpty()) {
-//            return false;
-//        }
-//        return teams.stream().anyMatch(t -> collectionTeams.contains(t));
-    }
+  
 
     @Test
     public void canView_EMail_ShouldError() throws Exception {
-        // TODO: 16/12/2021
-//        Exception exception = assertThrows(UnsupportedOperationExceptions.class, () ->
-//                jwtPermissionsService.canView(TEST_USER_EMAIL, collectionDescriptionMock));
-//        assertEquals("JWT Permissions service error for canView no longer required", exception.getMessage());
+       Exception exception = assertThrows(UnsupportedOperationExceptions.class, () ->
+               jwtPermissionsService.canView(TEST_USER_EMAIL, collectionDescriptionMock));
+       assertEquals("JWT Permissions service error for canView no longer required", exception.getMessage());
     }
 
     @Test
     public void canView_User_ShouldError() throws Exception {
-        // TODO: 16/12/2021
-//     Exception exception = assertThrows(UnsupportedOperationExceptions.class, () ->
-//                jwtPermissionsService.canView(user_Mock, collectionDescriptionMock));
-//        assertEquals("JWT Permissions service error for canView no longer required", exception.getMessage());
+    Exception exception = assertThrows(UnsupportedOperationExceptions.class, () ->
+               jwtPermissionsService.canView(user_Mock, collectionDescriptionMock));
+       assertEquals("JWT Permissions service error for canView no longer required", exception.getMessage());
     }
 
     @Test
     public void addViewerTeam_CollectionDescription_Team_Session_ShouldError() throws Exception {
-        // TODO: 16/12/2021
-//        Exception exception = assertThrows(UnsupportedOperationExceptions.class, () ->
-//                jwtPermissionsService.canView(user_Mock, collectionDescriptionMock));
-//        assertEquals("JWT Permissions service error for canView no longer required", exception.getMessage());
+       Exception exception = assertThrows(UnsupportedOperationExceptions.class, () ->
+               jwtPermissionsService.canView(user_Mock, collectionDescriptionMock));
+       assertEquals("JWT Permissions service error for canView no longer required", exception.getMessage());
     }
 
     @Test
@@ -405,14 +375,6 @@ public class JWTPermissionsServiceImplTest {
     }
 
     @Test
-    public void convertGroupsToTeams_GroupNull_ShouldError() throws Exception {
-        String expectedMessage = "JWT Permissions service error for convertGroupsToTeams no groups";
-        Session session = new Session();
-        JWTVerificationException ex = assertThrows(JWTVerificationException.class, () -> JWTPermissionsServiceImpl.convertGroupsToTeams(session));
-        MatcherAssert.assertThat(ex.getMessage(), equalTo(expectedMessage));
-    }
-
-    @Test
     public void convertGroupsToTeams() throws Exception {
         Session mocksession = new Session();
         mocksession.setEmail("dartagnan@strangerThings.com");
@@ -435,22 +397,33 @@ public class JWTPermissionsServiceImplTest {
     }
 
     @Test
-    public void convertGroupsToTeams_exceptionTesting_empty_session() throws Exception {
-        Session mocksession = new Session();
-        Exception exception = assertThrows(JWTVerificationException.class, () ->
-                JWTPermissionsServiceImpl.convertGroupsToTeams(mocksession));
-        assertEquals("JWT Permissions service error for convertGroupsToTeams no groups", exception.getMessage());
+    public void convertGroupsToTeams_GroupNull_ShouldError() throws Exception {
+        String expectedMessage = "JWT Permissions service error for convertGroupsToTeams no groups ";
+        Session session = new Session();
+        IOException ex = assertThrows(IOException.class, () -> 
+            JWTPermissionsServiceImpl.convertGroupsToTeams(session));
+        MatcherAssert.assertThat(ex.getMessage(), equalTo(expectedMessage));
     }
 
     @Test
+    public void convertGroupsToTeams_exceptionTesting_empty_session() throws Exception {
+        String expectedMessage = "JWT Permissions service error for convertGroupsToTeams no groups ";
+        Session mocksession = new Session();
+        IOException ex = assertThrows(IOException.class, () ->
+                JWTPermissionsServiceImpl.convertGroupsToTeams(mocksession));
+                MatcherAssert.assertThat(ex.getMessage(), equalTo(expectedMessage));
+            }
+
+    @Test
     public void convertGroupsToTeams_exceptionTesting_empty_sessiongroup() throws Exception {
+        String expectedMessage = "JWT Permissions service error for convertGroupsToTeams no groups ";
         Session mocksession = new Session();
         mocksession.setEmail("dartagnan@strangerThings.com");
         mocksession.setId(FLORENCE_TOKEN);
-        Exception exception = assertThrows(JWTVerificationException.class, () ->
+        IOException ex = assertThrows(IOException.class, () ->
                 JWTPermissionsServiceImpl.convertGroupsToTeams(mocksession));
-        assertEquals("JWT Permissions service error for convertGroupsToTeams no groups", exception.getMessage());
-    }
+                MatcherAssert.assertThat(ex.getMessage(), equalTo(expectedMessage));
+            }
 
 
 }

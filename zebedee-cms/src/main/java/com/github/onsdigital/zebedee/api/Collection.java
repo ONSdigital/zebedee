@@ -11,12 +11,10 @@ import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.CollectionType;
 import com.github.onsdigital.zebedee.keyring.CollectionKeyring;
-import com.github.onsdigital.zebedee.keyring.CollectionKeyringUtil;
 import com.github.onsdigital.zebedee.keyring.KeyringException;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.session.service.Sessions;
-import com.github.onsdigital.zebedee.user.model.User;
 import com.github.onsdigital.zebedee.user.service.UsersService;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.http.HttpStatus;
@@ -314,18 +312,9 @@ public class Collection {
         // Cancel any scheduled publish for this collection.
         scheduleCanceller.cancel(c);
 
-        // Remove the collection encryption key from the keyring
-        User user = null;
-        try {
-            user = CollectionKeyringUtil.getUser(usersService, s.getEmail());
-        } catch (Exception ex) {
-            String message = format("error attempting to get user from session details: {0}", s.getEmail());
-            throw new InternalServerError(message, ex);
-        }
-
         info().collectionID(c).log("collection deleted removing key from keyring");
         try {
-            collectionKeyring.remove(user, c);
+            collectionKeyring.remove(s, c);
         } catch (KeyringException ex) {
             String message = format("error attempting to remove collection key from keyring: {0}", c.getId());
             throw new InternalServerError(message, ex);

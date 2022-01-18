@@ -21,8 +21,7 @@ public class KafkaServiceImplTest {
     private static final String URI1 = "/moo";
     private static final String URI2 = "/quack";
     private static final String URI3 = "/oink";
-
-    private static final String DATA_TYPE = "zebedee-content";
+    private static final String TEST_DATATYPE = "testDataType";
 
     KafkaClient mockKafkaClient = mock(KafkaClient.class);
 
@@ -43,7 +42,7 @@ public class KafkaServiceImplTest {
         List<String> uris = Arrays.asList(URI1,URI2,URI3);
 
         // When publish is called on the collection
-        kafkaService.produceContentPublished(COLLECTION_ID,uris);
+        kafkaService.produceContentPublished(COLLECTION_ID,uris, TEST_DATATYPE);
 
         // Then publishImage should be called on the API for each image.
         ArgumentCaptor<String> uriCaptor = ArgumentCaptor.forClass(String.class);
@@ -58,11 +57,11 @@ public class KafkaServiceImplTest {
         assertTrue(urisCalled.contains(URI2));
         assertTrue(urisCalled.contains(URI3));
 
-        assertEquals(DATA_TYPE, dataTypeCaptor.getAllValues().get(0));
+        assertEquals(TEST_DATATYPE, dataTypeCaptor.getAllValues().get(0));
         assertEquals(COLLECTION_ID, colIdCaptor.getAllValues().get(0));
-        assertEquals(DATA_TYPE, dataTypeCaptor.getAllValues().get(1));
+        assertEquals(TEST_DATATYPE, dataTypeCaptor.getAllValues().get(1));
         assertEquals(COLLECTION_ID, colIdCaptor.getAllValues().get(1));
-        assertEquals(DATA_TYPE, dataTypeCaptor.getAllValues().get(2));
+        assertEquals(TEST_DATATYPE, dataTypeCaptor.getAllValues().get(2));
         assertEquals(COLLECTION_ID, colIdCaptor.getAllValues().get(2));
     }
 
@@ -74,7 +73,7 @@ public class KafkaServiceImplTest {
         List<String> uris = new ArrayList<>();
 
         // When publish is called on the collection
-        kafkaService.produceContentPublished(COLLECTION_ID,uris);
+        kafkaService.produceContentPublished(COLLECTION_ID,uris, TEST_DATATYPE);
 
         // Then publishImage should be called on the API for each image.
         verify(mockKafkaClient, never()).produceContentPublished(anyString(),anyString(),anyString());
@@ -89,11 +88,8 @@ public class KafkaServiceImplTest {
         KafkaService kafkaService = new KafkaServiceImpl(mockKafkaClient);
         List<String> uris = Arrays.asList(URI1, URI2, URI3);
         // When produceContentPublished is called on the collection
-        Throwable thrown = assertThrows(IOException.class, () -> kafkaService.produceContentPublished(COLLECTION_ID, uris));
+        Throwable thrown = assertThrows(IOException.class, () -> kafkaService.produceContentPublished(COLLECTION_ID, uris, TEST_DATATYPE));
         // Then a timeout exception is thrown.
         assertEquals(thrown.getMessage(), "unable to process kafka message");
     }
-
 }
-
-

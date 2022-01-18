@@ -39,7 +39,6 @@ import com.github.onsdigital.zebedee.service.ServiceSupplier;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.teams.model.Team;
 import com.github.onsdigital.zebedee.teams.service.TeamsService;
-import com.github.onsdigital.zebedee.user.model.User;
 import com.github.onsdigital.zebedee.util.versioning.VersionsService;
 import com.github.onsdigital.zebedee.util.versioning.VersionsServiceImpl;
 import com.google.common.annotations.VisibleForTesting;
@@ -80,7 +79,6 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
 
-import static com.github.onsdigital.zebedee.keyring.CollectionKeyringUtil.getUser;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.error;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.info;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.warn;
@@ -220,15 +218,14 @@ public class Collection {
             addTeamsToCollection(zebedee.getTeamsService(), zebedee.getPermissionsService(), collectionDescription, session);
         }
 
-        // Add the collection key to the keying - user is not required
-        User user = getUser(zebedee.getUsersService(), session.getEmail());
+        // Add the collection key to the keying
         SecretKey key = zebedee.getEncryptionKeyFactory().newCollectionKey();
 
         info().collectionID(collection).log("adding new collection key to master keyring");
-        zebedee.getCollectionKeyring().add(user, collection, key);
+        zebedee.getCollectionKeyring().add(session, collection, key);
 
         if (release != null) {
-            collection.associateWithRelease(session.getEmail(), release,
+            collection.associateWithRelease(session, release,
                     new ZebedeeCollectionWriter(zebedee, collection, session));
             collection.save();
         }
@@ -680,7 +677,7 @@ public class Collection {
      * false.
      * @throws IOException If a filesystem error occurs.
      */
-    public boolean create(String email, String uri) throws IOException {
+    public boolean create(Session session, String uri) throws IOException {
         boolean result = false;
 
         // Does this path already exist in the published area?
@@ -697,14 +694,14 @@ public class Collection {
         }
 
         // Does the current user have permission to edit?
-        boolean permission = zebedee.getPermissionsService().canEdit(email);
+        boolean permission = zebedee.getPermissionsService().canEdit(session);
 
         if (!isBeingEdited && !hasDeleteMarker && !exists && permission) {
             // Copy from Published to in progress:
             Path path = inProgress.toPath(uri);
             PathUtils.create(path);
 
-            addEvent(uri, new Event(new Date(), EventType.CREATED, email));
+            addEvent(uri, new Event(new Date(), EventType.CREATED, session.getEmail()));
 
             result = true;
         }
@@ -721,7 +718,7 @@ public class Collection {
      * exists in the published content, false.
      * @throws IOException If a filesystem error occurs.
      */
-    public boolean edit(String email, String uri, CollectionWriter collectionWriter, Boolean recursive) throws IOException, BadRequestException {
+    public boolean edit(Session session, String uri, CollectionWriter collectionWriter, Boolean recursive) throws IOException, BadRequestException {
         boolean result = false;
 
         try {
@@ -741,7 +738,7 @@ public class Collection {
             Collection collection = blockingCollection.get();
 
             info().data("saveOrEditConflict", this.generateCollectionSaveConflictMap(collection, uri))
-                    .data("user", email).log("Content was not saved as it currently in another collection.");
+                    .data("user", session.getEmail()).log("Content was not saved as it currently in another collection.");
 
             // return false as the content is blocked by another collection.
             return result;
@@ -749,9 +746,9 @@ public class Collection {
 
 
         // Does the user have permission to edit?
-        boolean permission = zebedee.getPermissionsService().canEdit(email);
+        boolean permission = zebedee.getPermissionsService().canEdit(session);
         if (!permission) {
-            info().data("path", uri).data("collectionId", this.getDescription().getId()).data("user", email)
+            info().data("path", uri).data("collectionId", this.getDescription().getId()).data("user", session.getEmail())
                     .log("Content was not saved as user does not have EDIT permission");
         }
 
@@ -773,19 +770,19 @@ public class Collection {
                 }
             }
 
-            addEvent(uri, new Event(new Date(), EventType.EDITED, email));
+            addEvent(uri, new Event(new Date(), EventType.EDITED, session.getEmail()));
             result = true;
         }
 
         return result;
     }
 
-    public boolean edit(String email, String uri, CollectionWriter collectionWriter) throws IOException, BadRequestException {
-        return edit(email, uri, collectionWriter, false);
+    public boolean edit(Session session, String uri, CollectionWriter collectionWriter) throws IOException, BadRequestException {
+        return edit(session, uri, collectionWriter, false);
     }
 
     /**
-     * @param email     The reviewing user's email.
+     * @param session   The reviewing user's session.
      * @param uri       The path you would like to review.
      * @param recursive
      * @return True if the path is found in {@link #inProgress} and was copied
@@ -793,9 +790,9 @@ public class Collection {
      * @throws IOException If a filesystem error occurs.
      */
 
-    public boolean complete(String email, String uri, boolean recursive) throws IOException {
+    public boolean complete(Session session, String uri, boolean recursive) throws IOException {
         boolean result = false;
-        boolean permission = zebedee.getPermissionsService().canEdit(email);
+        boolean permission = zebedee.getPermissionsService().canEdit(session);
 
         if (isInProgress(uri) && permission) {
             // Move the in-progress copy to completed:
@@ -809,7 +806,7 @@ public class Collection {
                 PathUtils.moveFilesInDirectory(source, destination);
             }
 
-            addEvent(uri, new Event(new Date(), EventType.COMPLETED, email));
+            addEvent(uri, new Event(new Date(), EventType.COMPLETED, session.getEmail()));
             result = true;
         }
 
@@ -832,15 +829,13 @@ public class Collection {
             throw new UnauthorizedException("Insufficient permissions");
         }
 
-
         boolean result = false;
 
         if (!this.isInCollection(uri)) {
             throw new NotFoundException("File not found");
         }
 
-
-        boolean permission = zebedee.getPermissionsService().canEdit(session.getEmail());
+        boolean permission = zebedee.getPermissionsService().canEdit(session);
         if (!permission) {
             throw new UnauthorizedException("Insufficient permissions");
         }
@@ -1235,19 +1230,19 @@ public class Collection {
     /**
      * Associate this collection with the given release
      *
-     * @param email
+     * @param session
      * @param release
      * @return
      * @throws NotFoundException
      * @throws IOException
      */
-    public Release associateWithRelease(String email, Release release, CollectionWriter collectionWriter) throws IOException, BadRequestException {
+    public Release associateWithRelease(Session session, Release release, CollectionWriter collectionWriter) throws IOException, BadRequestException {
 
         String uri = release.getUri().toString() + "/data.json";
 
         // add the release page to the collection in progress
         if (!isInCollection(uri)) {
-            this.edit(email, uri, collectionWriter, false);
+            this.edit(session, uri, collectionWriter, false);
         }
 
         release.getDescription().setPublished(true);

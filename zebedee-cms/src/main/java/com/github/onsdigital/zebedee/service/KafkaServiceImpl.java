@@ -20,14 +20,14 @@ public class KafkaServiceImpl implements KafkaService {
     }
 
     @Override
-    public void produceContentPublished(String collectionId, List<String> uris, String dataType) throws IOException {
+    public void produceContentPublished(String collectionId, List<String> uris, String dataType, String traceId) throws IOException {
         info().collectionID(collectionId)
                 .data("uris", uris)
                 .data("DataType", dataType)
                 .log("generating content-published kafka events for published collection");
 
         List<Future<RecordMetadata>> futureList = uris.stream()
-                .map((uri) -> kafkaClient.produceContentPublished(uri, dataType, collectionId))
+                .map((uri) -> kafkaClient.produceContentPublished(uri, dataType, collectionId, traceId))
                 .collect(Collectors.toList());
 
 

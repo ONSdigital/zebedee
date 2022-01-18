@@ -30,6 +30,7 @@ import com.github.onsdigital.zebedee.util.ZebedeeCmsService;
 import com.github.onsdigital.zebedee.util.slack.Notifier;
 import com.github.onsdigital.zebedee.util.slack.PostMessageField;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.MDC;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -42,6 +43,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
@@ -63,6 +65,7 @@ import static com.github.onsdigital.zebedee.util.SlackNotification.CollectionSta
 import static com.github.onsdigital.zebedee.util.SlackNotification.StageStatus.FAILED;
 import static com.github.onsdigital.zebedee.util.SlackNotification.StageStatus.STARTED;
 import static com.github.onsdigital.zebedee.util.SlackNotification.publishNotification;
+import static org.apache.commons.lang3.StringUtils.defaultIfBlank;
 
 
 public class Publisher {
@@ -86,6 +89,8 @@ public class Publisher {
     private static ServiceSupplier<DatasetService> datasetServiceSupplier;
     private static ServiceSupplier<ImageService> imageServiceSupplier;
     private static ServiceSupplier<KafkaService> kafkaServiceSupplier;
+
+    private static final String TRACE_ID_HEADER = "trace_id";
 
     static {
         theTrainHosts = Configuration.getTheTrainHosts();
@@ -790,12 +795,20 @@ public class Publisher {
     }
 
     // Putting message on kafka
+    // This method is taking advantage of MDC to enrich log messages with traceId and passing to kafka events
     private static void sendMessage (Collection collection, List<String> uris, String dataType) {
 
+        String traceId = defaultIfBlank(MDC.get(TRACE_ID_HEADER), UUID.randomUUID().toString());
+        info().data("traceId", traceId)
+                .log("traceId before sending event");
+
         try {
-            kafkaServiceSupplier.getService().produceContentPublished(collection.getId(), uris, dataType);
+            kafkaServiceSupplier.getService().produceContentPublished(collection.getId(), uris, dataType, traceId);
         } catch (Exception e) {
-            error().data("collectionId", collection.getDescription().getId()).data("publishing", true)
+            error()
+                    .data("collectionId", collection.getDescription().getId())
+                    .data("traceId", traceId)
+                    .data("publishing", true)
                     .logException(e, "failed to send content-published kafka events");
 
             String channel = Configuration.getDefaultSlackAlarmChannel();

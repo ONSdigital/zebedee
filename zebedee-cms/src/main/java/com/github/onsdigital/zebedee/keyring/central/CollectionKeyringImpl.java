@@ -7,7 +7,7 @@ import com.github.onsdigital.zebedee.keyring.KeyringException;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.Collections;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
-import com.github.onsdigital.zebedee.user.model.User;
+import com.github.onsdigital.zebedee.session.model.Session;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.crypto.SecretKey;
@@ -23,10 +23,8 @@ import java.util.stream.Collectors;
  */
 public class CollectionKeyringImpl implements CollectionKeyring {
 
-    static final String USER_NULL_ERR = "user required but was null";
-    static final String USER_EMAIL_ERR = "user email required but was null or empty";
-    static final String USER_KEYRING_NULL_ERR = "user keyring required but was null";
-    static final String USER_KEYRING_LOCKED_ERR = "error user keyring is locked";
+    static final String SESSION_NULL_ERR = "user session required but was null";
+    static final String SESSION_EMAIL_ERR = "user email required but was null or empty";
     static final String NOT_INITIALISED_ERR = "CollectionKeyring accessed but not yet initialised";
     static final String KEYRING_CACHE_NULL_ERR = "keyringCache required but was null";
     static final String COLLECTION_NULL_ERR = "collection required but was null";
@@ -74,11 +72,11 @@ public class CollectionKeyringImpl implements CollectionKeyring {
     }
 
     @Override
-    public SecretKey get(User user, Collection collection) throws KeyringException {
-        validateUser(user);
+    public SecretKey get(Session session, Collection collection) throws KeyringException {
+        validateSession(session);
         validateCollection(collection);
 
-        boolean hasPermission = hasViewPermissions(user, collection.getDescription());
+        boolean hasPermission = hasViewPermissions(session, collection.getDescription());
 
         if (!hasPermission) {
             return null;
@@ -88,11 +86,11 @@ public class CollectionKeyringImpl implements CollectionKeyring {
     }
 
     @Override
-    public void remove(User user, Collection collection) throws KeyringException {
-        validateUser(user);
+    public void remove(Session session, Collection collection) throws KeyringException {
+        validateSession(session);
         validateCollection(collection);
 
-        boolean hasPermission = hasEditPermissions(user);
+        boolean hasPermission = hasEditPermissions(session);
 
         if (!hasPermission) {
             return;
@@ -102,12 +100,12 @@ public class CollectionKeyringImpl implements CollectionKeyring {
     }
 
     @Override
-    public void add(User user, Collection collection, SecretKey key) throws KeyringException {
-        validateUser(user);
+    public void add(Session session, Collection collection, SecretKey key) throws KeyringException {
+        validateSession(session);
         validateCollection(collection);
         validateKey(key);
 
-        boolean hasPermission = hasEditPermissions(user);
+        boolean hasPermission = hasEditPermissions(session);
 
         if (!hasPermission) {
             return;
@@ -118,14 +116,14 @@ public class CollectionKeyringImpl implements CollectionKeyring {
 
 
     @Override
-    public Set<String> list(User user) throws KeyringException {
-        validateUser(user);
+    public Set<String> list(Session session) throws KeyringException {
+        validateSession(session);
         // if admin or editor return all.
-        if (hasEditPermissions(user)) {
+        if (hasEditPermissions(session)) {
             return keyCache.list();
         }
 
-        List<String> accessibleCollectionIDs = getCollectionIDsAccessibleByUser(user);
+        List<String> accessibleCollectionIDs = getCollectionIDsAccessibleByUser(session);
 
         // Return only the entries the user has access to.
         return keyCache.list()
@@ -134,13 +132,13 @@ public class CollectionKeyringImpl implements CollectionKeyring {
                 .collect(Collectors.toSet());
     }
 
-    private void validateUser(User user) throws KeyringException {
-        if (user == null) {
-            throw new KeyringException(USER_NULL_ERR);
+    private void validateSession(Session session) throws KeyringException {
+        if (session == null) {
+            throw new KeyringException(SESSION_NULL_ERR);
         }
 
-        if (StringUtils.isEmpty(user.getEmail())) {
-            throw new KeyringException(USER_EMAIL_ERR);
+        if (StringUtils.isEmpty(session.getEmail())) {
+            throw new KeyringException(SESSION_EMAIL_ERR);
         }
     }
 
@@ -165,17 +163,17 @@ public class CollectionKeyringImpl implements CollectionKeyring {
         }
     }
 
-    private boolean hasViewPermissions(User user, CollectionDescription desc) throws KeyringException {
+    private boolean hasViewPermissions(Session session, CollectionDescription desc) throws KeyringException {
         try {
-            return permissionsService.canView(user.getEmail(), desc);
+            return permissionsService.canView(session.getEmail(), desc);
         } catch (IOException ex) {
             throw new KeyringException(ex);
         }
     }
 
-    private boolean hasEditPermissions(User user) throws KeyringException {
+    private boolean hasEditPermissions(Session session) throws KeyringException {
         try {
-            return permissionsService.canEdit(user.getEmail());
+            return permissionsService.canEdit(session);
         } catch (IOException ex) {
             throw new KeyringException(ex);
         }
@@ -184,11 +182,11 @@ public class CollectionKeyringImpl implements CollectionKeyring {
     /**
      * Returns a list of collection IDs that the user has view permission for.
      */
-    private List<String> getCollectionIDsAccessibleByUser(User u) throws KeyringException {
+    private List<String> getCollectionIDsAccessibleByUser(Session s) throws KeyringException {
         try {
             // Filter the full list of collections to only those the user has view permisison for. Then Create a list of
             // collection ID strings from this output using the stream.map function.
-            return collections.filterBy(userHasViewPermission(u))
+            return collections.filterBy(userHasViewPermission(s))
                     .stream()
                     .map(c -> c.getId())
                     .collect(Collectors.toList());
@@ -197,10 +195,10 @@ public class CollectionKeyringImpl implements CollectionKeyring {
         }
     }
 
-    private Predicate<Collection> userHasViewPermission(User user) {
+    private Predicate<Collection> userHasViewPermission(Session session) {
         return (c) -> {
             try {
-                return permissionsService.canView(user, c.getDescription());
+                return permissionsService.canView(session, c.getDescription());
             } catch (Exception ex) {
                 throw new RuntimeException("error checking user view permission for collection " + c.getId());
             }

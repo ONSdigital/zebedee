@@ -57,7 +57,7 @@ public class ZebedeeCollectionWriter extends CollectionWriter {
 
         User user = getUser(zebedee, session);
 
-        SecretKey key = getCollectionKey(zebedee, collection, user);
+        SecretKey key = getCollectionKey(zebedee, collection, session);
 
         init(collection, key);
     }
@@ -134,9 +134,9 @@ public class ZebedeeCollectionWriter extends CollectionWriter {
         return user;
     }
 
-    private SecretKey getCollectionKey(Zebedee zebedee, Collection collection, User user)
+    private SecretKey getCollectionKey(Zebedee zebedee, Collection collection, Session session)
             throws KeyringException, UnauthorizedException {
-        SecretKey key = zebedee.getCollectionKeyring().get(user, collection);
+        SecretKey key = zebedee.getCollectionKeyring().get(session, collection);
 
         if (key == null) {
             throw new UnauthorizedException(COLLECTION_KEY_NULL_ERR);

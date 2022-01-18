@@ -15,6 +15,7 @@ import com.github.onsdigital.zebedee.api.cmd.UserDatasetPermissions;
 import com.github.onsdigital.zebedee.api.cmd.UserInstancePermissions;
 import com.github.onsdigital.zebedee.reader.api.endpoint.Health;
 import com.github.onsdigital.zebedee.reader.api.endpoint.PublishedData;
+import com.github.onsdigital.zebedee.reader.api.endpoint.PublishedIndex;
 import com.github.onsdigital.zebedee.search.api.endpoint.ReIndex;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.session.service.Sessions;
@@ -74,6 +75,7 @@ public class AuthenticationFilter implements PreFilter {
             .add(ServiceInstancePermissions.class)
             .add(Health.class)
             .add(PublishedData.class)
+            .add(PublishedIndex.class)
             .build();
 
     /**

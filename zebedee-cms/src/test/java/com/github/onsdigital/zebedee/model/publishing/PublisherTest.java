@@ -45,4 +45,44 @@ public class PublisherTest {
         //Then {uris returns the original string}
         assertTrue(actual.contains("/testUri1"));
     }
+
+    @Test
+    public void testisValidCMDDatasetURISuccess() {
+
+        //Given {A valid uri is passed}
+        String testUri = "/datasets/cpih01/editions/timeseries/versions/version";
+
+        //When {Check for uri validity}
+        boolean actual = publisher.isValidCMDDatasetURI(testUri);
+
+        //Then {The uri is valid}
+        assertTrue(actual);
+    }
+
+    @Test
+    public void testisValidCMDDatasetURIFailure() {
+
+        //Given {An invalid uri is passed}
+        String testUri = "/dataset/cpih/editions/timeseries/";
+
+        //When {Check for uri validity}
+        boolean actual = publisher.isValidCMDDatasetURI(testUri);
+
+        //Then {The uri is not valid}
+        assertFalse(actual);
+    }
+
+    @Test
+    public void testisValidCMDDatasetURISuccessWithHyphen() {
+
+        //Given {A valid uri with hypen is passed}
+        String testUri = "/datasets/cpih01-test-7/editions/time-series/versions/8";
+
+        //When {Check for uri validity}
+        boolean actual = publisher.isValidCMDDatasetURI(testUri);
+
+        //Then {The uri is valid}
+        assertTrue(actual);
+    }
+
 }

@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee.verification.http;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
 import org.apache.http.StatusLine;
@@ -28,8 +29,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 
 /**
  * Created by bren on 22/07/15.
@@ -132,6 +133,13 @@ public class PooledHttpClient {
         addHeaders(headers, request);
 
         request.setEntity(new StringEntity(content));
+
+        System.out.println("\n\nSTART\n\n");
+        for (Header h : request.getAllHeaders()) {
+            System.out.println(h.getName() + " : " + h.toString());
+        }
+        System.out.println("\n\nEND\n\n");
+
         return validate(httpClient.execute(request));
     }
 

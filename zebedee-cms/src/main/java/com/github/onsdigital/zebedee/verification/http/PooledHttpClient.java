@@ -20,6 +20,7 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.util.EntityUtils;
+import org.apache.http.HeaderIterator;
 
 import java.io.IOException;
 import java.net.URI;
@@ -130,24 +131,31 @@ public class PooledHttpClient {
     public CloseableHttpResponse sendPost(String path, Map<String, String> headers, String content) throws IOException {
         URI uri = buildPath(path);
         HttpPost request = new HttpPost(uri);
+        
+        System.out.println("\n\nSTART HEADER\n\n");
         addHeaders(headers, request);
+        System.out.println("\n\nEND HEADER\n\n");
 
+        System.out.println("\n\nCONTENT : " + content + "\n");
+        System.out.println("STRINGENTITY CONTENT : " + new StringEntity(content) + "\n");
         request.setEntity(new StringEntity(content));
 
-        System.out.println("\n\nSTART\n\n");
-        for (Header h : request.getAllHeaders()) {
-            System.out.println(h.getName() + " : " + h.toString());
-        }
-        System.out.println("\n\nEND\n\n");
+        String responseXml = EntityUtils.toString(request.getEntity());
+        System.out.println("ENTITY : " + responseXml + "\n");
+        // EntityUtils.consume(httpResponse.getEntity());
 
         return validate(httpClient.execute(request));
     }
+    // CONTENT : Hello
+    // STRINGENTITY CONTENT : [Content-Type: text/plain; charset=ISO-8859-1,Content-Length: 5,Chunked: false]
+    // ENTITY : Hello
 
     private void addHeaders(Map<String, String> headers, HttpRequestBase request) {
         if (headers != null) {
             Iterator<Map.Entry<String, String>> headerIterator = headers.entrySet().iterator();
             while (headerIterator.hasNext()) {
                 Map.Entry<String, String> next = headerIterator.next();
+                System.out.println(next.getKey() + " : " + next.getValue());
                 request.addHeader(next.getKey(), next.getValue());
             }
 

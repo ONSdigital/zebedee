@@ -76,7 +76,7 @@ public class CollectionKeyringImpl implements CollectionKeyring {
         validateSession(session);
         validateCollection(collection);
 
-        boolean hasPermission = hasViewPermissions(session, collection.getDescription());
+        boolean hasPermission = hasViewPermissions(session, collection.getDescription().getId());
 
         if (!hasPermission) {
             return null;
@@ -163,9 +163,9 @@ public class CollectionKeyringImpl implements CollectionKeyring {
         }
     }
 
-    private boolean hasViewPermissions(Session session, CollectionDescription desc) throws KeyringException {
+    private boolean hasViewPermissions(Session session, String collectionId) throws KeyringException {
         try {
-            return permissionsService.canView(session, desc);
+            return permissionsService.canView(session, collectionId);
         } catch (IOException ex) {
             throw new KeyringException(ex);
         }
@@ -198,7 +198,7 @@ public class CollectionKeyringImpl implements CollectionKeyring {
     private Predicate<Collection> userHasViewPermission(Session session) {
         return (c) -> {
             try {
-                return permissionsService.canView(session, c.getDescription());
+                return permissionsService.canView(session, c.getDescription().getId());
             } catch (Exception ex) {
                 throw new RuntimeException("error checking user view permission for collection " + c.getId());
             }

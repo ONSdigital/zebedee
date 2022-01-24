@@ -42,6 +42,7 @@ import com.github.onsdigital.zebedee.teams.service.TeamsService;
 import com.github.onsdigital.zebedee.util.versioning.VersionsService;
 import com.github.onsdigital.zebedee.util.versioning.VersionsServiceImpl;
 import com.google.common.annotations.VisibleForTesting;
+import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -56,6 +57,7 @@ import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.Array;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -214,8 +216,7 @@ public class Collection {
                 collectionCreated(collectionDescription));
 
         if (collectionDescription.getTeams() != null) {
-            // TODO: Remove dependency on the deprecated {@link TeamsService}. See addTeamsToCollection below for more details.
-            addTeamsToCollection(zebedee.getTeamsService(), zebedee.getPermissionsService(), collectionDescription, session);
+            setViewerTeams(collectionDescription, zebedee, session);
         }
 
         // Add the collection key to the keying
@@ -449,83 +450,42 @@ public class Collection {
         }
 
         LocalTime start = LocalTime.now();
-        Set<String> updatesTeams = updateViewerTeams(collectionDescription, zebedee, session);
+        Set<Integer> teamIds = setViewerTeams(collectionDescription, zebedee, session);
         long ms = TimeUnit.MILLISECONDS.convert(Duration.between(start, LocalTime.now()).getNano(), TimeUnit.NANOSECONDS);
 
         warn().data("duration_ms", ms).log("collection update viewer teams completed");
 
-        if (updatedCollection.getDescription().getTeams() != null) {
-            updatedCollection.getDescription().getTeams().clear();
-        } else {
-            updatedCollection.getDescription().setTeams(new ArrayList<>());
+        if (collectionDescription.getTeams() != null) {
+            updatedCollection.getDescription().setTeams(collectionDescription.getTeams());
         }
-        updatedCollection.getDescription().getTeams().addAll(updatesTeams);
 
         updatedCollection.save();
 
         return updatedCollection;
     }
 
-    private static Set<String> updateViewerTeams(CollectionDescription desc, Zebedee zebedee, Session session)
+    private static Set<Integer> setViewerTeams(CollectionDescription desc, Zebedee zebedee, Session session)
             throws IOException, ZebedeeException {
-        Set<String> teamsUpdated = new HashSet<>();
+        List<String> teamNames = desc.getTeams();
 
-        if (desc != null && desc.getTeams() != null) {
-            PermissionsService permissions = zebedee.getPermissionsService();
+        Set<Integer> teamIds = new HashSet<>();
+        if (teamNames != null) {
+            // TODO: Remove the following transitional code once Florence is updated to send the team IDs rather than the team names.
+            TeamsService teams = zebedee.getTeamsService();
+            for (String teamName : teamNames) {
+                Team team = teams.findTeam(teamName);
+                if (team == null) {
+                    throw new NotFoundException("team assigned to collection expected but does not exist");
+                }
 
-            // Remove any teams that should no longer have access.
-            removeTeamsFromCollection(permissions, desc, session);
-
-            // Add any new teams that have been granted access.
-            // TODO: Remove dependency on the deprecated {@link TeamsService}. See addTeamsToCollection below for more details.
-            teamsUpdated.addAll(addTeamsToCollection(zebedee.getTeamsService(), permissions, desc, session));
-        }
-
-        return teamsUpdated;
-    }
-
-    /**
-     * Remove any Teams from the collection if it is no longer assigned.
-     */
-    private static void removeTeamsFromCollection(PermissionsService permissions, CollectionDescription desc,
-                                                  Session session)
-            throws IOException, ZebedeeException {
-        Set<Integer> teamIDs = permissions.listViewerTeams(desc, session);
-
-        List<Integer> teamsToRemove = teamIDs.stream().filter(t -> !desc.getTeams().contains(t))
-                .collect(Collectors.toList());
-
-        if (teamsToRemove != null && !teamsToRemove.isEmpty()) {
-
-            for (int t : teamsToRemove) {
-                permissions.removeViewerTeam(desc, t, session);
+                teamIds.add(team.getId());
             }
         }
-    }
 
-    /**
-     * Adds teams to a collection if they should have access.
-     *
-     * TODO: Remove dependency on the deprecated {@link TeamsService#findTeam} by updating the logic to pass in the
-     *       team ID from florence rather than the team name.
-     */
-    private static Set<String> addTeamsToCollection(TeamsService teams, PermissionsService permissions,
-                                                    CollectionDescription desc, Session session)
-            throws IOException, ZebedeeException {
+        PermissionsService permissions = zebedee.getPermissionsService();
+        permissions.setViewerTeams(session, desc.getId(), desc.getName(), teamIds);
 
-        Set<String> teamsUpdated = new HashSet<>();
-
-        for (String teamName : desc.getTeams()) {
-            Team team = teams.findTeam(teamName);
-            if (team == null) {
-                throw new NotFoundException("team assigned to collection expected but does not exist");
-            }
-
-            permissions.addViewerTeam(desc, team.getId(), session);
-            teamsUpdated.add(teamName);
-        }
-
-        return teamsUpdated;
+        return teamIds;
     }
 
     public CollectionDescription getDescription() {

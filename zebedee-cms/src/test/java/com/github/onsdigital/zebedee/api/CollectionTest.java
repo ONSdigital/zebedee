@@ -80,7 +80,7 @@ public class CollectionTest extends ZebedeeAPIBaseTestCase {
         when(collection.getDescription())
                 .thenReturn(description);
 
-        when(permissionsService.canView(session, description))
+        when(permissionsService.canView(session, COLLECTION_ID))
                 .thenReturn(true);
 
         when(permissionsService.canEdit(session))
@@ -160,7 +160,7 @@ public class CollectionTest extends ZebedeeAPIBaseTestCase {
 
     @Test
     public void testGet_checkPermissionsError_shouldThrowException() throws Exception {
-        when(permissionsService.canView(session, description))
+        when(permissionsService.canView(session, COLLECTION_ID))
                 .thenThrow(IOException.class);
 
         UnauthorizedException actual = assertThrows(UnauthorizedException.class,
@@ -169,12 +169,12 @@ public class CollectionTest extends ZebedeeAPIBaseTestCase {
         assertThat(actual.getMessage(), equalTo("You are not authorised to view this collection"));
         verify(sessions, times(1)).get(mockRequest);
         verify(collections, times(1)).getCollection(COLLECTION_ID);
-        verify(permissionsService, times(1)).canView(session, description);
+        verify(permissionsService, times(1)).canView(session, COLLECTION_ID);
     }
 
     @Test
     public void testGet_permissionDenied_shouldThrowException() throws Exception {
-        when(permissionsService.canView(session, description))
+        when(permissionsService.canView(session, COLLECTION_ID))
                 .thenReturn(false);
 
         UnauthorizedException actual = assertThrows(UnauthorizedException.class,
@@ -183,7 +183,7 @@ public class CollectionTest extends ZebedeeAPIBaseTestCase {
         assertThat(actual.getMessage(), equalTo("You are not authorised to view this collection"));
         verify(sessions, times(1)).get(mockRequest);
         verify(collections, times(1)).getCollection(COLLECTION_ID);
-        verify(permissionsService, times(1)).canView(session, description);
+        verify(permissionsService, times(1)).canView(session, COLLECTION_ID);
     }
 
     @Test
@@ -193,7 +193,7 @@ public class CollectionTest extends ZebedeeAPIBaseTestCase {
         assertThat(actual, is(notNullValue()));
         verify(sessions, times(1)).get(mockRequest);
         verify(collections, times(1)).getCollection(COLLECTION_ID);
-        verify(permissionsService, times(1)).canView(session, description);
+        verify(permissionsService, times(1)).canView(session, COLLECTION_ID);
     }
 
     @Test

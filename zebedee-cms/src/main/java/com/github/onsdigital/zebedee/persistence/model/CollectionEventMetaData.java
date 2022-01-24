@@ -87,43 +87,12 @@ public class CollectionEventMetaData {
     }
 
     /**
-     * Create a {@link CollectionEventMetaData} for viewer team removed event.
+     * Create a {@link CollectionEventMetaData} for viewer teams updated event.
      */
-    public static CollectionEventMetaData[] teamRemoved(CollectionDescription collectionDescription,
-                                                        Session session, int teamId) throws IOException, ZebedeeException {
+    public static CollectionEventMetaData[] teamsUpdated(Set<Integer> collectionTeams) {
         List<CollectionEventMetaData> list = new ArrayList<>();
-        list.add(new CollectionEventMetaData(TEAM_REMOVED_KEY, Integer.toString(teamId)));
-
-        if (collectionDescription != null && session != null) {
-            list.add(new CollectionEventMetaData(VIEWER_TEAMS_KEY, viewerTeamsAsStr(collectionDescription,
-                    session)));
-        }
+        list.add(new CollectionEventMetaData(VIEWER_TEAMS_KEY, StringUtils.join(collectionTeams, ",")));
         return toArray(list);
-    }
-
-    /**
-     * Create a {@link CollectionEventMetaData} for viewer team added event.
-     */
-    public static CollectionEventMetaData[] teamAdded(CollectionDescription collectionDescription, Session session,
-                                                      Team team) throws IOException, ZebedeeException {
-
-        List<CollectionEventMetaData> list = new ArrayList<>();
-        if (team != null && StringUtils.isNotEmpty(team.getName())) {
-            list.add(new CollectionEventMetaData(TEAM_ADDED_KEY, team.getName()));
-        }
-
-        if (collectionDescription != null && session != null) {
-            list.add(new CollectionEventMetaData(VIEWER_TEAMS_KEY, viewerTeamsAsStr(collectionDescription,
-                    session)));
-        }
-        return toArray(list);
-    }
-
-    private static String viewerTeamsAsStr(CollectionDescription collectionDescription, Session session)
-            throws
-            IOException, ZebedeeException {
-        Set<Integer> teams = Root.zebedee.getPermissionsService().listViewerTeams(collectionDescription, session);
-        return StringUtils.join(teams, ",");
     }
 
     /**

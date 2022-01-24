@@ -21,6 +21,8 @@ import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import java.io.IOException;
 
+import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
+
 /**
  * @deprecated by the move to the dp-identity-api
  *
@@ -114,17 +116,26 @@ public class Permission {
      *    - When editing a user, this endpoint is called to load whether they are a viewer, publisher or admin to display
      *      on the user admin screens
      *
-     * // TODO: Remove this endpoint once the JWT sessions have been enabled and a new endpoint has been created on the
-     *          florence server component that will supersede this
+     * // TODO: Update this endpoint once the JWT sessions have been enabled to remove the ability to check the permissions
+     *          of another user (i.e. case 2 in the florence usages above). This basically means removing the ability to
+     *          pass the `email` param.
      */
     @GET
     public PermissionDefinition getPermissions(HttpServletRequest request, HttpServletResponse response)
-            throws IOException, NotFoundException, UnauthorizedException {
+            throws IOException, NotFoundException, UnauthorizedException, BadRequestException {
 
         Session session = sessionsService.get(request);
         String email = request.getParameter("email");
 
-        PermissionDefinition permissionDefinition = permissionsService.userPermissions(email, session);
+        PermissionDefinition permissionDefinition;
+        if (cmsFeatureFlags().isJwtSessionsEnabled()) {
+            if (email != null) {
+                throw new BadRequestException("invalid parameter 'email': checking the permissions of another user is no longer supported");
+            }
+            permissionDefinition = permissionsService.userPermissions(session);
+        } else {
+            permissionDefinition = permissionsService.userPermissions(email, session);
+        }
 
         return permissionDefinition;
     }

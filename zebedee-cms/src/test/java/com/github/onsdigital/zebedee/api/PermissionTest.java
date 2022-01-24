@@ -29,6 +29,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
@@ -146,9 +147,6 @@ public class PermissionTest extends ZebedeeAPIBaseTestCase {
 
     @Test
     public void testGrant_addAdminAssignSuccess_shouldAssignPermissionsAndKeys() throws Exception {
-        when(permissionsService.canView(session, collectionDescription))
-                .thenReturn(true);
-
         permission.isAdmin(true);
 
         endpoint.grantPermission(mockRequest, mockResponse, permission);

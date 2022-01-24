@@ -66,6 +66,7 @@ public class CollectionsTest {
 
     private static final String COLLECTION_FILE_NAME = "{0}-{1}.json";
     private static final String TEST_EMAIL = "TEST@ons.gov.uk";
+    private static final String COLLECTION_ID = "123";
 
     @Rule
     public TemporaryFolder rootDir = new TemporaryFolder();
@@ -162,6 +163,9 @@ public class CollectionsTest {
 
         when(collectionMock.getDescription())
                 .thenReturn(collectionDescriptionMock);
+
+        when(collectionDescriptionMock.getId())
+                .thenReturn(COLLECTION_ID);
 
         ReflectionTestUtils.setField(collections, "zebedeeSupplier", zebedeeSupplier);
         ReflectionTestUtils.setField(collections, "collectionReaderWriterFactory", collectionReaderWriterFactoryMock);
@@ -309,7 +313,7 @@ public class CollectionsTest {
             collections.listDirectory(collectionMock, "someURI", sessionMock);
         } catch (UnauthorizedException e) {
             verify(permissionsServiceMock, times(1))
-                    .canView(sessionMock, collectionDescriptionMock);
+                    .canView(sessionMock, COLLECTION_ID);
             verify(collectionMock, times(1))
                     .getDescription();
             verify(collectionMock, never())
@@ -708,14 +712,14 @@ public class CollectionsTest {
     public void shouldGetNotFoundIfAttemptingToListNonexistentDirectory() throws IOException, UnauthorizedException,
             BadRequestException, ConflictException, NotFoundException {
         String uri = "someURI";
-        when(permissionsServiceMock.canView(sessionMock, collectionDescriptionMock))
+        when(permissionsServiceMock.canView(sessionMock, COLLECTION_ID))
                 .thenReturn(true);
         when(collectionMock.find(uri))
                 .thenReturn(null);
         try {
             collections.listDirectory(collectionMock, uri, sessionMock);
         } catch (NotFoundException e) {
-            verify(permissionsServiceMock, times(1)).canView(sessionMock, collectionDescriptionMock);
+            verify(permissionsServiceMock, times(1)).canView(sessionMock, COLLECTION_ID);
             verify(collectionMock, times(1)).find(uri);
             throw e;
         }
@@ -725,14 +729,14 @@ public class CollectionsTest {
     public void shouldGetBadRequestIfAttemptingToListDirectoryOnAFile() throws IOException, UnauthorizedException,
             BadRequestException, ConflictException, NotFoundException {
         Path uri = rootDir.newFile("data.json").toPath();
-        when(permissionsServiceMock.canView(sessionMock, collectionDescriptionMock))
+        when(permissionsServiceMock.canView(sessionMock, COLLECTION_ID))
                 .thenReturn(true);
         when(collectionMock.find(uri.toString()))
                 .thenReturn(uri);
         try {
             collections.listDirectory(collectionMock, uri.toString(), sessionMock);
         } catch (BadRequestException e) {
-            verify(permissionsServiceMock, times(1)).canView(sessionMock, collectionDescriptionMock);
+            verify(permissionsServiceMock, times(1)).canView(sessionMock, COLLECTION_ID);
             verify(collectionMock, times(1)).find(uri.toString());
             throw e;
         }
@@ -749,7 +753,7 @@ public class CollectionsTest {
         expected.getFiles().put(file2.getFileName().toString(), file2.toString());
         expected.getFolders().put(collectionsPath.getFileName().toString(), collectionsPath.toString());
 
-        when(permissionsServiceMock.canView(sessionMock, collectionDescriptionMock))
+        when(permissionsServiceMock.canView(sessionMock, COLLECTION_ID))
                 .thenReturn(true);
         when(collectionMock.find(rootDir.getRoot().toString()))
                 .thenReturn(rootDir.getRoot().toPath());
@@ -757,7 +761,7 @@ public class CollectionsTest {
         DirectoryListing result = collections.listDirectory(collectionMock, rootDir.getRoot().toString(), sessionMock);
 
         assertThat(result, equalTo(expected));
-        verify(permissionsServiceMock, times(1)).canView(sessionMock, collectionDescriptionMock);
+        verify(permissionsServiceMock, times(1)).canView(sessionMock, COLLECTION_ID);
         verify(collectionMock, times(1)).find(rootDir.getRoot().toString());
     }
 
@@ -775,7 +779,7 @@ public class CollectionsTest {
         expected.getFiles().put(f1.getName(), f1.toPath().toString());
         expected.getFiles().put(f2.getName(), f2.toPath().toString());
 
-        when(permissionsServiceMock.canView(sessionMock, collectionDescriptionMock))
+        when(permissionsServiceMock.canView(sessionMock, COLLECTION_ID))
                 .thenReturn(true);
         when(collectionMock.find(uri.toString()))
                 .thenReturn(uri);
@@ -785,7 +789,7 @@ public class CollectionsTest {
         DirectoryListing result = collections.listDirectoryOverlayed(collectionMock, uri.toString(), sessionMock);
 
         assertThat(result, equalTo(expected));
-        verify(permissionsServiceMock, times(1)).canView(sessionMock, collectionDescriptionMock);
+        verify(permissionsServiceMock, times(1)).canView(sessionMock, COLLECTION_ID);
         verify(collectionMock, times(1)).find(uri.toString());
     }
 

@@ -44,7 +44,7 @@ import static org.mockito.Mockito.when;
 public class PermissionsServiceImplTest {
 
     private static final String EMAIL = "admin@ons.gov.uk";
-    private static final Integer COLLECTION_ID = 123;
+    private static final String COLLECTION_ID = "123";
 
     @Mock
     private PermissionsStore permissionsStore;
@@ -71,7 +71,6 @@ public class PermissionsServiceImplTest {
     private CollectionDescription collectionDescription;
 
     private PermissionsService permissions;
-    private ServiceSupplier<UsersService> usersServiceServiceSupplier;
     private ServiceSupplier<TeamsService> teamsServiceSupplier;
     private Session session;
     private Set<String> digitalPublishingTeam;
@@ -89,7 +88,6 @@ public class PermissionsServiceImplTest {
         userList = new UserList();
         userList.add(userMock);
 
-        usersServiceServiceSupplier = () -> usersService;
         teamsServiceSupplier = () -> teamsService;
 
         session = new Session();
@@ -101,7 +99,7 @@ public class PermissionsServiceImplTest {
         when(userMock.getEmail())
                 .thenReturn(EMAIL);
 
-        permissions = new PermissionsServiceImpl(permissionsStore, usersServiceServiceSupplier, teamsServiceSupplier);
+        permissions = new PermissionsServiceImpl(permissionsStore, teamsServiceSupplier);
     }
 
     @Test
@@ -467,7 +465,7 @@ public class PermissionsServiceImplTest {
         when(teamsService.listTeams())
                 .thenReturn(teamsList);
 
-        assertThat(permissions.canView(session, collectionDescription), is(false));
+        assertThat(permissions.canView(session, COLLECTION_ID), is(false));
 
         verify(permissionsStore, times(1)).getAccessMapping();
         verifyZeroInteractions(teamsService);

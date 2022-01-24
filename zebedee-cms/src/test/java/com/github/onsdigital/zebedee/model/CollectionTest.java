@@ -27,6 +27,8 @@ import com.github.onsdigital.zebedee.model.content.item.ContentItemVersion;
 import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
 import com.github.onsdigital.zebedee.model.publishing.scheduled.DummyScheduler;
 import com.github.onsdigital.zebedee.session.model.Session;
+import com.github.onsdigital.zebedee.teams.model.Team;
+import com.github.onsdigital.zebedee.teams.service.TeamsService;
 import com.github.onsdigital.zebedee.util.ContentDetailUtil;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -34,6 +36,7 @@ import org.joda.time.DateTime;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.mockito.Mock;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import javax.crypto.SecretKey;
@@ -49,7 +52,9 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertEquals;
@@ -58,8 +63,11 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class CollectionTest extends ZebedeeTestBaseFixture {
@@ -67,6 +75,14 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
     @Rule
     public TemporaryFolder rootDir = new TemporaryFolder();
 
+    @Mock
+    TeamsService teamsService;
+
+    @Mock
+    Team team;
+
+    private static final String teamName = "some team";
+    private static final int teamId = 12;
     private static final boolean recursive = false;
     Collection collection;
     Session publisher1Session;
@@ -87,6 +103,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         publisher2Session.setStart(new Date());
 
         setUpPermissionsServiceMockForLegacyTests(zebedee, publisher1Session);
+        ReflectionTestUtils.setField(zebedee, "teamsService", teamsService);
 
         when(permissionsService.canEdit(publisher2Session))
                 .thenReturn(true);
@@ -272,6 +289,14 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
 
     @Test
     public void shouldUpdateCollection() throws Exception {
+        Set<Integer> teamIds = new HashSet<>(Arrays.asList(12));
+
+        when(teamsService.findTeam(teamName))
+                .thenReturn(team);
+        when(team.getId())
+                .thenReturn(teamId);
+        doNothing().when(permissionsService).setViewerTeams(
+                publisher1Session, collection.description.getId(), collection.description.getName(), teamIds);
 
         // Given an existing collection
         String name = "Population Release";
@@ -287,6 +312,8 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         CollectionDescription updatedDescription = new CollectionDescription(newName);
         updatedDescription.setType(CollectionType.scheduled);
         updatedDescription.setPublishDate(new DateTime(collectionDescription.getPublishDate()).plusHours(1).toDate());
+        updatedDescription.setId(collectionDescription.getId());
+        updatedDescription.setTeams(Arrays.asList(teamName));
 
         setUpKeyringMocks();
 
@@ -314,6 +341,55 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         assertEquals(updatedDescription.getType(), updatedCollectionDescription.getType());
         assertEquals(updatedDescription.getPublishDate(), updatedCollectionDescription.getPublishDate());
         assertTrue(updatedCollectionDescription.getEvents().hasEventForType(EventType.CREATED));
+        assertEquals(updatedDescription.getTeams(), updatedCollectionDescription.getTeams());
+        verify(permissionsService, times(1)).setViewerTeams(
+                publisher1Session, collection.description.getId(), collection.description.getName(), teamIds);
+    }
+
+    @Test
+    public void shouldRemoveViewerTeams() throws Exception {
+        Set<Integer> teamIds = new HashSet<>(Arrays.asList(12));
+
+        when(teamsService.findTeam(teamName))
+                .thenReturn(team);
+        when(team.getId())
+                .thenReturn(teamId);
+
+        // Given an existing collection
+        String name = "Population Release 2";
+        CollectionDescription collectionDescription = new CollectionDescription(name);
+        collectionDescription.setType(CollectionType.manual);
+        collectionDescription.setPublishDate(new Date());
+        collectionDescription.setTeams(Arrays.asList(teamName));
+        Collection collection = Collection.create(collectionDescription, zebedee, publisher1Session);
+
+        // When the collection is updated
+        String filename = PathUtils.toFilename(name);
+        CollectionDescription updatedDescription = new CollectionDescription(name);
+        updatedDescription.setId(collectionDescription.getId());
+        updatedDescription.setTeams(new ArrayList<>());
+
+        Collection.update(collection, updatedDescription, zebedee, new DummyScheduler(), publisher1Session);
+
+        // Then the properties of the description passed to update have been updated.
+        Path rootPath = builder.zebedeeRootPath.resolve(Zebedee.COLLECTIONS);
+        Path collectionFolderPath = rootPath.resolve(filename);
+        Path collectionJsonPath = rootPath.resolve(filename + ".json");
+
+        assertTrue(Files.exists(collectionFolderPath));
+        assertTrue(Files.exists(collectionJsonPath));
+
+        CollectionDescription updatedCollectionDescription;
+        try (InputStream inputStream = Files.newInputStream(collectionJsonPath)) {
+            updatedCollectionDescription = Serialiser.deserialise(inputStream, CollectionDescription.class);
+        }
+
+        assertNotNull(updatedCollectionDescription);
+        assertEquals(collectionDescription.getId(), updatedCollectionDescription.getId());
+        assertTrue(updatedCollectionDescription.getEvents().hasEventForType(EventType.CREATED));
+        assertEquals(updatedDescription.getTeams(), updatedCollectionDescription.getTeams());
+        verify(permissionsService, times(1)).setViewerTeams(
+                publisher1Session, collection.description.getId(), collection.description.getName(), new HashSet<Integer>());
     }
 
     @Test

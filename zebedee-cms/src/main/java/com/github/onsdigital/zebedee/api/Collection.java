@@ -105,7 +105,7 @@ public class Collection {
             throw new NotFoundException("The collection you are trying to get was not found.");
         }
 
-        requireViewPermission(session, collection.getDescription());
+        requireViewPermission(session, collectionID);
 
         // TODO: Question - I am not sure why it's necessary to duplicate the description instead of just returning it?
         // Collate the result:
@@ -321,17 +321,17 @@ public class Collection {
         }
     }
 
-    private void requireViewPermission(Session session, CollectionDescription description) throws UnauthorizedException {
+    private void requireViewPermission(Session session, String collectionId) throws UnauthorizedException {
         boolean canView = false;
         try {
-            canView = permissionsService.canView(session, description);
+            canView = permissionsService.canView(session, collectionId);
         } catch (IOException ex) {
             throw new UnauthorizedException("You are not authorised to view this collection");
         }
 
         if (!canView) {
             warn().user(session.getEmail())
-                    .collectionID(description)
+                    .collectionID(collectionId)
                     .log("request unsuccessful user denied view permission");
 
             throw new UnauthorizedException("You are not authorised to view this collection");

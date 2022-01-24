@@ -400,7 +400,7 @@ public class CMDPermissionsServiceImplTest {
                 .thenReturn(collection);
         when(permissionsService.canEdit(session))
                 .thenReturn(false);
-        when(permissionsService.canView(session, description))
+        when(permissionsService.canView(session, COLLECTION_ID))
                 .thenReturn(true);
         when(description.getDatasets())
                 .thenReturn(datasets);
@@ -411,26 +411,7 @@ public class CMDPermissionsServiceImplTest {
         verify(sessions, times(1)).get(SESSION_ID);
         verify(collectionsService, times(1)).getCollection(COLLECTION_ID);
         verify(permissionsService, times(1)).canEdit(session);
-        verify(permissionsService, times(1)).canView(session, description);
-    }
-
-    @Test(expected = PermissionsException.class)
-    public void testGetUserDatasetPermissions_viewerCollectionIDNull() throws Exception {
-        GetPermissionsRequest request = new GetPermissionsRequest(SESSION_ID, SERVICE_TOKEN, null, null);
-
-        when(sessions.get(SESSION_ID))
-                .thenReturn(session);
-        when(permissionsService.canEdit(session))
-                .thenReturn(false);
-
-        try {
-            service.getUserDatasetPermissions(request);
-        } catch (PermissionsException ex) {
-            assertThat(ex.statusCode, equalTo(HttpStatus.SC_BAD_REQUEST));
-            verify(sessions, times(1)).get(SESSION_ID);
-            verify(collectionsService, never()).getCollection(anyString());
-            throw ex;
-        }
+        verify(permissionsService, times(1)).canView(session, COLLECTION_ID);
     }
 
     @Test
@@ -441,18 +422,15 @@ public class CMDPermissionsServiceImplTest {
                 .thenReturn(session);
         when(permissionsService.canEdit(session))
                 .thenReturn(false);
-        when(permissionsService.canView(session, description))
+        when(permissionsService.canView(session, COLLECTION_ID))
                 .thenReturn(false);
-        when(collectionsService.getCollection(COLLECTION_ID))
-                .thenReturn(collection);
 
         CRUD actual = service.getUserDatasetPermissions(request);
 
         assertThat(actual, equalTo(none));
         verify(sessions, times(1)).get(SESSION_ID);
-        verify(collectionsService, times(1)).getCollection(COLLECTION_ID);
         verify(permissionsService, times(1)).canEdit(session);
-        verify(permissionsService, times(1)).canView(session, description);
+        verify(permissionsService, times(1)).canView(session, COLLECTION_ID);
     }
 
     @Test
@@ -463,7 +441,7 @@ public class CMDPermissionsServiceImplTest {
                 .thenReturn(session);
         when(permissionsService.canEdit(session))
                 .thenReturn(false);
-        when(permissionsService.canView(session, description))
+        when(permissionsService.canView(session, COLLECTION_ID))
                 .thenReturn(true);
         when(collectionsService.getCollection(COLLECTION_ID))
                 .thenReturn(collection);
@@ -476,7 +454,7 @@ public class CMDPermissionsServiceImplTest {
         verify(sessions, times(1)).get(SESSION_ID);
         verify(collectionsService, times(1)).getCollection(COLLECTION_ID);
         verify(permissionsService, times(1)).canEdit(session);
-        verify(permissionsService, times(1)).canView(session, description);
+        verify(permissionsService, times(1)).canView(session, COLLECTION_ID);
     }
 
     @Test
@@ -520,36 +498,36 @@ public class CMDPermissionsServiceImplTest {
 
     @Test
     public void testUserHasViewCollectionPermission_true() throws Exception {
-        when(permissionsService.canView(session, description))
+        when(permissionsService.canView(session, COLLECTION_ID))
                 .thenReturn(true);
 
-        assertTrue(service.userHasViewCollectionPermission(session, description));
+        assertTrue(service.userHasViewCollectionPermission(session, COLLECTION_ID));
 
         verify(permissionsService, times(1))
-                .canView(session, description);
+                .canView(session, COLLECTION_ID);
     }
 
     @Test
     public void testUserHasViewCollectionPermission_false() throws Exception {
-        when(permissionsService.canView(session, description))
+        when(permissionsService.canView(session, COLLECTION_ID))
                 .thenReturn(false);
 
-        assertFalse(service.userHasViewCollectionPermission(session, description));
+        assertFalse(service.userHasViewCollectionPermission(session, COLLECTION_ID));
 
         verify(permissionsService, times(1))
-                .canView(session, description);
+                .canView(session, COLLECTION_ID);
     }
 
     @Test(expected = PermissionsException.class)
     public void testUserHasViewCollectionPermission_IOException() throws Exception {
-        when(permissionsService.canView(session, description))
+        when(permissionsService.canView(session, COLLECTION_ID))
                 .thenThrow(new IOException());
 
         try {
-            service.userHasViewCollectionPermission(session, description);
+            service.userHasViewCollectionPermission(session, COLLECTION_ID);
         } catch (PermissionsException ex) {
             verify(permissionsService, times(1))
-                    .canView(session, description);
+                    .canView(session, COLLECTION_ID);
             PermissionsException expected = internalServerErrorException();
             assertThat(expected.statusCode, equalTo(ex.statusCode));
             assertThat(expected.getMessage(), equalTo(ex.getMessage()));

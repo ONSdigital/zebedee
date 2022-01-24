@@ -10,7 +10,6 @@ import com.github.onsdigital.zebedee.content.partial.Link;
 import com.github.onsdigital.zebedee.content.partial.markdown.MarkdownSection;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
-import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.keyring.CollectionKeyring;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.user.model.User;
@@ -30,7 +29,6 @@ import java.util.ArrayList;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.when;
 
 
@@ -59,6 +57,7 @@ public class CollectionMoveTest extends ZebedeeTestBaseFixture {
 
     public void setUp() throws Exception {
         session = zebedee.openSession(builder.publisher1Credentials);
+        collection = new Collection(builder.collections.get(1), zebedee);
 
         ReflectionTestUtils.setField(zebedee, "usersService", usersService);
         ReflectionTestUtils.setField(zebedee, "permissionsService", permissionsService);
@@ -67,7 +66,7 @@ public class CollectionMoveTest extends ZebedeeTestBaseFixture {
         when(usersService.getUserByEmail(builder.publisher1Credentials.getEmail()))
                 .thenReturn(user);
 
-        when(permissionsService.canView(eq(session), any(CollectionDescription.class)))
+        when(permissionsService.canView(session, collection.getDescription().getId()))
                 .thenReturn(true);
 
         when(permissionsService.canEdit(session))
@@ -80,7 +79,6 @@ public class CollectionMoveTest extends ZebedeeTestBaseFixture {
         when(keyring.get(any(), any()))
                 .thenReturn(key);
 
-        collection = new Collection(builder.collections.get(1), zebedee);
         martin = createArticle("/people/martin", "Martin");
         bedford = createArticle("/places/bedford", "Bedford");
         bedfordshire = createArticle("/places/bedfordshire", "Bedfordshire");

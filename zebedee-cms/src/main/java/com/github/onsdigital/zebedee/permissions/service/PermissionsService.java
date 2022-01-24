@@ -130,29 +130,12 @@ public interface PermissionsService {
     /**
      * Check if a {@link User} can view unpublished content.
      *
-     * @param session               the {@link Session} to get the user details from.
-     * @param collectionDescription the {@link CollectionDescription} of the {@link Collection} to check.
+     * @param session      the {@link Session} to get the user details from.
+     * @param collectionId the ID of the {@link Collection} to check.
      * @return true of the user has view permission for the content, false otherwise.
      * @throws IOException unexpected error while checking permissions.
      */
-    boolean canView(Session session, CollectionDescription collectionDescription) throws IOException;
-
-    /**
-     * Grant view permissions to a team.
-     *
-     * @param collectionDescription The {@link CollectionDescription} of the collection to give the team access to.
-     * @param teamId                the ID of the team to permit view permission to.
-     * @param session               the {@link Session} of the user granting the permission. Only editors can permit a team access to a collection.
-     * @throws IOException If a filesystem error occurs.
-     * @throws ZebedeeException if the user is not authorised to add view team permissions.
-     *
-     * @deprecated as the dp-permissions-api policy management will supersede this when we complete the authorisation
-     *             migration
-     *
-     * TODO: Remove this method once the migration to the new dp-permissions-api is completed
-     */
-    @Deprecated
-    void addViewerTeam(CollectionDescription collectionDescription, Integer teamId, Session session) throws IOException, ZebedeeException;
+    boolean canView(Session session, String collectionId) throws IOException;
 
     /**
      * Returns a {@link List} of {@link Team}s that have viewer permissions on the specified collection.
@@ -170,24 +153,25 @@ public interface PermissionsService {
      * TODO: Remove this method once the migration to the new dp-permissions-api is completed
      */
     @Deprecated
-    Set<Integer> listViewerTeams(CollectionDescription collectionDescription, Session session) throws IOException, UnauthorizedException;
+    Set<Integer> listViewerTeams(Session session, String collectionId) throws IOException, UnauthorizedException;
 
     /**
-     * Revoke view permission from a {@link Team} for the specified {@link Collection}.
+     * Set the list of team IDs that are allowed viewer access to a collection
      *
-     * @param collectionDescription the {@link CollectionDescription} of the {@link Collection} to remove the team.
-     * @param teamId                the ID of the {@link Team} to remove.
-     * @param session               the {@link Session} of the user revoking view permission.
-     * @throws IOException      unexpected error while revoking permissions.
-     * @throws ZebedeeException unexpected error while revoking permissions.
+     * @param collectionID    the ID of the collection collection to set viewer permissions for.
+     * @param collectionName  the name of the collection for which permissions are being set.
+     * @param collectionTeams the set of team IDs for which viewer permissions should be granted to the collection.
+     * @param session         the session of the user that is attempting to set the viewer permissions.
+     * @throws IOException if reading or writing the access mapping fails.
+     * @throws UnauthorizedException if the users' session isn't authorised to edit collections.
      *
-     * @deprecated as the dp-permissions-api policy management will supersede this when we complete the authorisation
-     *             migration
+     * @deprecated this is deprecated in favour of the dp-permissions-api and will be removed once full migration to
+     *             the new API is complete.
      *
-     * TODO: Remove this method once the migration to the new dp-permissions-api is completed
+     * TODO: Remove once migration to dp-permissions-api is complete and the accessmapping is being removed.
      */
     @Deprecated
-    void removeViewerTeam(CollectionDescription collectionDescription, Integer teamId, Session session) throws IOException, ZebedeeException;
+    void setViewerTeams(Session session, String collectionId, String collectionName, Set<Integer> collectionTeams) throws IOException, ZebedeeException;
 
     /**
      * Return {@link PermissionDefinition} for the specified {@link User}.
@@ -199,12 +183,22 @@ public interface PermissionsService {
      * @throws NotFoundException     user with the specified email was not found.
      * @throws UnauthorizedException the requesting user does not have the required permissions.
      *
-     * @deprecated this will be removed after the creation of the new florence server endpoint for returning user
-     *             permissions and once the migration to JWT sessions has been completed
+     * @deprecated this will be removed once the migration to JWT sessions has been completed
      *
-     * TODO: Remove this method once the migration to JWT sessions is complete AND there is a new endpoint in Florence
-     *       server that returns the permissions information required by the Florence web application
+     * TODO: Remove this method once the migration to JWT sessions is complete
      */
     @Deprecated
     PermissionDefinition userPermissions(String email, Session session) throws IOException, NotFoundException, UnauthorizedException;
+
+    /**
+     * Return {@link PermissionDefinition} for the specified {@link User}.
+     *
+     * @param email   the email of the user to get the {@link PermissionDefinition} for.
+     * @param session the {@link Session} of the user requesting the {@link PermissionDefinition}.
+     * @return Return {@link PermissionDefinition} for the specified {@link User}.
+     * @throws IOException           unexpected error while getting the user {@link PermissionDefinition}.
+     * @throws NotFoundException     user with the specified email was not found.
+     * @throws UnauthorizedException the requesting user does not have the required permissions.
+     */
+    PermissionDefinition userPermissions(Session session) throws IOException, NotFoundException, UnauthorizedException;
 }

@@ -509,7 +509,7 @@ public class Collections {
 
         // Check view permissionsServiceImpl
         if (!permissionsService.canView(session,
-                collection.getDescription())) {
+                collection.getDescription().getId())) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 

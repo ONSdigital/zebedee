@@ -71,12 +71,13 @@ public class CMDPermissionsServiceImpl implements CMDPermissionsService {
             return grantUserDatasetCreateReadUpdateDelete(request, userSession);
         }
 
-        Collection targetCollection = getCollectionByID(request.getCollectionID());
+        String collectionId = request.getCollectionID();
 
-        if (!userHasViewCollectionPermission(userSession, targetCollection.getDescription())) {
+        if (!userHasViewCollectionPermission(userSession, collectionId)) {
             return grantUserNone(request, userSession, NO_COLLECTION_VIEW_PERMISSION);
         }
 
+        Collection targetCollection = getCollectionByID(collectionId);
         if (!collectionContainsDataset(targetCollection, request.getDatasetID())) {
             return grantUserNone(request, userSession, DATASET_NOT_IN_COLLECTION);
         }
@@ -218,10 +219,10 @@ public class CMDPermissionsServiceImpl implements CMDPermissionsService {
         return userHasEditCollectionPermission(session);
     }
 
-    boolean userHasViewCollectionPermission(Session session, CollectionDescription description)
+    boolean userHasViewCollectionPermission(Session session, String collectionId)
             throws PermissionsException {
         try {
-            return collectionPermissions.canView(session, description);
+            return collectionPermissions.canView(session, collectionId);
         } catch (IOException ex) {
             error().exception(ex)
                     .user(session)

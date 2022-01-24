@@ -128,9 +128,8 @@ public class PageDescription extends Content implements Comparable<PageDescripti
         this.metaDescription = metaDescription;
     }
 
-
     public boolean isNationalStatistic() {
-        return nationalStatistic == null ? false : nationalStatistic;
+        return nationalStatistic != null && nationalStatistic;
     }
 
     public void setNationalStatistic(boolean nationalStatistic) {
@@ -145,9 +144,13 @@ public class PageDescription extends Content implements Comparable<PageDescripti
         this.monthLabelStyle = monthLabelStyle;
     }
 
-    public Boolean isLatestRelease() { return latestRelease == null ? false:latestRelease; }
+    public Boolean isLatestRelease() { 
+        return latestRelease != null && latestRelease; 
+    }
 
-    public void setLatestRelease(Boolean latestRelease) { this.latestRelease = latestRelease; }
+    public void setLatestRelease(Boolean latestRelease) { 
+        this.latestRelease = latestRelease; 
+    }
 
     public Contact getContact() {
         return contact;
@@ -390,7 +393,7 @@ public class PageDescription extends Content implements Comparable<PageDescripti
     }
 
     public boolean isFinalised() {
-        return finalised == null ? false : finalised;
+        return finalised != null && finalised;
     }
 
     public void setFinalised(boolean finalised) {
@@ -398,7 +401,7 @@ public class PageDescription extends Content implements Comparable<PageDescripti
     }
 
     public boolean isCancelled() {
-        return cancelled == null ? false : true;
+        return cancelled != null && cancelled;
     }
 
     public void setCancelled(boolean cancelled) {

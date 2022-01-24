@@ -32,6 +32,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
+
 /**
  * Created by thomasridd on 28/04/15.
  * <p>
@@ -103,6 +105,10 @@ public class Teams {
             throws IOException, ConflictException, UnauthorizedException, NotFoundException, BadRequestException,
             ForbiddenException, InternalServerError {
 
+        if (cmsFeatureFlags().isJwtSessionsEnabled()) {
+            throw new NotFoundException("JWT sessions are enabled: POST /teams is no longer supported");
+        }
+
         String email = request.getParameter("email");
         if (StringUtils.isEmpty(email)) {
             return createTeam(request, response);
@@ -164,6 +170,9 @@ public class Teams {
     @DELETE
     public boolean delete(HttpServletRequest request, HttpServletResponse response) throws IOException,
             UnauthorizedException, NotFoundException, BadRequestException, ForbiddenException, InternalServerError {
+        if (cmsFeatureFlags().isJwtSessionsEnabled()) {
+            throw new NotFoundException("JWT sessions are enabled: DELETE /teams is no longer supported");
+        }
 
         String email = request.getParameter("email");
         if (email == null) {
@@ -223,6 +232,10 @@ public class Teams {
      */
     @GET
     public Object get(HttpServletRequest request, HttpServletResponse response) throws IOException, NotFoundException {
+        if (cmsFeatureFlags().isJwtSessionsEnabled()) {
+            throw new NotFoundException("JWT sessions are enabled: GET /teams is no longer supported");
+        }
+
         Object result = null;
         if (getTeamName(request) != null) {
             result = teamsService.findTeam(getTeamName(request));

@@ -16,6 +16,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.POST;
 import java.io.IOException;
 
+import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
+
 /**
  * API for resetting or changing a password.
  *
@@ -48,6 +50,9 @@ public class Password {
      */
     @POST
     public String setPassword(HttpServletRequest request, HttpServletResponse response, Credentials credentials) throws IOException, UnauthorizedException, BadRequestException, NotFoundException {
+        if (cmsFeatureFlags().isJwtSessionsEnabled()) {
+            throw new NotFoundException("JWT sessions are enabled: POST /password is no longer supported");
+        }
 
         // Get the user session
         Session session = Root.zebedee.getSessions().get(request);

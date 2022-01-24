@@ -23,12 +23,6 @@ import java.io.IOException;
 
 import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
 
-/**
- * @deprecated by the move to the dp-identity-api
- *
- * // TODO: Remove these endpoints once the migration to the JWT based sessions is complete
- */
-@Deprecated
 @Api
 public class Permission {
 
@@ -58,6 +52,8 @@ public class Permission {
     /**
      * Grants the specified permissions.
      *
+     * This endpoint is used by the user management screens to manage the role of the users.
+     *
      * @param request              Should be a {@link PermissionDefinition} Json message.
      * @param response             <ul>
      *                             <li>If admin is True, grants administrator permission. If admin is False, revokes</li>
@@ -70,14 +66,19 @@ public class Permission {
      * @throws UnauthorizedException If the logged in user is not an administrator.
      * @throws BadRequestException   If the user specified in the {@link PermissionDefinition} is not found.
      *
-     * This endpoint is used by the user management screens to manage the role of the users.
+     * @deprecated by the move to JWT sessions and will be removed after the migration is complete.
      *
      * // TODO: Remove this endpoint once the JWT sessions have been enabled as this will mean user management has moved
      *          to the dp-identity-api
      */
+    @Deprecated
     @POST
     public String grantPermission(HttpServletRequest request, HttpServletResponse response,
                                   PermissionDefinition permissionDefinition) throws IOException, ZebedeeException {
+
+        if (cmsFeatureFlags().isJwtSessionsEnabled()) {
+            throw new NotFoundException("JWT sessions are enabled: POST /permission is no longer supported");
+        }
 
         Session session = getSession(request);
 

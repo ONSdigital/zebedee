@@ -69,51 +69,51 @@ public class JWTPermissionsServiceImplTest {
     }
 
     @Test
-    public void hasPermission_Admin_ShouldTrue() {
+    public void isGroupMember_Admin_ShouldTrue() {
         Session session = new Session();
         session.setId(TEST_SESSION_ID);
         session.setEmail(TEST_USER_EMAIL);
         session.setGroups(GROUP_0);
-        when(jwtPSI_Mock.hasPermission(session, ADMIN)).thenReturn(true);
-        assertTrue(jwtPSI_Mock.hasPermission(session, ADMIN));
-        verify(jwtPSI_Mock, atLeastOnce()).hasPermission(session, ADMIN);
+        when(jwtPSI_Mock.isGroupMember(session, ADMIN)).thenReturn(true);
+        assertTrue(jwtPSI_Mock.isGroupMember(session, ADMIN));
+        verify(jwtPSI_Mock, atLeastOnce()).isGroupMember(session, ADMIN);
     }
 
     @Test
-    public void hasPermission_Publisher_ShouldTrue() {
+    public void isGroupMember_Publisher_ShouldTrue() {
         Session session = new Session();
         session.setId(TEST_SESSION_ID);
         session.setEmail(TEST_USER_EMAIL);
         session.setGroups(GROUP_0);
-        when(jwtPSI_Mock.hasPermission(session, PUBLISHER)).thenReturn(true);
-        assertTrue(jwtPSI_Mock.hasPermission(session, PUBLISHER));
-        verify(jwtPSI_Mock, atLeastOnce()).hasPermission(session, PUBLISHER);
+        when(jwtPSI_Mock.isGroupMember(session, PUBLISHER)).thenReturn(true);
+        assertTrue(jwtPSI_Mock.isGroupMember(session, PUBLISHER));
+        verify(jwtPSI_Mock, atLeastOnce()).isGroupMember(session, PUBLISHER);
     }
 
     @Test
-    public void hasPermission_PublishNotInGroup_ShouldFalse() {
+    public void isGroupMember_PublishNotInGroup_ShouldFalse() {
         Session session = new Session();
         session.setId(TEST_SESSION_ID);
         session.setEmail(TEST_USER_EMAIL);
         session.setGroups(GROUP_0B);
-        when(jwtPSI_Mock.hasPermission(session, PUBLISHER)).thenReturn(false);
-        assertFalse(jwtPSI_Mock.hasPermission(session, PUBLISHER));
+        when(jwtPSI_Mock.isGroupMember(session, PUBLISHER)).thenReturn(false);
+        assertFalse(jwtPSI_Mock.isGroupMember(session, PUBLISHER));
     }
 
     @Test
-    public void hasPermission_AdminNotInGroup_ShouldFalse() {
+    public void isGroupMember_AdminNotInGroup_ShouldFalse() {
         Session session = new Session();
         session.setId(TEST_SESSION_ID);
         session.setEmail(TEST_USER_EMAIL);
         session.setGroups(GROUP_0A);
-        when(jwtPSI_Mock.hasPermission(session, ADMIN)).thenReturn(false);
-        assertFalse(jwtPSI_Mock.hasPermission(session, PUBLISHER));
+        when(jwtPSI_Mock.isGroupMember(session, ADMIN)).thenReturn(false);
+        assertFalse(jwtPSI_Mock.isGroupMember(session, PUBLISHER));
     }
 
     @Test
-    public void hasPermission_nullSession_ShouldFalse() {
+    public void isGroupMember_nullSession_ShouldFalse() {
         Session session = null;
-        assertFalse(jwtPSI_Mock.hasPermission(session, ADMIN));
+        assertFalse(jwtPSI_Mock.isGroupMember(session, ADMIN));
     }
 
     @Test

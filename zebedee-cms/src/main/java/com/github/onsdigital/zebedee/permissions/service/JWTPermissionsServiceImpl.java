@@ -101,7 +101,7 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
     @Override
     public boolean isPublisher(Session session) throws IOException {
         return session != null && !StringUtils.isEmpty(session.getEmail()) &&
-                hasPermission(session, PUBLISHER_PERMISSIONS);
+                isGroupMember(session, PUBLISHER_PERMISSIONS);
     }
 
     /**
@@ -127,7 +127,7 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
     @Override
     public boolean isAdministrator(Session session) throws IOException {
         return session != null && !StringUtils.isEmpty(session.getEmail()) &&
-                hasPermission(session, ADMIN_PERMISSIONS);
+                isGroupMember(session, ADMIN_PERMISSIONS);
     }
 
     /**
@@ -194,7 +194,7 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
     @Override
     public boolean canEdit(Session session) throws IOException {
         return session != null && !StringUtils.isEmpty(session.getEmail()) &&
-                (hasPermission(session, PUBLISHER_PERMISSIONS) || hasPermission(session, ADMIN_PERMISSIONS));
+                (isGroupMember(session, PUBLISHER_PERMISSIONS) || isGroupMember(session, ADMIN_PERMISSIONS));
     }
 
     /**
@@ -385,7 +385,7 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
      * @param permission the role to check
      * @return boolean
      */
-    public boolean hasPermission(Session session, String permission) {
+    public boolean isGroupMember(Session session, String permission) {
         return ArrayUtils.contains(session.getGroups(), permission);
     }
 }

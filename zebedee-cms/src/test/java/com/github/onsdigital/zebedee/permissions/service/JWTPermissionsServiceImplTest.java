@@ -317,9 +317,6 @@ public class JWTPermissionsServiceImplTest {
     @Test
     public void canView_Session_Null_CollectionDescription() throws Exception {
         Session session = new Session();
-//        session.setEmail(TEST_USER_EMAIL);
-//        session.setGroups(GROUP_0);
-//        session.setId(FLORENCE_TOKEN);
         CollectionDescription collectionDescriptionMock = new CollectionDescription();
         collectionDescriptionMock.setId("1234");
         collectionDescriptionMock.setTeams(Arrays.asList(GROUP_0));
@@ -333,7 +330,6 @@ public class JWTPermissionsServiceImplTest {
     public void canView_Session_GroupNull_CollectionDescription() throws Exception {
         Session session = new Session();
         session.setEmail(TEST_USER_EMAIL);
-//        session.setGroups(GROUP_0);
         session.setId(FLORENCE_TOKEN);
         CollectionDescription collectionDescriptionMock = new CollectionDescription();
         collectionDescriptionMock.setId("1234");
@@ -351,8 +347,6 @@ public class JWTPermissionsServiceImplTest {
         session.setGroups(GROUP_0);
         session.setId(FLORENCE_TOKEN);
         CollectionDescription collectionDescriptionMock = new CollectionDescription();
-//        collectionDescriptionMock.setId("1234");
-//        collectionDescriptionMock.setTeams(Arrays.asList(GROUP_0));
 
         Exception exception = assertThrows(IOException.class, () ->
                 jwtPermissionsService.canView(session, collectionDescriptionMock));
@@ -574,5 +568,3 @@ public class JWTPermissionsServiceImplTest {
     }
 
 }
-
-

@@ -720,8 +720,8 @@ public class PermissionsServiceProxyTest {
         permissions = new PermissionsServiceProxy(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService);
         session = null;
         permissions.listViewerTeams(collectionDescription, session);
-        verifyZeroInteractions(jwtPermissionsService, usersService, teamsService);
-        verify(legacyPermissionsService, atLeastOnce()).listViewerTeams(collectionDescription, session);
+        verifyZeroInteractions(legacyPermissionsService, usersService, teamsService);
+        verify(jwtPermissionsService, atLeastOnce()).listViewerTeams(collectionDescription, session);
     }
 }
 

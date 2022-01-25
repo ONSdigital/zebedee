@@ -26,8 +26,6 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
 
     static final String PUBLISHER_PERMISSIONS = "role-publisher";
     static final String ADMIN_PERMISSIONS = "role-admin";
-//    private PermissionsStore permissionsStore;
-
 
     /**
      * this has been implemented for the migration to using JWT Session
@@ -89,9 +87,7 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
         }
         return teamsList;
 
-
     }
-
 
     /**
      * if the valid session groups contain the role publisher
@@ -318,6 +314,7 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
 
     /**
      * this method is being migrated to the dp-identity-api
+     * session and collection validation is in canview module
      *
      * @param collectionDescription the {@link CollectionDescription} of the {@link Collection} to get the viewer
      *                              teams for.

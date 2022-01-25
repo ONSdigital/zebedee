@@ -183,7 +183,9 @@ public class PermissionsServiceProxy implements PermissionsService {
     @Override
     public void addEditor(String email, Session session)
             throws IOException, UnauthorizedException, NotFoundException, BadRequestException {
-        if (jwtSessionsEnabled) jwtPermissionsService.addEditor(email, session);
+        if (jwtSessionsEnabled) {
+            jwtPermissionsService.addEditor(email, session);
+        }
         legacyPermissionsService.addEditor(email, session);
 
     }

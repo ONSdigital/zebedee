@@ -69,7 +69,8 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
 
     private static final boolean recursive = false;
     Collection collection;
-    Session publisherSession;
+    Session publisher1Session;
+    Session publisher2Session;
     String publisher1Email;
     FakeCollectionWriter collectionWriter;
 
@@ -78,13 +79,18 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
 
         collection = new Collection(builder.collections.get(1), zebedee);
 
-        publisherSession = zebedee.openSession(builder.publisher1Credentials);
+        publisher1Session = zebedee.openSession(builder.publisher1Credentials);
+        publisher2Session = new Session();
+        publisher2Session.setEmail(builder.publisher2.getEmail());
+        publisher2Session.setId("5678");
+        publisher2Session.setLastAccess(new Date());
+        publisher2Session.setStart(new Date());
 
-        setUpPermissionsServiceMockForLegacyTests(zebedee, publisherSession);
+        setUpPermissionsServiceMockForLegacyTests(zebedee, publisher1Session);
 
-        when(permissionsService.canEdit(builder.publisher2.getEmail()))
+        when(permissionsService.canEdit(publisher2Session))
                 .thenReturn(true);
-        when(permissionsService.canEdit(builder.publisher1.getEmail()))
+        when(permissionsService.canEdit(publisher1Session))
                 .thenReturn(true);
 
         publisher1Email = builder.publisher1.getEmail();
@@ -105,7 +111,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
 
         // When
 
-        Collection.create(collectionDescription, zebedee, publisherSession);
+        Collection.create(collectionDescription, zebedee, publisher1Session);
 
 
         // Then
@@ -147,7 +153,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
 
         // When the rename function is called.
 
-        Collection.create(collectionDescription, zebedee, publisherSession);
+        Collection.create(collectionDescription, zebedee, publisher1Session);
         verifyKeyAddedToCollectionKeyring();
 
         Collection.rename(collectionDescription, newName, zebedee);
@@ -191,7 +197,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
 
         // When the rename function is called.
 
-        Collection.create(collectionDescription, zebedee, publisherSession);
+        Collection.create(collectionDescription, zebedee, publisher1Session);
 
         Collection.rename(collectionDescription, newName, zebedee);
 
@@ -234,7 +240,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
 
         // When the rename function is called.
 
-        Collection.create(collectionDescription, zebedee, publisherSession);
+        Collection.create(collectionDescription, zebedee, publisher1Session);
 
         Collection.rename(collectionDescription, newName, zebedee);
 
@@ -273,7 +279,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         collectionDescription.setType(CollectionType.manual);
         collectionDescription.setPublishDate(new Date());
         collectionDescription.setTeams(new ArrayList<>());
-        Collection collection = Collection.create(collectionDescription, zebedee, publisherSession);
+        Collection collection = Collection.create(collectionDescription, zebedee, publisher1Session);
 
         // When the collection is updated
         String newName = "Economy Release";
@@ -284,7 +290,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
 
         setUpKeyringMocks();
 
-        Collection.update(collection, updatedDescription, zebedee, new DummyScheduler(), publisherSession);
+        Collection.update(collection, updatedDescription, zebedee, new DummyScheduler(), publisher1Session);
 
         // Then the properties of the description passed to update have been updated.
         Path rootPath = builder.zebedeeRootPath.resolve(Zebedee.COLLECTIONS);
@@ -318,7 +324,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         CollectionDescription collectionDescription = new CollectionDescription(name);
         collectionDescription.setType(CollectionType.manual);
         collectionDescription.setPublishDate(new Date());
-        Collection collection = Collection.create(collectionDescription, zebedee, publisherSession);
+        Collection collection = Collection.create(collectionDescription, zebedee, publisher1Session);
 
         // When the collection is updated
         String newName = "Population Release";
@@ -326,7 +332,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         CollectionDescription updatedDescription = new CollectionDescription(newName);
         updatedDescription.setType(CollectionType.manual);
         updatedDescription.setPublishDate(new Date());
-        Collection.update(collection, updatedDescription, zebedee, new DummyScheduler(), publisherSession);
+        Collection.update(collection, updatedDescription, zebedee, new DummyScheduler(), publisher1Session);
 
         // Then the properties of the description passed to update have been updated.
         Path rootPath = builder.zebedeeRootPath.resolve(Zebedee.COLLECTIONS);
@@ -357,7 +363,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         collectionDescription.setPublishDate(DateTime.now().plusSeconds(2).toDate());
         collectionDescription.setType(CollectionType.scheduled);
         collectionDescription.setTeams(new ArrayList<>());
-        Collection collection = Collection.create(collectionDescription, zebedee, publisherSession);
+        Collection collection = Collection.create(collectionDescription, zebedee, publisher1Session);
 
         DummyScheduler scheduler = new DummyScheduler();
         scheduler.schedulePublish(collection, zebedee);
@@ -367,7 +373,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         CollectionDescription updatedDescription = new CollectionDescription(newName);
         updatedDescription.setType(CollectionType.scheduled);
         updatedDescription.setPublishDate(DateTime.now().plusSeconds(10).toDate());
-        Collection updated = Collection.update(collection, updatedDescription, zebedee, scheduler, publisherSession);
+        Collection updated = Collection.update(collection, updatedDescription, zebedee, scheduler, publisher1Session);
 
         assertTrue(scheduler.taskExistsForCollection(updated));
         long timeUntilTaskRun = scheduler.getTaskForCollection(updated).getDelay(TimeUnit.SECONDS);
@@ -381,7 +387,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         Collection collection = null;
 
         // When we call the static update method
-        Collection.update(collection, new CollectionDescription("name"), zebedee, new DummyScheduler(), publisherSession);
+        Collection.update(collection, new CollectionDescription("name"), zebedee, new DummyScheduler(), publisher1Session);
 
         // Then the expected exception is thrown.
     }
@@ -396,7 +402,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         collectionDescription.setType(CollectionType.scheduled);
         collectionDescription.setPublishDate(new Date());
 
-        Collection.create(collectionDescription, zebedee, publisherSession);
+        Collection.create(collectionDescription, zebedee, publisher1Session);
 
         Path releasePath = builder.zebedeeRootPath.resolve(Zebedee.COLLECTIONS).resolve(
                 PathUtils.toFilename(name));
@@ -417,7 +423,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         String uri = "/economy/inflationandpriceindices/timeseries/abmi.html";
 
         // When
-        boolean created = collection.create(publisher1Email, uri);
+        boolean created = collection.create(publisher1Session, uri);
 
         // Then
         assertTrue(created);
@@ -437,7 +443,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         builder.createPublishedFile(uri);
 
         // When
-        boolean created = collection.create(publisherSession.getEmail(), uri);
+        boolean created = collection.create(publisher1Session, uri);
 
         // Then
         assertFalse(created);
@@ -454,7 +460,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         builder.createReviewedFile(uri);
 
         // When
-        boolean created = collection.create(publisherSession.getEmail(), uri);
+        boolean created = collection.create(publisher1Session, uri);
 
         // Then
         assertFalse(created);
@@ -471,7 +477,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         builder.createReviewedFile(uri);
 
         // When
-        boolean created = collection.create(publisherSession.getEmail(), uri);
+        boolean created = collection.create(publisher1Session, uri);
 
         // Then
         assertFalse(created);
@@ -488,7 +494,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         builder.createInProgressFile(uri);
 
         // When
-        boolean created = collection.create(publisherSession.getEmail(), uri);
+        boolean created = collection.create(publisher1Session, uri);
 
         // Then
         assertFalse(created);
@@ -507,7 +513,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         Path inProgress = builder.collections.get(1).resolve(Collection.IN_PROGRESS);
 
         // When the delete method is called on the json file
-        boolean result = collection.deleteContentDirectory(publisherSession.getEmail(), jsonFile);
+        boolean result = collection.deleteContentDirectory(publisher1Session.getEmail(), jsonFile);
 
         // Then both the json file and csv file are deleted.
         assertTrue(result);
@@ -530,7 +536,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         Path root = builder.collections.get(1).resolve(Collection.COMPLETE);
 
         // When the delete method is called on the json file
-        boolean result = collection.deleteContentDirectory(publisherSession.getEmail(), jsonFile);
+        boolean result = collection.deleteContentDirectory(publisher1Session.getEmail(), jsonFile);
 
         // Then both the json file and csv file are deleted.
         assertTrue(result);
@@ -633,7 +639,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         builder.createPublishedFile(uri);
 
         // When
-        boolean edited = collection.edit(publisher1Email, uri, collectionWriter, recursive);
+        boolean edited = collection.edit(publisher1Session, uri, collectionWriter, recursive);
 
         // Then
         assertTrue(edited);
@@ -658,7 +664,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         builder.createCompleteFile(uri);
 
         // When
-        boolean edited = collection.edit(publisher1Email, uri, collectionWriter, recursive);
+        boolean edited = collection.edit(publisher1Session, uri, collectionWriter, recursive);
 
         // Then
         // It should be edited
@@ -683,7 +689,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         builder.createReviewedFile(uri);
 
         // When
-        boolean edited = collection.edit(publisher1Email, uri, collectionWriter, recursive);
+        boolean edited = collection.edit(publisher1Session, uri, collectionWriter, recursive);
 
         // Then
         // It should be edited
@@ -707,7 +713,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         builder.createInProgressFile(uri);
 
         // When
-        boolean edited = collection.edit(publisher1Email, uri, collectionWriter, recursive);
+        boolean edited = collection.edit(publisher1Session, uri, collectionWriter, recursive);
 
         // Then
         assertTrue(edited);
@@ -722,7 +728,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         builder.isBeingEditedElsewhere(uri, 0);
 
         // When
-        boolean edited = collection.edit(publisher1Email, uri, collectionWriter, recursive);
+        boolean edited = collection.edit(publisher1Session, uri, collectionWriter, recursive);
 
         // Then
         assertFalse(edited);
@@ -736,7 +742,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         String uri = "/economy/inflationandpriceindices/timeseries/a9er.html";
 
         // When
-        boolean edited = collection.edit(publisher1Email, uri, collectionWriter, recursive);
+        boolean edited = collection.edit(publisher1Session, uri, collectionWriter, recursive);
 
         // Then
         assertFalse(edited);
@@ -751,7 +757,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
 
         // When
         // One of the digital publishing team reviews it
-        boolean reviewed = collection.review(builder.createSession(builder.publisher2), uri, recursive);
+        boolean reviewed = collection.review(publisher2Session, uri, recursive);
 
         // Then
         // The content should be reviewed and no longer located in "in progress"
@@ -772,7 +778,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
 
         // When
         // the original content creator attempts to review the content
-        collection.review(builder.createSession(publisher1Email), uri, recursive);
+        collection.review(publisher1Session, uri, recursive);
 
         // Then
         // expect an Unauthorized error
@@ -786,13 +792,13 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
 
     private String CreateEditedContent() throws IOException, BadRequestException {
         String uri = CreatePublishedContent();
-        collection.edit(publisher1Email, uri, collectionWriter, recursive);
+        collection.edit(publisher1Session, uri, collectionWriter, recursive);
         return uri;
     }
 
     private String CreateCompleteContent() throws IOException, BadRequestException {
         String uri = CreateEditedContent();
-        collection.complete(publisher1Email, uri, recursive);
+        collection.complete(publisher1Session, uri, recursive);
         return uri;
     }
 
@@ -802,10 +808,10 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         // Given some content that has been edited by a publisher:
         String uri = "/economy/inflationandpriceindices/timeseries/a9er.html";
         builder.createPublishedFile(uri);
-        collection.edit(publisher1Email, uri, collectionWriter, recursive);
+        collection.edit(publisher1Session, uri, collectionWriter, recursive);
 
         // When - A reviewer edits reviews content
-        boolean reviewed = collection.review(builder.createSession(builder.publisher2), uri, recursive);
+        boolean reviewed = collection.review(publisher2Session, uri, recursive);
 
         // Then
         // Expect an error
@@ -821,7 +827,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         builder.createInProgressFile(uri);
 
         // When
-        boolean complete = collection.complete(publisher1Email, uri, recursive);
+        boolean complete = collection.complete(publisher1Session, uri, recursive);
 
         // Then
         assertTrue(complete);
@@ -841,7 +847,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         builder.createInProgressFile(uri);
 
         // When
-        boolean complete = collection.complete(publisher1Email, uri, recursive);
+        boolean complete = collection.complete(publisher1Session, uri, recursive);
 
         // Then
         assertTrue(complete);
@@ -863,7 +869,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         builder.createReviewedFile(uri);
 
         // When
-        boolean isComplete = collection.complete(publisher1Email, uri, recursive);
+        boolean isComplete = collection.complete(publisher1Session, uri, recursive);
 
         // Then
         assertFalse(isComplete);
@@ -878,7 +884,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         builder.createCompleteFile(uri);
 
         // When
-        boolean isComplete = collection.complete(publisher1Email, uri, recursive);
+        boolean isComplete = collection.complete(publisher1Session, uri, recursive);
 
         // Then
         assertFalse(isComplete);
@@ -893,7 +899,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         builder.createCompleteFile(uri);
 
         // When
-        boolean isComplete = collection.complete(publisher1Email, uri, recursive);
+        boolean isComplete = collection.complete(publisher1Session, uri, recursive);
 
         // Then
         assertFalse(isComplete);
@@ -909,7 +915,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
 
         // When
         // An alternative publisher reviews the content
-        collection.review(builder.createSession(builder.publisher2), uri, recursive);
+        collection.review(publisher2Session, uri, recursive);
 
         // Then
         // Expect error
@@ -921,7 +927,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         // Given
         // Some content:
         String uri = "/economy/inflationandpriceindices/timeseries/a9er.html";
-        collection.edit(publisher1Email, uri, collectionWriter, recursive);
+        collection.edit(publisher1Session, uri, collectionWriter, recursive);
 
         // When content is trying to be reviewed before being completed
         boolean reviewed = collection.review(builder.createSession(publisher1Email), uri, recursive);
@@ -1184,10 +1190,10 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         // There is a release already in progress
         String uri = String.format("/releases/%s", Random.id());
         Release release = createRelease(uri, new DateTime().plusWeeks(4).toDate());
-        collection.edit(publisher1Email, uri + "/data.json", collectionWriter, recursive);
+        collection.edit(publisher1Session, uri + "/data.json", collectionWriter, recursive);
 
         // When we attempt to associate the collection with a release
-        Release result = collection.associateWithRelease(publisher1Email, release, collectionWriter);
+        Release result = collection.associateWithRelease(publisher1Session, release, collectionWriter);
 
         assertTrue(result.getDescription().getPublished());
         assertEquals(URI.create(uri), result.getUri());
@@ -1201,7 +1207,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         Release release = createRelease(uri, new DateTime().plusWeeks(4).toDate());
 
         // When we attempt to associate the collection with a release
-        Release result = collection.associateWithRelease(publisher1Email, release, collectionWriter);
+        Release result = collection.associateWithRelease(publisher1Session, release, collectionWriter);
 
         // Then the release is now in progress for the collection and the published flag is set to true
         assertTrue(collection.isInProgress(uri));
@@ -1220,12 +1226,12 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         description.setName(description.getId());
 
         collection.description.setReleaseUri(uri);
-        collection.associateWithRelease(publisher1Email, release, collectionWriter);
+        collection.associateWithRelease(publisher1Session, release, collectionWriter);
 
         String releaseJsonUri = uri + "/data.json";
 
-        collection.complete(builder.publisher1.getEmail(), releaseJsonUri, recursive);
-        collection.review(builder.createSession(builder.publisher2), releaseJsonUri, recursive);
+        collection.complete(publisher1Session, releaseJsonUri, recursive);
+        collection.review(publisher2Session, releaseJsonUri, recursive);
 
         ContentDetail articleDetail = new ContentDetail("My article", "/some/uri", PageType.article.toString());
         FileUtils.write(collection.getReviewed().path.resolve("some/uri/data.json").toFile(),
@@ -1270,7 +1276,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         collectionDescription.setReleaseUri(release.getUri().toString());
         collectionDescription.setType(CollectionType.scheduled);
 
-        Collection collection = Collection.create(collectionDescription, zebedee, publisherSession);
+        Collection collection = Collection.create(collectionDescription, zebedee, publisher1Session);
 
         // The release page is in progress within the collection and the collection publish date has been
         // taken from the release page date.
@@ -1289,7 +1295,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         CollectionDescription collectionDescription = new CollectionDescription(Random.id());
         collectionDescription.setReleaseUri(release.getUri().toString());
 
-        Collection.create(collectionDescription, zebedee, publisherSession);
+        Collection.create(collectionDescription, zebedee, publisher1Session);
 
 
         // Then the expected exception is thrown
@@ -1306,18 +1312,18 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
 
         ReflectionTestUtils.setField(zebedee, "permissionsService", permissionsService);
 
-        when(permissionsService.canEdit(publisherSession))
+        when(permissionsService.canEdit(publisher1Session))
                 .thenReturn(true);
 
         setUpKeyringMocks();
 
-        Collection.create(collectionDescription, zebedee, publisherSession);
+        Collection.create(collectionDescription, zebedee, publisher1Session);
 
         // When a new collection is created with the release uri given
         collectionDescription = new CollectionDescription(Random.id());
         collectionDescription.setReleaseUri(release.getUri().toString());
 
-        Collection.create(collectionDescription, zebedee, publisherSession);
+        Collection.create(collectionDescription, zebedee, publisher1Session);
 
 
         // Then the expected exception is thrown
@@ -1439,7 +1445,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         setUpKeyringMocks();
 
         // When we move content
-        boolean edited = collection.moveContent(publisherSession, uri, toUri);
+        boolean edited = collection.moveContent(publisher1Session, uri, toUri);
 
         // Then the file should exist only in the new location.
         assertTrue(edited);
@@ -1462,7 +1468,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         setUpKeyringMocks();
 
         // When we move content
-        boolean edited = collection.moveContent(publisherSession, uri, toUri);
+        boolean edited = collection.moveContent(publisher1Session, uri, toUri);
 
         // Then the file should exist only in the new location.
         assertTrue(edited);
@@ -1486,7 +1492,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         setUpKeyringMocks();
 
         // When we move content to a URI where some content already exists.
-        boolean edited = collection.moveContent(publisherSession, uri, toUri);
+        boolean edited = collection.moveContent(publisher1Session, uri, toUri);
 
         // Then the existing content should be overwritten.
         assertTrue(edited);

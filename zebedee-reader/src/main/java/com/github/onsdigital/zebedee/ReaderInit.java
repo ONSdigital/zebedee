@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee;
 
 import ch.qos.logback.classic.LoggerContext;
+import com.github.davidcarboni.restolino.framework.Priority;
 import com.github.davidcarboni.restolino.framework.Startup;
 import com.github.onsdigital.logging.v2.DPLogger;
 import com.github.onsdigital.logging.v2.Logger;
@@ -28,6 +29,7 @@ import static com.github.onsdigital.zebedee.logging.ReaderLogger.error;
 import static com.github.onsdigital.zebedee.logging.ReaderLogger.info;
 import static com.github.onsdigital.zebedee.search.configuration.SearchConfiguration.getSearchAlias;
 
+@Priority(1)
 public class ReaderInit implements Startup {
 
     private static final String FORMAT_LOGS_KEY = "FORMAT_LOGGING";
@@ -53,6 +55,8 @@ public class ReaderInit implements Startup {
                 System.exit(1);
             }
         }
+
+        info().log("initialising Zebedee Reader");
 
         info().log("loading zebedee reader configuration");
         ReaderConfiguration.get();

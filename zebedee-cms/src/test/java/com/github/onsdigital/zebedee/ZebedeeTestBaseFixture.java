@@ -2,9 +2,7 @@ package com.github.onsdigital.zebedee;
 
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.Credentials;
-import com.github.onsdigital.zebedee.keyring.CollectionKeyCache;
 import com.github.onsdigital.zebedee.keyring.CollectionKeyring;
-import com.github.onsdigital.zebedee.keyring.migration.KeyringHealthChecker;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.encryption.EncryptionKeyFactory;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
@@ -35,12 +33,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 
 /**
  * Common set up required by tests using {@link Builder} (Hide some of the nastiness).
@@ -68,13 +62,7 @@ public abstract class ZebedeeTestBaseFixture {
     protected Sessions sessions;
 
     @Mock
-    protected CollectionKeyCache schedulerKeyCache;
-
-    @Mock
     protected CollectionKeyring collectionKeyring;
-
-    @Mock
-    protected KeyringHealthChecker keyringHealthChecker;
 
     @Mock
     protected Credentials credentials;
@@ -127,10 +115,6 @@ public abstract class ZebedeeTestBaseFixture {
         ServiceSupplier<UsersService> usersServiceServiceSupplier = () -> usersService;
 
         ReflectionTestUtils.setField(zebedee, "usersService", usersService);
-
-        // TODO I think this is a mistake.
-        ReflectionTestUtils.setField(zebedee, "permissionsService", permissionsService);
-
         ReflectionTestUtils.setField(zebedee, "sessions", sessionsService);
         ReflectionTestUtils.setField(zebedee, "collectionKeyring", collectionKeyring);
         ReflectionTestUtils.setField(zebedee, "encryptionKeyFactory", encryptionKeyFactory);
@@ -144,6 +128,8 @@ public abstract class ZebedeeTestBaseFixture {
 
         when(usersService.getUserByEmail(builder.publisher1.getEmail()))
                 .thenReturn(builder.publisher1);
+        when(usersService.getUserByEmail(builder.publisher2.getEmail()))
+                .thenReturn(builder.publisher2);
         when(usersService.getUserByEmail(builder.reviewer1.getEmail()))
                 .thenReturn(builder.reviewer1);
         when(usersService.getUserByEmail(builder.administrator.getEmail()))
@@ -184,23 +170,10 @@ public abstract class ZebedeeTestBaseFixture {
 
         when(zebCfg.getSlackNotifier())
                 .thenReturn(slackNotifier);
-
-        when(zebCfg.getKeyringHealthChecker())
-                .thenReturn(keyringHealthChecker);
     }
 
     protected void verifyKeyAddedToCollectionKeyring() throws Exception {
         verify(collectionKeyring, times(1)).add(any(), any(), any());
-    }
-
-    protected void setUpPermissionsServiceMockForLegacyTests(Zebedee instance, User someUser) throws Exception {
-        when(permissionsService.canView(eq(someUser), any(CollectionDescription.class)))
-                .thenReturn(true);
-
-        when(permissionsService.canEdit(someUser))
-                .thenReturn(true);
-
-        ReflectionTestUtils.setField(instance, "permissionsService", permissionsService);
     }
 
     protected void setUpPermissionsServiceMockForLegacyTests(Zebedee instance, Session session) throws Exception {
@@ -213,8 +186,8 @@ public abstract class ZebedeeTestBaseFixture {
         ReflectionTestUtils.setField(instance, "permissionsService", permissionsService);
     }
 
-    protected void setUpKeyringMockForLegacyTests(Zebedee instance, User someUser, SecretKey key) throws Exception {
-        when(collectionKeyring.get(eq(someUser), any(Collection.class)))
+    protected void setUpKeyringMockForLegacyTests(Zebedee instance, Session someSession, SecretKey key) throws Exception {
+        when(collectionKeyring.get(eq(someSession), any(Collection.class)))
                 .thenReturn(key);
 
         ReflectionTestUtils.setField(instance, "collectionKeyring", collectionKeyring);

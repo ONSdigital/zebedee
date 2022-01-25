@@ -1,7 +1,7 @@
 package com.github.onsdigital.zebedee.keyring.central;
 
-import com.github.onsdigital.zebedee.keyring.KeyringException;
 import com.github.onsdigital.zebedee.keyring.CollectionKeyStore;
+import com.github.onsdigital.zebedee.keyring.KeyringException;
 import org.apache.commons.io.IOUtils;
 
 import javax.crypto.Cipher;

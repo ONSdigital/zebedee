@@ -23,6 +23,7 @@
         <encoding>UTF-8</encoding>
         <project.build.sourceEncoding>${encoding}</project.build.sourceEncoding>
         <project.reporting.outputEncoding>${encoding}</project.reporting.outputEncoding>
+        <restolino.version>v0.4.1</restolino.version>
         <fasterxml.jackson.version>2.13.0</fasterxml.jackson.version>
         <apache.poi.version>3.17</apache.poi.version>
     </properties>
@@ -108,7 +109,7 @@
             <dependency>
                 <groupId>com.github.onsdigital</groupId>
                 <artifactId>restolino</artifactId>
-                <version>v0.3.0</version>
+                <version>${restolino.version}</version>
             </dependency>
 
             <!-- Cryptography -->

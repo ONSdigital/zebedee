@@ -68,9 +68,6 @@ public class ZebedeeCollectionReaderTest extends ZebedeeTestBaseFixture {
     private CollectionDescription description;
 
     @Mock
-    private User user;
-
-    @Mock
     private SecretKey key;
 
     ZebedeeCollectionReader reader;
@@ -96,7 +93,7 @@ public class ZebedeeCollectionReaderTest extends ZebedeeTestBaseFixture {
         when(usersService.getUserByEmail(userSession.getEmail()))
                 .thenReturn(builder.publisher1);
 
-        when(keyring.get(user, collection))
+        when(keyring.get(userSession, collection))
                 .thenReturn(key);
 
         when(collection.getPath())
@@ -111,7 +108,7 @@ public class ZebedeeCollectionReaderTest extends ZebedeeTestBaseFixture {
         setUpPermissionsServiceMockForLegacyTests(zebedee, session);
 
         SecretKey collectionKey = Keys.newSecretKey();
-        setUpKeyringMockForLegacyTests(zebedee, builder.publisher1, collectionKey);
+        setUpKeyringMockForLegacyTests(zebedee, session, collectionKey);
 
         when(keyring.get(any(), any()))
                 .thenReturn(collectionKey);
@@ -159,11 +156,11 @@ public class ZebedeeCollectionReaderTest extends ZebedeeTestBaseFixture {
         // A uri that defines a directory
         String uri = "/this/is/a/directory/";
         Collection collection = new Collection(builder.collections.get(0), zebedee);
-        when(permissionsService.canEdit(builder.publisher1.getEmail()))
+        when(permissionsService.canEdit(userSession))
                 .thenReturn(true);
         ReflectionTestUtils.setField(zebedee, "permissionsService", permissionsService);
 
-        assertTrue(collection.create(builder.publisher1.getEmail(), uri + "file.json"));
+        assertTrue(collection.create(userSession, uri + "file.json"));
 
         // When
         // We attempt to read the file
@@ -177,7 +174,7 @@ public class ZebedeeCollectionReaderTest extends ZebedeeTestBaseFixture {
     public void shouldReadFile()
             throws IOException, ZebedeeException {
 
-        when(permissionsService.canEdit(builder.publisher1.getEmail()))
+        when(permissionsService.canEdit(userSession))
                 .thenReturn(true);
 
         ReflectionTestUtils.setField(zebedee, "permissionsService", permissionsService);
@@ -186,7 +183,7 @@ public class ZebedeeCollectionReaderTest extends ZebedeeTestBaseFixture {
         // A nonexistent file
         String uri = "/file.json";
         Collection collection = new Collection(builder.collections.get(0), zebedee);
-        assertTrue(collection.create(builder.publisher1.getEmail(), uri));
+        assertTrue(collection.create(userSession, uri));
 
         // When
         // We attempt to read the file
@@ -300,18 +297,18 @@ public class ZebedeeCollectionReaderTest extends ZebedeeTestBaseFixture {
 
     @Test
     public void testNew_getKeyError_shouldThrowException() throws Exception {
-        when(keyring.get(builder.publisher1, collection))
+        when(keyring.get(userSession, collection))
                 .thenThrow(KeyringException.class);
 
         assertThrows(KeyringException.class, () -> newReader(zebedeeMock, collection, userSession));
 
         verify(permissionsService, times(1)).canView(userSession, description);
-        verify(keyring, times(1)).get(builder.publisher1, collection);
+        verify(keyring, times(1)).get(userSession, collection);
     }
 
     @Test
     public void testNew_getKeyReturnsNull_shouldThrowException() throws Exception {
-        when(keyring.get(builder.publisher1, collection))
+        when(keyring.get(userSession, collection))
                 .thenReturn(null);
 
         UnauthorizedException ex = assertThrows(UnauthorizedException.class,
@@ -319,7 +316,7 @@ public class ZebedeeCollectionReaderTest extends ZebedeeTestBaseFixture {
 
         assertThat(ex.getMessage(), equalTo(COLLECTION_KEY_NULL_ERR));
         verify(permissionsService, times(1)).canView(userSession, description);
-        verify(keyring, times(1)).get(builder.publisher1, collection);
+        verify(keyring, times(1)).get(userSession, collection);
     }
 
     @Test
@@ -328,7 +325,7 @@ public class ZebedeeCollectionReaderTest extends ZebedeeTestBaseFixture {
 
         assertThat(reader, is(notNullValue()));
         verify(permissionsService, times(1)).canView(userSession, description);
-        verify(keyring, times(1)).get(builder.publisher1, collection);
+        verify(keyring, times(1)).get(userSession, collection);
     }
 
     private CollectionReader newReader(Zebedee z, Collection c, Session s) throws Exception {

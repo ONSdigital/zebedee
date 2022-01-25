@@ -93,7 +93,7 @@ public class ZebedeeCollectionWriterTest {
         when(usersService.getUserByEmail(EMAIL))
                 .thenReturn(user);
 
-        when(collectionKeyring.get(user, collection))
+        when(collectionKeyring.get(session, collection))
                 .thenReturn(key);
 
         when(session.getEmail())
@@ -207,7 +207,7 @@ public class ZebedeeCollectionWriterTest {
 
     @Test
     public void testNew_getKeyThrowsException_shouldThrowException() throws Exception {
-        when(collectionKeyring.get(user, collection))
+        when(collectionKeyring.get(session, collection))
                 .thenThrow(KeyringException.class);
 
         IOException ex = assertThrows(IOException.class,
@@ -215,12 +215,12 @@ public class ZebedeeCollectionWriterTest {
 
         verify(permissionsService, times(1)).canEdit(session);
         verify(usersService, times(1)).getUserByEmail(EMAIL);
-        verify(collectionKeyring, times(1)).get(user, collection);
+        verify(collectionKeyring, times(1)).get(session, collection);
     }
 
     @Test
     public void testNew_getKeyReturnsNull_shouldThrowException() throws Exception {
-        when(collectionKeyring.get(user, collection))
+        when(collectionKeyring.get(session, collection))
                 .thenReturn(null);
 
         UnauthorizedException ex = assertThrows(UnauthorizedException.class,
@@ -229,6 +229,6 @@ public class ZebedeeCollectionWriterTest {
         assertThat(ex.getMessage(), equalTo(COLLECTION_KEY_NULL_ERR));
         verify(permissionsService, times(1)).canEdit(session);
         verify(usersService, times(1)).getUserByEmail(EMAIL);
-        verify(collectionKeyring, times(1)).get(user, collection);
+        verify(collectionKeyring, times(1)).get(session, collection);
     }
 }

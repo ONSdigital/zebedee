@@ -103,7 +103,7 @@ public class PermissionsServiceProxyTest {
         permissions = new PermissionsServiceProxy(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService);
         assertThat(permissions.isPublisher(session), is(false));
         verifyZeroInteractions(jwtPermissionsService, usersService, teamsService);
-        verify(legacyPermissionsService, times(1)).isPublisher(session);
+        verify(legacyPermissionsService, atLeastOnce()).isPublisher(session);
     }
 
     /**
@@ -116,7 +116,7 @@ public class PermissionsServiceProxyTest {
         permissions = new PermissionsServiceProxy(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService);
         assertThat(permissions.isPublisher(session), is(false));
         verifyZeroInteractions(legacyPermissionsService, usersService, teamsService);
-        verify(jwtPermissionsService, times(1)).isPublisher(session);
+        verify(jwtPermissionsService, atLeastOnce()).isPublisher(session);
     }
 
     /**
@@ -129,7 +129,7 @@ public class PermissionsServiceProxyTest {
         permissions = new PermissionsServiceProxy(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService);
         assertThat(permissions.isPublisher(email), is(false));
         verifyZeroInteractions(jwtPermissionsService, usersService, teamsService);
-        verify(legacyPermissionsService, times(1)).isPublisher(email);
+        verify(legacyPermissionsService, atLeastOnce()).isPublisher(email);
 
     }
 
@@ -143,7 +143,7 @@ public class PermissionsServiceProxyTest {
         permissions = new PermissionsServiceProxy(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService);
         assertThat(permissions.isPublisher(email), is(false));
         verifyZeroInteractions(legacyPermissionsService, usersService, teamsService);
-        verify(jwtPermissionsService, times(1)).isPublisher(email);
+        verify(jwtPermissionsService, atLeastOnce()).isPublisher(email);
 
     }
 
@@ -157,7 +157,7 @@ public class PermissionsServiceProxyTest {
         permissions = new PermissionsServiceProxy(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService);
         assertThat(permissions.isAdministrator(session), is(false));
         verifyZeroInteractions(jwtPermissionsService, usersService, teamsService);
-        verify(legacyPermissionsService, times(1)).isAdministrator(session);
+        verify(legacyPermissionsService, atLeastOnce()).isAdministrator(session);
 
     }
 
@@ -171,7 +171,7 @@ public class PermissionsServiceProxyTest {
         permissions = new PermissionsServiceProxy(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService);
         assertThat(permissions.isAdministrator(session), is(false));
         verifyZeroInteractions(legacyPermissionsService, usersService, teamsService);
-        verify(jwtPermissionsService, times(1)).isAdministrator(session);
+        verify(jwtPermissionsService, atLeastOnce()).isAdministrator(session);
 
     }
 
@@ -185,7 +185,7 @@ public class PermissionsServiceProxyTest {
         permissions = new PermissionsServiceProxy(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService);
         assertThat(permissions.isAdministrator(email), is(false));
         verifyZeroInteractions(jwtPermissionsService, usersService, teamsService);
-        verify(legacyPermissionsService, times(1)).isAdministrator(email);
+        verify(legacyPermissionsService, atLeastOnce()).isAdministrator(email);
 
     }
 
@@ -199,7 +199,7 @@ public class PermissionsServiceProxyTest {
         permissions = new PermissionsServiceProxy(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService);
         assertThat(permissions.isAdministrator(email), is(false));
         verifyZeroInteractions(legacyPermissionsService, usersService, teamsService);
-        verify(jwtPermissionsService, times(1)).isAdministrator(email);
+        verify(jwtPermissionsService, atLeastOnce()).isAdministrator(email);
 
     }
 
@@ -219,7 +219,7 @@ public class PermissionsServiceProxyTest {
 
         assertThat(permissions.hasAdministrator(), is(false));
         verifyZeroInteractions(jwtPermissionsService, usersService, teamsService);
-        verify(legacyPermissionsService, times(1)).hasAdministrator();
+        verify(legacyPermissionsService, atLeastOnce()).hasAdministrator();
     }
 
     /**
@@ -237,7 +237,7 @@ public class PermissionsServiceProxyTest {
 
         assertThat(permissions.hasAdministrator(), is(false));
         verifyZeroInteractions(legacyPermissionsService, usersService, teamsService);
-        verify(jwtPermissionsService, times(1)).hasAdministrator();
+        verify(jwtPermissionsService, atLeastOnce()).hasAdministrator();
     }
 
 
@@ -252,7 +252,7 @@ public class PermissionsServiceProxyTest {
         String email2 = "test2@ons.gov.uk";
         permissions.addAdministrator(email2, session);
         verifyZeroInteractions(jwtPermissionsService, usersService, teamsService);
-        verify(legacyPermissionsService, times(1)).addAdministrator(email2, session);
+        verify(legacyPermissionsService, atLeastOnce()).addAdministrator(email2, session);
 
     }
 
@@ -281,7 +281,7 @@ public class PermissionsServiceProxyTest {
                 .thenReturn(new AccessMapping());
         assertThat(permissions.canView(userMock, collectionDescription), is(false));
         verifyZeroInteractions(jwtPermissionsService, usersService, teamsService);
-        verify(legacyPermissionsService, times(1)).canView(userMock, collectionDescription);
+        verify(legacyPermissionsService, atLeastOnce()).canView(userMock, collectionDescription);
     }
 
     /**
@@ -297,7 +297,7 @@ public class PermissionsServiceProxyTest {
 
         assertThat(permissions.canView(userMock, collectionDescription), is(false));
         verifyZeroInteractions(legacyPermissionsService, usersService, teamsService);
-        verify(jwtPermissionsService, times(1)).canView(userMock, collectionDescription);
+        verify(jwtPermissionsService, atLeastOnce()).canView(userMock, collectionDescription);
     }
 
     /**
@@ -315,7 +315,7 @@ public class PermissionsServiceProxyTest {
 
         assertThat(permissions.canView(session, collectionDescription), is(false));
         verifyZeroInteractions(jwtPermissionsService, usersService, teamsService);
-        verify(legacyPermissionsService, times(1)).canView(session, collectionDescription);
+        verify(legacyPermissionsService, atLeastOnce()).canView(session, collectionDescription);
     }
 
     /**
@@ -332,7 +332,7 @@ public class PermissionsServiceProxyTest {
 
         assertThat(permissions.canView(session, collectionDescription), is(false));
         verifyZeroInteractions(legacyPermissionsService, usersService, teamsService);
-        verify(jwtPermissionsService, times(1)).canView(session, collectionDescription);
+        verify(jwtPermissionsService, atLeastOnce()).canView(session, collectionDescription);
     }
 
     /**
@@ -372,15 +372,13 @@ public class PermissionsServiceProxyTest {
     public void canEdit_Session_JWTNotEnabled() throws Exception {
         session = null;
         jwtSessionsEnabled = false;
+        String email = null;
         permissions = new PermissionsServiceProxy(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService);
-
         when(permissionsStore.getAccessMapping())
                 .thenReturn(new AccessMapping());
-
-
-        assertThat(permissions.canView(session, collectionDescription), is(false));
+        assertThat(permissions.canEdit(session), is(false));
         verifyZeroInteractions(jwtPermissionsService, usersService, teamsService);
-        verify(legacyPermissionsService, times(1)).canView(session, collectionDescription);
+        verify(legacyPermissionsService, atLeastOnce()).canEdit(session);
     }
 
     /**
@@ -391,13 +389,11 @@ public class PermissionsServiceProxyTest {
         jwtSessionsEnabled = true;
         session = null;
         permissions = new PermissionsServiceProxy(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService);
-
         when(permissionsStore.getAccessMapping())
                 .thenReturn(new AccessMapping());
-
-        assertThat(permissions.canView(userMock, collectionDescription), is(false));
+        assertThat(permissions.canEdit(session), is(false));
         verifyZeroInteractions(legacyPermissionsService, usersService, teamsService);
-        verify(jwtPermissionsService, times(1)).canView(userMock, collectionDescription);
+        verify(jwtPermissionsService, atLeastOnce()).canEdit(session);
     }
 
     /**
@@ -407,14 +403,11 @@ public class PermissionsServiceProxyTest {
     public void canEdit_User_JWTNotEnabled() throws Exception {
         jwtSessionsEnabled = false;
         permissions = new PermissionsServiceProxy(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService);
-
         when(permissionsStore.getAccessMapping())
                 .thenReturn(new AccessMapping());
-
-
-        assertThat(permissions.canView(userMock, collectionDescription), is(false));
+        assertThat(permissions.canEdit(userMock), is(false));
         verifyZeroInteractions(jwtPermissionsService, usersService, teamsService);
-        verify(legacyPermissionsService, times(1)).canView(userMock, collectionDescription);
+        verify(legacyPermissionsService, atLeastOnce()).canEdit(userMock);
     }
 
     /**
@@ -428,9 +421,9 @@ public class PermissionsServiceProxyTest {
         when(permissionsStore.getAccessMapping())
                 .thenReturn(new AccessMapping());
 
-        assertThat(permissions.canView(userMock, collectionDescription), is(false));
+        assertThat(permissions.canEdit(userMock), is(false));
         verifyZeroInteractions(legacyPermissionsService, usersService, teamsService);
-        verify(jwtPermissionsService, times(1)).canView(userMock, collectionDescription);
+        verify(jwtPermissionsService, atLeastOnce()).canEdit(userMock);
     }
 
     /**
@@ -441,14 +434,11 @@ public class PermissionsServiceProxyTest {
         jwtSessionsEnabled = false;
         String email = null;
         permissions = new PermissionsServiceProxy(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService);
-
         when(permissionsStore.getAccessMapping())
                 .thenReturn(new AccessMapping());
-
-
-        assertThat(permissions.canView(email, collectionDescription), is(false));
+        assertThat(permissions.canEdit(email), is(false));
         verifyZeroInteractions(jwtPermissionsService, usersService, teamsService);
-        verify(legacyPermissionsService, times(1)).canView(email, collectionDescription);
+        verify(legacyPermissionsService, atLeastOnce()).canEdit(email);
     }
 
     /**
@@ -459,13 +449,11 @@ public class PermissionsServiceProxyTest {
         jwtSessionsEnabled = true;
         String email = null;
         permissions = new PermissionsServiceProxy(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService);
-
         when(permissionsStore.getAccessMapping())
                 .thenReturn(new AccessMapping());
-
-        assertThat(permissions.canView(email, collectionDescription), is(false));
+        assertThat(permissions.canEdit(email), is(false));
         verifyZeroInteractions(legacyPermissionsService, usersService, teamsService);
-        verify(jwtPermissionsService, times(1)).canView(email, collectionDescription);
+        verify(jwtPermissionsService, atLeastOnce()).canEdit(email);
     }
 
     /**
@@ -499,7 +487,7 @@ public class PermissionsServiceProxyTest {
         Set<String> actual = permissions.listCollectionsAccessibleByTeam(t);
 
         verifyZeroInteractions(jwtPermissionsService);
-        verify(legacyPermissionsService, times(1)).listCollectionsAccessibleByTeam(t);
+        verify(legacyPermissionsService, atLeastOnce()).listCollectionsAccessibleByTeam(t);
     }
 
     /**
@@ -522,7 +510,7 @@ public class PermissionsServiceProxyTest {
 
         permissions.removeEditor(EMAIL, session);
         verifyZeroInteractions(jwtPermissionsService, usersService, teamsService);
-        verify(legacyPermissionsService, times(1)).removeEditor(EMAIL, session);
+        verify(legacyPermissionsService, atLeastOnce()).removeEditor(EMAIL, session);
     }
 
     /**
@@ -545,7 +533,7 @@ public class PermissionsServiceProxyTest {
 
         permissions.removeEditor(EMAIL, session);
         verifyZeroInteractions(usersService, teamsService);
-        verify(jwtPermissionsService, times(1)).removeEditor(EMAIL, session);
+        verify(jwtPermissionsService, atLeastOnce()).removeEditor(EMAIL, session);
     }
 
     /**
@@ -565,7 +553,7 @@ public class PermissionsServiceProxyTest {
 
         permissions.removeAdministrator(EMAIL, session);
         verifyZeroInteractions(jwtPermissionsService, usersService, teamsService);
-        verify(legacyPermissionsService, times(1)).removeAdministrator(EMAIL, session);
+        verify(legacyPermissionsService, atLeastOnce()).removeAdministrator(EMAIL, session);
 
     }
 
@@ -576,17 +564,14 @@ public class PermissionsServiceProxyTest {
     public void removeAdministrator_JWTEnabled() throws Exception {
         jwtSessionsEnabled = true;
         permissions = new PermissionsServiceProxy(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService);
-
         admins.add(EMAIL);
-
         when(permissionsStore.getAccessMapping())
                 .thenReturn(accessMapping);
         when(accessMapping.getAdministrators())
                 .thenReturn(admins);
-
         permissions.removeAdministrator(EMAIL, session);
         verifyZeroInteractions(usersService, teamsService);
-        verify(jwtPermissionsService, times(1)).removeAdministrator(EMAIL, session);
+        verify(jwtPermissionsService, atLeastOnce()).removeAdministrator(EMAIL, session);
 
     }
 
@@ -605,7 +590,7 @@ public class PermissionsServiceProxyTest {
         Set<String> actual = permissions.listCollectionsAccessibleByTeam(t);
 
         verifyZeroInteractions(jwtPermissionsService);
-        verify(legacyPermissionsService, times(1)).listCollectionsAccessibleByTeam(t);
+        verify(legacyPermissionsService, atLeastOnce()).listCollectionsAccessibleByTeam(t);
     }
 
 
@@ -622,10 +607,9 @@ public class PermissionsServiceProxyTest {
 
         permissions.userPermissions(email2, session);
         verifyZeroInteractions(jwtPermissionsService, usersService, teamsService);
-        verify(legacyPermissionsService, times(1)).userPermissions(email2, session);
+        verify(legacyPermissionsService, atLeastOnce()).userPermissions(email2, session);
 
     }
-
 
     /**
      * @throws Exception
@@ -634,15 +618,11 @@ public class PermissionsServiceProxyTest {
     public void addEditor_JWTNotEnabled() throws Exception {
         jwtSessionsEnabled = false;
         permissions = new PermissionsServiceProxy(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService);
-
         String email2 = "test2@ons.gov.uk";
         session = null;
-
-
         permissions.addEditor(email2, session);
         verifyZeroInteractions(jwtPermissionsService, usersService, teamsService);
-        verify(legacyPermissionsService, times(1)).addEditor(email2, session);
-
+        verify(legacyPermissionsService, atLeastOnce()).addEditor(email2, session);
     }
 
     /**
@@ -652,13 +632,11 @@ public class PermissionsServiceProxyTest {
     public void addEditor_JWTEnabled() throws Exception {
         jwtSessionsEnabled = true;
         permissions = new PermissionsServiceProxy(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService);
-
         String email2 = "test2@ons.gov.uk";
         session = null;
-
         permissions.addEditor(email2, session);
         verifyZeroInteractions(usersService, teamsService);
-        verify(jwtPermissionsService, times(1)).addEditor(email2, session);
+        verify(jwtPermissionsService, atLeastOnce()).addEditor(email2, session);
 
     }
 
@@ -669,14 +647,11 @@ public class PermissionsServiceProxyTest {
     public void addViewerTeam_JWTNotEnabled() throws Exception {
         jwtSessionsEnabled = false;
         permissions = new PermissionsServiceProxy(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService);
-
         session = null;
         Integer t = 6;
-
         permissions.addViewerTeam(collectionDescription, t, session);
         verifyZeroInteractions(jwtPermissionsService, usersService, teamsService);
-        verify(legacyPermissionsService, times(1)).addViewerTeam(collectionDescription, t, session);
-
+        verify(legacyPermissionsService, atLeastOnce()).addViewerTeam(collectionDescription, t, session);
     }
 
     /**
@@ -686,13 +661,11 @@ public class PermissionsServiceProxyTest {
     public void addViewerTeam_JWTEnabled() throws Exception {
         jwtSessionsEnabled = true;
         permissions = new PermissionsServiceProxy(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService);
-
         session = null;
         Integer t = 6;
         permissions.addViewerTeam(collectionDescription, t, session);
         verifyZeroInteractions(usersService, teamsService);
-        verify(jwtPermissionsService, times(1)).addViewerTeam(collectionDescription, t, session);
-
+        verify(jwtPermissionsService, atLeastOnce()).addViewerTeam(collectionDescription, t, session);
     }
 
     /**
@@ -702,13 +675,11 @@ public class PermissionsServiceProxyTest {
     public void removeViewerTeam_JWTNotEnabled() throws Exception {
         jwtSessionsEnabled = false;
         permissions = new PermissionsServiceProxy(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService);
-
         session = null;
         Integer t = 6;
-
         permissions.removeViewerTeam(collectionDescription, t, session);
         verifyZeroInteractions(jwtPermissionsService, usersService, teamsService);
-        verify(legacyPermissionsService, times(1)).removeViewerTeam(collectionDescription, t, session);
+        verify(legacyPermissionsService, atLeastOnce()).removeViewerTeam(collectionDescription, t, session);
 
     }
 
@@ -723,9 +694,34 @@ public class PermissionsServiceProxyTest {
         Integer t = 6;
         permissions.removeViewerTeam(collectionDescription, t, session);
         verifyZeroInteractions(usersService, teamsService);
-        verify(jwtPermissionsService, times(1)).removeViewerTeam(collectionDescription, t, session);
+        verify(jwtPermissionsService, atLeastOnce()).removeViewerTeam(collectionDescription, t, session);
 
     }
 
+    /**
+     * @throws Exception
+     */
+    @Test
+    public void listViewerTeams_CollectionDescription_Session_JWTNotEnabled() throws Exception {
+        jwtSessionsEnabled = false;
+        permissions = new PermissionsServiceProxy(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService);
+        session = null;
+        permissions.listViewerTeams(collectionDescription, session);
+        verifyZeroInteractions(jwtPermissionsService, usersService, teamsService);
+        verify(legacyPermissionsService, atLeastOnce()).listViewerTeams(collectionDescription, session);
+    }
+
+    /**
+     * @throws Exception
+     */
+    @Test
+    public void listViewerTeams_CollectionDescription_Session_JWTEnabled() throws Exception {
+        jwtSessionsEnabled = true;
+        permissions = new PermissionsServiceProxy(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService);
+        session = null;
+        permissions.listViewerTeams(collectionDescription, session);
+        verifyZeroInteractions(jwtPermissionsService, usersService, teamsService);
+        verify(legacyPermissionsService, atLeastOnce()).listViewerTeams(collectionDescription, session);
+    }
 }
 

@@ -1,11 +1,10 @@
 package com.github.onsdigital.zebedee.permissions.service;
 
+import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.UnsupportedOperationExceptions;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.PermissionDefinition;
 import com.github.onsdigital.zebedee.model.Collection;
-import com.github.onsdigital.zebedee.permissions.model.AccessMapping;
-import com.github.onsdigital.zebedee.permissions.store.PermissionsStore;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.session.service.Sessions;
 import com.github.onsdigital.zebedee.teams.model.Team;
@@ -15,13 +14,19 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.stream.Collectors;
 
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.warn;
+
+/**
+ * this has been implemented for the migration to using JWT Session
+ * to implement 'PermissionStore' modules when the jwt is enabled
+ * Update Zebedee permissions service to get list of groups for user from JWT session store
+ */
 public class JWTPermissionsServiceImpl implements PermissionsService {
 
     static final String PUBLISHER_PERMISSIONS = "role-publisher";
     static final String ADMIN_PERMISSIONS = "role-admin";
-    private PermissionsStore permissionsStore;
+//    private PermissionsStore permissionsStore;
 
 
     /**
@@ -38,12 +43,15 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
     /**
      * @param session - {@link Sessions} to get the groups
      * @return list of groups where groupId is converted to teamId
-     * @throws IOException if session has no groups or empty list
+     * @throws IOException           if session has no groups or empty list
+     * @throws NumberFormatException if group name is not  permitted format (string of integers)
      */
-    public static List<Integer> convertGroupsToTeams(Session session) throws IOException {
-        if (session.getGroups() == null || !Arrays.stream(session.getGroups()).findAny().isPresent()) {
+    public static List<Integer> convertGroupsToTeams(Session session) throws IOException, NumberFormatException {
+        if (session == null || session.getGroups() == null || !Arrays.stream(session.getGroups()).findAny().isPresent()) {
             throw new IOException("JWT Permissions service error for convertGroupsToTeams no groups ");
         }
+
+        String[] valueArray = {PUBLISHER_PERMISSIONS, ADMIN_PERMISSIONS};
         String[] groups = session.getGroups();
         Set<String> setOfString = new HashSet<>(
                 Arrays.asList(groups));
@@ -51,12 +59,39 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
         for (String s : setOfString) {
             try {
                 teamsList.add(Integer.parseInt(s));
-            } catch (NumberFormatException ignored) {
+            } catch (NumberFormatException e) {
+                if (!Arrays.asList(valueArray).contains(s)) {
+                    String logString = "invalid group name format groupName " + s;
+                    warn().log(logString);
+                }
             }
         }
 
         return teamsList;
     }
+
+    public static List<Integer> convertTeamsListStringToListInteger(CollectionDescription collectionDescription) throws IOException, NumberFormatException {
+
+        if (collectionDescription == null ||
+                collectionDescription.getTeams() == null ||
+                collectionDescription.getTeams().size() == 0) {
+            throw new IOException("JWT Permissions service error for convertTeamsListStringToListInteger no teams ");
+        }
+        List<String> teams = collectionDescription.getTeams();
+        List<Integer> teamsList = new ArrayList<>();
+        for (String s : teams) {
+            try {
+                teamsList.add(Integer.parseInt(s));
+            } catch (NumberFormatException e) {
+                String logString = "invalid team name format teamName " + s;
+                warn().log(logString);
+            }
+        }
+        return teamsList;
+
+
+    }
+
 
     /**
      * if the valid session groups contain the role publisher
@@ -164,7 +199,6 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
     public boolean canEdit(Session session) throws IOException {
         return session != null && !StringUtils.isEmpty(session.getEmail()) &&
                 (hasPermission(session, PUBLISHER_PERMISSIONS) || hasPermission(session, ADMIN_PERMISSIONS));
-
     }
 
     /**
@@ -223,18 +257,24 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
      */
     @Override
     public boolean canView(Session session, CollectionDescription collectionDescription) throws IOException {
-        List<Integer> teams = convertGroupsToTeams(session);
-        try {
-            AccessMapping accessMapping = permissionsStore.getAccessMapping();
-            Set<Integer> collectionTeams = accessMapping.getCollections().get(collectionDescription.getId());
-            if (collectionTeams == null || collectionTeams.isEmpty()) {
-                return false;
-            }
-            return teams.stream().anyMatch(t -> collectionTeams.contains(t));
-        } catch (IOException ignored) {
-            return false;
+
+        if (session == null ||
+                collectionDescription == null ||
+                session.getGroups() == null ||
+                collectionDescription.getTeams() == null) {
+            throw new IOException("Empty or Null Session or CollectionDescription");
         }
 
+        Set<Integer> resultTeamIds = new HashSet<>();
+        for (Integer sessionTeamID : convertGroupsToTeams(session)) {
+            for (Integer collectionTeamIds : convertTeamsListStringToListInteger(collectionDescription)) {
+                if (sessionTeamID.equals(collectionTeamIds)) {
+                    resultTeamIds.add(sessionTeamID);
+                }
+            }
+        }
+
+        return resultTeamIds != null && !resultTeamIds.isEmpty();
     }
 
     /**
@@ -247,7 +287,8 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
      * @throws UnsupportedOperationExceptions will error if invoked.
      */
     @Override
-    public boolean canView(User user, CollectionDescription collectionDescription) throws UnsupportedOperationExceptions {
+    public boolean canView(User user, CollectionDescription collectionDescription) throws
+            UnsupportedOperationExceptions {
         throw new UnsupportedOperationExceptions("JWT Permissions service error for canView no longer required");
     }
 
@@ -261,7 +302,6 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
     public boolean canView(String email, CollectionDescription collectionDescription) throws
             UnsupportedOperationExceptions {
         throw new UnsupportedOperationExceptions("JWT Permissions service error for canView no longer required");
-
     }
 
     /**
@@ -273,7 +313,7 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
     @Override
     public void addViewerTeam(CollectionDescription collectionDescription, Integer teamId, Session session) throws
             UnsupportedOperationExceptions {
-        throw new UnsupportedOperationExceptions("JWT Permissions service error for CollectionDescription no longer required");
+        throw new UnsupportedOperationExceptions("JWT Permissions service error for addViewerTeam no longer required");
     }
 
     /**
@@ -283,13 +323,28 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
      *                              teams for.
      * @param session               the {@link Session} of the {@link User} requesting this information.
      * @return null
-     * @throws UnsupportedOperationExceptions will error if invoked.
+     * @throws IOException, ZebedeeException { will error if invoked.
      */
     @Override
     public Set<Integer> listViewerTeams(CollectionDescription collectionDescription, Session session) throws
-            UnsupportedOperationExceptions {
-        throw new UnsupportedOperationExceptions("JWT Permissions service error for listViewerTeams no longer required");
+            IOException, UnauthorizedException {
+        if (!canView(session, collectionDescription)) {
+            throw new IOException("JWT Permissions service error for listViewerTeams input error ");
+        }
 
+        List<Integer> sessionsTeamsList = convertGroupsToTeams(session);
+        List<Integer> collectionTeamIntegerList = convertTeamsListStringToListInteger(collectionDescription);
+
+        Set<Integer> resultTeamIds = new HashSet<>();
+        for (Integer sessionTeamID : sessionsTeamsList) {
+            for (Integer collectionTeamIds : collectionTeamIntegerList) {
+                if (sessionTeamID.equals(collectionTeamIds)) {
+                    resultTeamIds.add(sessionTeamID);
+                }
+            }
+        }
+
+        return java.util.Collections.unmodifiableSet(resultTeamIds);
     }
 
     /**
@@ -312,7 +367,8 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
      * @throws UnsupportedOperationExceptions will error if invoked.
      */
     @Override
-    public PermissionDefinition userPermissions(String email, Session session) throws UnsupportedOperationExceptions {
+    public PermissionDefinition userPermissions(String email, Session session) throws
+            UnsupportedOperationExceptions {
         throw new UnsupportedOperationExceptions("JWT Permissions service error for userPermissions no longer required");
     }
 
@@ -322,27 +378,10 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
      * @throws IOException If a filesystem error occurs
      */
     @Override
-    public Set<String> listCollectionsAccessibleByTeam(Team t) throws IOException {
-        AccessMapping accessMapping = permissionsStore.getAccessMapping();
-        if (accessMapping == null) {
-            throw new IOException("error reading accessMapping expected value but was null");
-        }
+    public Set<String> listCollectionsAccessibleByTeam(Team t) throws UnsupportedOperationExceptions {
+        throw new UnsupportedOperationExceptions("JWT Permissions service error for listCollectionsAccessibleByTeam no longer required");
 
-        if (accessMapping.getCollections() == null) {
-            return new HashSet<>();
-        }
-
-        // AccessMapping.Collections maps CollectionID -> List of Team IDs.
-        // Filter to find all the collections who have the specified team ID assigned to them.
-        // Returns a Set of collectionIDs matching given criteria.
-        return accessMapping.getCollections()
-                .entrySet()
-                .stream()
-                .filter(entry -> entry.getValue() != null && entry.getValue().contains(t.getId()))
-                .map(entry -> entry.getKey())
-                .collect(Collectors.toSet());
     }
-
 
     /**
      * @param session    the {@link Session} to check

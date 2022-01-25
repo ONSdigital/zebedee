@@ -1,11 +1,7 @@
 package com.github.onsdigital.zebedee.permissions.service;
 
-import com.github.onsdigital.exceptions.JWTVerificationException;
 import com.github.onsdigital.zebedee.exceptions.UnsupportedOperationExceptions;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
-import com.github.onsdigital.zebedee.model.Collection;
-import com.github.onsdigital.zebedee.permissions.model.AccessMapping;
-import com.github.onsdigital.zebedee.permissions.store.PermissionsStore;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.session.service.Sessions;
 import com.github.onsdigital.zebedee.teams.model.Team;
@@ -17,10 +13,12 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
@@ -28,29 +26,19 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 public class JWTPermissionsServiceImplTest {
-    //    public static final String SESSIONS = "sessions";
-    private static final String[] GROUP_0 = new String[]{"testgroup0", "role-publisher", "role-admin", "testgroup1"};
-    private static final String[] GROUP_0A = new String[]{"testgroup0", "role-publisher", "testgroup1"};
-    private static final String[] GROUP_0B = new String[]{"testgroup0", "role-admin", "testgroup1"};
+    private static final String[] GROUP_0 = new String[]{"123456", "role-publisher", "role-admin", "789012345", "testgroup0"};
+    private static final String[] GROUP_0A = new String[]{"123456", "role-publisher", "testgroup1"};
+    private static final String[] GROUP_0B = new String[]{"123456", "role-admin", "testgroup1"};
+    private static final String[] GROUP_0c = new String[]{"123456", "789012345"};
+    private static final String[] GROUP_0d = new String[]{"testgroup1", "testgroup2"};
 
-    private static final String[] GROUP_1 = new String[]{"testgroup0", "testgroup1"};
-    private static final String[] GROUP_2 = new String[]{"123456", "role-publisher", "role-admin", "789012345"};
     private static final String FLORENCE_TOKEN = "666";
     private static final String TEST_USER_EMAIL = "other123@ons.gov.uk";
     private static final String TEST_SESSION_ID = "123test-session-id";
     private static final String PUBLISHER = "role-publisher";
     private static final String ADMIN = "role-admin";
-    private static final String JWTPERMISSIONSSERVICE_ERROR = "error accessing JWTPermissions Service";
-    private Set<String> digitalPublishingTeam;
-
     @Mock
     private Session session;
-
-    @Mock
-    private PermissionsStore permissionsStore;
-
-    @Mock
-    private AccessMapping accessMapping;
 
     @Mock
     private Sessions sessionsService;
@@ -58,8 +46,6 @@ public class JWTPermissionsServiceImplTest {
     @Mock
     private PermissionsService jwtPermissionsService;
 
-    @Mock
-    private Collection collectionMock;
 
     @Mock
     private CollectionDescription collectionDescriptionMock;
@@ -70,12 +56,10 @@ public class JWTPermissionsServiceImplTest {
     @Mock
     private User user_Mock;
 
-    @Mock
-    private Team team_Mock;
-
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
+
         jwtPermissionsService = new JWTPermissionsServiceImpl(sessionsService);
         session = new Session();
         session.setEmail("test@ons.gov.co.uk");
@@ -132,13 +116,6 @@ public class JWTPermissionsServiceImplTest {
         assertFalse(jwtPSI_Mock.hasPermission(session, ADMIN));
     }
 
-
-
-
-
-
-    
-
     @Test
     public void isPublisher_Session_Publisher_ShouldReturnTrue() throws Exception {
         Session session = new Session();
@@ -159,7 +136,7 @@ public class JWTPermissionsServiceImplTest {
         Session session = new Session();
         session.setId(TEST_SESSION_ID);
         session.setEmail(null);
-        session.setGroups(GROUP_1);
+        session.setGroups(GROUP_0);
         assertFalse(jwtPermissionsService.isPublisher(session));
         verifyZeroInteractions(sessionsService);
     }
@@ -168,7 +145,7 @@ public class JWTPermissionsServiceImplTest {
     public void isPublisher_Session_NotPublisher_ShouldReturnFalse() throws Exception {
         Session session = new Session();
         session.setEmail(TEST_USER_EMAIL);
-        session.setGroups(GROUP_1);
+        session.setGroups(GROUP_0c);
         assertFalse(jwtPermissionsService.isPublisher(session));
         verifyZeroInteractions(sessionsService);
     }
@@ -214,7 +191,7 @@ public class JWTPermissionsServiceImplTest {
     public void isAdministrator_Session_NotAdmin_ShouldReturnFalse() throws Exception {
         Session session = new Session();
         session.setEmail(TEST_USER_EMAIL);
-        session.setGroups(GROUP_1);
+        session.setGroups(GROUP_0c);
         assertFalse(jwtPermissionsService.isAdministrator(session));
         verifyZeroInteractions(sessionsService);
     }
@@ -235,7 +212,7 @@ public class JWTPermissionsServiceImplTest {
     }
 
     @Test
-    public void hasAdministrator_ShouldError() throws Exception {
+    public void hasAdministrator_ShouldError() throws UnsupportedOperationExceptions {
         Exception exception = assertThrows(UnsupportedOperationExceptions.class, () ->
                 jwtPermissionsService.hasAdministrator());
         assertEquals("JWT Permissions service error for hasAdministrator no longer required", exception.getMessage());
@@ -275,7 +252,7 @@ public class JWTPermissionsServiceImplTest {
         Session session = new Session();
         session.setId(TEST_SESSION_ID);
         session.setEmail(null);
-        session.setGroups(GROUP_1);
+        session.setGroups(GROUP_0c);
         assertFalse(jwtPermissionsService.canEdit(session));
         verifyZeroInteractions(sessionsService);
     }
@@ -284,7 +261,7 @@ public class JWTPermissionsServiceImplTest {
     public void canEdit_Session_NotPublisher_ShouldReturnFalse() throws Exception {
         Session session = new Session();
         session.setEmail(TEST_USER_EMAIL);
-        session.setGroups(GROUP_1);
+        session.setGroups(GROUP_0c);
         assertFalse(jwtPermissionsService.canEdit(session));
         verifyZeroInteractions(sessionsService);
     }
@@ -306,7 +283,6 @@ public class JWTPermissionsServiceImplTest {
 
     @Test
     public void canEdit_User_ShouldError() throws Exception {
-
         Exception exception = assertThrows(UnsupportedOperationExceptions.class, () ->
                 jwtPermissionsService.canEdit(user_Mock));
         assertEquals("JWT Permissions service error for canEdit no longer required", exception.getMessage());
@@ -326,31 +302,125 @@ public class JWTPermissionsServiceImplTest {
         assertEquals("JWT Permissions service error for removeEditor no longer required", exception.getMessage());
     }
 
-  
+    @Test
+    public void canView_Session_CollectionDescription() throws Exception {
+        Session session = new Session();
+        session.setEmail(TEST_USER_EMAIL);
+        session.setGroups(GROUP_0);
+        session.setId(FLORENCE_TOKEN);
+        CollectionDescription collectionDescriptionMock = new CollectionDescription();
+        collectionDescriptionMock.setId("1234");
+        collectionDescriptionMock.setTeams(Arrays.asList(GROUP_0));
+        assertTrue(jwtPermissionsService.canView(session, collectionDescriptionMock));
+    }
+
+    @Test
+    public void canView_Session_Null_CollectionDescription() throws Exception {
+        Session session = new Session();
+//        session.setEmail(TEST_USER_EMAIL);
+//        session.setGroups(GROUP_0);
+//        session.setId(FLORENCE_TOKEN);
+        CollectionDescription collectionDescriptionMock = new CollectionDescription();
+        collectionDescriptionMock.setId("1234");
+        collectionDescriptionMock.setTeams(Arrays.asList(GROUP_0));
+
+        Exception exception = assertThrows(IOException.class, () ->
+                jwtPermissionsService.canView(session, collectionDescriptionMock));
+        assertEquals("Empty or Null Session or CollectionDescription", exception.getMessage());
+    }
+
+    @Test
+    public void canView_Session_GroupNull_CollectionDescription() throws Exception {
+        Session session = new Session();
+        session.setEmail(TEST_USER_EMAIL);
+//        session.setGroups(GROUP_0);
+        session.setId(FLORENCE_TOKEN);
+        CollectionDescription collectionDescriptionMock = new CollectionDescription();
+        collectionDescriptionMock.setId("1234");
+        collectionDescriptionMock.setTeams(Arrays.asList(GROUP_0));
+
+        Exception exception = assertThrows(IOException.class, () ->
+                jwtPermissionsService.canView(session, collectionDescriptionMock));
+        assertEquals("Empty or Null Session or CollectionDescription", exception.getMessage());
+    }
+
+    @Test
+    public void canView_Session_CollectionDescription_Null() throws Exception {
+        Session session = new Session();
+        session.setEmail(TEST_USER_EMAIL);
+        session.setGroups(GROUP_0);
+        session.setId(FLORENCE_TOKEN);
+        CollectionDescription collectionDescriptionMock = new CollectionDescription();
+//        collectionDescriptionMock.setId("1234");
+//        collectionDescriptionMock.setTeams(Arrays.asList(GROUP_0));
+
+        Exception exception = assertThrows(IOException.class, () ->
+                jwtPermissionsService.canView(session, collectionDescriptionMock));
+        assertEquals("Empty or Null Session or CollectionDescription", exception.getMessage());
+    }
+
+    @Test
+    public void canView_Session_CollectionDescription_TeamNull() throws Exception {
+        Session session = new Session();
+        session.setEmail(TEST_USER_EMAIL);
+        session.setGroups(GROUP_0);
+        session.setId(FLORENCE_TOKEN);
+        CollectionDescription collectionDescriptionMock = new CollectionDescription();
+        collectionDescriptionMock.setId("1234");
+//        collectionDescriptionMock.setTeams(Arrays.asList(GROUP_0));
+
+        Exception exception = assertThrows(IOException.class, () ->
+                jwtPermissionsService.canView(session, collectionDescriptionMock));
+        assertEquals("Empty or Null Session or CollectionDescription", exception.getMessage());
+    }
 
     @Test
     public void canView_EMail_ShouldError() throws Exception {
-       Exception exception = assertThrows(UnsupportedOperationExceptions.class, () ->
-               jwtPermissionsService.canView(TEST_USER_EMAIL, collectionDescriptionMock));
-       assertEquals("JWT Permissions service error for canView no longer required", exception.getMessage());
+        Exception exception = assertThrows(UnsupportedOperationExceptions.class, () ->
+                jwtPermissionsService.canView(TEST_USER_EMAIL, collectionDescriptionMock));
+        assertEquals("JWT Permissions service error for canView no longer required", exception.getMessage());
     }
 
     @Test
     public void canView_User_ShouldError() throws Exception {
-    Exception exception = assertThrows(UnsupportedOperationExceptions.class, () ->
-               jwtPermissionsService.canView(user_Mock, collectionDescriptionMock));
-       assertEquals("JWT Permissions service error for canView no longer required", exception.getMessage());
+        Exception exception = assertThrows(UnsupportedOperationExceptions.class, () ->
+                jwtPermissionsService.canView(user_Mock, collectionDescriptionMock));
+        assertEquals("JWT Permissions service error for canView no longer required", exception.getMessage());
     }
 
     @Test
-    public void addViewerTeam_CollectionDescription_Team_Session_ShouldError() throws Exception {
-       Exception exception = assertThrows(UnsupportedOperationExceptions.class, () ->
-               jwtPermissionsService.canView(user_Mock, collectionDescriptionMock));
-       assertEquals("JWT Permissions service error for canView no longer required", exception.getMessage());
+    public void addViewerTeam_CollectionDescription_Team_Session() throws Exception {
+        Integer t = 6;
+        Exception exception = assertThrows(UnsupportedOperationExceptions.class, () ->
+                jwtPermissionsService.addViewerTeam(collectionDescriptionMock, t, session));
+        assertEquals("JWT Permissions service error for addViewerTeam no longer required", exception.getMessage());
     }
 
     @Test
     public void listViewerTeams_collectionDescription_session() throws Exception {
+        Session session = new Session();
+        session.setEmail(TEST_USER_EMAIL);
+        session.setGroups(GROUP_0);
+        session.setId(FLORENCE_TOKEN);
+
+        CollectionDescription collectionDescriptionMock = new CollectionDescription();
+        collectionDescriptionMock.setId("1234");
+        collectionDescriptionMock.setTeams(Arrays.asList(GROUP_0));
+
+        Set<Integer> actual = jwtPermissionsService.listViewerTeams(collectionDescriptionMock, session);
+        assertThat(actual, is(notNullValue()));
+        assertFalse(actual.isEmpty());
+    }
+
+    @Test
+    public void listViewerTeams_CollectionDescription_session_Null() throws Exception {
+        Session session = null;
+        CollectionDescription collectionDescriptionMock = new CollectionDescription();
+        collectionDescriptionMock.setId("1234");
+        collectionDescriptionMock.setTeams(Arrays.asList(GROUP_0));
+        Exception exception = assertThrows(IOException.class, () ->
+                jwtPermissionsService.listViewerTeams(collectionDescriptionMock, session));
+        assertEquals("Empty or Null Session or CollectionDescription", exception.getMessage());
 
     }
 
@@ -371,7 +441,10 @@ public class JWTPermissionsServiceImplTest {
 
     @Test
     public void listCollectionsAccessibleByTeam_ShouldError() throws Exception {
-
+        Team team = new Team();
+        Exception exception = assertThrows(UnsupportedOperationExceptions.class, () ->
+                jwtPermissionsService.listCollectionsAccessibleByTeam(team));
+        assertEquals("JWT Permissions service error for listCollectionsAccessibleByTeam no longer required", exception.getMessage());
     }
 
     @Test
@@ -379,29 +452,40 @@ public class JWTPermissionsServiceImplTest {
         Session mocksession = new Session();
         mocksession.setEmail("dartagnan@strangerThings.com");
         mocksession.setId(FLORENCE_TOKEN);
-        mocksession.setGroups(GROUP_2);
+        mocksession.setGroups(GROUP_0);
         List<Integer> result = JWTPermissionsServiceImpl.convertGroupsToTeams(mocksession);
         assertTrue(result.stream().anyMatch(c -> c.equals(123456)));
         assertTrue(result.stream().anyMatch(c -> c.equals(789012345)));
         assertFalse(result.stream().anyMatch(c -> c.equals("role-publisher")));
+        assertFalse(result.stream().anyMatch(c -> c.equals("role-admin")));
+        assertFalse(result.stream().anyMatch(c -> c.equals("testgroup0")));
     }
 
     @Test
     public void convertGroupsToTeams_exceptionTesting_returnEmptylist() throws Exception {
-        Session session = new Session();
-        session.setEmail("dartagnan@strangerThings.com");
-        session.setId(FLORENCE_TOKEN);
-        session.setGroups(GROUP_0);
-        List<Integer> result = JWTPermissionsServiceImpl.convertGroupsToTeams(session);
+        Session mocksession = new Session();
+        mocksession.setEmail("dartagnan@strangerThings.com");
+        mocksession.setId(FLORENCE_TOKEN);
+        mocksession.setGroups(GROUP_0d);
+        List<Integer> result = JWTPermissionsServiceImpl.convertGroupsToTeams(mocksession);
         assertTrue(result.isEmpty());
+    }
+
+    @Test
+    public void convertGroupsToTeams_SessionNull_ShouldError() throws Exception {
+        String expectedMessage = "JWT Permissions service error for convertGroupsToTeams no groups ";
+        Session session = null;
+        IOException ex = assertThrows(IOException.class, () ->
+                JWTPermissionsServiceImpl.convertGroupsToTeams(session));
+        MatcherAssert.assertThat(ex.getMessage(), equalTo(expectedMessage));
     }
 
     @Test
     public void convertGroupsToTeams_GroupNull_ShouldError() throws Exception {
         String expectedMessage = "JWT Permissions service error for convertGroupsToTeams no groups ";
         Session session = new Session();
-        IOException ex = assertThrows(IOException.class, () -> 
-            JWTPermissionsServiceImpl.convertGroupsToTeams(session));
+        IOException ex = assertThrows(IOException.class, () ->
+                JWTPermissionsServiceImpl.convertGroupsToTeams(session));
         MatcherAssert.assertThat(ex.getMessage(), equalTo(expectedMessage));
     }
 
@@ -411,8 +495,8 @@ public class JWTPermissionsServiceImplTest {
         Session mocksession = new Session();
         IOException ex = assertThrows(IOException.class, () ->
                 JWTPermissionsServiceImpl.convertGroupsToTeams(mocksession));
-                MatcherAssert.assertThat(ex.getMessage(), equalTo(expectedMessage));
-            }
+        MatcherAssert.assertThat(ex.getMessage(), equalTo(expectedMessage));
+    }
 
     @Test
     public void convertGroupsToTeams_exceptionTesting_empty_sessiongroup() throws Exception {
@@ -422,9 +506,72 @@ public class JWTPermissionsServiceImplTest {
         mocksession.setId(FLORENCE_TOKEN);
         IOException ex = assertThrows(IOException.class, () ->
                 JWTPermissionsServiceImpl.convertGroupsToTeams(mocksession));
-                MatcherAssert.assertThat(ex.getMessage(), equalTo(expectedMessage));
-            }
+        MatcherAssert.assertThat(ex.getMessage(), equalTo(expectedMessage));
+    }
 
+    @Test
+    public void convertTeamsListStringToListInteger() throws Exception {
+        CollectionDescription collectionDescriptionMock = new CollectionDescription();
+        collectionDescriptionMock.setId("1234");
+        collectionDescriptionMock.setTeams(Arrays.asList(GROUP_0));
+        List<Integer> result = JWTPermissionsServiceImpl.convertTeamsListStringToListInteger(collectionDescriptionMock);
+        assertTrue(result.stream().anyMatch(c -> c.equals(123456)));
+        assertTrue(result.stream().anyMatch(c -> c.equals(789012345)));
+        assertFalse(result.stream().anyMatch(c -> c.equals("role-publisher")));
+        assertFalse(result.stream().anyMatch(c -> c.equals("role-admin")));
+        assertFalse(result.stream().anyMatch(c -> c.equals("testgroup0")));
+    }
+
+    @Test
+    public void convertTeamsListStringToListInteger_returnEmptylist() throws Exception {
+        CollectionDescription collectionDescriptionMock = new CollectionDescription();
+        collectionDescriptionMock.setId("1234");
+        collectionDescriptionMock.setTeams(Arrays.asList(GROUP_0d));
+        List<Integer> result = JWTPermissionsServiceImpl.convertTeamsListStringToListInteger(collectionDescriptionMock);
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    public void convertTeamsListStringToListInteger_CollectionDescriptionNull_ShouldError() throws Exception {
+        String expectedMessage = "JWT Permissions service error for convertTeamsListStringToListInteger no teams ";
+        CollectionDescription collectionDescriptionMock = null;
+        IOException ex = assertThrows(IOException.class, () ->
+                JWTPermissionsServiceImpl.convertTeamsListStringToListInteger(collectionDescriptionMock));
+        MatcherAssert.assertThat(ex.getMessage(), equalTo(expectedMessage));
+    }
+
+
+    @Test
+    public void convertTeamsListStringToListInteger_CollectionDescriptionTeamNull_ShouldError() throws Exception {
+        String expectedMessage = "JWT Permissions service error for convertTeamsListStringToListInteger no teams ";
+        CollectionDescription collectionDescriptionMock = new CollectionDescription();
+        collectionDescriptionMock.setId("1234");
+        collectionDescriptionMock.setTeams(null);
+        IOException ex = assertThrows(IOException.class, () ->
+                JWTPermissionsServiceImpl.convertTeamsListStringToListInteger(collectionDescriptionMock));
+        MatcherAssert.assertThat(ex.getMessage(), equalTo(expectedMessage));
+    }
+
+    @Test
+    public void convertTeamsListStringToListInteger_exceptionTesting_empty_CollectionDescription() throws Exception {
+        String expectedMessage = "JWT Permissions service error for convertTeamsListStringToListInteger no teams ";
+        CollectionDescription collectionDescriptionMock = new CollectionDescription();
+        IOException ex = assertThrows(IOException.class, () ->
+                JWTPermissionsServiceImpl.convertTeamsListStringToListInteger(collectionDescriptionMock));
+        MatcherAssert.assertThat(ex.getMessage(), equalTo(expectedMessage));
+    }
+
+    @Test
+    public void convertTeamsListStringToListInteger_exceptionTesting_empty_sessiongroup() throws Exception {
+        String expectedMessage = "JWT Permissions service error for convertTeamsListStringToListInteger no teams ";
+        CollectionDescription collectionDescriptionMock = new CollectionDescription();
+        collectionDescriptionMock.setId("1234");
+        List<String> mockList = new ArrayList<String>();
+        collectionDescriptionMock.setTeams(mockList);
+        IOException ex = assertThrows(IOException.class, () ->
+                JWTPermissionsServiceImpl.convertTeamsListStringToListInteger(collectionDescriptionMock));
+        MatcherAssert.assertThat(ex.getMessage(), equalTo(expectedMessage));
+    }
 
 }
 

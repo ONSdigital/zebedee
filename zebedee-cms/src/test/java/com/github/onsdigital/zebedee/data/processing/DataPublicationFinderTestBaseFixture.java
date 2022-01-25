@@ -45,11 +45,11 @@ public class DataPublicationFinderTestBaseFixture extends ZebedeeTestBaseFixture
 
     public void setUp() throws Exception {
         secretKey = Keys.newSecretKey();
-        setUpKeyringMockForLegacyTests(zebedee, builder.publisher1, secretKey);
 
         publisher = zebedee.openSession(builder.publisher1Credentials);
         reviewer = zebedee.openSession(builder.reviewer1Credentials);
 
+        setUpKeyringMockForLegacyTests(zebedee, publisher, secretKey);
         setUpPermissionsServiceMockForLegacyTests(zebedee, publisher);
 
         dataBuilder = new DataBuilder(zebedee, publisher, reviewer);

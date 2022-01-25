@@ -1,5 +1,6 @@
 package com.github.onsdigital.zebedee;
 
+import com.github.davidcarboni.restolino.framework.Priority;
 import com.github.davidcarboni.restolino.framework.Startup;
 import com.github.onsdigital.logging.v2.DPLogger;
 import com.github.onsdigital.logging.v2.Logger;
@@ -16,11 +17,13 @@ import com.github.onsdigital.zebedee.model.ZebedeeCollectionReaderFactory;
 import com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDaoFactory;
 import com.github.onsdigital.zebedee.reader.ZebedeeReader;
 
-import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
+import static com.github.onsdigital.zebedee.logging.CMSLogEvent.error;
+import static com.github.onsdigital.zebedee.logging.CMSLogEvent.info;
 
 /**
  * Created by bren on 31/07/15.
  */
+@Priority(2)
 public class Init implements Startup {
 
     private static final String FORMAT_LOGS_KEY = "FORMAT_LOGGING";
@@ -42,14 +45,21 @@ public class Init implements Startup {
             System.exit(1);
         }
 
+        info().log("initialising Zebedee CMS");
+
         info().log("loading CMS feature flags");
         CMSFeatureFlags.cmsFeatureFlags();
 
-        Root.init();
-        ZebedeeReader.setCollectionReaderFactory(new ZebedeeCollectionReaderFactory(Root.zebedee));
+        try {
+            Root.init();
+            ZebedeeReader.setCollectionReaderFactory(new ZebedeeCollectionReaderFactory(Root.zebedee));
+            CollectionHistoryDaoFactory.initialise();
+        } catch (Exception ex) {
+            error().exception(ex).log("CMS start up failed with error, exiting application");
+            System.exit(1);
+        }
 
-        CollectionHistoryDaoFactory.initialise();
-        info().log("zebedee cms start up completed");
+        info().log("zebedee cms start up completed successfully");
     }
 
     private LogSerialiser getLogSerialiser() {

@@ -220,7 +220,7 @@ public class Collections {
 
         CollectionHistoryEvent historyEvent = new CollectionHistoryEvent(collection, session, null, uri);
         // Attempt to complete:
-        if (collection.complete(session.getEmail(), uri, recursive)) {
+        if (collection.complete(session, uri, recursive)) {
             removeEmptyCollectionDirectories(path);
             collection.save();
             collectionHistoryDaoSupplier.get().saveCollectionHistoryEvent(historyEvent.eventType
@@ -654,7 +654,7 @@ public class Collections {
         // Create / edit
         if (path == null) {
             // create the file
-            if (!collection.create(session.getEmail(), uri)) {
+            if (!collection.create(session, uri)) {
                 // file may be being edited in a different collection
                 Optional<Collection> otherCollection = zebedeeSupplier.get().checkForCollectionBlockingChange(uri);
                 if (otherCollection.isPresent()) {
@@ -666,7 +666,7 @@ public class Collections {
             }
         } else {
             // edit the file
-            boolean result = collection.edit(session.getEmail(), uri, collectionWriter, recursive);
+            boolean result = collection.edit(session, uri, collectionWriter, recursive);
             if (!result) {
                 // file may be being edited in a different collection
                 Optional<Collection> otherCollection = zebedeeSupplier.get().checkForCollectionBlockingChange(uri);

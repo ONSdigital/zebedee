@@ -3,16 +3,8 @@ package com.github.onsdigital.zebedee.model;
 import com.github.davidcarboni.cryptolite.Keys;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.data.json.DirectoryListing;
-import com.github.onsdigital.zebedee.exceptions.BadRequestException;
-import com.github.onsdigital.zebedee.exceptions.ConflictException;
-import com.github.onsdigital.zebedee.exceptions.NotFoundException;
-import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
-import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
-import com.github.onsdigital.zebedee.json.ApprovalStatus;
-import com.github.onsdigital.zebedee.json.CollectionDescription;
-import com.github.onsdigital.zebedee.json.CollectionType;
-import com.github.onsdigital.zebedee.json.Event;
-import com.github.onsdigital.zebedee.json.EventType;
+import com.github.onsdigital.zebedee.exceptions.*;
+import com.github.onsdigital.zebedee.json.*;
 import com.github.onsdigital.zebedee.keyring.CollectionKeyring;
 import com.github.onsdigital.zebedee.model.approval.ApproveTask;
 import com.github.onsdigital.zebedee.model.encryption.EncryptionKeyFactory;
@@ -64,17 +56,8 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasSize;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 
 /**
  * Created by dave on 19/05/2017.
@@ -430,8 +413,8 @@ public class CollectionsTest {
             verify(collectionMock, times(2)).getDescription();
             verifyZeroInteractions(permissionsServiceMock);
             verify(collectionMock, never()).find(anyString());
-            verify(collectionMock, never()).create(anyString(), anyString());
-            verify(collectionMock, never()).edit(anyString(), anyString(), eq(collectionWriterMock), anyBoolean());
+            verify(collectionMock, never()).create(any(Session.class), anyString());
+            verify(collectionMock, never()).edit(any(Session.class), anyString(), eq(collectionWriterMock), anyBoolean());
             throw e;
         }
     }
@@ -463,7 +446,7 @@ public class CollectionsTest {
             verify(permissionsServiceMock, times(1)).canEdit(sessionMock);
             verify(collectionMock, times(1)).getInProgress();
             verify(inProg, times(1)).get(anyString());
-            verify(collectionMock, never()).complete(anyString(), anyString(), anyBoolean());
+            verify(collectionMock, never()).complete(any(Session.class), anyString(), anyBoolean());
             verify(collectionMock, never()).save();
             throw e;
         }
@@ -488,7 +471,7 @@ public class CollectionsTest {
             verify(permissionsServiceMock, times(1)).canEdit(sessionMock);
             verify(collectionMock, times(1)).getInProgress();
             verify(inProg, times(1)).get(uri);
-            verify(collectionMock, never()).complete(anyString(), anyString(), anyBoolean());
+            verify(collectionMock, never()).complete(any(Session.class), anyString(), anyBoolean());
             verify(collectionMock, never()).save();
             throw e;
         }
@@ -510,7 +493,7 @@ public class CollectionsTest {
                 .thenReturn("AGirlIsNoOne");
         when(collectionDescriptionMock.getId())
                 .thenReturn("1234567890");
-        when(collectionMock.complete(TEST_EMAIL, p.toString(), false))
+        when(collectionMock.complete(sessionMock, p.toString(), false))
                 .thenReturn(true);
 
         collections.complete(collectionMock, p.toString(), sessionMock, false);
@@ -518,7 +501,7 @@ public class CollectionsTest {
         verify(permissionsServiceMock, times(1)).canEdit(sessionMock);
         verify(collectionMock, times(1)).getInProgress();
         verify(inProg, times(1)).get(p.toString());
-        verify(collectionMock, times(1)).complete(TEST_EMAIL, p.toString(), false);
+        verify(collectionMock, times(1)).complete(sessionMock, p.toString(), false);
         verify(collectionMock, times(1)).save();
         verify(collectionHistoryDaoMock, times(1)).saveCollectionHistoryEvent(any(CollectionHistoryEvent.class));
     }
@@ -538,7 +521,7 @@ public class CollectionsTest {
                 .thenReturn("AGirlIsNoOne");
         when(collectionDescriptionMock.getId())
                 .thenReturn("1234567890");
-        when(collectionMock.complete(TEST_EMAIL, p.toString(), false))
+        when(collectionMock.complete(sessionMock, p.toString(), false))
                 .thenReturn(false);
 
         try {
@@ -547,7 +530,7 @@ public class CollectionsTest {
             verify(permissionsServiceMock, times(1)).canEdit(sessionMock);
             verify(collectionMock, times(1)).getInProgress();
             verify(inProg, times(1)).get(p.toString());
-            verify(collectionMock, times(1)).complete(TEST_EMAIL, p.toString(), false);
+            verify(collectionMock, times(1)).complete(sessionMock, p.toString(), false);
             verify(collectionMock, never()).save();
             throw e;
         }
@@ -865,8 +848,8 @@ public class CollectionsTest {
             verify(collectionDescriptionMock, times(1)).getApprovalStatus();
             verify(collectionMock, times(1)).find(uri.toString());
             verify(collectionMock, never()).save();
-            verify(collectionMock, never()).edit(anyString(), anyString(), any(), anyBoolean());
-            verify(collectionMock, never()).create(anyString(), anyString());
+            verify(collectionMock, never()).edit(any(Session.class), anyString(), any(), anyBoolean());
+            verify(collectionMock, never()).create(any(Session.class), anyString());
             verify(collectionMock, never()).getInProgressPath(anyString());
             verify(collectionWriterMock, never()).getInProgress();
             throw e;
@@ -885,7 +868,7 @@ public class CollectionsTest {
                 .thenReturn(ApprovalStatus.IN_PROGRESS);
         when(collectionMock.find(uri.toString()))
                 .thenReturn(null);
-        when(collectionMock.edit(TEST_EMAIL, uri.toString(), collectionWriterMock, false))
+        when(collectionMock.edit(sessionMock, uri.toString(), collectionWriterMock, false))
                 .thenReturn(false);
         when(zebedeeMock.checkForCollectionBlockingChange(uri.toString()))
                 .thenReturn(Optional.empty());
@@ -896,10 +879,10 @@ public class CollectionsTest {
             verify(collectionReaderWriterFactoryMock, times(1)).getWriter(zebedeeMock, collectionMock, sessionMock);
             verify(collectionDescriptionMock, times(1)).getApprovalStatus();
             verify(collectionMock, times(1)).find(uri.toString());
-            verify(collectionMock, times(1)).edit(TEST_EMAIL, uri.toString(), collectionWriterMock, false);
+            verify(collectionMock, times(1)).edit(sessionMock, uri.toString(), collectionWriterMock, false);
             verify(collectionMock, never()).save();
-            verify(collectionMock, never()).create(anyString(), anyString());
-            verify(collectionMock, never()).edit(anyString(), anyString(), any(), anyBoolean());
+            verify(collectionMock, never()).create(any(Session.class), anyString());
+            verify(collectionMock, never()).edit(any(Session.class), anyString(), any(), anyBoolean());
             verify(collectionMock, never()).getInProgressPath(anyString());
             verify(collectionWriterMock, never()).getInProgress();
             throw e;
@@ -917,7 +900,7 @@ public class CollectionsTest {
                 .thenReturn(ApprovalStatus.IN_PROGRESS);
         when(collectionMock.find(uri.toString()))
                 .thenReturn(uri);
-        when(collectionMock.edit(TEST_EMAIL, uri.toString(), collectionWriterMock, false))
+        when(collectionMock.edit(sessionMock, uri.toString(), collectionWriterMock, false))
                 .thenReturn(false);
         when(zebedeeMock.checkForCollectionBlockingChange(uri.toString()))
                 .thenReturn(Optional.empty());
@@ -928,10 +911,10 @@ public class CollectionsTest {
             verify(collectionReaderWriterFactoryMock, times(1)).getWriter(zebedeeMock, collectionMock, sessionMock);
             verify(collectionDescriptionMock, times(1)).getApprovalStatus();
             verify(collectionMock, times(1)).find(uri.toString());
-            verify(collectionMock, times(1)).edit(TEST_EMAIL, uri.toString(), collectionWriterMock, false);
+            verify(collectionMock, times(1)).edit(sessionMock, uri.toString(), collectionWriterMock, false);
             verify(collectionMock, never()).save();
-            verify(collectionMock, never()).create(anyString(), anyString());
-            verify(collectionMock, never()).edit(anyString(), anyString(), any(), anyBoolean());
+            verify(collectionMock, never()).create(any(Session.class), anyString());
+            verify(collectionMock, never()).edit(any(Session.class), anyString(), any(), anyBoolean());
             verify(collectionMock, never()).getInProgressPath(anyString());
             verify(collectionWriterMock, never()).getInProgress();
             throw e;
@@ -949,7 +932,7 @@ public class CollectionsTest {
                 .thenReturn(ApprovalStatus.IN_PROGRESS);
         when(collectionMock.find(uri.toString()))
                 .thenReturn(uri);
-        when(collectionMock.edit(TEST_EMAIL, uri.toString(), collectionWriterMock, false))
+        when(collectionMock.edit(sessionMock, uri.toString(), collectionWriterMock, false))
                 .thenReturn(true);
         when(collectionMock.getInProgressPath(uri.toString()))
                 .thenReturn(uri);
@@ -962,9 +945,9 @@ public class CollectionsTest {
         verify(collectionReaderWriterFactoryMock, times(1)).getWriter(zebedeeMock, collectionMock, sessionMock);
         verify(collectionDescriptionMock, times(1)).getApprovalStatus();
         verify(collectionMock, times(1)).find(uri.toString());
-        verify(collectionMock, times(1)).edit(TEST_EMAIL, uri.toString(), collectionWriterMock, false);
+        verify(collectionMock, times(1)).edit(sessionMock, uri.toString(), collectionWriterMock, false);
         verify(collectionMock, times(1)).save();
-        verify(collectionMock, never()).create(anyString(), anyString());
+        verify(collectionMock, never()).create(any(Session.class), anyString());
         verify(collectionMock, times(1)).getInProgressPath(uri.toString());
         verify(collectionWriterMock, times(1)).getInProgress();
         verify(contentWriterMock, times(1)).write(in, uri.toString());

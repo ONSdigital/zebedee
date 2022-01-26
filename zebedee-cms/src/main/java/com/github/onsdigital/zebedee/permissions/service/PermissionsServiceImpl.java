@@ -15,7 +15,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
@@ -33,7 +33,9 @@ import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMet
 public class PermissionsServiceImpl implements PermissionsService {
 
     private PermissionsStore permissionsStore;
-    private ReadWriteLock accessMappingLock = new ReentrantReadWriteLock();
+    private ReentrantReadWriteLock readWriteLock = new ReentrantReadWriteLock();
+    private final Lock readLock = readWriteLock.readLock();
+    private final Lock writeLock = readWriteLock.writeLock();
     private ServiceSupplier<TeamsService> teamsServiceSupplier;
 
     /**
@@ -59,10 +61,18 @@ public class PermissionsServiceImpl implements PermissionsService {
             return false;
         }
 
-        AccessMapping accessMapping = permissionsStore.getAccessMapping();
+        boolean result = false;
+        readLock.lock();
+        try {
+            AccessMapping accessMapping = permissionsStore.getAccessMapping();
 
-        return accessMapping.getDigitalPublishingTeam() != null && accessMapping.getDigitalPublishingTeam()
-                .contains(standardise(session.getEmail()));
+            result = accessMapping.getDigitalPublishingTeam() != null && accessMapping.getDigitalPublishingTeam()
+                    .contains(standardise(session.getEmail()));
+        } finally {
+            readLock.unlock();
+        }
+
+        return result;
     }
 
     /**
@@ -78,10 +88,19 @@ public class PermissionsServiceImpl implements PermissionsService {
             return false;
         }
 
-        AccessMapping accessMapping = permissionsStore.getAccessMapping();
+        boolean result = false;
+        readLock.lock();
+        try {
 
-        return accessMapping.getAdministrators() != null && accessMapping.getAdministrators()
-                .contains(standardise(session.getEmail()));
+            AccessMapping accessMapping = permissionsStore.getAccessMapping();
+
+            result = accessMapping.getAdministrators() != null && accessMapping.getAdministrators()
+                    .contains(standardise(session.getEmail()));
+        } finally {
+            readLock.unlock();
+        }
+
+        return result;
     }
 
     /**
@@ -92,8 +111,16 @@ public class PermissionsServiceImpl implements PermissionsService {
      */
     @Override
     public boolean hasAdministrator() throws IOException {
-        AccessMapping accessMapping = permissionsStore.getAccessMapping();
-        return accessMapping.getAdministrators() != null && !accessMapping.getAdministrators().isEmpty();
+        boolean result = false;
+        readLock.lock();
+        try {
+            AccessMapping accessMapping = permissionsStore.getAccessMapping();
+            result = accessMapping.getAdministrators() != null && !accessMapping.getAdministrators().isEmpty();
+        } finally {
+            readLock.unlock();
+        }
+
+        return result;
     }
 
     /**
@@ -112,12 +139,17 @@ public class PermissionsServiceImpl implements PermissionsService {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
-        AccessMapping accessMapping = permissionsStore.getAccessMapping();
-        if (accessMapping.getAdministrators() == null) {
-            accessMapping.setAdministrators(new HashSet<>());
+        writeLock.lock();
+        try {
+            AccessMapping accessMapping = permissionsStore.getAccessMapping();
+            if (accessMapping.getAdministrators() == null) {
+                accessMapping.setAdministrators(new HashSet<>());
+            }
+            accessMapping.getAdministrators().add(standardise(email));
+            permissionsStore.saveAccessMapping(accessMapping);
+        } finally {
+            writeLock.unlock();
         }
-        accessMapping.getAdministrators().add(standardise(email));
-        permissionsStore.saveAccessMapping(accessMapping);
     }
 
     /**
@@ -132,12 +164,17 @@ public class PermissionsServiceImpl implements PermissionsService {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
-        AccessMapping accessMapping = permissionsStore.getAccessMapping();
-        if (accessMapping.getAdministrators() == null) {
-            accessMapping.setAdministrators(new HashSet<>());
+        writeLock.lock();
+        try {
+            AccessMapping accessMapping = permissionsStore.getAccessMapping();
+            if (accessMapping.getAdministrators() == null) {
+                accessMapping.setAdministrators(new HashSet<>());
+            }
+            accessMapping.getAdministrators().remove(standardise(email));
+            permissionsStore.saveAccessMapping(accessMapping);
+        } finally {
+            writeLock.unlock();
         }
-        accessMapping.getAdministrators().remove(standardise(email));
-        permissionsStore.saveAccessMapping(accessMapping);
     }
 
     /**
@@ -153,8 +190,16 @@ public class PermissionsServiceImpl implements PermissionsService {
             return false;
         }
 
-        AccessMapping accessMapping = permissionsStore.getAccessMapping();
-        return canEdit(session.getEmail(), accessMapping);
+        boolean result = false;
+        readLock.lock();
+        try {
+            AccessMapping accessMapping = permissionsStore.getAccessMapping();
+            result = canEdit(session.getEmail(), accessMapping);
+        } finally {
+            readLock.unlock();
+        }
+
+        return result;
     }
 
     /**
@@ -169,9 +214,14 @@ public class PermissionsServiceImpl implements PermissionsService {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
-        AccessMapping accessMapping = permissionsStore.getAccessMapping();
-        accessMapping.getDigitalPublishingTeam().add(PathUtils.standardise(email));
-        permissionsStore.saveAccessMapping(accessMapping);
+        writeLock.lock();
+        try {
+            AccessMapping accessMapping = permissionsStore.getAccessMapping();
+            accessMapping.getDigitalPublishingTeam().add(PathUtils.standardise(email));
+            permissionsStore.saveAccessMapping(accessMapping);
+        } finally {
+            writeLock.unlock();
+        }
     }
 
 
@@ -188,9 +238,14 @@ public class PermissionsServiceImpl implements PermissionsService {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
-        AccessMapping accessMapping = permissionsStore.getAccessMapping();
-        accessMapping.getDigitalPublishingTeam().remove(PathUtils.standardise(email));
-        permissionsStore.saveAccessMapping(accessMapping);
+        writeLock.lock();
+        try {
+            AccessMapping accessMapping = permissionsStore.getAccessMapping();
+            accessMapping.getDigitalPublishingTeam().remove(PathUtils.standardise(email));
+            permissionsStore.saveAccessMapping(accessMapping);
+        } finally {
+            writeLock.unlock();
+        }
     }
 
     /**
@@ -208,20 +263,25 @@ public class PermissionsServiceImpl implements PermissionsService {
             return false;
         }
 
+        boolean result = false;
+        readLock.lock();
         try {
             AccessMapping accessMapping = permissionsStore.getAccessMapping();
-            return canEdit(session.getEmail(), accessMapping) || canView(session.getEmail(), collectionId, accessMapping);
+            result = canEdit(session.getEmail(), accessMapping) || canView(session.getEmail(), collectionId, accessMapping);
         } catch (IOException e) {
             error().data("collectionId", collectionId).data("user", session.getEmail())
                     .logException(e, "canView permission request denied: unexpected error");
+        } finally {
+            readLock.unlock();
         }
-        return false;
+
+        return result;
     }
 
     /**
      * Provide a list of team ID's currently associated with a collection
      *
-     *  @param collectionDescription
+     * @param collectionDescription
      * @param session
      * @return
      * @throws IOException
@@ -233,9 +293,16 @@ public class PermissionsServiceImpl implements PermissionsService {
              throw new UnauthorizedException(getUnauthorizedMessage(session));
          }
 
-         AccessMapping accessMapping = permissionsStore.getAccessMapping();
-         Set<Integer> teamIds = accessMapping.getCollections().get(collectionId);
-         if (teamIds == null) teamIds = new HashSet<>();
+         boolean result = false;
+         readLock.lock();
+         Set<Integer> teamIds;
+         try {
+             AccessMapping accessMapping = permissionsStore.getAccessMapping();
+             teamIds = accessMapping.getCollections().get(collectionId);
+             if (teamIds == null) teamIds = new HashSet<>();
+         } finally {
+             readLock.unlock();
+         }
 
          return java.util.Collections.unmodifiableSet(teamIds);
      }
@@ -260,13 +327,13 @@ public class PermissionsServiceImpl implements PermissionsService {
             collectionTeams = new HashSet<>();
         }
 
-        accessMappingLock.readLock().lock();
+        writeLock.lock();
         try {
             AccessMapping accessMapping = permissionsStore.getAccessMapping();
             accessMapping.getCollections().put(collectionID, collectionTeams);
             permissionsStore.saveAccessMapping(accessMapping);
         } finally {
-            accessMappingLock.readLock().unlock();
+            writeLock.unlock();
         }
 
         getCollectionHistoryDao().saveCollectionHistoryEvent(collectionName, collectionID, session, COLLECTION_VIEWER_TEAMS_UPDATED, teamsUpdated(collectionTeams));
@@ -289,7 +356,13 @@ public class PermissionsServiceImpl implements PermissionsService {
             throws IOException {
 
         // Check to see if the email is a member of a team associated with the given collection:
-        Set<Integer> teamIds = accessMapping.getCollections().get(collectionId);
+        Set<Integer> teamIds;
+        readLock.lock();
+        try {
+            teamIds = accessMapping.getCollections().get(collectionId);
+        } finally {
+            readLock.unlock();
+        }
         if (teamIds == null) {
             return false;
         }

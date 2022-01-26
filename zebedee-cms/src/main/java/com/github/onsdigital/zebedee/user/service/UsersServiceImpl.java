@@ -210,7 +210,7 @@ public class UsersServiceImpl implements UsersService {
         if (!userStore.exists(user.getEmail())) {
             throw new NotFoundException("User " + user.getEmail() + " could not be found");
         }
-        return update(user, updatedUser, session);
+        return update(user, updatedUser, session.getEmail());
     }
 
     @Override
@@ -248,7 +248,7 @@ public class UsersServiceImpl implements UsersService {
         }
     }
 
-    private User update(User user, User updatedUser, Session session) throws IOException {
+    private User update(User user, User updatedUser, String lastAdmin) throws IOException {
         lock.lock();
         try {
             if (user != null) {
@@ -267,7 +267,7 @@ public class UsersServiceImpl implements UsersService {
                     }
                 }
 
-                user.setLastAdmin(session.getEmail());
+                user.setLastAdmin(lastAdmin);
                 userStore.save(user);
             }
             return user;

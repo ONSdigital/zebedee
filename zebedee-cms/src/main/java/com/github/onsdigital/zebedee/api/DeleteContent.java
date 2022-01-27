@@ -47,7 +47,7 @@ public class DeleteContent {
                 deleteMarkerJson.getCollectionId());
         Session session = zebedeeCmsService.getSession(request);
 
-        if (!zebedeeCmsService.getPermissions().canView(session, collection.description.getId())) {
+        if (!zebedeeCmsService.getPermissions().canView(session, collection.getDescription().getId())) {
             return new DeleteContentResponse(HttpStatus.SC_UNAUTHORIZED);
         }
 
@@ -63,7 +63,7 @@ public class DeleteContent {
         com.github.onsdigital.zebedee.model.Collection collection = zebedeeCmsService.getCollection(request);
         Session session = zebedeeCmsService.getSession(request);
 
-        if (zebedeeCmsService.getPermissions().canView(session, collection.description.getId())) {
+        if (zebedeeCmsService.getPermissions().canView(session, collection.getDescription().getId())) {
             return new DeleteContentResponse(HttpStatus.SC_UNAUTHORIZED);
         }
 
@@ -88,7 +88,7 @@ public class DeleteContent {
         com.github.onsdigital.zebedee.model.Collection collection = zebedeeCmsService.getCollection(request);
         Session session = zebedeeCmsService.getSession(request);
 
-        if (!zebedeeCmsService.getPermissions().canView(session, collection.description.getId())) {
+        if (!zebedeeCmsService.getPermissions().canView(session, collection.getDescription().getId())) {
             return new DeleteContentResponse(HttpStatus.SC_UNAUTHORIZED);
         }
 

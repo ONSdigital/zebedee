@@ -171,7 +171,7 @@ public class Zebedee {
         Path searchValue = Paths.get(uri);
 
         for (Collection collection : collections.list()) {
-            if (collection.description.getPendingDeletes()
+            if (collection.getDescription().getPendingDeletes()
                     .stream()
                     .filter(existingDeleteRoot -> searchValue.startsWith(Paths.get(existingDeleteRoot.getRoot()
                             .contentPath)))

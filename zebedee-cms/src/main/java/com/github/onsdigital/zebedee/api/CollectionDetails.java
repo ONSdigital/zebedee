@@ -108,7 +108,7 @@ public class CollectionDetails {
         addEventsForDetails(result.complete, collection);
         addEventsForDetails(result.reviewed, collection);
 
-        Set<Integer> teamIds = zebedeeCmsService.getPermissions().listViewerTeams(session, collection.description.getId());
+        Set<Integer> teamIds = zebedeeCmsService.getPermissions().listViewerTeams(session, collection.getDescription().getId());
         result.teamsDetails = zebedeeCmsService.getZebedee().getTeamsService().resolveTeamDetails(teamIds);
         result.teamsDetails.forEach(team -> collection.getDescription().getTeams().add(team.getName()));
 

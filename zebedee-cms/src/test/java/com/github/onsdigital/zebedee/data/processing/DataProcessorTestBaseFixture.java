@@ -97,7 +97,7 @@ public class DataProcessorTestBaseFixture extends ZebedeeTestBaseFixture {
 
         collection = Collection.create(collectionDescription, zebedee, publisher);
 
-        publishedReader = new FileSystemContentReader(zebedee.getPublished().path);
+        publishedReader = new FileSystemContentReader(zebedee.getPublished().getPath());
         collectionReader = new ZebedeeCollectionReader(zebedee, collection, publisher);
         collectionWriter = new ZebedeeCollectionWriter(zebedee, collection, publisher);
 

@@ -144,7 +144,7 @@ public class PublishScheduler extends Scheduler {
 
             Set<CollectionBase> collectionData = new HashSet<>();
             for (Collection collection : collections) {
-                collectionData.add(collection.description);
+                collectionData.add(collection.getDescription());
             }
             data.collections = collectionData;
 

@@ -31,7 +31,7 @@ public class ManifestTest extends ZebedeeTestBaseFixture {
         Path path = Manifest.getManifestPath(collection);
 
         // Then the expected path is returned
-        assertEquals(collection.path.resolve(Manifest.filename), path);
+        assertEquals(collection.getPath().resolve(Manifest.filename), path);
     }
 
     @Test

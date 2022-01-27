@@ -42,7 +42,6 @@ import com.github.onsdigital.zebedee.teams.service.TeamsService;
 import com.github.onsdigital.zebedee.util.versioning.VersionsService;
 import com.github.onsdigital.zebedee.util.versioning.VersionsServiceImpl;
 import com.google.common.annotations.VisibleForTesting;
-import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -57,7 +56,6 @@ import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.sql.Array;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -112,13 +110,13 @@ public class Collection {
 
     private static ConcurrentMap<Path, ReadWriteLock> collectionLocks = new ConcurrentHashMap<>();
 
-    public final CollectionDescription description;
-    public final Path path;
+    private final CollectionDescription description;
+    private final Path path;
     private final Content reviewed;
     private final Content complete;
     private final Content inProgress;
 
-    public final Zebedee zebedee;
+    private final Zebedee zebedee;
 
     private final Path collectionJsonPath;
     private VersionsService versionsService;
@@ -199,7 +197,7 @@ public class Collection {
         collectionDescription.setId(filename + "-" + Random.id());
 
         // Create the folders:
-        Path rootCollectionsPath = zebedee.getCollections().path;
+        Path rootCollectionsPath = zebedee.getCollections().getPath();
 
         CreateCollectionFolders(filename, rootCollectionsPath);
 
@@ -377,15 +375,15 @@ public class Collection {
     }
 
     private static Path getCollectionPath(Zebedee zebedee, String name) {
-        return zebedee.getCollections().path.resolve(name);
+        return zebedee.getCollections().getPath().resolve(name);
     }
 
     private static Path getCollectionJsonPath(Zebedee zebedee, String name) {
-        return zebedee.getCollections().path.resolve(name + ".json");
+        return zebedee.getCollections().getPath().resolve(name + ".json");
     }
 
     private static Release getPublishedRelease(String uri, Zebedee zebedee) throws IOException, ZebedeeException {
-        Release release = (Release) new ZebedeeReader(zebedee.getPublished().path.toString(), null).getPublishedContent(uri);
+        Release release = (Release) new ZebedeeReader(zebedee.getPublished().getPath().toString(), null).getPublishedContent(uri);
         return release;
     }
 
@@ -432,7 +430,7 @@ public class Collection {
                 && updatedCollection.getDescription().getType() != collectionDescription.getType()) {
             updatedCollection.getDescription().setType(collectionDescription.getType());
             collectionHistoryDaoServiceSupplier.getService().saveCollectionHistoryEvent(collection, session, COLLECTION_TYPE_CHANGED, typeChanged
-                    (updatedCollection.description));
+                    (updatedCollection.getDescription()));
         }
 
         if (updatedCollection.getDescription().getType() == CollectionType.scheduled) {
@@ -1234,7 +1232,7 @@ public class Collection {
             throw new NotFoundException(String.format("The given URI %s was not found - it has not been published.", uri));
         }
 
-        ContentReader contentReader = new FileSystemContentReader(zebedee.getPublished().path);
+        ContentReader contentReader = new FileSystemContentReader(zebedee.getPublished().getPath());
 
         VersionedContentItem versionedContentItem = new VersionedContentItem(uri);
 
@@ -1242,7 +1240,7 @@ public class Collection {
             throw new ConflictException("A previous version of this file already exists");
         }
 
-        ContentItemVersion version = versionedContentItem.createVersion(zebedee.getPublished().path, contentReader, collectionWriter.getReviewed());
+        ContentItemVersion version = versionedContentItem.createVersion(zebedee.getPublished().getPath(), contentReader, collectionWriter.getReviewed());
         addEvent(uri, new Event(new Date(), EventType.VERSIONED, email, version.getIdentifier()));
         return version;
     }

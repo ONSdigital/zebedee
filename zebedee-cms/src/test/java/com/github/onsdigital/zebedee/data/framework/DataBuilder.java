@@ -70,7 +70,7 @@ public class DataBuilder {
         String publishTo = uri;
         if (publishTo.startsWith("/"))
             publishTo = publishTo.substring(1);
-        ContentWriter writer = new ContentWriter(zebedee.getPublished().path);
+        ContentWriter writer = new ContentWriter(zebedee.getPublished().getPath());
 
         writer.writeObject(page, publishTo + "/data.json");
     }

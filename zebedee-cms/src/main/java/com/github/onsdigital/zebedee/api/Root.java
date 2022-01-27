@@ -178,7 +178,7 @@ public class Root {
 
     public static void cancelPublish(Collection collection) {
         try {
-            info().data("collection_id", collection.description.getId())
+            info().data("collection_id", collection.getDescription().getId())
                     .data("type", collection.getDescription().getType().name())
                     .log("zebedee root: cancelling scheduled collection publish");
             scheduler.cancel(collection);
@@ -203,7 +203,7 @@ public class Root {
         // Copy to the master and launchpad content directories
         for (Path item : content) {
             Path source = taxonomy.resolve(item);
-            Path masterDestination = zebedee.getPublished().path.resolve(item);
+            Path masterDestination = zebedee.getPublished().getPath().resolve(item);
             Files.createDirectories(masterDestination.getParent());
             try (InputStream input = Files.newInputStream(source);
                  OutputStream output = Files.newOutputStream(masterDestination)) {

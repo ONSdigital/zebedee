@@ -241,7 +241,7 @@ public class Collection {
         Audit.Event.COLLECTION_UPDATED
                 .parameters()
                 .host(request)
-                .fromTo(collection.path.toString(), updatedCollection.path.toString())
+                .fromTo(collection.getPath().toString(), updatedCollection.getPath().toString())
                 .actionedBy(session.getEmail())
                 .log();
 

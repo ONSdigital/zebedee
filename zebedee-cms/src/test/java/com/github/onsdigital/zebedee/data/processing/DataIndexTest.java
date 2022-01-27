@@ -41,7 +41,7 @@ public class DataIndexTest extends ZebedeeTestBaseFixture {
         dataBuilder = new DataBuilder(zebedee, publisher, reviewer);
         generator = new DataPagesGenerator();
 
-        publishedReader = new FileSystemContentReader(zebedee.getPublished().path);
+        publishedReader = new FileSystemContentReader(zebedee.getPublished().getPath());
 
         // add a set of data to published
         published = generator.generateDataPagesSet("dataprocessor", "published", 2015, 2, "");

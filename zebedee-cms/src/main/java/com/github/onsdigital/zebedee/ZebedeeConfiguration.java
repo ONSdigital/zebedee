@@ -100,7 +100,6 @@ import static org.apache.commons.lang3.StringUtils.isEmpty;
  * directories required by zebedee, create the service instances it requires etc.
  */
 public class ZebedeeConfiguration {
-
     private Path rootPath;
     private Path zebedeePath;
     private Path publishedContentPath;
@@ -369,7 +368,7 @@ public class ZebedeeConfiguration {
         Content content = new Content(publishedContentPath);
         Path redirectPath = publishedContentPath.resolve(Content.REDIRECT);
         if (!Files.exists(redirectPath)) {
-            content.redirect = new RedirectTablePartialMatch(content);
+            content.setRedirects(new RedirectTablePartialMatch(content));
             try {
                 Files.createFile(redirectPath);
             } catch (IOException e) {
@@ -377,7 +376,7 @@ public class ZebedeeConfiguration {
                         .logException(e, "could not save redirect to requested path");
             }
         } else {
-            content.redirect = new RedirectTablePartialMatch(content, redirectPath);
+            content.setRedirects(new RedirectTablePartialMatch(content, redirectPath));
         }
         return content;
     }

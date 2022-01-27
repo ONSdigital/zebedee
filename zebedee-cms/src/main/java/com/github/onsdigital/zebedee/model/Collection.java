@@ -481,7 +481,7 @@ public class Collection {
         }
 
         PermissionsService permissions = zebedee.getPermissionsService();
-        permissions.setViewerTeams(session, desc.getId(), desc.getName(), teamIds);
+        permissions.setViewerTeams(session, desc.getId(), teamIds);
 
         return teamIds;
     }

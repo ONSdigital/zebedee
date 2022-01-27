@@ -20,9 +20,6 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getUnauthorizedMessage;
-import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_VIEWER_TEAMS_UPDATED;
-import static com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDaoFactory.getCollectionHistoryDao;
-import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData.teamsUpdated;
 
 /**
  * @deprecated this implementation is deprecated and will be removed once the JWT session migration has been completed
@@ -311,14 +308,13 @@ public class PermissionsServiceImpl implements PermissionsService {
      * Set the list of team IDs that are allowed viewer access to a collection
      *
      * @param collectionID    the ID of the collection collection to set viewer permissions for.
-     * @param collectionName  the name of the collection for which permissions are being set.
      * @param collectionTeams the set of team IDs for which viewer permissions should be granted to the collection.
      * @param session         the session of the user that is attempting to set the viewer permissions.
      * @throws IOException if reading or writing the access mapping fails.
      * @throws UnauthorizedException if the users' session isn't authorised to edit collections.
      */
     @Override
-    public void setViewerTeams(Session session, String collectionID, String collectionName, Set<Integer> collectionTeams) throws IOException, UnauthorizedException {
+    public void setViewerTeams(Session session, String collectionID, Set<Integer> collectionTeams) throws IOException, UnauthorizedException {
         if (session == null || !canEdit(session)) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
@@ -335,8 +331,6 @@ public class PermissionsServiceImpl implements PermissionsService {
         } finally {
             writeLock.unlock();
         }
-
-        getCollectionHistoryDao().saveCollectionHistoryEvent(collectionName, collectionID, session, COLLECTION_VIEWER_TEAMS_UPDATED, teamsUpdated(collectionTeams));
     }
 
     private boolean canEdit(String email, AccessMapping accessMapping) {

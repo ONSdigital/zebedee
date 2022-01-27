@@ -296,7 +296,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         when(team.getId())
                 .thenReturn(teamId);
         doNothing().when(permissionsService).setViewerTeams(
-                publisher1Session, collection.getDescription().getId(), collection.getDescription().getName(), teamIds);
+                publisher1Session, collection.getDescription().getId(), teamIds);
 
         // Given an existing collection
         String name = "Population Release";
@@ -343,7 +343,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         assertTrue(updatedCollectionDescription.getEvents().hasEventForType(EventType.CREATED));
         assertEquals(updatedDescription.getTeams(), updatedCollectionDescription.getTeams());
         verify(permissionsService, times(1)).setViewerTeams(
-                publisher1Session, collection.getDescription().getId(), collection.getDescription().getName(), teamIds);
+                publisher1Session, collection.getDescription().getId(), teamIds);
     }
 
     @Test
@@ -389,7 +389,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         assertTrue(updatedCollectionDescription.getEvents().hasEventForType(EventType.CREATED));
         assertEquals(updatedDescription.getTeams(), updatedCollectionDescription.getTeams());
         verify(permissionsService, times(1)).setViewerTeams(
-                publisher1Session, collection.getDescription().getId(), collection.getDescription().getName(), new HashSet<Integer>());
+                publisher1Session, collection.getDescription().getId(), new HashSet<Integer>());
     }
 
     @Test

@@ -87,15 +87,6 @@ public class CollectionEventMetaData {
     }
 
     /**
-     * Create a {@link CollectionEventMetaData} for viewer teams updated event.
-     */
-    public static CollectionEventMetaData[] teamsUpdated(Set<Integer> collectionTeams) {
-        List<CollectionEventMetaData> list = new ArrayList<>();
-        list.add(new CollectionEventMetaData(VIEWER_TEAMS_KEY, StringUtils.join(collectionTeams, ",")));
-        return toArray(list);
-    }
-
-    /**
      * Create a {@link CollectionEventMetaData} for collection renamed.
      */
     public static CollectionEventMetaData renamed(String previousName) {

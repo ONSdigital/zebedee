@@ -461,13 +461,13 @@ public class Collection {
     private static Set<Integer> setViewerTeams(CollectionDescription desc, Zebedee zebedee, Session session)
             throws IOException, ZebedeeException {
         Set<Integer> teamIds = new HashSet<>();
-
-        // TODO: Remove the following transitional code once Florence is updated to send the team IDs rather than the team names.
         List<String> teamNames = desc.getTeams();
-        if (teamNames == null || teamNames.isEmpty()) {
-            return teamIds;
+
+        if (teamNames == null) {
+            teamNames = new ArrayList<>();
         }
 
+        // TODO: Remove the following transitional code once Florence is updated to send the team IDs rather than the team names.
         TeamsService teams = zebedee.getTeamsService();
         for (String teamName : teamNames) {
             Team team = teams.findTeam(teamName);

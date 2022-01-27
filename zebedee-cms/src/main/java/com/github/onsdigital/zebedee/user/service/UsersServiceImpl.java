@@ -218,7 +218,7 @@ public class UsersServiceImpl implements UsersService {
         if (session == null) {
             throw new BadRequestException("A session is required to delete a user.");
         }
-        if (permissionsService.isAdministrator(session) == false) {
+        if (!permissionsService.isAdministrator(session)) {
             throw new UnauthorizedException("Administrator permissionsServiceImpl required");
         }
 

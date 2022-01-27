@@ -464,21 +464,24 @@ public class Collection {
 
     private static Set<Integer> setViewerTeams(CollectionDescription desc, Zebedee zebedee, Session session)
             throws IOException, ZebedeeException {
-        List<String> teamNames = desc.getTeams();
-
         Set<Integer> teamIds = new HashSet<>();
-        if (teamNames != null) {
-            // TODO: Remove the following transitional code once Florence is updated to send the team IDs rather than the team names.
-            TeamsService teams = zebedee.getTeamsService();
-            for (String teamName : teamNames) {
-                Team team = teams.findTeam(teamName);
-                if (team == null) {
-                    throw new NotFoundException("team assigned to collection expected but does not exist");
-                }
 
-                teamIds.add(team.getId());
-            }
+        // TODO: Remove the following transitional code once Florence is updated to send the team IDs rather than the team names.
+        List<String> teamNames = desc.getTeams();
+        if (teamNames == null || teamNames.isEmpty()) {
+            return teamIds;
         }
+
+        TeamsService teams = zebedee.getTeamsService();
+        for (String teamName : teamNames) {
+            Team team = teams.findTeam(teamName);
+            if (team == null) {
+                throw new NotFoundException("team assigned to collection expected but does not exist");
+            }
+
+            teamIds.add(team.getId());
+        }
+        // end of transitional code
 
         PermissionsService permissions = zebedee.getPermissionsService();
         permissions.setViewerTeams(session, desc.getId(), teamIds);

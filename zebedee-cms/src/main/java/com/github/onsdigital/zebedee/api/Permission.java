@@ -22,6 +22,7 @@ import javax.ws.rs.POST;
 import java.io.IOException;
 
 import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
+import static org.apache.commons.lang.StringUtils.isNotEmpty;
 
 @Api
 public class Permission {
@@ -125,14 +126,15 @@ public class Permission {
     public PermissionDefinition getPermissions(HttpServletRequest request, HttpServletResponse response)
             throws IOException, NotFoundException, UnauthorizedException, BadRequestException {
 
-        Session session = sessionsService.get(request);
         String email = request.getParameter("email");
+        if (cmsFeatureFlags().isJwtSessionsEnabled() && isNotEmpty(email)) {
+            throw new BadRequestException("invalid parameter 'email': checking the permissions of another user is no longer supported");
+        }
+
+        Session session = sessionsService.get(request);
 
         PermissionDefinition permissionDefinition;
         if (cmsFeatureFlags().isJwtSessionsEnabled()) {
-            if (email != null) {
-                throw new BadRequestException("invalid parameter 'email': checking the permissions of another user is no longer supported");
-            }
             permissionDefinition = permissionsService.userPermissions(session);
         } else {
             permissionDefinition = permissionsService.userPermissions(email, session);

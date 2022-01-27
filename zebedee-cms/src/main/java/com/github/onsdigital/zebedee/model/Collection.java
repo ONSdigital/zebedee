@@ -447,11 +447,7 @@ public class Collection {
             scheduler.cancel(collection);
         }
 
-        LocalTime start = LocalTime.now();
         Set<Integer> teamIds = setViewerTeams(collectionDescription, zebedee, session);
-        long ms = TimeUnit.MILLISECONDS.convert(Duration.between(start, LocalTime.now()).getNano(), TimeUnit.NANOSECONDS);
-
-        warn().data("duration_ms", ms).log("collection update viewer teams completed");
 
         if (collectionDescription.getTeams() != null) {
             updatedCollection.getDescription().setTeams(collectionDescription.getTeams());

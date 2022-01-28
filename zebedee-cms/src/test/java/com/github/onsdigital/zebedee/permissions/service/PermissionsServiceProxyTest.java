@@ -93,6 +93,7 @@ public class PermissionsServiceProxyTest {
                 .thenReturn(EMAIL);
     }
 
+
     /**
      * @throws Exception
      */
@@ -308,11 +309,8 @@ public class PermissionsServiceProxyTest {
         jwtSessionsEnabled = false;
         session = null;
         permissions = new PermissionsServiceProxy(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService);
-
         when(permissionsStore.getAccessMapping())
                 .thenReturn(new AccessMapping());
-
-
         assertThat(permissions.canView(session, collectionDescription), is(false));
         verifyZeroInteractions(jwtPermissionsService, usersService, teamsService);
         verify(legacyPermissionsService, atLeastOnce()).canView(session, collectionDescription);
@@ -326,10 +324,8 @@ public class PermissionsServiceProxyTest {
         jwtSessionsEnabled = true;
         session = null;
         permissions = new PermissionsServiceProxy(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService);
-
         when(permissionsStore.getAccessMapping())
                 .thenReturn(new AccessMapping());
-
         assertThat(permissions.canView(session, collectionDescription), is(false));
         verifyZeroInteractions(legacyPermissionsService, usersService, teamsService);
         verify(jwtPermissionsService, atLeastOnce()).canView(session, collectionDescription);

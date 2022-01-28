@@ -5,6 +5,8 @@ import com.github.onsdigital.zebedee.exceptions.UnsupportedOperationExceptions;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.PermissionDefinition;
 import com.github.onsdigital.zebedee.model.Collection;
+import com.github.onsdigital.zebedee.permissions.model.AccessMapping;
+import com.github.onsdigital.zebedee.permissions.store.PermissionsStore;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.session.service.Sessions;
 import com.github.onsdigital.zebedee.teams.model.Team;
@@ -14,8 +16,10 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.warn;
+import static com.github.onsdigital.zebedee.configuration.Configuration.getUnauthorizedMessage;
 
 /**
  * this has been implemented for the migration to using JWT Session
@@ -23,19 +27,20 @@ import static com.github.onsdigital.logging.v2.event.SimpleEvent.warn;
  * Update Zebedee permissions service to get list of groups for user from JWT session store
  */
 public class JWTPermissionsServiceImpl implements PermissionsService {
-
     static final String PUBLISHER_PERMISSIONS = "role-publisher";
     static final String ADMIN_PERMISSIONS = "role-admin";
+    private final PermissionsStore permissionsStore;
 
     /**
      * this has been implemented for the migration to using JWT Session
      * to implement 'PermissionStore' modules when the jwt is enabled
      * Update Zebedee permissions service to get list of groups for user from JWT session store
      *
-     * @param sessionService - {@link Sessions}
+     * @param permissionsStore - {@link PermissionsStore}
      */
 
-    public JWTPermissionsServiceImpl(Sessions sessionService) {
+    public JWTPermissionsServiceImpl(PermissionsStore permissionsStore) {
+        this.permissionsStore = permissionsStore;
     }
 
     /**
@@ -261,16 +266,14 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
             throw new IOException("Empty or Null Session or CollectionDescription");
         }
 
-        Set<Integer> resultTeamIds = new HashSet<>();
-        for (Integer sessionTeamID : convertGroupsToTeams(session)) {
-            for (Integer collectionTeamIds : convertTeamsListStringToListInteger(collectionDescription)) {
-                if (sessionTeamID.equals(collectionTeamIds)) {
-                    resultTeamIds.add(sessionTeamID);
-                }
-            }
-        }
+        List<Integer> userPermissions = convertGroupsToTeams(session);
+        List<Integer> collectionPermissions = convertTeamsListStringToListInteger(collectionDescription);
 
-        return resultTeamIds != null && !resultTeamIds.isEmpty();
+        List<Integer> result = userPermissions.stream()
+                .filter(collectionPermissions::contains)
+                .collect(Collectors.toList());
+
+        return result != null && !result.isEmpty();
     }
 
     /**
@@ -308,8 +311,23 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
      */
     @Override
     public void addViewerTeam(CollectionDescription collectionDescription, Integer teamId, Session session) throws
-            UnsupportedOperationExceptions {
-        throw new UnsupportedOperationExceptions("JWT Permissions service error for addViewerTeam no longer required");
+            IOException, UnauthorizedException {
+        if (session == null || !canEdit(session)) {
+            throw new UnauthorizedException(getUnauthorizedMessage(session));
+        }
+
+        AccessMapping accessMapping = permissionsStore.getAccessMapping();
+        Set<Integer> collectionTeams = accessMapping.getCollections().get(collectionDescription.getId());
+        if (collectionTeams == null) {
+            collectionTeams = new HashSet<>();
+            accessMapping.getCollections().put(collectionDescription.getId(), collectionTeams);
+        }
+
+        if (!collectionTeams.contains(teamId)) {
+            collectionTeams.add(teamId);
+            permissionsStore.saveAccessMapping(accessMapping);
+
+        }
     }
 
     /**
@@ -329,22 +347,18 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
             throw new IOException("JWT Permissions service error for listViewerTeams input error ");
         }
 
-        List<Integer> sessionsTeamsList = convertGroupsToTeams(session);
-        List<Integer> collectionTeamIntegerList = convertTeamsListStringToListInteger(collectionDescription);
-
-        Set<Integer> resultTeamIds = new HashSet<>();
-        for (Integer sessionTeamID : sessionsTeamsList) {
-            for (Integer collectionTeamIds : collectionTeamIntegerList) {
-                if (sessionTeamID.equals(collectionTeamIds)) {
-                    resultTeamIds.add(sessionTeamID);
-                }
-            }
+        AccessMapping accessMapping = permissionsStore.getAccessMapping();
+        Set<Integer> teamIds = accessMapping.getCollections().get(collectionDescription.getId());
+        if (teamIds == null) {
+            teamIds = new HashSet<>();
         }
 
-        return java.util.Collections.unmodifiableSet(resultTeamIds);
+        return java.util.Collections.unmodifiableSet(teamIds);
     }
 
     /**
+     * session and collection validation is in canview module
+     *
      * @param collectionDescription the {@link CollectionDescription} of the {@link Collection} to remove the team.
      * @param teamId                the {@link Team} to remove.
      * @param session               the {@link Session} of the user revoking view permission.
@@ -352,10 +366,24 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
      */
     @Override
     public void removeViewerTeam(CollectionDescription collectionDescription, Integer teamId, Session session) throws
-            UnsupportedOperationExceptions {
-        throw new UnsupportedOperationExceptions("JWT Permissions service error for removeViewerTeam no longer required");
-    }
+            IOException, UnauthorizedException {
+        if (!canEdit(session)) {
+            throw new UnauthorizedException(getUnauthorizedMessage(session));
+        }
 
+        AccessMapping accessMapping = permissionsStore.getAccessMapping();
+        Set<Integer> collectionTeams = accessMapping.getCollections().get(collectionDescription.getId());
+        if (collectionTeams == null) {
+            collectionTeams = new HashSet<>();
+            accessMapping.getCollections().put(collectionDescription.getId(), collectionTeams);
+        }
+
+        if (collectionTeams.contains(teamId)) {
+            collectionTeams.remove(teamId);
+            permissionsStore.saveAccessMapping(accessMapping);
+
+        }
+    }
 
     /**
      * @param email   the email of the user to get the {@link PermissionDefinition} for.

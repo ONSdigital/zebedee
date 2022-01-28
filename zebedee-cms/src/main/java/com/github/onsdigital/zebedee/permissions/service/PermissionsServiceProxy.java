@@ -155,7 +155,6 @@ public class PermissionsServiceProxy implements PermissionsService {
             return jwtPermissionsService.canEdit(email);
         }
         return legacyPermissionsService.canEdit(email);
-
     }
 
     /**
@@ -169,7 +168,6 @@ public class PermissionsServiceProxy implements PermissionsService {
             return jwtPermissionsService.canEdit(user);
         }
         return legacyPermissionsService.canEdit(user);
-
     }
 
     /**
@@ -187,7 +185,6 @@ public class PermissionsServiceProxy implements PermissionsService {
             jwtPermissionsService.addEditor(email, session);
         }
         legacyPermissionsService.addEditor(email, session);
-
     }
 
     /**
@@ -202,7 +199,6 @@ public class PermissionsServiceProxy implements PermissionsService {
             jwtPermissionsService.removeEditor(email, session);
         }
         legacyPermissionsService.removeEditor(email, session);
-
     }
 
     /**
@@ -246,7 +242,6 @@ public class PermissionsServiceProxy implements PermissionsService {
         }
         return legacyPermissionsService.canView(email, collectionDescription);
     }
-
 
     /**
      * @param collectionDescription the {@link CollectionDescription} of the {@link Collection} in question.

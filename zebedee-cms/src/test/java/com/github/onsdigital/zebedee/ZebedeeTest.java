@@ -345,7 +345,5 @@ public class ZebedeeTest extends ZebedeeTestBaseFixture {
         verify(usersService, times(1)).getUserByEmail(TEST_EMAIL);
         verify(sessions, times(1)).create(user);
         verifyZeroInteractions(usersKeyring);
-
-        verify(startUpAlerter, times(1)).queueUnlocked();
     }
 }

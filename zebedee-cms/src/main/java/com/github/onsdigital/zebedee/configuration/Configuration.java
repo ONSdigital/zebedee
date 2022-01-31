@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static java.text.MessageFormat.format;
 import static org.apache.commons.lang.StringUtils.defaultIfBlank;
 
 
@@ -113,6 +114,15 @@ public class Configuration {
         }
 
         return Arrays.asList(val.split(","));
+    }
+
+    public static String getSlackSupportChannelID() {
+        String channelID = getValue("SLACK_SUPPORT_CHANNEL_ID");
+        if (StringUtils.isEmpty(channelID)) {
+            return "#publishing-support";
+        }
+
+        return format("<#{0}>", channelID);
     }
 
     public static String getMathjaxServiceUrl() {

@@ -14,6 +14,7 @@ import com.github.onsdigital.zebedee.model.Collections;
 import com.github.onsdigital.zebedee.model.Content;
 import com.github.onsdigital.zebedee.model.publishing.scheduled.PublishScheduler;
 import com.github.onsdigital.zebedee.model.publishing.scheduled.Scheduler;
+import com.github.onsdigital.zebedee.notification.NotificationException;
 import com.github.onsdigital.zebedee.user.model.User;
 import com.github.onsdigital.zebedee.util.slack.AttachmentField;
 import com.github.onsdigital.zebedee.util.slack.Notifier;
@@ -35,6 +36,7 @@ import java.util.Map;
 import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.error;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.info;
+import static com.github.onsdigital.zebedee.logging.CMSLogEvent.warn;
 import static java.text.MessageFormat.format;
 
 public class Root {
@@ -78,15 +80,23 @@ public class Root {
         // environment variable on develop environment
         System.setProperty(ZEBEDEE_ROOT, root.toString());
 
-        Notifier notifier = zebedee.getSlackNotifier();
-        zebedee.getStartUpAlerter().queueLocked();
-
         try {
             Collections.CollectionList collections = zebedee.getCollections().list();
-            alertOnInProgressCollections(collections, notifier);
             loadExistingCollectionsIntoScheduler(collections);
         } catch (IOException ex) {
             throw new RuntimeException("failed to load collections list on startup", ex);
+        }
+
+        boolean notificationSuccessful = false;
+        try {
+            notificationSuccessful = zebedee.getStartUpNotifier().notifyStartUpComplete();
+        } catch (NotificationException ex) {
+            error().exception(ex).log("error sending CMS start up notifications");
+        }
+
+        if (!notificationSuccessful) {
+            warn().log("sending CMS start up notificaitons unsuccessful if is strongly suggested that you investigate" +
+                    " this issue.");
         }
 
         info().data(ZEBEDEE_ROOT, rootDir).log("zebedee cmd initialization completed successfully");

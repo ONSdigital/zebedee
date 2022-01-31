@@ -14,6 +14,7 @@ import com.github.onsdigital.zebedee.model.Content;
 import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
 import com.github.onsdigital.zebedee.model.encryption.EncryptionKeyFactory;
 import com.github.onsdigital.zebedee.model.publishing.PublishedCollections;
+import com.github.onsdigital.zebedee.notification.StartUpNotifier;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.service.DatasetService;
 import com.github.onsdigital.zebedee.service.ImageService;
@@ -26,7 +27,6 @@ import com.github.onsdigital.zebedee.teams.service.TeamsService;
 import com.github.onsdigital.zebedee.user.model.User;
 import com.github.onsdigital.zebedee.user.service.UsersService;
 import com.github.onsdigital.zebedee.util.slack.Notifier;
-import com.github.onsdigital.zebedee.util.slack.StartUpAlerter;
 import com.github.onsdigital.zebedee.verification.VerificationAgent;
 
 import java.io.IOException;
@@ -86,7 +86,7 @@ public class Zebedee {
     private final ImageService imageService;
     private final KafkaService kafkaService;
     private final ServiceStoreImpl serviceStoreImpl;
-    private final StartUpAlerter startUpAlerter;
+    private final StartUpNotifier startUpNotifier;
     private final Notifier slackNotifier;
 
     /**
@@ -123,7 +123,7 @@ public class Zebedee {
         this.redirectPath = cfg.getRedirectPath();
         this.servicePath = cfg.getServicePath();
         this.keyRingPath = cfg.getKeyRingPath();
-        this.startUpAlerter = cfg.getStartUpAlerter();
+        this.startUpNotifier = cfg.getStartUpNotifier();
         this.slackNotifier = cfg.getSlackNotifier();
     }
 
@@ -274,10 +274,9 @@ public class Zebedee {
      * @throws IOException
      * @throws NotFoundException
      * @throws BadRequestException
-     *
      * @deprecated Using the new JWT based sessions, sessions are never created within zebedee as the JWT token
-     *             issued by the dp-identity-api replaces the sessions in zebedee. Once migration to the dp-identity-api
-     *             is completed this method will be removed.
+     * issued by the dp-identity-api replaces the sessions in zebedee. Once migration to the dp-identity-api
+     * is completed this method will be removed.
      */
     @Deprecated
     public Session openSession(Credentials credentials) throws IOException, NotFoundException, BadRequestException {
@@ -294,19 +293,13 @@ public class Zebedee {
             return null;
         }
 
-        Session session = createSession(user);
-
-        if (permissionsService.isAdministrator(session)) {
-            startUpAlerter.queueUnlocked();
-        }
-
-        return session;
+        return createSession(user);
     }
 
     /**
      * @deprecated Using the new JWT based sessions, sessions are never created within zebedee as the JWT token
-     *             issued by the dp-identity-api replaces the sessions in zebedee. Once migration to the dp-identity-api
-     *             is completed this method will be removed.
+     * issued by the dp-identity-api replaces the sessions in zebedee. Once migration to the dp-identity-api
+     * is completed this method will be removed.
      */
     @Deprecated
     private Session createSession(User user) throws IOException {
@@ -400,8 +393,8 @@ public class Zebedee {
         return this.encryptionKeyFactory;
     }
 
-    public StartUpAlerter getStartUpAlerter() {
-        return this.startUpAlerter;
+    public StartUpNotifier getStartUpNotifier() {
+        return startUpNotifier;
     }
 
     public Notifier getSlackNotifier() {

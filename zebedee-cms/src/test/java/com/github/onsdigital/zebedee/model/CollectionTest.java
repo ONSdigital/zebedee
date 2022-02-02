@@ -22,6 +22,7 @@ import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.CollectionType;
 import com.github.onsdigital.zebedee.json.ContentDetail;
 import com.github.onsdigital.zebedee.json.ContentStatus;
+import com.github.onsdigital.zebedee.json.Event;
 import com.github.onsdigital.zebedee.json.EventType;
 import com.github.onsdigital.zebedee.model.content.item.ContentItemVersion;
 import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
@@ -52,6 +53,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -1281,7 +1286,19 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         // The release page is in progress within the collection and the collection publish date has been
         // taken from the release page date.
         assertTrue(collection.isInProgress(uri));
-        assertEquals(collection.description.getPublishDate(), release.getDescription().getReleaseDate());
+        assertEquals(collection.getDescription().getPublishDate(), release.getDescription().getReleaseDate());
+
+        List<Event> events = collection.getDescription().getEvents();
+        assertThat(events, is(notNullValue()));
+
+        assertThat(events.size(), equalTo(2));
+        assertThat(events.get(0).getType(), equalTo(EventType.CREATED));
+        assertThat(events.get(0).getEmail(), equalTo(publisher1Session.getEmail()));
+
+        assertThat(events.get(1).getType(), equalTo(EventType.CALENDAR_ENTRY_ATTACHED_ON_CREATION));
+        assertThat(events.get(1).getEmail(), equalTo(publisher1Session.getEmail()));
+
+        assertThat(events.get(0).getDate(), equalTo(events.get(1).getDate()));
     }
 
     @Test(expected = BadRequestException.class)

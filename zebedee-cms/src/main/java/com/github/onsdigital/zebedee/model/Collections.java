@@ -760,6 +760,9 @@ public class Collections {
         }
 
         boolean deleted = deletcContentFromCollection(collection, session, contentTargetPath, uri);
+        if (deleted) {
+            collection.addEvent(uri, new Event(new Date(), EventType.DELETED, session.getEmail()));
+        }
         collection.save();
 
         if (deleted) {

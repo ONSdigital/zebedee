@@ -1,6 +1,8 @@
 package com.github.onsdigital.zebedee.json;
 
 import com.github.onsdigital.zebedee.json.publishing.Result;
+import com.github.onsdigital.zebedee.session.model.Session;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -93,12 +95,36 @@ public class CollectionDescription extends CollectionBase {
      * @param event
      */
     public void addEvent(Event event) {
-
         if (events == null)
             events = new Events();
 
         events.add(event);
     }
+
+    public void addEvent(Date date, EventType eventType, Session session) {
+        this.addEvent(date, eventType, session, null);
+    }
+
+    /**
+     * Add an event to the collection history.
+     *
+     * @param date      the date of the event.
+     * @param eventType the type of event to record.
+     * @param session   the session of the user who triggered the event.
+     */
+    public void addEvent(Date date, EventType eventType, Session session, String note) {
+        String email = "";
+        if (session != null || StringUtils.isNotEmpty(session.getEmail())) {
+            email = session.getEmail();
+        }
+
+        if (StringUtils.isEmpty(note)) {
+            this.addEvent(new Event(date, eventType, email));
+        } else {
+            this.addEvent(new Event(date, eventType, email, note));
+        }
+    }
+
 
     /**
      * Add a {@link Result} to this

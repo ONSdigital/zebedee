@@ -53,6 +53,7 @@ import static junit.framework.Assert.assertFalse;
 import static junit.framework.TestCase.assertTrue;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasSize;
@@ -990,6 +991,8 @@ public class CollectionsTest {
         when(collectionMock.deleteContentDirectory(TEST_EMAIL, uri.toString()))
                 .thenReturn(true);
 
+        ArgumentCaptor<Event> eventCaptor = ArgumentCaptor.forClass(Event.class);
+
         assertThat(collections.deleteContent(collectionMock, uri.toString(), sessionMock), is(true));
         assertThat(uri.toFile().exists(), is(false));
         assertThat(uri.getParent().toFile().exists(), is(true));
@@ -997,11 +1000,16 @@ public class CollectionsTest {
         verify(collectionMock, times(1)).find(uri.toString());
         verify(collectionMock, times(1)).isInCollection(uri.toString());
         verify(collectionMock, times(4)).getDescription();
-        /*verify(collectionMock, never()).deleteContentDirectory(any(), any());*/
         verify(collectionMock, times(1)).deleteContentDirectory(TEST_EMAIL, uri.toString());
         verify(collectionMock, never()).deleteFile(uri.toString());
         verify(collectionMock, times(1)).save();
         verify(collectionHistoryDaoMock, times(1)).saveCollectionHistoryEvent(any(CollectionHistoryEvent.class));
+
+        verify(collectionMock, times(1)).addEvent(eq(uri.toString()), eventCaptor.capture());
+        Event event = eventCaptor.getValue();
+        assertThat(event, is(notNullValue()));
+        assertThat(event.getEmail(), equalTo(TEST_EMAIL));
+        assertThat(event.getType(), equalTo(EventType.DELETED));
     }
 
     @Test(expected = ConflictException.class)
@@ -1103,10 +1111,18 @@ public class CollectionsTest {
         when(collectionMock.deleteDataVisContent(sessionMock, filePath))
                 .thenAnswer(i -> Files.deleteIfExists(filePath));
 
+        ArgumentCaptor<Event> eventCaptor = ArgumentCaptor.forClass(Event.class);
+
         boolean deleteSuccessful = collections.deleteContent(collectionMock, filePath.toString(), sessionMock);
 
         assertTrue(deleteSuccessful);
         assertThat(collectionsPath.resolve("abc/inprogress").toFile().list().length, equalTo(0));
+
+        verify(collectionMock, times(1)).addEvent(eq(filePath.toString()), eventCaptor.capture());
+        Event event = eventCaptor.getValue();
+        assertThat(event, is(notNullValue()));
+        assertThat(event.getEmail(), equalTo(TEST_EMAIL));
+        assertThat(event.getType(), equalTo(EventType.DELETED));
     }
 
     @Test
@@ -1130,10 +1146,18 @@ public class CollectionsTest {
         when(collectionMock.deleteFileAndRelated(uri.toString()))
                 .thenAnswer(i -> Files.deleteIfExists(uri));
 
+        ArgumentCaptor<Event> eventCaptor = ArgumentCaptor.forClass(Event.class);
+
         boolean deleteSuccessful = collections.deleteContent(collectionMock, uri.toString(), sessionMock);
 
         assertTrue(deleteSuccessful);
         assertThat(collectionsPath.resolve("col1/inprogress").toFile().list().length, equalTo(0));
+
+        verify(collectionMock, times(1)).addEvent(eq(uri.toString()), eventCaptor.capture());
+        Event event = eventCaptor.getValue();
+        assertThat(event, is(notNullValue()));
+        assertThat(event.getEmail(), equalTo(TEST_EMAIL));
+        assertThat(event.getType(), equalTo(EventType.DELETED));
     }
 
     @Test

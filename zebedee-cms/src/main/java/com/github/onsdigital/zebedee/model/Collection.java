@@ -79,6 +79,8 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
 
+import static com.github.onsdigital.zebedee.json.EventType.CALENDAR_ENTRY_ATTACHED_ON_CREATION;
+import static com.github.onsdigital.zebedee.json.EventType.CREATED;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.error;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.info;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.warn;
@@ -94,6 +96,7 @@ import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMet
 import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData.renamed;
 import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData.reschedule;
 import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData.typeChanged;
+import static java.text.MessageFormat.format;
 
 public class Collection {
 
@@ -201,10 +204,11 @@ public class Collection {
 
         CreateCollectionFolders(filename, rootCollectionsPath);
 
-        collectionDescription.addEvent(new Event(new Date(), EventType.CREATED, session.getEmail()));
+        Date creationDate = new Date();
+        collectionDescription.addEvent(creationDate, CREATED, session);
+
         // Create the description:
-        Path collectionDescriptionPath = rootCollectionsPath.resolve(filename
-                + ".json");
+        Path collectionDescriptionPath = rootCollectionsPath.resolve(filename + ".json");
         try (OutputStream output = Files.newOutputStream(collectionDescriptionPath)) {
             Serialiser.serialise(output, collectionDescription);
         }
@@ -227,6 +231,9 @@ public class Collection {
         if (release != null) {
             collection.associateWithRelease(session, release,
                     new ZebedeeCollectionWriter(zebedee, collection, session));
+
+            String note = format("URI: {0}, Title: {1}", release.getUri(), release.getDescription().getTitle());
+            collection.getDescription().addEvent(creationDate, CALENDAR_ENTRY_ATTACHED_ON_CREATION, session, note);
             collection.save();
         }
 
@@ -701,7 +708,7 @@ public class Collection {
             Path path = inProgress.toPath(uri);
             PathUtils.create(path);
 
-            addEvent(uri, new Event(new Date(), EventType.CREATED, session.getEmail()));
+            addEvent(uri, new Event(new Date(), CREATED, session.getEmail()));
 
             result = true;
         }

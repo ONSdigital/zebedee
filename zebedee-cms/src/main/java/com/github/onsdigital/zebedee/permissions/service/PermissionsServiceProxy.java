@@ -57,7 +57,6 @@ public class PermissionsServiceProxy implements PermissionsService {
             return jwtPermissionsService.isAdministrator(session);
         }
         return legacyPermissionsService.isAdministrator(session);
-
     }
 
     /**
@@ -70,7 +69,6 @@ public class PermissionsServiceProxy implements PermissionsService {
             return jwtPermissionsService.hasAdministrator();
         }
         return legacyPermissionsService.hasAdministrator();
-
     }
 
     /**
@@ -83,10 +81,9 @@ public class PermissionsServiceProxy implements PermissionsService {
     public void addAdministrator(String email, Session session) throws IOException, UnauthorizedException {
         if (jwtSessionsEnabled) {
             jwtPermissionsService.addAdministrator(email, session);
-            return;
+        } else {
+            legacyPermissionsService.addAdministrator(email, session);
         }
-        legacyPermissionsService.addAdministrator(email, session);
-
     }
 
     /**
@@ -115,7 +112,6 @@ public class PermissionsServiceProxy implements PermissionsService {
             return jwtPermissionsService.canEdit(session);
         }
         return legacyPermissionsService.canEdit(session);
-
     }
 
     /**
@@ -131,9 +127,9 @@ public class PermissionsServiceProxy implements PermissionsService {
             throws IOException, UnauthorizedException, NotFoundException, BadRequestException {
         if (jwtSessionsEnabled) {
             jwtPermissionsService.addEditor(email, session);
-            return;
+        } else {
+            legacyPermissionsService.addEditor(email, session);
         }
-        legacyPermissionsService.addEditor(email, session);
     }
 
     /**
@@ -146,9 +142,9 @@ public class PermissionsServiceProxy implements PermissionsService {
     public void removeEditor(String email, Session session) throws IOException, UnauthorizedException {
         if (jwtSessionsEnabled) {
             jwtPermissionsService.removeEditor(email, session);
-            return;
+        } else {
+            legacyPermissionsService.removeEditor(email, session);
         }
-        legacyPermissionsService.removeEditor(email, session);
     }
 
     /**
@@ -184,9 +180,9 @@ public class PermissionsServiceProxy implements PermissionsService {
             throws IOException, ZebedeeException{
         if (jwtSessionsEnabled) {
             jwtPermissionsService.setViewerTeams(session, collectionId, collectionTeams);
-            return;
+        } else {
+            legacyPermissionsService.setViewerTeams(session, collectionId, collectionTeams);
         }
-        legacyPermissionsService.setViewerTeams(session, collectionId, collectionTeams);
     }
 
     /**

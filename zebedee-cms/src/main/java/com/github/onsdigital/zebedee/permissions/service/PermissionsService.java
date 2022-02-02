@@ -190,14 +190,11 @@ public interface PermissionsService {
     PermissionDefinition userPermissions(String email, Session session) throws IOException, NotFoundException, UnauthorizedException;
 
     /**
-     * Return {@link PermissionDefinition} for the specified {@link User}.
+     * Get user permission levels given an session
      *
-     * @param email   the email of the user to get the {@link PermissionDefinition} for.
-     * @param session the {@link Session} of the user requesting the {@link PermissionDefinition}.
-     * @return Return {@link PermissionDefinition} for the specified {@link User}.
-     * @throws IOException           unexpected error while getting the user {@link PermissionDefinition}.
-     * @throws NotFoundException     user with the specified email was not found.
-     * @throws UnauthorizedException the requesting user does not have the required permissions.
+     * @param session the user session
+     * @return a {@link PermissionDefinition} object representing the user's permissions
+     * @throws IOException If a filesystem error occurs.
      */
-    PermissionDefinition userPermissions(Session session) throws IOException, NotFoundException, UnauthorizedException;
+    PermissionDefinition userPermissions(Session session) throws IOException;
 }

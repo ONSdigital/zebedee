@@ -46,10 +46,10 @@ public class PermissionsServiceImpl implements PermissionsService {
     }
 
     /**
-     * Determines whether the specified user has publisher permissions/
+     * Determines whether the specified user has publisher permissions
      *
-     * @param session The user's login session.
-     * @return If the user is a publisher, true.
+     * @param session The user's login {@link Session}.
+     * @return <code>true</code> the user is a publisher or <code>false</code> otherwise.
      * @throws IOException If a filesystem error occurs.
      */
     @Override
@@ -75,8 +75,8 @@ public class PermissionsServiceImpl implements PermissionsService {
     /**
      * Determines whether the specified user has administator permissions.
      *
-     * @param session The user's login session.
-     * @return If the user is an administrator, true.
+     * @param session The user's login {@link Session}.
+     * @return <code>true</code> the user is an administrator or <code>false</code> otherwise.
      * @throws IOException If a filesystem error occurs.
      */
     @Override
@@ -121,9 +121,7 @@ public class PermissionsServiceImpl implements PermissionsService {
     }
 
     /**
-     * Adds the specified user to the administrators, giving them administrator permissions (but not content permissions).
-     * <p/>
-     * <p>If no administrator exists the first call will succeed otherwise </p>
+     * Adds the specified user to the list of administrators, giving them administrator permissions.
      *
      * @param email The user's email.
      * @throws IOException If a filesystem error occurs.
@@ -153,6 +151,7 @@ public class PermissionsServiceImpl implements PermissionsService {
      * Removes the specified user from the administrators, revoking administrative permissions (but not content permissions).
      *
      * @param email The user's email.
+     * @param session the {@link Session} of the user revoking the permission.
      * @throws IOException If a filesystem error occurs.
      */
     @Override
@@ -278,9 +277,9 @@ public class PermissionsServiceImpl implements PermissionsService {
     /**
      * Provide a list of team ID's currently associated with a collection
      *
-     * @param collectionDescription
-     * @param session
-     * @return
+     * @param collectionId the ID of the collection for which to list the viewer teams
+     * @param session      the {@link Session} of the user requesting the list of viewer teams
+     * @return The list of
      * @throws IOException
      * @throws UnauthorizedException
      */
@@ -296,7 +295,10 @@ public class PermissionsServiceImpl implements PermissionsService {
          try {
              AccessMapping accessMapping = permissionsStore.getAccessMapping();
              teamIds = accessMapping.getCollections().get(collectionId);
-             if (teamIds == null) teamIds = new HashSet<>();
+
+             if (teamIds == null) {
+                 teamIds = new HashSet<>();
+             }
          } finally {
              readLock.unlock();
          }
@@ -338,14 +340,6 @@ public class PermissionsServiceImpl implements PermissionsService {
         return (digitalPublishingTeam != null && digitalPublishingTeam.contains(standardise(email)));
     }
 
-    /**
-     * @deprecated this method is deprecated and needs to be reimplemented to use the JWT session to determine the
-     *             groups/teams a user is a member of.
-     *
-     * TODO: Add an implementation of this method that will use the groups stored in the JWT session rather than using
-     *       the Teams service
-     */
-    @Deprecated
     private boolean canView(String email, String collectionId, AccessMapping accessMapping)
             throws IOException {
 
@@ -374,7 +368,7 @@ public class PermissionsServiceImpl implements PermissionsService {
      *
      * @param email the user email
      * @return a {@link PermissionDefinition} object
-     * @throws IOException
+     * @throws IOException If a filesystem error occurs.
      * @throws UnauthorizedException If the request is not from an admin or publisher
      */
     @Override
@@ -395,11 +389,11 @@ public class PermissionsServiceImpl implements PermissionsService {
     }
 
     /**
-     * User permission levels given an session
+     * Get user permission levels given an session
      *
      * @param session the user session
-     * @return a {@link PermissionDefinition} object
-     * @throws IOException
+     * @return a {@link PermissionDefinition} object representing the user's permissions
+     * @throws IOException If a filesystem error occurs.
      */
     @Override
     public PermissionDefinition userPermissions(Session session) throws IOException {

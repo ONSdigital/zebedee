@@ -1,18 +1,13 @@
 package com.github.onsdigital.zebedee.permissions.service;
 
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
-import com.github.onsdigital.zebedee.exceptions.UnsupportedOperationExceptions;
-import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.PermissionDefinition;
-import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.permissions.model.AccessMapping;
 import com.github.onsdigital.zebedee.permissions.store.PermissionsStore;
 import com.github.onsdigital.zebedee.session.model.Session;
-import com.github.onsdigital.zebedee.session.service.Sessions;
-import com.github.onsdigital.zebedee.teams.model.Team;
-import com.github.onsdigital.zebedee.user.model.User;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import static java.text.MessageFormat.format;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -20,8 +15,11 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
 
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.warn;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getUnauthorizedMessage;
 
@@ -31,9 +29,14 @@ import static com.github.onsdigital.zebedee.configuration.Configuration.getUnaut
  * Update Zebedee permissions service to get list of groups for user from JWT session store
  */
 public class JWTPermissionsServiceImpl implements PermissionsService {
-    static final String PUBLISHER_PERMISSIONS = "role-publisher";
-    static final String ADMIN_PERMISSIONS = "role-admin";
-    private final PermissionsStore permissionsStore;
+    private static final String PUBLISHER_GROUP = "role-publisher";
+    private static final String ADMIN_GROUP = "role-admin";
+    private static final String UNSUPPORTED_ERROR = "JWT sessions are enabled: {0} is no longer supported";
+
+    private PermissionsStore permissionsStore;
+    private ReentrantReadWriteLock readWriteLock = new ReentrantReadWriteLock();
+    private final Lock readLock = readWriteLock.readLock();
+    private final Lock writeLock = readWriteLock.writeLock();
 
     /**
      * this has been implemented for the migration to using JWT Session
@@ -48,21 +51,20 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
     }
 
     /**
-     * @param session - {@link Sessions} to get the groups
+     * @param session - {@link Session} to get the groups
      * @return list of groups where groupId is converted to teamId
-     * @throws IOException           if session has no groups or empty list
      * @throws NumberFormatException if group name is not  permitted format (string of integers)
      */
-    public static List<Integer> convertGroupsToTeams(Session session) throws IOException, NumberFormatException {
-        if (session == null || session.getGroups() == null || !Arrays.stream(session.getGroups()).findAny().isPresent()) {
-            throw new IOException("JWT Permissions service error for convertGroupsToTeams no groups ");
+    private static List<Integer> convertGroupsToTeams(Session session) throws NumberFormatException {
+        List<Integer> teamsList = new ArrayList<>();
+        if (session == null || ArrayUtils.isEmpty(session.getGroups())) {
+            return teamsList;
         }
 
-        String[] valueArray = {PUBLISHER_PERMISSIONS, ADMIN_PERMISSIONS};
+        String[] valueArray = {PUBLISHER_GROUP, ADMIN_GROUP};
         String[] groups = session.getGroups();
         Set<String> setOfString = new HashSet<>(
                 Arrays.asList(groups));
-        List<Integer> teamsList = new ArrayList<>();
         for (String s : setOfString) {
             try {
                 teamsList.add(Integer.parseInt(s));
@@ -77,116 +79,75 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
         return teamsList;
     }
 
-    public static List<Integer> convertTeamsListStringToListInteger(CollectionDescription collectionDescription) throws IOException, NumberFormatException {
-
-        if (collectionDescription == null ||
-                collectionDescription.getTeams() == null ||
-                collectionDescription.getTeams().size() == 0) {
-            throw new IOException("JWT Permissions service error for convertTeamsListStringToListInteger no teams ");
-        }
-        List<String> teams = collectionDescription.getTeams();
-        List<Integer> teamsList = new ArrayList<>();
-        for (String s : teams) {
-            try {
-                teamsList.add(Integer.parseInt(s));
-            } catch (NumberFormatException e) {
-                String logString = "invalid team name format teamName " + s;
-                warn().log(logString);
-            }
-        }
-        return teamsList;
-
-    }
-
     /**
-     * if the valid session groups contain the role publisher
-     * implemented as part of session migration to JWT
-     * Get JWT from JWT session service and check if the user has the 'Publisher' permission in their groups.
+     * Determines whether the specified user has publisher permissions
      *
-     * @param session {@link Session} to get the user details from.
-     * @return boolean
-     * @throws IOException If a filesystem error occurs.
+     * @param session The user's login {@link Session}.
+     * @return <code>true</code> the user is a publisher or <code>false</code> otherwise.
      */
     @Override
-    public boolean isPublisher(Session session) throws IOException {
+    public boolean isPublisher(Session session) {
         return session != null && !StringUtils.isEmpty(session.getEmail()) &&
-                isGroupMember(session, PUBLISHER_PERMISSIONS);
+                isGroupMember(session, PUBLISHER_GROUP);
     }
 
     /**
-     * from the email get the session  and then groups contain the role publisher
-     * implemented as part of session migration to JWT
+     * Determines whether the specified user has administator permissions.
      *
-     * @param email the email of the user to check.
-     * @return boolean
-     * @throws UnsupportedOperationExceptions if invoked will error
+     * @param session The user's login {@link Session}.
+     * @return <code>true</code> the user is an administrator or <code>false</code> otherwise.
      */
     @Override
-    public boolean isPublisher(String email) throws UnsupportedOperationExceptions {
-        throw new UnsupportedOperationExceptions("JWT Permissions service error for isPublisher no longer required");
-    }
-
-    /**
-     * implemented as part of session migration to JWT
-     *
-     * @param session {@link Session} to get the user details from.
-     * @return boolean if valid session with email and has admin permissions
-     * @throws IOException If a filesystem error occurs.
-     */
-    @Override
-    public boolean isAdministrator(Session session) throws IOException {
+    public boolean isAdministrator(Session session) {
         return session != null && !StringUtils.isEmpty(session.getEmail()) &&
-                isGroupMember(session, ADMIN_PERMISSIONS);
+                isGroupMember(session, ADMIN_GROUP);
     }
 
     /**
-     * implemented as part of session migration to JWT
-     *
-     * @param email the email of the user to check.
-     * @return null
-     * @throws UnsupportedOperationExceptions will error if invoked.
-     */
-    @Override
-    public boolean isAdministrator(String email) throws UnsupportedOperationExceptions {
-        throw new UnsupportedOperationExceptions("JWT Permissions service error for isAdministrator no longer required");
-    }
-
-    /**
-     * implemented as part of session migration to JWT
-     * will not be required once jwt has been migrated but will error if invoked
+     * Determines whether an administator exists.
      *
      * @return null
-     * @throws UnsupportedOperationExceptions will error if invoked.
+     * @throws UnsupportedOperationException if invoked.
+     *
+     * @deprecated since this method is only used by the users service that will be removed shortly in favour of the
+     *             dp-identity-api and JWT sessions implementation.
      */
+    @Deprecated
     @Override
-    public boolean hasAdministrator() throws UnsupportedOperationExceptions {
-        throw new UnsupportedOperationExceptions("JWT Permissions service error for hasAdministrator no longer required");
+    public boolean hasAdministrator() {
+        throw new UnsupportedOperationException(format(UNSUPPORTED_ERROR, "hasAdministrator"));
     }
 
     /**
-     * implemented as part of session migration to JWT
-     * will not be required once jwt has been migrated but will error if invoked
+     * Adds the specified user to the list of administrators, giving them administrator permissions.
      *
      * @param email   the email of the user to permit the permission to.
      * @param session the {@link Session} of the user granting the permission.
-     * @throws UnsupportedOperationExceptions will error if invoked.
+     * @throws UnsupportedOperationException if invoked.
+     *
+     * @deprecated as the dp-identity-api groups management will supersede this when we complete the migration to JWT
+     *             sessions
      */
+    @Deprecated
     @Override
-    public void addAdministrator(String email, Session session) throws UnsupportedOperationExceptions {
-        throw new UnsupportedOperationExceptions("JWT Permissions service error for addAdministrator no longer required");
+    public void addAdministrator(String email, Session session) {
+        throw new UnsupportedOperationException(format(UNSUPPORTED_ERROR, "addAdministrator"));
     }
 
     /**
-     * implemented as part of session migration to JWT
-     * will not be required once jwt has been migrated but will error if invoked
+     * Removes the specified user from the administrators, revoking administrative permissions (but not content permissions).
      *
      * @param email   the email of the user to remove the permission from.
      * @param session the {@link Session} of the user revoking the permission.
-     * @throws UnsupportedOperationExceptions will error if invoked.
+     * @throws UnsupportedOperationException if invoked.
+     *
+     * @deprecated as the dp-identity-api groups management will supersede this when we complete the migration to JWT
+     *             sessions
      */
+    @Deprecated
     @Override
-    public void removeAdministrator(String email, Session session) throws UnsupportedOperationExceptions {
-        throw new UnsupportedOperationExceptions("JWT Permissions service error for removeAdministrator no longer required");
+    public void removeAdministrator(String email, Session session) {
+        throw new UnsupportedOperationException(format(UNSUPPORTED_ERROR, "removeAdministrator"));
     }
 
     /**
@@ -201,29 +162,8 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
      * @throws IOException If a filesystem error occurs.
      */
     @Override
-    public boolean canEdit(Session session) throws IOException {
-        return session != null && !StringUtils.isEmpty(session.getEmail()) &&
-                (isGroupMember(session, PUBLISHER_PERMISSIONS) || isGroupMember(session, ADMIN_PERMISSIONS));
-    }
-
-    /**
-     * @param email the email of the user to check.
-     * @return null
-     * @throws UnsupportedOperationExceptions will error if invoked.
-     */
-    @Override
-    public boolean canEdit(String email) throws IOException {
-        throw new UnsupportedOperationExceptions("JWT Permissions service error for canEdit no longer required");
-    }
-
-    /**
-     * @param user the {@link User} to check.
-     * @return null
-     * @throws UnsupportedOperationExceptions will error if invoked.
-     */
-    @Override
-    public boolean canEdit(User user) throws UnsupportedOperationExceptions {
-        throw new UnsupportedOperationExceptions("JWT Permissions service error for canEdit no longer required");
+    public boolean canEdit(Session session) {
+        return session != null && (isGroupMember(session, PUBLISHER_GROUP) || isGroupMember(session, ADMIN_GROUP));
     }
 
     /**
@@ -231,12 +171,16 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
      * will not be required once jwt has been migrated but will error if invoked
      *
      * @param email   the email of the user to permit the permission to.
-     * @param session the {@link Session} of the {@link User} granting the permission.
+     * @param session the {@link Session} of the user granting the permission.
      * @throws IOException If a filesystem error occurs.
+     *
+     * @deprecated as the dp-identity-api groups management will supersede this when we complete the migration to JWT
+     *             sessions
      */
+    @Deprecated
     @Override
-    public void addEditor(String email, Session session) throws IOException {
-        throw new UnsupportedOperationExceptions("JWT Permissions service error for addEditor no longer required");
+    public void addEditor(String email, Session session) {
+        throw new UnsupportedOperationException(format(UNSUPPORTED_ERROR, "addEditor"));
     }
 
     /**
@@ -244,180 +188,169 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
      * will not be required once jwt has been migrated but will error if invoked
      *
      * @param email   the email of the user to revoke the permission from.
-     * @param session the {@link Session} of the {@link User} revoking the permission.
-     * @throws UnsupportedOperationExceptions will error if invoked.
+     * @param session the {@link Session} of the user revoking the permission.
+     *
+     * @deprecated as the dp-identity-api groups management will supersede this when we complete the migration to JWT
+     *             sessions
      */
+    @Deprecated
     @Override
-    public void removeEditor(String email, Session session) throws UnsupportedOperationExceptions {
-        throw new UnsupportedOperationExceptions("JWT Permissions service error for removeEditor no longer required");
+    public void removeEditor(String email, Session session) {
+        throw new UnsupportedOperationException(format(UNSUPPORTED_ERROR, "removeEditor"));
     }
 
     /**
-     * Determines whether the subscribed session has viewing authorisation to collection
+     * Check if a user can view unpublished content.
      *
-     * @param session               the {@link Session} to get the user details from.
-     * @param collectionDescription the {@link CollectionDescription} of the {@link Collection} to check.
-     * @return null
+     * @param session      the {@link Session} to get the user details from.
+     * @param collectionId the ID of the collection to check.
+     * @return true of the user has view permission for the content, false otherwise.
      * @throws IOException If a filesystem error occurs.
      */
     @Override
-    public boolean canView(Session session, CollectionDescription collectionDescription) throws IOException {
+    public boolean canView(Session session, String collectionId) throws IOException {
 
-        if (session == null ||
-                collectionDescription == null ||
-                session.getGroups() == null ||
-                collectionDescription.getTeams() == null) {
-            throw new IOException("Empty or Null Session or CollectionDescription");
+        if (session == null || StringUtils.isBlank(session.getEmail()) || StringUtils.isBlank(collectionId)) {
+            return false;
         }
 
-        List<Integer> userPermissions = convertGroupsToTeams(session);
-        List<Integer> collectionPermissions = convertTeamsListStringToListInteger(collectionDescription);
+        List<Integer> userGroups = convertGroupsToTeams(session);
+        if (userGroups == null || userGroups.isEmpty()) {
+            return false;
+        }
 
-        List<Integer> result = userPermissions.stream()
-                .filter(collectionPermissions::contains)
-                .collect(Collectors.toList());
+        boolean result = false;
+        readLock.lock();
+        try {
+            AccessMapping accessMapping = permissionsStore.getAccessMapping();
+            Set<Integer> collectionGroups = accessMapping.getCollections().get(collectionId);
 
-        return result != null && !result.isEmpty();
+            if (collectionGroups == null || collectionGroups.isEmpty()) {
+                return false;
+            }
+
+            List<Integer> intersection = userGroups.stream()
+                    .filter(collectionGroups::contains)
+                    .collect(Collectors.toList());
+            result = !intersection.isEmpty();
+        } catch (IOException e) {
+            error().data("collectionId", collectionId).data("user", session.getEmail())
+                    .logException(e, "canView permission request denied: unexpected error");
+        } finally {
+            readLock.unlock();
+        }
+
+        return result;
     }
 
     /**
-     * implemented as part of session migration to JWT
-     * will not be required once jwt has been migrated but will error if invoked
+     * Returns a {@link List} of IDs of teams that have viewer permissions on the specified collection.
      *
-     * @param user                  the {@link User} to check.
-     * @param collectionDescription the {@link CollectionDescription} of the {@link Collection} to check.
-     * @return null
-     * @throws UnsupportedOperationExceptions will error if invoked.
+     * @param collectionId          the ID of the collection to get the viewer teams for.
+     * @param session               the {@link Session} of the user requesting this information.
+     * @return Returns a {@link List} of IDs of teams that have viewer permissions on the specified collection.
+     * @throws IOException           unexpected error while checking permissions.
+     * @throws UnauthorizedException unexpected error while checking permissions.
+     *
+     * @deprecated as the dp-permissions-api policy management will supersede this when we complete the authorisation
+     *             migration
      */
+    @Deprecated
     @Override
-    public boolean canView(User user, CollectionDescription collectionDescription) throws
-            UnsupportedOperationExceptions {
-        throw new UnsupportedOperationExceptions("JWT Permissions service error for canView no longer required");
-    }
-
-    /**
-     * @param email                 the email of the user to check.
-     * @param collectionDescription the {@link CollectionDescription} of the {@link Collection} to check.
-     * @return null
-     * @throws UnsupportedOperationExceptions will error if invoked.
-     */
-    @Override
-    public boolean canView(String email, CollectionDescription collectionDescription) throws
-            UnsupportedOperationExceptions {
-        throw new UnsupportedOperationExceptions("JWT Permissions service error for canView no longer required");
-    }
-
-    /**
-     * @param collectionDescription the {@link CollectionDescription} of the {@link Collection} in question.
-     * @param teamId                the {@link Team} to permit view permission to.
-     * @param session               the {@link Session} of the user granting the permission.
-     * @throws UnsupportedOperationExceptions will error if invoked.
-     */
-    @Override
-    public void addViewerTeam(CollectionDescription collectionDescription, Integer teamId, Session session) throws
-            IOException, UnauthorizedException {
-        if (session == null || !canEdit(session)) {
+    public Set<Integer> listViewerTeams(Session session, String collectionId) throws IOException, UnauthorizedException {
+        if (session == null || !canView(session, collectionId)) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
-        AccessMapping accessMapping = permissionsStore.getAccessMapping();
-        Set<Integer> collectionTeams = accessMapping.getCollections().get(collectionDescription.getId());
-        if (collectionTeams == null) {
-            collectionTeams = new HashSet<>();
-            accessMapping.getCollections().put(collectionDescription.getId(), collectionTeams);
-        }
+        boolean result = false;
+        readLock.lock();
+        Set<Integer> teamIds;
+        try {
+            AccessMapping accessMapping = permissionsStore.getAccessMapping();
+            teamIds = accessMapping.getCollections().get(collectionId);
 
-        if (!collectionTeams.contains(teamId)) {
-            collectionTeams.add(teamId);
-            permissionsStore.saveAccessMapping(accessMapping);
-
-        }
-    }
-
-    /**
-     * this method is being migrated to the dp-identity-api
-     * session and collection validation is in canview module
-     *
-     * @param collectionDescription the {@link CollectionDescription} of the {@link Collection} to get the viewer
-     *                              teams for.
-     * @param session               the {@link Session} of the {@link User} requesting this information.
-     * @return null
-     * @throws IOException, ZebedeeException { will error if invoked.
-     */
-    @Override
-    public Set<Integer> listViewerTeams(CollectionDescription collectionDescription, Session session) throws
-            IOException, UnauthorizedException {
-        if (!canView(session, collectionDescription)) {
-            throw new IOException("JWT Permissions service error for listViewerTeams input error ");
-        }
-
-        AccessMapping accessMapping = permissionsStore.getAccessMapping();
-        Set<Integer> teamIds = accessMapping.getCollections().get(collectionDescription.getId());
-        if (teamIds == null) {
-            teamIds = new HashSet<>();
+            if (teamIds == null) {
+                teamIds = new HashSet<>();
+            }
+        } finally {
+            readLock.unlock();
         }
 
         return java.util.Collections.unmodifiableSet(teamIds);
     }
 
     /**
-     * session and collection validation is in canview module
+     * Set the list of team IDs that are allowed viewer access to a collection
      *
-     * @param collectionDescription the {@link CollectionDescription} of the {@link Collection} to remove the team.
-     * @param teamId                the {@link Team} to remove.
-     * @param session               the {@link Session} of the user revoking view permission.
-     * @throws UnsupportedOperationExceptions will error if invoked.
+     * @param collectionID    the ID of the collection collection to set viewer permissions for.
+     * @param collectionTeams the set of team IDs for which viewer permissions should be granted to the collection.
+     * @param session         the session of the user that is attempting to set the viewer permissions.
+     * @throws IOException if reading or writing the access mapping fails.
+     * @throws UnauthorizedException if the users' session isn't authorised to edit collections.
+     *
+     * @deprecated this is deprecated in favour of the dp-permissions-api and will be removed once full migration to
+     *             the new API is complete.
      */
+    @Deprecated
     @Override
-    public void removeViewerTeam(CollectionDescription collectionDescription, Integer teamId, Session session) throws
-            IOException, UnauthorizedException {
-        if (!canEdit(session)) {
+    public void setViewerTeams(Session session, String collectionID, Set<Integer> collectionTeams) throws IOException, UnauthorizedException {
+        if (session == null || !canEdit(session)) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
-        AccessMapping accessMapping = permissionsStore.getAccessMapping();
-        Set<Integer> collectionTeams = accessMapping.getCollections().get(collectionDescription.getId());
         if (collectionTeams == null) {
             collectionTeams = new HashSet<>();
-            accessMapping.getCollections().put(collectionDescription.getId(), collectionTeams);
         }
 
-        if (collectionTeams.contains(teamId)) {
-            collectionTeams.remove(teamId);
+        writeLock.lock();
+        try {
+            AccessMapping accessMapping = permissionsStore.getAccessMapping();
+            accessMapping.getCollections().put(collectionID, collectionTeams);
             permissionsStore.saveAccessMapping(accessMapping);
-
+        } finally {
+            writeLock.unlock();
         }
     }
 
     /**
+     * Return {@link PermissionDefinition} for the specified user.
+     *
      * @param email   the email of the user to get the {@link PermissionDefinition} for.
      * @param session the {@link Session} of the user requesting the {@link PermissionDefinition}.
      * @return null
-     * @throws UnsupportedOperationExceptions will error if invoked.
+     * @throws UnsupportedOperationException if invoked.
+     *
+     * @deprecated This method is deprecated by the migration to using JWT sessions. In order to query the permissions
+     *             under this new implemention, the user's group membership should be queried fromt he dp-identity-api
+     *             instead.
      */
+    @Deprecated
     @Override
-    public PermissionDefinition userPermissions(String email, Session session) throws
-            UnsupportedOperationExceptions {
-        throw new UnsupportedOperationExceptions("JWT Permissions service error for userPermissions no longer required");
+    public PermissionDefinition userPermissions(String email, Session session) {
+        throw new UnsupportedOperationException(format(UNSUPPORTED_ERROR, "userPermissions"));
     }
 
     /**
-     * @param t the team to check.
-     * @return list of teams/groups
-     * @throws IOException If a filesystem error occurs
+     * Get user permission levels given an session
+     *
+     * @param session the user session
+     * @return a {@link PermissionDefinition} object representing the user's permissions
+     * @throws IOException If a filesystem error occurs.
      */
     @Override
-    public Set<String> listCollectionsAccessibleByTeam(Team t) throws UnsupportedOperationExceptions {
-        throw new UnsupportedOperationExceptions("JWT Permissions service error for listCollectionsAccessibleByTeam no longer required");
-
+    public PermissionDefinition userPermissions(Session session) throws IOException {
+        return new PermissionDefinition()
+                .setEmail(session.getEmail())
+                .isAdmin(isAdministrator(session))
+                .isEditor(canEdit(session));
     }
 
     /**
-     * @param session    the {@link Session} to check
-     * @param permission the role to check
-     * @return boolean
+     * @param session  the {@link Session} to check
+     * @param group    the group to check membership of
+     * @return <code>true</code> if the user is a member of the group, <code>false</code> otherwise.
      */
-    public boolean isGroupMember(Session session, String permission) {
-        return ArrayUtils.contains(session.getGroups(), permission);
+    private boolean isGroupMember(Session session, String group) {
+        return ArrayUtils.contains(session.getGroups(), group);
     }
 }

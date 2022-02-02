@@ -95,8 +95,8 @@ public class Root {
         }
 
         if (!notificationSuccessful) {
-            warn().log("sending CMS start up notificaitons unsuccessful if is strongly suggested that you investigate" +
-                    " this issue.");
+            warn().log("sending CMS start up notifications unsuccessful, it is strongly suggested that you " +
+                    "investigate this issue.");
         }
 
         info().data(ZEBEDEE_ROOT, rootDir).log("zebedee cmd initialization completed successfully");

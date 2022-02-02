@@ -31,8 +31,8 @@ public class SlackStartUpNotifier implements StartUpNotifier {
     private static final ExecutorService executorService = Executors.newFixedThreadPool(5);
     private static final AtomicBoolean hasRun = new AtomicBoolean(false);
 
-    static final String HELP_HINT_FMT = "Raise a ticket in via the {0} channel and the support team will investigate " +
-            ":fix-it-gopher:";
+    static final String HELP_HINT_FMT = "Please raise a ticket via the {0} channel and the support team will " +
+            "investigate :fix-it-gopher:";
 
     private SlackClient sClient;
     private List<String> channels;

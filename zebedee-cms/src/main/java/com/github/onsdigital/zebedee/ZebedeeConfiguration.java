@@ -24,8 +24,10 @@ import com.github.onsdigital.zebedee.model.encryption.EncryptionKeyFactory;
 import com.github.onsdigital.zebedee.model.encryption.EncryptionKeyFactoryImpl;
 import com.github.onsdigital.zebedee.model.publishing.PublishedCollections;
 import com.github.onsdigital.zebedee.notification.StartUpNotifier;
+import com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImpl;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsServiceImpl;
+import com.github.onsdigital.zebedee.permissions.service.PermissionsServiceProxy;
 import com.github.onsdigital.zebedee.permissions.store.PermissionsStore;
 import com.github.onsdigital.zebedee.permissions.store.PermissionsStoreFileSystemImpl;
 import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
@@ -190,7 +192,10 @@ public class ZebedeeConfiguration {
         initialisePermissions(permissionsPath);
         this.permissionsStore = new PermissionsStoreFileSystemImpl(permissionsPath);
 
-        this.permissionsService = new PermissionsServiceImpl(permissionsStore, this::getTeamsService);
+        PermissionsServiceImpl legacyPermissionsService = new PermissionsServiceImpl(permissionsStore, this::getTeamsService);
+        JWTPermissionsServiceImpl jwtPermissionsService = new JWTPermissionsServiceImpl(permissionsStore);
+        this.permissionsService = new PermissionsServiceProxy(cmsFeatureFlags().isJwtSessionsEnabled(),
+                legacyPermissionsService, jwtPermissionsService);
 
         VersionsService versionsService = new VersionsServiceImpl();
         this.collections = new Collections(collectionsPath, permissionsService, versionsService, published);

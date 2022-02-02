@@ -36,7 +36,6 @@ public class CollectionBase {
         return name;
     }
 
-
     public CollectionType getType() {
         return type;
     }

@@ -108,7 +108,7 @@ public class CollectionDetails {
         addEventsForDetails(result.complete, collection);
         addEventsForDetails(result.reviewed, collection);
 
-        Set<Integer> teamIds = zebedeeCmsService.getPermissions().listViewerTeams(session, collection.getDescription().getId());
+        Set<String> teamIds = zebedeeCmsService.getPermissions().listViewerTeams(session, collection.getDescription().getId());
         result.teamsDetails = zebedeeCmsService.getZebedee().getTeamsService().resolveTeamDetails(teamIds);
         result.teamsDetails.forEach(team -> collection.getDescription().getTeams().add(team.getName()));
 
@@ -116,8 +116,8 @@ public class CollectionDetails {
 
         if (datasetImportEnabled) {
             info().data("collectionId", collectionId).data("user", session.getEmail())
-                .log("CollectionDetails GET endpoint: datasetImportEnabled including dataset and dataset version " +
-                        "details to response");
+                    .log("CollectionDetails GET endpoint: datasetImportEnabled including dataset and dataset version " +
+                            "details to response");
 
             result.datasets = collection.getDescription().getDatasets();
             result.datasetVersions = collection.getDescription().getDatasetVersions();

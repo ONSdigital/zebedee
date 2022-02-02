@@ -44,19 +44,19 @@ public class TeamsStoreFileSystemImplTest {
 
     private static final String TEST_EMAIL = "test@ons.gov.uk";
 
+    private TeamsStore store;
+    private Path teamsPath;
+    private Team teamA;
+    private Team teamB;
+
+    @Rule
+    public TemporaryFolder zebedeeRoot;
+
     @Mock
     private ReadWriteLock rwLock;
 
     @Mock
     private Lock lock;
-
-    @Rule
-    public TemporaryFolder zebedeeRoot;
-
-    private TeamsStore store;
-    private Path teamsPath;
-    private Team teamA;
-    private Team teamB;
 
     /**
      * Set up the test.
@@ -73,7 +73,7 @@ public class TeamsStoreFileSystemImplTest {
         store = new TeamsStoreFileSystemImpl(teamsPath);
 
         teamA = new Team()
-                .setId(123)
+                .setId("123")
                 .setName("Team-A")
                 .setMembers(new HashSet<>())
                 .addMember("Dave")
@@ -81,7 +81,7 @@ public class TeamsStoreFileSystemImplTest {
                 .addMember("Janick");
 
         teamB = new Team()
-                .setId(456)
+                .setId("456")
                 .setName("Team-B")
                 .setMembers(new HashSet<>())
                 .addMember("Bruce")

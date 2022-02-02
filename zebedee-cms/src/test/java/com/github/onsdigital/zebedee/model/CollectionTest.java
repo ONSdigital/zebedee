@@ -45,7 +45,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Writer;
 import java.net.URI;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -72,23 +72,44 @@ import static org.mockito.Mockito.when;
 
 public class CollectionTest extends ZebedeeTestBaseFixture {
 
+    private static final String teamName = "some team";
+    private static final String teamId = "12";
+    private static final boolean recursive = false;
+
+    private Collection collection;
+    private Session publisher1Session;
+    private Session publisher2Session;
+    private String publisher1Email;
+    private FakeCollectionWriter collectionWriter;
+
     @Rule
     public TemporaryFolder rootDir = new TemporaryFolder();
 
     @Mock
-    TeamsService teamsService;
+    private TeamsService teamsService;
 
     @Mock
-    Team team;
+    private Team team;
 
-    private static final String teamName = "some team";
-    private static final int teamId = 12;
-    private static final boolean recursive = false;
-    Collection collection;
-    Session publisher1Session;
-    Session publisher2Session;
-    String publisher1Email;
-    FakeCollectionWriter collectionWriter;
+    public static Collection createCollection(Path destination, String collectionName) throws CollectionNotFoundException, IOException {
+
+        CollectionDescription collection = new CollectionDescription(collectionName);
+        collection.setType(CollectionType.manual);
+        collection.setEncrypted(false);
+        collection.setName(collectionName);
+
+        String filename = PathUtils.toFilename(collectionName);
+        collection.setId(filename + "-" + Random.id());
+        Collection.CreateCollectionFolders(filename, destination);
+
+        // Create the description:
+        Path collectionDescriptionPath = destination.resolve(filename + ".json");
+        try (OutputStream output = Files.newOutputStream(collectionDescriptionPath)) {
+            Serialiser.serialise(output, collection);
+        }
+
+        return new Collection(destination.resolve(filename), null);
+    }
 
     public void setUp() throws Exception {
         rootDir.create();
@@ -285,7 +306,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
 
     @Test
     public void shouldUpdateCollection() throws Exception {
-        Set<Integer> teamIds = new HashSet<>(Arrays.asList(12));
+        Set<String> teamIds = new HashSet<>(Arrays.asList("12"));
 
         when(teamsService.findTeam(teamName))
                 .thenReturn(team);
@@ -344,7 +365,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
 
     @Test
     public void shouldRemoveViewerTeams() throws Exception {
-        Set<Integer> teamIds = new HashSet<>(Arrays.asList(12));
+        Set<String> teamIds = new HashSet<>(Arrays.asList("12"));
 
         when(teamsService.findTeam(teamName))
                 .thenReturn(team);
@@ -385,7 +406,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         assertTrue(updatedCollectionDescription.getEvents().hasEventForType(EventType.CREATED));
         assertEquals(updatedDescription.getTeams(), updatedCollectionDescription.getTeams());
         verify(permissionsService, times(1)).setViewerTeams(
-                publisher1Session, collection.getDescription().getId(), new HashSet<Integer>());
+                publisher1Session, collection.getDescription().getId(), new HashSet<String>());
     }
 
     @Test
@@ -1126,7 +1147,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         // We write some output to the content:
         Path path = collection.getInProgressPath(uri);
         try (Writer writer = Files.newBufferedWriter(path,
-                Charset.forName("utf8"));) {
+                StandardCharsets.UTF_8)) {
             writer.append("test");
         }
 
@@ -1401,7 +1422,6 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         // Then the expected exception is thrown
     }
 
-
     @Test(expected = NotFoundException.class)
     public void versionShouldThrowNotFoundIfContentIsNotPublished() throws Exception {
 
@@ -1628,36 +1648,36 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
 
     @Test
     public void isAllContentReviewed_shouldReturnFalseWhenDatasetNotReviewed() throws IOException, ZebedeeException {
-            // Given a collection with a dataset that has not been set to reviewed.
-            Path collectionPath = Files.createTempDirectory(Random.id()); // create a temp directory to generate content into
-            Collection collection = CollectionTest.createCollection(collectionPath, "isAllContentReviewed");
+        // Given a collection with a dataset that has not been set to reviewed.
+        Path collectionPath = Files.createTempDirectory(Random.id()); // create a temp directory to generate content into
+        Collection collection = CollectionTest.createCollection(collectionPath, "isAllContentReviewed");
 
-            CollectionDataset dataset = new CollectionDataset();
-            dataset.setState(ContentStatus.Complete);
-            collection.getDescription().addDataset(dataset);
+        CollectionDataset dataset = new CollectionDataset();
+        dataset.setState(ContentStatus.Complete);
+        collection.getDescription().addDataset(dataset);
 
-            // When isAllContentReviewed() is called
-            boolean allContentReviewed = collection.isAllContentReviewed(true);
+        // When isAllContentReviewed() is called
+        boolean allContentReviewed = collection.isAllContentReviewed(true);
 
-            // Then the result is false
-            assertFalse(allContentReviewed);
+        // Then the result is false
+        assertFalse(allContentReviewed);
     }
 
     @Test
     public void isAllContentReviewed_shouldReturnFalseWhenDatasetVersionNotReviewed() throws IOException, ZebedeeException {
-            // Given a collection with a dataset version that has not been set to reviewed.
-            Path collectionPath = Files.createTempDirectory(Random.id()); // create a temp directory to generate content into
-            Collection collection = CollectionTest.createCollection(collectionPath, "isAllContentReviewed");
+        // Given a collection with a dataset version that has not been set to reviewed.
+        Path collectionPath = Files.createTempDirectory(Random.id()); // create a temp directory to generate content into
+        Collection collection = CollectionTest.createCollection(collectionPath, "isAllContentReviewed");
 
-            CollectionDatasetVersion datasetVersion = new CollectionDatasetVersion();
-            datasetVersion.setState(ContentStatus.Complete);
-            collection.getDescription().addDatasetVersion(datasetVersion);
+        CollectionDatasetVersion datasetVersion = new CollectionDatasetVersion();
+        datasetVersion.setState(ContentStatus.Complete);
+        collection.getDescription().addDatasetVersion(datasetVersion);
 
-            // When isAllContentReviewed() is called
-            boolean allContentReviewed = collection.isAllContentReviewed(true);
+        // When isAllContentReviewed() is called
+        boolean allContentReviewed = collection.isAllContentReviewed(true);
 
-            // Then the result is false
-            assertFalse(allContentReviewed);
+        // Then the result is false
+        assertFalse(allContentReviewed);
     }
 
     @Test
@@ -1850,26 +1870,6 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         assertFalse(Files.exists(c1.getReviewed().getPath().resolve("a/b/c/current/previous/v1/data.json")));
         assertFalse(Files.exists(c1.getReviewed().getPath().resolve("a/b/c/current/previous/v1/abc123.json")));
         assertFalse(Files.exists(c1.getReviewed().getPath().resolve("a/b/c/current/previous/v1/abc123.xlsx")));
-    }
-
-    public static Collection createCollection(Path destination, String collectionName) throws CollectionNotFoundException, IOException {
-
-        CollectionDescription collection = new CollectionDescription(collectionName);
-        collection.setType(CollectionType.manual);
-        collection.setEncrypted(false);
-        collection.setName(collectionName);
-
-        String filename = PathUtils.toFilename(collectionName);
-        collection.setId(filename + "-" + Random.id());
-        Collection.CreateCollectionFolders(filename, destination);
-
-        // Create the description:
-        Path collectionDescriptionPath = destination.resolve(filename + ".json");
-        try (OutputStream output = Files.newOutputStream(collectionDescriptionPath)) {
-            Serialiser.serialise(output, collection);
-        }
-
-        return new Collection(destination.resolve(filename), null);
     }
 
     private void setUpKeyringMocks() throws Exception {

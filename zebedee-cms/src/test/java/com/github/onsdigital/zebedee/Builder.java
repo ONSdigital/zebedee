@@ -48,17 +48,7 @@ public class Builder {
 
     public static final String COLLECTION_ONE_NAME = "inflationq22015";
     public static final String COLLECTION_TWO_NAME = "labourmarketq22015";
-
-    @Mock
-    private CollectionKeyring collectionKeyringMock;
-
-    @Mock
-    private SlackClient slackClient;
-
-    @Mock
-    private Profile slackProfile;
-
-    private static int teamId;
+    private static String teamId;
     private static User administratorTemplate;
     private static User publisher1Template;
     private static User publisher2Template;
@@ -66,7 +56,7 @@ public class Builder {
     private static User reviewer2Template;
     private static User dataVisTemplate;
     private static boolean usersInitialised = false;
-
+    private final Zebedee zebedee;
     public String[] collectionNames = {"Inflation Q2 2015", "Labour Market Q2 2015"};
     public String[] teamNames = {"Economy Team", "Labour Market Team"};
     public Path parent;
@@ -89,7 +79,14 @@ public class Builder {
     public Team labourMarketTeam;
     public Team inflationTeam;
 
-    private Zebedee zebedee;
+    @Mock
+    private CollectionKeyring collectionKeyringMock;
+
+    @Mock
+    private SlackClient slackClient;
+
+    @Mock
+    private Profile slackProfile;
 
     /**
      * Constructor to build a known {@link Zebedee} structure with minimal structure for testing.
@@ -205,7 +202,7 @@ public class Builder {
 
 
         ZebedeeConfiguration configuration = new ZebedeeConfiguration(parent, false);
-        ReflectionTestUtils.setField(configuration,"slackClient",slackClient);
+        ReflectionTestUtils.setField(configuration, "slackClient", slackClient);
         this.zebedee = new Zebedee(configuration);
 
         inflationTeam = createTeam(reviewer1, teamNames[0], teams);
@@ -326,16 +323,26 @@ public class Builder {
         return credentials;
     }
 
-    private Set<Integer> set(Team team) {
-        Set<Integer> ids = new HashSet<>();
+    private Set<String> set(Team team) {
+        Set<String> ids = new HashSet<>();
         ids.add(team.getId());
         return ids;
     }
 
     private Team createTeam(User user, String name, Path teams) throws IOException {
         Team team = new Team();
+        int teamId_int;
+        try {
+            teamId_int = Integer.parseInt(teamId);
+            teamId_int += 1;
+            team.setId(String.valueOf(teamId_int));
 
-        team.setId(++teamId);
+        } catch (NumberFormatException e) {
+            //Will Throw exception!
+            //do something! anything to handle the exception.
+        }
+
+
         team.setName(name);
         team.addMember(user.getEmail());
         Path labourMarketTeamPath = teams.resolve(PathUtils.toFilename(team.getName() + ".json"));
@@ -470,7 +477,7 @@ public class Builder {
 
     /**
      * This method creates the expected set of folders for a Zebedee structure.
-     * This code is intentionaly copied from {@link Zebedee#create(Path)}. This
+     * This code is intentionaly copied from  {@Link Zebedee#create(Path)}. This
      * ensures there's a fixed expectation, rather than relying on a method that
      * will be tested as part of the test suite.
      *

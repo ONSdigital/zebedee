@@ -1,6 +1,5 @@
 package com.github.onsdigital.zebedee.model;
 
-
 import com.github.davidcarboni.cryptolite.Random;
 import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.Zebedee;
@@ -90,7 +89,7 @@ public class Collection {
     private static final String TARGET_COLLECTION = "targetCollection";
     private static final String DATASETS_URI = "/datasets/";
 
-    private static ConcurrentMap<Path, ReadWriteLock> collectionLocks = new ConcurrentHashMap<>();
+    private static final ConcurrentMap<Path, ReadWriteLock> collectionLocks = new ConcurrentHashMap<>();
 
     private final CollectionDescription description;
     private final Path path;
@@ -101,7 +100,8 @@ public class Collection {
     private final Zebedee zebedee;
 
     private final Path collectionJsonPath;
-    private VersionsService versionsService;
+
+    private final VersionsService versionsService;
 
     /**
      * Instantiates an existing {@link Collection}. This validates that the
@@ -385,11 +385,10 @@ public class Collection {
         // only update the collection name if its given and its changed.
         if (collectionDescription.getName() != null
                 && !collectionDescription.getName().equals(collection.getDescription().getName())) {
-            String nameBeforeUpdate = collection.getDescription().getName();
 
             // check if only the casing of the name has changed. If so only the json is updated, not the filename.
             if (!collectionDescription.getName().equalsIgnoreCase(collection.getDescription().getName())) {
-                updatedCollection = collection.rename(collection.getDescription(), collectionDescription.getName(), zebedee);
+                updatedCollection = rename(collection.getDescription(), collectionDescription.getName(), zebedee);
             } else {
                 updatedCollection.getDescription().setName(collectionDescription.getName());
             }
@@ -411,7 +410,7 @@ public class Collection {
             scheduler.cancel(collection);
         }
 
-        Set<Integer> teamIds = setViewerTeams(collectionDescription, zebedee, session);
+        setViewerTeams(collectionDescription, zebedee, session);
 
         if (collectionDescription.getTeams() != null) {
             updatedCollection.getDescription().setTeams(collectionDescription.getTeams());
@@ -422,9 +421,9 @@ public class Collection {
         return updatedCollection;
     }
 
-    private static Set<Integer> setViewerTeams(CollectionDescription desc, Zebedee zebedee, Session session)
+    private static Set<String> setViewerTeams(CollectionDescription desc, Zebedee zebedee, Session session)
             throws IOException, ZebedeeException {
-        Set<Integer> teamIds = new HashSet<>();
+        Set<String> teamIds = new HashSet<>();
         List<String> teamNames = desc.getTeams();
 
         if (teamNames == null) {

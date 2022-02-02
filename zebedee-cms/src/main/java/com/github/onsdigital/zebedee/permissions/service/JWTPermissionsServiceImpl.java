@@ -54,8 +54,8 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
      * @return list of groups where groupId is converted to teamId
      * @throws NumberFormatException if group name is not  permitted format (string of integers)
      */
-    private static List<Integer> convertGroupsToTeams(Session session) throws NumberFormatException {
-        List<Integer> teamsList = new ArrayList<>();
+    private static List<String> convertGroupsToTeams(Session session) throws NumberFormatException {
+        List<String> teamsList = new ArrayList<>();
         if (session == null || session.getGroups().isEmpty()) {
             return teamsList;
         }
@@ -65,7 +65,7 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
         Set<String> setOfString = new HashSet<>(groups);
         for (String s : setOfString) {
             try {
-                teamsList.add(Integer.parseInt(s));
+                teamsList.add(s);
             } catch (NumberFormatException e) {
                 if (!Arrays.asList(valueArray).contains(s)) {
                     String logString = "invalid group name format groupName " + s;
@@ -212,7 +212,7 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
             return false;
         }
 
-        List<Integer> userGroups = convertGroupsToTeams(session);
+        List<String> userGroups = session.getGroups();
         if (userGroups == null || userGroups.isEmpty()) {
             return false;
         }
@@ -221,13 +221,13 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
         readLock.lock();
         try {
             AccessMapping accessMapping = permissionsStore.getAccessMapping();
-            Set<Integer> collectionGroups = accessMapping.getCollections().get(collectionId);
+            Set<String> collectionGroups = accessMapping.getCollections().get(collectionId);
 
             if (collectionGroups == null || collectionGroups.isEmpty()) {
                 return false;
             }
 
-            List<Integer> intersection = userGroups.stream()
+            List<String> intersection = userGroups.stream()
                     .filter(collectionGroups::contains)
                     .collect(Collectors.toList());
             result = !intersection.isEmpty();
@@ -255,14 +255,13 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
      */
     @Deprecated
     @Override
-    public Set<Integer> listViewerTeams(Session session, String collectionId) throws IOException, UnauthorizedException {
+    public Set<String> listViewerTeams(Session session, String collectionId) throws IOException, UnauthorizedException {
         if (session == null || !canView(session, collectionId)) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
-        boolean result = false;
         readLock.lock();
-        Set<Integer> teamIds;
+        Set<String> teamIds;
         try {
             AccessMapping accessMapping = permissionsStore.getAccessMapping();
             teamIds = accessMapping.getCollections().get(collectionId);
@@ -280,7 +279,7 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
     /**
      * Set the list of team IDs that are allowed viewer access to a collection
      *
-     * @param collectionID    the ID of the collection collection to set viewer permissions for.
+     * @param collectionId    the ID of the collection collection to set viewer permissions for.
      * @param collectionTeams the set of team IDs for which viewer permissions should be granted to the collection.
      * @param session         the session of the user that is attempting to set the viewer permissions.
      * @throws IOException if reading or writing the access mapping fails.
@@ -291,7 +290,7 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
      */
     @Deprecated
     @Override
-    public void setViewerTeams(Session session, String collectionID, Set<Integer> collectionTeams) throws IOException, UnauthorizedException {
+    public void setViewerTeams(Session session, String collectionId, Set<String> collectionTeams) throws IOException, UnauthorizedException {
         if (session == null || !canEdit(session)) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
@@ -303,7 +302,7 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
         writeLock.lock();
         try {
             AccessMapping accessMapping = permissionsStore.getAccessMapping();
-            accessMapping.getCollections().put(collectionID, collectionTeams);
+            accessMapping.getCollections().put(collectionId, collectionTeams);
             permissionsStore.saveAccessMapping(accessMapping);
         } finally {
             writeLock.unlock();

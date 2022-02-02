@@ -13,7 +13,6 @@ import com.github.onsdigital.zebedee.teams.service.TeamsService;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.locks.Lock;
@@ -285,13 +284,13 @@ public class PermissionsServiceImpl implements PermissionsService {
      * @throws UnauthorizedException
      */
      @Override
-     public Set<Integer> listViewerTeams(Session session, String collectionId) throws IOException, UnauthorizedException {
+     public Set<String> listViewerTeams(Session session, String collectionId) throws IOException, UnauthorizedException {
          if (session == null || !canView(session, collectionId)) {
              throw new UnauthorizedException(getUnauthorizedMessage(session));
          }
 
          readLock.lock();
-         Set<Integer> teamIds;
+         Set<String> teamIds;
          try {
              AccessMapping accessMapping = permissionsStore.getAccessMapping();
              teamIds = accessMapping.getCollections().get(collectionId);
@@ -316,7 +315,7 @@ public class PermissionsServiceImpl implements PermissionsService {
      * @throws UnauthorizedException if the users' session isn't authorised to edit collections.
      */
     @Override
-    public void setViewerTeams(Session session, String collectionID, Set<Integer> collectionTeams) throws IOException, UnauthorizedException {
+    public void setViewerTeams(Session session, String collectionID, Set<String> collectionTeams) throws IOException, UnauthorizedException {
         if (session == null || !canEdit(session)) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
@@ -344,7 +343,7 @@ public class PermissionsServiceImpl implements PermissionsService {
             throws IOException {
 
         // Check to see if the email is a member of a team associated with the given collection:
-        Set<Integer> teamIds;
+        Set<String> teamIds;
         readLock.lock();
         try {
             teamIds = accessMapping.getCollections().get(collectionId);

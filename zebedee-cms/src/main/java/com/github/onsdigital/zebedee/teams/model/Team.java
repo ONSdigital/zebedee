@@ -17,9 +17,9 @@ public class Team {
     /**
      * {@link Comparator} ordering {@link Team} by {@link Team#id}.
      */
-    public static Comparator<Team> teamIDComparator = (t1, t2) -> Integer.compare(t1.getId(), t2.getId());
+    public static Comparator<Team> teamIdComparator = (t1, t2) -> String.CASE_INSENSITIVE_ORDER.compare(t1.getId(), t2.getId());
 
-    private int id;
+    private String id;
     private String name;
     private Set<String> members;
 
@@ -27,11 +27,11 @@ public class Team {
         this.members = new HashSet<>();
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public Team setId(int id) {
+    public Team setId(String id) {
         this.id = id;
         return this;
     }

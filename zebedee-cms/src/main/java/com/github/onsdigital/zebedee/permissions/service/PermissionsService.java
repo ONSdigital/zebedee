@@ -153,12 +153,12 @@ public interface PermissionsService {
      * TODO: Remove this method once the migration to the new dp-permissions-api is completed
      */
     @Deprecated
-    Set<Integer> listViewerTeams(Session session, String collectionId) throws IOException, UnauthorizedException;
+    Set<String> listViewerTeams(Session session, String collectionId) throws IOException, UnauthorizedException;
 
     /**
      * Set the list of team IDs that are allowed viewer access to a collection
      *
-     * @param collectionID    the ID of the collection collection to set viewer permissions for.
+     * @param collectionId    the ID of the collection collection to set viewer permissions for.
      * @param collectionTeams the set of team IDs for which viewer permissions should be granted to the collection.
      * @param session         the session of the user that is attempting to set the viewer permissions.
      * @throws IOException if reading or writing the access mapping fails.
@@ -170,7 +170,7 @@ public interface PermissionsService {
      * TODO: Remove once migration to dp-permissions-api is complete and the accessmapping is being removed.
      */
     @Deprecated
-    void setViewerTeams(Session session, String collectionId, Set<Integer> collectionTeams) throws IOException, ZebedeeException;
+    void setViewerTeams(Session session, String collectionId, Set<String> collectionTeams) throws IOException, ZebedeeException;
 
     /**
      * Return {@link PermissionDefinition} for the specified {@link User}.

@@ -39,10 +39,19 @@ public class UsersServiceImpl implements UsersService {
     private static UsersService INSTANCE = null;
 
     private final ReentrantLock lock = new ReentrantLock();
+    private final PermissionsService permissionsService;
+    private final UserStore userStore;
+    private final UserFactory userFactory;
 
-    private PermissionsService permissionsService;
-    private UserStore userStore;
-    private UserFactory userFactory;
+    /**
+     * Create a new instance or the user service. Callers outside this package should use getInstance() to obtain the
+     * singleton instance.
+     */
+    UsersServiceImpl(UserStore userStore, PermissionsService permissionsService) {
+        this.permissionsService = permissionsService;
+        this.userStore = userStore;
+        this.userFactory = new UserFactory();
+    }
 
     /**
      * Get a singleton instance of {@link UsersServiceImpl}.
@@ -56,16 +65,6 @@ public class UsersServiceImpl implements UsersService {
             }
         }
         return INSTANCE;
-    }
-
-    /**
-     * Create a new instance or the user service. Callers outside this package should use getInstance() to obtain the
-     * singleton instance.
-     */
-    UsersServiceImpl(UserStore userStore, PermissionsService permissionsService) {
-        this.permissionsService = permissionsService;
-        this.userStore = userStore;
-        this.userFactory = new UserFactory();
     }
 
     @Override

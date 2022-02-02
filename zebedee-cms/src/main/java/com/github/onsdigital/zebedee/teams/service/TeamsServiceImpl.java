@@ -22,13 +22,13 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getUnauthorizedMessage;
-import static com.github.onsdigital.zebedee.teams.model.Team.teamIDComparator;
+import static com.github.onsdigital.zebedee.teams.model.Team.teamIdComparator;
 
 /**
  * Handles permissions mapping between users and {@link com.github.onsdigital.zebedee.Zebedee} functions.
@@ -41,21 +41,21 @@ public class TeamsServiceImpl implements TeamsService {
     private static final String FORBIDDEN_ERR_MSG = "User does not have the required admin permission to perform " +
             "requested action.";
 
-    private static final int DEFAULT_TEAM_ID = 1;
+    private static final String DEFAULT_TEAM_ID = "1";
 
-    private ReadWriteLock teamLock = new ReentrantReadWriteLock();
-    private ServiceSupplier<PermissionsService> permissionsServiceSupplier;
-    private TeamsStore teamsStore;
+    private final ReadWriteLock teamLock = new ReentrantReadWriteLock();
+    private final ServiceSupplier<PermissionsService> permissionsServiceSupplier;
+    private final TeamsStore teamsStore;
 
-    private Comparator<Team> sortTeamsbyName = (t1, t2) -> t1.getName().compareTo(t2.getName());
+    private final Comparator<Team> sortTeamsbyName = (t1, t2) -> t1.getName().compareTo(t2.getName());
 
-    private Comparator<AbstractMap.SimpleEntry<String, String>> sortByTeamName =
+    private final Comparator<AbstractMap.SimpleEntry<String, String>> sortByTeamName =
             (o1, o2) -> o1.getKey().compareTo(o2.getKey());
 
-    private Comparator<AbstractMap.SimpleEntry<String, String>> sortTeamByMemberName =
+    private final Comparator<AbstractMap.SimpleEntry<String, String>> sortTeamByMemberName =
             (o1, o2) -> o1.getValue().compareTo(o2.getValue());
 
-    private Comparator<AbstractMap.SimpleEntry<String, String>> sortTeamsReportList =
+    private final Comparator<AbstractMap.SimpleEntry<String, String>> sortTeamsReportList =
             sortByTeamName.thenComparing(sortTeamByMemberName);
 
     /**
@@ -73,7 +73,7 @@ public class TeamsServiceImpl implements TeamsService {
     }
 
     @Override
-    public List<Team> resolveTeams(Set<Integer> teamIds) throws IOException {
+    public List<Team> resolveTeams(Set<String> teamIds) throws IOException {
         return listTeams()
                 .parallelStream()
                 .filter(t -> teamIds.contains(t.getId()))
@@ -81,7 +81,7 @@ public class TeamsServiceImpl implements TeamsService {
     }
 
     @Override
-    public List<Team> resolveTeamDetails(Set<Integer> teamIds) throws IOException {
+    public List<Team> resolveTeamDetails(Set<String> teamIds) throws IOException {
         return resolveTeams(teamIds).stream()
                 .map(team -> new Team().setId(team.getId()).setName(team.getName()))
                 .collect(Collectors.toList());
@@ -106,7 +106,7 @@ public class TeamsServiceImpl implements TeamsService {
             // Order existing teams by their ID.
             List<Team> orderedTeams = listTeams()
                     .parallelStream()
-                    .sorted(teamIDComparator)
+                    .sorted(teamIdComparator)
                     .collect(Collectors.toList());
 
             // Reverse the order so the highest number is first (for convenience).
@@ -114,11 +114,11 @@ public class TeamsServiceImpl implements TeamsService {
 
             // For the record this is a lift & shift of the pervious implementation (albeit a bit refactored).
             // When we move to a database impl this can be properly.
-            int teamID = orderedTeams.isEmpty() ? DEFAULT_TEAM_ID : (1 + orderedTeams.get(0).getId());
+            String teamId = orderedTeams.isEmpty() ? DEFAULT_TEAM_ID : String.valueOf(1 + Integer.parseInt(orderedTeams.get(0).getId()));
 
             Team team = new Team()
                     .setName(teamName)
-                    .setId(teamID);
+                    .setId(teamId);
             teamsStore.save(team);
             return team;
         } finally {
@@ -160,7 +160,7 @@ public class TeamsServiceImpl implements TeamsService {
 
         for (Team team : listTeams()) {
             if (team.getMembers() == null || team.getMembers().isEmpty()) {
-                membersReport.add(new AbstractMap.SimpleEntry<String, String>(team.getName(), ""));
+                membersReport.add(new AbstractMap.SimpleEntry<>(team.getName(), ""));
                 continue;
             }
 
@@ -178,11 +178,11 @@ public class TeamsServiceImpl implements TeamsService {
     public List<String> listTeamsForUser(Session session) throws IOException {
         return listTeams().parallelStream()
                 .filter(t -> t.getMembers().contains(session.getEmail()))
-                .map(t -> Integer.toString(t.getId()))
+                .map(Team::getId)
                 .collect(Collectors.toList());
     }
 
-    private void updateTeam(Team target, Predicate<Team> validator, Function<Team, Team> updateTask) throws IOException, NotFoundException {
+    private void updateTeam(Team target, Predicate<Team> validator, UnaryOperator<Team> updateTask) throws IOException, NotFoundException {
         if (validator.test(target)) {
             teamLock.writeLock().lock();
             try {

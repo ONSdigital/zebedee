@@ -122,8 +122,6 @@ public abstract class ZebedeeTestBaseFixture {
 
         ServiceSupplier<CollectionHistoryDao> collectionHistoryDaoServiceSupplier = () -> collectionHistoryDao;
 
-        Collection.setCollectionHistoryDaoServiceSupplier(collectionHistoryDaoServiceSupplier);
-
         usersMap = new HashMap<>();
         usersMap.put(builder.publisher1.getEmail(), builder.publisher1);
 

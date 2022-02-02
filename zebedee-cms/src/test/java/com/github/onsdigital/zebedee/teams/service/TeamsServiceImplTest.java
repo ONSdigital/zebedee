@@ -28,7 +28,6 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -66,9 +65,9 @@ public class TeamsServiceImplTest {
     public void setUp() throws Exception {
         MockitoAnnotations.openMocks(this);
 
-        teamA = new Team().setId(10001).setName("teamA");
-        teamB = new Team().setId(10002).setName("teamB");
-        teamC = new Team().setId(10003).setName("teamC");
+        teamA = new Team().setId("10001").setName("teamA");
+        teamB = new Team().setId("10002").setName("teamB");
+        teamC = new Team().setId("10003").setName("teamC");
         teamsList = new ArrayList<>();
 
         permissionsServiceServiceSupplier = () -> permissionsService;
@@ -85,7 +84,7 @@ public class TeamsServiceImplTest {
 
     @Test
     public void resolveTeams_ShouldFindRequestedTeams() throws Exception {
-        Set<Integer> requestedTeamIDs = new HashSet<>();
+        Set<String> requestedTeamIDs = new HashSet<>();
         requestedTeamIDs.add(teamA.getId());
         requestedTeamIDs.add(teamB.getId());
 
@@ -108,7 +107,7 @@ public class TeamsServiceImplTest {
 
     @Test
     public void resolveTeamDetails_success() throws Exception {
-        Set<Integer> requestedTeamIDs = new HashSet<>();
+        Set<String> requestedTeamIDs = new HashSet<>();
         requestedTeamIDs.add(teamA.getId());
         requestedTeamIDs.add(teamB.getId());
 
@@ -239,7 +238,7 @@ public class TeamsServiceImplTest {
         teamsList.add(teamC);
 
         Team expected = new Team()
-                .setId(10004)
+                .setId("10004")
                 .setName(TEAM_D_NAME);
 
         when(teamsStore.exists(TEAM_D_NAME))
@@ -268,7 +267,7 @@ public class TeamsServiceImplTest {
         teamsList.add(teamB);
         teamsList.add(teamC);
         Team expected = new Team()
-                .setId(10004)
+                .setId("10004")
                 .setName(TEAM_D_NAME);
 
         when(teamsStore.exists(TEAM_D_NAME))
@@ -385,7 +384,7 @@ public class TeamsServiceImplTest {
         verifyNoInteractions(readWriteLock, lock);
     }
 
-    @Test (expected = UnauthorizedException.class)
+    @Test(expected = UnauthorizedException.class)
     public void addTeamMemeber_ShouldThrowExIfSessionNull() throws Exception {
         try {
             service.addTeamMember(EMAIL, teamA, null);
@@ -395,7 +394,7 @@ public class TeamsServiceImplTest {
         }
     }
 
-    @Test (expected = UnauthorizedException.class)
+    @Test(expected = UnauthorizedException.class)
     public void addTeamMemeber_ShouldThrowExIfSessionEmailNull() throws Exception {
         Session session = new Session("1234", null);
 
@@ -407,7 +406,7 @@ public class TeamsServiceImplTest {
         }
     }
 
-    @Test (expected = ForbiddenException.class)
+    @Test(expected = ForbiddenException.class)
     public void addTeamMemeber_ShouldThrowExIfDUserNotAdmin() throws Exception {
         Session session = new Session("1234", EMAIL);
 
@@ -469,7 +468,7 @@ public class TeamsServiceImplTest {
         verify(lock, times(1)).unlock();
     }
 
-    @Test (expected = UnauthorizedException.class)
+    @Test(expected = UnauthorizedException.class)
     public void removeTeamMember_ShouldThrowExIfSessionNull() throws Exception {
         try {
             service.removeTeamMember(EMAIL, teamA, null);
@@ -479,7 +478,7 @@ public class TeamsServiceImplTest {
         }
     }
 
-    @Test (expected = UnauthorizedException.class)
+    @Test(expected = UnauthorizedException.class)
     public void removeTeamMember_ShouldThrowExIfSessionEmailNull() throws Exception {
         Session session = new Session("1234", null);
 
@@ -491,7 +490,7 @@ public class TeamsServiceImplTest {
         }
     }
 
-    @Test (expected = ForbiddenException.class)
+    @Test(expected = ForbiddenException.class)
     public void removeTeamMember_ShouldThrowExIfUserNotAdmin() throws Exception {
         Session session = new Session("1234", EMAIL);
 
@@ -557,7 +556,7 @@ public class TeamsServiceImplTest {
         verify(lock, times(1)).unlock();
     }
 
-    @Test (expected = UnauthorizedException.class)
+    @Test(expected = UnauthorizedException.class)
     public void getTeamMembersSummary_ShouldThrowUnauthorizedExceptionIfSessionNull() throws Exception {
         try {
             service.getTeamMembersSummary(null);
@@ -567,7 +566,7 @@ public class TeamsServiceImplTest {
         }
     }
 
-    @Test (expected = UnauthorizedException.class)
+    @Test(expected = UnauthorizedException.class)
     public void getTeamMembersSummary_ShouldThrowUnauthorizedExceptionIfSessionEmailNull() throws Exception {
         Session session = new Session("1234", null);
         try {
@@ -578,7 +577,7 @@ public class TeamsServiceImplTest {
         }
     }
 
-    @Test (expected = ForbiddenException.class)
+    @Test(expected = ForbiddenException.class)
     public void getTeamMembersSummary_ShouldThrowUnauthorizedExceptionIfUserNotAdmin() throws Exception {
         Session session = new Session("1234", EMAIL);
 

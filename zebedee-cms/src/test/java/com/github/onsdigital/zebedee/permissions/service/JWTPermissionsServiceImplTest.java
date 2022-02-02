@@ -32,8 +32,8 @@ import static org.mockito.Mockito.when;
 
 public class JWTPermissionsServiceImplTest {
 
-    private static final List<String> ADMIN_PUBLISHER_GROUPS = Arrays.asList(new String[]{"123456", "role-publisher", "role-admin", "789012345", "testgroup0"});
-    private static final List<String> NON_ADMIN_PUBLISHER_GROUPS = Arrays.asList(new String[]{"123456", "789012345"});
+    private static final List<String> ADMIN_PUBLISHER_GROUPS = Arrays.asList("123456", "role-publisher", "role-admin", "789012345", "testgroup0");
+    private static final List<String> NON_ADMIN_PUBLISHER_GROUPS = Arrays.asList("123456", "789012345");
     private static final String COLLECTION_ID = "1234";
     private static final String FLORENCE_TOKEN = "666";
     private static final String TEST_USER_EMAIL = "other123@ons.gov.uk";
@@ -202,16 +202,16 @@ public class JWTPermissionsServiceImplTest {
 
     @Test
     public void canView_CollectionId_Session() throws Exception {
-        Integer teamId = 123456;
+        String teamId = "123456";
         List<String> teamList = new ArrayList<>();
         teamList.add(String.valueOf(teamId));
 
         Session session = new Session(TEST_SESSION_ID, TEST_USER_EMAIL, teamList);
 
-        Set<Integer> teams = new HashSet<Integer>() {{
+        Set<String> teams = new HashSet<String>() {{
             add(teamId);
         }};
-        Map<String, Set<Integer>> collectionMapping = new HashMap<>();
+        Map<String, Set<String>> collectionMapping = new HashMap<>();
         collectionMapping.put(COLLECTION_ID, teams);
 
         when(accessMapping.getCollections()).thenReturn(collectionMapping);
@@ -228,7 +228,7 @@ public class JWTPermissionsServiceImplTest {
     public void canView_Session_GroupNull_CollectionId() throws Exception {
         Session session = new Session(FLORENCE_TOKEN, TEST_USER_EMAIL, null);
 
-        Map<String, Set<Integer>> collectionMapping = new HashMap<>();
+        Map<String, Set<String>> collectionMapping = new HashMap<>();
         collectionMapping.put(COLLECTION_ID, new HashSet<>());
 
         when(accessMapping.getCollections()).thenReturn(collectionMapping);
@@ -254,18 +254,18 @@ public class JWTPermissionsServiceImplTest {
     public void setViewerTeams_Session_CollectionId_TeamIds() throws Exception {
         Session session = new Session(FLORENCE_TOKEN, TEST_USER_EMAIL, ADMIN_PUBLISHER_GROUPS);
 
-        Set<Integer> teamList = new HashSet<Integer>() {{
-            add(123456);
-            add(789012345);
+        Set<String> teamList = new HashSet<String>() {{
+            add("123456");
+            add("789012345");
         }};
 
-        Map<String, Set<Integer>> collectionMapping = new HashMap<>();
+        Map<String, Set<String>> collectionMapping = new HashMap<>();
 
         when(accessMapping.getCollections()).thenReturn(collectionMapping);
 
         jwtPermissionsService.setViewerTeams(session, COLLECTION_ID, teamList);
 
-        assertTrue(collectionMapping.get(COLLECTION_ID).size() == teamList.size());
+        assertEquals(teamList.size(), collectionMapping.get(COLLECTION_ID).size());
         assertEquals(collectionMapping.get(COLLECTION_ID), teamList);
     }
 
@@ -281,18 +281,18 @@ public class JWTPermissionsServiceImplTest {
     @Test
     public void setViewerTeams_Session_CollectionId_TeamsList_emptyCollectionMapping() throws Exception {
         Session session = new Session(FLORENCE_TOKEN, TEST_USER_EMAIL, ADMIN_PUBLISHER_GROUPS);
-        
-        Integer teamId = 666;
-        Map<String, Set<Integer>> collectionMapping = new HashMap<>();
-        Set<Integer> teamList = new HashSet<>();
+
+        String teamId = "666";
+        Map<String, Set<String>> collectionMapping = new HashMap<>();
+        Set<String> teamList = new HashSet<>();
         teamList.add(teamId);
 
         when(accessMapping.getCollections()).thenReturn(collectionMapping);
 
         jwtPermissionsService.setViewerTeams(session, COLLECTION_ID, teamList);
-        
+
         assertThat(collectionMapping, IsMapContaining.hasKey(COLLECTION_ID));
-        assertTrue(collectionMapping.get(COLLECTION_ID).size() == teamList.size());
+        assertEquals(teamList.size(), collectionMapping.get(COLLECTION_ID).size());
         assertTrue(collectionMapping.get(COLLECTION_ID).contains(teamId));
     }
 
@@ -304,28 +304,28 @@ public class JWTPermissionsServiceImplTest {
         collectionDescriptionMock.setId(COLLECTION_ID);
         collectionDescriptionMock.setTeams(ADMIN_PUBLISHER_GROUPS);
 
-        Set<Integer> teamList = new HashSet<Integer>() {{
-            add(123456);
-            add(789012345);
+        Set<String> teamList = new HashSet<String>() {{
+            add("123456");
+            add("789012345");
         }};
-        Map<String, Set<Integer>> collectionMapping = new HashMap<>();
+        Map<String, Set<String>> collectionMapping = new HashMap<>();
         collectionMapping.put(COLLECTION_ID, teamList);
 
         when(accessMapping.getCollections()).thenReturn(collectionMapping);
 
-        Set<Integer> actual = jwtPermissionsService.listViewerTeams(session, COLLECTION_ID);
+        Set<String> actual = jwtPermissionsService.listViewerTeams(session, COLLECTION_ID);
         assertThat(actual, is(notNullValue()));
         assertFalse(actual.isEmpty());
-        assertTrue(actual.stream().anyMatch(c -> c.equals(789012345)));
-        assertTrue(actual.stream().anyMatch(c -> c.equals(123456)));
-        assertFalse(actual.stream().anyMatch(c -> c.equals(666)));
+        assertTrue(actual.stream().anyMatch(c -> c.equals("789012345")));
+        assertTrue(actual.stream().anyMatch(c -> c.equals("123456")));
+        assertFalse(actual.stream().anyMatch(c -> c.equals("666")));
     }
 
     @Test
     public void listViewerTeams_session_collectionId_noPermissions() throws Exception {
         Session session = new Session(FLORENCE_TOKEN, TEST_USER_EMAIL, ADMIN_PUBLISHER_GROUPS);
 
-        Map<String, Set<Integer>> collectionMapping = new HashMap<>();
+        Map<String, Set<String>> collectionMapping = new HashMap<>();
         collectionMapping.put(COLLECTION_ID, new HashSet<>());
 
         when(accessMapping.getCollections()).thenReturn(collectionMapping);
@@ -346,19 +346,19 @@ public class JWTPermissionsServiceImplTest {
     public void setViewerTeams_CollectionDescription_Team_Session_collectionTeam() throws Exception {
         Session session = new Session(FLORENCE_TOKEN, TEST_USER_EMAIL, ADMIN_PUBLISHER_GROUPS);
 
-        Integer teamId = 666;
+        String teamId = "666";
 
-        Set<Integer> originalList = new HashSet<Integer>() {{
-            add(123456);
-            add(789012345);
+        Set<String> originalList = new HashSet<String>() {{
+            add("123456");
+            add("789012345");
             add(teamId);
         }};
-        Set<Integer> updatedList = new HashSet<Integer>() {{
-                add(123456);
-                add(789012345);
+        Set<String> updatedList = new HashSet<String>() {{
+                add("123456");
+                add("789012345");
         }};
 
-        Map<String, Set<Integer>> collectionMapping = new HashMap<>();
+        Map<String, Set<String>> collectionMapping = new HashMap<>();
         collectionMapping.put(COLLECTION_ID, originalList);
 
         when(accessMapping.getCollections()).thenReturn(collectionMapping);
@@ -367,8 +367,8 @@ public class JWTPermissionsServiceImplTest {
 
         assertThat(collectionMapping, is(notNullValue()));
         assertTrue(collectionMapping.get(COLLECTION_ID).size() > 0);
-        assertTrue(collectionMapping.get(COLLECTION_ID).contains(789012345));
-        assertTrue(collectionMapping.get(COLLECTION_ID).contains(123456));
+        assertTrue(collectionMapping.get(COLLECTION_ID).contains("789012345"));
+        assertTrue(collectionMapping.get(COLLECTION_ID).contains("123456"));
         assertFalse(collectionMapping.get(COLLECTION_ID).contains(teamId));
     }
 

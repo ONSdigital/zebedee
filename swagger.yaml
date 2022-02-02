@@ -1,0 +1,1647 @@
+openapi: 3.0.0
+info:
+  description: Used to access the data for legacy content types and for various
+    administrative functions related to the preparation and publishing of
+    content for the ONS website.
+  version: 1.0.0
+  title: Zebedee Reader and Zebedee CMS API
+  license:
+    name: Open Government Licence v3.0
+    url: http://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/
+
+tags:
+  - name: zebedee
+    description:
+      The CMS version of zebedee running in publishing and used to prepare and
+      publish content.
+  - name: zebedee-reader
+    description:
+      The public website backend version of zebedee running in web and used to
+      serve the data for the frontend services to render the website.
+
+servers:
+  - url: http://localhost:10050
+    description: Internal nomad cluster environment zebedee(-reader) address
+  - url: http://localhost:8082
+    description: Local development environment zebedee(-reader) address
+
+security:
+  - jwtToken: []
+  - florenceToken: []
+  - serviceToken: []
+
+paths:
+  /data:
+    get:
+      tags:
+        - zebedee-reader
+        - zebedee
+      summary: Get published page data
+      description:
+        Retrieves published content page model as JSON for the specified URI.
+        This is the data contained within the `data.json` files for each URI
+        (i.e. `/data.json` will be appended to the provided URI).
+      security:
+        - {} # Auth not required for zebedee reader
+        - jwtToken: []
+        - florenceToken: []
+        - serviceToken: []
+      parameters:
+        - $ref: "#/components/parameters/contentURI"
+        - $ref: "#/components/parameters/language"
+        - name: title
+          in: query
+          allowEmptyValue: true
+          description: Filter so only title of content is returned
+          schema:
+            type: boolean
+        - name: description
+          in: query
+          allowEmptyValue: true
+          description: Filter so only description of content is returned
+          schema:
+            type: boolean
+        - name: series
+          in: query
+          allowEmptyValue: true
+          description:
+            Filter so that only time series data is returned. Used for
+            sparklines on website
+          schema:
+            type: boolean
+      responses:
+        "200":
+          description: Returns the page model as JSON. Structure varies by content type.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  foo:
+                    example: bar
+        "400":
+          description: Invalid request parameters
+        "401":
+          description: Unauthorised request
+        "404":
+          description: URI not found
+        "500":
+          description: Internal server error
+  "/data/{collection_id}":
+    get:
+      tags:
+        - zebedee
+      summary: Get unpublished page data from collection
+      description:
+        Retrieves unpublished content from the specified collection as JSON for
+        the specified URI. This is the data contained within the `data.json`
+        files for each URI (i.e. `/data.json` will be appended to the provided
+        URI).
+      parameters:
+        - $ref: "#/components/parameters/contentURI"
+        - $ref: "#/components/parameters/language"
+        - $ref: "#/components/parameters/collectionID"
+        - name: title
+          in: query
+          allowEmptyValue: true
+          description: Filter so only title of content is returned
+          schema:
+            type: boolean
+        - name: description
+          in: query
+          allowEmptyValue: true
+          description: Filter so only description of content is returned
+          schema:
+            type: boolean
+        - name: series
+          in: query
+          allowEmptyValue: true
+          description:
+            Filter so that only time series data is returned. Used for
+            sparklines on website
+          schema:
+            type: boolean
+      responses:
+        "200":
+          description: Returns the page model as JSON. Structure varies by content type.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  foo:
+                    example: bar
+        "400":
+          description: Invalid request parameters
+        "401":
+          description: Unauthorised request
+        "404":
+          description: URI not found
+        "500":
+          description: Internal server error
+
+  /export:
+    post:
+      tags:
+        - zebedee-reader
+        - zebedee
+      summary: Export published time series data
+      description:
+        Generates excel or csv of time series data for the supplied list of time
+        series.
+      security:
+        - {} # Auth not required for zebedee reader
+        - jwtToken: []
+        - florenceToken: []
+        - serviceToken: []
+      requestBody:
+        $ref: "#/components/requestBodies/postExport"
+      responses:
+        "200":
+          description: Returns the exported file.
+          content:
+            text/csv:
+              schema:
+                type: string
+                format: binary
+            application/vnd.ms-excel:
+              schema:
+                type: string
+                format: binary
+            application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+              schema:
+                type: string
+                format: binary
+        "400":
+          description: Invalid request parameters
+        "401":
+          description: Unauthorised request
+        "404":
+          description: URI not found
+        "500":
+          description: Internal server error
+  "/export/{collection_id}":
+    post:
+      tags:
+        - zebedee
+      summary: Export unpublished time series data from collection
+      description:
+        Generates excel or csv of time series data for the supplied list of time
+        series using the data from the given collection.
+      parameters:
+        - $ref: "#/components/parameters/collectionID"
+      requestBody:
+        $ref: "#/components/requestBodies/postExport"
+      responses:
+        "200":
+          description: Returns the exported file.
+          content:
+            text/csv:
+              schema:
+                type: string
+                format: binary
+            application/vnd.ms-excel:
+              schema:
+                type: string
+                format: binary
+            application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+              schema:
+                type: string
+                format: binary
+        "400":
+          description: Invalid request parameters
+        "401":
+          description: Unauthorised request
+        "404":
+          description: URI not found
+        "500":
+          description: Internal server error
+
+  /filesize:
+    get:
+      tags:
+        - zebedee-reader
+        - zebedee
+      summary: Get filesize for a published URI
+      description: Get the filesize of the response for a published URI.
+      security:
+        - {} # Auth not required for zebedee reader
+        - jwtToken: []
+        - florenceToken: []
+        - serviceToken: []
+      parameters:
+        - $ref: "#/components/parameters/language"
+        - $ref: "#/components/parameters/contentURI"
+      responses:
+        "200":
+          description: Returns the filesize of the content at the specified URI
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  fileSize:
+                    description: The filesize in bytes
+                    type: integer
+                    example: 1234567890
+        "400":
+          description: Invalid request parameters
+        "401":
+          description: Unauthorised request
+        "404":
+          description: URI not found
+        "500":
+          description: Internal server error
+  "/filesize/{collection_id}":
+    get:
+      tags:
+        - zebedee
+      summary: Get filesize for a unpublished URI in the specified collection
+      description: Get the filesize of the response for a unpublished URI in the specified collection
+      parameters:
+        - $ref: "#/components/parameters/collectionID"
+        - $ref: "#/components/parameters/language"
+        - $ref: "#/components/parameters/contentURI"
+      responses:
+        "200":
+          description: Returns the filesize of the content at the specified URI
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  fileSize:
+                    description: The filesize in bytes
+                    type: integer
+                    example: 1234567890
+        "400":
+          description: Invalid request parameters
+        "401":
+          description: Unauthorised request
+        "404":
+          description: URI not found
+        "500":
+          description: Internal server error
+
+  /generator:
+    get:
+      tags:
+        - zebedee-reader
+        - zebedee
+      summary: Export published table or chart data as a file
+      description:
+        Generate a csv, xls or xlsx file containing the data from a chart or
+        table specified by the supplied URI.
+      security:
+        - {} # Auth not required for zebedee reader
+        - jwtToken: []
+        - florenceToken: []
+        - serviceToken: []
+      parameters:
+        - $ref: "#/components/parameters/language"
+        - $ref: "#/components/parameters/contentURI"
+        - name: format
+          in: query
+          required: true
+          description: The format in which to export the data
+          schema:
+            type: string
+            enum:
+              - csv
+              - xls
+              - xlsx
+      responses:
+        "200":
+          description: Returns the exported file.
+          content:
+            text/csv:
+              schema:
+                type: string
+                format: binary
+            application/vnd.ms-excel:
+              schema:
+                type: string
+                format: binary
+            application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+              schema:
+                type: string
+                format: binary
+        "400":
+          description: Invalid request parameters
+        "401":
+          description: Unauthorised request
+        "404":
+          description: URI not found
+        "500":
+          description: Internal server error
+  "/generator/{collection_id}":
+    get:
+      tags:
+        - zebedee
+      summary: Export unpublished table or chart data as a file from collection
+      description:
+        Generate a csv, xls or xlsx file containing the data from a chart or
+        table specified by the supplied URI and in the specified collection.
+      parameters:
+        - $ref: "#/components/parameters/collectionID"
+        - $ref: "#/components/parameters/language"
+        - $ref: "#/components/parameters/contentURI"
+        - name: format
+          in: query
+          required: true
+          description: The format in which to export the data
+          schema:
+            type: string
+            enum:
+              - csv
+              - xls
+              - xlsx
+      responses:
+        "200":
+          description: Returns the exported file.
+          content:
+            text/csv:
+              schema:
+                type: string
+                format: binary
+            application/vnd.ms-excel:
+              schema:
+                type: string
+                format: binary
+            application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+              schema:
+                type: string
+                format: binary
+        "400":
+          description: Invalid request parameters
+        "401":
+          description: Unauthorised request
+        "404":
+          description: URI not found
+        "500":
+          description: Internal server error
+
+  /health:
+    get:
+      tags:
+        - zebedee-reader
+        - zebedee
+      summary: Health check
+      description: Simple health check that returns 200 when API is running.
+      security: []
+      responses:
+        "200":
+          description: OK
+
+  /parents:
+    get:
+      tags:
+        - zebedee-reader
+        - zebedee
+      summary: Get parent pages for URI
+      description: Get parent pages for a given URI for use in breadcrumbs
+      security:
+        - {} # Auth not required for zebedee reader
+        - jwtToken: []
+        - florenceToken: []
+        - serviceToken: []
+      parameters:
+        - $ref: "#/components/parameters/language"
+        - $ref: "#/components/parameters/contentURI"
+      responses:
+        "200":
+          description: Returns list of parents
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ContentNode"
+        "400":
+          description: Invalid request parameters
+        "401":
+          description: Unauthorised request
+        "404":
+          description: URI not found
+        "500":
+          description: Internal server error
+  "/parents/{collection_id}":
+    get:
+      tags:
+        - zebedee
+      summary: Get parent pages for URI
+      description:
+        Get parent pages for a given URI in specified collection for use in
+        breadcrumbs
+      parameters:
+        - $ref: "#/components/parameters/collectionID"
+        - $ref: "#/components/parameters/language"
+        - $ref: "#/components/parameters/contentURI"
+      responses:
+        "200":
+          description: Returns list of parents
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ContentNode"
+        "400":
+          description: Invalid request parameters
+        "401":
+          description: Unauthorised request
+        "404":
+          description: URI not found
+        "500":
+          description: Internal server error
+
+  /publisheddata:
+    get:
+      tags:
+        - zebedee-reader
+        - zebedee
+      summary: Get only published page data
+      description:
+        Retrieves only published content page model as JSON for the specified
+        URI. Since there is no associated `/publisheddata/{collection_id}`
+        endpoint, the published version of the specified URI will always be
+        returned even when the user is currently viewing a collection.
+      security: []
+      parameters:
+        - $ref: "#/components/parameters/contentURI"
+        - $ref: "#/components/parameters/language"
+        - name: title
+          in: query
+          allowEmptyValue: true
+          description: Filter so only title of content is returned
+          schema:
+            type: boolean
+        - name: description
+          in: query
+          allowEmptyValue: true
+          description: Filter so only description of content is returned
+          schema:
+            type: boolean
+        - name: series
+          in: query
+          allowEmptyValue: true
+          description:
+            Filter so that only time series data is returned. Used for
+            sparklines on website
+          schema:
+            type: boolean
+      responses:
+        "200":
+          description: Returns the page model as JSON. Structure varies by content type.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  foo:
+                    example: bar
+        "400":
+          description: Invalid request parameters
+        "401":
+          description: Unauthorised request
+        "404":
+          description: URI not found
+        "500":
+          description: Internal server error
+
+  /publishedindex:
+    get:
+      tags:
+        - zebedee-reader
+        - zebedee
+      summary: Get a list of all published content URIs
+      security: []
+      description:
+        Get a list of URIs for all published content items held in the zebedee
+        content.
+      responses:
+        "200":
+          description: The list of all published content URIs
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PublishedIndexResponse"
+        "500":
+          description: Internal server error
+
+  /resolvedatasets:
+    get:
+      tags:
+        - zebedee-reader
+        - zebedee
+      summary: Get details for published product page datasets
+      description:
+        Resolves the list of highlighted datasets on a published product page
+        and gathers basic information (title, summary and URI) required for
+        displaying the dataset list on the product page.
+      security:
+        - {} # Auth not required for zebedee reader
+        - jwtToken: []
+        - florenceToken: []
+        - serviceToken: []
+      parameters:
+        - name: uri
+          in: query
+          required: true
+          description: The website path of the product page to resolve datasets for
+          schema:
+            type: string
+        - $ref: "#/components/parameters/language"
+      responses:
+        "200":
+          description: The list of datasets for the product page
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    title:
+                      type: string
+                      description: The title of the dataset
+                      example: Output of the production industries
+                    summary:
+                      type: string
+                      description: The brief description of the dataset
+                      example: Index values and growth rates for production,
+                        manufacturing and the main industrial groupings in the
+                        UK.
+                    uri:
+                      type: string
+                      description: The website path of the dataset's landing page
+                      example: /economy/economicoutputandproductivity/output/datasets/outputoftheproductionindustries
+        "400":
+          description: Invalid request parameters
+        "401":
+          description: Unauthorised request
+        "404":
+          description: Product page URI not found
+        "500":
+          description: Internal server error
+  "/resolvedatasets/{collection_id}":
+    get:
+      tags:
+        - zebedee
+      summary: Get details for unpublished product page datasets from collection
+      description:
+        Resolves the list of highlighted datasets on an unpublished product page
+        and gathers basic information (title, summary and URI) required for
+        displaying the dataset list on the product page.
+      parameters:
+        - $ref: "#/components/parameters/collectionID"
+        - name: uri
+          in: query
+          required: true
+          description: The website path of the product page to resolve datasets for
+          schema:
+            type: string
+        - $ref: "#/components/parameters/language"
+      responses:
+        "200":
+          description: The list of datasets for the product page
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    title:
+                      type: string
+                      description: The title of the dataset
+                      example: Output of the production industries
+                    summary:
+                      type: string
+                      description: The brief description of the dataset
+                      example: Index values and growth rates for production,
+                        manufacturing and the main industrial groupings in the
+                        UK.
+                    uri:
+                      type: string
+                      description: The website path of the dataset's landing page
+                      example: /economy/economicoutputandproductivity/output/datasets/outputoftheproductionindustries
+        "400":
+          description: Invalid request parameters
+        "401":
+          description: Unauthorised request
+        "404":
+          description: Product page URI not found
+        "500":
+          description: Internal server error
+
+  /resource:
+    get:
+      tags:
+        - zebedee-reader
+        - zebedee
+      summary: Get a published page resource file
+      description:
+        Retrieves published assets and data files other than `data.json` files
+        as specified by the URI.
+      security:
+        - {} # Auth not required for zebedee reader
+        - jwtToken: []
+        - florenceToken: []
+        - serviceToken: []
+      parameters:
+        - $ref: "#/components/parameters/language"
+        - name: uri
+          in: query
+          required: true
+          description: The URI of the individual resource file to get
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Returns the request resource file
+          content:
+            "*/*":
+              schema:
+                type: string
+                format: binary
+        "400":
+          description: Invalid request parameters
+        "401":
+          description: Unauthorised request
+        "404":
+          description: URI not found
+        "500":
+          description: Internal server error
+  "/resource/{collection_id}":
+    get:
+      tags:
+        - zebedee
+      summary: Get a published page resource file
+      description:
+        Retrieves published assets and data files other than `data.json` files
+        as specified by the URI.
+      parameters:
+        - $ref: "#/components/parameters/collectionID"
+        - $ref: "#/components/parameters/language"
+        - name: uri
+          in: query
+          required: true
+          description: The URI of the individual resource file to get
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Returns the request resource file
+          content:
+            "*/*":
+              schema:
+                type: string
+                format: binary
+        "400":
+          description: Invalid request parameters
+        "401":
+          description: Unauthorised request
+        "404":
+          description: URI not found
+        "500":
+          description: Internal server error
+
+  /taxonomy:
+    get:
+      tags:
+        - zebedee-reader
+        - zebedee
+      summary: Get the taxonomy tree
+      description:
+        Gets the taxonomy tree down to a specified depth. Currently this
+        endpoint is only used for populating the nav bar in the page header and
+        therefore all queries have `depth=2`.
+      security:
+        - {} # Auth not required for zebedee reader
+        - jwtToken: []
+        - florenceToken: []
+        - serviceToken: []
+      parameters:
+        - $ref: "#/components/parameters/language"
+        - name: depth
+          in: query
+          description: The tree depth to return
+          schema:
+            type: integer
+            minimum: 0
+            default: 1
+      responses:
+        "200":
+          description: The taxonomy tree
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TaxonomyNode"
+        "400":
+          description: Invalid request parameters
+        "401":
+          description: Unauthorised request
+        "500":
+          description: Internal server error
+  "/taxonomy/{collection_id}":
+    get:
+      tags:
+        - zebedee
+      summary: Get the taxonomy tree
+      description:
+        Gets the taxonomy tree down to a specified depth. Currently this
+        endpoint is only used for populating the nav bar in the page header and
+        therefore all queries have `depth=2`.
+      parameters:
+        - $ref: "#/components/parameters/collectionID"
+        - $ref: "#/components/parameters/language"
+        - name: depth
+          in: query
+          description: The tree depth to return
+          schema:
+            type: integer
+            minimum: 0
+            default: 1
+      responses:
+        "200":
+          description: The taxonomy tree
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TaxonomyNode"
+        "400":
+          description: Invalid request parameters
+        "401":
+          description: Unauthorised request
+        "500":
+          description: Internal server error
+
+  /reindex:
+    post:
+      tags:
+        - zebedee-reader
+        - zebedee
+      summary: Trigger search (re-)indexing
+      description:
+        Triggers the search (re-)indexing of a single piece of content or all
+        content within zebedee.
+      security:
+        - reindexKey: []
+      parameters:
+        - name: uri
+          in: query
+          description: The website path of the content to (re-)index.
+          schema:
+            type: string
+        - name: all
+          in: query
+          description: Trigger rebuild of the entire search index
+          schema:
+            type: string
+            enum:
+              - "1"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: string
+                example: "Elasticsearch: indexing complete"
+        "400":
+          description:
+            Invalid request parameters, either the `uri` or `all` query param is
+            required
+        "401":
+          description: Unauthorised request due to invalid `key` param
+        "409":
+          description: Conflict caused by a full re-index in progress
+        "500":
+          description: Internal server error
+    delete:
+      tags:
+        - zebedee-reader
+        - zebedee
+      summary: Trigger deletion of content from search
+      description: Triggers the deletion of a single piece of content from the search index.
+      security:
+        - reindexKey: []
+      parameters:
+        - name: uri
+          in: query
+          required: true
+          description: The website path of the content to remove from search index
+          schema:
+            type: string
+        - name: pageType
+          in: query
+          required: true
+          description: The page type of the content to delete
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: string
+                example: "Elasticsearch: indexing complete"
+        "400":
+          description: Invalid request parameters
+        "401":
+          description: Unauthorised request due to invalid `key` param
+        "409":
+          description: Conflict caused by a full re-index in progress
+        "500":
+          description: Internal server error
+  /servicedatasetpermissions:
+    get:
+      tags:
+        - zebedee
+      security: []
+      responses:
+        default:
+          description: Default response
+  /serviceinstancepermissions:
+    get:
+      tags:
+        - zebedee
+      security: []
+      responses:
+        default:
+          description: Default response
+  /userdatasetpermissions:
+    get:
+      tags:
+        - zebedee
+      security: []
+      responses:
+        default:
+          description: Default response
+  /userinstancepermissions:
+    get:
+      tags:
+        - zebedee
+      security: []
+      responses:
+        default:
+          description: Default response
+  /approve:
+    post:
+      tags:
+        - zebedee
+      responses:
+        default:
+          description: Default response
+  /checkcollectionsforuri:
+    get:
+      tags:
+        - zebedee
+      responses:
+        default:
+          description: Default response
+  /clickeventlog:
+    post:
+      tags:
+        - zebedee
+      security: []
+      responses:
+        default:
+          description: Default response
+  /collection:
+    get:
+      tags:
+        - zebedee
+      responses:
+        default:
+          description: Default response
+    post:
+      tags:
+        - zebedee
+      responses:
+        default:
+          description: Default response
+    put:
+      tags:
+        - zebedee
+      responses:
+        default:
+          description: Default response
+    delete:
+      tags:
+        - zebedee
+      responses:
+        default:
+          description: Default response
+  /collectionbrowsetree:
+    get:
+      tags:
+        - zebedee
+      responses:
+        default:
+          description: Default response
+  /collectiondetails:
+    get:
+      tags:
+        - zebedee
+      responses:
+        default:
+          description: Default response
+  /collectionhistory:
+    get:
+      tags:
+        - zebedee
+      responses:
+        default:
+          description: Default response
+  /collections:
+    get:
+      tags:
+        - zebedee
+      responses:
+        default:
+          description: Default response
+    put:
+      tags:
+        - zebedee
+      responses:
+        default:
+          description: Default response
+    delete:
+      tags:
+        - zebedee
+      responses:
+        default:
+          description: Default response
+  /complete:
+    post:
+      tags:
+        - zebedee
+      responses:
+        default:
+          description: Default response
+  /content:
+    get:
+      tags:
+        - zebedee
+      responses:
+        default:
+          description: Default response
+    delete:
+      tags:
+        - zebedee
+      responses:
+        default:
+          description: Default response
+  /contentmove:
+    post:
+      tags:
+        - zebedee
+      responses:
+        default:
+          description: Default response
+  /contentrename:
+    post:
+      tags:
+        - zebedee
+      responses:
+        default:
+          description: Default response
+  /dataservices:
+    post:
+      tags:
+        - zebedee
+      responses:
+        default:
+          description: Default response
+  /datavisualisationzip:
+    post:
+      tags:
+        - zebedee
+      responses:
+        default:
+          description: Default response
+    delete:
+      tags:
+        - zebedee
+      responses:
+        default:
+          description: Default response
+  /deletecontent:
+    get:
+      tags:
+        - zebedee
+      responses:
+        default:
+          description: Default response
+    post:
+      tags:
+        - zebedee
+      responses:
+        default:
+          description: Default response
+    delete:
+      tags:
+        - zebedee
+      responses:
+        default:
+          description: Default response
+  /deletedcontent:
+    get:
+      tags:
+        - zebedee
+      responses:
+        default:
+          description: Default response
+    post:
+      tags:
+        - zebedee
+      responses:
+        default:
+          description: Default response
+  /equation:
+    post:
+      tags:
+        - zebedee
+      responses:
+        default:
+          description: Default response
+    delete:
+      tags:
+        - zebedee
+      responses:
+        default:
+          description: Default response
+  /equationpreview:
+    post:
+      tags:
+        - zebedee
+      responses:
+        default:
+          description: Default response
+  /file:
+    get:
+      tags:
+        - zebedee
+      responses:
+        default:
+          description: Default response
+  /identity:
+    get:
+      tags:
+        - zebedee
+      summary: Identify a entity from their auth token
+      description:
+        If no florence token is provided, the identity object will contain the
+        callers id instead.
+      security: []
+      parameters:
+        - $ref: "#/components/parameters/authHeader"
+        - $ref: "#/components/parameters/florenceToken"
+      responses:
+        "200":
+          description: The identity of the authenticated user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Identity"
+        "401":
+          description: user not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          description: internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /listkeyring:
+    get:
+      tags:
+        - zebedee
+      responses:
+        default:
+          description: Default response
+  /login:
+    post:
+      tags:
+        - zebedee
+      deprecated: true
+      security: []
+      responses:
+        default:
+          description: Default response
+  /modifytable:
+    get:
+      tags:
+        - zebedee
+      responses:
+        default:
+          description: Default response
+    post:
+      tags:
+        - zebedee
+      responses:
+        default:
+          description: Default response
+  /onpublishcomplete:
+    post:
+      tags:
+        - zebedee
+      responses:
+        default:
+          description: Default response
+  /page:
+    post:
+      tags:
+        - zebedee
+      responses:
+        default:
+          description: Default response
+    delete:
+      tags:
+        - zebedee
+      responses:
+        default:
+          description: Default response
+  /password:
+    post:
+      tags:
+        - zebedee
+      deprecated: true
+      security: []
+      responses:
+        default:
+          description: Default response
+  /permission:
+    get:
+      tags:
+        - zebedee
+      responses:
+        default:
+          description: Default response
+    post:
+      tags:
+        - zebedee
+      responses:
+        default:
+          description: Default response
+  /ping:
+    post:
+      tags:
+        - zebedee
+      security: []
+      responses:
+        default:
+          description: Default response
+  /publish:
+    post:
+      tags:
+        - zebedee
+      responses:
+        default:
+          description: Default response
+  /publishedcollections:
+    get:
+      tags:
+        - zebedee
+      responses:
+        default:
+          description: Default response
+  /review:
+    post:
+      tags:
+        - zebedee
+      responses:
+        default:
+          description: Default response
+  /service:
+    post:
+      tags:
+        - zebedee
+      summary: Create a new service account
+      description:
+        Create a service which can authenticated against /identity. Only the
+        name is required. Once created a token will re returned from the
+        response. Only a admin can call this endpoint
+      security:
+        - authHeader: []
+        - florenceKey: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Service"
+      responses:
+        "200":
+          description: A new service was created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Service"
+        "400":
+          description: bad request
+        "500":
+          description: internal server error
+  /table:
+    post:
+      tags:
+        - zebedee
+      responses:
+        default:
+          description: Default response
+  /teams:
+    get:
+      tags:
+        - zebedee
+      deprecated: true
+      responses:
+        default:
+          description: Default response
+    post:
+      tags:
+        - zebedee
+      deprecated: true
+      responses:
+        default:
+          description: Default response
+    delete:
+      tags:
+        - zebedee
+      deprecated: true
+      responses:
+        default:
+          description: Default response
+  /teamsreport:
+    get:
+      tags:
+        - zebedee
+      deprecated: true
+      responses:
+        default:
+          description: Default response
+  /timeseriesimport:
+    post:
+      tags:
+        - zebedee
+      responses:
+        default:
+          description: Default response
+  /transfer:
+    post:
+      tags:
+        - zebedee
+      responses:
+        default:
+          description: Default response
+  /unlock:
+    post:
+      tags:
+        - zebedee
+      responses:
+        default:
+          description: Default response
+  /users:
+    get:
+      tags:
+        - zebedee
+      deprecated: true
+      summary: Get list of users or individual user
+      description: Lists all users by default or returns a specific user if the `email` query param is provided.
+      parameters:
+        - name: email
+          in: query
+          description: The email of the user to return. If not provided then a list of all users is returned.
+          schema:
+            type: string
+      responses:
+        "200":
+          description: A list of all users or a specific user
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/User"
+                  - $ref: "#/components/schemas/Users"
+        "400":
+          description: Invalid request parameters
+        "401":
+          description: Unauthorised request
+        "500":
+          description: Internal server error
+
+    post:
+      tags:
+        - zebedee
+      deprecated: true
+      responses:
+        default:
+          description: Default response
+    put:
+      tags:
+        - zebedee
+      deprecated: true
+      responses:
+        default:
+          description: Default response
+    delete:
+      tags:
+        - zebedee
+      deprecated: true
+      summary: Delete a user
+      description: Deletes a user account managed by zebedee.
+      parameters:
+        - name: email
+          in: query
+          description: The email of the user to delete
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: boolean
+                default: true
+        "400":
+          description: Invalid request parameters
+        "401":
+          description: Unauthorised request
+        "500":
+          description: Internal server error
+
+  /version:
+    post:
+      tags:
+        - zebedee
+      responses:
+        default:
+          description: Default response
+    delete:
+      tags:
+        - zebedee
+      responses:
+        default:
+          description: Default response
+components:
+  parameters:
+    authHeader:
+      in: header
+      name: Authorization
+      description:
+        A string containing the bearer's token. This can be a human or automated user's JWT token
+        or an automated user's opaque service token.
+      schema:
+        type: string
+    florenceToken:
+      in: header
+      name: X-Florence-Token
+      description: The user's Florence session token
+      schema:
+        type: string
+    collectionID:
+      in: path
+      name: collection_id
+      required: true
+      description: The ID of the collection to read from/write to
+      schema:
+        type: string
+    language:
+      in: query
+      name: lang
+      description: The language (i.e. english or welsh)
+      schema:
+        type: string
+        enum:
+          - en
+          - cy
+        default: en
+    contentURI:
+      in: query
+      name: uri
+      required: true
+      description: The website path of the content
+      schema:
+        type: string
+  requestBodies:
+    postExport:
+      content:
+        application/x-www-form-urlencoded:
+          schema:
+            type: object
+            properties:
+              lang:
+                description: The language (i.e. english or welsh)
+                type: string
+                enum:
+                  - en
+                  - cy
+                default: en
+              format:
+                description: The format in which to export the data
+                type: string
+                enum:
+                  - csv
+                  - xls
+                  - xlsx
+              uri:
+                description: The website paths of the content as a repeatable query param
+                type: string
+            required:
+              - format
+              - uri
+  securitySchemes:
+    jwtToken:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Bearer token for human or automated user issued by the Auth Service
+    serviceToken:
+      type: http
+      scheme: bearer
+      bearerFormat: Opaque token
+      description: Bearer token generated by zebedee `POST /service` endpoint for an automated user
+    florenceToken:
+      type: apiKey
+      in: header
+      name: X-Florence-Token
+      description: Session token issued by zebedee's `POST /login` endpoint for a human user
+    reindexKey:
+      type: apiKey
+      in: query
+      name: key
+      description: The search re-index secret key (shared secret, opaque token)
+  schemas:
+    Identity:
+      description: The identity of the authenticated user or service
+      type: object
+      properties:
+        identifier:
+          example: tyroin@lannister.com
+          type: string
+    Error:
+      description: internal server error
+      type: array
+      items:
+        type: object
+        properties:
+          message:
+            type: string
+    Service:
+      description: A service account
+      type: object
+      properties:
+        name:
+          description: The name of the service
+          type: string
+        token:
+          description: The token to identify the service
+          type: string
+          readOnly: true
+    ContentNode:
+      description: A content node in the website taxonomy tree
+      type: object
+      properties:
+        uri:
+          type: string
+          description: The content node's URI
+          example: /employmentandlabourmarket
+        type:
+          type: string
+          description: The content node's content type
+          example: taxonomy_landing_page
+        description:
+          type: object
+          properties:
+            title:
+              type: string
+              description: The content node's page title
+              example: Employment and labour market
+    PublishedIndexResponse:
+      description: A list of all published content URIs on the zebedee content volume
+      type: object
+      properties:
+        count:
+          type: integer
+          description:
+            The number of content items returned in this response. Pagination
+            was never implemented so this number is always the same as the
+            `total_count`.
+          example: 5
+        limit:
+          type: integer
+          description:
+            The number of content items returned per request. Pagination was
+            never implemented so this number is always the same as the
+            `total_count`.
+          example: 5
+        offset:
+          type: integer
+          description:
+            The offset to start listing content items from. Pagination was never
+            implemented so this number is always 0.
+          example: 0
+        total_count:
+          type: integer
+          description:
+            The total number of published content items held in the zebedee
+            content.
+          example: 5
+        items:
+          type: array
+          items:
+            type: object
+            properties:
+              uri:
+                type: string
+                description: The content item's website path
+            example:
+              - uri: /
+              - uri: /methodology
+              - uri: /methodology/methodologycontacts
+              - uri: /methodology/methodologytopicsandstatisticalconcepts
+              - uri: /methodology/methodologytopicsandstatisticalconcepts/indexnumbers
+    TaxonomyNode:
+      description: A node in the taxonomy tree
+      type: object
+      properties:
+        uri:
+          type: string
+          description: The website path of the taxonomy node
+          example: /businessindustryandtrade
+        description:
+          type: object
+          properties:
+            title:
+              type: string
+              description: The taxonomy node page title
+              example: Business, industry and trade
+        type:
+          type: string
+          description: The taxonomy node type
+          enum:
+            - taxonomy_landing_page
+            - static_landing_page
+            - product_page
+            - home_page_census
+          example: taxonomy_landing_page
+        children:
+          type: array
+          items:
+            $ref: "#/components/schemas/TaxonomyNode"
+      example:
+        uri: /businessindustryandtrade
+        description:
+          title: Business, industry and trade
+        type: taxonomy_landing_page
+        children:
+          - uri: /businessindustryandtrade/business
+            description:
+              title: Business
+            type: taxonomy_landing_page
+    User:
+      description: Details of a human user account managed by zebedee
+      type: object
+      properties:
+        name:
+          type: string
+          description: The user's name
+          example: John Doe
+        email:
+          type: string
+          description: The user's email
+          example: john.doe@ons.gov.uk
+        inactive:
+          type: boolean
+          description: Whether the user's account is active or not
+          example: false
+        temporaryPassword:
+          type: boolean
+          description: Whether the user has a temporary password
+          example: false
+        lastAdmin:
+          type: string
+          description: The email of the last user to have edited this user's details
+          example: john.doe@ons.gov.uk
+        adminOptions:
+          type: object
+          deprecated: true
+          properties:
+            rawJson:
+              type: boolean
+              description: This field is unused
+              example: false
+    Users:
+      description: List of human user accounts managed by zebedee
+      type: array
+      items:
+        $ref: "#/components/schemas/User"

@@ -1,5 +1,6 @@
 package com.github.onsdigital.zebedee;
 
+import com.github.onsdigital.zebedee.collection.service.CollectionsService;
 import com.github.onsdigital.zebedee.data.processing.DataIndex;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedException;
@@ -69,7 +70,7 @@ public class Zebedee {
 
     private final VerificationAgent verificationAgent;
     private final PublishedCollections publishedCollections;
-    private final Collections collections;
+    private final CollectionsService collectionsService;
     private final Content published;
     private final CollectionKeyCache schedulerKeyCache;
     private final Path publishedContentPath;
@@ -102,7 +103,7 @@ public class Zebedee {
         this.permissionsService = cfg.getPermissionsService();
         this.published = cfg.getPublished();
         this.dataIndex = cfg.getDataIndex();
-        this.collections = cfg.getCollections();
+        this.collectionsService = cfg.getCollectionsService();
         this.publishedCollections = cfg.getPublishCollections();
         this.teamsService = cfg.getTeamsService();
         this.usersService = cfg.getUsersService();
@@ -143,7 +144,7 @@ public class Zebedee {
         int result = 0;
 
         // Is this URI present anywhere else?
-        for (Collection collection : collections.list()) {
+        for (Collection collection : collectionsService.list()) {
             if (collection.isInCollection(uri)) {
                 result++;
             }

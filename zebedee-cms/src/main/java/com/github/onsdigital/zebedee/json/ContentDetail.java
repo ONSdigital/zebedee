@@ -22,36 +22,16 @@ public class ContentDetail {
 
     public ContentDetail() {
     }
-    
-    /**
-     * Convenience constructor
-     *
-     * @param uri
-     * @param type
-     */
+
     public ContentDetail(String uri, PageType type) {
         this.uri = uri;
         this.type = type;
     }
 
-    /**
-     * Convenience constructor taking the typical parameters.
-     *
-     * @param title
-     * @param uri
-     * @param type
-     */
     public ContentDetail(String title, String uri, PageType type) {
         this(new ContentDetailDescription(title), uri, type);
     }
 
-    /**
-     * Convenience constructor taking the typical parameters.
-     *
-     * @param description
-     * @param uri
-     * @param type
-     */
     public ContentDetail(ContentDetailDescription description, String uri, PageType type) {
         this(uri, type);
         this.description = description;

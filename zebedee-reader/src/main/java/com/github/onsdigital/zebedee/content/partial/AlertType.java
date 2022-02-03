@@ -5,6 +5,7 @@ import com.google.gson.annotations.SerializedName;
 public enum AlertType {
     @SerializedName("alert")
     ALERT,
+
     @SerializedName("correction")
-    CORRECTION
+    CORRECTION;
 }

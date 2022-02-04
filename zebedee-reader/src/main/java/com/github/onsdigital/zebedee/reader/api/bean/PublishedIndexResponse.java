@@ -5,6 +5,7 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Object representing a response for the PublishedIndex endpoint
@@ -17,6 +18,13 @@ public class PublishedIndexResponse {
     private int offset;
     @SerializedName("total_count")
     private int totalCount;
+
+    public PublishedIndexResponse(List<Item> items,  int offset,  int limit, int totalCount) {
+        this.items = items;
+        this.offset = offset;
+        this.limit = limit;
+        this.totalCount = totalCount;
+    }
 
     public PublishedIndexResponse() {
         this.items = new ArrayList<>();
@@ -83,5 +91,18 @@ public class PublishedIndexResponse {
         public String getUri() {
             return uri;
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        PublishedIndexResponse that = (PublishedIndexResponse) o;
+        return count == that.count && limit == that.limit && offset == that.offset && totalCount == that.totalCount && Objects.equals(items, that.items);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(count, items, limit, offset, totalCount);
     }
 }

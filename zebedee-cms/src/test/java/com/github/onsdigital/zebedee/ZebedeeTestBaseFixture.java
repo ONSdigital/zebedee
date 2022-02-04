@@ -1,6 +1,5 @@
 package com.github.onsdigital.zebedee;
 
-import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.Credentials;
 import com.github.onsdigital.zebedee.keyring.CollectionKeyring;
 import com.github.onsdigital.zebedee.model.Collection;
@@ -73,9 +72,6 @@ public abstract class ZebedeeTestBaseFixture {
 
     @Mock
     protected User user;
-
-    @Mock
-    protected com.github.onsdigital.zebedee.json.Keyring usersKeyring;
 
     @Mock
     protected PermissionsService permissionsService;

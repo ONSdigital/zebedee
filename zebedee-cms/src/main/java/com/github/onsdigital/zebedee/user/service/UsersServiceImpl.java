@@ -4,12 +4,10 @@ import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.ConflictException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
-import com.github.onsdigital.zebedee.json.AdminOptions;
 import com.github.onsdigital.zebedee.json.Credentials;
-import com.github.onsdigital.zebedee.keyring.CollectionKeyring;
-import com.github.onsdigital.zebedee.model.Collections;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.session.model.Session;
+import com.github.onsdigital.zebedee.user.model.AdminOptions;
 import com.github.onsdigital.zebedee.user.model.User;
 import com.github.onsdigital.zebedee.user.model.UserList;
 import com.github.onsdigital.zebedee.user.store.UserStore;
@@ -17,7 +15,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.function.Supplier;
 
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 import static java.text.MessageFormat.format;
@@ -44,29 +41,17 @@ public class UsersServiceImpl implements UsersService {
     private final ReentrantLock lock = new ReentrantLock();
 
     private PermissionsService permissionsService;
-    private Collections collections;
     private UserStore userStore;
     private UserFactory userFactory;
 
     /**
-     * There is a circular dependency between the UserService and the new Keyring they are both needed by each others
-     * constructors. To get around this we're using a supplier which returns the keying. This allows us to construct
-     * a new instance of the UserService without the actual Keyring object. When the Keyring is needed the supplier
-     * allows to lazy it load it on demand. Admittedly this is a bit of hack but:
-     * - This is Zebedee.
-     * - This was a quick & reasonably clean way to solve this issue.
-     */
-    private Supplier<CollectionKeyring> keyringSupplier;
-
-    /**
      * Get a singleton instance of {@link UsersServiceImpl}.
      */
-    public static UsersService getInstance(UserStore userStore, Collections collections,
-                                           PermissionsService permissionsService, Supplier<CollectionKeyring> keyringSupplier) {
+    public static UsersService getInstance(UserStore userStore, PermissionsService permissionsService) {
         if (INSTANCE == null) {
             synchronized (MUTEX) {
                 if (INSTANCE == null) {
-                    INSTANCE = new UsersServiceImpl(userStore, collections, permissionsService, keyringSupplier);
+                    INSTANCE = new UsersServiceImpl(userStore, permissionsService);
                 }
             }
         }
@@ -77,11 +62,8 @@ public class UsersServiceImpl implements UsersService {
      * Create a new instance or the user service. Callers outside this package should use getInstance() to obtain the
      * singleton instance.
      */
-    UsersServiceImpl(UserStore userStore, Collections collections, PermissionsService permissionsService,
-                     Supplier<CollectionKeyring> keyringSupplier) {
+    UsersServiceImpl(UserStore userStore, PermissionsService permissionsService) {
         this.permissionsService = permissionsService;
-        this.collections = collections;
-        this.keyringSupplier = keyringSupplier;
         this.userStore = userStore;
         this.userFactory = new UserFactory();
     }

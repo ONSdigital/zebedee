@@ -202,7 +202,7 @@ public class ZebedeeConfiguration {
             this.usersService = StubbedUsersServiceImpl.getInstance();
         } else {
             this.usersService = UsersServiceImpl.getInstance(
-                    new UserStoreFileSystemImpl(this.usersPath), collections, permissionsService, keyringSupplier);
+                    new UserStoreFileSystemImpl(this.usersPath), permissionsService);
         }
 
         // Configure the sessions

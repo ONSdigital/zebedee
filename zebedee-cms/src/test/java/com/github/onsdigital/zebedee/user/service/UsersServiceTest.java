@@ -4,10 +4,9 @@ import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.ConflictException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
-import com.github.onsdigital.zebedee.json.AdminOptions;
+import com.github.onsdigital.zebedee.user.model.AdminOptions;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.Credentials;
-import com.github.onsdigital.zebedee.json.Keyring;
 import com.github.onsdigital.zebedee.keyring.CollectionKeyring;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.Collections;
@@ -72,9 +71,6 @@ public class UsersServiceTest {
     private Session session;
 
     @Mock
-    private Keyring keyring;
-
-    @Mock
     private User userMock;
 
     @Mock
@@ -98,9 +94,7 @@ public class UsersServiceTest {
         user.setTemporaryPassword(false);
         user.setAdminOptions(new AdminOptions());
 
-        keyringSupplier = () -> collectionKeyring;
-
-        service = new UsersServiceImpl(userStore, collections, permissions, keyringSupplier);
+        service = new UsersServiceImpl(userStore, permissions);
 
         when(userMock.getEmail())
                 .thenReturn(EMAIL_2);
@@ -482,9 +476,6 @@ public class UsersServiceTest {
 
         when(permissions.isAdministrator(session))
                 .thenReturn(true);
-
-        Keyring originalKeyring = mock(Keyring.class);
-        ReflectionTestUtils.setField(userMock, "keyring", originalKeyring);
 
         User adminUser = mock(User.class);
         when(userStore.get(session.getEmail()))

@@ -257,7 +257,6 @@ public class Builder {
         clone.setTemporaryPassword(user.getTemporaryPassword());
         clone.setLastAdmin(user.getLastAdmin());
         clone(clone, user, "passwordHash");
-        clone(clone, user, "keyring");
         return clone;
     }
 

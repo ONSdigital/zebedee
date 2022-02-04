@@ -195,8 +195,6 @@ public class ZebedeeConfiguration {
         VersionsService versionsService = new VersionsServiceImpl();
         this.collections = new Collections(collectionsPath, permissionsService, versionsService, published);
 
-        Supplier<CollectionKeyring> keyringSupplier = () -> collectionKeyring;
-
         // TODO: Remove after migration to JWT sessions is complete
         if (cmsFeatureFlags().isJwtSessionsEnabled()) {
             this.usersService = StubbedUsersServiceImpl.getInstance();

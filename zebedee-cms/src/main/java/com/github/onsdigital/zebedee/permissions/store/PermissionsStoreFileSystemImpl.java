@@ -23,7 +23,6 @@ import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 public class PermissionsStoreFileSystemImpl implements PermissionsStore {
 
     static final String PERMISSIONS_FILE = "accessMapping.json";
-    static final String DATA_VIS_KEY = "dataVisualisationPublishers";
     static final String PUBLISHERS_KEY = "digitalPublishingTeam";
     static final String ADMINS_KEY = "administrators";
     static final String COLLECTIONS_KEY = "collections";
@@ -48,44 +47,6 @@ public class PermissionsStoreFileSystemImpl implements PermissionsStore {
             jsonPath.toFile().createNewFile();
             try (OutputStream output = Files.newOutputStream(jsonPath)) {
                 Serialiser.serialise(output, new AccessMapping());
-            }
-        } else {
-            migrateDataVisUsers(jsonPath);
-        }
-    }
-
-    /**
-     * Temporary legacy migration. Transfer deprecated Data Visualisation Publisher users to Digital Publishing team.
-     * Can be reomved once all users have been safely migrated.
-     */
-    private static void migrateDataVisUsers(Path p) throws IOException {
-        Map<String, Object> accessMapping = Serialiser.deserialise(p, Map.class);
-        if (accessMapping.containsKey(DATA_VIS_KEY)) {
-
-            List<String> dataVisualisationPublishers = (List<String>) accessMapping.get(DATA_VIS_KEY);
-            if (dataVisualisationPublishers != null && !dataVisualisationPublishers.isEmpty()) {
-
-                info().log("Migrating users from Data Visualisation team to Digital Publishing team.");
-
-                List<String> digitalPublishingTeam = (List<String>) accessMapping.get(PUBLISHERS_KEY);
-                List<String> administrators = (List<String>) accessMapping.get(ADMINS_KEY);
-                Map<String, Set<Integer>> collections = (Map<String, Set<Integer>>) accessMapping.get(COLLECTIONS_KEY);
-
-                AccessMapping updated = new AccessMapping();
-                updated.getDigitalPublishingTeam().addAll(digitalPublishingTeam);
-
-                dataVisualisationPublishers.stream()
-                        .forEach(dataVisUser -> {
-                            info().data("user", dataVisUser).log("Migrating user");
-                            updated.getDigitalPublishingTeam().add(dataVisUser);
-                        });
-
-                updated.getAdministrators().addAll(administrators);
-                updated.setCollections(collections);
-
-                try (OutputStream output = Files.newOutputStream(p)) {
-                    Serialiser.serialise(output, updated);
-                }
             }
         }
     }

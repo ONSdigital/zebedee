@@ -24,8 +24,10 @@ import com.github.onsdigital.zebedee.model.encryption.EncryptionKeyFactory;
 import com.github.onsdigital.zebedee.model.encryption.EncryptionKeyFactoryImpl;
 import com.github.onsdigital.zebedee.model.publishing.PublishedCollections;
 import com.github.onsdigital.zebedee.notification.StartUpNotifier;
+import com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImpl;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsServiceImpl;
+import com.github.onsdigital.zebedee.permissions.service.PermissionsServiceProxy;
 import com.github.onsdigital.zebedee.permissions.store.PermissionsStore;
 import com.github.onsdigital.zebedee.permissions.store.PermissionsStoreFileSystemImpl;
 import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
@@ -100,7 +102,6 @@ import static org.apache.commons.lang3.StringUtils.isEmpty;
  * directories required by zebedee, create the service instances it requires etc.
  */
 public class ZebedeeConfiguration {
-
     private Path rootPath;
     private Path zebedeePath;
     private Path publishedContentPath;
@@ -191,8 +192,10 @@ public class ZebedeeConfiguration {
         initialisePermissions(permissionsPath);
         this.permissionsStore = new PermissionsStoreFileSystemImpl(permissionsPath);
 
-        this.permissionsService = new PermissionsServiceImpl(permissionsStore, this::getUsersService,
-                this::getTeamsService);
+        PermissionsServiceImpl legacyPermissionsService = new PermissionsServiceImpl(permissionsStore, this::getTeamsService);
+        JWTPermissionsServiceImpl jwtPermissionsService = new JWTPermissionsServiceImpl(permissionsStore);
+        this.permissionsService = new PermissionsServiceProxy(cmsFeatureFlags().isJwtSessionsEnabled(),
+                legacyPermissionsService, jwtPermissionsService);
 
         VersionsService versionsService = new VersionsServiceImpl();
         this.collections = new Collections(collectionsPath, permissionsService, versionsService, published);
@@ -370,7 +373,7 @@ public class ZebedeeConfiguration {
         Content content = new Content(publishedContentPath);
         Path redirectPath = publishedContentPath.resolve(Content.REDIRECT);
         if (!Files.exists(redirectPath)) {
-            content.redirect = new RedirectTablePartialMatch(content);
+            content.setRedirects(new RedirectTablePartialMatch(content));
             try {
                 Files.createFile(redirectPath);
             } catch (IOException e) {
@@ -378,7 +381,7 @@ public class ZebedeeConfiguration {
                         .logException(e, "could not save redirect to requested path");
             }
         } else {
-            content.redirect = new RedirectTablePartialMatch(content, redirectPath);
+            content.setRedirects(new RedirectTablePartialMatch(content, redirectPath));
         }
         return content;
     }

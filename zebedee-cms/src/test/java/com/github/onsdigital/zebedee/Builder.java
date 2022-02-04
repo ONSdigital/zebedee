@@ -210,8 +210,8 @@ public class Builder {
 
         inflationTeam = createTeam(reviewer1, teamNames[0], teams);
         labourMarketTeam = createTeam(reviewer2, teamNames[1], teams);
-        accessMapping.getCollections().put(new Collection(collections.get(0), zebedee).description.getId(), set(inflationTeam));
-        accessMapping.getCollections().put(new Collection(collections.get(1), zebedee).description.getId(),
+        accessMapping.getCollections().put(new Collection(collections.get(0), zebedee).getDescription().getId(), set(inflationTeam));
+        accessMapping.getCollections().put(new Collection(collections.get(1), zebedee).getDescription().getId(),
                 set(labourMarketTeam));
 
         Path path = permissions.resolve("accessMapping.json");

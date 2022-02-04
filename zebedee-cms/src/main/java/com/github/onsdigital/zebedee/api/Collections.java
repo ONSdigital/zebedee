@@ -91,7 +91,7 @@ public class Collections {
             List<Collection> collections = Root.zebedee.getCollections().list();
 
             for (Collection collection : collections) {
-                if (Root.zebedee.getPermissionsService().canView(session, collection.getDescription())) {
+                if (Root.zebedee.getPermissionsService().canView(session, collection.getDescription().getId())) {
                     CollectionDescription newDesc = new CollectionDescription();
                     newDesc.setId(collection.getDescription().getId());
                     newDesc.setName(collection.getDescription().getName());

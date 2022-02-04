@@ -31,6 +31,11 @@ import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException
 import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.sessionNotFoundException;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
+/**
+ * @deprecated in favour of the dp-permissions-api. Once all dataset related APIs have been updated to use the
+ *             dp-authorisation v2 library and JWT sessions are in use, this service will be removed.
+ */
+@Deprecated
 public class CMDPermissionsServiceImpl implements CMDPermissionsService {
 
     private static final String DATASET_NOT_IN_COLLECTION = "no permissions granted to viewer user as the requested " +
@@ -66,12 +71,13 @@ public class CMDPermissionsServiceImpl implements CMDPermissionsService {
             return grantUserDatasetCreateReadUpdateDelete(request, userSession);
         }
 
-        Collection targetCollection = getCollectionByID(request.getCollectionID());
+        String collectionId = request.getCollectionID();
 
-        if (!userHasViewCollectionPermission(userSession, targetCollection.getDescription())) {
+        if (!userHasViewCollectionPermission(userSession, collectionId)) {
             return grantUserNone(request, userSession, NO_COLLECTION_VIEW_PERMISSION);
         }
 
+        Collection targetCollection = getCollectionByID(collectionId);
         if (!collectionContainsDataset(targetCollection, request.getDatasetID())) {
             return grantUserNone(request, userSession, DATASET_NOT_IN_COLLECTION);
         }
@@ -213,10 +219,10 @@ public class CMDPermissionsServiceImpl implements CMDPermissionsService {
         return userHasEditCollectionPermission(session);
     }
 
-    boolean userHasViewCollectionPermission(Session session, CollectionDescription description)
+    boolean userHasViewCollectionPermission(Session session, String collectionId)
             throws PermissionsException {
         try {
-            return collectionPermissions.canView(session, description);
+            return collectionPermissions.canView(session, collectionId);
         } catch (IOException ex) {
             error().exception(ex)
                     .user(session)

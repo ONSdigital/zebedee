@@ -25,6 +25,14 @@ import static com.github.onsdigital.zebedee.util.JsonUtils.writeResponseEntity;
 import static org.apache.http.HttpStatus.SC_OK;
 import static org.apache.http.HttpStatus.SC_UNAUTHORIZED;
 
+/**
+ * @deprecated The GET /identity endpoint is deprecated in favour of the new JWT sessions. Validating the JWT signature
+ *             accomplishes the same functionality as this implementation, but in a more distributed and performant
+ *             fashion.
+ *
+ * TODO: Once the migration to JWT sessions has been completed and all microservices have been updated to use the new
+ *       dp-authorisation implementation that includes JWT validation, then these API endpoints should be removed
+ */
 @Deprecated
 @Api
 public class Identity {
@@ -49,19 +57,33 @@ public class Identity {
         this.authorisationService = authorisationService;
     }
 
+    /**
+     * Endpoint validates user session token (provided via X-Florence-Token or Authorization header) and returns the
+     * user's email for human users or the user's service name (e.g. dp-dataset-exporter) for automated users.
+     *
+     * This is currently used by dp-api-clients-go/identity client which is in turn used by dp-net/handlers/Identity.
+     *
+     * @deprecated usage of this endpoint is deprecated in favour of JWT validation provided via the dp-authorisation library.
+     */
+    @Deprecated
     @GET
     public void identifyUser(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        // TODO: Remove after migration from X-Florence-Token to Authorization header is complete
-        String florenceHeader = request.getHeader(RequestUtils.FLORENCE_TOKEN_HEADER);
-        String authHeader = request.getHeader(AUTHORIZATION_HEADER);
-        if (florenceHeader != null || (StringUtils.isNotBlank(authHeader) && authHeader.contains("."))) {
-            findUser(request, response);
+        String sessionID = RequestUtils.getSessionId(request);
+        if (!StringUtils.isBlank(sessionID)) {
+            try {
+                UserIdentity identity = findUser(sessionID);
+                writeResponseEntity(response, identity, SC_OK);
+            } catch (UserIdentityException e) {
+                warn().log(e.getMessage());
+                writeResponseEntity(response, new Error(e.getMessage()), e.getResponseCode());
+            }
             return;
         }
 
         // TODO: Remove after new service user JWT auth is implemented
+        String authHeader = request.getHeader(AUTHORIZATION_HEADER);
         if (StringUtils.isNotBlank(authHeader)) {
-            ServiceAccount serviceAccount = handleServiceAccountRequest(request);
+            ServiceAccount serviceAccount = handleServiceAccountRequest(authHeader);
             if (serviceAccount != null) {
                 writeResponseEntity(response, new UserIdentity(serviceAccount.getID()), SC_OK);
                 return;
@@ -70,32 +92,27 @@ public class Identity {
         writeResponseEntity(response, new Error("service not authenticated"), SC_UNAUTHORIZED);
     }
 
-    private void findUser(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        String sessionID = RequestUtils.getSessionId(request);
-
+    private UserIdentity findUser(String sessionID) throws UserIdentityException {
         if (StringUtils.isEmpty(sessionID)) {
-            Error responseBody = new Error("user not authenticated");
-            warn().log(responseBody.getMessage());
-            writeResponseEntity(response, responseBody, SC_UNAUTHORIZED);
-            return;
+            throw new UserIdentityException("user not authenticated", SC_UNAUTHORIZED);
         }
 
+        UserIdentity identity;
         try {
-            UserIdentity identity = authorisationService.identifyUser(sessionID);
-            writeResponseEntity(response, identity, SC_OK);
+            identity = authorisationService.identifyUser(sessionID);
         } catch (UserIdentityException e) {
             error().logException(e, "identity endpoint: identify user failure, returning error response");
-            writeResponseEntity(response, new Error(e.getMessage()), e.getResponseCode());
+            throw e;
         }
+
+        return identity;
     }
 
-    private ServiceAccount handleServiceAccountRequest(HttpServletRequest request) throws IOException {
-        String authorizationHeader = request.getHeader(AUTHORIZATION_HEADER);
-
+    private ServiceAccount handleServiceAccountRequest(String authHeader) throws IOException {
         ServiceAccount serviceAccount = null;
 
-        if (isValidServiceAuthorizationHeader(authorizationHeader)) {
-            String serviceToken = extractServiceAccountTokenFromAuthHeader(authorizationHeader);
+        if (isValidServiceAuthorizationHeader(authHeader)) {
+            String serviceToken = extractServiceAccountTokenFromAuthHeader(authHeader);
 
             if (isValidServiceToken(serviceToken)) {
                 serviceAccount = getServiceAccount(serviceToken);

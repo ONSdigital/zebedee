@@ -64,7 +64,7 @@ public class Manifest {
             }
         }
 
-        for (PendingDelete delete : collection.description.getPendingDeletes()) {
+        for (PendingDelete delete : collection.getDescription().getPendingDeletes()) {
             manifest.addDelete(delete.getRoot().uri);
         }
     }
@@ -105,7 +105,7 @@ public class Manifest {
     }
 
     public static Path getManifestPath(Collection collection) {
-        return collection.path.resolve(filename);
+        return collection.getPath().resolve(filename);
     }
 
     void addDelete(String uri) {

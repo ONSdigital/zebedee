@@ -69,7 +69,7 @@ public class ZebedeeCmsService {
     }
 
     public ContentReader getPublishedContentReader() {
-        return new FileSystemContentReader(Root.zebedee.getPublished().path);
+        return new FileSystemContentReader(Root.zebedee.getPublished().getPath());
     }
 
     public CollectionWriter getZebedeeCollectionWriter(Collection collection, Session session) throws ZebedeeException {

@@ -88,8 +88,8 @@ public class PostPublisher {
 
             savePublishMetrics(publishedCollection);
 
-            ContentReader contentReader = new FileSystemContentReader(zebedee.getPublished().path);
-            ContentWriter contentWriter = new ContentWriter(zebedee.getPublished().path);
+            ContentReader contentReader = new FileSystemContentReader(zebedee.getPublished().getPath());
+            ContentWriter contentWriter = new ContentWriter(zebedee.getPublished().getPath());
 
             applyDeletesToPublishing(collection, contentReader, contentWriter);
             processManifestForMaster(collection, contentReader, contentWriter);
@@ -170,7 +170,7 @@ public class PostPublisher {
     }
 
     public static PublishedCollection getPublishedCollection(Collection collection) throws IOException {
-        Path path = Paths.get(collection.path.toString() + ".json");
+        Path path = Paths.get(collection.getPath().toString() + ".json");
         PublishedCollection publishedCollection;
         try (InputStream input = Files.newInputStream(path)) {
             publishedCollection = ContentUtil.deserialise(input,
@@ -296,7 +296,7 @@ public class PostPublisher {
             if (source != null) {
                 if (source.getFileName().toString().equals("timeseries-to-publish.zip")) {
                     String publishUri = StringUtils.removeStart(StringUtils.removeEnd(uri, "-to-publish.zip"), "/");
-                    Path publishPath = zebedee.getPublished().path.resolve(publishUri);
+                    Path publishPath = zebedee.getPublished().getPath().resolve(publishUri);
                     info().data("source", source.toString()).data("destination", publishPath.toString())
                             .log("Unzipping TimeSeries");
                     try (
@@ -326,7 +326,7 @@ public class PostPublisher {
                 }
             }
 
-            for (PendingDelete pendingDelete : collection.description.getPendingDeletes()) {
+            for (PendingDelete pendingDelete : collection.getDescription().getPendingDeletes()) {
 
                 ContentTreeNavigator.getInstance().search(pendingDelete.getRoot(), node -> {
                     info().data("uri", node.uri).log("Deleting index from publishing search ");
@@ -395,8 +395,8 @@ public class PostPublisher {
                 .log("moving collection files to archive for collection");
 
         String filename = PathUtils.toFilename(collection.getDescription().getName());
-        Path collectionJsonSource = zebedee.getCollections().path.resolve(filename + ".json");
-        Path collectionFilesSource = collection.getReviewed().path;
+        Path collectionJsonSource = zebedee.getCollections().getPath().resolve(filename + ".json");
+        Path collectionFilesSource = collection.getReviewed().getPath();
         Path logPath = zebedee.getPublishedCollections().path;
 
         if (!Files.exists(logPath)) {

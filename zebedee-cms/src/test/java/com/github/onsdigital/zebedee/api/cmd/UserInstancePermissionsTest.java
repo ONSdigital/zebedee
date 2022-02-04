@@ -5,7 +5,6 @@ import com.github.onsdigital.zebedee.permissions.cmd.CMDPermissionsService;
 import com.github.onsdigital.zebedee.permissions.cmd.CRUD;
 import com.github.onsdigital.zebedee.permissions.cmd.GetPermissionsRequest;
 import com.github.onsdigital.zebedee.util.HttpResponseWriter;
-import org.apache.http.HttpStatus;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -50,17 +49,7 @@ public class UserInstancePermissionsTest {
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
-        api = new UserInstancePermissions(true, permissionsService, httpResponseWriter);
-    }
-
-    @Test
-    public void givenFeatureIsNotEnabled() throws Exception {
-        api = new UserInstancePermissions(false, permissionsService, httpResponseWriter);
-
-        api.handle(request, response);
-
-        verify(httpResponseWriter, times(1)).writeJSONResponse(response, null, HttpStatus.SC_NOT_FOUND);
-        verifyZeroInteractions(permissionsService);
+        api = new UserInstancePermissions(permissionsService, httpResponseWriter);
     }
 
     @Test

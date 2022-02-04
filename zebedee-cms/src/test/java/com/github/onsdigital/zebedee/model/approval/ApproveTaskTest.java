@@ -97,7 +97,7 @@ public class ApproveTaskTest {
         String uriToDelete = "some/uri/to/check";
         ContentDetail contentDetail = new ContentDetail("Title", uriToDelete, "type");
         PendingDelete pendingDelete = new PendingDelete("", contentDetail);
-        collection.description.getPendingDeletes().add(pendingDelete);
+        collection.getDescription().getPendingDeletes().add(pendingDelete);
 
         // When the publish notification is created as part of the approval process.
         PublishNotification publishNotification = ApproveTask.createPublishNotification(new ArrayList<>(), collection);

@@ -177,7 +177,7 @@ public class UsersServiceImpl implements UsersService {
                 isSuccess = changePassword(targetUser, credentials.getOldPassword(), credentials.getPassword());
             } else {
                 // Only an admin can update another users password.
-                if (permissionsService.isAdministrator(session.getEmail()) || !permissionsService.hasAdministrator()) {
+                if (permissionsService.isAdministrator(session) || !permissionsService.hasAdministrator()) {
 
                     targetUser = resetPassword(targetUser, credentials.getPassword(), session.getEmail());
                     userStore.save(targetUser);
@@ -203,7 +203,7 @@ public class UsersServiceImpl implements UsersService {
     @Override
     public User update(Session session, User user, User updatedUser) throws IOException, UnauthorizedException,
             NotFoundException, BadRequestException {
-        if (!permissionsService.isAdministrator(session.getEmail())) {
+        if (!permissionsService.isAdministrator(session)) {
             throw new UnauthorizedException("Administrator permissionsServiceImpl required");
         }
 
@@ -218,7 +218,7 @@ public class UsersServiceImpl implements UsersService {
         if (session == null) {
             throw new BadRequestException("A session is required to delete a user.");
         }
-        if (permissionsService.isAdministrator(session.getEmail()) == false) {
+        if (!permissionsService.isAdministrator(session)) {
             throw new UnauthorizedException("Administrator permissionsServiceImpl required");
         }
 

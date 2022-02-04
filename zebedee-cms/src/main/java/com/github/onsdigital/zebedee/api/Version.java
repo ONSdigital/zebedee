@@ -37,7 +37,7 @@ public class Version {
     @POST
     public String create(HttpServletRequest request, HttpServletResponse response) throws IOException, ZebedeeException {
         Session session = Root.zebedee.getSessions().get(request);
-        if (session == null || !Root.zebedee.getPermissionsService().canEdit(session.getEmail())) {
+        if (session == null || !Root.zebedee.getPermissionsService().canEdit(session)) {
             throw new UnauthorizedException("You are not authorised to edit content.");
         }
 
@@ -81,7 +81,7 @@ public class Version {
     public boolean delete(HttpServletRequest request, HttpServletResponse response) throws IOException, BadRequestException, NotFoundException, UnauthorizedException {
 
         Session session = Root.zebedee.getSessions().get(request);
-        if (session == null || !Root.zebedee.getPermissionsService().canEdit(session.getEmail())) {
+        if (session == null || !Root.zebedee.getPermissionsService().canEdit(session)) {
             throw new UnauthorizedException("You are not authorised to edit content.");
         }
 

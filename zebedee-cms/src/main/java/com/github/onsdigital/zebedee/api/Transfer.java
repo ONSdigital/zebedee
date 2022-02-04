@@ -41,7 +41,7 @@ public class Transfer {
 
         // user has permission
         Session session = Root.zebedee.getSessions().get(request);
-        if (!Root.zebedee.getPermissionsService().canEdit(session.getEmail())){
+        if (!Root.zebedee.getPermissionsService().canEdit(session)){
             response.setStatus(HttpStatus.UNAUTHORIZED_401);
             return false;
         }

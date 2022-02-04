@@ -14,7 +14,7 @@ public class CollectionLogDesc {
     private List<String> files;
 
     public CollectionLogDesc(Collection collection) throws IOException {
-        this.path = collection.path.toString();
+        this.path = collection.getPath().toString();
         this.files = collection.reviewedUris();
     }
 

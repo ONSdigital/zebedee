@@ -222,7 +222,7 @@ public class Publisher {
             // Now attempt to get a file (inter-JVM) lock. This prevents Staging and Live attempting to publish the
             // same collection at the same time. We specify WRITE so we can get a lock and CREATE to ensure the file
             // is created if it doesn't exist.
-            Path collectionLock = collection.path.resolve(".lock");
+            Path collectionLock = collection.getPath().resolve(".lock");
 
             try (FileChannel channel = FileChannel.open(collectionLock, StandardOpenOption.WRITE, StandardOpenOption.CREATE);
                  FileLock lock = channel.tryLock()) {

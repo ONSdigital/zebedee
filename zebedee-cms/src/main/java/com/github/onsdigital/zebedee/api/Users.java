@@ -25,6 +25,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
+
 /**
  * API for managing user accounts. For password management, see {@link Password}.
  *
@@ -57,6 +59,10 @@ public class Users {
      */
     @GET
     public Object read(HttpServletRequest request, HttpServletResponse response) throws IOException, NotFoundException, BadRequestException {
+        if (cmsFeatureFlags().isJwtSessionsEnabled()) {
+            throw new NotFoundException("JWT sessions are enabled: GET /users is no longer supported");
+        }
+
         Object result = null;
 
         String email = request.getParameter(EMAIL_PARAM);
@@ -90,7 +96,11 @@ public class Users {
      */
     @POST
     public UserSanitised create(HttpServletRequest request, HttpServletResponse response, User user) throws
-            IOException, ConflictException, BadRequestException, UnauthorizedException {
+            IOException, ConflictException, BadRequestException, UnauthorizedException, NotFoundException {
+        if (cmsFeatureFlags().isJwtSessionsEnabled()) {
+            throw new NotFoundException("JWT sessions are enabled: POST /users is no longer supported");
+        }
+
         Session session = Root.zebedee.getSessions().get(request);
         User created = usersServiceSupplier.getService().create(session, user);
 
@@ -115,6 +125,10 @@ public class Users {
     @PUT
     public UserSanitised update(HttpServletRequest request, HttpServletResponse response, User updatedUser) throws
             IOException, NotFoundException, BadRequestException, UnauthorizedException {
+        if (cmsFeatureFlags().isJwtSessionsEnabled()) {
+            throw new NotFoundException("JWT sessions are enabled: PUT /users is no longer supported");
+        }
+
         Session session = Root.zebedee.getSessions().get(request);
 
         String email = request.getParameter(EMAIL_PARAM);
@@ -139,6 +153,9 @@ public class Users {
     @DELETE
     public boolean delete(HttpServletRequest request, HttpServletResponse response) throws
             UnauthorizedException, IOException, NotFoundException, BadRequestException {
+        if (cmsFeatureFlags().isJwtSessionsEnabled()) {
+            throw new NotFoundException("JWT sessions are enabled: DELETE /users is no longer supported");
+        }
 
         Session session = Root.zebedee.getSessions().get(request);
         String email = request.getParameter(EMAIL_PARAM);

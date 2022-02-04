@@ -181,7 +181,7 @@ public abstract class ZebedeeTestBaseFixture {
     }
 
     protected void setUpPermissionsServiceMockForLegacyTests(Zebedee instance, Session session) throws Exception {
-        when(permissionsService.canView(eq(session), any(CollectionDescription.class)))
+        when(permissionsService.canView(eq(session), any(String.class)))
                 .thenReturn(true);
 
         when(permissionsService.canEdit(session))

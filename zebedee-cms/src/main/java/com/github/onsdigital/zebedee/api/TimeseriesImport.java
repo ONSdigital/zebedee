@@ -33,7 +33,7 @@ public class TimeseriesImport {
 
             CollectionWriter collectionWriter = new ZebedeeCollectionWriter(Root.zebedee, collection, session);
 
-            if (collection.description.getApprovalStatus() == ApprovalStatus.COMPLETE) {
+            if (collection.getDescription().getApprovalStatus() == ApprovalStatus.COMPLETE) {
                 throw new BadRequestException("This collection has been approved and cannot be saved to.");
             }
 

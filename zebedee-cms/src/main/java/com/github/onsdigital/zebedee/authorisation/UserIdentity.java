@@ -8,6 +8,14 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import static java.util.Objects.requireNonNull;
 
+/**
+ * @deprecated The AuthorisationService is deprecated in favour of the new JWT sessions. Validating the JWT signature
+ *             accomplishes the same functionality as this implementation, but in a more distributed fashion.
+ *
+ * TODO: Once the migration to JWT sessions has been completed and all microservices have been updated to use the new
+ *       dp-authorisation implementation that includes JWT validation, then this service should be removed
+ */
+@Deprecated
 public class UserIdentity implements JSONable {
 
     private String identifier;

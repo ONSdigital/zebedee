@@ -164,7 +164,8 @@ public class PooledHttpClient {
 
     private URIBuilder newUriBuilder(String path) {
         URIBuilder uriBuilder = new URIBuilder(HOST);
-        uriBuilder.setPath((uriBuilder.getPath() + "/" + path).replaceAll("//+", "/"));
+        String uri = StringUtils.defaultIfEmpty(uriBuilder.getPath(), "");
+        uriBuilder.setPath((uri + "/" + path).replaceAll("//+", "/"));
         return uriBuilder;
     }
 

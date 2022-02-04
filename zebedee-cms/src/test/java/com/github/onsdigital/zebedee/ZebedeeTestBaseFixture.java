@@ -5,17 +5,17 @@ import com.github.onsdigital.zebedee.json.Credentials;
 import com.github.onsdigital.zebedee.keyring.CollectionKeyring;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.encryption.EncryptionKeyFactory;
+import com.github.onsdigital.zebedee.notification.StartUpNotifier;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDao;
 import com.github.onsdigital.zebedee.service.ServiceSupplier;
 import com.github.onsdigital.zebedee.session.model.Session;
-import com.github.onsdigital.zebedee.session.service.Sessions;
 import com.github.onsdigital.zebedee.session.service.JWTSessionsServiceImpl;
+import com.github.onsdigital.zebedee.session.service.Sessions;
 import com.github.onsdigital.zebedee.user.model.User;
 import com.github.onsdigital.zebedee.user.model.UserList;
 import com.github.onsdigital.zebedee.user.service.UsersService;
 import com.github.onsdigital.zebedee.util.slack.Notifier;
-import com.github.onsdigital.zebedee.util.slack.StartUpAlerter;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -33,8 +33,12 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Common set up required by tests using {@link Builder} (Hide some of the nastiness).
@@ -83,7 +87,7 @@ public abstract class ZebedeeTestBaseFixture {
     protected EncryptionKeyFactory encryptionKeyFactory;
 
     @Mock
-    protected StartUpAlerter startUpAlerter;
+    protected StartUpNotifier startUpNotifier;
 
     protected Zebedee zebedee;
     protected Builder builder;
@@ -162,8 +166,8 @@ public abstract class ZebedeeTestBaseFixture {
         when(zebCfg.getCollectionKeyring())
                 .thenReturn(collectionKeyring);
 
-        when(zebCfg.getStartUpAlerter())
-                .thenReturn(startUpAlerter);
+        when(zebCfg.getStartUpNotifier())
+                .thenReturn(startUpNotifier);
 
         when(zebCfg.getPermissionsService())
                 .thenReturn(permissionsService);

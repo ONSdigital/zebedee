@@ -23,6 +23,7 @@ import com.github.onsdigital.zebedee.model.RedirectTablePartialMatch;
 import com.github.onsdigital.zebedee.model.encryption.EncryptionKeyFactory;
 import com.github.onsdigital.zebedee.model.encryption.EncryptionKeyFactoryImpl;
 import com.github.onsdigital.zebedee.model.publishing.PublishedCollections;
+import com.github.onsdigital.zebedee.notification.StartUpNotifier;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsServiceImpl;
 import com.github.onsdigital.zebedee.permissions.store.PermissionsStore;
@@ -47,13 +48,12 @@ import com.github.onsdigital.zebedee.user.service.StubbedUsersServiceImpl;
 import com.github.onsdigital.zebedee.user.service.UsersService;
 import com.github.onsdigital.zebedee.user.service.UsersServiceImpl;
 import com.github.onsdigital.zebedee.user.store.UserStoreFileSystemImpl;
-import com.github.onsdigital.zebedee.util.slack.NoOpStartUpAlerter;
 import com.github.onsdigital.zebedee.util.slack.NopNotifierImpl;
 import com.github.onsdigital.zebedee.util.slack.NopSlackClientImpl;
+import com.github.onsdigital.zebedee.util.slack.NopStartUpNotifier;
 import com.github.onsdigital.zebedee.util.slack.Notifier;
 import com.github.onsdigital.zebedee.util.slack.SlackNotifier;
-import com.github.onsdigital.zebedee.util.slack.StartUpAlerter;
-import com.github.onsdigital.zebedee.util.slack.StartUpAlerterImpl;
+import com.github.onsdigital.zebedee.util.slack.SlackStartUpNotifier;
 import com.github.onsdigital.zebedee.util.versioning.VersionsService;
 import com.github.onsdigital.zebedee.util.versioning.VersionsServiceImpl;
 import com.github.onsdigital.zebedee.verification.VerificationAgent;
@@ -90,6 +90,7 @@ import static com.github.onsdigital.zebedee.configuration.Configuration.getKafka
 import static com.github.onsdigital.zebedee.configuration.Configuration.getKeyringInitVector;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getKeyringSecretKey;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getServiceAuthToken;
+import static com.github.onsdigital.zebedee.configuration.Configuration.getSlackSupportChannelID;
 import static com.github.onsdigital.zebedee.configuration.Configuration.slackChannelsToNotfiyOnStartUp;
 import static com.github.onsdigital.zebedee.permissions.store.PermissionsStoreFileSystemImpl.initialisePermissions;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
@@ -128,7 +129,7 @@ public class ZebedeeConfiguration {
     private CollectionKeyring collectionKeyring;
     private CollectionKeyCache schedulerKeyCache;
     private EncryptionKeyFactory encryptionKeyFactory;
-    private StartUpAlerter startUpAlerter;
+    private StartUpNotifier startUpNotifier;
     private SlackClient slackClient;
     private Notifier slackNotifier;
 
@@ -253,7 +254,6 @@ public class ZebedeeConfiguration {
                 .data("enable_verification_agent", useVerificationAgent)
                 .data("sessions_api_enabled", cmsFeatureFlags().isSessionAPIEnabled())
                 .log("zebedee configuration creation complete");
-
     }
 
     private void initCollectionKeyring() throws KeyringException {
@@ -298,13 +298,19 @@ public class ZebedeeConfiguration {
                     .create());
 
             this.slackNotifier = new SlackNotifier(this.slackClient);
-            this.startUpAlerter = new StartUpAlerterImpl(slackClient, startUpNotificationRecipients);
+
+            this.startUpNotifier = new SlackStartUpNotifier(
+                    slackClient,
+                    startUpNotificationRecipients,
+                    getSlackSupportChannelID()
+            );
+
         } else {
             warn().log("slack configuration missing/empty defaulting to No op implementation");
 
             this.slackClient = new NopSlackClientImpl();
             this.slackNotifier = new NopNotifierImpl();
-            this.startUpAlerter = new NoOpStartUpAlerter();
+            this.startUpNotifier = new NopStartUpNotifier();
         }
     }
 
@@ -446,8 +452,8 @@ public class ZebedeeConfiguration {
         return dir;
     }
 
-    public StartUpAlerter getStartUpAlerter() {
-        return this.startUpAlerter;
+    public StartUpNotifier getStartUpNotifier() {
+        return startUpNotifier;
     }
 
     public Notifier getSlackNotifier() {

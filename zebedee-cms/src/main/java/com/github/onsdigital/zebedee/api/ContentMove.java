@@ -22,7 +22,7 @@ public class ContentMove {
     @POST
     public boolean MoveContent(HttpServletRequest request, HttpServletResponse response) throws IOException, ZebedeeException {
 
-        Session session = Root.zebedee.getSessions().get(request);
+        Session session = Root.zebedee.getSessions().get();
         Collection collection = Collections.getCollection(request);
 
         String uri = request.getParameter("uri");

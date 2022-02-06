@@ -63,7 +63,7 @@ public class PermissionTest extends ZebedeeAPIBaseTestCase {
 
     @Override
     protected void customSetUp() throws Exception {
-        when(sessionsService.get(mockRequest))
+        when(sessionsService.get())
                 .thenReturn(session);
 
         when(usersService.getUserByEmail(TEST_EMAIL))
@@ -96,27 +96,15 @@ public class PermissionTest extends ZebedeeAPIBaseTestCase {
     }
 
     @Test
-    public void testGrant_getSessionError_shouldThrowException() throws Exception {
-        when(sessionsService.get(mockRequest))
-                .thenThrow(IOException.class);
-
-        InternalServerError ex = assertThrows(InternalServerError.class,
-                () -> endpoint.grantPermission(mockRequest, mockResponse, permission));
-
-        assertThat(ex.getMessage(), equalTo("error getting user session"));
-        verify(sessionsService, times(1)).get(mockRequest);
-    }
-
-    @Test
     public void testGrant_getSessionReturnsNull_shouldThrowException() throws Exception {
-        when(sessionsService.get(mockRequest))
+        when(sessionsService.get())
                 .thenReturn(null);
 
-        InternalServerError ex = assertThrows(InternalServerError.class,
+        UnauthorizedException ex = assertThrows(UnauthorizedException.class,
                 () -> endpoint.grantPermission(mockRequest, mockResponse, permission));
 
         assertThat(ex.getMessage(), equalTo("error expected user session but was null"));
-        verify(sessionsService, times(1)).get(mockRequest);
+        verify(sessionsService, times(1)).get();
     }
 
     @Test
@@ -130,7 +118,7 @@ public class PermissionTest extends ZebedeeAPIBaseTestCase {
         assertThrows(UnauthorizedException.class,
                 () -> endpoint.grantPermission(mockRequest, mockResponse, permission));
 
-        verify(sessionsService, times(1)).get(mockRequest);
+        verify(sessionsService, times(1)).get();
         verify(permissionsService, times(1)).addAdministrator(USER_EMAIL, session);
     }
 
@@ -140,7 +128,7 @@ public class PermissionTest extends ZebedeeAPIBaseTestCase {
 
         endpoint.grantPermission(mockRequest, mockResponse, permission);
 
-        verify(sessionsService, times(1)).get(mockRequest);
+        verify(sessionsService, times(1)).get();
         verify(permissionsService, times(1)).addAdministrator(USER_EMAIL, session);
     }
 
@@ -155,7 +143,7 @@ public class PermissionTest extends ZebedeeAPIBaseTestCase {
         assertThrows(UnauthorizedException.class,
                 () -> endpoint.grantPermission(mockRequest, mockResponse, permission));
 
-        verify(sessionsService, times(1)).get(mockRequest);
+        verify(sessionsService, times(1)).get();
         verify(permissionsService, times(1)).removeAdministrator(USER_EMAIL, session);
     }
 
@@ -171,7 +159,7 @@ public class PermissionTest extends ZebedeeAPIBaseTestCase {
         assertThrows(UnauthorizedException.class,
                 () -> endpoint.grantPermission(mockRequest, mockResponse, permission));
 
-        verify(sessionsService, times(1)).get(mockRequest);
+        verify(sessionsService, times(1)).get();
         verify(permissionsService, times(1)).addEditor(USER_EMAIL, session);
         verify(permissionsService, times(1)).removeAdministrator(USER_EMAIL, session);
     }
@@ -188,7 +176,7 @@ public class PermissionTest extends ZebedeeAPIBaseTestCase {
         assertThrows(UnauthorizedException.class,
                 () -> endpoint.grantPermission(mockRequest, mockResponse, permission));
 
-        verify(sessionsService, times(1)).get(mockRequest);
+        verify(sessionsService, times(1)).get();
         verify(permissionsService, times(1)).removeEditor(USER_EMAIL, session);
         verify(permissionsService, times(1)).removeAdministrator(USER_EMAIL, session);
     }
@@ -202,7 +190,7 @@ public class PermissionTest extends ZebedeeAPIBaseTestCase {
         String expected = "Permissions updated for " + USER_EMAIL;
 
         assertThat(actual, equalTo(expected));
-        verify(sessionsService, times(1)).get(mockRequest);
+        verify(sessionsService, times(1)).get();
         verify(permissionsService, times(1)).removeEditor(USER_EMAIL, session);
         verify(permissionsService, times(1)).removeAdministrator(USER_EMAIL, session);
     }

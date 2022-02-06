@@ -88,7 +88,7 @@ public class Collection {
             throws IOException, ZebedeeException {
         info().log("get collection endpoint: request received");
 
-        Session session = sessionsService.get(request);
+        Session session = sessionsService.get();
         if (session == null) {
             info().log("get collection endpoint: request unsuccessful valid session for user was not found.");
             throw new UnauthorizedException("You are not authorised to view collections.");
@@ -151,7 +151,7 @@ public class Collection {
             throws IOException, ZebedeeException {
         info().log("create collection endpoint: request received");
 
-        Session session = sessionsService.get(request);
+        Session session = sessionsService.get();
         if (session == null) {
             warn().log("create collection endpoint: request unsuccessful no valid session found");
             throw new UnauthorizedException("You are not authorised to create collections.");
@@ -217,7 +217,7 @@ public class Collection {
 
         String collectionId = Collections.getCollectionId(request);
 
-        Session session = sessionsService.get(request);
+        Session session = sessionsService.get();
         if (session == null) {
             warn().user(session.getEmail())
                     .collectionID(collectionId)
@@ -268,7 +268,7 @@ public class Collection {
             ZebedeeException {
         info().log("delete collection endpoint: request received");
 
-        Session session = sessionsService.get(request);
+        Session session = sessionsService.get();
         if (session == null) {
             error().log("delete collection endpoint: request unsuccessful no valid session found");
             throw new UnauthorizedException("You are not authorised to delete collections.");

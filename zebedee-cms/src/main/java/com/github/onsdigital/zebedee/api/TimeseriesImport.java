@@ -3,10 +3,12 @@ package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
+import com.github.onsdigital.zebedee.exceptions.NotFoundException;
+import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.ApprovalStatus;
-import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.model.CollectionWriter;
 import com.github.onsdigital.zebedee.model.ZebedeeCollectionWriter;
+import com.github.onsdigital.zebedee.session.model.Session;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 
@@ -23,12 +25,13 @@ import java.util.ArrayList;
 @Api
 public class TimeseriesImport {
     @POST
-    public boolean importTimeseries(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public boolean importTimeseries(HttpServletRequest request, HttpServletResponse response) throws IOException,
+            UnauthorizedException, BadRequestException, NotFoundException {
 
         // otherwise the call to get a request parameter will actually consume the body:
         try (InputStream requestBody = request.getInputStream()) {
 
-            Session session = Root.zebedee.getSessions().get(request);
+            Session session = Root.zebedee.getSessions().get();
             com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request);
 
             CollectionWriter collectionWriter = new ZebedeeCollectionWriter(Root.zebedee, collection, session);

@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee.permissions.cmd;
 
 import com.github.onsdigital.zebedee.reader.util.RequestUtils;
+import com.github.onsdigital.zebedee.session.model.Session;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
@@ -19,11 +20,11 @@ public class GetPermissionsRequest {
 
     private String collectionID;
     private String datasetID;
-    private String sessionID;
+    private Session session;
     private String serviceToken;
 
-    public GetPermissionsRequest(HttpServletRequest req) {
-        this.sessionID = RequestUtils.getSessionId(req);
+    public GetPermissionsRequest(Session session, HttpServletRequest req) {
+        this.session = session;
 
         // TODO: Remove after new service user JWT auth is implemented and all automated users are using JWT sessions
         String authHeader = req.getHeader(SERVICE_AUTH_HEADER);
@@ -35,8 +36,8 @@ public class GetPermissionsRequest {
         this.collectionID = req.getParameter(COLLECTION_ID_PARAM);
     }
 
-    public GetPermissionsRequest(String sessionID, String serviceToken, String datasetID, String collectionID) {
-        this.sessionID = sessionID;
+    public GetPermissionsRequest(Session session, String serviceToken, String datasetID, String collectionID) {
+        this.session = session;
         this.serviceToken = RequestUtils.removeBearerPrefixIfPresent(serviceToken);
         this.datasetID = datasetID;
         this.collectionID = collectionID;
@@ -50,8 +51,8 @@ public class GetPermissionsRequest {
         return datasetID;
     }
 
-    public String getSessionID() {
-        return sessionID;
+    public Session getSession() {
+        return session;
     }
 
     public String getServiceToken() {
@@ -73,7 +74,7 @@ public class GetPermissionsRequest {
         return new EqualsBuilder()
                 .append(getCollectionID(), request.getCollectionID())
                 .append(getDatasetID(), request.getDatasetID())
-                .append(getSessionID(), request.getSessionID())
+                .append(getSession(), request.getSession())
                 .append(getServiceToken(), request.getServiceToken())
                 .isEquals();
     }
@@ -83,7 +84,7 @@ public class GetPermissionsRequest {
         return new HashCodeBuilder(17, 37)
                 .append(getCollectionID())
                 .append(getDatasetID())
-                .append(getSessionID())
+                .append(getSession())
                 .append(getServiceToken())
                 .toHashCode();
     }

@@ -55,7 +55,7 @@ public class Password {
         }
 
         // Get the user session
-        Session session = Root.zebedee.getSessions().get(request);
+        Session session = Root.zebedee.getSessions().get();
 
         // If the user is not logged in, but they are attempting to change their password, authenticate using the old password
         if (session == null && credentials != null) {
@@ -66,6 +66,10 @@ public class Password {
                 oldPasswordCredentials.password = credentials.oldPassword;
                 session = Root.zebedee.openSession(oldPasswordCredentials);
             }
+        }
+
+        if (session == null) {
+            throw new UnauthorizedException("password change failed: unable to authenticate request");
         }
 
         // Attempt to change or reset the password:

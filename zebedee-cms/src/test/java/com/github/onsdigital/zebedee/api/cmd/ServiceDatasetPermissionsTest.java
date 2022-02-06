@@ -5,6 +5,8 @@ import com.github.onsdigital.zebedee.permissions.cmd.CMDPermissionsService;
 import com.github.onsdigital.zebedee.permissions.cmd.CRUD;
 import com.github.onsdigital.zebedee.permissions.cmd.GetPermissionsRequest;
 import com.github.onsdigital.zebedee.permissions.cmd.PermissionsException;
+import com.github.onsdigital.zebedee.session.model.Session;
+import com.github.onsdigital.zebedee.session.service.Sessions;
 import com.github.onsdigital.zebedee.util.HttpResponseWriter;
 import org.hamcrest.CoreMatchers;
 import org.junit.Before;
@@ -43,6 +45,12 @@ public class ServiceDatasetPermissionsTest {
     HttpServletResponse resp;
 
     @Mock
+    Session session;
+
+    @Mock
+    Sessions sessions;
+
+    @Mock
     HttpResponseWriter httpResponseWriter;
 
     @Mock
@@ -59,9 +67,9 @@ public class ServiceDatasetPermissionsTest {
         MockitoAnnotations.initMocks(this);
         fullPermissions = new CRUD().permit(CREATE, READ, UPDATE, DELETE);
 
-        getPermissionsRequest = new GetPermissionsRequest("111", "222", "333", "444");
+        getPermissionsRequest = new GetPermissionsRequest(session, "222", "333", "444");
 
-        api = new ServiceDatasetPermissions(cmdPermissionsService, httpResponseWriter);
+        api = new ServiceDatasetPermissions(cmdPermissionsService, httpResponseWriter, sessions);
     }
 
     @Test

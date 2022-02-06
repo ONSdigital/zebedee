@@ -6,12 +6,12 @@ import com.github.onsdigital.zebedee.permissions.cmd.CMDPermissionsServiceImpl;
 import com.github.onsdigital.zebedee.permissions.cmd.CRUD;
 import com.github.onsdigital.zebedee.permissions.cmd.GetPermissionsRequest;
 import com.github.onsdigital.zebedee.permissions.cmd.PermissionsException;
+import com.github.onsdigital.zebedee.session.service.Sessions;
 import com.github.onsdigital.zebedee.util.HttpResponseWriter;
 
 import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.internalServerErrorException;
-import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.sessionIDNotProvidedException;
+import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.sessionNotProvidedException;
 import static com.github.onsdigital.zebedee.util.JsonUtils.writeResponseEntity;
-import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 /**
  * API endpoint for getting a user's CMD instance permissions.
@@ -36,9 +36,11 @@ public class UserInstancePermissions extends PermissionsAPIBase {
      *
      * @param cmdPermissionsService
      * @param responseWriter        the http response writer impl to use.
+     * @param sessionsService       the sessions service
      */
-    public UserInstancePermissions(CMDPermissionsService cmdPermissionsService, HttpResponseWriter responseWriter) {
-        super(cmdPermissionsService, responseWriter);
+    public UserInstancePermissions(CMDPermissionsService cmdPermissionsService, HttpResponseWriter responseWriter,
+                                     Sessions sessionsService) {
+        super(cmdPermissionsService, responseWriter, sessionsService);
     }
 
     @Override
@@ -52,8 +54,8 @@ public class UserInstancePermissions extends PermissionsAPIBase {
             throw internalServerErrorException();
         }
 
-        if (isEmpty(request.getSessionID())) {
-            throw sessionIDNotProvidedException();
+        if (request.getSession() == null) {
+            throw sessionNotProvidedException();
         }
     }
 }

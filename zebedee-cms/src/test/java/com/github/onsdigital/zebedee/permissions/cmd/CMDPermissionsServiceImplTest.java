@@ -27,14 +27,11 @@ import static com.github.onsdigital.zebedee.permissions.cmd.PermissionType.UPDAT
 import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.internalServerErrorException;
 import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.serviceAccountNotFoundException;
 import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.serviceTokenNotProvidedException;
-import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.sessionIDNotProvidedException;
 import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.sessionNotFoundException;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -89,67 +86,11 @@ public class CMDPermissionsServiceImplTest {
 
         when(collection.getDescription()).thenReturn(description);
 
-        service = new CMDPermissionsServiceImpl(sessions, collectionsService, serviceStore,
-                permissionsService);
+        service = new CMDPermissionsServiceImpl(collectionsService, serviceStore, permissionsService);
 
         none = new CRUD();
         fullPermissions = new CRUD().permit(CREATE, READ, UPDATE, DELETE);
         readOnly = new CRUD().permit(READ);
-    }
-
-    @Test(expected = PermissionsException.class)
-    public void testGetSession_sessionIDNull() throws Exception {
-        try {
-            service.getSessionByID(null);
-        } catch (PermissionsException ex) {
-            assertThat(ex.statusCode, equalTo(HttpStatus.SC_BAD_REQUEST));
-
-            verifyZeroInteractions(sessions);
-            throw ex;
-        }
-    }
-
-    @Test(expected = PermissionsException.class)
-    public void testGetSession_sessionNotFound() throws Exception {
-        when(sessions.get(SESSION_ID))
-                .thenReturn(null);
-
-        try {
-            service.getSessionByID(SESSION_ID);
-        } catch (PermissionsException ex) {
-            assertThat(ex.statusCode, equalTo(HttpStatus.SC_UNAUTHORIZED));
-
-            verify(sessions, times(1)).get(SESSION_ID);
-            verifyNoMoreInteractions(sessions);
-            throw ex;
-        }
-    }
-
-    @Test(expected = PermissionsException.class)
-    public void testGetSession_IOException() throws Exception {
-        when(sessions.get(SESSION_ID))
-                .thenThrow(new IOException(""));
-
-        try {
-            service.getSessionByID(SESSION_ID);
-        } catch (PermissionsException ex) {
-            assertThat(ex.statusCode, equalTo(HttpStatus.SC_INTERNAL_SERVER_ERROR));
-
-            verify(sessions, times(1)).get(SESSION_ID);
-            verifyNoMoreInteractions(sessions);
-            throw ex;
-        }
-    }
-
-    @Test
-    public void testGetSession_success() throws Exception {
-        when(sessions.get(SESSION_ID))
-                .thenReturn(session);
-
-        Session result = service.getSessionByID(SESSION_ID);
-        assertThat(result, equalTo(session));
-
-        verify(sessions, times(1)).get(SESSION_ID);
     }
 
     @Test(expected = PermissionsException.class)
@@ -376,26 +317,21 @@ public class CMDPermissionsServiceImplTest {
 
     @Test
     public void testGetUserDatasetPermissions_editorUser() throws Exception {
-        GetPermissionsRequest request = new GetPermissionsRequest(SESSION_ID, SERVICE_TOKEN, DATASET_ID, COLLECTION_ID);
+        GetPermissionsRequest request = new GetPermissionsRequest(session, SERVICE_TOKEN, DATASET_ID, COLLECTION_ID);
 
-        when(sessions.get(SESSION_ID))
-                .thenReturn(session);
         when(permissionsService.canEdit(session))
                 .thenReturn(true);
 
         CRUD actual = service.getUserDatasetPermissions(request);
 
         assertThat(actual, equalTo(fullPermissions));
-        verify(sessions, times(1)).get(SESSION_ID);
         verify(permissionsService, times(1)).canEdit(session);
     }
 
     @Test
     public void testGetUserDatasetPermissions_viewerUserAssignedToCollection() throws Exception {
-        GetPermissionsRequest request = new GetPermissionsRequest(SESSION_ID, SERVICE_TOKEN, DATASET_ID, COLLECTION_ID);
+        GetPermissionsRequest request = new GetPermissionsRequest(session, SERVICE_TOKEN, DATASET_ID, COLLECTION_ID);
 
-        when(sessions.get(SESSION_ID))
-                .thenReturn(session);
         when(collectionsService.getCollection(COLLECTION_ID))
                 .thenReturn(collection);
         when(permissionsService.canEdit(session))
@@ -408,7 +344,6 @@ public class CMDPermissionsServiceImplTest {
         CRUD actual = service.getUserDatasetPermissions(request);
 
         assertThat(actual, equalTo(readOnly));
-        verify(sessions, times(1)).get(SESSION_ID);
         verify(collectionsService, times(1)).getCollection(COLLECTION_ID);
         verify(permissionsService, times(1)).canEdit(session);
         verify(permissionsService, times(1)).canView(session, COLLECTION_ID);
@@ -416,10 +351,8 @@ public class CMDPermissionsServiceImplTest {
 
     @Test
     public void testGetUserDatasetPermissions_viewerCannotViewCollection() throws Exception {
-        GetPermissionsRequest request = new GetPermissionsRequest(SESSION_ID, SERVICE_TOKEN, DATASET_ID, COLLECTION_ID);
+        GetPermissionsRequest request = new GetPermissionsRequest(session, SERVICE_TOKEN, DATASET_ID, COLLECTION_ID);
 
-        when(sessions.get(SESSION_ID))
-                .thenReturn(session);
         when(permissionsService.canEdit(session))
                 .thenReturn(false);
         when(permissionsService.canView(session, COLLECTION_ID))
@@ -428,17 +361,14 @@ public class CMDPermissionsServiceImplTest {
         CRUD actual = service.getUserDatasetPermissions(request);
 
         assertThat(actual, equalTo(none));
-        verify(sessions, times(1)).get(SESSION_ID);
         verify(permissionsService, times(1)).canEdit(session);
         verify(permissionsService, times(1)).canView(session, COLLECTION_ID);
     }
 
     @Test
     public void testGetUserDatasetPermissions_viewerDatasetNotInCollection() throws Exception {
-        GetPermissionsRequest request = new GetPermissionsRequest(SESSION_ID, SERVICE_TOKEN, DATASET_ID, COLLECTION_ID);
+        GetPermissionsRequest request = new GetPermissionsRequest(session, SERVICE_TOKEN, DATASET_ID, COLLECTION_ID);
 
-        when(sessions.get(SESSION_ID))
-                .thenReturn(session);
         when(permissionsService.canEdit(session))
                 .thenReturn(false);
         when(permissionsService.canView(session, COLLECTION_ID))
@@ -451,7 +381,6 @@ public class CMDPermissionsServiceImplTest {
         CRUD actual = service.getUserDatasetPermissions(request);
 
         assertThat(actual, equalTo(none));
-        verify(sessions, times(1)).get(SESSION_ID);
         verify(collectionsService, times(1)).getCollection(COLLECTION_ID);
         verify(permissionsService, times(1)).canEdit(session);
         verify(permissionsService, times(1)).canView(session, COLLECTION_ID);
@@ -537,30 +466,26 @@ public class CMDPermissionsServiceImplTest {
 
     @Test
     public void testGetUserInstancePermissions_publisherUserSuccess() throws Exception {
-        GetPermissionsRequest request = new GetPermissionsRequest(SESSION_ID, null, null, null);
+        GetPermissionsRequest request = new GetPermissionsRequest(session, null, null, null);
 
-        when(sessions.get(SESSION_ID)).thenReturn(session);
         when(permissionsService.canEdit(session)).thenReturn(true);
 
-        CRUD expected = grantUserInstanceCreateReadUpdateDelete(request, session);
+        CRUD expected = grantUserInstanceCreateReadUpdateDelete(request);
         CRUD actual = service.getUserInstancePermissions(request);
 
-        verify(sessions, times(1)).get(SESSION_ID);
         verify(permissionsService, times(1)).canEdit(session);
         assertThat(actual, equalTo(expected));
     }
 
     @Test
     public void testGetUserInstancePermissions_viewerUserSuccess() throws Exception {
-        GetPermissionsRequest request = new GetPermissionsRequest(SESSION_ID, null, null, null);
+        GetPermissionsRequest request = new GetPermissionsRequest(session, null, null, null);
 
-        when(sessions.get(SESSION_ID)).thenReturn(session);
         when(permissionsService.canEdit(session)).thenReturn(false);
 
-        CRUD expected = grantUserNone(request, session, "");
+        CRUD expected = grantUserNone(request, "");
         CRUD actual = service.getUserInstancePermissions(request);
 
-        verify(sessions, times(1)).get(SESSION_ID);
         verify(permissionsService, times(1)).canEdit(session);
         assertThat(actual, equalTo(expected));
     }
@@ -577,27 +502,8 @@ public class CMDPermissionsServiceImplTest {
     }
 
     @Test(expected = PermissionsException.class)
-    public void testGetUserInstancePermissions_sessionIDNull() throws Exception {
-        GetPermissionsRequest request = new GetPermissionsRequest(null, null, null, null);
-
-        try {
-            service.getUserInstancePermissions(request);
-        } catch (PermissionsException ex) {
-            PermissionsException expected = sessionIDNotProvidedException();
-
-            assertThat(ex.getMessage(), equalTo(expected.getMessage()));
-            assertThat(ex.statusCode, equalTo(expected.statusCode));
-            verifyZeroInteractions(serviceStore, collectionsService, collectionsService, sessions);
-            throw ex;
-        }
-    }
-
-    @Test(expected = PermissionsException.class)
     public void testGetUserInstancePermissions_sessionNotFound() throws Exception {
-        GetPermissionsRequest request = new GetPermissionsRequest(SESSION_ID, null, null, null);
-
-        when(sessions.get(SESSION_ID))
-                .thenReturn(null);
+        GetPermissionsRequest request = new GetPermissionsRequest(null, null, null, null);
 
         try {
             service.getUserInstancePermissions(request);
@@ -607,27 +513,6 @@ public class CMDPermissionsServiceImplTest {
             assertThat(ex.getMessage(), equalTo(expected.getMessage()));
             assertThat(ex.statusCode, equalTo(expected.statusCode));
 
-            verify(sessions, times(1)).get(SESSION_ID);
-            verifyZeroInteractions(serviceStore, collectionsService, collectionsService);
-            throw ex;
-        }
-    }
-
-    @Test(expected = PermissionsException.class)
-    public void testGetUserInstancePermissions_getSessionIOEx() throws Exception {
-        GetPermissionsRequest request = new GetPermissionsRequest(SESSION_ID, null, null, null);
-
-        when(sessions.get(SESSION_ID)).thenThrow(new IOException());
-
-        try {
-            service.getUserInstancePermissions(request);
-        } catch (PermissionsException ex) {
-            PermissionsException expected = internalServerErrorException();
-
-            assertThat(ex.getMessage(), equalTo(expected.getMessage()));
-            assertThat(ex.statusCode, equalTo(expected.statusCode));
-
-            verify(sessions, times(1)).get(SESSION_ID);
             verifyZeroInteractions(serviceStore, collectionsService, collectionsService);
             throw ex;
         }
@@ -635,16 +520,14 @@ public class CMDPermissionsServiceImplTest {
 
     @Test(expected = PermissionsException.class)
     public void testGetUserInstancePermissions_canEditIOEx() throws Exception {
-        GetPermissionsRequest request = new GetPermissionsRequest(SESSION_ID, null, null, null);
+        GetPermissionsRequest request = new GetPermissionsRequest(session, null, null, null);
 
-        when(sessions.get(SESSION_ID)).thenReturn(session);
         when(permissionsService.canEdit(session)).thenThrow(new IOException());
 
         PermissionsException expected = internalServerErrorException();
         try {
             CRUD actual = service.getUserInstancePermissions(request);
         } catch (PermissionsException ex) {
-            verify(sessions, times(1)).get(SESSION_ID);
             verify(permissionsService, times(1)).canEdit(session);
 
 

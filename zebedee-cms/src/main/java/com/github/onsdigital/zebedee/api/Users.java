@@ -66,7 +66,7 @@ public class Users {
         Object result = null;
 
         String email = request.getParameter(EMAIL_PARAM);
-        Session session = Root.zebedee.getSessions().get(request);
+        Session session = Root.zebedee.getSessions().get();
 
         if (session != null) {
             // If email is empty
@@ -101,7 +101,7 @@ public class Users {
             throw new NotFoundException("JWT sessions are enabled: POST /users is no longer supported");
         }
 
-        Session session = Root.zebedee.getSessions().get(request);
+        Session session = Root.zebedee.getSessions().get();
         User created = usersServiceSupplier.getService().create(session, user);
 
         Audit.Event.USER_CREATED
@@ -129,7 +129,7 @@ public class Users {
             throw new NotFoundException("JWT sessions are enabled: PUT /users is no longer supported");
         }
 
-        Session session = Root.zebedee.getSessions().get(request);
+        Session session = Root.zebedee.getSessions().get();
 
         String email = request.getParameter(EMAIL_PARAM);
         User user = usersServiceSupplier.getService().getUserByEmail(email);
@@ -157,7 +157,7 @@ public class Users {
             throw new NotFoundException("JWT sessions are enabled: DELETE /users is no longer supported");
         }
 
-        Session session = Root.zebedee.getSessions().get(request);
+        Session session = Root.zebedee.getSessions().get();
         String email = request.getParameter(EMAIL_PARAM);
         User user = usersServiceSupplier.getService().getUserByEmail(email);
         boolean result = usersServiceSupplier.getService().delete(session, user);

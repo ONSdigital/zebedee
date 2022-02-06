@@ -144,7 +144,6 @@ public abstract class ZebedeeTestBaseFixture {
         session.setStart(new Date());
 
         when(sessionsService.create(anyString())).thenReturn(session);
-        when(sessionsService.get(anyString())).thenReturn(session);
 
         Map<String, String> emailToCreds = new HashMap<>();
         emailToCreds.put(builder.publisher1.getEmail(), builder.publisher1Credentials.password);

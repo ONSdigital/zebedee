@@ -41,9 +41,9 @@ public class CollectionHistory {
     @GET
     public com.github.onsdigital.zebedee.model.collection.audit.CollectionHistory getCollectionEventHistory(
             HttpServletRequest request, HttpServletResponse response)
-            throws ZebedeeException, IOException {
+            throws ZebedeeException {
 
-        Session session = zebedeeCmsService.getSession(request);
+        Session session = zebedeeCmsService.getSession();
         checkPermission(session);
 
         String collectionId = RequestUtils.getCollectionId(request);

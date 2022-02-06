@@ -59,13 +59,12 @@ public class ZebedeeCmsService {
         return instance;
     }
 
-    public Session getSession(HttpServletRequest request) throws ZebedeeException {
-        try {
-            return Root.zebedee.getSessions().get(request);
-        } catch (IOException e) {
-            error().logException(e, SESSION_NOT_FOUND_MSG);
+    public Session getSession() throws UnauthorizedException {
+        Session session = Root.zebedee.getSessions().get();
+        if (session == null) {
             throw new UnauthorizedException(SESSION_NOT_FOUND_MSG);
         }
+        return session;
     }
 
     public ContentReader getPublishedContentReader() {

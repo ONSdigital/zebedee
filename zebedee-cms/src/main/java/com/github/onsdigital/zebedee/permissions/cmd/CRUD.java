@@ -1,7 +1,6 @@
 package com.github.onsdigital.zebedee.permissions.cmd;
 
 import com.github.onsdigital.zebedee.model.ServiceAccount;
-import com.github.onsdigital.zebedee.session.model.Session;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.util.HashSet;
@@ -66,32 +65,32 @@ public class CRUD {
         return new CRUD().permit(CREATE, READ, UPDATE, DELETE);
     }
 
-    public static CRUD grantUserDatasetCreateReadUpdateDelete(GetPermissionsRequest request, Session session) {
+    public static CRUD grantUserDatasetCreateReadUpdateDelete(GetPermissionsRequest request) {
         info().collectionID(request.getCollectionID())
                 .datasetID(request.getDatasetID())
-                .email(session)
+                .email(request.getSession())
                 .log("granting full CRUD permissions to user");
         return new CRUD().permit(CREATE, READ, UPDATE, DELETE);
     }
 
-    public static CRUD grantUserDatasetRead(GetPermissionsRequest request, Session session) {
+    public static CRUD grantUserDatasetRead(GetPermissionsRequest request) {
         info().collectionID(request.getCollectionID())
                 .datasetID(request.getDatasetID())
-                .email(session)
+                .email(request.getSession())
                 .log("granting READ permission to user");
         return new CRUD().permit(READ);
     }
 
-    public static CRUD grantUserNone(GetPermissionsRequest request, Session session, String message) {
+    public static CRUD grantUserNone(GetPermissionsRequest request, String message) {
         info().collectionID(request.getCollectionID())
                 .datasetID(request.getDatasetID())
-                .email(session)
+                .email(request.getSession())
                 .log(message);
         return new CRUD();
     }
 
-    public static CRUD grantUserInstanceCreateReadUpdateDelete(GetPermissionsRequest request, Session session) {
-        info().email(session).log("granting full CRUD instance permissions to user");
+    public static CRUD grantUserInstanceCreateReadUpdateDelete(GetPermissionsRequest request) {
+        info().email(request.getSession()).log("granting full CRUD instance permissions to user");
         return new CRUD().permit(CREATE, READ, UPDATE, DELETE);
     }
 

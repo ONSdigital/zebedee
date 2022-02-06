@@ -93,27 +93,12 @@ public class SessionsServiceImpl extends TimerTask implements Sessions {
     /**
      * Gets the record for an existing session.
      *
-     * @param request The {@link HttpServletRequest}.
-     * @return The requested session, unless the ID is blank or no record exists
-     * for this ID.
-     * @throws java.io.IOException If a filesystem error occurs.
-     */
-    @Override
-    public Session get(HttpServletRequest request) throws IOException {
-        String token = RequestUtils.getSessionId(request);
-        return get(token);
-    }
-
-    /**
-     * Gets the record for an existing session.
-     *
      * @param id The session ID in order to locate the session record.
      * @return The requested session, unless the ID is blank or no record exists
      * for this ID.
      * @throws java.io.IOException If a filesystem error occurs.
      */
-    @Override
-    public Session get(String id) throws IOException {
+    protected Session get(String id) throws IOException {
         Session result = null;
 
         // Check the session record exists:
@@ -190,7 +175,7 @@ public class SessionsServiceImpl extends TimerTask implements Sessions {
      * @throws IOException for any problem getting a session from the request.
      */
     @Override
-    public Session get() throws IOException {
+    public Session get() {
         info().log("Session get() - no-Op.");
         return null;
     }

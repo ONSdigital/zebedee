@@ -5,6 +5,8 @@ import com.github.onsdigital.zebedee.permissions.cmd.CMDPermissionsService;
 import com.github.onsdigital.zebedee.permissions.cmd.CRUD;
 import com.github.onsdigital.zebedee.permissions.cmd.GetPermissionsRequest;
 import com.github.onsdigital.zebedee.permissions.cmd.PermissionsException;
+import com.github.onsdigital.zebedee.session.model.Session;
+import com.github.onsdigital.zebedee.session.service.Sessions;
 import com.github.onsdigital.zebedee.util.HttpResponseWriter;
 import org.hamcrest.CoreMatchers;
 import org.junit.Before;
@@ -24,7 +26,7 @@ import static com.github.onsdigital.zebedee.permissions.cmd.PermissionType.READ;
 import static com.github.onsdigital.zebedee.permissions.cmd.PermissionType.UPDATE;
 import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.collectionIDNotProvidedException;
 import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.datasetIDNotProvidedException;
-import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.sessionIDNotProvidedException;
+import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.sessionNotProvidedException;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -44,6 +46,12 @@ public class UserDatasetPermissionsTest {
     HttpServletResponse resp;
 
     @Mock
+    Session session;
+
+    @Mock
+    Sessions sessions;
+
+    @Mock
     HttpResponseWriter httpResponseWriter;
 
     @Mock
@@ -60,9 +68,12 @@ public class UserDatasetPermissionsTest {
         MockitoAnnotations.initMocks(this);
         fullPermissions = new CRUD().permit(CREATE, READ, UPDATE, DELETE);
 
-        getPermissionsRequest = new GetPermissionsRequest("111", "222", "333", "444");
+        getPermissionsRequest = new GetPermissionsRequest(session, "222", "333", "444");
 
-        api = new UserDatasetPermissions(cmdPermissionsService, httpResponseWriter);
+        api = new UserDatasetPermissions(cmdPermissionsService, httpResponseWriter, sessions);
+
+        when(sessions.get()).thenReturn(session);
+        when(session.getId()).thenReturn("111");
     }
 
     @Test
@@ -95,9 +106,6 @@ public class UserDatasetPermissionsTest {
         when(req.getParameter("collection_id"))
                 .thenReturn("collection_id");
 
-        when(req.getHeader("X-Florence-Token"))
-                .thenReturn("X-Florence-Token");
-
         when(cmdPermissionsService.getUserDatasetPermissions(any(GetPermissionsRequest.class)))
                 .thenThrow(new PermissionsException("boom", 500));
 
@@ -113,11 +121,13 @@ public class UserDatasetPermissionsTest {
 
     @Test
     public void testGetDatasetPermissions_BadRequest() throws Exception {
+        when(sessions.get()).thenReturn(null);
+
         api.handle(req, resp);
 
         verifyZeroInteractions(cmdPermissionsService);
 
-        PermissionsException expected = sessionIDNotProvidedException();
+        PermissionsException expected = sessionNotProvidedException();
 
         verify(httpResponseWriter, times(1))
                 .writeJSONResponse(resp, new Error(expected.getMessage()), expected.statusCode);
@@ -216,7 +226,8 @@ public class UserDatasetPermissionsTest {
     }
 
     @Test
-    public void testGetDatasePermissions_sessionIDNull() throws Exception {
+    public void testGetDatasePermissions_sessionNull() throws Exception {
+        when(sessions.get()).thenReturn(null);
         when(cmdPermissionsService.getUserDatasetPermissions(any(GetPermissionsRequest.class)))
                 .thenReturn(fullPermissions);
 
@@ -224,7 +235,7 @@ public class UserDatasetPermissionsTest {
 
         verifyZeroInteractions(cmdPermissionsService);
 
-        PermissionsException expected = sessionIDNotProvidedException();
+        PermissionsException expected = sessionNotProvidedException();
         verify(httpResponseWriter, times(1))
                 .writeJSONResponse(resp, new Error(expected.getMessage()), expected.statusCode);
     }

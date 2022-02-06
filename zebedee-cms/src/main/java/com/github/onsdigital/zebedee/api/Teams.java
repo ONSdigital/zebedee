@@ -6,19 +6,13 @@ import com.github.onsdigital.zebedee.audit.Audit;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.ConflictException;
 import com.github.onsdigital.zebedee.exceptions.ForbiddenException;
-import com.github.onsdigital.zebedee.exceptions.InternalServerError;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
-import com.github.onsdigital.zebedee.json.CollectionDescription;
-import com.github.onsdigital.zebedee.keyring.CollectionKeyring;
-import com.github.onsdigital.zebedee.model.Collections;
-import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.session.service.Sessions;
 import com.github.onsdigital.zebedee.teams.model.Team;
 import com.github.onsdigital.zebedee.teams.model.TeamList;
 import com.github.onsdigital.zebedee.teams.service.TeamsService;
-import com.github.onsdigital.zebedee.user.service.UsersService;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
@@ -27,10 +21,7 @@ import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
 
@@ -53,12 +44,10 @@ import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFea
 @Deprecated
 public class Teams {
 
+    private static final String EMAIL_PARAM = "email";
+
     private Sessions sessionsService;
     private TeamsService teamsService;
-    private PermissionsService permissionsService;
-    private Collections collectionsService;
-    private CollectionKeyring collectionKeyring;
-    private UsersService usersService;
 
     /**
      * Construct a new Teams instance using the default configuration.
@@ -66,10 +55,6 @@ public class Teams {
     public Teams() {
         this.sessionsService = Root.zebedee.getSessions();
         this.teamsService = Root.zebedee.getTeamsService();
-        this.permissionsService = Root.zebedee.getPermissionsService();
-        this.collectionsService = Root.zebedee.getCollections();
-        this.collectionKeyring = Root.zebedee.getCollectionKeyring();
-        this.usersService = Root.zebedee.getUsersService();
     }
 
     /**
@@ -77,15 +62,9 @@ public class Teams {
      * @param teamsService
      * @param permissionsService
      */
-    public Teams(final Sessions sessionsService, final TeamsService teamsService,
-                 final PermissionsService permissionsService, final Collections collectionsService,
-                 final CollectionKeyring collectionKeyring, final UsersService usersService) {
+    public Teams(final Sessions sessionsService, final TeamsService teamsService) {
         this.sessionsService = sessionsService;
         this.teamsService = teamsService;
-        this.permissionsService = permissionsService;
-        this.collectionsService = collectionsService;
-        this.collectionKeyring = collectionKeyring;
-        this.usersService = usersService;
     }
 
     /**
@@ -102,25 +81,24 @@ public class Teams {
      */
     @POST
     public boolean post(HttpServletRequest request, HttpServletResponse response)
-            throws IOException, ConflictException, UnauthorizedException, NotFoundException, BadRequestException,
-            ForbiddenException, InternalServerError {
+            throws IOException, ConflictException, UnauthorizedException, NotFoundException, ForbiddenException {
 
         if (cmsFeatureFlags().isJwtSessionsEnabled()) {
             throw new NotFoundException("JWT sessions are enabled: POST /teams is no longer supported");
         }
 
-        String email = request.getParameter("email");
+        String email = request.getParameter(EMAIL_PARAM);
         if (StringUtils.isEmpty(email)) {
-            return createTeam(request, response);
+            return createTeam(request);
         }
 
-        return addTeamMember(request, response);
+        return addTeamMember(request);
     }
 
-    public boolean createTeam(HttpServletRequest request, HttpServletResponse response) throws IOException,
+    public boolean createTeam(HttpServletRequest request) throws IOException,
             ConflictException, UnauthorizedException, NotFoundException, ForbiddenException {
 
-        Session session = sessionsService.get(request);
+        Session session = sessionsService.get();
         String teamName = getTeamName(request);
 
         teamsService.createTeam(teamName, session);
@@ -134,13 +112,13 @@ public class Teams {
         return true;
     }
 
-    public boolean addTeamMember(HttpServletRequest request, HttpServletResponse response) throws UnauthorizedException,
-            IOException, NotFoundException, BadRequestException, ForbiddenException, InternalServerError {
-        Session session = sessionsService.get(request);
+    public boolean addTeamMember(HttpServletRequest request) throws UnauthorizedException,
+            IOException, NotFoundException, ForbiddenException {
+        Session session = sessionsService.get();
 
         String teamName = getTeamName(request);
 
-        String email = request.getParameter("email");
+        String email = request.getParameter(EMAIL_PARAM);
         Team team = teamsService.findTeam(teamName);
 
         teamsService.addTeamMember(email, team, session);
@@ -169,24 +147,24 @@ public class Teams {
      */
     @DELETE
     public boolean delete(HttpServletRequest request, HttpServletResponse response) throws IOException,
-            UnauthorizedException, NotFoundException, BadRequestException, ForbiddenException, InternalServerError {
+            UnauthorizedException, NotFoundException, BadRequestException, ForbiddenException {
         if (cmsFeatureFlags().isJwtSessionsEnabled()) {
             throw new NotFoundException("JWT sessions are enabled: DELETE /teams is no longer supported");
         }
 
-        String email = request.getParameter("email");
+        String email = request.getParameter(EMAIL_PARAM);
         if (email == null) {
-            return deleteTeam(request, response);
+            return deleteTeam(request);
         } else {
-            return removeTeamMember(request, response);
+            return removeTeamMember(request);
         }
     }
 
-    public boolean deleteTeam(HttpServletRequest request, HttpServletResponse response) throws NotFoundException,
-            BadRequestException, UnauthorizedException, IOException, ForbiddenException, InternalServerError {
+    public boolean deleteTeam(HttpServletRequest request) throws NotFoundException,
+            BadRequestException, UnauthorizedException, IOException, ForbiddenException {
         String teamName = getTeamName(request);
 
-        Session session = sessionsService.get(request);
+        Session session = sessionsService.get();
         Team team = teamsService.findTeam(teamName);
         teamsService.deleteTeam(team, session);
 
@@ -199,13 +177,12 @@ public class Teams {
         return true;
     }
 
-    public boolean removeTeamMember(HttpServletRequest request, HttpServletResponse response)
-            throws UnauthorizedException, IOException, NotFoundException, BadRequestException, ForbiddenException,
-            InternalServerError {
+    public boolean removeTeamMember(HttpServletRequest request)
+            throws UnauthorizedException, IOException, NotFoundException, ForbiddenException {
         String teamName = getTeamName(request);
 
-        Session session = sessionsService.get(request);
-        String email = request.getParameter("email");
+        Session session = sessionsService.get();
+        String email = request.getParameter(EMAIL_PARAM);
         Team team = teamsService.findTeam(teamName);
 
         teamsService.removeTeamMember(email, team, session);
@@ -248,8 +225,7 @@ public class Teams {
     }
 
 
-    private static String getTeamName(HttpServletRequest request)
-            throws IOException {
+    private static String getTeamName(HttpServletRequest request) {
 
         Path path = Path.newInstance(request);
         List<String> segments = path.segments();

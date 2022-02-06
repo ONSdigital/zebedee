@@ -7,12 +7,13 @@ import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
-import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.Resource;
+import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.util.XlsToHtmlConverter;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Node;
 
@@ -24,11 +25,12 @@ import javax.xml.transform.TransformerException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import static com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDaoFactory.getCollectionHistoryDao;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_TABLE_CREATED;
+import static com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDaoFactory.getCollectionHistoryDao;
 import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData.tableCreated;
 
 @Api
@@ -38,7 +40,7 @@ public class Table {
     public void createTable(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ParserConfigurationException, TransformerException, ZebedeeException {
 
-        Session session = Root.zebedee.getSessions().get(request);
+        Session session = Root.zebedee.getSessions().get();
         com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request);
         String uri = request.getParameter("uri");
         CollectionReader collectionReader = new ZebedeeCollectionReader(Root.zebedee, collection, session);
@@ -77,8 +79,7 @@ public class Table {
             String output = XlsToHtmlConverter.docToString(table);
 
             // Write the file to the response
-            org.apache.commons.io.IOUtils.copy(new StringReader(output),
-                    response.getOutputStream());
+            IOUtils.copy(new StringReader(output), response.getOutputStream(), StandardCharsets.UTF_8);
 
             getCollectionHistoryDao().saveCollectionHistoryEvent(collection, session, COLLECTION_TABLE_CREATED,
                     tableCreated(uri, modifications));

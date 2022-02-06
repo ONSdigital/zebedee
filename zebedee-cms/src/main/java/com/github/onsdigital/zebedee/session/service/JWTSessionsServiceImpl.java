@@ -69,41 +69,6 @@ public class JWTSessionsServiceImpl implements Sessions {
     /**
      * Get a {@link Session} session object from thread local.
      *
-     * @param id the {@link String} to get the session object from thread local for.
-     * @return the {@link Session} from thread local or <code>null</code> if no session is found.
-     *
-     * @deprecated Since the new JWT sessions implementation can only get the session of the current user, a single
-     *             {@link this#get()} method is provided. Once migration to the new JWT sessions is completed all
-     *             references to this method should be updated to use the {@link this#get()} instead.
-     */
-    @Deprecated
-    @Override
-    public Session get(String id) {
-        return get();
-    }
-
-    /**
-     * Get a {@link Session} session object from thread local.
-     *
-     * @param req the {@link HttpServletRequest} to get the session object from thread local for.
-     * @return the {@link Session} from thread local or <code>null</code> if no session is found.
-     *
-     * @deprecated Since the new JWT sessions implementation can only get the session of the current user, a single
-     *             {@link this#get()} method is provided. Once migration to the new JWT sessions is completed all
-     *             references to this method that are not simply repeating the
-     *             {@link com.github.onsdigital.zebedee.filters.AuthenticationFilter} should be should be updated to
-     *             use {@link this#get()} instead. If the call is duplicating the filter, then it should be removed
-     *             so as not to waste compute and request latency.
-     */
-    @Deprecated
-    @Override
-    public Session get(HttpServletRequest req) {
-        return get();
-    }
-
-    /**
-     * Get a {@link Session} session object from thread local.
-     *
      * @return the {@link Session} from thread local or <code>null</code> if no session is found.
      */
     @Override

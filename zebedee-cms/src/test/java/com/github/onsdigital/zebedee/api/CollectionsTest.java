@@ -171,7 +171,7 @@ public class CollectionsTest {
     @Test
     public void TestPutDataset_SessionNotFound() throws Exception {
         // Given a session that does not exist
-        when(mockZebedeeCmsService.getSession(request)).thenReturn(null);
+        when(mockZebedeeCmsService.getSession()).thenReturn(null);
 
         // When the put method is called
         collections.put(request, response);
@@ -299,7 +299,7 @@ public class CollectionsTest {
     public void TestDelete_SessionNotFound() throws Exception {
 
         // Given a session that does not exist
-        when(mockZebedeeCmsService.getSession(request)).thenReturn(null);
+        when(mockZebedeeCmsService.getSession()).thenReturn(null);
 
         // When the delete method is called
         collections.delete(request, response);
@@ -328,7 +328,7 @@ public class CollectionsTest {
     // mock the authorisation for the given request to authorise the request is the authorise param is true.
     private void shouldAuthorise(HttpServletRequest request, boolean authorise) throws ZebedeeException, IOException {
 
-        when(mockZebedeeCmsService.getSession(request)).thenReturn(session);
+        when(mockZebedeeCmsService.getSession()).thenReturn(session);
 
         PermissionsService permissionsService = mock(PermissionsService.class);
         when(mockZebedeeCmsService.getPermissions()).thenReturn(permissionsService);

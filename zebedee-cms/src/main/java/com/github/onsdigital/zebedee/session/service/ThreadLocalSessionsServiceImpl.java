@@ -10,10 +10,8 @@ import com.github.onsdigital.zebedee.teams.service.TeamsService;
 import com.github.onsdigital.zebedee.teams.service.TeamsServiceImpl;
 import org.apache.commons.lang3.StringUtils;
 
-import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.ArrayList;
-
 
 /**
  * A transitional {@link Sessions} service implementation that uses the legacy {@link SessionsServiceImpl} to validate
@@ -59,27 +57,6 @@ public class ThreadLocalSessionsServiceImpl extends SessionsServiceImpl {
     @Deprecated
     @Override
     public Session get(String id) {
-        return get();
-    }
-
-    /**
-     * Get a {@link Session} session object from thread local.
-     *
-     * @param req the {@link HttpServletRequest} to get the session object from thread local for.
-     * @return the {@link Session} from thread local or <code>null</code> if no session is found.
-     *
-     * @deprecated Since the new JWT sessions implementation can only get the session of the current user, a single
-     *             {@link this#get()} method is provided. Once migration to the new JWT sessions is completed all
-     *             references to this method that are not simply repeating the
-     *             {@link com.github.onsdigital.zebedee.filters.AuthenticationFilter} should be should be updated to
-     *             use {@link this#get()} instead. If the call is duplicating the filter, then it should be removed
-     *             so as not to waste compute and request latency.
-     *
-     * TODO: Write out usage of this method prior to JWT migration
-     */
-    @Deprecated
-    @Override
-    public Session get(HttpServletRequest req) {
         return get();
     }
 

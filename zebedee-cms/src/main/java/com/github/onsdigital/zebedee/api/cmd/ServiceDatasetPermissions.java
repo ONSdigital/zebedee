@@ -6,6 +6,7 @@ import com.github.onsdigital.zebedee.permissions.cmd.CMDPermissionsServiceImpl;
 import com.github.onsdigital.zebedee.permissions.cmd.CRUD;
 import com.github.onsdigital.zebedee.permissions.cmd.GetPermissionsRequest;
 import com.github.onsdigital.zebedee.permissions.cmd.PermissionsException;
+import com.github.onsdigital.zebedee.session.service.Sessions;
 import com.github.onsdigital.zebedee.util.HttpResponseWriter;
 
 import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.datasetIDNotProvidedException;
@@ -33,9 +34,11 @@ public class ServiceDatasetPermissions extends PermissionsAPIBase {
      *
      * @param cmdPermissionsService
      * @param responseWriter        the http response writer impl to use.
+     * @param sessionsService       the sessions service
      */
-    public ServiceDatasetPermissions(CMDPermissionsService cmdPermissionsService, HttpResponseWriter responseWriter) {
-        super(cmdPermissionsService, responseWriter);
+    public ServiceDatasetPermissions(CMDPermissionsService cmdPermissionsService, HttpResponseWriter responseWriter,
+                                     Sessions sessionsService) {
+        super(cmdPermissionsService, responseWriter, sessionsService);
     }
 
     @Override

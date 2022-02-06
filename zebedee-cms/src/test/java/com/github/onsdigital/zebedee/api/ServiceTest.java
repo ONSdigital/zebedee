@@ -63,12 +63,12 @@ public class ServiceTest {
         session.setEmail("other@ons.gov.uk");
         session.setId("123");
 
-        when(sessions.get(mockRequest)).thenReturn(session);
+        when(sessions.get()).thenReturn(session);
         when(permissionsService.isAdministrator(session)).thenReturn(true);
         when(serviceStore.store(Mockito.anyString(), any())).thenReturn(new ServiceAccount("123"));
         when(mockResponse.getWriter()).thenReturn(printWriterMock);
         api.createService(mockRequest, mockResponse);
-        verify(sessions, times(1)).get(mockRequest);
+        verify(sessions, times(1)).get();
         verify(permissionsService, times(1)).isAdministrator(session);
         verify(serviceStore, times(1)).store(Mockito.anyString(), any());
         verify(mockResponse).setStatus(HttpServletResponse.SC_CREATED);
@@ -80,11 +80,11 @@ public class ServiceTest {
         session.setEmail("other@ons.gov.uk");
         session.setId("123");
 
-        when(sessions.get(mockRequest)).thenReturn(session);
+        when(sessions.get()).thenReturn(session);
         when(permissionsService.isAdministrator(session)).thenReturn(false);
         when(serviceStore.store(Mockito.anyString(), any())).thenReturn(new ServiceAccount("123"));
         api.createService(mockRequest, mockResponse);
-        verify(sessions, times(1)).get(mockRequest);
+        verify(sessions, times(1)).get();
         verify(permissionsService, times(1)).isAdministrator(session);
         verify(serviceStore, times(0)).store(Mockito.anyString(), any());
         verify(mockResponse).setStatus(HttpServletResponse.SC_FORBIDDEN);

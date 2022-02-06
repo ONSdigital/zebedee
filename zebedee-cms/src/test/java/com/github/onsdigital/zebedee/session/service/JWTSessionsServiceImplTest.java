@@ -6,22 +6,17 @@ import com.github.onsdigital.interfaces.JWTHandler;
 import com.github.onsdigital.zebedee.junit4.rules.RunInThread;
 import com.github.onsdigital.zebedee.junit4.rules.RunInThreadRule;
 import com.github.onsdigital.zebedee.session.model.Session;
-import com.github.onsdigital.zebedee.teams.model.Team;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
-import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -62,19 +57,13 @@ public class JWTSessionsServiceImplTest {
     +"MwIDAQAB";
 
     private final static String EMAIL = "janedoe@example.com";
+    private final static String[] TEAM_IDS = {"publishing-role", "1", "something"};
 
     private JWTSessionsServiceImpl jwtSessionsServiceImpl;
 
     private Map<String, String> rsaKeyMap = new HashMap<String, String>();
 
     private JWTHandler jwtHandler = new JWTHandlerImpl();
-
-    private List<Team> teams;
-    private String[] teamIDs;
-    private Team team1;
-    private Team team2;
-
-    @Mock
     private UserDataPayload userDataPayload;
 
     private static ThreadLocal<UserDataPayload> store = new ThreadLocal<>();
@@ -94,21 +83,7 @@ public class JWTSessionsServiceImplTest {
         rsaKeyMap.put(RSA_KEY_ID_1, RSA_SIGNING_KEY_1);
         rsaKeyMap.put(RSA_KEY_ID_2, RSA_SIGNING_KEY_2);
 
-        this.teams = new ArrayList<>();
-
-        this.team1 = new Team();
-        this.team1.setId(10);
-        this.teams.add(team1);
-
-        this.team2 = new Team();
-        this.team2.setId(20);
-        this.team2.addMember(EMAIL);
-        this.teams.add(team2);
-
-        this.teamIDs = teams.stream().map(t -> Integer.toString(t.getId())).toArray(String[]::new);
-
-        this.userDataPayload = new UserDataPayload(EMAIL, teamIDs);
-
+        this.userDataPayload = new UserDataPayload(EMAIL, TEAM_IDS);
         this.jwtSessionsServiceImpl = new JWTSessionsServiceImpl(jwtHandler, rsaKeyMap);
     }
 
@@ -188,44 +163,19 @@ public class JWTSessionsServiceImplTest {
 
     @Test
     @RunInThread
-    public void getByRequest_sessionDoesNotExist_shouldReturnNull() throws Exception {
-        HttpServletRequest request = mock(HttpServletRequest.class);
+    public void get_ShouldReturnSession_WhenValidSession() throws Exception {
+        store.set(userDataPayload);
 
-        Session actual = jwtSessionsServiceImpl.get(request);
+        Session actual = jwtSessionsServiceImpl.get();
 
-        assertThat(actual, is(nullValue()));
+        assertThat(actual.getEmail(), is(EMAIL));
+        assertThat(actual.getGroups(), is(TEAM_IDS));
     }
 
     @Test
     @RunInThread
-    public void getByRequest_success_shouldReturnSession() throws Exception {
-        HttpServletRequest request = mock(HttpServletRequest.class);
-
-        this.store.set(userDataPayload);
-
-        Session actual = jwtSessionsServiceImpl.get(request);
-
-        assertThat(actual, is(notNullValue()));
-        assertThat(actual.getEmail(), equalTo(EMAIL));
-        assertThat(actual.getGroups(), equalTo(teamIDs));
-    }
-
-    @Test
-    @RunInThread
-    public void getByIDSessionDoesNotExist_shouldReturnNull() throws Exception {
-        assertThat(jwtSessionsServiceImpl.get("ID"), is(nullValue()));
-    }
-
-    @Test
-    @RunInThread
-    public void getByID_success_shouldReturnSession() throws Exception {
-        this.store.set(userDataPayload);
-
-        Session actual = jwtSessionsServiceImpl.get("666");
-
-        assertThat(actual, is(notNullValue()));
-        assertThat(actual.getEmail(), equalTo(EMAIL));
-        assertThat(actual.getGroups(), equalTo(teamIDs));
+    public void get_ShouldReturnNull_WhenNoSession() throws Exception {
+        assertThat(jwtSessionsServiceImpl.get(), is(nullValue()));
     }
 
     @Test

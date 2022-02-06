@@ -81,7 +81,10 @@ public class Permission {
             throw new NotFoundException("JWT sessions are enabled: POST /permission is no longer supported");
         }
 
-        Session session = getSession(request);
+        Session session = sessionsService.get();
+        if (session == null) {
+            throw new UnauthorizedException("error expected user session but was null");
+        }
 
         // Assign / remove admin permissions
         if (permissionDefinition.isAdmin()) {
@@ -131,7 +134,7 @@ public class Permission {
             throw new BadRequestException("invalid parameter 'email': checking the permissions of another user is no longer supported");
         }
 
-        Session session = sessionsService.get(request);
+        Session session = sessionsService.get();
 
         PermissionDefinition permissionDefinition;
         if (cmsFeatureFlags().isJwtSessionsEnabled()) {
@@ -188,20 +191,5 @@ public class Permission {
                 .host(request)
                 .actionedByEffecting(session.getEmail(), permissionDefinition.getEmail())
                 .log();
-    }
-
-    private Session getSession(HttpServletRequest request) throws InternalServerError {
-        Session session = null;
-        try {
-            session = sessionsService.get(request);
-        } catch (IOException ex) {
-            throw new InternalServerError("error getting user session", ex);
-        }
-
-        if (session == null) {
-            throw new InternalServerError("error expected user session but was null");
-        }
-
-        return session;
     }
 }

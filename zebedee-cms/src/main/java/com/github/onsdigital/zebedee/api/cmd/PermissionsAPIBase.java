@@ -1,10 +1,13 @@
 package com.github.onsdigital.zebedee.api.cmd;
 
+import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.json.response.Error;
 import com.github.onsdigital.zebedee.permissions.cmd.CMDPermissionsService;
 import com.github.onsdigital.zebedee.permissions.cmd.CRUD;
 import com.github.onsdigital.zebedee.permissions.cmd.GetPermissionsRequest;
 import com.github.onsdigital.zebedee.permissions.cmd.PermissionsException;
+import com.github.onsdigital.zebedee.session.model.Session;
+import com.github.onsdigital.zebedee.session.service.Sessions;
 import com.github.onsdigital.zebedee.util.HttpResponseWriter;
 
 import javax.servlet.http.HttpServletRequest;
@@ -28,6 +31,7 @@ public abstract class PermissionsAPIBase {
 
     protected CMDPermissionsService permissionsService;
     protected HttpResponseWriter httpResponseWriter;
+    protected Sessions sessionsService;
 
     /**
      * Construct a new Permissions endpoint.
@@ -35,16 +39,32 @@ public abstract class PermissionsAPIBase {
      * @param cmdPermissionsService the permission service to use.
      * @param responseWriter        the http response writer impl to use.
      */
-    public PermissionsAPIBase(CMDPermissionsService cmdPermissionsService,
-                              HttpResponseWriter responseWriter) {
+    protected PermissionsAPIBase(CMDPermissionsService cmdPermissionsService,
+                                 HttpResponseWriter responseWriter) {
         this.permissionsService = cmdPermissionsService;
         this.httpResponseWriter = responseWriter;
+        this.sessionsService = Root.zebedee.getSessions();
+    }
+
+    /**
+     * Construct a new Permissions endpoint.
+     *
+     * @param cmdPermissionsService the permission service to use.
+     * @param responseWriter        the http response writer impl to use.
+     * @param sessionsService       the sessions service
+     */
+    protected PermissionsAPIBase(CMDPermissionsService cmdPermissionsService,
+                              HttpResponseWriter responseWriter, Sessions sessionsService) {
+        this.permissionsService = cmdPermissionsService;
+        this.httpResponseWriter = responseWriter;
+        this.sessionsService = sessionsService;
     }
 
     @GET
     public void handle(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        Session session = sessionsService.get();
         try {
-            GetPermissionsRequest getPermissionsRequest = new GetPermissionsRequest(request);
+            GetPermissionsRequest getPermissionsRequest = new GetPermissionsRequest(session, request);
             CRUD permissions = getPermissions(getPermissionsRequest);
             writeResponse(response, permissions, SC_OK);
         } catch (PermissionsException ex) {

@@ -6,12 +6,13 @@ import com.github.onsdigital.zebedee.permissions.cmd.CMDPermissionsServiceImpl;
 import com.github.onsdigital.zebedee.permissions.cmd.CRUD;
 import com.github.onsdigital.zebedee.permissions.cmd.GetPermissionsRequest;
 import com.github.onsdigital.zebedee.permissions.cmd.PermissionsException;
+import com.github.onsdigital.zebedee.session.service.Sessions;
 import com.github.onsdigital.zebedee.util.HttpResponseWriter;
 
 import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.collectionIDNotProvidedException;
 import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.datasetIDNotProvidedException;
 import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.internalServerErrorException;
-import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.sessionIDNotProvidedException;
+import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.sessionNotProvidedException;
 import static com.github.onsdigital.zebedee.util.JsonUtils.writeResponseEntity;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
@@ -25,13 +26,20 @@ import static org.apache.commons.lang3.StringUtils.isEmpty;
 public class UserDatasetPermissions extends PermissionsAPIBase {
 
     public UserDatasetPermissions() {
-        this(CMDPermissionsServiceImpl.getInstance(),
+        super(CMDPermissionsServiceImpl.getInstance(),
                 (r, b, s) -> writeResponseEntity(r, b, s));
     }
 
-    public UserDatasetPermissions(CMDPermissionsService cmdPermissionsService,
-                                  HttpResponseWriter responseWriter) {
-        super(cmdPermissionsService, responseWriter);
+    /**
+     * Construct a new ServiceDatasetPermissions endpoint.
+     *
+     * @param cmdPermissionsService
+     * @param responseWriter        the http response writer impl to use.
+     * @param sessionsService       the sessions service
+     */
+    public UserDatasetPermissions(CMDPermissionsService cmdPermissionsService, HttpResponseWriter responseWriter,
+                                     Sessions sessionsService) {
+        super(cmdPermissionsService, responseWriter, sessionsService);
     }
 
     @Override
@@ -46,8 +54,8 @@ public class UserDatasetPermissions extends PermissionsAPIBase {
             throw internalServerErrorException();
         }
 
-        if (isEmpty(request.getSessionID())) {
-            throw sessionIDNotProvidedException();
+        if (request.getSession() == null) {
+            throw sessionNotProvidedException();
         }
 
         if (isEmpty(request.getDatasetID())) {

@@ -29,7 +29,7 @@ public class Service {
 
     public static final Error NOT_FOUND_ERR = new Error("not found");
 
-    private Supplier<String> randomIdGenerator = () -> Random.id();
+    private Supplier<String> randomIdGenerator = Random::id;
     private ServiceStore serviceStore;
     private Sessions sessions;
     private PermissionsService permissionsService;
@@ -37,7 +37,7 @@ public class Service {
     @POST
     public void createService(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
-        final Session session = getSessions().get(request);
+        final Session session = getSessions().get();
         if (session != null && getPermissionsService().isAdministrator(session)) {
             final ServiceStore serviceStoreImpl = getServiceStore();
             final String token = randomIdGenerator.get();

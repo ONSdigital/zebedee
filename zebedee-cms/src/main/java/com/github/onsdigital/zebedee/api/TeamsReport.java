@@ -72,7 +72,7 @@ public class TeamsReport {
             throw new NotFoundException("JWT sessions are enabled: GET /teamsreport is no longer supported");
         }
 
-        Session session = serviceServiceSupplier.getService().get(request);
+        Session session = serviceServiceSupplier.getService().get();
         response.setContentType(MediaType.APPLICATION_OCTET_STREAM);
         response.setHeader(CONTENT_DISPOSITION_HEADER, format(CONTENT_DISPOSITION_VALUE, getDateString()));
         response.setStatus(HttpStatus.SC_OK);

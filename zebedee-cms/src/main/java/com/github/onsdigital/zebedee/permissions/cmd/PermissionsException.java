@@ -20,8 +20,8 @@ public class PermissionsException extends ZebedeeException {
         return new PermissionsException(ERROR_PREFIX + "dataset ID required but was empty", SC_BAD_REQUEST);
     }
 
-    public static PermissionsException sessionIDNotProvidedException() {
-        return new PermissionsException(ERROR_PREFIX + "session ID required but empty", SC_BAD_REQUEST);
+    public static PermissionsException sessionNotProvidedException() {
+        return new PermissionsException(ERROR_PREFIX + "session required but empty", SC_BAD_REQUEST);
     }
 
     public static PermissionsException internalServerErrorException() {

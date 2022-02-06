@@ -190,7 +190,7 @@ public interface PermissionsService {
     PermissionDefinition userPermissions(String email, Session session) throws IOException, NotFoundException, UnauthorizedException;
 
     /**
-     * Get user permission levels given an session
+     * Get user permission levels given a session
      *
      * @param session the user session
      * @return a {@link PermissionDefinition} object representing the user's permissions

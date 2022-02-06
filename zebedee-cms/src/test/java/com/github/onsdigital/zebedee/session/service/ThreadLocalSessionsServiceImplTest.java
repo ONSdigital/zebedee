@@ -25,10 +25,10 @@ import java.util.List;
 import java.util.function.Supplier;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -40,7 +40,7 @@ public class ThreadLocalSessionsServiceImplTest {
 
     private final static String SESSION_TOKEN = "7be8cdc8f0b63603eb34490c2fcb91a0a2d01a9c292dd8baf397779a22d917d9";
     private final static String EMAIL = "someone@example.com";
-    private final static List<String> TEAM_IDS = Arrays.asList(new String[]{"publishing-role", "1", "something"});
+    private final static List<String> TEAM_IDS = Arrays.asList(new String[]{ThreadLocalSessionsServiceImpl.ADMIN_GROUP, ThreadLocalSessionsServiceImpl.PUBLISHER_GROUP, "10", "something"});
 
     private static ThreadLocal<Session> threadLocal = new ThreadLocal<>();
 
@@ -200,7 +200,7 @@ public class ThreadLocalSessionsServiceImplTest {
                 .thenReturn(true);
         when(legacySessionsStore.read(SESSION_TOKEN))
                 .thenReturn(legacySession);
-        when(permissionsService.userPermissions(session))
+        when(permissionsService.userPermissions(EMAIL, session))
                 .thenThrow(new IOException("some error"));
 
         assertThrows(IOException.class, () -> threadLocalSessionsService.set(SESSION_TOKEN));
@@ -231,6 +231,9 @@ public class ThreadLocalSessionsServiceImplTest {
     public void set_ShouldSetSession_WhenTokenValid() throws Exception {
         LegacySession legacySession = new LegacySession(SESSION_TOKEN, EMAIL);
         Session session = new Session(SESSION_TOKEN, EMAIL);
+        List<String> teams = new ArrayList<>();
+        teams.add("10");
+        teams.add("something");
 
         when(legacySessionsStore.exists(SESSION_TOKEN))
                 .thenReturn(true);
@@ -244,18 +247,19 @@ public class ThreadLocalSessionsServiceImplTest {
         threadLocalSessionsService.set(SESSION_TOKEN);
 
         Session actual = threadLocal.get();
-        assertThat(actual, is(notNullValue()));
-        assertThat(actual.getId(), is(SESSION_TOKEN));
-        assertThat(actual.getEmail(), is(EMAIL));
-        assertThat(actual.getGroups().get(0), is(ThreadLocalSessionsServiceImpl.ADMIN_GROUP));
-        assertThat(actual.getGroups().get(1), is(ThreadLocalSessionsServiceImpl.PUBLISHER_GROUP));
-        assertThat(actual.getGroups().get(2), is(TEAM_IDS.get(0)));
+        assertNotNull(actual);
+        assertEquals(SESSION_TOKEN, actual.getId());
+        assertEquals(EMAIL, actual.getEmail());
+        assertEquals(ThreadLocalSessionsServiceImpl.ADMIN_GROUP, actual.getGroups().get(0));
+        assertEquals(ThreadLocalSessionsServiceImpl.PUBLISHER_GROUP, actual.getGroups().get(1));
+        assertEquals(teams.get(0), actual.getGroups().get(2));
+        assertEquals(teams.get(1), actual.getGroups().get(3));
     }
 
     @Test
     @RunInThread
     public void set_ShouldClearThread_WhenSetAgain() throws Exception {
-        threadLocal.set(new Session(SESSION_TOKEN, EMAIL, TEAM_IDS));
+        threadLocal.set(new Session(SESSION_TOKEN, EMAIL));
 
         assertThrows(SessionsException.class, () -> threadLocalSessionsService.set(""));
 
@@ -276,7 +280,7 @@ public class ThreadLocalSessionsServiceImplTest {
     @Test
     @RunInThread
     public void get_ShouldReturnNull_WhenNoSession() throws Exception {
-        assertThat(threadLocalSessionsService.get(), is(nullValue()));
+        assertNull(threadLocalSessionsService.get());
     }
 
     @Test

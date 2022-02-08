@@ -26,6 +26,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThrows;
 import static org.mockito.Mockito.mock;
 
@@ -178,6 +179,15 @@ public class JWTSessionsServiceImplTest {
 
     @Test
     @RunInThread
+    public void set_ShouldClearThread_WhenSetAgain() throws Exception {
+        store.set(userDataPayload);
+
+        assertThrows(SessionsException.class, () -> jwtSessionsServiceImpl.set(""));
+        assertNull(store.get());
+    }
+
+    @Test
+    @RunInThread
     public void getByRequest_sessionDoesNotExist_shouldReturnNull() throws Exception {
         HttpServletRequest request = mock(HttpServletRequest.class);
 
@@ -216,5 +226,15 @@ public class JWTSessionsServiceImplTest {
         assertThat(actual, is(notNullValue()));
         assertThat(actual.getEmail(), equalTo(EMAIL));
         assertThat(actual.getGroups(), equalTo(teamIDs));
+    }
+
+    @Test
+    @RunInThread
+    public void resetThread_ShouldClearSessions() throws Exception {
+        store.set(userDataPayload);
+
+        jwtSessionsServiceImpl.resetThread();
+
+        assertNull(store.get());
     }
 }

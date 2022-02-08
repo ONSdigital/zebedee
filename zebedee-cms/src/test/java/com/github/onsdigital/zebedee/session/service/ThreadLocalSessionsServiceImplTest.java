@@ -256,6 +256,16 @@ public class ThreadLocalSessionsServiceImplTest {
 
     @Test
     @RunInThread
+    public void set_ShouldClearThread_WhenSetAgain() throws Exception {
+        threadLocal.set(userDataPayload);
+
+        assertThrows(SessionsException.class, () -> threadLocalSessionsService.set(""));
+
+        assertNull(threadLocal.get());
+    }
+
+    @Test
+    @RunInThread
     public void get_ShouldReturnSession_WhenValidSession() throws Exception {
         threadLocal.set(userDataPayload);
 
@@ -269,5 +279,15 @@ public class ThreadLocalSessionsServiceImplTest {
     @RunInThread
     public void get_ShouldReturnNull_WhenNoSession() throws Exception {
         assertThat(threadLocalSessionsService.get(), is(nullValue()));
+    }
+
+    @Test
+    @RunInThread
+    public void resetThread_ShouldClearSessions() throws Exception {
+        threadLocal.set(userDataPayload);
+
+        threadLocalSessionsService.resetThread();
+
+        assertNull(threadLocal.get());
     }
 }

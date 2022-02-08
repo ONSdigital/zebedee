@@ -75,6 +75,7 @@ public class AuthenticationFilterTest extends ZebedeeTestBaseFixture {
         doNothing().when(response).setContentType(MediaType.JSON_UTF_8.toString());
         doNothing().when(response).setStatus(anyInt());
         when(response.getOutputStream()).thenReturn(outputStream);
+        doNothing().when(sessions).resetThread();
     }
 
     @Test
@@ -82,6 +83,7 @@ public class AuthenticationFilterTest extends ZebedeeTestBaseFixture {
         when(request.getMethod()).thenReturn(HttpMethod.OPTIONS);
 
         assertTrue(authenticationFilter.filter(request, response));
+        verify(sessions, times(1)).resetThread();
     }
 
     @Test
@@ -99,6 +101,7 @@ public class AuthenticationFilterTest extends ZebedeeTestBaseFixture {
         String responseBody = new String(responseBodyCaptor.getValue(), responseBodyOffset.getValue(),
                 responseBodyLength.getValue(), StandardCharsets.UTF_8);
         assertEquals(doubleQuoted(SOME_VALIDATION_ERROR), responseBody);
+        verify(sessions, times(1)).resetThread();
     }
 
     @Test
@@ -117,6 +120,7 @@ public class AuthenticationFilterTest extends ZebedeeTestBaseFixture {
         String responseBody = new String(responseBodyCaptor.getValue(), responseBodyOffset.getValue(),
                 responseBodyLength.getValue(), StandardCharsets.UTF_8);
         assertEquals(doubleQuoted(SOME_VALIDATION_ERROR), responseBody);
+        verify(sessions, times(1)).resetThread();
     }
 
     @Test
@@ -135,6 +139,7 @@ public class AuthenticationFilterTest extends ZebedeeTestBaseFixture {
         String responseBody = new String(responseBodyCaptor.getValue(), responseBodyOffset.getValue(),
                 responseBodyLength.getValue(), StandardCharsets.UTF_8);
         assertEquals(doubleQuoted(SOME_VALIDATION_ERROR), responseBody);
+        verify(sessions, times(1)).resetThread();
     }
 
     @Test
@@ -146,6 +151,7 @@ public class AuthenticationFilterTest extends ZebedeeTestBaseFixture {
         assertTrue(authenticationFilter.filter(request, response));
 
         verify(sessions, times(1)).set(LEGACY_TOKEN);
+        verify(sessions, times(1)).resetThread();
     }
 
     @Test
@@ -157,6 +163,7 @@ public class AuthenticationFilterTest extends ZebedeeTestBaseFixture {
         assertTrue(authenticationFilter.filter(request, response));
 
         verify(sessions, times(1)).set(JWT_TOKEN);
+        verify(sessions, times(1)).resetThread();
     }
 
     @Test
@@ -169,6 +176,7 @@ public class AuthenticationFilterTest extends ZebedeeTestBaseFixture {
         assertTrue(authenticationFilter.filter(request, response));
 
         verify(sessions, times(1)).set(LEGACY_TOKEN);
+        verify(sessions, times(1)).resetThread();
     }
 
     @Test
@@ -187,6 +195,7 @@ public class AuthenticationFilterTest extends ZebedeeTestBaseFixture {
         String responseBody = new String(responseBodyCaptor.getValue(), responseBodyOffset.getValue(),
                 responseBodyLength.getValue(), StandardCharsets.UTF_8);
         assertEquals(doubleQuoted(SOME_VALIDATION_ERROR), responseBody);
+        verify(sessions, times(1)).resetThread();
     }
 
     @Test
@@ -197,6 +206,7 @@ public class AuthenticationFilterTest extends ZebedeeTestBaseFixture {
         assertTrue(authenticationFilter.filter(request, response));
 
         verify(sessions, times(1)).set(null);
+        verify(sessions, times(1)).resetThread();
     }
 
     @Test
@@ -208,6 +218,7 @@ public class AuthenticationFilterTest extends ZebedeeTestBaseFixture {
         assertTrue(authenticationFilter.filter(request, response));
 
         verify(sessions, times(1)).set(LEGACY_TOKEN);
+        verify(sessions, times(1)).resetThread();
     }
 
     @Test
@@ -219,6 +230,7 @@ public class AuthenticationFilterTest extends ZebedeeTestBaseFixture {
         assertTrue(authenticationFilter.filter(request, response));
 
         verify(sessions, times(1)).set(LEGACY_TOKEN);
+        verify(sessions, times(1)).resetThread();
     }
 
     private String doubleQuoted(String input) {

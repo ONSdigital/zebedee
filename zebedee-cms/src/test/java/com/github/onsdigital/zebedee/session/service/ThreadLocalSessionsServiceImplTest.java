@@ -40,6 +40,11 @@ public class ThreadLocalSessionsServiceImplTest {
     private final static String EMAIL = "someone@example.com";
     private final static String[] TEAM_IDS = {"publishing-role", "1", "something"};
 
+    private static ThreadLocal<UserDataPayload> threadLocal = new ThreadLocal<>();
+
+    private PermissionDefinition permissionDefinition;
+    private UserDataPayload userDataPayload;
+
     /**
      * Class under test
      */
@@ -56,11 +61,6 @@ public class ThreadLocalSessionsServiceImplTest {
 
     @Mock
     private Supplier<String> randomIdGenerator;
-
-    private PermissionDefinition permissionDefinition;
-    private UserDataPayload userDataPayload;
-
-    private static ThreadLocal<UserDataPayload> threadLocal = new ThreadLocal<>();
 
     @Rule
     public TemporaryFolder rootDir = new TemporaryFolder();

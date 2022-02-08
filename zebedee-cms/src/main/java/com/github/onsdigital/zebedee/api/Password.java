@@ -22,7 +22,7 @@ import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFea
  * API for resetting or changing a password.
  *
  * @deprecated The user management in zebedee is deprecated in favour of the dp-identity-api with its JWT based auth
- *             and will be removed after migration of users and teams to the new service.
+ * and will be removed after migration of users and teams to the new service.
  */
 @Deprecated
 @Api
@@ -32,11 +32,11 @@ public class Password {
      * Wrap static method calls to obtain service in function makes testing easier - class member can be
      * replaced with a mocked giving control of desired behaviour.
      */
-    private ServiceSupplier<UsersService> usersServiceSupplier = () -> Root.zebedee.getUsersService();
+    private final ServiceSupplier<UsersService> usersServiceSupplier = () -> Root.zebedee.getUsersService();
 
     /**
      * Update password
-     *
+     * <p>
      * Will set password as permanent if it is the user updating
      * Will set password as temporary if an admin does it
      *

@@ -19,8 +19,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
@@ -92,6 +92,7 @@ public class CollectionDetails {
         result.setType(collection.getDescription().getType());
         result.setPublishDate(collection.getDescription().getPublishDate());
         result.setTeams(collection.getDescription().getTeams());
+        result.setViewerTeams(collection.getDescription().getViewerTeams());
         result.setReleaseUri(collection.getDescription().getReleaseUri());
 
         result.pendingDeletes = contentDeleteService.getDeleteItemsByCollection(collection);
@@ -109,8 +110,15 @@ public class CollectionDetails {
         addEventsForDetails(result.reviewed, collection);
 
         Set<String> teamIds = zebedeeCmsService.getPermissions().listViewerTeams(session, collection.getDescription().getId());
-        result.teamsDetails = zebedeeCmsService.getZebedee().getTeamsService().resolveTeamDetails(teamIds);
-        result.teamsDetails.forEach(team -> collection.getDescription().getTeams().add(team.getName()));
+
+        // TODO: Remove feature flag after migration to dp-identity-api
+        if (cmsFeatureFlags().isJwtSessionsEnabled()) {
+            result.setViewerTeams(new ArrayList<>(teamIds));
+        } else {
+            result.teamsDetails = zebedeeCmsService.getZebedee().getTeamsService().resolveTeamDetails(teamIds);
+            result.teamsDetails.forEach(team -> collection.getDescription().getTeams().add(team.getName()));
+            result.teamsDetails.forEach(team -> collection.getDescription().getViewerTeams().add(team.getName()));
+        }
 
         String collectionId = Collections.getCollectionId(request);
 

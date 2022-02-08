@@ -321,6 +321,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         collectionDescription.setType(CollectionType.manual);
         collectionDescription.setPublishDate(new Date());
         collectionDescription.setTeams(new ArrayList<>());
+        collectionDescription.setViewerTeams(new ArrayList<>());
         Collection collection = Collection.create(collectionDescription, zebedee, publisher1Session);
 
         // When the collection is updated
@@ -456,6 +457,8 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         collectionDescription.setPublishDate(DateTime.now().plusSeconds(2).toDate());
         collectionDescription.setType(CollectionType.scheduled);
         collectionDescription.setTeams(new ArrayList<>());
+        collectionDescription.setViewerTeams(new ArrayList<>());
+
         Collection collection = Collection.create(collectionDescription, zebedee, publisher1Session);
 
         DummyScheduler scheduler = new DummyScheduler();

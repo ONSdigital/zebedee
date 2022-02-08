@@ -15,6 +15,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import javax.ws.rs.HEAD;
 import java.io.IOException;
 import java.util.HashSet;
 
@@ -34,8 +35,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 
@@ -76,7 +76,7 @@ public class CMDPermissionsServiceImplTest {
 
     @Before
     public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         dataset = new CollectionDataset();
         dataset.setId(DATASET_ID);
@@ -99,7 +99,7 @@ public class CMDPermissionsServiceImplTest {
             service.getServiceAccountByID(null);
         } catch (PermissionsException ex) {
             assertThat(ex.statusCode, equalTo(HttpStatus.SC_BAD_REQUEST));
-            verifyZeroInteractions(serviceStore);
+            verifyNoInteractions(serviceStore);
             throw ex;
         }
     }
@@ -110,7 +110,7 @@ public class CMDPermissionsServiceImplTest {
             service.getServiceAccountByID("");
         } catch (PermissionsException ex) {
             assertThat(ex.statusCode, equalTo(HttpStatus.SC_BAD_REQUEST));
-            verifyZeroInteractions(serviceStore);
+            verifyNoInteractions(serviceStore);
             throw ex;
         }
     }
@@ -190,7 +190,7 @@ public class CMDPermissionsServiceImplTest {
             service.getCollectionByID(null);
         } catch (PermissionsException ex) {
             assertThat(ex.statusCode, equalTo(HttpStatus.SC_BAD_REQUEST));
-            verifyZeroInteractions(collectionsService);
+            verifyNoInteractions(collectionsService);
             throw ex;
         }
     }
@@ -201,7 +201,7 @@ public class CMDPermissionsServiceImplTest {
             service.getCollectionByID("");
         } catch (PermissionsException ex) {
             assertThat(ex.statusCode, equalTo(HttpStatus.SC_BAD_REQUEST));
-            verifyZeroInteractions(collectionsService);
+            verifyNoInteractions(collectionsService);
             throw ex;
         }
     }
@@ -251,7 +251,7 @@ public class CMDPermissionsServiceImplTest {
             service.getServiceDatasetPermissions(request);
         } catch (PermissionsException ex) {
             assertThat(ex.statusCode, equalTo(HttpStatus.SC_BAD_REQUEST));
-            verifyZeroInteractions(serviceStore);
+            verifyNoInteractions(serviceStore);
             throw ex;
         }
     }
@@ -263,7 +263,7 @@ public class CMDPermissionsServiceImplTest {
             service.getServiceDatasetPermissions(request);
         } catch (PermissionsException ex) {
             assertThat(ex.statusCode, equalTo(HttpStatus.SC_BAD_REQUEST));
-            verifyZeroInteractions(serviceStore);
+            verifyNoInteractions(serviceStore);
             throw ex;
         }
     }
@@ -496,7 +496,7 @@ public class CMDPermissionsServiceImplTest {
             service.getUserInstancePermissions(null);
         } catch (PermissionsException ex) {
             assertThat(ex.statusCode, equalTo(HttpStatus.SC_INTERNAL_SERVER_ERROR));
-            verifyZeroInteractions(serviceStore, collectionsService, collectionsService, sessions);
+            verifyNoInteractions(serviceStore, collectionsService, collectionsService, sessions);
             throw ex;
         }
     }
@@ -513,7 +513,7 @@ public class CMDPermissionsServiceImplTest {
             assertThat(ex.getMessage(), equalTo(expected.getMessage()));
             assertThat(ex.statusCode, equalTo(expected.statusCode));
 
-            verifyZeroInteractions(serviceStore, collectionsService, collectionsService);
+            verifyNoInteractions(serviceStore, collectionsService, collectionsService);
             throw ex;
         }
     }
@@ -551,7 +551,7 @@ public class CMDPermissionsServiceImplTest {
             assertThat(ex.getMessage(), equalTo(expected.getMessage()));
             assertThat(ex.statusCode, equalTo(expected.statusCode));
 
-            verifyZeroInteractions(serviceStore, collectionsService, collectionsService, sessions);
+            verifyNoInteractions(serviceStore, collectionsService, collectionsService, sessions);
             throw ex;
         }
     }
@@ -572,7 +572,7 @@ public class CMDPermissionsServiceImplTest {
             assertThat(ex.getMessage(), equalTo(expected.getMessage()));
             assertThat(ex.statusCode, equalTo(expected.statusCode));
 
-            verifyZeroInteractions(serviceStore, collectionsService, collectionsService, sessions);
+            verifyNoInteractions(serviceStore, collectionsService, collectionsService, sessions);
             throw ex;
         }
     }
@@ -596,7 +596,7 @@ public class CMDPermissionsServiceImplTest {
             assertThat(ex.statusCode, equalTo(expected.statusCode));
 
             verify(serviceStore, times(1)).get(SERVICE_TOKEN);
-            verifyZeroInteractions(collectionsService, collectionsService, sessions);
+            verifyNoInteractions(collectionsService, collectionsService, sessions);
             throw ex;
         }
     }
@@ -620,7 +620,7 @@ public class CMDPermissionsServiceImplTest {
             assertThat(ex.statusCode, equalTo(expected.statusCode));
 
             verify(serviceStore, times(1)).get(SERVICE_TOKEN);
-            verifyZeroInteractions(collectionsService, collectionsService, sessions);
+            verifyNoInteractions(collectionsService, collectionsService, sessions);
             throw ex;
         }
     }
@@ -642,6 +642,6 @@ public class CMDPermissionsServiceImplTest {
         assertThat(actual, equalTo(expected));
 
         verify(serviceStore, times(1)).get(SERVICE_TOKEN);
-        verifyZeroInteractions(collectionsService, collectionsService, sessions);
+        verifyNoInteractions(collectionsService, collectionsService, sessions);
     }
 }

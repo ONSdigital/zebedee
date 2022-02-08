@@ -30,11 +30,11 @@ import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 public class UserDatasetPermissionsTest {
@@ -65,7 +65,7 @@ public class UserDatasetPermissionsTest {
 
     @Before
     public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         fullPermissions = new CRUD().permit(CREATE, READ, UPDATE, DELETE);
 
         getPermissionsRequest = new GetPermissionsRequest(session, "222", "333", "444");
@@ -125,7 +125,7 @@ public class UserDatasetPermissionsTest {
 
         api.handle(req, resp);
 
-        verifyZeroInteractions(cmdPermissionsService);
+        verifyNoInteractions(cmdPermissionsService);
 
         PermissionsException expected = sessionNotProvidedException();
 
@@ -233,7 +233,7 @@ public class UserDatasetPermissionsTest {
 
         api.handle(req, resp);
 
-        verifyZeroInteractions(cmdPermissionsService);
+        verifyNoInteractions(cmdPermissionsService);
 
         PermissionsException expected = sessionNotProvidedException();
         verify(httpResponseWriter, times(1))
@@ -250,7 +250,7 @@ public class UserDatasetPermissionsTest {
 
         api.handle(req, resp);
 
-        verifyZeroInteractions(cmdPermissionsService);
+        verifyNoInteractions(cmdPermissionsService);
 
         PermissionsException expected = datasetIDNotProvidedException();
         verify(httpResponseWriter, times(1))
@@ -270,7 +270,7 @@ public class UserDatasetPermissionsTest {
 
         api.handle(req, resp);
 
-        verifyZeroInteractions(cmdPermissionsService);
+        verifyNoInteractions(cmdPermissionsService);
 
         PermissionsException expected = collectionIDNotProvidedException();
         verify(httpResponseWriter, times(1))

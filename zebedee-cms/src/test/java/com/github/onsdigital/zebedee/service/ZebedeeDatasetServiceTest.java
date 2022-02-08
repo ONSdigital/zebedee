@@ -22,8 +22,8 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
-import static org.mockito.Matchers.anyObject;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -125,7 +125,7 @@ public class ZebedeeDatasetServiceTest {
         service.updateDatasetInCollection(mockCollection, datasetID, collectionDataset, user);
 
         // Then the dataset API is not called to set the collection ID
-        verify(mockDatasetAPI, times(0)).updateDataset(anyString(), anyObject());
+        verify(mockDatasetAPI, times(0)).updateDataset(anyString(), any());
     }
 
     @Test(expected = ConflictException.class)
@@ -176,7 +176,7 @@ public class ZebedeeDatasetServiceTest {
         service.updateDatasetInCollection(mockCollection, datasetID, collectionDataset, user);
 
         // Then the dataset API is not called to set the collection ID
-        verify(mockDatasetAPI, times(0)).updateDatasetVersion(anyString(), anyString(), anyString(), anyObject());
+        verify(mockDatasetAPI, times(0)).updateDatasetVersion(anyString(), anyString(), anyString(), any());
     }
 
     @Test(expected = ConflictException.class)

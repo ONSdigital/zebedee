@@ -20,7 +20,7 @@ import java.util.function.Supplier;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -37,7 +37,7 @@ public class PublishingClientImplTest {
 
     @Before
     public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         clientSupplier = () -> httpClient;
         this.client = new PublishingClientImpl(clientSupplier, requestBuilder);

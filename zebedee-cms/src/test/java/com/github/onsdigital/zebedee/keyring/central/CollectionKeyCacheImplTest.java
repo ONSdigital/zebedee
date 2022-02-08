@@ -38,8 +38,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 public class CollectionKeyCacheImplTest {
@@ -72,7 +72,7 @@ public class CollectionKeyCacheImplTest {
 
     @Before
     public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         this.cache = new HashMap<>();
         this.keyCache = new CollectionKeyCacheImpl(keyStore, cache);
@@ -113,7 +113,7 @@ public class CollectionKeyCacheImplTest {
         assertThat(cache.size(), equalTo(1));
         assertTrue(cache.containsKey(TEST_COLLECTION_ID));
         assertThat(cache.get(TEST_COLLECTION_ID), equalTo(secretKey));
-        verifyZeroInteractions(keyStore);
+        verifyNoInteractions(keyStore);
     }
 
     @Test
@@ -123,7 +123,7 @@ public class CollectionKeyCacheImplTest {
 
         KeyringException ex = assertThrows(KeyringException.class, () -> keyCache.add(TEST_COLLECTION_ID, secretKey));
 
-        verifyZeroInteractions(keyStore);
+        verifyNoInteractions(keyStore);
         assertThat(cache.size(), equalTo(1));
         assertThat(ex.getMessage(), equalTo(formatExceptionMsg(KEY_MISMATCH_ERR, TEST_COLLECTION_ID)));
         assertThat(ex.getCollectionID(), equalTo(TEST_COLLECTION_ID));
@@ -206,7 +206,7 @@ public class CollectionKeyCacheImplTest {
         KeyringException ex = assertThrows(KeyringException.class, () -> keyCache.get(null));
 
         assertThat(ex.getMessage(), equalTo(INVALID_COLLECTION_ID_ERR));
-        verifyZeroInteractions(keyStore);
+        verifyNoInteractions(keyStore);
     }
 
     @Test
@@ -214,7 +214,7 @@ public class CollectionKeyCacheImplTest {
         KeyringException ex = assertThrows(KeyringException.class, () -> keyCache.get(null));
 
         assertThat(ex.getMessage(), equalTo(INVALID_COLLECTION_ID_ERR));
-        verifyZeroInteractions(keyStore);
+        verifyNoInteractions(keyStore);
     }
 
     @Test
@@ -224,7 +224,7 @@ public class CollectionKeyCacheImplTest {
         SecretKey actual = keyCache.get(TEST_COLLECTION_ID);
 
         assertThat(actual, equalTo(secretKey));
-        verifyZeroInteractions(keyStore);
+        verifyNoInteractions(keyStore);
     }
 
     @Test
@@ -283,7 +283,7 @@ public class CollectionKeyCacheImplTest {
 
         assertThat(ex.getMessage(), equalTo(INVALID_COLLECTION_ID_ERR));
 
-        verifyZeroInteractions(keyStore);
+        verifyNoInteractions(keyStore);
     }
 
     @Test
@@ -292,7 +292,7 @@ public class CollectionKeyCacheImplTest {
 
         assertThat(ex.getMessage(), equalTo(INVALID_COLLECTION_ID_ERR));
 
-        verifyZeroInteractions(keyStore);
+        verifyNoInteractions(keyStore);
     }
 
     @Test
@@ -497,7 +497,7 @@ public class CollectionKeyCacheImplTest {
         Set<String> actual = keyCache.list();
 
         assertTrue(actual.contains(TEST_COLLECTION_ID));
-        verifyZeroInteractions(keyStore);
+        verifyNoInteractions(keyStore);
     }
 
     @Test

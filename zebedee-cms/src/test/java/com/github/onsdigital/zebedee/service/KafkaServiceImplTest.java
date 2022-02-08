@@ -12,7 +12,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import static org.junit.Assert.*;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 public class KafkaServiceImplTest {

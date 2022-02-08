@@ -97,7 +97,7 @@ public class Builder {
      * @throws IOException
      */
     public Builder() throws IOException, CollectionNotFoundException {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         when(slackClient.getProfile())
                 .thenReturn(slackProfile);

@@ -6,8 +6,6 @@ import com.github.onsdigital.zebedee.permissions.model.AccessMapping;
 import com.github.onsdigital.zebedee.permissions.store.PermissionsStore;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.user.model.User;
-import org.apache.commons.lang3.ArrayUtils;
-import org.hamcrest.MatcherAssert;
 import org.hamcrest.collection.IsMapContaining;
 import org.junit.Before;
 import org.junit.Test;
@@ -18,19 +16,17 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 public class JWTPermissionsServiceImplTest {
@@ -66,7 +62,7 @@ public class JWTPermissionsServiceImplTest {
 
     @Before
     public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         jwtPermissionsService = new JWTPermissionsServiceImpl(jwtPermissionStore_Mock);
 
         session = new Session();
@@ -90,7 +86,7 @@ public class JWTPermissionsServiceImplTest {
     public void isPublisher_SessionNull_ShouldReturnFalse() throws Exception {
         Session session = null;
         assertFalse(jwtPermissionsService.isPublisher(session));
-        verifyZeroInteractions(jwtPermissionStore_Mock);
+        verifyNoInteractions(jwtPermissionStore_Mock);
     }
 
     @Test
@@ -100,7 +96,7 @@ public class JWTPermissionsServiceImplTest {
         session.setEmail(null);
         session.setGroups(GROUP_0);
         assertFalse(jwtPermissionsService.isPublisher(session));
-        verifyZeroInteractions(jwtPermissionStore_Mock);
+        verifyNoInteractions(jwtPermissionStore_Mock);
     }
 
     @Test
@@ -109,7 +105,7 @@ public class JWTPermissionsServiceImplTest {
         session.setEmail(TEST_USER_EMAIL);
         session.setGroups(GROUP_0c);
         assertFalse(jwtPermissionsService.isPublisher(session));
-        verifyZeroInteractions(jwtPermissionStore_Mock);
+        verifyNoInteractions(jwtPermissionStore_Mock);
     }
 
     @Test
@@ -117,7 +113,7 @@ public class JWTPermissionsServiceImplTest {
         Session session = new Session();
         session.setEmail(TEST_USER_EMAIL);
         assertFalse(jwtPermissionsService.isPublisher(session));
-        verifyZeroInteractions(jwtPermissionStore_Mock);
+        verifyNoInteractions(jwtPermissionStore_Mock);
     }
 
     @Test
@@ -132,14 +128,14 @@ public class JWTPermissionsServiceImplTest {
     public void isAdministrator_SessionNull_ShouldReturnFalse() throws Exception {
         Session session = null;
         assertFalse(jwtPermissionsService.isAdministrator(session));
-        verifyZeroInteractions(jwtPermissionStore_Mock);
+        verifyNoInteractions(jwtPermissionStore_Mock);
     }
 
     @Test
     public void isAdministrator_Session_EmailNull_ShouldReturnFalse() throws Exception {
         Session session = new Session();
         assertFalse(jwtPermissionsService.isAdministrator(session));
-        verifyZeroInteractions(jwtPermissionStore_Mock);
+        verifyNoInteractions(jwtPermissionStore_Mock);
     }
 
     @Test
@@ -148,7 +144,7 @@ public class JWTPermissionsServiceImplTest {
         session.setEmail(TEST_USER_EMAIL);
         session.setGroups(GROUP_0c);
         assertFalse(jwtPermissionsService.isAdministrator(session));
-        verifyZeroInteractions(jwtPermissionStore_Mock);
+        verifyNoInteractions(jwtPermissionStore_Mock);
     }
 
     @Test
@@ -156,7 +152,7 @@ public class JWTPermissionsServiceImplTest {
         Session session = new Session();
         session.setEmail(TEST_USER_EMAIL);
         assertFalse(jwtPermissionsService.isAdministrator(session));
-        verifyZeroInteractions(jwtPermissionStore_Mock);
+        verifyNoInteractions(jwtPermissionStore_Mock);
     }
 
     @Test
@@ -192,7 +188,7 @@ public class JWTPermissionsServiceImplTest {
     public void canEdit_SessionNull_ShouldReturnFalse() throws Exception {
         Session session = null;
         assertFalse(jwtPermissionsService.canEdit(session));
-        verifyZeroInteractions(jwtPermissionStore_Mock);
+        verifyNoInteractions(jwtPermissionStore_Mock);
     }
 
     @Test
@@ -202,7 +198,7 @@ public class JWTPermissionsServiceImplTest {
         session.setEmail(null);
         session.setGroups(GROUP_0c);
         assertFalse(jwtPermissionsService.canEdit(session));
-        verifyZeroInteractions(jwtPermissionStore_Mock);
+        verifyNoInteractions(jwtPermissionStore_Mock);
     }
 
     @Test
@@ -211,7 +207,7 @@ public class JWTPermissionsServiceImplTest {
         session.setEmail(TEST_USER_EMAIL);
         session.setGroups(GROUP_0c);
         assertFalse(jwtPermissionsService.canEdit(session));
-        verifyZeroInteractions(jwtPermissionStore_Mock);
+        verifyNoInteractions(jwtPermissionStore_Mock);
     }
 
     @Test
@@ -219,7 +215,7 @@ public class JWTPermissionsServiceImplTest {
         Session session = new Session();
         session.setEmail(TEST_USER_EMAIL);
         assertFalse(jwtPermissionsService.canEdit(session));
-        verifyZeroInteractions(jwtPermissionStore_Mock);
+        verifyNoInteractions(jwtPermissionStore_Mock);
     }
 
     @Test

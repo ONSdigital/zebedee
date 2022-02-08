@@ -32,9 +32,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -103,7 +103,7 @@ public abstract class ZebedeeTestBaseFixture {
 
     @Before
     public void init() throws Exception {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         TestUtils.initReaderConfig();
 
         builder = new Builder();

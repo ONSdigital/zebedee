@@ -24,7 +24,7 @@ public class HealthTest {
 
     @Before
     public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         this.api = new Health();
     }
 

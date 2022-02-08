@@ -13,6 +13,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import javax.ws.rs.HEAD;
 import java.io.IOException;
 
 import static org.apache.http.HttpStatus.SC_INTERNAL_SERVER_ERROR;
@@ -22,7 +23,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 public class AuthorisationServiceImplTest {
@@ -53,7 +54,7 @@ public class AuthorisationServiceImplTest {
 
     @Before
     public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         notAuthenticatedEx = new UserIdentityException("user not authenticated", SC_UNAUTHORIZED);
         internalServerErrorEx = new UserIdentityException("internal server error", SC_INTERNAL_SERVER_ERROR);
@@ -78,7 +79,7 @@ public class AuthorisationServiceImplTest {
             service.identifyUser(null);
         } catch (UserIdentityException ex) {
             assertThat(ex, equalTo(notAuthenticatedEx));
-            verifyZeroInteractions(sessions, usersService);
+            verifyNoInteractions(sessions, usersService);
             throw ex;
         }
     }
@@ -89,7 +90,7 @@ public class AuthorisationServiceImplTest {
             service.identifyUser("");
         } catch (UserIdentityException ex) {
             assertThat(ex, equalTo(notAuthenticatedEx));
-            verifyZeroInteractions(sessions, usersService);
+            verifyNoInteractions(sessions, usersService);
             throw ex;
         }
     }
@@ -103,7 +104,7 @@ public class AuthorisationServiceImplTest {
         } catch (UserIdentityException ex) {
             assertThat(ex, equalTo(notAuthenticatedEx));
             verify(sessions, times(1)).get();
-            verifyZeroInteractions(usersService);
+            verifyNoInteractions(usersService);
             throw ex;
         }
     }

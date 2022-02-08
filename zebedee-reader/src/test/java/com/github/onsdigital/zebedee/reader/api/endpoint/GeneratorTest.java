@@ -46,7 +46,7 @@ public class GeneratorTest {
 
     @Before
     public void initialize() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         ReaderConfiguration.init("target/test-classes/test-content/");
         readRequestHandler = new ReadRequestHandler();
         generator = new DataGenerator();

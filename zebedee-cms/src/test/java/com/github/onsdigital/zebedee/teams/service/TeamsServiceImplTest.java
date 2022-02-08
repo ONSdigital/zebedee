@@ -32,7 +32,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 /**
@@ -65,7 +65,7 @@ public class TeamsServiceImplTest {
 
     @Before
     public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         teamA = new Team().setId(10001).setName("teamA");
         teamB = new Team().setId(10002).setName("teamB");
@@ -179,7 +179,7 @@ public class TeamsServiceImplTest {
         try {
             service.createTeam(TEAM_D_NAME, null);
         } catch (UnauthorizedException e) {
-            verifyZeroInteractions(permissionsService, teamsStore, readWriteLock, lock);
+            verifyNoInteractions(permissionsService, teamsStore, readWriteLock, lock);
             throw e;
         }
     }
@@ -189,7 +189,7 @@ public class TeamsServiceImplTest {
         try {
             service.createTeam(TEAM_D_NAME, session);
         } catch (UnauthorizedException e) {
-            verifyZeroInteractions(permissionsService, teamsStore, readWriteLock, lock);
+            verifyNoInteractions(permissionsService, teamsStore, readWriteLock, lock);
             throw e;
         }
     }
@@ -206,7 +206,7 @@ public class TeamsServiceImplTest {
         } catch (ForbiddenException e) {
             verify(permissionsService, times(1)).isAdministrator(session);
             verifyNoMoreInteractions(permissionsService);
-            verifyZeroInteractions(teamsStore, readWriteLock, lock);
+            verifyNoInteractions(teamsStore, readWriteLock, lock);
             throw e;
         }
     }
@@ -226,7 +226,7 @@ public class TeamsServiceImplTest {
             verify(teamsStore, times(1)).exists(TEAM_D_NAME);
             verify(permissionsService, times(1)).isAdministrator(session);
             verifyNoMoreInteractions(teamsStore, permissionsService);
-            verifyZeroInteractions(readWriteLock, lock);
+            verifyNoInteractions(readWriteLock, lock);
             throw e;
         }
     }
@@ -297,7 +297,7 @@ public class TeamsServiceImplTest {
         try {
             service.deleteTeam(teamA, null);
         } catch (UnauthorizedException e) {
-            verifyZeroInteractions(permissionsService, teamsStore, readWriteLock, lock);
+            verifyNoInteractions(permissionsService, teamsStore, readWriteLock, lock);
             throw e;
         }
     }
@@ -307,7 +307,7 @@ public class TeamsServiceImplTest {
         try {
             service.deleteTeam(teamA, session);
         } catch (UnauthorizedException e) {
-            verifyZeroInteractions(permissionsService, teamsStore, readWriteLock, lock);
+            verifyNoInteractions(permissionsService, teamsStore, readWriteLock, lock);
             throw e;
         }
     }
@@ -324,7 +324,7 @@ public class TeamsServiceImplTest {
         } catch (ForbiddenException e) {
             verify(permissionsService, times(1)).isAdministrator(session);
             verifyNoMoreInteractions(permissionsService);
-            verifyZeroInteractions(teamsStore, readWriteLock, lock);
+            verifyNoInteractions(teamsStore, readWriteLock, lock);
             throw e;
         }
     }
@@ -343,7 +343,7 @@ public class TeamsServiceImplTest {
         } catch (IOException e) {
             verify(permissionsService, times(1)).isAdministrator(session);
             verify(teamsStore, times(1)).deleteTeam(teamA);
-            verifyZeroInteractions(readWriteLock, lock);
+            verifyNoInteractions(readWriteLock, lock);
             throw e;
         }
     }
@@ -362,7 +362,7 @@ public class TeamsServiceImplTest {
         } catch (IOException e) {
             verify(permissionsService, times(1)).isAdministrator(session);
             verify(teamsStore, times(1)).deleteTeam(teamA);
-            verifyZeroInteractions(readWriteLock, lock);
+            verifyNoInteractions(readWriteLock, lock);
             throw e;
         }
     }
@@ -379,7 +379,7 @@ public class TeamsServiceImplTest {
         service.deleteTeam(teamA, session);
         verify(permissionsService, times(1)).isAdministrator(session);
         verify(teamsStore, times(1)).deleteTeam(teamA);
-        verifyZeroInteractions(readWriteLock, lock);
+        verifyNoInteractions(readWriteLock, lock);
     }
 
     @Test (expected = UnauthorizedException.class)
@@ -387,7 +387,7 @@ public class TeamsServiceImplTest {
         try {
             service.addTeamMember(EMAIL, teamA, null);
         } catch (UnauthorizedException e) {
-            verifyZeroInteractions(permissionsService, teamsStore, readWriteLock, lock);
+            verifyNoInteractions(permissionsService, teamsStore, readWriteLock, lock);
             throw e;
         }
     }
@@ -397,7 +397,7 @@ public class TeamsServiceImplTest {
         try {
             service.addTeamMember(EMAIL, teamA, session);
         } catch (UnauthorizedException e) {
-            verifyZeroInteractions(permissionsService, teamsStore, readWriteLock, lock);
+            verifyNoInteractions(permissionsService, teamsStore, readWriteLock, lock);
             throw e;
         }
     }
@@ -413,7 +413,7 @@ public class TeamsServiceImplTest {
             service.addTeamMember(EMAIL, teamA, session);
         } catch (ForbiddenException e) {
             verify(permissionsService, times(1)).isAdministrator(session);
-            verifyZeroInteractions(teamsStore, readWriteLock, lock);
+            verifyNoInteractions(teamsStore, readWriteLock, lock);
             throw e;
         }
     }
@@ -428,7 +428,7 @@ public class TeamsServiceImplTest {
         service.addTeamMember(null, teamA, session);
 
         verify(permissionsService, times(1)).isAdministrator(session);
-        verifyZeroInteractions(teamsStore, readWriteLock, lock);
+        verifyNoInteractions(teamsStore, readWriteLock, lock);
     }
 
     @Test
@@ -441,7 +441,7 @@ public class TeamsServiceImplTest {
         service.addTeamMember(EMAIL, null, session);
 
         verify(permissionsService, times(1)).isAdministrator(session);
-        verifyZeroInteractions(teamsStore, readWriteLock, lock);
+        verifyNoInteractions(teamsStore, readWriteLock, lock);
     }
 
     @Test
@@ -469,7 +469,7 @@ public class TeamsServiceImplTest {
         try {
             service.removeTeamMember(EMAIL, teamA, null);
         } catch (UnauthorizedException e) {
-            verifyZeroInteractions(permissionsService, teamsStore, readWriteLock, lock);
+            verifyNoInteractions(permissionsService, teamsStore, readWriteLock, lock);
             throw e;
         }
     }
@@ -479,7 +479,7 @@ public class TeamsServiceImplTest {
         try {
             service.removeTeamMember(EMAIL, teamA, session);
         } catch (UnauthorizedException e) {
-            verifyZeroInteractions(permissionsService, teamsStore, readWriteLock, lock);
+            verifyNoInteractions(permissionsService, teamsStore, readWriteLock, lock);
             throw e;
         }
     }
@@ -495,7 +495,7 @@ public class TeamsServiceImplTest {
             service.removeTeamMember(EMAIL, teamA, session);
         } catch (ForbiddenException e) {
             verify(permissionsService, times(1)).isAdministrator(session);
-            verifyZeroInteractions(teamsStore, readWriteLock, lock);
+            verifyNoInteractions(teamsStore, readWriteLock, lock);
             throw e;
         }
     }
@@ -512,7 +512,7 @@ public class TeamsServiceImplTest {
         service.removeTeamMember(null, target, session);
 
         verify(permissionsService, times(1)).isAdministrator(session);
-        verifyZeroInteractions(target, teamsStore, readWriteLock, lock);
+        verifyNoInteractions(target, teamsStore, readWriteLock, lock);
     }
 
     @Test
@@ -527,7 +527,7 @@ public class TeamsServiceImplTest {
         service.removeTeamMember(EMAIL, null, session);
 
         verify(permissionsService, times(1)).isAdministrator(session);
-        verifyZeroInteractions(target, teamsStore, readWriteLock, lock);
+        verifyNoInteractions(target, teamsStore, readWriteLock, lock);
     }
 
     @Test
@@ -555,7 +555,7 @@ public class TeamsServiceImplTest {
         try {
             service.getTeamMembersSummary(null);
         } catch (UnauthorizedException e) {
-            verifyZeroInteractions(teamsStore, permissionsService);
+            verifyNoInteractions(teamsStore, permissionsService);
             throw e;
         }
     }
@@ -566,7 +566,7 @@ public class TeamsServiceImplTest {
         try {
             service.getTeamMembersSummary(session);
         } catch (UnauthorizedException e) {
-            verifyZeroInteractions(teamsStore, permissionsService);
+            verifyNoInteractions(teamsStore, permissionsService);
             throw e;
         }
     }
@@ -582,7 +582,7 @@ public class TeamsServiceImplTest {
             service.getTeamMembersSummary(session);
         } catch (ForbiddenException e) {
             verify(permissionsService, times(1)).isAdministrator(session);
-            verifyZeroInteractions(teamsStore);
+            verifyNoInteractions(teamsStore);
             throw e;
         }
     }

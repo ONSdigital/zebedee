@@ -30,7 +30,7 @@ import static com.github.onsdigital.zebedee.api.TeamsReport.USER_COL;
 import static com.github.onsdigital.zebedee.api.TeamsReport.USER_COL_INDEX;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;

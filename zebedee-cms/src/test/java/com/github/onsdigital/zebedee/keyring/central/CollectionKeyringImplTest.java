@@ -27,7 +27,7 @@ import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 public class CollectionKeyringImplTest {
@@ -59,7 +59,7 @@ public class CollectionKeyringImplTest {
 
     @Before
     public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         CollectionKeyringImpl.init(keyCache, permissionsService, collections);
         keyring = CollectionKeyringImpl.getInstance();
@@ -656,7 +656,7 @@ public class CollectionKeyringImplTest {
         keyring.add(session, collection, secretKey);
 
         verify(permissionsService, times(1)).canEdit(session);
-        verifyZeroInteractions(keyCache);
+        verifyNoInteractions(keyCache);
     }
 
     @Test
@@ -763,7 +763,7 @@ public class CollectionKeyringImplTest {
         Set<String> actual = keyring.list(session);
 
         assertThat(actual, equalTo(expected));
-        verifyZeroInteractions(collections);
+        verifyNoInteractions(collections);
         verify(permissionsService, times(1)).canEdit(session);
     }
 

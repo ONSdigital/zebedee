@@ -16,7 +16,7 @@ import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.util.ZebedeeCmsService;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Matchers;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -36,9 +36,9 @@ import static com.github.onsdigital.zebedee.persistence.CollectionEventType.DATA
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.contains;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.contains;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -97,7 +97,7 @@ public class DataVisualisationZipTest {
 
     @Before
     public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         endpoint = new DataVisualisationZip();
         zipResource = new Resource();
         visualisation = new Visualisation();
@@ -152,7 +152,7 @@ public class DataVisualisationZipTest {
         verify(mockContentWriter, never()).write(any(InputStream.class), contains("__MACOSX"));
         verify(mockContentWriter, never()).write(any(InputStream.class), contains(".DS_Store"));
         verify(collectionHistoryDaoMock, times(1)).saveCollectionHistoryEvent(eq(mockCollection), eq(mockSession),
-                eq(DATA_VISUALISATION_ZIP_UNPACKED), Matchers.<CollectionEventMetaData>anyVararg());
+                eq(DATA_VISUALISATION_ZIP_UNPACKED), ArgumentMatchers.<CollectionEventMetaData>any());
 
         assertThat(response, is(equalTo(DataVisualisationZip.unzipSuccessResponse)));
     }

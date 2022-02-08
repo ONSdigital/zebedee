@@ -15,6 +15,7 @@ import com.github.onsdigital.zebedee.user.service.UsersService;
 import org.apache.http.HttpStatus;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
@@ -26,8 +27,8 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -68,6 +69,8 @@ public class CollectionTest extends ZebedeeAPIBaseTestCase {
 
     @Override
     protected void customSetUp() throws Exception {
+        MockitoAnnotations.openMocks(this);
+
         when(sessions.get())
                 .thenReturn(session);
 
@@ -96,16 +99,6 @@ public class CollectionTest extends ZebedeeAPIBaseTestCase {
     @Override
     protected Object getAPIName() {
         return "Collection";
-    }
-
-    @Test
-    public void testGet_getSessionException_shouldThrowException() throws Exception {
-        when(sessions.get())
-                .thenThrow(IOException.class);
-
-        IOException actual = assertThrows(IOException.class, () -> endpoint.get(mockRequest, mockResponse));
-
-        verify(sessions, times(1)).get();
     }
 
     @Test
@@ -194,16 +187,6 @@ public class CollectionTest extends ZebedeeAPIBaseTestCase {
         verify(sessions, times(1)).get();
         verify(collections, times(1)).getCollection(COLLECTION_ID);
         verify(permissionsService, times(1)).canView(session, COLLECTION_ID);
-    }
-
-    @Test
-    public void testPost_sessionServiceError_shouldThrowException() throws Exception {
-        when(sessions.get())
-                .thenThrow(IOException.class);
-
-        assertThrows(IOException.class, () -> endpoint.create(mockRequest, mockResponse, description));
-
-        verify(sessions, times(1)).get();
     }
 
     @Test

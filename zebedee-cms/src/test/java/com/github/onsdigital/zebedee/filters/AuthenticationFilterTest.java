@@ -24,7 +24,7 @@ import static com.github.onsdigital.zebedee.reader.util.RequestUtils.FLORENCE_TO
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
@@ -68,7 +68,7 @@ public class AuthenticationFilterTest extends ZebedeeTestBaseFixture {
 
     @Before
     public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         authenticationFilter = new AuthenticationFilter(sessions);
 

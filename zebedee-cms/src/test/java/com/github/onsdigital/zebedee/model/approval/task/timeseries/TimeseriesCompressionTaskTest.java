@@ -48,7 +48,7 @@ public class TimeseriesCompressionTaskTest {
     @Before
     public void setUp() throws Exception {
 
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         // mock the properties required of collection.getDescription()
         CollectionDescription collectionDescription = new CollectionDescription();
         collectionDescription.setEncrypted(isEncrypted);

@@ -36,8 +36,8 @@ import static com.github.onsdigital.zebedee.reader.DataGenerator.UNIT_COL;
 import static com.github.onsdigital.zebedee.reader.DataGenerator.XLS_EXT;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -85,7 +85,7 @@ public class DataGeneratorTest {
 
     @Before
     public void setup() throws Exception {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         temporaryFolder = new TemporaryFolder();
         temporaryFolder.create();

@@ -34,7 +34,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 /**
@@ -63,7 +63,7 @@ public class TeamsStoreFileSystemImplTest {
      */
     @Before
     public void setup() throws Exception {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         zebedeeRoot = new TemporaryFolder();
         zebedeeRoot.create();
@@ -120,7 +120,7 @@ public class TeamsStoreFileSystemImplTest {
         try {
             store.get(teamA.getName());
         } catch (NotFoundException e) {
-            verifyZeroInteractions(rwLock, lock);
+            verifyNoInteractions(rwLock, lock);
             throw e;
         }
     }
@@ -149,7 +149,7 @@ public class TeamsStoreFileSystemImplTest {
             store.save(null);
         } catch (NotFoundException e) {
             assertThat(teamsPath.toFile().list().length, equalTo(0));
-            verifyZeroInteractions(rwLock, lock);
+            verifyNoInteractions(rwLock, lock);
             throw e;
         }
     }

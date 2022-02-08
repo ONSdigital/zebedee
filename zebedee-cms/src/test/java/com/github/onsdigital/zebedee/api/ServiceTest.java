@@ -19,7 +19,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -50,7 +50,7 @@ public class ServiceTest {
     public void setUp() throws Exception {
         api = new Service(); // enable the dataset import feature
 
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         ReflectionTestUtils.setField(api, "serviceStore", serviceStore);
         ReflectionTestUtils.setField(api, "permissionsService", permissionsService);

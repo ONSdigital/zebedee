@@ -26,7 +26,7 @@ import static org.apache.http.HttpStatus.SC_INTERNAL_SERVER_ERROR;
 import static org.apache.http.HttpStatus.SC_OK;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 public class UserInstancePermissionsTest {
@@ -56,7 +56,7 @@ public class UserInstancePermissionsTest {
 
     @Before
     public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         api = new UserInstancePermissions(permissionsService, httpResponseWriter, sessions);
 
         when(sessions.get()).thenReturn(session);
@@ -87,7 +87,7 @@ public class UserInstancePermissionsTest {
         Error expected = new Error(sessionNotProvidedException().getMessage());
 
         verify(httpResponseWriter, times(1)).writeJSONResponse(response, expected, SC_BAD_REQUEST);
-        verifyZeroInteractions(permissionsService);
+        verifyNoInteractions(permissionsService);
     }
 
     @Test

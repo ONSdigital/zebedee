@@ -79,7 +79,7 @@ public class JWTSessionsServiceImplTest {
 
     @Before
     public void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         rsaKeyMap.put(RSA_KEY_ID_1, RSA_SIGNING_KEY_1);
         rsaKeyMap.put(RSA_KEY_ID_2, RSA_SIGNING_KEY_2);

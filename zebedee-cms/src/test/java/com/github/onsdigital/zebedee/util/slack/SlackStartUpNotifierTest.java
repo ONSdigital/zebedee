@@ -5,6 +5,7 @@ import com.github.onsdigital.slack.client.PostMessageResponse;
 import com.github.onsdigital.slack.client.SlackClient;
 import com.github.onsdigital.slack.messages.Colour;
 import com.github.onsdigital.slack.messages.PostMessage;
+import com.github.onsdigital.slack.messages.PostMessageAttachment;
 import com.github.onsdigital.zebedee.notification.NotificationException;
 import com.github.onsdigital.zebedee.notification.StartUpNotifier;
 import org.junit.Before;
@@ -20,7 +21,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.github.onsdigital.zebedee.util.slack.SlackStartUpNotifier.HELP_HINT_FMT;
@@ -33,12 +33,11 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
-import com.github.onsdigital.slack.messages.PostMessageAttachment;
 
 public class SlackStartUpNotifierTest {
 
@@ -56,7 +55,7 @@ public class SlackStartUpNotifierTest {
 
     @Before
     public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         channels = new ArrayList<>();
         channels.add("AAA");
@@ -148,7 +147,7 @@ public class SlackStartUpNotifierTest {
 
         assertFalse(notificationSent);
         assertFalse(notificationSent);
-        verifyZeroInteractions(sClient);
+        verifyNoInteractions(sClient);
     }
 
     private void assertSentMessages(List<PostMessage> sentMessages) {

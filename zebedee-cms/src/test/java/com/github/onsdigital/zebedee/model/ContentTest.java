@@ -17,7 +17,11 @@ import java.util.List;
 
 import static com.github.onsdigital.zebedee.model.Content.isVisible;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 public class ContentTest {
 
@@ -236,7 +240,7 @@ public class ContentTest {
         p = p.resolve("timeseries");
         p.toFile().mkdir();
 
-        assertThat(isVisible(p), is(false));
+        assertFalse(isVisible(p));
     }
 
     @Test
@@ -247,7 +251,7 @@ public class ContentTest {
         zebedeeURI = zebedeeURI.resolve("nested");
         zebedeeURI.toFile().mkdir();
 
-        assertThat(isVisible(zebedeeURI), is(false));
+        assertFalse(isVisible(zebedeeURI));
     }
 
     @Test
@@ -256,7 +260,7 @@ public class ContentTest {
         p = p.resolve("datasets");
         p.toFile().mkdir();
 
-        assertThat(isVisible(p), is(true));
+        assertTrue(isVisible(p));
     }
 
 
@@ -266,7 +270,6 @@ public class ContentTest {
         p = p.resolve("thisisnotatimeseriesdir");
         p.toFile().mkdir();
 
-        boolean result = isVisible(p);
-        assertThat(result, is(true));
+        assertTrue(isVisible(p));
     }
 }

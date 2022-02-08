@@ -19,12 +19,12 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 public class ServiceStoreImplTest {
@@ -42,7 +42,7 @@ public class ServiceStoreImplTest {
 
     @Before
     public void setUp() throws IOException {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         servicePath = temporaryFolder.newFolder("service").toPath();
 
@@ -60,7 +60,7 @@ public class ServiceStoreImplTest {
         ServiceAccount actual = serviceStore.get(TEST_TOKEN);
 
         assertThat(actual, is(nullValue()));
-        verifyZeroInteractions(jsonSerialiser);
+        verifyNoInteractions(jsonSerialiser);
     }
 
     @Test(expected = IOException.class)
@@ -71,7 +71,7 @@ public class ServiceStoreImplTest {
             serviceStore.get(TEST_TOKEN);
         } catch (IOException ex) {
             assertThat(ex.getMessage(), equalTo("error getting service account path for token"));
-            verifyZeroInteractions(jsonSerialiser);
+            verifyNoInteractions(jsonSerialiser);
             throw ex;
         }
     }
@@ -113,7 +113,7 @@ public class ServiceStoreImplTest {
             serviceStore.store(null, null);
         } catch (IOException ex) {
             assertThat(ex.getMessage(), equalTo("error getting service account path for token"));
-            verifyZeroInteractions(jsonSerialiser);
+            verifyNoInteractions(jsonSerialiser);
             throw ex;
         }
     }
@@ -127,7 +127,7 @@ public class ServiceStoreImplTest {
             serviceStore.store(TEST_TOKEN, inputStream);
         } catch (FileAlreadyExistsException ex) {
             assertThat(ex.getMessage(), equalTo("The service token already exists : " + p));
-            verifyZeroInteractions(jsonSerialiser);
+            verifyNoInteractions(jsonSerialiser);
             throw ex;
         }
     }

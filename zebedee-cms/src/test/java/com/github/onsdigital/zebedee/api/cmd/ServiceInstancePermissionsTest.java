@@ -26,7 +26,7 @@ import static org.apache.http.HttpStatus.SC_INTERNAL_SERVER_ERROR;
 import static org.apache.http.HttpStatus.SC_OK;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 public class ServiceInstancePermissionsTest {
@@ -52,7 +52,7 @@ public class ServiceInstancePermissionsTest {
 
     @Before
     public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         api = new ServiceInstancePermissions(cmdPermissionsService, httpResponseWriter, sessions);
     }
@@ -66,7 +66,7 @@ public class ServiceInstancePermissionsTest {
         Error expected = new Error(serviceTokenNotProvidedException().getMessage());
 
         verify(httpResponseWriter, times(1)).writeJSONResponse(response, expected, SC_BAD_REQUEST);
-        verifyZeroInteractions(cmdPermissionsService);
+        verifyNoInteractions(cmdPermissionsService);
     }
 
     @Test

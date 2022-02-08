@@ -3,8 +3,16 @@ package com.github.onsdigital.zebedee.model;
 import com.github.davidcarboni.cryptolite.Keys;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.data.json.DirectoryListing;
-import com.github.onsdigital.zebedee.exceptions.*;
-import com.github.onsdigital.zebedee.json.*;
+import com.github.onsdigital.zebedee.exceptions.BadRequestException;
+import com.github.onsdigital.zebedee.exceptions.ConflictException;
+import com.github.onsdigital.zebedee.exceptions.NotFoundException;
+import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
+import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
+import com.github.onsdigital.zebedee.json.ApprovalStatus;
+import com.github.onsdigital.zebedee.json.CollectionDescription;
+import com.github.onsdigital.zebedee.json.CollectionType;
+import com.github.onsdigital.zebedee.json.Event;
+import com.github.onsdigital.zebedee.json.EventType;
 import com.github.onsdigital.zebedee.keyring.CollectionKeyring;
 import com.github.onsdigital.zebedee.model.approval.ApproveTask;
 import com.github.onsdigital.zebedee.model.encryption.EncryptionKeyFactory;
@@ -49,15 +57,24 @@ import java.util.function.Supplier;
 
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_DELETED;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_UNLOCKED;
-import static junit.framework.Assert.assertFalse;
+import static junit.framework.TestCase.assertFalse;
 import static junit.framework.TestCase.assertTrue;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasSize;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 
 /**
  * Created by dave on 19/05/2017.
@@ -143,7 +160,7 @@ public class CollectionsTest {
 
     @Before
     public void setUp() throws IOException {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         System.setProperty("audit_db_enabled", "false");
         testUser = new User();
@@ -268,7 +285,7 @@ public class CollectionsTest {
         } catch (BadRequestException e) {
             verify(permissionsServiceMock, times(1))
                     .canEdit(sessionMock);
-            verifyZeroInteractions(collectionMock, publishedContentMock);
+            verifyNoInteractions(collectionMock, publishedContentMock);
             throw e;
         }
     }
@@ -283,7 +300,7 @@ public class CollectionsTest {
         } catch (BadRequestException e) {
             verify(permissionsServiceMock, times(1))
                     .canEdit(sessionMock);
-            verifyZeroInteractions(collectionMock, publishedContentMock);
+            verifyNoInteractions(collectionMock, publishedContentMock);
             throw e;
         }
     }
@@ -297,7 +314,7 @@ public class CollectionsTest {
         } catch (UnauthorizedException e) {
             verify(permissionsServiceMock, times(1))
                     .canEdit(sessionMock);
-            verifyZeroInteractions(publishedContentMock, zebedeeMock);
+            verifyNoInteractions(publishedContentMock, zebedeeMock);
             throw e;
         }
     }
@@ -331,7 +348,7 @@ public class CollectionsTest {
             collections.complete(collectionMock, "someURI", sessionMock, false);
         } catch (UnauthorizedException e) {
             verify(permissionsServiceMock, times(1)).canEdit(sessionMock);
-            verifyZeroInteractions(collectionMock);
+            verifyNoInteractions(collectionMock);
             throw e;
         }
     }
@@ -344,7 +361,7 @@ public class CollectionsTest {
             collections.delete(collectionMock, sessionMock);
         } catch (UnauthorizedException e) {
             verify(permissionsServiceMock, times(1)).canEdit(sessionMock);
-            verifyZeroInteractions(collectionMock);
+            verifyNoInteractions(collectionMock);
             throw e;
         }
     }
@@ -360,7 +377,7 @@ public class CollectionsTest {
                     inputStreamMock, false, CollectionEventType.COLLECTION_PAGE_SAVED, true);
         } catch (UnauthorizedException e) {
             verify(collectionReaderWriterFactoryMock, times(1)).getWriter(zebedeeMock, collectionMock, sessionMock);
-            verifyZeroInteractions(collectionMock);
+            verifyNoInteractions(collectionMock);
             throw e;
         }
     }
@@ -373,7 +390,7 @@ public class CollectionsTest {
             collections.deleteContent(collectionMock, "someURI", sessionMock);
         } catch (UnauthorizedException e) {
             verify(permissionsServiceMock, times(1)).canEdit(sessionMock);
-            verifyZeroInteractions(collectionMock);
+            verifyNoInteractions(collectionMock);
             throw e;
         }
     }
@@ -386,7 +403,7 @@ public class CollectionsTest {
             collections.moveContent(sessionMock, collectionMock, "from", "to");
         } catch (UnauthorizedException e) {
             verify(permissionsServiceMock, times(1)).canEdit(sessionMock);
-            verifyZeroInteractions(collectionMock, publishedContentMock);
+            verifyNoInteractions(collectionMock, publishedContentMock);
             throw e;
         }
     }
@@ -409,7 +426,7 @@ public class CollectionsTest {
             verify(collectionReaderWriterFactoryMock, times(1)).getWriter(zebedeeMock, collectionMock, sessionMock);
             verify(sessionMock, times(1)).getEmail();
             verify(collectionMock, times(2)).getDescription();
-            verifyZeroInteractions(permissionsServiceMock);
+            verifyNoInteractions(permissionsServiceMock);
             verify(collectionMock, never()).find(anyString());
             verify(collectionMock, never()).create(any(Session.class), anyString());
             verify(collectionMock, never()).edit(any(Session.class), anyString(), eq(collectionWriterMock), anyBoolean());
@@ -425,7 +442,7 @@ public class CollectionsTest {
             collections.deleteContent(collectionMock, null, sessionMock);
         } catch (BadRequestException e) {
             verify(permissionsServiceMock, times(1)).canEdit(sessionMock);
-            verifyZeroInteractions(collectionMock, collectionDescriptionMock, zebedeeMock);
+            verifyNoInteractions(collectionMock, collectionDescriptionMock, zebedeeMock);
             throw e;
         }
     }
@@ -1009,7 +1026,7 @@ public class CollectionsTest {
             collections.createContent(collectionMock, uri, sessionMock, null, null, null, false);
         } catch (ConflictException e) {
             verify(publishedContentMock, times(1)).exists(uri);
-            verifyZeroInteractions(zebedeeMock, collectionReaderWriterFactoryMock, collectionDescriptionMock,
+            verifyNoInteractions(zebedeeMock, collectionReaderWriterFactoryMock, collectionDescriptionMock,
                     collectionWriterMock, collectionMock);
             throw e;
         }

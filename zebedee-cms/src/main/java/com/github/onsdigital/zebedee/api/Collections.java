@@ -34,19 +34,19 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.warn;
-import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
+import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
 import static org.apache.http.HttpStatus.SC_NOT_FOUND;
 
 @Api
 public class Collections {
 
-    private ZebedeeCmsService zebedeeCmsService;
-    private DatasetService datasetService;
-    private final boolean datasetImportEnabled;
     private static final String GET_COLLECTIONS_ERROR = "get collections endpoint: unexpected error while attempting to get collections";
+    private final boolean datasetImportEnabled;
+    private final ZebedeeCmsService zebedeeCmsService;
+    private final DatasetService datasetService;
 
     /**
      * Default constructor used instantiates dependencies itself.
@@ -65,6 +65,30 @@ public class Collections {
         this.zebedeeCmsService = zebedeeCmsService;
         this.datasetService = datasetService;
         this.datasetImportEnabled = datasetImportEnabled;
+    }
+
+    /**
+     * Get the collection defined by the given HttpServletRequest
+     *
+     * @param request the request containing the id of the collection to get.
+     * @return
+     * @throws IOException
+     */
+    public static Collection getCollection(HttpServletRequest request)
+            throws IOException {
+        String collectionId = getCollectionId(request);
+        return Root.zebedee.getCollections().getCollection(collectionId);
+    }
+
+    public static String getCollectionId(HttpServletRequest request) {
+        Path path = Path.newInstance(request);
+        List<String> segments = path.segments();
+
+        String collectionId = "";
+        if (segments.size() > 1) {
+            collectionId = segments.get(1);
+        }
+        return collectionId;
     }
 
     /**
@@ -113,7 +137,7 @@ public class Collections {
 
             return result;
         } catch (IOException e) {
-            error().data("user", session.getEmail()).logException(e,GET_COLLECTIONS_ERROR);
+            error().data("user", session.getEmail()).logException(e, GET_COLLECTIONS_ERROR);
             throw new UnexpectedErrorException(GET_COLLECTIONS_ERROR, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
     }
@@ -301,30 +325,6 @@ public class Collections {
         }
 
         return true;
-    }
-
-    /**
-     * Get the collection defined by the given HttpServletRequest
-     *
-     * @param request the request containing the id of the collection to get.
-     * @return
-     * @throws IOException
-     */
-    public static Collection getCollection(HttpServletRequest request)
-            throws IOException {
-        String collectionId = getCollectionId(request);
-        return Root.zebedee.getCollections().getCollection(collectionId);
-    }
-
-    public static String getCollectionId(HttpServletRequest request) {
-        Path path = Path.newInstance(request);
-        List<String> segments = path.segments();
-
-        String collectionId = "";
-        if (segments.size() > 1) {
-            collectionId = segments.get(1);
-        }
-        return collectionId;
     }
 
 }

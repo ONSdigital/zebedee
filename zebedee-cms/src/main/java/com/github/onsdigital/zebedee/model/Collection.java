@@ -64,7 +64,6 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Scanner;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.Lock;
@@ -185,7 +184,7 @@ public class Collection {
 
         Collection collection = new Collection(rootCollectionsPath.resolve(filename), zebedee);
 
-        if (collectionDescription.getTeams() != null) {
+        if (collectionDescription.getViewerTeams() != null || collectionDescription.getTeams() != null) {
             setViewerTeams(collectionDescription, zebedee, session);
         }
 
@@ -409,10 +408,14 @@ public class Collection {
             scheduler.cancel(collection);
         }
 
-        setViewerTeams(collectionDescription, zebedee, session);
+        List<String> updatedTeamIds = setViewerTeams(collectionDescription, zebedee, session);
 
         if (collectionDescription.getTeams() != null) {
             updatedCollection.getDescription().setTeams(collectionDescription.getTeams());
+        }
+
+        if (collectionDescription.getViewerTeams() != null) {
+            updatedCollection.getDescription().setViewerTeams(new ArrayList<>(updatedTeamIds));
         }
 
         updatedCollection.save();
@@ -420,29 +423,35 @@ public class Collection {
         return updatedCollection;
     }
 
-    private static Set<String> setViewerTeams(CollectionDescription desc, Zebedee zebedee, Session session)
+    private static List<String> setViewerTeams(CollectionDescription desc, Zebedee zebedee, Session session)
             throws IOException, ZebedeeException {
-        Set<String> teamIds = new HashSet<>();
+        List<String> teamIds = desc.getViewerTeams();
         List<String> teamNames = desc.getTeams();
 
-        if (teamNames == null) {
-            teamNames = new ArrayList<>();
+        if (teamIds == null) {
+            teamIds = new ArrayList<>();
         }
 
         // TODO: Remove the following transitional code once Florence is updated to send the team IDs rather than the team names.
-        TeamsService teams = zebedee.getTeamsService();
-        for (String teamName : teamNames) {
-            Team team = teams.findTeam(teamName);
-            if (team == null) {
-                throw new NotFoundException("team assigned to collection expected but does not exist");
+        if (teamIds == null || teamIds.isEmpty()) {
+            if (teamNames == null) {
+                teamNames = new ArrayList<>();
             }
 
-            teamIds.add(team.getId());
+            TeamsService teams = zebedee.getTeamsService();
+            for (String teamName : teamNames) {
+                Team team = teams.findTeam(teamName);
+                if (team == null) {
+                    throw new NotFoundException("team assigned to collection expected but does not exist");
+                }
+
+                teamIds.add(team.getId());
+            }
         }
         // end of transitional code
 
         PermissionsService permissions = zebedee.getPermissionsService();
-        permissions.setViewerTeams(session, desc.getId(), teamIds);
+        permissions.setViewerTeams(session, desc.getId(), new HashSet<>(teamIds));
 
         return teamIds;
     }
@@ -478,7 +487,7 @@ public class Collection {
     }
 
     /**
-     * Deconstructs a {@link Collection} in the given {@link Zebedee} and deletes it's description
+     * Deconstructs a {@link Collection} in the given {@link Zebedee} and deletes its description
      *
      * @return
      * @throws IOException
@@ -503,8 +512,8 @@ public class Collection {
     }
 
     /**
-     * This methods is used by {@link Publisher Publisher}
-     * to acquire a write lock on a collection during publishing.
+     * This method is used by {@link Publisher Publisher}
+     * to acquire a "write lock" on a collection during publishing.
      *
      * @return The collection write lock.
      */
@@ -953,7 +962,7 @@ public class Collection {
      * directory are supplimentary files related to the page content - tables, charts, images etc. Also deletes any
      * files in the reviewed dir that are version URIs and start with the same dir path.
      *
-     * @return true the delete is successful, false otherwise.
+     * @return true if the "delete" is successful, false otherwise.
      */
     public boolean deleteFileAndRelated(String uri) throws IOException {
         boolean deleteSuccessful = false;
@@ -1125,8 +1134,8 @@ public class Collection {
 
     /**
      * When we delete content, we don't want to just delete the whole directory it lives in as it may have nested content.
-     * Instead only the files in the directory are deleted, as we know these are all associated with that content.
-     * We also delete the versions directory as all the contents will also be associated with the content being deleted.
+     * Instead, only the files in the directory are deleted, as we know these are all associated with that content.
+     * We also delete the versions_directory as all the contents will also be associated with the content being deleted.
      *
      * @param content
      * @param uri
@@ -1182,7 +1191,7 @@ public class Collection {
      */
     public ContentItemVersion version(String email, String uri, CollectionWriter collectionWriter) throws ZebedeeException, IOException {
 
-        // first ensure the content exists in published area so we can create a version from it.
+        // first ensure the content exists in published area, so we can create a version from it.
         Path versionSource = zebedee.getPublished().get(uri);
         if (versionSource == null) {
             throw new NotFoundException(String.format("The given URI %s was not found - it has not been published.", uri));
@@ -1331,7 +1340,7 @@ public class Collection {
             }
 
         } catch (NoSuchElementException e) {
-            // do nothing if its not found.
+            // do nothing if it is not found.
         }
     }
 

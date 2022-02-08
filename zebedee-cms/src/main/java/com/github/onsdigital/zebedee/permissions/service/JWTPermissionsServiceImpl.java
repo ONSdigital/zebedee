@@ -50,34 +50,6 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
     }
 
     /**
-     * @param session - {@link Session} to get the groups
-     * @return list of groups where groupId is converted to teamId
-     * @throws NumberFormatException if group name is not  permitted format (string of integers)
-     */
-    private static List<String> convertGroupsToTeams(Session session) throws NumberFormatException {
-        List<String> teamsList = new ArrayList<>();
-        if (session == null || session.getGroups().isEmpty()) {
-            return teamsList;
-        }
-
-        String[] valueArray = {PUBLISHER_GROUP, ADMIN_GROUP};
-        List<String> groups = session.getGroups();
-        Set<String> setOfString = new HashSet<>(groups);
-        for (String s : setOfString) {
-            try {
-                teamsList.add(s);
-            } catch (NumberFormatException e) {
-                if (!Arrays.asList(valueArray).contains(s)) {
-                    String logString = "invalid group name format groupName " + s;
-                    warn().log(logString);
-                }
-            }
-        }
-
-        return teamsList;
-    }
-
-    /**
      * Determines whether the specified user has publisher permissions
      *
      * @param session The user's login {@link Session}.

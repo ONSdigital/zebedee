@@ -36,7 +36,7 @@ public class PermissionsServiceProxyTest {
     @Test
     public void isPublisher_JWTNotEnabled() throws Exception {
         boolean jwtSessionsEnabled = false;
-        PermissionsServiceProxy permissions = new PermissionsServiceProxy(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService);
+        PermissionsServiceProxy permissions = new PermissionsServiceProxy(legacyPermissionsService, jwtPermissionsService, jwtSessionsEnabled);
 
         assertThat(permissions.isPublisher(session), is(false));
         verifyNoInteractions(jwtPermissionsService);
@@ -46,7 +46,7 @@ public class PermissionsServiceProxyTest {
     @Test
     public void isPublisher_JWEnabled() throws Exception {
         boolean jwtSessionsEnabled = true;
-        PermissionsServiceProxy permissions = new PermissionsServiceProxy(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService);
+        PermissionsServiceProxy permissions = new PermissionsServiceProxy(legacyPermissionsService, jwtPermissionsService, jwtSessionsEnabled);
 
         assertThat(permissions.isPublisher(session), is(false));
         verifyNoInteractions(legacyPermissionsService);
@@ -56,7 +56,7 @@ public class PermissionsServiceProxyTest {
     @Test
     public void isAdministrator_JWTNotEnabled() throws Exception {
         boolean jwtSessionsEnabled = false;
-        PermissionsServiceProxy permissions = new PermissionsServiceProxy(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService);
+        PermissionsServiceProxy permissions = new PermissionsServiceProxy(legacyPermissionsService, jwtPermissionsService, jwtSessionsEnabled);
 
         assertThat(permissions.isAdministrator(session), is(false));
         verifyNoInteractions(jwtPermissionsService);
@@ -66,7 +66,7 @@ public class PermissionsServiceProxyTest {
     @Test
     public void isAdministrator_JWEnabled() throws Exception {
         boolean jwtSessionsEnabled = true;
-        PermissionsServiceProxy permissions = new PermissionsServiceProxy(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService);
+        PermissionsServiceProxy permissions = new PermissionsServiceProxy(legacyPermissionsService, jwtPermissionsService, jwtSessionsEnabled);
 
         assertThat(permissions.isAdministrator(session), is(false));
         verifyNoInteractions(legacyPermissionsService);
@@ -76,7 +76,7 @@ public class PermissionsServiceProxyTest {
     @Test
     public void hasAdministrator_JWTNotEnabled() throws Exception {
         boolean jwtSessionsEnabled = false;
-        PermissionsServiceProxy permissions = new PermissionsServiceProxy(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService);
+        PermissionsServiceProxy permissions = new PermissionsServiceProxy(legacyPermissionsService, jwtPermissionsService, jwtSessionsEnabled);
 
         assertThat(permissions.hasAdministrator(), is(false));
         verifyNoInteractions(jwtPermissionsService);
@@ -86,7 +86,7 @@ public class PermissionsServiceProxyTest {
     @Test
     public void hasAdministrator_JWTEnabled() throws Exception {
         boolean jwtSessionsEnabled = true;
-        PermissionsServiceProxy permissions = new PermissionsServiceProxy(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService);
+        PermissionsServiceProxy permissions = new PermissionsServiceProxy(legacyPermissionsService, jwtPermissionsService, jwtSessionsEnabled);
 
         assertThat(permissions.hasAdministrator(), is(false));
         verifyNoInteractions(legacyPermissionsService);
@@ -96,7 +96,7 @@ public class PermissionsServiceProxyTest {
     @Test
     public void addAdministrator_JWTNotEnabled() throws Exception {
         boolean jwtSessionsEnabled = false;
-        PermissionsServiceProxy permissions = new PermissionsServiceProxy(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService);
+        PermissionsServiceProxy permissions = new PermissionsServiceProxy(legacyPermissionsService, jwtPermissionsService, jwtSessionsEnabled);
 
         permissions.addAdministrator(EMAIL, session);
 
@@ -108,7 +108,7 @@ public class PermissionsServiceProxyTest {
     @Test
     public void addAdministrator_JWTEnabled() throws Exception {
         boolean jwtSessionsEnabled = true;
-        PermissionsServiceProxy permissions = new PermissionsServiceProxy(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService);
+        PermissionsServiceProxy permissions = new PermissionsServiceProxy(legacyPermissionsService, jwtPermissionsService, jwtSessionsEnabled);
 
         permissions.addAdministrator(EMAIL, session);
 
@@ -120,7 +120,7 @@ public class PermissionsServiceProxyTest {
     @Test
     public void removeAdministrator_JWTNotEnabled() throws Exception {
         boolean jwtSessionsEnabled = false;
-        PermissionsServiceProxy permissions = new PermissionsServiceProxy(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService);
+        PermissionsServiceProxy permissions = new PermissionsServiceProxy(legacyPermissionsService, jwtPermissionsService, jwtSessionsEnabled);
 
         permissions.removeAdministrator(EMAIL, session);
 
@@ -131,7 +131,7 @@ public class PermissionsServiceProxyTest {
     @Test
     public void removeAdministrator_JWTEnabled() throws Exception {
         boolean jwtSessionsEnabled = true;
-        PermissionsServiceProxy permissions = new PermissionsServiceProxy(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService);
+        PermissionsServiceProxy permissions = new PermissionsServiceProxy(legacyPermissionsService, jwtPermissionsService, jwtSessionsEnabled);
 
         permissions.removeAdministrator(EMAIL, session);
 
@@ -142,7 +142,7 @@ public class PermissionsServiceProxyTest {
     @Test
     public void canEdit_JWTNotEnabled() throws Exception {
         boolean jwtSessionsEnabled = false;
-        PermissionsServiceProxy permissions = new PermissionsServiceProxy(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService);
+        PermissionsServiceProxy permissions = new PermissionsServiceProxy(legacyPermissionsService, jwtPermissionsService, jwtSessionsEnabled);
 
         assertThat(permissions.canEdit(session), is(false));
 
@@ -153,7 +153,7 @@ public class PermissionsServiceProxyTest {
     @Test
     public void canEdit_JWTEnabled() throws Exception {
         boolean jwtSessionsEnabled = true;
-        PermissionsServiceProxy permissions = new PermissionsServiceProxy(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService);
+        PermissionsServiceProxy permissions = new PermissionsServiceProxy(legacyPermissionsService, jwtPermissionsService, jwtSessionsEnabled);
 
         assertThat(permissions.canEdit(session), is(false));
 
@@ -164,7 +164,7 @@ public class PermissionsServiceProxyTest {
     @Test
     public void addEditor_JWTNotEnabled() throws Exception {
         boolean jwtSessionsEnabled = false;
-        PermissionsServiceProxy permissions = new PermissionsServiceProxy(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService);
+        PermissionsServiceProxy permissions = new PermissionsServiceProxy(legacyPermissionsService, jwtPermissionsService, jwtSessionsEnabled);
 
         permissions.addEditor(EMAIL, session);
 
@@ -175,7 +175,7 @@ public class PermissionsServiceProxyTest {
     @Test
     public void addEditor_JWTEnabled() throws Exception {
         boolean jwtSessionsEnabled = true;
-        PermissionsServiceProxy permissions = new PermissionsServiceProxy(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService);
+        PermissionsServiceProxy permissions = new PermissionsServiceProxy(legacyPermissionsService, jwtPermissionsService, jwtSessionsEnabled);
 
         permissions.addEditor(EMAIL, session);
 
@@ -187,7 +187,7 @@ public class PermissionsServiceProxyTest {
     @Test
     public void removeEditor_JWTNotEnabled() throws Exception {
         boolean jwtSessionsEnabled = false;
-        PermissionsServiceProxy permissions = new PermissionsServiceProxy(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService);
+        PermissionsServiceProxy permissions = new PermissionsServiceProxy(legacyPermissionsService, jwtPermissionsService, jwtSessionsEnabled);
 
         permissions.removeEditor(EMAIL, session);
 
@@ -198,7 +198,7 @@ public class PermissionsServiceProxyTest {
     @Test
     public void removeEditor_JWTEnabled() throws Exception {
         boolean jwtSessionsEnabled = true;
-        PermissionsServiceProxy permissions = new PermissionsServiceProxy(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService);
+        PermissionsServiceProxy permissions = new PermissionsServiceProxy(legacyPermissionsService, jwtPermissionsService, jwtSessionsEnabled);
 
         permissions.removeEditor(EMAIL, session);
 
@@ -209,7 +209,7 @@ public class PermissionsServiceProxyTest {
     @Test
     public void canView_JWTNotEnabled() throws Exception {
         boolean jwtSessionsEnabled = false;
-        PermissionsServiceProxy permissions = new PermissionsServiceProxy(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService);
+        PermissionsServiceProxy permissions = new PermissionsServiceProxy(legacyPermissionsService, jwtPermissionsService, jwtSessionsEnabled);
 
         assertThat(permissions.canView(session, COLLECTION_ID), is(false));
 
@@ -220,7 +220,7 @@ public class PermissionsServiceProxyTest {
     @Test
     public void canView_JWTEnabled() throws Exception {
         boolean jwtSessionsEnabled = true;
-        PermissionsServiceProxy permissions = new PermissionsServiceProxy(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService);
+        PermissionsServiceProxy permissions = new PermissionsServiceProxy(legacyPermissionsService, jwtPermissionsService, jwtSessionsEnabled);
 
         assertThat(permissions.canView(session, COLLECTION_ID), is(false));
 
@@ -231,7 +231,7 @@ public class PermissionsServiceProxyTest {
     @Test
     public void listViewerTeams_JWTNotEnabled() throws Exception {
         boolean jwtSessionsEnabled = false;
-        PermissionsServiceProxy permissions = new PermissionsServiceProxy(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService);
+        PermissionsServiceProxy permissions = new PermissionsServiceProxy(legacyPermissionsService, jwtPermissionsService, jwtSessionsEnabled);
 
         permissions.listViewerTeams(session, COLLECTION_ID);
 
@@ -242,7 +242,7 @@ public class PermissionsServiceProxyTest {
     @Test
     public void listViewerTeams_JWTEnabled() throws Exception {
         boolean jwtSessionsEnabled = true;
-        PermissionsServiceProxy permissions = new PermissionsServiceProxy(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService);
+        PermissionsServiceProxy permissions = new PermissionsServiceProxy(legacyPermissionsService, jwtPermissionsService, jwtSessionsEnabled);
 
         permissions.listViewerTeams(session, COLLECTION_ID);
 
@@ -254,7 +254,7 @@ public class PermissionsServiceProxyTest {
     @Test
     public void setViewerTeams_JWTNotEnabled() throws Exception {
         boolean jwtSessionsEnabled = false;
-        PermissionsServiceProxy permissions = new PermissionsServiceProxy(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService);
+        PermissionsServiceProxy permissions = new PermissionsServiceProxy(legacyPermissionsService, jwtPermissionsService, jwtSessionsEnabled);
 
         permissions.setViewerTeams(session, COLLECTION_ID, new HashSet<>());
 
@@ -265,7 +265,7 @@ public class PermissionsServiceProxyTest {
     @Test
     public void setViewerTeams_JWTEnabled() throws Exception {
         boolean jwtSessionsEnabled = true;
-        PermissionsServiceProxy permissions = new PermissionsServiceProxy(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService);
+        PermissionsServiceProxy permissions = new PermissionsServiceProxy(legacyPermissionsService, jwtPermissionsService, jwtSessionsEnabled);
 
         permissions.setViewerTeams(session, COLLECTION_ID, new HashSet<>());
 
@@ -276,7 +276,7 @@ public class PermissionsServiceProxyTest {
     @Test
     public void userPermissions_Self_JWTNotEnabled() throws Exception {
         boolean jwtSessionsEnabled = false;
-        PermissionsServiceProxy permissions = new PermissionsServiceProxy(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService);
+        PermissionsServiceProxy permissions = new PermissionsServiceProxy(legacyPermissionsService, jwtPermissionsService, jwtSessionsEnabled);
 
         permissions.userPermissions(session);
 
@@ -287,7 +287,7 @@ public class PermissionsServiceProxyTest {
     @Test
     public void userPermissions_Self_JWTEnabled() throws Exception {
         boolean jwtSessionsEnabled = true;
-        PermissionsServiceProxy permissions = new PermissionsServiceProxy(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService);
+        PermissionsServiceProxy permissions = new PermissionsServiceProxy(legacyPermissionsService, jwtPermissionsService, jwtSessionsEnabled);
 
         permissions.userPermissions(session);
 
@@ -298,7 +298,7 @@ public class PermissionsServiceProxyTest {
     @Test
     public void userPermissions_AnotherUser_JWTNotEnabled() throws Exception {
         boolean jwtSessionsEnabled = false;
-        PermissionsServiceProxy permissions = new PermissionsServiceProxy(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService);
+        PermissionsServiceProxy permissions = new PermissionsServiceProxy(legacyPermissionsService, jwtPermissionsService, jwtSessionsEnabled);
 
         permissions.userPermissions(session);
 
@@ -309,7 +309,7 @@ public class PermissionsServiceProxyTest {
     @Test
     public void userPermissions_AnotherUser_JWTEnabled() throws Exception {
         boolean jwtSessionsEnabled = true;
-        PermissionsServiceProxy permissions = new PermissionsServiceProxy(jwtSessionsEnabled, legacyPermissionsService, jwtPermissionsService);
+        PermissionsServiceProxy permissions = new PermissionsServiceProxy(legacyPermissionsService, jwtPermissionsService, jwtSessionsEnabled);
 
         permissions.userPermissions(EMAIL, session);
 

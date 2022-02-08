@@ -99,6 +99,8 @@ public class Collections {
                     newDesc.setApprovalStatus(collection.getDescription().getApprovalStatus());
                     newDesc.setType(collection.getDescription().getType());
                     newDesc.setTeams(collection.getDescription().getTeams());
+                    newDesc.setViewerTeams(collection.getDescription().getViewerTeams());
+
                     result.add(newDesc);
                 }
             }

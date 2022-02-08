@@ -26,53 +26,68 @@ public class CollectionBase {
      */
     protected String releaseUri;
 
+    @Deprecated
     protected List<String> teams; // list of team Id's
+
+    protected List<String> viewerTeams; // list of team Id's
 
     public String getId() {
         return this.id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public CollectionType getType() {
-        return type;
-    }
-
-    public Date getPublishDate() {
-        return publishDate;
-    }
-
-    public String getReleaseUri() {
-        return releaseUri;
-    }
-
-    public List<String> getTeams() {
-        return teams;
     }
 
     public void setId(String id) {
         this.id = id;
     }
 
+    public String getName() {
+        return name;
+    }
+
     public void setName(String name) {
         this.name = name;
+    }
+
+    public CollectionType getType() {
+        return type;
     }
 
     public void setType(CollectionType type) {
         this.type = type;
     }
 
+    public Date getPublishDate() {
+        return publishDate;
+    }
+
     public void setPublishDate(Date publishDate) {
         this.publishDate = publishDate;
+    }
+
+    public String getReleaseUri() {
+        return releaseUri;
     }
 
     public void setReleaseUri(String releaseUri) {
         this.releaseUri = releaseUri;
     }
 
+    public List<String> getViewerTeams() {
+        return viewerTeams;
+    }
+
+    public void setViewerTeams(List<String> viewerTeams) {
+        this.viewerTeams = viewerTeams;
+    }
+
+    @Deprecated
+    public List<String> getTeams() {
+        return teams;
+    }
+
+    @Deprecated
     public void setTeams(List<String> teams) {
         this.teams = teams;
     }
+
+
 }

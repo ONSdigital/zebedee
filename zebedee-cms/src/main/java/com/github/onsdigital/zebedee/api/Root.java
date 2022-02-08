@@ -41,16 +41,15 @@ import static java.text.MessageFormat.format;
 
 public class Root {
 
+    static final String ZEBEDEE_ROOT = "zebedee_root";
     private static final String DEFAULT_SYS_USER_EMAIL = "florence@magicroundabout.ons.gov.uk";
     private static final String DEFAULT_SYS_USER_NAME = "Florence";
     private static final String DEFAULT_SYS_USER_PASSWORD = "Doug4l";
-
-    static final String ZEBEDEE_ROOT = "zebedee_root";
+    private static final Scheduler scheduler = new PublishScheduler();
     // Environment variables are stored as a static variable so if necessary we can hijack them for testing
     public static Map<String, String> env = System.getenv();
     public static Zebedee zebedee;
     static Path root;
-    private static Scheduler scheduler = new PublishScheduler();
 
     /**
      * Initalise the CMS.
@@ -221,8 +220,7 @@ public class Root {
         return scheduler;
     }
 
-    private static Zebedee initialiseZebedee(Path root) throws IOException, NotFoundException, BadRequestException,
-            UnauthorizedException {
+    private static Zebedee initialiseZebedee(Path root) throws IOException, UnauthorizedException, NotFoundException, BadRequestException {
         zebedee = new Zebedee(new ZebedeeConfiguration(root, true));
 
         // TODO: Remove this logic after migration to using the dp-identity-api
@@ -233,7 +231,7 @@ public class Root {
         return zebedee;
     }
 
-    private static void createSystemUser() throws NotFoundException, BadRequestException, UnauthorizedException, IOException {
+    private static void createSystemUser() throws IOException, UnauthorizedException, NotFoundException, BadRequestException {
         User user = new User();
         user.setEmail(DEFAULT_SYS_USER_EMAIL);
         user.setName(DEFAULT_SYS_USER_NAME);

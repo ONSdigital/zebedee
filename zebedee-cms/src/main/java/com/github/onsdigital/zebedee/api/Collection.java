@@ -39,12 +39,12 @@ public class Collection {
 
     static final String COLLECTION_NAME = "collectionName";
 
-    private Sessions sessionsService;
-    private PermissionsService permissionsService;
-    private com.github.onsdigital.zebedee.model.Collections collections;
-    private UsersService usersService;
-    private CollectionKeyring collectionKeyring;
-    private ScheduleCanceller scheduleCanceller;
+    private final Sessions sessionsService;
+    private final PermissionsService permissionsService;
+    private final com.github.onsdigital.zebedee.model.Collections collections;
+    private final UsersService usersService;
+    private final CollectionKeyring collectionKeyring;
+    private final ScheduleCanceller scheduleCanceller;
 
     /**
      * Construct a new instance of the Collection API endpoint.
@@ -120,6 +120,8 @@ public class Collection {
         result.setApprovalStatus(collection.getDescription().getApprovalStatus());
         result.setType(collection.getDescription().getType());
         result.setTeams(collection.getDescription().getTeams());
+        result.setViewerTeams(collection.getDescription().getViewerTeams());
+
         result.setEncrypted(collection.getDescription().isEncrypted());
         result.setReleaseUri(collection.getDescription().getReleaseUri());
 
@@ -133,7 +135,8 @@ public class Collection {
     /**
      * Creates or updates collection details the endpoint /Collection/
      * <p>
-     * Checks if a collection exists using {@link CollectionDescription#name}
+     * Checks if a collection exists using {@link CollectionDescription#getTeams()}
+     * Checks if a collection exists using {@link CollectionDescription#getViewerTeams()}
      *
      * @param request               This should contain a X-Florence-Token header for the current session
      * @param response              <ul>
@@ -231,7 +234,7 @@ public class Collection {
                 .collectionID(collectionId)
                 .log("update collection endpoint: user granted canEdit permission");
 
-        com.github.onsdigital.zebedee.model.Collection updatedCollection = collection.update(
+        com.github.onsdigital.zebedee.model.Collection updatedCollection = com.github.onsdigital.zebedee.model.Collection.update(
                 collection,
                 collectionDescription,
                 Root.zebedee,
@@ -357,7 +360,7 @@ public class Collection {
     /**
      * ScheduleCanceller is an abstraction wrapper for functionality to cancel a scheduled publish.
      */
-    public static interface ScheduleCanceller {
+    public interface ScheduleCanceller {
 
         /**
          * Cancel a scheduled publish for the provided collection.

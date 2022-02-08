@@ -24,9 +24,9 @@ public class PermissionsServiceProxy implements PermissionsService {
     private final PermissionsService jwtPermissionsService;
     private final boolean jwtSessionsEnabled;
 
-    public PermissionsServiceProxy(boolean jwtSessionsEnabled,
-                                   PermissionsService legacyPermissionsService,
-                                   PermissionsService jwtPermissionsService) {
+    public PermissionsServiceProxy(PermissionsService legacyPermissionsService,
+                                   PermissionsService jwtPermissionsService,
+                                   boolean jwtSessionsEnabled) {
 
         this.legacyPermissionsService = legacyPermissionsService;
         this.jwtPermissionsService = jwtPermissionsService;

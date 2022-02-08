@@ -25,16 +25,13 @@ import java.util.List;
 @Deprecated
 public class ThreadLocalSessionsServiceImpl extends SessionsServiceImpl {
 
-    private PermissionsService permissionsService;
-    private TeamsService teamsService;
-
-    private static ThreadLocal<Session> store = new ThreadLocal<>();
-
     public static final String ACCESS_TOKEN_REQUIRED_ERROR = "access token required but none provided.";
     public static final String ACCESS_TOKEN_EXPIRED_ERROR = "session token lookup failed as token is expired.";
-
     public static final String ADMIN_GROUP = "role-admin";
     public static final String PUBLISHER_GROUP = "role-publisher";
+    private static ThreadLocal<Session> store = new ThreadLocal<>();
+    private final PermissionsService permissionsService;
+    private final TeamsService teamsService;
 
     public ThreadLocalSessionsServiceImpl(LegacySessionsStore legacySessionsStore, PermissionsService permissionsService,
                                           TeamsService teamsService) {
@@ -48,7 +45,6 @@ public class ThreadLocalSessionsServiceImpl extends SessionsServiceImpl {
      *
      * @param id the {@link String} to get the session object from thread local for.
      * @return the {@link Session} from thread local or <code>null</code> if no session is found.
-     *
      * @deprecated Since the new JWT sessions implementation can only get the session of the current user, a single
      *             {@link this#get()} method is provided. Once migration to the new JWT sessions is completed all
      *             references to this method should be updated to use the {@link this#get()} instead.

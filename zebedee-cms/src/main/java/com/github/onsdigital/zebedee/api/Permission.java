@@ -3,7 +3,6 @@ package com.github.onsdigital.zebedee.api;
 import com.github.davidcarboni.restolino.framework.Api;
 import com.github.onsdigital.zebedee.audit.Audit;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
-import com.github.onsdigital.zebedee.exceptions.InternalServerError;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
@@ -27,11 +26,11 @@ import static org.apache.commons.lang.StringUtils.isNotEmpty;
 @Api
 public class Permission {
 
-    private Sessions sessionsService;
-    private PermissionsService permissionsService;
-    private UsersService usersService;
-    private CollectionKeyring collectionKeyring;
-    private Collections collections;
+    private final Sessions sessionsService;
+    private final PermissionsService permissionsService;
+    private final UsersService usersService;
+    private final CollectionKeyring collectionKeyring;
+    private final Collections collections;
 
     public Permission() {
         this.sessionsService = Root.zebedee.getSessions();
@@ -66,7 +65,6 @@ public class Permission {
      * @throws IOException           If an error occurs accessing data.
      * @throws UnauthorizedException If the logged in user is not an administrator.
      * @throws BadRequestException   If the user specified in the {@link PermissionDefinition} is not found.
-     *
      * @deprecated by the move to JWT sessions and will be removed after the migration is complete.
      *
      * // TODO: Remove this endpoint once the JWT sessions have been enabled as this will mean user management has moved
@@ -116,14 +114,14 @@ public class Permission {
      * @throws UnauthorizedException If the user is not an administrator.
      * @throws BadRequestException   If the user specified in the {@link PermissionDefinition} is not found.
      *
-     * This endpoint is called by florence in two places:
-     *    - On login to determine whether the calling user is a viewer, publisher or admin
-     *    - When editing a user, this endpoint is called to load whether they are a viewer, publisher or admin to display
-     *      on the user admin screens
+     *                               This endpoint is called by florence in two places:
+     *                               - On login to determine whether the calling user is a viewer, publisher or admin
+     *                               - When editing a user, this endpoint is called to load whether they are a viewer, publisher or admin to display
+     *                               on the user admin screens
      *
-     * // TODO: Update this endpoint once the JWT sessions have been enabled to remove the ability to check the permissions
-     *          of another user (i.e. case 2 in the florence usages above). This basically means removing the ability to
-     *          pass the `email` param.
+     * TODO: Update this endpoint once the JWT sessions have been enabled to remove the ability to check the permissions
+     *       of another user (i.e. case 2 in the florence usages above). This basically means removing the ability to
+     *       pass the `email` param.
      */
     @GET
     public PermissionDefinition getPermissions(HttpServletRequest request, HttpServletResponse response)
@@ -147,8 +145,7 @@ public class Permission {
     }
 
     private void assignAdminPermissionsToUser(HttpServletRequest request, PermissionDefinition permissionDefinition,
-                                              Session session)
-            throws IOException, UnauthorizedException {
+                                              Session session) throws IOException, UnauthorizedException {
         permissionsService.addAdministrator(permissionDefinition.getEmail(), session);
         Audit.Event.ADMIN_PERMISSION_ADDED
                 .parameters()
@@ -158,8 +155,7 @@ public class Permission {
     }
 
     private void removeAdminPermissionsFromUser(HttpServletRequest request, PermissionDefinition permissionDefinition,
-                                                Session session)
-            throws IOException, UnauthorizedException {
+                                                Session session) throws IOException, UnauthorizedException {
         permissionsService.removeAdministrator(permissionDefinition.getEmail(), session);
 
         Audit.Event.ADMIN_PERMISSION_REMOVED
@@ -182,8 +178,7 @@ public class Permission {
     }
 
     private void removeEditorPermissionFromUser(HttpServletRequest request, PermissionDefinition permissionDefinition,
-                                                Session session)
-            throws IOException, UnauthorizedException {
+                                                Session session) throws IOException, UnauthorizedException {
         permissionsService.removeEditor(permissionDefinition.getEmail(), session);
 
         Audit.Event.PUBLISHER_PERMISSION_REMOVED

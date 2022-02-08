@@ -26,6 +26,31 @@ export KEYRING_INIT_VECTOR="RkL9MmjfRcPB86alO82gHQ=="
 export DATASET_API_URL="http://localhost:22000"
 export DATASET_API_AUTH_TOKEN="FD0108EA-825D-411C-9B1D-41EF7727F465"
 
+# Dev local defaults for Cognito Pool
+if [[ "${ENABLE_JWT_SESSIONS}" == "true"
+      && -z "${AWS_COGNITO_SIGNING_KEY_ONE}" && -z "${AWS_COGNITO_SIGNING_KEY_TWO}"
+      && -z "${AWS_COGNITO_KEY_ID_ONE}" && -z "${AWS_COGNITO_KEY_ID_TWO}" ]]; then
+
+  if ! command -v curl &> /dev/null; then
+      echo "local dev autoconfiguration requires 'curl', either 'brew install jq' or set the 'AWS_COGNITO_*' configs manually"
+      exit 1
+  fi
+  if ! command -v jq &> /dev/null; then
+      echo "local dev autoconfiguration requires 'jq', either 'brew install jq' or set the 'AWS_COGNITO_*' configs manually"
+      exit 1
+  fi
+
+  AWS_REGION=eu-west-1
+  LOCAL_USER_POOL_ID=eu-west-1_Rnma9lp2q
+
+  KEYS_JSON=$(curl "https://cognito-idp.${AWS_REGION}.amazonaws.com/$LOCAL_USER_POOL_ID/.well-known/jwks.json")
+
+  export AWS_COGNITO_KEY_ID_ONE=$(echo $KEYS_JSON | jq '.keys[0].kid')
+  export AWS_COGNITO_SIGNING_KEY_ONE=$(echo $KEYS_JSON | jq '.keys[1].n')
+  export AWS_COGNITO_KEY_ID_TWO=$(echo $KEYS_JSON | jq '.keys[1].kid')
+  export AWS_COGNITO_SIGNING_KEY_TWO=$(echo $KEYS_JSON | jq '.keys[1].n')
+fi
+
 # Development: reloadable
 mvn clean package dependency:copy-dependencies -Dmaven.test.skip=true -Dossindex.skip=true && \
 java $JAVA_OPTS \

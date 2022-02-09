@@ -125,18 +125,10 @@ public class AuthenticationFilter implements PreFilter {
      * @throws IOException if any
      */
     private void verifyAndStoreAccessToken(String authToken, Path path) throws UnauthorizedException, IOException {
-        // If an path is an unathenticated endpoint, try to set the session if it exists
-        if (noAuthorisationRequired(path)) {
-            try {
-                getSessions().set(authToken);
-            } catch (SessionsException ignore) {
-                // Ignore
-            }
-        } else {
-            // Otherwise validate the token and store the session details
-            try {
-                getSessions().set(authToken);
-            } catch (SessionsException e) {
+        try {
+            getSessions().set(authToken);
+        } catch (SessionsException e) {
+            if (authorisationRequired(path)) {
                 // treat access token expired or malformed access token as unauthorised
                 throw new UnauthorizedException(e.getMessage());
             }
@@ -168,8 +160,8 @@ public class AuthenticationFilter implements PreFilter {
         response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR_500);
     }
 
-    private boolean noAuthorisationRequired(Path path) {
-        return NO_AUTH_REQUIRED.stream()
+    private boolean authorisationRequired(Path path) {
+        return !NO_AUTH_REQUIRED.stream()
                 .anyMatch(clazzName -> clazzName.getSimpleName().equalsIgnoreCase(path.lastSegment()));
     }
 

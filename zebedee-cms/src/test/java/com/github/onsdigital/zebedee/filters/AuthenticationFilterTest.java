@@ -79,7 +79,7 @@ public class AuthenticationFilterTest extends ZebedeeTestBaseFixture {
     }
 
     @Test
-    public void filter_ShouldReturnTrue_WhenTokenNotProvidedForOptionsRequest() throws Exception {
+    public void filter_shouldReturnTrue_whenTokenNotProvidedForOptionsRequest() throws Exception {
         when(request.getMethod()).thenReturn(HttpMethod.OPTIONS);
 
         assertTrue(authenticationFilter.filter(request, response));
@@ -87,7 +87,7 @@ public class AuthenticationFilterTest extends ZebedeeTestBaseFixture {
     }
 
     @Test
-    public void filter_ShouldReturnUnauthorised_WhenTokenNotProvidedForAuthenticatedPath() throws Exception {
+    public void filter_shouldReturnUnauthorised_whenTokenNotProvidedForAuthenticatedPath() throws Exception {
         when(request.getPathInfo()).thenReturn(AUTHENTICATED_PATH);
         doThrow(new SessionsException(SOME_VALIDATION_ERROR)).when(sessions).set(null);
 
@@ -105,7 +105,7 @@ public class AuthenticationFilterTest extends ZebedeeTestBaseFixture {
     }
 
     @Test
-    public void filter_ShouldReturnUnauthorised_WhenEmptyTokenProvidedForAuthenticatedPath() throws Exception {
+    public void filter_shouldReturnUnauthorised_whenEmptyTokenProvidedForAuthenticatedPath() throws Exception {
         when(request.getHeader(FLORENCE_TOKEN_HEADER)).thenReturn("  ");
         when(request.getPathInfo()).thenReturn(AUTHENTICATED_PATH);
         doThrow(new SessionsException(SOME_VALIDATION_ERROR)).when(sessions).set(null);
@@ -124,7 +124,7 @@ public class AuthenticationFilterTest extends ZebedeeTestBaseFixture {
     }
 
     @Test
-    public void filter_ShouldReturnUnauthorised_WhenInvalidTokenProvidedForAuthenticatedPath() throws Exception {
+    public void filter_shouldReturnUnauthorised_whenInvalidTokenProvidedForAuthenticatedPath() throws Exception {
         when(request.getHeader(FLORENCE_TOKEN_HEADER)).thenReturn(LEGACY_TOKEN);
         when(request.getPathInfo()).thenReturn(AUTHENTICATED_PATH);
         doThrow(new SessionsException(SOME_VALIDATION_ERROR)).when(sessions).set(LEGACY_TOKEN);
@@ -143,7 +143,7 @@ public class AuthenticationFilterTest extends ZebedeeTestBaseFixture {
     }
 
     @Test
-    public void filter_ShouldReturnTrue_WhenValidFlorenceTokenProvidedForAuthenticatedPath() throws Exception {
+    public void filter_shouldReturnTrue_whenValidFlorenceTokenProvidedForAuthenticatedPath() throws Exception {
         when(request.getHeader(FLORENCE_TOKEN_HEADER)).thenReturn(LEGACY_TOKEN);
         when(request.getPathInfo()).thenReturn(AUTHENTICATED_PATH);
         doNothing().when(sessions).set(LEGACY_TOKEN);
@@ -155,7 +155,7 @@ public class AuthenticationFilterTest extends ZebedeeTestBaseFixture {
     }
 
     @Test
-    public void filter_ShouldReturnTrue_WhenValidJWTTokenProvidedForAuthenticatedPath() throws Exception {
+    public void filter_shouldReturnTrue_whenValidJWTTokenProvidedForAuthenticatedPath() throws Exception {
         when(request.getHeader(AUTH_HEADER)).thenReturn(BEARER_PREFIX + JWT_TOKEN);
         when(request.getPathInfo()).thenReturn(AUTHENTICATED_PATH);
         doNothing().when(sessions).set(JWT_TOKEN);
@@ -167,7 +167,7 @@ public class AuthenticationFilterTest extends ZebedeeTestBaseFixture {
     }
 
     @Test
-    public void filter_ShouldUseFlorenceToken_WhenValidFlorenceAndServiceTokensProvided() throws Exception {
+    public void filter_shouldUseFlorenceToken_whenValidFlorenceAndServiceTokensProvided() throws Exception {
         when(request.getHeader(FLORENCE_TOKEN_HEADER)).thenReturn(LEGACY_TOKEN);
         when(request.getHeader(AUTH_HEADER)).thenReturn(BEARER_PREFIX + SERVICE_TOKEN);
         when(request.getPathInfo()).thenReturn(AUTHENTICATED_PATH);
@@ -180,7 +180,7 @@ public class AuthenticationFilterTest extends ZebedeeTestBaseFixture {
     }
 
     @Test
-    public void filter_ShouldIgnoreServiceToken_WhenServiceTokenProvidedForAuthenticatedPath() throws Exception {
+    public void filter_shouldIgnoreServiceToken_whenServiceTokenProvidedForAuthenticatedPath() throws Exception {
         when(request.getHeader(AUTH_HEADER)).thenReturn(SERVICE_TOKEN);
         when(request.getPathInfo()).thenReturn(AUTHENTICATED_PATH);
         doThrow(new SessionsException(SOME_VALIDATION_ERROR)).when(sessions).set(null);
@@ -199,7 +199,7 @@ public class AuthenticationFilterTest extends ZebedeeTestBaseFixture {
     }
 
     @Test
-    public void filter_ShouldReturnTrue_WhenTokenNotProvidedForUnauthenticatedPath() throws Exception {
+    public void filter_shouldReturnTrue_whenTokenNotProvidedForUnauthenticatedPath() throws Exception {
         when(request.getPathInfo()).thenReturn(UNAUTHENTICATED_PATH);
         doThrow(new SessionsException(SOME_VALIDATION_ERROR)).when(sessions).set(null);
 
@@ -210,7 +210,7 @@ public class AuthenticationFilterTest extends ZebedeeTestBaseFixture {
     }
 
     @Test
-    public void filter_ShouldReturnTrue_WhenInvalidTokenProvidedForUnauthenticatedPath() throws Exception {
+    public void filter_shouldReturnTrue_whenInvalidTokenProvidedForUnauthenticatedPath() throws Exception {
         when(request.getHeader(FLORENCE_TOKEN_HEADER)).thenReturn(LEGACY_TOKEN);
         when(request.getPathInfo()).thenReturn(UNAUTHENTICATED_PATH);
         doThrow(new SessionsException(SOME_VALIDATION_ERROR)).when(sessions).set(LEGACY_TOKEN);
@@ -222,7 +222,7 @@ public class AuthenticationFilterTest extends ZebedeeTestBaseFixture {
     }
 
     @Test
-    public void filter_ShouldReturnTrue_WhenValidTokenProvidedForUnauthenticatedPath() throws Exception {
+    public void filter_shouldReturnTrue_whenValidTokenProvidedForUnauthenticatedPath() throws Exception {
         when(request.getHeader(FLORENCE_TOKEN_HEADER)).thenReturn(LEGACY_TOKEN);
         when(request.getPathInfo()).thenReturn(UNAUTHENTICATED_PATH);
         doNothing().when(sessions).set(LEGACY_TOKEN);

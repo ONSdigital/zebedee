@@ -24,7 +24,7 @@ import static com.github.onsdigital.zebedee.logging.CMSLogEvent.error;
  * Created by david on 12/03/2015.
  *
  * @deprecated In favour of the transition ThreadLocalSessionsServiceImpl. The ThreadLocalSessionsServiceImpl should be
- *             used in all cases. This calss
+ *             used in all cases. This class will be removed.
  */
 @Deprecated
 public class SessionsServiceImpl extends TimerTask implements Sessions {

@@ -12,6 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A transitional {@link Sessions} service implementation that uses the legacy {@link SessionsServiceImpl} to validate
@@ -96,7 +97,7 @@ public class ThreadLocalSessionsServiceImpl extends SessionsServiceImpl {
             throw new SessionsException(ACCESS_TOKEN_EXPIRED_ERROR);
         }
 
-        ArrayList<String> teams = new ArrayList<>();
+        List<String> teams = new ArrayList<>();
         PermissionDefinition permissions = permissionsService.userPermissions(session);
 
         if (permissions.isAdmin()) {

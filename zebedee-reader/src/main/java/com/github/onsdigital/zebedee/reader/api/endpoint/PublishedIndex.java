@@ -39,6 +39,5 @@ public class PublishedIndex {
         publishedIndexResponse.setLimit(docs.size());
         publishedIndexResponse.setTotalCount(docs.size());
         return publishedIndexResponse;
-
     }
 }

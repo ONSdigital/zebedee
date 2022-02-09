@@ -41,9 +41,7 @@ public abstract class PermissionsAPIBase {
      */
     protected PermissionsAPIBase(CMDPermissionsService cmdPermissionsService,
                                  HttpResponseWriter responseWriter) {
-        this.permissionsService = cmdPermissionsService;
-        this.httpResponseWriter = responseWriter;
-        this.sessionsService = Root.zebedee.getSessions();
+        this(cmdPermissionsService, responseWriter, Root.zebedee.getSessions());
     }
 
     /**

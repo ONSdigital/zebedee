@@ -11,7 +11,6 @@ import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.CollectionWriter;
 import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
 import com.github.onsdigital.zebedee.model.ZebedeeCollectionWriter;
-import com.github.onsdigital.zebedee.persistence.CollectionEventType;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.service.EquationService;
 import com.github.onsdigital.zebedee.service.EquationServiceResponse;
@@ -71,7 +70,7 @@ public class Equation {
         Path mmlPath = path.getParent().resolve(equation.getFilename() + ".mml");
         try (InputStream inputStream = new ByteArrayInputStream(equationServiceResponse.mml.getBytes())) {
             boolean validateJson = false;
-            Root.zebedee.getCollections().writeContent(collection, mmlPath.toString(), session, request, inputStream, false, CollectionEventType.COLLECTION_FILE_SAVED, validateJson);
+            Root.zebedee.getCollections().writeContent(collection, mmlPath.toString(), session, request, inputStream, false, validateJson);
 
             String fileName = mmlPath.getFileName().toString();
             addAssociatedFileToEquation(equation, "generated-mml", fileName, "mml");
@@ -82,7 +81,7 @@ public class Equation {
         Path svgPath = path.getParent().resolve(equation.getFilename() + ".svg");
         try (InputStream inputStream = new ByteArrayInputStream(equationServiceResponse.svg.getBytes())) {
             boolean validateJson = false;
-            Root.zebedee.getCollections().writeContent(collection, svgPath.toString(), session, request, inputStream, false, CollectionEventType.COLLECTION_FILE_SAVED, validateJson);
+            Root.zebedee.getCollections().writeContent(collection, svgPath.toString(), session, request, inputStream, false, validateJson);
 
             String fileName = svgPath.getFileName().toString();
             addAssociatedFileToEquation(equation, "generated-svg", fileName, "svg");
@@ -185,7 +184,7 @@ public class Equation {
         String serialisedEquation = ContentUtil.serialise(equation);
         try (InputStream inputStream = new ByteArrayInputStream(serialisedEquation.getBytes())) {
             boolean validateJson = true;
-            Root.zebedee.getCollections().writeContent(collection, uri, session, request, inputStream, false, CollectionEventType.COLLECTION_FILE_SAVED, validateJson);
+            Root.zebedee.getCollections().writeContent(collection, uri, session, request, inputStream, false, validateJson);
             Audit.Event.CONTENT_OVERWRITTEN
                     .parameters()
                     .host(request)

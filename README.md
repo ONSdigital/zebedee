@@ -124,7 +124,6 @@ Otherwise :violin: kindly ask someone from the dev team to help troubleshoot.
 | KAFKA_SEC_PROTO                                   | _unset_                                     | if set to "TLS", kafka connections will use TLS
 | KAFKA_SEC_CLIENT_CERT                             | _unset_                                     | PEM for the client certificate [1]
 | KAFKA_SEC_CLIENT_KEY                              | _unset_                                     | PEM for the client key [1]
-| AUDIT_DB_ENABLED_ENV_VAR                          | "audit_db_enabled"                          | Audit DB
 | MATHJAX_SERVICE_URL                               | "http://localhost:8888"                     | Mathjax service URL
 | DATASET_API_URL                                   | "http://localhost:22000"                    | Dataset API URL
 | IMAGE_API_URL                                     | "http://localhost:24700"                    | Image API URL

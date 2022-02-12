@@ -4,7 +4,7 @@ import com.github.onsdigital.zebedee.keyring.CollectionKeyCache;
 import com.github.onsdigital.zebedee.keyring.CollectionKeyStore;
 import com.github.onsdigital.zebedee.keyring.KeyNotFoundException;
 import com.github.onsdigital.zebedee.keyring.KeyringException;
-import liquibase.util.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.crypto.SecretKey;
 import java.util.HashMap;

@@ -28,20 +28,16 @@ import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
 import com.github.onsdigital.zebedee.model.publishing.Publisher;
 import com.github.onsdigital.zebedee.model.publishing.scheduled.Scheduler;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
-import com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDao;
-import com.github.onsdigital.zebedee.persistence.model.CollectionHistoryEvent;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
 import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.reader.ZebedeeReader;
-import com.github.onsdigital.zebedee.service.ServiceSupplier;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.teams.model.Team;
 import com.github.onsdigital.zebedee.teams.service.TeamsService;
 import com.github.onsdigital.zebedee.util.versioning.VersionsService;
 import com.github.onsdigital.zebedee.util.versioning.VersionsServiceImpl;
-import com.google.common.annotations.VisibleForTesting;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -58,7 +54,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -73,7 +68,6 @@ import java.util.Scanner;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -82,18 +76,6 @@ import java.util.stream.Collectors;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.error;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.info;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.warn;
-import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_CONTENT_REVIEWED;
-import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_CREATED;
-import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_NAME_CHANGED;
-import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_PUBLISH_RESCHEDULED;
-import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_TYPE_CHANGED;
-import static com.github.onsdigital.zebedee.persistence.CollectionEventType.DATA_VISUALISATION_COLLECTION_CONTENT_DELETED;
-import static com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDaoFactory.getCollectionHistoryDao;
-import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData.collectionCreated;
-import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData.contentReviewed;
-import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData.renamed;
-import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData.reschedule;
-import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData.typeChanged;
 
 public class Collection {
 
@@ -120,13 +102,6 @@ public class Collection {
 
     private final Path collectionJsonPath;
     private VersionsService versionsService;
-
-    private static ServiceSupplier<CollectionHistoryDao> collectionHistoryDaoServiceSupplier = () -> getCollectionHistoryDao();
-
-    @VisibleForTesting
-    public static void setCollectionHistoryDaoServiceSupplier(ServiceSupplier<CollectionHistoryDao> supplier) {
-        collectionHistoryDaoServiceSupplier = supplier;
-    }
 
     /**
      * Instantiates an existing {@link Collection}. This validates that the
@@ -210,8 +185,6 @@ public class Collection {
         }
 
         Collection collection = new Collection(rootCollectionsPath.resolve(filename), zebedee);
-        collectionHistoryDaoServiceSupplier.getService().saveCollectionHistoryEvent(collection, session, COLLECTION_CREATED,
-                collectionCreated(collectionDescription));
 
         if (collectionDescription.getTeams() != null) {
             setViewerTeams(collectionDescription, zebedee, session);
@@ -420,25 +393,16 @@ public class Collection {
             } else {
                 updatedCollection.getDescription().setName(collectionDescription.getName());
             }
-
-            collectionHistoryDaoServiceSupplier.getService().saveCollectionHistoryEvent(collection, session, COLLECTION_NAME_CHANGED, renamed
-                    (nameBeforeUpdate));
         }
 
         // if the type has changed
         if (collectionDescription.getType() != null
                 && updatedCollection.getDescription().getType() != collectionDescription.getType()) {
             updatedCollection.getDescription().setType(collectionDescription.getType());
-            collectionHistoryDaoServiceSupplier.getService().saveCollectionHistoryEvent(collection, session, COLLECTION_TYPE_CHANGED, typeChanged
-                    (updatedCollection.getDescription()));
         }
 
         if (updatedCollection.getDescription().getType() == CollectionType.scheduled) {
             if (collectionDescription.getPublishDate() != null) {
-                if (!collectionDescription.getPublishDate().equals(collection.getDescription().getPublishDate())) {
-                    collectionHistoryDaoServiceSupplier.getService().saveCollectionHistoryEvent(collection, session, COLLECTION_PUBLISH_RESCHEDULED,
-                            reschedule(collection.getDescription().getPublishDate(), collectionDescription.getPublishDate()));
-                }
                 updatedCollection.getDescription().setPublishDate(collectionDescription.getPublishDate());
                 scheduler.schedulePublish(updatedCollection, zebedee);
             }
@@ -833,9 +797,6 @@ public class Collection {
             }
 
             addEvent(uri, new Event(new Date(), EventType.REVIEWED, session.getEmail()));
-            collectionHistoryDaoServiceSupplier.getService().saveCollectionHistoryEvent(
-                    new CollectionHistoryEvent(this.description.getId(), this.description.getName(), session,
-                            COLLECTION_CONTENT_REVIEWED, contentReviewed(source, destination)));
             result = true;
         }
 
@@ -1106,8 +1067,6 @@ public class Collection {
 
         if (hasDeleted) {
             addEvent(visualisationZipUri, new Event(new Date(), EventType.DELETED, session.getEmail()));
-            collectionHistoryDaoServiceSupplier.getService().saveCollectionHistoryEvent(new CollectionHistoryEvent(this, session,
-                    DATA_VISUALISATION_COLLECTION_CONTENT_DELETED, visualisationZipUri));
         }
         save();
         return hasDeleted;

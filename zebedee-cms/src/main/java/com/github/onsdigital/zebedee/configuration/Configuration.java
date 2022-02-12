@@ -31,7 +31,6 @@ public class Configuration {
     private static final String DEFAULT_TRAIN_URL = "http://localhost:8084";
     private static final String DEFAULT_DYLAN_URL = "http://localhost:8085";
     private static final String CONTENT_DIRECTORY = "content";
-    private static final String AUDIT_DB_ENABLED_ENV_VAR = "audit_db_enabled";
     private static final String MATHJAX_SERVICE_URL = "http://localhost:8888";
     private static final String DATASET_API_URL = "http://localhost:22000";
     private static final String IMAGE_API_URL = "http://localhost:24700";
@@ -208,26 +207,6 @@ public class Configuration {
 
     public static String getReindexKey() {
         return StringUtils.defaultIfBlank(getValue("website_reindex_key"), "");
-    }
-
-    public static boolean isAuditDatabaseEnabled() {
-        return Boolean.valueOf(StringUtils.defaultIfBlank(getValue(AUDIT_DB_ENABLED_ENV_VAR), "true"));
-    }
-
-    public static boolean storeDeletedContent() {
-        return Boolean.valueOf(StringUtils.defaultIfBlank(getValue("store_deleted_content"), "true"));
-    }
-
-    public static String getAuditDBURL() {
-        return StringUtils.defaultIfBlank(getValue("db_audit_url"), "");
-    }
-
-    public static String getAuditDBUsername() {
-        return StringUtils.defaultIfBlank(getValue("db_audit_username"), "");
-    }
-
-    public static String getAuditDBPassword() {
-        return StringUtils.defaultIfBlank(getValue("db_audit_password"), "");
     }
 
     public static String getSessionsApiUrl() {

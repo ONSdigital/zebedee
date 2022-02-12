@@ -29,10 +29,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_TABLE_CREATED;
-import static com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDaoFactory.getCollectionHistoryDao;
-import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData.tableCreated;
-
 @Api
 public class Table {
 
@@ -80,9 +76,6 @@ public class Table {
 
             // Write the file to the response
             IOUtils.copy(new StringReader(output), response.getOutputStream(), StandardCharsets.UTF_8);
-
-            getCollectionHistoryDao().saveCollectionHistoryEvent(collection, session, COLLECTION_TABLE_CREATED,
-                    tableCreated(uri, modifications));
 
             Audit.Event.COLLECTION_TABLE_CREATED
                     .parameters()

@@ -98,7 +98,7 @@ public class PageTest extends ZebedeeAPIBaseTestCase {
         assertTrue(pageCreationHook.wasOnPageUpdatedCalled());
 
         // Then collections.createContent is called
-        verify(collections, times(1)).createContent(any(), any(), any(), any(), any(), any(), anyBoolean());
+        verify(collections, times(1)).createContent(any(), any(), any(), any(), any(), anyBoolean());
         verify(mockResponse, times(1)).setStatus(HttpStatus.SC_CREATED);
     }
 
@@ -174,7 +174,7 @@ public class PageTest extends ZebedeeAPIBaseTestCase {
 
         // Given a mock collections that throws an exception on createContent
         doThrow(new ConflictException(""))
-                .when(collections).createContent(any(), any(), any(), any(), any(), any(), anyBoolean());
+                .when(collections).createContent(any(), any(), any(), any(), any(), anyBoolean());
 
         when(mockRequest.getParameter("uri")).thenReturn(uri);
         when(zebedeeCmsService.getSession()).thenReturn(session);

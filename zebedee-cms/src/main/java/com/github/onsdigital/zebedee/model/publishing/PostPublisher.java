@@ -2,7 +2,6 @@ package com.github.onsdigital.zebedee.model.publishing;
 
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.configuration.Configuration;
-import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.PendingDelete;
@@ -19,17 +18,14 @@ import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
 import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.search.indexing.Indexer;
 import com.github.onsdigital.zebedee.service.DeletedContent.DeletedContentService;
-import com.github.onsdigital.zebedee.service.DeletedContent.DeletedContentServiceFactory;
 import com.github.onsdigital.zebedee.service.content.navigation.ContentTreeNavigator;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.util.ContentTree;
 import com.github.onsdigital.zebedee.util.SlackNotification;
 import com.github.onsdigital.zebedee.util.URIUtils;
-import com.github.onsdigital.zebedee.util.ZipUtils;
 import com.github.onsdigital.zebedee.util.mertics.service.MetricsService;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.FastDateFormat;
 
@@ -40,18 +36,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.error;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.info;
-import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_POST_PUBLISHED_CONFIRMATION;
-import static com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDaoFactory.getCollectionHistoryDao;
 
 /**
  * Post publish functionality.
@@ -63,8 +54,6 @@ public class PostPublisher {
     private static Session zebdeePublisherSession = null;
 
     private static final ExecutorService pool = Executors.newFixedThreadPool(10);
-
-    private static DeletedContentService deletedContentService;
 
     /**
      * Do tasks required after a publish takes place.
@@ -82,9 +71,6 @@ public class PostPublisher {
 
             // FIXME using PostPublisher.getPublishedCollection feels a bit hacky
             SlackNotification.publishNotification(publishedCollection,SlackNotification.CollectionStage.POST_PUBLISH, SlackNotification.StageStatus.STARTED);
-
-            getCollectionHistoryDao().saveCollectionHistoryEvent(collection, getPublisherClassSession(),
-                    COLLECTION_POST_PUBLISHED_CONFIRMATION);
 
             savePublishMetrics(publishedCollection);
 
@@ -135,7 +121,6 @@ public class PostPublisher {
     private static void applyDeletesToPublishing(Collection collection, ContentReader contentReader, ContentWriter contentWriter) {
 
         try {
-            archiveContentToBeDeleted(collection, contentReader);
             applyManifestDeletesToMaster(collection, contentReader, contentWriter);
         } catch (Exception e) {
             error().collectionID(collection)
@@ -177,30 +162,6 @@ public class PostPublisher {
                     PublishedCollection.class);
         }
         return publishedCollection;
-    }
-
-    private static void archiveContentToBeDeleted(Collection collection, ContentReader contentReader) {
-
-        List<PendingDelete> pendingDeletes = collection.getDescription().getPendingDeletes();
-
-        if (pendingDeletes.size() > 0) {
-
-            for (PendingDelete pendingDelete : pendingDeletes) {
-
-                Set<String> urisToDelete = new HashSet<>();
-                ContentTreeNavigator.getInstance().search(pendingDelete.getRoot(), node -> {
-                    info().log("Adding uri " + node.uri + " to be archived as part of deleting uri: " + pendingDelete.getRoot().uri);
-                    urisToDelete.add(node.uri);
-                });
-
-                try {
-                    Page page = ContentUtil.deserialiseContent(contentReader.getResource(pendingDelete.getRoot().uri + "/data.json").getData());
-                    getDeletedContentService().storeDeletedContent(page, new Date(), urisToDelete, contentReader, collection);
-                } catch (ZebedeeException | IOException e) {
-                    error().logException(e, "Failed to stored deleted content for URI: " + pendingDelete.getRoot().uri);
-                }
-            }
-        }
     }
 
     private static void applyManifestDeletesToMaster(Collection collection, ContentReader contentReader, ContentWriter contentWriter) {
@@ -279,37 +240,6 @@ public class PostPublisher {
             }
         });
     }
-
-    /**
-     * Timeseries are zipped for the publish to the website, and then need to be unzipped before moving into master
-     * on the publishing side
-     *
-     * @param collection
-     * @param zebedee
-     * @throws IOException
-     */
-    private static void unzipTimeseries(Collection collection, CollectionReader collectionReader, Zebedee zebedee) throws IOException, ZebedeeException {
-        info().collectionID(collection).log("Unzipping files if required to move to master.");
-
-        for (String uri : collection.getReviewed().uris()) {
-            Path source = collection.getReviewed().get(uri);
-            if (source != null) {
-                if (source.getFileName().toString().equals("timeseries-to-publish.zip")) {
-                    String publishUri = StringUtils.removeStart(StringUtils.removeEnd(uri, "-to-publish.zip"), "/");
-                    Path publishPath = zebedee.getPublished().getPath().resolve(publishUri);
-                    info().data("source", source.toString()).data("destination", publishPath.toString())
-                            .log("Unzipping TimeSeries");
-                    try (
-                            Resource resource = collectionReader.getResource(uri);
-                            InputStream dataStream = resource.getData()
-                    ) {
-                        ZipUtils.unzip(dataStream, publishPath.toString());
-                    }
-                }
-            }
-        }
-    }
-
 
     private static void reindexPublishingSearch(Collection collection) throws IOException {
 
@@ -437,13 +367,4 @@ public class PostPublisher {
 
         return collectionJsonDestination;
     }
-
-    public synchronized static DeletedContentService getDeletedContentService() {
-
-        if (deletedContentService == null)
-            deletedContentService = DeletedContentServiceFactory.createInstance();
-
-        return deletedContentService;
-    }
-
 }

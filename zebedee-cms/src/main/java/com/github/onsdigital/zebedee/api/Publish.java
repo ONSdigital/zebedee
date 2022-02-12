@@ -8,7 +8,6 @@ import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.session.model.Session;
-import com.github.onsdigital.zebedee.persistence.model.CollectionHistoryEvent;
 import com.github.onsdigital.zebedee.util.ZebedeeCmsService;
 import org.apache.commons.lang3.BooleanUtils;
 import org.eclipse.jetty.http.HttpStatus;
@@ -17,11 +16,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.POST;
 import java.io.IOException;
-
-import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_MANUAL_PUBLISHED_FAILURE;
-import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_MANUAL_PUBLISHED_SUCCESS;
-import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_MANUAL_PUBLISHED_TRIGGERED;
-import static com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDaoFactory.getCollectionHistoryDao;
 
 @Api
 public class Publish {
@@ -55,8 +49,6 @@ public class Publish {
         com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request);
         Session session = zebedeeCmsService.getSession();
 
-        getCollectionHistoryDao().saveCollectionHistoryEvent(collection, session, COLLECTION_MANUAL_PUBLISHED_TRIGGERED);
-
         String breakBeforePublish = request.getParameter("breakbeforefiletransfer");
         String skipVerification = request.getParameter("skipVerification");
 
@@ -77,21 +69,13 @@ public class Publish {
     private void logPublishResult(HttpServletRequest request, com.github.onsdigital.zebedee.model.Collection collection,
                                   Session session, boolean result, Exception ex) {
         Audit.Event auditEvent;
-        CollectionHistoryEvent historyEvent;
 
         if (result) {
             auditEvent = Audit.Event.COLLECTION_PUBLISHED;
-            historyEvent = new CollectionHistoryEvent(collection, session, COLLECTION_MANUAL_PUBLISHED_SUCCESS);
         } else {
             auditEvent = Audit.Event.COLLECTION_PUBLISH_UNSUCCESSFUL;
-            historyEvent = new CollectionHistoryEvent(collection, session, COLLECTION_MANUAL_PUBLISHED_FAILURE);
-        }
-
-        if (ex != null) {
-            historyEvent.exceptionText(ex.getMessage());
         }
 
         auditEvent.parameters().host(request).collection(collection).actionedBy(session.getEmail()).log();
-        getCollectionHistoryDao().saveCollectionHistoryEvent(historyEvent);
     }
 }

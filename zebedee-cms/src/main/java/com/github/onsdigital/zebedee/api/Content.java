@@ -2,13 +2,16 @@ package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
 import com.github.onsdigital.zebedee.audit.Audit;
-import com.github.onsdigital.zebedee.exceptions.*;
-import com.github.onsdigital.zebedee.session.model.Session;
+import com.github.onsdigital.zebedee.exceptions.BadRequestException;
+import com.github.onsdigital.zebedee.exceptions.ConflictException;
+import com.github.onsdigital.zebedee.exceptions.NotFoundException;
+import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
+import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.model.Collection;
-import com.github.onsdigital.zebedee.persistence.CollectionEventType;
 import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.reader.util.ReaderResponseResponseUtils;
 import com.github.onsdigital.zebedee.reader.util.RequestUtils;
+import com.github.onsdigital.zebedee.session.model.Session;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -20,11 +23,6 @@ import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
-import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_FILE_SAVED;
-import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_PAGE_SAVED;
 
 @Api
 public class Content {
@@ -83,11 +81,10 @@ public class Content {
         String uri = request.getParameter("uri");
         Boolean overwriteExisting = BooleanUtils.toBoolean(StringUtils.defaultIfBlank(request.getParameter("overwriteExisting"), "true"));
         Boolean recursive = BooleanUtils.toBoolean(StringUtils.defaultIfBlank(request.getParameter("recursive"), "false"));
-        CollectionEventType eventType = getEventType(Paths.get(uri));
         Boolean validateJson = BooleanUtils.toBoolean(StringUtils.defaultIfBlank(request.getParameter("validateJson"), "true"));
 
         if (overwriteExisting) {
-            Root.zebedee.getCollections().writeContent(collection, uri, session, request, requestBody, recursive, eventType, validateJson);
+            Root.zebedee.getCollections().writeContent(collection, uri, session, request, requestBody, recursive, validateJson);
             Audit.Event.CONTENT_OVERWRITTEN
                     .parameters()
                     .host(request)
@@ -96,7 +93,7 @@ public class Content {
                     .user(session.getEmail())
                     .log();
         } else {
-            Root.zebedee.getCollections().createContent(collection, uri, session, request, requestBody, eventType, validateJson);
+            Root.zebedee.getCollections().createContent(collection, uri, session, request, requestBody, validateJson);
             Audit.Event.CONTENT_SAVED
                     .parameters()
                     .host(request)
@@ -142,9 +139,5 @@ public class Content {
         }
 
         return result;
-    }
-
-    private CollectionEventType getEventType(Path uri) {
-        return DATA_JSON.equals(uri.getFileName().toString()) ? COLLECTION_PAGE_SAVED : COLLECTION_FILE_SAVED;
     }
 }

@@ -14,7 +14,6 @@ import com.github.onsdigital.logging.v2.storage.MDCLogStore;
 import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.configuration.CMSFeatureFlags;
 import com.github.onsdigital.zebedee.model.ZebedeeCollectionReaderFactory;
-import com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDaoFactory;
 import com.github.onsdigital.zebedee.reader.ZebedeeReader;
 
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.error;
@@ -53,7 +52,6 @@ public class Init implements Startup {
         try {
             Root.init();
             ZebedeeReader.setCollectionReaderFactory(new ZebedeeCollectionReaderFactory(Root.zebedee));
-            CollectionHistoryDaoFactory.initialise();
         } catch (Exception ex) {
             error().exception(ex).log("CMS start up failed with error, exiting application");
             System.exit(1);

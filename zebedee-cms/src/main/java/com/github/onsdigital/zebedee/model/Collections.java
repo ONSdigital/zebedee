@@ -24,10 +24,6 @@ import com.github.onsdigital.zebedee.model.publishing.PostPublisher;
 import com.github.onsdigital.zebedee.model.publishing.PublishNotification;
 import com.github.onsdigital.zebedee.model.publishing.Publisher;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
-import com.github.onsdigital.zebedee.persistence.CollectionEventType;
-import com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDao;
-import com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDaoFactory;
-import com.github.onsdigital.zebedee.persistence.model.CollectionHistoryEvent;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
@@ -75,16 +71,6 @@ import static com.github.onsdigital.zebedee.logging.CMSLogEvent.error;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.info;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.warn;
 import static com.github.onsdigital.zebedee.model.Content.isDataVisualisationFile;
-import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_APPROVED;
-import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_COMPLETED_ERROR;
-import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_CONTENT_DELETED;
-import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_CONTENT_MOVED;
-import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_CONTENT_RENAMED;
-import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_DELETED;
-import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_ITEM_COMPLETED;
-import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_UNLOCKED;
-import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData.contentMoved;
-import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData.contentRenamed;
 import static java.time.temporal.ChronoUnit.MINUTES;
 
 public class Collections {
@@ -98,7 +84,6 @@ public class Collections {
     private Function<ApproveTask, Future<Boolean>> addTaskToQueue = ApprovalQueue::add;
     private BiConsumer<Collection, EventType> publishingNotificationConsumer = (c, e) -> new PublishNotification(c).sendNotification(e);
     private Function<Path, ContentReader> contentReaderFactory = FileSystemContentReader::new;
-    private Supplier<CollectionHistoryDao> collectionHistoryDaoSupplier = CollectionHistoryDaoFactory::getCollectionHistoryDao;
     private Comparator<String> strComparator = Comparator.comparing(String::toString);
     private VersionsService versionsService;
 
@@ -227,15 +212,11 @@ public class Collections {
             throw new BadRequestException("URI does not represent a file.");
         }
 
-        CollectionHistoryEvent historyEvent = new CollectionHistoryEvent(collection, session, null, uri);
         // Attempt to complete:
         if (collection.complete(session, uri, recursive)) {
             removeEmptyCollectionDirectories(path);
             collection.save();
-            collectionHistoryDaoSupplier.get().saveCollectionHistoryEvent(historyEvent.eventType
-                    (COLLECTION_ITEM_COMPLETED));
         } else {
-            collectionHistoryDaoSupplier.get().saveCollectionHistoryEvent(historyEvent.eventType(COLLECTION_COMPLETED_ERROR));
             throw new BadRequestException("URI was not completed.");
         }
     }
@@ -402,7 +383,6 @@ public class Collections {
         }
 
         info().data("collectionId", collectionId).log("approve collection: saving collection history event");
-        collectionHistoryDaoSupplier.get().saveCollectionHistoryEvent(collection, session, COLLECTION_APPROVED);
 
         info().data("collectionId", collectionId).log("approve collection: API approve step compeleted successfully");
         return future;
@@ -440,7 +420,6 @@ public class Collections {
         // Go ahead
         collection.getDescription().setApprovalStatus(ApprovalStatus.NOT_STARTED);
         collection.getDescription().addEvent(new Event(new Date(), EventType.UNLOCKED, session.getEmail()));
-        collectionHistoryDaoSupplier.get().saveCollectionHistoryEvent(collection, session, COLLECTION_UNLOCKED);
 
         publishingNotificationConsumer.accept(collection, EventType.UNLOCKED);
         return collection.save();
@@ -586,7 +565,6 @@ public class Collections {
 
         // Go ahead
         collection.delete();
-        collectionHistoryDaoSupplier.get().saveCollectionHistoryEvent(collection, session, COLLECTION_DELETED);
     }
 
     /**
@@ -605,7 +583,7 @@ public class Collections {
      */
     public void createContent(
             Collection collection, String uri, Session session, HttpServletRequest request,
-            InputStream requestBody, CollectionEventType eventType, boolean validateJson
+            InputStream requestBody, boolean validateJson
     ) throws ZebedeeException, IOException,
             FileUploadException {
 
@@ -629,13 +607,12 @@ public class Collections {
             throw new ConflictException("This URI is marked for deletion in another collection", ex.getCollectionName());
         }
 
-        writeContent(collection, uri, session, request, requestBody, false, eventType, validateJson);
+        writeContent(collection, uri, session, request, requestBody, false, validateJson);
     }
 
     public void writeContent(
             Collection collection, String uri,
             Session session, HttpServletRequest request, InputStream requestBody, Boolean recursive,
-            CollectionEventType eventType,
             boolean validateJson
     ) throws IOException, ZebedeeException, FileUploadException {
 
@@ -699,11 +676,9 @@ public class Collections {
                     "Somehow we weren't able to edit the requested URI");
         }
 
-        CollectionHistoryEvent historyEvent = new CollectionHistoryEvent(collection, session, eventType, uri);
-
         // Detect whether this is a multipart request
         if (ServletFileUpload.isMultipartContent(request)) {
-            postDataFile(request, uri, collectionWriter, historyEvent);
+            postDataFile(request, uri, collectionWriter);
 
         } else {
             if (validateJson) {
@@ -712,9 +687,6 @@ public class Collections {
                 }
             } else {
                 collectionWriter.getInProgress().write(requestBody, uri);
-            }
-            if (eventType != null) {
-                collectionHistoryDaoSupplier.get().saveCollectionHistoryEvent(historyEvent);
             }
         }
     }
@@ -773,8 +745,6 @@ public class Collections {
 
         if (deleted) {
             removeEmptyCollectionDirectories(contentTargetPath);
-            collectionHistoryDaoSupplier.get().saveCollectionHistoryEvent(new CollectionHistoryEvent(collection, session,
-                    COLLECTION_CONTENT_DELETED, uri));
         }
         return deleted;
     }
@@ -812,9 +782,7 @@ public class Collections {
      * @throws IOException
      */
     private void postDataFile(
-            HttpServletRequest request, String uri, CollectionWriter collectionWriter,
-            CollectionHistoryEvent historyEvent
-    )
+            HttpServletRequest request, String uri, CollectionWriter collectionWriter)
             throws FileUploadException, IOException {
 
         ServletFileUpload upload = getServletFileUpload();
@@ -824,7 +792,6 @@ public class Collections {
                 try (InputStream inputStream = item.getInputStream()) {
                     collectionWriter.getInProgress().write(inputStream, uri);
                 }
-                collectionHistoryDaoSupplier.get().saveCollectionHistoryEvent(historyEvent);
             }
         } catch (Exception e) {
             throw new IOException("Error processing uploaded file", e);
@@ -838,7 +805,6 @@ public class Collections {
      */
     public ServletFileUpload getServletFileUpload() {
         // Set up the objects that do all the heavy lifting
-        // PrintWriter out = response.getWriter();
         EncryptedFileItemFactory factory = new EncryptedFileItemFactory();
         ServletFileUpload upload = new ServletFileUpload(factory);
 
@@ -903,8 +869,6 @@ public class Collections {
         }
 
         collection.moveContent(session, uri, newUri);
-        collectionHistoryDaoSupplier.get().saveCollectionHistoryEvent(collection, session, COLLECTION_CONTENT_MOVED,
-                contentMoved(uri, newUri));
         collection.save();
     }
 
@@ -933,8 +897,6 @@ public class Collections {
         }
 
         collection.renameContent(session.getEmail(), uri, toUri);
-        collectionHistoryDaoSupplier.get().saveCollectionHistoryEvent(collection, session, COLLECTION_CONTENT_RENAMED,
-                contentRenamed(uri, toUri));
         collection.save();
     }
 

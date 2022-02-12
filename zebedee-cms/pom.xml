@@ -157,31 +157,6 @@
         </dependency>
 
         <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-core</artifactId>
-            <version>5.6.1.Final</version>
-        </dependency>
-
-
-        <dependency>
-            <groupId>org.liquibase</groupId>
-            <artifactId>liquibase-core</artifactId>
-            <version>3.5.1</version>
-        </dependency>
-
-        <dependency>
-            <groupId>postgresql</groupId>
-            <artifactId>postgresql</artifactId>
-            <version>9.1-901-1.jdbc4</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-c3p0</artifactId>
-            <version>5.6.1.Final</version>
-        </dependency>
-
-        <dependency>
             <groupId>com.github.onsdigital</groupId>
             <artifactId>dp-image-api-client-java</artifactId>
             <version>0.1.0</version>
@@ -235,25 +210,6 @@
                             <goal>copy-dependencies</goal>
                         </goals>
                         <!-- Default output folder is ${project.build.directory}/dependency -->
-                    </execution>
-                </executions>
-            </plugin>
-
-            <plugin>
-                <groupId>org.liquibase</groupId>
-                <artifactId>liquibase-maven-plugin</artifactId>
-                <version>3.5.1</version>
-                <configuration>
-                    <propertyFile>src/main/resources/liquibase.properties</propertyFile>
-                    <url>${db_audit_url}</url>
-                    <username>${db_audit_username}</username>
-                    <password>${db_audit_password}</password>
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>update</goal>
-                        </goals>
                     </execution>
                 </executions>
             </plugin>

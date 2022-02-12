@@ -14,7 +14,6 @@ import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.model.Collection;
-import com.github.onsdigital.zebedee.persistence.CollectionEventType;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.util.ZebedeeCmsService;
@@ -189,7 +188,6 @@ public class Page {
                     session,
                     request,
                     inputStream,
-                    CollectionEventType.COLLECTION_PAGE_SAVED,
                     false);
 
         } catch (ZebedeeException e) {

@@ -18,9 +18,6 @@ import com.github.onsdigital.zebedee.model.approval.ApproveTask;
 import com.github.onsdigital.zebedee.model.encryption.EncryptionKeyFactory;
 import com.github.onsdigital.zebedee.model.publishing.PublishNotification;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
-import com.github.onsdigital.zebedee.persistence.CollectionEventType;
-import com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDao;
-import com.github.onsdigital.zebedee.persistence.model.CollectionHistoryEvent;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.ZebedeeReader;
@@ -55,8 +52,6 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_DELETED;
-import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_UNLOCKED;
 import static junit.framework.TestCase.assertFalse;
 import static junit.framework.TestCase.assertTrue;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -116,9 +111,6 @@ public class CollectionsTest {
     private CollectionDescription collectionDescriptionMock;
 
     @Mock
-    private CollectionHistoryDao collectionHistoryDaoMock;
-
-    @Mock
     private Content publishedContentMock;
 
     @Mock
@@ -156,13 +148,11 @@ public class CollectionsTest {
     private User testUser;
     private Supplier<Zebedee> zebedeeSupplier;
     private BiConsumer<Collection, EventType> publishingNotificationConsumer;
-    private Supplier<CollectionHistoryDao> collectionHistoryDaoSupplier;
 
     @Before
     public void setUp() throws IOException {
         MockitoAnnotations.openMocks(this);
 
-        System.setProperty("audit_db_enabled", "false");
         testUser = new User();
         testUser.setEmail(TEST_EMAIL);
         rootDir.create();
@@ -173,7 +163,6 @@ public class CollectionsTest {
 
         zebedeeSupplier = () -> zebedeeMock;
         publishingNotificationConsumer = (c, e) -> publishNotification.sendNotification(e);
-        collectionHistoryDaoSupplier = () -> collectionHistoryDaoMock;
 
         when(sessionMock.getEmail())
                 .thenReturn(TEST_EMAIL);
@@ -187,7 +176,6 @@ public class CollectionsTest {
         ReflectionTestUtils.setField(collections, "zebedeeSupplier", zebedeeSupplier);
         ReflectionTestUtils.setField(collections, "collectionReaderWriterFactory", collectionReaderWriterFactoryMock);
         ReflectionTestUtils.setField(collections, "publishingNotificationConsumer", publishingNotificationConsumer);
-        ReflectionTestUtils.setField(collections, "collectionHistoryDaoSupplier", collectionHistoryDaoSupplier);
         ReflectionTestUtils.setField(collections, "zebedeeCmsService", zebedeeCmsService);
     }
 
@@ -261,7 +249,7 @@ public class CollectionsTest {
                 .thenThrow(new NotFoundException(""));
 
         collections.writeContent(null, "someURI", sessionMock, request,
-                inputStream, false, CollectionEventType.COLLECTION_PAGE_SAVED, false);
+                inputStream, false, false);
     }
 
     @Test(expected = BadRequestException.class)
@@ -374,7 +362,7 @@ public class CollectionsTest {
                 .thenThrow(new UnauthorizedException(""));
         try {
             collections.writeContent(collectionMock, "someURI", sessionMock, requestMock,
-                    inputStreamMock, false, CollectionEventType.COLLECTION_PAGE_SAVED, true);
+                    inputStreamMock, false, true);
         } catch (UnauthorizedException e) {
             verify(collectionReaderWriterFactoryMock, times(1)).getWriter(zebedeeMock, collectionMock, sessionMock);
             verifyNoInteractions(collectionMock);
@@ -421,7 +409,7 @@ public class CollectionsTest {
 
         try {
             collections.writeContent(collectionMock, null, sessionMock, requestMock,
-                    inputStreamMock, false, CollectionEventType.COLLECTION_PAGE_SAVED, true);
+                    inputStreamMock, false, true);
         } catch (BadRequestException e) {
             verify(collectionReaderWriterFactoryMock, times(1)).getWriter(zebedeeMock, collectionMock, sessionMock);
             verify(sessionMock, times(1)).getEmail();
@@ -518,7 +506,6 @@ public class CollectionsTest {
         verify(inProg, times(1)).get(p.toString());
         verify(collectionMock, times(1)).complete(sessionMock, p.toString(), false);
         verify(collectionMock, times(1)).save();
-        verify(collectionHistoryDaoMock, times(1)).saveCollectionHistoryEvent(any(CollectionHistoryEvent.class));
     }
 
     @Test(expected = BadRequestException.class)
@@ -578,7 +565,6 @@ public class CollectionsTest {
             assertThat(eventCaptor.getValue().type, equalTo(EventType.APPROVE_SUBMITTED));
             verify(collectionReaderWriterFactoryMock, never()).getReader(any(), any(), any());
             verify(collectionReaderWriterFactoryMock, never()).getWriter(any(), any(), any());
-            verify(collectionHistoryDaoMock, never()).saveCollectionHistoryEvent(any(CollectionHistoryEvent.class));
             throw e;
         }
     }
@@ -644,7 +630,6 @@ public class CollectionsTest {
         verify(collectionMock, times(1)).isAllContentReviewed(anyBoolean());
         verify(collectionReaderWriterFactoryMock, times(1)).getReader(zebedeeMock, collectionMock, sessionMock);
         verify(collectionReaderWriterFactoryMock, times(1)).getWriter(zebedeeMock, collectionMock, sessionMock);
-        verify(collectionHistoryDaoMock, times(1)).saveCollectionHistoryEvent(any(), any(), any());
     }
 
     @Test
@@ -666,8 +651,6 @@ public class CollectionsTest {
         verify(collectionDescriptionMock, times(1)).addEvent(any(Event.class));
         verify(publishNotification, times(1)).sendNotification(EventType.UNLOCKED);
         verify(collectionMock, times(1)).save();
-        verify(collectionHistoryDaoMock, times(1)).saveCollectionHistoryEvent(collectionMock, sessionMock,
-                COLLECTION_UNLOCKED);
     }
 
     @Test
@@ -838,8 +821,6 @@ public class CollectionsTest {
         verify(permissionsServiceMock, times(1)).canEdit(sessionMock);
         verify(collectionMock, times(1)).isEmpty();
         verify(collectionMock, times(1)).delete();
-        verify(collectionHistoryDaoMock, times(1)).saveCollectionHistoryEvent(eq(collectionMock), eq(sessionMock),
-                eq(COLLECTION_DELETED));
     }
 
     @Test(expected = BadRequestException.class)
@@ -854,8 +835,8 @@ public class CollectionsTest {
         when(collectionMock.find(uri.toString()))
                 .thenReturn(uri);
         try {
-            collections.writeContent(collectionMock, uri.toString(), sessionMock, requestMock, mock(InputStream.class), false,
-                    CollectionEventType.COLLECTION_PAGE_SAVED, false);
+            collections.writeContent(collectionMock, uri.toString(), sessionMock, requestMock, mock(InputStream.class),
+                    false, false);
         } catch (BadRequestException e) {
             verify(collectionReaderWriterFactoryMock, times(1)).getWriter(zebedeeMock, collectionMock, sessionMock);
             verify(collectionDescriptionMock, times(1)).getApprovalStatus();
@@ -886,8 +867,8 @@ public class CollectionsTest {
         when(zebedeeMock.checkForCollectionBlockingChange(uri.toString()))
                 .thenReturn(Optional.empty());
         try {
-            collections.writeContent(collectionMock, uri.toString(), sessionMock, requestMock, mock(InputStream.class), false,
-                    CollectionEventType.COLLECTION_PAGE_SAVED, false);
+            collections.writeContent(collectionMock, uri.toString(), sessionMock, requestMock, mock(InputStream.class),
+                    false, false);
         } catch (BadRequestException e) {
             verify(collectionReaderWriterFactoryMock, times(1)).getWriter(zebedeeMock, collectionMock, sessionMock);
             verify(collectionDescriptionMock, times(1)).getApprovalStatus();
@@ -918,8 +899,8 @@ public class CollectionsTest {
         when(zebedeeMock.checkForCollectionBlockingChange(uri.toString()))
                 .thenReturn(Optional.empty());
         try {
-            collections.writeContent(collectionMock, uri.toString(), sessionMock, requestMock, mock(InputStream.class), false,
-                    CollectionEventType.COLLECTION_PAGE_SAVED, false);
+            collections.writeContent(collectionMock, uri.toString(), sessionMock, requestMock, mock(InputStream.class),
+                    false, false);
         } catch (BadRequestException e) {
             verify(collectionReaderWriterFactoryMock, times(1)).getWriter(zebedeeMock, collectionMock, sessionMock);
             verify(collectionDescriptionMock, times(1)).getApprovalStatus();
@@ -952,8 +933,7 @@ public class CollectionsTest {
         when(collectionWriterMock.getInProgress())
                 .thenReturn(contentWriterMock);
 
-        collections.writeContent(collectionMock, uri.toString(), sessionMock, requestMock, in, false,
-                CollectionEventType.COLLECTION_PAGE_SAVED, false);
+        collections.writeContent(collectionMock, uri.toString(), sessionMock, requestMock, in, false, false);
 
         verify(collectionReaderWriterFactoryMock, times(1)).getWriter(zebedeeMock, collectionMock, sessionMock);
         verify(collectionDescriptionMock, times(1)).getApprovalStatus();
@@ -964,7 +944,6 @@ public class CollectionsTest {
         verify(collectionMock, times(1)).getInProgressPath(uri.toString());
         verify(collectionWriterMock, times(1)).getInProgress();
         verify(contentWriterMock, times(1)).write(in, uri.toString());
-        verify(collectionHistoryDaoMock, times(1)).saveCollectionHistoryEvent(any(CollectionHistoryEvent.class));
     }
 
     @Test(expected = NotFoundException.class)
@@ -1009,12 +988,10 @@ public class CollectionsTest {
         verify(permissionsServiceMock, times(1)).canEdit(sessionMock);
         verify(collectionMock, times(1)).find(uri.toString());
         verify(collectionMock, times(1)).isInCollection(uri.toString());
-        verify(collectionMock, times(4)).getDescription();
-        /*verify(collectionMock, never()).deleteContentDirectory(any(), any());*/
+        verify(collectionMock, times(2)).getDescription();
         verify(collectionMock, times(1)).deleteContentDirectory(TEST_EMAIL, uri.toString());
         verify(collectionMock, never()).deleteFile(uri.toString());
         verify(collectionMock, times(1)).save();
-        verify(collectionHistoryDaoMock, times(1)).saveCollectionHistoryEvent(any(CollectionHistoryEvent.class));
     }
 
     @Test(expected = ConflictException.class)
@@ -1023,7 +1000,7 @@ public class CollectionsTest {
         when(publishedContentMock.exists(uri))
                 .thenReturn(true);
         try {
-            collections.createContent(collectionMock, uri, sessionMock, null, null, null, false);
+            collections.createContent(collectionMock, uri, sessionMock, null, null, false);
         } catch (ConflictException e) {
             verify(publishedContentMock, times(1)).exists(uri);
             verifyNoInteractions(zebedeeMock, collectionReaderWriterFactoryMock, collectionDescriptionMock,
@@ -1050,7 +1027,7 @@ public class CollectionsTest {
                 .thenReturn("Steve");
 
         try {
-            collections.createContent(collectionMock, uri, sessionMock, null, null, null, false);
+            collections.createContent(collectionMock, uri, sessionMock, null, null, false);
         } catch (ConflictException e) {
             verify(publishedContentMock, times(1)).exists(uri);
             verify(zebedeeMock, times(1)).checkForCollectionBlockingChange(collectionMock, uri);

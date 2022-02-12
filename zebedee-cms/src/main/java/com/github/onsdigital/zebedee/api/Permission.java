@@ -22,7 +22,7 @@ import javax.ws.rs.POST;
 import java.io.IOException;
 
 import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
-import static org.apache.commons.lang.StringUtils.isNotEmpty;
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 @Api
 public class Permission {

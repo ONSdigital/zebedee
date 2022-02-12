@@ -30,10 +30,6 @@
         </repository>
     </repositories>
 
-    <properties>
-        <dp.logging.version>v2.0.0-beta</dp.logging.version>
-    </properties>
-
     <dependencies>
         <!--Restolino-->
         <dependency>
@@ -46,18 +42,15 @@
             <artifactId>reflections</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+        </dependency>
+
         <!-- Elastic Search -->
         <dependency>
             <groupId>org.elasticsearch</groupId>
             <artifactId>elasticsearch</artifactId>
-            <version>2.1.1</version>
-        </dependency>
-
-        <!-- Elastic search multicast, used for discovering elastic search  instances-->
-        <dependency>
-            <groupId>org.elasticsearch.plugin</groupId>
-            <artifactId>discovery-multicast</artifactId>
-            <version>2.4.6</version>
         </dependency>
 
         <!-- Encryption -->
@@ -70,39 +63,103 @@
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi-ooxml</artifactId>
-            <version>${apache.poi.version}</version>
         </dependency>
 
         <!-- CSV generator -->
         <dependency>
             <groupId>net.sf.opencsv</groupId>
             <artifactId>opencsv</artifactId>
-            <version>2.3</version>
         </dependency>
 
         <!-- Logging -->
         <dependency>
             <groupId>com.github.onsdigital</groupId>
             <artifactId>dp-logging</artifactId>
-            <version>${dp.logging.version}</version>
         </dependency>
 
         <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+        </dependency>
+
+        <!-- API Clients -->
+        <dependency>
             <groupId>com.github.onsdigital</groupId>
             <artifactId>dp-dataset-api-java-client</artifactId>
-            <version>v1.1.0</version>
         </dependency>
 
         <dependency>
             <groupId>org.apache.tika</groupId>
             <artifactId>tika-core</artifactId>
-            <version>1.27</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.carrotsearch</groupId>
+            <artifactId>hppc</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.ws.rs</groupId>
+            <artifactId>javax.ws.rs-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+        </dependency>
+
+        <!-- JSON Serialisation -->
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+        </dependency>
+
+        <!-- Test -->
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-all</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
-
         <plugins>
             <!-- A folder of dependencies is used in development when reloading classes: -->
             <plugin>
@@ -119,9 +176,6 @@
                     </execution>
                 </executions>
             </plugin>
-
         </plugins>
-
     </build>
-
 </project>

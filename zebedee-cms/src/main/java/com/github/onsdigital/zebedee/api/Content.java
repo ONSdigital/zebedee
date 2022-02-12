@@ -13,7 +13,7 @@ import com.github.onsdigital.zebedee.reader.util.ReaderResponseResponseUtils;
 import com.github.onsdigital.zebedee.reader.util.RequestUtils;
 import com.github.onsdigital.zebedee.session.model.Session;
 import org.apache.commons.fileupload.FileUploadException;
-import org.apache.commons.lang.BooleanUtils;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;

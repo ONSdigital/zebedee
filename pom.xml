@@ -26,81 +26,9 @@
         <restolino.version>v0.4.1</restolino.version>
         <fasterxml.jackson.version>2.13.0</fasterxml.jackson.version>
         <apache.poi.version>3.17</apache.poi.version>
+        <spring.version>5.3.13</spring.version>
+        <dp.logging.version>v2.0.0-beta</dp.logging.version>
     </properties>
-
-    <dependencies>
-
-        <!-- commons -->
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-            <version>3.12.0</version>
-        </dependency>
-        <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-            <version>2.11.0</version>
-        </dependency>
-
-        <!--Gson-->
-        <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-            <version>2.8.9</version>
-        </dependency>
-
-        <!--SVG conversion-->
-        <dependency>
-            <groupId>org.apache.xmlgraphics</groupId>
-            <artifactId>batik-transcoder</artifactId>
-            <version>1.14</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.xmlgraphics</groupId>
-            <artifactId>batik-codec</artifactId>
-            <version>1.14</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.xmlgraphics</groupId>
-            <artifactId>xmlgraphics-commons</artifactId>
-            <version>2.6</version>
-        </dependency>
-
-        <!-- Fasterxml Jackson dependencies - overrides vulnerable transitive dependencies
-       and declared explicitly to resolve conflicts in elasticsearch and dp-logging -->
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-core</artifactId>
-            <version>${fasterxml.jackson.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-annotations</artifactId>
-            <version>${fasterxml.jackson.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.fasterxml.jackson.dataformat</groupId>
-            <artifactId>jackson-dataformat-smile</artifactId>
-            <version>${fasterxml.jackson.version}</version>
-        </dependency>
-
-        <!-- Test -->
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.13.2</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-core</artifactId>
-            <version>3.12.4</version>
-            <scope>test</scope>
-        </dependency>
-
-    </dependencies>
 
     <dependencyManagement>
         <dependencies>
@@ -132,6 +60,62 @@
                 <version>0.9.10</version>
             </dependency>
 
+            <!-- commons -->
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>3.12.0</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-io</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>2.11.0</version>
+            </dependency>
+
+            <!--Gson-->
+            <dependency>
+                <groupId>com.google.code.gson</groupId>
+                <artifactId>gson</artifactId>
+                <version>2.8.9</version>
+            </dependency>
+
+            <!--SVG conversion-->
+            <dependency>
+                <groupId>org.apache.xmlgraphics</groupId>
+                <artifactId>batik-transcoder</artifactId>
+                <version>1.14</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.xmlgraphics</groupId>
+                <artifactId>batik-codec</artifactId>
+                <version>1.14</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.xmlgraphics</groupId>
+                <artifactId>xmlgraphics-commons</artifactId>
+                <version>2.6</version>
+            </dependency>
+
+            <!-- Fasterxml Jackson dependencies - overrides vulnerable transitive dependencies
+           and declared explicitly to resolve conflicts in elasticsearch and dp-logging -->
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-core</artifactId>
+                <version>${fasterxml.jackson.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-annotations</artifactId>
+                <version>${fasterxml.jackson.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.fasterxml.jackson.dataformat</groupId>
+                <artifactId>jackson-dataformat-smile</artifactId>
+                <version>${fasterxml.jackson.version}</version>
+            </dependency>
+
             <!-- override the Guava version used by reflections and elasticsearch -->
             <dependency>
                 <groupId>com.google.guava</groupId>
@@ -139,14 +123,227 @@
                 <version>30.1.1-jre</version>
             </dependency>
 
+
+            <!-- File upload -->
+            <dependency>
+                <groupId>commons-fileupload</groupId>
+                <artifactId>commons-fileupload</artifactId>
+                <version>1.4</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.davidcarboni</groupId>
+                <artifactId>encrypted-file-upload</artifactId>
+                <version>1.0.0</version>
+                <exclusions>
+                    <!-- Brings in an older version of davidcarboni/cryptolite which conflicts
+                         with the onsdigital fork. This stops the old version being imported. -->
+                    <exclusion>
+                        <groupId>com.github.davidcarboni</groupId>
+                        <artifactId>cryptolite</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+
+            <dependency>
+                <groupId>joda-time</groupId>
+                <artifactId>joda-time</artifactId>
+                <version>2.10.13</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.github.davidcarboni</groupId>
+                <artifactId>resource-utils</artifactId>
+                <version>1.2.2</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.poi</groupId>
+                <artifactId>poi-scratchpad</artifactId>
+                <version>${apache.poi.version}</version>
+            </dependency>
+
+            <!-- Spreadsheet handling -->
+            <dependency>
+                <groupId>org.apache.poi</groupId>
+                <artifactId>poi-ooxml</artifactId>
+                <version>${apache.poi.version}</version>
+            </dependency>
+
+            <!-- CSV generator (currently in Zebedee but should end up in Brian) -->
+            <dependency>
+                <groupId>net.sf.opencsv</groupId>
+                <artifactId>opencsv</artifactId>
+                <version>2.3</version>
+            </dependency>
+
+            <!-- Logging -->
+            <dependency>
+                <groupId>com.github.onsdigital</groupId>
+                <artifactId>dp-logging</artifactId>
+                <version>${dp.logging.version}</version>
+            </dependency>
+
+            <!-- Http -->
+            <dependency>
+                <groupId>com.github.davidcarboni</groupId>
+                <artifactId>httpino</artifactId>
+                <version>0.0.7</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpclient</artifactId>
+                <version>4.5.13</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpmime</artifactId>
+                <version>4.5.13</version>
+            </dependency>
+
+            <dependency>
+                <groupId>xml-apis</groupId>
+                <artifactId>xml-apis</artifactId>
+                <version>1.4.01</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>2.12.1</version>
+            </dependency>
+            <dependency>
+                <groupId>org.elasticsearch</groupId>
+                <artifactId>elasticsearch</artifactId>
+                <version>2.1.1</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.poi</groupId>
+                <artifactId>poi</artifactId>
+                <version>3.17</version>
+            </dependency>
+            <dependency>
+                <groupId>javax.servlet</groupId>
+                <artifactId>javax.servlet-api</artifactId>
+                <version>3.1.0</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>1.7.25</version>
+            </dependency>
+            <dependency>
+                <groupId>javax.ws.rs</groupId>
+                <artifactId>javax.ws.rs-api</artifactId>
+                <version>2.1.1</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpcore</artifactId>
+                <version>4.4.15</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-codec</groupId>
+                <artifactId>commons-codec</artifactId>
+                <version>1.10</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.github.onsdigital</groupId>
+                <artifactId>dp-image-api-client-java</artifactId>
+                <version>0.1.0</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.github.onsdigital</groupId>
+                <artifactId>dp-slack-client-java</artifactId>
+                <version>0.1.0</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.github.onsdigital</groupId>
+                <artifactId>dp-jwt-verifier-java</artifactId>
+                <version>0.1.2</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.kafka</groupId>
+                <artifactId>kafka-clients</artifactId>
+                <version>2.8.0</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.avro</groupId>
+                <artifactId>avro</artifactId>
+                <version>1.11.0</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.github.onsdigital</groupId>
+                <artifactId>dp-dataset-api-java-client</artifactId>
+                <version>v1.1.0</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.tika</groupId>
+                <artifactId>tika-core</artifactId>
+                <version>1.27</version>
+            </dependency>
+
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-classic</artifactId>
+                <version>1.2.3</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.carrotsearch</groupId>
+                <artifactId>hppc</artifactId>
+                <version>0.7.1</version>
+            </dependency>
+
+            <!-- Test -->
+            <dependency>
+                <groupId>org.hamcrest</groupId>
+                <artifactId>hamcrest-all</artifactId>
+                <version>1.3</version>
+                <scope>test</scope>
+            </dependency>
+
+<!--            <dependency>-->
+<!--                <groupId>org.hamcrest</groupId>-->
+<!--                <artifactId>hamcrest-core</artifactId>-->
+<!--                <version>1.3</version>-->
+<!--                <scope>test</scope>-->
+<!--            </dependency>-->
+
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-test</artifactId>
+                <version>${spring.version}</version>
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>4.13.2</version>
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-core</artifactId>
+                <version>3.12.4</version>
+                <scope>test</scope>
+            </dependency>
+
             <!-- used in the Test builder project for timeseries random walk generation-->
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-math3</artifactId>
-                <version>3.5</version>
+                <version>3.6.1</version>
                 <scope>test</scope>
             </dependency>
-
         </dependencies>
     </dependencyManagement>
 
@@ -188,43 +385,28 @@
                     <!-- if CVSS >= 7.0 (high or critical) then ERROR else WARN -->
                     <fail>true</fail>
                     <cvssScoreThreshold>7.0</cvssScoreThreshold>
-                            <excludeCoordinates>
-                                <!--
-                                    Trello card for the following exclusions.
-                                    https://trello.com/c/jKsZJby5/1717-ionettynettyjar3105finalcompile-security-vulnerabilities
-                                 -->
-                                <exlude>
-                                    <groupId>io.netty</groupId>
-                                    <artifactId>netty</artifactId>
-                                    <version>3.10.5.Final</version>
-                                </exlude>
-                                <exlude>
-                                    <groupId>org.elasticsearch</groupId>
-                                    <artifactId>elasticsearch</artifactId>
-                                    <version>2.1.1</version>
-                                </exlude>
-                                <exlude>
-                                    <groupId>org.yaml</groupId>
-                                    <artifactId>snakeyaml</artifactId>
-                                    <version>1.15</version>
-                                </exlude>
-                                <exlude>
-                                    <groupId>org.yaml</groupId>
-                                    <artifactId>snakeyaml</artifactId>
-                                    <version>1.13</version>
-                                </exlude>
-                                <!-- End Trello #1717 -->
-                                <exlude>
-                                    <groupId>org.bouncycastle</groupId>
-                                    <artifactId>bcprov-jdk15on</artifactId>
-                                    <version>1.65</version>
-                                </exlude>
-                                <exlude>
-                                    <groupId>org.apache.commons</groupId>
-                                    <artifactId>commons-compress</artifactId>
-                                    <version>1.20</version>
-                                </exlude>
-                            </excludeCoordinates>
+                    <excludeCoordinates>
+                        <!--
+                            Trello card for the following exclusions.
+                            https://trello.com/c/jKsZJby5/1717-ionettynettyjar3105finalcompile-security-vulnerabilities
+                         -->
+                        <exlude>
+                            <groupId>io.netty</groupId>
+                            <artifactId>netty</artifactId>
+                            <version>3.10.5.Final</version>
+                        </exlude>
+                        <exlude>
+                            <groupId>org.elasticsearch</groupId>
+                            <artifactId>elasticsearch</artifactId>
+                            <version>2.1.1</version>
+                        </exlude>
+                        <exlude>
+                            <groupId>org.yaml</groupId>
+                            <artifactId>snakeyaml</artifactId>
+                            <version>1.15</version>
+                        </exlude>
+                        <!-- End Trello #1717 -->
+                    </excludeCoordinates>
                 </configuration>
             </plugin>
         </plugins>

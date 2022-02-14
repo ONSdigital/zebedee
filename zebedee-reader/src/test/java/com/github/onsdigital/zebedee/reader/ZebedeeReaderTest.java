@@ -136,7 +136,7 @@ public class ZebedeeReaderTest {
         assertNotNull(content);
         assertTrue(content instanceof Page);
         Page page = (Page) content;
-        assertEquals(page.getType(), PageType.article);
+        assertEquals(page.getType(), PageType.ARTICLE);
         assertTrue(content instanceof Article);
     }
 
@@ -181,7 +181,7 @@ public class ZebedeeReaderTest {
         Content content = readPublishedContent(path);
         assertTrue(content instanceof Page);
         Page page = (Page) content;
-        assertEquals(page.getType(), PageType.static_page);
+        assertEquals(page.getType(), PageType.STATIC_PAGE);
         assertEquals("Accessibility", page.getDescription().getTitle());
         assertTrue(page instanceof StaticPage);
         StaticPage staticPage = (StaticPage) content;

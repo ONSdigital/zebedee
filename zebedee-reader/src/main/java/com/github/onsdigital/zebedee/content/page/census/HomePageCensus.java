@@ -17,7 +17,7 @@ public class HomePageCensus extends TaxonomyNode {
 
     @Override
     public PageType getType() {
-        return PageType.home_page_census;
+        return PageType.HOME_PAGE_CENSUS;
     }
 
     public MarkdownSection getIntro() {

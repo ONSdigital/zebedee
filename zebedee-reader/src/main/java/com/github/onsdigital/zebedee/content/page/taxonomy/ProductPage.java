@@ -23,7 +23,7 @@ public class ProductPage extends TaxonomyNode {
 
     @Override
     public PageType getType() {
-        return PageType.product_page;
+        return PageType.PRODUCT_PAGE;
     }
 
     public List<Link> getItems() {

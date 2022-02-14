@@ -9,7 +9,7 @@ public class ApiDatasetLandingPage extends Statistics {
 
     @Override
     public PageType getType() {
-        return PageType.api_dataset_landing_page;
+        return PageType.API_DATASET_LANDING_PAGE;
     }
 
     public String getapiDatasetId() {

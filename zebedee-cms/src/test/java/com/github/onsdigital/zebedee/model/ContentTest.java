@@ -2,6 +2,7 @@ package com.github.onsdigital.zebedee.model;
 
 import com.github.davidcarboni.cryptolite.Random;
 import com.github.davidcarboni.restolino.json.Serialiser;
+import com.github.onsdigital.zebedee.content.page.base.PageType;
 import com.github.onsdigital.zebedee.json.ContentDetail;
 import com.github.onsdigital.zebedee.json.ContentDetailDescription;
 import org.apache.commons.io.FileUtils;
@@ -57,9 +58,7 @@ public class ContentTest {
         subDirectoryJsonFile = subDirectoryA.resolve(filename);
         Files.createFile(baseJsonFile);
 
-        baseContent = new ContentDetail();
-        baseContent.description = new ContentDetailDescription("Some release 2014");
-        baseContent.type = "home";
+        baseContent = new ContentDetail("Some release 2014", "/", PageType.HOME_PAGE);
 
         // Serialise
         try (OutputStream output = Files.newOutputStream(baseJsonFile)) {
@@ -70,9 +69,7 @@ public class ContentTest {
         Files.createDirectory(subDirectoryA);
         Files.createDirectory(subDirectoryB);
 
-        subContent = new ContentDetail();
-        subContent.description = new ContentDetailDescription("Some sub 2015");
-        subContent.type = "t2";
+        subContent = new ContentDetail("Some sub 2015", "/t2", PageType.DATASET);
 
         // Serialise
         try (OutputStream output = Files.newOutputStream(subDirectoryJsonFile)) {
@@ -91,9 +88,7 @@ public class ContentTest {
         timeseriesDirectory2 = subDirectoryB.resolve(timeseriesDirectoryName);
         Files.createDirectory(timeseriesDirectory2);
 
-        bulletinContent = new ContentDetail();
-        bulletinContent.description = new ContentDetailDescription("Some bulletin 2010");
-        bulletinContent.type = "bulletin";
+        bulletinContent = new ContentDetail("Some bulletin 2010", "/b", PageType.BULLETIN);
 
         // Serialise
         try (OutputStream output = Files.newOutputStream(exampleBulletinJsonFile)) {
@@ -117,7 +112,7 @@ public class ContentTest {
 
         // The result has the expected values
         assertEquals(baseContent.description.title, result.description.title);
-        assertEquals(baseContent.type, result.type);
+        assertEquals(baseContent.getType(), result.getType());
         assertEquals("/", result.uri);
     }
 

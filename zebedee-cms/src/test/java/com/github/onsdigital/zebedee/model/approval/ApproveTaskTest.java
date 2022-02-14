@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee.model.approval;
 
 import com.github.davidcarboni.cryptolite.Random;
+import com.github.onsdigital.zebedee.content.page.base.PageType;
 import com.github.onsdigital.zebedee.data.processing.DataIndex;
 import com.github.onsdigital.zebedee.json.ApprovalStatus;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
@@ -95,7 +96,7 @@ public class ApproveTaskTest {
         Path collectionPath = Files.createTempDirectory(Random.id()); // create a temp directory to generate content into
         Collection collection = CollectionTest.createCollection(collectionPath, "createPublishNotificationShouldIncludePendingDeletes");
         String uriToDelete = "some/uri/to/check";
-        ContentDetail contentDetail = new ContentDetail("Title", uriToDelete, "type");
+        ContentDetail contentDetail = new ContentDetail("Title", uriToDelete, PageType.DATA_SLICE);
         PendingDelete pendingDelete = new PendingDelete("", contentDetail);
         collection.getDescription().getPendingDeletes().add(pendingDelete);
 

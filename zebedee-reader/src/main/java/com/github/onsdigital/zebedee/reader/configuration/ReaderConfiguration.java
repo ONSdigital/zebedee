@@ -8,8 +8,8 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-import static com.github.onsdigital.zebedee.content.page.base.PageType.api_dataset;
-import static com.github.onsdigital.zebedee.content.page.base.PageType.api_dataset_landing_page;
+import static com.github.onsdigital.zebedee.content.page.base.PageType.API_DATASET;
+import static com.github.onsdigital.zebedee.content.page.base.PageType.API_DATASET_LANDING_PAGE;
 import static com.github.onsdigital.zebedee.logging.ReaderLogger.error;
 import static com.github.onsdigital.zebedee.logging.ReaderLogger.info;
 import static com.github.onsdigital.zebedee.util.VariableUtils.getVariableValue;
@@ -129,7 +129,7 @@ public class ReaderConfiguration {
             this.serviceAuthToken = validateCMDConfig(SERVICE_AUTH_TOKEN_KEY);
             this.datasetAPIHost = validateCMDConfig(DATASET_API_URL_KEY);
             this.datasetAPIAuthToken = validateCMDConfig(DATASET_API_AUTH_TOKEN_KEY);
-            this.datasetImportPageTypes = new HashSet<>(Arrays.asList(api_dataset, api_dataset_landing_page));
+            this.datasetImportPageTypes = new HashSet<>(Arrays.asList(API_DATASET, API_DATASET_LANDING_PAGE));
             info().data(ENABLE_DATASET_IMPORT, true).log("CMD feature flag enabled for zebedee reader");
         } else {
             this.serviceAuthToken = "";

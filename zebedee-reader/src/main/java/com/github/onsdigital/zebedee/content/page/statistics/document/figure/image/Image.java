@@ -53,6 +53,6 @@ public class Image extends FigureBase {
 
     @Override
     public PageType getType() {
-        return PageType.image;
+        return PageType.IMAGE;
     }
 }

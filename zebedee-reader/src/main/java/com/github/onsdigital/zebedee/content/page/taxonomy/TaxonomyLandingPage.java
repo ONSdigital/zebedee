@@ -20,7 +20,7 @@ public class TaxonomyLandingPage extends TaxonomyNode {
 
     @Override
     public PageType getType() {
-        return PageType.taxonomy_landing_page;
+        return PageType.TAXONOMY_LANDING_PAGE;
     }
 
     public List<Link> getSections() {

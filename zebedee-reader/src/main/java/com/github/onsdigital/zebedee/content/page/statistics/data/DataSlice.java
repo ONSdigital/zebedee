@@ -10,7 +10,7 @@ public class DataSlice extends StatisticalData {
 
     @Override
     public PageType getType() {
-        return PageType.data_slice;
+        return PageType.DATA_SLICE;
     }
 
 }

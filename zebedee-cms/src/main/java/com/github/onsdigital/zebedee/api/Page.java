@@ -98,7 +98,7 @@ public class Page {
                 new APIDatasetLandingPageDeletionHook(datasetAPIClient);
 
         Map<PageType, PageUpdateHook> deletionHooks = new HashMap<>();
-        deletionHooks.put(PageType.api_dataset_landing_page, datasetLandingPageDeletionHook);
+        deletionHooks.put(PageType.API_DATASET_LANDING_PAGE, datasetLandingPageDeletionHook);
 
         return deletionHooks;
     }
@@ -108,7 +108,7 @@ public class Page {
                 new APIDatasetLandingPageCreationHook(datasetAPIClient);
 
         Map<PageType, PageUpdateHook> creationHooks = new HashMap<>();
-        creationHooks.put(PageType.api_dataset_landing_page, datasetLandingPageCreationHook);
+        creationHooks.put(PageType.API_DATASET_LANDING_PAGE, datasetLandingPageCreationHook);
 
         return creationHooks;
     }

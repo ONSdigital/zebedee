@@ -29,8 +29,8 @@ import static com.github.onsdigital.zebedee.persistence.dao.impl.CollectionHisto
 import static com.github.onsdigital.zebedee.persistence.dao.impl.CollectionHistoryDaoImpl.SELECT_BY_COLLECTION_ID;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -70,7 +70,7 @@ public class CollectionHistoryDaoImplTest {
 
     @Before
     public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         session = new Session();
         session.setEmail("tyrionLannister@test.com");

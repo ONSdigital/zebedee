@@ -81,7 +81,7 @@ public class Collections {
         info().log("get collections endpoint: request received");
         Session session = null;
         try {
-            session = Root.zebedee.getSessions().get(request);
+            session = Root.zebedee.getSessions().get();
             if (session == null) {
                 warn().log("get collections endpoint: valid user session not found");
                 throw new UnauthorizedException("You are not authorized to perform get collections requests");
@@ -91,7 +91,7 @@ public class Collections {
             List<Collection> collections = Root.zebedee.getCollections().list();
 
             for (Collection collection : collections) {
-                if (Root.zebedee.getPermissionsService().canView(session, collection.getDescription())) {
+                if (Root.zebedee.getPermissionsService().canView(session, collection.getDescription().getId())) {
                     CollectionDescription newDesc = new CollectionDescription();
                     newDesc.setId(collection.getDescription().getId());
                     newDesc.setName(collection.getDescription().getName());
@@ -129,7 +129,7 @@ public class Collections {
             return;
         }
 
-        Session session = zebedeeCmsService.getSession(request);
+        Session session = zebedeeCmsService.getSession();
         if (session == null || !zebedeeCmsService.getPermissions().canEdit(session)) {
             info().log("Forbidden request made to the collection endpoint");
             response.setStatus(HttpStatus.SC_FORBIDDEN);
@@ -194,7 +194,7 @@ public class Collections {
             return;
         }
 
-        Session session = zebedeeCmsService.getSession(request);
+        Session session = zebedeeCmsService.getSession();
         if (session == null || !zebedeeCmsService.getPermissions().canEdit(session)) {
             info().log("Forbidden request made to the collection endpoint");
             response.setStatus(HttpStatus.SC_FORBIDDEN);

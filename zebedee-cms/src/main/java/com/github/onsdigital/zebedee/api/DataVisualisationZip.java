@@ -71,8 +71,8 @@ public class DataVisualisationZip {
      * a data visualisation zip file.
      */
     public static final Predicate<ZipEntry> isValidDataVisContentFile = (zipEntry ->
-            (!MAC_OS_ZIP_IGNORE.stream().filter(ignoreItem -> zipEntry.getName().contains(ignoreItem))
-                    .findFirst().isPresent()) && !zipEntry.isDirectory());
+            (!MAC_OS_ZIP_IGNORE.stream().anyMatch(ignoreItem -> zipEntry.getName().contains(ignoreItem)))
+                    && !zipEntry.isDirectory());
 
     public static final SimpleZebedeeResponse unzipSuccessResponse = new SimpleZebedeeResponse(
             UNPACK_ZIP_SUCCESS_MSG, Response.Status.OK);
@@ -125,7 +125,7 @@ public class DataVisualisationZip {
 
         info().data("zipPath", zipPath).log(DELETING_ZIP_DEBUG);
 
-        Session session = zebedeeCmsService.getSession(request);
+        Session session = zebedeeCmsService.getSession();
         com.github.onsdigital.zebedee.model.Collection collection = zebedeeCmsService.getCollection(request);
 
         try {
@@ -152,7 +152,7 @@ public class DataVisualisationZip {
 
         info().data("zipPath", zipPath).log(UNZIP_DEBUG);
 
-        Session session = zebedeeCmsService.getSession(request);
+        Session session = zebedeeCmsService.getSession();
         com.github.onsdigital.zebedee.model.Collection collection = zebedeeCmsService.getCollection(request);
         CollectionReader collectionReader = zebedeeCmsService.getZebedeeCollectionReader(collection, session);
         CollectionWriter collectionWriter = zebedeeCmsService.getZebedeeCollectionWriter(collection, session);

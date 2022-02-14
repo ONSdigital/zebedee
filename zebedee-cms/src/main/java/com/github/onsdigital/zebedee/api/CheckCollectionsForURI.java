@@ -28,8 +28,8 @@ public class CheckCollectionsForURI {
     public String get(HttpServletRequest request, HttpServletResponse response)
             throws IOException, UnauthorizedException {
 
-        Session session = Root.zebedee.getSessions().get(request);
-        if (session == null || !zebedeeCmsService.getPermissions().canEdit(session.getEmail())) {
+        Session session = Root.zebedee.getSessions().get();
+        if (session == null || !zebedeeCmsService.getPermissions().canEdit(session)) {
             throw new UnauthorizedException("You are not authorised to check collections for a URI");
         }
 

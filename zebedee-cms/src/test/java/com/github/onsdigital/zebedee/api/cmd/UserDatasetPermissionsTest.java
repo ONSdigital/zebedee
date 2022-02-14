@@ -5,6 +5,8 @@ import com.github.onsdigital.zebedee.permissions.cmd.CMDPermissionsService;
 import com.github.onsdigital.zebedee.permissions.cmd.CRUD;
 import com.github.onsdigital.zebedee.permissions.cmd.GetPermissionsRequest;
 import com.github.onsdigital.zebedee.permissions.cmd.PermissionsException;
+import com.github.onsdigital.zebedee.session.model.Session;
+import com.github.onsdigital.zebedee.session.service.Sessions;
 import com.github.onsdigital.zebedee.util.HttpResponseWriter;
 import org.hamcrest.CoreMatchers;
 import org.junit.Before;
@@ -24,17 +26,15 @@ import static com.github.onsdigital.zebedee.permissions.cmd.PermissionType.READ;
 import static com.github.onsdigital.zebedee.permissions.cmd.PermissionType.UPDATE;
 import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.collectionIDNotProvidedException;
 import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.datasetIDNotProvidedException;
-import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.invalidPermissionsRequestException;
-import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.sessionIDNotProvidedException;
+import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.sessionNotProvidedException;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 public class UserDatasetPermissionsTest {
@@ -44,6 +44,12 @@ public class UserDatasetPermissionsTest {
 
     @Mock
     HttpServletResponse resp;
+
+    @Mock
+    Session session;
+
+    @Mock
+    Sessions sessions;
 
     @Mock
     HttpResponseWriter httpResponseWriter;
@@ -59,22 +65,15 @@ public class UserDatasetPermissionsTest {
 
     @Before
     public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         fullPermissions = new CRUD().permit(CREATE, READ, UPDATE, DELETE);
 
-        getPermissionsRequest = new GetPermissionsRequest("111", "222", "333", "444");
+        getPermissionsRequest = new GetPermissionsRequest(session, "222", "333", "444");
 
-        api = new UserDatasetPermissions(true, cmdPermissionsService, httpResponseWriter);
-    }
+        api = new UserDatasetPermissions(cmdPermissionsService, httpResponseWriter, sessions);
 
-    @Test
-    public void testGetDatasetPermissions_featureDisabled() throws Exception {
-        api = new UserDatasetPermissions(false, cmdPermissionsService, httpResponseWriter);
-
-        api.handle(req, resp);
-
-        verifyZeroInteractions(cmdPermissionsService);
-        verify(httpResponseWriter, times(1)).writeJSONResponse(resp, null, 404);
+        when(sessions.get()).thenReturn(session);
+        when(session.getId()).thenReturn("111");
     }
 
     @Test
@@ -107,9 +106,6 @@ public class UserDatasetPermissionsTest {
         when(req.getParameter("collection_id"))
                 .thenReturn("collection_id");
 
-        when(req.getHeader("X-Florence-Token"))
-                .thenReturn("X-Florence-Token");
-
         when(cmdPermissionsService.getUserDatasetPermissions(any(GetPermissionsRequest.class)))
                 .thenThrow(new PermissionsException("boom", 500));
 
@@ -125,11 +121,13 @@ public class UserDatasetPermissionsTest {
 
     @Test
     public void testGetDatasetPermissions_BadRequest() throws Exception {
+        when(sessions.get()).thenReturn(null);
+
         api.handle(req, resp);
 
-        verifyZeroInteractions(cmdPermissionsService);
+        verifyNoInteractions(cmdPermissionsService);
 
-        PermissionsException expected = sessionIDNotProvidedException();
+        PermissionsException expected = sessionNotProvidedException();
 
         verify(httpResponseWriter, times(1))
                 .writeJSONResponse(resp, new Error(expected.getMessage()), expected.statusCode);
@@ -228,15 +226,16 @@ public class UserDatasetPermissionsTest {
     }
 
     @Test
-    public void testGetDatasePermissions_sessionIDNull() throws Exception {
+    public void testGetDatasePermissions_sessionNull() throws Exception {
+        when(sessions.get()).thenReturn(null);
         when(cmdPermissionsService.getUserDatasetPermissions(any(GetPermissionsRequest.class)))
                 .thenReturn(fullPermissions);
 
         api.handle(req, resp);
 
-        verifyZeroInteractions(cmdPermissionsService);
+        verifyNoInteractions(cmdPermissionsService);
 
-        PermissionsException expected = sessionIDNotProvidedException();
+        PermissionsException expected = sessionNotProvidedException();
         verify(httpResponseWriter, times(1))
                 .writeJSONResponse(resp, new Error(expected.getMessage()), expected.statusCode);
     }
@@ -251,7 +250,7 @@ public class UserDatasetPermissionsTest {
 
         api.handle(req, resp);
 
-        verifyZeroInteractions(cmdPermissionsService);
+        verifyNoInteractions(cmdPermissionsService);
 
         PermissionsException expected = datasetIDNotProvidedException();
         verify(httpResponseWriter, times(1))
@@ -271,7 +270,7 @@ public class UserDatasetPermissionsTest {
 
         api.handle(req, resp);
 
-        verifyZeroInteractions(cmdPermissionsService);
+        verifyNoInteractions(cmdPermissionsService);
 
         PermissionsException expected = collectionIDNotProvidedException();
         verify(httpResponseWriter, times(1))

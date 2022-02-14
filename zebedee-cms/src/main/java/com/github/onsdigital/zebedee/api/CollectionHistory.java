@@ -41,9 +41,9 @@ public class CollectionHistory {
     @GET
     public com.github.onsdigital.zebedee.model.collection.audit.CollectionHistory getCollectionEventHistory(
             HttpServletRequest request, HttpServletResponse response)
-            throws ZebedeeException, IOException {
+            throws ZebedeeException {
 
-        Session session = zebedeeCmsService.getSession(request);
+        Session session = zebedeeCmsService.getSession();
         checkPermission(session);
 
         String collectionId = RequestUtils.getCollectionId(request);
@@ -57,7 +57,7 @@ public class CollectionHistory {
 
     private void checkPermission(Session session) throws ZebedeeException {
         try {
-            if (session == null || !zebedeeCmsService.getPermissions().canEdit(session.getEmail())) {
+            if (session == null || !zebedeeCmsService.getPermissions().canEdit(session)) {
                 throw new UnauthorizedException("You are not authorised to create collections.");
             }
         } catch (IOException io) {

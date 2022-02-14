@@ -22,7 +22,7 @@ public class CompendiumLandingPage extends Page {
 
     @Override
     public PageType getType() {
-        return PageType.compendium_landing_page;
+        return PageType.COMPENDIUM_LANDING_PAGE;
     }
 
     public List<Link> getDatasets() {

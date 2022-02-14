@@ -138,7 +138,7 @@ public class DataFileGeneratorTest {
 
     @Before
     public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         when(contentWriterMock.getOutputStream(XLS_PATH))
                 .thenReturn(outputStreamMock);

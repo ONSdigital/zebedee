@@ -59,17 +59,16 @@ public class ZebedeeCmsService {
         return instance;
     }
 
-    public Session getSession(HttpServletRequest request) throws ZebedeeException {
-        try {
-            return Root.zebedee.getSessions().get(request);
-        } catch (IOException e) {
-            error().logException(e, SESSION_NOT_FOUND_MSG);
+    public Session getSession() throws UnauthorizedException {
+        Session session = Root.zebedee.getSessions().get();
+        if (session == null) {
             throw new UnauthorizedException(SESSION_NOT_FOUND_MSG);
         }
+        return session;
     }
 
     public ContentReader getPublishedContentReader() {
-        return new FileSystemContentReader(Root.zebedee.getPublished().path);
+        return new FileSystemContentReader(Root.zebedee.getPublished().getPath());
     }
 
     public CollectionWriter getZebedeeCollectionWriter(Collection collection, Session session) throws ZebedeeException {

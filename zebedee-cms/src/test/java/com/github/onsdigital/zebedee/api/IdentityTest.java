@@ -27,7 +27,7 @@ import static org.apache.http.HttpStatus.SC_OK;
 import static org.apache.http.HttpStatus.SC_UNAUTHORIZED;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 public class IdentityTest {
@@ -58,7 +58,7 @@ public class IdentityTest {
     public void setUp() throws Exception {
         api = new Identity(serviceStore, authorisationService); // enable feature by default
 
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         ReflectionTestUtils.setField(api, "authorisationService", authorisationService);
 
@@ -72,7 +72,7 @@ public class IdentityTest {
 
         api.identifyUser(mockRequest, mockResponse);
 
-        verifyZeroInteractions(authorisationService);
+        verifyNoInteractions(authorisationService);
         verifyResponseInteractions(new Error("service not authenticated"), SC_UNAUTHORIZED);
     }
 
@@ -175,7 +175,7 @@ public class IdentityTest {
             verify(mockResponse, times(1)).getWriter();
             verify(mockResponse, times(1)).setCharacterEncoding(StandardCharsets.UTF_8.name());
             verify(mockResponse, times(1)).setContentType(APPLICATION_JSON);
-            verifyZeroInteractions(printWriterMock);
+            verifyNoInteractions(printWriterMock);
             throw e;
         }
     }
@@ -191,7 +191,7 @@ public class IdentityTest {
         api = new Identity(serviceStore, authorisationService);
         api.identifyUser(mockRequest, mockResponse);
 
-        verifyZeroInteractions(serviceStore, authorisationService);
+        verifyNoInteractions(serviceStore, authorisationService);
         verifyResponseInteractions(new Error("service not authenticated"), SC_UNAUTHORIZED);
     }
 

@@ -28,9 +28,9 @@ import java.nio.file.Paths;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -86,10 +86,10 @@ public class PageTest extends ZebedeeAPIBaseTestCase {
 
         // Given a page instance with mock dependencies
         when(mockRequest.getParameter("uri")).thenReturn(uri);
-        when(zebedeeCmsService.getSession(mockRequest)).thenReturn(session);
+        when(zebedeeCmsService.getSession()).thenReturn(session);
         when(zebedeeCmsService.getCollection(mockRequest)).thenReturn(collection);
 
-        Page page = new Page(zebedeeCmsService, pageCreationHook, pageDeletionHook, true);
+        Page page = new Page(zebedeeCmsService, pageCreationHook, pageDeletionHook);
 
         // When createPage is called
         page.createPage(mockRequest, mockResponse);
@@ -103,12 +103,12 @@ public class PageTest extends ZebedeeAPIBaseTestCase {
     }
 
     @Test
-    public void testPage_createPage_uriNotFound() {
+    public void testPage_createPage_uriNotFound() throws UnauthorizedException {
 
         // Given a null uri
         when(mockRequest.getParameter("uri")).thenReturn(null);
 
-        Page page = new Page(zebedeeCmsService, pageCreationHook, pageDeletionHook, true);
+        Page page = new Page(zebedeeCmsService, pageCreationHook, pageDeletionHook);
 
         // When createPage is called
         page.createPage(mockRequest, mockResponse);
@@ -118,13 +118,13 @@ public class PageTest extends ZebedeeAPIBaseTestCase {
     }
 
     @Test
-    public void testPage_createPage_sessionNotFound() throws ZebedeeException {
+    public void testPage_createPage_sessionNotFound() throws UnauthorizedException {
 
         // Given a page instance where sessions cannot be found
         when(mockRequest.getParameter("uri")).thenReturn(uri);
-        when(zebedeeCmsService.getSession(mockRequest)).thenThrow(new UnauthorizedException(""));
+        when(zebedeeCmsService.getSession()).thenThrow(new UnauthorizedException(""));
 
-        Page page = new Page(zebedeeCmsService, pageCreationHook, pageDeletionHook, true);
+        Page page = new Page(zebedeeCmsService, pageCreationHook, pageDeletionHook);
 
         // When createPage is called
         page.createPage(mockRequest, mockResponse);
@@ -138,10 +138,10 @@ public class PageTest extends ZebedeeAPIBaseTestCase {
 
         // Given a page instance where collections cannot be found
         when(mockRequest.getParameter("uri")).thenReturn(uri);
-        when(zebedeeCmsService.getSession(mockRequest)).thenReturn(session);
+        when(zebedeeCmsService.getSession()).thenReturn(session);
         when(zebedeeCmsService.getCollection(mockRequest)).thenThrow(new NotFoundException(""));
 
-        Page page = new Page(zebedeeCmsService, pageCreationHook, pageDeletionHook, true);
+        Page page = new Page(zebedeeCmsService, pageCreationHook, pageDeletionHook);
 
         // When createPage is called
         page.createPage(mockRequest, mockResponse);
@@ -157,10 +157,10 @@ public class PageTest extends ZebedeeAPIBaseTestCase {
         doThrow(new RuntimeException()).when(mockPageHook).onPageUpdated(any(), anyString());
 
         when(mockRequest.getParameter("uri")).thenReturn(uri);
-        when(zebedeeCmsService.getSession(mockRequest)).thenReturn(session);
+        when(zebedeeCmsService.getSession()).thenReturn(session);
         when(zebedeeCmsService.getCollection(mockRequest)).thenReturn(collection);
 
-        Page page = new Page(zebedeeCmsService, mockPageHook, pageDeletionHook, true);
+        Page page = new Page(zebedeeCmsService, mockPageHook, pageDeletionHook);
 
         // When createPage is called
         page.createPage(mockRequest, mockResponse);
@@ -177,10 +177,10 @@ public class PageTest extends ZebedeeAPIBaseTestCase {
                 .when(collections).createContent(any(), any(), any(), any(), any(), any(), anyBoolean());
 
         when(mockRequest.getParameter("uri")).thenReturn(uri);
-        when(zebedeeCmsService.getSession(mockRequest)).thenReturn(session);
+        when(zebedeeCmsService.getSession()).thenReturn(session);
         when(zebedeeCmsService.getCollection(mockRequest)).thenReturn(collection);
 
-        Page page = new Page(zebedeeCmsService, pageCreationHook, pageDeletionHook, true);
+        Page page = new Page(zebedeeCmsService, pageCreationHook, pageDeletionHook);
 
         // When createPage is called
         page.createPage(mockRequest, mockResponse);
@@ -197,10 +197,10 @@ public class PageTest extends ZebedeeAPIBaseTestCase {
                 .when(collectionReader).getContent(anyString());
 
         when(mockRequest.getParameter("uri")).thenReturn(uri);
-        when(zebedeeCmsService.getSession(mockRequest)).thenReturn(session);
+        when(zebedeeCmsService.getSession()).thenReturn(session);
         when(zebedeeCmsService.getCollection(mockRequest)).thenReturn(collection);
 
-        Page page = new Page(zebedeeCmsService, pageCreationHook, pageDeletionHook, true);
+        Page page = new Page(zebedeeCmsService, pageCreationHook, pageDeletionHook);
 
         // When delete is called
         page.deletePage(mockRequest, mockResponse);
@@ -217,10 +217,10 @@ public class PageTest extends ZebedeeAPIBaseTestCase {
                 .when(collections).deleteContent(any(), any(), any());
 
         when(mockRequest.getParameter("uri")).thenReturn(uri);
-        when(zebedeeCmsService.getSession(mockRequest)).thenReturn(session);
+        when(zebedeeCmsService.getSession()).thenReturn(session);
         when(zebedeeCmsService.getCollection(mockRequest)).thenReturn(collection);
 
-        Page page = new Page(zebedeeCmsService, pageCreationHook, pageDeletionHook, true);
+        Page page = new Page(zebedeeCmsService, pageCreationHook, pageDeletionHook);
 
         // When delete is called
         page.deletePage(mockRequest, mockResponse);
@@ -235,10 +235,10 @@ public class PageTest extends ZebedeeAPIBaseTestCase {
         // Given a page instance with mock dependencies
         when(mockRequest.getParameter("uri")).thenReturn(uri);
         when(collectionReader.getContent(uri)).thenReturn(page);
-        when(zebedeeCmsService.getSession(mockRequest)).thenReturn(session);
+        when(zebedeeCmsService.getSession()).thenReturn(session);
         when(zebedeeCmsService.getCollection(mockRequest)).thenReturn(collection);
 
-        Page page = new Page(zebedeeCmsService, pageCreationHook, pageDeletionHook, true);
+        Page page = new Page(zebedeeCmsService, pageCreationHook, pageDeletionHook);
 
         // When delete is called
         page.deletePage(mockRequest, mockResponse);
@@ -252,12 +252,12 @@ public class PageTest extends ZebedeeAPIBaseTestCase {
     }
 
     @Test
-    public void testPage_deletePage_uriNotFound() {
+    public void testPage_deletePage_uriNotFound() throws UnauthorizedException {
 
         // Given an empty uri in the request
         when(mockRequest.getParameter("uri")).thenReturn("");
 
-        Page page = new Page(zebedeeCmsService, pageCreationHook, pageDeletionHook, true);
+        Page page = new Page(zebedeeCmsService, pageCreationHook, pageDeletionHook);
 
         // When delete is called
         page.deletePage(mockRequest, mockResponse);
@@ -272,10 +272,10 @@ public class PageTest extends ZebedeeAPIBaseTestCase {
         // Given a mock zebedeeCmsService that throws an exception on getSession
         when(mockRequest.getParameter("uri")).thenReturn(uri);
         when(zebedeeCmsService.getZebedee()).thenReturn(zebedee);
-        when(zebedeeCmsService.getSession(mockRequest)).thenThrow(new UnauthorizedException(""));
+        when(zebedeeCmsService.getSession()).thenThrow(new UnauthorizedException(""));
         when(zebedee.getCollections()).thenReturn(collections);
 
-        Page page = new Page(zebedeeCmsService, pageCreationHook, pageDeletionHook, true);
+        Page page = new Page(zebedeeCmsService, pageCreationHook, pageDeletionHook);
 
         // When delete is called
         page.deletePage(mockRequest, mockResponse);
@@ -290,10 +290,10 @@ public class PageTest extends ZebedeeAPIBaseTestCase {
         // Given a mock zebedeeCmsService that throws an exception on getCollection
         when(mockRequest.getParameter("uri")).thenReturn(uri);
         when(collectionReader.getContent(uri)).thenReturn(page);
-        when(zebedeeCmsService.getSession(mockRequest)).thenReturn(session);
+        when(zebedeeCmsService.getSession()).thenReturn(session);
         when(zebedeeCmsService.getCollection(mockRequest)).thenThrow(new NotFoundException(""));
 
-        Page page = new Page(zebedeeCmsService, pageCreationHook, pageDeletionHook, true);
+        Page page = new Page(zebedeeCmsService, pageCreationHook, pageDeletionHook);
 
         // When delete is called
         page.deletePage(mockRequest, mockResponse);
@@ -310,10 +310,10 @@ public class PageTest extends ZebedeeAPIBaseTestCase {
         doThrow(new RuntimeException()).when(mockPageHook).onPageUpdated(any(), anyString());
 
         when(mockRequest.getParameter("uri")).thenReturn(uri);
-        when(zebedeeCmsService.getSession(mockRequest)).thenReturn(session);
+        when(zebedeeCmsService.getSession()).thenReturn(session);
         when(zebedeeCmsService.getCollection(mockRequest)).thenReturn(collection);
 
-        Page page = new Page(zebedeeCmsService, pageCreationHook, mockPageHook, true);
+        Page page = new Page(zebedeeCmsService, pageCreationHook, mockPageHook);
 
         // When deletePage is called
         page.deletePage(mockRequest, mockResponse);
@@ -329,9 +329,9 @@ public class PageTest extends ZebedeeAPIBaseTestCase {
         when(collectionReader.getContent(uri)).thenThrow(new NotFoundException("page not found"));
 
         when(mockRequest.getParameter("uri")).thenReturn(uri);
-        when(zebedeeCmsService.getSession(mockRequest)).thenReturn(session);
+        when(zebedeeCmsService.getSession()).thenReturn(session);
 
-        Page page = new Page(zebedeeCmsService, pageCreationHook, pageDeletionHook, true);
+        Page page = new Page(zebedeeCmsService, pageCreationHook, pageDeletionHook);
 
         // When delete is called
         page.deletePage(mockRequest, mockResponse);

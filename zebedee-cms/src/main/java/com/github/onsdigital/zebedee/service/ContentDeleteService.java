@@ -33,9 +33,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-import static com.github.onsdigital.zebedee.content.page.base.PageType.home_page;
-import static com.github.onsdigital.zebedee.content.page.base.PageType.product_page;
-import static com.github.onsdigital.zebedee.content.page.base.PageType.taxonomy_landing_page;
+import static com.github.onsdigital.zebedee.content.page.base.PageType.HOME_PAGE;
+import static com.github.onsdigital.zebedee.content.page.base.PageType.PRODUCT_PAGE;
+import static com.github.onsdigital.zebedee.content.page.base.PageType.TAXONOMY_LANDING_PAGE;
 import static com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedException.alreadyMarkedDeleteInCurrentCollectionError;
 import static com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedException.deleteForbiddenForPageTypeError;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.DELETE_MARKED_ADDED;
@@ -61,7 +61,7 @@ public class ContentDeleteService {
             DELETE_MARKED_REMOVED, EventType.DELETE_MARKER_REMOVED);
 
     private static final ImmutableList<PageType> NON_DELETABLE_PAGE_TYPES =
-            ImmutableList.of(home_page, taxonomy_landing_page, product_page);
+            ImmutableList.of(HOME_PAGE, TAXONOMY_LANDING_PAGE, PRODUCT_PAGE);
 
     public static ContentDeleteService instance = null;
 
@@ -84,7 +84,7 @@ public class ContentDeleteService {
         deletes.stream().forEach(delete -> {
             LeafCounter leafCounter = new LeafCounter();
             contentTreeNavigator.applyAndPropagate(delete.getRoot(), (node -> {
-                if (StringUtils.isNotEmpty(node.uri) && node.type != null) {
+                if (StringUtils.isNotEmpty(node.uri) && node.getType() != null) {
                     leafCounter.increment();
                 }
             }));
@@ -101,7 +101,7 @@ public class ContentDeleteService {
         }
 
         List<ContentDetail> matches = new ArrayList<>();
-        collection.description.getPendingDeletes().stream()
+        collection.getDescription().getPendingDeletes().stream()
                 .forEach(pendingDelete -> contentTreeNavigator.search(pendingDelete.getRoot(), (node) -> {
                     if (node.contentPath.equals(marker.getUri())) {
                         matches.add(node);
@@ -127,7 +127,7 @@ public class ContentDeleteService {
                     info().data("path", node.contentPath).log("Marking node as deleted");
                 }
         );
-        collection.description.getPendingDeletes().add(new PendingDelete(marker.getUser(), deleteImpact));
+        collection.getDescription().getPendingDeletes().add(new PendingDelete(marker.getUser(), deleteImpact));
         logDeleteEvent(collection, session, deleteImpact.contentPath, DELETED_ADDED,
                 deleteMarkerAdded(deleteImpact.contentPath, deletedUris));
         saveManifest(collection);
@@ -158,7 +158,7 @@ public class ContentDeleteService {
 
         logDeleteEvent(collection, session, contentUri, DELETE_REMOVED,
                 deleteMarkerRemoved(contentUri, cancelledDeleteUris));
-        collection.description.cancelPendingDelete(contentUri);
+        collection.getDescription().cancelPendingDelete(contentUri);
         saveManifest(collection);
     }
 
@@ -177,7 +177,7 @@ public class ContentDeleteService {
         zebedeeCmsService.getZebedee().getCollections().list()
                 .stream()
                 .forEach(collection -> {
-                    collection.description
+                    collection.getDescription()
                             .getPendingDeletes()
                             .stream()
                             .forEach(contentDetailsToPathList(allDeleteMarkers));
@@ -187,9 +187,9 @@ public class ContentDeleteService {
 
     public List<String> getCollectionDeleteUrisAsList(Collection collection) {
         List<String> uris = new ArrayList<>();
-        collection.description.getPendingDeletes().forEach(pendingDelete -> {
+        collection.getDescription().getPendingDeletes().forEach(pendingDelete -> {
             contentTreeNavigator.applyAndPropagate(pendingDelete.getRoot(), (node) -> {
-                if (node.type != null && StringUtils.isNotEmpty(node.uri)) {
+                if (node.getType() != null && StringUtils.isNotEmpty(node.uri)) {
                     uris.add(node.uri);
                 }
             });
@@ -199,7 +199,7 @@ public class ContentDeleteService {
 
     private void saveManifest(Collection collection) throws ZebedeeException {
         try (OutputStream output = Files.newOutputStream(manifestPath(collection))) {
-            Serialiser.serialise(output, collection.description);
+            Serialiser.serialise(output, collection.getDescription());
         } catch (IOException e) {
             // TODO probably want exception type for this.
             error().logException(e, "Error while serialising delete markers...");
@@ -218,7 +218,7 @@ public class ContentDeleteService {
     }
 
     private Path manifestPath(com.github.onsdigital.zebedee.model.Collection collection) {
-        return Paths.get(collection.path.toString() + JSON_FILE_EXT);
+        return Paths.get(collection.getPath().toString() + JSON_FILE_EXT);
     }
 
     private Consumer<PendingDelete> contentDetailsToPathList(List<Path> resultsList) {

@@ -30,7 +30,7 @@ import static com.github.onsdigital.zebedee.api.TeamsReport.USER_COL;
 import static com.github.onsdigital.zebedee.api.TeamsReport.USER_COL_INDEX;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -69,7 +69,7 @@ public class TeamsReportTest extends ZebedeeAPIBaseTestCase {
 
     @Test(expected = UnauthorizedException.class)
     public void getReport_ShouldProbegateExceptionFromTeamsService() throws Exception {
-        when(sessions.get(mockRequest))
+        when(sessions.get())
                 .thenReturn(session);
         when(teamsService.getTeamMembersSummary(any()))
                 .thenThrow(new UnauthorizedException(""));
@@ -77,7 +77,7 @@ public class TeamsReportTest extends ZebedeeAPIBaseTestCase {
         try {
             api.getReport(mockRequest, mockResponse);
         } catch (UnauthorizedException e) {
-            verify(sessions, times(1)).get(mockRequest);
+            verify(sessions, times(1)).get();
             verify(teamsService, times(1)).getTeamMembersSummary(session);
             verify(mockResponse, never()).getOutputStream();
             throw e;
@@ -94,7 +94,7 @@ public class TeamsReportTest extends ZebedeeAPIBaseTestCase {
         teamUserMapping.add(create("CTeam", "userA"));
         teamUserMapping.add(create("CTeam", "userC"));
 
-        when(sessions.get(mockRequest))
+        when(sessions.get())
                 .thenReturn(session);
         when(teamsService.getTeamMembersSummary(session))
                 .thenReturn(teamUserMapping);
@@ -110,7 +110,7 @@ public class TeamsReportTest extends ZebedeeAPIBaseTestCase {
 
         verify(mockResponse, times(1)).setStatus(HttpStatus.SC_OK);
         verify(mockResponse, times(1)).setContentType(MediaType.APPLICATION_OCTET_STREAM);
-        verify(sessions, times(1)).get(mockRequest);
+        verify(sessions, times(1)).get();
         verify(teamsService, times(1)).getTeamMembersSummary(session);
 
         // assert that HSSFWorkbook is as expected.

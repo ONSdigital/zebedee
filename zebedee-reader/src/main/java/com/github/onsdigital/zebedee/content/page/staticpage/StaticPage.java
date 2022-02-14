@@ -53,6 +53,6 @@ public class StaticPage extends BaseStaticPage {
 
     @Override
     public PageType getType() {
-        return PageType.static_page;
+        return PageType.STATIC_PAGE;
     }
 }

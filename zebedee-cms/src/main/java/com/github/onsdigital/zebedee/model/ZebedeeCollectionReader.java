@@ -61,7 +61,7 @@ public class ZebedeeCollectionReader extends CollectionReader {
             throws IOException, NotFoundException, UnauthorizedException {
         validate(zebedee, collection, session);
 
-        checkUserAuthorisedToAccessCollection(zebedee, collection, session);
+        checkUserAuthorisedToAccessCollection(zebedee, collection.getDescription().getId(), session);
 
         User user = getUser(zebedee, session);
 
@@ -105,11 +105,11 @@ public class ZebedeeCollectionReader extends CollectionReader {
         }
     }
 
-    private void checkUserAuthorisedToAccessCollection(Zebedee zebedee, Collection collection, Session session)
+    private void checkUserAuthorisedToAccessCollection(Zebedee zebedee, String collectionId, Session session)
             throws IOException, UnauthorizedException {
         boolean isAuthorised = false;
         try {
-            isAuthorised = zebedee.getPermissionsService().canView(session, collection.getDescription());
+            isAuthorised = zebedee.getPermissionsService().canView(session, collectionId);
         } catch (Exception ex) {
             throw new IOException(PERMISSIONS_CHECK_ERR, ex);
         }

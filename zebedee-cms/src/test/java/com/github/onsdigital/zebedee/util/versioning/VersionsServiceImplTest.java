@@ -24,11 +24,12 @@ import java.util.Optional;
 
 import static com.github.onsdigital.zebedee.util.versioning.VersionNotFoundException.versionsNotFoundException;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -74,7 +75,7 @@ public class VersionsServiceImplTest {
 
     @Before
     public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         service = new VersionsServiceImpl();
 
@@ -182,44 +183,44 @@ public class VersionsServiceImplTest {
     public void getVersionNameFromURI_uriForVersionDir_shouldReturnVersion() {
         Optional<String> result = service.getVersionNameFromURI("/a/b/c/previous/v1");
         assertTrue(result.isPresent());
-        assertThat(result.get(), equalTo("v1"));
+        assertEquals("v1", result.get());
     }
 
     @Test
     public void getVersionNameFromURI_uriForVersionFile_shouldReturnVersion() {
         Optional<String> result = service.getVersionNameFromURI("/a/b/c/previous/v1/data.json");
         assertTrue(result.isPresent());
-        assertThat(result.get(), equalTo("v1"));
+        assertEquals("v1", result.get());
     }
 
     @Test
     public void getVersionNumber_validURI_shouldReturnExpectedValue() {
-        assertThat(service.getVersionNumberFromURI("/a/b/c/current/previous/v1/data.json"), equalTo(1));
+        assertEquals(1, service.getVersionNumberFromURI("/a/b/c/current/previous/v1/data.json"));
     }
 
     @Test
     public void getVersionNumberFromURI_nullValue_shouldReturnDefault() {
-        assertThat(service.getVersionNumberFromURI(null), equalTo(-1));
+        assertEquals(-1, service.getVersionNumberFromURI(null));
     }
 
     @Test
     public void getVersionNumberFromURI_emptyValue_shouldReturnDefault() {
-        assertThat(service.getVersionNumberFromURI(""), equalTo(-1));
+        assertEquals(-1, service.getVersionNumberFromURI(""));
     }
 
     @Test
     public void getVersionNumberFromURI_notVersionURI_shouldReturnDefault() {
-        assertThat(service.getVersionNumberFromURI("/a/b/c"), equalTo(-1));
+        assertEquals(-1, service.getVersionNumberFromURI("/a/b/c"));
     }
 
     @Test
     public void getVersionNumberFromURI_uriForVersionDir_shouldReturnDefault() {
-        assertThat(service.getVersionNumberFromURI("/a/b/c/previous/v3"), equalTo(3));
+        assertEquals(3, service.getVersionNumberFromURI("/a/b/c/previous/v3"));
     }
 
     @Test
     public void getVersionNumberFromURI_uriForVersionFile_shouldReturnDefault() {
-        assertThat(service.getVersionNumberFromURI("/a/b/c/previous/v3/data.json"), equalTo(3));
+        assertEquals(3, service.getVersionNumberFromURI("/a/b/c/previous/v3/data.json"));
     }
 
     @Test
@@ -268,7 +269,7 @@ public class VersionsServiceImplTest {
                 add(new MissingVersion(dataset, v2));
             }};
 
-            assertThat(ex.getMessage(), equalTo(versionsNotFoundException(missingVersions).getMessage()));
+            assertEquals(versionsNotFoundException(missingVersions).getMessage(), ex.getMessage());
             throw ex;
         }
     }
@@ -411,6 +412,6 @@ public class VersionsServiceImplTest {
         expected.add("/economy/economicoutputandproductivity/output/datasets/outputoftheproductionindustries/current/previous/v1/data.json");
         expected.add("/economy/economicoutputandproductivity/output/datasets/outputoftheproductionindustries/current/previous/v1/data.xlsx");
 
-        assertThat(result, equalTo(expected));
+        assertEquals(expected, result);
     }
 }

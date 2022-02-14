@@ -1,6 +1,5 @@
 package com.github.onsdigital.zebedee;
 
-import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.Credentials;
 import com.github.onsdigital.zebedee.keyring.CollectionKeyring;
 import com.github.onsdigital.zebedee.model.Collection;
@@ -33,9 +32,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -75,9 +74,6 @@ public abstract class ZebedeeTestBaseFixture {
     protected User user;
 
     @Mock
-    protected com.github.onsdigital.zebedee.json.Keyring usersKeyring;
-
-    @Mock
     protected PermissionsService permissionsService;
 
     @Mock
@@ -107,7 +103,7 @@ public abstract class ZebedeeTestBaseFixture {
 
     @Before
     public void init() throws Exception {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         TestUtils.initReaderConfig();
 
         builder = new Builder();
@@ -147,8 +143,7 @@ public abstract class ZebedeeTestBaseFixture {
         session.setLastAccess(new Date());
         session.setStart(new Date());
 
-        when(sessionsService.create(any(User.class))).thenReturn(session);
-        when(sessionsService.get(anyString())).thenReturn(session);
+        when(sessionsService.create(anyString())).thenReturn(session);
 
         Map<String, String> emailToCreds = new HashMap<>();
         emailToCreds.put(builder.publisher1.getEmail(), builder.publisher1Credentials.password);
@@ -181,7 +176,7 @@ public abstract class ZebedeeTestBaseFixture {
     }
 
     protected void setUpPermissionsServiceMockForLegacyTests(Zebedee instance, Session session) throws Exception {
-        when(permissionsService.canView(eq(session), any(CollectionDescription.class)))
+        when(permissionsService.canView(eq(session), any(String.class)))
                 .thenReturn(true);
 
         when(permissionsService.canEdit(session))

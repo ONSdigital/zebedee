@@ -22,10 +22,10 @@ import java.util.List;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 public class ResolveDatasetsTest {
@@ -55,7 +55,7 @@ public class ResolveDatasetsTest {
 
     @Before
     public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         api = new ResolveDatasets(datasetSummaryResolver, responseWriter, (lang) -> handler);
     }
 
@@ -66,7 +66,7 @@ public class ResolveDatasetsTest {
         ArgumentCaptor<BadRequestException> captor = ArgumentCaptor.forClass(BadRequestException.class);
 
         verify(responseWriter, times(1)).sendBadRequest(captor.capture(), eq(request), eq(response));
-        verifyZeroInteractions(handler, datasetSummaryResolver);
+        verifyNoInteractions(handler, datasetSummaryResolver);
 
         assertThat(captor.getValue().getMessage(), equalTo("uri parameter is required but was not specified"));
     }
@@ -84,7 +84,7 @@ public class ResolveDatasetsTest {
 
         verify(handler, times(1)).findContent(request, null);
         verify(responseWriter, times(1)).sendBadRequest(captor.capture(), eq(request), eq(response));
-        verifyZeroInteractions(datasetSummaryResolver);
+        verifyNoInteractions(datasetSummaryResolver);
 
         assertThat(captor.getValue().getMessage(), equalTo("invalid page type for getDatasetSummaries datasets"));
     }
@@ -104,7 +104,7 @@ public class ResolveDatasetsTest {
 
         verify(handler, times(1)).findContent(request, null);
         verify(responseWriter, times(1)).sendResponse(new ArrayList<DatasetSummary>(), response);
-        verifyZeroInteractions(datasetSummaryResolver);
+        verifyNoInteractions(datasetSummaryResolver);
     }
 
     @Test
@@ -123,7 +123,7 @@ public class ResolveDatasetsTest {
 
         verify(handler, times(1)).findContent(request, null);
         verify(responseWriter, times(1)).sendResponse(new ArrayList<DatasetSummary>(), response);
-        verifyZeroInteractions(datasetSummaryResolver);
+        verifyNoInteractions(datasetSummaryResolver);
     }
 
     @Test

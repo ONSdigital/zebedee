@@ -8,24 +8,21 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 
 /**
- * A File system implementation of {@link PermissionsStore}. Provides functionality for reading / writing
- * {@link AccessMapping} objects to/from json files on disk.
+ * @deprecated the files-on-disk access mapping is deprecated and will be removed once the migration of policy management
+ *             to the dp-permissions-api has been completed
+ *
+ * // TODO: remove this implementation once the authorisation migration to using the dp-permissions-api been completed
  */
 public class PermissionsStoreFileSystemImpl implements PermissionsStore {
 
     static final String PERMISSIONS_FILE = "accessMapping.json";
-    static final String DATA_VIS_KEY = "dataVisualisationPublishers";
     static final String PUBLISHERS_KEY = "digitalPublishingTeam";
     static final String ADMINS_KEY = "administrators";
     static final String COLLECTIONS_KEY = "collections";
@@ -50,44 +47,6 @@ public class PermissionsStoreFileSystemImpl implements PermissionsStore {
             jsonPath.toFile().createNewFile();
             try (OutputStream output = Files.newOutputStream(jsonPath)) {
                 Serialiser.serialise(output, new AccessMapping());
-            }
-        } else {
-            migrateDataVisUsers(jsonPath);
-        }
-    }
-
-    /**
-     * Temporary legacy migration. Transfer deprecated Data Visualisation Publisher users to Digital Publishing team.
-     * Can be reomved once all users have been safely migrated.
-     */
-    private static void migrateDataVisUsers(Path p) throws IOException {
-        Map<String, Object> accessMapping = Serialiser.deserialise(p, Map.class);
-        if (accessMapping.containsKey(DATA_VIS_KEY)) {
-
-            List<String> dataVisualisationPublishers = (List<String>) accessMapping.get(DATA_VIS_KEY);
-            if (dataVisualisationPublishers != null && !dataVisualisationPublishers.isEmpty()) {
-
-                info().log("Migrating users from Data Visualisation team to Digital Publishing team.");
-
-                List<String> digitalPublishingTeam = (List<String>) accessMapping.get(PUBLISHERS_KEY);
-                List<String> administrators = (List<String>) accessMapping.get(ADMINS_KEY);
-                Map<String, Set<Integer>> collections = (Map<String, Set<Integer>>) accessMapping.get(COLLECTIONS_KEY);
-
-                AccessMapping updated = new AccessMapping();
-                updated.getDigitalPublishingTeam().addAll(digitalPublishingTeam);
-
-                dataVisualisationPublishers.stream()
-                        .forEach(dataVisUser -> {
-                            info().data("user", dataVisUser).log("Migrating user");
-                            updated.getDigitalPublishingTeam().add(dataVisUser);
-                        });
-
-                updated.getAdministrators().addAll(administrators);
-                updated.setCollections(collections);
-
-                try (OutputStream output = Files.newOutputStream(p)) {
-                    Serialiser.serialise(output, updated);
-                }
             }
         }
     }

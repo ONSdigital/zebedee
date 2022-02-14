@@ -64,7 +64,7 @@ public class DataPublicationDetailsTestBaseFixture extends ZebedeeTestBaseFixtur
         collectionDescription.setPublishDate(new Date());
         collection = Collection.create(collectionDescription, zebedee, publisher);
 
-        publishedReader = new FileSystemContentReader(zebedee.getPublished().path);
+        publishedReader = new FileSystemContentReader(zebedee.getPublished().getPath());
         collectionReader = new ZebedeeCollectionReader(zebedee, collection, publisher);
         collectionWriter = new ZebedeeCollectionWriter(zebedee, collection, publisher);
     }
@@ -90,7 +90,7 @@ public class DataPublicationDetailsTestBaseFixture extends ZebedeeTestBaseFixtur
 
         // Then
         // details landing page should be identified
-        assertEquals(PageType.dataset_landing_page, details.landingPage.getType());
+        assertEquals(PageType.DATASET_LANDING_PAGE, details.landingPage.getType());
         assertEquals(example.datasetLandingPage.getUri().toString(), details.landingPageUri);
     }
 
@@ -110,7 +110,7 @@ public class DataPublicationDetailsTestBaseFixture extends ZebedeeTestBaseFixtur
 
         // Then
         // details landing page should be identified
-        assertEquals(PageType.timeseries_dataset, details.datasetPage.getType());
+        assertEquals(PageType.TIMESERIES_DATASET, details.datasetPage.getType());
         assertEquals(example.timeSeriesDataset.getUri().toString(), details.datasetUri);
     }
 
@@ -153,7 +153,7 @@ public class DataPublicationDetailsTestBaseFixture extends ZebedeeTestBaseFixtur
 
         // Then
         // details landing page should be identified
-        assertEquals(PageType.timeseries_dataset, details.datasetPage.getType());
+        assertEquals(PageType.TIMESERIES_DATASET, details.datasetPage.getType());
         assertEquals(reviewed.timeSeriesDataset.getUri().toString(), details.datasetUri);
 
     }

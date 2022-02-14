@@ -2,10 +2,10 @@ package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
 import com.github.onsdigital.zebedee.audit.Audit;
-import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.json.TransferRequest;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.PathUtils;
+import com.github.onsdigital.zebedee.session.model.Session;
 import org.eclipse.jetty.http.HttpStatus;
 
 import javax.servlet.http.HttpServletRequest;
@@ -36,12 +36,9 @@ public class Transfer {
      */
     @POST
     public boolean move(HttpServletRequest request, HttpServletResponse response, TransferRequest params) throws IOException {
-        boolean result = true;
-
-
         // user has permission
-        Session session = Root.zebedee.getSessions().get(request);
-        if (!Root.zebedee.getPermissionsService().canEdit(session.getEmail())){
+        Session session = Root.zebedee.getSessions().get();
+        if (!Root.zebedee.getPermissionsService().canEdit(session)){
             response.setStatus(HttpStatus.UNAUTHORIZED_401);
             return false;
         }

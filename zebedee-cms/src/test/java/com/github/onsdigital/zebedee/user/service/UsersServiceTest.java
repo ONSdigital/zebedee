@@ -4,10 +4,9 @@ import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.ConflictException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
-import com.github.onsdigital.zebedee.json.AdminOptions;
+import com.github.onsdigital.zebedee.user.model.AdminOptions;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.Credentials;
-import com.github.onsdigital.zebedee.json.Keyring;
 import com.github.onsdigital.zebedee.keyring.CollectionKeyring;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.Collections;
@@ -35,15 +34,15 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 /**
@@ -72,9 +71,6 @@ public class UsersServiceTest {
     private Session session;
 
     @Mock
-    private Keyring keyring;
-
-    @Mock
     private User userMock;
 
     @Mock
@@ -89,7 +85,7 @@ public class UsersServiceTest {
 
     @Before
     public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         user = new User();
         user.setEmail(EMAIL);
@@ -98,9 +94,7 @@ public class UsersServiceTest {
         user.setTemporaryPassword(false);
         user.setAdminOptions(new AdminOptions());
 
-        keyringSupplier = () -> collectionKeyring;
-
-        service = new UsersServiceImpl(userStore, collections, permissions, keyringSupplier);
+        service = new UsersServiceImpl(userStore, permissions);
 
         when(userMock.getEmail())
                 .thenReturn(EMAIL_2);
@@ -193,7 +187,7 @@ public class UsersServiceTest {
             verify(permissions, times(1)).isAdministrator(session);
             verify(userStore, never()).exists(anyString());
             verify(userStore, never()).save(any(User.class));
-            verifyZeroInteractions(lockMock);
+            verifyNoInteractions(lockMock);
             throw e;
         }
     }
@@ -209,7 +203,7 @@ public class UsersServiceTest {
             verify(permissions, times(1)).isAdministrator(session);
             verify(userStore, never()).exists(anyString());
             verify(userStore, never()).save(any(User.class));
-            verifyZeroInteractions(lockMock);
+            verifyNoInteractions(lockMock);
             throw e;
         }
     }
@@ -227,7 +221,7 @@ public class UsersServiceTest {
             verify(permissions, times(1)).isAdministrator(session);
             verify(userStore, times(1)).exists(EMAIL);
             verify(userStore, never()).save(any(User.class));
-            verifyZeroInteractions(lockMock);
+            verifyNoInteractions(lockMock);
             throw e;
         }
     }
@@ -247,7 +241,7 @@ public class UsersServiceTest {
             verify(permissions, times(1)).isAdministrator(session);
             verify(userStore, times(1)).exists(EMAIL);
             verify(userStore, never()).save(any(User.class));
-            verifyZeroInteractions(lockMock);
+            verifyNoInteractions(lockMock);
             throw e;
         }
     }
@@ -296,23 +290,21 @@ public class UsersServiceTest {
     public void update_ShouldThrowExceptionIfNotAuthorized() throws Exception {
         when(session.getEmail())
                 .thenReturn(EMAIL);
-        when(permissions.isAdministrator(EMAIL))
+        when(permissions.isAdministrator(session))
                 .thenReturn(false);
 
         try {
             service.update(session, null, null);
         } catch (UnauthorizedException e) {
-            verify(permissions, times(1)).isAdministrator(EMAIL);
-            verifyZeroInteractions(lockMock, userStore);
+            verify(permissions, times(1)).isAdministrator(session);
+            verifyNoInteractions(lockMock, userStore);
             throw e;
         }
     }
 
     @Test(expected = NotFoundException.class)
     public void update_ShouldThrowExceptionIfUserDoesNotExist() throws Exception {
-        when(session.getEmail())
-                .thenReturn(EMAIL);
-        when(permissions.isAdministrator(EMAIL))
+        when(permissions.isAdministrator(session))
                 .thenReturn(true);
         when(userStore.exists(EMAIL_2))
                 .thenReturn(false);
@@ -320,23 +312,22 @@ public class UsersServiceTest {
         try {
             service.update(session, userMock, null);
         } catch (NotFoundException e) {
-            verify(permissions, times(1)).isAdministrator(EMAIL);
-            verify(session, times(1)).getEmail();
+            verify(permissions, times(1)).isAdministrator(session);
             verify(userStore, times(1)).exists(EMAIL_2);
             verifyNoMoreInteractions(userStore);
-            verifyZeroInteractions(lockMock);
+            verifyNoInteractions(lockMock);
             throw e;
         }
     }
 
     @Test
     public void update_Success() throws Exception {
-        when(session.getEmail())
-                .thenReturn(EMAIL);
-        when(permissions.isAdministrator(EMAIL))
+        when(permissions.isAdministrator(session))
                 .thenReturn(true);
         when(userStore.exists(EMAIL))
                 .thenReturn(true);
+        when(session.getEmail())
+                .thenReturn(EMAIL);
 
         User updated = new User();
         updated.setEmail(EMAIL);
@@ -348,8 +339,7 @@ public class UsersServiceTest {
 
         User result = service.update(session, user, updated);
 
-        verify(permissions, times(1)).isAdministrator(EMAIL);
-        verify(session, times(2)).getEmail();
+        verify(permissions, times(1)).isAdministrator(session);
         verify(userStore, times(1)).exists(EMAIL);
         verify(userStore, times(1)).save(updated);
         verifyLockObtainedAndReleased();
@@ -357,17 +347,14 @@ public class UsersServiceTest {
 
     @Test(expected = UnauthorizedException.class)
     public void delete_ShouldThrowExceptionIfNotAuthorized() throws Exception {
-        when(session.getEmail())
-                .thenReturn(EMAIL);
-        when(permissions.isAdministrator(EMAIL))
+        when(permissions.isAdministrator(session))
                 .thenReturn(false);
 
         try {
             service.delete(session, user);
         } catch (UnauthorizedException e) {
-            verify(session, times(1)).getEmail();
-            verify(permissions, times(1)).isAdministrator(EMAIL);
-            verifyZeroInteractions(userStore, lockMock);
+            verify(permissions, times(1)).isAdministrator(session);
+            verifyNoInteractions(userStore, lockMock);
             throw e;
         }
     }
@@ -377,16 +364,14 @@ public class UsersServiceTest {
         try {
             service.delete(null, user);
         } catch (BadRequestException e) {
-            verifyZeroInteractions(permissions, userStore, lockMock);
+            verifyNoInteractions(permissions, userStore, lockMock);
             throw e;
         }
     }
 
     @Test(expected = NotFoundException.class)
     public void delete_ShouldThrowExceptionIfUserDoesNotExist() throws Exception {
-        when(session.getEmail())
-                .thenReturn(EMAIL);
-        when(permissions.isAdministrator(EMAIL))
+        when(permissions.isAdministrator(session))
                 .thenReturn(true);
         when(userStore.exists(user.getEmail()))
                 .thenReturn(false);
@@ -394,20 +379,17 @@ public class UsersServiceTest {
         try {
             service.delete(session, user);
         } catch (NotFoundException e) {
-            verify(session, times(1)).getEmail();
-            verify(permissions, times(1)).isAdministrator(EMAIL);
+            verify(permissions, times(1)).isAdministrator(session);
             verify(userStore, times(1)).exists(user.getEmail());
             verify(userStore, never()).delete(any(User.class));
-            verifyZeroInteractions(lockMock);
+            verifyNoInteractions(lockMock);
             throw e;
         }
     }
 
     @Test
     public void delete_Success() throws Exception {
-        when(session.getEmail())
-                .thenReturn(EMAIL);
-        when(permissions.isAdministrator(EMAIL))
+        when(permissions.isAdministrator(session))
                 .thenReturn(true);
         when(userStore.exists(user.getEmail()))
                 .thenReturn(true);
@@ -415,8 +397,7 @@ public class UsersServiceTest {
                 .thenReturn(true);
 
         assertThat(service.delete(session, user), is(true));
-        verify(session, times(1)).getEmail();
-        verify(permissions, times(1)).isAdministrator(EMAIL);
+        verify(permissions, times(1)).isAdministrator(session);
         verify(userStore, times(1)).exists(user.getEmail());
         verify(userStore, times(1)).delete(user);
     }
@@ -493,11 +474,8 @@ public class UsersServiceTest {
         when(permissions.isAdministrator(session))
                 .thenReturn(true);
 
-        when(permissions.isAdministrator(email))
+        when(permissions.isAdministrator(session))
                 .thenReturn(true);
-
-        Keyring originalKeyring = mock(Keyring.class);
-        ReflectionTestUtils.setField(userMock, "keyring", originalKeyring);
 
         User adminUser = mock(User.class);
         when(userStore.get(session.getEmail()))

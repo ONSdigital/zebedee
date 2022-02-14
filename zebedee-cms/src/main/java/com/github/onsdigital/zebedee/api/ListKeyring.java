@@ -6,14 +6,12 @@ import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.keyring.CollectionKeyring;
 import com.github.onsdigital.zebedee.keyring.KeyringException;
-import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.session.service.Sessions;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
-import java.io.IOException;
 import java.util.Set;
 
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.error;
@@ -27,7 +25,6 @@ public class ListKeyring {
 
     private CollectionKeyring collectionKeyring;
     private Sessions sessions;
-    private PermissionsService permissionsService;
 
     /**
      * Construct a new instance using the default configuration.
@@ -35,18 +32,15 @@ public class ListKeyring {
     public ListKeyring() {
         this(
                 Root.zebedee.getCollectionKeyring(),
-                Root.zebedee.getSessions(),
-                Root.zebedee.getPermissionsService());
+                Root.zebedee.getSessions());
     }
 
     /**
      * Construct a new instance using the provided configuration.
      */
-    public ListKeyring(final CollectionKeyring collectionKeyring, final Sessions sessions,
-                       final PermissionsService permissionsService) {
+    public ListKeyring(final CollectionKeyring collectionKeyring, final Sessions sessions) {
         this.collectionKeyring = collectionKeyring;
         this.sessions = sessions;
-        this.permissionsService = permissionsService;
     }
 
     /**
@@ -54,7 +48,10 @@ public class ListKeyring {
      */
     @GET
     public Set<String> listUserKeys(HttpServletRequest request, HttpServletResponse response) throws ZebedeeException {
-        Session session = getSession(request);
+        Session session = sessions.get();
+        if (session == null) {
+            throw new UnauthorizedException("user not authorised to access this resource");
+        }
 
         try {
             return collectionKeyring.list(session);
@@ -62,21 +59,5 @@ public class ListKeyring {
             error().user(session.getEmail()).exception(ex).log("error listing user's keyring");
             throw new InternalServerError("internal server error");
         }
-    }
-
-    Session getSession(HttpServletRequest request) throws UnauthorizedException, InternalServerError {
-        Session session;
-        try {
-            session = sessions.get(request);
-        } catch (IOException ex) {
-            error().exception(ex).log("error getting session from request");
-            throw new InternalServerError("internal server error");
-        }
-
-        if (session == null) {
-            throw new UnauthorizedException("user not authorised to access this resource");
-        }
-
-        return session;
     }
 }

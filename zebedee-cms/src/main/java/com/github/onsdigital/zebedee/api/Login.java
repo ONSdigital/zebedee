@@ -18,6 +18,7 @@ import javax.ws.rs.POST;
 import java.io.IOException;
 
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
+import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
 
 /**
  * API for processing login requests.
@@ -50,6 +51,10 @@ public class Login {
      */
     @POST
     public String authenticate(HttpServletRequest request, HttpServletResponse response, Credentials credentials) throws IOException, NotFoundException, BadRequestException {
+        if (cmsFeatureFlags().isJwtSessionsEnabled()) {
+            throw new NotFoundException("JWT sessions are enabled: POST /login is no longer supported");
+        }
+
         info().log("login endpoint: request received");
         if (credentials == null || StringUtils.isBlank(credentials.getEmail())) {
             info().log("login endpoint: request unsuccessful no credentials provided");
@@ -58,7 +63,7 @@ public class Login {
         }
 
         User user = usersServiceSupplier.getService().getUserByEmail(credentials.getEmail());
-        boolean result = user.authenticate(credentials.password);
+        boolean result = user.authenticate(credentials.getPassword());
 
         if (!result) {
             response.setStatus(HttpStatus.UNAUTHORIZED_401);

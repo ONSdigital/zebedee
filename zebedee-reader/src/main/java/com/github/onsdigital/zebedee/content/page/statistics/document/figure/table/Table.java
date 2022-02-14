@@ -13,7 +13,7 @@ public class Table extends FigureBase {
 
     @Override
     public PageType getType() {
-        return PageType.table;
+        return PageType.TABLE;
     }
 
     public String getHtml() {

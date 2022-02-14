@@ -39,7 +39,7 @@ public class DataPublisherTest {
 
     @Before
     public void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
     }
 
     @BeforeClass

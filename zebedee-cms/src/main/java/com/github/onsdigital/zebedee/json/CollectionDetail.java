@@ -16,6 +16,10 @@ public class CollectionDetail extends CollectionBase {
     public Set<CollectionDataset> datasets;
     public Set<CollectionDatasetVersion> datasetVersions;
 
+    /**
+     * The following is deprecated and must be removed after the migration to JWT sessions is complete.
+     */
+    @Deprecated
     public List<Team> teamsDetails;
 
 }

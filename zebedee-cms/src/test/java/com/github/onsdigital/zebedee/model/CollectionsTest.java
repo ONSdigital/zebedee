@@ -3,8 +3,16 @@ package com.github.onsdigital.zebedee.model;
 import com.github.davidcarboni.cryptolite.Keys;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.data.json.DirectoryListing;
-import com.github.onsdigital.zebedee.exceptions.*;
-import com.github.onsdigital.zebedee.json.*;
+import com.github.onsdigital.zebedee.exceptions.BadRequestException;
+import com.github.onsdigital.zebedee.exceptions.ConflictException;
+import com.github.onsdigital.zebedee.exceptions.NotFoundException;
+import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
+import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
+import com.github.onsdigital.zebedee.json.ApprovalStatus;
+import com.github.onsdigital.zebedee.json.CollectionDescription;
+import com.github.onsdigital.zebedee.json.CollectionType;
+import com.github.onsdigital.zebedee.json.Event;
+import com.github.onsdigital.zebedee.json.EventType;
 import com.github.onsdigital.zebedee.keyring.CollectionKeyring;
 import com.github.onsdigital.zebedee.model.approval.ApproveTask;
 import com.github.onsdigital.zebedee.model.encryption.EncryptionKeyFactory;
@@ -49,15 +57,24 @@ import java.util.function.Supplier;
 
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_DELETED;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_UNLOCKED;
-import static junit.framework.Assert.assertFalse;
+import static junit.framework.TestCase.assertFalse;
 import static junit.framework.TestCase.assertTrue;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasSize;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 
 /**
  * Created by dave on 19/05/2017.
@@ -66,6 +83,7 @@ public class CollectionsTest {
 
     private static final String COLLECTION_FILE_NAME = "{0}-{1}.json";
     private static final String TEST_EMAIL = "TEST@ons.gov.uk";
+    private static final String COLLECTION_ID = "123";
 
     @Rule
     public TemporaryFolder rootDir = new TemporaryFolder();
@@ -142,7 +160,7 @@ public class CollectionsTest {
 
     @Before
     public void setUp() throws IOException {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         System.setProperty("audit_db_enabled", "false");
         testUser = new User();
@@ -162,6 +180,9 @@ public class CollectionsTest {
 
         when(collectionMock.getDescription())
                 .thenReturn(collectionDescriptionMock);
+
+        when(collectionDescriptionMock.getId())
+                .thenReturn(COLLECTION_ID);
 
         ReflectionTestUtils.setField(collections, "zebedeeSupplier", zebedeeSupplier);
         ReflectionTestUtils.setField(collections, "collectionReaderWriterFactory", collectionReaderWriterFactoryMock);
@@ -256,50 +277,44 @@ public class CollectionsTest {
     @Test(expected = BadRequestException.class)
     public void shouldThrowBadRequestForBlankUriOnMoveContent() throws IOException, ZebedeeException {
 
-        when(permissionsServiceMock.canEdit(TEST_EMAIL))
+        when(permissionsServiceMock.canEdit(sessionMock))
                 .thenReturn(true);
 
         try {
             collections.moveContent(sessionMock, collectionMock, "", "toURI");
         } catch (BadRequestException e) {
             verify(permissionsServiceMock, times(1))
-                    .canEdit(TEST_EMAIL);
-            verify(sessionMock, times(1))
-                    .getEmail();
-            verifyZeroInteractions(collectionMock, publishedContentMock);
+                    .canEdit(sessionMock);
+            verifyNoInteractions(collectionMock, publishedContentMock);
             throw e;
         }
     }
 
     @Test(expected = BadRequestException.class)
     public void shouldThrowBadRequestForBlankToUriOnMoveContent() throws IOException, ZebedeeException {
-        when(permissionsServiceMock.canEdit(TEST_EMAIL))
+        when(permissionsServiceMock.canEdit(sessionMock))
                 .thenReturn(true);
 
         try {
             collections.moveContent(sessionMock, collectionMock, "fromURI", "");
         } catch (BadRequestException e) {
             verify(permissionsServiceMock, times(1))
-                    .canEdit(TEST_EMAIL);
-            verify(sessionMock, times(1))
-                    .getEmail();
-            verifyZeroInteractions(collectionMock, publishedContentMock);
+                    .canEdit(sessionMock);
+            verifyNoInteractions(collectionMock, publishedContentMock);
             throw e;
         }
     }
 
     @Test(expected = UnauthorizedException.class)
     public void shouldThrowUnauthorizedIfNotLoggedInOnApprove() throws IOException, ZebedeeException {
-        when(permissionsServiceMock.canEdit(TEST_EMAIL))
+        when(permissionsServiceMock.canEdit(sessionMock))
                 .thenReturn(false);
         try {
             collections.approve(collectionMock, sessionMock);
         } catch (UnauthorizedException e) {
             verify(permissionsServiceMock, times(1))
-                    .canEdit(TEST_EMAIL);
-            verify(sessionMock, times(1))
-                    .getEmail();
-            verifyZeroInteractions(publishedContentMock, zebedeeMock);
+                    .canEdit(sessionMock);
+            verifyNoInteractions(publishedContentMock, zebedeeMock);
             throw e;
         }
     }
@@ -308,14 +323,14 @@ public class CollectionsTest {
     public void shouldThrowUnauthorizedIfNotLoggedInOnListDirectory() throws IOException, UnauthorizedException,
             BadRequestException,
             ConflictException, NotFoundException {
-        when(permissionsServiceMock.canEdit(TEST_EMAIL))
+        when(permissionsServiceMock.canEdit(sessionMock))
                 .thenReturn(false);
 
         try {
             collections.listDirectory(collectionMock, "someURI", sessionMock);
         } catch (UnauthorizedException e) {
             verify(permissionsServiceMock, times(1))
-                    .canView(sessionMock, collectionDescriptionMock);
+                    .canView(sessionMock, COLLECTION_ID);
             verify(collectionMock, times(1))
                     .getDescription();
             verify(collectionMock, never())
@@ -333,7 +348,7 @@ public class CollectionsTest {
             collections.complete(collectionMock, "someURI", sessionMock, false);
         } catch (UnauthorizedException e) {
             verify(permissionsServiceMock, times(1)).canEdit(sessionMock);
-            verifyZeroInteractions(collectionMock);
+            verifyNoInteractions(collectionMock);
             throw e;
         }
     }
@@ -346,7 +361,7 @@ public class CollectionsTest {
             collections.delete(collectionMock, sessionMock);
         } catch (UnauthorizedException e) {
             verify(permissionsServiceMock, times(1)).canEdit(sessionMock);
-            verifyZeroInteractions(collectionMock);
+            verifyNoInteractions(collectionMock);
             throw e;
         }
     }
@@ -362,7 +377,7 @@ public class CollectionsTest {
                     inputStreamMock, false, CollectionEventType.COLLECTION_PAGE_SAVED, true);
         } catch (UnauthorizedException e) {
             verify(collectionReaderWriterFactoryMock, times(1)).getWriter(zebedeeMock, collectionMock, sessionMock);
-            verifyZeroInteractions(collectionMock);
+            verifyNoInteractions(collectionMock);
             throw e;
         }
     }
@@ -370,25 +385,25 @@ public class CollectionsTest {
     @Test(expected = UnauthorizedException.class)
     public void shouldThrowUnauthorizedIfNotLoggedInOnDeleteContent() throws IOException, ZebedeeException {
         try {
-            when(permissionsServiceMock.canEdit(TEST_EMAIL))
+            when(permissionsServiceMock.canEdit(sessionMock))
                     .thenReturn(false);
             collections.deleteContent(collectionMock, "someURI", sessionMock);
         } catch (UnauthorizedException e) {
-            verify(permissionsServiceMock, times(1)).canEdit(TEST_EMAIL);
-            verifyZeroInteractions(collectionMock);
+            verify(permissionsServiceMock, times(1)).canEdit(sessionMock);
+            verifyNoInteractions(collectionMock);
             throw e;
         }
     }
 
     @Test(expected = UnauthorizedException.class)
     public void shouldThrowUnauthorizedIfNotLoggedInOnMoveContent() throws IOException, ZebedeeException {
-        when(permissionsServiceMock.canEdit(TEST_EMAIL))
+        when(permissionsServiceMock.canEdit(sessionMock))
                 .thenReturn(false);
         try {
             collections.moveContent(sessionMock, collectionMock, "from", "to");
         } catch (UnauthorizedException e) {
-            verify(permissionsServiceMock, times(1)).canEdit(TEST_EMAIL);
-            verifyZeroInteractions(collectionMock, publishedContentMock);
+            verify(permissionsServiceMock, times(1)).canEdit(sessionMock);
+            verifyNoInteractions(collectionMock, publishedContentMock);
             throw e;
         }
     }
@@ -411,7 +426,7 @@ public class CollectionsTest {
             verify(collectionReaderWriterFactoryMock, times(1)).getWriter(zebedeeMock, collectionMock, sessionMock);
             verify(sessionMock, times(1)).getEmail();
             verify(collectionMock, times(2)).getDescription();
-            verifyZeroInteractions(permissionsServiceMock);
+            verifyNoInteractions(permissionsServiceMock);
             verify(collectionMock, never()).find(anyString());
             verify(collectionMock, never()).create(any(Session.class), anyString());
             verify(collectionMock, never()).edit(any(Session.class), anyString(), eq(collectionWriterMock), anyBoolean());
@@ -421,13 +436,13 @@ public class CollectionsTest {
 
     @Test(expected = BadRequestException.class)
     public void shouldThrowBadRequestIfNoUriOnDeleteContent() throws IOException, ZebedeeException {
-        when(permissionsServiceMock.canEdit(TEST_EMAIL))
+        when(permissionsServiceMock.canEdit(sessionMock))
                 .thenReturn(true);
         try {
             collections.deleteContent(collectionMock, null, sessionMock);
         } catch (BadRequestException e) {
-            verify(permissionsServiceMock, times(1)).canEdit(TEST_EMAIL);
-            verifyZeroInteractions(collectionMock, collectionDescriptionMock, zebedeeMock);
+            verify(permissionsServiceMock, times(1)).canEdit(sessionMock);
+            verifyNoInteractions(collectionMock, collectionDescriptionMock, zebedeeMock);
             throw e;
         }
     }
@@ -544,7 +559,7 @@ public class CollectionsTest {
         CollectionDescription description = mock(CollectionDescription.class);
         ArgumentCaptor<Event> eventCaptor = ArgumentCaptor.forClass(Event.class);
 
-        when(permissionsServiceMock.canEdit(TEST_EMAIL))
+        when(permissionsServiceMock.canEdit(sessionMock))
                 .thenReturn(true);
         when(collectionMock.inProgressUris())
                 .thenReturn(inProgressURIS);
@@ -558,8 +573,7 @@ public class CollectionsTest {
         try {
             collections.approve(collectionMock, sessionMock);
         } catch (ConflictException e) {
-            verify(permissionsServiceMock, times(1)).canEdit(TEST_EMAIL);
-            verify(sessionMock, times(3)).getEmail();
+            verify(permissionsServiceMock, times(1)).canEdit(sessionMock);
             verify(collectionMock, times(1)).inProgressUris();
             assertThat(eventCaptor.getValue().type, equalTo(EventType.APPROVE_SUBMITTED));
             verify(collectionReaderWriterFactoryMock, never()).getReader(any(), any(), any());
@@ -577,7 +591,7 @@ public class CollectionsTest {
         CollectionDescription description = mock(CollectionDescription.class);
         ArgumentCaptor<Event> eventCaptor = ArgumentCaptor.forClass(Event.class);
 
-        when(permissionsServiceMock.canEdit(TEST_EMAIL))
+        when(permissionsServiceMock.canEdit(sessionMock))
                 .thenReturn(true);
         when(collectionMock.isAllContentReviewed(false))
                 .thenReturn(false);
@@ -593,8 +607,7 @@ public class CollectionsTest {
         try {
             collections.approve(collectionMock, sessionMock);
         } catch (ConflictException e) {
-            verify(permissionsServiceMock, times(1)).canEdit(TEST_EMAIL);
-            verify(sessionMock, times(3)).getEmail();
+            verify(permissionsServiceMock, times(1)).canEdit(sessionMock);
             verify(collectionMock, times(1)).inProgressUris();
             verify(collectionMock, times(1)).completeUris();
             assertThat(eventCaptor.getValue().type, equalTo(EventType.APPROVE_SUBMITTED));
@@ -614,7 +627,7 @@ public class CollectionsTest {
         ReflectionTestUtils.setField(collections, "addTaskToQueue", addTaskToQueue);
         ReflectionTestUtils.setField(collections, "addTaskToQueue", addTaskToQueue);
 
-        when(permissionsServiceMock.canEdit(TEST_EMAIL))
+        when(permissionsServiceMock.canEdit(sessionMock))
                 .thenReturn(true);
         when(collectionMock.isAllContentReviewed(anyBoolean()))
                 .thenReturn(true);
@@ -627,7 +640,7 @@ public class CollectionsTest {
 
         assertThat(futureMock, equalTo(collections.approve(collectionMock, sessionMock)));
 
-        verify(permissionsServiceMock, times(1)).canEdit(TEST_EMAIL);
+        verify(permissionsServiceMock, times(1)).canEdit(sessionMock);
         verify(collectionMock, times(1)).isAllContentReviewed(anyBoolean());
         verify(collectionReaderWriterFactoryMock, times(1)).getReader(zebedeeMock, collectionMock, sessionMock);
         verify(collectionReaderWriterFactoryMock, times(1)).getWriter(zebedeeMock, collectionMock, sessionMock);
@@ -636,7 +649,7 @@ public class CollectionsTest {
 
     @Test
     public void shouldUnlockCollection() throws IOException, ZebedeeException, ExecutionException, InterruptedException {
-        when(permissionsServiceMock.canEdit(TEST_EMAIL))
+        when(permissionsServiceMock.canEdit(sessionMock))
                 .thenReturn(true);
         when(collectionDescriptionMock.getApprovalStatus())
                 .thenReturn(ApprovalStatus.COMPLETE);
@@ -646,7 +659,7 @@ public class CollectionsTest {
         boolean result = collections.unlock(collectionMock, sessionMock);
 
         assertThat(result, is(true));
-        verify(permissionsServiceMock, times(1)).canEdit(TEST_EMAIL);
+        verify(permissionsServiceMock, times(1)).canEdit(sessionMock);
         verify(collectionMock, times(3)).getDescription();
         verify(collectionDescriptionMock, times(1)).getApprovalStatus();
         verify(collectionDescriptionMock, times(1)).setApprovalStatus(ApprovalStatus.NOT_STARTED);
@@ -659,7 +672,7 @@ public class CollectionsTest {
 
     @Test
     public void shouldUnlockWithoutAddingEventIfAlreadyUnlocked() throws Exception {
-        when(permissionsServiceMock.canEdit(TEST_EMAIL))
+        when(permissionsServiceMock.canEdit(sessionMock))
                 .thenReturn(true);
         when(collectionDescriptionMock.getApprovalStatus())
                 .thenReturn(ApprovalStatus.IN_PROGRESS);
@@ -669,7 +682,7 @@ public class CollectionsTest {
         boolean result = collections.unlock(collectionMock, sessionMock);
 
         assertThat(result, is(true));
-        verify(permissionsServiceMock, times(1)).canEdit(TEST_EMAIL);
+        verify(permissionsServiceMock, times(1)).canEdit(sessionMock);
         verify(collectionMock, times(1)).getDescription();
         verify(collectionDescriptionMock, times(1)).getApprovalStatus();
         verify(collectionDescriptionMock, never()).setApprovalStatus(any(ApprovalStatus.class));
@@ -680,12 +693,12 @@ public class CollectionsTest {
 
     @Test(expected = UnauthorizedException.class)
     public void shouldThrowUnauthorizedIfNotLoggedInOnUnlock() throws Exception {
-        when(permissionsServiceMock.canEdit(TEST_EMAIL))
+        when(permissionsServiceMock.canEdit(sessionMock))
                 .thenReturn(false);
         try {
             collections.unlock(collectionMock, sessionMock);
         } catch (UnauthorizedException e) {
-            verify(permissionsServiceMock, times(1)).canEdit(TEST_EMAIL);
+            verify(permissionsServiceMock, times(1)).canEdit(sessionMock);
             verify(collectionMock, never()).getDescription();
             verify(collectionDescriptionMock, never()).getApprovalStatus();
             verify(collectionDescriptionMock, never()).setApprovalStatus(any(ApprovalStatus.class));
@@ -701,7 +714,7 @@ public class CollectionsTest {
         try {
             collections.unlock(null, sessionMock);
         } catch (UnauthorizedException e) {
-            verify(permissionsServiceMock, never()).canEdit(TEST_EMAIL);
+            verify(permissionsServiceMock, never()).canEdit(sessionMock);
             verify(collectionMock, never()).getDescription();
             verify(collectionDescriptionMock, never()).getApprovalStatus();
             verify(collectionDescriptionMock, never()).setApprovalStatus(any(ApprovalStatus.class));
@@ -716,14 +729,14 @@ public class CollectionsTest {
     public void shouldGetNotFoundIfAttemptingToListNonexistentDirectory() throws IOException, UnauthorizedException,
             BadRequestException, ConflictException, NotFoundException {
         String uri = "someURI";
-        when(permissionsServiceMock.canView(sessionMock, collectionDescriptionMock))
+        when(permissionsServiceMock.canView(sessionMock, COLLECTION_ID))
                 .thenReturn(true);
         when(collectionMock.find(uri))
                 .thenReturn(null);
         try {
             collections.listDirectory(collectionMock, uri, sessionMock);
         } catch (NotFoundException e) {
-            verify(permissionsServiceMock, times(1)).canView(sessionMock, collectionDescriptionMock);
+            verify(permissionsServiceMock, times(1)).canView(sessionMock, COLLECTION_ID);
             verify(collectionMock, times(1)).find(uri);
             throw e;
         }
@@ -733,14 +746,14 @@ public class CollectionsTest {
     public void shouldGetBadRequestIfAttemptingToListDirectoryOnAFile() throws IOException, UnauthorizedException,
             BadRequestException, ConflictException, NotFoundException {
         Path uri = rootDir.newFile("data.json").toPath();
-        when(permissionsServiceMock.canView(sessionMock, collectionDescriptionMock))
+        when(permissionsServiceMock.canView(sessionMock, COLLECTION_ID))
                 .thenReturn(true);
         when(collectionMock.find(uri.toString()))
                 .thenReturn(uri);
         try {
             collections.listDirectory(collectionMock, uri.toString(), sessionMock);
         } catch (BadRequestException e) {
-            verify(permissionsServiceMock, times(1)).canView(sessionMock, collectionDescriptionMock);
+            verify(permissionsServiceMock, times(1)).canView(sessionMock, COLLECTION_ID);
             verify(collectionMock, times(1)).find(uri.toString());
             throw e;
         }
@@ -757,7 +770,7 @@ public class CollectionsTest {
         expected.getFiles().put(file2.getFileName().toString(), file2.toString());
         expected.getFolders().put(collectionsPath.getFileName().toString(), collectionsPath.toString());
 
-        when(permissionsServiceMock.canView(sessionMock, collectionDescriptionMock))
+        when(permissionsServiceMock.canView(sessionMock, COLLECTION_ID))
                 .thenReturn(true);
         when(collectionMock.find(rootDir.getRoot().toString()))
                 .thenReturn(rootDir.getRoot().toPath());
@@ -765,7 +778,7 @@ public class CollectionsTest {
         DirectoryListing result = collections.listDirectory(collectionMock, rootDir.getRoot().toString(), sessionMock);
 
         assertThat(result, equalTo(expected));
-        verify(permissionsServiceMock, times(1)).canView(sessionMock, collectionDescriptionMock);
+        verify(permissionsServiceMock, times(1)).canView(sessionMock, COLLECTION_ID);
         verify(collectionMock, times(1)).find(rootDir.getRoot().toString());
     }
 
@@ -783,7 +796,7 @@ public class CollectionsTest {
         expected.getFiles().put(f1.getName(), f1.toPath().toString());
         expected.getFiles().put(f2.getName(), f2.toPath().toString());
 
-        when(permissionsServiceMock.canView(sessionMock, collectionDescriptionMock))
+        when(permissionsServiceMock.canView(sessionMock, COLLECTION_ID))
                 .thenReturn(true);
         when(collectionMock.find(uri.toString()))
                 .thenReturn(uri);
@@ -793,7 +806,7 @@ public class CollectionsTest {
         DirectoryListing result = collections.listDirectoryOverlayed(collectionMock, uri.toString(), sessionMock);
 
         assertThat(result, equalTo(expected));
-        verify(permissionsServiceMock, times(1)).canView(sessionMock, collectionDescriptionMock);
+        verify(permissionsServiceMock, times(1)).canView(sessionMock, COLLECTION_ID);
         verify(collectionMock, times(1)).find(uri.toString());
     }
 
@@ -957,12 +970,12 @@ public class CollectionsTest {
     @Test(expected = NotFoundException.class)
     public void shouldThrowNotFoundForDeletingNonexistentFile() throws IOException, ZebedeeException {
         String uri = "someURI";
-        when(permissionsServiceMock.canEdit(TEST_EMAIL))
+        when(permissionsServiceMock.canEdit(sessionMock))
                 .thenReturn(true);
         try {
             collections.deleteContent(collectionMock, uri, sessionMock);
         } catch (NotFoundException e) {
-            verify(permissionsServiceMock, times(1)).canEdit(TEST_EMAIL);
+            verify(permissionsServiceMock, times(1)).canEdit(sessionMock);
             verify(collectionMock, times(1)).find(uri);
             verify(collectionMock, never()).isInCollection(anyString());
             verify(collectionMock, never()).getDescription();
@@ -981,7 +994,7 @@ public class CollectionsTest {
         uri = uri.resolve("test");
         uri.toFile().mkdir();
 
-        when(permissionsServiceMock.canEdit(TEST_EMAIL))
+        when(permissionsServiceMock.canEdit(sessionMock))
                 .thenReturn(true);
         when(collectionMock.find(uri.toString()))
                 .thenReturn(uri);
@@ -993,7 +1006,7 @@ public class CollectionsTest {
         assertThat(collections.deleteContent(collectionMock, uri.toString(), sessionMock), is(true));
         assertThat(uri.toFile().exists(), is(false));
         assertThat(uri.getParent().toFile().exists(), is(true));
-        verify(permissionsServiceMock, times(1)).canEdit(TEST_EMAIL);
+        verify(permissionsServiceMock, times(1)).canEdit(sessionMock);
         verify(collectionMock, times(1)).find(uri.toString());
         verify(collectionMock, times(1)).isInCollection(uri.toString());
         verify(collectionMock, times(4)).getDescription();
@@ -1013,7 +1026,7 @@ public class CollectionsTest {
             collections.createContent(collectionMock, uri, sessionMock, null, null, null, false);
         } catch (ConflictException e) {
             verify(publishedContentMock, times(1)).exists(uri);
-            verifyZeroInteractions(zebedeeMock, collectionReaderWriterFactoryMock, collectionDescriptionMock,
+            verifyNoInteractions(zebedeeMock, collectionReaderWriterFactoryMock, collectionDescriptionMock,
                     collectionWriterMock, collectionMock);
             throw e;
         }
@@ -1091,7 +1104,7 @@ public class CollectionsTest {
 
         assertTrue(Files.exists(filePath));
 
-        when(permissionsServiceMock.canEdit(TEST_EMAIL))
+        when(permissionsServiceMock.canEdit(sessionMock))
                 .thenReturn(true);
 
         when(collectionMock.find(filePath.toString()))
@@ -1118,7 +1131,7 @@ public class CollectionsTest {
         Path uri = inprogress.resolve("data.json");
         assertTrue(uri.toFile().createNewFile());
 
-        when(permissionsServiceMock.canEdit(TEST_EMAIL))
+        when(permissionsServiceMock.canEdit(sessionMock))
                 .thenReturn(true);
 
         when(collectionMock.find(uri.toString()))

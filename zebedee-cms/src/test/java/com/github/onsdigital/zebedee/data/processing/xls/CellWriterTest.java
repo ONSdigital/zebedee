@@ -11,7 +11,7 @@ import org.mockito.MockitoAnnotations;
 import java.util.Arrays;
 import java.util.Collection;
 
-import static org.mockito.Matchers.anyString;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -42,7 +42,7 @@ public class CellWriterTest {
 
     @Before
     public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         numericCellWriter = new NumericCellWriter();
         stringCellWriter = new StringCellWriter();

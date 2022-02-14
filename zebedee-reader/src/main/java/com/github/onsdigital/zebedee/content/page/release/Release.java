@@ -92,7 +92,7 @@ public class Release extends Page{
 
     @Override
     public PageType getType() {
-        return PageType.release;
+        return PageType.RELEASE;
     }
 
     public List<String> getMarkdown() {

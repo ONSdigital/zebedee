@@ -37,12 +37,12 @@ public class DeletedContent {
      * @throws Exception
      */
     @GET
-    public List<DeletedContentEvent> listDeletedContent(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public List<DeletedContentEvent> listDeletedContent(HttpServletRequest request, HttpServletResponse response)
+            throws ZebedeeException, IOException {
 
-        Session session = getSession(request, "You must be a publisher or admin to view deleted content.");
-        List<DeletedContentEvent> deletedContentEvents = deletedContentService.listDeletedContent();
+        getSession("You must be a publisher or admin to view deleted content.");
 
-        return deletedContentEvents;
+        return deletedContentService.listDeletedContent();
     }
 
     /**
@@ -56,7 +56,7 @@ public class DeletedContent {
     @POST
     public String restoreDeletedContent(HttpServletRequest request, HttpServletResponse response) throws ZebedeeException, IOException {
 
-        Session session = getSession(request, "You must be a publisher or admin to restore deleted content.");
+        Session session = getSession("You must be a publisher or admin to restore deleted content.");
 
         long deletedContentId = getDeletedContentId(request);
         com.github.onsdigital.zebedee.model.Collection collection = getCollection(request);
@@ -68,8 +68,8 @@ public class DeletedContent {
                 + collection.getDescription().getName();
     }
 
-    private Session getSession(HttpServletRequest request, String message) throws ZebedeeException, IOException {
-        Session session = zebedeeCmsService.getSession(request);
+    private Session getSession(String message) throws ZebedeeException, IOException {
+        Session session = zebedeeCmsService.getSession();
         if (!zebedeeCmsService.getPermissions().isPublisher(session) && !zebedeeCmsService.getPermissions().isAdministrator(session)) {
             throw new UnauthorizedException(message);
         }

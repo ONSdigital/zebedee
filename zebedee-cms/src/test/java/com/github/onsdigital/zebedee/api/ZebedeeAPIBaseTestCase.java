@@ -30,7 +30,7 @@ public abstract class ZebedeeAPIBaseTestCase {
 
     @Before
     public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         session = new Session();
         session.setEmail(TEST_EMAIL);

@@ -255,9 +255,7 @@ public class ApproveTask implements Callable<Boolean> {
                 info().data("collectionId", collection.getDescription().getId()).log("adding uri to delete to the publish notification " + node.uri);
 
                 if (!contentToDelete.contains(node.uri)) {
-                    ContentDetail contentDetailToDelete = new ContentDetail();
-                    contentDetailToDelete.uri = node.uri;
-                    contentDetailToDelete.type = node.type;
+                    ContentDetail contentDetailToDelete = new ContentDetail(node.uri, node.getType());
                     contentToDelete.add(contentDetailToDelete);
                 }
             });

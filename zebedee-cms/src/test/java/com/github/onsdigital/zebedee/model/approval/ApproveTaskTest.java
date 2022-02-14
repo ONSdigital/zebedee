@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee.model.approval;
 
 import com.github.davidcarboni.cryptolite.Random;
+import com.github.onsdigital.zebedee.content.page.base.PageType;
 import com.github.onsdigital.zebedee.data.processing.DataIndex;
 import com.github.onsdigital.zebedee.json.ApprovalStatus;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
@@ -36,7 +37,7 @@ import java.util.concurrent.Future;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertFalse;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -78,7 +79,7 @@ public class ApproveTaskTest {
 
     @Before
     public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         this.executorService = Executors.newSingleThreadExecutor();
     }
 
@@ -95,9 +96,9 @@ public class ApproveTaskTest {
         Path collectionPath = Files.createTempDirectory(Random.id()); // create a temp directory to generate content into
         Collection collection = CollectionTest.createCollection(collectionPath, "createPublishNotificationShouldIncludePendingDeletes");
         String uriToDelete = "some/uri/to/check";
-        ContentDetail contentDetail = new ContentDetail("Title", uriToDelete, "type");
+        ContentDetail contentDetail = new ContentDetail("Title", uriToDelete, PageType.DATA_SLICE);
         PendingDelete pendingDelete = new PendingDelete("", contentDetail);
-        collection.description.getPendingDeletes().add(pendingDelete);
+        collection.getDescription().getPendingDeletes().add(pendingDelete);
 
         // When the publish notification is created as part of the approval process.
         PublishNotification publishNotification = ApproveTask.createPublishNotification(new ArrayList<>(), collection);

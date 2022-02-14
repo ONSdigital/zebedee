@@ -76,13 +76,12 @@ public class CollectionDetails {
             return null;
         }
 
-        Session session = zebedeeCmsService.getSession(request);
-        if (!zebedeeCmsService.getPermissions().canView(session.getEmail(), collection.getDescription())) {
+        Session session = zebedeeCmsService.getSession();
+        if (!zebedeeCmsService.getPermissions().canView(session, collection.getDescription().getId())) {
             response.setStatus(HttpStatus.UNAUTHORIZED_401);
             return null;
         }
 
-        //CollectionReader collectionReader = new ZebedeeCollectionReader(Root.zebedee, collection, session);
         CollectionReader collectionReader = zebedeeCollectionReaderSupplier.get(
                 zebedeeCmsService.getZebedee(), collection, session);
 
@@ -109,16 +108,9 @@ public class CollectionDetails {
         addEventsForDetails(result.complete, collection);
         addEventsForDetails(result.reviewed, collection);
 
-        Set<Integer> teamIds = zebedeeCmsService.getPermissions().listViewerTeams(collection.description,
-                session);
-        // TODO: Remove feature flag after migration to dp-identity-api
-        if (cmsFeatureFlags().isJwtSessionsEnabled()) {
-            // TODO: remove the conversion from Integer to String after the permissions have been updated to be a string
-            result.setTeams(teamIds.stream().map(id -> Integer.toString(id)).collect(Collectors.toList()));
-        } else {
-            result.teamsDetails = zebedeeCmsService.getZebedee().getTeamsService().resolveTeamDetails(teamIds);
-            result.teamsDetails.forEach(team -> collection.getDescription().getTeams().add(team.getName()));
-        }
+        Set<Integer> teamIds = zebedeeCmsService.getPermissions().listViewerTeams(session, collection.getDescription().getId());
+        result.teamsDetails = zebedeeCmsService.getZebedee().getTeamsService().resolveTeamDetails(teamIds);
+        result.teamsDetails.forEach(team -> collection.getDescription().getTeams().add(team.getName()));
 
         String collectionId = Collections.getCollectionId(request);
 

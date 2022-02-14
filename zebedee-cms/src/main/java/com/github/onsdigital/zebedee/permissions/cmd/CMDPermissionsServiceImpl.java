@@ -1,7 +1,6 @@
 package com.github.onsdigital.zebedee.permissions.cmd;
 
 import com.github.onsdigital.zebedee.api.Root;
-import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.Collections;
 import com.github.onsdigital.zebedee.model.ServiceAccount;
@@ -27,10 +26,14 @@ import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException
 import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.internalServerErrorException;
 import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.serviceAccountNotFoundException;
 import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.serviceTokenNotProvidedException;
-import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.sessionIDNotProvidedException;
 import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.sessionNotFoundException;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
+/**
+ * @deprecated in favour of the dp-permissions-api. Once all dataset related APIs have been updated to use the
+ *             dp-authorisation v2 library and JWT sessions are in use, this service will be removed.
+ */
+@Deprecated
 public class CMDPermissionsServiceImpl implements CMDPermissionsService {
 
     private static final String DATASET_NOT_IN_COLLECTION = "no permissions granted to viewer user as the requested " +
@@ -44,14 +47,12 @@ public class CMDPermissionsServiceImpl implements CMDPermissionsService {
 
     public static CMDPermissionsService instance = null;
 
-    private Sessions sessions;
     private Collections collectionsService;
     private ServiceStore serviceStore;
     private PermissionsService collectionPermissions;
 
-    CMDPermissionsServiceImpl(Sessions sessions, Collections collectionsService,
-                              ServiceStore serviceStore, PermissionsService collectionPermissions) {
-        this.sessions = sessions;
+    CMDPermissionsServiceImpl(Collections collectionsService, ServiceStore serviceStore,
+                              PermissionsService collectionPermissions) {
         this.collectionsService = collectionsService;
         this.serviceStore = serviceStore;
         this.collectionPermissions = collectionPermissions;
@@ -60,23 +61,27 @@ public class CMDPermissionsServiceImpl implements CMDPermissionsService {
     @Override
     public CRUD getUserDatasetPermissions(GetPermissionsRequest request)
             throws PermissionsException {
-        Session userSession = getSessionByID(request.getSessionID());
-
-        if (userHasEditCollectionPermission(userSession)) {
-            return grantUserDatasetCreateReadUpdateDelete(request, userSession);
+        if (request.getSession() == null) {
+            info().log("user dataset permissions request denied session not found");
+            throw sessionNotFoundException();
         }
 
-        Collection targetCollection = getCollectionByID(request.getCollectionID());
-
-        if (!userHasViewCollectionPermission(userSession, targetCollection.getDescription())) {
-            return grantUserNone(request, userSession, NO_COLLECTION_VIEW_PERMISSION);
+        if (userHasEditCollectionPermission(request.getSession())) {
+            return grantUserDatasetCreateReadUpdateDelete(request);
         }
 
+        String collectionId = request.getCollectionID();
+
+        if (!userHasViewCollectionPermission(request.getSession(), collectionId)) {
+            return grantUserNone(request, NO_COLLECTION_VIEW_PERMISSION);
+        }
+
+        Collection targetCollection = getCollectionByID(collectionId);
         if (!collectionContainsDataset(targetCollection, request.getDatasetID())) {
-            return grantUserNone(request, userSession, DATASET_NOT_IN_COLLECTION);
+            return grantUserNone(request, DATASET_NOT_IN_COLLECTION);
         }
 
-        return grantUserDatasetRead(request, userSession);
+        return grantUserDatasetRead(request);
     }
 
     @Override
@@ -99,12 +104,15 @@ public class CMDPermissionsServiceImpl implements CMDPermissionsService {
             throw internalServerErrorException();
         }
 
-        Session session = getSessionByID(request.getSessionID());
-
-        if (userHasPublisherPermissions(session)) {
-            return grantUserInstanceCreateReadUpdateDelete(request, session);
+        if (request.getSession() == null) {
+            info().log("user instance permissions request denied session not found");
+            throw sessionNotFoundException();
         }
-        return grantUserNone(request, session, INSTANCE_PERMISSIONS_DENIED);
+
+        if (userHasPublisherPermissions(request.getSession())) {
+            return grantUserInstanceCreateReadUpdateDelete(request);
+        }
+        return grantUserNone(request, INSTANCE_PERMISSIONS_DENIED);
     }
 
     @Override
@@ -118,28 +126,6 @@ public class CMDPermissionsServiceImpl implements CMDPermissionsService {
         }
         ServiceAccount serviceAccount = getServiceAccountByID(request.getServiceToken());
         return grantServiceAccountInstanceCreateReadUpdateDelete(request, serviceAccount);
-    }
-
-
-    Session getSessionByID(String sessionID) throws PermissionsException {
-        if (isEmpty(sessionID)) {
-            throw sessionIDNotProvidedException();
-        }
-
-        Session session;
-        try {
-            session = sessions.get(sessionID);
-        } catch (IOException ex) {
-            error().exception(ex).log("user dataset permissions request failed error getting session");
-            throw internalServerErrorException();
-        }
-
-        if (session == null) {
-            info().log("user dataset permissions request denied session not found");
-            throw sessionNotFoundException();
-        }
-
-        return session;
     }
 
     Collection getCollectionByID(String id) throws PermissionsException {
@@ -187,14 +173,11 @@ public class CMDPermissionsServiceImpl implements CMDPermissionsService {
         return account;
     }
 
-    boolean collectionContainsDataset(Collection collection, String datasetID)
-            throws PermissionsException {
+    boolean collectionContainsDataset(Collection collection, String datasetID) {
         return collection.getDescription()
                 .getDatasets()
                 .stream()
-                .filter(dataset -> StringUtils.equals(datasetID, dataset.getId()))
-                .findFirst()
-                .isPresent();
+                .anyMatch(dataset -> StringUtils.equals(datasetID, dataset.getId()));
     }
 
     boolean userHasEditCollectionPermission(Session session) throws PermissionsException {
@@ -213,10 +196,10 @@ public class CMDPermissionsServiceImpl implements CMDPermissionsService {
         return userHasEditCollectionPermission(session);
     }
 
-    boolean userHasViewCollectionPermission(Session session, CollectionDescription description)
+    boolean userHasViewCollectionPermission(Session session, String collectionId)
             throws PermissionsException {
         try {
-            return collectionPermissions.canView(session, description);
+            return collectionPermissions.canView(session, collectionId);
         } catch (IOException ex) {
             error().exception(ex)
                     .user(session)
@@ -235,8 +218,7 @@ public class CMDPermissionsServiceImpl implements CMDPermissionsService {
                     Collections collections = Root.zebedee.getCollections();
                     PermissionsService permissionsService = Root.zebedee.getPermissionsService();
 
-                    instance = new CMDPermissionsServiceImpl(sessions, collections, serviceStore,
-                            permissionsService);
+                    instance = new CMDPermissionsServiceImpl(collections, serviceStore, permissionsService);
                 }
             }
         }

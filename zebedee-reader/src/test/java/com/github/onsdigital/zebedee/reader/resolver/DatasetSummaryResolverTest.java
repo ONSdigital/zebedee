@@ -23,11 +23,11 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 public class DatasetSummaryResolverTest {
@@ -53,7 +53,7 @@ public class DatasetSummaryResolverTest {
 
     @Before
     public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         this.cmdDatasetLink = new Link(new URI("/datasets/" + CPIH01_ID));
         this.legacyDatasetLink = new Link(new URI("/economy/economicoutputandproductivity/output/datasets/indexofproduction"));
@@ -113,7 +113,7 @@ public class DatasetSummaryResolverTest {
 
         assertThat(result, is(nullValue()));
         verify(handler, times(1)).getContent(legacyDatasetLink.getUri().toString(), request);
-        verifyZeroInteractions(datasetAPIClient);
+        verifyNoInteractions(datasetAPIClient);
     }
 
     @Test
@@ -129,7 +129,7 @@ public class DatasetSummaryResolverTest {
         assertThat(result.getTitle(), equalTo(datasetLandingPage.getDescription().getTitle()));
         assertThat(result.getSummary(), equalTo(datasetLandingPage.getDescription().getSummary()));
         verify(handler, times(1)).getContent(legacyDatasetLink.getUri().toString(), request);
-        verifyZeroInteractions(datasetAPIClient);
+        verifyNoInteractions(datasetAPIClient);
     }
 
     @Test
@@ -143,7 +143,7 @@ public class DatasetSummaryResolverTest {
 
         assertThat(result, is(nullValue()));
         verify(datasetAPIClient, times(1)).getDataset(CPIH01_ID);
-        verifyZeroInteractions(handler);
+        verifyNoInteractions(handler);
     }
 
     @Test
@@ -153,7 +153,7 @@ public class DatasetSummaryResolverTest {
         DatasetSummary result = resolver.resolve(PAGE_URI, cmdDatasetLink, request, handler);
 
         assertThat(result, is(nullValue()));
-        verifyZeroInteractions(handler, datasetAPIClient);
+        verifyNoInteractions(handler, datasetAPIClient);
     }
 
     @Test
@@ -169,7 +169,7 @@ public class DatasetSummaryResolverTest {
         assertThat(result.getTitle(), equalTo(cpihDataset.getTitle()));
         assertThat(result.getUri(), equalTo(cpihDataset.getLinks().getSelf().getHref()));
         verify(datasetAPIClient, times(1)).getDataset(CPIH01_ID);
-        verifyZeroInteractions(handler);
+        verifyNoInteractions(handler);
     }
 
     @Test

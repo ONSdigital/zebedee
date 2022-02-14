@@ -3,6 +3,7 @@ package com.github.onsdigital.zebedee.api;
 import com.github.davidcarboni.restolino.framework.Api;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.ForbiddenException;
+import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.service.ServiceSupplier;
 import com.github.onsdigital.zebedee.session.model.Session;
@@ -29,6 +30,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
 import static java.text.MessageFormat.format;
 
 /**
@@ -65,8 +67,12 @@ public class TeamsReport {
      */
     @GET
     public void getReport(HttpServletRequest request, HttpServletResponse response) throws IOException,
-            BadRequestException, UnauthorizedException, ForbiddenException {
-        Session session = serviceServiceSupplier.getService().get(request);
+            BadRequestException, UnauthorizedException, ForbiddenException, NotFoundException {
+        if (cmsFeatureFlags().isJwtSessionsEnabled()) {
+            throw new NotFoundException("JWT sessions are enabled: GET /teamsreport is no longer supported");
+        }
+
+        Session session = serviceServiceSupplier.getService().get();
         response.setContentType(MediaType.APPLICATION_OCTET_STREAM);
         response.setHeader(CONTENT_DISPOSITION_HEADER, format(CONTENT_DISPOSITION_VALUE, getDateString()));
         response.setStatus(HttpStatus.SC_OK);

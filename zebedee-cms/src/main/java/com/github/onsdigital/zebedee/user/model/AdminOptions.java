@@ -1,4 +1,4 @@
-package com.github.onsdigital.zebedee.json;
+package com.github.onsdigital.zebedee.user.model;
 
 /**
  * Created by crispin on 09/05/2016.

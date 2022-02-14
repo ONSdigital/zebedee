@@ -59,7 +59,7 @@ public class ContentReaderTest {
     public void testGetAvailableContent() throws ZebedeeException, IOException {
         Page content = contentReader.getContent("about/accessibility");
         assertNotNull(content);
-        assertEquals(content.getType(), PageType.static_page);
+        assertEquals(content.getType(), PageType.STATIC_PAGE);
         assertEquals("Accessibility", content.getDescription().getTitle());
         assertTrue(content instanceof StaticPage);
         StaticPage staticPage = (StaticPage) content;
@@ -70,7 +70,7 @@ public class ContentReaderTest {
     public void testGetHome() throws ZebedeeException, IOException {
         Page content = contentReader.getContent("/");
         assertNotNull(content);
-        assertEquals(content.getType(), PageType.home_page);
+        assertEquals(content.getType(), PageType.HOME_PAGE);
         assertEquals("Home", content.getDescription().getTitle());
     }
 

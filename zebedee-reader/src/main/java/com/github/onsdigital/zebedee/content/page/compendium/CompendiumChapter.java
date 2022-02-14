@@ -18,7 +18,7 @@ public class CompendiumChapter extends StatisticalDocument {
 
     @Override
     public PageType getType() {
-        return PageType.compendium_chapter;
+        return PageType.COMPENDIUM_CHAPTER;
     }
 
     @Override

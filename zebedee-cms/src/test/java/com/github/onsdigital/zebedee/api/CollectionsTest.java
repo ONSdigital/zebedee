@@ -10,7 +10,6 @@ import com.github.onsdigital.zebedee.util.ZebedeeCmsService;
 import org.apache.http.HttpStatus;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Matchers;
 
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
@@ -18,11 +17,12 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
-import static org.mockito.Matchers.anyInt;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 public class CollectionsTest {
@@ -59,7 +59,7 @@ public class CollectionsTest {
         collections.put(request, response);
 
         verify(response, times(1)).setStatus(HttpServletResponse.SC_NOT_FOUND);
-        verifyZeroInteractions(mockZebedeeCmsService, mockDatasetService);
+        verifyNoInteractions(mockZebedeeCmsService, mockDatasetService);
     }
 
     @Test
@@ -70,7 +70,7 @@ public class CollectionsTest {
         collections.delete(request, response);
 
         verify(response, times(1)).setStatus(HttpServletResponse.SC_NOT_FOUND);
-        verifyZeroInteractions(mockZebedeeCmsService, mockDatasetService);
+        verifyNoInteractions(mockZebedeeCmsService, mockDatasetService);
     }
 
     @Test
@@ -171,7 +171,7 @@ public class CollectionsTest {
     @Test
     public void TestPutDataset_SessionNotFound() throws Exception {
         // Given a session that does not exist
-        when(mockZebedeeCmsService.getSession(request)).thenReturn(null);
+        when(mockZebedeeCmsService.getSession()).thenReturn(null);
 
         // When the put method is called
         collections.put(request, response);
@@ -299,7 +299,7 @@ public class CollectionsTest {
     public void TestDelete_SessionNotFound() throws Exception {
 
         // Given a session that does not exist
-        when(mockZebedeeCmsService.getSession(request)).thenReturn(null);
+        when(mockZebedeeCmsService.getSession()).thenReturn(null);
 
         // When the delete method is called
         collections.delete(request, response);
@@ -328,7 +328,7 @@ public class CollectionsTest {
     // mock the authorisation for the given request to authorise the request is the authorise param is true.
     private void shouldAuthorise(HttpServletRequest request, boolean authorise) throws ZebedeeException, IOException {
 
-        when(mockZebedeeCmsService.getSession(request)).thenReturn(session);
+        when(mockZebedeeCmsService.getSession()).thenReturn(session);
 
         PermissionsService permissionsService = mock(PermissionsService.class);
         when(mockZebedeeCmsService.getPermissions()).thenReturn(permissionsService);
@@ -341,7 +341,7 @@ public class CollectionsTest {
         try (ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(json.getBytes())) {
 
             // needed this monstrosity to mock the request body input stream.
-            when(mockServletInputStream.read(Matchers.any(), anyInt(), anyInt())).thenAnswer(invocationOnMock -> {
+            when(mockServletInputStream.read(any(), anyInt(), anyInt())).thenAnswer(invocationOnMock -> {
                 Object[] args = invocationOnMock.getArguments();
                 byte[] output = (byte[]) args[0];
                 int offset = (int) args[1];

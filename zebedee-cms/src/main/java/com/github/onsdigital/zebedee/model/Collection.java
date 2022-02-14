@@ -110,13 +110,13 @@ public class Collection {
 
     private static ConcurrentMap<Path, ReadWriteLock> collectionLocks = new ConcurrentHashMap<>();
 
-    public final CollectionDescription description;
-    public final Path path;
+    private final CollectionDescription description;
+    private final Path path;
     private final Content reviewed;
     private final Content complete;
     private final Content inProgress;
 
-    public final Zebedee zebedee;
+    private final Zebedee zebedee;
 
     private final Path collectionJsonPath;
     private VersionsService versionsService;
@@ -197,7 +197,7 @@ public class Collection {
         collectionDescription.setId(filename + "-" + Random.id());
 
         // Create the folders:
-        Path rootCollectionsPath = zebedee.getCollections().path;
+        Path rootCollectionsPath = zebedee.getCollections().getPath();
 
         CreateCollectionFolders(filename, rootCollectionsPath);
 
@@ -214,8 +214,7 @@ public class Collection {
                 collectionCreated(collectionDescription));
 
         if (collectionDescription.getTeams() != null) {
-            // TODO: Remove dependency on the deprecated {@link TeamsService}. See addTeamsToCollection below for more details.
-            addTeamsToCollection(zebedee.getTeamsService(), zebedee.getPermissionsService(), collectionDescription, session);
+            setViewerTeams(collectionDescription, zebedee, session);
         }
 
         // Add the collection key to the keying
@@ -376,15 +375,15 @@ public class Collection {
     }
 
     private static Path getCollectionPath(Zebedee zebedee, String name) {
-        return zebedee.getCollections().path.resolve(name);
+        return zebedee.getCollections().getPath().resolve(name);
     }
 
     private static Path getCollectionJsonPath(Zebedee zebedee, String name) {
-        return zebedee.getCollections().path.resolve(name + ".json");
+        return zebedee.getCollections().getPath().resolve(name + ".json");
     }
 
     private static Release getPublishedRelease(String uri, Zebedee zebedee) throws IOException, ZebedeeException {
-        Release release = (Release) new ZebedeeReader(zebedee.getPublished().path.toString(), null).getPublishedContent(uri);
+        Release release = (Release) new ZebedeeReader(zebedee.getPublished().getPath().toString(), null).getPublishedContent(uri);
         return release;
     }
 
@@ -431,7 +430,7 @@ public class Collection {
                 && updatedCollection.getDescription().getType() != collectionDescription.getType()) {
             updatedCollection.getDescription().setType(collectionDescription.getType());
             collectionHistoryDaoServiceSupplier.getService().saveCollectionHistoryEvent(collection, session, COLLECTION_TYPE_CHANGED, typeChanged
-                    (updatedCollection.description));
+                    (updatedCollection.getDescription()));
         }
 
         if (updatedCollection.getDescription().getType() == CollectionType.scheduled) {
@@ -448,84 +447,42 @@ public class Collection {
             scheduler.cancel(collection);
         }
 
-        LocalTime start = LocalTime.now();
-        Set<String> updatesTeams = updateViewerTeams(collectionDescription, zebedee, session);
-        long ms = TimeUnit.MILLISECONDS.convert(Duration.between(start, LocalTime.now()).getNano(), TimeUnit.NANOSECONDS);
+        Set<Integer> teamIds = setViewerTeams(collectionDescription, zebedee, session);
 
-        warn().data("duration_ms", ms).log("collection update viewer teams completed");
-
-        if (updatedCollection.getDescription().getTeams() != null) {
-            updatedCollection.getDescription().getTeams().clear();
-        } else {
-            updatedCollection.getDescription().setTeams(new ArrayList<>());
+        if (collectionDescription.getTeams() != null) {
+            updatedCollection.getDescription().setTeams(collectionDescription.getTeams());
         }
-        updatedCollection.getDescription().getTeams().addAll(updatesTeams);
 
         updatedCollection.save();
 
         return updatedCollection;
     }
 
-    private static Set<String> updateViewerTeams(CollectionDescription desc, Zebedee zebedee, Session session)
+    private static Set<Integer> setViewerTeams(CollectionDescription desc, Zebedee zebedee, Session session)
             throws IOException, ZebedeeException {
-        Set<String> teamsUpdated = new HashSet<>();
+        Set<Integer> teamIds = new HashSet<>();
+        List<String> teamNames = desc.getTeams();
 
-        if (desc != null && desc.getTeams() != null) {
-            PermissionsService permissions = zebedee.getPermissionsService();
-
-            // Remove any teams that should no longer have access.
-            removeTeamsFromCollection(permissions, desc, session);
-
-            // Add any new teams that have been granted access.
-            // TODO: Remove dependency on the deprecated {@link TeamsService}. See addTeamsToCollection below for more details.
-            teamsUpdated.addAll(addTeamsToCollection(zebedee.getTeamsService(), permissions, desc, session));
+        if (teamNames == null) {
+            teamNames = new ArrayList<>();
         }
 
-        return teamsUpdated;
-    }
-
-    /**
-     * Remove any Teams from the collection if it is no longer assigned.
-     */
-    private static void removeTeamsFromCollection(PermissionsService permissions, CollectionDescription desc,
-                                                  Session session)
-            throws IOException, ZebedeeException {
-        Set<Integer> teamIDs = permissions.listViewerTeams(desc, session);
-
-        List<Integer> teamsToRemove = teamIDs.stream().filter(t -> !desc.getTeams().contains(t))
-                .collect(Collectors.toList());
-
-        if (teamsToRemove != null && !teamsToRemove.isEmpty()) {
-
-            for (int t : teamsToRemove) {
-                permissions.removeViewerTeam(desc, t, session);
-            }
-        }
-    }
-
-    /**
-     * Adds teams to a collection if they should have access.
-     *
-     * TODO: Remove dependency on the deprecated {@link TeamsService#findTeam} by updating the logic to pass in the
-     *       team ID from florence rather than the team name.
-     */
-    private static Set<String> addTeamsToCollection(TeamsService teams, PermissionsService permissions,
-                                                    CollectionDescription desc, Session session)
-            throws IOException, ZebedeeException {
-
-        Set<String> teamsUpdated = new HashSet<>();
-
-        for (String teamName : desc.getTeams()) {
+        // TODO: Remove the following transitional code once Florence is updated to send the team IDs rather than the team names.
+        TeamsService teams = zebedee.getTeamsService();
+        for (String teamName : teamNames) {
             Team team = teams.findTeam(teamName);
             if (team == null) {
                 throw new NotFoundException("team assigned to collection expected but does not exist");
             }
 
-            permissions.addViewerTeam(desc, team.getId(), session);
-            teamsUpdated.add(teamName);
+            teamIds.add(team.getId());
         }
+        // end of transitional code
 
-        return teamsUpdated;
+        PermissionsService permissions = zebedee.getPermissionsService();
+        permissions.setViewerTeams(session, desc.getId(), teamIds);
+
+        return teamIds;
     }
 
     public CollectionDescription getDescription() {
@@ -1274,7 +1231,7 @@ public class Collection {
             throw new NotFoundException(String.format("The given URI %s was not found - it has not been published.", uri));
         }
 
-        ContentReader contentReader = new FileSystemContentReader(zebedee.getPublished().path);
+        ContentReader contentReader = new FileSystemContentReader(zebedee.getPublished().getPath());
 
         VersionedContentItem versionedContentItem = new VersionedContentItem(uri);
 
@@ -1282,7 +1239,7 @@ public class Collection {
             throw new ConflictException("A previous version of this file already exists");
         }
 
-        ContentItemVersion version = versionedContentItem.createVersion(zebedee.getPublished().path, contentReader, collectionWriter.getReviewed());
+        ContentItemVersion version = versionedContentItem.createVersion(zebedee.getPublished().getPath(), contentReader, collectionWriter.getReviewed());
         addEvent(uri, new Event(new Date(), EventType.VERSIONED, email, version.getIdentifier()));
         return version;
     }
@@ -1487,7 +1444,7 @@ public class Collection {
         return description.getDatasets().stream().map(ds -> {
 
             String url = URI.create(ds.getUri()).getPath();
-            return new ContentDetail(ds.getTitle(), url, PageType.api_dataset_landing_page.toString());
+            return new ContentDetail(ds.getTitle(), url, PageType.API_DATASET_LANDING_PAGE);
 
         }).collect(Collectors.toList());
     }
@@ -1503,8 +1460,8 @@ public class Collection {
             String datasetURL = "/datasets/" + ds.getId();
             String versionURL = datasetURL + "/editions/" + ds.getEdition() + "/versions/" + ds.getVersion();
 
-            ContentDetail versionDetail = new ContentDetail(ds.getTitle(), versionURL, PageType.api_dataset.toString());
-            ContentDetail datasetDetail = new ContentDetail(ds.getTitle(), datasetURL, PageType.api_dataset_landing_page.toString());
+            ContentDetail versionDetail = new ContentDetail(ds.getTitle(), versionURL, PageType.API_DATASET);
+            ContentDetail datasetDetail = new ContentDetail(ds.getTitle(), datasetURL, PageType.API_DATASET_LANDING_PAGE);
 
             return (new ArrayList<>(Arrays.asList(versionDetail, datasetDetail))).stream();
 

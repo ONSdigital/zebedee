@@ -2,10 +2,7 @@ package com.github.onsdigital.zebedee.authorisation;
 
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.model.Collection;
-import com.github.onsdigital.zebedee.model.Collections;
 import com.github.onsdigital.zebedee.model.ServiceAccount;
-import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
-import com.github.onsdigital.zebedee.service.ServiceStore;
 import com.github.onsdigital.zebedee.service.ServiceSupplier;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.session.service.Sessions;
@@ -16,6 +13,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import javax.ws.rs.HEAD;
 import java.io.IOException;
 
 import static org.apache.http.HttpStatus.SC_INTERNAL_SERVER_ERROR;
@@ -25,7 +23,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 public class AuthorisationServiceImplTest {
@@ -39,15 +37,6 @@ public class AuthorisationServiceImplTest {
     private UsersService usersService;
 
     @Mock
-    private Collections collections;
-
-    @Mock
-    private PermissionsService permissionsService;
-
-    @Mock
-    private ServiceStore serviceStore;
-
-    @Mock
     private Collection collection;
 
     @Mock
@@ -55,9 +44,6 @@ public class AuthorisationServiceImplTest {
 
     private ServiceSupplier<Sessions> sessionsSupplier = () -> sessions;
     private ServiceSupplier<UsersService> userServiceSupplier = () -> usersService;
-    private ServiceSupplier<Collections> collectionsSupplier = () -> collections;
-    private ServiceSupplier<PermissionsService> permissionsServiceSupplier = () -> permissionsService;
-    private ServiceSupplier<ServiceStore> serviceStoreSupplier = () -> serviceStore;
 
     private AuthorisationService service;
     private UserIdentityException notAuthenticatedEx;
@@ -68,7 +54,7 @@ public class AuthorisationServiceImplTest {
 
     @Before
     public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         notAuthenticatedEx = new UserIdentityException("user not authenticated", SC_UNAUTHORIZED);
         internalServerErrorEx = new UserIdentityException("internal server error", SC_INTERNAL_SERVER_ERROR);
@@ -85,9 +71,6 @@ public class AuthorisationServiceImplTest {
 
         ReflectionTestUtils.setField(service, "sessionsSupplier", sessionsSupplier);
         ReflectionTestUtils.setField(service, "userServiceSupplier", userServiceSupplier);
-        ReflectionTestUtils.setField(service, "collectionsSupplier", collectionsSupplier);
-        ReflectionTestUtils.setField(service, "permissionsServiceSupplier", permissionsServiceSupplier);
-        ReflectionTestUtils.setField(service, "serviceStoreSupplier", serviceStoreSupplier);
     }
 
     @Test(expected = UserIdentityException.class)
@@ -96,7 +79,7 @@ public class AuthorisationServiceImplTest {
             service.identifyUser(null);
         } catch (UserIdentityException ex) {
             assertThat(ex, equalTo(notAuthenticatedEx));
-            verifyZeroInteractions(sessions, usersService);
+            verifyNoInteractions(sessions, usersService);
             throw ex;
         }
     }
@@ -107,42 +90,28 @@ public class AuthorisationServiceImplTest {
             service.identifyUser("");
         } catch (UserIdentityException ex) {
             assertThat(ex, equalTo(notAuthenticatedEx));
-            verifyZeroInteractions(sessions, usersService);
-            throw ex;
-        }
-    }
-
-    @Test(expected = UserIdentityException.class)
-    public void shouldReturnInternalServerErrorIfErrorGettingSession() throws Exception {
-        when(sessions.get(SESSION_ID))
-                .thenThrow(new IOException("error getting session"));
-        try {
-            service.identifyUser(SESSION_ID);
-        } catch (UserIdentityException ex) {
-            assertThat(ex, equalTo(internalServerErrorEx));
-            verify(sessions, times(1)).get(SESSION_ID);
-            verifyZeroInteractions(usersService);
+            verifyNoInteractions(sessions, usersService);
             throw ex;
         }
     }
 
     @Test(expected = UserIdentityException.class)
     public void shouldReturnNotAuthenicatedIfSessionNotFound() throws Exception {
-        when(sessions.get(SESSION_ID))
+        when(sessions.get())
                 .thenReturn(null);
         try {
             service.identifyUser(SESSION_ID);
         } catch (UserIdentityException ex) {
             assertThat(ex, equalTo(notAuthenticatedEx));
-            verify(sessions, times(1)).get(SESSION_ID);
-            verifyZeroInteractions(usersService);
+            verify(sessions, times(1)).get();
+            verifyNoInteractions(usersService);
             throw ex;
         }
     }
 
     @Test(expected = UserIdentityException.class)
     public void shouldReturnNotFoundIfUserDoesNotExist() throws Exception {
-        when(sessions.get(SESSION_ID))
+        when(sessions.get())
                 .thenReturn(session);
         when(usersService.exists(session.getEmail()))
                 .thenReturn(false);
@@ -150,7 +119,7 @@ public class AuthorisationServiceImplTest {
             service.identifyUser(SESSION_ID);
         } catch (UserIdentityException ex) {
             assertThat(ex, equalTo(notFoundEx));
-            verify(sessions, times(1)).get(SESSION_ID);
+            verify(sessions, times(1)).get();
             verify(usersService, times(1)).exists(session.getEmail());
             throw ex;
         }
@@ -158,7 +127,7 @@ public class AuthorisationServiceImplTest {
 
     @Test(expected = UserIdentityException.class)
     public void shouldReturnInternalServerErrorIfErrorCheckingUserExistance() throws Exception {
-        when(sessions.get(SESSION_ID))
+        when(sessions.get())
                 .thenReturn(session);
         when(usersService.exists(session.getEmail()))
                 .thenThrow(new IOException("something terrible happened!"));
@@ -166,7 +135,7 @@ public class AuthorisationServiceImplTest {
             service.identifyUser(SESSION_ID);
         } catch (UserIdentityException ex) {
             assertThat(ex, equalTo(internalServerErrorEx));
-            verify(sessions, times(1)).get(SESSION_ID);
+            verify(sessions, times(1)).get();
             verify(usersService, times(1)).exists(session.getEmail());
             throw ex;
         }
@@ -174,7 +143,7 @@ public class AuthorisationServiceImplTest {
 
     @Test
     public void shouldReturnUserIdentityIfSessionAndUserExist() throws Exception {
-        when(sessions.get(SESSION_ID))
+        when(sessions.get())
                 .thenReturn(session);
         when(usersService.exists(session.getEmail()))
                 .thenReturn(true);
@@ -184,7 +153,7 @@ public class AuthorisationServiceImplTest {
         UserIdentity actual = service.identifyUser(SESSION_ID);
 
         assertThat(actual, equalTo(expected));
-        verify(sessions, times(1)).get(SESSION_ID);
+        verify(sessions, times(1)).get();
         verify(usersService, times(1)).exists(session.getEmail());
     }
 

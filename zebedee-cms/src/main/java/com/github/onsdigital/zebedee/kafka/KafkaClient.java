@@ -16,5 +16,5 @@ public interface KafkaClient {
      * @param collectionID the ID of the collection being published
      * @return
      */
-    public Future<RecordMetadata> produceContentPublished(String uri, String dataType, String collectionID);
+    public Future<RecordMetadata> produceContentPublished(String uri, String dataType, String collectionID, String traceID);
 }

@@ -132,7 +132,7 @@ public class TimeSeries extends StatisticalData implements Comparable<TimeSeries
 
     @Override
     public PageType getType() {
-        return PageType.timeseries;
+        return PageType.TIMESERIES;
     }
 
     public String getCdid() {

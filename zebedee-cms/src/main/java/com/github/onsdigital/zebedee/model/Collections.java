@@ -89,7 +89,7 @@ import static java.time.temporal.ChronoUnit.MINUTES;
 
 public class Collections {
 
-    public final Path path;
+    private final Path path;
     private PermissionsService permissionsService;
     private Content published;
     private Supplier<Zebedee> zebedeeSupplier = () -> Root.zebedee;
@@ -109,6 +109,15 @@ public class Collections {
         this.versionsService = versionsService;
         this.published = published;
         this.collectionReaderWriterFactory = new CollectionReaderWriterFactory();
+    }
+
+    /**
+     * Get the collections directory path.
+     *
+     * @return the collections directory path.
+     */
+    public Path getPath() {
+        return path;
     }
 
     /**
@@ -340,7 +349,7 @@ public class Collections {
         }
 
         // User has permission
-        if (session == null || !permissionsService.canEdit(session.getEmail())) {
+        if (session == null || !permissionsService.canEdit(session)) {
             error().log("approve collection: user permission check failed");
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
@@ -364,7 +373,7 @@ public class Collections {
 
         CollectionReader collectionReader = collectionReaderWriterFactory.getReader(zebedeeSupplier.get(), collection, session);
         CollectionWriter collectionWriter = collectionReaderWriterFactory.getWriter(zebedeeSupplier.get(), collection, session);
-        ContentReader publishedReader = contentReaderFactory.apply(this.published.path);
+        ContentReader publishedReader = contentReaderFactory.apply(this.published.getPath());
 
         if (skipDatasetVersionsValidation(userOverrideKey, getDatasetVersionVerificationOverrideKey(), session)) {
             skipDatasetVersionsValidation(collection, session);
@@ -419,7 +428,7 @@ public class Collections {
         }
 
         // User has permission
-        if (session == null || !permissionsService.canEdit(session.getEmail())) {
+        if (session == null || !permissionsService.canEdit(session)) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
@@ -459,12 +468,12 @@ public class Collections {
         }
 
         // User has permission
-        if (session == null || !permissionsService.canEdit(session.getEmail())) {
+        if (session == null || !permissionsService.canEdit(session)) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
         // Check approval status
-        if (collection.description.getApprovalStatus() != ApprovalStatus.COMPLETE) {
+        if (collection.getDescription().getApprovalStatus() != ApprovalStatus.COMPLETE) {
             throw new ConflictException("This collection cannot be published because it is not approved");
         }
 
@@ -509,7 +518,7 @@ public class Collections {
 
         // Check view permissionsServiceImpl
         if (!permissionsService.canView(session,
-                collection.getDescription())) {
+                collection.getDescription().getId())) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
@@ -741,7 +750,7 @@ public class Collections {
         }
 
         // Authorisation
-        if (session == null || !permissionsService.canEdit(session.getEmail())) {
+        if (session == null || !permissionsService.canEdit(session)) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
@@ -877,7 +886,7 @@ public class Collections {
         }
 
         // Authorisation
-        if (session == null || !permissionsService.canEdit(session.getEmail())) {
+        if (session == null || !permissionsService.canEdit(session)) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
@@ -907,7 +916,7 @@ public class Collections {
         }
 
         // Authorisation
-        if (session == null || !permissionsService.canEdit(session.getEmail())) {
+        if (session == null || !permissionsService.canEdit(session)) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
@@ -973,7 +982,7 @@ public class Collections {
 
                 String filename = PathUtils.toFilename(name);
                 for (Collection collection : this) {
-                    String collectionFilename = collection.path.getFileName()
+                    String collectionFilename = collection.getPath().getFileName()
                             .toString();
                     if (StringUtils.equalsIgnoreCase(collectionFilename,
                             filename)) {

@@ -146,6 +146,11 @@ public enum CollectionEventType {
      */
     DELETE_MARKED_REMOVED("delete.marker.removed.description", 26),
 
+    /**
+     * Viewer teams updated for collection.
+     */
+    COLLECTION_VIEWER_TEAMS_UPDATED("collection.viewer.teams.updated.description", 27),
+
     UNSPECIFIED("unspecified.action.description", 666);
 
     private final String descriptionKey;

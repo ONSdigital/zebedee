@@ -46,7 +46,7 @@ public class HashVerificationTaskTest {
 
     @Before
     public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         task = new HashVerificationTask.Builder()
                 .collectionID(COLLECTION_ID)

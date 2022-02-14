@@ -9,8 +9,12 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Created by david on 17/03/2015.
+ * @deprecated the access mapping is deprecated and will be removed once the migration of policy management to
+ *             the dp-permissions-api has been completed
+ *
+ * // TODO: remove this class once the authorisation migration to using the dp-permissions-api been completed
  */
+@Deprecated
 public class AccessMapping {
 
     /**

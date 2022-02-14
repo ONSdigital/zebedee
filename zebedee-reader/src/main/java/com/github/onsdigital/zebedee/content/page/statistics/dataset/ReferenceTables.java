@@ -11,7 +11,7 @@ public class ReferenceTables extends DatasetLandingPage {
 
     @Override
     public PageType getType() {
-        return PageType.reference_tables;
+        return PageType.REFERENCE_TABLES;
     }
 
     public boolean isMigrated() {

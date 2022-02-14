@@ -18,7 +18,7 @@ import java.util.ArrayList;
 
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 public class CollectionPdfGeneratorTest {
@@ -39,7 +39,7 @@ public class CollectionPdfGeneratorTest {
 
     @Before
     public void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         generator = new CollectionPdfGenerator(mockPDFService);
     }
 
@@ -47,7 +47,7 @@ public class CollectionPdfGeneratorTest {
     @Test
     public void shouldGenerateNothingForAnEmptyCollection() throws Exception {
         generator.generatePDFsForCollection(collection, mockCollectionWriter, new ArrayList<>());
-        verifyZeroInteractions(mockPDFService);
+        verifyNoInteractions(mockPDFService);
     }
 
     @Test
@@ -57,7 +57,7 @@ public class CollectionPdfGeneratorTest {
 
         ArrayList<ContentDetail> collectionContent = new ArrayList<>();
         String uri = "/the/uri";
-        collectionContent.add(new ContentDetail("Some article", uri, PageType.article.toString()));
+        collectionContent.add(new ContentDetail("Some article", uri, PageType.ARTICLE));
 
         generator.generatePDFsForCollection(collection, mockCollectionWriter, collectionContent);
 

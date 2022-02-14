@@ -36,7 +36,7 @@ public class DataPublicationFinder {
 
                 // Find all timeseries_datasets
                 Page page = reviewedContentReader.getContent(pageUri);
-                if (page != null && page.getType() == PageType.timeseries_dataset) {
+                if (page != null && page.getType() == PageType.TIMESERIES_DATASET) {
                     DataPublication newPublication = new DataPublication(publishedContentReader, reviewedContentReader, pageUri);
                     results.add(newPublication);
                 }

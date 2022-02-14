@@ -54,10 +54,8 @@ public class PageDescription extends Content implements Comparable<PageDescripti
     // We provide a minimal default for the unit, otherwise highcharts shows
     // "undefined":
     private String unit = "";
-    private Boolean isIndex;
     private String preUnit = "";
     private String source = ""; // Where a statistic comes from. Typically "Office for National Statistics"
-    private String seasonalAdjustment;
     private String monthLabelStyle;
     //Below fields appear on references to time series on other content types
     private String date;
@@ -83,6 +81,8 @@ public class PageDescription extends Content implements Comparable<PageDescripti
     private String versionLabel;
     private String metaCmd;
     private String apiDatasetId;
+    private String primaryTopic;
+    private List<String> secondaryTopics;
 
     public PageDescription() {
     }
@@ -128,9 +128,8 @@ public class PageDescription extends Content implements Comparable<PageDescripti
         this.metaDescription = metaDescription;
     }
 
-
     public boolean isNationalStatistic() {
-        return nationalStatistic == null ? false : nationalStatistic;
+        return nationalStatistic != null && nationalStatistic;
     }
 
     public void setNationalStatistic(boolean nationalStatistic) {
@@ -145,9 +144,13 @@ public class PageDescription extends Content implements Comparable<PageDescripti
         this.monthLabelStyle = monthLabelStyle;
     }
 
-    public Boolean isLatestRelease() { return latestRelease == null ? false:latestRelease; }
+    public Boolean isLatestRelease() { 
+        return latestRelease != null && latestRelease; 
+    }
 
-    public void setLatestRelease(Boolean latestRelease) { this.latestRelease = latestRelease; }
+    public void setLatestRelease(Boolean latestRelease) { 
+        this.latestRelease = latestRelease; 
+    }
 
     public Contact getContact() {
         return contact;
@@ -390,7 +393,7 @@ public class PageDescription extends Content implements Comparable<PageDescripti
     }
 
     public boolean isFinalised() {
-        return finalised == null ? false : finalised;
+        return finalised != null && finalised;
     }
 
     public void setFinalised(boolean finalised) {
@@ -398,7 +401,7 @@ public class PageDescription extends Content implements Comparable<PageDescripti
     }
 
     public boolean isCancelled() {
-        return cancelled == null ? false : true;
+        return cancelled != null && cancelled;
     }
 
     public void setCancelled(boolean cancelled) {
@@ -445,11 +448,27 @@ public class PageDescription extends Content implements Comparable<PageDescripti
         this.metaCmd = metaCmd;
     }
 
-    public String getapiDatasetId() {
+    public String getApiDatasetId() {
         return apiDatasetId;
     }
 
-    public void setapiDatasetId(String apiDatasetId) {
+    public void setApiDatasetId(String apiDatasetId) {
       this.apiDatasetId = apiDatasetId;
+    }
+
+    public String getPrimaryTopic() {
+        return primaryTopic;
+    }
+
+    public void setPrimaryTopic(String primaryTopic) {
+        this.primaryTopic = primaryTopic;
+    }
+
+    public List<String> getSecondaryTopics() {
+        return secondaryTopics;
+    }
+
+    public void setSecondaryTopics(List<String> secondaryTopics) {
+        this.secondaryTopics = secondaryTopics;
     }
 }

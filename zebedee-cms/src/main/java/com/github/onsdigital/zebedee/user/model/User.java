@@ -1,7 +1,6 @@
 package com.github.onsdigital.zebedee.user.model;
 
 import com.github.davidcarboni.cryptolite.Password;
-import com.github.onsdigital.zebedee.json.Keyring;
 
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
@@ -14,11 +13,7 @@ import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFea
  */
 public class User extends UserSanitised {
 
-    // The password is used for both login and
-    // to unlock the keyring, so we need to
-    // manage these fields together.
     private String passwordHash;
-    private Keyring keyring;
 
     private static final String UNSUPPORTED_METHOD = "unsupported attempt to call user password related method when JWT sessions are enabled";
 
@@ -62,28 +57,19 @@ public class User extends UserSanitised {
             throw new UnsupportedOperationException(UNSUPPORTED_METHOD);
         }
 
-        boolean result = true;
-
+        boolean result = false;
         if (authenticate(oldPassword)) {
-            if (keyring.changePassword(oldPassword, newPassword)) {
-                passwordHash = Password.hash(newPassword);
-                result = true;
-            } else {
-                info().log("Unable to change keyring password");
-            }
+            passwordHash = Password.hash(newPassword);
+            result = true;
         } else {
             info().log("Could not authenticate with the old password");
         }
 
-        /*
-         FIXME: this always returns true regardless of whether the password change succeeds. Not fixing now since
-                this method will be removed shortly once the JWT session migration is complete.
-         */
         return result;
     }
 
     /**
-     * Sets the user's password and generates a new, empty keyring.
+     * Sets the user's password.
      * @param password The new password for the user.
      *
      * @deprecated as the user management functionality is being migrated to the dp-identity-api.
@@ -97,9 +83,5 @@ public class User extends UserSanitised {
 
         // Update the password hash
         passwordHash = Password.hash(password);
-
-        // Generate a new key pair and wipe out any stored keys.
-        // Without the original password none of the stored keys can be recovered.
-        keyring = Keyring.generate(password);
     }
 }

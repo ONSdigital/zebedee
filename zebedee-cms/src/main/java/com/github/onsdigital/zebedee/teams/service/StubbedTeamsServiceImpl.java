@@ -3,6 +3,7 @@ package com.github.onsdigital.zebedee.teams.service;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.teams.model.Team;
 
+import java.io.IOException;
 import java.util.AbstractMap;
 import java.util.List;
 import java.util.Set;
@@ -116,6 +117,17 @@ public class StubbedTeamsServiceImpl implements TeamsService {
     @Deprecated
     @Override
     public List<AbstractMap.SimpleEntry<String, String>> getTeamMembersSummary(Session session) {
+        error().log(UNSUPPORTED_METHOD);
+        throw new UnsupportedOperationException(UNSUPPORTED_METHOD);
+    }
+
+    /**
+     * @deprecated because teams management will be moving to the dp-identity-api. Once the migration to the new service
+     *             is completed this method will be removed.
+     */
+    @Deprecated
+    @Override
+    public List<String> listTeamsForUser(Session session) throws IOException {
         error().log(UNSUPPORTED_METHOD);
         throw new UnsupportedOperationException(UNSUPPORTED_METHOD);
     }

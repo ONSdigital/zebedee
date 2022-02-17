@@ -8,7 +8,6 @@ import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.PermissionDefinition;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.session.model.Session;
-import com.github.onsdigital.zebedee.teams.model.Team;
 import com.github.onsdigital.zebedee.user.model.User;
 
 import java.io.IOException;
@@ -48,20 +47,6 @@ public class PermissionsServiceProxy implements PermissionsService {
     }
 
     /**
-     * @param email the email of the user to check.
-     * @return the required module on jwtSessionsEnabled
-     * @throws IOException from required module
-     */
-    @Override
-    public boolean isPublisher(String email) throws IOException {
-        if (jwtSessionsEnabled) {
-            return jwtPermissionsService.isPublisher(email);
-        }
-        return legacyPermissionsService.isPublisher(email);
-
-    }
-
-    /**
      * @param session {@link Session} to get the user details from.
      * @return the required module on jwtSessionsEnabled
      * @throws IOException from required module
@@ -72,20 +57,6 @@ public class PermissionsServiceProxy implements PermissionsService {
             return jwtPermissionsService.isAdministrator(session);
         }
         return legacyPermissionsService.isAdministrator(session);
-
-    }
-
-    /**
-     * @param email the email of the user to check.
-     * @return the required module on jwtSessionsEnabled
-     * @throws IOException from required module
-     */
-    @Override
-    public boolean isAdministrator(String email) throws IOException {
-        if (jwtSessionsEnabled) {
-            return jwtPermissionsService.isAdministrator(email);
-        }
-        return legacyPermissionsService.isAdministrator(email);
     }
 
     /**
@@ -98,7 +69,6 @@ public class PermissionsServiceProxy implements PermissionsService {
             return jwtPermissionsService.hasAdministrator();
         }
         return legacyPermissionsService.hasAdministrator();
-
     }
 
     /**
@@ -111,9 +81,9 @@ public class PermissionsServiceProxy implements PermissionsService {
     public void addAdministrator(String email, Session session) throws IOException, UnauthorizedException {
         if (jwtSessionsEnabled) {
             jwtPermissionsService.addAdministrator(email, session);
+        } else {
+            legacyPermissionsService.addAdministrator(email, session);
         }
-        legacyPermissionsService.addAdministrator(email, session);
-
     }
 
     /**
@@ -126,6 +96,7 @@ public class PermissionsServiceProxy implements PermissionsService {
     public void removeAdministrator(String email, Session session) throws IOException, UnauthorizedException {
         if (jwtSessionsEnabled) {
             jwtPermissionsService.removeAdministrator(email, session);
+            return;
         }
         legacyPermissionsService.removeAdministrator(email, session);
     }
@@ -141,33 +112,6 @@ public class PermissionsServiceProxy implements PermissionsService {
             return jwtPermissionsService.canEdit(session);
         }
         return legacyPermissionsService.canEdit(session);
-
-    }
-
-    /**
-     * @param email the email of the user to check.
-     * @return the required module on jwtSessionsEnabled
-     * @throws IOException
-     */
-    @Override
-    public boolean canEdit(String email) throws IOException {
-        if (jwtSessionsEnabled) {
-            return jwtPermissionsService.canEdit(email);
-        }
-        return legacyPermissionsService.canEdit(email);
-    }
-
-    /**
-     * @param user the {@link User} to check.
-     * @return the required module on jwtSessionsEnabled
-     * @throws IOException
-     */
-    @Override
-    public boolean canEdit(User user) throws IOException {
-        if (jwtSessionsEnabled) {
-            return jwtPermissionsService.canEdit(user);
-        }
-        return legacyPermissionsService.canEdit(user);
     }
 
     /**
@@ -183,8 +127,9 @@ public class PermissionsServiceProxy implements PermissionsService {
             throws IOException, UnauthorizedException, NotFoundException, BadRequestException {
         if (jwtSessionsEnabled) {
             jwtPermissionsService.addEditor(email, session);
+        } else {
+            legacyPermissionsService.addEditor(email, session);
         }
-        legacyPermissionsService.addEditor(email, session);
     }
 
     /**
@@ -197,66 +142,47 @@ public class PermissionsServiceProxy implements PermissionsService {
     public void removeEditor(String email, Session session) throws IOException, UnauthorizedException {
         if (jwtSessionsEnabled) {
             jwtPermissionsService.removeEditor(email, session);
+        } else {
+            legacyPermissionsService.removeEditor(email, session);
         }
-        legacyPermissionsService.removeEditor(email, session);
     }
 
     /**
-     * @param session               the {@link Session} to get the user details from.
-     * @param collectionDescription the {@link CollectionDescription} of the {@link Collection} to check.
+     * @param session      the {@link Session} to get the user details from.
+     * @param collectionId the ID of the {@link Collection} to check.
      * @return
      * @throws IOException
      */
     @Override
-    public boolean canView(Session session, CollectionDescription collectionDescription) throws IOException {
+    public boolean canView(Session session, String collectionId) throws IOException {
         if (jwtSessionsEnabled) {
-            return jwtPermissionsService.canView(session, collectionDescription);
+            return jwtPermissionsService.canView(session, collectionId);
         }
-        return legacyPermissionsService.canView(session, collectionDescription);
+        return legacyPermissionsService.canView(session, collectionId);
     }
 
     /**
-     * @param user                  the {@link User} to check.
-     * @param collectionDescription the {@link CollectionDescription} of the {@link Collection} to check.
-     * @return
-     * @throws IOException
+     * Set the list of team IDs that are allowed viewer access to a collection
+     *
+     * @param collectionID    the ID of the collection collection to set viewer permissions for.
+     * @param collectionTeams the set of team IDs for which viewer permissions should be granted to the collection.
+     * @param session         the session of the user that is attempting to set the viewer permissions.
+     * @throws IOException if reading or writing the access mapping fails.
+     * @throws UnauthorizedException if the users' session isn't authorised to edit collections.
+     *
+     * @deprecated this is deprecated in favour of the dp-permissions-api and will be removed once full migration to
+     *             the new API is complete.
+     *
+     * TODO: Remove once migration to dp-permissions-api is complete and the accessmapping is being removed.
      */
-    @Override
-    public boolean canView(User user, CollectionDescription collectionDescription) throws IOException {
+    @Deprecated
+    public void setViewerTeams(Session session, String collectionId, Set<Integer> collectionTeams)
+            throws IOException, ZebedeeException{
         if (jwtSessionsEnabled) {
-            return jwtPermissionsService.canView(user, collectionDescription);
+            jwtPermissionsService.setViewerTeams(session, collectionId, collectionTeams);
+        } else {
+            legacyPermissionsService.setViewerTeams(session, collectionId, collectionTeams);
         }
-        return legacyPermissionsService.canView(user, collectionDescription);
-    }
-
-    /**
-     * @param email                 the email of the user to check.
-     * @param collectionDescription the {@link CollectionDescription} of the {@link Collection} to check.
-     * @return
-     * @throws IOException
-     */
-    @Override
-    public boolean canView(String email, CollectionDescription collectionDescription) throws IOException {
-        if (jwtSessionsEnabled) {
-            return jwtPermissionsService.canView(email, collectionDescription);
-        }
-        return legacyPermissionsService.canView(email, collectionDescription);
-    }
-
-    /**
-     * @param collectionDescription the {@link CollectionDescription} of the {@link Collection} in question.
-     * @param teamId                the {@link Team} to permit view permission to.
-     * @param session               the {@link Session} of the user granting the permission.
-     * @throws IOException
-     * @throws ZebedeeException
-     */
-    @Override
-    public void addViewerTeam(CollectionDescription collectionDescription, Integer teamId, Session session)
-            throws IOException, ZebedeeException {
-        if (jwtSessionsEnabled) {
-            jwtPermissionsService.addViewerTeam(collectionDescription, teamId, session);
-        }
-        legacyPermissionsService.addViewerTeam(collectionDescription, teamId, session);
     }
 
     /**
@@ -268,29 +194,12 @@ public class PermissionsServiceProxy implements PermissionsService {
      * @throws UnauthorizedException
      */
     @Override
-    public Set<Integer> listViewerTeams(CollectionDescription collectionDescription, Session session)
+    public Set<Integer> listViewerTeams(Session session, String collectionId)
             throws IOException, UnauthorizedException {
         if (jwtSessionsEnabled) {
-            return jwtPermissionsService.listViewerTeams(collectionDescription, session);
+            return jwtPermissionsService.listViewerTeams(session, collectionId);
         }
-        return legacyPermissionsService.listViewerTeams(collectionDescription, session);
-    }
-
-    /**
-     * @param collectionDescription the {@link CollectionDescription} of the {@link Collection} to remove the team.
-     * @param teamId                the {@link Team} to remove.
-     * @param session               the {@link Session} of the user revoking view permission.
-     * @throws IOException
-     * @throws ZebedeeException
-     */
-    @Override
-    public void removeViewerTeam(CollectionDescription collectionDescription, Integer teamId, Session session)
-            throws IOException, ZebedeeException {
-        if (jwtSessionsEnabled) {
-            jwtPermissionsService.removeViewerTeam(collectionDescription, teamId, session);
-        }
-        legacyPermissionsService.removeViewerTeam(collectionDescription, teamId, session);
-
+        return legacyPermissionsService.listViewerTeams(session, collectionId);
     }
 
     /**
@@ -304,19 +213,17 @@ public class PermissionsServiceProxy implements PermissionsService {
     @Override
     public PermissionDefinition userPermissions(String email, Session session)
             throws IOException, NotFoundException, UnauthorizedException {
+        if (jwtSessionsEnabled) {
+            return jwtPermissionsService.userPermissions(email, session);
+        }
         return legacyPermissionsService.userPermissions(email, session);
     }
 
-    /**
-     * this will always use legacy code
-     *
-     * @param t the team to check.
-     * @return
-     * @throws IOException
-     */
     @Override
-    public Set<String> listCollectionsAccessibleByTeam(Team t) throws IOException {
-        return legacyPermissionsService.listCollectionsAccessibleByTeam(t);
+    public PermissionDefinition userPermissions(Session session) throws IOException {
+        if (jwtSessionsEnabled) {
+            return jwtPermissionsService.userPermissions(session);
+        }
+        return legacyPermissionsService.userPermissions(session);
     }
-
 }

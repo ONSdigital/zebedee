@@ -36,9 +36,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
+import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
 
 @Api
 public class Page {
@@ -46,7 +46,6 @@ public class Page {
     private final ZebedeeCmsService zebedeeCmsService;
     private final Optional<PageUpdateHook> pageCreationHook;
     private final Optional<PageUpdateHook> pageDeletionHook;
-    private final boolean datasetImportEnabled;
 
     static final String zebedeeFileSuffix = "/data.json";
 
@@ -61,7 +60,6 @@ public class Page {
      * Constructor allowing you to specifying if the dataset import feature should be enabled.
      */
     public Page(boolean datasetImportEnabled) throws URISyntaxException {
-        this.datasetImportEnabled = datasetImportEnabled;
         this.zebedeeCmsService = ZebedeeCmsService.getInstance();
 
         if (datasetImportEnabled) {
@@ -89,9 +87,7 @@ public class Page {
      * @param pageCreationHook
      * @param pageDeletionHook
      */
-    Page(ZebedeeCmsService zebedeeCmsService, PageUpdateHook pageCreationHook, PageUpdateHook pageDeletionHook,
-         boolean datasetImportEnabled) {
-        this.datasetImportEnabled = datasetImportEnabled;
+    Page(ZebedeeCmsService zebedeeCmsService, PageUpdateHook pageCreationHook, PageUpdateHook pageDeletionHook) {
         this.zebedeeCmsService = zebedeeCmsService;
         this.pageCreationHook = Optional.ofNullable(pageCreationHook);
         this.pageDeletionHook = Optional.ofNullable(pageDeletionHook);
@@ -129,7 +125,7 @@ public class Page {
      * @throws ConflictException     If the URI is being edited in another collection
      */
     @POST
-    public com.github.onsdigital.zebedee.content.page.base.Page createPage(HttpServletRequest request, HttpServletResponse response) {
+    public com.github.onsdigital.zebedee.content.page.base.Page createPage(HttpServletRequest request, HttpServletResponse response) throws UnauthorizedException {
         com.github.onsdigital.zebedee.content.page.base.Page page = null;
 
         String uri = request.getParameter("uri");
@@ -142,7 +138,7 @@ public class Page {
 
         Session session;
         try {
-            session = zebedeeCmsService.getSession(request);
+            session = zebedeeCmsService.getSession();
         } catch (ZebedeeException e) {
             error().data("path", uri).logException(e, "page get endpoint: failed to get session");
             response.setStatus(e.statusCode);
@@ -230,7 +226,7 @@ public class Page {
      * @throws ConflictException     If the URI is being edited in another collection
      */
     @DELETE
-    public void deletePage(HttpServletRequest request, HttpServletResponse response) {
+    public void deletePage(HttpServletRequest request, HttpServletResponse response) throws UnauthorizedException {
 
         String uri = request.getParameter("uri");
         if (StringUtils.isEmpty(uri)) {
@@ -242,7 +238,7 @@ public class Page {
 
         Session session;
         try {
-            session = zebedeeCmsService.getSession(request);
+            session = zebedeeCmsService.getSession();
         } catch (ZebedeeException e) {
             error().data("path", uri).logException(e, "page delete endpoint: failed to get session");
             response.setStatus(e.statusCode);
@@ -320,7 +316,6 @@ public class Page {
                 .log();
 
         response.setStatus(HttpStatus.SC_NO_CONTENT);
-        return;
     }
 
     private void handleZebdeeException(

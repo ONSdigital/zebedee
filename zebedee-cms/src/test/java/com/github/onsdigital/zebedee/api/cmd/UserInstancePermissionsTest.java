@@ -4,8 +4,9 @@ import com.github.onsdigital.zebedee.json.response.Error;
 import com.github.onsdigital.zebedee.permissions.cmd.CMDPermissionsService;
 import com.github.onsdigital.zebedee.permissions.cmd.CRUD;
 import com.github.onsdigital.zebedee.permissions.cmd.GetPermissionsRequest;
+import com.github.onsdigital.zebedee.session.model.Session;
+import com.github.onsdigital.zebedee.session.service.Sessions;
 import com.github.onsdigital.zebedee.util.HttpResponseWriter;
-import org.apache.http.HttpStatus;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -19,7 +20,7 @@ import static com.github.onsdigital.zebedee.permissions.cmd.PermissionType.DELET
 import static com.github.onsdigital.zebedee.permissions.cmd.PermissionType.READ;
 import static com.github.onsdigital.zebedee.permissions.cmd.PermissionType.UPDATE;
 import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.internalServerErrorException;
-import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.sessionIDNotProvidedException;
+import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.sessionNotProvidedException;
 import static org.apache.http.HttpStatus.SC_BAD_REQUEST;
 import static org.apache.http.HttpStatus.SC_INTERNAL_SERVER_ERROR;
 import static org.apache.http.HttpStatus.SC_OK;
@@ -40,6 +41,12 @@ public class UserInstancePermissionsTest {
     HttpServletResponse response;
 
     @Mock
+    Session session;
+
+    @Mock
+    Sessions sessions;
+
+    @Mock
     CMDPermissionsService permissionsService;
 
     @Mock
@@ -50,26 +57,18 @@ public class UserInstancePermissionsTest {
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
-        api = new UserInstancePermissions(true, permissionsService, httpResponseWriter);
-    }
+        api = new UserInstancePermissions(permissionsService, httpResponseWriter, sessions);
 
-    @Test
-    public void givenFeatureIsNotEnabled() throws Exception {
-        api = new UserInstancePermissions(false, permissionsService, httpResponseWriter);
-
-        api.handle(request, response);
-
-        verify(httpResponseWriter, times(1)).writeJSONResponse(response, null, HttpStatus.SC_NOT_FOUND);
-        verifyZeroInteractions(permissionsService);
+        when(sessions.get()).thenReturn(session);
+        when(session.getId()).thenReturn(SESSION_ID);
     }
 
     @Test
     public void givenAValidRequest() throws Exception {
-        GetPermissionsRequest getPermissionsRequest = new GetPermissionsRequest(SESSION_ID, null, null, null);
+        GetPermissionsRequest getPermissionsRequest = new GetPermissionsRequest(session, null, null, null);
 
         CRUD expected = new CRUD().permit(CREATE, READ, UPDATE, DELETE);
 
-        when(request.getHeader(FLORENCE_HEADER)).thenReturn(SESSION_ID);
         when(permissionsService.getUserInstancePermissions(getPermissionsRequest))
                 .thenReturn(expected);
 
@@ -80,12 +79,12 @@ public class UserInstancePermissionsTest {
     }
 
     @Test
-    public void givenRequestDoesNotContainASessionIDHeader() throws Exception {
-        when(request.getHeader(FLORENCE_HEADER)).thenReturn(null);
+    public void givenRequestDoesNotContainASession() throws Exception {
+        when(sessions.get()).thenReturn(null);
 
         api.handle(request, response);
 
-        Error expected = new Error(sessionIDNotProvidedException().getMessage());
+        Error expected = new Error(sessionNotProvidedException().getMessage());
 
         verify(httpResponseWriter, times(1)).writeJSONResponse(response, expected, SC_BAD_REQUEST);
         verifyZeroInteractions(permissionsService);
@@ -93,9 +92,8 @@ public class UserInstancePermissionsTest {
 
     @Test
     public void givenPermissionsServiceThrowsPermissionsException() throws Exception {
-        GetPermissionsRequest getPermissionsRequest = new GetPermissionsRequest(SESSION_ID, null, null, null);
+        GetPermissionsRequest getPermissionsRequest = new GetPermissionsRequest(session, null, null, null);
 
-        when(request.getHeader(FLORENCE_HEADER)).thenReturn(SESSION_ID);
         when(permissionsService.getUserInstancePermissions(getPermissionsRequest))
                 .thenThrow(internalServerErrorException());
 

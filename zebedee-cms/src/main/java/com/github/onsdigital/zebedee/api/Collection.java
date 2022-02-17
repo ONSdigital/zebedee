@@ -88,7 +88,7 @@ public class Collection {
             throws IOException, ZebedeeException {
         info().log("get collection endpoint: request received");
 
-        Session session = sessionsService.get(request);
+        Session session = sessionsService.get();
         if (session == null) {
             info().log("get collection endpoint: request unsuccessful valid session for user was not found.");
             throw new UnauthorizedException("You are not authorised to view collections.");
@@ -105,7 +105,7 @@ public class Collection {
             throw new NotFoundException("The collection you are trying to get was not found.");
         }
 
-        requireViewPermission(session.getEmail(), collection.getDescription());
+        requireViewPermission(session, collectionID);
 
         // TODO: Question - I am not sure why it's necessary to duplicate the description instead of just returning it?
         // Collate the result:
@@ -151,7 +151,7 @@ public class Collection {
             throws IOException, ZebedeeException {
         info().log("create collection endpoint: request received");
 
-        Session session = sessionsService.get(request);
+        Session session = sessionsService.get();
         if (session == null) {
             warn().log("create collection endpoint: request unsuccessful no valid session found");
             throw new UnauthorizedException("You are not authorised to create collections.");
@@ -163,7 +163,7 @@ public class Collection {
             return null;
         }
 
-        requireEditPermission(session.getEmail());
+        requireEditPermission(session);
 
         info().user(session.getEmail()).log("create collection endpoint: user granted canEdit permission");
 
@@ -217,7 +217,7 @@ public class Collection {
 
         String collectionId = Collections.getCollectionId(request);
 
-        Session session = sessionsService.get(request);
+        Session session = sessionsService.get();
         if (session == null) {
             warn().user(session.getEmail())
                     .collectionID(collectionId)
@@ -225,7 +225,7 @@ public class Collection {
             throw new UnauthorizedException("You are not authorised to update collections.");
         }
 
-        requireEditPermission(session.getEmail());
+        requireEditPermission(session);
 
         info().user(session.getEmail())
                 .collectionID(collectionId)
@@ -241,7 +241,7 @@ public class Collection {
         Audit.Event.COLLECTION_UPDATED
                 .parameters()
                 .host(request)
-                .fromTo(collection.path.toString(), updatedCollection.path.toString())
+                .fromTo(collection.getPath().toString(), updatedCollection.getPath().toString())
                 .actionedBy(session.getEmail())
                 .log();
 
@@ -268,7 +268,7 @@ public class Collection {
             ZebedeeException {
         info().log("delete collection endpoint: request received");
 
-        Session session = sessionsService.get(request);
+        Session session = sessionsService.get();
         if (session == null) {
             error().log("delete collection endpoint: request unsuccessful no valid session found");
             throw new UnauthorizedException("You are not authorised to delete collections.");
@@ -321,33 +321,33 @@ public class Collection {
         }
     }
 
-    private void requireViewPermission(String email, CollectionDescription description) throws UnauthorizedException {
+    private void requireViewPermission(Session session, String collectionId) throws UnauthorizedException {
         boolean canView = false;
         try {
-            canView = permissionsService.canView(email, description);
+            canView = permissionsService.canView(session, collectionId);
         } catch (IOException ex) {
             throw new UnauthorizedException("You are not authorised to view this collection");
         }
 
         if (!canView) {
-            warn().user(email)
-                    .collectionID(description)
+            warn().user(session.getEmail())
+                    .collectionID(collectionId)
                     .log("request unsuccessful user denied view permission");
 
             throw new UnauthorizedException("You are not authorised to view this collection");
         }
     }
 
-    private void requireEditPermission(String email) throws UnauthorizedException {
+    private void requireEditPermission(Session session) throws UnauthorizedException {
         boolean canEdit = false;
         try {
-            canEdit = permissionsService.canEdit(email);
+            canEdit = permissionsService.canEdit(session);
         } catch (IOException ex) {
             throw new UnauthorizedException("You are not authorised to edit collections.");
         }
 
         if (!canEdit) {
-            warn().user(email)
+            warn().user(session.getEmail())
                     .log("request unsuccessful user denied edit permission");
 
             throw new UnauthorizedException("You are not authorised to edit collections.");

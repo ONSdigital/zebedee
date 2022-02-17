@@ -25,22 +25,26 @@ import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 import static com.github.onsdigital.zebedee.model.PathUtils.findByCriteria;
 
+/**
+ * A set of content (i.e. a directory containing the entire content taxonomy). This can be the complete set of site
+ * content or a subset of content in a certain state (e.g. inprogress, completed or reviewed) contained within a
+ * collection.
+ */
 public class Content {
-
-
     public static final String REDIRECT = "redirect.txt";
-    public static final String DATA_VIS_DIR = "visualisations";
-    public static final String TIME_SERIES_KEYWORD = "timeseries";
+
+    private static final String DATA_VIS_DIR = "visualisations";
+    private static final String TIME_SERIES_KEYWORD = "timeseries";
     private static final String DATA_JSON = "data.json";
     private static final String WELSH_DATA_JSON = "data_cy.json";
 
     private static final Predicate<Path> IS_DATA_VIZ_FILE = (p) -> p != null && p.toFile().isDirectory() &&
             DATA_VIS_DIR.equals(p.getFileName().toString());
 
-    public final Path path;
-    public final Path dataVisualisationsPath;
+    private final Path path;
+    private final Path dataVisualisationsPath;
 
-    public RedirectTablePartialMatch redirect = null;
+    private RedirectTablePartialMatch redirects = null;
     private Path publishedContentPath;
 
     public Content(Path path) {
@@ -99,6 +103,15 @@ public class Content {
         return this.path;
     }
 
+    /**
+     * Set the redirects table for this set of content.
+     *
+     * @param redirects the redirects table to set for this set of content.
+     */
+    public void setRedirects(RedirectTablePartialMatch redirects) {
+        this.redirects = redirects;
+    }
+
     boolean exists(URI uri) {
         return exists(uri.getPath());
     }
@@ -115,8 +128,8 @@ public class Content {
 
         // Redirect if required
         String finalUri = uri;
-        if (doRedirect && redirect != null) {
-            finalUri = redirect.get(uri);
+        if (doRedirect && redirects != null) {
+            finalUri = redirects.get(uri);
         }
         if (finalUri == null) {
             return false;
@@ -157,8 +170,8 @@ public class Content {
 
         // Redirect if necessary and possible
         String finalUri = uri;
-        if (doRedirect && (redirect != null)) {
-            finalUri = redirect.get(uri);
+        if (doRedirect && (redirects != null)) {
+            finalUri = redirects.get(uri);
         }
 
         if (finalUri == null) {
@@ -471,7 +484,7 @@ public class Content {
                 && !DATA_VIS_DIR.equals(path.getParent().getFileName().toString().toLowerCase());
     }
 
-    public Path getPublishedContentPath() {
+    private Path getPublishedContentPath() {
 
         if (publishedContentPath == null)
             publishedContentPath = ZebedeeCmsService.getInstance().getZebedee().getPublishedContentPath();

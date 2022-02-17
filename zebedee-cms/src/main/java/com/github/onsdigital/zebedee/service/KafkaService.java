@@ -15,5 +15,5 @@ public interface KafkaService {
      * @param uris A list of uris modified/created in the collection
      * @param dataType A string to identify if the list of uris are from datasetAPI
      */
-    void produceContentPublished(String collectionID, List<String> uris, String dataType) throws IOException;
+    void produceContentPublished(String collectionID, List<String> uris, String dataType, String traceID) throws IOException;
 }

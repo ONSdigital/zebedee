@@ -4,8 +4,8 @@ import com.github.onsdigital.zebedee.json.response.Error;
 import com.github.onsdigital.zebedee.permissions.cmd.CMDPermissionsService;
 import com.github.onsdigital.zebedee.permissions.cmd.CRUD;
 import com.github.onsdigital.zebedee.permissions.cmd.GetPermissionsRequest;
+import com.github.onsdigital.zebedee.session.service.Sessions;
 import com.github.onsdigital.zebedee.util.HttpResponseWriter;
-import org.apache.http.HttpStatus;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -26,7 +26,6 @@ import static org.apache.http.HttpStatus.SC_INTERNAL_SERVER_ERROR;
 import static org.apache.http.HttpStatus.SC_OK;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
@@ -41,6 +40,9 @@ public class ServiceInstancePermissionsTest {
     HttpServletResponse response;
 
     @Mock
+    Sessions sessions;
+
+    @Mock
     CMDPermissionsService cmdPermissionsService;
 
     @Mock
@@ -52,17 +54,7 @@ public class ServiceInstancePermissionsTest {
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
 
-        api = new ServiceInstancePermissions(true, cmdPermissionsService, httpResponseWriter);
-    }
-
-    @Test
-    public void givenFeatureIsDisabled() throws Exception {
-        api = new ServiceInstancePermissions(false, cmdPermissionsService, httpResponseWriter);
-
-        api.handle(request, response);
-
-        verify(httpResponseWriter, times(1)).writeJSONResponse(response, null, HttpStatus.SC_NOT_FOUND);
-        verifyNoMoreInteractions(cmdPermissionsService);
+        api = new ServiceInstancePermissions(cmdPermissionsService, httpResponseWriter, sessions);
     }
 
     @Test

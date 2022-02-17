@@ -27,11 +27,11 @@ public interface SessionsStore {
     /**
      * Read a {@link Session} specified by the path parameter.
      *
-     * @param path the {@link Path} of the {@link Session} to read.
+     * @param id the session id of the {@link Session} to read.
      * @return the requested {@link Session} if it exists.
      * @throws IOException
      */
-    Session read(Path path) throws IOException;
+    Session read(String id) throws IOException;
 
     /**
      * Determined if a {@link Session} exists with the specified ID.
@@ -63,8 +63,8 @@ public interface SessionsStore {
     /**
      * Delete {@link Session} if it exists.
      *
-     * @param p the {@link Path} of the session to delete.
+     * @param id the id of the session to delete.
      * @throws IOException unexpected error while attempting to delete the session.
      */
-    void delete(Path p) throws IOException;
+    void delete(String id) throws IOException;
 }

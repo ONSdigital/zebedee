@@ -3,8 +3,6 @@ package com.github.onsdigital.zebedee.api;
 import com.github.onsdigital.zebedee.exceptions.InternalServerError;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.keyring.CollectionKeyring;
-import com.github.onsdigital.zebedee.keyring.KeyringException;
-import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.session.service.Sessions;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -26,26 +24,20 @@ public class ListKeyringTest extends ZebedeeAPIBaseTestCase {
     @Mock
     private Sessions sessions;
 
-    @Mock
-    private PermissionsService permissionsService;
-
     private ListKeyring endpoint;
 
     private String email;
 
     @Override
     protected void customSetUp() throws Exception {
-        endpoint = new ListKeyring(centralKeyring, sessions, permissionsService);
+        endpoint = new ListKeyring(centralKeyring, sessions);
         email = "123@test.com";
 
-        when(sessions.get(mockRequest))
+        when(sessions.get())
                 .thenReturn(session);
 
         when(mockRequest.getParameter("email"))
                 .thenReturn(email);
-
-        when(permissionsService.isAdministrator(session))
-                .thenReturn(true);
     }
 
     @Override
@@ -54,30 +46,11 @@ public class ListKeyringTest extends ZebedeeAPIBaseTestCase {
     }
 
     @Test
-    public void testGet_getSessionErr_shouldThrowInternalServerErrorException() throws Exception {
-        when(sessions.get(mockRequest))
-                .thenThrow(IOException.class);
-
-        assertThrows(InternalServerError.class, () -> endpoint.listUserKeys(mockRequest, mockResponse));
-    }
-
-    @Test
     public void testGet_getSessionNull_shouldThrowUnauthorisedException() throws Exception {
-        when(sessions.get(mockRequest))
+        when(sessions.get())
                 .thenReturn(null);
 
         assertThrows(UnauthorizedException.class, () -> endpoint.listUserKeys(mockRequest, mockResponse));
-    }
-
-    @Test
-    public void testGet_keyringListError_shouldThrowInternalServerErrorException() throws Exception {
-        when(centralKeyring.list(session))
-                .thenThrow(KeyringException.class);
-
-        InternalServerError ex = assertThrows(InternalServerError.class,
-                () -> endpoint.listUserKeys(mockRequest, mockResponse));
-
-        assertThat(ex.getMessage(), equalTo("internal server error"));
     }
 
     @Test

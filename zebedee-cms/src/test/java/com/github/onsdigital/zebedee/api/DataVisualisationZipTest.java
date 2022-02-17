@@ -114,7 +114,7 @@ public class DataVisualisationZipTest {
     public void shouldUnzipSuccessfully() throws Exception {
         when(mockRequest.getParameter(ZIP_PATH_KEY))
                 .thenReturn(ZIP_PATH);
-        when(zebedeeCmsServiceMock.getSession(mockRequest))
+        when(zebedeeCmsServiceMock.getSession())
                 .thenReturn(mockSession);
         when(zebedeeCmsServiceMock.getCollection(mockRequest))
                 .thenReturn(mockCollection);
@@ -142,7 +142,7 @@ public class DataVisualisationZipTest {
 
         // Verify
         verify(mockCollectionWriter, times(2)).getInProgress();
-        verify(zebedeeCmsServiceMock, times(1)).getSession(mockRequest);
+        verify(zebedeeCmsServiceMock, times(1)).getSession();
         verify(zebedeeCmsServiceMock, times(1)).getCollection(mockRequest);
         verify(zebedeeCmsServiceMock, times(1)).getZebedeeCollectionReader(mockCollection, mockSession);
         verify(mockCollectionReader, times(1)).getResource(ZIP_PATH);
@@ -167,7 +167,7 @@ public class DataVisualisationZipTest {
 
         when(mockRequest.getParameter(ZIP_PATH_KEY))
                 .thenReturn(ZIP_PATH);
-        when(zebedeeCmsServiceMock.getSession(mockRequest))
+        when(zebedeeCmsServiceMock.getSession())
                 .thenReturn(session);
         when(zebedeeCmsServiceMock.getCollection(mockRequest))
                 .thenReturn(mockCollection);
@@ -192,7 +192,7 @@ public class DataVisualisationZipTest {
         } catch (BadRequestException br) {
             assertThat(br.getMessage(), equalTo("Please specify the zip file path."));
 
-            verify(zebedeeCmsServiceMock, never()).getSession(mockRequest);
+            verify(zebedeeCmsServiceMock, never()).getSession();
             verify(zebedeeCmsServiceMock, never()).getCollection(mockRequest);
             verify(mockCollection, never()).deleteContentDirectory(any(), any());
             throw br;
@@ -212,7 +212,7 @@ public class DataVisualisationZipTest {
         try {
             when(mockRequest.getParameter(ZIP_PATH_KEY))
                     .thenReturn(ZIP_PATH);
-            when(zebedeeCmsServiceMock.getSession(mockRequest))
+            when(zebedeeCmsServiceMock.getSession())
                     .thenReturn(session);
             when(zebedeeCmsServiceMock.getCollection(mockRequest))
                     .thenThrow(new UnexpectedErrorException(null, 0));
@@ -239,7 +239,7 @@ public class DataVisualisationZipTest {
 
         when(mockRequest.getParameter(ZIP_PATH_KEY))
                 .thenReturn(ZIP_PATH);
-        when(zebedeeCmsServiceMock.getSession(mockRequest))
+        when(zebedeeCmsServiceMock.getSession())
                 .thenReturn(session);
         when(zebedeeCmsServiceMock.getCollection(mockRequest))
                 .thenReturn(mockCollection);

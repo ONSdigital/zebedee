@@ -5,6 +5,8 @@ import com.github.onsdigital.zebedee.permissions.cmd.CMDPermissionsService;
 import com.github.onsdigital.zebedee.permissions.cmd.CRUD;
 import com.github.onsdigital.zebedee.permissions.cmd.GetPermissionsRequest;
 import com.github.onsdigital.zebedee.permissions.cmd.PermissionsException;
+import com.github.onsdigital.zebedee.session.model.Session;
+import com.github.onsdigital.zebedee.session.service.Sessions;
 import com.github.onsdigital.zebedee.util.HttpResponseWriter;
 import org.hamcrest.CoreMatchers;
 import org.junit.Before;
@@ -15,7 +17,6 @@ import org.mockito.MockitoAnnotations;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import java.io.IOException;
 import java.util.List;
 
@@ -25,13 +26,11 @@ import static com.github.onsdigital.zebedee.permissions.cmd.PermissionType.READ;
 import static com.github.onsdigital.zebedee.permissions.cmd.PermissionType.UPDATE;
 import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.datasetIDNotProvidedException;
 import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.serviceTokenNotProvidedException;
-import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.sessionIDNotProvidedException;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
@@ -44,6 +43,12 @@ public class ServiceDatasetPermissionsTest {
 
     @Mock
     HttpServletResponse resp;
+
+    @Mock
+    Session session;
+
+    @Mock
+    Sessions sessions;
 
     @Mock
     HttpResponseWriter httpResponseWriter;
@@ -62,19 +67,9 @@ public class ServiceDatasetPermissionsTest {
         MockitoAnnotations.initMocks(this);
         fullPermissions = new CRUD().permit(CREATE, READ, UPDATE, DELETE);
 
-        getPermissionsRequest = new GetPermissionsRequest("111", "222", "333", "444");
+        getPermissionsRequest = new GetPermissionsRequest(session, "222", "333", "444");
 
-        api = new ServiceDatasetPermissions(true, cmdPermissionsService, httpResponseWriter);
-    }
-
-    @Test
-    public void testGetDatasetPermissions_featureDisabled() throws Exception {
-        api = new ServiceDatasetPermissions(false, cmdPermissionsService, httpResponseWriter);
-
-        api.handle(req, resp);
-
-        verifyZeroInteractions(cmdPermissionsService);
-        verify(httpResponseWriter, times(1)).writeJSONResponse(resp, null, 404);
+        api = new ServiceDatasetPermissions(cmdPermissionsService, httpResponseWriter, sessions);
     }
 
     @Test

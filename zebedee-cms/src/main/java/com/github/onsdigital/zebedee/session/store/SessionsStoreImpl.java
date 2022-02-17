@@ -40,16 +40,6 @@ public class SessionsStoreImpl implements SessionsStore {
         this.sessionJSONSerialiser = new JSONSerialiser(Session.class);
     }
 
-    /**
-     * Determines the filesystem path for the given session ID.
-     *
-     * @param id The ID to get a path for.
-     * @return The path, or null if the ID is blank.
-     */
-    private Path getPath(Session s) {
-        return getPath(s.getId());
-    }
-
     private Path getPath(String id) {
         Path result = null;
         if (StringUtils.isNotBlank(id)) {
@@ -68,7 +58,7 @@ public class SessionsStoreImpl implements SessionsStore {
      */
     @Override
     public synchronized void write(Session session) throws IOException {
-        try (OutputStream output = Files.newOutputStream(getPath(session))) {
+        try (OutputStream output = Files.newOutputStream(getPath(session.getId()))) {
             Serialiser.serialise(output, session);
         }
     }
@@ -82,7 +72,12 @@ public class SessionsStoreImpl implements SessionsStore {
      * @throws IOException If a filesystem error occurs.
      */
     @Override
-    public synchronized Session read(Path path) throws IOException {
+    public synchronized Session read(String id) throws IOException {
+        Path path = getPath(id);
+        return read(path);
+    }
+
+    private Session read(Path path) throws IOException {
         Session session = null;
 
         if (Files.exists(path)) {
@@ -137,7 +132,7 @@ public class SessionsStoreImpl implements SessionsStore {
     }
 
     @Override
-    public void delete(Path p) throws IOException {
-        Files.delete(p);
+    public void delete(String id) throws IOException {
+        Files.delete(getPath(id));
     }
 }

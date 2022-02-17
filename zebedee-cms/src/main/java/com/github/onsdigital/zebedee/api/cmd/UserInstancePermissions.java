@@ -6,56 +6,56 @@ import com.github.onsdigital.zebedee.permissions.cmd.CMDPermissionsServiceImpl;
 import com.github.onsdigital.zebedee.permissions.cmd.CRUD;
 import com.github.onsdigital.zebedee.permissions.cmd.GetPermissionsRequest;
 import com.github.onsdigital.zebedee.permissions.cmd.PermissionsException;
+import com.github.onsdigital.zebedee.session.service.Sessions;
 import com.github.onsdigital.zebedee.util.HttpResponseWriter;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
 import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.internalServerErrorException;
-import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.sessionIDNotProvidedException;
+import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.sessionNotProvidedException;
 import static com.github.onsdigital.zebedee.util.JsonUtils.writeResponseEntity;
-import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 /**
  * API endpoint for getting a user's CMD instance permissions.
+ *
+ * @deprecated the permissions APIs are deprecated in favour of the new dp-permissions-api. Once the migration of all
+ *             dataset services to the new dp-authorisation v2 library has been completed these endpoints should be
+ *             removed.
  */
+@Deprecated
 @Api
 public class UserInstancePermissions extends PermissionsAPIBase {
 
     /**
-     * Create a new UserInstancePermissions endpoint using the default costructor parameters.
+     * Create a new UserInstancePermissions endpoint using the default constructor parameters.
      */
     public UserInstancePermissions() {
-        super(cmsFeatureFlags().isPermissionsAuthEnabled(), CMDPermissionsServiceImpl.getInstance(), (r, b, s) -> writeResponseEntity(r, b, s));
+        super(CMDPermissionsServiceImpl.getInstance(), (r, b, s) -> writeResponseEntity(r, b, s));
     }
 
     /**
      * Construct a new UserInstancePermissions endpoint.
      *
-     * @param enabled               true enables the endpoint, false all request valid or invaild will return 404.
      * @param cmdPermissionsService
-     * @param responseWriter        the http reponse writer impl to use.
+     * @param responseWriter        the http response writer impl to use.
+     * @param sessionsService       the sessions service
      */
-    public UserInstancePermissions(boolean enabled, CMDPermissionsService cmdPermissionsService, HttpResponseWriter responseWriter) {
-        super(enabled, cmdPermissionsService, responseWriter);
+    public UserInstancePermissions(CMDPermissionsService cmdPermissionsService, HttpResponseWriter responseWriter,
+                                     Sessions sessionsService) {
+        super(cmdPermissionsService, responseWriter, sessionsService);
     }
 
     @Override
-    public CRUD getPermissions(HttpServletRequest request, HttpServletResponse response) throws PermissionsException {
+    public CRUD getPermissions(GetPermissionsRequest request) throws PermissionsException {
         validateRequest(request);
-        GetPermissionsRequest getPermissionsRequest = new GetPermissionsRequest(request);
-        return permissionsService.getUserInstancePermissions(getPermissionsRequest);
+        return permissionsService.getUserInstancePermissions(request);
     }
 
-    void validateRequest(HttpServletRequest request) throws PermissionsException {
+    void validateRequest(GetPermissionsRequest request) throws PermissionsException {
         if (request == null) {
             throw internalServerErrorException();
         }
 
-        String sessionID = request.getHeader(FLORENCE_AUTH_HEATHER);
-        if (isEmpty(sessionID)) {
-            throw sessionIDNotProvidedException();
+        if (request.getSession() == null) {
+            throw sessionNotProvidedException();
         }
     }
 }

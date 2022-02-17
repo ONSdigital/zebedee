@@ -6,40 +6,47 @@ import com.github.onsdigital.zebedee.permissions.cmd.CMDPermissionsServiceImpl;
 import com.github.onsdigital.zebedee.permissions.cmd.CRUD;
 import com.github.onsdigital.zebedee.permissions.cmd.GetPermissionsRequest;
 import com.github.onsdigital.zebedee.permissions.cmd.PermissionsException;
+import com.github.onsdigital.zebedee.session.service.Sessions;
 import com.github.onsdigital.zebedee.util.HttpResponseWriter;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
 import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.collectionIDNotProvidedException;
 import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.datasetIDNotProvidedException;
 import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.internalServerErrorException;
-import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.sessionIDNotProvidedException;
+import static com.github.onsdigital.zebedee.permissions.cmd.PermissionsException.sessionNotProvidedException;
 import static com.github.onsdigital.zebedee.util.JsonUtils.writeResponseEntity;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
+/**
+ * @deprecated the permissions APIs are deprecated in favour of the new dp-permissions-api. Once the migration of all
+ *             dataset services to the new dp-authorisation v2 library has been completed these endpoints should be
+ *             removed.
+ */
+@Deprecated
 @Api
 public class UserDatasetPermissions extends PermissionsAPIBase {
 
     public UserDatasetPermissions() {
-        this(cmsFeatureFlags().isPermissionsAuthEnabled(),
-                CMDPermissionsServiceImpl.getInstance(),
+        super(CMDPermissionsServiceImpl.getInstance(),
                 (r, b, s) -> writeResponseEntity(r, b, s));
     }
 
-    public UserDatasetPermissions(boolean enabled, CMDPermissionsService cmdPermissionsService,
-                                  HttpResponseWriter responseWriter) {
-        super(enabled, cmdPermissionsService, responseWriter);
+    /**
+     * Construct a new ServiceDatasetPermissions endpoint.
+     *
+     * @param cmdPermissionsService
+     * @param responseWriter        the http response writer impl to use.
+     * @param sessionsService       the sessions service
+     */
+    public UserDatasetPermissions(CMDPermissionsService cmdPermissionsService, HttpResponseWriter responseWriter,
+                                     Sessions sessionsService) {
+        super(cmdPermissionsService, responseWriter, sessionsService);
     }
 
     @Override
-    public CRUD getPermissions(HttpServletRequest request, HttpServletResponse response) throws PermissionsException {
-        GetPermissionsRequest getPermissionsRequest = new GetPermissionsRequest(request);
+    public CRUD getPermissions(GetPermissionsRequest request) throws PermissionsException {
+        validateGetPermissionsRequest(request);
 
-        validateGetPermissionsRequest(getPermissionsRequest);
-
-        return permissionsService.getUserDatasetPermissions(getPermissionsRequest);
+        return permissionsService.getUserDatasetPermissions(request);
     }
 
     void validateGetPermissionsRequest(GetPermissionsRequest request) throws PermissionsException {
@@ -47,8 +54,8 @@ public class UserDatasetPermissions extends PermissionsAPIBase {
             throw internalServerErrorException();
         }
 
-        if (isEmpty(request.getSessionID())) {
-            throw sessionIDNotProvidedException();
+        if (request.getSession() == null) {
+            throw sessionNotProvidedException();
         }
 
         if (isEmpty(request.getDatasetID())) {

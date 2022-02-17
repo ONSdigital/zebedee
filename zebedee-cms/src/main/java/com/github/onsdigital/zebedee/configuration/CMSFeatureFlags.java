@@ -11,7 +11,6 @@ import static com.github.onsdigital.logging.v2.event.SimpleEvent.warn;
 public class CMSFeatureFlags {
 
     public static final String ENABLE_DATASET_IMPORT = "ENABLE_DATASET_IMPORT";
-    public static final String ENABLE_PERMISSIONS_AUTH = "ENABLE_PERMISSIONS_AUTH";
     private static final String ENABLE_VERIFY_PUBLISH_CONTENT = "ENABLE_VERIFY_PUBLISH_CONTENT";
     private static final String ENABLE_DATASET_VERSION_VERIFICATION = "ENABLE_DATASET_VERSION_VERIFICATION";
     private static final String ENABLE_SESSIONS_API = "ENABLE_SESSIONS_API";
@@ -26,8 +25,6 @@ public class CMSFeatureFlags {
     private static CMSFeatureFlags instance = null;
 
     private final boolean isDatasetImportEnabled;
-
-    private final boolean isPermissionsAuthEnabled;
 
     private final boolean isVerifyPublishEnabled;
 
@@ -48,7 +45,6 @@ public class CMSFeatureFlags {
      */
     private CMSFeatureFlags() {
         this.isDatasetImportEnabled = Boolean.valueOf(getConfigValue(ENABLE_DATASET_IMPORT));
-        this.isPermissionsAuthEnabled = Boolean.valueOf(getConfigValue(ENABLE_PERMISSIONS_AUTH));
         this.isVerifyPublishEnabled = Boolean.valueOf(getConfigValue(ENABLE_VERIFY_PUBLISH_CONTENT));
         this.isDatasetVersionVerificationEnabled = Boolean.valueOf(getConfigValue(ENABLE_DATASET_VERSION_VERIFICATION));
         this.isSessionAPIEnabled = Boolean.valueOf(getConfigValue(ENABLE_SESSIONS_API));
@@ -58,7 +54,6 @@ public class CMSFeatureFlags {
         this.isKafkaEnabled = Boolean.valueOf(getConfigValue(ENABLE_KAFKA));
 
         info().data(ENABLE_DATASET_IMPORT, isDatasetImportEnabled)
-                .data(ENABLE_PERMISSIONS_AUTH, isPermissionsAuthEnabled)
                 .data(ENABLE_VERIFY_PUBLISH_CONTENT, isVerifyPublishEnabled)
                 .data(ENABLE_DATASET_VERSION_VERIFICATION, isDatasetVersionVerificationEnabled)
                 .data(ENABLE_SESSIONS_API, isSessionAPIEnabled)
@@ -73,16 +68,6 @@ public class CMSFeatureFlags {
      */
     public boolean isEnableDatasetImport() {
         return this.isDatasetImportEnabled;
-    }
-
-    /**
-     * If true enables API endpoints {@link com.github.onsdigital.zebedee.api.cmd.UserDatasetPermissions},
-     * {@link com.github.onsdigital.zebedee.api.cmd.ServiceDatasetPermissions}.
-     *
-     * @return true if configured to be enabled false otherwise.
-     */
-    public boolean isPermissionsAuthEnabled() {
-        return isPermissionsAuthEnabled;
     }
 
     /**

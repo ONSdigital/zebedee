@@ -198,13 +198,13 @@ public class TeamsServiceImplTest {
     public void createTeam_ShouldThrowExeIfUserNotAdmin() throws Exception {
         session.setEmail(EMAIL);
 
-        when(permissionsService.isAdministrator(EMAIL))
+        when(permissionsService.isAdministrator(session))
                 .thenReturn(false);
 
         try {
             service.createTeam(TEAM_D_NAME, session);
         } catch (ForbiddenException e) {
-            verify(permissionsService, times(1)).isAdministrator(EMAIL);
+            verify(permissionsService, times(1)).isAdministrator(session);
             verifyNoMoreInteractions(permissionsService);
             verifyZeroInteractions(teamsStore, readWriteLock, lock);
             throw e;
@@ -217,14 +217,14 @@ public class TeamsServiceImplTest {
 
         when(teamsStore.exists(TEAM_D_NAME))
                 .thenReturn(true);
-        when(permissionsService.isAdministrator(EMAIL))
+        when(permissionsService.isAdministrator(session))
                 .thenReturn(true);
 
         try {
             service.createTeam(TEAM_D_NAME, session);
         } catch (ConflictException e) {
             verify(teamsStore, times(1)).exists(TEAM_D_NAME);
-            verify(permissionsService, times(1)).isAdministrator(EMAIL);
+            verify(permissionsService, times(1)).isAdministrator(session);
             verifyNoMoreInteractions(teamsStore, permissionsService);
             verifyZeroInteractions(readWriteLock, lock);
             throw e;
@@ -244,7 +244,7 @@ public class TeamsServiceImplTest {
 
         when(teamsStore.exists(TEAM_D_NAME))
                 .thenReturn(false);
-        when(permissionsService.isAdministrator(EMAIL))
+        when(permissionsService.isAdministrator(session))
                 .thenReturn(true);
         when(teamsStore.listTeams())
                 .thenReturn(teamsList);
@@ -252,7 +252,7 @@ public class TeamsServiceImplTest {
         Team result = service.createTeam(TEAM_D_NAME, session);
 
         assertThat(result, equalTo(expected));
-        verify(permissionsService, times(1)).isAdministrator(EMAIL);
+        verify(permissionsService, times(1)).isAdministrator(session);
         verify(readWriteLock, times(2)).writeLock();
         verify(teamsStore, times(1)).listTeams();
         verify(teamsStore, times(1)).save(expected);
@@ -272,7 +272,7 @@ public class TeamsServiceImplTest {
 
         when(teamsStore.exists(TEAM_D_NAME))
                 .thenReturn(false);
-        when(permissionsService.isAdministrator(EMAIL))
+        when(permissionsService.isAdministrator(session))
                 .thenReturn(true);
         when(teamsStore.listTeams())
                 .thenReturn(teamsList);
@@ -282,7 +282,7 @@ public class TeamsServiceImplTest {
         try {
             Team result = service.createTeam(TEAM_D_NAME, session);
         } catch (IOException e) {
-            verify(permissionsService, times(1)).isAdministrator(EMAIL);
+            verify(permissionsService, times(1)).isAdministrator(session);
             verify(readWriteLock, times(2)).writeLock();
             verify(teamsStore, times(1)).listTeams();
             verify(teamsStore, times(1)).save(expected);
@@ -316,13 +316,13 @@ public class TeamsServiceImplTest {
     public void deleteTeam_ShouldThrowExeUserNotAdmin() throws Exception {
         session.setEmail(EMAIL);
 
-        when(permissionsService.isAdministrator(EMAIL))
+        when(permissionsService.isAdministrator(session))
                 .thenReturn(false);
 
         try {
             service.deleteTeam(teamA, session);
         } catch (ForbiddenException e) {
-            verify(permissionsService, times(1)).isAdministrator(EMAIL);
+            verify(permissionsService, times(1)).isAdministrator(session);
             verifyNoMoreInteractions(permissionsService);
             verifyZeroInteractions(teamsStore, readWriteLock, lock);
             throw e;
@@ -333,7 +333,7 @@ public class TeamsServiceImplTest {
     public void deleteTest_ShouldPropagteTeamsStoreException() throws Exception {
         session.setEmail(EMAIL);
 
-        when(permissionsService.isAdministrator(EMAIL))
+        when(permissionsService.isAdministrator(session))
                 .thenReturn(true);
         when(teamsStore.deleteTeam(teamA))
                 .thenThrow(new IOException());
@@ -341,7 +341,7 @@ public class TeamsServiceImplTest {
         try {
             service.deleteTeam(teamA, session);
         } catch (IOException e) {
-            verify(permissionsService, times(1)).isAdministrator(EMAIL);
+            verify(permissionsService, times(1)).isAdministrator(session);
             verify(teamsStore, times(1)).deleteTeam(teamA);
             verifyZeroInteractions(readWriteLock, lock);
             throw e;
@@ -352,7 +352,7 @@ public class TeamsServiceImplTest {
     public void deleteTest_ShouldThrowExceptionIfDeleteUncessucessful() throws Exception {
         session.setEmail(EMAIL);
 
-        when(permissionsService.isAdministrator(EMAIL))
+        when(permissionsService.isAdministrator(session))
                 .thenReturn(true);
         when(teamsStore.deleteTeam(teamA))
                 .thenReturn(false);
@@ -360,7 +360,7 @@ public class TeamsServiceImplTest {
         try {
             service.deleteTeam(teamA, session);
         } catch (IOException e) {
-            verify(permissionsService, times(1)).isAdministrator(EMAIL);
+            verify(permissionsService, times(1)).isAdministrator(session);
             verify(teamsStore, times(1)).deleteTeam(teamA);
             verifyZeroInteractions(readWriteLock, lock);
             throw e;
@@ -371,13 +371,13 @@ public class TeamsServiceImplTest {
     public void deleteTest_Success() throws Exception {
         session.setEmail(EMAIL);
 
-        when(permissionsService.isAdministrator(EMAIL))
+        when(permissionsService.isAdministrator(session))
                 .thenReturn(true);
         when(teamsStore.deleteTeam(teamA))
                 .thenReturn(true);
 
         service.deleteTeam(teamA, session);
-        verify(permissionsService, times(1)).isAdministrator(EMAIL);
+        verify(permissionsService, times(1)).isAdministrator(session);
         verify(teamsStore, times(1)).deleteTeam(teamA);
         verifyZeroInteractions(readWriteLock, lock);
     }
@@ -406,13 +406,13 @@ public class TeamsServiceImplTest {
     public void addTeamMemeber_ShouldThrowExIfDUserNotAdmin() throws Exception {
         session.setEmail(EMAIL);
 
-        when(permissionsService.isAdministrator(EMAIL))
+        when(permissionsService.isAdministrator(session))
                 .thenReturn(false);
 
         try {
             service.addTeamMember(EMAIL, teamA, session);
         } catch (ForbiddenException e) {
-            verify(permissionsService, times(1)).isAdministrator(EMAIL);
+            verify(permissionsService, times(1)).isAdministrator(session);
             verifyZeroInteractions(teamsStore, readWriteLock, lock);
             throw e;
         }
@@ -422,12 +422,12 @@ public class TeamsServiceImplTest {
     public void addTeamMember_ShouldNotAddIfEmailNull() throws Exception {
         session.setEmail(EMAIL);
 
-        when(permissionsService.isAdministrator(EMAIL))
+        when(permissionsService.isAdministrator(session))
                 .thenReturn(true);
 
         service.addTeamMember(null, teamA, session);
 
-        verify(permissionsService, times(1)).isAdministrator(EMAIL);
+        verify(permissionsService, times(1)).isAdministrator(session);
         verifyZeroInteractions(teamsStore, readWriteLock, lock);
     }
 
@@ -435,12 +435,12 @@ public class TeamsServiceImplTest {
     public void addTeamMember_ShouldNotAddIfTeamNull() throws Exception {
         session.setEmail(EMAIL);
 
-        when(permissionsService.isAdministrator(EMAIL))
+        when(permissionsService.isAdministrator(session))
                 .thenReturn(true);
 
         service.addTeamMember(EMAIL, null, session);
 
-        verify(permissionsService, times(1)).isAdministrator(EMAIL);
+        verify(permissionsService, times(1)).isAdministrator(session);
         verifyZeroInteractions(teamsStore, readWriteLock, lock);
     }
 
@@ -449,14 +449,14 @@ public class TeamsServiceImplTest {
         session.setEmail(EMAIL);
         Team target = mock(Team.class);
 
-        when(permissionsService.isAdministrator(EMAIL))
+        when(permissionsService.isAdministrator(session))
                 .thenReturn(true);
         when(target.addMember(EMAIL))
                 .thenReturn(target);
 
         service.addTeamMember(EMAIL, target, session);
 
-        verify(permissionsService, times(1)).isAdministrator(EMAIL);
+        verify(permissionsService, times(1)).isAdministrator(session);
         verify(target, times(1)).addMember(EMAIL);
         verify(teamsStore, times(1)).save(target);
         verify(readWriteLock, times(2)).writeLock();
@@ -488,13 +488,13 @@ public class TeamsServiceImplTest {
     public void removeTeamMember_ShouldThrowExIfUserNotAdmin() throws Exception {
         session.setEmail(EMAIL);
 
-        when(permissionsService.isAdministrator(EMAIL))
+        when(permissionsService.isAdministrator(session))
                 .thenReturn(false);
 
         try {
             service.removeTeamMember(EMAIL, teamA, session);
         } catch (ForbiddenException e) {
-            verify(permissionsService, times(1)).isAdministrator(EMAIL);
+            verify(permissionsService, times(1)).isAdministrator(session);
             verifyZeroInteractions(teamsStore, readWriteLock, lock);
             throw e;
         }
@@ -506,12 +506,12 @@ public class TeamsServiceImplTest {
 
         Team target = mock(Team.class);
 
-        when(permissionsService.isAdministrator(EMAIL))
+        when(permissionsService.isAdministrator(session))
                 .thenReturn(true);
 
         service.removeTeamMember(null, target, session);
 
-        verify(permissionsService, times(1)).isAdministrator(EMAIL);
+        verify(permissionsService, times(1)).isAdministrator(session);
         verifyZeroInteractions(target, teamsStore, readWriteLock, lock);
     }
 
@@ -521,12 +521,12 @@ public class TeamsServiceImplTest {
 
         Team target = mock(Team.class);
 
-        when(permissionsService.isAdministrator(EMAIL))
+        when(permissionsService.isAdministrator(session))
                 .thenReturn(true);
 
         service.removeTeamMember(EMAIL, null, session);
 
-        verify(permissionsService, times(1)).isAdministrator(EMAIL);
+        verify(permissionsService, times(1)).isAdministrator(session);
         verifyZeroInteractions(target, teamsStore, readWriteLock, lock);
     }
 
@@ -535,14 +535,14 @@ public class TeamsServiceImplTest {
         session.setEmail(EMAIL);
         Team target = mock(Team.class);
 
-        when(permissionsService.isAdministrator(EMAIL))
+        when(permissionsService.isAdministrator(session))
                 .thenReturn(true);
         when(target.removeMember(EMAIL))
                 .thenReturn(target);
 
         service.removeTeamMember(EMAIL, target, session);
 
-        verify(permissionsService, times(1)).isAdministrator(EMAIL);
+        verify(permissionsService, times(1)).isAdministrator(session);
         verify(target, times(1)).removeMember(EMAIL);
         verify(teamsStore, times(1)).save(target);
         verify(readWriteLock, times(2)).writeLock();
@@ -581,7 +581,7 @@ public class TeamsServiceImplTest {
         try {
             service.getTeamMembersSummary(session);
         } catch (ForbiddenException e) {
-            verify(permissionsService, times(1)).isAdministrator(EMAIL);
+            verify(permissionsService, times(1)).isAdministrator(session);
             verifyZeroInteractions(teamsStore);
             throw e;
         }
@@ -594,7 +594,7 @@ public class TeamsServiceImplTest {
         teamsList.add(teamA.addMember("userA").addMember("userB"));
         teamsList.add(teamC.addMember("userC"));
 
-        when(permissionsService.isAdministrator(EMAIL))
+        when(permissionsService.isAdministrator(session))
                 .thenReturn(true);
         when(teamsStore.listTeams())
                 .thenReturn(teamsList);
@@ -607,7 +607,7 @@ public class TeamsServiceImplTest {
         List<AbstractMap.SimpleEntry<String, String>> result = service.getTeamMembersSummary(session);
 
         assertThat(result, equalTo(expected));
-        verify(permissionsService, times(1)).isAdministrator(EMAIL);
+        verify(permissionsService, times(1)).isAdministrator(session);
         verify(teamsStore, times(1)).listTeams();
         verifyNoMoreInteractions(permissionsService, teamsStore);
     }

@@ -1,7 +1,5 @@
 package com.github.onsdigital.zebedee.user.model;
 
-import com.github.onsdigital.zebedee.user.model.User;
-import com.github.onsdigital.zebedee.user.model.UserList;
 import com.github.onsdigital.zebedee.util.CustomListCollector;
 import com.google.common.collect.ImmutableList;
 

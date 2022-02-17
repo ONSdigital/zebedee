@@ -45,9 +45,9 @@ public class DeleteContent {
         }
         com.github.onsdigital.zebedee.model.Collection collection = zebedeeCmsService.getCollection(
                 deleteMarkerJson.getCollectionId());
-        Session session = zebedeeCmsService.getSession(request);
+        Session session = zebedeeCmsService.getSession();
 
-        if (!zebedeeCmsService.getPermissions().canView(session.getEmail(), collection.description)) {
+        if (!zebedeeCmsService.getPermissions().canView(session, collection.getDescription().getId())) {
             return new DeleteContentResponse(HttpStatus.SC_UNAUTHORIZED);
         }
 
@@ -61,9 +61,9 @@ public class DeleteContent {
 
         // TODO if collection ID scope = collection. Otherwise all delete items.
         com.github.onsdigital.zebedee.model.Collection collection = zebedeeCmsService.getCollection(request);
-        Session session = zebedeeCmsService.getSession(request);
+        Session session = zebedeeCmsService.getSession();
 
-        if (zebedeeCmsService.getPermissions().canView(session.getEmail(), collection.description)) {
+        if (zebedeeCmsService.getPermissions().canView(session, collection.getDescription().getId())) {
             return new DeleteContentResponse(HttpStatus.SC_UNAUTHORIZED);
         }
 
@@ -86,9 +86,9 @@ public class DeleteContent {
     public DeleteContentResponse removeDeleteMarker(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ZebedeeException {
         com.github.onsdigital.zebedee.model.Collection collection = zebedeeCmsService.getCollection(request);
-        Session session = zebedeeCmsService.getSession(request);
+        Session session = zebedeeCmsService.getSession();
 
-        if (!zebedeeCmsService.getPermissions().canView(session.getEmail(), collection.description)) {
+        if (!zebedeeCmsService.getPermissions().canView(session, collection.getDescription().getId())) {
             return new DeleteContentResponse(HttpStatus.SC_UNAUTHORIZED);
         }
 

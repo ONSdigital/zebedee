@@ -1,9 +1,6 @@
 package com.github.onsdigital.zebedee.authorisation;
 
 import com.github.onsdigital.zebedee.api.Root;
-import com.github.onsdigital.zebedee.model.Collections;
-import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
-import com.github.onsdigital.zebedee.service.ServiceStore;
 import com.github.onsdigital.zebedee.service.ServiceSupplier;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.session.service.Sessions;
@@ -19,13 +16,18 @@ import static org.apache.http.HttpStatus.SC_INTERNAL_SERVER_ERROR;
 import static org.apache.http.HttpStatus.SC_NOT_FOUND;
 import static org.apache.http.HttpStatus.SC_UNAUTHORIZED;
 
+/**
+ * @deprecated The AuthorisationService is deprecated in favour of the new JWT sessions. Validating the JWT signature
+ *             accomplishes the same functionality as this implementation, but in a more distributed fashion.
+ *
+ * TODO: Once the migration to JWT sessions has been completed and all microservices have been updated to use the new
+ *       dp-authorisation implementation that includes JWT validation, then this service should be removed
+ */
+@Deprecated
 public class AuthorisationServiceImpl implements AuthorisationService {
 
     private ServiceSupplier<Sessions> sessionsSupplier = () -> Root.zebedee.getSessions();
     private ServiceSupplier<UsersService> userServiceSupplier = () -> Root.zebedee.getUsersService();
-    private ServiceSupplier<Collections> collectionsSupplier = () -> Root.zebedee.getCollections();
-    private ServiceSupplier<PermissionsService> permissionsServiceSupplier = () -> Root.zebedee.getPermissionsService();
-    private ServiceSupplier<ServiceStore> serviceStoreSupplier = () -> Root.zebedee.getServiceStore();
 
     private static final String INTERNAL_ERROR = "internal server error";
     private static final String AUTHENTICATED_ERROR = "user not authenticated";
@@ -38,15 +40,7 @@ public class AuthorisationServiceImpl implements AuthorisationService {
             throw new UserIdentityException(AUTHENTICATED_ERROR, SC_UNAUTHORIZED);
         }
 
-        Session session;
-        try {
-            // TODO: replace with sessionsSupplier.getService().get() once migration to JWT sessions is complete
-            session = sessionsSupplier.getService().get(sessionID);
-        } catch (IOException e) {
-            error().logException(e, "identify user error, unexpected error while attempting to get user session");
-            throw new UserIdentityException(INTERNAL_ERROR, SC_INTERNAL_SERVER_ERROR);
-        }
-
+        Session session = sessionsSupplier.getService().get();
         if (session == null) {
             warn().log("identify user error, session with specified ID could not be found");
             throw new UserIdentityException(AUTHENTICATED_ERROR, SC_UNAUTHORIZED);

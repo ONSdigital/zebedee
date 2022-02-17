@@ -9,17 +9,16 @@ import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.TableBuilderException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
-import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
 import com.github.onsdigital.zebedee.persistence.model.CollectionHistoryEvent;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.reader.util.RequestUtils;
+import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.util.XlsToHtmlConverter;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
-import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.BooleanUtils;
@@ -63,9 +62,9 @@ public class ModifyTable {
      */
     @POST
     public void modifyTable(HttpServletRequest request, HttpServletResponse response)
-            throws IOException, ZebedeeException, ParserConfigurationException, TransformerException, FileUploadException {
+            throws IOException, ZebedeeException, ParserConfigurationException, TransformerException {
 
-        Session session = Root.zebedee.getSessions().get(request);
+        Session session = Root.zebedee.getSessions().get();
         com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request);
         CollectionReader collectionReader = new ZebedeeCollectionReader(Root.zebedee, collection, session);
         String currentUri = request.getParameter(CURRENT_URI);
@@ -97,7 +96,7 @@ public class ModifyTable {
     @GET
     public void getTableMetadata(HttpServletRequest request, HttpServletResponse response) throws IOException,
             ZebedeeException {
-        Session session = Root.zebedee.getSessions().get(request);
+        Session session = Root.zebedee.getSessions().get();
         com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request);
 
         CollectionReader collectionReader = new ZebedeeCollectionReader(Root.zebedee, collection, session);
@@ -181,7 +180,7 @@ public class ModifyTable {
     }
 
     private String generateModifiedTable(InputStream inputStream, TableModifications modifications)
-            throws ParserConfigurationException, TableBuilderException, IOException, TransformerException {
+            throws ParserConfigurationException, IOException, TransformerException {
 
         if (modifications == null || modifications.getRowsExcluded().isEmpty()
                 && modifications.getHeaderColumns().isEmpty() && modifications.getHeaderRows().isEmpty()) {

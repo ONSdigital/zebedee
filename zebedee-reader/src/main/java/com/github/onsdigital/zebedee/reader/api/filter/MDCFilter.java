@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee.reader.api.filter;
 
 import com.github.davidcarboni.restolino.framework.PreFilter;
+import com.github.davidcarboni.restolino.framework.Priority;
 import com.github.onsdigital.logging.util.RequestLogUtil;
 
 import javax.servlet.http.HttpServletRequest;
@@ -11,6 +12,7 @@ import static com.github.onsdigital.zebedee.logging.ReaderLogger.info;
 /**
  * Filter to add the X-Request-Id and remote address to the {@link org.slf4j.MDC} for logging.
  */
+@Priority(1)
 public class MDCFilter implements PreFilter {
 
     private static final String PING = "/ping";

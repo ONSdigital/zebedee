@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee.filters;
 
 import com.github.davidcarboni.restolino.framework.PreFilter;
+import com.github.davidcarboni.restolino.framework.Priority;
 import com.github.davidcarboni.restolino.helpers.Path;
 import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.api.ClickEventLog;
@@ -32,6 +33,7 @@ import java.io.IOException;
 
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
 
+@Priority(2)
 public class AuthenticationFilter implements PreFilter {
 
     static final String AUTH_HEADER = "Authorization";
@@ -161,8 +163,8 @@ public class AuthenticationFilter implements PreFilter {
     }
 
     private boolean authorisationRequired(Path path) {
-        return !NO_AUTH_REQUIRED.stream()
-                .anyMatch(clazzName -> clazzName.getSimpleName().equalsIgnoreCase(path.lastSegment()));
+        return NO_AUTH_REQUIRED.stream()
+                .noneMatch(clazzName -> clazzName.getSimpleName().equalsIgnoreCase(path.lastSegment()));
     }
 
     /**

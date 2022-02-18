@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee.filters;
 
 import com.github.davidcarboni.restolino.framework.PreFilter;
+import com.github.davidcarboni.restolino.framework.Priority;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -10,22 +11,12 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * Captures requests with a file extension as they do not get routed to the API.
  */
-public class StaticFilter implements PreFilter
-{
+@Priority(3)
+public class StaticFilter implements PreFilter {
 
     @Override
     public boolean filter(HttpServletRequest req, HttpServletResponse res) {
-        if (isStaticContentRequest(req)) {
-//            try {
-//                // reading the content and add it to the response
-//            } catch (IOException | NotFoundException | BadRequestException | UnauthorizedException e) {
-//                return true;
-//            }
-
-            return false;
-        }
-
-        return true;
+        return !isStaticContentRequest(req);
     }
 
     /**

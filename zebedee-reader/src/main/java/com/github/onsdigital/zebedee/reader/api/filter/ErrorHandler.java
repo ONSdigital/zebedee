@@ -5,7 +5,6 @@ import com.github.davidcarboni.restolino.framework.ServerError;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeExceptionWithData;
 import com.github.onsdigital.zebedee.reader.api.bean.ServerResponse;
-import com.github.onsdigital.zebedee.util.mertics.service.MetricsService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -17,11 +16,8 @@ import static com.github.onsdigital.zebedee.logging.ReaderLogger.error;
  */
 public class ErrorHandler implements ServerError {
 
-    private static MetricsService metricsService = MetricsService.getInstance();
-
     @Override
     public ServerResponse handle(HttpServletRequest req, HttpServletResponse res, RequestHandler requestHandler, Throwable t) {
-        metricsService.captureErrorMetrics();
 
         // If it's an ZebedeeExceptionWithData subclass, set the status code and message
         if (t != null && ZebedeeExceptionWithData.class.isAssignableFrom(t.getClass())) {

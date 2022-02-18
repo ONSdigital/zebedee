@@ -6,7 +6,6 @@ import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.reader.Resource;
-import com.github.onsdigital.zebedee.util.mertics.service.MetricsService;
 import org.apache.commons.io.IOUtils;
 
 import javax.servlet.http.HttpServletRequest;
@@ -22,8 +21,6 @@ import static com.github.onsdigital.zebedee.logging.ReaderLogger.info;
  */
 public class ReaderResponseResponseUtils {
 
-    private static MetricsService metricsService = MetricsService.getInstance();
-
     public static void sendResponse(Object content, HttpServletResponse response) throws IOException {
         response.setStatus(HttpServletResponse.SC_OK);
         response.setContentType(MediaType.APPLICATION_JSON);
@@ -37,7 +34,6 @@ public class ReaderResponseResponseUtils {
         }
 
         IOUtils.copy(new StringReader(ContentUtil.serialise(content)), response.getOutputStream());
-        metricsService.captureRequestResponseTimeMetrics();
     }
 
     public static void sendResponse(Resource resource, HttpServletResponse response, String encoding) throws IOException {

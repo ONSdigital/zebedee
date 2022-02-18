@@ -26,7 +26,6 @@ import com.github.onsdigital.zebedee.util.ContentTree;
 import com.github.onsdigital.zebedee.util.SlackNotification;
 import com.github.onsdigital.zebedee.util.URIUtils;
 import com.github.onsdigital.zebedee.util.ZipUtils;
-import com.github.onsdigital.zebedee.util.mertics.service.MetricsService;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -46,7 +45,6 @@ import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
 
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.error;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.info;
@@ -85,8 +83,6 @@ public class PostPublisher {
 
             getCollectionHistoryDao().saveCollectionHistoryEvent(collection, getPublisherClassSession(),
                     COLLECTION_POST_PUBLISHED_CONFIRMATION);
-
-            savePublishMetrics(publishedCollection);
 
             ContentReader contentReader = new FileSystemContentReader(zebedee.getPublished().getPath());
             ContentWriter contentWriter = new ContentWriter(zebedee.getPublished().getPath());
@@ -141,31 +137,6 @@ public class PostPublisher {
             error().collectionID(collection)
                     .exception(e)
                     .log("An error occurred trying apply the deletes to publishing content");
-        }
-    }
-
-    public static void savePublishMetrics(PublishedCollection publishedCollection) {
-        try {
-            long publishTimeMs = Math.round(publishedCollection.publishEndDate.getTime() - publishedCollection.publishStartDate.getTime());
-
-            Date publishDate = publishedCollection.getPublishDate();
-
-            if (publishDate == null)
-                publishDate = publishedCollection.publishStartDate;
-
-            if (publishDate == null)
-                publishDate = new Date();
-
-            MetricsService.getInstance().captureCollectionPublishMetrics(
-                    publishedCollection.getId(),
-                    publishTimeMs,
-                    publishedCollection.publishResults.get(0).transaction.uriInfos.size(),
-                    publishedCollection.getType().toString(),
-                    publishDate);
-        } catch (Exception exception) {
-            error().collectionID(publishedCollection.getId())
-                    .exception(exception)
-                    .log("An error occurred saving publish metrics");
         }
     }
 

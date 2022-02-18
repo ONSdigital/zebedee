@@ -1,6 +1,5 @@
 package com.github.onsdigital.zebedee.session.service;
 
-import com.github.onsdigital.impl.UserDataPayload;
 import com.github.onsdigital.zebedee.json.PermissionDefinition;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.permissions.store.PermissionsStore;
@@ -8,6 +7,7 @@ import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.session.store.SessionsStore;
 import com.github.onsdigital.zebedee.teams.service.TeamsService;
 import com.github.onsdigital.zebedee.teams.service.TeamsServiceImpl;
+import com.google.common.annotations.VisibleForTesting;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
@@ -28,7 +28,7 @@ public class ThreadLocalSessionsServiceImpl extends SessionsServiceImpl {
     private PermissionsService permissionsService;
     private TeamsService teamsService;
 
-    private static ThreadLocal<UserDataPayload> store = new ThreadLocal<>();
+    private static ThreadLocal<Session> store = new ThreadLocal<>();
 
     public static final String ACCESS_TOKEN_REQUIRED_ERROR = "access token required but none provided.";
     public static final String ACCESS_TOKEN_EXPIRED_ERROR = "session token lookup failed as token is expired.";
@@ -68,12 +68,7 @@ public class ThreadLocalSessionsServiceImpl extends SessionsServiceImpl {
      */
     @Override
     public Session get() {
-        UserDataPayload jwtDetails = store.get();
-        if (jwtDetails == null) {
-            return null;
-        }
-
-        return new Session(jwtDetails);
+        return store.get();
     }
 
     /**
@@ -108,7 +103,7 @@ public class ThreadLocalSessionsServiceImpl extends SessionsServiceImpl {
         }
         teams.addAll(teamsService.listTeamsForUser(session));
 
-        store.set(new UserDataPayload(session.getEmail(), teams.toArray(new String[teams.size()])));
+        store.set(new Session(session.getId(), session.getEmail(), teams));
     }
 
     /**
@@ -121,7 +116,8 @@ public class ThreadLocalSessionsServiceImpl extends SessionsServiceImpl {
         store.remove();
     }
 
-    static void setStore(ThreadLocal<UserDataPayload> store) {
+    @VisibleForTesting
+    static void setStore(ThreadLocal<Session> store) {
         ThreadLocalSessionsServiceImpl.store = store;
     }
 }

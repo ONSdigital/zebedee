@@ -18,6 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
@@ -59,9 +60,7 @@ public class ServiceTest {
 
     @Test
     public void createNewServiceAccountTest() throws IOException, NotFoundException, UnauthorizedException {
-        Session session = new Session();
-        session.setEmail("other@ons.gov.uk");
-        session.setId("123");
+        Session session = new Session("123", "other@ons.gov.uk", new ArrayList<>());
 
         when(sessions.get()).thenReturn(session);
         when(permissionsService.isAdministrator(session)).thenReturn(true);
@@ -76,9 +75,7 @@ public class ServiceTest {
 
     @Test
     public void createNewServiceAccountWithNoAdminRights() throws IOException, NotFoundException, UnauthorizedException {
-        Session session = new Session();
-        session.setEmail("other@ons.gov.uk");
-        session.setId("123");
+        Session session = new Session("123", "other@ons.gov.uk", new ArrayList<>());
 
         when(sessions.get()).thenReturn(session);
         when(permissionsService.isAdministrator(session)).thenReturn(false);

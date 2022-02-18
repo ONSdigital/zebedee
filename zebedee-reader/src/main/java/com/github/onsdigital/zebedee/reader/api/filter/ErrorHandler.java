@@ -18,7 +18,6 @@ public class ErrorHandler implements ServerError {
 
     @Override
     public ServerResponse handle(HttpServletRequest req, HttpServletResponse res, RequestHandler requestHandler, Throwable t) {
-
         // If it's an ZebedeeExceptionWithData subclass, set the status code and message
         if (t != null && ZebedeeExceptionWithData.class.isAssignableFrom(t.getClass())) {
             ZebedeeExceptionWithData exception = (ZebedeeExceptionWithData) t;

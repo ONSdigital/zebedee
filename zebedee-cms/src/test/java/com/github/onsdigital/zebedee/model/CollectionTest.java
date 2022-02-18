@@ -95,12 +95,8 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
 
         collection = new Collection(builder.collections.get(1), zebedee);
 
-        publisher1Session = zebedee.openSession(builder.publisher1Credentials);
-        publisher2Session = new Session();
-        publisher2Session.setEmail(builder.publisher2.getEmail());
-        publisher2Session.setId("5678");
-        publisher2Session.setLastAccess(new Date());
-        publisher2Session.setStart(new Date());
+        publisher1Session = new Session("5678", builder.publisher1.getEmail(), new ArrayList<>());
+        publisher2Session = new Session("5678", builder.publisher2.getEmail(), new ArrayList<>());
 
         setUpPermissionsServiceMockForLegacyTests(zebedee, publisher1Session);
         ReflectionTestUtils.setField(zebedee, "teamsService", teamsService);

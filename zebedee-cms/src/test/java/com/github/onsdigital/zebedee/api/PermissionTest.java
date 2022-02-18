@@ -1,6 +1,5 @@
 package com.github.onsdigital.zebedee.api;
 
-import com.github.onsdigital.zebedee.exceptions.InternalServerError;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.PermissionDefinition;
@@ -15,7 +14,6 @@ import org.junit.Test;
 import org.mockito.Mock;
 
 import javax.crypto.SecretKey;
-import java.io.IOException;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -64,7 +62,7 @@ public class PermissionTest extends ZebedeeAPIBaseTestCase {
     @Override
     protected void customSetUp() throws Exception {
         when(sessionsService.get())
-                .thenReturn(session);
+                .thenReturn(mockSession);
 
         when(usersService.getUserByEmail(TEST_EMAIL))
                 .thenReturn(srcUser);
@@ -111,7 +109,7 @@ public class PermissionTest extends ZebedeeAPIBaseTestCase {
     public void testGrant_addAdminError_shouldThrowException() throws Exception {
         doThrow(UnauthorizedException.class)
                 .when(permissionsService)
-                .addAdministrator(USER_EMAIL, session);
+                .addAdministrator(USER_EMAIL, mockSession);
 
         permission.isAdmin(true);
 
@@ -119,7 +117,7 @@ public class PermissionTest extends ZebedeeAPIBaseTestCase {
                 () -> endpoint.grantPermission(mockRequest, mockResponse, permission));
 
         verify(sessionsService, times(1)).get();
-        verify(permissionsService, times(1)).addAdministrator(USER_EMAIL, session);
+        verify(permissionsService, times(1)).addAdministrator(USER_EMAIL, mockSession);
     }
 
     @Test
@@ -129,7 +127,7 @@ public class PermissionTest extends ZebedeeAPIBaseTestCase {
         endpoint.grantPermission(mockRequest, mockResponse, permission);
 
         verify(sessionsService, times(1)).get();
-        verify(permissionsService, times(1)).addAdministrator(USER_EMAIL, session);
+        verify(permissionsService, times(1)).addAdministrator(USER_EMAIL, mockSession);
     }
 
     @Test
@@ -138,13 +136,13 @@ public class PermissionTest extends ZebedeeAPIBaseTestCase {
 
         doThrow(UnauthorizedException.class)
                 .when(permissionsService)
-                .removeAdministrator(USER_EMAIL, session);
+                .removeAdministrator(USER_EMAIL, mockSession);
 
         assertThrows(UnauthorizedException.class,
                 () -> endpoint.grantPermission(mockRequest, mockResponse, permission));
 
         verify(sessionsService, times(1)).get();
-        verify(permissionsService, times(1)).removeAdministrator(USER_EMAIL, session);
+        verify(permissionsService, times(1)).removeAdministrator(USER_EMAIL, mockSession);
     }
 
     @Test
@@ -154,14 +152,14 @@ public class PermissionTest extends ZebedeeAPIBaseTestCase {
 
         doThrow(UnauthorizedException.class)
                 .when(permissionsService)
-                .addEditor(USER_EMAIL, session);
+                .addEditor(USER_EMAIL, mockSession);
 
         assertThrows(UnauthorizedException.class,
                 () -> endpoint.grantPermission(mockRequest, mockResponse, permission));
 
         verify(sessionsService, times(1)).get();
-        verify(permissionsService, times(1)).addEditor(USER_EMAIL, session);
-        verify(permissionsService, times(1)).removeAdministrator(USER_EMAIL, session);
+        verify(permissionsService, times(1)).addEditor(USER_EMAIL, mockSession);
+        verify(permissionsService, times(1)).removeAdministrator(USER_EMAIL, mockSession);
     }
 
     @Test
@@ -171,14 +169,14 @@ public class PermissionTest extends ZebedeeAPIBaseTestCase {
 
         doThrow(UnauthorizedException.class)
                 .when(permissionsService)
-                .removeEditor(USER_EMAIL, session);
+                .removeEditor(USER_EMAIL, mockSession);
 
         assertThrows(UnauthorizedException.class,
                 () -> endpoint.grantPermission(mockRequest, mockResponse, permission));
 
         verify(sessionsService, times(1)).get();
-        verify(permissionsService, times(1)).removeEditor(USER_EMAIL, session);
-        verify(permissionsService, times(1)).removeAdministrator(USER_EMAIL, session);
+        verify(permissionsService, times(1)).removeEditor(USER_EMAIL, mockSession);
+        verify(permissionsService, times(1)).removeAdministrator(USER_EMAIL, mockSession);
     }
 
     @Test
@@ -191,7 +189,7 @@ public class PermissionTest extends ZebedeeAPIBaseTestCase {
 
         assertThat(actual, equalTo(expected));
         verify(sessionsService, times(1)).get();
-        verify(permissionsService, times(1)).removeEditor(USER_EMAIL, session);
-        verify(permissionsService, times(1)).removeAdministrator(USER_EMAIL, session);
+        verify(permissionsService, times(1)).removeEditor(USER_EMAIL, mockSession);
+        verify(permissionsService, times(1)).removeAdministrator(USER_EMAIL, mockSession);
     }
 }

@@ -2,7 +2,7 @@ package com.github.onsdigital.zebedee.session.store;
 
 import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.model.PathUtils;
-import com.github.onsdigital.zebedee.session.model.Session;
+import com.github.onsdigital.zebedee.session.model.LegacySession;
 import com.github.onsdigital.zebedee.session.service.JWTSessionsServiceImpl;
 import com.github.onsdigital.zebedee.util.serialiser.JSONSerialiser;
 import org.apache.commons.lang3.StringUtils;
@@ -33,11 +33,11 @@ public class SessionsStoreImpl implements SessionsStore {
     private static final Predicate<Path> isSessionFile = (p) -> p != null && !Files.isDirectory(p)
             && p.getFileName().toString().endsWith(JSON_EXT);
 
-    private JSONSerialiser<Session> sessionJSONSerialiser;
+    private JSONSerialiser<LegacySession> sessionJSONSerialiser;
 
     public SessionsStoreImpl(Path sessionsPath) {
         this.sessionsPath = sessionsPath;
-        this.sessionJSONSerialiser = new JSONSerialiser(Session.class);
+        this.sessionJSONSerialiser = new JSONSerialiser(LegacySession.class);
     }
 
     private Path getPath(String id) {
@@ -53,18 +53,18 @@ public class SessionsStoreImpl implements SessionsStore {
     /**
      * Writes a session object to disk.
      *
-     * @param session The {@link Session} to be written.
+     * @param session The {@link LegacySession} to be written.
      * @throws IOException If a filesystem error occurs.
      */
     @Override
-    public synchronized void write(Session session) throws IOException {
+    public synchronized void write(LegacySession session) throws IOException {
         try (OutputStream output = Files.newOutputStream(getPath(session.getId()))) {
             Serialiser.serialise(output, session);
         }
     }
 
     /**
-     * Reads a {@link Session} object
+     * Reads a {@link LegacySession} object
      * from the given {@link java.nio.file.Path}
      *
      * @param path The path to read from.
@@ -72,13 +72,13 @@ public class SessionsStoreImpl implements SessionsStore {
      * @throws IOException If a filesystem error occurs.
      */
     @Override
-    public synchronized Session read(String id) throws IOException {
+    public synchronized LegacySession read(String id) throws IOException {
         Path path = getPath(id);
         return read(path);
     }
 
-    private Session read(Path path) throws IOException {
-        Session session = null;
+    private LegacySession read(Path path) throws IOException {
+        LegacySession session = null;
 
         if (Files.exists(path)) {
             try (InputStream input = Files.newInputStream(path)) {
@@ -94,11 +94,10 @@ public class SessionsStoreImpl implements SessionsStore {
     }
 
     @Override
-    public Session find(String email) throws IOException {
-        Session candidate = null;
-        Session result = null;
+    public LegacySession find(String email) throws IOException {
+        LegacySession candidate = null;
+        LegacySession result = null;
 
-        iterate:
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(sessionsPath)) {
             for (Path entry : stream) {
                 if (isSessionFile.test(entry)) {
@@ -115,13 +114,13 @@ public class SessionsStoreImpl implements SessionsStore {
     }
 
     @Override
-    public List<Session> filterSessions(Predicate<Session> criteria) throws IOException {
-        List<Session> results = new ArrayList<>();
+    public List<LegacySession> filterSessions(Predicate<LegacySession> criteria) throws IOException {
+        List<LegacySession> results = new ArrayList<>();
 
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(sessionsPath)) {
             for (Path entry : stream) {
                 if (isSessionFile.test(entry)) {
-                    Session s = read(entry);
+                    LegacySession s = read(entry);
                     if (criteria.test(s)) {
                         results.add(s);
                     }

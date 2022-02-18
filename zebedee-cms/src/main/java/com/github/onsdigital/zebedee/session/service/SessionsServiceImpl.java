@@ -1,13 +1,13 @@
 package com.github.onsdigital.zebedee.session.service;
 
 import com.github.davidcarboni.cryptolite.Random;
-import com.github.onsdigital.zebedee.reader.util.RequestUtils;
+import com.github.onsdigital.zebedee.session.model.LegacySession;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.session.store.SessionsStore;
 import org.apache.commons.lang3.StringUtils;
 
-import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -76,15 +76,15 @@ public class SessionsServiceImpl extends TimerTask implements Sessions {
         if (StringUtils.isNotBlank(email)) {
 
             // Check for an existing session:
-            session = find(email);
+            LegacySession legacySession = find(email);
 
             // Otherwise go ahead and create
-            if (session == null || expired(session)) {
-                session = new Session();
-                session.setId(randomIdGenerator.get());
-                session.setEmail(email);
-                sessionsStore.write(session);
+            if (legacySession == null || expired(legacySession)) {
+                legacySession = new LegacySession(randomIdGenerator.get(),email);
+                sessionsStore.write(legacySession);
             }
+
+            session = new Session(legacySession.getId(), legacySession.getEmail(), new ArrayList<>());
         }
 
         return session;
@@ -99,21 +99,21 @@ public class SessionsServiceImpl extends TimerTask implements Sessions {
      * @throws java.io.IOException If a filesystem error occurs.
      */
     protected Session get(String id) throws IOException {
-        Session result = null;
+        Session session = null;
 
         // Check the session record exists:
         if (sessionsStore.exists(id)) {
             // Deserialise the json:
-            Session session = sessionsStore.read(id);
-            if (!expired(session)) {
-                updateLastAccess(session);
-                result = session;
+            LegacySession legacySession = sessionsStore.read(id);
+            if (!expired(legacySession)) {
+                updateLastAccess(legacySession);
+                session = new Session(legacySession.getId(), legacySession.getEmail(), new ArrayList<>());
             }
             else{
                warn().log("session found expired, this is a known error during session get");
             }
         }
-        return result;
+        return session;
     }
 
     /**
@@ -123,8 +123,8 @@ public class SessionsServiceImpl extends TimerTask implements Sessions {
      * @return An existing session, if found.
      * @throws IOException If a filesystem error occurs.
      */
-    private Session find(String email) throws IOException {
-        Session session = sessionsStore.find(email);
+    private LegacySession find(String email) throws IOException {
+        LegacySession session = sessionsStore.find(email);
         if (!expired(session)) {
             updateLastAccess(session);
         }
@@ -140,10 +140,10 @@ public class SessionsServiceImpl extends TimerTask implements Sessions {
      * @throws IOException If a filesystem error occurs.
      */
     void deleteExpiredSessions() throws IOException {
-        Predicate<Session> isExpired = this::expired;
-        List<Session> expired = sessionsStore.filterSessions(isExpired);
+        Predicate<LegacySession> isExpired = this::expired;
+        List<LegacySession> expired = sessionsStore.filterSessions(isExpired);
 
-        for (Session s : expired) {
+        for (LegacySession s : expired) {
             info().data("user", s.getEmail()).log(DELETING_SESSION_MSG);
             sessionsStore.delete(s.getId());
         }
@@ -156,7 +156,7 @@ public class SessionsServiceImpl extends TimerTask implements Sessions {
      * @return If the session is not null and the last access time is
      * more than 60 minutes in the past, true.
      */
-    boolean expired(Session session) {
+    boolean expired(LegacySession session) {
         boolean result = false;
 
         if (session != null) {
@@ -207,7 +207,7 @@ public class SessionsServiceImpl extends TimerTask implements Sessions {
      * @param session The session to update.
      * @throws IOException If a filesystem error occurs.
      */
-    private void updateLastAccess(Session session) throws IOException {
+    private void updateLastAccess(LegacySession session) throws IOException {
         if (session != null) {
             session.setLastAccess(new Date());
             sessionsStore.write(session);

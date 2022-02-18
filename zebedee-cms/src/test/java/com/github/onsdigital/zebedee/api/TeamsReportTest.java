@@ -70,7 +70,7 @@ public class TeamsReportTest extends ZebedeeAPIBaseTestCase {
     @Test(expected = UnauthorizedException.class)
     public void getReport_ShouldProbegateExceptionFromTeamsService() throws Exception {
         when(sessions.get())
-                .thenReturn(session);
+                .thenReturn(mockSession);
         when(teamsService.getTeamMembersSummary(any()))
                 .thenThrow(new UnauthorizedException(""));
 
@@ -78,7 +78,7 @@ public class TeamsReportTest extends ZebedeeAPIBaseTestCase {
             api.getReport(mockRequest, mockResponse);
         } catch (UnauthorizedException e) {
             verify(sessions, times(1)).get();
-            verify(teamsService, times(1)).getTeamMembersSummary(session);
+            verify(teamsService, times(1)).getTeamMembersSummary(mockSession);
             verify(mockResponse, never()).getOutputStream();
             throw e;
         }
@@ -95,8 +95,8 @@ public class TeamsReportTest extends ZebedeeAPIBaseTestCase {
         teamUserMapping.add(create("CTeam", "userC"));
 
         when(sessions.get())
-                .thenReturn(session);
-        when(teamsService.getTeamMembersSummary(session))
+                .thenReturn(mockSession);
+        when(teamsService.getTeamMembersSummary(mockSession))
                 .thenReturn(teamUserMapping);
 
         ByteArrayOutputStream content = new ByteArrayOutputStream(1024);
@@ -111,7 +111,7 @@ public class TeamsReportTest extends ZebedeeAPIBaseTestCase {
         verify(mockResponse, times(1)).setStatus(HttpStatus.SC_OK);
         verify(mockResponse, times(1)).setContentType(MediaType.APPLICATION_OCTET_STREAM);
         verify(sessions, times(1)).get();
-        verify(teamsService, times(1)).getTeamMembersSummary(session);
+        verify(teamsService, times(1)).getTeamMembersSummary(mockSession);
 
         // assert that HSSFWorkbook is as expected.
         assertThat(result.getNumberOfSheets(), equalTo(1));

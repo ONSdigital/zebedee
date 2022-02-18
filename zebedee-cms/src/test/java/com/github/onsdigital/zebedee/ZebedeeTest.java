@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -199,8 +200,7 @@ public class ZebedeeTest extends ZebedeeTestBaseFixture {
         // create content in collection 01.
         builder.createInProgressFile(contentPath);
 
-        Session session = new Session();
-        session.setEmail("makingData@greatagain.com");
+        Session session = new Session("1234", "makingData@greatagain.com", new ArrayList<>());
         Optional<Collection> blockingCollection = zebedee.checkForCollectionBlockingChange(collectionOne, contentPath);
 
         assertThat(blockingCollection.isPresent(), is(true));
@@ -216,8 +216,7 @@ public class ZebedeeTest extends ZebedeeTestBaseFixture {
         String contentPath = "/aboutus/data.json";
         Collection collectionOne = zebedee.getCollections().getCollectionByName(COLLECTION_ONE_NAME);
 
-        Session session = new Session();
-        session.setEmail("makingData@greatagain.com");
+        Session session = new Session("1234", "makingData@greatagain.com", new ArrayList<>());
         Optional<Collection> blockingCollection = zebedee.checkForCollectionBlockingChange(collectionOne, contentPath);
         assertThat(blockingCollection.isPresent(), is(false));
 

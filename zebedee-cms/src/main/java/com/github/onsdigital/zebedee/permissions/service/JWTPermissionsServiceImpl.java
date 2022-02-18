@@ -57,14 +57,14 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
      */
     private static List<Integer> convertGroupsToTeams(Session session) throws NumberFormatException {
         List<Integer> teamsList = new ArrayList<>();
-        if (session == null || ArrayUtils.isEmpty(session.getGroups())) {
+        if (session == null || session.getGroups().isEmpty()) {
             return teamsList;
         }
 
         String[] valueArray = {PUBLISHER_GROUP, ADMIN_GROUP};
-        String[] groups = session.getGroups();
+        List<String> groups = session.getGroups();
         Set<String> setOfString = new HashSet<>(
-                Arrays.asList(groups));
+                groups);
         for (String s : setOfString) {
             try {
                 teamsList.add(Integer.parseInt(s));
@@ -351,6 +351,6 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
      * @return <code>true</code> if the user is a member of the group, <code>false</code> otherwise.
      */
     private boolean isGroupMember(Session session, String group) {
-        return ArrayUtils.contains(session.getGroups(), group);
+        return session.getGroups().contains(group);
     }
 }

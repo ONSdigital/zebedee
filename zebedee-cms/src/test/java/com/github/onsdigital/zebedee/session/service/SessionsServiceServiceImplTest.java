@@ -5,10 +5,9 @@ import com.github.onsdigital.zebedee.TestUtils;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.json.Credentials;
+import com.github.onsdigital.zebedee.session.model.LegacySession;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.session.store.SessionsStoreImpl;
-import com.github.onsdigital.zebedee.user.model.User;
-import org.joda.time.DateTime;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -20,16 +19,15 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-import static com.github.onsdigital.zebedee.Zebedee.SESSIONS;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
@@ -56,7 +54,7 @@ public class SessionsServiceServiceImplTest {
     private SessionsStoreImpl sessionsStore;
 
     @Mock
-    private Session sessionMock;
+    private LegacySession legacySessionMock;
 
     private Credentials credentials;
     private SessionsServiceImpl sessionsServiceImpl;
@@ -91,14 +89,11 @@ public class SessionsServiceServiceImplTest {
 
     @Test
     public void shouldCreateSession() throws IOException, NotFoundException, BadRequestException, ClassNotFoundException {
-        Session expected = new Session();
-        expected.setEmail(EMAIL);
-        expected.setId(SESSION_ID);
-
         Session actual = sessionsServiceImpl.create(EMAIL);
 
-        assertThat(expected, equalTo(actual));
-        verify(sessionsStore, times(1)).write(expected);
+        assertEquals(SESSION_ID, actual.getId());
+        assertEquals(EMAIL, actual.getEmail());
+        verify(sessionsStore, times(1)).write(any(LegacySession.class));
         verify(randomIdGenerator, times(1)).get();
     }
 
@@ -108,23 +103,23 @@ public class SessionsServiceServiceImplTest {
 
         when(sessionsStore.read(any()))
                 .thenReturn(null);
-        when(sessionMock.getEmail())
+        when(legacySessionMock.getEmail())
                 .thenReturn(EMAIL);
-        when(sessionMock.getLastAccess())
+        when(legacySessionMock.getLastAccess())
                 .thenReturn(new Date());
 
         sessionsServiceImpl.create(EMAIL);
 
         when(sessionsStore.find(EMAIL))
-                .thenReturn(sessionMock);
+                .thenReturn(legacySessionMock);
 
         when(sessionsStore.read(any()))
-                .thenReturn(sessionMock);
+                .thenReturn(legacySessionMock);
 
         sessionsServiceImpl.create(EMAIL);
 
         verify(sessionsStore, times(2)).find(EMAIL);
-        verify(sessionsStore, times(1)).write(sessionMock);
+        verify(sessionsStore, times(1)).write(legacySessionMock);
     }
 
     @Test
@@ -135,16 +130,16 @@ public class SessionsServiceServiceImplTest {
 
 
         // create a session.
-        Session expected = new Session();
-        expected.setEmail(EMAIL);
-        expected.setId(SESSION_ID);
+        Session expected = new Session(SESSION_ID, EMAIL, new ArrayList<>());
+        LegacySession storedSession = new LegacySession(SESSION_ID, EMAIL);
 
         when(sessionsStore.exists(SESSION_ID))
                 .thenReturn(true);
         when(sessionsStore.read(SESSION_ID))
-                .thenReturn(expected);
+                .thenReturn(storedSession);
 
         assertThat(sessionsServiceImpl.get(SESSION_ID), equalTo(expected));
+
         verify(sessionsStore, times(1)).exists(SESSION_ID);
         verify(sessionsStore, times(1)).read(SESSION_ID);
     }
@@ -156,7 +151,7 @@ public class SessionsServiceServiceImplTest {
 
         assertThat(sessionsStore.find(EMAIL), equalTo(null));
         verify(sessionsStore, times(1)).find(EMAIL);
-        verify(sessionsStore, never()).write(any(Session.class));
+        verify(sessionsStore, never()).write(any(LegacySession.class));
     }
 
     @Test
@@ -164,23 +159,23 @@ public class SessionsServiceServiceImplTest {
         Session result = sessionsServiceImpl.create(null);
 
         assertNull(result);
-        verify(sessionsStore, never()).write(any(Session.class));
+        verify(sessionsStore, never()).write(any(LegacySession.class));
     }
 
     @Test
     public void shouldExpireSessions() throws IOException, InterruptedException, NotFoundException, BadRequestException {
-        List<Session> expired = new ArrayList<>();
-        expired.add(sessionMock);
+        List<LegacySession> expired = new ArrayList<>();
+        expired.add(legacySessionMock);
 
         when(sessionsStore.filterSessions(any(Predicate.class)))
                 .thenReturn(expired);
-        when(sessionMock.getId())
+        when(legacySessionMock.getId())
                 .thenReturn(SESSION_ID);
 
         sessionsServiceImpl.deleteExpiredSessions();
 
         verify(sessionsStore, times(1)).filterSessions(any(Predicate.class));
-        verify(sessionMock, times(1)).getId();
+        verify(legacySessionMock, times(1)).getId();
         verify(sessionsStore, times(1)).delete(SESSION_ID);
     }
 }

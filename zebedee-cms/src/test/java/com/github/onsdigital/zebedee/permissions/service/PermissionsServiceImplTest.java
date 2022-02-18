@@ -63,9 +63,12 @@ public class PermissionsServiceImplTest {
     @Mock
     private CollectionDescription collectionDescription;
 
+    @Mock
+    private Session sessionMock;
+
     private PermissionsService permissions;
     private ServiceSupplier<TeamsService> teamsServiceSupplier;
-    private Session session;
+
     private Set<String> digitalPublishingTeam;
     private Set<String> admins;
     private List<Team> teamsList;
@@ -83,13 +86,12 @@ public class PermissionsServiceImplTest {
 
         teamsServiceSupplier = () -> teamsService;
 
-        session = new Session();
-        session.setEmail(EMAIL);
-
         digitalPublishingTeam = new HashSet<>();
         admins = new HashSet<>();
 
         when(userMock.getEmail())
+                .thenReturn(EMAIL);
+        when(sessionMock.getEmail())
                 .thenReturn(EMAIL);
 
         permissions = new PermissionsServiceImpl(permissionsStore, teamsServiceSupplier);
@@ -97,7 +99,7 @@ public class PermissionsServiceImplTest {
 
     @Test
     public void isPublisherBySession_ShouldReturnFalseIfSessionNull() throws Exception {
-        session = null;
+        Session session = null;
 
         assertThat(permissions.isPublisher(session), is(false));
         verifyNoInteractions(permissionsStore, usersService, teamsService);
@@ -105,15 +107,16 @@ public class PermissionsServiceImplTest {
 
     @Test
     public void isPublisherBySession_ShouldReturnFalseIfSessionEmailNull() throws Exception {
-        session.setEmail(null);
+        when(sessionMock.getEmail())
+                .thenReturn(null);
 
-        assertThat(permissions.isPublisher(session), is(false));
+        assertThat(permissions.isPublisher(sessionMock), is(false));
         verifyNoInteractions(permissionsStore, usersService, teamsService);
     }
 
     @Test
     public void isPublisherBySession_ShouldReturnFalseIfSessionEmailEmpty() throws Exception {
-        session.setEmail("");
+        Session session = new Session("1234", "", new ArrayList<>());
 
         assertThat(permissions.isPublisher(session), is(false));
         verifyNoInteractions(permissionsStore, usersService, teamsService);
@@ -126,7 +129,7 @@ public class PermissionsServiceImplTest {
         when(accessMapping.getDigitalPublishingTeam())
                 .thenReturn(null);
 
-        assertThat(permissions.isPublisher(session), is(false));
+        assertThat(permissions.isPublisher(sessionMock), is(false));
         verify(permissionsStore, times(1)).getAccessMapping();
         verify(accessMapping, times(1)).getDigitalPublishingTeam();
         verifyNoInteractions(usersService, teamsService);
@@ -134,6 +137,7 @@ public class PermissionsServiceImplTest {
 
     @Test
     public void isPublisherBySession_ShouldReturnFalseIfPSTDoesNotContainSessionEmail() throws Exception {
+        Session session = new Session("1234", EMAIL, new ArrayList<>());
         when(permissionsStore.getAccessMapping())
                 .thenReturn(accessMapping);
         when(accessMapping.getDigitalPublishingTeam())
@@ -147,6 +151,7 @@ public class PermissionsServiceImplTest {
 
     @Test
     public void isPublisherBySession_ShouldReturnTrueIfPSTContainsSessionEmail() throws Exception {
+        Session session = new Session("1234", EMAIL, new ArrayList<>());
         digitalPublishingTeam.add(EMAIL);
 
         when(permissionsStore.getAccessMapping())
@@ -162,15 +167,17 @@ public class PermissionsServiceImplTest {
 
     @Test
     public void isAdministratorBySession_ShouldReturnFalseIsSessionNull() throws Exception {
-        session = null;
+        Session session = null;
         assertThat(permissions.isAdministrator(session), is(false));
         verifyNoInteractions(permissionsStore, usersService, accessMapping, teamsService);
     }
 
     @Test
     public void isAdministratorBySession_ShouldReturnFalseIsSessionEmailNull() throws Exception {
-        session.setEmail(null);
-        assertThat(permissions.isAdministrator(session), is(false));
+        when(sessionMock.getEmail())
+                .thenReturn(null);
+
+        assertThat(permissions.isAdministrator(sessionMock), is(false));
         verifyNoInteractions(permissionsStore, usersService, accessMapping, teamsService);
     }
 
@@ -181,7 +188,7 @@ public class PermissionsServiceImplTest {
         when(accessMapping.getAdministrators())
                 .thenReturn(null);
 
-        assertThat(permissions.isAdministrator(session), is(false));
+        assertThat(permissions.isAdministrator(sessionMock), is(false));
         verify(permissionsStore, times(1)).getAccessMapping();
         verify(accessMapping, times(1)).getAdministrators();
         verifyNoInteractions(usersService, teamsService);
@@ -194,7 +201,7 @@ public class PermissionsServiceImplTest {
         when(accessMapping.getAdministrators())
                 .thenReturn(admins);
 
-        assertThat(permissions.isAdministrator(session), is(false));
+        assertThat(permissions.isAdministrator(sessionMock), is(false));
         verify(permissionsStore, times(1)).getAccessMapping();
         verify(accessMapping, times(2)).getAdministrators();
         verifyNoInteractions(usersService, teamsService);
@@ -209,7 +216,7 @@ public class PermissionsServiceImplTest {
         when(accessMapping.getAdministrators())
                 .thenReturn(admins);
 
-        assertThat(permissions.isAdministrator(session), is(true));
+        assertThat(permissions.isAdministrator(sessionMock), is(true));
         verify(permissionsStore, times(1)).getAccessMapping();
         verify(accessMapping, times(2)).getAdministrators();
         verifyNoInteractions(usersService, teamsService);
@@ -270,7 +277,7 @@ public class PermissionsServiceImplTest {
     @Test(expected = UnauthorizedException.class)
     public void removeAdministrator_ShouldThrowExceptionIfEmailNull() throws Exception {
         try {
-            permissions.removeAdministrator(null, session);
+            permissions.removeAdministrator(null, sessionMock);
         } catch (UnauthorizedException e) {
             verifyNoInteractions(permissionsStore, accessMapping, usersService, teamsService);
             throw e;
@@ -285,7 +292,7 @@ public class PermissionsServiceImplTest {
                 .thenReturn(admins);
 
         try {
-            permissions.removeAdministrator(EMAIL, session);
+            permissions.removeAdministrator(EMAIL, sessionMock);
         } catch (UnauthorizedException e) {
             verify(permissionsStore, times(1)).getAccessMapping();
             verify(accessMapping, times(2)).getAdministrators();
@@ -303,7 +310,7 @@ public class PermissionsServiceImplTest {
         when(accessMapping.getAdministrators())
                 .thenReturn(admins);
 
-        permissions.removeAdministrator(EMAIL, session);
+        permissions.removeAdministrator(EMAIL, sessionMock);
         verify(permissionsStore, times(2)).getAccessMapping();
         verify(accessMapping, times(4)).getAdministrators();
         verify(permissionsStore, times(1)).saveAccessMapping(accessMapping);
@@ -324,7 +331,7 @@ public class PermissionsServiceImplTest {
     @Test(expected = UnauthorizedException.class)
     public void removeEditor_ShouldThrowExceptionIfEmailNull() throws Exception {
         try {
-            permissions.removeEditor(null, session);
+            permissions.removeEditor(null, sessionMock);
         } catch (UnauthorizedException e) {
             verifyNoInteractions(permissionsStore, accessMapping, usersService, teamsService);
             throw e;
@@ -339,7 +346,7 @@ public class PermissionsServiceImplTest {
                 .thenReturn(digitalPublishingTeam);
 
         try {
-            permissions.removeEditor(EMAIL, session);
+            permissions.removeEditor(EMAIL, sessionMock);
         } catch (UnauthorizedException e) {
             verify(permissionsStore, times(1)).getAccessMapping();
             verify(accessMapping, times(2)).getAdministrators();
@@ -360,7 +367,7 @@ public class PermissionsServiceImplTest {
         when(accessMapping.getAdministrators())
                 .thenReturn(admins);
 
-        permissions.removeEditor(EMAIL, session);
+        permissions.removeEditor(EMAIL, sessionMock);
         verify(permissionsStore, times(2)).getAccessMapping();
         verify(accessMapping, times(2)).getAdministrators();
         verify(permissionsStore, times(1)).saveAccessMapping(accessMapping);
@@ -389,15 +396,16 @@ public class PermissionsServiceImplTest {
     @Test(expected = UnauthorizedException.class)
     public void addAdministrator_ShouldThrowErrorSessionEmailNull() throws Exception {
         admins.add(EMAIL);
-        session.setEmail(null);
 
+        when(sessionMock.getEmail())
+                .thenReturn(null);
         when(permissionsStore.getAccessMapping())
                 .thenReturn(accessMapping);
         when(accessMapping.getAdministrators())
                 .thenReturn(admins);
 
         try {
-            permissions.addAdministrator(EMAIL, session);
+            permissions.addAdministrator(EMAIL, sessionMock);
         } catch (UnauthorizedException e) {
             verify(permissionsStore, times(1)).getAccessMapping();
             verify(accessMapping, times(2)).getAdministrators();
@@ -409,7 +417,8 @@ public class PermissionsServiceImplTest {
     @Test(expected = UnauthorizedException.class)
     public void addAdministrator_ShouldThrowErrorIfUserNotAdmin() throws Exception {
         admins.add(EMAIL);
-        session.setEmail("test2@ons.gov.uk");
+        when(sessionMock.getEmail())
+                .thenReturn("test2@ons.gov.uk");
 
         when(permissionsStore.getAccessMapping())
                 .thenReturn(accessMapping);
@@ -417,7 +426,7 @@ public class PermissionsServiceImplTest {
                 .thenReturn(admins);
 
         try {
-            permissions.addAdministrator(EMAIL, session);
+            permissions.addAdministrator(EMAIL, sessionMock);
         } catch (UnauthorizedException e) {
             verify(permissionsStore, times(2)).getAccessMapping();
             verify(accessMapping, times(4)).getAdministrators();
@@ -443,7 +452,7 @@ public class PermissionsServiceImplTest {
                 .thenReturn(admins)
                 .thenReturn(adminsMock);
 
-        permissions.addAdministrator(email2, session);
+        permissions.addAdministrator(email2, sessionMock);
 
         verify(permissionsStore, times(3)).getAccessMapping();
         verify(accessMapping, times(6)).getAdministrators();
@@ -458,7 +467,7 @@ public class PermissionsServiceImplTest {
         when(teamsService.listTeams())
                 .thenReturn(teamsList);
 
-        assertThat(permissions.canView(session, COLLECTION_ID), is(false));
+        assertThat(permissions.canView(sessionMock, COLLECTION_ID), is(false));
 
         verify(permissionsStore, times(1)).getAccessMapping();
         verifyNoInteractions(teamsService);

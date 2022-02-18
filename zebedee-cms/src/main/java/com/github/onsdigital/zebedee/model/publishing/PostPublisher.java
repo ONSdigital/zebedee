@@ -28,7 +28,6 @@ import com.github.onsdigital.zebedee.util.URIUtils;
 import com.github.onsdigital.zebedee.util.ZipUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.FastDateFormat;
 
@@ -122,8 +121,7 @@ public class PostPublisher {
      */
     private static Session getPublisherClassSession() {
         if (zebdeePublisherSession == null) {
-            zebdeePublisherSession = new Session();
-            zebdeePublisherSession.setEmail(Publisher.class.getName());
+            zebdeePublisherSession = new Session(null, Publisher.class.getName(), null);
         }
         return zebdeePublisherSession;
     }

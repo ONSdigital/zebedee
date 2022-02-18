@@ -13,9 +13,11 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -31,11 +33,8 @@ import static org.mockito.Mockito.when;
 
 public class JWTPermissionsServiceImplTest {
 
-    private static final String[] GROUP_0 = new String[]{"123456", "role-publisher", "role-admin", "789012345", "testgroup0"};
-    private static final String[] GROUP_0A = new String[]{"123456", "role-publisher", "testgroup1"};
-    private static final String[] GROUP_0B = new String[]{"123456", "role-admin", "testgroup1"};
-    private static final String[] GROUP_0c = new String[]{"123456", "789012345"};
-    private static final String[] GROUP_0d = new String[]{"testgroup1", "testgroup2"};
+    private static final List<String> ADMIN_PUBLISHER_GROUPS = Arrays.asList(new String[]{"123456", "role-publisher", "role-admin", "789012345", "testgroup0"});
+    private static final List<String> NON_ADMIN_PUBLISHER_GROUPS = Arrays.asList(new String[]{"123456", "789012345"});
     private static final String COLLECTION_ID = "1234";
     private static final String FLORENCE_TOKEN = "666";
     private static final String TEST_USER_EMAIL = "other123@ons.gov.uk";
@@ -65,20 +64,12 @@ public class JWTPermissionsServiceImplTest {
         MockitoAnnotations.openMocks(this);
         jwtPermissionsService = new JWTPermissionsServiceImpl(jwtPermissionStore_Mock);
 
-        session = new Session();
-        session.setEmail("test@ons.gov.co.uk");
-        session.setId("666");
-        session.setLastAccess(null);
-        session.setStart(null);
-
         when(jwtPermissionStore_Mock.getAccessMapping()).thenReturn(accessMapping_Mock);
     }
 
     @Test
     public void isPublisher_Session_Publisher_ShouldReturnTrue() throws Exception {
-        Session session = new Session();
-        session.setEmail(TEST_USER_EMAIL);
-        session.setGroups(GROUP_0);
+        Session session = new Session(TEST_SESSION_ID, TEST_USER_EMAIL, ADMIN_PUBLISHER_GROUPS);
         assertTrue(jwtPermissionsService.isPublisher(session));
     }
 
@@ -91,36 +82,28 @@ public class JWTPermissionsServiceImplTest {
 
     @Test
     public void isPublisher_Session_EmailNull_ShouldReturnFalse() throws Exception {
-        Session session = new Session();
-        session.setId(TEST_SESSION_ID);
-        session.setEmail(null);
-        session.setGroups(GROUP_0);
+        Session session = new Session(TEST_SESSION_ID,null, ADMIN_PUBLISHER_GROUPS);
         assertFalse(jwtPermissionsService.isPublisher(session));
         verifyNoInteractions(jwtPermissionStore_Mock);
     }
 
     @Test
     public void isPublisher_Session_NotPublisher_ShouldReturnFalse() throws Exception {
-        Session session = new Session();
-        session.setEmail(TEST_USER_EMAIL);
-        session.setGroups(GROUP_0c);
+        Session session = new Session(TEST_SESSION_ID, TEST_USER_EMAIL, NON_ADMIN_PUBLISHER_GROUPS);
         assertFalse(jwtPermissionsService.isPublisher(session));
         verifyNoInteractions(jwtPermissionStore_Mock);
     }
 
     @Test
     public void isPublisher_Session_NullGroup_ShouldReturnFalse() throws Exception {
-        Session session = new Session();
-        session.setEmail(TEST_USER_EMAIL);
+        Session session = new Session(TEST_SESSION_ID, TEST_USER_EMAIL, null);
         assertFalse(jwtPermissionsService.isPublisher(session));
         verifyNoInteractions(jwtPermissionStore_Mock);
     }
 
     @Test
     public void isAdministrator_Session_Publisher_ShouldReturnTrue() throws Exception {
-        Session session = new Session();
-        session.setEmail(TEST_USER_EMAIL);
-        session.setGroups(GROUP_0);
+        Session session = new Session(TEST_SESSION_ID, TEST_USER_EMAIL, ADMIN_PUBLISHER_GROUPS);
         assertTrue(jwtPermissionsService.isAdministrator(session));
     }
 
@@ -133,24 +116,21 @@ public class JWTPermissionsServiceImplTest {
 
     @Test
     public void isAdministrator_Session_EmailNull_ShouldReturnFalse() throws Exception {
-        Session session = new Session();
+        Session session = new Session(TEST_SESSION_ID, null, ADMIN_PUBLISHER_GROUPS);
         assertFalse(jwtPermissionsService.isAdministrator(session));
         verifyNoInteractions(jwtPermissionStore_Mock);
     }
 
     @Test
     public void isAdministrator_Session_NotAdmin_ShouldReturnFalse() throws Exception {
-        Session session = new Session();
-        session.setEmail(TEST_USER_EMAIL);
-        session.setGroups(GROUP_0c);
+        Session session = new Session(TEST_SESSION_ID, TEST_USER_EMAIL, NON_ADMIN_PUBLISHER_GROUPS);
         assertFalse(jwtPermissionsService.isAdministrator(session));
         verifyNoInteractions(jwtPermissionStore_Mock);
     }
 
     @Test
     public void isAdministrator_Session_NullGroup_ShouldReturnFalse() throws Exception {
-        Session session = new Session();
-        session.setEmail(TEST_USER_EMAIL);
+        Session session = new Session(TEST_SESSION_ID, TEST_USER_EMAIL, null);
         assertFalse(jwtPermissionsService.isAdministrator(session));
         verifyNoInteractions(jwtPermissionStore_Mock);
     }
@@ -178,9 +158,7 @@ public class JWTPermissionsServiceImplTest {
 
     @Test
     public void canEdit_Session_Publisher_ShouldReturnTrue() throws Exception {
-        Session session = new Session();
-        session.setEmail(TEST_USER_EMAIL);
-        session.setGroups(GROUP_0);
+        Session session = new Session(TEST_SESSION_ID, TEST_USER_EMAIL, ADMIN_PUBLISHER_GROUPS);
         assertTrue(jwtPermissionsService.canEdit(session));
     }
 
@@ -193,27 +171,21 @@ public class JWTPermissionsServiceImplTest {
 
     @Test
     public void canEdit_Session_EmailNull_ShouldReturnFalse() throws Exception {
-        Session session = new Session();
-        session.setId(TEST_SESSION_ID);
-        session.setEmail(null);
-        session.setGroups(GROUP_0c);
+        Session session = new Session(TEST_SESSION_ID, null, NON_ADMIN_PUBLISHER_GROUPS);
         assertFalse(jwtPermissionsService.canEdit(session));
         verifyNoInteractions(jwtPermissionStore_Mock);
     }
 
     @Test
     public void canEdit_Session_NotPublisher_ShouldReturnFalse() throws Exception {
-        Session session = new Session();
-        session.setEmail(TEST_USER_EMAIL);
-        session.setGroups(GROUP_0c);
+        Session session = new Session(TEST_SESSION_ID, TEST_USER_EMAIL, NON_ADMIN_PUBLISHER_GROUPS);
         assertFalse(jwtPermissionsService.canEdit(session));
         verifyNoInteractions(jwtPermissionStore_Mock);
     }
 
     @Test
     public void canEdit_Session_NullGroup_ShouldReturnFalse() throws Exception {
-        Session session = new Session();
-        session.setEmail(TEST_USER_EMAIL);
+        Session session = new Session(TEST_SESSION_ID, TEST_USER_EMAIL, null);
         assertFalse(jwtPermissionsService.canEdit(session));
         verifyNoInteractions(jwtPermissionStore_Mock);
     }
@@ -235,12 +207,10 @@ public class JWTPermissionsServiceImplTest {
     @Test
     public void canView_CollectionId_Session() throws Exception {
         Integer teamId = 123456;
-        String[] teamList = {String.valueOf(teamId)};
+        List<String> teamList = new ArrayList<>();
+        teamList.add(String.valueOf(teamId));
 
-        Session session = new Session();
-        session.setEmail(TEST_USER_EMAIL);
-        session.setGroups(teamList);
-        session.setId(FLORENCE_TOKEN);
+        Session session = new Session(TEST_SESSION_ID, TEST_USER_EMAIL, teamList);
 
         Set<Integer> teams = new HashSet<Integer>() {{
             add(teamId);
@@ -260,9 +230,7 @@ public class JWTPermissionsServiceImplTest {
 
     @Test
     public void canView_Session_GroupNull_CollectionId() throws Exception {
-        Session session = new Session();
-        session.setEmail(TEST_USER_EMAIL);
-        session.setId(FLORENCE_TOKEN);
+        Session session = new Session(FLORENCE_TOKEN, TEST_USER_EMAIL, null);
 
         Map<String, Set<Integer>> collectionMapping = new HashMap<>();
         collectionMapping.put(COLLECTION_ID, new HashSet<>());
@@ -274,31 +242,21 @@ public class JWTPermissionsServiceImplTest {
 
     @Test
     public void canView_Session_CollectionId_Null() throws Exception {
-        Session session = new Session();
-        session.setEmail(TEST_USER_EMAIL);
-        session.setGroups(GROUP_0);
-        session.setId(FLORENCE_TOKEN);
+        Session session = new Session(FLORENCE_TOKEN, TEST_USER_EMAIL, ADMIN_PUBLISHER_GROUPS);
 
         assertFalse(jwtPermissionsService.canView(session, null));
     }
 
     @Test
     public void canView_Session_CollectionDescription_NoPermissions() throws Exception {
-        Session session = new Session();
-        session.setEmail(TEST_USER_EMAIL);
-        session.setGroups(GROUP_0);
-        session.setId(FLORENCE_TOKEN);
+        Session session = new Session(FLORENCE_TOKEN, TEST_USER_EMAIL, ADMIN_PUBLISHER_GROUPS);
 
         assertFalse(jwtPermissionsService.canView(session, COLLECTION_ID));
     }
 
     @Test
     public void setViewerTeams_Session_CollectionId_TeamIds() throws Exception {
-
-        Session session = new Session();
-        session.setEmail(TEST_USER_EMAIL);
-        session.setGroups(GROUP_0);
-        session.setId(FLORENCE_TOKEN);
+        Session session = new Session(FLORENCE_TOKEN, TEST_USER_EMAIL, ADMIN_PUBLISHER_GROUPS);
 
         Set<Integer> teamList = new HashSet<Integer>() {{
             add(123456);
@@ -317,8 +275,8 @@ public class JWTPermissionsServiceImplTest {
 
     @Test
     public void setViewerTeams_Session_Null_CollectionId_TeamIds() throws Exception {
-        Session session = new Session();
-        
+        Session session = new Session(null, null, null);
+
         Exception exception = assertThrows(UnauthorizedException.class, () ->
                 jwtPermissionsService.setViewerTeams(session, COLLECTION_ID, new HashSet<>()));
         assertEquals("You do not have the right permission: null (null)", exception.getMessage());
@@ -326,10 +284,7 @@ public class JWTPermissionsServiceImplTest {
 
     @Test
     public void setViewerTeams_Session_CollectionId_TeamsList_emptyCollectionMapping() throws Exception {
-        Session session = new Session();
-        session.setEmail(TEST_USER_EMAIL);
-        session.setGroups(GROUP_0);
-        session.setId(FLORENCE_TOKEN);
+        Session session = new Session(FLORENCE_TOKEN, TEST_USER_EMAIL, ADMIN_PUBLISHER_GROUPS);
         
         Integer teamId = 666;
         Map<String, Set<Integer>> collectionMapping = new HashMap<>();
@@ -347,14 +302,11 @@ public class JWTPermissionsServiceImplTest {
 
     @Test
     public void listViewerTeams_collectionDescription_session() throws Exception {
-        Session session = new Session();
-        session.setEmail(TEST_USER_EMAIL);
-        session.setGroups(GROUP_0);
-        session.setId(FLORENCE_TOKEN);
+        Session session = new Session(FLORENCE_TOKEN, TEST_USER_EMAIL, ADMIN_PUBLISHER_GROUPS);
 
         CollectionDescription collectionDescriptionMock = new CollectionDescription();
         collectionDescriptionMock.setId(COLLECTION_ID);
-        collectionDescriptionMock.setTeams(Arrays.asList(GROUP_0));
+        collectionDescriptionMock.setTeams(ADMIN_PUBLISHER_GROUPS);
 
         Set<Integer> teamList = new HashSet<Integer>() {{
             add(123456);
@@ -375,10 +327,7 @@ public class JWTPermissionsServiceImplTest {
 
     @Test
     public void listViewerTeams_session_collectionId_noPermissions() throws Exception {
-        Session session = new Session();
-        session.setEmail(TEST_USER_EMAIL);
-        session.setGroups(GROUP_0);
-        session.setId(FLORENCE_TOKEN);
+        Session session = new Session(FLORENCE_TOKEN, TEST_USER_EMAIL, ADMIN_PUBLISHER_GROUPS);
 
         Map<String, Set<Integer>> collectionMapping = new HashMap<>();
         collectionMapping.put(COLLECTION_ID, new HashSet<>());
@@ -399,10 +348,7 @@ public class JWTPermissionsServiceImplTest {
 
     @Test
     public void setViewerTeams_CollectionDescription_Team_Session_collectionTeam() throws Exception {
-        Session session = new Session();
-        session.setEmail(TEST_USER_EMAIL);
-        session.setGroups(GROUP_0);
-        session.setId(FLORENCE_TOKEN);
+        Session session = new Session(FLORENCE_TOKEN, TEST_USER_EMAIL, ADMIN_PUBLISHER_GROUPS);
 
         Integer teamId = 666;
 

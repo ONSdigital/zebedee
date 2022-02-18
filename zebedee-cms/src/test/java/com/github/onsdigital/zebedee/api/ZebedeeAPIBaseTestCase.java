@@ -26,14 +26,15 @@ public abstract class ZebedeeAPIBaseTestCase {
     @Mock
     protected HttpServletResponse mockResponse;
 
-    protected Session session;
+    @Mock
+    protected Session mockSession;
 
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.openMocks(this);
 
-        session = new Session();
-        session.setEmail(TEST_EMAIL);
+        when(mockSession.getEmail())
+                .thenReturn(TEST_EMAIL);
 
         customSetUp();
         REQUESTED_URI = MessageFormat.format(REQUESTED_URI, getAPIName());

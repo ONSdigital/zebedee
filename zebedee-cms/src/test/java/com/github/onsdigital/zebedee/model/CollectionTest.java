@@ -406,7 +406,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         assertTrue(updatedCollectionDescription.getEvents().hasEventForType(EventType.CREATED));
         assertEquals(updatedDescription.getTeams(), updatedCollectionDescription.getTeams());
         verify(permissionsService, times(1)).setViewerTeams(
-                publisher1Session, collection.getDescription().getId(), new HashSet<String>());
+                publisher1Session, collection.getDescription().getId(), teamIds);
     }
 
     @Test

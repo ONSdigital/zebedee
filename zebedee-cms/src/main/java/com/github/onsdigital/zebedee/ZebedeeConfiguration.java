@@ -92,7 +92,7 @@ import static com.github.onsdigital.zebedee.configuration.Configuration.getSlack
 import static com.github.onsdigital.zebedee.configuration.Configuration.getSlackToken;
 import static com.github.onsdigital.zebedee.configuration.Configuration.isVerificationEnabled;
 import static com.github.onsdigital.zebedee.configuration.Configuration.slackChannelsToNotfiyOnStartUp;
-import static com.github.onsdigital.zebedee.permissions.store.PermissionsStoreFileSystemImpl.initialisePermissions;
+import static com.github.onsdigital.zebedee.permissions.store.PermissionsStoreFileSystemImpl.initialiseAccessMapping;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 /**
@@ -312,7 +312,7 @@ public class ZebedeeConfiguration {
      */
     private void initPermissionsService(Path zebedeePath, TeamsService teamsService) throws IOException {
         Path permissionsPath = createDir(zebedeePath, PERMISSIONS);
-        initialisePermissions(permissionsPath);
+        initialiseAccessMapping(permissionsPath);
 
         PermissionsStore permissionsStore = new PermissionsStoreFileSystemImpl(permissionsPath);
         PermissionsServiceImpl legacyPermissionsService = new PermissionsServiceImpl(permissionsStore, this::getTeamsService);

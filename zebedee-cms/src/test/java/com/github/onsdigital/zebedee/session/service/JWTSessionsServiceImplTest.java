@@ -157,7 +157,7 @@ public class JWTSessionsServiceImplTest {
     @Test
     @RunInThread
     public void set_ShouldClearThread_WhenSetAgain() throws Exception {
-        store.set(new Session(SIGNED_TOKEN, EMAIL, new ArrayList<>()));
+        store.set(new Session(SIGNED_TOKEN, EMAIL));
 
         assertThrows(SessionsException.class, () -> jwtSessionsServiceImpl.set(""));
         assertNull(store.get());
@@ -183,7 +183,7 @@ public class JWTSessionsServiceImplTest {
     @Test
     @RunInThread
     public void resetThread_ShouldClearSession() throws Exception {
-        store.set(new Session(SIGNED_TOKEN, EMAIL, new ArrayList<>()));
+        store.set(new Session(SIGNED_TOKEN, EMAIL));
 
         jwtSessionsServiceImpl.resetThread();
 

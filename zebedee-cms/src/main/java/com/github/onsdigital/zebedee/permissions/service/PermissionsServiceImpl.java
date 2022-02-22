@@ -380,7 +380,7 @@ public class PermissionsServiceImpl implements PermissionsService {
         }
 
         // This is a little ugly, but this class is deprecated and will be removed very soon
-        Session userSession = new Session(null, email, new ArrayList<>());
+        Session userSession = new Session(null, email);
 
         return new PermissionDefinition()
                 .setEmail(email)

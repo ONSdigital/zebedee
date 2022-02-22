@@ -4,7 +4,7 @@ import com.github.onsdigital.zebedee.json.PermissionDefinition;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.permissions.store.PermissionsStore;
 import com.github.onsdigital.zebedee.session.model.Session;
-import com.github.onsdigital.zebedee.session.store.SessionsStore;
+import com.github.onsdigital.zebedee.session.store.LegacySessionsStore;
 import com.github.onsdigital.zebedee.teams.service.TeamsService;
 import com.github.onsdigital.zebedee.teams.service.TeamsServiceImpl;
 import com.google.common.annotations.VisibleForTesting;
@@ -36,9 +36,9 @@ public class ThreadLocalSessionsServiceImpl extends SessionsServiceImpl {
     public static final String ADMIN_GROUP = "role-admin";
     public static final String PUBLISHER_GROUP = "role-publisher";
 
-    public ThreadLocalSessionsServiceImpl(SessionsStore sessionsStore, PermissionsService permissionsService,
+    public ThreadLocalSessionsServiceImpl(LegacySessionsStore legacySessionsStore, PermissionsService permissionsService,
                                           TeamsService teamsService) {
-        super(sessionsStore);
+        super(legacySessionsStore);
         this.permissionsService = permissionsService;
         this.teamsService = teamsService;
     }

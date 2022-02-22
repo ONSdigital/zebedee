@@ -6,7 +6,7 @@ import com.github.onsdigital.zebedee.junit4.rules.RunInThreadRule;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.session.model.LegacySession;
 import com.github.onsdigital.zebedee.session.model.Session;
-import com.github.onsdigital.zebedee.session.store.SessionsStore;
+import com.github.onsdigital.zebedee.session.store.LegacySessionsStore;
 import com.github.onsdigital.zebedee.teams.service.TeamsService;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -53,7 +52,7 @@ public class ThreadLocalSessionsServiceImplTest {
     private ThreadLocalSessionsServiceImpl threadLocalSessionsService;
 
     @Mock
-    private SessionsStore sessionsStore;
+    private LegacySessionsStore legacySessionsStore;
 
     @Mock
     private PermissionsService permissionsService;
@@ -89,7 +88,7 @@ public class ThreadLocalSessionsServiceImplTest {
                 .isEditor(true)
                 .isAdmin(true);
 
-        this.threadLocalSessionsService = new ThreadLocalSessionsServiceImpl(sessionsStore, permissionsService, teamsService);
+        this.threadLocalSessionsService = new ThreadLocalSessionsServiceImpl(legacySessionsStore, permissionsService, teamsService);
 
         ReflectionTestUtils.setField(threadLocalSessionsService, "randomIdGenerator", randomIdGenerator);
 
@@ -114,13 +113,13 @@ public class ThreadLocalSessionsServiceImplTest {
 
     @Test
     public void create_ShouldCreateSession_WhenValidEmailAndNoSessionExists() throws Exception {
-        when(sessionsStore.find(EMAIL)).thenReturn(null);
+        when(legacySessionsStore.find(EMAIL)).thenReturn(null);
 
         Session actual = threadLocalSessionsService.create(EMAIL);
 
         assertEquals(EMAIL, actual.getEmail());
         assertEquals(SESSION_TOKEN, actual.getId());
-        verify(sessionsStore, times(1)).write(any(LegacySession.class));
+        verify(legacySessionsStore, times(1)).write(any(LegacySession.class));
         verify(randomIdGenerator, times(1)).get();
     }
 
@@ -132,13 +131,13 @@ public class ThreadLocalSessionsServiceImplTest {
         when(legacySessionMock.getLastAccess())
                 .thenReturn(oldTime.getTime());
 
-        when(sessionsStore.find(EMAIL)).thenReturn(legacySessionMock);
+        when(legacySessionsStore.find(EMAIL)).thenReturn(legacySessionMock);
 
         Session actual = threadLocalSessionsService.create(EMAIL);
 
         assertEquals(EMAIL, actual.getEmail());
         assertEquals(SESSION_TOKEN, actual.getId());
-        verify(sessionsStore, times(1)).write(any(LegacySession.class));
+        verify(legacySessionsStore, times(1)).write(any(LegacySession.class));
         verify(randomIdGenerator, times(1)).get();
     }
 
@@ -150,13 +149,13 @@ public class ThreadLocalSessionsServiceImplTest {
         LegacySession session = new LegacySession(SESSION_TOKEN, EMAIL);
         session.setLastAccess(oldTime.getTime());
 
-        when(sessionsStore.find(EMAIL)).thenReturn(session);
+        when(legacySessionsStore.find(EMAIL)).thenReturn(session);
 
         Session actual = threadLocalSessionsService.create(EMAIL);
 
         assertEquals(EMAIL, actual.getEmail());
         assertEquals(SESSION_TOKEN, actual.getId());
-        verify(sessionsStore, times(1)).write(any(LegacySession.class));
+        verify(legacySessionsStore, times(1)).write(any(LegacySession.class));
         verify(randomIdGenerator, times(0)).get();
     }
 
@@ -171,7 +170,7 @@ public class ThreadLocalSessionsServiceImplTest {
     @Test
     @RunInThread
     public void set_ShouldThrowException_WhenTokenHasExpired() throws Exception {
-        when(sessionsStore.exists(SESSION_TOKEN))
+        when(legacySessionsStore.exists(SESSION_TOKEN))
                 .thenReturn(false);
 
         Exception exception = assertThrows(SessionsException.class, () -> threadLocalSessionsService.set(SESSION_TOKEN));
@@ -182,9 +181,9 @@ public class ThreadLocalSessionsServiceImplTest {
     @Test
     @RunInThread
     public void set_ShouldThrowException_WhenFailToReadSession() throws Exception {
-        when(sessionsStore.exists(SESSION_TOKEN))
+        when(legacySessionsStore.exists(SESSION_TOKEN))
                 .thenReturn(true);
-        when(sessionsStore.read(SESSION_TOKEN))
+        when(legacySessionsStore.read(SESSION_TOKEN))
                 .thenThrow(new IOException("some error"));
 
         assertThrows(IOException.class, () -> threadLocalSessionsService.set(SESSION_TOKEN));
@@ -195,11 +194,11 @@ public class ThreadLocalSessionsServiceImplTest {
     @RunInThread
     public void set_ShouldThrowException_WhenFailToReadPermissions() throws Exception {
         LegacySession legacySession = new LegacySession(SESSION_TOKEN, EMAIL);
-        Session session = new Session(SESSION_TOKEN, EMAIL, new ArrayList<>());
+        Session session = new Session(SESSION_TOKEN, EMAIL);
 
-        when(sessionsStore.exists(SESSION_TOKEN))
+        when(legacySessionsStore.exists(SESSION_TOKEN))
                 .thenReturn(true);
-        when(sessionsStore.read(SESSION_TOKEN))
+        when(legacySessionsStore.read(SESSION_TOKEN))
                 .thenReturn(legacySession);
         when(permissionsService.userPermissions(session))
                 .thenThrow(new IOException("some error"));
@@ -212,11 +211,11 @@ public class ThreadLocalSessionsServiceImplTest {
     @RunInThread
     public void set_ShouldThrowException_WhenFailToReadTeams() throws Exception {
         LegacySession legacySession = new LegacySession(SESSION_TOKEN, EMAIL);
-        Session session = new Session(SESSION_TOKEN, EMAIL, new ArrayList<>());
+        Session session = new Session(SESSION_TOKEN, EMAIL);
 
-        when(sessionsStore.exists(SESSION_TOKEN))
+        when(legacySessionsStore.exists(SESSION_TOKEN))
                 .thenReturn(true);
-        when(sessionsStore.read(SESSION_TOKEN))
+        when(legacySessionsStore.read(SESSION_TOKEN))
                 .thenReturn(legacySession);
         when(permissionsService.userPermissions(session))
                 .thenReturn(permissionDefinition);
@@ -231,11 +230,11 @@ public class ThreadLocalSessionsServiceImplTest {
     @RunInThread
     public void set_ShouldSetSession_WhenTokenValid() throws Exception {
         LegacySession legacySession = new LegacySession(SESSION_TOKEN, EMAIL);
-        Session session = new Session(SESSION_TOKEN, EMAIL, new ArrayList<>());
+        Session session = new Session(SESSION_TOKEN, EMAIL);
 
-        when(sessionsStore.exists(SESSION_TOKEN))
+        when(legacySessionsStore.exists(SESSION_TOKEN))
                 .thenReturn(true);
-        when(sessionsStore.read(SESSION_TOKEN))
+        when(legacySessionsStore.read(SESSION_TOKEN))
                 .thenReturn(legacySession);
         when(permissionsService.userPermissions(session))
                 .thenReturn(permissionDefinition);
@@ -283,7 +282,7 @@ public class ThreadLocalSessionsServiceImplTest {
     @Test
     @RunInThread
     public void resetThread_ShouldClearSessions() throws Exception {
-        threadLocal.set(new Session(SESSION_TOKEN, EMAIL, new ArrayList<>()));
+        threadLocal.set(new Session(SESSION_TOKEN, EMAIL));
 
         threadLocalSessionsService.resetThread();
 

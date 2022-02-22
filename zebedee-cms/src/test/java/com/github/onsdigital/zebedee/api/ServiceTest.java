@@ -60,7 +60,7 @@ public class ServiceTest {
 
     @Test
     public void createNewServiceAccountTest() throws IOException, NotFoundException, UnauthorizedException {
-        Session session = new Session("123", "other@ons.gov.uk", new ArrayList<>());
+        Session session = new Session("123", "other@ons.gov.uk");
 
         when(sessions.get()).thenReturn(session);
         when(permissionsService.isAdministrator(session)).thenReturn(true);
@@ -75,7 +75,7 @@ public class ServiceTest {
 
     @Test
     public void createNewServiceAccountWithNoAdminRights() throws IOException, NotFoundException, UnauthorizedException {
-        Session session = new Session("123", "other@ons.gov.uk", new ArrayList<>());
+        Session session = new Session("123", "other@ons.gov.uk");
 
         when(sessions.get()).thenReturn(session);
         when(permissionsService.isAdministrator(session)).thenReturn(false);

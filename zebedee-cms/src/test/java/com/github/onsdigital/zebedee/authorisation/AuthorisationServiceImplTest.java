@@ -63,7 +63,7 @@ public class AuthorisationServiceImplTest {
 
         service = new AuthorisationServiceImpl();
 
-        session = new Session(SESSION_ID, "rickSanchez@CitadelOfRicks.com", new ArrayList<>());
+        session = new Session(SESSION_ID, "rickSanchez@CitadelOfRicks.com");
 
         desc = new CollectionDescription();
         desc.setId("666");

@@ -23,10 +23,10 @@ public class SessionTest {
         List<String> originalGroups = new ArrayList<>();
         originalGroups.add("group1");
         originalGroups.add("group2");
-        String newGroup = "group3";
 
         Session session = new Session(SESSION_TOKEN, EMAIL, originalGroups);
 
+        String newGroup = "group3";
         originalGroups.add(newGroup);
 
         assertEquals(2, session.getGroups().size());

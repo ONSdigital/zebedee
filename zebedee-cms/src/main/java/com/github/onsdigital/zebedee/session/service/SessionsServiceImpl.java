@@ -3,7 +3,7 @@ package com.github.onsdigital.zebedee.session.service;
 import com.github.davidcarboni.cryptolite.Random;
 import com.github.onsdigital.zebedee.session.model.LegacySession;
 import com.github.onsdigital.zebedee.session.model.Session;
-import com.github.onsdigital.zebedee.session.store.SessionsStore;
+import com.github.onsdigital.zebedee.session.store.LegacySessionsStore;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
@@ -35,10 +35,10 @@ public class SessionsServiceImpl extends TimerTask implements Sessions {
 
     private Supplier<String> randomIdGenerator = Random::id;
     private ClosableTimer timer;
-    protected SessionsStore sessionsStore;
+    protected LegacySessionsStore legacySessionsStore;
 
-    public SessionsServiceImpl(SessionsStore sessionsStore) {
-        this.sessionsStore = sessionsStore;
+    public SessionsServiceImpl(LegacySessionsStore legacySessionsStore) {
+        this.legacySessionsStore = legacySessionsStore;
 
         // Run every minute after the first minute:
         info().log("starting sessions timer");
@@ -81,10 +81,10 @@ public class SessionsServiceImpl extends TimerTask implements Sessions {
             // Otherwise go ahead and create
             if (legacySession == null || expired(legacySession)) {
                 legacySession = new LegacySession(randomIdGenerator.get(),email);
-                sessionsStore.write(legacySession);
+                legacySessionsStore.write(legacySession);
             }
 
-            session = new Session(legacySession.getId(), legacySession.getEmail(), new ArrayList<>());
+            session = new Session(legacySession.getId(), legacySession.getEmail());
         }
 
         return session;
@@ -102,12 +102,12 @@ public class SessionsServiceImpl extends TimerTask implements Sessions {
         Session session = null;
 
         // Check the session record exists:
-        if (sessionsStore.exists(id)) {
+        if (legacySessionsStore.exists(id)) {
             // Deserialise the json:
-            LegacySession legacySession = sessionsStore.read(id);
+            LegacySession legacySession = legacySessionsStore.read(id);
             if (!expired(legacySession)) {
                 updateLastAccess(legacySession);
-                session = new Session(legacySession.getId(), legacySession.getEmail(), new ArrayList<>());
+                session = new Session(legacySession.getId(), legacySession.getEmail());
             }
             else{
                warn().log("session found expired, this is a known error during session get");
@@ -124,7 +124,7 @@ public class SessionsServiceImpl extends TimerTask implements Sessions {
      * @throws IOException If a filesystem error occurs.
      */
     private LegacySession find(String email) throws IOException {
-        LegacySession session = sessionsStore.find(email);
+        LegacySession session = legacySessionsStore.find(email);
         if (!expired(session)) {
             updateLastAccess(session);
         }
@@ -141,11 +141,11 @@ public class SessionsServiceImpl extends TimerTask implements Sessions {
      */
     void deleteExpiredSessions() throws IOException {
         Predicate<LegacySession> isExpired = this::expired;
-        List<LegacySession> expired = sessionsStore.filterSessions(isExpired);
+        List<LegacySession> expired = legacySessionsStore.filterSessions(isExpired);
 
         for (LegacySession s : expired) {
             info().data("user", s.getEmail()).log(DELETING_SESSION_MSG);
-            sessionsStore.delete(s.getId());
+            legacySessionsStore.delete(s.getId());
         }
     }
 
@@ -210,7 +210,7 @@ public class SessionsServiceImpl extends TimerTask implements Sessions {
     private void updateLastAccess(LegacySession session) throws IOException {
         if (session != null) {
             session.setLastAccess(new Date());
-            sessionsStore.write(session);
+            legacySessionsStore.write(session);
         }
     }
 

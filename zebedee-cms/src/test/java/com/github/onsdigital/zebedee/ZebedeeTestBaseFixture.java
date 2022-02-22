@@ -138,7 +138,7 @@ public abstract class ZebedeeTestBaseFixture {
         when(usersService.list())
                 .thenReturn(usersList);
 
-        Session session = new Session("1234", builder.publisher1.getEmail(), new ArrayList<>());
+        Session session = new Session("1234", builder.publisher1.getEmail());
 
         when(sessionsService.create(anyString())).thenReturn(session);
 

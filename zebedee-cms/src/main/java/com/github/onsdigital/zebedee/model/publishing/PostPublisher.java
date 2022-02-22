@@ -121,7 +121,7 @@ public class PostPublisher {
      */
     private static Session getPublisherClassSession() {
         if (zebdeePublisherSession == null) {
-            zebdeePublisherSession = new Session(null, Publisher.class.getName(), null);
+            zebdeePublisherSession = new Session(null, Publisher.class.getName());
         }
         return zebdeePublisherSession;
     }

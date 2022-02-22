@@ -72,7 +72,7 @@ public class CollectionHistoryDaoImplTest {
     public void setUp() throws Exception {
         MockitoAnnotations.openMocks(this);
 
-        session = new Session("1234", "tyrionLannister@test.com", new ArrayList<>());
+        session = new Session("1234", "tyrionLannister@test.com");
 
         dao = new CollectionHistoryDaoImpl(hibernateServiceMock);
         eventType = randomEvent();

@@ -5,9 +5,7 @@ import com.github.onsdigital.zebedee.json.PermissionDefinition;
 import com.github.onsdigital.zebedee.permissions.model.AccessMapping;
 import com.github.onsdigital.zebedee.permissions.store.PermissionsStore;
 import com.github.onsdigital.zebedee.session.model.Session;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import static java.text.MessageFormat.format;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -22,6 +20,7 @@ import java.util.stream.Collectors;
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.warn;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getUnauthorizedMessage;
+import static java.text.MessageFormat.format;
 
 /**
  * this has been implemented for the migration to using JWT Session
@@ -63,8 +62,7 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
 
         String[] valueArray = {PUBLISHER_GROUP, ADMIN_GROUP};
         List<String> groups = session.getGroups();
-        Set<String> setOfString = new HashSet<>(
-                groups);
+        Set<String> setOfString = new HashSet<>(groups);
         for (String s : setOfString) {
             try {
                 teamsList.add(Integer.parseInt(s));

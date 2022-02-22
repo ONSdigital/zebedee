@@ -200,7 +200,7 @@ public class ZebedeeTest extends ZebedeeTestBaseFixture {
         // create content in collection 01.
         builder.createInProgressFile(contentPath);
 
-        Session session = new Session("1234", "makingData@greatagain.com", new ArrayList<>());
+        Session session = new Session("1234", "makingData@greatagain.com");
         Optional<Collection> blockingCollection = zebedee.checkForCollectionBlockingChange(collectionOne, contentPath);
 
         assertThat(blockingCollection.isPresent(), is(true));
@@ -216,7 +216,7 @@ public class ZebedeeTest extends ZebedeeTestBaseFixture {
         String contentPath = "/aboutus/data.json";
         Collection collectionOne = zebedee.getCollections().getCollectionByName(COLLECTION_ONE_NAME);
 
-        Session session = new Session("1234", "makingData@greatagain.com", new ArrayList<>());
+        Session session = new Session("1234", "makingData@greatagain.com");
         Optional<Collection> blockingCollection = zebedee.checkForCollectionBlockingChange(collectionOne, contentPath);
         assertThat(blockingCollection.isPresent(), is(false));
 

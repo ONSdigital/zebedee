@@ -184,7 +184,7 @@ public class TeamsServiceImplTest {
 
     @Test(expected = UnauthorizedException.class)
     public void createTeam_ShouldThrowExeIfSessionEmailNull() throws Exception {
-        Session session = new Session("1234", null, new ArrayList<>());
+        Session session = new Session("1234", null);
         try {
             service.createTeam(TEAM_D_NAME, session);
         } catch (UnauthorizedException e) {
@@ -195,7 +195,7 @@ public class TeamsServiceImplTest {
 
     @Test(expected = ForbiddenException.class)
     public void createTeam_ShouldThrowExeIfUserNotAdmin() throws Exception {
-        Session session = new Session("1234", EMAIL, new ArrayList<>());
+        Session session = new Session("1234", EMAIL);
 
         when(permissionsService.isAdministrator(session))
                 .thenReturn(false);
@@ -212,7 +212,7 @@ public class TeamsServiceImplTest {
 
     @Test(expected = ConflictException.class)
     public void createTeam_ShouldThrowExeIfTeamExistsAlready() throws Exception {
-        Session session = new Session("1234", EMAIL, new ArrayList<>());
+        Session session = new Session("1234", EMAIL);
 
         when(teamsStore.exists(TEAM_D_NAME))
                 .thenReturn(true);
@@ -232,7 +232,7 @@ public class TeamsServiceImplTest {
 
     @Test
     public void createTeam_Success() throws Exception {
-        Session session = new Session("1234", EMAIL, new ArrayList<>());
+        Session session = new Session("1234", EMAIL);
 
         teamsList.add(teamA);
         teamsList.add(teamB);
@@ -262,7 +262,7 @@ public class TeamsServiceImplTest {
 
     @Test(expected = IOException.class)
     public void createTeam_ShouldReleaseLockAndProgagateException() throws Exception {
-        Session session = new Session("1234", EMAIL, new ArrayList<>());
+        Session session = new Session("1234", EMAIL);
 
         teamsList.add(teamA);
         teamsList.add(teamB);
@@ -305,7 +305,7 @@ public class TeamsServiceImplTest {
 
     @Test(expected = UnauthorizedException.class)
     public void deleteTeam_ShouldThrowExeIfSessionEmailNull() throws Exception {
-        Session session = new Session("1234", null, new ArrayList<>());
+        Session session = new Session("1234", null);
 
         try {
             service.deleteTeam(teamA, session);
@@ -317,7 +317,7 @@ public class TeamsServiceImplTest {
 
     @Test(expected = ForbiddenException.class)
     public void deleteTeam_ShouldThrowExeUserNotAdmin() throws Exception {
-        Session session = new Session("1234", EMAIL, new ArrayList<>());
+        Session session = new Session("1234", EMAIL);
 
         when(permissionsService.isAdministrator(session))
                 .thenReturn(false);
@@ -334,7 +334,7 @@ public class TeamsServiceImplTest {
 
     @Test(expected = IOException.class)
     public void deleteTest_ShouldPropagteTeamsStoreException() throws Exception {
-        Session session = new Session("1234", EMAIL, new ArrayList<>());
+        Session session = new Session("1234", EMAIL);
 
         when(permissionsService.isAdministrator(session))
                 .thenReturn(true);
@@ -353,7 +353,7 @@ public class TeamsServiceImplTest {
 
     @Test(expected = IOException.class)
     public void deleteTest_ShouldThrowExceptionIfDeleteUncessucessful() throws Exception {
-        Session session = new Session("1234", EMAIL, new ArrayList<>());
+        Session session = new Session("1234", EMAIL);
 
         when(permissionsService.isAdministrator(session))
                 .thenReturn(true);
@@ -372,7 +372,7 @@ public class TeamsServiceImplTest {
 
     @Test
     public void deleteTest_Success() throws Exception {
-        Session session = new Session("1234", EMAIL, new ArrayList<>());
+        Session session = new Session("1234", EMAIL);
 
         when(permissionsService.isAdministrator(session))
                 .thenReturn(true);
@@ -397,7 +397,7 @@ public class TeamsServiceImplTest {
 
     @Test (expected = UnauthorizedException.class)
     public void addTeamMemeber_ShouldThrowExIfSessionEmailNull() throws Exception {
-        Session session = new Session("1234", null, new ArrayList<>());
+        Session session = new Session("1234", null);
 
         try {
             service.addTeamMember(EMAIL, teamA, session);
@@ -409,7 +409,7 @@ public class TeamsServiceImplTest {
 
     @Test (expected = ForbiddenException.class)
     public void addTeamMemeber_ShouldThrowExIfDUserNotAdmin() throws Exception {
-        Session session = new Session("1234", EMAIL, new ArrayList<>());
+        Session session = new Session("1234", EMAIL);
 
         when(permissionsService.isAdministrator(session))
                 .thenReturn(false);
@@ -425,7 +425,7 @@ public class TeamsServiceImplTest {
 
     @Test
     public void addTeamMember_ShouldNotAddIfEmailNull() throws Exception {
-        Session session = new Session("1234", EMAIL, new ArrayList<>());
+        Session session = new Session("1234", EMAIL);
 
         when(permissionsService.isAdministrator(session))
                 .thenReturn(true);
@@ -438,7 +438,7 @@ public class TeamsServiceImplTest {
 
     @Test
     public void addTeamMember_ShouldNotAddIfTeamNull() throws Exception {
-        Session session = new Session("1234", EMAIL, new ArrayList<>());
+        Session session = new Session("1234", EMAIL);
 
         when(permissionsService.isAdministrator(session))
                 .thenReturn(true);
@@ -451,7 +451,7 @@ public class TeamsServiceImplTest {
 
     @Test
     public void addTeamMember_Success() throws Exception {
-        Session session = new Session("1234", EMAIL, new ArrayList<>());
+        Session session = new Session("1234", EMAIL);
         Team target = mock(Team.class);
 
         when(permissionsService.isAdministrator(session))
@@ -481,7 +481,7 @@ public class TeamsServiceImplTest {
 
     @Test (expected = UnauthorizedException.class)
     public void removeTeamMember_ShouldThrowExIfSessionEmailNull() throws Exception {
-        Session session = new Session("1234", null, new ArrayList<>());
+        Session session = new Session("1234", null);
 
         try {
             service.removeTeamMember(EMAIL, teamA, session);
@@ -493,7 +493,7 @@ public class TeamsServiceImplTest {
 
     @Test (expected = ForbiddenException.class)
     public void removeTeamMember_ShouldThrowExIfUserNotAdmin() throws Exception {
-        Session session = new Session("1234", EMAIL, new ArrayList<>());
+        Session session = new Session("1234", EMAIL);
 
         when(permissionsService.isAdministrator(session))
                 .thenReturn(false);
@@ -509,7 +509,7 @@ public class TeamsServiceImplTest {
 
     @Test
     public void removeTeamMember_ShouldNotRemoveIfEmailNull() throws Exception {
-        Session session = new Session("1234", EMAIL, new ArrayList<>());
+        Session session = new Session("1234", EMAIL);
 
         Team target = mock(Team.class);
 
@@ -524,7 +524,7 @@ public class TeamsServiceImplTest {
 
     @Test
     public void removeTeamMember_ShouldNotRemoveIfTeamNull() throws Exception {
-        Session session = new Session("1234", EMAIL, new ArrayList<>());
+        Session session = new Session("1234", EMAIL);
 
         Team target = mock(Team.class);
 
@@ -539,7 +539,7 @@ public class TeamsServiceImplTest {
 
     @Test
     public void removeTeamMember_Success() throws Exception {
-        Session session = new Session("1234", EMAIL, new ArrayList<>());
+        Session session = new Session("1234", EMAIL);
         Team target = mock(Team.class);
 
         when(permissionsService.isAdministrator(session))
@@ -569,7 +569,7 @@ public class TeamsServiceImplTest {
 
     @Test (expected = UnauthorizedException.class)
     public void getTeamMembersSummary_ShouldThrowUnauthorizedExceptionIfSessionEmailNull() throws Exception {
-        Session session = new Session("1234", null, new ArrayList<>());
+        Session session = new Session("1234", null);
         try {
             service.getTeamMembersSummary(session);
         } catch (UnauthorizedException e) {
@@ -580,7 +580,7 @@ public class TeamsServiceImplTest {
 
     @Test (expected = ForbiddenException.class)
     public void getTeamMembersSummary_ShouldThrowUnauthorizedExceptionIfUserNotAdmin() throws Exception {
-        Session session = new Session("1234", EMAIL, new ArrayList<>());
+        Session session = new Session("1234", EMAIL);
 
         when(permissionsService.isAdministrator(session))
                 .thenReturn(false);
@@ -596,7 +596,7 @@ public class TeamsServiceImplTest {
 
     @Test
     public void getTeamMembersSummary_Success() throws Exception {
-        Session session = new Session("1234", EMAIL, new ArrayList<>());
+        Session session = new Session("1234", EMAIL);
 
         teamsList.add(teamA.addMember("userA").addMember("userB"));
         teamsList.add(teamC.addMember("userC"));

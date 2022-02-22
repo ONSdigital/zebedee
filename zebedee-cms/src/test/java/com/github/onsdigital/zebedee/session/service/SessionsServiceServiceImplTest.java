@@ -7,7 +7,7 @@ import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.json.Credentials;
 import com.github.onsdigital.zebedee.session.model.LegacySession;
 import com.github.onsdigital.zebedee.session.model.Session;
-import com.github.onsdigital.zebedee.session.store.SessionsStoreImpl;
+import com.github.onsdigital.zebedee.session.store.LegacySessionsStoreImpl;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -51,7 +51,7 @@ public class SessionsServiceServiceImplTest {
     private Supplier<String> randomIdGenerator;
 
     @Mock
-    private SessionsStoreImpl sessionsStore;
+    private LegacySessionsStoreImpl legacySessionsStore;
 
     @Mock
     private LegacySession legacySessionMock;
@@ -78,13 +78,13 @@ public class SessionsServiceServiceImplTest {
         credentials.email = EMAIL;
         credentials.password = PWD;
 
-        sessionsServiceImpl = new SessionsServiceImpl(sessionsStore);
+        sessionsServiceImpl = new SessionsServiceImpl(legacySessionsStore);
 
         when(randomIdGenerator.get())
                 .thenReturn(SESSION_ID);
 
         ReflectionTestUtils.setField(sessionsServiceImpl, "randomIdGenerator", randomIdGenerator);
-        ReflectionTestUtils.setField(sessionsServiceImpl, "sessionsStore", sessionsStore);
+        ReflectionTestUtils.setField(sessionsServiceImpl, "legacySessionsStore", legacySessionsStore);
     }
 
     @Test
@@ -93,15 +93,13 @@ public class SessionsServiceServiceImplTest {
 
         assertEquals(SESSION_ID, actual.getId());
         assertEquals(EMAIL, actual.getEmail());
-        verify(sessionsStore, times(1)).write(any(LegacySession.class));
+        verify(legacySessionsStore, times(1)).write(any(LegacySession.class));
         verify(randomIdGenerator, times(1)).get();
     }
 
     @Test
     public void shouldNotCreateDuplicateSession() throws IOException, NotFoundException, BadRequestException {
-        ReflectionTestUtils.setField(sessionsServiceImpl, "sessionsStore", sessionsStore);
-
-        when(sessionsStore.read(any()))
+        when(legacySessionsStore.read(any()))
                 .thenReturn(null);
         when(legacySessionMock.getEmail())
                 .thenReturn(EMAIL);
@@ -110,48 +108,42 @@ public class SessionsServiceServiceImplTest {
 
         sessionsServiceImpl.create(EMAIL);
 
-        when(sessionsStore.find(EMAIL))
+        when(legacySessionsStore.find(EMAIL))
                 .thenReturn(legacySessionMock);
 
-        when(sessionsStore.read(any()))
+        when(legacySessionsStore.read(any()))
                 .thenReturn(legacySessionMock);
 
         sessionsServiceImpl.create(EMAIL);
 
-        verify(sessionsStore, times(2)).find(EMAIL);
-        verify(sessionsStore, times(1)).write(legacySessionMock);
+        verify(legacySessionsStore, times(2)).find(EMAIL);
+        verify(legacySessionsStore, times(1)).write(legacySessionMock);
     }
 
     @Test
     public void shouldGetSession() throws IOException, NotFoundException, BadRequestException {
-        // Create a session.
-        randomIdGenerator = () -> Random.id();
-        ReflectionTestUtils.setField(sessionsServiceImpl, "randomIdGenerator", randomIdGenerator);
-
-
-        // create a session.
-        Session expected = new Session(SESSION_ID, EMAIL, new ArrayList<>());
+        Session expected = new Session(SESSION_ID, EMAIL);
         LegacySession storedSession = new LegacySession(SESSION_ID, EMAIL);
 
-        when(sessionsStore.exists(SESSION_ID))
+        when(legacySessionsStore.exists(SESSION_ID))
                 .thenReturn(true);
-        when(sessionsStore.read(SESSION_ID))
+        when(legacySessionsStore.read(SESSION_ID))
                 .thenReturn(storedSession);
 
         assertThat(sessionsServiceImpl.get(SESSION_ID), equalTo(expected));
 
-        verify(sessionsStore, times(1)).exists(SESSION_ID);
-        verify(sessionsStore, times(1)).read(SESSION_ID);
+        verify(legacySessionsStore, times(1)).exists(SESSION_ID);
+        verify(legacySessionsStore, times(1)).read(SESSION_ID);
     }
 
     @Test
     public void shouldNotGetNonexistentSession() throws IOException, NotFoundException, BadRequestException {
-        when(sessionsStore.find(EMAIL))
+        when(legacySessionsStore.find(EMAIL))
                 .thenReturn(null);
 
-        assertThat(sessionsStore.find(EMAIL), equalTo(null));
-        verify(sessionsStore, times(1)).find(EMAIL);
-        verify(sessionsStore, never()).write(any(LegacySession.class));
+        assertThat(legacySessionsStore.find(EMAIL), equalTo(null));
+        verify(legacySessionsStore, times(1)).find(EMAIL);
+        verify(legacySessionsStore, never()).write(any(LegacySession.class));
     }
 
     @Test
@@ -159,7 +151,7 @@ public class SessionsServiceServiceImplTest {
         Session result = sessionsServiceImpl.create(null);
 
         assertNull(result);
-        verify(sessionsStore, never()).write(any(LegacySession.class));
+        verify(legacySessionsStore, never()).write(any(LegacySession.class));
     }
 
     @Test
@@ -167,15 +159,15 @@ public class SessionsServiceServiceImplTest {
         List<LegacySession> expired = new ArrayList<>();
         expired.add(legacySessionMock);
 
-        when(sessionsStore.filterSessions(any(Predicate.class)))
+        when(legacySessionsStore.filterSessions(any(Predicate.class)))
                 .thenReturn(expired);
         when(legacySessionMock.getId())
                 .thenReturn(SESSION_ID);
 
         sessionsServiceImpl.deleteExpiredSessions();
 
-        verify(sessionsStore, times(1)).filterSessions(any(Predicate.class));
+        verify(legacySessionsStore, times(1)).filterSessions(any(Predicate.class));
         verify(legacySessionMock, times(1)).getId();
-        verify(sessionsStore, times(1)).delete(SESSION_ID);
+        verify(legacySessionsStore, times(1)).delete(SESSION_ID);
     }
 }

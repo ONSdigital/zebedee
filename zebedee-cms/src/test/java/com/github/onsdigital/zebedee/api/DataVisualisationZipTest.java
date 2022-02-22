@@ -163,7 +163,7 @@ public class DataVisualisationZipTest {
      */
     @Test
     public void shouldDeleteZipAndContent() throws Exception {
-        Session session = new Session("1234", TEST_EMAIL, new ArrayList<>());
+        Session session = new Session("1234", TEST_EMAIL);
 
         when(mockRequest.getParameter(ZIP_PATH_KEY))
                 .thenReturn(ZIP_PATH);
@@ -206,7 +206,7 @@ public class DataVisualisationZipTest {
      */
     @Test(expected = UnexpectedErrorException.class)
     public void shouldThrowNotFoundExceptionForGetCollectionError() throws Exception {
-        Session session = new Session("1234", TEST_EMAIL, new ArrayList<>());
+        Session session = new Session("1234", TEST_EMAIL);
 
         try {
             when(mockRequest.getParameter(ZIP_PATH_KEY))
@@ -233,7 +233,7 @@ public class DataVisualisationZipTest {
      */
     @Test(expected = UnexpectedErrorException.class)
     public void shouldThrowUnexpectedErrorForErrorWhileDeletingContent() throws Exception {
-        Session session = new Session("1234", TEST_EMAIL, new ArrayList<>());
+        Session session = new Session("1234", TEST_EMAIL);
 
         when(mockRequest.getParameter(ZIP_PATH_KEY))
                 .thenReturn(ZIP_PATH);

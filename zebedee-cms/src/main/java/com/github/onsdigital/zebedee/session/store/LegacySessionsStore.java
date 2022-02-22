@@ -13,7 +13,7 @@ import java.util.function.Predicate;
  *             dp-identity-api. Once the migration is complete this will be removed.
  */
 @Deprecated
-public interface SessionsStore {
+public interface LegacySessionsStore {
 
     /**
      * Persist a {@link LegacySession}.

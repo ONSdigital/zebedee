@@ -23,7 +23,7 @@ import java.util.function.Predicate;
  * @deprecated in favour of {@link JWTSessionsServiceImpl} and will be removed after migration to dp-identity-api is complete.
  */
 @Deprecated
-public class SessionsStoreImpl implements SessionsStore {
+public class LegacySessionsStoreImpl implements LegacySessionsStore {
 
     private static final String DS_STORE_FILE = ".DS_Store";
     private static final String JSON_EXT = ".json";
@@ -35,7 +35,7 @@ public class SessionsStoreImpl implements SessionsStore {
 
     private JSONSerialiser<LegacySession> sessionJSONSerialiser;
 
-    public SessionsStoreImpl(Path sessionsPath) {
+    public LegacySessionsStoreImpl(Path sessionsPath) {
         this.sessionsPath = sessionsPath;
         this.sessionJSONSerialiser = new JSONSerialiser(LegacySession.class);
     }

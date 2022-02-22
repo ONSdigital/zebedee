@@ -96,7 +96,7 @@ public class IdentityTest {
 
     @Test
     public void shouldReturnIdentityUserAndOKResponseForSuccess() throws Exception {
-        Session session = new Session(FLORENCE_TOKEN, "dartagnan@strangerThings.com", new ArrayList<>());
+        Session session = new Session(FLORENCE_TOKEN, "dartagnan@strangerThings.com");
 
         UserIdentity identity = new UserIdentity(session);
 
@@ -149,7 +149,7 @@ public class IdentityTest {
 
     @Test(expected = IOException.class)
     public void shouldThrowIOExIfFailsToWriteResponse() throws Exception {
-        Session session = new Session(FLORENCE_TOKEN, "dartagnan@strangerThings.com", new ArrayList<>());
+        Session session = new Session(FLORENCE_TOKEN, "dartagnan@strangerThings.com");
 
         UserIdentity identity = new UserIdentity(session);
 

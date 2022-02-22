@@ -43,11 +43,20 @@ public class Session {
         this.id = id;
         this.email = email;
 
-        if (groups != null) {
-            this.groups = new ArrayList<>(groups);
-        } else {
-            this.groups = new ArrayList<>();
+        if (groups == null) {
+            groups = new ArrayList<>();
         }
+        this.groups = Collections.unmodifiableList(new ArrayList<>(groups));
+    }
+
+    /**
+     * Construct a new Session without any group membership.
+     *
+     * @param id     the unqiue ID of the session.
+     * @param email  the user email the session belongs to.
+     */
+    public Session(String id, String email) {
+        this(id, email, new ArrayList<>());
     }
 
     public String getId() {
@@ -59,7 +68,7 @@ public class Session {
     }
 
     public List<String> getGroups() {
-        return Collections.unmodifiableList(this.groups);
+        return groups;
     }
 
     @Override

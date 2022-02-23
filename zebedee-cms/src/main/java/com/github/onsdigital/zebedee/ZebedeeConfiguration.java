@@ -41,10 +41,9 @@ import com.github.onsdigital.zebedee.service.ServiceStoreImpl;
 import com.github.onsdigital.zebedee.service.ZebedeeDatasetService;
 import com.github.onsdigital.zebedee.session.service.JWTSessionsServiceImpl;
 import com.github.onsdigital.zebedee.session.service.Sessions;
-import com.github.onsdigital.zebedee.session.service.SessionsServiceImpl;
 import com.github.onsdigital.zebedee.session.service.ThreadLocalSessionsServiceImpl;
-import com.github.onsdigital.zebedee.session.store.SessionsStore;
-import com.github.onsdigital.zebedee.session.store.SessionsStoreImpl;
+import com.github.onsdigital.zebedee.session.store.LegacySessionsStore;
+import com.github.onsdigital.zebedee.session.store.LegacySessionsStoreImpl;
 import com.github.onsdigital.zebedee.teams.service.StubbedTeamsServiceImpl;
 import com.github.onsdigital.zebedee.teams.service.TeamsService;
 import com.github.onsdigital.zebedee.teams.service.TeamsServiceImpl;
@@ -70,7 +69,6 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.function.Supplier;
 
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
@@ -208,8 +206,8 @@ public class ZebedeeConfiguration {
             JWTHandler jwtHandler = new JWTHandlerImpl();
             this.sessions = new JWTSessionsServiceImpl(jwtHandler, getCognitoKeyIdPairs());
         } else {
-            SessionsStore sessionsStore = new SessionsStoreImpl(sessionsPath);
-            this.sessions = new ThreadLocalSessionsServiceImpl(sessionsStore, permissionsService, teamsService);
+            LegacySessionsStore legacySessionsStore = new LegacySessionsStoreImpl(sessionsPath);
+            this.sessions = new ThreadLocalSessionsServiceImpl(legacySessionsStore, permissionsService, teamsService);
         }
 
         // Init the collection keyring and scheduler cache.

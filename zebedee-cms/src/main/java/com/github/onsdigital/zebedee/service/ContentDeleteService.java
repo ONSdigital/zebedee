@@ -31,9 +31,9 @@ import java.util.function.Consumer;
 
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
-import static com.github.onsdigital.zebedee.content.page.base.PageType.home_page;
-import static com.github.onsdigital.zebedee.content.page.base.PageType.product_page;
-import static com.github.onsdigital.zebedee.content.page.base.PageType.taxonomy_landing_page;
+import static com.github.onsdigital.zebedee.content.page.base.PageType.HOME_PAGE;
+import static com.github.onsdigital.zebedee.content.page.base.PageType.PRODUCT_PAGE;
+import static com.github.onsdigital.zebedee.content.page.base.PageType.TAXONOMY_LANDING_PAGE;
 import static com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedException.alreadyMarkedDeleteInCurrentCollectionError;
 import static com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedException.deleteForbiddenForPageTypeError;
 
@@ -50,7 +50,7 @@ public class ContentDeleteService {
             EventType.DELETE_MARKER_REMOVED);
 
     private static final ImmutableList<PageType> NON_DELETABLE_PAGE_TYPES =
-            ImmutableList.of(home_page, taxonomy_landing_page, product_page);
+            ImmutableList.of(HOME_PAGE, TAXONOMY_LANDING_PAGE, PRODUCT_PAGE);
 
     public static ContentDeleteService instance = null;
 
@@ -73,7 +73,7 @@ public class ContentDeleteService {
         deletes.stream().forEach(delete -> {
             LeafCounter leafCounter = new LeafCounter();
             contentTreeNavigator.applyAndPropagate(delete.getRoot(), (node -> {
-                if (StringUtils.isNotEmpty(node.uri) && node.type != null) {
+                if (StringUtils.isNotEmpty(node.uri) && node.getType() != null) {
                     leafCounter.increment();
                 }
             }));
@@ -176,7 +176,7 @@ public class ContentDeleteService {
         List<String> uris = new ArrayList<>();
         collection.getDescription().getPendingDeletes().forEach(pendingDelete -> {
             contentTreeNavigator.applyAndPropagate(pendingDelete.getRoot(), (node) -> {
-                if (node.type != null && StringUtils.isNotEmpty(node.uri)) {
+                if (node.getType() != null && StringUtils.isNotEmpty(node.uri)) {
                     uris.add(node.uri);
                 }
             });

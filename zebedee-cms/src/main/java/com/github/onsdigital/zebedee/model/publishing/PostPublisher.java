@@ -22,7 +22,6 @@ import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.util.ContentTree;
 import com.github.onsdigital.zebedee.util.SlackNotification;
 import com.github.onsdigital.zebedee.util.URIUtils;
-import com.github.onsdigital.zebedee.util.mertics.service.MetricsService;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -71,8 +70,6 @@ public class PostPublisher {
             // FIXME using PostPublisher.getPublishedCollection feels a bit hacky
             SlackNotification.publishNotification(publishedCollection,SlackNotification.CollectionStage.POST_PUBLISH, SlackNotification.StageStatus.STARTED);
 
-            savePublishMetrics(publishedCollection);
-
             ContentReader contentReader = new FileSystemContentReader(zebedee.getPublished().getPath());
             ContentWriter contentWriter = new ContentWriter(zebedee.getPublished().getPath());
 
@@ -111,8 +108,7 @@ public class PostPublisher {
      */
     private static Session getPublisherClassSession() {
         if (zebdeePublisherSession == null) {
-            zebdeePublisherSession = new Session();
-            zebdeePublisherSession.setEmail(Publisher.class.getName());
+            zebdeePublisherSession = new Session(null, Publisher.class.getName());
         }
         return zebdeePublisherSession;
     }
@@ -125,31 +121,6 @@ public class PostPublisher {
             error().collectionID(collection)
                     .exception(e)
                     .log("An error occurred trying apply the deletes to publishing content");
-        }
-    }
-
-    public static void savePublishMetrics(PublishedCollection publishedCollection) {
-        try {
-            long publishTimeMs = Math.round(publishedCollection.publishEndDate.getTime() - publishedCollection.publishStartDate.getTime());
-
-            Date publishDate = publishedCollection.getPublishDate();
-
-            if (publishDate == null)
-                publishDate = publishedCollection.publishStartDate;
-
-            if (publishDate == null)
-                publishDate = new Date();
-
-            MetricsService.getInstance().captureCollectionPublishMetrics(
-                    publishedCollection.getId(),
-                    publishTimeMs,
-                    publishedCollection.publishResults.get(0).transaction.uriInfos.size(),
-                    publishedCollection.getType().toString(),
-                    publishDate);
-        } catch (Exception exception) {
-            error().collectionID(publishedCollection.getId())
-                    .exception(exception)
-                    .log("An error occurred saving publish metrics");
         }
     }
 
@@ -261,7 +232,7 @@ public class PostPublisher {
                     info().data("uri", node.uri).log("Deleting index from publishing search ");
                     pool.submit(() -> {
                         try {
-                            Indexer.getInstance().deleteContentIndex(node.type, node.uri);
+                            Indexer.getInstance().deleteContentIndex(node.getType().getLabel(), node.uri);
                         } catch (Exception e) {
                             error().logException(e, "Exception reloading search index:");
                         }

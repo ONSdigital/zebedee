@@ -5,12 +5,14 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.github.onsdigital.zebedee.content.page.base.PageType;
+
 /**
  * Class to hold a file uri and any other properties required from that file.
  */
 public class ContentDetail {
     public String uri;
-    public String type;
+    private PageType type;
     public ContentDetailDescription description;
 
     public List<ContentDetail> children;
@@ -21,36 +23,22 @@ public class ContentDetail {
     public ContentDetail() {
     }
 
-    /**
-     * Convenience constructor taking the typical parameters.
-     *
-     * @param title
-     * @param uri
-     * @param type
-     */
-    public ContentDetail(String title, String uri, String type) {
+    public ContentDetail(String uri, PageType type) {
         this.uri = uri;
         this.type = type;
-        this.description = new ContentDetailDescription(title);
     }
 
-    /**
-     * Convenience constructor taking the typical parameters.
-     *
-     * @param description
-     * @param uri
-     * @param type
-     */
-    public ContentDetail(ContentDetailDescription description, String uri, String type) {
-        this.uri = uri;
-        this.type = type;
+    public ContentDetail(String title, String uri, PageType type) {
+        this(new ContentDetailDescription(title), uri, type);
+    }
+
+    public ContentDetail(ContentDetailDescription description, String uri, PageType type) {
+        this(uri, type);
         this.description = description;
     }
 
-    public ContentDetail(ContentDetailDescription description, String uri, String type, String contentPath) {
-        this.uri = uri;
-        this.type = type;
-        this.description = description;
+    public ContentDetail(ContentDetailDescription description, String uri, PageType type, String contentPath) {
+        this(description, uri, type);
         this.contentPath = contentPath;
     }
 
@@ -216,5 +204,9 @@ public class ContentDetail {
 
     public void setDeleteMarker(boolean hasDeleteMarker) {
         this.deleteMarker = hasDeleteMarker;
+    }
+    
+    public PageType getType() {
+        return type;
     }
 }

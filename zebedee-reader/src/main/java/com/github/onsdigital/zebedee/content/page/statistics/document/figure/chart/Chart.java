@@ -68,7 +68,7 @@ public class Chart extends FigureBase {
 
     @Override
     public PageType getType() {
-        return PageType.chart;
+        return PageType.CHART;
     }
 
     public String getSubtitle() {

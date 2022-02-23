@@ -96,6 +96,6 @@ public class ArticleDownload extends Statistics {
 
     @Override
     public PageType getType() {
-        return PageType.article_download;
+        return PageType.ARTICLE_DOWNLOAD;
     }
 }

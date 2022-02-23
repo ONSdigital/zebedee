@@ -95,12 +95,8 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
 
         collection = new Collection(builder.collections.get(1), zebedee);
 
-        publisher1Session = zebedee.openSession(builder.publisher1Credentials);
-        publisher2Session = new Session();
-        publisher2Session.setEmail(builder.publisher2.getEmail());
-        publisher2Session.setId("5678");
-        publisher2Session.setLastAccess(new Date());
-        publisher2Session.setStart(new Date());
+        publisher1Session = new Session("5678", builder.publisher1.getEmail());
+        publisher2Session = new Session("5678", builder.publisher2.getEmail());
 
         setUpPermissionsServiceMockForLegacyTests(zebedee, publisher1Session);
         ReflectionTestUtils.setField(zebedee, "teamsService", teamsService);
@@ -1309,7 +1305,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         collection.complete(publisher1Session, releaseJsonUri, recursive);
         collection.review(publisher2Session, releaseJsonUri, recursive);
 
-        ContentDetail articleDetail = new ContentDetail("My article", "/some/uri", PageType.article.toString());
+        ContentDetail articleDetail = new ContentDetail("My article", "/some/uri", PageType.ARTICLE);
         FileUtils.write(collection.getReviewed().getPath().resolve("some/uri/data.json").toFile(),
                 Serialiser.serialise(articleDetail));
 
@@ -1719,7 +1715,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         ContentDetail datasetDetail = datasetContent.get(0);
 
         assertEquals("/datasets/123", datasetDetail.uri);
-        assertEquals(PageType.api_dataset_landing_page.toString(), datasetDetail.type);
+        assertEquals(PageType.API_DATASET_LANDING_PAGE, datasetDetail.getType());
         assertEquals(dataset.getTitle(), datasetDetail.description.title);
     }
 
@@ -1743,13 +1739,13 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         // Then the expected values have been set
         ContentDetail versionDetail = datasetContent.get(0);
         assertEquals("/datasets/123/editions/2015/versions/1", versionDetail.uri);
-        assertEquals(PageType.api_dataset.toString(), versionDetail.type);
+        assertEquals(PageType.API_DATASET, versionDetail.getType());
         assertEquals(datasetVersion.getTitle(), versionDetail.description.title);
 
         // Then an entry for the parent dataset is also added
         ContentDetail datasetDetail = datasetContent.get(1);
         assertEquals("/datasets/123", datasetDetail.uri);
-        assertEquals(PageType.api_dataset_landing_page.toString(), datasetDetail.type);
+        assertEquals(PageType.API_DATASET_LANDING_PAGE, datasetDetail.getType());
         assertEquals(datasetVersion.getTitle(), datasetDetail.description.title);
     }
 

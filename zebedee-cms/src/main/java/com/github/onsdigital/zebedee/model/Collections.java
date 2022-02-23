@@ -310,16 +310,13 @@ public class Collections {
      *
      * @param collection
      * @param session
+     * @param userOverrideKey
      * @return
      * @throws IOException
      * @throws UnauthorizedException
      * @throws BadRequestException
      * @throws ConflictException
      */
-    public Future<Boolean> approve(Collection collection, Session session) throws IOException, ZebedeeException {
-        return approve(collection, session, null);
-    }
-
     public Future<Boolean> approve(Collection collection, Session session, Long userOverrideKey)
             throws IOException, ZebedeeException {
 
@@ -371,7 +368,7 @@ public class Collections {
                 .log("approve collection: saving collection");
         collection.save();
 
-        info().data("collectionId", collectionId).log("approve collection: adding approval take to queue");
+        info().data("collectionId", collectionId).log("approve collection: adding approval task to queue");
 
         Future<Boolean> future = null;
         try {

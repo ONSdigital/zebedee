@@ -6,13 +6,14 @@ import com.github.onsdigital.exceptions.JWTVerificationException;
 import com.github.onsdigital.impl.UserDataPayload;
 import com.github.onsdigital.interfaces.JWTHandler;
 import com.github.onsdigital.zebedee.session.model.Session;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import org.apache.commons.lang3.StringUtils;
 
-import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.Map;
 
@@ -35,7 +36,7 @@ public class JWTSessionsServiceImpl implements Sessions {
 
     private Gson gson;
 
-    private static ThreadLocal<UserDataPayload> store = new ThreadLocal<>();
+    private static ThreadLocal<Session> store = new ThreadLocal<>();
 
     private static final int JWT_CHUNK_SIZE = 3;
 
@@ -73,12 +74,7 @@ public class JWTSessionsServiceImpl implements Sessions {
      */
     @Override
     public Session get() {
-        UserDataPayload jwtDetails = store.get();
-        if (jwtDetails == null) {
-            return null;
-        }
-
-        return new Session(jwtDetails);
+        return store.get();
     }
 
     /**
@@ -92,7 +88,7 @@ public class JWTSessionsServiceImpl implements Sessions {
         // Ensure that any existing session is clear in case this is a recycled thread
         resetThread();
 
-        if (StringUtils.isEmpty(token)) {
+        if (StringUtils.isBlank(token)) {
             throw new SessionsException(ACCESS_TOKEN_REQUIRED_ERROR);
         }
 
@@ -110,7 +106,8 @@ public class JWTSessionsServiceImpl implements Sessions {
         String publicSigningKey = getPublicSigningKey(chunks[0]);
 
         try {
-            store.set(jwtHandler.verifyJWT(token, publicSigningKey));
+            UserDataPayload jwtData = jwtHandler.verifyJWT(token, publicSigningKey);
+            store.set(new Session(token, jwtData.getEmail(), Arrays.asList(jwtData.getGroups())));
         } catch (JWTTokenExpiredException e) {
             throw new SessionsException(ACCESS_TOKEN_EXPIRED_ERROR);
         } catch (JWTVerificationException | JWTDecodeException e) {
@@ -146,7 +143,8 @@ public class JWTSessionsServiceImpl implements Sessions {
         );
     }
 
-    static void setStore(ThreadLocal<UserDataPayload> store) {
+    @VisibleForTesting
+    static void setStore(ThreadLocal<Session> store) {
         JWTSessionsServiceImpl.store = store;
     }
 }

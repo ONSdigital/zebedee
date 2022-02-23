@@ -17,7 +17,6 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 
 import static java.text.MessageFormat.format;
@@ -72,7 +71,7 @@ public class CollectionTest extends ZebedeeAPIBaseTestCase {
         MockitoAnnotations.openMocks(this);
 
         when(sessions.get())
-                .thenReturn(session);
+                .thenReturn(mockSession);
 
         when(collections.getCollectionId(mockRequest))
                 .thenReturn(COLLECTION_ID);
@@ -83,10 +82,10 @@ public class CollectionTest extends ZebedeeAPIBaseTestCase {
         when(collection.getDescription())
                 .thenReturn(description);
 
-        when(permissionsService.canView(session, COLLECTION_ID))
+        when(permissionsService.canView(mockSession, COLLECTION_ID))
                 .thenReturn(true);
 
-        when(permissionsService.canEdit(session))
+        when(permissionsService.canEdit(mockSession))
                 .thenReturn(true);
 
         when(description.getName())
@@ -153,7 +152,7 @@ public class CollectionTest extends ZebedeeAPIBaseTestCase {
 
     @Test
     public void testGet_checkPermissionsError_shouldThrowException() throws Exception {
-        when(permissionsService.canView(session, COLLECTION_ID))
+        when(permissionsService.canView(mockSession, COLLECTION_ID))
                 .thenThrow(IOException.class);
 
         UnauthorizedException actual = assertThrows(UnauthorizedException.class,
@@ -162,12 +161,12 @@ public class CollectionTest extends ZebedeeAPIBaseTestCase {
         assertThat(actual.getMessage(), equalTo("You are not authorised to view this collection"));
         verify(sessions, times(1)).get();
         verify(collections, times(1)).getCollection(COLLECTION_ID);
-        verify(permissionsService, times(1)).canView(session, COLLECTION_ID);
+        verify(permissionsService, times(1)).canView(mockSession, COLLECTION_ID);
     }
 
     @Test
     public void testGet_permissionDenied_shouldThrowException() throws Exception {
-        when(permissionsService.canView(session, COLLECTION_ID))
+        when(permissionsService.canView(mockSession, COLLECTION_ID))
                 .thenReturn(false);
 
         UnauthorizedException actual = assertThrows(UnauthorizedException.class,
@@ -176,7 +175,7 @@ public class CollectionTest extends ZebedeeAPIBaseTestCase {
         assertThat(actual.getMessage(), equalTo("You are not authorised to view this collection"));
         verify(sessions, times(1)).get();
         verify(collections, times(1)).getCollection(COLLECTION_ID);
-        verify(permissionsService, times(1)).canView(session, COLLECTION_ID);
+        verify(permissionsService, times(1)).canView(mockSession, COLLECTION_ID);
     }
 
     @Test
@@ -186,7 +185,7 @@ public class CollectionTest extends ZebedeeAPIBaseTestCase {
         assertThat(actual, is(notNullValue()));
         verify(sessions, times(1)).get();
         verify(collections, times(1)).getCollection(COLLECTION_ID);
-        verify(permissionsService, times(1)).canView(session, COLLECTION_ID);
+        verify(permissionsService, times(1)).canView(mockSession, COLLECTION_ID);
     }
 
     @Test
@@ -227,7 +226,7 @@ public class CollectionTest extends ZebedeeAPIBaseTestCase {
 
     @Test
     public void testPost_permissionsCheckError_shouldThrowException() throws Exception {
-        when(permissionsService.canEdit(session))
+        when(permissionsService.canEdit(mockSession))
                 .thenThrow(IOException.class);
 
         UnauthorizedException ex = assertThrows(UnauthorizedException.class,
@@ -235,13 +234,13 @@ public class CollectionTest extends ZebedeeAPIBaseTestCase {
 
         assertThat(ex.getMessage(), equalTo("You are not authorised to edit collections."));
         verify(sessions, times(1)).get();
-        verify(permissionsService, times(1)).canEdit(session);
+        verify(permissionsService, times(1)).canEdit(mockSession);
         verifyNoMoreInteractions(sessions, permissionsService, collections);
     }
 
     @Test
     public void testPost_permissionDenied_shouldThrowException() throws Exception {
-        when(permissionsService.canEdit(session))
+        when(permissionsService.canEdit(mockSession))
                 .thenReturn(false);
 
         UnauthorizedException ex = assertThrows(UnauthorizedException.class,
@@ -249,7 +248,7 @@ public class CollectionTest extends ZebedeeAPIBaseTestCase {
 
         assertThat(ex.getMessage(), equalTo("You are not authorised to edit collections."));
         verify(sessions, times(1)).get();
-        verify(permissionsService, times(1)).canEdit(session);
+        verify(permissionsService, times(1)).canEdit(mockSession);
         verifyNoMoreInteractions(sessions, permissionsService, collections);
     }
 
@@ -268,7 +267,7 @@ public class CollectionTest extends ZebedeeAPIBaseTestCase {
     @Test
     public void testDelete_getCollectionError_shouldThrowEx() throws Exception {
         when(sessions.get())
-                .thenReturn(session);
+                .thenReturn(mockSession);
 
         when(mockRequest.getPathInfo())
                 .thenReturn("collections/1234");
@@ -285,7 +284,7 @@ public class CollectionTest extends ZebedeeAPIBaseTestCase {
     @Test
     public void testDelete_collectionNotFound_shouldThrowEx() throws Exception {
         when(sessions.get())
-                .thenReturn(session);
+                .thenReturn(mockSession);
 
         when(mockRequest.getPathInfo())
                 .thenReturn("collections/1234");
@@ -304,7 +303,7 @@ public class CollectionTest extends ZebedeeAPIBaseTestCase {
     @Test
     public void testDelete_deleteCollectionError_shouldThrowEx() throws Exception {
         when(sessions.get())
-                .thenReturn(session);
+                .thenReturn(mockSession);
 
         when(mockRequest.getPathInfo())
                 .thenReturn("collections/" + COLLECTION_ID);
@@ -317,7 +316,7 @@ public class CollectionTest extends ZebedeeAPIBaseTestCase {
 
         doThrow(IOException.class)
                 .when(collections)
-                .delete(collection, session);
+                .delete(collection, mockSession);
 
         InternalServerError ex = assertThrows(InternalServerError.class,
                 () -> endpoint.deleteCollection(mockRequest, mockResponse));
@@ -325,13 +324,13 @@ public class CollectionTest extends ZebedeeAPIBaseTestCase {
         assertThat(ex.getMessage(), equalTo(format("error attempting to delete collection: {0}", COLLECTION_ID)));
         verify(sessions, times(1)).get();
         verify(collections, times(1)).getCollection(COLLECTION_ID);
-        verify(collections, times(1)).delete(collection, session);
+        verify(collections, times(1)).delete(collection, mockSession);
     }
 
     @Test
     public void testDelete_keyringRemoveError_shouldThrowEx() throws Exception {
         when(sessions.get())
-                .thenReturn(session);
+                .thenReturn(mockSession);
 
         when(mockRequest.getPathInfo())
                 .thenReturn("collections/" + COLLECTION_ID);
@@ -344,7 +343,7 @@ public class CollectionTest extends ZebedeeAPIBaseTestCase {
 
         doThrow(KeyringException.class)
                 .when(collectionKeyring)
-                .remove(session, collection);
+                .remove(mockSession, collection);
 
         InternalServerError ex = assertThrows(InternalServerError.class,
                 () -> endpoint.deleteCollection(mockRequest, mockResponse));
@@ -352,14 +351,14 @@ public class CollectionTest extends ZebedeeAPIBaseTestCase {
         assertThat(ex.getMessage(), equalTo(format("error attempting to remove collection key from keyring: {0}", COLLECTION_ID)));
         verify(sessions, times(1)).get();
         verify(collections, times(1)).getCollection(COLLECTION_ID);
-        verify(collections, times(1)).delete(collection, session);
-        verify(collectionKeyring, times(1)).remove(session, collection);
+        verify(collections, times(1)).delete(collection, mockSession);
+        verify(collectionKeyring, times(1)).remove(mockSession, collection);
     }
 
     @Test
     public void testDelete_success_shouldDeleteCollection() throws Exception {
         when(sessions.get())
-                .thenReturn(session);
+                .thenReturn(mockSession);
 
         when(mockRequest.getPathInfo())
                 .thenReturn("collections/1234");
@@ -373,8 +372,8 @@ public class CollectionTest extends ZebedeeAPIBaseTestCase {
         boolean result = endpoint.deleteCollection(mockRequest, mockResponse);
 
         assertTrue(result);
-        verify(collections, times(1)).delete(collection, session);
+        verify(collections, times(1)).delete(collection, mockSession);
         verify(scheduleCanceller, times(1)).cancel(collection);
-        verify(collectionKeyring, times(1)).remove(session, collection);
+        verify(collectionKeyring, times(1)).remove(mockSession, collection);
     }
 }

@@ -1403,7 +1403,7 @@ public class Collection {
         return description.getDatasets().stream().map(ds -> {
 
             String url = URI.create(ds.getUri()).getPath();
-            return new ContentDetail(ds.getTitle(), url, PageType.api_dataset_landing_page.toString());
+            return new ContentDetail(ds.getTitle(), url, PageType.API_DATASET_LANDING_PAGE);
 
         }).collect(Collectors.toList());
     }
@@ -1419,8 +1419,8 @@ public class Collection {
             String datasetURL = "/datasets/" + ds.getId();
             String versionURL = datasetURL + "/editions/" + ds.getEdition() + "/versions/" + ds.getVersion();
 
-            ContentDetail versionDetail = new ContentDetail(ds.getTitle(), versionURL, PageType.api_dataset.toString());
-            ContentDetail datasetDetail = new ContentDetail(ds.getTitle(), datasetURL, PageType.api_dataset_landing_page.toString());
+            ContentDetail versionDetail = new ContentDetail(ds.getTitle(), versionURL, PageType.API_DATASET);
+            ContentDetail datasetDetail = new ContentDetail(ds.getTitle(), datasetURL, PageType.API_DATASET_LANDING_PAGE);
 
             return (new ArrayList<>(Arrays.asList(versionDetail, datasetDetail))).stream();
 

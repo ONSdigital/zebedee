@@ -226,7 +226,7 @@ public class ReadRequestHandler {
         Collection<ContentNode> nodeList = nodes.values();
         for (Iterator<ContentNode> iterator = nodeList.iterator(); iterator.hasNext(); ) {
             ContentNode next = iterator.next();
-            if (PageType.taxonomy_landing_page.equals(next.getType()) == false) {
+            if (PageType.TAXONOMY_LANDING_PAGE.equals(next.getType()) == false) {
                 continue;
             }
             next.setChildren(getTaxonomy(collectionId, sessionId, next.getUri().toString(), depth));

@@ -19,11 +19,11 @@ import java.util.concurrent.Future;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import static com.github.onsdigital.zebedee.content.page.base.PageType.article;
-import static com.github.onsdigital.zebedee.content.page.base.PageType.bulletin;
-import static com.github.onsdigital.zebedee.content.page.base.PageType.compendium_chapter;
-import static com.github.onsdigital.zebedee.content.page.base.PageType.compendium_landing_page;
-import static com.github.onsdigital.zebedee.content.page.base.PageType.static_methodology;
+import static com.github.onsdigital.zebedee.content.page.base.PageType.ARTICLE;
+import static com.github.onsdigital.zebedee.content.page.base.PageType.BULLETIN;
+import static com.github.onsdigital.zebedee.content.page.base.PageType.COMPENDIUM_CHAPTER;
+import static com.github.onsdigital.zebedee.content.page.base.PageType.COMPENDIUM_LANDING_PAGE;
+import static com.github.onsdigital.zebedee.content.page.base.PageType.STATIC_METHODOLOGY;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.info;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.warn;
 import static java.text.MessageFormat.format;
@@ -42,11 +42,11 @@ public class CollectionPdfGenerator {
         EXECUTOR_SERVICE = Executors.newFixedThreadPool(5); // TODO should this be configurable?
 
         PDF_GENERATING_PAGES = new ArrayList<PageType>() {{
-            add(article);
-            add(bulletin);
-            add(compendium_landing_page);
-            add(compendium_chapter);
-            add(static_methodology);
+            add(ARTICLE);
+            add(BULLETIN);
+            add(COMPENDIUM_LANDING_PAGE);
+            add(COMPENDIUM_CHAPTER);
+            add(STATIC_METHODOLOGY);
         }};
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> closeExecutorService()));
@@ -54,7 +54,7 @@ public class CollectionPdfGenerator {
 
     private PdfService pdfService;
 
-    private Predicate<ContentDetail> isPDFPage = (c -> PDF_GENERATING_PAGES.contains(PageType.valueOf(c.type)));
+    private Predicate<ContentDetail> isPDFPage = (c -> PDF_GENERATING_PAGES.contains(c.getType()));
 
     /**
      * Create a new instance to use the provided PdfService.

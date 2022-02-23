@@ -46,6 +46,6 @@ public class MethodologyDownload extends BaseStaticPage {
 
     @Override
     public PageType getType() {
-        return PageType.static_methodology_download;
+        return PageType.STATIC_METHODOLOGY_DOWNLOAD;
     }
 }

@@ -58,6 +58,6 @@ public class Visualisation extends Page {
 
     @Override
     public PageType getType() {
-        return PageType.visualisation;
+        return PageType.VISUALISATION;
     }
 }

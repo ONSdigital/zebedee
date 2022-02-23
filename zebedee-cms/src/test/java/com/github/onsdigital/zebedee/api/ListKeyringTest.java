@@ -1,13 +1,11 @@
 package com.github.onsdigital.zebedee.api;
 
-import com.github.onsdigital.zebedee.exceptions.InternalServerError;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.keyring.CollectionKeyring;
 import com.github.onsdigital.zebedee.session.service.Sessions;
 import org.junit.Test;
 import org.mockito.Mock;
 
-import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -34,7 +32,7 @@ public class ListKeyringTest extends ZebedeeAPIBaseTestCase {
         email = "123@test.com";
 
         when(sessions.get())
-                .thenReturn(session);
+                .thenReturn(mockSession);
 
         when(mockRequest.getParameter("email"))
                 .thenReturn(email);
@@ -58,7 +56,7 @@ public class ListKeyringTest extends ZebedeeAPIBaseTestCase {
         Set<String> userKeys = new HashSet<>();
         userKeys.add("666");
 
-        when(centralKeyring.list(session))
+        when(centralKeyring.list(mockSession))
                 .thenReturn(userKeys);
 
         Set<String> actual = endpoint.listUserKeys(mockRequest, mockResponse);

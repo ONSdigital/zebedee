@@ -220,7 +220,7 @@ public class CollectionsTest {
 
     @Test(expected = BadRequestException.class)
     public void shouldThrowBadRequestForNullCollectionOnApprove() throws IOException, ZebedeeException {
-        collections.approve(null, sessionMock);
+        collections.approve(null, sessionMock, null);
     }
 
     @Test(expected = BadRequestException.class)
@@ -298,7 +298,7 @@ public class CollectionsTest {
         when(permissionsServiceMock.canEdit(sessionMock))
                 .thenReturn(false);
         try {
-            collections.approve(collectionMock, sessionMock);
+            collections.approve(collectionMock, sessionMock, null);
         } catch (UnauthorizedException e) {
             verify(permissionsServiceMock, times(1))
                     .canEdit(sessionMock);
@@ -558,7 +558,7 @@ public class CollectionsTest {
         doNothing().when(description).addEvent(eventCaptor.capture());
 
         try {
-            collections.approve(collectionMock, sessionMock);
+            collections.approve(collectionMock, sessionMock, null);
         } catch (ConflictException e) {
             verify(permissionsServiceMock, times(1)).canEdit(sessionMock);
             verify(collectionMock, times(1)).inProgressUris();
@@ -591,7 +591,7 @@ public class CollectionsTest {
         doNothing().when(description).addEvent(eventCaptor.capture());
 
         try {
-            collections.approve(collectionMock, sessionMock);
+            collections.approve(collectionMock, sessionMock, null);
         } catch (ConflictException e) {
             verify(permissionsServiceMock, times(1)).canEdit(sessionMock);
             verify(collectionMock, times(1)).inProgressUris();
@@ -624,7 +624,7 @@ public class CollectionsTest {
         when(zebedeeCmsService.getZebedeeReader())
                 .thenReturn(zebedeeReader);
 
-        assertThat(futureMock, equalTo(collections.approve(collectionMock, sessionMock)));
+        assertThat(futureMock, equalTo(collections.approve(collectionMock, sessionMock, null)));
 
         verify(permissionsServiceMock, times(1)).canEdit(sessionMock);
         verify(collectionMock, times(1)).isAllContentReviewed(anyBoolean());

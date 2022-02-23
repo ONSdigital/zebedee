@@ -15,6 +15,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import javax.ws.rs.HEAD;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import static org.apache.http.HttpStatus.SC_INTERNAL_SERVER_ERROR;
 import static org.apache.http.HttpStatus.SC_NOT_FOUND;
@@ -62,9 +63,7 @@ public class AuthorisationServiceImplTest {
 
         service = new AuthorisationServiceImpl();
 
-        session = new Session();
-        session.setEmail("rickSanchez@CitadelOfRicks.com");
-        session.setId(SESSION_ID);
+        session = new Session(SESSION_ID, "rickSanchez@CitadelOfRicks.com");
 
         desc = new CollectionDescription();
         desc.setId("666");

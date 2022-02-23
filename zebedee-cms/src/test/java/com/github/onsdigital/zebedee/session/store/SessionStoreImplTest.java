@@ -1,8 +1,9 @@
 package com.github.onsdigital.zebedee.session.store;
 
 import com.github.onsdigital.zebedee.TestUtils;
-import com.github.onsdigital.zebedee.session.model.Session;
-import com.google.gson.Gson;
+import com.github.onsdigital.zebedee.json.serialiser.IsoDateSerializer;
+import com.github.onsdigital.zebedee.session.model.LegacySession;
+import com.google.gson.GsonBuilder;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -21,18 +22,20 @@ import java.util.UUID;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertEquals;
 
 public class SessionStoreImplTest {
 
     @Rule
     public TemporaryFolder root = new TemporaryFolder();
 
-    private SessionsStore sessionsStore;
+    private LegacySessionsStore legacySessionsStore;
     private File sessionsDir;
     private Date lastAccessed;
     private Date startDate;
-    private Session session;
+    private LegacySession session;
     private Path sessionFile;
+    private GsonBuilder gsonBuilder;
 
     @BeforeClass
     public static void setup() {
@@ -51,16 +54,15 @@ public class SessionStoreImplTest {
         lastAccessed = new Date();
         startDate = new Date();
 
-        session = new Session();
-        session.setEmail("test@ons.gov.co.uk");
-        session.setId("666");
-        session.setLastAccess(null);
-        session.setStart(null);
+        session = new LegacySession("666", "test@ons.gov.co.uk");
 
         String fileName = UUID.randomUUID().toString();
         sessionFile = sessionsDir.toPath().resolve(fileName + ".json");
 
-        sessionsStore = new SessionsStoreImpl(sessionsDir.toPath());
+        legacySessionsStore = new LegacySessionsStoreImpl(sessionsDir.toPath());
+
+        gsonBuilder = new GsonBuilder();
+        gsonBuilder.registerTypeAdapter(Date.class, new IsoDateSerializer());
     }
 
     @After
@@ -71,11 +73,12 @@ public class SessionStoreImplTest {
     @Test
     public void filterSessions_Success() throws Exception {
         sessionFile.toFile().createNewFile();
-        Files.write(sessionFile, new Gson().toJson(session).getBytes(), StandardOpenOption.APPEND);
+        Files.write(sessionFile, gsonBuilder.create().toJson(session).getBytes(), StandardOpenOption.APPEND);
 
-        List<Session> result = sessionsStore.filterSessions((p) -> true); // return all / any session.
+        List<LegacySession> result = legacySessionsStore.filterSessions((p) -> true); // return all / any session.
         assertThat(result.size(), equalTo(1));
-        assertThat(result.get(0), equalTo(session));
+        assertEquals(session.getId(), result.get(0).getId());
+        assertEquals(session.getEmail(), result.get(0).getEmail());
     }
 
     @Test
@@ -84,20 +87,22 @@ public class SessionStoreImplTest {
         sessionsDir.toPath().resolve(".DS_Store").toFile().createNewFile();
         sessionsDir.toPath().resolve("shoppinglist.txt").toFile().createNewFile();
         sessionFile.toFile().createNewFile();
-        Files.write(sessionFile, new Gson().toJson(session).getBytes(), StandardOpenOption.APPEND);
+        Files.write(sessionFile, gsonBuilder.create().toJson(session).getBytes(), StandardOpenOption.APPEND);
 
-        List<Session> result = sessionsStore.filterSessions((p) -> true); // return all / any session.
+        List<LegacySession> result = legacySessionsStore.filterSessions((p) -> true); // return all / any session.
         assertThat(result.size(), equalTo(1));
-        assertThat(result.get(0), equalTo(session));
+        assertEquals(session.getId(), result.get(0).getId());
+        assertEquals(session.getEmail(), result.get(0).getEmail());
     }
 
     @Test
     public void find_Success() throws Exception {
         sessionFile.toFile().createNewFile();
-        Files.write(sessionFile, new Gson().toJson(session).getBytes(), StandardOpenOption.APPEND);
+        Files.write(sessionFile, gsonBuilder.create().toJson(session).getBytes(), StandardOpenOption.APPEND);
 
-        Session result = sessionsStore.find(session.getEmail()); // return all / any session.
-        assertThat(result, equalTo(session));
+        LegacySession result = legacySessionsStore.find(session.getEmail()); // return all / any session.
+        assertEquals(session.getId(), result.getId());
+        assertEquals(session.getEmail(), result.getEmail());
     }
 
     @Test
@@ -106,9 +111,10 @@ public class SessionStoreImplTest {
         sessionsDir.toPath().resolve(".DS_Store").toFile().createNewFile();
         sessionsDir.toPath().resolve("shoppinglist.txt").toFile().createNewFile();
         sessionFile.toFile().createNewFile();
-        Files.write(sessionFile, new Gson().toJson(session).getBytes(), StandardOpenOption.APPEND);
+        Files.write(sessionFile, gsonBuilder.create().toJson(session).getBytes(), StandardOpenOption.APPEND);
 
-        Session result = sessionsStore.find(session.getEmail()); // return all / any session.
-        assertThat(result, equalTo(session));
+        LegacySession result = legacySessionsStore.find(session.getEmail()); // return all / any session.
+        assertEquals(session.getId(), result.getId());
+        assertEquals(session.getEmail(), result.getEmail());
     }
 }

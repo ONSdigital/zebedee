@@ -433,9 +433,7 @@ public class Builder {
     public Session createSession(String email) throws IOException {
 
         // Build the session object
-        Session session = new Session();
-        session.setId(Random.id());
-        session.setEmail(email);
+        Session session = new Session(Random.id(), email);
 
         // Determine the path in which to create the session Json
         Path sessionPath;
@@ -454,9 +452,7 @@ public class Builder {
     public Session createSession(User user) throws IOException {
 
         // Build the session object
-        Session session = new Session();
-        session.setId(Random.id());
-        session.setEmail(user.getEmail());
+        Session session = new Session(Random.id(), user.getEmail());
 
         // Determine the path in which to create the session Json
         Path sessionPath;

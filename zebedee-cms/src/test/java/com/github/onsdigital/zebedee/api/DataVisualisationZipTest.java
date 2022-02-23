@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -151,8 +152,7 @@ public class DataVisualisationZipTest {
      */
     @Test
     public void shouldDeleteZipAndContent() throws Exception {
-        Session session = new Session();
-        session.setEmail(TEST_EMAIL);
+        Session session = new Session("1234", TEST_EMAIL);
 
         when(mockRequest.getParameter(ZIP_PATH_KEY))
                 .thenReturn(ZIP_PATH);
@@ -195,8 +195,7 @@ public class DataVisualisationZipTest {
      */
     @Test(expected = UnexpectedErrorException.class)
     public void shouldThrowNotFoundExceptionForGetCollectionError() throws Exception {
-        Session session = new Session();
-        session.setEmail(TEST_EMAIL);
+        Session session = new Session("1234", TEST_EMAIL);
 
         try {
             when(mockRequest.getParameter(ZIP_PATH_KEY))
@@ -223,8 +222,7 @@ public class DataVisualisationZipTest {
      */
     @Test(expected = UnexpectedErrorException.class)
     public void shouldThrowUnexpectedErrorForErrorWhileDeletingContent() throws Exception {
-        Session session = new Session();
-        session.setEmail(TEST_EMAIL);
+        Session session = new Session("1234", TEST_EMAIL);
 
         when(mockRequest.getParameter(ZIP_PATH_KEY))
                 .thenReturn(ZIP_PATH);

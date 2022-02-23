@@ -20,6 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static org.apache.http.HttpStatus.SC_FORBIDDEN;
@@ -95,10 +96,7 @@ public class IdentityTest {
 
     @Test
     public void shouldReturnIdentityUserAndOKResponseForSuccess() throws Exception {
-        Session session = new Session();
-        session.setEmail("dartagnan@strangerThings.com");
-        session.setId(FLORENCE_TOKEN);
-
+        Session session = new Session(FLORENCE_TOKEN, "dartagnan@strangerThings.com");
 
         UserIdentity identity = new UserIdentity(session);
 
@@ -151,9 +149,7 @@ public class IdentityTest {
 
     @Test(expected = IOException.class)
     public void shouldThrowIOExIfFailsToWriteResponse() throws Exception {
-        Session session = new Session();
-        session.setEmail("dartagnan@strangerThings.com");
-        session.setId(FLORENCE_TOKEN);
+        Session session = new Session(FLORENCE_TOKEN, "dartagnan@strangerThings.com");
 
         UserIdentity identity = new UserIdentity(session);
 

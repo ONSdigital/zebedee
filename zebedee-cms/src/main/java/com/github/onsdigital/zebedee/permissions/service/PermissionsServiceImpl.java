@@ -13,6 +13,7 @@ import com.github.onsdigital.zebedee.teams.service.TeamsService;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.locks.Lock;
@@ -289,7 +290,6 @@ public class PermissionsServiceImpl implements PermissionsService {
              throw new UnauthorizedException(getUnauthorizedMessage(session));
          }
 
-         boolean result = false;
          readLock.lock();
          Set<Integer> teamIds;
          try {
@@ -379,8 +379,8 @@ public class PermissionsServiceImpl implements PermissionsService {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
-        Session userSession = new Session();
-        userSession.setEmail(email);
+        // This is a little ugly, but this class is deprecated and will be removed very soon
+        Session userSession = new Session(null, email);
 
         return new PermissionDefinition()
                 .setEmail(email)

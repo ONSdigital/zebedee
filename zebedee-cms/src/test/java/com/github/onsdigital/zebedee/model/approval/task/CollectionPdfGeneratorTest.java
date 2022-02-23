@@ -57,7 +57,7 @@ public class CollectionPdfGeneratorTest {
 
         ArrayList<ContentDetail> collectionContent = new ArrayList<>();
         String uri = "/the/uri";
-        collectionContent.add(new ContentDetail("Some article", uri, PageType.article.toString()));
+        collectionContent.add(new ContentDetail("Some article", uri, PageType.ARTICLE));
 
         generator.generatePDFsForCollection(collection, mockCollectionWriter, collectionContent);
 

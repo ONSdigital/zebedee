@@ -21,6 +21,6 @@ public class Methodology extends StaticArticle {
 
     @Override
     public PageType getType() {
-        return PageType.static_methodology;
+        return PageType.STATIC_METHODOLOGY;
     }
 }

@@ -30,7 +30,7 @@ public class HomePage extends TaxonomyNode {
 
     @Override
     public PageType getType() {
-        return PageType.home_page;
+        return PageType.HOME_PAGE;
     }
 
     public List<HomeContentItem> getFeaturedContent() {

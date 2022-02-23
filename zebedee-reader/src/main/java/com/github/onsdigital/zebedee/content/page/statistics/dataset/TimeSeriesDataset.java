@@ -9,6 +9,6 @@ public class TimeSeriesDataset extends Dataset {
 
     @Override
     public PageType getType() {
-        return PageType.timeseries_dataset;
+        return PageType.TIMESERIES_DATASET;
     }
 }

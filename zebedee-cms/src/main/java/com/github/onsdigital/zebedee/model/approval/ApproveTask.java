@@ -96,7 +96,6 @@ public class ApproveTask implements Callable<Boolean> {
 
     @Override
     public Boolean call() {
-        ApprovalEventLog eventLog = null;
         try {
             return doApproval();
         } catch (Exception e) {
@@ -107,9 +106,6 @@ public class ApproveTask implements Callable<Boolean> {
                 errorLog.data("approver", session.getEmail());
             }
 
-            if (eventLog != null) {
-                errorLog.data("approvalManifest", eventLog);
-            }
             errorLog.logException(e, "approve task: unrecoverable error while attempting to approve collection");
             return false;
         }
@@ -163,10 +159,7 @@ public class ApproveTask implements Callable<Boolean> {
             info().data("user", session.getEmail()).data("collectionId", collection.getDescription().getId())
                     .log("approve task: collection approve task completed successfully");
 
-            if (collection == null) {
-                return false;
-            }
-            return true;
+            return collection != null;
 
         } catch (Exception e) {
             String channel = Configuration.getDefaultSlackAlarmChannel();
@@ -203,7 +196,7 @@ public class ApproveTask implements Callable<Boolean> {
     ) throws IOException, ZebedeeException, URISyntaxException {
 
         // Import any time series update CSV file
-        List<TimeseriesUpdateCommand> updateCommands = ImportUpdateCommandCsvs(collection, publishedReader, collectionReader);
+        List<TimeseriesUpdateCommand> updateCommands = importUpdateCommandCsvs(collection, publishedReader, collectionReader);
 
         // Generate time series if required.
         new DataPublisher().preprocessCollection(
@@ -212,9 +205,14 @@ public class ApproveTask implements Callable<Boolean> {
                 collectionWriter.getReviewed(), true, dataIndex, updateCommands);
     }
 
-    public static List<TimeseriesUpdateCommand> ImportUpdateCommandCsvs(Collection collection, ContentReader publishedReader, CollectionReader collectionReader) throws ZebedeeException, IOException {
+    public static List<TimeseriesUpdateCommand> importUpdateCommandCsvs(Collection collection, ContentReader publishedReader,
+                                                                        CollectionReader collectionReader)
+            throws ZebedeeException, IOException {
+
         List<TimeseriesUpdateCommand> updateCommands = new ArrayList<>();
-        if (collection.getDescription().getTimeseriesImportFiles() != null) {
+        if (collection.getDescription().getTimeseriesImportFiles() != null
+                && !collection.getDescription().getTimeseriesImportFiles().isEmpty()) {
+
             info().data("collectionId", collection.getDescription().getId())
                     .log("approve collection: collection contains time series data processing importing CSDB file");
 
@@ -255,9 +253,7 @@ public class ApproveTask implements Callable<Boolean> {
                 info().data("collectionId", collection.getDescription().getId()).log("adding uri to delete to the publish notification " + node.uri);
 
                 if (!contentToDelete.contains(node.uri)) {
-                    ContentDetail contentDetailToDelete = new ContentDetail();
-                    contentDetailToDelete.uri = node.uri;
-                    contentDetailToDelete.type = node.type;
+                    ContentDetail contentDetailToDelete = new ContentDetail(node.uri, node.getType());
                     contentToDelete.add(contentDetailToDelete);
                 }
             });

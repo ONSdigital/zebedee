@@ -5,9 +5,7 @@ import com.github.onsdigital.zebedee.json.PermissionDefinition;
 import com.github.onsdigital.zebedee.permissions.model.AccessMapping;
 import com.github.onsdigital.zebedee.permissions.store.PermissionsStore;
 import com.github.onsdigital.zebedee.session.model.Session;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import static java.text.MessageFormat.format;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -22,6 +20,7 @@ import java.util.stream.Collectors;
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.warn;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getUnauthorizedMessage;
+import static java.text.MessageFormat.format;
 
 /**
  * this has been implemented for the migration to using JWT Session
@@ -57,14 +56,13 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
      */
     private static List<Integer> convertGroupsToTeams(Session session) throws NumberFormatException {
         List<Integer> teamsList = new ArrayList<>();
-        if (session == null || ArrayUtils.isEmpty(session.getGroups())) {
+        if (session == null || session.getGroups().isEmpty()) {
             return teamsList;
         }
 
         String[] valueArray = {PUBLISHER_GROUP, ADMIN_GROUP};
-        String[] groups = session.getGroups();
-        Set<String> setOfString = new HashSet<>(
-                Arrays.asList(groups));
+        List<String> groups = session.getGroups();
+        Set<String> setOfString = new HashSet<>(groups);
         for (String s : setOfString) {
             try {
                 teamsList.add(Integer.parseInt(s));
@@ -351,6 +349,6 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
      * @return <code>true</code> if the user is a member of the group, <code>false</code> otherwise.
      */
     private boolean isGroupMember(Session session, String group) {
-        return ArrayUtils.contains(session.getGroups(), group);
+        return session.getGroups().contains(group);
     }
 }

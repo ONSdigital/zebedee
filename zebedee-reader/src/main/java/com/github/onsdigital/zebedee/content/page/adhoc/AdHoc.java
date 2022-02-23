@@ -10,7 +10,7 @@ public class AdHoc extends BaseStaticPage {
 
     @Override
     public PageType getType() {
-        return PageType.static_adhoc;
+        return PageType.STATIC_ADHOC;
     }
 
 }

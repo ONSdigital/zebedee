@@ -26,6 +26,7 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import java.security.SecureRandom;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
@@ -129,11 +130,7 @@ public abstract class ZebedeeTestBaseFixture {
         when(usersService.list())
                 .thenReturn(usersList);
 
-        Session session = new Session();
-        session.setEmail(builder.publisher1.getEmail());
-        session.setId("1234");
-        session.setLastAccess(new Date());
-        session.setStart(new Date());
+        Session session = new Session("1234", builder.publisher1.getEmail());
 
         when(sessionsService.create(anyString())).thenReturn(session);
 

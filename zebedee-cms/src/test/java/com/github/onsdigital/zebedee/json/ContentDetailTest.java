@@ -2,6 +2,8 @@ package com.github.onsdigital.zebedee.json;
 
 import org.junit.Test;
 
+import com.github.onsdigital.zebedee.content.page.base.PageType;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,13 +15,13 @@ public class ContentDetailTest {
     public void overlayDetailsShouldAddNewItems() {
 
         // Given a content detail instance with a child
-        ContentDetail detail = new ContentDetail("base content", "/", "home");
-        ContentDetail child = new ContentDetail("child content", "/child", "article");
+        ContentDetail detail = new ContentDetail("base content", "/", PageType.HOME_PAGE);
+        ContentDetail child = new ContentDetail("child content", "/child", PageType.ARTICLE);
         detail.children = new ArrayList<>();
         detail.children.add(child);
 
         // When we call the overlayDetails method with a new item
-        ContentDetail descendant = new ContentDetail("descendant content", "/child/descendant", "bulletin");
+        ContentDetail descendant = new ContentDetail("descendant content", "/child/descendant", PageType.BULLETIN);
         List<ContentDetail> toOverlay = new ArrayList<>();
         toOverlay.add(descendant);
         detail.overlayDetails(toOverlay);
@@ -32,10 +34,10 @@ public class ContentDetailTest {
     public void overlayDetailsShouldAddNewDirectories() {
 
         // Given a content detail instance
-        ContentDetail detail = new ContentDetail("base content", "/", "home");
+        ContentDetail detail = new ContentDetail("base content", "/", PageType.HOME_PAGE);
 
         // When we call the overlayDetails method with a Content detail instace with new directories to create.
-        ContentDetail descendant = new ContentDetail("descendant content", "/childdir1/childdir2/descendant", "bulletin");
+        ContentDetail descendant = new ContentDetail("descendant content", "/childdir1/childdir2/descendant", PageType.BULLETIN);
         List<ContentDetail> toOverlay = new ArrayList<>();
         toOverlay.add(descendant);
         detail.overlayDetails(toOverlay);
@@ -54,11 +56,11 @@ public class ContentDetailTest {
     public void overlayDetailsShouldIgnoreExistingItems() {
 
         // Given a content detail instance with an existing descendant
-        ContentDetail detail = new ContentDetail("base content", "/", "home");
-        ContentDetail child = new ContentDetail("child content", "/child", "article");
+        ContentDetail detail = new ContentDetail("base content", "/", PageType.HOME_PAGE);
+        ContentDetail child = new ContentDetail("child content", "/child", PageType.ARTICLE);
         detail.children = new ArrayList<>();
         detail.children.add(child);
-        ContentDetail descendant = new ContentDetail("descendant content", "/child/descendant", "bulletin");
+        ContentDetail descendant = new ContentDetail("descendant content", "/child/descendant", PageType.BULLETIN);
         child.children = new ArrayList<>();
         child.children.add(descendant);
 
@@ -75,8 +77,8 @@ public class ContentDetailTest {
     public void containsChildShouldReturnTrueIfChildExists() {
 
         // Given a content detail instance with a child
-        ContentDetail detail = new ContentDetail("base content", "/", "home");
-        ContentDetail child = new ContentDetail("child content", "/child", "article");
+        ContentDetail detail = new ContentDetail("base content", "/", PageType.HOME_PAGE);
+        ContentDetail child = new ContentDetail("child content", "/child", PageType.ARTICLE);
         detail.children = new ArrayList<>();
         detail.children.add(child);
 
@@ -91,8 +93,8 @@ public class ContentDetailTest {
     public void containsChildShouldReturnFalseIfChildIsNotFound() {
 
         // Given a content detail instance with a child
-        ContentDetail detail = new ContentDetail("base content", "/", "home");
-        ContentDetail child = new ContentDetail("child content", "/child", "article");
+        ContentDetail detail = new ContentDetail("base content", "/", PageType.HOME_PAGE);
+        ContentDetail child = new ContentDetail("child content", "/child", PageType.ARTICLE);
         detail.children = new ArrayList<>();
 
         // When we call the contains child method with the child instance.
@@ -106,8 +108,8 @@ public class ContentDetailTest {
     public void containsChildShouldReturnFalseIfChildrenIsNull() {
 
         // Given a content detail instance with a child
-        ContentDetail detail = new ContentDetail("base content", "/", "home");
-        ContentDetail child = new ContentDetail("child content", "/child", "article");
+        ContentDetail detail = new ContentDetail("base content", "/", PageType.HOME_PAGE);
+        ContentDetail child = new ContentDetail("child content", "/child", PageType.ARTICLE);
 
         // When we call the contains child method with the child instance.
         boolean containChild = detail.containsChild(child);
@@ -120,9 +122,9 @@ public class ContentDetailTest {
     public void containsDescendantShouldReturnTrueIfFound() {
 
         // Given a content detail instance with a descendant
-        ContentDetail detail = new ContentDetail("base content", "/", "home");
-        ContentDetail child = new ContentDetail("child content", "/child", "article");
-        ContentDetail descendant = new ContentDetail("descendant content", "/child/descendant", "bulletin");
+        ContentDetail detail = new ContentDetail("base content", "/", PageType.HOME_PAGE);
+        ContentDetail child = new ContentDetail("child content", "/child", PageType.ARTICLE);
+        ContentDetail descendant = new ContentDetail("descendant content", "/child/descendant", PageType.BULLETIN);
         detail.children = new ArrayList<>();
         detail.children.add(child);
         child.children = new ArrayList<>();
@@ -140,9 +142,9 @@ public class ContentDetailTest {
     public void containsDescendantShouldReturnFalseIfNotFound() {
 
         // Given a content detail instance without adding a descendant.
-        ContentDetail detail = new ContentDetail("base content", "/", "home");
-        ContentDetail child = new ContentDetail("child content", "/child", "article");
-        ContentDetail descendant = new ContentDetail("descendant content", "/child/descendant", "bulletin");
+        ContentDetail detail = new ContentDetail("base content", "/", PageType.HOME_PAGE);
+        ContentDetail child = new ContentDetail("child content", "/child", PageType.ARTICLE);
+        ContentDetail descendant = new ContentDetail("descendant content", "/child/descendant", PageType.BULLETIN);
         detail.children = new ArrayList<>();
         detail.children.add(child);
         child.children = new ArrayList<>();
@@ -158,15 +160,15 @@ public class ContentDetailTest {
     public void cloneShouldCreateCopyIncludingChildNodes() {
 
         // Given a content detail instance with a child
-        ContentDetail detail = new ContentDetail("base content", "/", "home");
-        ContentDetail child = new ContentDetail("child content", "/child", "article");
+        ContentDetail detail = new ContentDetail("base content", "/", PageType.HOME_PAGE);
+        ContentDetail child = new ContentDetail("child content", "/child", PageType.ARTICLE);
         detail.children = new ArrayList<>();
         detail.children.add(child);
 
         // When we clone it and add an overlay to the clone.
         ContentDetail clone = detail.clone();
 
-        ContentDetail descendant = new ContentDetail("descendant content", "/child/descendant", "bulletin");
+        ContentDetail descendant = new ContentDetail("descendant content", "/child/descendant", PageType.BULLETIN);
         List<ContentDetail> toOverlay = new ArrayList<>();
         toOverlay.add(descendant);
         clone.overlayDetails(toOverlay);

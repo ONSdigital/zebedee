@@ -291,12 +291,7 @@ public class Page {
         }
 
         try {
-            String uriToDelete = uri;
-            // Remove trailing slashes
-            while (uriToDelete.endsWith("/")) {
-                uriToDelete = uriToDelete.substring(0, uriToDelete.length() - 1);
-            }
-            uriToDelete += zebedeeFileSuffix;
+            String uriToDelete = uri.replaceAll("/+$","") + zebedeeFileSuffix;
 
             zebedeeCmsService.getZebedee().getCollections().deleteContent(
                     collection,

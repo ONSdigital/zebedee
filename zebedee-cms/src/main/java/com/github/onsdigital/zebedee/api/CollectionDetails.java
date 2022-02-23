@@ -110,14 +110,12 @@ public class CollectionDetails {
         addEventsForDetails(result.reviewed, collection);
 
         Set<String> teamIds = zebedeeCmsService.getPermissions().listViewerTeams(session, collection.getDescription().getId());
+        result.setViewerTeams(new ArrayList<>(teamIds));
 
         // TODO: Remove feature flag after migration to dp-identity-api
-        if (cmsFeatureFlags().isJwtSessionsEnabled()) {
-            result.setViewerTeams(new ArrayList<>(teamIds));
-        } else {
+        if (!cmsFeatureFlags().isJwtSessionsEnabled()) {
             result.teamsDetails = zebedeeCmsService.getZebedee().getTeamsService().resolveTeamDetails(teamIds);
             result.teamsDetails.forEach(team -> collection.getDescription().getTeams().add(team.getName()));
-            result.teamsDetails.forEach(team -> collection.getDescription().getViewerTeams().add(team.getName()));
         }
 
         String collectionId = Collections.getCollectionId(request);

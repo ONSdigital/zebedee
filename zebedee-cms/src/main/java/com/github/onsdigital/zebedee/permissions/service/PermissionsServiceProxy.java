@@ -4,7 +4,6 @@ import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
-import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.PermissionDefinition;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.session.model.Session;
@@ -167,17 +166,16 @@ public class PermissionsServiceProxy implements PermissionsService {
      * @param collectionId    the ID of the collection collection to set viewer permissions for.
      * @param collectionTeams the set of team IDs for which viewer permissions should be granted to the collection.
      * @param session         the session of the user that is attempting to set the viewer permissions.
-     * @throws IOException if reading or writing the access mapping fails.
+     * @throws IOException           if reading or writing the access mapping fails.
      * @throws UnauthorizedException if the users' session isn't authorised to edit collections.
-     *
      * @deprecated this is deprecated in favour of the dp-permissions-api and will be removed once full migration to
-     *             the new API is complete.
-     *
+     * the new API is complete.
+     * <p>
      * TODO: Remove once migration to dp-permissions-api is complete and the accessmapping is being removed.
      */
     @Deprecated
     public void setViewerTeams(Session session, String collectionId, Set<String> collectionTeams)
-            throws IOException, ZebedeeException{
+            throws IOException, ZebedeeException {
         if (jwtSessionsEnabled) {
             jwtPermissionsService.setViewerTeams(session, collectionId, collectionTeams);
         } else {
@@ -186,9 +184,7 @@ public class PermissionsServiceProxy implements PermissionsService {
     }
 
     /**
-     * @param collectionDescription the {@link CollectionDescription} of the {@link Collection} to get the viewer
-     *                              teams for.
-     * @param session               the {@link Session} of the {@link User} requesting this information.
+     * @param session the {@link Session} of the {@link User} requesting this information.
      * @return
      * @throws IOException
      * @throws UnauthorizedException

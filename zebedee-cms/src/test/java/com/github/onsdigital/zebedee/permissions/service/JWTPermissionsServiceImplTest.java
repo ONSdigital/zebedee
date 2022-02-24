@@ -2,6 +2,7 @@ package com.github.onsdigital.zebedee.permissions.service;
 
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
+import com.github.onsdigital.zebedee.json.PermissionDefinition;
 import com.github.onsdigital.zebedee.permissions.model.AccessMapping;
 import com.github.onsdigital.zebedee.permissions.store.PermissionsStore;
 import com.github.onsdigital.zebedee.session.model.Session;
@@ -78,7 +79,7 @@ public class JWTPermissionsServiceImplTest {
 
     @Test
     public void isPublisher_Session_EmailNull_ShouldReturnFalse() throws Exception {
-        Session session = new Session(TEST_SESSION_ID,null, ADMIN_PUBLISHER_GROUPS);
+        Session session = new Session(TEST_SESSION_ID, null, ADMIN_PUBLISHER_GROUPS);
         assertFalse(jwtPermissionsService.isPublisher(session));
         verifyNoInteractions(jwtPermissionStore);
     }
@@ -204,7 +205,7 @@ public class JWTPermissionsServiceImplTest {
     public void canView_CollectionId_Session() throws Exception {
         String teamId = "123456";
         List<String> teamList = new ArrayList<>();
-        teamList.add(String.valueOf(teamId));
+        teamList.add(teamId);
 
         Session session = new Session(TEST_SESSION_ID, TEST_USER_EMAIL, teamList);
 
@@ -218,7 +219,7 @@ public class JWTPermissionsServiceImplTest {
 
         assertTrue(jwtPermissionsService.canView(session, COLLECTION_ID));
     }
-
+    
     @Test
     public void canView_Session_Null_CollectionId() throws IOException {
         assertFalse(jwtPermissionsService.canView(null, COLLECTION_ID));
@@ -246,7 +247,6 @@ public class JWTPermissionsServiceImplTest {
     @Test
     public void canView_Session_CollectionDescription_NoPermissions() throws Exception {
         Session session = new Session(FLORENCE_TOKEN, TEST_USER_EMAIL, ADMIN_PUBLISHER_GROUPS);
-
         assertFalse(jwtPermissionsService.canView(session, COLLECTION_ID));
     }
 
@@ -354,8 +354,8 @@ public class JWTPermissionsServiceImplTest {
             add(teamId);
         }};
         Set<String> updatedList = new HashSet<String>() {{
-                add("123456");
-                add("789012345");
+            add("123456");
+            add("789012345");
         }};
 
         Map<String, Set<String>> collectionMapping = new HashMap<>();
@@ -378,4 +378,14 @@ public class JWTPermissionsServiceImplTest {
                 jwtPermissionsService.userPermissions(TEST_USER_EMAIL, session));
         assertEquals("JWT sessions are enabled: userPermissions is no longer supported", exception.getMessage());
     }
+
+    @Test
+    public void userPermissions_Sessions() throws Exception {
+        Session session = new Session(FLORENCE_TOKEN, TEST_USER_EMAIL, ADMIN_PUBLISHER_GROUPS);
+        PermissionDefinition actual = jwtPermissionsService.userPermissions(session);
+        assertTrue(actual.isAdmin());
+        assertTrue(actual.isEditor());
+        assertTrue(actual.getEmail() == TEST_USER_EMAIL);
+    }
+
 }

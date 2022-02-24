@@ -18,7 +18,7 @@ public class PermissionsServiceProxyTest {
 
     private static final String EMAIL = "admin@ons.gov.uk";
     private static final String COLLECTION_ID = "1234";
-    
+
     @Mock
     private PermissionsService legacyPermissionsService;
 
@@ -300,10 +300,10 @@ public class PermissionsServiceProxyTest {
         boolean jwtSessionsEnabled = false;
         PermissionsServiceProxy permissions = new PermissionsServiceProxy(legacyPermissionsService, jwtPermissionsService, jwtSessionsEnabled);
 
-        permissions.userPermissions(session);
+        permissions.userPermissions(EMAIL, session);
 
         verifyNoInteractions(jwtPermissionsService);
-        verify(legacyPermissionsService, atLeastOnce()).userPermissions(session);
+        verify(legacyPermissionsService, atLeastOnce()).userPermissions(EMAIL, session);
     }
 
     @Test

@@ -737,7 +737,7 @@ public class Collections {
                     "This URI cannot be found in the collection");
         }
 
-        boolean deleted = deletcContentFromCollection(collection, session, contentTargetPath, uri);
+        boolean deleted = deleteContentFromCollection(collection, session, contentTargetPath, uri);
         collection.save();
 
         if (deleted) {
@@ -746,9 +746,8 @@ public class Collections {
         return deleted;
     }
 
-    boolean deletcContentFromCollection(Collection collection, Session session, Path contentTargetPath, String uri) throws IOException {
+    boolean deleteContentFromCollection(Collection collection, Session session, Path contentTargetPath, String uri) throws IOException {
         boolean deleted;
-        Path uriPath = Paths.get(uri);
 
         CMSLogEvent event = info().collectionID(collection).uri(contentTargetPath);
 

@@ -275,7 +275,7 @@ public class Indexer {
     private IndexRequestBuilder prepareIndexRequest(String indexName, Document document) throws ZebedeeException, IOException {
         Page page = getPage(document.getUri());
         if (page != null && page.getType() != null) {
-            IndexRequestBuilder indexRequestBuilder = searchUtils.prepareIndex(indexName, page.getType().name(), page.getUri().toString());
+            IndexRequestBuilder indexRequestBuilder = searchUtils.prepareIndex(indexName, page.getType().getLabel(), page.getUri().toString());
             indexRequestBuilder.setSource(serialise(toSearchDocument(page, document.getSearchTerms())));
             return indexRequestBuilder;
         }

@@ -289,9 +289,11 @@ public class Page {
         }
 
         try {
+            String uriToDelete = uri.replaceAll("/+$","") + zebedeeFileSuffix;
+
             zebedeeCmsService.getZebedee().getCollections().deleteContent(
                     collection,
-                    uri + zebedeeFileSuffix,
+                    uriToDelete,
                     session);
         } catch (IOException e) {
             error().data("collection_id", collection.getDescription().getId())

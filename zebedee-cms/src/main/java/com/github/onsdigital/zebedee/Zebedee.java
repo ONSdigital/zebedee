@@ -11,6 +11,7 @@ import com.github.onsdigital.zebedee.keyring.CollectionKeyring;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.Collections;
 import com.github.onsdigital.zebedee.model.Content;
+import com.github.onsdigital.zebedee.model.PublishedContent;
 import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
 import com.github.onsdigital.zebedee.model.encryption.EncryptionKeyFactory;
 import com.github.onsdigital.zebedee.model.publishing.PublishedCollections;
@@ -19,8 +20,7 @@ import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.service.DatasetService;
 import com.github.onsdigital.zebedee.service.ImageService;
 import com.github.onsdigital.zebedee.service.KafkaService;
-import com.github.onsdigital.zebedee.service.ServiceStore;
-import com.github.onsdigital.zebedee.service.ServiceStoreImpl;
+import com.github.onsdigital.zebedee.servicetokens.store.ServiceStore;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.session.service.Sessions;
 import com.github.onsdigital.zebedee.teams.service.TeamsService;
@@ -36,7 +36,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
 
-import static com.github.onsdigital.zebedee.configuration.Configuration.isVerificationEnabled;
+import static com.github.onsdigital.zebedee.ZebedeeConfiguration.COLLECTIONS;
 import static com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedException.beingEditedByAnotherCollectionError;
 import static com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedException.beingEditedByThisCollectionError;
 import static com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedException.markedDeleteInAnotherCollectionError;
@@ -44,36 +44,11 @@ import static com.github.onsdigital.zebedee.logging.CMSLogEvent.error;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.info;
 
 public class Zebedee {
-    public static final String PUBLISHED = "master";
-    public static final String COLLECTIONS = "collections";
-    public static final String PUBLISHED_COLLECTIONS = "publish-log";
-    public static final String ZEBEDEE = "zebedee";
-    public static final String USERS = "users";
-    public static final String SESSIONS = "sessions";
-    public static final String PERMISSIONS = "permissions";
-    public static final String TEAMS = "teams";
-    public static final String LAUNCHPAD = "launchpad";
-    public static final String APPLICATION_KEYS = "application-keys";
-    public static final String SERVICES = "services";
-    public static final String KEYRING = "keyring";
-
-    private final Path publishedCollectionsPath;
-    private final Path collectionsPath;
-    private final Path usersPath;
-    private final Path sessionsPath;
-    private final Path permissionsPath;
-    private final Path teamsPath;
-    private final Path redirectPath;
-    private final Path servicePath;
-    private final Path keyRingPath;
-
     private final VerificationAgent verificationAgent;
     private final PublishedCollections publishedCollections;
     private final Collections collections;
-    private final Content published;
+    private final PublishedContent published;
     private final CollectionKeyCache schedulerKeyCache;
-    private final Path publishedContentPath;
-    private final Path path;
     private final PermissionsService permissionsService;
     private final CollectionKeyring collectionKeyring;
     private final EncryptionKeyFactory encryptionKeyFactory;
@@ -85,9 +60,11 @@ public class Zebedee {
     private final DatasetService datasetService;
     private final ImageService imageService;
     private final KafkaService kafkaService;
-    private final ServiceStoreImpl serviceStoreImpl;
+    private final ServiceStore serviceStore;
     private final StartUpNotifier startUpNotifier;
     private final Notifier slackNotifier;
+
+    private final Path path;
 
     /**
      * Create a new instance of Zebedee setting.
@@ -96,7 +73,6 @@ public class Zebedee {
      */
     public Zebedee(ZebedeeConfiguration cfg) {
         this.path = cfg.getZebedeePath();
-        this.publishedContentPath = cfg.getPublishedContentPath();
         this.sessions = cfg.getSessions();
         this.schedulerKeyCache = cfg.getSchedulerKeyringCache();
         this.permissionsService = cfg.getPermissionsService();
@@ -106,23 +82,14 @@ public class Zebedee {
         this.publishedCollections = cfg.getPublishCollections();
         this.teamsService = cfg.getTeamsService();
         this.usersService = cfg.getUsersService();
-        this.verificationAgent = cfg.getVerificationAgent(isVerificationEnabled(), this);
+        this.verificationAgent = cfg.getVerificationAgent();
         this.datasetService = cfg.getDatasetService();
         this.imageService = cfg.getImageService();
         this.kafkaService = cfg.getKafkaService();
-        this.serviceStoreImpl = cfg.getServiceStore();
+        this.serviceStore = cfg.getServiceStore();
         this.collectionKeyring = cfg.getCollectionKeyring();
         this.encryptionKeyFactory = cfg.getEncryptionKeyFactory();
 
-        this.collectionsPath = cfg.getCollectionsPath();
-        this.publishedCollectionsPath = cfg.getPublishedCollectionsPath();
-        this.usersPath = cfg.getUsersPath();
-        this.sessionsPath = cfg.getSessionsPath();
-        this.permissionsPath = cfg.getPermissionsPath();
-        this.teamsPath = cfg.getTeamsPath();
-        this.redirectPath = cfg.getRedirectPath();
-        this.servicePath = cfg.getServicePath();
-        this.keyRingPath = cfg.getKeyRingPath();
         this.startUpNotifier = cfg.getStartUpNotifier();
         this.slackNotifier = cfg.getSlackNotifier();
     }
@@ -325,11 +292,7 @@ public class Zebedee {
         return this.permissionsService;
     }
 
-    public Path getPublishedContentPath() {
-        return this.publishedContentPath;
-    }
-
-    public Content getPublished() {
+    public PublishedContent getPublished() {
         return this.published;
     }
 
@@ -374,15 +337,7 @@ public class Zebedee {
     }
 
     public ServiceStore getServiceStore() {
-        return serviceStoreImpl;
-    }
-
-    public Path getServicePath() {
-        return servicePath;
-    }
-
-    public Path getKeyRingPath() {
-        return keyRingPath;
+        return serviceStore;
     }
 
     public CollectionKeyring getCollectionKeyring() {

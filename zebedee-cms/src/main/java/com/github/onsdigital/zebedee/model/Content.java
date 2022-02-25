@@ -45,7 +45,6 @@ public class Content {
     private final Path dataVisualisationsPath;
 
     private RedirectTablePartialMatch redirects = null;
-    private Path publishedContentPath;
 
     public Content(Path path) {
         this.path = path;
@@ -60,16 +59,7 @@ public class Content {
         }
     }
 
-    /**
-     * Create a new instance using an injected publishedContentPath.
-     *
-     * @param path
-     * @param publishedContentPath
-     */
-    public Content(Path path, Path publishedContentPath) {
-        this(path);
-        this.publishedContentPath = publishedContentPath;
-    }
+
 
     private static boolean isTimeseries(Path path) {
         return findByCriteria(path, p -> {
@@ -237,64 +227,6 @@ public class Content {
         }
 
         return uris;
-    }
-
-    /**
-     * Returns a list of details with the details of child page details nested.
-     *
-     * @return
-     * @throws IOException
-     */
-    public ContentDetail nestedDetails() throws IOException {
-        return nestedDetails(path);
-    }
-
-    private ContentDetail nestedDetails(Path contentPath) throws IOException {
-        ContentDetail detail = details(contentPath.resolve("data.json"));
-
-        // if the folder is empty put in an empty node with just a name.
-        if (detail == null) {
-            detail = new ContentDetail();
-            detail.description = new ContentDetailDescription(contentPath.getFileName().toString());
-            detail.uri = "";
-        }
-
-        detail.contentPath = "/" + getPublishedContentPath().relativize(contentPath);
-        detail.children = new ArrayList<>();
-
-        // todo: remove timeseries filter once we are caching the browse tree.
-        try (DirectoryStream<Path> stream = Files.newDirectoryStream(contentPath)) {
-            for (Path entry : stream) {
-                if (isVisible(entry)) {
-                    ContentDetail child = nestedDetails(entry);
-                    if (child != null) {
-                        detail.children.add(child);
-                    }
-                }
-            }
-        }
-
-        try {
-            if (detail.children.size() > 1) {
-                java.util.Collections.sort(detail.children, (o1, o2) -> {
-
-                    if ((o1.description == null || o1.description.title == null) && (o2.description == null || o2.description.title == null)) {
-                        return 0; // if both are null
-                    }
-                    if (o1.description == null || o1.description.title == null) {
-                        return 1;//nulls last
-                    }
-                    if (o2.description == null || o2.description.title == null) {
-                        return -1;
-                    }
-                    return o1.description.title.compareTo(o2.description.title);
-                });
-            }
-        } catch (IllegalArgumentException e) {
-            error().data("path", contentPath.toString()).logException(e, "Failed to sort content detail items");
-        }
-
-        return detail;
     }
 
     /**
@@ -482,14 +414,6 @@ public class Content {
         }
         return !DATA_VIS_DIR.equals(path.getFileName().toString().toLowerCase())
                 && !DATA_VIS_DIR.equals(path.getParent().getFileName().toString().toLowerCase());
-    }
-
-    private Path getPublishedContentPath() {
-
-        if (publishedContentPath == null)
-            publishedContentPath = ZebedeeCmsService.getInstance().getZebedee().getPublishedContentPath();
-
-        return publishedContentPath;
     }
 
     public static boolean isDataVisualisationFile(Path path) {

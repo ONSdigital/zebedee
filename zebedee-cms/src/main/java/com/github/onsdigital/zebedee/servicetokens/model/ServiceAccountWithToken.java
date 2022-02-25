@@ -1,4 +1,4 @@
-package com.github.onsdigital.zebedee.model;
+package com.github.onsdigital.zebedee.servicetokens.model;
 
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.json.JSONable;

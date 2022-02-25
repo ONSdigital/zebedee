@@ -1,6 +1,6 @@
 package com.github.onsdigital.zebedee.permissions.cmd;
 
-import com.github.onsdigital.zebedee.model.ServiceAccount;
+import com.github.onsdigital.zebedee.servicetokens.model.ServiceAccount;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.util.HashSet;

@@ -1,11 +1,12 @@
-package com.github.onsdigital.zebedee.service;
+package com.github.onsdigital.zebedee.servicetokens;
 
+import com.github.onsdigital.zebedee.servicetokens.ServiceTokenUtils;
 import org.junit.Test;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import static com.github.onsdigital.zebedee.service.ServiceTokenUtils.BEARER_PREFIX_UC;
+import static com.github.onsdigital.zebedee.servicetokens.ServiceTokenUtils.BEARER_PREFIX_UC;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;

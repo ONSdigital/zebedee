@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee.teams.store;
 
 import com.github.davidcarboni.restolino.json.Serialiser;
+import com.github.onsdigital.zebedee.ZebedeeConfiguration;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.teams.model.Team;
 import com.github.onsdigital.zebedee.teams.service.TeamsServiceImpl;
@@ -28,7 +29,6 @@ import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 
-import static com.github.onsdigital.zebedee.Zebedee.TEAMS;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -68,7 +68,7 @@ public class TeamsStoreFileSystemImplTest {
         zebedeeRoot = new TemporaryFolder();
         zebedeeRoot.create();
         zebedeeRoot.newFolder("teams");
-        teamsPath = zebedeeRoot.getRoot().toPath().resolve(TEAMS);
+        teamsPath = zebedeeRoot.getRoot().toPath().resolve(ZebedeeConfiguration.TEAMS);
 
         store = new TeamsStoreFileSystemImpl(teamsPath);
 

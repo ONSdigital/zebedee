@@ -6,6 +6,7 @@ import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.json.publishing.PublishedCollection;
 import com.github.onsdigital.zebedee.json.publishing.Result;
 import com.github.onsdigital.zebedee.json.publishing.UriInfo;
+import com.github.onsdigital.zebedee.model.publishing.PublishedCollections;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.util.DateConverter;
@@ -37,18 +38,18 @@ import static java.util.Arrays.asList;
  */
 public class VerificationAgent {
 
+    private final PublishedCollections publishedCollections;
+
     private PooledHttpClient verificationProxyClient;
     private ExecutorService pool;
-    private Zebedee zebedee;
 
-    public VerificationAgent(Zebedee zebedee) {
-        this.zebedee = zebedee;
-        String defaultVerificationUrl = Configuration.getDefaultVerificationUrl();
-        info().data("url", defaultVerificationUrl).log("Initializing verification agent");
+    public VerificationAgent(PublishedCollections publishedCollections, String verificationUrl) {
+        this.publishedCollections = publishedCollections;
+        info().data("url", verificationUrl).log("Initializing verification agent");
         ClientConfiguration clientConfiguration = new ClientConfiguration();
         clientConfiguration.setMaxTotalConnection(100);
         clientConfiguration.setDisableRedirectHandling(true);
-        verificationProxyClient = new PooledHttpClient(defaultVerificationUrl, clientConfiguration);
+        verificationProxyClient = new PooledHttpClient(verificationUrl, clientConfiguration);
         pool = Executors.newFixedThreadPool(100);
     }
 
@@ -172,7 +173,7 @@ public class VerificationAgent {
 
     private void save(PublishedCollection publishedCollection, Path jsonPath) {
         try {
-            zebedee.getPublishedCollections().save(publishedCollection, jsonPath);
+            publishedCollections.save(publishedCollection, jsonPath);
         } catch (IOException e) {
             error().data("collectionId", publishedCollection.getId())
                     .logException(e, "Saving published collection failed");

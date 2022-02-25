@@ -1,6 +1,5 @@
 package com.github.onsdigital.zebedee.session.service;
 
-import com.github.davidcarboni.cryptolite.Random;
 import com.github.onsdigital.zebedee.TestUtils;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;

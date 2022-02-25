@@ -33,7 +33,6 @@ import static java.text.MessageFormat.format;
 public class UsersServiceImpl implements UsersService {
 
     private static final Object MUTEX = new Object();
-    private static final String JSON_EXT = ".json";
     static final String SYSTEM_USER = "system";
 
     private static UsersService INSTANCE = null;

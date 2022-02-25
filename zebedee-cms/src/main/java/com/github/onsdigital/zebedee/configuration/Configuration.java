@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
 import static java.text.MessageFormat.format;
 import static org.apache.commons.lang3.StringUtils.defaultIfBlank;
 
@@ -104,6 +105,10 @@ public class Configuration {
 
     public static String getSlackUsername() {
         return StringUtils.defaultIfBlank(getValue("SLACK_USERNAME"), DEFAULT_SLACK_USERNAME);
+    }
+
+    public static String getSlackToken() {
+        return getValue("slack_api_token");
     }
 
     public static List<String> slackChannelsToNotfiyOnStartUp() {
@@ -251,6 +256,10 @@ public class Configuration {
      * Get a map of cognito id and signing key pairs
      */
     public static Map<String, String> getCognitoKeyIdPairs() {
+        if (!cmsFeatureFlags().isJwtSessionsEnabled()) {
+            return new HashMap<>();
+        }
+
         String awsCognitoSigningKeyOne = getValue("AWS_COGNITO_SIGNING_KEY_ONE");
         if (StringUtils.isEmpty(awsCognitoSigningKeyOne)) {
             throw new RuntimeException("expected public signing key one in environment variable but was empty");

@@ -27,7 +27,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.function.Supplier;
 
 import static com.github.onsdigital.zebedee.user.service.UsersServiceImpl.SYSTEM_USER;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -56,9 +55,6 @@ public class UsersServiceTest {
     private static final String MOCK_USER_NAME = "A girl is no one";
 
     @Mock
-    private Collections collections;
-
-    @Mock
     private PermissionsService permissions;
 
     @Mock
@@ -81,7 +77,6 @@ public class UsersServiceTest {
 
     private UsersService service;
     private User user;
-    private Supplier<CollectionKeyring> keyringSupplier;
 
     @Before
     public void setUp() throws Exception {
@@ -503,9 +498,6 @@ public class UsersServiceTest {
         when(c2.getDescription())
                 .thenReturn(desc2);
         allCollections.add(c2);
-
-        when(collections.list())
-                .thenReturn(allCollections);
 
         boolean result = service.setPassword(session, credentials);
 

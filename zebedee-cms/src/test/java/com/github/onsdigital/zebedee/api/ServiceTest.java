@@ -2,9 +2,9 @@ package com.github.onsdigital.zebedee.api;
 
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
-import com.github.onsdigital.zebedee.model.ServiceAccount;
+import com.github.onsdigital.zebedee.servicetokens.model.ServiceAccount;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
-import com.github.onsdigital.zebedee.service.ServiceStore;
+import com.github.onsdigital.zebedee.servicetokens.store.ServiceStore;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.session.service.Sessions;
 import org.junit.Before;

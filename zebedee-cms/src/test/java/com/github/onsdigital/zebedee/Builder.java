@@ -121,7 +121,7 @@ public class Builder {
         teams = new ArrayList<>();
 
         // Create some published content:
-        Path folder = zebedeeRootPath.resolve(Zebedee.PUBLISHED);
+        Path folder = zebedeeRootPath.resolve(ZebedeeConfiguration.PUBLISHED);
         contentUris = new ArrayList<>();
         String contentUri;
         Path contentPath;
@@ -141,7 +141,7 @@ public class Builder {
         contentUris.add(contentUri);
 
         // A couple of users:
-        Path users = zebedeeRootPath.resolve(Zebedee.USERS);
+        Path users = zebedeeRootPath.resolve(ZebedeeConfiguration.USERS);
         Files.createDirectories(users);
 
         administrator = clone(administratorTemplate);
@@ -181,13 +181,13 @@ public class Builder {
         reviewer2Credentials = userCredentials(reviewer2);
         dataVisCredentials = userCredentials(dataVis);
 
-        Path sessions = zebedeeRootPath.resolve(Zebedee.SESSIONS);
+        Path sessions = zebedeeRootPath.resolve(ZebedeeConfiguration.SESSIONS);
         Files.createDirectories(sessions);
 
         // Set up some permissions:
-        Path permissions = zebedeeRootPath.resolve(Zebedee.PERMISSIONS);
+        Path permissions = zebedeeRootPath.resolve(ZebedeeConfiguration.PERMISSIONS);
         Files.createDirectories(permissions);
-        Path teams = zebedeeRootPath.resolve(Zebedee.TEAMS);
+        Path teams = zebedeeRootPath.resolve(ZebedeeConfiguration.TEAMS);
         Files.createDirectories(teams);
 
         AccessMapping accessMapping = new AccessMapping();
@@ -205,7 +205,6 @@ public class Builder {
 
 
         ZebedeeConfiguration configuration = new ZebedeeConfiguration(parent, false);
-        ReflectionTestUtils.setField(configuration,"slackClient",slackClient);
         this.zebedee = new Zebedee(configuration);
 
         inflationTeam = createTeam(reviewer1, teamNames[0], teams);
@@ -229,22 +228,22 @@ public class Builder {
     public Builder(Path bootStrap) throws IOException, CollectionNotFoundException {
         this();
 
-        FileUtils.deleteDirectory(this.zebedeeRootPath.resolve(Zebedee.PUBLISHED).toFile());
-        FileUtils.deleteDirectory(this.zebedeeRootPath.resolve(Zebedee.LAUNCHPAD).toFile());
-        FileUtils.deleteDirectory(this.zebedeeRootPath.resolve(Zebedee.COLLECTIONS).toFile());
-        Files.createDirectory(this.zebedeeRootPath.resolve(Zebedee.PUBLISHED));
-        Files.createDirectory(this.zebedeeRootPath.resolve(Zebedee.LAUNCHPAD));
-        Files.createDirectory(this.zebedeeRootPath.resolve(Zebedee.COLLECTIONS));
+        FileUtils.deleteDirectory(this.zebedeeRootPath.resolve(ZebedeeConfiguration.PUBLISHED).toFile());
+        FileUtils.deleteDirectory(this.zebedeeRootPath.resolve(ZebedeeConfiguration.LAUNCHPAD).toFile());
+        FileUtils.deleteDirectory(this.zebedeeRootPath.resolve(ZebedeeConfiguration.COLLECTIONS).toFile());
+        Files.createDirectory(this.zebedeeRootPath.resolve(ZebedeeConfiguration.PUBLISHED));
+        Files.createDirectory(this.zebedeeRootPath.resolve(ZebedeeConfiguration.LAUNCHPAD));
+        Files.createDirectory(this.zebedeeRootPath.resolve(ZebedeeConfiguration.COLLECTIONS));
 
-        FileUtils.copyDirectory(bootStrap.resolve(Zebedee.PUBLISHED).toFile(), this.zebedeeRootPath.resolve(Zebedee.PUBLISHED).toFile());
-        if (Files.exists(bootStrap.resolve(Zebedee.LAUNCHPAD))) {
-            FileUtils.copyDirectory(bootStrap.resolve(Zebedee.LAUNCHPAD).toFile(), this.zebedeeRootPath.resolve(Zebedee.LAUNCHPAD).toFile());
+        FileUtils.copyDirectory(bootStrap.resolve(ZebedeeConfiguration.PUBLISHED).toFile(), this.zebedeeRootPath.resolve(ZebedeeConfiguration.PUBLISHED).toFile());
+        if (Files.exists(bootStrap.resolve(ZebedeeConfiguration.LAUNCHPAD))) {
+            FileUtils.copyDirectory(bootStrap.resolve(ZebedeeConfiguration.LAUNCHPAD).toFile(), this.zebedeeRootPath.resolve(ZebedeeConfiguration.LAUNCHPAD).toFile());
         } else {
-            FileUtils.copyDirectory(bootStrap.resolve(Zebedee.PUBLISHED).toFile(), this.zebedeeRootPath.resolve(Zebedee.LAUNCHPAD).toFile()); // Not bothering with distinct launchpad
+            FileUtils.copyDirectory(bootStrap.resolve(ZebedeeConfiguration.PUBLISHED).toFile(), this.zebedeeRootPath.resolve(ZebedeeConfiguration.LAUNCHPAD).toFile()); // Not bothering with distinct launchpad
         }
 
-        if (Files.exists(bootStrap.resolve(Zebedee.COLLECTIONS))) {
-            FileUtils.copyDirectory(bootStrap.resolve(Zebedee.COLLECTIONS).toFile(), this.zebedeeRootPath.resolve(Zebedee.COLLECTIONS).toFile());
+        if (Files.exists(bootStrap.resolve(ZebedeeConfiguration.COLLECTIONS))) {
+            FileUtils.copyDirectory(bootStrap.resolve(ZebedeeConfiguration.COLLECTIONS).toFile(), this.zebedeeRootPath.resolve(ZebedeeConfiguration.COLLECTIONS).toFile());
         }
     }
 
@@ -358,7 +357,7 @@ public class Builder {
      */
     public Path createPublishedFile(String uri) throws IOException {
 
-        Path published = zebedeeRootPath.resolve(Zebedee.PUBLISHED);
+        Path published = zebedeeRootPath.resolve(ZebedeeConfiguration.PUBLISHED);
         Path content = published.resolve(uri.substring(1));
         Files.createDirectories(content.getParent());
         Files.createFile(content);
@@ -439,7 +438,7 @@ public class Builder {
         Path sessionPath;
         String sessionFileName = PathUtils.toFilename(session.getId());
         sessionFileName += ".json";
-        sessionPath = zebedeeRootPath.resolve(Zebedee.SESSIONS).resolve(sessionFileName);
+        sessionPath = zebedeeRootPath.resolve(ZebedeeConfiguration.SESSIONS).resolve(sessionFileName);
 
         // Serialise
         try (OutputStream output = Files.newOutputStream(sessionPath)) {
@@ -458,7 +457,7 @@ public class Builder {
         Path sessionPath;
         String sessionFileName = PathUtils.toFilename(session.getId());
         sessionFileName += ".json";
-        sessionPath = zebedeeRootPath.resolve(Zebedee.SESSIONS).resolve(sessionFileName);
+        sessionPath = zebedeeRootPath.resolve(ZebedeeConfiguration.SESSIONS).resolve(sessionFileName);
 
         // Serialise
         try (OutputStream output = Files.newOutputStream(sessionPath)) {
@@ -480,15 +479,15 @@ public class Builder {
      * @throws IOException If a filesystem error occurs.
      */
     private Path createZebedee(Path parent) throws IOException {
-        Path path = Files.createDirectory(parent.resolve(Zebedee.ZEBEDEE));
-        Files.createDirectory(path.resolve(Zebedee.PUBLISHED));
-        Files.createDirectory(path.resolve(Zebedee.COLLECTIONS));
-        Files.createDirectory(path.resolve(Zebedee.SESSIONS));
-        Files.createDirectory(path.resolve(Zebedee.PERMISSIONS));
-        Files.createDirectory(path.resolve(Zebedee.TEAMS));
-        Files.createDirectory(path.resolve(Zebedee.LAUNCHPAD));
-        Files.createDirectory(path.resolve(Zebedee.PUBLISHED_COLLECTIONS));
-        Files.createDirectory(path.resolve(Zebedee.APPLICATION_KEYS));
+        Path path = Files.createDirectory(parent.resolve(ZebedeeConfiguration.ZEBEDEE));
+        Files.createDirectory(path.resolve(ZebedeeConfiguration.PUBLISHED));
+        Files.createDirectory(path.resolve(ZebedeeConfiguration.COLLECTIONS));
+        Files.createDirectory(path.resolve(ZebedeeConfiguration.SESSIONS));
+        Files.createDirectory(path.resolve(ZebedeeConfiguration.PERMISSIONS));
+        Files.createDirectory(path.resolve(ZebedeeConfiguration.TEAMS));
+        Files.createDirectory(path.resolve(ZebedeeConfiguration.LAUNCHPAD));
+        Files.createDirectory(path.resolve(ZebedeeConfiguration.PUBLISHED_COLLECTIONS));
+        Files.createDirectory(path.resolve(ZebedeeConfiguration.APPLICATION_KEYS));
         return path;
     }
 
@@ -507,7 +506,7 @@ public class Builder {
     private Path createCollection(String name, Path root) throws IOException {
 
         String filename = PathUtils.toFilename(name);
-        Path collections = root.resolve(Zebedee.COLLECTIONS);
+        Path collections = root.resolve(ZebedeeConfiguration.COLLECTIONS);
 
         // Create the folders:
         Path collection = collections.resolve(filename);

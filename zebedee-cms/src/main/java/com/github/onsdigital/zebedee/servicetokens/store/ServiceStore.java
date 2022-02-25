@@ -1,6 +1,6 @@
-package com.github.onsdigital.zebedee.service;
+package com.github.onsdigital.zebedee.servicetokens.store;
 
-import com.github.onsdigital.zebedee.model.ServiceAccount;
+import com.github.onsdigital.zebedee.servicetokens.model.ServiceAccount;
 
 import java.io.IOException;
 import java.io.InputStream;

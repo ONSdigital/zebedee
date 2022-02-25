@@ -13,12 +13,12 @@ import com.github.onsdigital.zebedee.kafka.KafkaClientImpl;
 import com.github.onsdigital.zebedee.keyring.CollectionKeyCache;
 import com.github.onsdigital.zebedee.keyring.CollectionKeyStore;
 import com.github.onsdigital.zebedee.keyring.CollectionKeyring;
-import com.github.onsdigital.zebedee.keyring.KeyringException;
 import com.github.onsdigital.zebedee.keyring.central.CollectionKeyCacheImpl;
 import com.github.onsdigital.zebedee.keyring.central.CollectionKeyStoreImpl;
 import com.github.onsdigital.zebedee.keyring.central.CollectionKeyringImpl;
 import com.github.onsdigital.zebedee.model.Collections;
 import com.github.onsdigital.zebedee.model.Content;
+import com.github.onsdigital.zebedee.model.PublishedContent;
 import com.github.onsdigital.zebedee.model.RedirectTablePartialMatch;
 import com.github.onsdigital.zebedee.model.encryption.EncryptionKeyFactory;
 import com.github.onsdigital.zebedee.model.encryption.EncryptionKeyFactoryImpl;
@@ -37,8 +37,10 @@ import com.github.onsdigital.zebedee.service.ImageServiceImpl;
 import com.github.onsdigital.zebedee.service.KafkaService;
 import com.github.onsdigital.zebedee.service.KafkaServiceImpl;
 import com.github.onsdigital.zebedee.service.NoOpKafkaService;
-import com.github.onsdigital.zebedee.service.ServiceStoreImpl;
+import com.github.onsdigital.zebedee.service.ServiceSupplier;
 import com.github.onsdigital.zebedee.service.ZebedeeDatasetService;
+import com.github.onsdigital.zebedee.servicetokens.store.ServiceStore;
+import com.github.onsdigital.zebedee.servicetokens.store.ServiceStoreImpl;
 import com.github.onsdigital.zebedee.session.service.JWTSessionsServiceImpl;
 import com.github.onsdigital.zebedee.session.service.Sessions;
 import com.github.onsdigital.zebedee.session.service.ThreadLocalSessionsServiceImpl;
@@ -51,9 +53,9 @@ import com.github.onsdigital.zebedee.teams.store.TeamsStoreFileSystemImpl;
 import com.github.onsdigital.zebedee.user.service.StubbedUsersServiceImpl;
 import com.github.onsdigital.zebedee.user.service.UsersService;
 import com.github.onsdigital.zebedee.user.service.UsersServiceImpl;
+import com.github.onsdigital.zebedee.user.store.UserStore;
 import com.github.onsdigital.zebedee.user.store.UserStoreFileSystemImpl;
 import com.github.onsdigital.zebedee.util.slack.NopNotifierImpl;
-import com.github.onsdigital.zebedee.util.slack.NopSlackClientImpl;
 import com.github.onsdigital.zebedee.util.slack.NopStartUpNotifier;
 import com.github.onsdigital.zebedee.util.slack.Notifier;
 import com.github.onsdigital.zebedee.util.slack.SlackNotifier;
@@ -64,29 +66,22 @@ import com.github.onsdigital.zebedee.verification.VerificationAgent;
 import dp.api.dataset.DatasetAPIClient;
 import dp.api.dataset.DatasetClient;
 
+import javax.ws.rs.HEAD;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
 
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.warn;
-import static com.github.onsdigital.zebedee.Zebedee.COLLECTIONS;
-import static com.github.onsdigital.zebedee.Zebedee.KEYRING;
-import static com.github.onsdigital.zebedee.Zebedee.PERMISSIONS;
-import static com.github.onsdigital.zebedee.Zebedee.PUBLISHED;
-import static com.github.onsdigital.zebedee.Zebedee.PUBLISHED_COLLECTIONS;
-import static com.github.onsdigital.zebedee.Zebedee.SERVICES;
-import static com.github.onsdigital.zebedee.Zebedee.SESSIONS;
-import static com.github.onsdigital.zebedee.Zebedee.TEAMS;
-import static com.github.onsdigital.zebedee.Zebedee.USERS;
-import static com.github.onsdigital.zebedee.Zebedee.ZEBEDEE;
 import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getCognitoKeyIdPairs;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getDatasetAPIAuthToken;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getDatasetAPIURL;
+import static com.github.onsdigital.zebedee.configuration.Configuration.getDefaultVerificationUrl;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getImageAPIURL;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getKafkaContentPublishedTopic;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getKafkaURL;
@@ -94,6 +89,8 @@ import static com.github.onsdigital.zebedee.configuration.Configuration.getKeyri
 import static com.github.onsdigital.zebedee.configuration.Configuration.getKeyringSecretKey;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getServiceAuthToken;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getSlackSupportChannelID;
+import static com.github.onsdigital.zebedee.configuration.Configuration.getSlackToken;
+import static com.github.onsdigital.zebedee.configuration.Configuration.isVerificationEnabled;
 import static com.github.onsdigital.zebedee.configuration.Configuration.slackChannelsToNotfiyOnStartUp;
 import static com.github.onsdigital.zebedee.permissions.store.PermissionsStoreFileSystemImpl.initialisePermissions;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
@@ -103,28 +100,29 @@ import static org.apache.commons.lang3.StringUtils.isEmpty;
  * directories required by zebedee, create the service instances it requires etc.
  */
 public class ZebedeeConfiguration {
-    private Path rootPath;
-    private Path zebedeePath;
-    private Path publishedContentPath;
-    private Path publishedCollectionsPath;
-    private Path collectionsPath;
-    private Path usersPath;
-    private Path sessionsPath;
-    private Path permissionsPath;
-    private Path teamsPath;
-    private Path redirectPath;
-    private Path servicePath;
-    private Path keyRingPath;
+    public static final String PUBLISHED = "master";
+    public static final String COLLECTIONS = "collections";
+    public static final String PUBLISHED_COLLECTIONS = "publish-log";
+    public static final String ZEBEDEE = "zebedee";
+    public static final String USERS = "users";
+    public static final String SESSIONS = "sessions";
+    public static final String PERMISSIONS = "permissions";
+    public static final String TEAMS = "teams";
+    public static final String LAUNCHPAD = "launchpad";
+    public static final String APPLICATION_KEYS = "application-keys";
+    public static final String SERVICES = "services";
+    public static final String KEYRING = "keyring";
+
     private boolean useVerificationAgent;
+    private Path zebedeePath;
     private PublishedCollections publishedCollections;
     private Collections collections;
-    private Content published;
+    private PublishedContent published;
     private PermissionsService permissionsService;
     private UsersService usersService;
     private TeamsService teamsService;
     private Sessions sessions;
     private DataIndex dataIndex;
-    private PermissionsStore permissionsStore;
     private DatasetService datasetService;
     private ImageService imageService;
     private KafkaService kafkaService;
@@ -132,8 +130,9 @@ public class ZebedeeConfiguration {
     private CollectionKeyCache schedulerKeyCache;
     private EncryptionKeyFactory encryptionKeyFactory;
     private StartUpNotifier startUpNotifier;
-    private SlackClient slackClient;
     private Notifier slackNotifier;
+    private ServiceStore serviceStore;
+    private VerificationAgent verificationAgent;
 
     /**
      * Create a new configuration object.
@@ -149,241 +148,64 @@ public class ZebedeeConfiguration {
             throw new IllegalArgumentException("zebedee root directory doesn't not exist." + rootPath.toAbsolutePath());
         }
 
-        // Create the zebedee file system structure
-        this.rootPath = rootPath;
-        this.zebedeePath = createDir(rootPath, ZEBEDEE);
-        this.publishedContentPath = createDir(zebedeePath, PUBLISHED);
-        this.collectionsPath = createDir(zebedeePath, COLLECTIONS);
-        this.publishedCollectionsPath = createDir(zebedeePath, PUBLISHED_COLLECTIONS);
-        this.usersPath = createDir(zebedeePath, USERS);
-        this.sessionsPath = createDir(zebedeePath, SESSIONS);
-        this.permissionsPath = createDir(zebedeePath, PERMISSIONS);
-        this.teamsPath = createDir(zebedeePath, TEAMS);
-        this.redirectPath = this.publishedContentPath.resolve(Content.REDIRECT);
-        this.servicePath = createDir(zebedeePath, SERVICES);
-        this.keyRingPath = createDir(zebedeePath, KEYRING);
-        if (!Files.exists(redirectPath)) {
-            Files.createFile(redirectPath);
-        }
         this.useVerificationAgent = enableVerificationAgent;
 
+        // Create the zebedee file system structure
+        zebedeePath = createDir(rootPath, ZEBEDEE);
+
         // Create the services and objects...
-        this.dataIndex = new DataIndex(new FileSystemContentReader(publishedContentPath));
-        this.publishedCollections = new PublishedCollections(publishedCollectionsPath);
-        this.encryptionKeyFactory = new EncryptionKeyFactoryImpl();
+        // Initialise the teams service (uses a service supplier to break circular dependency with permissions service)
+        initTeamsService(zebedeePath, this::getPermissionsService);
 
-        // TODO: Remove after migration to JWT sessions is complete
-        if (cmsFeatureFlags().isJwtSessionsEnabled()) {
-            this.teamsService = new StubbedTeamsServiceImpl();
-        } else {
-            this.teamsService = new TeamsServiceImpl(
-                    new TeamsStoreFileSystemImpl(teamsPath), this::getPermissionsService);
-        }
+        // Initialise the permissions service
+        initPermissionsService(zebedeePath, teamsService);
 
-        this.published = createPublished();
+        // Initialise the users service
+        initUsersService(zebedeePath, permissionsService);
 
-        initialisePermissions(permissionsPath);
-        this.permissionsStore = new PermissionsStoreFileSystemImpl(permissionsPath);
+        // Initialise the sessions service
+        initSessionsService(zebedeePath, getCognitoKeyIdPairs());
 
-        PermissionsServiceImpl legacyPermissionsService = new PermissionsServiceImpl(permissionsStore, this::getTeamsService);
-        JWTPermissionsServiceImpl jwtPermissionsService = new JWTPermissionsServiceImpl(permissionsStore);
-        this.permissionsService = new PermissionsServiceProxy(cmsFeatureFlags().isJwtSessionsEnabled(),
-                legacyPermissionsService, jwtPermissionsService);
+        // Initialise published content services (data index and published content reader)
+        initPublishedContentServices(zebedeePath);
 
-        VersionsService versionsService = new VersionsServiceImpl();
-        this.collections = new Collections(collectionsPath, permissionsService, versionsService, published);
+        // Initialise collection content services
+        initCollectionServices(zebedeePath, permissionsService);
 
-        // TODO: Remove after migration to JWT sessions is complete
-        if (cmsFeatureFlags().isJwtSessionsEnabled()) {
-            this.usersService = StubbedUsersServiceImpl.getInstance();
-        } else {
-            this.usersService = UsersServiceImpl.getInstance(
-                    new UserStoreFileSystemImpl(this.usersPath), permissionsService);
-        }
+        // Initialise the collection keyring and scheduler cache.
+        initCollectionKeyring(zebedeePath, permissionsService, collections);
 
-        // Configure the sessions
-        if (cmsFeatureFlags().isJwtSessionsEnabled()) {
-            JWTHandler jwtHandler = new JWTHandlerImpl();
-            this.sessions = new JWTSessionsServiceImpl(jwtHandler, getCognitoKeyIdPairs());
-        } else {
-            LegacySessionsStore legacySessionsStore = new LegacySessionsStoreImpl(sessionsPath);
-            this.sessions = new ThreadLocalSessionsServiceImpl(legacySessionsStore, permissionsService, teamsService);
-        }
+        // Initialise the post publish verification service
+        initVerificationAgent(publishedCollections, getDefaultVerificationUrl());
 
-        // Init the collection keyring and scheduler cache.
-        initCollectionKeyring();
+        // Initialise Dataset API integration
+        initDatasetService(getDatasetAPIURL(), getDatasetAPIAuthToken(), getServiceAuthToken());
 
-        DatasetClient datasetClient;
-        try {
-            datasetClient = new DatasetAPIClient(getDatasetAPIURL(), getDatasetAPIAuthToken(), getServiceAuthToken());
-        } catch (URISyntaxException e) {
-            error().logException(e, "failed to initialise dataset api client - invalid URI");
-            throw new RuntimeException(e);
-        }
+        // Initialise Image service
+        initImageService(getImageAPIURL(), getServiceAuthToken());
 
-        datasetService = new ZebedeeDatasetService(datasetClient);
+        // Initialise the kafka producer for producing content published events for use by services such as search indexing
+        initKafkaService(getKafkaURL(), getKafkaContentPublishedTopic());
 
-        ImageClient imageClient;
-        try {
-            imageClient = new ImageAPIClient(getImageAPIURL(), getServiceAuthToken());
-        } catch (URISyntaxException e) {
-            error().logException(e, "failed to initialise image api client - invalid URI");
-            throw new RuntimeException(e);
-        }
+        // Initialise service token store
+        initServiceTokenStore(zebedeePath);
 
-        imageService = new ImageServiceImpl(imageClient);
-
-        if (cmsFeatureFlags().isKafkaEnabled()) {
-
-            KafkaClient kafkaClient = new KafkaClientImpl(getKafkaURL(), getKafkaContentPublishedTopic());
-            kafkaService = new KafkaServiceImpl(kafkaClient);
-        } else {
-            kafkaService = new NoOpKafkaService();
-        }
-
-        initSlackIntegration();
+        // Initialise slack integration
+        initSlackIntegration(getSlackToken(), slackChannelsToNotfiyOnStartUp(), getSlackSupportChannelID());
 
         info().data("root_path", rootPath.toString())
                 .data("zebedee_path", zebedeePath.toString())
-                .data("keyring_path", keyRingPath.toString())
-                .data("published_content_path", publishedContentPath.toString())
-                .data("collections_path", collectionsPath.toString())
-                .data("published_collections_path", publishedCollectionsPath.toString())
-                .data("users_path", usersPath.toString())
-                .data("sessions_path", sessionsPath.toString())
-                .data("permissions_path", permissionsPath.toString())
-                .data("teams_path", teamsPath.toString())
-                .data("services_path", servicePath.toString())
                 .data("enable_verification_agent", useVerificationAgent)
-                .data("sessions_api_enabled", cmsFeatureFlags().isSessionAPIEnabled())
                 .log("zebedee configuration creation complete");
     }
 
-    private void initCollectionKeyring() throws KeyringException {
-        CollectionKeyStore keyStore = new CollectionKeyStoreImpl(
-                getKeyRingPath(), getKeyringSecretKey(), getKeyringInitVector());
-
-        CollectionKeyCacheImpl.init(keyStore);
-        CollectionKeyCache collectionKeyCache = CollectionKeyCacheImpl.getInstance();
-
-        this.schedulerKeyCache = collectionKeyCache;
-
-        CollectionKeyringImpl.init(collectionKeyCache, permissionsService, collections);
-        this.collectionKeyring = CollectionKeyringImpl.getInstance();
-    }
-
-    /**
-     * Initalise the CMS's Slack integration. If the required configuration values are not available the CMS will
-     * default to No Op implementation - slack messages will be logged but sent to the Slack API.
-     */
-    private void initSlackIntegration() {
-        String slackToken = System.getenv("slack_api_token");
-        List<String> startUpNotificationRecipients = slackChannelsToNotfiyOnStartUp();
-
-        boolean validConfig = true;
-        if (isEmpty(slackToken)) {
-            warn().log("env var slack_api_token is null or empty");
-            validConfig = false;
-        }
-
-        if (startUpNotificationRecipients == null || startUpNotificationRecipients.isEmpty()) {
-            warn().log("env var START_UP_NOTIFY_LIST is null or empty");
-            validConfig = false;
-        }
-
-        if (validConfig) {
-            info().log("valid Slack configuation found for CMS/Slack integration");
-
-            this.slackClient = new SlackClientImpl(new Profile.Builder()
-                    .emoji(":flo:")
-                    .username("Florence")
-                    .authToken(slackToken)
-                    .create());
-
-            this.slackNotifier = new SlackNotifier(this.slackClient);
-
-            this.startUpNotifier = new SlackStartUpNotifier(
-                    slackClient,
-                    startUpNotificationRecipients,
-                    getSlackSupportChannelID()
-            );
-
-        } else {
-            warn().log("slack configuration missing/empty defaulting to No op implementation");
-
-            this.slackClient = new NopSlackClientImpl();
-            this.slackNotifier = new NopNotifierImpl();
-            this.startUpNotifier = new NopStartUpNotifier();
-        }
-    }
-
-    public boolean isUseVerificationAgent() {
-        return useVerificationAgent;
-    }
 
     public Path getZebedeePath() {
         return zebedeePath;
     }
 
-    public Path getPublishedContentPath() {
-        return publishedContentPath;
-    }
-
-    public Path getPublishedCollectionsPath() {
-        return publishedCollectionsPath;
-    }
-
-    public Path getCollectionsPath() {
-        return collectionsPath;
-    }
-
-    public Path getUsersPath() {
-        return usersPath;
-    }
-
-    public Path getSessionsPath() {
-        return sessionsPath;
-    }
-
-    public Path getPermissionsPath() {
-        return permissionsPath;
-    }
-
-    public Path getTeamsPath() {
-        return teamsPath;
-    }
-
-    public Path getRedirectPath() {
-        return redirectPath;
-    }
-
-    public Path getKeyRingPath() {
-        return keyRingPath;
-    }
-
-    public Path getServicePath() {
-        return servicePath;
-    }
-
-    public Content getPublished() {
+    public PublishedContent getPublished() {
         return this.published;
-    }
-
-    private Content createPublished() {
-        Content content = new Content(publishedContentPath);
-        Path redirectPath = publishedContentPath.resolve(Content.REDIRECT);
-        if (!Files.exists(redirectPath)) {
-            content.setRedirects(new RedirectTablePartialMatch(content));
-            try {
-                Files.createFile(redirectPath);
-            } catch (IOException e) {
-                error().data("requestedPath", redirectPath.toString())
-                        .logException(e, "could not save redirect to requested path");
-            }
-        } else {
-            content.setRedirects(new RedirectTablePartialMatch(content, redirectPath));
-        }
-        return content;
     }
 
     public DataIndex getDataIndex() {
@@ -414,8 +236,8 @@ public class ZebedeeConfiguration {
         return this.usersService;
     }
 
-    public VerificationAgent getVerificationAgent(boolean verificationIsEnabled, Zebedee z) {
-        return isUseVerificationAgent() && verificationIsEnabled ? new VerificationAgent(z) : null;
+    public VerificationAgent getVerificationAgent() {
+        return verificationAgent;
     }
 
     public DatasetService getDatasetService() {
@@ -430,20 +252,330 @@ public class ZebedeeConfiguration {
         return kafkaService;
     }
 
-    public ServiceStoreImpl getServiceStore() {
-        return new ServiceStoreImpl(servicePath);
+    public ServiceStore getServiceStore() {
+        return serviceStore;
     }
 
     public CollectionKeyring getCollectionKeyring() {
-        return this.collectionKeyring;
+        return collectionKeyring;
     }
 
     public EncryptionKeyFactory getEncryptionKeyFactory() {
-        return this.encryptionKeyFactory;
+        return encryptionKeyFactory;
     }
 
     public CollectionKeyCache getSchedulerKeyringCache() {
-        return this.schedulerKeyCache;
+        return schedulerKeyCache;
+    }
+
+    public StartUpNotifier getStartUpNotifier() {
+        return startUpNotifier;
+    }
+
+    public Notifier getSlackNotifier() {
+        return slackNotifier;
+    }
+
+    /**
+     * Initialise the teams service.
+     *
+     * @param zebedeePath                       the zebedee base directory (i.e. `$zebedee_root/zebedee`)
+     * @param permissionsServiceServiceSupplier a {@link ServiceSupplier} to supply the {@link PermissionsService} without
+     *                                          creating a circular dependency
+     * @throws IOException If a filesystem error occurs.
+     *
+     * TODO: Remove after migration to JWT sessions is complete
+     */
+    private void initTeamsService(Path zebedeePath,
+                                  ServiceSupplier<PermissionsService> permissionsServiceServiceSupplier)
+            throws IOException {
+
+        Path teamsPath = createDir(zebedeePath, TEAMS);
+        if (cmsFeatureFlags().isJwtSessionsEnabled()) {
+            this.teamsService = new StubbedTeamsServiceImpl();
+            info().log("JWT sessions enabled: stubbed teams service initialised");
+        } else {
+            this.teamsService = new TeamsServiceImpl(
+                    new TeamsStoreFileSystemImpl(teamsPath), permissionsServiceServiceSupplier);
+
+            info().data("teams_path", teamsPath.toString())
+                    .log("legacy teams service initialised");
+        }
+    }
+
+    /**
+     * Initialise the permissions service.
+     *
+     * @param zebedeePath the zebedee base directory (i.e. `$zebedee_root/zebedee`)
+     * @param teamsService the {@link TeamsService}
+     * @throws IOException If a filesystem error occurs.
+     */
+    private void initPermissionsService(Path zebedeePath, TeamsService teamsService) throws IOException {
+        Path permissionsPath = createDir(zebedeePath, PERMISSIONS);
+        initialisePermissions(permissionsPath);
+
+        PermissionsStore permissionsStore = new PermissionsStoreFileSystemImpl(permissionsPath);
+        PermissionsServiceImpl legacyPermissionsService = new PermissionsServiceImpl(permissionsStore, this::getTeamsService);
+        JWTPermissionsServiceImpl jwtPermissionsService = new JWTPermissionsServiceImpl(permissionsStore);
+        this.permissionsService = new PermissionsServiceProxy(cmsFeatureFlags().isJwtSessionsEnabled(),
+                legacyPermissionsService, jwtPermissionsService);
+
+        info().data("permissions_path", permissionsPath.toString())
+                .data("jwt_sessions_enabled", cmsFeatureFlags().isJwtSessionsEnabled())
+                .log("permissions service initialised");
+    }
+
+    /**
+     * Initialise the users service.
+     *
+     * @param zebedeePath the zebedee base directory (i.e. `$zebedee_root/zebedee`)
+     * @param permissionsService the {@link PermissionsService}
+     * @throws IOException If a filesystem error occurs.
+     *
+     * TODO: Remove after migration to JWT sessions is complete
+     */
+    private void initUsersService(Path zebedeePath, PermissionsService permissionsService) throws IOException {
+        Path usersPath = createDir(zebedeePath, USERS);
+        if (cmsFeatureFlags().isJwtSessionsEnabled()) {
+            this.usersService = StubbedUsersServiceImpl.getInstance();
+            info().log("JWT sessions enabled: stubbed users service initialised");
+        } else {
+            UserStore usersStore = new UserStoreFileSystemImpl(usersPath);
+            this.usersService = UsersServiceImpl.getInstance(usersStore, permissionsService);
+
+            info().data("users_path", usersPath.toString())
+                    .log("legacy users service initialised");
+        }
+    }
+
+    /**
+     * Initialise the sessions service.
+     *
+     * @param zebedeePath the zebedee base directory (i.e. `$zebedee_root/zebedee`)
+     * @param cognitoKeyIdPairs the cognito public signing keys
+     * @throws IOException If a filesystem error occurs.
+     */
+    private void initSessionsService(Path zebedeePath, Map<String, String> cognitoKeyIdPairs) throws IOException {
+        Path sessionsPath = createDir(zebedeePath, SESSIONS);
+        if (cmsFeatureFlags().isJwtSessionsEnabled()) {
+            JWTHandler jwtHandler = new JWTHandlerImpl();
+            this.sessions = new JWTSessionsServiceImpl(jwtHandler, getCognitoKeyIdPairs());
+            info().log("JWT sessions service initialised");
+        } else {
+            LegacySessionsStore legacySessionsStore = new LegacySessionsStoreImpl(sessionsPath);
+            this.sessions = new ThreadLocalSessionsServiceImpl(legacySessionsStore, permissionsService, teamsService);
+            info().data("sessions_path", sessionsPath.toString())
+                    .log("legacy sessions service initialised");
+        }
+    }
+
+    /**
+     * Initialise the central keyring used to store the encryption keys for the collection content.
+     *
+     * @param zebedeePath        the zebedee base directory (i.e. `$zebedee_root/zebedee`)
+     * @param permissionsService the {@link PermissionsService}
+     * @param collections        the {@link Collections} service
+     * @throws IOException If a filesystem error occurs.
+     */
+    private void initCollectionKeyring(Path zebedeePath, PermissionsService permissionsService, Collections collections)
+            throws IOException {
+
+        Path keyringPath = createDir(zebedeePath, KEYRING);
+
+        CollectionKeyStore keyStore = new CollectionKeyStoreImpl(
+                keyringPath, getKeyringSecretKey(), getKeyringInitVector());
+
+        CollectionKeyCacheImpl.init(keyStore);
+        CollectionKeyCache collectionKeyCache = CollectionKeyCacheImpl.getInstance();
+
+        this.schedulerKeyCache = collectionKeyCache;
+
+        CollectionKeyringImpl.init(collectionKeyCache, permissionsService, collections);
+        this.collectionKeyring = CollectionKeyringImpl.getInstance();
+
+        info().data("keyring_path", keyringPath.toString())
+                .log("collection keyring initialised");
+    }
+
+    /**
+     * Initialise content services (i.e. data index and published content reader).
+     *
+     * @param zebedeePath the zebedee base directory (i.e. `$zebedee_root/zebedee`)
+     * @throws IOException If a filesystem error occurs.
+     */
+    private void initPublishedContentServices(Path zebedeePath) throws IOException {
+        Path publishedContentPath = createDir(zebedeePath, PUBLISHED);
+
+        Path redirectPath = publishedContentPath.resolve(Content.REDIRECT);
+        if (!Files.exists(redirectPath)) {
+            Files.createFile(redirectPath);
+        }
+
+        published = new PublishedContent(publishedContentPath);
+        published.setRedirects(new RedirectTablePartialMatch(published));
+
+        this.dataIndex = new DataIndex(new FileSystemContentReader(publishedContentPath));
+
+        info().data("published_content_path", publishedContentPath.toString())
+                .log("published content services initialised");
+    }
+
+    /**
+     * Initialise the collection content services.
+     *
+     * @param zebedeePath the zebedee base directory (i.e. `$zebedee_root/zebedee`)
+     * @param permissionsService the {@link PermissionsService}
+     * @throws IOException If a filesystem error occurs.
+     */
+    private void initCollectionServices(Path zebedeePath, PermissionsService permissionsService)
+            throws IOException {
+
+        Path collectionsPath = createDir(zebedeePath, COLLECTIONS);
+        Path publishedCollectionsPath = createDir(zebedeePath, PUBLISHED_COLLECTIONS);
+
+        this.publishedCollections = new PublishedCollections(publishedCollectionsPath);
+        this.encryptionKeyFactory = new EncryptionKeyFactoryImpl();
+
+        VersionsService versionsService = new VersionsServiceImpl();
+        this.collections = new Collections(collectionsPath, permissionsService, versionsService, published);
+
+        info().data("collections_path", collectionsPath.toString())
+                .data("published_collections_path", publishedCollectionsPath.toString())
+                .log("collection services initialised");
+    }
+
+    /**
+     * Initialise the dataset service responsible for integration with the dataset API for publishing datasets.
+     *
+     * @param datasetAPIURL       the base dataset API url
+     * @param datasetAPIAuthToken the deprecated service to service shared secret token
+     * @param serviceAuthToken    zebedee's service auth token for use in authenticating requests to the dataset API
+     */
+    private void initDatasetService(String datasetAPIURL, String datasetAPIAuthToken, String serviceAuthToken) {
+        DatasetClient datasetClient;
+        try {
+            datasetClient = new DatasetAPIClient(datasetAPIURL, datasetAPIAuthToken, serviceAuthToken);
+        } catch (URISyntaxException e) {
+            error().logException(e, "failed to initialise dataset api client - invalid URI");
+            throw new IllegalArgumentException(e);
+        }
+
+        datasetService = new ZebedeeDatasetService(datasetClient);
+
+        info().data("dataset_api_url", datasetAPIURL)
+                .log("dataset api client service initialised");
+    }
+
+    /**
+     * Initialise the image service which provides integration with the Image API for publishing images.
+     *
+     * @param imageAPIURL      the image API base url
+     * @param serviceAuthToken zebedee's service auth token for use in authenticating requests to the image API
+     */
+    private void initImageService(String imageAPIURL, String serviceAuthToken) {
+        ImageClient imageClient;
+        try {
+            imageClient = new ImageAPIClient(imageAPIURL, serviceAuthToken);
+        } catch (URISyntaxException e) {
+            error().logException(e, "failed to initialise image api client - invalid URI");
+            throw new IllegalArgumentException(e);
+        }
+
+        imageService = new ImageServiceImpl(imageClient);
+
+        info().data("image_api_url", imageAPIURL)
+                .log("image api client service initialised");
+    }
+
+    /**
+     * Initialise the kafka producer service. This service produces content published events for consumption by services
+     * such as search indexing
+     *
+     * @param kafkaURL                   the kafka URL
+     * @param kafkaContentPublishedTopic the topic name on which to produce content published events
+     */
+    private void initKafkaService(String kafkaURL, String kafkaContentPublishedTopic) {
+        if (cmsFeatureFlags().isKafkaEnabled()) {
+            KafkaClient kafkaClient = new KafkaClientImpl(kafkaURL, kafkaContentPublishedTopic);
+            kafkaService = new KafkaServiceImpl(kafkaClient);
+        } else {
+            kafkaService = new NoOpKafkaService();
+        }
+
+        info().data("kafka_url", kafkaURL)
+                .data("kafka_content_published_topic", kafkaContentPublishedTopic)
+                .log("kafka producer service initialised");
+    }
+
+    /**
+     * Initialise the service token store.
+     *
+     * @param zebedeePath the zebedee base directory (i.e. `$zebedee_root/zebedee`)
+     * @throws IOException If a filesystem error occurs.
+     */
+    private void initServiceTokenStore(Path zebedeePath) throws IOException {
+        Path servicePath = createDir(zebedeePath, SERVICES);
+
+        this.serviceStore = new ServiceStoreImpl(servicePath);
+
+        info().data("services_path", servicePath.toString())
+                .log("service token store initialised");
+    }
+
+    /**
+     * Initalise the CMS's Slack integration. If the required configuration values are not available the CMS will
+     * default to No Op implementation - slack messages will be logged but sent to the Slack API.
+     *
+     * @param slackToken                     the slack token to use to authenticate requests to slack
+     * @param slackChannelsToNotfiyOnStartUp the list of slack channels in which to post startup notifications
+     * @param slackSupportChannelID          the support slack channel id to include in messages so that user's know
+     *                                       which channel to raise support requests
+     */
+    private void initSlackIntegration(String slackToken, List<String> slackChannelsToNotfiyOnStartUp, String slackSupportChannelID) {
+
+        boolean validConfig = true;
+        if (isEmpty(slackToken)) {
+            warn().log("env var slack_api_token is null or empty");
+            validConfig = false;
+        }
+
+        if (slackChannelsToNotfiyOnStartUp == null || slackChannelsToNotfiyOnStartUp.isEmpty()) {
+            warn().log("env var START_UP_NOTIFY_LIST is null or empty");
+            validConfig = false;
+        }
+
+        if (validConfig) {
+            info().log("valid Slack configuation found for CMS/Slack integration");
+
+            SlackClient slackClient = new SlackClientImpl(new Profile.Builder()
+                    .emoji(":flo:")
+                    .username("Florence")
+                    .authToken(slackToken)
+                    .create());
+
+            this.slackNotifier = new SlackNotifier(slackClient);
+
+            this.startUpNotifier = new SlackStartUpNotifier(
+                    slackClient,
+                    slackChannelsToNotfiyOnStartUp,
+                    slackSupportChannelID
+            );
+
+            info().data("slack_channels_to_notify_on_startup", slackChannelsToNotfiyOnStartUp.toString())
+                    .log("slack integration initialised");
+
+        } else {
+            warn().log("slack configuration missing/empty defaulting to No op implementation");
+
+            this.slackNotifier = new NopNotifierImpl();
+            this.startUpNotifier = new NopStartUpNotifier();
+        }
+    }
+
+    private void initVerificationAgent(PublishedCollections publishedCollections, String verificationUrl) {
+        if (isVerificationEnabled()) {
+            this.verificationAgent = new VerificationAgent(publishedCollections, verificationUrl);
+        }
     }
 
     private Path createDir(Path root, String dirName) throws IOException {
@@ -453,13 +585,5 @@ public class ZebedeeConfiguration {
             Files.createDirectory(dir);
         }
         return dir;
-    }
-
-    public StartUpNotifier getStartUpNotifier() {
-        return startUpNotifier;
-    }
-
-    public Notifier getSlackNotifier() {
-        return slackNotifier;
     }
 }

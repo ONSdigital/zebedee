@@ -55,17 +55,7 @@ import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Optional;
-import java.util.Scanner;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.Lock;
@@ -90,7 +80,7 @@ public class Collection {
     private static final String TARGET_COLLECTION = "targetCollection";
     private static final String DATASETS_URI = "/datasets/";
 
-    private static ConcurrentMap<Path, ReadWriteLock> collectionLocks = new ConcurrentHashMap<>();
+    private static final ConcurrentMap<Path, ReadWriteLock> collectionLocks = new ConcurrentHashMap<>();
 
     private final CollectionDescription description;
     private final Path path;
@@ -101,7 +91,7 @@ public class Collection {
     private final Zebedee zebedee;
 
     private final Path collectionJsonPath;
-    private VersionsService versionsService;
+    private final VersionsService versionsService;
 
     /**
      * Instantiates an existing {@link Collection}. This validates that the
@@ -389,7 +379,7 @@ public class Collection {
 
             // check if only the casing of the name has changed. If so only the json is updated, not the filename.
             if (!collectionDescription.getName().equalsIgnoreCase(collection.getDescription().getName())) {
-                updatedCollection = collection.rename(collection.getDescription(), collectionDescription.getName(), zebedee);
+                updatedCollection = rename(collection.getDescription(), collectionDescription.getName(), zebedee);
             } else {
                 updatedCollection.getDescription().setName(collectionDescription.getName());
             }
@@ -424,7 +414,7 @@ public class Collection {
 
     private static Set<Integer> setViewerTeams(CollectionDescription desc, Zebedee zebedee, Session session)
             throws IOException, ZebedeeException {
-        Set<Integer> teamIds = new HashSet<>();
+        Set<String> teamIds = new HashSet<>();
         List<String> teamNames = desc.getTeams();
 
         if (teamNames == null) {
@@ -447,6 +437,11 @@ public class Collection {
         permissions.setViewerTeams(session, desc.getId(), teamIds);
 
         return teamIds;
+    }
+
+    private static String collectionContentPath(String collectioName, String uri) {
+        uri = uri.startsWith("/") ? uri.substring(1) : uri;
+        return Paths.get(collectioName).resolve("inprogress").resolve(uri).toString();
     }
 
     public CollectionDescription getDescription() {
@@ -684,7 +679,7 @@ public class Collection {
                 } else {
                     PathUtils.moveFilesInDirectory(source, destination);
                 }
-                zebedee.getCollections().removeEmptyCollectionDirectories(source);
+                Collections.removeEmptyCollectionDirectories(source);
             } else {
                 try (InputStream inputStream = new FileInputStream(source.toFile())) {
                     collectionWriter.getInProgress().write(inputStream, uri);
@@ -816,12 +811,12 @@ public class Collection {
 
         FileUtils.deleteDirectory(dest.getParent().toFile());
         FileUtils.moveDirectory(src.getParent().toFile(), dest.getParent().toFile());
-        zebedee.getCollections().removeEmptyCollectionDirectories(src.getParent());
+        Collections.removeEmptyCollectionDirectories(src.getParent());
     }
 
     private void reviewSingleFile(Path src, Path dest) throws IOException {
         PathUtils.moveFilesInDirectory(src, dest);
-        zebedee.getCollections().removeEmptyCollectionDirectories(src);
+        Collections.removeEmptyCollectionDirectories(src);
     }
 
     private boolean contentWasCompleted(String uri) {
@@ -1050,7 +1045,7 @@ public class Collection {
         boolean hasDeleted = false;
 
         for (Content collectionDir : new Content[]{inProgress, complete, reviewed}) {
-            if (collectionDir.exists(visualisationZipUri.toString())) {
+            if (collectionDir.exists(visualisationZipUri)) {
                 File targetDir = new File(collectionDir.getPath().toString() + visualisationZipUri);
 
                 info().data("zip_path", targetDir.toString())
@@ -1120,7 +1115,7 @@ public class Collection {
             if (src.toFile().exists()) {
                 Files.createDirectories(dest.getParent());
                 Files.move(src, dest);
-                zebedee.getCollections().removeEmptyCollectionDirectories(src.getParent());
+                Collections.removeEmptyCollectionDirectories(src.getParent());
             }
         }
     }
@@ -1444,12 +1439,6 @@ public class Collection {
 
         return 0;
     }
-
-    private static String collectionContentPath(String collectioName, String uri) {
-        uri = uri.startsWith("/") ? uri.substring(1) : uri;
-        return Paths.get(collectioName).resolve("inprogress").resolve(uri).toString();
-    }
-
 
     public HashMap<String, String> generateCollectionSaveConflictMap(Collection blockingCollection, String targetURI) throws IOException {
 

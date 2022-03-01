@@ -1,21 +1,16 @@
 package com.github.onsdigital.zebedee.session.service;
 
+import com.github.onsdigital.JWTVerifier;
+import com.github.onsdigital.UserDataPayload;
 import com.github.onsdigital.exceptions.JWTDecodeException;
 import com.github.onsdigital.exceptions.JWTTokenExpiredException;
 import com.github.onsdigital.exceptions.JWTVerificationException;
-import com.github.onsdigital.impl.UserDataPayload;
-import com.github.onsdigital.interfaces.JWTHandler;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.Map;
 
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
 
@@ -30,26 +25,21 @@ import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
  */
 public class JWTSessionsServiceImpl implements Sessions {
 
-    private JWTHandler jwtHandler;
-
-    private Map<String, String> rsaKeyMap;
-
-    private Gson gson;
-
-    private static ThreadLocal<Session> store = new ThreadLocal<>();
-
-    private static final int JWT_CHUNK_SIZE = 3;
-
     public static final String ACCESS_TOKEN_REQUIRED_ERROR = "Access Token required but none provided.";
     public static final String ACCESS_TOKEN_EXPIRED_ERROR = "JWT verification failed as token is expired.";
-    public static final String TOKEN_NOT_VALID_ERROR = "Token format not valid.";
-    public static final String TOKEN_NULL_ERROR = "Token cannot be null.";
     private static final String UNSUPPORTED_METHOD = "forbidden attempt to call sessions method that is not supported JWT sessions are enabled";
 
-    // class constructor - takes HashMap<String, String> as param.
-    public JWTSessionsServiceImpl(JWTHandler jwtHandler, Map<String, String> rsaKeyMap) {
-        this.jwtHandler = jwtHandler;
-        this.rsaKeyMap = rsaKeyMap;
+    private static ThreadLocal<Session> store = new ThreadLocal<>();
+    private JWTVerifier jwtVerifier;
+    private Gson gson;
+
+    /**
+     * Initialises a new {@link JWTSessionsServiceImpl}.
+     *
+     * @param jwtVerifier the {@link JWTVerifier} implementation to use to verify JWTs
+     */
+    public JWTSessionsServiceImpl(JWTVerifier jwtVerifier) {
+        this.jwtVerifier = jwtVerifier;
         this.gson = new Gson();
     }
 
@@ -92,22 +82,9 @@ public class JWTSessionsServiceImpl implements Sessions {
             throw new SessionsException(ACCESS_TOKEN_REQUIRED_ERROR);
         }
 
-        String[] chunks;
         try {
-            chunks = token.split("\\.");
-        } catch (NullPointerException e) {
-            throw new SessionsException(TOKEN_NULL_ERROR, e);
-        }
-        // check token validity; throw error if []chunks doesn't contain 3 elements
-        if (chunks.length != JWT_CHUNK_SIZE) {
-            throw new SessionsException(TOKEN_NOT_VALID_ERROR);
-        }
-
-        String publicSigningKey = getPublicSigningKey(chunks[0]);
-
-        try {
-            UserDataPayload jwtData = jwtHandler.verifyJWT(token, publicSigningKey);
-            store.set(new Session(token, jwtData.getEmail(), Arrays.asList(jwtData.getGroups())));
+            UserDataPayload jwtData = jwtVerifier.verify(token);
+            store.set(new Session(token, jwtData.getEmail(), jwtData.getGroups()));
         } catch (JWTTokenExpiredException e) {
             throw new SessionsException(ACCESS_TOKEN_EXPIRED_ERROR);
         } catch (JWTVerificationException | JWTDecodeException e) {
@@ -123,24 +100,6 @@ public class JWTSessionsServiceImpl implements Sessions {
     @Override
     public void resetThread() {
         store.remove();
-    }
-
-    private String getPublicSigningKey(String tokenHeader) {
-        String headerDecoded = new String(
-                Base64.getDecoder().decode(tokenHeader),
-                StandardCharsets.UTF_8
-        );
-
-        Map<String, String> decodedResult = this.gson.fromJson(
-                headerDecoded,
-                new TypeToken<Map<String, String>>() {
-                }.getType()
-        );
-
-        // return rsa public signing key from this.rsaKeyMap
-        return this.rsaKeyMap.get(
-                decodedResult.get("kid")
-        );
     }
 
     @VisibleForTesting

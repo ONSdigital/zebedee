@@ -6,7 +6,6 @@ import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.encryption.EncryptionKeyFactory;
 import com.github.onsdigital.zebedee.notification.StartUpNotifier;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
-import com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDao;
 import com.github.onsdigital.zebedee.service.ServiceSupplier;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.session.service.JWTSessionsServiceImpl;
@@ -27,9 +26,7 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import java.security.SecureRandom;
-import java.util.ArrayList;
 import java.util.Base64;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -49,46 +46,31 @@ public abstract class ZebedeeTestBaseFixture {
 
     @Mock
     protected UsersService usersService;
-
-    @Mock
-    private CollectionHistoryDao collectionHistoryDao;
-
-    @Mock
-    private JWTSessionsServiceImpl sessionsService;
-
     @Mock
     protected ZebedeeConfiguration zebCfg;
-
     @Mock
     protected Notifier slackNotifier;
-
     @Mock
     protected Sessions sessions;
-
     @Mock
     protected CollectionKeyring collectionKeyring;
-
     @Mock
     protected Credentials credentials;
-
     @Mock
     protected User user;
-
     @Mock
     protected PermissionsService permissionsService;
-
     @Mock
     protected Session userSession;
-
     @Mock
     protected EncryptionKeyFactory encryptionKeyFactory;
-
     @Mock
     protected StartUpNotifier startUpNotifier;
-
     protected Zebedee zebedee;
     protected Builder builder;
     protected Map<String, User> usersMap;
+    @Mock
+    private JWTSessionsServiceImpl sessionsService;
 
     @BeforeClass
     public static void setUpKeyringEnvVars() throws Exception {
@@ -100,6 +82,25 @@ public abstract class ZebedeeTestBaseFixture {
     public static void tearDownKeyringEnvVars() {
         System.clearProperty("KEYRING_SECRET_KEY");
         System.clearProperty("KEYRING_INIT_VECTOR");
+    }
+
+    private static String createCollectionKeyStoreKey() throws Exception {
+        KeyGenerator keyGen = KeyGenerator.getInstance("AES");
+        SecretKey secretKey = keyGen.generateKey();
+        return Base64.getEncoder().encodeToString(secretKey.getEncoded());
+    }
+
+    private static String createCollectionKeyStoreIV() throws Exception {
+        byte[] iv = new byte[16];
+        SecureRandom random = new SecureRandom();
+        random.nextBytes(iv);
+
+        return Base64.getEncoder().encodeToString(new IvParameterSpec(iv).getIV());
+    }
+
+    @AfterClass
+    public static void cleanUp() {
+        TestUtils.clearReaderConfig();
     }
 
     @Before
@@ -119,8 +120,6 @@ public abstract class ZebedeeTestBaseFixture {
         ReflectionTestUtils.setField(zebedee, "sessions", sessionsService);
         ReflectionTestUtils.setField(zebedee, "collectionKeyring", collectionKeyring);
         ReflectionTestUtils.setField(zebedee, "encryptionKeyFactory", encryptionKeyFactory);
-
-        ServiceSupplier<CollectionHistoryDao> collectionHistoryDaoServiceSupplier = () -> collectionHistoryDao;
 
         usersMap = new HashMap<>();
         usersMap.put(builder.publisher1.getEmail(), builder.publisher1);
@@ -187,30 +186,10 @@ public abstract class ZebedeeTestBaseFixture {
         ReflectionTestUtils.setField(instance, "collectionKeyring", collectionKeyring);
     }
 
-    private static String createCollectionKeyStoreKey() throws Exception {
-        KeyGenerator keyGen = KeyGenerator.getInstance("AES");
-        SecretKey secretKey = keyGen.generateKey();
-        return Base64.getEncoder().encodeToString(secretKey.getEncoded());
-    }
-
-    private static String createCollectionKeyStoreIV() throws Exception {
-        byte[] iv = new byte[16];
-        SecureRandom random = new SecureRandom();
-        random.nextBytes(iv);
-
-        return Base64.getEncoder().encodeToString(new IvParameterSpec(iv).getIV());
-    }
-
-
     public abstract void setUp() throws Exception;
 
     @After
     public void tearDown() throws Exception {
         builder.delete();
-    }
-
-    @AfterClass
-    public static void cleanUp() {
-        TestUtils.clearReaderConfig();
     }
 }

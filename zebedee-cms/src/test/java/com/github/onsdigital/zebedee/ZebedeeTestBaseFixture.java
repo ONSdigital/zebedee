@@ -6,6 +6,7 @@ import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.encryption.EncryptionKeyFactory;
 import com.github.onsdigital.zebedee.notification.StartUpNotifier;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
+import com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDao;
 import com.github.onsdigital.zebedee.service.ServiceSupplier;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.session.service.JWTSessionsServiceImpl;
@@ -48,6 +49,9 @@ public abstract class ZebedeeTestBaseFixture {
 
     @Mock
     protected UsersService usersService;
+
+    @Mock
+    private CollectionHistoryDao collectionHistoryDao;
 
     @Mock
     private JWTSessionsServiceImpl sessionsService;
@@ -115,6 +119,8 @@ public abstract class ZebedeeTestBaseFixture {
         ReflectionTestUtils.setField(zebedee, "sessions", sessionsService);
         ReflectionTestUtils.setField(zebedee, "collectionKeyring", collectionKeyring);
         ReflectionTestUtils.setField(zebedee, "encryptionKeyFactory", encryptionKeyFactory);
+
+        ServiceSupplier<CollectionHistoryDao> collectionHistoryDaoServiceSupplier = () -> collectionHistoryDao;
 
         usersMap = new HashMap<>();
         usersMap.put(builder.publisher1.getEmail(), builder.publisher1);

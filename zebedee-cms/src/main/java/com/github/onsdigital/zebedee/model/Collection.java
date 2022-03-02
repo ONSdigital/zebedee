@@ -88,7 +88,7 @@ public class Collection {
     private static final String TARGET_COLLECTION = "targetCollection";
     private static final String DATASETS_URI = "/datasets/";
 
-    private static final ConcurrentMap<Path, ReadWriteLock> collectionLocks = new ConcurrentHashMap<>();
+    private static ConcurrentMap<Path, ReadWriteLock> collectionLocks = new ConcurrentHashMap<>();
 
     private final CollectionDescription description;
     private final Path path;
@@ -1489,4 +1489,3 @@ public class Collection {
         return this.inProgress;
     }
 }
-

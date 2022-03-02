@@ -130,7 +130,7 @@ public class ZebedeeConfiguration {
     private KafkaService kafkaService;
     private CollectionKeyring collectionKeyring;
     private CollectionKeyCache schedulerKeyCache;
-    private final EncryptionKeyFactory encryptionKeyFactory;
+    private EncryptionKeyFactory encryptionKeyFactory;
     private StartUpNotifier startUpNotifier;
     private SlackClient slackClient;
     private Notifier slackNotifier;

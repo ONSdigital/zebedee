@@ -32,7 +32,7 @@ public class Password {
      * Wrap static method calls to obtain service in function makes testing easier - class member can be
      * replaced with a mocked giving control of desired behaviour.
      */
-    private final ServiceSupplier<UsersService> usersServiceSupplier = () -> Root.zebedee.getUsersService();
+    private ServiceSupplier<UsersService> usersServiceSupplier = () -> Root.zebedee.getUsersService();
 
     /**
      * Update password

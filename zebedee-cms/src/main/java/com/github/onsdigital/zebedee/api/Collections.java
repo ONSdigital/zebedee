@@ -80,6 +80,10 @@ public class Collections {
         return Root.zebedee.getCollections().getCollection(collectionId);
     }
 
+    /**
+     * @param request
+     * @return a List of {@link Collection#getId()}
+     */
     public static String getCollectionId(HttpServletRequest request) {
         Path path = Path.newInstance(request);
         List<String> segments = path.segments();

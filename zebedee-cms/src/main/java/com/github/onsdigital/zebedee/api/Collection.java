@@ -39,12 +39,12 @@ public class Collection {
 
     static final String COLLECTION_NAME = "collectionName";
 
-    private final Sessions sessionsService;
-    private final PermissionsService permissionsService;
-    private final com.github.onsdigital.zebedee.model.Collections collections;
-    private final UsersService usersService;
-    private final CollectionKeyring collectionKeyring;
-    private final ScheduleCanceller scheduleCanceller;
+    private Sessions sessionsService;
+    private PermissionsService permissionsService;
+    private com.github.onsdigital.zebedee.model.Collections collections;
+    private UsersService usersService;
+    private CollectionKeyring collectionKeyring;
+    private ScheduleCanceller scheduleCanceller;
 
     /**
      * Construct a new instance of the Collection API endpoint.

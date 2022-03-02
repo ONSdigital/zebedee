@@ -23,6 +23,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
+@SuppressWarnings("ALL")
 public class JWTSessionsServiceImplTest {
 
     private static final String REQUIRED_CLAIM_PAYLOAD_ERROR = "Required JWT payload claim not found [username or cognito:groups].";
@@ -55,12 +56,12 @@ public class JWTSessionsServiceImplTest {
             + "MwIDAQAB";
 
     private static final String EMAIL = "janedoe@example.com";
-    private static final List<String> TEAM_IDS = Arrays.asList("10","20");
+    private static final List<String> TEAM_IDS = Arrays.asList("10", "20");
 
-    private static ThreadLocal<Session> store = new ThreadLocal<>();
+    private static final ThreadLocal<Session> store = new ThreadLocal<>();
 
-    private Map<String, String> rsaKeyMap = new HashMap<String, String>();
-    private JWTHandler jwtHandler = new JWTHandlerImpl();
+    private final Map<String, String> rsaKeyMap = new HashMap<String, String>();
+    private final JWTHandler jwtHandler = new JWTHandlerImpl();
 
     /**
      * Class under test

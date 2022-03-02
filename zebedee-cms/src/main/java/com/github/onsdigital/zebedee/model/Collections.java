@@ -73,19 +73,20 @@ import static com.github.onsdigital.zebedee.logging.CMSLogEvent.warn;
 import static com.github.onsdigital.zebedee.model.Content.isDataVisualisationFile;
 import static java.time.temporal.ChronoUnit.MINUTES;
 
+@SuppressWarnings("ALL")
 public class Collections {
 
     private final Path path;
-    private PermissionsService permissionsService;
-    private Content published;
-    private Supplier<Zebedee> zebedeeSupplier = () -> Root.zebedee;
-    private ZebedeeCmsService zebedeeCmsService = ZebedeeCmsService.getInstance();
-    private CollectionReaderWriterFactory collectionReaderWriterFactory;
-    private Function<ApproveTask, Future<Boolean>> addTaskToQueue = ApprovalQueue::add;
-    private BiConsumer<Collection, EventType> publishingNotificationConsumer = (c, e) -> new PublishNotification(c).sendNotification(e);
-    private Function<Path, ContentReader> contentReaderFactory = FileSystemContentReader::new;
-    private Comparator<String> strComparator = Comparator.comparing(String::toString);
-    private VersionsService versionsService;
+    private final PermissionsService permissionsService;
+    private final Content published;
+    private final Supplier<Zebedee> zebedeeSupplier = () -> Root.zebedee;
+    private final ZebedeeCmsService zebedeeCmsService = ZebedeeCmsService.getInstance();
+    private final CollectionReaderWriterFactory collectionReaderWriterFactory;
+    private final Function<ApproveTask, Future<Boolean>> addTaskToQueue = ApprovalQueue::add;
+    private final BiConsumer<Collection, EventType> publishingNotificationConsumer = (c, e) -> new PublishNotification(c).sendNotification(e);
+    private final Function<Path, ContentReader> contentReaderFactory = FileSystemContentReader::new;
+    private final Comparator<String> strComparator = Comparator.comparing(String::toString);
+    private final VersionsService versionsService;
 
     public Collections(Path path, PermissionsService permissionsService,
                        VersionsService versionsService, Content published) {
@@ -94,15 +95,6 @@ public class Collections {
         this.versionsService = versionsService;
         this.published = published;
         this.collectionReaderWriterFactory = new CollectionReaderWriterFactory();
-    }
-
-    /**
-     * Get the collections directory path.
-     *
-     * @return the collections directory path.
-     */
-    public Path getPath() {
-        return path;
     }
 
     /**
@@ -171,6 +163,15 @@ public class Collections {
             return true;
 
         return Arrays.asList(files).isEmpty();
+    }
+
+    /**
+     * Get the collections directory path.
+     *
+     * @return the collections directory path.
+     */
+    public Path getPath() {
+        return path;
     }
 
     /**
@@ -896,81 +897,6 @@ public class Collections {
         collection.save();
     }
 
-    /**
-     * Represents the list of all collections currently in the system. This adds
-     * a couple of utility methods to {@link ArrayList}.
-     */
-    public static class CollectionList extends ArrayList<Collection> {
-
-        /**
-         * Retrieves a collection with the given id.
-         *
-         * @param id The id to look for.
-         * @return If a {@link Collection} matching the given name exists,
-         * (according to {@link PathUtils#toFilename(String)}) the
-         * collection. Otherwise null.
-         */
-        public Collection getCollection(String id) {
-            Collection result = null;
-
-            if (StringUtils.isNotBlank(id)) {
-                for (Collection collection : this) {
-                    if (StringUtils.equalsIgnoreCase(collection.getDescription().getId(), id)) {
-                        result = collection;
-                        break;
-                    }
-                }
-            }
-
-            return result;
-        }
-
-        /**
-         * Retrieves a collection with the given name.
-         *
-         * @param name The name to look for.
-         * @return If a {@link Collection} matching the given name exists,
-         * (according to {@link PathUtils#toFilename(String)}) the
-         * collection. Otherwise null.
-         */
-        public Collection getCollectionByName(String name) {
-            Collection result = null;
-
-            if (StringUtils.isNotBlank(name)) {
-
-                String filename = PathUtils.toFilename(name);
-                for (Collection collection : this) {
-                    String collectionFilename = collection.getPath().getFileName()
-                            .toString();
-                    if (StringUtils.equalsIgnoreCase(collectionFilename,
-                            filename)) {
-                        result = collection;
-                        break;
-                    }
-                }
-            }
-
-            return result;
-        }
-
-        /**
-         * Determines whether a collection with the given name exists.
-         *
-         * @param name The name to check for.
-         * @return If {@link #getCollection(String)} returns non-null, true.
-         */
-        public boolean hasCollection(String name) {
-            return getCollectionByName(name) != null;
-        }
-
-        public List<Collection> withApprovalInProgressOrError() {
-            return this.stream()
-                    .filter(c -> c.getDescription().getApprovalStatus() == ApprovalStatus.IN_PROGRESS
-                            || c.getDescription().getApprovalStatus() == ApprovalStatus.ERROR)
-                    .collect(Collectors.toList());
-        }
-    }
-
     public void verifyDatasetVersions(Collection collection, CollectionReader collectionReader, Session session) throws ZebedeeException, IOException {
         if (!cmsFeatureFlags().isDatasetVersionVerificationEnabled()) {
             info().collectionID(collection).log("skipping dataset version verification feature not enabled");
@@ -1061,6 +987,81 @@ public class Collections {
             collectionId = segments.get(1);
         }
         return collectionId;
+    }
+
+    /**
+     * Represents the list of all collections currently in the system. This adds
+     * a couple of utility methods to {@link ArrayList}.
+     */
+    public static class CollectionList extends ArrayList<Collection> {
+
+        /**
+         * Retrieves a collection with the given id.
+         *
+         * @param id The id to look for.
+         * @return If a {@link Collection} matching the given name exists,
+         * (according to {@link PathUtils#toFilename(String)}) the
+         * collection. Otherwise null.
+         */
+        public Collection getCollection(String id) {
+            Collection result = null;
+
+            if (StringUtils.isNotBlank(id)) {
+                for (Collection collection : this) {
+                    if (StringUtils.equalsIgnoreCase(collection.getDescription().getId(), id)) {
+                        result = collection;
+                        break;
+                    }
+                }
+            }
+
+            return result;
+        }
+
+        /**
+         * Retrieves a collection with the given name.
+         *
+         * @param name The name to look for.
+         * @return If a {@link Collection} matching the given name exists,
+         * (according to {@link PathUtils#toFilename(String)}) the
+         * collection. Otherwise null.
+         */
+        public Collection getCollectionByName(String name) {
+            Collection result = null;
+
+            if (StringUtils.isNotBlank(name)) {
+
+                String filename = PathUtils.toFilename(name);
+                for (Collection collection : this) {
+                    String collectionFilename = collection.getPath().getFileName()
+                            .toString();
+                    if (StringUtils.equalsIgnoreCase(collectionFilename,
+                            filename)) {
+                        result = collection;
+                        break;
+                    }
+                }
+            }
+
+            return result;
+        }
+
+        /**
+         * Determines whether a collection with the given name exists.
+         *
+         * @param name The name to check for.
+         * @return If {@link #getCollection(String)} returns non-null, true.
+         */
+        public boolean hasCollection(String name) {
+            return getCollectionByName(name) != null;
+        }
+
+        public List<Collection> withApprovalInProgressOrError() {
+            return this.stream()
+                    .filter(c -> c.getDescription().getApprovalStatus() == ApprovalStatus.IN_PROGRESS
+                            || c.getDescription().getApprovalStatus() == ApprovalStatus.ERROR)
+                    .collect(Collectors.toList());
+        }
     }
 
 }

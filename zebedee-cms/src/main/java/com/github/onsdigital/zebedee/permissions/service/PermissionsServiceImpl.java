@@ -23,17 +23,18 @@ import static com.github.onsdigital.zebedee.configuration.Configuration.getUnaut
 
 /**
  * @deprecated this implementation is deprecated and will be removed once the JWT session migration has been completed
- *
+ * <p>
  * // TODO: remove this class once the migration to JWT sessions has been completed
  */
+@SuppressWarnings("ALL")
 @Deprecated
 public class PermissionsServiceImpl implements PermissionsService {
 
-    private PermissionsStore permissionsStore;
-    private ReentrantReadWriteLock readWriteLock = new ReentrantReadWriteLock();
+    private final PermissionsStore permissionsStore;
+    private final ReentrantReadWriteLock readWriteLock = new ReentrantReadWriteLock();
     private final Lock readLock = readWriteLock.readLock();
     private final Lock writeLock = readWriteLock.writeLock();
-    private ServiceSupplier<TeamsService> teamsServiceSupplier;
+    private final ServiceSupplier<TeamsService> teamsServiceSupplier;
 
     /**
      * @param permissionsStore
@@ -150,7 +151,7 @@ public class PermissionsServiceImpl implements PermissionsService {
     /**
      * Removes the specified user from the administrators, revoking administrative permissions (but not content permissions).
      *
-     * @param email The user's email.
+     * @param email   The user's email.
      * @param session the {@link Session} of the user revoking the permission.
      * @throws IOException If a filesystem error occurs.
      */
@@ -283,27 +284,27 @@ public class PermissionsServiceImpl implements PermissionsService {
      * @throws IOException
      * @throws UnauthorizedException
      */
-     @Override
-     public Set<String> listViewerTeams(Session session, String collectionId) throws IOException, UnauthorizedException {
-         if (session == null || !canView(session, collectionId)) {
-             throw new UnauthorizedException(getUnauthorizedMessage(session));
-         }
+    @Override
+    public Set<String> listViewerTeams(Session session, String collectionId) throws IOException, UnauthorizedException {
+        if (session == null || !canView(session, collectionId)) {
+            throw new UnauthorizedException(getUnauthorizedMessage(session));
+        }
 
-         readLock.lock();
-         Set<String> teamIds;
-         try {
-             AccessMapping accessMapping = permissionsStore.getAccessMapping();
-             teamIds = accessMapping.getCollections().get(collectionId);
+        readLock.lock();
+        Set<String> teamIds;
+        try {
+            AccessMapping accessMapping = permissionsStore.getAccessMapping();
+            teamIds = accessMapping.getCollections().get(collectionId);
 
-             if (teamIds == null) {
-                 teamIds = new HashSet<>();
-             }
-         } finally {
-             readLock.unlock();
-         }
+            if (teamIds == null) {
+                teamIds = new HashSet<>();
+            }
+        } finally {
+            readLock.unlock();
+        }
 
-         return java.util.Collections.unmodifiableSet(teamIds);
-     }
+        return java.util.Collections.unmodifiableSet(teamIds);
+    }
 
     /**
      * Set the list of team IDs that are allowed viewer access to a collection
@@ -311,7 +312,7 @@ public class PermissionsServiceImpl implements PermissionsService {
      * @param collectionID    the ID of the collection collection to set viewer permissions for.
      * @param collectionTeams the set of team IDs for which viewer permissions should be granted to the collection.
      * @param session         the session of the user that is attempting to set the viewer permissions.
-     * @throws IOException if reading or writing the access mapping fails.
+     * @throws IOException           if reading or writing the access mapping fails.
      * @throws UnauthorizedException if the users' session isn't authorised to edit collections.
      */
     @Override
@@ -367,7 +368,7 @@ public class PermissionsServiceImpl implements PermissionsService {
      *
      * @param email the user email
      * @return a {@link PermissionDefinition} object
-     * @throws IOException If a filesystem error occurs.
+     * @throws IOException           If a filesystem error occurs.
      * @throws UnauthorizedException If the request is not from an admin or publisher
      */
     @Override

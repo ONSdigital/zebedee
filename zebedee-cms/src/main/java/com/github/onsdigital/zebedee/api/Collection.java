@@ -39,12 +39,12 @@ public class Collection {
 
     static final String COLLECTION_NAME = "collectionName";
 
-    private final Sessions sessionsService;
-    private final PermissionsService permissionsService;
-    private final com.github.onsdigital.zebedee.model.Collections collections;
-    private final UsersService usersService;
-    private final CollectionKeyring collectionKeyring;
-    private final ScheduleCanceller scheduleCanceller;
+    private Sessions sessionsService;
+    private PermissionsService permissionsService;
+    private com.github.onsdigital.zebedee.model.Collections collections;
+    private UsersService usersService;
+    private CollectionKeyring collectionKeyring;
+    private ScheduleCanceller scheduleCanceller;
 
     /**
      * Construct a new instance of the Collection API endpoint.
@@ -132,6 +132,23 @@ public class Collection {
         return result;
     }
 
+    private void requireViewPermission(Session session, String collectionId) throws UnauthorizedException {
+        boolean canView = false;
+        try {
+            canView = permissionsService.canView(session, collectionId);
+        } catch (IOException ex) {
+            throw new UnauthorizedException("You are not authorised to view this collection");
+        }
+
+        if (!canView) {
+            warn().user(session.getEmail())
+                    .collectionID(collectionId)
+                    .log("request unsuccessful user denied view permission");
+
+            throw new UnauthorizedException("You are not authorised to view this collection");
+        }
+    }
+
     /**
      * Creates or updates collection details the endpoint /Collection/
      * <p>
@@ -203,6 +220,22 @@ public class Collection {
                 .log("create collection endpoint: request completed successfully");
 
         return collection.getDescription();
+    }
+
+    private void requireEditPermission(Session session) throws UnauthorizedException {
+        boolean canEdit = false;
+        try {
+            canEdit = permissionsService.canEdit(session);
+        } catch (IOException ex) {
+            throw new UnauthorizedException("You are not authorised to edit collections.");
+        }
+
+        if (!canEdit) {
+            warn().user(session.getEmail())
+                    .log("request unsuccessful user denied edit permission");
+
+            throw new UnauthorizedException("You are not authorised to edit collections.");
+        }
     }
 
     @PUT
@@ -321,39 +354,6 @@ public class Collection {
         } catch (KeyringException ex) {
             String message = format("error attempting to remove collection key from keyring: {0}", c.getId());
             throw new InternalServerError(message, ex);
-        }
-    }
-
-    private void requireViewPermission(Session session, String collectionId) throws UnauthorizedException {
-        boolean canView = false;
-        try {
-            canView = permissionsService.canView(session, collectionId);
-        } catch (IOException ex) {
-            throw new UnauthorizedException("You are not authorised to view this collection");
-        }
-
-        if (!canView) {
-            warn().user(session.getEmail())
-                    .collectionID(collectionId)
-                    .log("request unsuccessful user denied view permission");
-
-            throw new UnauthorizedException("You are not authorised to view this collection");
-        }
-    }
-
-    private void requireEditPermission(Session session) throws UnauthorizedException {
-        boolean canEdit = false;
-        try {
-            canEdit = permissionsService.canEdit(session);
-        } catch (IOException ex) {
-            throw new UnauthorizedException("You are not authorised to edit collections.");
-        }
-
-        if (!canEdit) {
-            warn().user(session.getEmail())
-                    .log("request unsuccessful user denied edit permission");
-
-            throw new UnauthorizedException("You are not authorised to edit collections.");
         }
     }
 

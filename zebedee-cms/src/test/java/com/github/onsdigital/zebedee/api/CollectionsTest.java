@@ -25,25 +25,25 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+@SuppressWarnings("ALL")
 public class CollectionsTest {
 
-    private ZebedeeCmsService mockZebedeeCmsService = mock(ZebedeeCmsService.class);
-    private DatasetService mockDatasetService = mock(DatasetService.class);
-    private ServletInputStream mockServletInputStream = mock(ServletInputStream.class);
+    private final ZebedeeCmsService mockZebedeeCmsService = mock(ZebedeeCmsService.class);
+    private final DatasetService mockDatasetService = mock(DatasetService.class);
+    private final ServletInputStream mockServletInputStream = mock(ServletInputStream.class);
 
-    private com.github.onsdigital.zebedee.model.Collection mockCollection =
+    private final com.github.onsdigital.zebedee.model.Collection mockCollection =
             mock(com.github.onsdigital.zebedee.model.Collection.class);
 
-    private HttpServletRequest request = mock(HttpServletRequest.class);
-    private HttpServletResponse response = mock(HttpServletResponse.class);
-    private Session session = mock(Session.class);
-
+    private final HttpServletRequest request = mock(HttpServletRequest.class);
+    private final HttpServletResponse response = mock(HttpServletResponse.class);
+    private final Session session = mock(Session.class);
+    private final String collectionID = "123";
+    private final String datasetID = "345";
+    private final String edition = "2014";
+    private final String version = "1";
+    private final String user = "test@email.com";
     private Collections collections = new Collections(mockZebedeeCmsService, mockDatasetService, true);
-    private String collectionID = "123";
-    private String datasetID = "345";
-    private String edition = "2014";
-    private String version = "1";
-    private String user = "test@email.com";
 
     @Before
     public void setUp() throws Exception {

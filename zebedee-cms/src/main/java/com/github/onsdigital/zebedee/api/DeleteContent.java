@@ -28,11 +28,12 @@ import static com.github.onsdigital.zebedee.model.DeleteMarker.jsonToMarker;
 /**
  * Mark content to be deleted.
  */
+@SuppressWarnings("ALL")
 @Api
 public class DeleteContent {
 
-    private static ZebedeeCmsService zebedeeCmsService = ZebedeeCmsService.getInstance();
-    private static ContentDeleteService deleteService = ContentDeleteService.getInstance();
+    private static final ZebedeeCmsService zebedeeCmsService = ZebedeeCmsService.getInstance();
+    private static final ContentDeleteService deleteService = ContentDeleteService.getInstance();
 
     @POST
     public DeleteContentResponse createDeleteMarker(HttpServletRequest request, HttpServletResponse response,

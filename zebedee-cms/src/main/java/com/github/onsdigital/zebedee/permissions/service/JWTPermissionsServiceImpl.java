@@ -24,13 +24,14 @@ import static java.text.MessageFormat.format;
  * to implement 'PermissionStore' modules when the jwt is enabled
  * Update Zebedee permissions service to get list of groups for user from JWT session store
  */
+@SuppressWarnings("ALL")
 public class JWTPermissionsServiceImpl implements PermissionsService {
     private static final String PUBLISHER_GROUP = "role-publisher";
     private static final String ADMIN_GROUP = "role-admin";
     private static final String UNSUPPORTED_ERROR = "JWT sessions are enabled: {0} is no longer supported";
 
-    private PermissionsStore permissionsStore;
-    private ReentrantReadWriteLock readWriteLock = new ReentrantReadWriteLock();
+    private final PermissionsStore permissionsStore;
+    private final ReentrantReadWriteLock readWriteLock = new ReentrantReadWriteLock();
     private final Lock readLock = readWriteLock.readLock();
     private final Lock writeLock = readWriteLock.writeLock();
 
@@ -75,9 +76,8 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
      *
      * @return null
      * @throws UnsupportedOperationException if invoked.
-     *
      * @deprecated since this method is only used by the users service that will be removed shortly in favour of the
-     *             dp-identity-api and JWT sessions implementation.
+     * dp-identity-api and JWT sessions implementation.
      */
     @Deprecated
     @Override
@@ -91,9 +91,8 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
      * @param email   the email of the user to permit the permission to.
      * @param session the {@link Session} of the user granting the permission.
      * @throws UnsupportedOperationException if invoked.
-     *
      * @deprecated as the dp-identity-api groups management will supersede this when we complete the migration to JWT
-     *             sessions
+     * sessions
      */
     @Deprecated
     @Override
@@ -107,9 +106,8 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
      * @param email   the email of the user to remove the permission from.
      * @param session the {@link Session} of the user revoking the permission.
      * @throws UnsupportedOperationException if invoked.
-     *
      * @deprecated as the dp-identity-api groups management will supersede this when we complete the migration to JWT
-     *             sessions
+     * sessions
      */
     @Deprecated
     @Override
@@ -140,9 +138,8 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
      * @param email   the email of the user to permit the permission to.
      * @param session the {@link Session} of the user granting the permission.
      * @throws IOException If a filesystem error occurs.
-     *
      * @deprecated as the dp-identity-api groups management will supersede this when we complete the migration to JWT
-     *             sessions
+     * sessions
      */
     @Deprecated
     @Override
@@ -156,9 +153,8 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
      *
      * @param email   the email of the user to revoke the permission from.
      * @param session the {@link Session} of the user revoking the permission.
-     *
      * @deprecated as the dp-identity-api groups management will supersede this when we complete the migration to JWT
-     *             sessions
+     * sessions
      */
     @Deprecated
     @Override
@@ -213,14 +209,13 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
     /**
      * Returns a {@link List} of IDs of teams that have viewer permissions on the specified collection.
      *
-     * @param collectionId          the ID of the collection to get the viewer teams for.
-     * @param session               the {@link Session} of the user requesting this information.
+     * @param collectionId the ID of the collection to get the viewer teams for.
+     * @param session      the {@link Session} of the user requesting this information.
      * @return Returns a {@link List} of IDs of teams that have viewer permissions on the specified collection.
      * @throws IOException           unexpected error while checking permissions.
      * @throws UnauthorizedException unexpected error while checking permissions.
-     *
      * @deprecated as the dp-permissions-api policy management will supersede this when we complete the authorisation
-     *             migration
+     * migration
      */
     @Deprecated
     @Override
@@ -251,11 +246,10 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
      * @param collectionId    the ID of the collection collection to set viewer permissions for.
      * @param collectionTeams the set of team IDs for which viewer permissions should be granted to the collection.
      * @param session         the session of the user that is attempting to set the viewer permissions.
-     * @throws IOException if reading or writing the access mapping fails.
+     * @throws IOException           if reading or writing the access mapping fails.
      * @throws UnauthorizedException if the users' session isn't authorised to edit collections.
-     *
      * @deprecated this is deprecated in favour of the dp-permissions-api and will be removed once full migration to
-     *             the new API is complete.
+     * the new API is complete.
      */
     @Deprecated
     @Override
@@ -285,10 +279,9 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
      * @param session the {@link Session} of the user requesting the {@link PermissionDefinition}.
      * @return null
      * @throws UnsupportedOperationException if invoked.
-     *
      * @deprecated This method is deprecated by the migration to using JWT sessions. In order to query the permissions
-     *             under this new implemention, the user's group membership should be queried fromt he dp-identity-api
-     *             instead.
+     * under this new implemention, the user's group membership should be queried fromt he dp-identity-api
+     * instead.
      */
     @Deprecated
     @Override
@@ -312,8 +305,8 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
     }
 
     /**
-     * @param session  the {@link Session} to check
-     * @param group    the group to check membership of
+     * @param session the {@link Session} to check
+     * @param group   the group to check membership of
      * @return <code>true</code> if the user is a member of the group, <code>false</code> otherwise.
      */
     private boolean isGroupMember(Session session, String group) {

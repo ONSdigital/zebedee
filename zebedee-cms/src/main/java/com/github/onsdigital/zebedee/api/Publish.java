@@ -17,10 +17,11 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.POST;
 import java.io.IOException;
 
+@SuppressWarnings("ALL")
 @Api
 public class Publish {
 
-    private ZebedeeCmsService zebedeeCmsService;
+    private final ZebedeeCmsService zebedeeCmsService;
 
     public Publish() {
         zebedeeCmsService = ZebedeeCmsService.getInstance();

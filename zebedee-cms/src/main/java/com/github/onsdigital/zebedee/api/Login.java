@@ -24,8 +24,9 @@ import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFea
  * API for processing login requests.
  *
  * @deprecated The zebedee session based login is deprecated in favour of the new JWT login using the dp-identity-api
- *             and will be removed after migration to the new auth services.
+ * and will be removed after migration to the new auth services.
  */
+@SuppressWarnings("ALL")
 @Deprecated
 @Api
 public class Login {
@@ -34,7 +35,7 @@ public class Login {
      * Wrap static method calls to obtain service in function makes testing easier - class member can be
      * replaced with a mocked giving control of desired behaviour.
      */
-    private ServiceSupplier<UsersService> usersServiceSupplier = () -> Root.zebedee.getUsersService();
+    private final ServiceSupplier<UsersService> usersServiceSupplier = () -> Root.zebedee.getUsersService();
 
     /**
      * Authenticates with Zebedee.

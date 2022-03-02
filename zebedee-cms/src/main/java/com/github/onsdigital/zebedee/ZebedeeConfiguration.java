@@ -73,9 +73,28 @@ import java.util.List;
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.warn;
-import static com.github.onsdigital.zebedee.Zebedee.*;
+import static com.github.onsdigital.zebedee.Zebedee.COLLECTIONS;
+import static com.github.onsdigital.zebedee.Zebedee.KEYRING;
+import static com.github.onsdigital.zebedee.Zebedee.PERMISSIONS;
+import static com.github.onsdigital.zebedee.Zebedee.PUBLISHED;
+import static com.github.onsdigital.zebedee.Zebedee.PUBLISHED_COLLECTIONS;
+import static com.github.onsdigital.zebedee.Zebedee.SERVICES;
+import static com.github.onsdigital.zebedee.Zebedee.SESSIONS;
+import static com.github.onsdigital.zebedee.Zebedee.TEAMS;
+import static com.github.onsdigital.zebedee.Zebedee.USERS;
+import static com.github.onsdigital.zebedee.Zebedee.ZEBEDEE;
 import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
-import static com.github.onsdigital.zebedee.configuration.Configuration.*;
+import static com.github.onsdigital.zebedee.configuration.Configuration.getCognitoKeyIdPairs;
+import static com.github.onsdigital.zebedee.configuration.Configuration.getDatasetAPIAuthToken;
+import static com.github.onsdigital.zebedee.configuration.Configuration.getDatasetAPIURL;
+import static com.github.onsdigital.zebedee.configuration.Configuration.getImageAPIURL;
+import static com.github.onsdigital.zebedee.configuration.Configuration.getKafkaContentPublishedTopic;
+import static com.github.onsdigital.zebedee.configuration.Configuration.getKafkaURL;
+import static com.github.onsdigital.zebedee.configuration.Configuration.getKeyringInitVector;
+import static com.github.onsdigital.zebedee.configuration.Configuration.getKeyringSecretKey;
+import static com.github.onsdigital.zebedee.configuration.Configuration.getServiceAuthToken;
+import static com.github.onsdigital.zebedee.configuration.Configuration.getSlackSupportChannelID;
+import static com.github.onsdigital.zebedee.configuration.Configuration.slackChannelsToNotfiyOnStartUp;
 import static com.github.onsdigital.zebedee.permissions.store.PermissionsStoreFileSystemImpl.initialisePermissions;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
@@ -84,34 +103,34 @@ import static org.apache.commons.lang3.StringUtils.isEmpty;
  * directories required by zebedee, create the service instances it requires etc.
  */
 public class ZebedeeConfiguration {
-    private final Path rootPath;
-    private final Path zebedeePath;
-    private final Path publishedContentPath;
-    private final Path publishedCollectionsPath;
-    private final Path collectionsPath;
-    private final Path usersPath;
-    private final Path sessionsPath;
-    private final Path permissionsPath;
-    private final Path teamsPath;
-    private final Path redirectPath;
-    private final Path servicePath;
-    private final Path keyRingPath;
-    private final boolean useVerificationAgent;
-    private final PublishedCollections publishedCollections;
-    private final Collections collections;
-    private final Content published;
-    private final PermissionsService permissionsService;
-    private final UsersService usersService;
-    private final TeamsService teamsService;
-    private final Sessions sessions;
-    private final DataIndex dataIndex;
-    private final PermissionsStore permissionsStore;
-    private final DatasetService datasetService;
-    private final ImageService imageService;
-    private final KafkaService kafkaService;
+    private Path rootPath;
+    private Path zebedeePath;
+    private Path publishedContentPath;
+    private Path publishedCollectionsPath;
+    private Path collectionsPath;
+    private Path usersPath;
+    private Path sessionsPath;
+    private Path permissionsPath;
+    private Path teamsPath;
+    private Path redirectPath;
+    private Path servicePath;
+    private Path keyRingPath;
+    private boolean useVerificationAgent;
+    private PublishedCollections publishedCollections;
+    private Collections collections;
+    private Content published;
+    private PermissionsService permissionsService;
+    private UsersService usersService;
+    private TeamsService teamsService;
+    private Sessions sessions;
+    private DataIndex dataIndex;
+    private PermissionsStore permissionsStore;
+    private DatasetService datasetService;
+    private ImageService imageService;
+    private KafkaService kafkaService;
     private CollectionKeyring collectionKeyring;
     private CollectionKeyCache schedulerKeyCache;
-    private final EncryptionKeyFactory encryptionKeyFactory;
+    private EncryptionKeyFactory encryptionKeyFactory;
     private StartUpNotifier startUpNotifier;
     private SlackClient slackClient;
     private Notifier slackNotifier;
@@ -239,6 +258,40 @@ public class ZebedeeConfiguration {
                 .log("zebedee configuration creation complete");
     }
 
+    private Path createDir(Path root, String dirName) throws IOException {
+        Path dir = root.resolve(dirName);
+        if (!Files.exists(dir)) {
+            info().data("path", dirName).log("creating required Zebedee directory as it does not exist.");
+            Files.createDirectory(dir);
+        }
+        return dir;
+    }
+
+    public PermissionsService getPermissionsService() {
+        return this.permissionsService;
+    }
+
+    private Content createPublished() {
+        Content content = new Content(publishedContentPath);
+        Path redirectPath = publishedContentPath.resolve(Content.REDIRECT);
+        if (!Files.exists(redirectPath)) {
+            content.setRedirects(new RedirectTablePartialMatch(content));
+            try {
+                Files.createFile(redirectPath);
+            } catch (IOException e) {
+                error().data("requestedPath", redirectPath.toString())
+                        .logException(e, "could not save redirect to requested path");
+            }
+        } else {
+            content.setRedirects(new RedirectTablePartialMatch(content, redirectPath));
+        }
+        return content;
+    }
+
+    public TeamsService getTeamsService() {
+        return this.teamsService;
+    }
+
     private void initCollectionKeyring() throws KeyringException {
         CollectionKeyStore keyStore = new CollectionKeyStoreImpl(
                 getKeyRingPath(), getKeyringSecretKey(), getKeyringInitVector());
@@ -297,8 +350,8 @@ public class ZebedeeConfiguration {
         }
     }
 
-    public boolean isUseVerificationAgent() {
-        return useVerificationAgent;
+    public Path getKeyRingPath() {
+        return keyRingPath;
     }
 
     public Path getZebedeePath() {
@@ -337,33 +390,12 @@ public class ZebedeeConfiguration {
         return redirectPath;
     }
 
-    public Path getKeyRingPath() {
-        return keyRingPath;
-    }
-
     public Path getServicePath() {
         return servicePath;
     }
 
     public Content getPublished() {
         return this.published;
-    }
-
-    private Content createPublished() {
-        Content content = new Content(publishedContentPath);
-        Path redirectPath = publishedContentPath.resolve(Content.REDIRECT);
-        if (!Files.exists(redirectPath)) {
-            content.setRedirects(new RedirectTablePartialMatch(content));
-            try {
-                Files.createFile(redirectPath);
-            } catch (IOException e) {
-                error().data("requestedPath", redirectPath.toString())
-                        .logException(e, "could not save redirect to requested path");
-            }
-        } else {
-            content.setRedirects(new RedirectTablePartialMatch(content, redirectPath));
-        }
-        return content;
     }
 
     public DataIndex getDataIndex() {
@@ -382,20 +414,16 @@ public class ZebedeeConfiguration {
         return this.sessions;
     }
 
-    public PermissionsService getPermissionsService() {
-        return this.permissionsService;
-    }
-
-    public TeamsService getTeamsService() {
-        return this.teamsService;
-    }
-
     public UsersService getUsersService() {
         return this.usersService;
     }
 
     public VerificationAgent getVerificationAgent(boolean verificationIsEnabled, Zebedee z) {
         return isUseVerificationAgent() && verificationIsEnabled ? new VerificationAgent(z) : null;
+    }
+
+    public boolean isUseVerificationAgent() {
+        return useVerificationAgent;
     }
 
     public DatasetService getDatasetService() {
@@ -424,15 +452,6 @@ public class ZebedeeConfiguration {
 
     public CollectionKeyCache getSchedulerKeyringCache() {
         return this.schedulerKeyCache;
-    }
-
-    private Path createDir(Path root, String dirName) throws IOException {
-        Path dir = root.resolve(dirName);
-        if (!Files.exists(dir)) {
-            info().data("path", dirName).log("creating required Zebedee directory as it does not exist.");
-            Files.createDirectory(dir);
-        }
-        return dir;
     }
 
     public StartUpNotifier getStartUpNotifier() {

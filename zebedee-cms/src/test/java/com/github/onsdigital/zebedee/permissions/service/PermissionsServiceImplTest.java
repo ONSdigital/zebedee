@@ -30,13 +30,14 @@ import static org.mockito.Mockito.when;
 /**
  * Created by dave on 31/05/2017.
  */
+@SuppressWarnings("ALL")
 public class PermissionsServiceImplTest {
 
     private static final String EMAIL = "admin@ons.gov.uk";
     private static final String COLLECTION_ID = "123";
 
-    private Set<String> digitalPublishingTeam = new HashSet<>();
-    private Set<String> admins = new HashSet<>();
+    private final Set<String> digitalPublishingTeam = new HashSet<>();
+    private final Set<String> admins = new HashSet<>();
 
     /**
      * Class under test

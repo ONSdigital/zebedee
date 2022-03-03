@@ -465,12 +465,11 @@ public class Collection {
                 InputStream dataStream = resource.getData()
         ) {
             Release release = (Release) ContentUtil.deserialiseContent(dataStream);
-            info().data("collectionId", this.getDescription().getId()).data("title", release.getDescription().getTitle())
-                    .log("Release identified for collection");
-
             if (release == null) {
                 throw new BadRequestException("This collection is not associated with a release.");
             }
+            info().data("collectionId", this.getDescription().getId()).data("title", release.getDescription().getTitle())
+                    .log("Release identified for collection");
 
             release = ReleasePopulator.populate(release, collectionContent);
             collectionWriter.getReviewed().writeObject(release, uri);

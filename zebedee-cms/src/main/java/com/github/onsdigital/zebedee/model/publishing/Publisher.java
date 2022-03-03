@@ -804,7 +804,7 @@ public class Publisher {
                 .log("traceId before sending event");
 
         try {
-            kafkaServiceSupplier.getService().produceContentPublished(collection.getId(), uris, dataType, traceId);
+            kafkaServiceSupplier.getService().produceContentPublished(collection.getId(), uris, dataType, "", "ONS", traceId);
         } catch (Exception e) {
             error()
                     .data("collectionId", collection.getDescription().getId())

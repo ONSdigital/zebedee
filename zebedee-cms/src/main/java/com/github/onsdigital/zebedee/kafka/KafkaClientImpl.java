@@ -55,8 +55,8 @@ public class KafkaClientImpl implements KafkaClient {
      * Produce a content-published kafka message and return a future for that message result
      */
     @Override
-    public Future<RecordMetadata> produceContentPublished(String uri, String dataType, String collectionID, String traceID) {
-        ContentPublished value = new ContentPublished(uri,dataType,collectionID, traceID);
+    public Future<RecordMetadata> produceContentPublished(String uri, String dataType, String collectionID, String jobId, String searchIndex,String traceID) {
+        ContentPublished value = new ContentPublished(uri,dataType,collectionID,jobId,searchIndex,traceID);
         return producer.send(new ProducerRecord<>(topic,value));
     }
 

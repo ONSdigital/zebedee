@@ -16,7 +16,6 @@ import com.github.onsdigital.zebedee.logging.CMSLogEvent;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.CollectionWriter;
 import com.github.onsdigital.zebedee.model.approval.tasks.CollectionPdfGenerator;
-import com.github.onsdigital.zebedee.model.approval.tasks.ReleasePopulator;
 import com.github.onsdigital.zebedee.model.approval.tasks.timeseries.TimeSeriesCompressionTask;
 import com.github.onsdigital.zebedee.model.content.CompoundContentReader;
 import com.github.onsdigital.zebedee.model.publishing.PublishNotification;

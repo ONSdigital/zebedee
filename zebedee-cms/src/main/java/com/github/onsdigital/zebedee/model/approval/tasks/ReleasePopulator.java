@@ -4,15 +4,11 @@ import com.github.onsdigital.zebedee.content.page.release.Release;
 import com.github.onsdigital.zebedee.content.partial.Link;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.ContentDetail;
-import com.github.onsdigital.zebedee.model.Collection;
-import com.github.onsdigital.zebedee.model.CollectionWriter;
-import com.github.onsdigital.zebedee.reader.CollectionReader;
 
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 
-import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 
 public class ReleasePopulator {

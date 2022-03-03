@@ -20,7 +20,7 @@ public class KafkaServiceImpl implements KafkaService {
     }
 
     @Override
-    public void produceContentPublished(String collectionId, List<String> uris, String dataType, String jobID, String searchIndex,String traceId) throws IOException {
+    public void produceContentPublished(String collectionId, List<String> uris, String dataType, String jobID, String searchIndex, String traceId) throws IOException {
         info().collectionID(collectionId)
                 .data("uris", uris)
                 .data("DataType", dataType)

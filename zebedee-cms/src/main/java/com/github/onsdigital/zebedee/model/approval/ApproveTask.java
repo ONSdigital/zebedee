@@ -290,7 +290,7 @@ public class ApproveTask implements Callable<Boolean> {
 
     public void populateReleasePage(Iterable<ContentDetail> collectionContent) throws IOException {
         // If the collection is associated with a release then populate the release page.
-        ReleasePopulator.populateQuietly(collection, collectionReader, collectionWriter, collectionContent);
+        collection.populateReleaseQuietly(collectionReader, collectionWriter, collectionContent);
     }
 
     public void generatePdfFiles(List<ContentDetail> collectionContent) throws ZebedeeException {

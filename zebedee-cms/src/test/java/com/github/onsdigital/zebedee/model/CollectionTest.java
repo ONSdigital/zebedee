@@ -1288,8 +1288,8 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         assertEquals(URI.create(uri), result.getUri());
     }
 
-    @Test(expected = BadRequestException.class)
-    public void populateReleaseShouldThrowExceptionWhenCollectionNotAssociatedToRelease() throws ZebedeeException, IOException {
+    @Test
+    public void populateReleaseQuietlyShouldReturnNullWhenCollectionNotAssociatedToRelease() throws ZebedeeException, IOException {
         // Given a collection that is NOT associated with a release
         String releaseUri = "";
         collection.getDescription().setReleaseUri(releaseUri);
@@ -1302,14 +1302,17 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
                 collection.getDescription().getId());
         Iterable<ContentDetail> collectionContent = Collections.emptyList();
 
-        collection.populateRelease(
+        Release result = collection.populateReleaseQuietly(
                 collectionReader,
                 collectionWriter,
                 collectionContent);
+
+        // Then the returned release object is null
+        assertNull(result);
     }
 
-    @Test(expected = BadRequestException.class)
-    public void populateReleaseShouldThrowExceptionWhenReleaseJsonInvalid() throws ZebedeeException, IOException {
+    @Test
+    public void populateReleaseQuietlyShouldReturnNullWhenReleaseJsonInvalid() throws ZebedeeException, IOException {
         // Given a collection that is associated with a release and has an article
         String uri = String.format("/releases/%s", Random.id());
         Release release = createRelease(uri, new DateTime().plusWeeks(4).toDate());
@@ -1338,14 +1341,17 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         Iterable<ContentDetail> collectionContent = ContentDetailUtil.resolveDetails(collection.getReviewed(),
                 collectionReader.getReviewed());
 
-        collection.populateRelease(
+        Release result = collection.populateReleaseQuietly(
                 collectionReader,
                 collectionWriter,
                 collectionContent);
+
+        // Then the returned release object is null
+        assertNull(result);
     }
 
     @Test
-    public void populateReleaseShouldAddLinksToReleasePageForCollectionContent() throws ZebedeeException, IOException {
+    public void populateReleaseQuietlyShouldAddLinksToReleasePageForCollectionContent() throws ZebedeeException, IOException {
         // Given a collection that is associated with a release and has an article
         String uri = String.format("/releases/%s", Random.id());
         Release release = createRelease(uri, new DateTime().plusWeeks(4).toDate());
@@ -1376,7 +1382,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         Iterable<ContentDetail> collectionContent = ContentDetailUtil.resolveDetails(collection.getReviewed(),
                 collectionReader.getReviewed());
 
-        Release result = collection.populateRelease(
+        Release result = collection.populateReleaseQuietly(
                 collectionReader,
                 collectionWriter,
                 collectionContent);

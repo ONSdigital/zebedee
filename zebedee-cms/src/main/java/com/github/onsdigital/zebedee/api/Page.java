@@ -139,7 +139,7 @@ public class Page {
         try {
             session = zebedeeCmsService.getSession();
         } catch (ZebedeeException e) {
-            error().data("path", uri).logException(e, "page get endpoint: failed to get session");
+            error().data("path", uri).logException(e, "page create endpoint: failed to get session");
             response.setStatus(e.statusCode);
             return null;
         }
@@ -149,7 +149,7 @@ public class Page {
             collection = zebedeeCmsService.getCollection(request);
         } catch (ZebedeeException e) {
             error().data("user", session.getEmail()).data("path", uri)
-                    .logException(e, "page get endpoint: failed to get collection");
+                    .logException(e, "page create endpoint: failed to get collection");
             response.setStatus(e.statusCode);
             return null;
         }
@@ -161,7 +161,7 @@ public class Page {
             requestBodyBytes = IOUtils.toByteArray(requestBody);
         } catch (Exception e) {
             response.setStatus(HttpStatus.SC_BAD_REQUEST);
-            error().logException(e, "page get endpoint: failed to deserialise page from the request body");
+            error().logException(e, "page create endpoint: failed to deserialise page from the request body");
             return null;
         }
 
@@ -169,7 +169,7 @@ public class Page {
             page = ContentUtil.deserialiseContent(pageInputStream);
         } catch (Exception e) {
             response.setStatus(HttpStatus.SC_BAD_REQUEST);
-            error().logException(e, "page get endpoint: failed to deserialise page from the request body");
+            error().logException(e, "page create endpoint: failed to deserialise page from the request body");
             return null;
         }
 
@@ -196,7 +196,7 @@ public class Page {
             error().data("collection_id", collection.getDescription().getId())
                     .data("user", session.getEmail())
                     .data("path", uri)
-                    .logException(e, "page get endpoint: exception when calling collections.createContent");
+                    .logException(e, "page create endpoint: exception when calling collections.createContent");
             response.setStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR);
         }
 

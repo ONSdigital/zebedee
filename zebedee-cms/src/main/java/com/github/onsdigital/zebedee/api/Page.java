@@ -337,7 +337,7 @@ public class Page {
                                      Collection collection, Session session) {
         info().data("path", uri).data("collection_id", collection.getDescription().getId()).data("user",
                 session.getEmail())
-                .log("page delete endpoint: executing PageCreationHook");
+                .log("page create endpoint: executing PageCreationHook");
         try {
             pageCreationHook.get().onPageUpdated(page, uri);
             return true;
@@ -345,7 +345,7 @@ public class Page {
             error().data("collection_id", collection.getDescription().getId())
                     .data("user", session.getEmail())
                     .data("path", uri)
-                    .logException(e, "page delete endpoint: exception when calling page creation hook");
+                    .logException(e, "page create endpoint: exception when calling page creation hook");
             return false;
         }
     }

@@ -43,7 +43,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
@@ -69,14 +71,13 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 /**
  * Created by dave on 19/05/2017.
  */
 public class CollectionsTest {
-
-    private static final String COLLECTION_FILE_NAME = "{0}-{1}.json";
     private static final String TEST_EMAIL = "TEST@ons.gov.uk";
     private static final String COLLECTION_ID = "123";
 
@@ -540,7 +541,7 @@ public class CollectionsTest {
 
     @Test(expected = ConflictException.class)
     public void shouldNotApproveIfAUriIsInProgress() throws IOException, ZebedeeException {
-        List<String> inProgressURIS = new ArrayList();
+        List<String> inProgressURIS = new ArrayList<>();
         inProgressURIS.add("data.json");
 
         CollectionDescription description = mock(CollectionDescription.class);
@@ -571,7 +572,7 @@ public class CollectionsTest {
 
     @Test(expected = ConflictException.class)
     public void shouldNotApproveIfAUriIsComplete() throws IOException, ZebedeeException {
-        List<String> completeURIS = new ArrayList();
+        List<String> completeURIS = new ArrayList<>();
         completeURIS.add("data.json");
 
         CollectionDescription description = mock(CollectionDescription.class);
@@ -992,6 +993,9 @@ public class CollectionsTest {
         verify(collectionMock, times(1)).deleteContentDirectory(TEST_EMAIL, uri.toString());
         verify(collectionMock, never()).deleteFile(uri.toString());
         verify(collectionMock, times(1)).save();
+        verify(collectionMock, never()).deleteDataVisContent(sessionMock, uri);
+        verify(collectionMock, never()).deleteFileAndRelated(uri.toString());
+        verify(collectionMock, never()).deleteFile(uri.toString());
     }
 
     @Test(expected = ConflictException.class)
@@ -1063,12 +1067,7 @@ public class CollectionsTest {
         List<String> orphans = collections.listOrphaned();
 
         assertThat("incorrect number of orphans returned", orphans.size(), equalTo(2));
-        assertThat("incorrect number of orphans returned", orphans, equalTo(
-                new ArrayList() {{
-                    add("c2");
-                    add("c3");
-                }})
-        );
+        assertThat("incorrect number of orphans returned", orphans, equalTo(Arrays.asList("c2","c3")));
     }
 
     @Test
@@ -1097,6 +1096,10 @@ public class CollectionsTest {
 
         assertTrue(deleteSuccessful);
         assertThat(collectionsPath.resolve("abc/inprogress").toFile().list().length, equalTo(0));
+        verify(collectionMock, times(1)).save();
+        verify(collectionMock, never()).deleteContentDirectory(any(), eq(filePath.toString()));
+        verify(collectionMock, never()).deleteFileAndRelated(filePath.toString());
+        verify(collectionMock, never()).deleteFile(filePath.toString());
     }
 
     @Test
@@ -1124,6 +1127,67 @@ public class CollectionsTest {
 
         assertTrue(deleteSuccessful);
         assertThat(collectionsPath.resolve("col1/inprogress").toFile().list().length, equalTo(0));
+        verify(collectionMock, times(1)).save();
+        verify(collectionMock, never()).deleteDataVisContent(sessionMock, uri);
+        verify(collectionMock, never()).deleteContentDirectory(any(), eq(uri.toString()));
+        verify(collectionMock, never()).deleteFile(uri.toString());
+    }
+
+    @Test
+    public void shouldDeleteSingleNonJsonFile() throws IOException, ZebedeeException {
+        // populate the collection with some content.
+        Path inprogress = collectionsPath.resolve("col1/inprogress/aboutus");
+        assertTrue(inprogress.toFile().mkdirs());
+
+        Path uri = inprogress.resolve("nondatajson");
+        assertTrue(uri.toFile().createNewFile());
+
+        when(permissionsServiceMock.canEdit(sessionMock))
+                .thenReturn(true);
+
+        when(collectionMock.find(uri.toString()))
+                .thenReturn(collectionsPath.resolve(uri));
+
+        when(collectionMock.isInCollection(uri.toString()))
+                .thenReturn(true);
+
+        when(collectionMock.deleteFile(uri.toString()))
+                .thenAnswer(i -> Files.deleteIfExists(uri));
+
+        boolean deleteSuccessful = collections.deleteContent(collectionMock, uri.toString(), sessionMock);
+
+        assertTrue(deleteSuccessful);
+        assertThat(collectionsPath.resolve("col1/inprogress").toFile().list().length, equalTo(0));
+        verify(collectionMock, times(1)).save();
+        verify(collectionMock, never()).deleteDataVisContent(sessionMock, uri);
+        verify(collectionMock, never()).deleteContentDirectory(any(), eq(uri.toString()));
+        verify(collectionMock, never()).deleteFileAndRelated(uri.toString());
+    }
+
+    @Test
+    public void shouldDeleteHomePage() throws IOException, ZebedeeException {
+        String uri = "/data.json";
+        Path path = Paths.get(uri);
+
+        when(permissionsServiceMock.canEdit(sessionMock))
+                .thenReturn(true);
+
+        when(collectionMock.find(uri.toString()))
+                .thenReturn(path);
+
+        when(collectionMock.isInCollection(uri))
+                .thenReturn(true);
+
+        when(collectionMock.deleteFile(uri))
+                .thenReturn(true);
+
+        boolean deleteSuccessful = collections.deleteContent(collectionMock, uri.toString(), sessionMock);
+
+        assertTrue(deleteSuccessful);
+        verify(collectionMock, times(1)).save();
+        verify(collectionMock, never()).deleteDataVisContent(sessionMock, path);
+        verify(collectionMock, never()).deleteContentDirectory(any(), eq(uri));
+        verify(collectionMock, never()).deleteFileAndRelated(uri);
     }
 
     @Test

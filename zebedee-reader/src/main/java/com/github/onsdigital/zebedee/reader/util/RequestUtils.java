@@ -8,20 +8,24 @@ import com.github.onsdigital.zebedee.reader.api.ReadRequestHandler;
 import com.github.onsdigital.zebedee.util.URIUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.Optional;
+import javax.servlet.http.HttpServletRequest;
 
 import static com.github.onsdigital.zebedee.reader.util.ReaderRequestUtils.getRequestedLanguage;
 
 /**
  * Common functions for reading application data from Http request objects.
  */
-public class RequestUtils {
+public final class RequestUtils {
 
     public static final String BEARER_PREFIX = "Bearer ";
     public static final String AUTH_HEADER = "Authorization";
     public static final String FLORENCE_TOKEN_HEADER = "X-Florence-Token";
+
+    private RequestUtils() {
+        throw new IllegalStateException("Instantiation of a utility class is not allowed");
+    }
 
     /**
      * Get the zebedee session id from the given HttpServletRequest.
@@ -34,17 +38,18 @@ public class RequestUtils {
         if (request == null) {
             return null;
         }
+
         // TODO: Simplify after migration from X-Florence-Token to Authorization header is complete
-        String sessionId = request.getHeader(FLORENCE_TOKEN_HEADER);
+        String florenceHeader = request.getHeader(FLORENCE_TOKEN_HEADER);
         String authHeader = request.getHeader(AUTH_HEADER);
+        String sessionId = null;
         // If the Authorization header contains a '.' then it is a JWT session token rather than a service token
-        if (StringUtils.isBlank(sessionId) && authHeader != null && authHeader.contains(".")) {
+        if (StringUtils.isNotBlank(authHeader) && authHeader.contains(".")) {
             sessionId = removeBearerPrefixIfPresent(authHeader);
+        } else if (StringUtils.isNotBlank(florenceHeader)) {
+            sessionId = removeBearerPrefixIfPresent(florenceHeader);
         }
 
-        if (StringUtils.isBlank(sessionId)) {
-            sessionId = null;
-        }
         return sessionId;
     }
 

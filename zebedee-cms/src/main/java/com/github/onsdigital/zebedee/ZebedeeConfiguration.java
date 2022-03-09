@@ -1,9 +1,9 @@
 package com.github.onsdigital.zebedee;
 
-import com.github.onsdigital.JWTHandlerImpl;
+import com.github.onsdigital.JWTVerifier;
+import com.github.onsdigital.JWTVerifierImpl;
 import com.github.onsdigital.dp.image.api.client.ImageAPIClient;
 import com.github.onsdigital.dp.image.api.client.ImageClient;
-import com.github.onsdigital.interfaces.JWTHandler;
 import com.github.onsdigital.slack.Profile;
 import com.github.onsdigital.slack.client.SlackClient;
 import com.github.onsdigital.slack.client.SlackClientImpl;
@@ -66,7 +66,6 @@ import com.github.onsdigital.zebedee.verification.VerificationAgent;
 import dp.api.dataset.DatasetAPIClient;
 import dp.api.dataset.DatasetClient;
 
-import javax.ws.rs.HEAD;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
@@ -306,7 +305,7 @@ public class ZebedeeConfiguration {
     /**
      * Initialise the permissions service.
      *
-     * @param zebedeePath the zebedee base directory (i.e. `$zebedee_root/zebedee`)
+     * @param zebedeePath  the zebedee base directory (i.e. `$zebedee_root/zebedee`)
      * @param teamsService the {@link TeamsService}
      * @throws IOException If a filesystem error occurs.
      */
@@ -328,7 +327,7 @@ public class ZebedeeConfiguration {
     /**
      * Initialise the users service.
      *
-     * @param zebedeePath the zebedee base directory (i.e. `$zebedee_root/zebedee`)
+     * @param zebedeePath        the zebedee base directory (i.e. `$zebedee_root/zebedee`)
      * @param permissionsService the {@link PermissionsService}
      * @throws IOException If a filesystem error occurs.
      *
@@ -351,15 +350,15 @@ public class ZebedeeConfiguration {
     /**
      * Initialise the sessions service.
      *
-     * @param zebedeePath the zebedee base directory (i.e. `$zebedee_root/zebedee`)
+     * @param zebedeePath       the zebedee base directory (i.e. `$zebedee_root/zebedee`)
      * @param cognitoKeyIdPairs the cognito public signing keys
      * @throws IOException If a filesystem error occurs.
      */
     private void initSessionsService(Path zebedeePath, Map<String, String> cognitoKeyIdPairs) throws IOException {
         Path sessionsPath = createDir(zebedeePath, SESSIONS);
         if (cmsFeatureFlags().isJwtSessionsEnabled()) {
-            JWTHandler jwtHandler = new JWTHandlerImpl();
-            this.sessions = new JWTSessionsServiceImpl(jwtHandler, getCognitoKeyIdPairs());
+            JWTVerifier jwtVerifier = new JWTVerifierImpl(getCognitoKeyIdPairs());
+            this.sessions = new JWTSessionsServiceImpl(jwtVerifier);
             info().log("JWT sessions service initialised");
         } else {
             LegacySessionsStore legacySessionsStore = new LegacySessionsStoreImpl(sessionsPath);
@@ -423,7 +422,7 @@ public class ZebedeeConfiguration {
     /**
      * Initialise the collection content services.
      *
-     * @param zebedeePath the zebedee base directory (i.e. `$zebedee_root/zebedee`)
+     * @param zebedeePath        the zebedee base directory (i.e. `$zebedee_root/zebedee`)
      * @param permissionsService the {@link PermissionsService}
      * @throws IOException If a filesystem error occurs.
      */

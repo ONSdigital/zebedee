@@ -23,6 +23,8 @@ public class KafkaServiceImplTest {
     private static final String URI3 = "/oink";
     private static final String TEST_DATATYPE = "testDataType";
     private static final String TEST_TRACE_ID = "10110011100010000";
+    private static final String TEST_JOBID = "";
+    private static final String TEST_SEARCHINDEX = "testONS";
 
     KafkaClient mockKafkaClient = mock(KafkaClient.class);
 
@@ -31,7 +33,7 @@ public class KafkaServiceImplTest {
     public void setup() throws Exception {
         Future<RecordMetadata> mockFuture = mock(Future.class);
         when(mockFuture.get()).thenReturn(new RecordMetadata(null, 0, 0, 0, null, 0, 0));
-        when(mockKafkaClient.produceContentPublished(anyString(), anyString(), anyString(), anyString()))
+        when(mockKafkaClient.produceContentPublished(anyString(), anyString(), anyString(), anyString(), anyString(), anyString()))
                 .thenReturn(mockFuture);
     }
 
@@ -43,14 +45,16 @@ public class KafkaServiceImplTest {
         List<String> uris = Arrays.asList(URI1,URI2,URI3);
 
         // When publish is called on the collection
-        kafkaService.produceContentPublished(COLLECTION_ID,uris, TEST_DATATYPE, TEST_TRACE_ID);
+        kafkaService.produceContentPublished(COLLECTION_ID,uris, TEST_DATATYPE, TEST_JOBID, TEST_SEARCHINDEX, TEST_TRACE_ID);
 
         // Then publishImage should be called on the API for each image.
         ArgumentCaptor<String> uriCaptor = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<String> dataTypeCaptor = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<String> colIdCaptor = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<String> jobIdCapture = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<String> searchIndexCapture = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<String> traceIdCaptor = ArgumentCaptor.forClass(String.class);
-        verify(mockKafkaClient, times(3)).produceContentPublished(uriCaptor.capture(), dataTypeCaptor.capture(), colIdCaptor.capture(), traceIdCaptor.capture());
+        verify(mockKafkaClient, times(3)).produceContentPublished(uriCaptor.capture(), dataTypeCaptor.capture(), colIdCaptor.capture(), jobIdCapture.capture(), searchIndexCapture.capture(), traceIdCaptor.capture());
 
         Set<String> urisCalled = new HashSet<>(uriCaptor.getAllValues());
 
@@ -75,22 +79,22 @@ public class KafkaServiceImplTest {
         List<String> uris = new ArrayList<>();
 
         // When publish is called on the collection
-        kafkaService.produceContentPublished(COLLECTION_ID,uris, TEST_DATATYPE, TEST_TRACE_ID);
+        kafkaService.produceContentPublished(COLLECTION_ID,uris, TEST_DATATYPE, TEST_JOBID, TEST_SEARCHINDEX, TEST_TRACE_ID);
 
         // Then publishImage should be called on the API for each image.
-        verify(mockKafkaClient, never()).produceContentPublished(anyString(),anyString(),anyString(), anyString());
+        verify(mockKafkaClient, never()).produceContentPublished(anyString(),anyString(),anyString(), anyString(), anyString(), anyString());
     }
 
     @Test
     public void testProduceContentPublished_clientException() throws Exception {
         final Future future = mock(Future.class);
         when(future.get()).thenThrow(new ExecutionException(new IOException()));
-        when(mockKafkaClient.produceContentPublished(anyString(), anyString(), anyString(), anyString()))
+        when(mockKafkaClient.produceContentPublished(anyString(), anyString(), anyString(), anyString(), anyString(), anyString()))
                 .thenReturn(future);
         KafkaService kafkaService = new KafkaServiceImpl(mockKafkaClient);
         List<String> uris = Arrays.asList(URI1, URI2, URI3);
         // When produceContentPublished is called on the collection
-        Throwable thrown = assertThrows(IOException.class, () -> kafkaService.produceContentPublished(COLLECTION_ID, uris, TEST_DATATYPE, TEST_TRACE_ID));
+        Throwable thrown = assertThrows(IOException.class, () -> kafkaService.produceContentPublished(COLLECTION_ID, uris, TEST_DATATYPE, TEST_JOBID, TEST_SEARCHINDEX, TEST_TRACE_ID));
         // Then a timeout exception is thrown.
         assertEquals(thrown.getMessage(), "unable to process kafka message");
     }

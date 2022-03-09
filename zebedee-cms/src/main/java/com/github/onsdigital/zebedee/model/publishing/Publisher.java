@@ -92,6 +92,10 @@ public class Publisher {
     private static ServiceSupplier<KafkaService> kafkaServiceSupplier;
 
     private static final String TRACE_ID_HEADER = "trace_id";
+    public static final String SEARCHINDEX = "ONS";
+
+    public static final String DATASETCONTENTFLAG = "datasets";
+    public static final String LEGACYCONTENTFLAG = "legacy";
 
     static {
         theTrainHosts = Configuration.getTheTrainHosts();
@@ -777,7 +781,7 @@ public class Publisher {
                     .data("Dataset-uris", datasetUris)
                     .data("publishing", true)
                     .log("converted dataset valid URIs ready for kafka event");
-            sendMessage (collection, datasetUris, "Dataset-uris");
+            sendMessage (collection, datasetUris, DATASETCONTENTFLAG);
         }
 
         List<String> reviewedUris = collection.getReviewed().uris()
@@ -787,7 +791,7 @@ public class Publisher {
                 .data("Reviewed-uris", reviewedUris)
                 .data("publishing", true)
                 .log("converted reviewed URIs for kafka event");
-        sendMessage (collection, reviewedUris, "Reviewed-uris");
+        sendMessage (collection, reviewedUris, LEGACYCONTENTFLAG);
     }
 
     // Valid CMDDataset uris for published CMD versions of a dataset (edition) - /dataset/{datatsetId}/editions/{edition}/versions/{version}/metadata
@@ -804,7 +808,7 @@ public class Publisher {
                 .log("traceId before sending event");
 
         try {
-            kafkaServiceSupplier.getService().produceContentPublished(collection.getId(), uris, dataType, traceId);
+            kafkaServiceSupplier.getService().produceContentPublished(collection.getId(), uris, dataType, "", SEARCHINDEX, traceId);
         } catch (Exception e) {
             error()
                     .data("collectionId", collection.getDescription().getId())

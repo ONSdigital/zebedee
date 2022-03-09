@@ -9,7 +9,7 @@ import java.util.List;
 public class NoOpKafkaService implements KafkaService {
 
     @Override
-    public void produceContentPublished(String collectionId, List<String> uris, String dataType, String traceId) throws IOException {
+    public void produceContentPublished(String collectionId, List<String> uris, String dataType, String jobID, String searchIndex, String traceId) throws IOException {
         return;
     }
 }

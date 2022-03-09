@@ -1,9 +1,9 @@
 package com.github.onsdigital.zebedee;
 
-import com.github.onsdigital.JWTHandlerImpl;
+import com.github.onsdigital.JWTVerifier;
+import com.github.onsdigital.JWTVerifierImpl;
 import com.github.onsdigital.dp.image.api.client.ImageAPIClient;
 import com.github.onsdigital.dp.image.api.client.ImageClient;
-import com.github.onsdigital.interfaces.JWTHandler;
 import com.github.onsdigital.slack.Profile;
 import com.github.onsdigital.slack.client.SlackClient;
 import com.github.onsdigital.slack.client.SlackClientImpl;
@@ -203,8 +203,8 @@ public class ZebedeeConfiguration {
 
         // Configure the sessions
         if (cmsFeatureFlags().isJwtSessionsEnabled()) {
-            JWTHandler jwtHandler = new JWTHandlerImpl();
-            this.sessions = new JWTSessionsServiceImpl(jwtHandler, getCognitoKeyIdPairs());
+            JWTVerifier jwtVerifier = new JWTVerifierImpl(getCognitoKeyIdPairs());
+            this.sessions = new JWTSessionsServiceImpl(jwtVerifier);
         } else {
             LegacySessionsStore legacySessionsStore = new LegacySessionsStoreImpl(sessionsPath);
             this.sessions = new ThreadLocalSessionsServiceImpl(legacySessionsStore, permissionsService, teamsService);

@@ -1,7 +1,7 @@
 package com.github.onsdigital.zebedee.session.service;
 
-import com.github.onsdigital.JWTHandlerImpl;
-import com.github.onsdigital.interfaces.JWTHandler;
+import com.github.onsdigital.JWTVerifier;
+import com.github.onsdigital.JWTVerifierImpl;
 import com.github.onsdigital.zebedee.junit4.rules.RunInThread;
 import com.github.onsdigital.zebedee.junit4.rules.RunInThreadRule;
 import com.github.onsdigital.zebedee.session.model.Session;
@@ -10,16 +10,13 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.MockitoAnnotations;
-import org.springframework.test.util.ReflectionTestUtils;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
@@ -31,7 +28,7 @@ import static org.junit.Assert.assertTrue;
 public class JWTSessionsServiceImplTest {
 
     private static final String REQUIRED_CLAIM_PAYLOAD_ERROR = "Required JWT payload claim not found [username or cognito:groups].";
-    private static final String ACCESS_TOKEN_INTEGRITY_ERROR = "Verification of JWT token integrity failed.";
+    private static final String ACCESS_TOKEN_INTEGRITY_ERROR = "JWT signature verification failed.";
     private static final String RSA_PUBLIC_KEY_INALID_ERROR  = "Public Key cannot be empty or null.";
 
     private static final String SIGNED_TOKEN         = "eyJhbGciOiJSUzI1NiIsImtpZCI6IjUxR3BvdHBTVGxtK3FjNXhOWUhzSko2S2tlT2JSZjlYSDQxYkhIS0JJOE09In0.eyJzdWIiOiJhYWFhYWFhYS1iYmJiLWNjY2MtZGRkZC1lZWVlZWVlZWVlZWUiLCJkZXZpY2Vfa2V5IjoiYWFhYWFhYWEtYmJiYi1jY2NjLWRkZGQtZWVlZWVlZWVlZWVlIiwiY29nbml0bzpncm91cHMiOlsiYWRtaW4iLCJwdWJsaXNoaW5nIiwiZGF0YSIsInRlc3QiXSwidG9rZW5fdXNlIjoiYWNjZXNzIiwic2NvcGUiOiJhd3MuY29nbml0by5zaWduaW4udXNlci5hZG1pbiIsImF1dGhfdGltZSI6MTU2MjE5MDUyNCwiaXNzIjoiaHR0cHM6Ly9jb2duaXRvLWlkcC51cy13ZXN0LTIuYW1hem9uYXdzLmNvbS91cy13ZXN0LTJfZXhhbXBsZSIsImV4cCI6OTk5OTk5OTk5OSwiaWF0IjoxNTYyMTkwNTI0LCJqdGkiOiJhYWFhYWFhYS1iYmJiLWNjY2MtZGRkZC1lZWVlZWVlZWVlZWUiLCJjbGllbnRfaWQiOiI1N2NiaXNoazRqMjRwYWJjMTIzNDU2Nzg5MCIsInVzZXJuYW1lIjoiamFuZWRvZUBleGFtcGxlLmNvbSJ9.fC3P6jnpnhmOxdlw0u4nOhehz7dCXsqX7RvqI1gEC4wrJoE6rlKH1mo7lR16K-EXWdXRoeN0_z0PZQzo__xOprAsY2XSNOexOcIo3hoydx6CkGWGmNNsLp35iGY3DgW6SLpQsdGF8HicJ9D9KCTPXKAGmOrkX3t92WSCLiQXXuER9gndzC6oLMU0akvKDstoTfwLWeSsogOQBn7_lUqGaHC8T06ZR37n_eOgUGSXwSFuYbg1zcY2xK3tMh4Wo8TOrADOrfLg660scpXuu-oDf0PNdgpXGU318IK1R0A2LiqqJWIV1sDE88uuPcX9-xgKc0eUn6qABXM9qhEyr6MS6g";
@@ -65,7 +62,7 @@ public class JWTSessionsServiceImplTest {
     private static ThreadLocal<Session> store = new ThreadLocal<>();
 
     private Map<String, String> rsaKeyMap = new HashMap<String, String>();
-    private JWTHandler jwtHandler = new JWTHandlerImpl();
+    private JWTVerifier jwtVerifier;
 
     /**
      * Class under test
@@ -87,7 +84,9 @@ public class JWTSessionsServiceImplTest {
         rsaKeyMap.put(RSA_KEY_ID_1, RSA_SIGNING_KEY_1);
         rsaKeyMap.put(RSA_KEY_ID_2, RSA_SIGNING_KEY_2);
 
-        this.jwtSessionsServiceImpl = new JWTSessionsServiceImpl(jwtHandler, rsaKeyMap);
+        jwtVerifier = new JWTVerifierImpl(rsaKeyMap);
+
+        this.jwtSessionsServiceImpl = new JWTSessionsServiceImpl(jwtVerifier);
     }
 
     @Test
@@ -116,14 +115,6 @@ public class JWTSessionsServiceImplTest {
 
     @Test
     @RunInThread
-    public void set_ShouldThrowException_WhenTokenMissingUsername() throws Exception {
-        Exception exception = assertThrows(SessionsException.class, () -> this.jwtSessionsServiceImpl.set(TOKEN_NO_USER));
-        assertThat(exception.getMessage(), is(REQUIRED_CLAIM_PAYLOAD_ERROR));
-        assertNull(store.get());
-    }
-
-    @Test
-    @RunInThread
     public void set_ShouldThrowException_WhenAccessTokenExpired() throws Exception {
         Exception exception = assertThrows(SessionsException.class, () -> this.jwtSessionsServiceImpl.set(TOKEN_EXPIRED_TIME));
         assertThat(exception.getMessage(), is(this.jwtSessionsServiceImpl.ACCESS_TOKEN_EXPIRED_ERROR));
@@ -135,22 +126,6 @@ public class JWTSessionsServiceImplTest {
     public void set_ShouldThrowException_WhenAcessTokenInvalid() throws Exception {
         Exception exception = assertThrows(SessionsException.class, () -> this.jwtSessionsServiceImpl.set(INVALID_SIGNED_TOKEN));
         assertThat(exception.getMessage(), is(ACCESS_TOKEN_INTEGRITY_ERROR));
-        assertNull(store.get());
-    }
-
-    @Test
-    @RunInThread
-    public void set_ShouldThrowException_WhenUnknownKeyId() throws Exception {
-        Exception exception = assertThrows(SessionsException.class, () -> this.jwtSessionsServiceImpl.set(HEADER_KID_NOT_FOUND));
-        assertThat(exception.getMessage(), is(RSA_PUBLIC_KEY_INALID_ERROR));
-        assertNull(store.get());
-    }
-
-    @Test
-    @RunInThread
-    public void set_ShouldThrowException_WhenInvalidAccessTokenFormat() throws Exception {
-        Exception exception = assertThrows(SessionsException.class, () -> this.jwtSessionsServiceImpl.set(UNSIGNED_TOKEN));
-        assertThat(exception.getMessage(), is(this.jwtSessionsServiceImpl.TOKEN_NOT_VALID_ERROR));
         assertNull(store.get());
     }
 

@@ -3,7 +3,6 @@ package com.github.onsdigital.zebedee.api;
 import com.github.davidcarboni.restolino.framework.Api;
 import com.github.onsdigital.zebedee.audit.Audit;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
-import com.github.onsdigital.zebedee.exceptions.InternalServerError;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
@@ -14,15 +13,15 @@ import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.session.service.Sessions;
 import com.github.onsdigital.zebedee.user.service.UsersService;
+import org.apache.commons.lang3.StringUtils;
 
+import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
-import java.io.IOException;
 
 import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
-import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 @Api
 public class Permission {
@@ -130,14 +129,14 @@ public class Permission {
             throws IOException, NotFoundException, UnauthorizedException, BadRequestException {
 
         String email = request.getParameter("email");
-        if (cmsFeatureFlags().isJwtSessionsEnabled() && isNotEmpty(email)) {
+        if (cmsFeatureFlags().isJwtSessionsEnabled() && StringUtils.isNotEmpty(email)) {
             throw new BadRequestException("invalid parameter 'email': checking the permissions of another user is no longer supported");
         }
 
         Session session = sessionsService.get();
 
         PermissionDefinition permissionDefinition;
-        if (cmsFeatureFlags().isJwtSessionsEnabled()) {
+        if (cmsFeatureFlags().isJwtSessionsEnabled() || StringUtils.isEmpty(email)) {
             permissionDefinition = permissionsService.userPermissions(session);
         } else {
             permissionDefinition = permissionsService.userPermissions(email, session);

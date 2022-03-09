@@ -15,6 +15,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import static junit.framework.TestCase.assertTrue;
+import static org.junit.Assert.assertNotNull;
 
 public class RunnableSchedulerTest {
 
@@ -110,22 +111,19 @@ public class RunnableSchedulerTest {
 
     @Test
     public void scheduleShouldTakeMillisecondsIntoAccount() throws InterruptedException, ExecutionException {
-
-        System.out.println("scheduleShouldTakeMillisecondsIntoAccount start");
         // Given a scheduled task that fails with an exception.
         DummyTask task = new DummyTask();
-        Date now = new Date(System.currentTimeMillis() + 1333);
-        ScheduledFuture<?> future = runnableScheduler.schedule(task, now);
+        Date scheduled = DateTime.now().plusSeconds(10).withMillisOfSecond(567).toDate();
+        ScheduledFuture<?> future = runnableScheduler.schedule(task, scheduled);
 
-        if (future == null) {
-            System.out.println("scheduleShouldTakeMillisecondsIntoAccount - future is null");
-        }
+        assertNotNull(future);
 
-        // When the time for the task passes.
         long delayInMs = future.getDelay(TimeUnit.MILLISECONDS);
-        assertTrue(delayInMs > 1300);
 
-        System.out.println("scheduleShouldTakeMillisecondsIntoAccount end");
+        long expected = scheduled.getTime() - DateTime.now().getMillis();
+        long timeDiff = delayInMs - expected;
+        // check delay in ms is as expected within 500ms tolerance
+        assertTrue(timeDiff >= 0 && timeDiff <= 500);
     }
 }
 

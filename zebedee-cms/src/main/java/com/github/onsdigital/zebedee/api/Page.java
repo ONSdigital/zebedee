@@ -291,31 +291,38 @@ public class Page {
         try {
             String uriToDelete = uri.replaceAll("/+$","") + zebedeeFileSuffix;
 
-            zebedeeCmsService.getZebedee().getCollections().deleteContent(
-                    collection,
-                    uriToDelete,
-                    session);
-        } catch (IOException e) {
-            error().data("collection_id", collection.getDescription().getId())
+            boolean deleted = zebedeeCmsService.getZebedee().getCollections().deleteContent(
+                        collection, uriToDelete, session);
+            if (deleted) {
+                Audit.Event.CONTENT_DELETED
+                    .parameters()
+                    .host(request)
+                    .collection(collection)
+                    .content(uri)
+                    .user(session.getEmail())
+                    .log();
+                response.setStatus(HttpStatus.SC_NO_CONTENT);
+            } else {
+                error().data("collection_id", collection.getDescription().getId())
                     .data("user", session.getEmail())
                     .data("path", uri)
-                    .logException(e, "page delete endpoint: exception when deleting content");
+                    .data("uriToDelete", uriToDelete)
+                    .log("page delete endpoint: couldn't delete content");
+                response.setStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR);
+            }
+        } catch (IOException e) {
+            logException(e, "page delete endpoint: exception when deleting content", uri, session, collection);
             response.setStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR);
-            return;
         } catch (ZebedeeException e) {
             handleZebdeeException("page delete endpoint: exception when deleting content", e, response, uri, session, collection);
-            return;
         }
-
-        Audit.Event.CONTENT_DELETED
-                .parameters()
-                .host(request)
-                .collection(collection)
-                .content(uri)
-                .user(session.getEmail())
-                .log();
-
-        response.setStatus(HttpStatus.SC_NO_CONTENT);
+    }
+    
+    private void logException(Exception e, String message, String path, Session session, Collection collection) {
+        error().data("collection_id", collection.getDescription().getId())
+            .data("user", session.getEmail())
+            .data("path", path)
+            .logException(e, message);
     }
 
     private void handleZebdeeException(
@@ -326,10 +333,7 @@ public class Page {
             Session session,
             Collection collection) {
 
-        error().data("collection_id", collection.getDescription().getId())
-                .data("user", session.getEmail())
-                .data("path", uri)
-                .logException(e, message);
+        logException(e, message, uri, session, collection);
         response.setStatus(e.statusCode);
     }
 

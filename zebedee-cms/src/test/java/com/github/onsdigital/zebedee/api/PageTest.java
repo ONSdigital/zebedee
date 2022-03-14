@@ -50,7 +50,7 @@ public class PageTest extends ZebedeeAPIBaseTestCase {
     private final CollectionReader collectionReader = mock(CollectionReader.class);
 
     private static final String uri = "/releases/adoption";
-    private static final ApiDatasetLandingPage page = new ApiDatasetLandingPage();
+    private static final com.github.onsdigital.zebedee.content.page.base.Page page = new ApiDatasetLandingPage();
     private static final byte[] serialisedPageBytes = ContentUtil.serialise(page).getBytes();
 
     @BeforeClass
@@ -194,7 +194,7 @@ public class PageTest extends ZebedeeAPIBaseTestCase {
 
         // Given a mock collection reader that throws an exception on getContent
         doThrow(new ForbiddenException(""))
-                .when(collectionReader).getContent(anyString());
+                .when(collectionReader).getContent(uri);
 
         when(mockRequest.getParameter("uri")).thenReturn(uri);
         when(zebedeeCmsService.getSession()).thenReturn(mockSession);
@@ -210,11 +210,11 @@ public class PageTest extends ZebedeeAPIBaseTestCase {
     }
 
     @Test
-    public void testPage_deletePage_deleteContentException() throws ZebedeeException, IOException {
+    public void testPage_deletePage_deleteContentZebedeeException() throws ZebedeeException, IOException {
 
         // Given a mock collections that throws an exception on deleteContent
         doThrow(new ForbiddenException(""))
-                .when(collections).deleteContent(any(), any(), any());
+                .when(collections).deleteContent(collection, uri + "/data.json", mockSession);
 
         when(mockRequest.getParameter("uri")).thenReturn(uri);
         when(zebedeeCmsService.getSession()).thenReturn(mockSession);
@@ -227,6 +227,43 @@ public class PageTest extends ZebedeeAPIBaseTestCase {
 
         // Then the http response code is set as expected
         verify(mockResponse, times(1)).setStatus(HttpStatus.SC_FORBIDDEN);
+    }
+
+    @Test
+    public void testPage_deletePage_deleteContentIOException() throws ZebedeeException, IOException {
+
+        // Given a mock collections that throws an exception on deleteContent
+        doThrow(new IOException("message"))
+                .when(collections).deleteContent(collection, uri + "/data.json", mockSession);
+
+        when(mockRequest.getParameter("uri")).thenReturn(uri);
+        when(zebedeeCmsService.getSession()).thenReturn(mockSession);
+        when(zebedeeCmsService.getCollection(mockRequest)).thenReturn(collection);
+
+        Page page = new Page(zebedeeCmsService, pageCreationHook, pageDeletionHook);
+
+        // When delete is called
+        page.deletePage(mockRequest, mockResponse);
+
+        // Then the http response code is set as expected
+        verify(mockResponse, times(1)).setStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR);
+    }
+
+    @Test
+    public void testPage_deletePage_deleteContentFailed() throws ZebedeeException, IOException {
+        when(mockRequest.getParameter("uri")).thenReturn(uri);
+        when(zebedeeCmsService.getSession()).thenReturn(mockSession);
+        when(zebedeeCmsService.getCollection(mockRequest)).thenReturn(collection);
+        // Given it failed to delete the content
+        when(collections.deleteContent(collection, uri + "/data.json", mockSession)).thenReturn(false);
+
+        Page page = new Page(zebedeeCmsService, pageCreationHook, pageDeletionHook);
+
+        // When delete is called
+        page.deletePage(mockRequest, mockResponse);
+
+        // Then the http response code is set as expected
+        verify(mockResponse, times(1)).setStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR);
     }
 
     @Test
@@ -237,6 +274,7 @@ public class PageTest extends ZebedeeAPIBaseTestCase {
         when(collectionReader.getContent(uri)).thenReturn(page);
         when(zebedeeCmsService.getSession()).thenReturn(mockSession);
         when(zebedeeCmsService.getCollection(mockRequest)).thenReturn(collection);
+        when(collections.deleteContent(collection, uri + "/data.json", mockSession)).thenReturn(true);
 
         Page page = new Page(zebedeeCmsService, pageCreationHook, pageDeletionHook);
 
@@ -246,8 +284,7 @@ public class PageTest extends ZebedeeAPIBaseTestCase {
         // Then the page update hook is called
         assertTrue(pageDeletionHook.wasOnPageUpdatedCalled());
 
-        // Then collections.createContent is called
-        verify(collections, times(1)).deleteContent(collection, uri + "/data.json", mockSession);
+        // Then a 204 code is returned
         verify(mockResponse, times(1)).setStatus(HttpStatus.SC_NO_CONTENT);
     }
     
@@ -259,6 +296,7 @@ public class PageTest extends ZebedeeAPIBaseTestCase {
         when(collectionReader.getContent(uri)).thenReturn(page);
         when(zebedeeCmsService.getSession()).thenReturn(mockSession);
         when(zebedeeCmsService.getCollection(mockRequest)).thenReturn(collection);
+        when(collections.deleteContent(collection, "/data.json", mockSession)).thenReturn(true);
 
         Page page = new Page(zebedeeCmsService, pageCreationHook, pageDeletionHook);
 
@@ -268,8 +306,7 @@ public class PageTest extends ZebedeeAPIBaseTestCase {
         // Then the page update hook is called
         assertTrue(pageDeletionHook.wasOnPageUpdatedCalled());
 
-        // Then collections.createContent is called
-        verify(collections, times(1)).deleteContent(collection, "/data.json", mockSession);
+        // Then a 204 code is returned
         verify(mockResponse, times(1)).setStatus(HttpStatus.SC_NO_CONTENT);
     }
     
@@ -281,6 +318,7 @@ public class PageTest extends ZebedeeAPIBaseTestCase {
         when(collectionReader.getContent(uri)).thenReturn(page);
         when(zebedeeCmsService.getSession()).thenReturn(mockSession);
         when(zebedeeCmsService.getCollection(mockRequest)).thenReturn(collection);
+        when(collections.deleteContent(collection, uri + "/data.json", mockSession)).thenReturn(true);
 
         Page page = new Page(zebedeeCmsService, pageCreationHook, pageDeletionHook);
 
@@ -290,8 +328,7 @@ public class PageTest extends ZebedeeAPIBaseTestCase {
         // Then the page update hook is called
         assertTrue(pageDeletionHook.wasOnPageUpdatedCalled());
 
-        // Then collections.createContent is called
-        verify(collections, times(1)).deleteContent(collection, uri + "/data.json", mockSession);
+        // Then a 204 code is returned
         verify(mockResponse, times(1)).setStatus(HttpStatus.SC_NO_CONTENT);
     }
 
@@ -350,10 +387,11 @@ public class PageTest extends ZebedeeAPIBaseTestCase {
     public void testPage_deletePage_pageHookException() throws ZebedeeException, IOException {
 
         // Given a mock page hook that throws an exception
-        PageUpdateHook mockPageHook = mock(PageUpdateHook.class);
-        doThrow(new RuntimeException()).when(mockPageHook).onPageUpdated(any(), anyString());
+        PageUpdateHook<com.github.onsdigital.zebedee.content.page.base.Page> mockPageHook = mock(PageUpdateHook.class);
+        doThrow(new RuntimeException()).when(mockPageHook).onPageUpdated(page, uri);
 
         when(mockRequest.getParameter("uri")).thenReturn(uri);
+        when(collectionReader.getContent(uri)).thenReturn(page);
         when(zebedeeCmsService.getSession()).thenReturn(mockSession);
         when(zebedeeCmsService.getCollection(mockRequest)).thenReturn(collection);
 

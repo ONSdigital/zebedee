@@ -30,16 +30,16 @@ public class PublishSchedulerTest extends ZebedeeTestBaseFixture {
     public void scheduledPublish() throws IOException, ZebedeeException, InterruptedException {
 
         // Given a scheduled collection
+        DateTime publishDateTime = DateTime.now().plusSeconds(2000).withMillisOfSecond(0);
         CollectionDescription description = new CollectionDescription("collectionName");
         description.setType(CollectionType.scheduled);
         description.setApprovalStatus(ApprovalStatus.COMPLETE);
-        description.setPublishDate(DateTime.now().plusSeconds(2000).toDate());
+        description.setPublishDate(publishDateTime.toDate());
         Collection collection = Collection.create(description, zebedee, session);
-        Date startDate = description.getPublishDate();
-        Date prePublishStartDate = new DateTime(description.getPublishDate()).minusSeconds(1).toDate();
+        Date prePublishStartDate = publishDateTime.minusSeconds(1).toDate();
 
         // When the collection is scheduled for pre-publish
-        scheduler.schedulePrePublish(collection, zebedee, prePublishStartDate, startDate);
+        scheduler.schedulePrePublish(collection, zebedee, prePublishStartDate, description.getPublishDate());
 
         // Then the scheduled date should match the date it was given to be scheduled for.
         List<ScheduledPublishTaskData> prePublishTaskData = scheduler.getPrePublishTaskData(zebedee);
@@ -49,8 +49,8 @@ public class PublishSchedulerTest extends ZebedeeTestBaseFixture {
         Assert.assertNotNull(taskData);
         Assert.assertTrue(taskData.collectionIds.contains(description.getId()));
 
-        // check scheduled time is as expected within 50ms tolerance
-        Assert.assertEquals(prePublishStartDate.getTime() / 100, taskData.scheduledPublishDate.getTime() / 100);
+        // check scheduled time is as expected within 500ms tolerance
+        Assert.assertTrue(taskData.scheduledPublishDate.getTime() - prePublishStartDate.getTime() <= 500);
 
         // cleanup
         scheduler.cancel(collection);

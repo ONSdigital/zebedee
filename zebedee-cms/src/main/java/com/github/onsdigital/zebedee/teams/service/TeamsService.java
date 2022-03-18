@@ -41,7 +41,7 @@ public interface TeamsService {
      *             removed.
      */
     @Deprecated
-    List<Team> resolveTeams(Set<Integer> teamIds) throws IOException;
+    List<Team> resolveTeams(Set<String> teamIds) throws IOException;
 
     /**
      * Return a list of {@link Team} matching the IDS provided containing only the team name & ID.
@@ -50,7 +50,7 @@ public interface TeamsService {
      * @deprecated as Florence can request the team names from the dp-identity-api for presentation on the front end
      */
     @Deprecated
-    List<Team> resolveTeamDetails(Set<Integer> teamIds) throws IOException;
+    List<Team> resolveTeamDetails(Set<String> teamIds) throws IOException;
 
     /**
      * Find a team by name.

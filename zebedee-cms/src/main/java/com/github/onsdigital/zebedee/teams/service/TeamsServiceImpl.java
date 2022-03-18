@@ -1,10 +1,6 @@
 package com.github.onsdigital.zebedee.teams.service;
 
-import com.github.onsdigital.zebedee.exceptions.BadRequestException;
-import com.github.onsdigital.zebedee.exceptions.ConflictException;
-import com.github.onsdigital.zebedee.exceptions.ForbiddenException;
-import com.github.onsdigital.zebedee.exceptions.NotFoundException;
-import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
+import com.github.onsdigital.zebedee.exceptions.*;
 import com.github.onsdigital.zebedee.model.PathUtils;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.service.ServiceSupplier;
@@ -14,12 +10,7 @@ import com.github.onsdigital.zebedee.teams.store.TeamsStore;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
-import java.util.AbstractMap;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Function;
@@ -41,7 +32,7 @@ public class TeamsServiceImpl implements TeamsService {
     private static final String FORBIDDEN_ERR_MSG = "User does not have the required admin permission to perform " +
             "requested action.";
 
-    private static final int DEFAULT_TEAM_ID = 1;
+    private static final String DEFAULT_TEAM_ID = "1";
 
     private ReadWriteLock teamLock = new ReentrantReadWriteLock();
     private ServiceSupplier<PermissionsService> permissionsServiceSupplier;
@@ -73,7 +64,7 @@ public class TeamsServiceImpl implements TeamsService {
     }
 
     @Override
-    public List<Team> resolveTeams(Set<Integer> teamIds) throws IOException {
+    public List<Team> resolveTeams(Set<String> teamIds) throws IOException {
         return listTeams()
                 .parallelStream()
                 .filter(t -> teamIds.contains(t.getId()))
@@ -81,7 +72,7 @@ public class TeamsServiceImpl implements TeamsService {
     }
 
     @Override
-    public List<Team> resolveTeamDetails(Set<Integer> teamIds) throws IOException {
+    public List<Team> resolveTeamDetails(java.util.Set<String> teamIds) throws IOException {
         return resolveTeams(teamIds).stream()
                 .map(team -> new Team().setId(team.getId()).setName(team.getName()))
                 .collect(Collectors.toList());
@@ -114,7 +105,7 @@ public class TeamsServiceImpl implements TeamsService {
 
             // For the record this is a lift & shift of the pervious implementation (albeit a bit refactored).
             // When we move to a database impl this can be properly.
-            int teamID = orderedTeams.isEmpty() ? DEFAULT_TEAM_ID : (1 + orderedTeams.get(0).getId());
+            String teamID = orderedTeams.isEmpty() ? DEFAULT_TEAM_ID : String.valueOf(1 + Integer.parseInt(orderedTeams.get(0).getId()));
 
             Team team = new Team()
                     .setName(teamName)
@@ -178,7 +169,7 @@ public class TeamsServiceImpl implements TeamsService {
     public List<String> listTeamsForUser(Session session) throws IOException {
         return listTeams().parallelStream()
                 .filter(t -> t.getMembers().contains(session.getEmail()))
-                .map(t -> Integer.toString(t.getId()))
+                .map(t -> t.getId())
                 .collect(Collectors.toList());
     }
 

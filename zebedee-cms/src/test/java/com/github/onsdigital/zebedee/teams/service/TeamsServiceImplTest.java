@@ -66,9 +66,9 @@ public class TeamsServiceImplTest {
     public void setUp() throws Exception {
         MockitoAnnotations.openMocks(this);
 
-        teamA = new Team().setId(10001).setName("teamA");
-        teamB = new Team().setId(10002).setName("teamB");
-        teamC = new Team().setId(10003).setName("teamC");
+        teamA = new Team().setId("10001").setName("teamA");
+        teamB = new Team().setId("10002").setName("teamB");
+        teamC = new Team().setId("10003").setName("teamC");
         teamsList = new ArrayList<>();
 
         permissionsServiceServiceSupplier = () -> permissionsService;
@@ -85,7 +85,7 @@ public class TeamsServiceImplTest {
 
     @Test
     public void resolveTeams_ShouldFindRequestedTeams() throws Exception {
-        Set<Integer> requestedTeamIDs = new HashSet<>();
+        Set<String> requestedTeamIDs = new HashSet<>();
         requestedTeamIDs.add(teamA.getId());
         requestedTeamIDs.add(teamB.getId());
 
@@ -108,7 +108,7 @@ public class TeamsServiceImplTest {
 
     @Test
     public void resolveTeamDetails_success() throws Exception {
-        Set<Integer> requestedTeamIDs = new HashSet<>();
+        Set<String> requestedTeamIDs = new HashSet<>();
         requestedTeamIDs.add(teamA.getId());
         requestedTeamIDs.add(teamB.getId());
 
@@ -239,7 +239,7 @@ public class TeamsServiceImplTest {
         teamsList.add(teamC);
 
         Team expected = new Team()
-                .setId(10004)
+                .setId("10004")
                 .setName(TEAM_D_NAME);
 
         when(teamsStore.exists(TEAM_D_NAME))
@@ -268,7 +268,7 @@ public class TeamsServiceImplTest {
         teamsList.add(teamB);
         teamsList.add(teamC);
         Team expected = new Team()
-                .setId(10004)
+                .setId("10004")
                 .setName(TEAM_D_NAME);
 
         when(teamsStore.exists(TEAM_D_NAME))

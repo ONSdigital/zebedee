@@ -9,20 +9,8 @@ import com.github.onsdigital.zebedee.content.page.base.PageDescription;
 import com.github.onsdigital.zebedee.content.page.base.PageType;
 import com.github.onsdigital.zebedee.content.page.release.Release;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
-import com.github.onsdigital.zebedee.exceptions.BadRequestException;
-import com.github.onsdigital.zebedee.exceptions.CollectionNotFoundException;
-import com.github.onsdigital.zebedee.exceptions.ConflictException;
-import com.github.onsdigital.zebedee.exceptions.NotFoundException;
-import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
-import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
-import com.github.onsdigital.zebedee.json.ApprovalStatus;
-import com.github.onsdigital.zebedee.json.CollectionDataset;
-import com.github.onsdigital.zebedee.json.CollectionDatasetVersion;
-import com.github.onsdigital.zebedee.json.CollectionDescription;
-import com.github.onsdigital.zebedee.json.CollectionType;
-import com.github.onsdigital.zebedee.json.ContentDetail;
-import com.github.onsdigital.zebedee.json.ContentStatus;
-import com.github.onsdigital.zebedee.json.EventType;
+import com.github.onsdigital.zebedee.exceptions.*;
+import com.github.onsdigital.zebedee.json.*;
 import com.github.onsdigital.zebedee.model.content.item.ContentItemVersion;
 import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
 import com.github.onsdigital.zebedee.model.publishing.scheduled.DummyScheduler;
@@ -45,30 +33,16 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Writer;
 import java.net.URI;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class CollectionTest extends ZebedeeTestBaseFixture {
 
@@ -82,7 +56,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
     Team team;
 
     private static final String teamName = "some team";
-    private static final int teamId = 12;
+    private static final String teamId = "12";
     private static final boolean recursive = false;
     Collection collection;
     Session publisher1Session;
@@ -285,7 +259,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
 
     @Test
     public void shouldUpdateCollection() throws Exception {
-        Set<Integer> teamIds = new HashSet<>(Arrays.asList(12));
+        Set<String> teamIds = new HashSet<>(Arrays.asList("12"));
 
         when(teamsService.findTeam(teamName))
                 .thenReturn(team);
@@ -385,7 +359,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         assertTrue(updatedCollectionDescription.getEvents().hasEventForType(EventType.CREATED));
         assertEquals(updatedDescription.getTeams(), updatedCollectionDescription.getTeams());
         verify(permissionsService, times(1)).setViewerTeams(
-                publisher1Session, collection.getDescription().getId(), new HashSet<Integer>());
+                publisher1Session, collection.getDescription().getId(), new HashSet<String>());
     }
 
     @Test
@@ -1126,7 +1100,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         // We write some output to the content:
         Path path = collection.getInProgressPath(uri);
         try (Writer writer = Files.newBufferedWriter(path,
-                Charset.forName("utf8"));) {
+                StandardCharsets.UTF_8)) {
             writer.append("test");
         }
 
@@ -1628,36 +1602,36 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
 
     @Test
     public void isAllContentReviewed_shouldReturnFalseWhenDatasetNotReviewed() throws IOException, ZebedeeException {
-            // Given a collection with a dataset that has not been set to reviewed.
-            Path collectionPath = Files.createTempDirectory(Random.id()); // create a temp directory to generate content into
-            Collection collection = CollectionTest.createCollection(collectionPath, "isAllContentReviewed");
+        // Given a collection with a dataset that has not been set to reviewed.
+        Path collectionPath = Files.createTempDirectory(Random.id()); // create a temp directory to generate content into
+        Collection collection = CollectionTest.createCollection(collectionPath, "isAllContentReviewed");
 
-            CollectionDataset dataset = new CollectionDataset();
-            dataset.setState(ContentStatus.Complete);
-            collection.getDescription().addDataset(dataset);
+        CollectionDataset dataset = new CollectionDataset();
+        dataset.setState(ContentStatus.Complete);
+        collection.getDescription().addDataset(dataset);
 
-            // When isAllContentReviewed() is called
-            boolean allContentReviewed = collection.isAllContentReviewed(true);
+        // When isAllContentReviewed() is called
+        boolean allContentReviewed = collection.isAllContentReviewed(true);
 
-            // Then the result is false
-            assertFalse(allContentReviewed);
+        // Then the result is false
+        assertFalse(allContentReviewed);
     }
 
     @Test
     public void isAllContentReviewed_shouldReturnFalseWhenDatasetVersionNotReviewed() throws IOException, ZebedeeException {
-            // Given a collection with a dataset version that has not been set to reviewed.
-            Path collectionPath = Files.createTempDirectory(Random.id()); // create a temp directory to generate content into
-            Collection collection = CollectionTest.createCollection(collectionPath, "isAllContentReviewed");
+        // Given a collection with a dataset version that has not been set to reviewed.
+        Path collectionPath = Files.createTempDirectory(Random.id()); // create a temp directory to generate content into
+        Collection collection = CollectionTest.createCollection(collectionPath, "isAllContentReviewed");
 
-            CollectionDatasetVersion datasetVersion = new CollectionDatasetVersion();
-            datasetVersion.setState(ContentStatus.Complete);
-            collection.getDescription().addDatasetVersion(datasetVersion);
+        CollectionDatasetVersion datasetVersion = new CollectionDatasetVersion();
+        datasetVersion.setState(ContentStatus.Complete);
+        collection.getDescription().addDatasetVersion(datasetVersion);
 
-            // When isAllContentReviewed() is called
-            boolean allContentReviewed = collection.isAllContentReviewed(true);
+        // When isAllContentReviewed() is called
+        boolean allContentReviewed = collection.isAllContentReviewed(true);
 
-            // Then the result is false
-            assertFalse(allContentReviewed);
+        // Then the result is false
+        assertFalse(allContentReviewed);
     }
 
     @Test

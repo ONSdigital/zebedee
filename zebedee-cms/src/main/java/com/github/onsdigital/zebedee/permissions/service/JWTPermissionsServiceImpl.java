@@ -212,7 +212,7 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
             return false;
         }
 
-        List<Integer> userGroups = convertGroupsToTeams(session);
+        List<String> userGroups = session.getGroups();
         if (userGroups == null || userGroups.isEmpty()) {
             return false;
         }
@@ -221,13 +221,13 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
         readLock.lock();
         try {
             AccessMapping accessMapping = permissionsStore.getAccessMapping();
-            Set<Integer> collectionGroups = accessMapping.getCollections().get(collectionId);
+            Set<String> collectionGroups = accessMapping.getCollections().get(collectionId);
 
             if (collectionGroups == null || collectionGroups.isEmpty()) {
                 return false;
             }
 
-            List<Integer> intersection = userGroups.stream()
+            List<String> intersection = userGroups.stream()
                     .filter(collectionGroups::contains)
                     .collect(Collectors.toList());
             result = !intersection.isEmpty();
@@ -255,14 +255,14 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
      */
     @Deprecated
     @Override
-    public Set<Integer> listViewerTeams(Session session, String collectionId) throws IOException, UnauthorizedException {
+    public java.util.Set<String> listViewerTeams(com.github.onsdigital.zebedee.session.model.Session session, String collectionId) throws IOException, UnauthorizedException {
         if (session == null || !canView(session, collectionId)) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
         boolean result = false;
         readLock.lock();
-        Set<Integer> teamIds;
+        Set<String> teamIds;
         try {
             AccessMapping accessMapping = permissionsStore.getAccessMapping();
             teamIds = accessMapping.getCollections().get(collectionId);
@@ -291,7 +291,7 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
      */
     @Deprecated
     @Override
-    public void setViewerTeams(Session session, String collectionID, Set<Integer> collectionTeams) throws IOException, UnauthorizedException {
+    public void setViewerTeams(Session session, String collectionID, Set<String> collectionTeams) throws IOException, UnauthorizedException {
         if (session == null || !canEdit(session)) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }

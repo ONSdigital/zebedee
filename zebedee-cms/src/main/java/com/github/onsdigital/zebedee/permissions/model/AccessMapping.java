@@ -31,7 +31,7 @@ public class AccessMapping {
      * Content owners can be assigned access to collections via one or more teams.
      * <p>NB: This is a map of collection ID to the set of team IDs that have access to the collection.</p>
      */
-    private Map<String, Set<Integer>> collections;
+    private Map<String, Set<String>> collections;
 
     /**
      * Create a new AccessMapping.
@@ -50,7 +50,7 @@ public class AccessMapping {
         return digitalPublishingTeam;
     }
 
-    public Map<String, Set<Integer>> getCollections() {
+    public Map<String, Set<String>> getCollections() {
         return collections;
     }
 
@@ -62,7 +62,7 @@ public class AccessMapping {
         this.digitalPublishingTeam = digitalPublishingTeam;
     }
 
-    public void setCollections(Map<String, Set<Integer>> collections) {
+    public void setCollections(Map<String, Set<String>> collections) {
         this.collections = collections;
     }
 

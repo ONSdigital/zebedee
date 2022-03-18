@@ -30,12 +30,7 @@ import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 import static org.mockito.Mockito.when;
@@ -58,7 +53,7 @@ public class Builder {
     @Mock
     private Profile slackProfile;
 
-    private static int teamId;
+    private static String teamId;
     private static User administratorTemplate;
     private static User publisher1Template;
     private static User publisher2Template;
@@ -89,7 +84,7 @@ public class Builder {
     public Team labourMarketTeam;
     public Team inflationTeam;
 
-    private Zebedee zebedee;
+    private final Zebedee zebedee;
 
     /**
      * Constructor to build a known {@link Zebedee} structure with minimal structure for testing.
@@ -205,7 +200,7 @@ public class Builder {
 
 
         ZebedeeConfiguration configuration = new ZebedeeConfiguration(parent, false);
-        ReflectionTestUtils.setField(configuration,"slackClient",slackClient);
+        ReflectionTestUtils.setField(configuration, "slackClient", slackClient);
         this.zebedee = new Zebedee(configuration);
 
         inflationTeam = createTeam(reviewer1, teamNames[0], teams);
@@ -326,8 +321,8 @@ public class Builder {
         return credentials;
     }
 
-    private Set<Integer> set(Team team) {
-        Set<Integer> ids = new HashSet<>();
+    private Set<String> set(Team team) {
+        Set<String> ids = new HashSet<>();
         ids.add(team.getId());
         return ids;
     }
@@ -335,7 +330,17 @@ public class Builder {
     private Team createTeam(User user, String name, Path teams) throws IOException {
         Team team = new Team();
 
-        team.setId(++teamId);
+        int teamId_int;
+        try {
+            teamId_int = Integer.parseInt(teamId);
+            teamId_int += 1;
+            team.setId(String.valueOf(teamId_int));
+
+        } catch (NumberFormatException e) {
+            //Will Throw exception!
+            //do something! anything to handle the exception.
+        }
+
         team.setName(name);
         team.addMember(user.getEmail());
         Path labourMarketTeamPath = teams.resolve(PathUtils.toFilename(team.getName() + ".json"));

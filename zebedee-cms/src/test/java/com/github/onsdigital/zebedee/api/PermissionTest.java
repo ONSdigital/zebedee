@@ -64,12 +64,6 @@ public class PermissionTest extends ZebedeeAPIBaseTestCase {
         when(sessionsService.get())
                 .thenReturn(mockSession);
 
-        when(usersService.getUserByEmail(TEST_EMAIL))
-                .thenReturn(srcUser);
-
-        when(usersService.getUserByEmail(USER_EMAIL))
-                .thenReturn(targetUser);
-
         Collections.CollectionList collectionList = new Collections.CollectionList();
         collectionList.add(collectionMock);
 

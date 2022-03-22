@@ -55,8 +55,6 @@ public class ZebedeeCollectionWriter extends CollectionWriter {
 
         checkUserAuthorisedToAccessCollection(zebedee, session);
 
-        User user = getUser(zebedee, session);
-
         SecretKey key = getCollectionKey(zebedee, collection, session);
 
         init(collection, key);
@@ -117,21 +115,6 @@ public class ZebedeeCollectionWriter extends CollectionWriter {
         if (!isAuthorised) {
             throw new UnauthorizedException(PERMISSION_DENIED_ERR);
         }
-    }
-
-    private User getUser(Zebedee zebedee, Session session) throws IOException, NotFoundException, BadRequestException {
-        User user = null;
-        try {
-            user = zebedee.getUsersService().getUserByEmail(session.getEmail());
-        } catch (Exception ex) {
-            throw new IOException(GET_USER_ERR, ex);
-        }
-
-        if (user == null) {
-            throw new IOException(USER_NULL_ERR);
-        }
-
-        return user;
     }
 
     private SecretKey getCollectionKey(Zebedee zebedee, Collection collection, Session session)

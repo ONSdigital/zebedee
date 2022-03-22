@@ -63,9 +63,6 @@ public class CollectionMoveTest extends ZebedeeTestBaseFixture {
         ReflectionTestUtils.setField(zebedee, "permissionsService", permissionsService);
         ReflectionTestUtils.setField(zebedee, "collectionKeyring", keyring);
 
-        when(usersService.getUserByEmail(builder.publisher1Credentials.getEmail()))
-                .thenReturn(user);
-
         when(permissionsService.canView(session, collection.getDescription().getId()))
                 .thenReturn(true);
 

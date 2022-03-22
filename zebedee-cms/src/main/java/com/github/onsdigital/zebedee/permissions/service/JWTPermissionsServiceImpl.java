@@ -255,7 +255,7 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
      */
     @Deprecated
     @Override
-    public java.util.Set<String> listViewerTeams(com.github.onsdigital.zebedee.session.model.Session session, String collectionId) throws IOException, UnauthorizedException {
+    public Set<String> listViewerTeams(Session session, String collectionId) throws IOException, UnauthorizedException {
         if (session == null || !canView(session, collectionId)) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }

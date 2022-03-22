@@ -49,23 +49,6 @@ public class ThreadLocalSessionsServiceImpl extends SessionsServiceImpl {
     /**
      * Get a {@link Session} session object from thread local.
      *
-     * @param id the {@link String} to get the session object from thread local for.
-     * @return the {@link Session} from thread local or <code>null</code> if no session is found.
-     * @deprecated Since the new JWT sessions implementation can only get the session of the current user, a single
-     *             {@link this#get()} method is provided. Once migration to the new JWT sessions is completed all
-     *             references to this method should be updated to use the {@link this#get()} instead.
-     *
-     * TODO: Write out usage of this method prior to JWT migration
-     */
-    @Deprecated
-    @Override
-    public Session get(String id) {
-        return get();
-    }
-
-    /**
-     * Get a {@link Session} session object from thread local.
-     *
      * @return the {@link Session} from thread local or <code>null</code> if no session is found.
      */
     @Override

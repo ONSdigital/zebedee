@@ -1,7 +1,6 @@
 package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
-import com.github.onsdigital.zebedee.configuration.CMSFeatureFlags;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.CollectionDetail;
 import com.github.onsdigital.zebedee.json.ContentDetail;
@@ -22,6 +21,7 @@ import java.io.IOException;
 import java.util.Set;
 
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
+import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
 
 @Api
 public class CollectionDetails {
@@ -37,7 +37,7 @@ public class CollectionDetails {
     private ZebedeeCollectionReaderSupplier zebedeeCollectionReaderSupplier = ZebedeeCollectionReader::new;
 
     public CollectionDetails() {
-        this.datasetImportEnabled = CMSFeatureFlags.cmsFeatureFlags().isEnableDatasetImport();
+        this.datasetImportEnabled = cmsFeatureFlags().isEnableDatasetImport();
     }
 
     /**

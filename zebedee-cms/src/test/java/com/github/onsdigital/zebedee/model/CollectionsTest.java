@@ -194,8 +194,6 @@ public class CollectionsTest {
                 .thenReturn(encryptionKeyFactory);
         when(zebedeeMock.getCollectionKeyring())
                 .thenReturn(collectionKeyring);
-        when(usersServiceMock.getUserByEmail(anyString()))
-                .thenReturn(testUser);
         when(collectionReaderWriterFactoryMock.getWriter(zebedeeMock, collectionMock, sessionMock))
                 .thenReturn(collectionWriterMock);
 

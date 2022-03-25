@@ -95,9 +95,6 @@ public class ZebedeeCollectionReaderTest extends ZebedeeTestBaseFixture {
         when(permissionsService.canView(userSession, COLLECTION_ID))
                 .thenReturn(true);
 
-        when(usersService.getUserByEmail(userSession.getEmail()))
-                .thenReturn(builder.publisher1);
-
         when(keyring.get(userSession, collection))
                 .thenReturn(key);
 
@@ -285,18 +282,6 @@ public class ZebedeeCollectionReaderTest extends ZebedeeTestBaseFixture {
                 () -> newReader(zebedeeMock, collection, userSession));
 
         assertThat(ex.getMessage(), equalTo(PERMISSION_DENIED_ERR));
-        verify(permissionsService, times(1)).canView(userSession, COLLECTION_ID);
-    }
-
-    @Test
-    public void testNew_getUserError_shouldThrowException() throws Exception {
-        when(usersService.getUserByEmail(anyString()))
-                .thenThrow(IOException.class);
-
-        IOException ex = assertThrows(IOException.class,
-                () -> newReader(zebedeeMock, collection, userSession));
-
-        assertThat(ex.getMessage(), equalTo(GET_USER_ERR));
         verify(permissionsService, times(1)).canView(userSession, COLLECTION_ID);
     }
 

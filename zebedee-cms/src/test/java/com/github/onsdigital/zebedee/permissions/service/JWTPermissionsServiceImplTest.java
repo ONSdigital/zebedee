@@ -2,7 +2,7 @@ package com.github.onsdigital.zebedee.permissions.service;
 
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
-import com.github.onsdigital.zebedee.permissions.model.AccessMapping;
+import com.github.onsdigital.zebedee.json.PermissionDefinition;import com.github.onsdigital.zebedee.permissions.model.AccessMapping;
 import com.github.onsdigital.zebedee.permissions.store.PermissionsStore;
 import com.github.onsdigital.zebedee.session.model.Session;
 import org.hamcrest.collection.IsMapContaining;
@@ -48,7 +48,8 @@ public class JWTPermissionsServiceImplTest {
 
     @Mock
     private Session session;
-
+    @Mock
+    private JWTPermissionsServiceImpl jwtPermissionsServiceMock;
     @Mock
     private PermissionsStore jwtPermissionStore;
 
@@ -296,6 +297,13 @@ public class JWTPermissionsServiceImplTest {
         assertTrue(collectionMapping.get(COLLECTION_ID).contains(teamId));
     }
 
+/**
+* note if (teamIds == null) {
+                       teamIds = new HashSet<>();
+                   }
+        can't be tested as an empty or null teamIds will be caught by canview
+ @throws Exception
+*/
     @Test
     public void listViewerTeams_collectionDescription_session() throws Exception {
         Session session = new Session(FLORENCE_TOKEN, TEST_USER_EMAIL, ADMIN_PUBLISHER_GROUPS);
@@ -378,4 +386,18 @@ public class JWTPermissionsServiceImplTest {
                 jwtPermissionsService.userPermissions(TEST_USER_EMAIL, session));
         assertEquals("JWT sessions are enabled: userPermissions is no longer supported", exception.getMessage());
     }
+
+
+   @Test
+    public void userPermissions_Sessions() throws Exception {
+        Session session = new Session(FLORENCE_TOKEN, TEST_USER_EMAIL, ADMIN_PUBLISHER_GROUPS);
+        PermissionDefinition actual = jwtPermissionsService.userPermissions(session);
+        assertTrue(actual.isAdmin());
+        assertTrue(actual.isEditor());
+        assertTrue(actual.getEmail() == TEST_USER_EMAIL);
+    }
+
+
+
+
 }

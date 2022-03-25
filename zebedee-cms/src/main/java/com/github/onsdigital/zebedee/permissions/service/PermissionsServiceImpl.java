@@ -24,7 +24,7 @@ import static com.github.onsdigital.zebedee.configuration.Configuration.getUnaut
  * // TODO: remove this class once the migration to JWT sessions has been completed
  */
 @Deprecated
-public class PermissionsServiceImpl extends JWTPermissionsServiceImpl implements PermissionsService {
+public class PermissionsServiceImpl extends JWTPermissionsServiceImpl {
 
     private ReentrantReadWriteLock readWriteLock = new ReentrantReadWriteLock();
     private final Lock readLock = readWriteLock.readLock();

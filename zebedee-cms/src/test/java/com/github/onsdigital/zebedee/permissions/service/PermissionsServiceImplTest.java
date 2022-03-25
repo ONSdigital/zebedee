@@ -15,10 +15,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -68,7 +67,8 @@ public class PermissionsServiceImplTest {
         when(accessMapping.getAdministrators())
                 .thenReturn(null);
 
-        assertThat(permissions.hasAdministrator(), is(false));
+        assertFalse(permissions.hasAdministrator());
+
         verify(permissionsStore, times(1)).getAccessMapping();
         verify(accessMapping, times(1)).getAdministrators();
     }
@@ -80,7 +80,8 @@ public class PermissionsServiceImplTest {
         when(accessMapping.getAdministrators())
                 .thenReturn(new HashSet<>());
 
-        assertThat(permissions.hasAdministrator(), is(false));
+        assertFalse(permissions.hasAdministrator());
+
         verify(permissionsStore, times(1)).getAccessMapping();
         verify(accessMapping, times(2)).getAdministrators();
     }
@@ -95,33 +96,30 @@ public class PermissionsServiceImplTest {
         when(accessMapping.getAdministrators())
                 .thenReturn(admins);
 
-        assertThat(permissions.hasAdministrator(), is(true));
+        assertTrue(permissions.hasAdministrator());
+
         verify(permissionsStore, times(1)).getAccessMapping();
         verify(accessMapping, times(2)).getAdministrators();
     }
 
 
-    @Test(expected = UnauthorizedException.class)
+    @Test
     public void removeAdministrator_ShouldThrowExceptionIfSessionNull() throws Exception {
-        try {
-            permissions.removeAdministrator(EMAIL, null);
-        } catch (UnauthorizedException e) {
-            verifyNoInteractions(permissionsStore, accessMapping);
-            throw e;
-        }
+        Exception exception = assertThrows(UnauthorizedException.class, () ->
+                permissions.removeAdministrator(EMAIL, null));
+
+        verifyNoInteractions(permissionsStore, accessMapping);
     }
 
-    @Test(expected = UnauthorizedException.class)
+    @Test
     public void removeAdministrator_ShouldThrowExceptionIfEmailNull() throws Exception {
-        try {
-            permissions.removeAdministrator(null, session);
-        } catch (UnauthorizedException e) {
-            verifyNoInteractions(permissionsStore, accessMapping);
-            throw e;
-        }
+        Exception exception = assertThrows(UnauthorizedException.class, () ->
+                permissions.removeAdministrator(null, session));
+
+        verifyNoInteractions(permissionsStore, accessMapping);
     }
 
-    @Test(expected = UnauthorizedException.class)
+    @Test
     public void removeAdministrator_ShouldThrowExceptionIfUserIsNotAnAdmin() throws Exception {
         when(session.getGroups())
                 .thenReturn(new ArrayList<>());
@@ -130,12 +128,10 @@ public class PermissionsServiceImplTest {
         when(accessMapping.getAdministrators())
                 .thenReturn(new HashSet<>());
 
-        try {
-            permissions.removeAdministrator(EMAIL, session);
-        } catch (UnauthorizedException e) {
-            verifyNoInteractions(permissionsStore, accessMapping);
-            throw e;
-        }
+        Exception exception = assertThrows(UnauthorizedException.class, () ->
+                permissions.removeAdministrator(EMAIL, session));
+
+        verifyNoInteractions(permissionsStore, accessMapping);
     }
 
     @Test
@@ -153,6 +149,7 @@ public class PermissionsServiceImplTest {
                 .thenReturn(admins);
 
         permissions.removeAdministrator(EMAIL, session);
+
         assertFalse(admins.contains(EMAIL));
         verify(permissionsStore, times(1)).getAccessMapping();
         verify(accessMapping, times(2)).getAdministrators();
@@ -160,27 +157,23 @@ public class PermissionsServiceImplTest {
     }
 
 
-    @Test(expected = UnauthorizedException.class)
+    @Test
     public void removeEditor_ShouldThrowExceptionIfSessionNull() throws Exception {
-        try {
-            permissions.removeEditor(EMAIL, null);
-        } catch (UnauthorizedException e) {
-            verifyNoInteractions(permissionsStore, accessMapping);
-            throw e;
-        }
+        Exception exception = assertThrows(UnauthorizedException.class, () ->
+                permissions.removeEditor(EMAIL, null));
+
+        verifyNoInteractions(permissionsStore, accessMapping);
     }
 
-    @Test(expected = UnauthorizedException.class)
+    @Test
     public void removeEditor_ShouldThrowExceptionIfEmailNull() throws Exception {
-        try {
-            permissions.removeEditor(null, session);
-        } catch (UnauthorizedException e) {
-            verifyNoInteractions(permissionsStore, accessMapping);
-            throw e;
-        }
+        Exception exception = assertThrows(UnauthorizedException.class, () ->
+                permissions.removeEditor(null, session));
+
+        verifyNoInteractions(permissionsStore, accessMapping);
     }
 
-    @Test(expected = UnauthorizedException.class)
+    @Test
     public void removeEditor_ShouldThrowExceptionIfUserIsNotAnAdmin() throws Exception {
         when(permissionsStore.getAccessMapping())
                 .thenReturn(accessMapping);
@@ -189,12 +182,10 @@ public class PermissionsServiceImplTest {
         when(session.getGroups())
                 .thenReturn(new ArrayList<>());
 
-        try {
-            permissions.removeEditor(EMAIL, session);
-        } catch (UnauthorizedException e) {
-            verifyNoInteractions(permissionsStore, accessMapping);
-            throw e;
-        }
+        Exception exception = assertThrows(UnauthorizedException.class, () ->
+                permissions.removeEditor(EMAIL, session));
+
+        verifyNoInteractions(permissionsStore, accessMapping);
     }
 
     @Test
@@ -219,7 +210,7 @@ public class PermissionsServiceImplTest {
         verify(permissionsStore, times(1)).saveAccessMapping(accessMapping);
     }
 
-    @Test(expected = UnauthorizedException.class)
+    @Test
     public void addAdministrator_ShouldThrowErrorSessionNull() throws Exception {
         Set<String> admins = new HashSet<>();
         admins.add(EMAIL);
@@ -229,17 +220,15 @@ public class PermissionsServiceImplTest {
         when(accessMapping.getAdministrators())
                 .thenReturn(admins);
 
-        try {
-            permissions.addAdministrator(EMAIL, null);
-        } catch (UnauthorizedException e) {
-            verify(permissionsStore, times(1)).getAccessMapping();
-            verify(accessMapping, times(2)).getAdministrators();
-            verifyNoMoreInteractions(permissionsStore, accessMapping);
-            throw e;
-        }
+        Exception exception = assertThrows(UnauthorizedException.class, () ->
+                permissions.addAdministrator(EMAIL, null));
+
+        verify(permissionsStore, times(1)).getAccessMapping();
+        verify(accessMapping, times(2)).getAdministrators();
+        verifyNoMoreInteractions(permissionsStore, accessMapping);
     }
 
-    @Test(expected = UnauthorizedException.class)
+    @Test
     public void addAdministrator_ShouldThrowErrorSessionEmailNull() throws Exception {
         Set<String> admins = new HashSet<>();
         admins.add(EMAIL);
@@ -251,17 +240,15 @@ public class PermissionsServiceImplTest {
         when(accessMapping.getAdministrators())
                 .thenReturn(admins);
 
-        try {
-            permissions.addAdministrator(EMAIL, session);
-        } catch (UnauthorizedException e) {
-            verify(permissionsStore, times(1)).getAccessMapping();
-            verify(accessMapping, times(2)).getAdministrators();
-            verifyNoMoreInteractions(permissionsStore, accessMapping);
-            throw e;
-        }
+        Exception exception = assertThrows(UnauthorizedException.class, () ->
+                permissions.addAdministrator(EMAIL, session));
+
+        verify(permissionsStore, times(1)).getAccessMapping();
+        verify(accessMapping, times(2)).getAdministrators();
+        verifyNoMoreInteractions(permissionsStore, accessMapping);
     }
 
-    @Test(expected = UnauthorizedException.class)
+    @Test
     public void addAdministrator_ShouldThrowErrorIfUserNotAdmin() throws Exception {
         String email2 = "test2@ons.gov.uk";
         Set<String> admins = new HashSet<>();
@@ -276,14 +263,12 @@ public class PermissionsServiceImplTest {
         when(accessMapping.getAdministrators())
                 .thenReturn(admins);
 
-        try {
-            permissions.addAdministrator(email2, session);
-        } catch (UnauthorizedException e) {
-            verify(permissionsStore, times(1)).getAccessMapping();
-            verify(accessMapping, times(2)).getAdministrators();
-            verifyNoMoreInteractions(permissionsStore, accessMapping);
-            throw e;
-        }
+        Exception exception = assertThrows(UnauthorizedException.class, () ->
+                permissions.addAdministrator(email2, session));
+
+        verify(permissionsStore, times(1)).getAccessMapping();
+        verify(accessMapping, times(2)).getAdministrators();
+        verifyNoMoreInteractions(permissionsStore, accessMapping);
     }
 
 
@@ -310,7 +295,7 @@ public class PermissionsServiceImplTest {
         verify(permissionsStore, times(1)).saveAccessMapping(accessMapping);
     }
 
-    @Test(expected = UnauthorizedException.class)
+    @Test
     public void addEditor_ShouldThrowErrorSessionNull() throws Exception {
         Set<String> admins = new HashSet<>();
         admins.add(EMAIL);
@@ -320,17 +305,15 @@ public class PermissionsServiceImplTest {
         when(accessMapping.getAdministrators())
                 .thenReturn(admins);
 
-        try {
-            permissions.addEditor(EMAIL, null);
-        } catch (UnauthorizedException e) {
-            verify(permissionsStore, times(1)).getAccessMapping();
-            verify(accessMapping, times(2)).getAdministrators();
-            verifyNoMoreInteractions(permissionsStore, accessMapping);
-            throw e;
-        }
+        Exception exception = assertThrows(UnauthorizedException.class, () ->
+                permissions.addEditor(EMAIL, null));
+
+        verify(permissionsStore, times(1)).getAccessMapping();
+        verify(accessMapping, times(2)).getAdministrators();
+        verifyNoMoreInteractions(permissionsStore, accessMapping);
     }
 
-    @Test(expected = UnauthorizedException.class)
+    @Test
     public void addEditor_ShouldThrowErrorSessionEmailNull() throws Exception {
         Set<String> admins = new HashSet<>();
         admins.add(EMAIL);
@@ -342,17 +325,15 @@ public class PermissionsServiceImplTest {
         when(accessMapping.getAdministrators())
                 .thenReturn(admins);
 
-        try {
-            permissions.addEditor(EMAIL, session);
-        } catch (UnauthorizedException e) {
-            verify(permissionsStore, times(1)).getAccessMapping();
-            verify(accessMapping, times(2)).getAdministrators();
-            verifyNoMoreInteractions(permissionsStore, accessMapping);
-            throw e;
-        }
+        Exception exception = assertThrows(UnauthorizedException.class, () ->
+                permissions.addEditor(EMAIL, session));
+
+        verify(permissionsStore, times(1)).getAccessMapping();
+        verify(accessMapping, times(2)).getAdministrators();
+        verifyNoMoreInteractions(permissionsStore, accessMapping);
     }
 
-    @Test(expected = UnauthorizedException.class)
+    @Test
     public void addEditor_ShouldThrowErrorIfUserNotAdmin() throws Exception {
         Set<String> admins = new HashSet<>();
         admins.add(EMAIL);
@@ -366,14 +347,12 @@ public class PermissionsServiceImplTest {
         when(accessMapping.getAdministrators())
                 .thenReturn(admins);
 
-        try {
-            permissions.addEditor(EMAIL, session);
-        } catch (UnauthorizedException e) {
-            verify(permissionsStore, times(1)).getAccessMapping();
-            verify(accessMapping, times(2)).getAdministrators();
-            verifyNoMoreInteractions(permissionsStore, accessMapping);
-            throw e;
-        }
+        Exception exception = assertThrows(UnauthorizedException.class, () ->
+                permissions.addEditor(EMAIL, session));
+
+        verify(permissionsStore, times(1)).getAccessMapping();
+        verify(accessMapping, times(2)).getAdministrators();
+        verifyNoMoreInteractions(permissionsStore, accessMapping);
     }
 
     @Test

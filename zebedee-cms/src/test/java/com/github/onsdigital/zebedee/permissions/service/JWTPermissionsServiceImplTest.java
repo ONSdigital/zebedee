@@ -2,7 +2,8 @@ package com.github.onsdigital.zebedee.permissions.service;
 
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
-import com.github.onsdigital.zebedee.json.PermissionDefinition;import com.github.onsdigital.zebedee.permissions.model.AccessMapping;
+import com.github.onsdigital.zebedee.json.PermissionDefinition;
+import com.github.onsdigital.zebedee.permissions.model.AccessMapping;
 import com.github.onsdigital.zebedee.permissions.store.PermissionsStore;
 import com.github.onsdigital.zebedee.session.model.Session;
 import org.hamcrest.collection.IsMapContaining;

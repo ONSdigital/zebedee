@@ -1614,36 +1614,36 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
 
     @Test
     public void isAllContentReviewed_shouldReturnFalseWhenDatasetNotReviewed() throws IOException, ZebedeeException {
-        // Given a collection with a dataset that has not been set to reviewed.
-        Path collectionPath = Files.createTempDirectory(Random.id()); // create a temp directory to generate content into
-        Collection collection = CollectionTest.createCollection(collectionPath, "isAllContentReviewed");
+            // Given a collection with a dataset that has not been set to reviewed.
+            Path collectionPath = Files.createTempDirectory(Random.id()); // create a temp directory to generate content into
+            Collection collection = CollectionTest.createCollection(collectionPath, "isAllContentReviewed");
 
-        CollectionDataset dataset = new CollectionDataset();
-        dataset.setState(ContentStatus.Complete);
-        collection.getDescription().addDataset(dataset);
+            CollectionDataset dataset = new CollectionDataset();
+            dataset.setState(ContentStatus.Complete);
+            collection.getDescription().addDataset(dataset);
 
-        // When isAllContentReviewed() is called
-        boolean allContentReviewed = collection.isAllContentReviewed(true);
+            // When isAllContentReviewed() is called
+            boolean allContentReviewed = collection.isAllContentReviewed(true);
 
-        // Then the result is false
-        assertFalse(allContentReviewed);
+            // Then the result is false
+            assertFalse(allContentReviewed);
     }
 
     @Test
     public void isAllContentReviewed_shouldReturnFalseWhenDatasetVersionNotReviewed() throws IOException, ZebedeeException {
-        // Given a collection with a dataset version that has not been set to reviewed.
-        Path collectionPath = Files.createTempDirectory(Random.id()); // create a temp directory to generate content into
-        Collection collection = CollectionTest.createCollection(collectionPath, "isAllContentReviewed");
+            // Given a collection with a dataset version that has not been set to reviewed.
+            Path collectionPath = Files.createTempDirectory(Random.id()); // create a temp directory to generate content into
+            Collection collection = CollectionTest.createCollection(collectionPath, "isAllContentReviewed");
 
-        CollectionDatasetVersion datasetVersion = new CollectionDatasetVersion();
-        datasetVersion.setState(ContentStatus.Complete);
-        collection.getDescription().addDatasetVersion(datasetVersion);
+            CollectionDatasetVersion datasetVersion = new CollectionDatasetVersion();
+            datasetVersion.setState(ContentStatus.Complete);
+            collection.getDescription().addDatasetVersion(datasetVersion);
 
-        // When isAllContentReviewed() is called
-        boolean allContentReviewed = collection.isAllContentReviewed(true);
+            // When isAllContentReviewed() is called
+            boolean allContentReviewed = collection.isAllContentReviewed(true);
 
-        // Then the result is false
-        assertFalse(allContentReviewed);
+            // Then the result is false
+            assertFalse(allContentReviewed);
     }
 
     @Test

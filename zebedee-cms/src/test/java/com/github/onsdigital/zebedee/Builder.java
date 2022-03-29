@@ -89,7 +89,7 @@ public class Builder {
     public Team labourMarketTeam;
     public Team inflationTeam;
 
-    private final Zebedee zebedee;
+    private Zebedee zebedee;
 
     /**
      * Constructor to build a known {@link Zebedee} structure with minimal structure for testing.
@@ -205,7 +205,7 @@ public class Builder {
 
 
         ZebedeeConfiguration configuration = new ZebedeeConfiguration(parent, false);
-        ReflectionTestUtils.setField(configuration, "slackClient", slackClient);
+        ReflectionTestUtils.setField(configuration,"slackClient",slackClient);
         this.zebedee = new Zebedee(configuration);
 
         inflationTeam = createTeam(reviewer1, teamNames[0], teams);

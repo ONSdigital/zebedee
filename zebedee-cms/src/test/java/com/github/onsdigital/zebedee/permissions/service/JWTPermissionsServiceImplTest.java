@@ -230,10 +230,9 @@ public class JWTPermissionsServiceImplTest {
 
         assertTrue(jwtPermissionsService.canView(session, COLLECTION_ID));
     }
-
-
+    
     @Test
-    public void canView_CollectionId_Session() throws Exception {
+    public void canView_CollectionId_Session_viewer() throws Exception {
         String teamId = "123456";
         List<String> teamList = new ArrayList<>();
         teamList.add(teamId);
@@ -241,6 +240,8 @@ public class JWTPermissionsServiceImplTest {
         Session session = new Session(TEST_SESSION_ID, TEST_USER_EMAIL, teamList);
 
         Set<String> teams = new HashSet<String>() {{
+            add("12345");
+            add("67890");
             add(teamId);
         }};
         Map<String, Set<String>> collectionMapping = new HashMap<>();
@@ -345,13 +346,14 @@ public class JWTPermissionsServiceImplTest {
         assertTrue(collectionMapping.get(COLLECTION_ID).contains(teamId));
     }
 
-/**
-* note if (teamIds == null) {
-                       teamIds = new HashSet<>();
-                   }
-        can't be tested as an empty or null teamIds will be caught by canview
- @throws Exception
-*/
+    /**
+    * note if (teamIds == null) {
+    *                       teamIds = new HashSet<>();
+    *                   }
+    *        can't be tested as an empty or null teamIds will be caught by canview
+    * @throws Exception
+    */
+    
     @Test
     public void listViewerTeams_collectionDescription_session() throws Exception {
         List<String> sessionGroups = new ArrayList<>();
@@ -445,8 +447,7 @@ public class JWTPermissionsServiceImplTest {
                 jwtPermissionsService.userPermissions(TEST_USER_EMAIL, session));
         assertEquals("JWT sessions are enabled: userPermissions is no longer supported", exception.getMessage());
     }
-
-
+    
    @Test
     public void userPermissions_Sessions() throws Exception {
         Session session = new Session(TEST_SESSION_ID, TEST_USER_EMAIL, ADMIN_PUBLISHER_GROUPS);
@@ -455,8 +456,4 @@ public class JWTPermissionsServiceImplTest {
         assertTrue(actual.isEditor());
         assertTrue(actual.getEmail() == TEST_USER_EMAIL);
     }
-
-
-
-
 }

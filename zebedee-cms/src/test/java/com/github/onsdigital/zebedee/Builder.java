@@ -342,8 +342,7 @@ public class Builder {
             team.setId(String.valueOf(teamId_int));
 
         } catch (NumberFormatException e) {
-            //Will Throw exception!
-            //do something! anything to handle the exception.
+            info().exception(e).log("failed to convert teamId");
         }
 
         team.setName(name);

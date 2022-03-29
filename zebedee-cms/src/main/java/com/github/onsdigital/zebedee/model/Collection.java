@@ -98,7 +98,7 @@ public class Collection {
     private final Content complete;
     private final Content inProgress;
 
-    private Zebedee zebedee;
+    private final Zebedee zebedee;
 
     private final Path collectionJsonPath;
     private VersionsService versionsService;

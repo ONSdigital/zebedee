@@ -30,7 +30,12 @@ import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 import static org.mockito.Mockito.when;

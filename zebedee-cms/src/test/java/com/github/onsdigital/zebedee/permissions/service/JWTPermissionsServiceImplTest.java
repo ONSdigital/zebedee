@@ -36,8 +36,6 @@ public class JWTPermissionsServiceImplTest {
     private static final List<String> ADMIN_PUBLISHER_GROUPS = Arrays.asList("123456", "role-publisher", "role-admin", "789012345", "testgroup0");
     private static final List<String> NON_ADMIN_PUBLISHER_GROUPS = Arrays.asList("123456", "789012345");
     private static final String COLLECTION_ID = "1234";
-//    private static final String FLORENCE_TOKEN = "666";
-
     private static final String TEST_SESSION_ID = "666";
     private static final String TEST_USER_EMAIL = "other123@ons.gov.uk";
     private static final String PUBLISHER = "role-publisher";

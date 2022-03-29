@@ -366,9 +366,6 @@ public class CollectionTest extends ZebedeeAPIBaseTestCase {
         when(collections.getCollection("1234"))
                 .thenReturn(collection);
 
-        when(usersService.getUserByEmail(TEST_EMAIL))
-                .thenReturn(user);
-
         boolean result = endpoint.deleteCollection(mockRequest, mockResponse);
 
         assertTrue(result);

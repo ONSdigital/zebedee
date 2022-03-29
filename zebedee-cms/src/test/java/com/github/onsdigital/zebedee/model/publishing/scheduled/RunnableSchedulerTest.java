@@ -113,18 +113,17 @@ public class RunnableSchedulerTest {
     public void scheduleShouldTakeMillisecondsIntoAccount() throws InterruptedException, ExecutionException {
         // Given a scheduled task that fails with an exception.
         DummyTask task = new DummyTask();
-        Date scheduled = DateTime.now().plusSeconds(10).withMillisOfSecond(567).toDate();
+        DateTime now = DateTime.now();
+        Date scheduled = now.plusSeconds(10).withMillisOfSecond(567).toDate();
+        long expected = scheduled.getTime() - now.getMillis();
+
         ScheduledFuture<?> future = runnableScheduler.schedule(task, scheduled);
 
         assertNotNull(future);
 
         long delayInMs = future.getDelay(TimeUnit.MILLISECONDS);
-
-        long expected = scheduled.getTime() - DateTime.now().getMillis();
         long timeDiff = delayInMs - expected;
         // check delay in ms is as expected within 500ms tolerance
-        assertTrue(timeDiff >= 0 && timeDiff <= 500);
+        assertTrue(timeDiff <= 500);
     }
 }
-
-

@@ -63,8 +63,6 @@ public class ZebedeeCollectionReader extends CollectionReader {
 
         checkUserAuthorisedToAccessCollection(zebedee, collection.getDescription().getId(), session);
 
-        User user = getUser(zebedee, session);
-
         SecretKey key = getCollectionKey(zebedee, collection, session);
 
         init(collection, key);
@@ -94,14 +92,6 @@ public class ZebedeeCollectionReader extends CollectionReader {
 
         if (session == null) {
             throw new UnauthorizedException(SESSION_NULL_ERR);
-        }
-    }
-
-    private User getUser(Zebedee zebedee, Session session) throws IOException {
-        try {
-            return zebedee.getUsersService().getUserByEmail(session.getEmail());
-        } catch (Exception ex) {
-            throw new IOException(GET_USER_ERR, ex);
         }
     }
 

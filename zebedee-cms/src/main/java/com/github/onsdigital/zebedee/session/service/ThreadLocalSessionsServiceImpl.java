@@ -1,5 +1,7 @@
 package com.github.onsdigital.zebedee.session.service;
 
+import com.github.onsdigital.zebedee.exceptions.NotFoundException;
+import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.PermissionDefinition;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.permissions.store.PermissionsStore;
@@ -32,6 +34,7 @@ public class ThreadLocalSessionsServiceImpl extends SessionsServiceImpl {
 
     public static final String ACCESS_TOKEN_REQUIRED_ERROR = "access token required but none provided.";
     public static final String ACCESS_TOKEN_EXPIRED_ERROR = "session token lookup failed as token is expired.";
+    public static final String FAILED_PERMISSIONS_LOOKUP_ERROR = "unexpected error: failed to get permissions for user";
 
     public static final String ADMIN_GROUP = "role-admin";
     public static final String PUBLISHER_GROUP = "role-publisher";
@@ -41,24 +44,6 @@ public class ThreadLocalSessionsServiceImpl extends SessionsServiceImpl {
         super(legacySessionsStore);
         this.permissionsService = permissionsService;
         this.teamsService = teamsService;
-    }
-
-    /**
-     * Get a {@link Session} session object from thread local.
-     *
-     * @param id the {@link String} to get the session object from thread local for.
-     * @return the {@link Session} from thread local or <code>null</code> if no session is found.
-     *
-     * @deprecated Since the new JWT sessions implementation can only get the session of the current user, a single
-     *             {@link this#get()} method is provided. Once migration to the new JWT sessions is completed all
-     *             references to this method should be updated to use the {@link this#get()} instead.
-     *
-     * TODO: Write out usage of this method prior to JWT migration
-     */
-    @Deprecated
-    @Override
-    public Session get(String id) {
-        return get();
     }
 
     /**
@@ -76,7 +61,7 @@ public class ThreadLocalSessionsServiceImpl extends SessionsServiceImpl {
      *
      * @param token - the access token to be verified and stored.
      * @throws SessionsException for any problem verifying a token or storing a session in ThreadLocal
-     * @throws IOException if a filesystem error occurs
+     * @throws IOException       if a filesystem error occurs
      */
     @Override
     public void set(String token) throws SessionsException, IOException {
@@ -93,14 +78,25 @@ public class ThreadLocalSessionsServiceImpl extends SessionsServiceImpl {
         }
 
         List<String> teams = new ArrayList<>();
-        PermissionDefinition permissions = permissionsService.userPermissions(session);
+        PermissionDefinition permissions = null;
+        try {
+            permissions = permissionsService.userPermissions(session.getEmail(), session);
+        } catch (NotFoundException e) {
+            throw new SessionsException(FAILED_PERMISSIONS_LOOKUP_ERROR);
+        } catch (UnauthorizedException e) {
+            // This should be impossible since the email and session passed in will always match
+            throw new IOException("if you are seeing this it is definitely a bug, this error should be impossible");
+        }
 
-        if (permissions.isAdmin()) {
-            teams.add(ADMIN_GROUP);
+        if (permissions != null) {
+            if (permissions.isAdmin()) {
+                teams.add(ADMIN_GROUP);
+            }
+            if (permissions.isEditor()) {
+                teams.add(PUBLISHER_GROUP);
+            }
         }
-        if (permissions.isEditor()) {
-            teams.add(PUBLISHER_GROUP);
-        }
+
         teams.addAll(teamsService.listTeamsForUser(session));
 
         store.set(new Session(session.getId(), session.getEmail(), teams));

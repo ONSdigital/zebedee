@@ -27,7 +27,6 @@ import com.github.onsdigital.zebedee.notification.StartUpNotifier;
 import com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImpl;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsServiceImpl;
-import com.github.onsdigital.zebedee.permissions.service.PermissionsServiceProxy;
 import com.github.onsdigital.zebedee.permissions.store.PermissionsStore;
 import com.github.onsdigital.zebedee.permissions.store.PermissionsStoreFileSystemImpl;
 import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
@@ -124,7 +123,6 @@ public class ZebedeeConfiguration {
     private TeamsService teamsService;
     private Sessions sessions;
     private DataIndex dataIndex;
-    private PermissionsStore permissionsStore;
     private DatasetService datasetService;
     private ImageService imageService;
     private KafkaService kafkaService;
@@ -183,12 +181,12 @@ public class ZebedeeConfiguration {
         this.published = createPublished();
 
         initialisePermissions(permissionsPath);
-        this.permissionsStore = new PermissionsStoreFileSystemImpl(permissionsPath);
-
-        PermissionsServiceImpl legacyPermissionsService = new PermissionsServiceImpl(permissionsStore, this::getTeamsService);
-        JWTPermissionsServiceImpl jwtPermissionsService = new JWTPermissionsServiceImpl(permissionsStore);
-        this.permissionsService = new PermissionsServiceProxy(cmsFeatureFlags().isJwtSessionsEnabled(),
-                legacyPermissionsService, jwtPermissionsService);
+        PermissionsStore permissionsStore = new PermissionsStoreFileSystemImpl(permissionsPath);
+        if (cmsFeatureFlags().isJwtSessionsEnabled()) {
+            this.permissionsService = new JWTPermissionsServiceImpl(permissionsStore);
+        } else {
+            this.permissionsService = new PermissionsServiceImpl(permissionsStore);
+        }
 
         VersionsService versionsService = new VersionsServiceImpl();
         this.collections = new Collections(collectionsPath, permissionsService, versionsService, published);

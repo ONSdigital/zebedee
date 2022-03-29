@@ -1,5 +1,7 @@
 package com.github.onsdigital.zebedee.permissions.service;
 
+import com.github.onsdigital.zebedee.exceptions.BadRequestException;
+import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.PermissionDefinition;
 import com.github.onsdigital.zebedee.permissions.model.AccessMapping;
@@ -32,7 +34,8 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
     private static final String ADMIN_GROUP = "role-admin";
     private static final String UNSUPPORTED_ERROR = "JWT sessions are enabled: {0} is no longer supported";
 
-    private PermissionsStore permissionsStore;
+    // TODO: change the following field to private once migration to JWT sessions is complete and the PermissionsServiceImpl is removed
+    protected PermissionsStore permissionsStore;
     private ReentrantReadWriteLock readWriteLock = new ReentrantReadWriteLock();
     private final Lock readLock = readWriteLock.readLock();
     private final Lock writeLock = readWriteLock.writeLock();
@@ -57,8 +60,7 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
      */
     @Override
     public boolean isPublisher(Session session) {
-        return session != null && !StringUtils.isEmpty(session.getEmail()) &&
-                isGroupMember(session, PUBLISHER_GROUP);
+        return session != null && isGroupMember(session, PUBLISHER_GROUP);
     }
 
     /**
@@ -69,8 +71,7 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
      */
     @Override
     public boolean isAdministrator(Session session) {
-        return session != null && !StringUtils.isEmpty(session.getEmail()) &&
-                isGroupMember(session, ADMIN_GROUP);
+        return session != null && isGroupMember(session, ADMIN_GROUP);
     }
 
     /**
@@ -84,7 +85,7 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
      */
     @Deprecated
     @Override
-    public boolean hasAdministrator() {
+    public boolean hasAdministrator() throws IOException {
         throw new UnsupportedOperationException(format(UNSUPPORTED_ERROR, "hasAdministrator"));
     }
 
@@ -100,7 +101,7 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
      */
     @Deprecated
     @Override
-    public void addAdministrator(String email, Session session) {
+    public void addAdministrator(String email, Session session) throws UnauthorizedException, IOException {
         throw new UnsupportedOperationException(format(UNSUPPORTED_ERROR, "addAdministrator"));
     }
 
@@ -116,7 +117,7 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
      */
     @Deprecated
     @Override
-    public void removeAdministrator(String email, Session session) {
+    public void removeAdministrator(String email, Session session) throws IOException, UnauthorizedException {
         throw new UnsupportedOperationException(format(UNSUPPORTED_ERROR, "removeAdministrator"));
     }
 
@@ -149,7 +150,7 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
      */
     @Deprecated
     @Override
-    public void addEditor(String email, Session session) {
+    public void addEditor(String email, Session session) throws IOException, UnauthorizedException, NotFoundException, BadRequestException {
         throw new UnsupportedOperationException(format(UNSUPPORTED_ERROR, "addEditor"));
     }
 
@@ -165,7 +166,7 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
      */
     @Deprecated
     @Override
-    public void removeEditor(String email, Session session) {
+    public void removeEditor(String email, Session session) throws IOException, UnauthorizedException {
         throw new UnsupportedOperationException(format(UNSUPPORTED_ERROR, "removeEditor"));
     }
 
@@ -184,12 +185,15 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
             return false;
         }
 
+        if (canEdit(session)) {
+            return true;
+            }
+
         List<String> userGroups = session.getGroups();
         if (userGroups == null || userGroups.isEmpty()) {
             return false;
         }
 
-        boolean result = false;
         readLock.lock();
         try {
             AccessMapping accessMapping = permissionsStore.getAccessMapping();
@@ -202,15 +206,16 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
             List<String> intersection = userGroups.stream()
                     .filter(collectionGroups::contains)
                     .collect(Collectors.toList());
-            result = !intersection.isEmpty();
+
+            return !intersection.isEmpty();
+
         } catch (IOException e) {
             error().data("collectionId", collectionId).data("user", session.getEmail())
                     .logException(e, "canView permission request denied: unexpected error");
         } finally {
             readLock.unlock();
         }
-
-        return result;
+        return false;
     }
 
     /**
@@ -232,7 +237,6 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
-        boolean result = false;
         readLock.lock();
         Set<String> teamIds;
         try {
@@ -296,7 +300,7 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
      */
     @Deprecated
     @Override
-    public PermissionDefinition userPermissions(String email, Session session) {
+    public PermissionDefinition userPermissions(String email, Session session) throws IOException, UnauthorizedException {
         throw new UnsupportedOperationException(format(UNSUPPORTED_ERROR, "userPermissions"));
     }
 

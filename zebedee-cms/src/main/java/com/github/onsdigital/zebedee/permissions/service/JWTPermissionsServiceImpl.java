@@ -187,7 +187,7 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
 
         if (canEdit(session)) {
             return true;
-            }
+        }
 
         List<String> userGroups = session.getGroups();
         if (userGroups == null || userGroups.isEmpty()) {

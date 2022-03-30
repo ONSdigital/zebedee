@@ -19,7 +19,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.ws.rs.HEAD;
 
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -32,7 +31,6 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 public class JWTPermissionsServiceImplTest {
-
     private static final List<String> ADMIN_PUBLISHER_GROUPS = Arrays.asList("123456", "role-publisher", "role-admin", "789012345", "testgroup0");
     private static final List<String> NON_ADMIN_PUBLISHER_GROUPS = Arrays.asList("123456", "789012345");
     private static final String COLLECTION_ID = "1234";
@@ -47,10 +45,6 @@ public class JWTPermissionsServiceImplTest {
     private JWTPermissionsServiceImpl jwtPermissionsService;
 
     @Mock
-    private Session session;
-    @Mock
-    private JWTPermissionsServiceImpl jwtPermissionsServiceMock;
-    @Mock
     private PermissionsStore jwtPermissionStore;
 
     @Mock
@@ -59,321 +53,313 @@ public class JWTPermissionsServiceImplTest {
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.openMocks(this);
-        jwtPermissionsService = new JWTPermissionsServiceImpl(jwtPermissionStore);
+        this.jwtPermissionsService = new JWTPermissionsServiceImpl(this.jwtPermissionStore);
 
-        when(jwtPermissionStore.getAccessMapping()).thenReturn(accessMapping);
+        when(this.jwtPermissionStore.getAccessMapping()).thenReturn(this.accessMapping);
     }
 
     @Test
     public void isPublisher_Session_Publisher_ShouldReturnTrue() throws Exception {
-        List<String> sessionGroups = new ArrayList<>();
-        sessionGroups.add(PUBLISHER);
+        final List<String> sessionGroups = new ArrayList<>();
+        sessionGroups.add(com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.PUBLISHER);
 
-        Session session = new Session(TEST_SESSION_ID, TEST_USER_EMAIL, sessionGroups);
-        assertTrue(jwtPermissionsService.isPublisher(session));
+        final Session session = new Session(com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.TEST_SESSION_ID, com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.TEST_USER_EMAIL, sessionGroups);
+        assertTrue(this.jwtPermissionsService.isPublisher(session));
     }
 
     @Test
     public void isPublisher_Session_Admin_ShouldReturnFalse() throws Exception {
-        List<String> sessionGroups = new ArrayList<>();
-        sessionGroups.add(ADMIN);
+        final List<String> sessionGroups = new ArrayList<>();
+        sessionGroups.add(com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.ADMIN);
 
-        Session session = new Session(TEST_SESSION_ID, TEST_USER_EMAIL, sessionGroups);
-        assertFalse(jwtPermissionsService.isPublisher(session));
+        final Session session = new Session(com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.TEST_SESSION_ID, com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.TEST_USER_EMAIL, sessionGroups);
+        assertFalse(this.jwtPermissionsService.isPublisher(session));
     }
 
     @Test
     public void isPublisher_SessionNull_ShouldReturnFalse() throws Exception {
-        Session session = null;
-        assertFalse(jwtPermissionsService.isPublisher(session));
-        verifyNoInteractions(jwtPermissionStore);
+        final Session session = null;
+        assertFalse(this.jwtPermissionsService.isPublisher(session));
+        verifyNoInteractions(this.jwtPermissionStore);
     }
 
     @Test
     public void isPublisher_Session_NotPublisher_ShouldReturnFalse() throws Exception {
-        Session session = new Session(TEST_SESSION_ID, TEST_USER_EMAIL, new ArrayList<>());
-        assertFalse(jwtPermissionsService.isPublisher(session));
-        verifyNoInteractions(jwtPermissionStore);
+        final Session session = new Session(com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.TEST_SESSION_ID, com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.TEST_USER_EMAIL, new ArrayList<>());
+        assertFalse(this.jwtPermissionsService.isPublisher(session));
+        verifyNoInteractions(this.jwtPermissionStore);
     }
 
     @Test
     public void isPublisher_Session_NullGroup_ShouldReturnFalse() throws Exception {
-        Session session = new Session(TEST_SESSION_ID, TEST_USER_EMAIL, null);
-        assertFalse(jwtPermissionsService.isPublisher(session));
-        verifyNoInteractions(jwtPermissionStore);
+        final Session session = new Session(com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.TEST_SESSION_ID, com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.TEST_USER_EMAIL, null);
+        assertFalse(this.jwtPermissionsService.isPublisher(session));
+        verifyNoInteractions(this.jwtPermissionStore);
     }
 
     @Test
     public void isAdministrator_Session_Admin_ShouldReturnTrue() throws Exception {
-        List<String> sessionGroups = new ArrayList<>();
-        sessionGroups.add(ADMIN);
+        final List<String> sessionGroups = new ArrayList<>();
+        sessionGroups.add(com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.ADMIN);
 
-        Session session = new Session(TEST_SESSION_ID, TEST_USER_EMAIL, sessionGroups);
-        assertTrue(jwtPermissionsService.isAdministrator(session));
+        final Session session = new Session(com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.TEST_SESSION_ID, com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.TEST_USER_EMAIL, sessionGroups);
+        assertTrue(this.jwtPermissionsService.isAdministrator(session));
     }
 
     @Test
     public void isAdministrator_Session_Publisher_ShouldReturnFalse() throws Exception {
-        List<String> sessionGroups = new ArrayList<>();
-        sessionGroups.add(PUBLISHER);
+        final List<String> sessionGroups = new ArrayList<>();
+        sessionGroups.add(com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.PUBLISHER);
 
-        Session session = new Session(TEST_SESSION_ID, TEST_USER_EMAIL, sessionGroups);
-        assertFalse(jwtPermissionsService.isAdministrator(session));
+        final Session session = new Session(com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.TEST_SESSION_ID, com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.TEST_USER_EMAIL, sessionGroups);
+        assertFalse(this.jwtPermissionsService.isAdministrator(session));
     }
 
     @Test
     public void isAdministrator_SessionNull_ShouldReturnFalse() throws Exception {
-        Session session = null;
-        assertFalse(jwtPermissionsService.isAdministrator(session));
-        verifyNoInteractions(jwtPermissionStore);
+        final Session session = null;
+        assertFalse(this.jwtPermissionsService.isAdministrator(session));
+        verifyNoInteractions(this.jwtPermissionStore);
     }
 
     @Test
     public void isAdministrator_Session_EmailNull_ShouldReturnFalse() throws Exception {
-        List<String> sessionGroups = new ArrayList<>();
-        sessionGroups.add(PUBLISHER);
+        final List<String> sessionGroups = new ArrayList<>();
+        sessionGroups.add(com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.PUBLISHER);
 
-        Session session = new Session(TEST_SESSION_ID, null, sessionGroups);
-        assertFalse(jwtPermissionsService.isAdministrator(session));
-        verifyNoInteractions(jwtPermissionStore);
+        final Session session = new Session(com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.TEST_SESSION_ID, null, sessionGroups);
+        assertFalse(this.jwtPermissionsService.isAdministrator(session));
+        verifyNoInteractions(this.jwtPermissionStore);
     }
 
     @Test
     public void isAdministrator_Session_NotAdmin_ShouldReturnFalse() throws Exception {
-        Session session = new Session(TEST_SESSION_ID, TEST_USER_EMAIL, new ArrayList<>());
-        assertFalse(jwtPermissionsService.isAdministrator(session));
-        verifyNoInteractions(jwtPermissionStore);
+        final Session session = new Session(com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.TEST_SESSION_ID, com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.TEST_USER_EMAIL, new ArrayList<>());
+        assertFalse(this.jwtPermissionsService.isAdministrator(session));
+        verifyNoInteractions(this.jwtPermissionStore);
     }
 
     @Test
     public void isAdministrator_Session_NullGroup_ShouldReturnFalse() throws Exception {
-        Session session = new Session(TEST_SESSION_ID, TEST_USER_EMAIL, null);
-        assertFalse(jwtPermissionsService.isAdministrator(session));
-        verifyNoInteractions(jwtPermissionStore);
+        final Session session = new Session(com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.TEST_SESSION_ID, com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.TEST_USER_EMAIL, null);
+        assertFalse(this.jwtPermissionsService.isAdministrator(session));
+        verifyNoInteractions(this.jwtPermissionStore);
     }
 
     @Test
     public void hasAdministrator_ShouldError() throws Exception {
-        UnsupportedOperationException exception = assertThrows(UnsupportedOperationException.class, () ->
-                jwtPermissionsService.hasAdministrator());
+        final UnsupportedOperationException exception = assertThrows(UnsupportedOperationException.class, () ->
+                this.jwtPermissionsService.hasAdministrator());
         assertEquals("JWT sessions are enabled: hasAdministrator is no longer supported", exception.getMessage());
     }
 
     @Test
     public void addAdministrator_Email_Sessions_ShouldError() throws Exception {
-        Session session = new Session(TEST_SESSION_ID, TEST_USER_EMAIL);
-        UnsupportedOperationException exception = assertThrows(UnsupportedOperationException.class, () ->
-                jwtPermissionsService.addAdministrator(TEST_USER_EMAIL, session));
+        final Session session = new Session(com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.TEST_SESSION_ID, com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.TEST_USER_EMAIL);
+        final UnsupportedOperationException exception = assertThrows(UnsupportedOperationException.class, () ->
+                this.jwtPermissionsService.addAdministrator(com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.TEST_USER_EMAIL, session));
         assertEquals("JWT sessions are enabled: addAdministrator is no longer supported", exception.getMessage());
     }
 
     @Test
     public void removeAdministrator_Email_Sessions_ShouldError() throws Exception {
-        Session session = new Session(TEST_SESSION_ID, TEST_USER_EMAIL);
-        UnsupportedOperationException exception = assertThrows(UnsupportedOperationException.class, () ->
-                jwtPermissionsService.removeAdministrator(TEST_USER_EMAIL, session));
+        final Session session = new Session(com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.TEST_SESSION_ID, com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.TEST_USER_EMAIL);
+        final UnsupportedOperationException exception = assertThrows(UnsupportedOperationException.class, () ->
+                this.jwtPermissionsService.removeAdministrator(com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.TEST_USER_EMAIL, session));
         assertEquals("JWT sessions are enabled: removeAdministrator is no longer supported", exception.getMessage());
     }
 
     @Test
     public void canEdit_Session_Publisher_ShouldReturnTrue() throws Exception {
-        List<String> sessionGroups = new ArrayList<>();
-        sessionGroups.add(PUBLISHER);
+        final List<String> sessionGroups = new ArrayList<>();
+        sessionGroups.add(com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.PUBLISHER);
 
-        Session session = new Session(TEST_SESSION_ID, TEST_USER_EMAIL, sessionGroups);
-        assertTrue(jwtPermissionsService.canEdit(session));
+        final Session session = new Session(com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.TEST_SESSION_ID, com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.TEST_USER_EMAIL, sessionGroups);
+        assertTrue(this.jwtPermissionsService.canEdit(session));
     }
 
     @Test
     public void canEdit_SessionNull_ShouldReturnFalse() throws Exception {
-        Session session = null;
-        assertFalse(jwtPermissionsService.canEdit(session));
-        verifyNoInteractions(jwtPermissionStore);
+        final Session session = null;
+        assertFalse(this.jwtPermissionsService.canEdit(session));
+        verifyNoInteractions(this.jwtPermissionStore);
     }
 
     @Test
     public void canEdit_Session_NotPublisher_ShouldReturnFalse() throws Exception {
-        Session session = new Session(TEST_SESSION_ID, TEST_USER_EMAIL, new ArrayList<>());
+        final Session session = new Session(com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.TEST_SESSION_ID, com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.TEST_USER_EMAIL, new ArrayList<>());
 
-        assertFalse(jwtPermissionsService.canEdit(session));
-        verifyNoInteractions(jwtPermissionStore);
+        assertFalse(this.jwtPermissionsService.canEdit(session));
+        verifyNoInteractions(this.jwtPermissionStore);
     }
 
     @Test
     public void canEdit_Session_NullGroup_ShouldReturnFalse() throws Exception {
-        Session session = new Session(TEST_SESSION_ID, TEST_USER_EMAIL, null);
-        assertFalse(jwtPermissionsService.canEdit(session));
-        verifyNoInteractions(jwtPermissionStore);
+        final Session session = new Session(com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.TEST_SESSION_ID, com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.TEST_USER_EMAIL, null);
+        assertFalse(this.jwtPermissionsService.canEdit(session));
+        verifyNoInteractions(this.jwtPermissionStore);
     }
 
     @Test
     public void addEditor_Email_Session_ShouldError() throws Exception {
-        Session session = new Session(TEST_SESSION_ID, TEST_USER_EMAIL);
-        UnsupportedOperationException exception = assertThrows(UnsupportedOperationException.class, () ->
-                jwtPermissionsService.addEditor(TEST_USER_EMAIL, session));
+        final Session session = new Session(com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.TEST_SESSION_ID, com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.TEST_USER_EMAIL);
+        final UnsupportedOperationException exception = assertThrows(UnsupportedOperationException.class, () ->
+                this.jwtPermissionsService.addEditor(com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.TEST_USER_EMAIL, session));
         assertEquals("JWT sessions are enabled: addEditor is no longer supported", exception.getMessage());
     }
 
     @Test
     public void removeEditor_Email_Session_ShouldError() throws Exception {
-        Session session = new Session(TEST_SESSION_ID, TEST_USER_EMAIL);
-        UnsupportedOperationException exception = assertThrows(UnsupportedOperationException.class, () ->
-                jwtPermissionsService.removeEditor(TEST_USER_EMAIL, session));
+        final Session session = new Session(com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.TEST_SESSION_ID, com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.TEST_USER_EMAIL);
+        final UnsupportedOperationException exception = assertThrows(UnsupportedOperationException.class, () ->
+                this.jwtPermissionsService.removeEditor(com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.TEST_USER_EMAIL, session));
         assertEquals("JWT sessions are enabled: removeEditor is no longer supported", exception.getMessage());
     }
 
     @Test
     public void canView_CollectionId_Session_publisher() throws Exception {
-        List<String> sessionGroups = new ArrayList<>();
-        sessionGroups.add(PUBLISHER);
-        Session session = new Session(TEST_SESSION_ID, TEST_USER_EMAIL, sessionGroups);
+        final List<String> sessionGroups = new ArrayList<>();
+        sessionGroups.add(com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.PUBLISHER);
+        final Session session = new Session(com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.TEST_SESSION_ID, com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.TEST_USER_EMAIL, sessionGroups);
 
-        assertTrue(jwtPermissionsService.canView(session, COLLECTION_ID));
+        assertTrue(this.jwtPermissionsService.canView(session, com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.COLLECTION_ID));
     }
-    
+
     @Test
     public void canView_CollectionId_Session_viewer() throws Exception {
-        String teamId = "123456";
-        List<String> teamList = new ArrayList<>();
+        final String teamId = "123456";
+        final List<String> teamList = new ArrayList<>();
         teamList.add(teamId);
 
-        Session session = new Session(TEST_SESSION_ID, TEST_USER_EMAIL, teamList);
+        final Session session = new Session(com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.TEST_SESSION_ID, com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.TEST_USER_EMAIL, teamList);
 
-        Set<String> teams = new HashSet<String>() {{
-            add("12345");
-            add("67890");
-            add(teamId);
+        final Set<String> teams = new HashSet<String>() {{
+            this.add("12345");
+            this.add("67890");
+            this.add(teamId);
         }};
-        Map<String, Set<String>> collectionMapping = new HashMap<>();
-        collectionMapping.put(COLLECTION_ID, teams);
+        final Map<String, Set<String>> collectionMapping = new HashMap<>();
+        collectionMapping.put(com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.COLLECTION_ID, teams);
 
-        when(accessMapping.getCollections()).thenReturn(collectionMapping);
+        when(this.accessMapping.getCollections()).thenReturn(collectionMapping);
 
-        assertTrue(jwtPermissionsService.canView(session, COLLECTION_ID));
+        assertTrue(this.jwtPermissionsService.canView(session, com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.COLLECTION_ID));
     }
 
     @Test
     public void canView_Session_Null_CollectionId() throws Exception {
-        assertFalse(jwtPermissionsService.canView(null, COLLECTION_ID));
+        assertFalse(this.jwtPermissionsService.canView(null, com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.COLLECTION_ID));
     }
 
     @Test
     public void canView_Session_GroupNull_CollectionId() throws Exception {
-        Session session = new Session(TEST_SESSION_ID, TEST_USER_EMAIL, null);
+        final Session session = new Session(com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.TEST_SESSION_ID, com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.TEST_USER_EMAIL, null);
 
-        Map<String, Set<String>> collectionMapping = new HashMap<>();
-        collectionMapping.put(COLLECTION_ID, new HashSet<>());
+        final Map<String, Set<String>> collectionMapping = new HashMap<>();
+        collectionMapping.put(com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.COLLECTION_ID, new HashSet<>());
 
-        when(accessMapping.getCollections()).thenReturn(collectionMapping);
+        when(this.accessMapping.getCollections()).thenReturn(collectionMapping);
 
-        assertFalse(jwtPermissionsService.canView(session, COLLECTION_ID));
+        assertFalse(this.jwtPermissionsService.canView(session, com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.COLLECTION_ID));
     }
 
     @Test
     public void canView_Session_CollectionId_Null() throws Exception {
-        List<String> sessionGroups = new ArrayList<>();
-        sessionGroups.add(PUBLISHER);
-        Session session = new Session(TEST_SESSION_ID, TEST_USER_EMAIL, new ArrayList<>());
+        final List<String> sessionGroups = new ArrayList<>();
+        sessionGroups.add(com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.PUBLISHER);
+        final Session session = new Session(com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.TEST_SESSION_ID, com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.TEST_USER_EMAIL, new ArrayList<>());
 
-        assertFalse(jwtPermissionsService.canView(session, null));
+        assertFalse(this.jwtPermissionsService.canView(session, null));
     }
 
     @Test
     public void canView_Session_CollectionDescription_NoPermissions() throws Exception {
-        List<String> sessionGroups = new ArrayList<>();
+        final List<String> sessionGroups = new ArrayList<>();
         sessionGroups.add("7890");
-        Session session = new Session(TEST_SESSION_ID, TEST_USER_EMAIL, sessionGroups);
+        final Session session = new Session(com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.TEST_SESSION_ID, com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.TEST_USER_EMAIL, sessionGroups);
 
-        Set<String> teams = new HashSet<String>() {{
-            add("12345");
-            add("67890");
+        final Set<String> teams = new HashSet<String>() {{
+            this.add("12345");
+            this.add("67890");
         }};
-        Map<String, Set<String>> collectionMapping = new HashMap<>();
-        collectionMapping.put(COLLECTION_ID, teams);
+        final Map<String, Set<String>> collectionMapping = new HashMap<>();
+        collectionMapping.put(com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.COLLECTION_ID, teams);
 
-        when(accessMapping.getCollections()).thenReturn(collectionMapping);
+        when(this.accessMapping.getCollections()).thenReturn(collectionMapping);
 
-        assertFalse(jwtPermissionsService.canView(session, COLLECTION_ID));
+        assertFalse(this.jwtPermissionsService.canView(session, com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.COLLECTION_ID));
     }
 
     @Test
     public void setViewerTeams_Session_CollectionId_TeamIds() throws Exception {
-        List<String> sessionGroups = new ArrayList<>();
-        sessionGroups.add(PUBLISHER);
-        Session session = new Session(TEST_SESSION_ID, TEST_USER_EMAIL, sessionGroups);
+        final List<String> sessionGroups = new ArrayList<>();
+        sessionGroups.add(com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.PUBLISHER);
+        final Session session = new Session(com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.TEST_SESSION_ID, com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.TEST_USER_EMAIL, sessionGroups);
 
-        Set<String> teamList = new HashSet<String>() {{
-            add("123456");
-            add("789012345");
+        final Set<String> teamList = new HashSet<String>() {{
+            this.add("123456");
+            this.add("789012345");
         }};
 
-        Map<String, Set<String>> collectionMapping = new HashMap<>();
+        final Map<String, Set<String>> collectionMapping = new HashMap<>();
 
-        when(accessMapping.getCollections()).thenReturn(collectionMapping);
+        when(this.accessMapping.getCollections()).thenReturn(collectionMapping);
 
-        jwtPermissionsService.setViewerTeams(session, COLLECTION_ID, teamList);
+        this.jwtPermissionsService.setViewerTeams(session, com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.COLLECTION_ID, teamList);
 
-        assertEquals(teamList.size(), collectionMapping.get(COLLECTION_ID).size());
-        assertEquals(collectionMapping.get(COLLECTION_ID), teamList);
+        assertEquals(teamList.size(), collectionMapping.get(com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.COLLECTION_ID).size());
+        assertEquals(collectionMapping.get(com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.COLLECTION_ID), teamList);
     }
 
     @Test
     public void setViewerTeams_Session_Null_CollectionId_TeamIds() throws Exception {
-        Session session = new Session(null, null, null);
+        final Session session = new Session(null, null, null);
 
-        Exception exception = assertThrows(UnauthorizedException.class, () ->
-                jwtPermissionsService.setViewerTeams(session, COLLECTION_ID, new HashSet<>()));
+        final Exception exception = assertThrows(UnauthorizedException.class, () ->
+                this.jwtPermissionsService.setViewerTeams(session, com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.COLLECTION_ID, new HashSet<>()));
         assertEquals("You do not have the right permission: null (null)", exception.getMessage());
     }
 
     @Test
     public void setViewerTeams_Session_CollectionId_TeamsList_emptyCollectionMapping() throws Exception {
-        List<String> sessionGroups = new ArrayList<>();
-        sessionGroups.add(PUBLISHER);
-        Session session = new Session(TEST_SESSION_ID, TEST_USER_EMAIL, sessionGroups);
+        final List<String> sessionGroups = new ArrayList<>();
+        sessionGroups.add(com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.PUBLISHER);
+        final Session session = new Session(com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.TEST_SESSION_ID, com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.TEST_USER_EMAIL, sessionGroups);
 
-        String teamId = "666";
-        Map<String, Set<String>> collectionMapping = new HashMap<>();
-        Set<String> teamList = new HashSet<>();
+        final String teamId = "666";
+        final Map<String, Set<String>> collectionMapping = new HashMap<>();
+        final Set<String> teamList = new HashSet<>();
         teamList.add(teamId);
 
-        when(accessMapping.getCollections()).thenReturn(collectionMapping);
+        when(this.accessMapping.getCollections()).thenReturn(collectionMapping);
 
-        jwtPermissionsService.setViewerTeams(session, COLLECTION_ID, teamList);
+        this.jwtPermissionsService.setViewerTeams(session, com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.COLLECTION_ID, teamList);
 
-        assertThat(collectionMapping, IsMapContaining.hasKey(COLLECTION_ID));
-        assertEquals(teamList.size(), collectionMapping.get(COLLECTION_ID).size());
-        assertTrue(collectionMapping.get(COLLECTION_ID).contains(teamId));
+        assertThat(collectionMapping, IsMapContaining.hasKey(com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.COLLECTION_ID));
+        assertEquals(teamList.size(), collectionMapping.get(com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.COLLECTION_ID).size());
+        assertTrue(collectionMapping.get(com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.COLLECTION_ID).contains(teamId));
     }
 
-    /**
-    * note if (teamIds == null) {
-    *                       teamIds = new HashSet<>();
-    *                   }
-    *        can't be tested as an empty or null teamIds will be caught by canview
-    * @throws Exception
-    */
-    
     @Test
     public void listViewerTeams_collectionDescription_session() throws Exception {
-        List<String> sessionGroups = new ArrayList<>();
-        sessionGroups.add(PUBLISHER);
-        Session session = new Session(TEST_SESSION_ID, TEST_USER_EMAIL, sessionGroups);
+        final List<String> sessionGroups = new ArrayList<>();
+        sessionGroups.add(com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.PUBLISHER);
+        final Session session = new Session(com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.TEST_SESSION_ID, com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.TEST_USER_EMAIL, sessionGroups);
 
-        CollectionDescription collectionDescriptionMock = new CollectionDescription();
-        collectionDescriptionMock.setId(COLLECTION_ID);
-        collectionDescriptionMock.setTeams(Arrays.asList(PUBLISHER));
+        final CollectionDescription collectionDescriptionMock = new CollectionDescription();
+        collectionDescriptionMock.setId(com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.COLLECTION_ID);
+        collectionDescriptionMock.setTeams(Arrays.asList(com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.PUBLISHER));
 
-        Set<String> teamList = new HashSet<String>() {{
-            add("123456");
-            add("789012345");
+        final Set<String> teamList = new HashSet<String>() {{
+            this.add("123456");
+            this.add("789012345");
         }};
-        Map<String, Set<String>> collectionMapping = new HashMap<>();
-        collectionMapping.put(COLLECTION_ID, teamList);
+        final Map<String, Set<String>> collectionMapping = new HashMap<>();
+        collectionMapping.put(com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.COLLECTION_ID, teamList);
 
-        when(accessMapping.getCollections()).thenReturn(collectionMapping);
+        when(this.accessMapping.getCollections()).thenReturn(collectionMapping);
 
-        Set<String> actual = jwtPermissionsService.listViewerTeams(session, COLLECTION_ID);
+        final Set<String> actual = this.jwtPermissionsService.listViewerTeams(session, com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.COLLECTION_ID);
         assertThat(actual, is(notNullValue()));
         assertFalse(actual.isEmpty());
         assertTrue(actual.stream().anyMatch(c -> c.equals("789012345")));
@@ -383,77 +369,77 @@ public class JWTPermissionsServiceImplTest {
 
     @Test
     public void listViewerTeams_session_collectionId_noPermissions() throws Exception {
-        Session session = new Session(TEST_SESSION_ID, TEST_USER_EMAIL, new ArrayList<>());
+        final Session session = new Session(com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.TEST_SESSION_ID, com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.TEST_USER_EMAIL, new ArrayList<>());
 
-        Map<String, Set<String>> collectionMapping = new HashMap<>();
-        collectionMapping.put(COLLECTION_ID, new HashSet<>());
+        final Map<String, Set<String>> collectionMapping = new HashMap<>();
+        collectionMapping.put(com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.COLLECTION_ID, new HashSet<>());
 
-        when(accessMapping.getCollections()).thenReturn(collectionMapping);
+        when(this.accessMapping.getCollections()).thenReturn(collectionMapping);
 
-        Exception exception = assertThrows(UnauthorizedException.class, () ->
-                jwtPermissionsService.listViewerTeams(session, COLLECTION_ID));
+        final Exception exception = assertThrows(UnauthorizedException.class, () ->
+                this.jwtPermissionsService.listViewerTeams(session, com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.COLLECTION_ID));
         assertEquals("You do not have the right permission: other123@ons.gov.uk (666)", exception.getMessage());
     }
 
     @Test
     public void listViewerTeams_Session_Null_CollectionId() throws Exception {
-        Exception exception = assertThrows(UnauthorizedException.class, () ->
-                jwtPermissionsService.listViewerTeams(null, COLLECTION_ID));
+        final Exception exception = assertThrows(UnauthorizedException.class, () ->
+                this.jwtPermissionsService.listViewerTeams(null, com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.COLLECTION_ID));
         assertEquals("Please log in", exception.getMessage());
     }
 
     @Test
     public void setViewerTeams_CollectionDescription_Team_Session_collectionTeam() throws Exception {
-        Session session = new Session(TEST_SESSION_ID, TEST_USER_EMAIL, ADMIN_PUBLISHER_GROUPS);
+        final Session session = new Session(com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.TEST_SESSION_ID, com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.TEST_USER_EMAIL, com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.ADMIN_PUBLISHER_GROUPS);
 
-        String teamId = "666";
+        final String teamId = "666";
 
-        Set<String> originalList = new HashSet<String>() {{
-            add("123456");
-            add("789012345");
-            add(teamId);
+        final Set<String> originalList = new HashSet<String>() {{
+            this.add("123456");
+            this.add("789012345");
+            this.add(teamId);
         }};
-        Set<String> updatedList = new HashSet<String>() {{
-            add("123456");
-            add("789012345");
+        final Set<String> updatedList = new HashSet<String>() {{
+            this.add("123456");
+            this.add("789012345");
         }};
 
-        Map<String, Set<String>> collectionMapping = new HashMap<>();
-        collectionMapping.put(COLLECTION_ID, originalList);
+        final Map<String, Set<String>> collectionMapping = new HashMap<>();
+        collectionMapping.put(com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.COLLECTION_ID, originalList);
 
-        when(accessMapping.getCollections()).thenReturn(collectionMapping);
+        when(this.accessMapping.getCollections()).thenReturn(collectionMapping);
 
-        jwtPermissionsService.setViewerTeams(session, COLLECTION_ID, updatedList);
+        this.jwtPermissionsService.setViewerTeams(session, com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.COLLECTION_ID, updatedList);
 
         assertThat(collectionMapping, is(notNullValue()));
-        assertTrue(collectionMapping.get(COLLECTION_ID).size() > 0);
-        assertTrue(collectionMapping.get(COLLECTION_ID).contains("789012345"));
-        assertTrue(collectionMapping.get(COLLECTION_ID).contains("123456"));
-        assertFalse(collectionMapping.get(COLLECTION_ID).contains(teamId));
+        assertTrue(collectionMapping.get(com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.COLLECTION_ID).size() > 0);
+        assertTrue(collectionMapping.get(com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.COLLECTION_ID).contains("789012345"));
+        assertTrue(collectionMapping.get(com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.COLLECTION_ID).contains("123456"));
+        assertFalse(collectionMapping.get(com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.COLLECTION_ID).contains(teamId));
     }
 
     @Test
     public void setViewerTeams_CollectionDescription_Team_Session_viewer_collectionTeam() throws Exception {
-        Session session = new Session(TEST_SESSION_ID, TEST_USER_EMAIL, new ArrayList<>());
+        final Session session = new Session(com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.TEST_SESSION_ID, com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.TEST_USER_EMAIL, new ArrayList<>());
 
-        Exception exception = assertThrows(UnauthorizedException.class, () ->
-                jwtPermissionsService.setViewerTeams(session, COLLECTION_ID, new HashSet<String>()));
+        final Exception exception = assertThrows(UnauthorizedException.class, () ->
+                this.jwtPermissionsService.setViewerTeams(session, com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.COLLECTION_ID, new HashSet<String>()));
     }
 
     @Test
     public void userPermissions_Email_Sessions_ShouldError() throws Exception {
-        Session session = new Session(TEST_SESSION_ID, TEST_USER_EMAIL);
-        Exception exception = assertThrows(UnsupportedOperationException.class, () ->
-                jwtPermissionsService.userPermissions(TEST_USER_EMAIL, session));
+        final Session session = new Session(com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.TEST_SESSION_ID, com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.TEST_USER_EMAIL);
+        final Exception exception = assertThrows(UnsupportedOperationException.class, () ->
+                this.jwtPermissionsService.userPermissions(com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.TEST_USER_EMAIL, session));
         assertEquals("JWT sessions are enabled: userPermissions is no longer supported", exception.getMessage());
     }
-    
-   @Test
+
+    @Test
     public void userPermissions_Sessions() throws Exception {
-        Session session = new Session(TEST_SESSION_ID, TEST_USER_EMAIL, ADMIN_PUBLISHER_GROUPS);
-        PermissionDefinition actual = jwtPermissionsService.userPermissions(session);
+        final Session session = new Session(com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.TEST_SESSION_ID, com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.TEST_USER_EMAIL, com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.ADMIN_PUBLISHER_GROUPS);
+        final PermissionDefinition actual = this.jwtPermissionsService.userPermissions(session);
         assertTrue(actual.isAdmin());
         assertTrue(actual.isEditor());
-        assertTrue(actual.getEmail() == TEST_USER_EMAIL);
+        assertTrue(actual.getEmail() == com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.TEST_USER_EMAIL);
     }
 }

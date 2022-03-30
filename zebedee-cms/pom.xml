@@ -126,6 +126,16 @@
             <groupId>org.apache.xmlgraphics</groupId>
             <artifactId>batik-transcoder</artifactId>
         </dependency>
+        <!--
+        batik-transcoder is missing declaring one of its own dependencies which results in the error:
+        'Could not write PNG file because no WriteAdapter is availble'. As such we need to explicitly
+        declare the following dependency on batik-codec desipite it not appearing as a dependency of zebedee
+        directly. See https://stackoverflow.com/questions/45239099/apache-batik-no-writeadapter-is-available.
+        -->
+        <dependency>
+            <groupId>org.apache.xmlgraphics</groupId>
+            <artifactId>batik-codec</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>com.google.guava</groupId>

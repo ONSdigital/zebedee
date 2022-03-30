@@ -99,10 +99,10 @@ public class JWTPermissionsServiceImplTest {
 
     @Test
     public void isAdministrator_Session_Admin_ShouldReturnTrue() throws Exception {
-        final List<String> sessionGroups = new ArrayList<>();
+        List<String> sessionGroups = new ArrayList<>();
         sessionGroups.add(com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.ADMIN);
 
-        final Session session = new Session(com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.TEST_SESSION_ID, com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.TEST_USER_EMAIL, sessionGroups);
+        Session session = new Session(com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.TEST_SESSION_ID, com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.TEST_USER_EMAIL, sessionGroups);
         assertTrue(this.jwtPermissionsService.isAdministrator(session));
     }
 
@@ -390,16 +390,16 @@ public class JWTPermissionsServiceImplTest {
 
     @Test
     public void setViewerTeams_CollectionDescription_Team_Session_collectionTeam() throws Exception {
-        final Session session = new Session(com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.TEST_SESSION_ID, com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.TEST_USER_EMAIL, com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.ADMIN_PUBLISHER_GROUPS);
+        Session session = new Session(com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.TEST_SESSION_ID, com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.TEST_USER_EMAIL, com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImplTest.ADMIN_PUBLISHER_GROUPS);
 
         final String teamId = "666";
 
-        final Set<String> originalList = new HashSet<String>() {{
+        Set<String> originalList = new HashSet<String>() {{
             this.add("123456");
             this.add("789012345");
             this.add(teamId);
         }};
-        final Set<String> updatedList = new HashSet<String>() {{
+        Set<String> updatedList = new HashSet<String>() {{
             this.add("123456");
             this.add("789012345");
         }};

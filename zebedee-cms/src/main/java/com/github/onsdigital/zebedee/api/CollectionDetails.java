@@ -37,19 +37,19 @@ public class CollectionDetails {
     private ZebedeeCollectionReaderSupplier zebedeeCollectionReaderSupplier = ZebedeeCollectionReader::new;
 
     public CollectionDetails() {
-        this.datasetImportEnabled = cmsFeatureFlags().isEnableDatasetImport();
+        datasetImportEnabled = cmsFeatureFlags().isEnableDatasetImport();
     }
 
     /**
      * Constructor to allow dependencies to be injected.
      */
-    CollectionDetails(ContentDeleteService deleteService, ZebedeeCollectionReaderSupplier zebedeeCollectionReaderSupplier,
-                      ZebedeeCmsService cmsService, boolean datasetImportEnabled) {
+    CollectionDetails(final ContentDeleteService deleteService, final ZebedeeCollectionReaderSupplier zebedeeCollectionReaderSupplier,
+                      final ZebedeeCmsService cmsService, final boolean datasetImportEnabled) {
         this.datasetImportEnabled = datasetImportEnabled;
         this.zebedeeCollectionReaderSupplier = zebedeeCollectionReaderSupplier;
 
-        contentDeleteService = deleteService;
-        zebedeeCmsService = cmsService;
+        com.github.onsdigital.zebedee.api.CollectionDetails.contentDeleteService = deleteService;
+        com.github.onsdigital.zebedee.api.CollectionDetails.zebedeeCmsService = cmsService;
     }
 
     /**
@@ -63,10 +63,10 @@ public class CollectionDetails {
      * @throws IOException
      */
     @GET
-    public CollectionDetail get(HttpServletRequest request, HttpServletResponse response)
+    public CollectionDetail get(final HttpServletRequest request, final HttpServletResponse response)
             throws IOException, ZebedeeException {
 
-        com.github.onsdigital.zebedee.model.Collection collection = Collections
+        final com.github.onsdigital.zebedee.model.Collection collection = Collections
                 .getCollection(request);
 
         if (collection == null) {
@@ -74,16 +74,16 @@ public class CollectionDetails {
             return null;
         }
 
-        Session session = zebedeeCmsService.getSession();
-        if (!zebedeeCmsService.getPermissions().canView(session, collection.getDescription().getId())) {
+        final Session session = com.github.onsdigital.zebedee.api.CollectionDetails.zebedeeCmsService.getSession();
+        if (!com.github.onsdigital.zebedee.api.CollectionDetails.zebedeeCmsService.getPermissions().canView(session, collection.getDescription().getId())) {
             response.setStatus(HttpStatus.UNAUTHORIZED_401);
             return null;
         }
 
-        CollectionReader collectionReader = zebedeeCollectionReaderSupplier.get(
-                zebedeeCmsService.getZebedee(), collection, session);
+        final CollectionReader collectionReader = this.zebedeeCollectionReaderSupplier.get(
+                com.github.onsdigital.zebedee.api.CollectionDetails.zebedeeCmsService.getZebedee(), collection, session);
 
-        CollectionDetail result = new CollectionDetail();
+        final CollectionDetail result = new CollectionDetail();
 
         result.setId(collection.getDescription().getId());
         result.setName(collection.getDescription().getName());
@@ -92,7 +92,7 @@ public class CollectionDetails {
         result.setTeams(collection.getDescription().getTeams());
         result.setReleaseUri(collection.getDescription().getReleaseUri());
 
-        result.pendingDeletes = contentDeleteService.getDeleteItemsByCollection(collection);
+        result.pendingDeletes = com.github.onsdigital.zebedee.api.CollectionDetails.contentDeleteService.getDeleteItemsByCollection(collection);
 
         result.inProgress = ContentDetailUtil.resolveDetails(collection.getInProgress(), collectionReader.getInProgress());
         result.complete = ContentDetailUtil.resolveDetails(collection.getComplete(), collectionReader.getComplete());
@@ -102,22 +102,22 @@ public class CollectionDetails {
         result.events = collection.getDescription().getEvents();
         result.timeseriesImportFiles = collection.getDescription().getTimeseriesImportFiles();
 
-        addEventsForDetails(result.inProgress, collection);
-        addEventsForDetails(result.complete, collection);
-        addEventsForDetails(result.reviewed, collection);
+        this.addEventsForDetails(result.inProgress, collection);
+        this.addEventsForDetails(result.complete, collection);
+        this.addEventsForDetails(result.reviewed, collection);
 
-        Set<String> teamIds = zebedeeCmsService.getPermissions().listViewerTeams(session,collection.getDescription().getId());
+        final Set<String> teamIds = com.github.onsdigital.zebedee.api.CollectionDetails.zebedeeCmsService.getPermissions().listViewerTeams(session, collection.getDescription().getId());
 
         if (!cmsFeatureFlags().isJwtSessionsEnabled()) {
-            result.teamsDetails = zebedeeCmsService.getZebedee().getTeamsService().resolveTeamDetails(teamIds);
+            result.teamsDetails = com.github.onsdigital.zebedee.api.CollectionDetails.zebedeeCmsService.getZebedee().getTeamsService().resolveTeamDetails(teamIds);
             result.teamsDetails.forEach(team -> collection.getDescription().getTeams().add(team.getName()));
         }
-        String collectionId = Collections.getCollectionId(request);
+        final String collectionId = Collections.getCollectionId(request);
 
-        if (datasetImportEnabled) {
+        if (this.datasetImportEnabled) {
             info().data("collectionId", collectionId).data("user", session.getEmail())
-                .log("CollectionDetails GET endpoint: datasetImportEnabled including dataset and dataset version " +
-                        "details to response");
+                    .log("CollectionDetails GET endpoint: datasetImportEnabled including dataset and dataset version " +
+                            "details to response");
 
             result.datasets = collection.getDescription().getDatasets();
             result.datasetVersions = collection.getDescription().getDatasetVersions();
@@ -127,11 +127,11 @@ public class CollectionDetails {
     }
 
     private void addEventsForDetails(
-            Iterable<ContentDetail> detailsToAddEventsFor,
-            com.github.onsdigital.zebedee.model.Collection collection
+            final Iterable<ContentDetail> detailsToAddEventsFor,
+            final com.github.onsdigital.zebedee.model.Collection collection
     ) {
 
-        for (ContentDetail contentDetail : detailsToAddEventsFor) {
+        for (final ContentDetail contentDetail : detailsToAddEventsFor) {
             String language = contentDetail.description.language;
             if (language == null) {
                 language = "";
@@ -139,7 +139,7 @@ public class CollectionDetails {
                 language = "_" + contentDetail.description.language;
             }
             if (collection.getDescription().getEventsByUri() != null) {
-                Events eventsForFile = collection.getDescription()
+                final Events eventsForFile = collection.getDescription()
                         .getEventsByUri()
                         .get(contentDetail.uri + "/data" + language + ".json");
                 contentDetail.events = eventsForFile;

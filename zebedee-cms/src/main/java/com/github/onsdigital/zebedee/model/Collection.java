@@ -411,7 +411,7 @@ public class Collection {
             scheduler.cancel(collection);
         }
 
-        Set<Integer> teamIds = setViewerTeams(collectionDescription, zebedee, session);
+        Set<String> teamIds = setViewerTeams(collectionDescription, zebedee, session);
 
         if (collectionDescription.getTeams() != null) {
             updatedCollection.getDescription().setTeams(collectionDescription.getTeams());
@@ -422,9 +422,9 @@ public class Collection {
         return updatedCollection;
     }
 
-    private static Set<Integer> setViewerTeams(CollectionDescription desc, Zebedee zebedee, Session session)
+    private static Set<String> setViewerTeams(CollectionDescription desc, Zebedee zebedee, Session session)
             throws IOException, ZebedeeException {
-        Set<Integer> teamIds = new HashSet<>();
+        Set<String> teamIds = new HashSet<>();
         List<String> teamNames = desc.getTeams();
 
         if (teamNames == null) {
@@ -1482,4 +1482,3 @@ public class Collection {
         return this.inProgress;
     }
 }
-

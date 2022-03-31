@@ -81,7 +81,7 @@ public class TeamsServiceImpl implements TeamsService {
     }
 
     @Override
-    public List<Team> resolveTeamDetails(java.util.Set<String> teamIds) throws IOException {
+    public List<Team> resolveTeamDetails(Set<String> teamIds) throws IOException {
         return resolveTeams(teamIds).stream()
                 .map(team -> new Team().setId(team.getId()).setName(team.getName()))
                 .collect(Collectors.toList());

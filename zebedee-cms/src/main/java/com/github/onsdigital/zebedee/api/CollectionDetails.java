@@ -37,7 +37,7 @@ public class CollectionDetails {
     private ZebedeeCollectionReaderSupplier zebedeeCollectionReaderSupplier = ZebedeeCollectionReader::new;
 
     public CollectionDetails() {
-        this.datasetImportEnabled = cmsFeatureFlags().isEnableDatasetImport();
+        datasetImportEnabled = cmsFeatureFlags().isEnableDatasetImport();
     }
 
     /**

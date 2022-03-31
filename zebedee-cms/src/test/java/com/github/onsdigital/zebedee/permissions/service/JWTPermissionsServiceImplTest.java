@@ -390,8 +390,10 @@ public class JWTPermissionsServiceImplTest {
     }
 
     @Test
-    public void setViewerTeams_CollectionDescription_Team_Session_collectionTeam() throws Exception {
-        Session session = new Session(TEST_SESSION_ID, TEST_USER_EMAIL, ADMIN_PUBLISHER_GROUPS);
+    public void setViewerTeams_CollectionDescription_Team_Session_Admin_collectionTeam() throws Exception {
+        List<String> sessionGroups = new ArrayList<>();
+        sessionGroups.add(ADMIN);
+        Session session = new Session(TEST_SESSION_ID, TEST_USER_EMAIL, sessionGroups);
 
         String teamId = "666";
 
@@ -418,7 +420,7 @@ public class JWTPermissionsServiceImplTest {
         assertTrue(collectionMapping.get(COLLECTION_ID).contains("123456"));
         assertFalse(collectionMapping.get(COLLECTION_ID).contains(teamId));
     }
-
+    
     @Test
     public void setViewerTeams_CollectionDescription_Team_Session_viewer_collectionTeam() throws Exception {
         Session session = new Session(TEST_SESSION_ID, TEST_USER_EMAIL, new ArrayList<>());

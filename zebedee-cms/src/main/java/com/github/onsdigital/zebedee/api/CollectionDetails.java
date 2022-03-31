@@ -25,21 +25,21 @@ import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFea
 
 @Api
 public class CollectionDetails {
-
+    
     private static ContentDeleteService contentDeleteService = ContentDeleteService.getInstance();
     private static ZebedeeCmsService zebedeeCmsService = ZebedeeCmsService.getInstance();
-
+    
     private final boolean datasetImportEnabled;
-
+    
     // Slighly convoluted but wrapping the creation of a new ZebedeeCollectionReader in a "supplier" means we can
     // replace it with a mock in our tests and avoid all the unnecessary pain and agro associated with creating
     // complex object.
     private ZebedeeCollectionReaderSupplier zebedeeCollectionReaderSupplier = ZebedeeCollectionReader::new;
-
+    
     public CollectionDetails() {
-        datasetImportEnabled = cmsFeatureFlags().isEnableDatasetImport();
+        this.datasetImportEnabled = cmsFeatureFlags().isEnableDatasetImport();
     }
-
+    
     /**
      * Constructor to allow dependencies to be injected.
      */
@@ -47,11 +47,11 @@ public class CollectionDetails {
                       ZebedeeCmsService cmsService, boolean datasetImportEnabled) {
         this.datasetImportEnabled = datasetImportEnabled;
         this.zebedeeCollectionReaderSupplier = zebedeeCollectionReaderSupplier;
-
+        
         contentDeleteService = deleteService;
         zebedeeCmsService = cmsService;
     }
-
+    
     /**
      * Retrieves a CollectionDetail object at the endpoint /CollectionDetails/[CollectionName]
      *
@@ -64,73 +64,73 @@ public class CollectionDetails {
      */
     @GET
     public CollectionDetail get(HttpServletRequest request, HttpServletResponse response)
-        throws IOException, ZebedeeException {
-
+            throws IOException, ZebedeeException {
+        
         com.github.onsdigital.zebedee.model.Collection collection = Collections
-            .getCollection(request);
-
+                .getCollection(request);
+        
         if (collection == null) {
             response.setStatus(HttpStatus.NOT_FOUND_404);
             return null;
         }
-
+        
         Session session = zebedeeCmsService.getSession();
         if (!zebedeeCmsService.getPermissions().canView(session, collection.getDescription().getId())) {
             response.setStatus(HttpStatus.UNAUTHORIZED_401);
             return null;
         }
-
+        
         CollectionReader collectionReader = zebedeeCollectionReaderSupplier.get(
-            zebedeeCmsService.getZebedee(), collection, session);
-
+                zebedeeCmsService.getZebedee(), collection, session);
+        
         CollectionDetail result = new CollectionDetail();
-
+        
         result.setId(collection.getDescription().getId());
         result.setName(collection.getDescription().getName());
         result.setType(collection.getDescription().getType());
         result.setPublishDate(collection.getDescription().getPublishDate());
         result.setTeams(collection.getDescription().getTeams());
         result.setReleaseUri(collection.getDescription().getReleaseUri());
-
+        
         result.pendingDeletes = contentDeleteService.getDeleteItemsByCollection(collection);
-
+        
         result.inProgress = ContentDetailUtil.resolveDetails(collection.getInProgress(), collectionReader.getInProgress());
         result.complete = ContentDetailUtil.resolveDetails(collection.getComplete(), collectionReader.getComplete());
         result.reviewed = ContentDetailUtil.resolveDetails(collection.getReviewed(), collectionReader.getReviewed());
-
+        
         result.approvalStatus = collection.getDescription().getApprovalStatus();
         result.events = collection.getDescription().getEvents();
         result.timeseriesImportFiles = collection.getDescription().getTimeseriesImportFiles();
-
+        
         addEventsForDetails(result.inProgress, collection);
         addEventsForDetails(result.complete, collection);
         addEventsForDetails(result.reviewed, collection);
-
+        
         Set<String> teamIds = zebedeeCmsService.getPermissions().listViewerTeams(session, collection.getDescription().getId());
         if (!cmsFeatureFlags().isJwtSessionsEnabled()) {
             result.teamsDetails = zebedeeCmsService.getZebedee().getTeamsService().resolveTeamDetails(teamIds);
             result.teamsDetails.forEach(team -> collection.getDescription().getTeams().add(team.getName()));
         }
-
+        
         String collectionId = Collections.getCollectionId(request);
-
+        
         if (datasetImportEnabled) {
             info().data("collectionId", collectionId).data("user", session.getEmail())
-                .log("CollectionDetails GET endpoint: datasetImportEnabled including dataset and dataset version " +
-                    "details to response");
-
+                    .log("CollectionDetails GET endpoint: datasetImportEnabled including dataset and dataset version " +
+                            "details to response");
+            
             result.datasets = collection.getDescription().getDatasets();
             result.datasetVersions = collection.getDescription().getDatasetVersions();
         }
-
+        
         return result;
     }
-
+    
     private void addEventsForDetails(
-        Iterable<ContentDetail> detailsToAddEventsFor,
-        com.github.onsdigital.zebedee.model.Collection collection
+            Iterable<ContentDetail> detailsToAddEventsFor,
+            com.github.onsdigital.zebedee.model.Collection collection
     ) {
-
+        
         for (ContentDetail contentDetail : detailsToAddEventsFor) {
             String language = contentDetail.description.language;
             if (language == null) {
@@ -140,8 +140,8 @@ public class CollectionDetails {
             }
             if (collection.getDescription().getEventsByUri() != null) {
                 Events eventsForFile = collection.getDescription()
-                    .getEventsByUri()
-                    .get(contentDetail.uri + "/data" + language + ".json");
+                        .getEventsByUri()
+                        .get(contentDetail.uri + "/data" + language + ".json");
                 contentDetail.events = eventsForFile;
             } else {
                 contentDetail.events = new Events();

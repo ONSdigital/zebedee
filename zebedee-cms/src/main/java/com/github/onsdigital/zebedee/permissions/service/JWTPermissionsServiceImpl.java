@@ -181,7 +181,7 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
     @Override
     public boolean canView(Session session, String collectionId) throws IOException {
 
-        if (session == null || StringUtils.isBlank(session.getEmail()) || StringUtils.isBlank(collectionId)) {
+        if (session == null || StringUtils.isBlank(collectionId)) {
             return false;
         }
 
@@ -190,7 +190,7 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
         }
 
         List<String> userGroups = session.getGroups();
-        if (userGroups == null || userGroups.isEmpty()) {
+        if (userGroups.isEmpty()) {
             return false;
         }
 

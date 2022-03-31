@@ -117,8 +117,8 @@ public class CollectionDetails {
 
         if (datasetImportEnabled) {
             info().data("collectionId", collectionId).data("user", session.getEmail())
-                    .log("CollectionDetails GET endpoint: datasetImportEnabled including dataset and dataset version " +
-                            "details to response");
+                .log("CollectionDetails GET endpoint: datasetImportEnabled including dataset and dataset version " +
+                    "details to response");
 
             result.datasets = collection.getDescription().getDatasets();
             result.datasetVersions = collection.getDescription().getDatasetVersions();

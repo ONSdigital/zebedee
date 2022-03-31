@@ -64,10 +64,10 @@ public class CollectionDetails {
      */
     @GET
     public CollectionDetail get(HttpServletRequest request, HttpServletResponse response)
-            throws IOException, ZebedeeException {
+        throws IOException, ZebedeeException {
 
         com.github.onsdigital.zebedee.model.Collection collection = Collections
-                .getCollection(request);
+            .getCollection(request);
 
         if (collection == null) {
             response.setStatus(HttpStatus.NOT_FOUND_404);
@@ -81,7 +81,7 @@ public class CollectionDetails {
         }
 
         CollectionReader collectionReader = zebedeeCollectionReaderSupplier.get(
-                zebedeeCmsService.getZebedee(), collection, session);
+            zebedeeCmsService.getZebedee(), collection, session);
 
         CollectionDetail result = new CollectionDetail();
 
@@ -106,19 +106,18 @@ public class CollectionDetails {
         addEventsForDetails(result.complete, collection);
         addEventsForDetails(result.reviewed, collection);
 
-        Set<String> teamIds = zebedeeCmsService.getPermissions().listViewerTeams(session,
-                collection.getDescription().getId());
-        result.teamsDetails = zebedeeCmsService.getZebedee().getTeamsService()
-                .resolveTeamDetails(teamIds);
-        result.teamsDetails.forEach(team -> collection.getDescription().getTeams()
-                .add(team.getName()));
+        Set<String> teamIds = zebedeeCmsService.getPermissions().listViewerTeams(session, collection.getDescription().getId());
+        if (!cmsFeatureFlags().isJwtSessionsEnabled()) {
+            result.teamsDetails = zebedeeCmsService.getZebedee().getTeamsService().resolveTeamDetails(teamIds);
+            result.teamsDetails.forEach(team -> collection.getDescription().getTeams().add(team.getName()));
+        }
 
         String collectionId = Collections.getCollectionId(request);
 
         if (datasetImportEnabled) {
             info().data("collectionId", collectionId).data("user", session.getEmail())
-                    .log("CollectionDetails GET endpoint: datasetImportEnabled including dataset and dataset version " +
-                            "details to response");
+                .log("CollectionDetails GET endpoint: datasetImportEnabled including dataset and dataset version " +
+                    "details to response");
 
             result.datasets = collection.getDescription().getDatasets();
             result.datasetVersions = collection.getDescription().getDatasetVersions();
@@ -128,8 +127,8 @@ public class CollectionDetails {
     }
 
     private void addEventsForDetails(
-            Iterable<ContentDetail> detailsToAddEventsFor,
-            com.github.onsdigital.zebedee.model.Collection collection
+        Iterable<ContentDetail> detailsToAddEventsFor,
+        com.github.onsdigital.zebedee.model.Collection collection
     ) {
 
         for (ContentDetail contentDetail : detailsToAddEventsFor) {
@@ -141,8 +140,8 @@ public class CollectionDetails {
             }
             if (collection.getDescription().getEventsByUri() != null) {
                 Events eventsForFile = collection.getDescription()
-                        .getEventsByUri()
-                        .get(contentDetail.uri + "/data" + language + ".json");
+                    .getEventsByUri()
+                    .get(contentDetail.uri + "/data" + language + ".json");
                 contentDetail.events = eventsForFile;
             } else {
                 contentDetail.events = new Events();

@@ -32,6 +32,7 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 public class JWTPermissionsServiceImplTest {
+    
     private static final List<String> ADMIN_PUBLISHER_GROUPS = Arrays.asList("123456", "role-publisher", "role-admin", "789012345", "testgroup0");
     private static final List<String> NON_ADMIN_PUBLISHER_GROUPS = Arrays.asList("123456", "789012345");
     private static final String COLLECTION_ID = "1234";
@@ -391,6 +392,38 @@ public class JWTPermissionsServiceImplTest {
 
     @Test
     public void setViewerTeams_CollectionDescription_Team_Session_Admin_collectionTeam() throws Exception {
+        List<String> sessionGroups = new ArrayList<>();
+        sessionGroups.add(ADMIN);
+        Session session = new Session(TEST_SESSION_ID, TEST_USER_EMAIL, sessionGroups);
+
+        String teamId = "666";
+
+        Set<String> originalList = new HashSet<String>() {{
+            add("123456");
+            add("789012345");
+            add(teamId);
+        }};
+        Set<String> updatedList = new HashSet<String>() {{
+            add("123456");
+            add("789012345");
+        }};
+
+        Map<String, Set<String>> collectionMapping = new HashMap<>();
+        collectionMapping.put(COLLECTION_ID, originalList);
+
+        when(accessMapping.getCollections()).thenReturn(collectionMapping);
+
+        jwtPermissionsService.setViewerTeams(session, COLLECTION_ID, updatedList);
+
+        assertThat(collectionMapping, is(notNullValue()));
+        assertTrue(collectionMapping.get(COLLECTION_ID).size() > 0);
+        assertTrue(collectionMapping.get(COLLECTION_ID).contains("789012345"));
+        assertTrue(collectionMapping.get(COLLECTION_ID).contains("123456"));
+        assertFalse(collectionMapping.get(COLLECTION_ID).contains(teamId));
+    }
+
+    @Test
+    public void setViewerTeams_CollectionDescription_Team_Session_Publisher_collectionTeam() throws Exception {
         List<String> sessionGroups = new ArrayList<>();
         sessionGroups.add(ADMIN);
         Session session = new Session(TEST_SESSION_ID, TEST_USER_EMAIL, sessionGroups);

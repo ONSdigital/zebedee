@@ -425,7 +425,7 @@ public class JWTPermissionsServiceImplTest {
     @Test
     public void setViewerTeams_CollectionDescription_Team_Session_Publisher_collectionTeam() throws Exception {
         List<String> sessionGroups = new ArrayList<>();
-        sessionGroups.add(ADMIN);
+        sessionGroups.add(PUBLISHER);
         Session session = new Session(TEST_SESSION_ID, TEST_USER_EMAIL, sessionGroups);
 
         String teamId = "666";

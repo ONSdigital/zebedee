@@ -83,7 +83,6 @@ import static com.github.onsdigital.zebedee.Zebedee.TEAMS;
 import static com.github.onsdigital.zebedee.Zebedee.USERS;
 import static com.github.onsdigital.zebedee.Zebedee.ZEBEDEE;
 import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
-import static com.github.onsdigital.zebedee.configuration.Configuration.getCognitoKeyIdPairs;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getDatasetAPIAuthToken;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getDatasetAPIURL;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getImageAPIURL;

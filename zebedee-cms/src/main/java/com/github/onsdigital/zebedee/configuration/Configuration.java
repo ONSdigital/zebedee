@@ -263,34 +263,6 @@ public class Configuration {
     }
 
     /**
-     * Get a map of cognito id and signing key pairs
-     */
-    public static Map<String, String> getCognitoKeyIdPairs() {
-        String awsCognitoSigningKeyOne = getValue("AWS_COGNITO_SIGNING_KEY_ONE");
-        if (StringUtils.isEmpty(awsCognitoSigningKeyOne)) {
-            throw new RuntimeException("expected public signing key one in environment variable but was empty");
-        }
-        String awsCognitoSigningKeyTwo = getValue("AWS_COGNITO_SIGNING_KEY_TWO");
-        if (StringUtils.isEmpty(awsCognitoSigningKeyTwo)) {
-            throw new RuntimeException("expected public signing key two in environment variable but was empty");
-        }
-        String awsCognitoKeyIdOne = getValue("AWS_COGNITO_KEY_ID_ONE");
-        if (StringUtils.isEmpty(awsCognitoKeyIdOne)) {
-            throw new RuntimeException("expected key id one in environment variable but was empty");
-        }
-        String awsCognitoKeyIdTwo = getValue("AWS_COGNITO_KEY_ID_TWO");
-        if (StringUtils.isEmpty(awsCognitoKeyIdTwo)) {
-            throw new RuntimeException("expected key id two in environment variable but was empty");
-        }
-
-        Map<String, String> idKeyPairMap = new HashMap<>();
-        idKeyPairMap.put(awsCognitoKeyIdOne, awsCognitoSigningKeyOne);
-        idKeyPairMap.put(awsCognitoKeyIdTwo, awsCognitoSigningKeyTwo);
-
-        return idKeyPairMap;
-    }
-
-    /**
      * Gets a configured value for the given key from either the system
      * properties or an environment variable.
      * <p/>

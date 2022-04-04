@@ -34,6 +34,7 @@ public class Configuration {
     private static final String MATHJAX_SERVICE_URL = "http://localhost:8888";
     private static final String DATASET_API_URL = "http://localhost:22000";
     private static final String IMAGE_API_URL = "http://localhost:24700";
+    private static final String IDENTITY_API_URL = "http://localhost:25600";
     private static final String KAFKA_ADDR = "localhost:9092";
     private static final String KAFKA_CONTENT_PUBLISHED_TOPIC = "content-published";
     private static final String DATASET_API_AUTH_TOKEN = "FD0108EA-825D-411C-9B1D-41EF7727F465";
@@ -45,6 +46,11 @@ public class Configuration {
 
     private static final int VERIFY_RETRY_DELAY = 5000; //milliseconds
     private static final int VERIFY_RETRY_COUNT = 10;
+
+    //Default retry configs to handle fetching jwt keys from identity api failure
+    private static final int DEFAULT_INITIAL_RETRY_INTERVAL = 500;
+    private static final int DEFAULT_MAX_RETRY_ELAPSED_TIME = 900000;
+    private static final int DEFAULT_MAX_RETRY_INTERVAL = 60000;
 
     // how many seconds before the actual publish time should we run the preprocess
     private static final int DEFAULT_PREPROCESS_SECONDS_BEFORE_PUBLISH = 30;
@@ -72,22 +78,27 @@ public class Configuration {
      * how many seconds before the actual publish time should we run the preprocess.
      */
     public static int getPreProcessSecondsBeforePublish() {
-        try {
-            return Integer.parseInt(getValue("pre_publish_seconds_before_publish"));
-        } catch (Exception e) {
-            return DEFAULT_PREPROCESS_SECONDS_BEFORE_PUBLISH;
-        }
+        return getIntWithDefault("pre_publish_seconds_before_publish", DEFAULT_PREPROCESS_SECONDS_BEFORE_PUBLISH);
     }
 
     /**
      * how many additional seconds after the publish should content be cached.
      */
     public static int getSecondsToCacheAfterScheduledPublish() {
-        try {
-            return Integer.parseInt(getValue("seconds_to_cache_after_scheduled_publish"));
-        } catch (Exception e) {
-            return DEFAULT_SECONDS_TO_CACHE_AFTER_SCHEDULED_PUBLISH;
-        }
+        return getIntWithDefault("seconds_to_cache_after_scheduled_publish", DEFAULT_SECONDS_TO_CACHE_AFTER_SCHEDULED_PUBLISH);
+    }
+
+
+    public static int getMaxRetryTimeout() {
+        return getIntWithDefault("MAX_RETRY_ELAPSED_TIME", DEFAULT_MAX_RETRY_ELAPSED_TIME);
+    }
+
+    public static int getInitialRetryInterval() {
+        return getIntWithDefault("INITIAL_RETRY_INTERVAL", DEFAULT_INITIAL_RETRY_INTERVAL);
+    }
+
+    public static int getMaxRetryInterval() {
+        return getIntWithDefault("MAX_RETRY_INTERVAL", DEFAULT_MAX_RETRY_INTERVAL);
     }
 
     public static String getPublicWebsiteUrl() {
@@ -134,6 +145,10 @@ public class Configuration {
 
     public static String getImageAPIURL() {
         return StringUtils.defaultIfBlank(getValue("IMAGE_API_URL"), IMAGE_API_URL);
+    }
+
+    public static String getIdentityAPIURL() {
+        return StringUtils.defaultIfBlank(getValue("IDENTITY_API_URL"), IDENTITY_API_URL);
     }
 
     public static String getKafkaURL() {
@@ -289,6 +304,27 @@ public class Configuration {
      */
     static String getValue(String key) {
         return StringUtils.defaultIfBlank(System.getProperty(key), System.getenv(key));
+    }
+
+
+    /**
+     * Gets a configured int value for the given key from either the system
+     * properties or an environment variable.
+     * <p/>
+     *
+     * @param key          The name of the configuration value.
+     * @param defaultValue The default value to be used if configuration is missing.
+     * @return The system property corresponding to the given key (e.g.
+     * -Dkey=value). If that is blank, the environment variable
+     * corresponding to the given key (e.g. EXPORT key=value). If that
+     * is blank, defaultValue passed to the method.
+     */
+    static int getIntWithDefault(String key, int defaultValue) {
+        try {
+            return Integer.parseInt(getValue(key));
+        } catch (Exception e) {
+            return defaultValue;
+        }
     }
 
     public static String getContentDirectory() {

@@ -94,6 +94,10 @@ import static com.github.onsdigital.zebedee.configuration.Configuration.getKeyri
 import static com.github.onsdigital.zebedee.configuration.Configuration.getServiceAuthToken;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getSlackSupportChannelID;
 import static com.github.onsdigital.zebedee.configuration.Configuration.slackChannelsToNotfiyOnStartUp;
+import static com.github.onsdigital.zebedee.configuration.Configuration.getIdentityAPIURL;
+import static com.github.onsdigital.zebedee.configuration.Configuration.getMaxRetryInterval;
+import static com.github.onsdigital.zebedee.configuration.Configuration.getMaxRetryTimeout;
+import static com.github.onsdigital.zebedee.configuration.Configuration.getInitialRetryInterval;
 import static com.github.onsdigital.zebedee.permissions.store.PermissionsStoreFileSystemImpl.initialisePermissions;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
@@ -201,7 +205,13 @@ public class ZebedeeConfiguration {
 
         // Configure the sessions
         if (cmsFeatureFlags().isJwtSessionsEnabled()) {
-            JWTVerifier jwtVerifier = new JWTVerifierImpl(getCognitoKeyIdPairs());
+            JWTVerifier jwtVerifier = null;
+            try {
+                jwtVerifier = new JWTVerifierImpl(getIdentityAPIURL(), getInitialRetryInterval(), getMaxRetryTimeout(), getMaxRetryInterval());
+            } catch (Exception e) {
+                error().logException(e, "failed to initialise JWT validator");
+                throw new RuntimeException(e);
+            }
             this.sessions = new JWTSessionsServiceImpl(jwtVerifier);
         } else {
             LegacySessionsStore legacySessionsStore = new LegacySessionsStoreImpl(sessionsPath);

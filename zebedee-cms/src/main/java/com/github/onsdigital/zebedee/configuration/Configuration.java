@@ -88,7 +88,6 @@ public class Configuration {
         return getIntWithDefault("seconds_to_cache_after_scheduled_publish", DEFAULT_SECONDS_TO_CACHE_AFTER_SCHEDULED_PUBLISH);
     }
 
-
     public static int getMaxRetryTimeout() {
         return getIntWithDefault("MAX_RETRY_ELAPSED_TIME", DEFAULT_MAX_RETRY_ELAPSED_TIME);
     }

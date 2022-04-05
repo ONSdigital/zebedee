@@ -80,6 +80,7 @@ In order to use Zebedee you will need to have the following other project runnin
 - Babbage
 - Sixteens
 - dp-compose
+- dp-identity-api
 
 Follow the steps in the README of each project.
 
@@ -139,7 +140,7 @@ Otherwise :violin: kindly ask someone from the dev team to help troubleshoot.
 | VERIFY_RETRY_COUNT                                | 10                                          | Retry count for how long, in seconds, to wait for retry
 | DEFAULT_PREPROCESS_SECONDS_BEFORE_PUBLISH         | 30                                          | how many seconds before the actual publish time should we run the preprocess
 | DEFAULT_SECONDS_TO_CACHE_AFTER_SCHEDULED_PUBLISH  | 30                                          | how many additional seconds after the publi
-
+| IDENTITY_API_URL                                  | "http://localhost:25600"                    | Identity API URL
 ### New Central Keyring configuration
 The new central keyring feature is currently behind a feature flag:
 ```bash

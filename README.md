@@ -45,7 +45,7 @@ _The Dev team_
 _NOTE_: The following set guide will set up Zebedee in **"CMS"** mode as this is typically how the devlopers will run 
 the stack locally. 
 
-Getting the code
+Getting the code:
 
 ```
 git clone git@github.com:ONSdigital/zebedee.git

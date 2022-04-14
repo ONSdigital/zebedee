@@ -86,7 +86,7 @@ public class Publisher {
     private static ServiceSupplier<DatasetService> datasetServiceSupplier;
     private static ServiceSupplier<ImageService> imageServiceSupplier;
     private static ServiceSupplier<KafkaService> kafkaServiceSupplier;
-    private static StaticFileService staticFileServerService;
+    private static StaticFileService staticFileService;
 
     private static final String TRACE_ID_HEADER = "trace_id";
     public static final String SEARCHINDEX = "ONS";
@@ -105,7 +105,7 @@ public class Publisher {
     }
 
     static void setStaticFilePublisherForTesting(StaticFileService service) {
-        staticFileServerService = service;
+        staticFileService = service;
     }
     /**
      * Execute the prepublish steps.
@@ -128,10 +128,6 @@ public class Publisher {
             imageFuture = publishImages(collection);
         }
 
-        if (CMSFeatureFlags.cmsFeatureFlags().isStaticFilesPublishingEnabled()) {
-            staticFileServerService.publishCollection(collection);
-        }
-
         publishFilteredCollectionFiles(collection, collectionReader);
 
         if (CMSFeatureFlags.cmsFeatureFlags().isVerifyPublishEnabled()) {
@@ -148,6 +144,17 @@ public class Publisher {
         if (cmsFeatureFlags().isEnableDatasetImport()) {
             success &= publishDatasets(collection);
         }
+
+        if (CMSFeatureFlags.cmsFeatureFlags().isStaticFilesPublishingEnabled()) {
+            try {
+                staticFileService.publishCollection(collection);
+                success &= true;
+            } catch (Exception e) {
+                error().logException(e, "Exception thrown when performing static file publish()");
+                success = false;
+            }
+        }
+
 
         if (CMSFeatureFlags.cmsFeatureFlags().isImagePublishingEnabled()) {
             try {

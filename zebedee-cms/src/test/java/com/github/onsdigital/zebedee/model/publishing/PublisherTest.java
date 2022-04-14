@@ -127,10 +127,11 @@ public class PublisherTest {
         System.setProperty(CMSFeatureFlags.ENABLE_VERIFY_PUBLISH_CONTENT, "false");
         System.setProperty(CMSFeatureFlags.ENABLE_KAFKA, "false");
         System.setProperty(CMSFeatureFlags.ENABLE_STATIC_FILES_PUBLISHING, "false");
-
     }
+
+
     @Test
-    public void whenFilePublishingEnableStaticFilesArePublished() throws Exception{
+    public void whenFilePublishingEnableStaticFilesAreSuccessfullyPublished() throws Exception{
         // Given {A Collection with no files}
         // Default
 
@@ -140,36 +141,59 @@ public class PublisherTest {
         Publisher.setStaticFilePublisherForTesting(mockFileService);
 
         //When {executePublish is called}
-        boolean actual = Publisher.executePublish(mockCollection, null, emailAddress);
+        boolean executeResult = Publisher.executePublish(mockCollection, null, emailAddress);
 
         //Then {return is true (success)}
-        assertTrue(actual);
+        assertTrue(executeResult);
 
         // ensure that static file published was called
         verify(mockFileService, times(1)).publishCollection(any(Collection.class));
+    }
 
+    @Test
+    public void whenFilePublishingEnableStaticFilesPublishingThrowsException() throws Exception{
+        // Given {A Collection with no files}
+        // Default
+
+        // And {features are disabled except static files}
+        System.setProperty(CMSFeatureFlags.ENABLE_STATIC_FILES_PUBLISHING, "true");
+        CMSFeatureFlags.reset();
+
+        doThrow(new RuntimeException("BROKEN"))
+                .when(mockFileService)
+                .publishCollection(any());
+
+        Publisher.setStaticFilePublisherForTesting(mockFileService);
+
+        //When {executePublish is called}
+        boolean executeResult = Publisher.executePublish(mockCollection, null, emailAddress);
+
+        //Then {return is true (success)}
+        assertFalse(executeResult);
+
+        // ensure that static file published was called
+        verify(mockFileService, times(1)).publishCollection(any(Collection.class));
     }
 
     @Test
     public void whenFilePublishingEnableStaticFilesArePublishedToo() throws Exception{
         //Given {A Collection with no files}
         //default
+        System.setProperty(CMSFeatureFlags.ENABLE_STATIC_FILES_PUBLISHING, "true");
+        CMSFeatureFlags.reset();
 
         // And {features are disabled except static files}
         Publisher.setStaticFilePublisherForTesting(mockFileService);
 
-        System.setProperty(CMSFeatureFlags.ENABLE_STATIC_FILES_PUBLISHING, "true");
-        CMSFeatureFlags.reset();
+
         //When {executePublish is called}
-        boolean actual = Publisher.executePublish(mockCollection, null, emailAddress);
-        boolean actualToo = Publisher.executePublish(mockCollection, null, emailAddress);
+        boolean executeResult = Publisher.executePublish(mockCollection, null, emailAddress);
 
         //Then {return is true (success)}
-        assertTrue(actual);
-        assertTrue(actualToo);
+        assertTrue(executeResult);
 
         // ensure that static file published was called
-        verify(mockFileService, times(2)).publishCollection(any(Collection.class));
+        verify(mockFileService, times(1)).publishCollection(any(Collection.class));
 
     }
 
@@ -183,17 +207,16 @@ public class PublisherTest {
         // default - all features disabled
         CMSFeatureFlags.reset();
 
-        //Publisher.setStaticFilePublisherForTesting(mockFileService);
+        Publisher.setStaticFilePublisherForTesting(mockFileService);
 
         //When {executePublish is called}
-        boolean actual = Publisher.executePublish(mockCollection, null, emailAddress);
+        boolean executeResult = Publisher.executePublish(mockCollection, null, emailAddress);
 
         //Then {return is true (success)}
-        assertTrue(actual);
+        assertTrue(executeResult);
 
         // ensure that static file published was not called
         verify(mockFileService, never()).publishCollection(any(Collection.class));
-
     }
 
     private String randomCollectionId() {

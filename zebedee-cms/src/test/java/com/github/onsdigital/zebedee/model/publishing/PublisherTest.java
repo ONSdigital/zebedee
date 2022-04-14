@@ -136,6 +136,7 @@ public class PublisherTest {
 
         // And {features are disabled except static files}
         System.setProperty(CMSFeatureFlags.ENABLE_STATIC_FILES_PUBLISHING, "true");
+        CMSFeatureFlags.reset();
         Publisher.setStaticFilePublisherForTesting(mockFileService);
 
         //When {executePublish is called}
@@ -158,7 +159,7 @@ public class PublisherTest {
         Publisher.setStaticFilePublisherForTesting(mockFileService);
 
         System.setProperty(CMSFeatureFlags.ENABLE_STATIC_FILES_PUBLISHING, "true");
-
+        CMSFeatureFlags.reset();
         //When {executePublish is called}
         boolean actual = Publisher.executePublish(mockCollection, null, emailAddress);
         boolean actualToo = Publisher.executePublish(mockCollection, null, emailAddress);
@@ -180,6 +181,7 @@ public class PublisherTest {
 
         // And {features are disabled except static files}
         // default - all features disabled
+        CMSFeatureFlags.reset();
 
         //Publisher.setStaticFilePublisherForTesting(mockFileService);
 

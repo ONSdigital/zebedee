@@ -68,6 +68,13 @@ public class CMSFeatureFlags {
                 .log("CMS feature flags configurations");
     }
 
+    public static void reset() {
+        warn().log("resetting CMS feature flag configuration - probably should only be done in testing");
+        synchronized (CMSFeatureFlags.class) {
+            instance = null;
+        }
+    }
+
     /**
      * @return true if datasets import has been enabled, false otherwise.
      */

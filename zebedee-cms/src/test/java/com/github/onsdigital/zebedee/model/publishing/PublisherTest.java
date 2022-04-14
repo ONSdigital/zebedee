@@ -4,7 +4,7 @@ import com.github.onsdigital.zebedee.configuration.CMSFeatureFlags;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.Content;
-import com.github.onsdigital.zebedee.service.StaticFileService;
+import com.github.onsdigital.zebedee.service.StaticFilesService;
 import org.apache.commons.lang.RandomStringUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -107,7 +107,7 @@ public class PublisherTest {
     @Mock
     Content mockContent;
     @Mock
-    StaticFileService mockFileService;
+    StaticFilesService mockFileService;
 
     @Before
     public void beforeEach() throws Exception{

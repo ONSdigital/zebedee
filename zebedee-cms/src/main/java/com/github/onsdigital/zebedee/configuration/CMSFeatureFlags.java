@@ -11,13 +11,14 @@ import static com.github.onsdigital.logging.v2.event.SimpleEvent.warn;
 public class CMSFeatureFlags {
 
     public static final String ENABLE_DATASET_IMPORT = "ENABLE_DATASET_IMPORT";
-    private static final String ENABLE_VERIFY_PUBLISH_CONTENT = "ENABLE_VERIFY_PUBLISH_CONTENT";
+    public static final String ENABLE_VERIFY_PUBLISH_CONTENT = "ENABLE_VERIFY_PUBLISH_CONTENT";
     private static final String ENABLE_DATASET_VERSION_VERIFICATION = "ENABLE_DATASET_VERSION_VERIFICATION";
     private static final String ENABLE_SESSIONS_API = "ENABLE_SESSIONS_API";
     private static final String ENABLE_CENTRALISED_KEYRING = "ENABLE_CENTRALISED_KEYRING";
-    private static final String ENABLE_IMAGE_PUBLISHING = "ENABLE_IMAGE_PUBLISHING";
+    public static final String ENABLE_IMAGE_PUBLISHING = "ENABLE_IMAGE_PUBLISHING";
     private static final String ENABLE_JWT_SESSIONS = "ENABLE_JWT_SESSIONS";
-    private static final String ENABLE_KAFKA = "ENABLE_KAFKA";
+    public static final String ENABLE_KAFKA = "ENABLE_KAFKA";
+    public static final String ENABLE_STATIC_FILES_PUBLISHING = "ENABLE_STATIC_FILES_PUBLISHING";
 
     /**
      * Singleton instance
@@ -39,6 +40,7 @@ public class CMSFeatureFlags {
     private final boolean isJwtSessionsEnabled;
 
     private final boolean isKafkaEnabled;
+    private final boolean isStaticFilesPublishingEnabled;
 
     /**
      * Construct a new feature flags instance.
@@ -52,6 +54,7 @@ public class CMSFeatureFlags {
         this.isImagePublishingEnabled = Boolean.valueOf(getConfigValue(ENABLE_IMAGE_PUBLISHING));
         this.isJwtSessionsEnabled = Boolean.valueOf(getConfigValue(ENABLE_JWT_SESSIONS));
         this.isKafkaEnabled = Boolean.valueOf(getConfigValue(ENABLE_KAFKA));
+        this.isStaticFilesPublishingEnabled = Boolean.valueOf(getConfigValue(ENABLE_STATIC_FILES_PUBLISHING));
 
         info().data(ENABLE_DATASET_IMPORT, isDatasetImportEnabled)
                 .data(ENABLE_VERIFY_PUBLISH_CONTENT, isVerifyPublishEnabled)
@@ -60,6 +63,8 @@ public class CMSFeatureFlags {
                 .data(ENABLE_CENTRALISED_KEYRING, isCentralisedKeyringEnabled)
                 .data(ENABLE_IMAGE_PUBLISHING, isImagePublishingEnabled)
                 .data(ENABLE_JWT_SESSIONS, isJwtSessionsEnabled)
+                .data(ENABLE_KAFKA, isKafkaEnabled)
+                .data(ENABLE_STATIC_FILES_PUBLISHING, isStaticFilesPublishingEnabled)
                 .log("CMS feature flags configurations");
     }
 
@@ -106,6 +111,9 @@ public class CMSFeatureFlags {
 
     public boolean isKafkaEnabled() { return isKafkaEnabled; }
 
+    public boolean isStaticFilesPublishingEnabled() {return isStaticFilesPublishingEnabled;}
+
+
     public static String getConfigValue(String name) {
         String value = System.getProperty(name);
         if (StringUtils.isNoneEmpty(value)) {
@@ -136,4 +144,5 @@ public class CMSFeatureFlags {
         }
         return instance;
     }
+
 }

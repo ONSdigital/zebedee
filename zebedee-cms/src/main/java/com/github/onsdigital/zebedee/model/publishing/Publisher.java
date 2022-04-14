@@ -19,11 +19,7 @@ import com.github.onsdigital.zebedee.model.publishing.verify.HashVerifier;
 import com.github.onsdigital.zebedee.model.publishing.verify.HashVerifierImpl;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.Resource;
-import com.github.onsdigital.zebedee.service.DatasetService;
-import com.github.onsdigital.zebedee.service.ImageService;
-import com.github.onsdigital.zebedee.service.ImageServicePublishingResult;
-import com.github.onsdigital.zebedee.service.KafkaService;
-import com.github.onsdigital.zebedee.service.ServiceSupplier;
+import com.github.onsdigital.zebedee.service.*;
 import com.github.onsdigital.zebedee.util.Http;
 import com.github.onsdigital.zebedee.util.SlackNotification;
 import com.github.onsdigital.zebedee.util.ZebedeeCmsService;
@@ -90,6 +86,7 @@ public class Publisher {
     private static ServiceSupplier<DatasetService> datasetServiceSupplier;
     private static ServiceSupplier<ImageService> imageServiceSupplier;
     private static ServiceSupplier<KafkaService> kafkaServiceSupplier;
+    private static StaticFileService staticFileServerService;
 
     private static final String TRACE_ID_HEADER = "trace_id";
     public static final String SEARCHINDEX = "ONS";
@@ -107,6 +104,9 @@ public class Publisher {
         kafkaServiceSupplier = () -> ZebedeeCmsService.getInstance().getKafkaService();
     }
 
+    static void setStaticFilePublisherForTesting(StaticFileService service) {
+        staticFileServerService = service;
+    }
     /**
      * Execute the prepublish steps.
      */
@@ -126,6 +126,10 @@ public class Publisher {
         Future<ImageServicePublishingResult> imageFuture = null;
         if (CMSFeatureFlags.cmsFeatureFlags().isImagePublishingEnabled()) {
             imageFuture = publishImages(collection);
+        }
+
+        if (CMSFeatureFlags.cmsFeatureFlags().isStaticFilesPublishingEnabled()) {
+            staticFileServerService.publishCollection(collection);
         }
 
         publishFilteredCollectionFiles(collection, collectionReader);

@@ -1,13 +1,27 @@
 package com.github.onsdigital.zebedee.model.publishing;
 
+import com.github.onsdigital.zebedee.configuration.CMSFeatureFlags;
+import com.github.onsdigital.zebedee.json.CollectionDescription;
+import com.github.onsdigital.zebedee.model.Collection;
+import com.github.onsdigital.zebedee.model.Content;
+import com.github.onsdigital.zebedee.reader.CollectionReader;
+import com.github.onsdigital.zebedee.service.StaticFileService;
+import org.apache.commons.lang.RandomStringUtils;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.TreeMap;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.*;
 
+@RunWith(MockitoJUnitRunner.class)
 public class PublisherTest {
 
     private Publisher publisher;
@@ -16,6 +30,7 @@ public class PublisherTest {
     public void setup() throws IOException {
         this.publisher = new Publisher();
     }
+
 
     @Test
     public void testConvertUriWithJsonForEvent() {
@@ -84,5 +99,104 @@ public class PublisherTest {
         //Then {The uri is valid}
         assertTrue(actual);
     }
+
+    String emailAddress = "bogusEmail@ons.gov.uk";
+    @Mock
+    Collection mockCollection;
+    @Mock
+    CollectionDescription mockCollectionDescription;
+    @Mock
+    Content mockContent;
+    @Mock
+    StaticFileService mockFileService;
+
+    @Before
+    public void beforeEach() throws Exception{
+        //Given {A Collection with no files}
+        when(mockContent.uris()).thenReturn(new ArrayList<String>(0));
+
+        when(mockCollectionDescription.getId()).thenReturn(randomCollectionId());
+        when(mockCollectionDescription.getPublishTransactionIds()).thenReturn(new TreeMap<String,String>());
+
+        when(mockCollection.getReviewed()).thenReturn(mockContent);
+        when(mockCollection.getDescription()).thenReturn(mockCollectionDescription);
+
+        // And {features are disabled except static files}
+        System.setProperty(CMSFeatureFlags.ENABLE_DATASET_IMPORT, "false");
+        System.setProperty(CMSFeatureFlags.ENABLE_IMAGE_PUBLISHING, "false");
+        System.setProperty(CMSFeatureFlags.ENABLE_VERIFY_PUBLISH_CONTENT, "false");
+        System.setProperty(CMSFeatureFlags.ENABLE_KAFKA, "false");
+        System.setProperty(CMSFeatureFlags.ENABLE_STATIC_FILES_PUBLISHING, "false");
+
+    }
+    @Test
+    public void whenFilePublishingEnableStaticFilesArePublished() throws Exception{
+        // Given {A Collection with no files}
+        // Default
+
+        // And {features are disabled except static files}
+        System.setProperty(CMSFeatureFlags.ENABLE_STATIC_FILES_PUBLISHING, "true");
+        Publisher.setStaticFilePublisherForTesting(mockFileService);
+
+        //When {executePublish is called}
+        boolean actual = Publisher.executePublish(mockCollection, null, emailAddress);
+
+        //Then {return is true (success)}
+        assertTrue(actual);
+
+        // ensure that static file published was called
+        verify(mockFileService, times(1)).publishCollection(any(Collection.class));
+
+    }
+
+    @Test
+    public void whenFilePublishingEnableStaticFilesArePublishedToo() throws Exception{
+        //Given {A Collection with no files}
+        //default
+
+        // And {features are disabled except static files}
+        Publisher.setStaticFilePublisherForTesting(mockFileService);
+
+        System.setProperty(CMSFeatureFlags.ENABLE_STATIC_FILES_PUBLISHING, "true");
+
+        //When {executePublish is called}
+        boolean actual = Publisher.executePublish(mockCollection, null, emailAddress);
+        boolean actualToo = Publisher.executePublish(mockCollection, null, emailAddress);
+
+        //Then {return is true (success)}
+        assertTrue(actual);
+        assertTrue(actualToo);
+
+        // ensure that static file published was called
+        verify(mockFileService, times(2)).publishCollection(any(Collection.class));
+
+    }
+
+    @Test
+    public void testIfEmptyCollectionWorks() throws Exception{
+        //Given {A Collection with no files}
+        // default
+
+
+        // And {features are disabled except static files}
+        // default - all features disabled
+
+        //Publisher.setStaticFilePublisherForTesting(mockFileService);
+
+        //When {executePublish is called}
+        boolean actual = Publisher.executePublish(mockCollection, null, emailAddress);
+
+        //Then {return is true (success)}
+        assertTrue(actual);
+
+        // ensure that static file published was not called
+        verify(mockFileService, never()).publishCollection(any(Collection.class));
+
+    }
+
+    private String randomCollectionId() {
+        return RandomStringUtils.random(20, true, true);
+    }
+
 
 }

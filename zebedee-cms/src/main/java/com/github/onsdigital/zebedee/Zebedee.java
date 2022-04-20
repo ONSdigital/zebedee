@@ -16,11 +16,7 @@ import com.github.onsdigital.zebedee.model.encryption.EncryptionKeyFactory;
 import com.github.onsdigital.zebedee.model.publishing.PublishedCollections;
 import com.github.onsdigital.zebedee.notification.StartUpNotifier;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
-import com.github.onsdigital.zebedee.service.DatasetService;
-import com.github.onsdigital.zebedee.service.ImageService;
-import com.github.onsdigital.zebedee.service.KafkaService;
-import com.github.onsdigital.zebedee.service.ServiceStore;
-import com.github.onsdigital.zebedee.service.ServiceStoreImpl;
+import com.github.onsdigital.zebedee.service.*;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.session.service.Sessions;
 import com.github.onsdigital.zebedee.teams.service.TeamsService;
@@ -85,6 +81,7 @@ public class Zebedee {
     private final DatasetService datasetService;
     private final ImageService imageService;
     private final KafkaService kafkaService;
+    private final StaticFilesService staticFilesService;
     private final ServiceStoreImpl serviceStoreImpl;
     private final StartUpNotifier startUpNotifier;
     private final Notifier slackNotifier;
@@ -110,6 +107,7 @@ public class Zebedee {
         this.datasetService = cfg.getDatasetService();
         this.imageService = cfg.getImageService();
         this.kafkaService = cfg.getKafkaService();
+        this.staticFilesService = cfg.getStaticFilesService();
         this.serviceStoreImpl = cfg.getServiceStore();
         this.collectionKeyring = cfg.getCollectionKeyring();
         this.encryptionKeyFactory = cfg.getEncryptionKeyFactory();
@@ -371,6 +369,10 @@ public class Zebedee {
 
     public KafkaService getKafkaService() {
         return kafkaService;
+    }
+
+    public StaticFilesService getStaticFilesService() {
+        return staticFilesService;
     }
 
     public ServiceStore getServiceStore() {

@@ -30,14 +30,7 @@ import com.github.onsdigital.zebedee.permissions.service.PermissionsServiceImpl;
 import com.github.onsdigital.zebedee.permissions.store.PermissionsStore;
 import com.github.onsdigital.zebedee.permissions.store.PermissionsStoreFileSystemImpl;
 import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
-import com.github.onsdigital.zebedee.service.DatasetService;
-import com.github.onsdigital.zebedee.service.ImageService;
-import com.github.onsdigital.zebedee.service.ImageServiceImpl;
-import com.github.onsdigital.zebedee.service.KafkaService;
-import com.github.onsdigital.zebedee.service.KafkaServiceImpl;
-import com.github.onsdigital.zebedee.service.NoOpKafkaService;
-import com.github.onsdigital.zebedee.service.ServiceStoreImpl;
-import com.github.onsdigital.zebedee.service.ZebedeeDatasetService;
+import com.github.onsdigital.zebedee.service.*;
 import com.github.onsdigital.zebedee.session.service.JWTSessionsServiceImpl;
 import com.github.onsdigital.zebedee.session.service.Sessions;
 import com.github.onsdigital.zebedee.session.service.ThreadLocalSessionsServiceImpl;
@@ -129,6 +122,8 @@ public class ZebedeeConfiguration {
     private DatasetService datasetService;
     private ImageService imageService;
     private KafkaService kafkaService;
+    private StaticFilesService staticFilesService;
+
     private CollectionKeyring collectionKeyring;
     private CollectionKeyCache schedulerKeyCache;
     private EncryptionKeyFactory encryptionKeyFactory;
@@ -431,6 +426,10 @@ public class ZebedeeConfiguration {
 
     public ImageService getImageService() {
         return imageService;
+    }
+
+    public StaticFilesService getStaticFilesService() {
+        return staticFilesService;
     }
 
     public KafkaService getKafkaService() {

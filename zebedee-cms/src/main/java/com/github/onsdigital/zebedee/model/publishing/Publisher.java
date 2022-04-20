@@ -86,7 +86,7 @@ public class Publisher {
     private static ServiceSupplier<DatasetService> datasetServiceSupplier;
     private static ServiceSupplier<ImageService> imageServiceSupplier;
     private static ServiceSupplier<KafkaService> kafkaServiceSupplier;
-    private static StaticFilesService staticFilesService;
+    static ServiceSupplier<StaticFilesService> staticFilesServiceSupplier;
 
     private static final String TRACE_ID_HEADER = "trace_id";
     public static final String SEARCHINDEX = "ONS";
@@ -102,11 +102,9 @@ public class Publisher {
         datasetServiceSupplier = () -> ZebedeeCmsService.getInstance().getDatasetService();
         imageServiceSupplier = () -> ZebedeeCmsService.getInstance().getImageService();
         kafkaServiceSupplier = () -> ZebedeeCmsService.getInstance().getKafkaService();
+        staticFilesServiceSupplier = () -> ZebedeeCmsService.getInstance().getStaticFilesService();
     }
 
-    static void setStaticFilePublisherForTesting(StaticFilesService service) {
-        staticFilesService = service;
-    }
     /**
      * Execute the prepublish steps.
      */
@@ -147,7 +145,7 @@ public class Publisher {
 
         if (CMSFeatureFlags.cmsFeatureFlags().isStaticFilesPublishingEnabled()) {
             try {
-                staticFilesService.publishCollection(collection);
+                staticFilesServiceSupplier.getService().publishCollection(collection);
                 success &= true;
             } catch (Exception e) {
                 error().logException(e, "Exception thrown when performing static file publish()");

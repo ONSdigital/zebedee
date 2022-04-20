@@ -126,6 +126,9 @@ public class PublisherTest {
         System.setProperty(CMSFeatureFlags.ENABLE_VERIFY_PUBLISH_CONTENT, "false");
         System.setProperty(CMSFeatureFlags.ENABLE_KAFKA, "false");
         System.setProperty(CMSFeatureFlags.ENABLE_STATIC_FILES_PUBLISHING, "false");
+
+        Publisher.staticFilesServiceSupplier = () ->  mockFileService;
+
     }
 
 
@@ -137,8 +140,6 @@ public class PublisherTest {
         // And {features are disabled except static files}
         System.setProperty(CMSFeatureFlags.ENABLE_STATIC_FILES_PUBLISHING, "true");
         CMSFeatureFlags.reset();
-        Publisher.setStaticFilePublisherForTesting(mockFileService);
-
         //When {executePublish is called}
         boolean executeResult = Publisher.executePublish(mockCollection, null, emailAddress);
 
@@ -162,7 +163,6 @@ public class PublisherTest {
                 .when(mockFileService)
                 .publishCollection(any());
 
-        Publisher.setStaticFilePublisherForTesting(mockFileService);
 
         //When {executePublish is called}
         boolean executeResult = Publisher.executePublish(mockCollection, null, emailAddress);
@@ -182,7 +182,6 @@ public class PublisherTest {
         CMSFeatureFlags.reset();
 
         // And {features are disabled except static files}
-        Publisher.setStaticFilePublisherForTesting(mockFileService);
 
 
         //When {executePublish is called}
@@ -205,8 +204,6 @@ public class PublisherTest {
         // And {features are disabled except static files}
         // default - all features disabled
         CMSFeatureFlags.reset();
-
-        Publisher.setStaticFilePublisherForTesting(mockFileService);
 
         //When {executePublish is called}
         boolean executeResult = Publisher.executePublish(mockCollection, null, emailAddress);

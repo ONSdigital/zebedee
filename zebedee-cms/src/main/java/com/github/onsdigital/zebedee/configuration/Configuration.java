@@ -34,6 +34,7 @@ public class Configuration {
     private static final String MATHJAX_SERVICE_URL = "http://localhost:8888";
     private static final String DATASET_API_URL = "http://localhost:22000";
     private static final String IMAGE_API_URL = "http://localhost:24700";
+    private static final String STATIC_FILES_API_URL = "http://localhost:26900";
     private static final String IDENTITY_API_URL = "http://localhost:25600";
     private static final String KAFKA_ADDR = "localhost:9092";
     private static final String KAFKA_CONTENT_PUBLISHED_TOPIC = "content-published";
@@ -144,6 +145,10 @@ public class Configuration {
 
     public static String getImageAPIURL() {
         return StringUtils.defaultIfBlank(getValue("IMAGE_API_URL"), IMAGE_API_URL);
+    }
+
+    public static String getStaticFilesAPIURL() {
+        return StringUtils.defaultIfBlank(getValue("FILES_API_URL"), STATIC_FILES_API_URL);
     }
 
     public static String getIdentityAPIURL() {

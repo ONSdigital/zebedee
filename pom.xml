@@ -26,7 +26,7 @@
         <restolino.version>v0.4.2</restolino.version>
         <fasterxml.jackson.version>2.13.0</fasterxml.jackson.version>
         <apache.poi.version>3.17</apache.poi.version>
-        <spring.version>5.3.13</spring.version>
+        <spring.version>5.3.19</spring.version>
         <dp.logging.version>v2.0.0-beta</dp.logging.version>
     </properties>
 

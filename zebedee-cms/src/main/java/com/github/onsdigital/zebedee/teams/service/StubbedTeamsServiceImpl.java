@@ -23,7 +23,7 @@ public class StubbedTeamsServiceImpl implements TeamsService {
      */
     @Deprecated
     @Override
-    public List<Team> resolveTeamDetails(Set<Integer> teamIds) {
+    public List<Team> resolveTeamDetails(Set<String> teamIds) {
         error().log(UNSUPPORTED_METHOD);
         throw new UnsupportedOperationException(UNSUPPORTED_METHOD);
     }
@@ -47,7 +47,7 @@ public class StubbedTeamsServiceImpl implements TeamsService {
      */
     @Deprecated
     @Override
-    public List<Team> resolveTeams(Set<Integer> teamIds) {
+    public List<Team> resolveTeams(Set<String> teamIds) {
         error().log(UNSUPPORTED_METHOD);
         throw new UnsupportedOperationException(UNSUPPORTED_METHOD);
     }

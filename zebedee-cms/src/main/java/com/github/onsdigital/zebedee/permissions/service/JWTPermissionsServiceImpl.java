@@ -1,5 +1,7 @@
 package com.github.onsdigital.zebedee.permissions.service;
 
+import com.github.onsdigital.zebedee.exceptions.BadRequestException;
+import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.PermissionDefinition;
 import com.github.onsdigital.zebedee.permissions.model.AccessMapping;
@@ -32,7 +34,8 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
     private static final String ADMIN_GROUP = "role-admin";
     private static final String UNSUPPORTED_ERROR = "JWT sessions are enabled: {0} is no longer supported";
 
-    private PermissionsStore permissionsStore;
+    // TODO: change the following field to private once migration to JWT sessions is complete and the PermissionsServiceImpl is removed
+    protected PermissionsStore permissionsStore;
     private ReentrantReadWriteLock readWriteLock = new ReentrantReadWriteLock();
     private final Lock readLock = readWriteLock.readLock();
     private final Lock writeLock = readWriteLock.writeLock();
@@ -50,34 +53,6 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
     }
 
     /**
-     * @param session - {@link Session} to get the groups
-     * @return list of groups where groupId is converted to teamId
-     * @throws NumberFormatException if group name is not  permitted format (string of integers)
-     */
-    private static List<Integer> convertGroupsToTeams(Session session) throws NumberFormatException {
-        List<Integer> teamsList = new ArrayList<>();
-        if (session == null || session.getGroups().isEmpty()) {
-            return teamsList;
-        }
-
-        String[] valueArray = {PUBLISHER_GROUP, ADMIN_GROUP};
-        List<String> groups = session.getGroups();
-        Set<String> setOfString = new HashSet<>(groups);
-        for (String s : setOfString) {
-            try {
-                teamsList.add(Integer.parseInt(s));
-            } catch (NumberFormatException e) {
-                if (!Arrays.asList(valueArray).contains(s)) {
-                    String logString = "invalid group name format groupName " + s;
-                    warn().log(logString);
-                }
-            }
-        }
-
-        return teamsList;
-    }
-
-    /**
      * Determines whether the specified user has publisher permissions
      *
      * @param session The user's login {@link Session}.
@@ -85,8 +60,7 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
      */
     @Override
     public boolean isPublisher(Session session) {
-        return session != null && !StringUtils.isEmpty(session.getEmail()) &&
-                isGroupMember(session, PUBLISHER_GROUP);
+        return session != null && isGroupMember(session, PUBLISHER_GROUP);
     }
 
     /**
@@ -97,8 +71,7 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
      */
     @Override
     public boolean isAdministrator(Session session) {
-        return session != null && !StringUtils.isEmpty(session.getEmail()) &&
-                isGroupMember(session, ADMIN_GROUP);
+        return session != null && isGroupMember(session, ADMIN_GROUP);
     }
 
     /**
@@ -112,7 +85,7 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
      */
     @Deprecated
     @Override
-    public boolean hasAdministrator() {
+    public boolean hasAdministrator() throws IOException {
         throw new UnsupportedOperationException(format(UNSUPPORTED_ERROR, "hasAdministrator"));
     }
 
@@ -128,7 +101,7 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
      */
     @Deprecated
     @Override
-    public void addAdministrator(String email, Session session) {
+    public void addAdministrator(String email, Session session) throws UnauthorizedException, IOException {
         throw new UnsupportedOperationException(format(UNSUPPORTED_ERROR, "addAdministrator"));
     }
 
@@ -144,7 +117,7 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
      */
     @Deprecated
     @Override
-    public void removeAdministrator(String email, Session session) {
+    public void removeAdministrator(String email, Session session) throws IOException, UnauthorizedException {
         throw new UnsupportedOperationException(format(UNSUPPORTED_ERROR, "removeAdministrator"));
     }
 
@@ -177,7 +150,7 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
      */
     @Deprecated
     @Override
-    public void addEditor(String email, Session session) {
+    public void addEditor(String email, Session session) throws IOException, UnauthorizedException, NotFoundException, BadRequestException {
         throw new UnsupportedOperationException(format(UNSUPPORTED_ERROR, "addEditor"));
     }
 
@@ -193,7 +166,7 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
      */
     @Deprecated
     @Override
-    public void removeEditor(String email, Session session) {
+    public void removeEditor(String email, Session session) throws IOException, UnauthorizedException {
         throw new UnsupportedOperationException(format(UNSUPPORTED_ERROR, "removeEditor"));
     }
 
@@ -208,37 +181,41 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
     @Override
     public boolean canView(Session session, String collectionId) throws IOException {
 
-        if (session == null || StringUtils.isBlank(session.getEmail()) || StringUtils.isBlank(collectionId)) {
+        if (session == null || StringUtils.isBlank(collectionId)) {
             return false;
         }
 
-        List<Integer> userGroups = convertGroupsToTeams(session);
-        if (userGroups == null || userGroups.isEmpty()) {
+        if (canEdit(session)) {
+            return true;
+        }
+
+        List<String> userGroups = session.getGroups();
+        if (userGroups.isEmpty()) {
             return false;
         }
 
-        boolean result = false;
         readLock.lock();
         try {
             AccessMapping accessMapping = permissionsStore.getAccessMapping();
-            Set<Integer> collectionGroups = accessMapping.getCollections().get(collectionId);
+            Set<String> collectionGroups = accessMapping.getCollections().get(collectionId);
 
             if (collectionGroups == null || collectionGroups.isEmpty()) {
                 return false;
             }
 
-            List<Integer> intersection = userGroups.stream()
+            List<String> intersection = userGroups.stream()
                     .filter(collectionGroups::contains)
                     .collect(Collectors.toList());
-            result = !intersection.isEmpty();
+
+            return !intersection.isEmpty();
+
         } catch (IOException e) {
             error().data("collectionId", collectionId).data("user", session.getEmail())
                     .logException(e, "canView permission request denied: unexpected error");
         } finally {
             readLock.unlock();
         }
-
-        return result;
+        return false;
     }
 
     /**
@@ -255,14 +232,13 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
      */
     @Deprecated
     @Override
-    public Set<Integer> listViewerTeams(Session session, String collectionId) throws IOException, UnauthorizedException {
+    public Set<String> listViewerTeams(Session session, String collectionId) throws IOException, UnauthorizedException {
         if (session == null || !canView(session, collectionId)) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
-        boolean result = false;
         readLock.lock();
-        Set<Integer> teamIds;
+        Set<String> teamIds;
         try {
             AccessMapping accessMapping = permissionsStore.getAccessMapping();
             teamIds = accessMapping.getCollections().get(collectionId);
@@ -291,7 +267,7 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
      */
     @Deprecated
     @Override
-    public void setViewerTeams(Session session, String collectionID, Set<Integer> collectionTeams) throws IOException, UnauthorizedException {
+    public void setViewerTeams(Session session, String collectionID, Set<String> collectionTeams) throws IOException, UnauthorizedException {
         if (session == null || !canEdit(session)) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
@@ -324,7 +300,7 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
      */
     @Deprecated
     @Override
-    public PermissionDefinition userPermissions(String email, Session session) {
+    public PermissionDefinition userPermissions(String email, Session session) throws IOException, UnauthorizedException {
         throw new UnsupportedOperationException(format(UNSUPPORTED_ERROR, "userPermissions"));
     }
 

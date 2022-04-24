@@ -1,7 +1,6 @@
 package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
-import com.github.onsdigital.zebedee.configuration.CMSFeatureFlags;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.CollectionDetail;
 import com.github.onsdigital.zebedee.json.ContentDetail;
@@ -20,7 +19,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
 import java.io.IOException;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
@@ -36,10 +34,10 @@ public class CollectionDetails {
     // Slighly convoluted but wrapping the creation of a new ZebedeeCollectionReader in a "supplier" means we can
     // replace it with a mock in our tests and avoid all the unnecessary pain and agro associated with creating
     // complex object.
-    private ZebedeeCollectionReaderSupplier zebedeeCollectionReaderSupplier = (z, c, s) -> new ZebedeeCollectionReader(z, c, s);
+    private ZebedeeCollectionReaderSupplier zebedeeCollectionReaderSupplier = ZebedeeCollectionReader::new;
 
     public CollectionDetails() {
-        this.datasetImportEnabled = CMSFeatureFlags.cmsFeatureFlags().isEnableDatasetImport();
+        this.datasetImportEnabled = cmsFeatureFlags().isEnableDatasetImport();
     }
 
     /**
@@ -108,16 +106,19 @@ public class CollectionDetails {
         addEventsForDetails(result.complete, collection);
         addEventsForDetails(result.reviewed, collection);
 
-        Set<Integer> teamIds = zebedeeCmsService.getPermissions().listViewerTeams(session, collection.getDescription().getId());
-        result.teamsDetails = zebedeeCmsService.getZebedee().getTeamsService().resolveTeamDetails(teamIds);
-        result.teamsDetails.forEach(team -> collection.getDescription().getTeams().add(team.getName()));
+        Set<String> teamIds = zebedeeCmsService.getPermissions().listViewerTeams(session, collection.getDescription().getId());
+
+        if (!cmsFeatureFlags().isJwtSessionsEnabled()) {
+            result.teamsDetails = zebedeeCmsService.getZebedee().getTeamsService().resolveTeamDetails(teamIds);
+            result.teamsDetails.forEach(team -> collection.getDescription().getTeams().add(team.getName()));
+        }
 
         String collectionId = Collections.getCollectionId(request);
 
         if (datasetImportEnabled) {
             info().data("collectionId", collectionId).data("user", session.getEmail())
                 .log("CollectionDetails GET endpoint: datasetImportEnabled including dataset and dataset version " +
-                        "details to response");
+                    "details to response");
 
             result.datasets = collection.getDescription().getDatasets();
             result.datasetVersions = collection.getDescription().getDatasetVersions();

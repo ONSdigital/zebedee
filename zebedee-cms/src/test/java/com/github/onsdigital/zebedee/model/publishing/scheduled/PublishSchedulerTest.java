@@ -10,10 +10,15 @@ import com.github.onsdigital.zebedee.session.model.Session;
 import org.joda.time.DateTime;
 import org.junit.Assert;
 import org.junit.Test;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
+
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.when;
 
 public class PublishSchedulerTest extends ZebedeeTestBaseFixture {
 
@@ -24,6 +29,11 @@ public class PublishSchedulerTest extends ZebedeeTestBaseFixture {
     public void setUp() throws Exception {
         session = zebedee.openSession(builder.publisher1Credentials);
         scheduler = new PublishScheduler();
+
+        when(permissionsService.canEdit(session))
+                .thenReturn(true);
+
+        ReflectionTestUtils.setField(zebedee, "permissionsService", permissionsService);
     }
 
     @Test
@@ -78,55 +88,6 @@ public class PublishSchedulerTest extends ZebedeeTestBaseFixture {
         ScheduledPublishTaskData taskData = prePublishTaskData.get(0);
         Assert.assertNotNull(taskData);
         Assert.assertFalse(taskData.collectionIds.contains(description.getId()));
-    }
-
-    @Test
-    public void deletedCollectionShouldCancel() throws IOException, ZebedeeException, InterruptedException {
-
-        // Given a scheduled collection that has been deleted.
-        CollectionDescription description = new CollectionDescription("collectionName");
-        description.setType(CollectionType.scheduled);
-        description.setApprovalStatus(ApprovalStatus.COMPLETE);
-        description.setPublishDate(DateTime.now().plusSeconds(2000).toDate());
-        Collection collection = Collection.create(description, zebedee, session);
-        Date startDate = description.getPublishDate();
-        Date prePublishStartDate = new DateTime(description.getPublishDate()).minusSeconds(1).toDate();
-        scheduler.schedulePrePublish(collection, zebedee, prePublishStartDate, startDate);
-        zebedee.getCollections().delete(collection, session);
-
-        // When the collection is cancelled from the schuduler.
-        scheduler.cancel(collection);
-
-        // Then the collection task is no longer queued.
-        List<ScheduledPublishTaskData> prePublishTaskData = scheduler.getPrePublishTaskData(zebedee);
-        Assert.assertNotNull(prePublishTaskData);
-        ScheduledPublishTaskData taskData = prePublishTaskData.get(0);
-        Assert.assertNotNull(taskData);
-        Assert.assertFalse(taskData.collectionIds.contains(description.getId()));
-    }
-
-    @Test
-    public void deletedCollectionShouldNotThrowExceptionOnLoadCollections() throws IOException, ZebedeeException, InterruptedException {
-
-        // Given a scheduled collection
-        CollectionDescription description = new CollectionDescription("collectionName");
-        description.setType(CollectionType.scheduled);
-        description.setApprovalStatus(ApprovalStatus.COMPLETE);
-        description.setPublishDate(DateTime.now().plusSeconds(2000).toDate());
-        Collection collection = Collection.create(description, zebedee, session);
-
-        Date startDate = description.getPublishDate();
-        Date prePublishStartDate = new DateTime(description.getPublishDate()).minusSeconds(1).toDate();
-        scheduler.schedulePrePublish(collection, zebedee, prePublishStartDate, startDate);
-
-        // When the collection is deleted but not removed from the scheduler.
-        zebedee.getCollections().delete(collection, session);
-
-        // Then getting collection data does not throw any exceptions.
-        List<ScheduledPublishTaskData> prePublishTaskData = scheduler.getPrePublishTaskData(zebedee);
-        Assert.assertNotNull(prePublishTaskData);
-        ScheduledPublishTaskData taskData = prePublishTaskData.get(0);
-        Assert.assertNotNull(taskData);
     }
 
     @Test

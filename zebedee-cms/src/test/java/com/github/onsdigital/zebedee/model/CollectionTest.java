@@ -45,7 +45,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Writer;
 import java.net.URI;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -82,7 +82,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
     Team team;
 
     private static final String teamName = "some team";
-    private static final int teamId = 12;
+    private static final String teamId = "12";
     private static final boolean recursive = false;
     Collection collection;
     Session publisher1Session;
@@ -285,7 +285,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
 
     @Test
     public void shouldUpdateCollection() throws Exception {
-        Set<Integer> teamIds = new HashSet<>(Arrays.asList(12));
+        Set<String> teamIds = new HashSet<>(Arrays.asList("12"));
 
         when(teamsService.findTeam(teamName))
                 .thenReturn(team);
@@ -385,7 +385,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         assertTrue(updatedCollectionDescription.getEvents().hasEventForType(EventType.CREATED));
         assertEquals(updatedDescription.getTeams(), updatedCollectionDescription.getTeams());
         verify(permissionsService, times(1)).setViewerTeams(
-                publisher1Session, collection.getDescription().getId(), new HashSet<Integer>());
+                publisher1Session, collection.getDescription().getId(), new HashSet<String>());
     }
 
     @Test
@@ -1126,7 +1126,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         // We write some output to the content:
         Path path = collection.getInProgressPath(uri);
         try (Writer writer = Files.newBufferedWriter(path,
-                Charset.forName("utf8"));) {
+                StandardCharsets.UTF_8)) {
             writer.append("test");
         }
 

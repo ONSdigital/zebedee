@@ -58,7 +58,7 @@ public class Builder {
     @Mock
     private Profile slackProfile;
 
-    private static int teamId;
+    private static String teamId;
     private static User administratorTemplate;
     private static User publisher1Template;
     private static User publisher2Template;
@@ -325,8 +325,8 @@ public class Builder {
         return credentials;
     }
 
-    private Set<Integer> set(Team team) {
-        Set<Integer> ids = new HashSet<>();
+    private Set<String> set(Team team) {
+        Set<String> ids = new HashSet<>();
         ids.add(team.getId());
         return ids;
     }
@@ -334,7 +334,16 @@ public class Builder {
     private Team createTeam(User user, String name, Path teams) throws IOException {
         Team team = new Team();
 
-        team.setId(++teamId);
+        int teamId_int;
+        try {
+            teamId_int = Integer.parseInt(teamId);
+            teamId_int += 1;
+            team.setId(String.valueOf(teamId_int));
+
+        } catch (NumberFormatException e) {
+            info().exception(e).log("failed to convert teamId");
+        }
+
         team.setName(name);
         team.addMember(user.getEmail());
         Path labourMarketTeamPath = teams.resolve(PathUtils.toFilename(team.getName() + ".json"));

@@ -27,7 +27,6 @@ import com.github.onsdigital.zebedee.notification.StartUpNotifier;
 import com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImpl;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsServiceImpl;
-import com.github.onsdigital.zebedee.permissions.service.PermissionsServiceProxy;
 import com.github.onsdigital.zebedee.permissions.store.PermissionsStore;
 import com.github.onsdigital.zebedee.permissions.store.PermissionsStoreFileSystemImpl;
 import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
@@ -71,21 +70,25 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Map;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.IvParameterSpec;
 
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.warn;
 import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
-import static com.github.onsdigital.zebedee.configuration.Configuration.getCognitoKeyIdPairs;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getDatasetAPIAuthToken;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getDatasetAPIURL;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getDefaultVerificationUrl;
+import static com.github.onsdigital.zebedee.configuration.Configuration.getIdentityAPIURL;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getImageAPIURL;
+import static com.github.onsdigital.zebedee.configuration.Configuration.getInitialRetryInterval;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getKafkaContentPublishedTopic;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getKafkaURL;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getKeyringInitVector;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getKeyringSecretKey;
+import static com.github.onsdigital.zebedee.configuration.Configuration.getMaxRetryInterval;
+import static com.github.onsdigital.zebedee.configuration.Configuration.getMaxRetryTimeout;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getServiceAuthToken;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getSlackSupportChannelID;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getSlackToken;
@@ -163,7 +166,7 @@ public class ZebedeeConfiguration {
         initUsersService(zebedeePath, permissionsService);
 
         // Initialise the sessions service
-        initSessionsService(zebedeePath, getCognitoKeyIdPairs());
+        initSessionsService(zebedeePath, getIdentityAPIURL(), getInitialRetryInterval(), getMaxRetryTimeout(), getMaxRetryInterval());
 
         // Initialise published content services (data index and published content reader)
         initPublishedContentServices(zebedeePath);
@@ -172,7 +175,7 @@ public class ZebedeeConfiguration {
         initCollectionServices(zebedeePath, permissionsService);
 
         // Initialise the collection keyring and scheduler cache.
-        initCollectionKeyring(zebedeePath, permissionsService, collections);
+        initCollectionKeyring(zebedeePath, permissionsService, collections, getKeyringSecretKey(), getKeyringInitVector());
 
         // Initialise the post publish verification service
         initVerificationAgent(publishedCollections, getDefaultVerificationUrl());
@@ -314,10 +317,11 @@ public class ZebedeeConfiguration {
         initialiseAccessMapping(permissionsPath);
 
         PermissionsStore permissionsStore = new PermissionsStoreFileSystemImpl(permissionsPath);
-        PermissionsServiceImpl legacyPermissionsService = new PermissionsServiceImpl(permissionsStore, this::getTeamsService);
-        JWTPermissionsServiceImpl jwtPermissionsService = new JWTPermissionsServiceImpl(permissionsStore);
-        this.permissionsService = new PermissionsServiceProxy(cmsFeatureFlags().isJwtSessionsEnabled(),
-                legacyPermissionsService, jwtPermissionsService);
+        if (cmsFeatureFlags().isJwtSessionsEnabled()) {
+            this.permissionsService = new JWTPermissionsServiceImpl(permissionsStore);
+        } else {
+            this.permissionsService = new PermissionsServiceImpl(permissionsStore);
+        }
 
         info().data("permissions_path", permissionsPath.toString())
                 .data("jwt_sessions_enabled", cmsFeatureFlags().isJwtSessionsEnabled())
@@ -354,10 +358,16 @@ public class ZebedeeConfiguration {
      * @param cognitoKeyIdPairs the cognito public signing keys
      * @throws IOException If a filesystem error occurs.
      */
-    private void initSessionsService(Path zebedeePath, Map<String, String> cognitoKeyIdPairs) throws IOException {
+    private void initSessionsService(Path zebedeePath, String identityAPIURL, int initialRetryInterval, int maxRetryTimeout, int maxRetryInterval) throws IOException {
         Path sessionsPath = createDir(zebedeePath, SESSIONS);
         if (cmsFeatureFlags().isJwtSessionsEnabled()) {
-            JWTVerifier jwtVerifier = new JWTVerifierImpl(getCognitoKeyIdPairs());
+            JWTVerifier jwtVerifier = null;
+            try {
+                jwtVerifier = new JWTVerifierImpl(identityAPIURL, initialRetryInterval, maxRetryTimeout, maxRetryInterval);
+            } catch (Exception e) {
+                error().logException(e, "failed to initialise JWT validator");
+                throw new RuntimeException(e);
+            }
             this.sessions = new JWTSessionsServiceImpl(jwtVerifier);
             info().log("JWT sessions service initialised");
         } else {
@@ -376,13 +386,12 @@ public class ZebedeeConfiguration {
      * @param collections        the {@link Collections} service
      * @throws IOException If a filesystem error occurs.
      */
-    private void initCollectionKeyring(Path zebedeePath, PermissionsService permissionsService, Collections collections)
+    private void initCollectionKeyring(Path zebedeePath, PermissionsService permissionsService, Collections collections, SecretKey keyringSecretKey, IvParameterSpec keyringInitVector)
             throws IOException {
 
         Path keyringPath = createDir(zebedeePath, KEYRING);
 
-        CollectionKeyStore keyStore = new CollectionKeyStoreImpl(
-                keyringPath, getKeyringSecretKey(), getKeyringInitVector());
+        CollectionKeyStore keyStore = new CollectionKeyStoreImpl(keyringPath, keyringSecretKey, keyringInitVector);
 
         CollectionKeyCacheImpl.init(keyStore);
         CollectionKeyCache collectionKeyCache = CollectionKeyCacheImpl.getInstance();

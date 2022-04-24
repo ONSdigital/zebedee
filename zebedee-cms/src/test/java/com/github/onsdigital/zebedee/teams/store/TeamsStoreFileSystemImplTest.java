@@ -73,7 +73,7 @@ public class TeamsStoreFileSystemImplTest {
         store = new TeamsStoreFileSystemImpl(teamsPath);
 
         teamA = new Team()
-                .setId(123)
+                .setId("123")
                 .setName("Team-A")
                 .setMembers(new HashSet<>())
                 .addMember("Dave")
@@ -81,7 +81,7 @@ public class TeamsStoreFileSystemImplTest {
                 .addMember("Janick");
 
         teamB = new Team()
-                .setId(456)
+                .setId("456")
                 .setName("Team-B")
                 .setMembers(new HashSet<>())
                 .addMember("Bruce")

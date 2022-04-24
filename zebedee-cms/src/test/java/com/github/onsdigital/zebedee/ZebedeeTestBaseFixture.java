@@ -127,8 +127,6 @@ public abstract class ZebedeeTestBaseFixture {
                 .thenReturn(builder.reviewer1);
         when(usersService.getUserByEmail(builder.administrator.getEmail()))
                 .thenReturn(builder.administrator);
-        when(usersService.list())
-                .thenReturn(usersList);
 
         Session session = new Session("1234", builder.publisher1.getEmail());
 
@@ -165,7 +163,7 @@ public abstract class ZebedeeTestBaseFixture {
     }
 
     protected void setUpPermissionsServiceMockForLegacyTests(Zebedee instance, Session session) throws Exception {
-        when(permissionsService.canView(eq(session), any(String.class)))
+        when(permissionsService.canView(eq(session), anyString()))
                 .thenReturn(true);
 
         when(permissionsService.canEdit(session))

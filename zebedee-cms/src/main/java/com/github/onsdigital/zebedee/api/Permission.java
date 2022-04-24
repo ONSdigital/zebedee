@@ -129,14 +129,14 @@ public class Permission {
             throws IOException, NotFoundException, UnauthorizedException, BadRequestException {
 
         String email = request.getParameter("email");
-        if (cmsFeatureFlags().isJwtSessionsEnabled() && StringUtils.isNotEmpty(email)) {
+        if (cmsFeatureFlags().isJwtSessionsEnabled() && StringUtils.isNotBlank(email)) {
             throw new BadRequestException("invalid parameter 'email': checking the permissions of another user is no longer supported");
         }
 
         Session session = sessionsService.get();
 
         PermissionDefinition permissionDefinition;
-        if (cmsFeatureFlags().isJwtSessionsEnabled() || StringUtils.isEmpty(email)) {
+        if (StringUtils.isBlank(email)) {
             permissionDefinition = permissionsService.userPermissions(session);
         } else {
             permissionDefinition = permissionsService.userPermissions(email, session);

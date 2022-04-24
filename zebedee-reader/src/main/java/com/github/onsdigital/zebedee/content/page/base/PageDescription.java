@@ -81,7 +81,7 @@ public class PageDescription extends Content implements Comparable<PageDescripti
     private String versionLabel;
     private String metaCmd;
     private String apiDatasetId;
-    private String primaryTopic;
+    private String canonicalTopic;
     private List<String> secondaryTopics;
 
     public PageDescription() {
@@ -456,12 +456,12 @@ public class PageDescription extends Content implements Comparable<PageDescripti
       this.apiDatasetId = apiDatasetId;
     }
 
-    public String getPrimaryTopic() {
-        return primaryTopic;
+    public String getCanonicalTopic() {
+        return canonicalTopic;
     }
 
-    public void setPrimaryTopic(String primaryTopic) {
-        this.primaryTopic = primaryTopic;
+    public void setCanonicalTopic(String canonicalTopic) {
+        this.canonicalTopic = canonicalTopic;
     }
 
     public List<String> getSecondaryTopics() {

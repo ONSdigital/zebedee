@@ -441,7 +441,8 @@ public class Collection {
             for (String teamName : teamNames) {
                 Team team = teams.findTeam(teamName);
                 if (team == null) {
-                    throw new NotFoundException("team assigned to collection expected but does not exist");
+                    info().data("team", teamName).log("team assigned to collection expected but does not exist, skipping...");
+                    continue;
                 }
 
                 teamIds.add(team.getId());

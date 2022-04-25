@@ -46,7 +46,7 @@ public class PermissionsStoreFileSystemImplTest {
 
     @Test
     public void constructor_ShouldCreateAccessMappingIfDoesNotExist() throws Exception {
-        PermissionsStoreFileSystemImpl.initialisePermissions(permissionsDir);
+        PermissionsStoreFileSystemImpl.initialiseAccessMapping(permissionsDir);
         PermissionsStore store = new PermissionsStoreFileSystemImpl(permissionsDir);
 
         assertThat(Files.exists(accessMappingPath.toPath()), is(true));

@@ -1,4 +1,4 @@
-package com.github.onsdigital.zebedee.model;
+package com.github.onsdigital.zebedee.servicetokens.model;
 
 public class ServiceAccount {
 

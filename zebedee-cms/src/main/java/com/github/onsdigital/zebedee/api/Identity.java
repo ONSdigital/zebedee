@@ -6,9 +6,9 @@ import com.github.onsdigital.zebedee.authorisation.AuthorisationServiceImpl;
 import com.github.onsdigital.zebedee.authorisation.UserIdentity;
 import com.github.onsdigital.zebedee.authorisation.UserIdentityException;
 import com.github.onsdigital.zebedee.json.response.Error;
-import com.github.onsdigital.zebedee.model.ServiceAccount;
+import com.github.onsdigital.zebedee.servicetokens.model.ServiceAccount;
 import com.github.onsdigital.zebedee.reader.util.RequestUtils;
-import com.github.onsdigital.zebedee.service.ServiceStore;
+import com.github.onsdigital.zebedee.servicetokens.store.ServiceStore;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
@@ -18,9 +18,9 @@ import java.io.IOException;
 
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.error;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.warn;
-import static com.github.onsdigital.zebedee.service.ServiceTokenUtils.extractServiceAccountTokenFromAuthHeader;
-import static com.github.onsdigital.zebedee.service.ServiceTokenUtils.isValidServiceAuthorizationHeader;
-import static com.github.onsdigital.zebedee.service.ServiceTokenUtils.isValidServiceToken;
+import static com.github.onsdigital.zebedee.servicetokens.ServiceTokenUtils.extractServiceAccountTokenFromAuthHeader;
+import static com.github.onsdigital.zebedee.servicetokens.ServiceTokenUtils.isValidServiceAuthorizationHeader;
+import static com.github.onsdigital.zebedee.servicetokens.ServiceTokenUtils.isValidServiceToken;
 import static com.github.onsdigital.zebedee.util.JsonUtils.writeResponseEntity;
 import static org.apache.http.HttpStatus.SC_OK;
 import static org.apache.http.HttpStatus.SC_UNAUTHORIZED;

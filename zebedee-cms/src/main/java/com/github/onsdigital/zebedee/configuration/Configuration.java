@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
 import static java.text.MessageFormat.format;
 import static org.apache.commons.lang3.StringUtils.defaultIfBlank;
 
@@ -114,6 +115,10 @@ public class Configuration {
 
     public static String getSlackUsername() {
         return StringUtils.defaultIfBlank(getValue("SLACK_USERNAME"), DEFAULT_SLACK_USERNAME);
+    }
+
+    public static String getSlackToken() {
+        return getValue("slack_api_token");
     }
 
     public static List<String> slackChannelsToNotfiyOnStartUp() {
@@ -276,7 +281,6 @@ public class Configuration {
     static String getValue(String key) {
         return StringUtils.defaultIfBlank(System.getProperty(key), System.getenv(key));
     }
-
 
     /**
      * Gets a configured int value for the given key from either the system

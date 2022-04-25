@@ -73,7 +73,7 @@ public class PostPublisher {
             ContentReader contentReader = new FileSystemContentReader(zebedee.getPublished().getPath());
             ContentWriter contentWriter = new ContentWriter(zebedee.getPublished().getPath());
 
-            applyDeletesToPublishing(collection, contentReader, contentWriter);
+            applyDeletesToPublishing(collection, contentReader, contentWriter, zebedee.getPath());
             processManifestForMaster(collection, contentReader, contentWriter);
             copyFilesToMaster(zebedee, collection, collectionReader);
 
@@ -113,7 +113,8 @@ public class PostPublisher {
         return zebdeePublisherSession;
     }
 
-    private static void applyDeletesToPublishing(Collection collection, ContentReader contentReader, ContentWriter contentWriter) {
+    private static void applyDeletesToPublishing(Collection collection, ContentReader contentReader,
+                                                 ContentWriter contentWriter, Path zebedeePath) {
 
         try {
             applyManifestDeletesToMaster(collection, contentReader, contentWriter);

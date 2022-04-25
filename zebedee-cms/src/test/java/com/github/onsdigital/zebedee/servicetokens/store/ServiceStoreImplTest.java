@@ -1,6 +1,8 @@
-package com.github.onsdigital.zebedee.service;
+package com.github.onsdigital.zebedee.servicetokens.store;
 
-import com.github.onsdigital.zebedee.model.ServiceAccount;
+import com.github.onsdigital.zebedee.servicetokens.model.ServiceAccount;
+import com.github.onsdigital.zebedee.servicetokens.store.ServiceStore;
+import com.github.onsdigital.zebedee.servicetokens.store.ServiceStoreImpl;
 import com.github.onsdigital.zebedee.util.serialiser.JSONSerialiser;
 import org.junit.Before;
 import org.junit.Rule;

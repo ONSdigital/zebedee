@@ -4,7 +4,6 @@ import com.github.davidcarboni.cryptolite.Random;
 import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.content.page.base.PageType;
 import com.github.onsdigital.zebedee.json.ContentDetail;
-import com.github.onsdigital.zebedee.json.ContentDetailDescription;
 import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.Before;
@@ -17,11 +16,9 @@ import java.nio.file.Path;
 import java.util.List;
 
 import static com.github.onsdigital.zebedee.model.Content.isVisible;
-import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 public class ContentTest {
@@ -114,64 +111,6 @@ public class ContentTest {
         assertEquals(baseContent.description.title, result.description.title);
         assertEquals(baseContent.getType(), result.getType());
         assertEquals("/", result.uri);
-    }
-
-    @Test
-    public void shouldGetNestedDetails() throws IOException {
-
-        // Given an instance of content
-        Content content = new Content(basePath, basePath);
-
-        // When the nestedDetails method is called
-        ContentDetail root = content.nestedDetails();
-
-        // Then the result has child nodes defined.
-        assertNotNull(root);
-        assertNotNull(root.children);
-        assertTrue(root.children.size() > 0);
-        assertEquals(baseContent.description.title, root.description.title);
-    }
-
-    @Test
-    public void getNestedDetailsShouldAlphabeticallyOrderFiles() throws IOException {
-
-        // Given an instance of content with three subdirectories
-        Content content = new Content(basePath, basePath);
-
-        // When the nestedDetails method is called
-        ContentDetail root = content.nestedDetails();
-
-        // Then the result has child nodes ordered alphabetically
-        assertNotNull(root);
-        assertNotNull(root.children);
-        assertTrue(root.children.size() > 0);
-        assertEquals("Some sub 2015", root.children.get(0).description.title);
-        assertEquals(directoryBName, root.children.get(1).description.title);
-        assertEquals(directoryCName, root.children.get(2).description.title);
-    }
-
-
-    @Test
-    public void shouldGetNestedDetailsWithNoDataJsonFile() throws IOException {
-
-        // Given an instance of content
-        Content content = new Content(basePath, basePath);
-
-        // When the nestedDetails method is called
-        ContentDetail root = content.nestedDetails();
-
-        // Then a directory with no data.json file will still be evaluated but only the name returned without the URI.
-        ContentDetail bulletinDirectoryDetails = root.children.get(0).children.get(0);
-
-        assertNotNull(bulletinDirectoryDetails);
-        assertEquals(bulletinsDirectoryName, bulletinDirectoryDetails.description.title);
-        assertTrue(bulletinDirectoryDetails.children.size() > 0);
-
-        ContentDetail bulletinDetails = bulletinDirectoryDetails.children.get(0);
-        assertNotNull(bulletinDetails);
-        assertEquals(bulletinContent.description.title, bulletinDetails.description.title);
-        assertEquals("/" + basePath.relativize(exampleBulletinDirectory), bulletinDetails.uri);
-        assertTrue(bulletinDetails.children.size() == 0);
     }
 
     @Test

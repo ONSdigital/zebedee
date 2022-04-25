@@ -38,7 +38,7 @@ public class PermissionsStoreFileSystemImpl implements PermissionsStore {
      * @param accessMappingPath the path of the accessMapping json file.
      * @throws IOException error while initializing.
      */
-    public static void initialisePermissions(Path accessMappingPath) throws IOException {
+    public static void initialiseAccessMapping(Path accessMappingPath) throws IOException {
         Path jsonPath = accessMappingPath.resolve(PERMISSIONS_FILE);
 
         if (!Files.exists(jsonPath)) {

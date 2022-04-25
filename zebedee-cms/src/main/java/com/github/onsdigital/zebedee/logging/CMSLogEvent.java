@@ -6,7 +6,7 @@ import com.github.onsdigital.logging.v2.event.Severity;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.model.ClickEvent;
 import com.github.onsdigital.zebedee.model.Collection;
-import com.github.onsdigital.zebedee.model.ServiceAccount;
+import com.github.onsdigital.zebedee.servicetokens.model.ServiceAccount;
 import com.github.onsdigital.zebedee.permissions.cmd.CRUD;
 import com.github.onsdigital.zebedee.session.model.Session;
 import org.apache.commons.lang3.StringUtils;

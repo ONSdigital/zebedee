@@ -1,15 +1,15 @@
-package com.github.onsdigital.zebedee.service;
+package com.github.onsdigital.zebedee.servicetokens;
 
+import com.github.onsdigital.zebedee.servicetokens.model.ServiceAccount;
 import org.apache.commons.lang3.StringUtils;
 
 import java.nio.file.Path;
 import java.util.regex.Pattern;
 
-import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.warn;
 
 /**
- * Utility class for {@link com.github.onsdigital.zebedee.model.ServiceAccount} token values.
+ * Utility class for {@link ServiceAccount} token values.
  */
 public class ServiceTokenUtils {
 

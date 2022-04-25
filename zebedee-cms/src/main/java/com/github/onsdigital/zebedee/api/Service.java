@@ -3,10 +3,10 @@ package com.github.onsdigital.zebedee.api;
 import com.github.davidcarboni.cryptolite.Random;
 import com.github.davidcarboni.restolino.framework.Api;
 import com.github.onsdigital.zebedee.json.response.Error;
-import com.github.onsdigital.zebedee.model.ServiceAccount;
-import com.github.onsdigital.zebedee.model.ServiceAccountWithToken;
+import com.github.onsdigital.zebedee.servicetokens.model.ServiceAccount;
+import com.github.onsdigital.zebedee.servicetokens.model.ServiceAccountWithToken;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
-import com.github.onsdigital.zebedee.service.ServiceStore;
+import com.github.onsdigital.zebedee.servicetokens.store.ServiceStore;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.session.service.Sessions;
 

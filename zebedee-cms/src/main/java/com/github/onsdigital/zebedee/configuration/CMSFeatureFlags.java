@@ -24,21 +24,13 @@ public class CMSFeatureFlags {
      * Singleton instance
      **/
     private static CMSFeatureFlags instance = null;
-
     private final boolean isDatasetImportEnabled;
-
     private final boolean isVerifyPublishEnabled;
-
     private final boolean isDatasetVersionVerificationEnabled;
-
     private final boolean isSessionAPIEnabled;
-
     private final boolean isCentralisedKeyringEnabled;
-
     private final boolean isImagePublishingEnabled;
-
     private final boolean isJwtSessionsEnabled;
-
     private final boolean isKafkaEnabled;
     private final boolean isStaticFilesPublishingEnabled;
 
@@ -116,9 +108,13 @@ public class CMSFeatureFlags {
         return isJwtSessionsEnabled;
     }
 
-    public boolean isKafkaEnabled() { return isKafkaEnabled; }
+    public boolean isKafkaEnabled() {
+        return isKafkaEnabled;
+    }
 
-    public boolean isStaticFilesPublishingEnabled() {return isStaticFilesPublishingEnabled;}
+    public boolean isStaticFilesPublishingEnabled() {
+        return isStaticFilesPublishingEnabled;
+    }
 
 
     public static String getConfigValue(String name) {

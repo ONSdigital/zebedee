@@ -112,7 +112,6 @@ public class ZebedeeConfiguration {
     private ImageService imageService;
     private KafkaService kafkaService;
     private StaticFilesService staticFilesService;
-
     private CollectionKeyring collectionKeyring;
     private CollectionKeyCache schedulerKeyCache;
     private EncryptionKeyFactory encryptionKeyFactory;

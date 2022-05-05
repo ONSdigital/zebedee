@@ -11,8 +11,10 @@ import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.session.service.Sessions;
 import com.github.onsdigital.zebedee.user.service.UsersService;
+import com.github.onsdigital.zebedee.util.EncryptionUtils;
+import com.github.onsdigital.zebedee.util.slack.Notifier;
 import com.github.onsdigital.zebedee.util.versioning.VersionsServiceImpl;
-import org.apache.commons.io.file.PathUtils;
+import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -21,6 +23,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
+import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -47,8 +50,6 @@ public class ContentTest {
     @Mock
     private CollectionKeyring mockCollectionKeyring;
 
-    @Mock
-    private SecretKey secretKey;
 
     @Mock
     private PermissionsService mockPermissionsService;
@@ -56,8 +57,11 @@ public class ContentTest {
     @Mock
     UsersService mockUsersService;
 
+    @Mock
+    Notifier mockNotifier;
+
     @Test
-    public void It_Should_Write_Content_To_File() throws Exception {
+    public void WriteVersionFileV1() throws Exception {
         Path tempBasePath = Files.createTempDirectory("tempZebedee");
 
         System.setProperty("ENABLE_DATASET_IMPORT", "false");
@@ -68,9 +72,13 @@ public class ContentTest {
         request.setPathInfo("/content/" + collectionId);
         String datasetURL = "/peoplepopulationandcommunity/birthsdeathsandmarriages/livebirths/datasets/babynamesenglandandwalesbabynamesstatisticsboys/2022/data.json";
         request.addParameter("uri", datasetURL);
+        request.setContent(getRequestContent());
 
         CollectionDescription collectionDescription = new CollectionDescription("AK Testing");
+        collectionDescription.setEncrypted(false);
         EncryptionKeyFactory encryptionKeyFactory = new EncryptionKeyFactoryImpl();
+
+        SecretKey secretKey = KeyGenerator.getInstance("AES").generateKey();
 
         VersionsServiceImpl versionsService = new VersionsServiceImpl();
         com.github.onsdigital.zebedee.model.Content content = new com.github.onsdigital.zebedee.model.Content(tempBasePath);
@@ -83,46 +91,65 @@ public class ContentTest {
 
         when(mockCollections.getPath()).thenReturn(tempBasePath);
 
+        when(mockCollectionKeyring.get(any(), any())).thenReturn(secretKey);
+
+        when(mockNotifier.sendCollectionWarning(any(), any(), any())).thenReturn(true);
         when(mockZebedee.getCollections()).thenReturn(collections);
         when(mockZebedee.getSessions()).thenReturn(mockSessions);
         when(mockZebedee.getEncryptionKeyFactory()).thenReturn(encryptionKeyFactory);
         when(mockZebedee.getPermissionsService()).thenReturn(mockPermissionsService);
         when(mockZebedee.getUsersService()).thenReturn(mockUsersService);
         when(mockZebedee.getCollectionKeyring()).thenReturn(mockCollectionKeyring);
+        when(mockZebedee.getSlackNotifier()).thenReturn(mockNotifier);
         Root.zebedee = mockZebedee;
 
-        Collection collection = Collection.create(collectionDescription, mockZebedee, mockSession);
-        when(mockCollections.getCollection(collectionId)).thenReturn(collection); // Do we still need to do this given we have a real collection (TRY DELETING THIS LINE)
-        when(mockCollectionKeyring.get(any(), any())).thenReturn(secretKey);
+        Collection.create(collectionDescription, mockZebedee, mockSession);
 
-        MockHttpServletResponse response = new MockHttpServletResponse();
-
-        // "/peoplepopulationandcommunity/birthsdeathsandmarriages/livebirths/datasets/babynamesenglandandwalesbabynamesstatisticsboys/2022/data.json";
-
-//        Path a = Paths.get(tempBasePath.toString(), collectionId, "peoplepopulationandcommunity");
-//        Files.createDirectory(a);
-//        Path b = Paths.get(tempBasePath.toString(), collectionId, "peoplepopulationandcommunity", "birthsdeathsandmarriages");
-//        Files.createDirectory(b);
-        Path c = Paths.get(tempBasePath.toString(), collectionId, "inprogress","peoplepopulationandcommunity", "birthsdeathsandmarriages", "livebirths", "datasets", "babynamesenglandandwalesbabynamesstatisticsboys", "2022");
-//        Files.createDirectory(c);
-
-        Path d = Files.createDirectories(c);
-        Path versionFile = Paths.get(d.toString(), "data.json");
+        Path pathToCreate = Paths.get(tempBasePath.toString(), collectionId, "inprogress","peoplepopulationandcommunity", "birthsdeathsandmarriages", "livebirths", "datasets", "babynamesenglandandwalesbabynamesstatisticsboys", "2022");
+        Path datasetPath = Files.createDirectories(pathToCreate);
+        Path versionFile = Paths.get(datasetPath.toString(), "data.json");
         Files.createFile(versionFile);
-
-        Version versionApi = new Version();
-        versionApi.create(newVersionRequest, newVersionResponse);
-        Page pageApi = new Page(false);
-        pageApi.createPage(newPageRequest, newPageResponse);
 
         try {
             Content contentApi = new Content();
-            boolean result = contentApi.saveContent(request, response);
+            boolean result = contentApi.saveContent(request, new MockHttpServletResponse());
+            Assert.assertTrue(result);
         } catch (Exception e) {
             Assert.fail(e.getMessage() + e.toString());
             e.printStackTrace();
             throw e;
         }
 
+        byte[] bytes = IOUtils.toByteArray(EncryptionUtils.encryptionInputStream(versionFile, secretKey));
+
+        Assert.assertEquals(expectedContentV1, new String(bytes));
     }
+
+    private byte[] getRequestContent() {
+        return expectedContentV1.getBytes();
+    }
+
+    private static final String expectedContentV1 =
+            "{\"downloads\":" +
+                "[{\"file\":\"ac2be72c.xls\"}]," +
+            "\"type\":\"dataset\"," +
+            "\"uri\":\"/peoplepopulationandcommunity/birthsdeathsandmarriages/livebirths/datasets/babynamesenglandandwalesbabynamesstatisticsboys/2014\"," +
+            "\"description\":" +
+                "{\"title\":\"Baby Names Statistics Boys\"," +
+                "\"summary\":\"Ranks and counts for boys' baby names in England and Wales and also by region and month.\"," +
+                "\"keywords\":[\"top,ten,boys,girls,most,popular\"]," +
+                "\"metaDescription\":\"Ranks and counts for boys' baby names in England and Wales and also by region and month.\"," +
+                "\"nationalStatistic\":true," +
+                "\"contact\":{\"email\":\"vsob@ons.gov.uk\",\"name\":\"Elizabeth McLaren\",\"telephone\":\"+44 (0)1329 444110\"}," + "\"releaseDate\":\"2015-08-16T23:00:00.000Z\"," +
+                "\"nextRelease\":\"August - September 16 (provisional date)\"," +
+                "\"edition\":\"2014\"," +
+                "\"datasetId\":\"\"," +
+                "\"unit\":\"\",\"preUnit\":\"\"," +
+                "\"source\":\"\"," +
+                "\"versionLabel\":\"Testing\"}," +
+            "\"versions\":[{\"correctionNotice\":\"\"," +
+                "\"updateDate\":\"2022-05-03T11:31:21.283Z\"," +
+                "\"uri\":\"/peoplepopulationandcommunity/birthsdeathsandmarriages/livebirths/datasets/babynamesenglandandwalesbabynamesstatisticsboys/2014/previous/v1\"," +
+                "\"label\":\"Testing\"}]" +
+            "}";
 }

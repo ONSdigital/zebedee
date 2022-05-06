@@ -12,6 +12,8 @@ public class DownloadSection extends Content {
     private List<String> cdids;
     private String file;
     private String fileDescription; //Markdown
+    private String url;
+    private String version;
 
     public String getTitle() {
         return title;

@@ -8,6 +8,7 @@ import com.github.onsdigital.zebedee.model.Collections;
 import com.github.onsdigital.zebedee.model.encryption.EncryptionKeyFactory;
 import com.github.onsdigital.zebedee.model.encryption.EncryptionKeyFactoryImpl;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
+import com.github.onsdigital.zebedee.reader.api.endpoint.Data;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.session.service.Sessions;
 import com.github.onsdigital.zebedee.user.service.UsersService;
@@ -49,8 +50,7 @@ public class ContentTest {
 
     @Mock
     private CollectionKeyring mockCollectionKeyring;
-
-
+    
     @Mock
     private PermissionsService mockPermissionsService;
 
@@ -110,6 +110,9 @@ public class ContentTest {
         Path versionFile = Paths.get(datasetPath.toString(), "data.json");
         Files.createFile(versionFile);
 
+
+        
+        // Create the version content via the content API.
         try {
             Content contentApi = new Content();
             boolean result = contentApi.saveContent(request, new MockHttpServletResponse());
@@ -123,6 +126,27 @@ public class ContentTest {
         byte[] bytes = IOUtils.toByteArray(EncryptionUtils.encryptionInputStream(versionFile, secretKey));
 
         Assert.assertEquals(expectedContentV1, new String(bytes));
+
+        // read the version content via the content API.
+       MockHttpServletResponse response = new MockHttpServletResponse();
+        MockHttpServletRequest dataRequest = new MockHttpServletRequest();
+//        dataRequest.setPathInfo("/data/" + collectionId);
+        dataRequest.setRequestURI("/data/" + collectionId);
+
+        String dataURL = "/peoplepopulationandcommunity/birthsdeathsandmarriages/livebirths/datasets/babynamesenglandandwalesbabynamesstatisticsboys/2022";
+        dataRequest.addParameter("uri", dataURL);
+
+        try {
+            Data dataAPI = new Data();
+            dataAPI.read(dataRequest, response);
+        } catch (Exception e) {
+            e.printStackTrace();
+            Assert.fail(e.getMessage() + e.toString());
+            throw e;
+        }
+
+        Assert.assertEquals(200, response.getStatus());
+        Assert.assertEquals(expectedContentV1, response.getContentAsString());
     }
 
     private byte[] getV1RequestContent() {

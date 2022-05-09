@@ -40,6 +40,13 @@ import java.nio.file.Paths;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+/**
+ * An Integration test for the end-to-end of creating a piece of content in Zebedee
+ *
+ * Note: this should probably use FailSafe and be renamed to ContentTestIT but the current
+ * zebedee CI pipeline does not execute the verify maven phase, so would never execute these tests.
+ *
+ */
 @RunWith(MockitoJUnitRunner.class)
 public class ContentTest {
     
@@ -53,9 +60,6 @@ public class ContentTest {
     private Session mockSession;
 
     @Mock
-    private Collections mockCollections;
-
-    @Mock
     private CollectionKeyring mockCollectionKeyring;
     
     @Mock
@@ -66,10 +70,7 @@ public class ContentTest {
 
     @Mock
     Notifier mockNotifier;
-
-    @Mock
-    CollectionReaderFactory collectionReaderFactory;
-
+    
     Path tempBasePath;
 
     CollectionDescription collectionDescription;

@@ -10,7 +10,6 @@ import com.github.onsdigital.zebedee.model.ZebedeeCollectionReaderFactory;
 import com.github.onsdigital.zebedee.model.encryption.EncryptionKeyFactory;
 import com.github.onsdigital.zebedee.model.encryption.EncryptionKeyFactoryImpl;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
-import com.github.onsdigital.zebedee.reader.CollectionReaderFactory;
 import com.github.onsdigital.zebedee.reader.ZebedeeReader;
 import com.github.onsdigital.zebedee.reader.api.endpoint.Data;
 import com.github.onsdigital.zebedee.session.model.Session;
@@ -52,25 +51,18 @@ public class ContentTest {
     
     @Mock
     private Zebedee mockZebedee;
-
     @Mock
     private Sessions mockSessions;
-
     @Mock
     private Session mockSession;
-
     @Mock
     private CollectionKeyring mockCollectionKeyring;
-    
     @Mock
     private PermissionsService mockPermissionsService;
-
     @Mock
     UsersService mockUsersService;
-
     @Mock
     Notifier mockNotifier;
-    
     Path tempBasePath;
 
     CollectionDescription collectionDescription;
@@ -113,7 +105,7 @@ public class ContentTest {
     }
 
     @Test
-    public void WriteVersionFileV1() throws Exception {
+    public void writeVersionFileV1() throws Exception {
         MockHttpServletRequest request = new MockHttpServletRequest();
         String collectionId = "aktesting";
         request.setPathInfo("/content/" + collectionId);
@@ -129,61 +121,13 @@ public class ContentTest {
             boolean result = contentApi.saveContent(request, new MockHttpServletResponse());
             Assert.assertTrue(result);
         } catch (Exception e) {
-            Assert.fail(e.getMessage() + e.toString());
-            e.printStackTrace();
-            throw e;
-        }
-
-        byte[] bytes = IOUtils.toByteArray(EncryptionUtils.encryptionInputStream(versionFile, secretKey));
-        Assert.assertEquals(expectedContentV1, new String(bytes));
-
-        // read the version content via the content API.
-       MockHttpServletResponse response = new MockHttpServletResponse();
-        MockHttpServletRequest dataRequest = new MockHttpServletRequest();
-        dataRequest.setRequestURI("/data/" + collectionId);
-
-        String dataURL = "/peoplepopulationandcommunity/birthsdeathsandmarriages/livebirths/datasets/babynamesenglandandwalesbabynamesstatisticsboys/2022";
-        dataRequest.addParameter("uri", dataURL);
-
-        ZebedeeCollectionReaderFactory factory = new ZebedeeCollectionReaderFactory(mockZebedee);
-        ZebedeeReader.setCollectionReaderFactory(factory);
-
-        try {
-            Data dataAPI = new Data();
-            dataAPI.read(dataRequest, response);
-        } catch (Exception e) {
-            e.printStackTrace();
-            Assert.fail(e.getMessage() + e.toString());
-            throw e;
-        }
-
-        Assert.assertEquals(200, response.getStatus());
-        JSONAssert.assertEquals(expectedContentV1, response.getContentAsString(), false);
-    }
-
-    @Test
-    public void WriteVersionFileV2() throws Exception {
-        MockHttpServletRequest request = new MockHttpServletRequest();
-        String collectionId = "aktesting";
-        request.setPathInfo("/content/" + collectionId);
-        String datasetURL = "/peoplepopulationandcommunity/birthsdeathsandmarriages/livebirths/datasets/babynamesenglandandwalesbabynamesstatisticsboys/2022/data.json";
-        request.addParameter("uri", datasetURL);
-        request.setContent(getV2RequestContent());
-
-        Path versionFile = createCollectionAndPaths(collectionId);
-
-        try {
-            Content contentApi = new Content();
-            boolean result = contentApi.saveContent(request, new MockHttpServletResponse());
-            Assert.assertTrue(result);
-        } catch (Exception e) {
             e.printStackTrace();
             Assert.fail(e.getMessage() + e.toString());
             throw e;
         }
 
         byte[] bytes = IOUtils.toByteArray(EncryptionUtils.encryptionInputStream(versionFile, secretKey));
-        Assert.assertEquals(expectedContentV2, new String(bytes));
+        Assert.assertEquals(EXPECTED_CONTENT_V1, new String(bytes));
 
         // read the version content via the content API.
         MockHttpServletResponse response = new MockHttpServletResponse();
@@ -206,7 +150,55 @@ public class ContentTest {
         }
 
         Assert.assertEquals(200, response.getStatus());
-        JSONAssert.assertEquals(expectedContentV2, response.getContentAsString(), false);
+        JSONAssert.assertEquals(EXPECTED_CONTENT_V1, response.getContentAsString(), false);
+    }
+
+    @Test
+    public void writeVersionFileV2() throws Exception {
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        String collectionId = "aktesting";
+        request.setPathInfo("/content/" + collectionId);
+        String datasetURL = "/peoplepopulationandcommunity/birthsdeathsandmarriages/livebirths/datasets/babynamesenglandandwalesbabynamesstatisticsboys/2022/data.json";
+        request.addParameter("uri", datasetURL);
+        request.setContent(getV2RequestContent());
+
+        Path versionFile = createCollectionAndPaths(collectionId);
+
+        try {
+            Content contentApi = new Content();
+            boolean result = contentApi.saveContent(request, new MockHttpServletResponse());
+            Assert.assertTrue(result);
+        } catch (Exception e) {
+            e.printStackTrace();
+            Assert.fail(e.getMessage() + e.toString());
+            throw e;
+        }
+
+        byte[] bytes = IOUtils.toByteArray(EncryptionUtils.encryptionInputStream(versionFile, secretKey));
+        Assert.assertEquals(EXPECTED_CONTENT_V2, new String(bytes));
+
+        // read the version content via the content API.
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        MockHttpServletRequest dataRequest = new MockHttpServletRequest();
+        dataRequest.setRequestURI("/data/" + collectionId);
+
+        String dataURL = "/peoplepopulationandcommunity/birthsdeathsandmarriages/livebirths/datasets/babynamesenglandandwalesbabynamesstatisticsboys/2022";
+        dataRequest.addParameter("uri", dataURL);
+
+        ZebedeeCollectionReaderFactory factory = new ZebedeeCollectionReaderFactory(mockZebedee);
+        ZebedeeReader.setCollectionReaderFactory(factory);
+
+        try {
+            Data dataAPI = new Data();
+            dataAPI.read(dataRequest, response);
+        } catch (Exception e) {
+            e.printStackTrace();
+            Assert.fail(e.getMessage() + e.toString());
+            throw e;
+        }
+
+        Assert.assertEquals(200, response.getStatus());
+        JSONAssert.assertEquals(EXPECTED_CONTENT_V2, response.getContentAsString(), false);
     }
 
     private Path createCollectionAndPaths(String collectionId) throws IOException, ZebedeeException {
@@ -219,10 +211,10 @@ public class ContentTest {
     }
 
     private byte[] getV1RequestContent() {
-        return expectedContentV1.getBytes();
+        return EXPECTED_CONTENT_V1.getBytes();
     }
 
-    private static final String expectedContentV1 =
+    private static final String EXPECTED_CONTENT_V1 =
             "{\"downloads\":" +
                     "[{\"file\":\"ac2be72c.xls\"}]," +
                     "\"type\":\"dataset\"," +
@@ -247,10 +239,10 @@ public class ContentTest {
                     "}";
 
     private byte[] getV2RequestContent() {
-        return expectedContentV2.getBytes();
+        return EXPECTED_CONTENT_V2.getBytes();
     }
 
-    private static final String expectedContentV2 =
+    private static final String EXPECTED_CONTENT_V2 =
             "{\"downloads\":[{\"url\":\"some/path/some/file.csv\",\"version\":\"v2\"}]," +
                     "\"type\":\"dataset\"," +
                     "\"uri\":\"/peoplepopulationandcommunity/birthsdeathsandmarriages/livebirths/datasets/babynamesenglandandwalesbabynamesstatisticsboys/2022\"," +

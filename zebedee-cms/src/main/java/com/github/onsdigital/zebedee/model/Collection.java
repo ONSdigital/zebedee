@@ -459,7 +459,7 @@ public class Collection {
         return this.description;
     }
 
-    public Release populateRelease(CollectionReader reader, CollectionWriter collectionWriter, Iterable<ContentDetail> collectionContent) throws IOException, ZebedeeException {
+    private Release populateRelease(CollectionReader reader, CollectionWriter collectionWriter, Iterable<ContentDetail> collectionContent) throws IOException, ZebedeeException {
 
         if (StringUtils.isEmpty(this.getDescription().getReleaseUri())) {
             throw new BadRequestException("This collection is not associated with a release.");
@@ -471,18 +471,28 @@ public class Collection {
                 InputStream dataStream = resource.getData()
         ) {
             Release release = (Release) ContentUtil.deserialiseContent(dataStream);
-            info().data("collectionId", this.getDescription().getId()).data("title", release.getDescription().getTitle())
-                    .log("Release identified for collection");
-
             if (release == null) {
-                throw new BadRequestException("This collection is not associated with a release.");
+                throw new BadRequestException("Couldn't read release content: " + uri);
             }
+            info().data("collectionId", this.getDescription().getId()).data("title", release.getDescription().getTitle())
+                    .log("Release identified for collection, populating the page links");
 
             release = ReleasePopulator.populate(release, collectionContent);
             collectionWriter.getReviewed().writeObject(release, uri);
 
             return release;
         }
+    }
+
+    public Release populateReleaseQuietly(CollectionReader reader, CollectionWriter writer, Iterable<ContentDetail> collectionContent) throws IOException {
+        Release release = null;
+        try {
+            release = populateRelease(reader, writer, collectionContent);
+        } catch (ZebedeeException e) {
+            error().data("collectionId", this.getDescription().getId())
+                    .logException(e, "Failed to populate release page for collection");
+        }
+        return release;
     }
 
     /**

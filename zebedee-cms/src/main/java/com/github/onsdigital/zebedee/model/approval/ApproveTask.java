@@ -16,7 +16,6 @@ import com.github.onsdigital.zebedee.logging.CMSLogEvent;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.CollectionWriter;
 import com.github.onsdigital.zebedee.model.approval.tasks.CollectionPdfGenerator;
-import com.github.onsdigital.zebedee.model.approval.tasks.ReleasePopulator;
 import com.github.onsdigital.zebedee.model.approval.tasks.timeseries.TimeSeriesCompressionTask;
 import com.github.onsdigital.zebedee.model.content.CompoundContentReader;
 import com.github.onsdigital.zebedee.model.publishing.PublishNotification;
@@ -290,7 +289,7 @@ public class ApproveTask implements Callable<Boolean> {
 
     public void populateReleasePage(Iterable<ContentDetail> collectionContent) throws IOException {
         // If the collection is associated with a release then populate the release page.
-        ReleasePopulator.populateQuietly(collection, collectionReader, collectionWriter, collectionContent);
+        collection.populateReleaseQuietly(collectionReader, collectionWriter, collectionContent);
     }
 
     public void generatePdfFiles(List<ContentDetail> collectionContent) throws ZebedeeException {

@@ -83,6 +83,7 @@ public class PageDescription extends Content implements Comparable<PageDescripti
     private String apiDatasetId;
     private String canonicalTopic;
     private List<String> secondaryTopics;
+    private Survey survey;
 
     public PageDescription() {
     }
@@ -470,5 +471,13 @@ public class PageDescription extends Content implements Comparable<PageDescripti
 
     public void setSecondaryTopics(List<String> secondaryTopics) {
         this.secondaryTopics = secondaryTopics;
+    }
+
+    public Survey getSurvey() {
+        return survey;
+    }
+
+    public void setSurvey(Survey survey) {
+        this.survey = survey;
     }
 }

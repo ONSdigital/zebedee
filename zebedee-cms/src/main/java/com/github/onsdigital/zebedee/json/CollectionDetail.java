@@ -14,6 +14,7 @@ public class CollectionDetail extends CollectionBase {
     public List<PendingDelete> pendingDeletes;
     public Events events;
     public Set<CollectionDataset> datasets;
+    public Set<CollectionInteractive> interactives;
     public Set<CollectionDatasetVersion> datasetVersions;
 
     /**

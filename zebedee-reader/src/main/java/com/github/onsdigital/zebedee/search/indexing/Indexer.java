@@ -182,6 +182,10 @@ public class Indexer {
             if (page == null) {
                 throw new NotFoundException("Content not found for re-indexing, uri: " + uri);
             }
+            if (page.getType() == PageType.INTERACTIVE) {
+                return; //TODO implement expected behaviour here
+            }
+
             if (isPeriodic(page.getType())) {
                 //TODO: optimize resolving latest flag, only update elastic search for existing releases rather than reindexing
                 //Load old releases as well to get latest flag re-calculated

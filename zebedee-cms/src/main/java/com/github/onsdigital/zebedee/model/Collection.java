@@ -1394,6 +1394,10 @@ public class Collection {
     public boolean isAllContentReviewed(boolean datasetImportEnabled) throws IOException {
         // FIXME CMD feature flag
         if (datasetImportEnabled) {
+            boolean allInteractivesReviewed = description.getInteractives()
+                    .stream()
+                    .allMatch(i -> i.getState().equals(ContentStatus.Reviewed));
+
             boolean allDatasetsReviewed = description.getDatasets()
                     .stream()
                     .allMatch(ds -> ds.getState().equals(ContentStatus.Reviewed));
@@ -1405,10 +1409,24 @@ public class Collection {
             return (inProgressUris().isEmpty()
                     && completeUris().isEmpty()
                     && allDatasetsReviewed
-                    && allDatasetVersionsReviewed);
+                    && allDatasetVersionsReviewed
+                    && allInteractivesReviewed);
         }
 
         return inProgressUris().isEmpty() && completeUris().isEmpty();
+    }
+
+    /**
+     * Return a list of ContentDetail items for each interactive in the collection.
+     */
+    public List<ContentDetail> getInteractiveDetails() {
+
+        return description.getInteractives().stream().map(ds -> {
+
+            String url = URI.create(ds.getUri()).getPath();
+            return new ContentDetail(ds.getTitle(), url, PageType.INTERACTIVE);
+
+        }).collect(Collectors.toList());
     }
 
     /**

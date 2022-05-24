@@ -27,6 +27,7 @@ import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
+import com.github.onsdigital.zebedee.service.InteractivesService;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.util.ZebedeeCmsService;
 import com.github.onsdigital.zebedee.util.versioning.VersionNotFoundException;
@@ -77,6 +78,7 @@ public class Collections {
 
     private final Path path;
     private PermissionsService permissionsService;
+    private InteractivesService interactivesService;
     private Content published;
     private Supplier<Zebedee> zebedeeSupplier = () -> Root.zebedee;
     private ZebedeeCmsService zebedeeCmsService = ZebedeeCmsService.getInstance();
@@ -87,11 +89,15 @@ public class Collections {
     private Comparator<String> strComparator = Comparator.comparing(String::toString);
     private VersionsService versionsService;
 
-    public Collections(Path path, PermissionsService permissionsService,
-                       VersionsService versionsService, Content published) {
+    public Collections(Path path,
+                       PermissionsService permissionsService,
+                       VersionsService versionsService,
+                       InteractivesService interactivesService,
+                       Content published) {
         this.path = path;
         this.permissionsService = permissionsService;
         this.versionsService = versionsService;
+        this.interactivesService = interactivesService;
         this.published = published;
         this.collectionReaderWriterFactory = new CollectionReaderWriterFactory();
     }

@@ -6,6 +6,8 @@ public enum ApprovalEventType {
 
     RESOLVED_DETAILS("resolvedDetails"),
 
+    ADD_INTERACTIVE_DETAILS("addInteractiveDetails"),
+
     ADD_DATASET_DETAILS("addDatasetDetails"),
 
     ADD_DATASET_VERSION_DETAILS("addDatasetDetails"),

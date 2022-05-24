@@ -19,6 +19,7 @@ public class CMSFeatureFlags {
     private static final String ENABLE_JWT_SESSIONS = "ENABLE_JWT_SESSIONS";
     public static final String ENABLE_KAFKA = "ENABLE_KAFKA";
     public static final String ENABLE_STATIC_FILES_PUBLISHING = "ENABLE_STATIC_FILES_PUBLISHING";
+    public static final String ENABLE_INTERACTIVES_PUBLISHING = "ENABLE_INTERACTIVES_PUBLISHING";
 
     /**
      * Singleton instance
@@ -33,6 +34,8 @@ public class CMSFeatureFlags {
     private final boolean isJwtSessionsEnabled;
     private final boolean isKafkaEnabled;
     private final boolean isStaticFilesPublishingEnabled;
+    private final boolean isInteractivesPublishingEnabled;
+
 
     /**
      * Construct a new feature flags instance.
@@ -47,6 +50,7 @@ public class CMSFeatureFlags {
         this.isJwtSessionsEnabled = Boolean.valueOf(getConfigValue(ENABLE_JWT_SESSIONS));
         this.isKafkaEnabled = Boolean.valueOf(getConfigValue(ENABLE_KAFKA));
         this.isStaticFilesPublishingEnabled = Boolean.valueOf(getConfigValue(ENABLE_STATIC_FILES_PUBLISHING));
+        this.isInteractivesPublishingEnabled = Boolean.valueOf(getConfigValue(ENABLE_INTERACTIVES_PUBLISHING));
 
         info().data(ENABLE_DATASET_IMPORT, isDatasetImportEnabled)
                 .data(ENABLE_VERIFY_PUBLISH_CONTENT, isVerifyPublishEnabled)
@@ -57,6 +61,7 @@ public class CMSFeatureFlags {
                 .data(ENABLE_JWT_SESSIONS, isJwtSessionsEnabled)
                 .data(ENABLE_KAFKA, isKafkaEnabled)
                 .data(ENABLE_STATIC_FILES_PUBLISHING, isStaticFilesPublishingEnabled)
+                .data(ENABLE_INTERACTIVES_PUBLISHING, isInteractivesPublishingEnabled)
                 .log("CMS feature flags configurations");
     }
 
@@ -116,6 +121,9 @@ public class CMSFeatureFlags {
         return isStaticFilesPublishingEnabled;
     }
 
+    public boolean isInteractivesPublishingEnabled() {
+        return isInteractivesPublishingEnabled;
+    }
 
     public static String getConfigValue(String name) {
         String value = System.getProperty(name);

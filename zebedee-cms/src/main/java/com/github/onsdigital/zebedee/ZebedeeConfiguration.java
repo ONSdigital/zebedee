@@ -3,9 +3,9 @@ package com.github.onsdigital.zebedee;
 import com.github.onsdigital.JWTVerifier;
 import com.github.onsdigital.JWTVerifierImpl;
 import com.github.onsdigital.dp.files.api.APIClient;
-import com.github.onsdigital.dp.files.api.Client;
 import com.github.onsdigital.dp.image.api.client.ImageAPIClient;
 import com.github.onsdigital.dp.image.api.client.ImageClient;
+import com.github.onsdigital.dp.interactives.api.InteractivesAPIClient;
 import com.github.onsdigital.slack.Profile;
 import com.github.onsdigital.slack.client.SlackClient;
 import com.github.onsdigital.slack.client.SlackClientImpl;
@@ -35,6 +35,8 @@ import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
 import com.github.onsdigital.zebedee.service.DatasetService;
 import com.github.onsdigital.zebedee.service.ImageService;
 import com.github.onsdigital.zebedee.service.ImageServiceImpl;
+import com.github.onsdigital.zebedee.service.InteractivesService;
+import com.github.onsdigital.zebedee.service.InteractivesServiceImpl;
 import com.github.onsdigital.zebedee.service.KafkaService;
 import com.github.onsdigital.zebedee.service.KafkaServiceImpl;
 import com.github.onsdigital.zebedee.service.NoOpKafkaService;
@@ -92,6 +94,7 @@ import static com.github.onsdigital.zebedee.configuration.Configuration.getDatas
 import static com.github.onsdigital.zebedee.configuration.Configuration.getIdentityAPIURL;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getImageAPIURL;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getInitialRetryInterval;
+import static com.github.onsdigital.zebedee.configuration.Configuration.getInteractivesAPIURL;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getKafkaContentPublishedTopic;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getKafkaURL;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getKeyringInitVector;
@@ -132,6 +135,7 @@ public class ZebedeeConfiguration {
     private Sessions sessions;
     private DataIndex dataIndex;
     private DatasetService datasetService;
+    private InteractivesService interactivesService;
     private ImageService imageService;
     private KafkaService kafkaService;
     private StaticFilesService staticFilesService;
@@ -197,8 +201,11 @@ public class ZebedeeConfiguration {
             this.permissionsService = new PermissionsServiceImpl(permissionsStore);
         }
 
+        InteractivesAPIClient interactivesClient = new InteractivesAPIClient(getInteractivesAPIURL(), getServiceAuthToken());
+        interactivesService = new InteractivesServiceImpl(interactivesClient);
+
         VersionsService versionsService = new VersionsServiceImpl();
-        this.collections = new Collections(collectionsPath, permissionsService, versionsService, published);
+        this.collections = new Collections(collectionsPath, permissionsService, versionsService, interactivesService, published);
 
         // TODO: Remove after migration to JWT sessions is complete
         if (cmsFeatureFlags().isJwtSessionsEnabled()) {
@@ -435,6 +442,10 @@ public class ZebedeeConfiguration {
 
     public DatasetService getDatasetService() {
         return datasetService;
+    }
+
+    public InteractivesService getInteractivesService() {
+        return interactivesService;
     }
 
     public ImageService getImageService() {

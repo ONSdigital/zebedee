@@ -21,6 +21,7 @@ import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.ZebedeeReader;
+import com.github.onsdigital.zebedee.service.InteractivesService;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.user.model.User;
 import com.github.onsdigital.zebedee.user.service.UsersService;
@@ -71,7 +72,6 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 /**
@@ -104,6 +104,9 @@ public class CollectionsTest {
 
     @Mock
     private UsersService usersServiceMock;
+
+    @Mock
+    InteractivesService interactivesService;
 
     @Mock
     private Collection collectionMock;
@@ -160,7 +163,7 @@ public class CollectionsTest {
         collectionsPath = rootDir.newFolder("collections").toPath();
 
         // Test target.
-        collections = new Collections(collectionsPath, permissionsServiceMock, versionsService, publishedContentMock);
+        collections = new Collections(collectionsPath, permissionsServiceMock, versionsService, interactivesService, publishedContentMock);
 
         zebedeeSupplier = () -> zebedeeMock;
         publishingNotificationConsumer = (c, e) -> publishNotification.sendNotification(e);

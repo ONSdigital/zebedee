@@ -12,6 +12,7 @@ import com.github.onsdigital.zebedee.model.encryption.EncryptionKeyFactoryImpl;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.reader.ZebedeeReader;
 import com.github.onsdigital.zebedee.reader.api.endpoint.Data;
+import com.github.onsdigital.zebedee.service.InteractivesService;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.session.service.Sessions;
 import com.github.onsdigital.zebedee.user.service.UsersService;
@@ -63,6 +64,8 @@ public class ContentTest {
     UsersService mockUsersService;
     @Mock
     Notifier mockNotifier;
+    @Mock
+    InteractivesService interactivesService;
     Path tempBasePath;
 
     CollectionDescription collectionDescription;
@@ -85,7 +88,7 @@ public class ContentTest {
         versionsService = new VersionsServiceImpl();
 
         content = new com.github.onsdigital.zebedee.model.Content(tempBasePath);
-        collections = new Collections(tempBasePath, mockPermissionsService, versionsService, content);
+        collections = new Collections(tempBasePath, mockPermissionsService, versionsService, interactivesService, content);
 
         when(mockPermissionsService.canEdit(mockSession)).thenReturn(true);
         when(mockPermissionsService.canView(any(), any())).thenReturn(true);

@@ -407,25 +407,29 @@
                             <version>1.15</version>
                         </exlude>
                         <!-- End Trello #1717 -->
-                        <!-- org.apache.xmlbeans:xmlbeans:jar:2.6.0:compile; https://ossindex.sonatype.org/component/pkg:maven/org.apache.xmlbeans/xmlbeans@2.6.0?utm_source=ossindex-client&utm_medium=integration&utm_content=1.1.1 -->
+
+                        <!-- https://trello.com/c/xSwdnxm8 -->
                         <exlude>
                             <groupId>org.apache.xmlbeans</groupId>
                             <artifactId>xmlbeans</artifactId>
                             <version>2.6.0</version>
                         </exlude>
-                        <!-- org.apache.lucene:lucene-queryparser:jar:5.3.1:compile; https://ossindex.sonatype.org/component/pkg:maven/org.apache.lucene/lucene-queryparser@5.3.1?utm_source=ossindex-client&utm_medium=integration&utm_content=1.1.1 -->
+                        <!-- End -->
+
+                        <!-- https://trello.com/c/xDqibumj -->
                         <exlude>
                             <groupId>org.apache.lucene</groupId>
                             <artifactId>lucene-queryparser</artifactId>
                             <version>5.3.1</version>
                         </exlude>
-                        <!-- com.fasterxml.jackson.dataformat:jackson-dataformat-cbor:jar:2.6.2:compile; https://ossindex.sonatype.org/component/pkg:maven/com.fasterxml.jackson.dataformat/jackson-dataformat-cbor@2.6.2?utm_source=ossindex-client&utm_medium=integration&utm_content=1.1.1 -->
+                        <!-- https://ossindex.sonatype.org/component/pkg:maven/com.fasterxml.jackson.dataformat/jackson-dataformat-cbor@2.6.2 -->
                         <exlude>
                             <groupId>com.fasterxml.jackson.dataformat</groupId>
                             <artifactId>jackson-dataformat-cbor</artifactId>
                             <version>2.6.2</version>
                         </exlude>
-                        <!-- org.springframework:spring-web:jar:5.3.20:test; https://ossindex.sonatype.org/component/pkg:maven/org.springframework/spring-web@5.3.20?utm_source=ossindex-client&utm_medium=integration&utm_content=1.1.1 -->
+
+                        <!-- https://ossindex.sonatype.org/component/pkg:maven/org.springframework/spring-web@5.3.20 -->
                         <!-- will not fix: https://github.com/spring-projects/spring-framework/issues/24434 -->
                         <exlude>
                             <groupId>org.springframework</groupId>

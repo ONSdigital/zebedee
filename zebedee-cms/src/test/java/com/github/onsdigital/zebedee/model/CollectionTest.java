@@ -5,6 +5,7 @@ import com.github.davidcarboni.cryptolite.Random;
 import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.ZebedeeTestBaseFixture;
+import com.github.onsdigital.zebedee.configuration.CMSFeatureFlags;
 import com.github.onsdigital.zebedee.content.page.base.PageDescription;
 import com.github.onsdigital.zebedee.content.page.base.PageType;
 import com.github.onsdigital.zebedee.content.page.release.Release;
@@ -1711,6 +1712,9 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
 
     @Test
     public void isAllContentReviewed_shouldReturnFalseWhenInteractiveNotReviewed() throws IOException, ZebedeeException {
+        System.setProperty(CMSFeatureFlags.ENABLE_INTERACTIVES_PUBLISHING, "true");
+        CMSFeatureFlags.reset();
+
         // Given a collection with an interactive that has not been set to reviewed.
         Path collectionPath = Files.createTempDirectory(Random.id()); // create a temp directory to generate content into
         Collection collection = CollectionTest.createCollection(collectionPath, "isAllContentReviewed");

@@ -21,6 +21,7 @@ import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
 import com.github.onsdigital.zebedee.reader.ZebedeeReader;
 import com.github.onsdigital.zebedee.service.DatasetService;
 import com.github.onsdigital.zebedee.service.ImageService;
+import com.github.onsdigital.zebedee.service.InteractivesService;
 import com.github.onsdigital.zebedee.service.KafkaService;
 import com.github.onsdigital.zebedee.service.StaticFilesService;
 import com.github.onsdigital.zebedee.session.model.Session;
@@ -135,6 +136,10 @@ public class ZebedeeCmsService {
 
     public DatasetService getDatasetService() {
         return Root.zebedee.getDatasetService();
+    }
+
+    public InteractivesService getInteractivesService() {
+        return Root.zebedee.getInteractivesService();
     }
 
     public ImageService getImageService() {

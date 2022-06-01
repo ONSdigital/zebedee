@@ -1392,6 +1392,9 @@ public class Collection {
      * Return true if this collection has had all of its content reviewed.
      */
     public boolean isAllContentReviewed(boolean datasetImportEnabled) throws IOException {
+
+        boolean isContentReviewed = inProgressUris().isEmpty() && completeUris().isEmpty();
+
         // FIXME CMD feature flag
         if (datasetImportEnabled) {
             boolean allDatasetsReviewed = description.getDatasets()
@@ -1402,13 +1405,31 @@ public class Collection {
                     .stream()
                     .allMatch(ds -> ds.getState().equals(ContentStatus.Reviewed));
 
-            return (inProgressUris().isEmpty()
-                    && completeUris().isEmpty()
-                    && allDatasetsReviewed
-                    && allDatasetVersionsReviewed);
+            isContentReviewed &= allDatasetsReviewed && allDatasetVersionsReviewed;
         }
 
-        return inProgressUris().isEmpty() && completeUris().isEmpty();
+        if (cmsFeatureFlags().isInteractivesPublishingEnabled()) {
+            boolean allInteractivesReviewed = description.getInteractives()
+                    .stream()
+                    .allMatch(i -> i.getState().equals(ContentStatus.Reviewed));
+
+            isContentReviewed &= allInteractivesReviewed;
+        }
+
+        return isContentReviewed;
+    }
+
+    /**
+     * Return a list of ContentDetail items for each interactive in the collection.
+     */
+    public List<ContentDetail> getInteractiveDetails() {
+
+        return description.getInteractives().stream().map(ds -> {
+
+            String url = URI.create(ds.getUri()).getPath();
+            return new ContentDetail(ds.getTitle(), url, PageType.INTERACTIVE);
+
+        }).collect(Collectors.toList());
     }
 
     /**

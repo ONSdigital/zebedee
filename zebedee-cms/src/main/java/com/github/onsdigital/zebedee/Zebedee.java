@@ -18,6 +18,7 @@ import com.github.onsdigital.zebedee.notification.StartUpNotifier;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.service.DatasetService;
 import com.github.onsdigital.zebedee.service.ImageService;
+import com.github.onsdigital.zebedee.service.InteractivesService;
 import com.github.onsdigital.zebedee.service.KafkaService;
 import com.github.onsdigital.zebedee.service.ServiceStore;
 import com.github.onsdigital.zebedee.service.ServiceStoreImpl;
@@ -84,6 +85,7 @@ public class Zebedee {
     private final Sessions sessions;
     private final DataIndex dataIndex;
     private final DatasetService datasetService;
+    private final InteractivesService interactivesService;
     private final ImageService imageService;
     private final KafkaService kafkaService;
     private final StaticFilesService staticFilesService;
@@ -110,6 +112,7 @@ public class Zebedee {
         this.usersService = cfg.getUsersService();
         this.verificationAgent = cfg.getVerificationAgent(isVerificationEnabled(), this);
         this.datasetService = cfg.getDatasetService();
+        this.interactivesService = cfg.getInteractivesService();
         this.imageService = cfg.getImageService();
         this.kafkaService = cfg.getKafkaService();
         this.staticFilesService = cfg.getStaticFilesService();
@@ -366,6 +369,10 @@ public class Zebedee {
 
     public DatasetService getDatasetService() {
         return datasetService;
+    }
+
+    public InteractivesService getInteractivesService() {
+        return interactivesService;
     }
 
     public ImageService getImageService() {

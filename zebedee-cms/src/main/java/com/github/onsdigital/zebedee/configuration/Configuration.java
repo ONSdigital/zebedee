@@ -11,9 +11,7 @@ import javax.crypto.spec.SecretKeySpec;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import static java.text.MessageFormat.format;
@@ -34,6 +32,7 @@ public class Configuration {
     private static final String MATHJAX_SERVICE_URL = "http://localhost:8888";
     private static final String DATASET_API_URL = "http://localhost:22000";
     private static final String IMAGE_API_URL = "http://localhost:24700";
+    private static final String INTERACTIVES_API_URL = "http://localhost:27500";
     private static final String STATIC_FILES_API_URL = "http://localhost:26900";
     private static final String IDENTITY_API_URL = "http://localhost:25600";
     private static final String KAFKA_ADDR = "localhost:9092";
@@ -145,6 +144,10 @@ public class Configuration {
 
     public static String getImageAPIURL() {
         return StringUtils.defaultIfBlank(getValue("IMAGE_API_URL"), IMAGE_API_URL);
+    }
+
+    public static String getInteractivesAPIURL() {
+        return StringUtils.defaultIfBlank(getValue("INTERACTIVES_API_URL"), INTERACTIVES_API_URL);
     }
 
     public static String getStaticFilesAPIURL() {

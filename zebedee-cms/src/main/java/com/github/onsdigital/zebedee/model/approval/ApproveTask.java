@@ -123,6 +123,11 @@ public class ApproveTask implements Callable<Boolean> {
                     collectionReader.getReviewed());
             eventLog.resolvedDetails();
 
+            if (cmsFeatureFlags().isInteractivesPublishingEnabled()) {
+                collectionContent.addAll(collection.getInteractiveDetails());
+                eventLog.addInteractiveDetails();
+            }
+
             if (cmsFeatureFlags().isEnableDatasetImport()) {
                 collectionContent.addAll(collection.getDatasetDetails());
                 eventLog.addDatasetDetails();

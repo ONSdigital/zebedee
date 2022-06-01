@@ -50,6 +50,46 @@ public class CollectionDescriptionTest {
     }
 
     @Test
+    public void testAddInteractive() throws Exception {
+
+        // Given a collection description and a CollectionDataset
+        CollectionDescription collection = new CollectionDescription();
+
+        CollectionInteractive interactive = new CollectionInteractive();
+        String id = "123";
+        interactive.setId(id);
+
+        // When a dataset is added
+        collection.addInteractive(interactive);
+
+        // Then the dataset is in the collection description
+        Optional<CollectionInteractive> optional = collection.getInteractive(id);
+        assertTrue(optional.isPresent());
+        assertTrue(collection.getInteractives().contains(interactive));
+    }
+
+    @Test
+    public void testRemoveInteractive() throws Exception {
+
+        // Given a collection description with a dataset
+        CollectionDescription collection = new CollectionDescription();
+
+        CollectionInteractive interactive = new CollectionInteractive();
+        String id = "123";
+        interactive.setId(id);
+
+        collection.addInteractive(interactive);
+
+        // When a dataset is removed
+        collection.removeInteractive(interactive);
+
+        // Then the dataset is in the collection description
+        Optional<CollectionInteractive> option = collection.getInteractive(id);
+        assertFalse(option.isPresent());
+        assertFalse(collection.getDatasets().contains(interactive));
+    }
+
+    @Test
     public void testAddDatasetVersion() throws Exception {
 
         // Given a collection description and a CollectionDatasetVersion

@@ -30,6 +30,9 @@ public class CollectionDescription extends CollectionBase {
     private Map<String, String> publishTransactionIds;
     private Map<String, Events> eventsByUri;
     private Set<CollectionDataset> datasets;
+
+    private Set<CollectionInteractive> interactives;
+
     private Set<CollectionDatasetVersion> datasetVersions;
 
     private ApprovalStatus approvalStatus = ApprovalStatus.NOT_STARTED;
@@ -53,6 +56,7 @@ public class CollectionDescription extends CollectionBase {
         this.eventsByUri = new HashMap<>();
         this.datasets = new HashSet<>();
         this.datasetVersions = new HashSet<>();
+        this.interactives = new HashSet<>();
     }
 
     /**
@@ -72,6 +76,7 @@ public class CollectionDescription extends CollectionBase {
         this.eventsByUri = new HashMap<>();
         this.datasets = new HashSet<>();
         this.datasetVersions = new HashSet<>();
+        this.interactives = new HashSet<>();
     }
 
 
@@ -139,6 +144,41 @@ public class CollectionDescription extends CollectionBase {
 
     public void setApprovalStatus(ApprovalStatus approvalStatus) {
         this.approvalStatus = approvalStatus;
+    }
+
+    public Set<CollectionInteractive> getInteractives() {
+
+        if (this.interactives == null) {
+            this.interactives = new HashSet<>();
+        }
+
+        return Collections.unmodifiableSet(this.interactives);
+    }
+
+    public Optional<CollectionInteractive> getInteractive(String interactiveID) {
+
+        if (this.interactives == null) {
+            return Optional.empty();
+        }
+
+        return this.interactives.stream()
+                .filter(i -> i.getId().equals(interactiveID)).findFirst();
+    }
+
+    public void addInteractive(CollectionInteractive interactive) {
+
+        if (this.interactives == null) {
+            this.interactives = new HashSet<>();
+        }
+
+        this.interactives.add(interactive);
+    }
+
+    public void removeInteractive(CollectionInteractive interactive) {
+
+        if (this.interactives == null) return;
+
+        this.interactives.remove(interactive);
     }
 
     /**
@@ -321,6 +361,10 @@ public class CollectionDescription extends CollectionBase {
 
     public void setDatasets(final Set<CollectionDataset> datasets) {
         this.datasets = datasets;
+    }
+
+    public void setInteractives(final Set<CollectionInteractive> interactives) {
+        this.interactives = interactives;
     }
 
     public void setDatasetVersions(final Set<CollectionDatasetVersion> datasetVersions) {

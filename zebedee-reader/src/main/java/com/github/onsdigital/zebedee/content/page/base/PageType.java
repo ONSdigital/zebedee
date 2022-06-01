@@ -73,6 +73,9 @@ public enum PageType {
     @SerializedName("static_adhoc")
     STATIC_ADHOC("Static adhoc page"),
 
+    @SerializedName("interactive")
+    INTERACTIVE("Interactive page"),
+
     @SerializedName("dataset")
     DATASET("Dataset page"),
 

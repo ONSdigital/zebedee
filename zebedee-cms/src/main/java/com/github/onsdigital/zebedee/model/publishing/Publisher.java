@@ -22,9 +22,10 @@ import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.service.DatasetService;
 import com.github.onsdigital.zebedee.service.ImageService;
 import com.github.onsdigital.zebedee.service.ImageServicePublishingResult;
+import com.github.onsdigital.zebedee.service.StaticFilesService;
 import com.github.onsdigital.zebedee.service.KafkaService;
 import com.github.onsdigital.zebedee.service.ServiceSupplier;
-import com.github.onsdigital.zebedee.service.StaticFilesService;
+import com.github.onsdigital.zebedee.service.InteractivesService;
 import com.github.onsdigital.zebedee.util.Http;
 import com.github.onsdigital.zebedee.util.SlackNotification;
 import com.github.onsdigital.zebedee.util.ZebedeeCmsService;
@@ -92,6 +93,7 @@ public class Publisher {
     private static ServiceSupplier<ImageService> imageServiceSupplier;
     private static ServiceSupplier<KafkaService> kafkaServiceSupplier;
     static ServiceSupplier<StaticFilesService> staticFilesServiceSupplier;
+    private static ServiceSupplier<InteractivesService> interactivesServiceSupplier;
 
     private static final String TRACE_ID_HEADER = "trace_id";
     public static final String SEARCHINDEX = "ONS";
@@ -108,6 +110,7 @@ public class Publisher {
         imageServiceSupplier = () -> ZebedeeCmsService.getInstance().getImageService();
         kafkaServiceSupplier = () -> ZebedeeCmsService.getInstance().getKafkaService();
         staticFilesServiceSupplier = () -> ZebedeeCmsService.getInstance().getStaticFilesService();
+        interactivesServiceSupplier = () -> ZebedeeCmsService.getInstance().getInteractivesService();
     }
 
     /**
@@ -158,7 +161,6 @@ public class Publisher {
             }
         }
 
-
         if (CMSFeatureFlags.cmsFeatureFlags().isImagePublishingEnabled()) {
             try {
                 if (imageFuture == null) {
@@ -175,6 +177,16 @@ public class Publisher {
                 String channel = Configuration.getDefaultSlackAlarmChannel();
                 Notifier notifier = zebedee.getSlackNotifier();
                 notifier.sendCollectionAlarm(collection, channel, "Error publishing images", e);
+                success = false;
+            }
+        }
+
+        if (CMSFeatureFlags.cmsFeatureFlags().isInteractivesPublishingEnabled()) {
+            try {
+                interactivesServiceSupplier.getService().publishCollection(collection);
+                success &= true;
+            } catch (Exception e) {
+                error().logException(e, "Exception thrown when performing interactives publish()");
                 success = false;
             }
         }

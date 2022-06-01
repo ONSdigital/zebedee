@@ -20,6 +20,7 @@ import com.github.onsdigital.zebedee.util.EncryptionUtils;
 import com.github.onsdigital.zebedee.util.slack.Notifier;
 import com.github.onsdigital.zebedee.util.versioning.VersionsServiceImpl;
 import org.apache.commons.io.IOUtils;
+import org.apache.http.HttpStatus;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -32,13 +33,20 @@ import org.springframework.mock.web.MockHttpServletResponse;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.WriteListener;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.core.MediaType;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 /**
  * An Integration test for the end-to-end of creating a piece of content in Zebedee
@@ -49,7 +57,7 @@ import static org.mockito.Mockito.when;
  */
 @RunWith(MockitoJUnitRunner.class)
 public class ContentTest {
-    
+
     @Mock
     private Zebedee mockZebedee;
     @Mock
@@ -74,6 +82,10 @@ public class ContentTest {
     private VersionsServiceImpl versionsService;
     private com.github.onsdigital.zebedee.model.Content content;
     private Collections collections;
+
+    @Mock
+    HttpServletResponse mockResponse;
+
 
     @Before
     public void setUp() throws Exception {
@@ -107,6 +119,7 @@ public class ContentTest {
         Root.zebedee = mockZebedee;
     }
 
+
     @Test
     public void writeVersionFileV1() throws Exception {
         MockHttpServletRequest request = new MockHttpServletRequest();
@@ -133,8 +146,9 @@ public class ContentTest {
         Assert.assertEquals(EXPECTED_CONTENT_V1, new String(bytes));
 
         // read the version content via the content API.
-        MockHttpServletResponse response = new MockHttpServletResponse();
         MockHttpServletRequest dataRequest = new MockHttpServletRequest();
+
+
         dataRequest.setRequestURI("/data/" + collectionId);
 
         String dataURL = "/peoplepopulationandcommunity/birthsdeathsandmarriages/livebirths/datasets/babynamesenglandandwalesbabynamesstatisticsboys/2022";
@@ -143,17 +157,25 @@ public class ContentTest {
         ZebedeeCollectionReaderFactory factory = new ZebedeeCollectionReaderFactory(mockZebedee);
         ZebedeeReader.setCollectionReaderFactory(factory);
 
+        ByteArrayOutputStream content = new ByteArrayOutputStream(1024);
+        when(mockResponse.getOutputStream())
+                .thenReturn(new StubServletOutputStream(content));
+
+
         try {
             Data dataAPI = new Data();
-            dataAPI.read(dataRequest, response);
+            dataAPI.read(dataRequest, mockResponse);
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail(e.getMessage() + e.toString());
             throw e;
         }
 
-        Assert.assertEquals(200, response.getStatus());
-        JSONAssert.assertEquals(EXPECTED_CONTENT_V1, response.getContentAsString(), false);
+        // admittedly a little fragile - ideally we'd like to be sure that the last invocation (or possibly default value) was correct.
+        verify(mockResponse, atLeast(1)).setStatus(HttpStatus.SC_OK);
+        verify(mockResponse, atLeast(1)).setContentType(MediaType.APPLICATION_JSON);
+
+        JSONAssert.assertEquals(EXPECTED_CONTENT_V1, content.toString(), false);
     }
 
     @Test
@@ -181,7 +203,6 @@ public class ContentTest {
         Assert.assertEquals(EXPECTED_CONTENT_V2, new String(bytes));
 
         // read the version content via the content API.
-        MockHttpServletResponse response = new MockHttpServletResponse();
         MockHttpServletRequest dataRequest = new MockHttpServletRequest();
         dataRequest.setRequestURI("/data/" + collectionId);
 
@@ -191,22 +212,29 @@ public class ContentTest {
         ZebedeeCollectionReaderFactory factory = new ZebedeeCollectionReaderFactory(mockZebedee);
         ZebedeeReader.setCollectionReaderFactory(factory);
 
+        ByteArrayOutputStream content = new ByteArrayOutputStream(1024);
+        when(mockResponse.getOutputStream())
+                .thenReturn(new StubServletOutputStream(content));
+
+
         try {
             Data dataAPI = new Data();
-            dataAPI.read(dataRequest, response);
+            dataAPI.read(dataRequest, mockResponse);
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail(e.getMessage() + e.toString());
             throw e;
         }
+        // admittedly a little fragile - ideally we'd like to be sure that the last invocation (or possibly default value) was correct.
+        verify(mockResponse, atLeast(1)).setStatus(HttpStatus.SC_OK);
+        verify(mockResponse, atLeast(1)).setContentType(MediaType.APPLICATION_JSON);
 
-        Assert.assertEquals(200, response.getStatus());
-        JSONAssert.assertEquals(EXPECTED_CONTENT_V2, response.getContentAsString(), false);
+        JSONAssert.assertEquals(EXPECTED_CONTENT_V2, content.toString(), false);
     }
 
     private Path createCollectionAndPaths(String collectionId) throws IOException, ZebedeeException {
         Collection.create(collectionDescription, mockZebedee, mockSession);
-        Path pathToCreate = Paths.get(tempBasePath.toString(), collectionId, "inprogress","peoplepopulationandcommunity", "birthsdeathsandmarriages", "livebirths", "datasets", "babynamesenglandandwalesbabynamesstatisticsboys", "2022");
+        Path pathToCreate = Paths.get(tempBasePath.toString(), collectionId, "inprogress", "peoplepopulationandcommunity", "birthsdeathsandmarriages", "livebirths", "datasets", "babynamesenglandandwalesbabynamesstatisticsboys", "2022");
         Path datasetPath = Files.createDirectories(pathToCreate);
         Path versionFile = Paths.get(datasetPath.toString(), "data.json");
         Files.createFile(versionFile);
@@ -267,4 +295,34 @@ public class ContentTest {
                     "\"uri\":\"/peoplepopulationandcommunity/birthsdeathsandmarriages/livebirths/datasets/babynamesenglandandwalesbabynamesstatisticsboys/2022/previous/v1\"," +
                     "\"label\":\"Testing\"}]" +
                     "}";
+
+
+    private class StubServletOutputStream extends ServletOutputStream {
+        private OutputStream target;
+
+        public StubServletOutputStream(final OutputStream target) {
+            this.target = target;
+        }
+
+        @Override
+        public boolean isReady() {
+            return true;
+        }
+
+        @Override
+        public void setWriteListener(WriteListener writeListener) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void write(int b) throws IOException {
+            target.write(b);
+        }
+
+        @Override
+        public void flush() throws IOException {
+            super.flush();
+            target.flush();
+        }
+    }
 }

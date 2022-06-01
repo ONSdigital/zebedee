@@ -46,7 +46,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.atLeast;
 
 /**
  * An Integration test for the end-to-end of creating a piece of content in Zebedee
@@ -147,7 +149,6 @@ public class ContentTest {
 
         // read the version content via the content API.
         MockHttpServletRequest dataRequest = new MockHttpServletRequest();
-
 
         dataRequest.setRequestURI("/data/" + collectionId);
 

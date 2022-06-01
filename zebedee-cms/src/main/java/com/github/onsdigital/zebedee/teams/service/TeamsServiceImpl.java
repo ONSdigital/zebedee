@@ -12,6 +12,7 @@ import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.teams.model.Team;
 import com.github.onsdigital.zebedee.teams.store.TeamsStore;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 
 import java.io.IOException;
 import java.util.AbstractMap;
@@ -28,6 +29,7 @@ import java.util.stream.Collectors;
 
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getUnauthorizedMessage;
+import static com.github.onsdigital.zebedee.teams.model.Team.numericTeamIDComparator;
 import static com.github.onsdigital.zebedee.teams.model.Team.teamIDComparator;
 
 /**
@@ -106,7 +108,8 @@ public class TeamsServiceImpl implements TeamsService {
             // Order existing teams by their ID.
             List<Team> orderedTeams = listTeams()
                     .parallelStream()
-                    .sorted(teamIDComparator)
+                    .filter(t -> NumberUtils.isParsable(t.getId()))
+                    .sorted(numericTeamIDComparator)
                     .collect(Collectors.toList());
 
             // Reverse the order so the highest number is first (for convenience).

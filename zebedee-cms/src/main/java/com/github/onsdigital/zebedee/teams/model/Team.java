@@ -18,6 +18,7 @@ public class Team {
      * {@link Comparator} ordering {@link Team} by {@link Team#id}.
      */
     public static Comparator<Team> teamIDComparator = (t1, t2) -> String.CASE_INSENSITIVE_ORDER.compare(t1.getId(), t2.getId());
+    public static Comparator<Team> numericTeamIDComparator = Comparator.comparingInt(t -> Integer.parseInt(t.getId()));
 
     private String id;
     private String name;

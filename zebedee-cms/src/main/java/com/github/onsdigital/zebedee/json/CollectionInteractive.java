@@ -11,6 +11,8 @@ public class CollectionInteractive {
     private String uri;
     private String lastEditedBy;
 
+    private CollectionInteractiveFile[] files;
+
     public String getId() {
         return id;
     }
@@ -50,6 +52,10 @@ public class CollectionInteractive {
     public String getLastEditedBy() {
         return lastEditedBy;
     }
+
+    public void setFiles(CollectionInteractiveFile[] files) { this.files = files; }
+
+    public CollectionInteractiveFile[] getFiles() { return files; }
 
     @Override
     public boolean equals(Object o) {

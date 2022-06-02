@@ -2,18 +2,22 @@ package com.github.onsdigital.zebedee.service;
 
 import com.github.onsdigital.dp.interactives.api.InteractivesAPIClient;
 import com.github.onsdigital.dp.interactives.api.models.Interactive;
+import com.github.onsdigital.dp.interactives.api.models.InteractiveHTMLFile;
 import com.github.onsdigital.dp.interactives.api.models.InteractiveMetadata;
 import com.github.onsdigital.zebedee.exceptions.ConflictException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.CollectionInteractive;
+import com.github.onsdigital.zebedee.json.CollectionInteractiveFile;
 import com.github.onsdigital.zebedee.json.ContentStatus;
 import com.github.onsdigital.zebedee.model.Collection;
-import dp.api.dataset.exception.DatasetAPIException;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.bouncycastle.util.Arrays;
 
 import java.io.IOException;
 import java.io.InvalidObjectException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
@@ -48,7 +52,7 @@ public class InteractivesServiceImpl implements InteractivesService {
         if (updatedInteractive != null && updatedInteractive.getState() != null) {
             collectionInteractive.setState(ContentStatusUtils.updatedStateInCollection(collectionInteractive.getState(), updatedInteractive.getState(), collectionInteractive.getLastEditedBy(), user));
         } else {
-            collectionInteractive.setState(ContentStatus.InProgress);
+            collectionInteractive.setState(ContentStatus.Complete);
         }
 
         collectionInteractive.setLastEditedBy(user);
@@ -78,6 +82,13 @@ public class InteractivesServiceImpl implements InteractivesService {
                 interactivesClient.linkInteractiveToCollection(id, collection.getId());
             }
 
+            if (! Arrays.isNullOrEmpty(interactive.getHTMLFiles())) {
+                List<CollectionInteractiveFile> files = new ArrayList<>();
+                for (InteractiveHTMLFile x : interactive.getHTMLFiles()) {
+                    files.add(new CollectionInteractiveFile(x.getName(), x.getURI()));
+                }
+                collectionInteractive.setFiles(files.toArray(new CollectionInteractiveFile[0]));
+            }
             collectionInteractive.setUri(interactive.getURL());
             collectionInteractive.setTitle(metadata.getTitle());
             collection.getDescription().addInteractive(collectionInteractive);

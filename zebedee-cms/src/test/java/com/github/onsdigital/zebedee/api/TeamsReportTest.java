@@ -137,33 +137,4 @@ public class TeamsReportTest extends ZebedeeAPIBaseTestCase {
     private AbstractMap.SimpleEntry<String, String> create(String team, String user) {
         return new AbstractMap.SimpleEntry<String, String>(team, user);
     }
-
-    private class StubServletOutputStream extends ServletOutputStream {
-        private OutputStream target;
-
-        public StubServletOutputStream(final OutputStream target) {
-            this.target = target;
-        }
-
-        @Override
-        public boolean isReady() {
-            return true;
-        }
-
-        @Override
-        public void setWriteListener(WriteListener writeListener) {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public void write(int b) throws IOException {
-            target.write(b);
-        }
-
-        @Override
-        public void flush() throws IOException {
-            super.flush();
-            target.flush();
-        }
-    }
 }

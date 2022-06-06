@@ -116,7 +116,7 @@ public class ContentTest {
     }
 
     @Test
-    public void Response_Contains_File_Download_Link_When_JSON_V1_Is_Written() throws Exception {
+    public void ResponseContainsFileDownloadLinkWhenJSONV1IsWritten() throws Exception {
         MockHttpServletRequest request = new MockHttpServletRequest();
         String collectionId = "aktesting";
         request.setPathInfo("/content/" + collectionId);
@@ -170,7 +170,7 @@ public class ContentTest {
     }
 
     @Test
-    public void Response_Contains_Uri_Download_Link_When_JSON_V2_Is_Written() throws Exception {
+    public void ResponseContainsUriDownloadLinkWhenJSONV2IsWritten() throws Exception {
         MockHttpServletRequest request = new MockHttpServletRequest();
         String collectionId = "aktesting";
         request.setPathInfo("/content/" + collectionId);
@@ -285,33 +285,4 @@ public class ContentTest {
                     "\"uri\":\"/peoplepopulationandcommunity/birthsdeathsandmarriages/livebirths/datasets/babynamesenglandandwalesbabynamesstatisticsboys/2022/previous/v1\"," +
                     "\"label\":\"Testing\"}]" +
                     "}";
-
-    private class StubServletOutputStream extends ServletOutputStream {
-        private OutputStream target;
-
-        public StubServletOutputStream(final OutputStream target) {
-            this.target = target;
-        }
-
-        @Override
-        public boolean isReady() {
-            return true;
-        }
-
-        @Override
-        public void setWriteListener(WriteListener writeListener) {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public void write(int b) throws IOException {
-            target.write(b);
-        }
-
-        @Override
-        public void flush() throws IOException {
-            super.flush();
-            target.flush();
-        }
-    }
 }

@@ -71,10 +71,7 @@
                 <artifactId>commons-io</artifactId>
                 <version>2.11.0</version>
             </dependency>
-            <!--
-                can remove tika-core when commons-io bumps:
-                https://ossindex.sonatype.org/vulnerability/CVE-2021-34429?component-type=maven&component-name=org.eclipse.jetty%2Fjetty-http&utm_source=ossindex-client&utm_medium=integration&utm_content=1.1.1
-            -->
+
             <dependency>
                 <groupId>org.apache.tika</groupId>
                 <artifactId>tika-core</artifactId>

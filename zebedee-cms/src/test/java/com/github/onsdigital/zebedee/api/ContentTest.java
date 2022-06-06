@@ -20,12 +20,12 @@ import com.github.onsdigital.zebedee.util.EncryptionUtils;
 import com.github.onsdigital.zebedee.util.slack.Notifier;
 import com.github.onsdigital.zebedee.util.versioning.VersionsServiceImpl;
 import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpStatus;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -35,9 +35,8 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.WriteListener;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.core.MediaType;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -48,7 +47,6 @@ import java.nio.file.Paths;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.atLeast;
 
 /**
  * An Integration test for the end-to-end of creating a piece of content in Zebedee
@@ -85,10 +83,6 @@ public class ContentTest {
     private com.github.onsdigital.zebedee.model.Content content;
     private Collections collections;
 
-    @Mock
-    HttpServletResponse mockResponse;
-
-
     @Before
     public void setUp() throws Exception {
         tempBasePath = Files.createTempDirectory("tempZebedee");
@@ -121,9 +115,8 @@ public class ContentTest {
         Root.zebedee = mockZebedee;
     }
 
-
     @Test
-    public void writeVersionFileV1() throws Exception {
+    public void Response_Contains_File_Download_Link_When_JSON_V1_Is_Written() throws Exception {
         MockHttpServletRequest request = new MockHttpServletRequest();
         String collectionId = "aktesting";
         request.setPathInfo("/content/" + collectionId);
@@ -133,23 +126,22 @@ public class ContentTest {
 
         Path versionFile = createCollectionAndPaths(collectionId);
 
-        // Create the version content via the content API.
+        // Given V1 Of the JSON was written
         try {
             Content contentApi = new Content();
             boolean result = contentApi.saveContent(request, new MockHttpServletResponse());
             Assert.assertTrue(result);
         } catch (Exception e) {
             e.printStackTrace();
-            Assert.fail(e.getMessage() + e.toString());
+            Assert.fail(e.getMessage() + e);
             throw e;
         }
 
         byte[] bytes = IOUtils.toByteArray(EncryptionUtils.encryptionInputStream(versionFile, secretKey));
         Assert.assertEquals(EXPECTED_CONTENT_V1, new String(bytes));
 
-        // read the version content via the content API.
+        // When the content is requested from Content API
         MockHttpServletRequest dataRequest = new MockHttpServletRequest();
-
         dataRequest.setRequestURI("/data/" + collectionId);
 
         String dataURL = "/peoplepopulationandcommunity/birthsdeathsandmarriages/livebirths/datasets/babynamesenglandandwalesbabynamesstatisticsboys/2022";
@@ -158,29 +150,27 @@ public class ContentTest {
         ZebedeeCollectionReaderFactory factory = new ZebedeeCollectionReaderFactory(mockZebedee);
         ZebedeeReader.setCollectionReaderFactory(factory);
 
+        HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
         ByteArrayOutputStream content = new ByteArrayOutputStream(1024);
-        when(mockResponse.getOutputStream())
+        when(response.getOutputStream())
                 .thenReturn(new StubServletOutputStream(content));
-
 
         try {
             Data dataAPI = new Data();
-            dataAPI.read(dataRequest, mockResponse);
+            dataAPI.read(dataRequest, response);
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail(e.getMessage() + e.toString());
             throw e;
         }
 
-        // admittedly a little fragile - ideally we'd like to be sure that the last invocation (or possibly default value) was correct.
-        verify(mockResponse, atLeast(1)).setStatus(HttpStatus.SC_OK);
-        verify(mockResponse, atLeast(1)).setContentType(MediaType.APPLICATION_JSON);
-
+        // Then I should receive a structured V1 content back with file download link
+        verify(response).setStatus(200);
         JSONAssert.assertEquals(EXPECTED_CONTENT_V1, content.toString(), false);
     }
 
     @Test
-    public void writeVersionFileV2() throws Exception {
+    public void Response_Contains_Uri_Download_Link_When_JSON_V2_Is_Written() throws Exception {
         MockHttpServletRequest request = new MockHttpServletRequest();
         String collectionId = "aktesting";
         request.setPathInfo("/content/" + collectionId);
@@ -213,29 +203,28 @@ public class ContentTest {
         ZebedeeCollectionReaderFactory factory = new ZebedeeCollectionReaderFactory(mockZebedee);
         ZebedeeReader.setCollectionReaderFactory(factory);
 
+        HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
         ByteArrayOutputStream content = new ByteArrayOutputStream(1024);
-        when(mockResponse.getOutputStream())
+        when(response.getOutputStream())
                 .thenReturn(new StubServletOutputStream(content));
-
 
         try {
             Data dataAPI = new Data();
-            dataAPI.read(dataRequest, mockResponse);
+            dataAPI.read(dataRequest, response);
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail(e.getMessage() + e.toString());
             throw e;
         }
-        // admittedly a little fragile - ideally we'd like to be sure that the last invocation (or possibly default value) was correct.
-        verify(mockResponse, atLeast(1)).setStatus(HttpStatus.SC_OK);
-        verify(mockResponse, atLeast(1)).setContentType(MediaType.APPLICATION_JSON);
 
+        // Then I should receive a structured V1 content back with uri download link
+        verify(response).setStatus(200);
         JSONAssert.assertEquals(EXPECTED_CONTENT_V2, content.toString(), false);
     }
 
     private Path createCollectionAndPaths(String collectionId) throws IOException, ZebedeeException {
         Collection.create(collectionDescription, mockZebedee, mockSession);
-        Path pathToCreate = Paths.get(tempBasePath.toString(), collectionId, "inprogress", "peoplepopulationandcommunity", "birthsdeathsandmarriages", "livebirths", "datasets", "babynamesenglandandwalesbabynamesstatisticsboys", "2022");
+        Path pathToCreate = Paths.get(tempBasePath.toString(), collectionId, "inprogress","peoplepopulationandcommunity", "birthsdeathsandmarriages", "livebirths", "datasets", "babynamesenglandandwalesbabynamesstatisticsboys", "2022");
         Path datasetPath = Files.createDirectories(pathToCreate);
         Path versionFile = Paths.get(datasetPath.toString(), "data.json");
         Files.createFile(versionFile);
@@ -296,7 +285,6 @@ public class ContentTest {
                     "\"uri\":\"/peoplepopulationandcommunity/birthsdeathsandmarriages/livebirths/datasets/babynamesenglandandwalesbabynamesstatisticsboys/2022/previous/v1\"," +
                     "\"label\":\"Testing\"}]" +
                     "}";
-
 
     private class StubServletOutputStream extends ServletOutputStream {
         private OutputStream target;

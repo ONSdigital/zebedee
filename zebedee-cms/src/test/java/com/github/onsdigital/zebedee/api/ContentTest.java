@@ -217,7 +217,7 @@ public class ContentTest {
             throw e;
         }
 
-        // Then I should receive a structured V1 content back with uri download link
+        // Then I should receive a structured V2 content back with uri download link
         verify(response).setStatus(200);
         JSONAssert.assertEquals(EXPECTED_CONTENT_V2, content.toString(), false);
     }

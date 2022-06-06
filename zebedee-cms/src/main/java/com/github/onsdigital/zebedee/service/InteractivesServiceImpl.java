@@ -93,7 +93,7 @@ public class InteractivesServiceImpl implements InteractivesService {
                 }
                 collectionInteractive.setFiles(files.toArray(new CollectionInteractiveFile[0]));
             }
-            collectionInteractive.setUri(interactive.getURL());
+            collectionInteractive.setUri(interactive.getURI());
             collectionInteractive.setTitle(metadata.getTitle());
             collection.getDescription().addInteractive(collectionInteractive);
             collection.save();

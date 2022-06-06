@@ -108,13 +108,13 @@ public class ContentTest {
     }
 
     @Test
-    public void writeVersionFileV1() throws Exception {
+    public void writeVersionFile() throws Exception {
         MockHttpServletRequest request = new MockHttpServletRequest();
         String collectionId = "aktesting";
         request.setPathInfo("/content/" + collectionId);
         String datasetURL = "/peoplepopulationandcommunity/birthsdeathsandmarriages/livebirths/datasets/babynamesenglandandwalesbabynamesstatisticsboys/2022/data.json";
         request.addParameter("uri", datasetURL);
-        request.setContent(getV1RequestContent());
+        request.setContent(getRequestContent());
 
         Path versionFile = createCollectionAndPaths(collectionId);
 
@@ -130,7 +130,7 @@ public class ContentTest {
         }
 
         byte[] bytes = IOUtils.toByteArray(EncryptionUtils.encryptionInputStream(versionFile, secretKey));
-        Assert.assertEquals(EXPECTED_CONTENT_V1, new String(bytes));
+        Assert.assertEquals(EXPECTED_CONTENT, new String(bytes));
 
         // read the version content via the content API.
         MockHttpServletResponse response = new MockHttpServletResponse();
@@ -153,55 +153,7 @@ public class ContentTest {
         }
 
         Assert.assertEquals(200, response.getStatus());
-        JSONAssert.assertEquals(EXPECTED_CONTENT_V1, response.getContentAsString(), false);
-    }
-
-    @Test
-    public void writeVersionFileV2() throws Exception {
-        MockHttpServletRequest request = new MockHttpServletRequest();
-        String collectionId = "aktesting";
-        request.setPathInfo("/content/" + collectionId);
-        String datasetURL = "/peoplepopulationandcommunity/birthsdeathsandmarriages/livebirths/datasets/babynamesenglandandwalesbabynamesstatisticsboys/2022/data.json";
-        request.addParameter("uri", datasetURL);
-        request.setContent(getV2RequestContent());
-
-        Path versionFile = createCollectionAndPaths(collectionId);
-
-        try {
-            Content contentApi = new Content();
-            boolean result = contentApi.saveContent(request, new MockHttpServletResponse());
-            Assert.assertTrue(result);
-        } catch (Exception e) {
-            e.printStackTrace();
-            Assert.fail(e.getMessage() + e.toString());
-            throw e;
-        }
-
-        byte[] bytes = IOUtils.toByteArray(EncryptionUtils.encryptionInputStream(versionFile, secretKey));
-        Assert.assertEquals(EXPECTED_CONTENT_V2, new String(bytes));
-
-        // read the version content via the content API.
-        MockHttpServletResponse response = new MockHttpServletResponse();
-        MockHttpServletRequest dataRequest = new MockHttpServletRequest();
-        dataRequest.setRequestURI("/data/" + collectionId);
-
-        String dataURL = "/peoplepopulationandcommunity/birthsdeathsandmarriages/livebirths/datasets/babynamesenglandandwalesbabynamesstatisticsboys/2022";
-        dataRequest.addParameter("uri", dataURL);
-
-        ZebedeeCollectionReaderFactory factory = new ZebedeeCollectionReaderFactory(mockZebedee);
-        ZebedeeReader.setCollectionReaderFactory(factory);
-
-        try {
-            Data dataAPI = new Data();
-            dataAPI.read(dataRequest, response);
-        } catch (Exception e) {
-            e.printStackTrace();
-            Assert.fail(e.getMessage() + e.toString());
-            throw e;
-        }
-
-        Assert.assertEquals(200, response.getStatus());
-        JSONAssert.assertEquals(EXPECTED_CONTENT_V2, response.getContentAsString(), false);
+        JSONAssert.assertEquals(EXPECTED_CONTENT, response.getContentAsString(), false);
     }
 
     private Path createCollectionAndPaths(String collectionId) throws IOException, ZebedeeException {
@@ -213,40 +165,13 @@ public class ContentTest {
         return versionFile;
     }
 
-    private byte[] getV1RequestContent() {
-        return EXPECTED_CONTENT_V1.getBytes();
+    private byte[] getRequestContent() {
+        return EXPECTED_CONTENT.getBytes();
     }
 
-    private static final String EXPECTED_CONTENT_V1 =
+    private static final String EXPECTED_CONTENT =
             "{\"downloads\":" +
-                    "[{\"file\":\"ac2be72c.xls\"}]," +
-                    "\"type\":\"dataset\"," +
-                    "\"uri\":\"/peoplepopulationandcommunity/birthsdeathsandmarriages/livebirths/datasets/babynamesenglandandwalesbabynamesstatisticsboys/2022\"," +
-                    "\"description\":" +
-                    "{\"title\":\"Baby Names Statistics Boys\"," +
-                    "\"summary\":\"Ranks and counts for boys' baby names in England and Wales and also by region and month.\"," +
-                    "\"keywords\":[\"top,ten,boys,girls,most,popular\"]," +
-                    "\"metaDescription\":\"Ranks and counts for boys' baby names in England and Wales and also by region and month.\"," +
-                    "\"nationalStatistic\":true," +
-                    "\"contact\":{\"email\":\"vsob@ons.gov.uk\",\"name\":\"Elizabeth McLaren\",\"telephone\":\"+44 (0)1329 444110\"}," + "\"releaseDate\":\"2015-08-16T23:00:00.000Z\"," +
-                    "\"nextRelease\":\"August - September 16 (provisional date)\"," +
-                    "\"edition\":\"2022\"," +
-                    "\"datasetId\":\"\"," +
-                    "\"unit\":\"\",\"preUnit\":\"\"," +
-                    "\"source\":\"\"," +
-                    "\"versionLabel\":\"Testing\"}," +
-                    "\"versions\":[{\"correctionNotice\":\"\"," +
-                    "\"updateDate\":\"2022-05-03T11:31:21.283Z\"," +
-                    "\"uri\":\"/peoplepopulationandcommunity/birthsdeathsandmarriages/livebirths/datasets/babynamesenglandandwalesbabynamesstatisticsboys/2022/previous/v1\"," +
-                    "\"label\":\"Testing\"}]" +
-                    "}";
-
-    private byte[] getV2RequestContent() {
-        return EXPECTED_CONTENT_V2.getBytes();
-    }
-
-    private static final String EXPECTED_CONTENT_V2 =
-            "{\"downloads\":[{\"url\":\"some/path/some/file.csv\",\"version\":\"v2\"}]," +
+                    "[{\"file\":\"ac2be72c.xls\", \"url\":\"some/path/some/file.csv\",\"version\":\"v2\"}]," +
                     "\"type\":\"dataset\"," +
                     "\"uri\":\"/peoplepopulationandcommunity/birthsdeathsandmarriages/livebirths/datasets/babynamesenglandandwalesbabynamesstatisticsboys/2022\"," +
                     "\"description\":" +

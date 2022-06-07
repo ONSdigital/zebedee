@@ -1424,12 +1424,9 @@ public class Collection {
      */
     public List<ContentDetail> getInteractiveDetails() {
 
-        return description.getInteractives().stream().map(ds -> {
-
-            String url = URI.create(ds.getUri()).getPath();
-            return new ContentDetail(ds.getTitle(), url, PageType.INTERACTIVE);
-
-        }).collect(Collectors.toList());
+        return description.getInteractives().stream()
+            .map(i -> new ContentDetail(i.getTitle(), i.getUri(), PageType.INTERACTIVE))
+            .collect(Collectors.toList());
     }
 
     /**

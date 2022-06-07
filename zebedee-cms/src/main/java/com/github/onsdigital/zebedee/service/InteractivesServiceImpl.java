@@ -50,6 +50,10 @@ public class InteractivesServiceImpl implements InteractivesService {
         }
 
         if (updatedInteractive != null && updatedInteractive.getState() != null) {
+            if (updatedInteractive.getState().equals(ContentStatus.InProgress)) {
+                //initial state is always Complete
+                updatedInteractive.setState(ContentStatus.Complete);
+            }
             collectionInteractive.setState(ContentStatusUtils.updatedStateInCollection(collectionInteractive.getState(), updatedInteractive.getState(), collectionInteractive.getLastEditedBy(), user));
         } else {
             collectionInteractive.setState(ContentStatus.Complete);
@@ -89,7 +93,7 @@ public class InteractivesServiceImpl implements InteractivesService {
                 }
                 collectionInteractive.setFiles(files.toArray(new CollectionInteractiveFile[0]));
             }
-            collectionInteractive.setUri(interactive.getURL());
+            collectionInteractive.setUri(interactive.getURI());
             collectionInteractive.setTitle(metadata.getTitle());
             collection.getDescription().addInteractive(collectionInteractive);
             collection.save();

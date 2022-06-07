@@ -1832,7 +1832,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         Collection collection = CollectionTest.createCollection(collectionPath, "isAllContentReviewed");
 
         CollectionInteractive interactive = new CollectionInteractive();
-        interactive.setUri("http://localhost:1234/interactives/123");
+        interactive.setUri("/interactives/123");
         interactive.setTitle("title");
         collection.getDescription().addInteractive(interactive);
 

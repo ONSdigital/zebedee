@@ -116,7 +116,7 @@ public class ContentTest {
     }
 
     @Test
-    public void ResponseContainsFileDownloadLinkWhenJSONV1IsWritten() throws Exception {
+    public void responseContainsFileDownloadLinkWhenJSONV1IsWritten() throws Exception {
         MockHttpServletRequest request = new MockHttpServletRequest();
         String collectionId = "aktesting";
         request.setPathInfo("/content/" + collectionId);
@@ -127,15 +127,9 @@ public class ContentTest {
         Path versionFile = createCollectionAndPaths(collectionId);
 
         // Given V1 Of the JSON was written
-        try {
-            Content contentApi = new Content();
-            boolean result = contentApi.saveContent(request, new MockHttpServletResponse());
-            Assert.assertTrue(result);
-        } catch (Exception e) {
-            e.printStackTrace();
-            Assert.fail(e.getMessage() + e);
-            throw e;
-        }
+        Content contentApi = new Content();
+        contentApi.saveContent(request, new MockHttpServletResponse());
+
 
         byte[] bytes = IOUtils.toByteArray(EncryptionUtils.encryptionInputStream(versionFile, secretKey));
         Assert.assertEquals(EXPECTED_CONTENT_V1, new String(bytes));
@@ -155,14 +149,8 @@ public class ContentTest {
         when(response.getOutputStream())
                 .thenReturn(new StubServletOutputStream(content));
 
-        try {
-            Data dataAPI = new Data();
-            dataAPI.read(dataRequest, response);
-        } catch (Exception e) {
-            e.printStackTrace();
-            Assert.fail(e.getMessage() + e.toString());
-            throw e;
-        }
+        Data dataAPI = new Data();
+        dataAPI.read(dataRequest, response);
 
         // Then I should receive a structured V1 content back with file download link
         verify(response).setStatus(200);
@@ -180,15 +168,8 @@ public class ContentTest {
 
         Path versionFile = createCollectionAndPaths(collectionId);
 
-        try {
-            Content contentApi = new Content();
-            boolean result = contentApi.saveContent(request, new MockHttpServletResponse());
-            Assert.assertTrue(result);
-        } catch (Exception e) {
-            e.printStackTrace();
-            Assert.fail(e.getMessage() + e.toString());
-            throw e;
-        }
+        Content contentApi = new Content();
+        contentApi.saveContent(request, new MockHttpServletResponse());
 
         byte[] bytes = IOUtils.toByteArray(EncryptionUtils.encryptionInputStream(versionFile, secretKey));
         Assert.assertEquals(EXPECTED_CONTENT_V2, new String(bytes));
@@ -208,14 +189,8 @@ public class ContentTest {
         when(response.getOutputStream())
                 .thenReturn(new StubServletOutputStream(content));
 
-        try {
-            Data dataAPI = new Data();
-            dataAPI.read(dataRequest, response);
-        } catch (Exception e) {
-            e.printStackTrace();
-            Assert.fail(e.getMessage() + e.toString());
-            throw e;
-        }
+        Data dataAPI = new Data();
+        dataAPI.read(dataRequest, response);
 
         // Then I should receive a structured V2 content back with uri download link
         verify(response).setStatus(200);

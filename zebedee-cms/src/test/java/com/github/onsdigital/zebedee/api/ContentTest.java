@@ -158,7 +158,7 @@ public class ContentTest {
     }
 
     @Test
-    public void ResponseContainsUriDownloadLinkWhenJSONV2IsWritten() throws Exception {
+    public void responseContainsUriDownloadLinkWhenJSONV2IsWritten() throws Exception {
         MockHttpServletRequest request = new MockHttpServletRequest();
         String collectionId = "aktesting";
         request.setPathInfo("/content/" + collectionId);

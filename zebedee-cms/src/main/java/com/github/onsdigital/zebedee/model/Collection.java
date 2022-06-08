@@ -412,9 +412,8 @@ public class Collection {
             scheduler.cancel(collection);
         }
 
-        Set<String> teamIds = setViewerTeams(collectionDescription, zebedee, session);
-
         if (collectionDescription.getTeams() != null) {
+            Set<String> teamIds = setViewerTeams(collectionDescription, zebedee, session);
             updatedCollection.getDescription().setTeams(collectionDescription.getTeams());
         }
 

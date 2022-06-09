@@ -111,7 +111,7 @@ public class Collections {
 
             return result;
         } catch (IOException e) {
-            error().data("user", session.getEmail()).logException(e,GET_COLLECTIONS_ERROR);
+            error().data("user", session.getEmail()).logException(e, GET_COLLECTIONS_ERROR);
             throw new UnexpectedErrorException(GET_COLLECTIONS_ERROR, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
     }

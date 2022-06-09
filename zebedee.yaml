@@ -1,0 +1,190 @@
+openapi: 3.0.3
+info:
+  title: Zebedee
+  description: Zebedee CMS API
+  version: 1.0.0
+servers:
+  - url: 'https'
+paths:
+  /login:
+    post:
+      summary: Authenticate a User
+      requestBody:
+        description: The details of the user authenticating
+        content:
+          application/json:
+            schema:
+              properties:
+                email:
+                  type: string
+                  example: florence@magicroundabout.ons.gov.uk
+                  description: The email address of the user authenticating
+                password:
+                  type: string
+                  example: p@ssword123!
+                  description: The password of the user authenticating
+              required:
+                - email
+                - password
+      responses:
+        200:
+          description: Returns the quoted authentication token
+          content:
+            text/plain:
+              example: "123456789poiuytrewqasdfghjkzxcvbnm"
+  /content/{collection_id}:
+    post:
+      summary: Handle the upload of files (multi-part) and CMS (Collection/Versions/Page) data (JSON)
+      description: TODO - implemented in com.github.onsdigital.zebedee.api.Content
+      parameters:
+        - name: collection_id
+          required: true
+          description: the ID of the collection the content file or data is associated with
+          example: aktesting-123456789
+          in: path
+          schema:
+            type: string
+        - name: uri
+          required: true
+          example:
+            - /peoplepopulationandcommunity/birthsdeathsandmarriages/livebirths/datasets/babynamesenglandandwalesbabynamesstatisticsboys/2022/data.json
+          description: the file path to be created/overwritten
+          in: query
+          schema:
+            type: string
+        - name: overwriteExisting
+          required: false
+          example: true
+          description: Whether the file should overwritten if it exists (if false and file exists and error will be returned) Default - true
+          in: query
+          schema:
+            type: boolean
+        - name: recursive
+          required: false
+          example: false
+          description: TODO Default - false
+          in: query
+          schema:
+            type: boolean
+        - name: validateJson
+          required: false
+          example: true
+          description: TODO Default - true
+          in: query
+          schema:
+            type: boolean
+      requestBody:
+        required: true
+        content:
+          application/json:
+            examples:
+              any:
+                description: any JSON encode of classes defined in zebedee-reader within the com.github.onsdigital.zebebee.content packages
+          multipart/mixed:
+            examples:
+              TODO:
+                description: Uploading of CSV/Excel file (This function is deprecated - use Static File dp-upload-service)
+      responses:
+        200:
+          description: Whether the content is store based on the boolean in the response body
+        409:
+          description: if overwriteExisting = false and file already exists
+  /data/{collection_id}:
+    get:
+      summary: returns the content of a Zebedee CMS data file based on the URI provided
+      description: TODO.... Implemented in zebedee-reader at com.github.onsdigital.zebedee.reader.api.endpoint.Data
+      parameters:
+        - name: collection_id
+          required: true
+          description: the ID of the collection the content file or data is associated with
+          example: aktesting-123456789
+          in: path
+          schema:
+            type: string
+        - name: uri
+          required: true
+          example:
+            - /peoplepopulationandcommunity/birthsdeathsandmarriages/livebirths/datasets/babynamesenglandandwalesbabynamesstatisticsboys/2022/
+          description: the file path to be created/overwritten
+          in: query
+          schema:
+            type: string
+      responses:
+        200:
+          description: any JSON encode of classes defined in zebedee-reader within the com.github.onsdigital.zebebee.content packages, based on the `type` field in the content
+  /collection:
+    post:
+      summary: Create a collection
+      parameters:
+        - name: X-Florence-Token
+          in: header
+          required: true
+          description: Auth Token for the currently used auth system
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                name:
+                  type: string
+                  description: The name of the collection
+                  example: 2021 Annual Births Analysis
+                type:
+                  type: string
+                  description: the type of collection either manual or scheduled
+                  example: manual
+                TODO:
+                  description: There are more properties that we have not discovered/used TODO please continues documenting
+              required:
+                - name
+                - type
+      responses:
+        200:
+          description: Whether the content is store based on the boolean in the response body
+  /publish/{collection_id}:
+    post:
+      summary: Publish a collection
+      parameters:
+        - name: collection_id
+          in: path
+          required: true
+          description: The ID of the collection to be published
+          schema:
+            type: string
+        - name: X-Florence-Token
+          in: header
+          required: true
+          description: Auth Token for the currently used auth system
+          schema:
+            type: string
+      responses:
+        200:
+          description: Returns a boolean based on the success of publication
+          content:
+            text/plain:
+              example: true
+  /approve/{collection_id}:
+    post:
+      summary: Approve a collection
+      parameters:
+        - name: collection_id
+          in: path
+          required: true
+          description: The ID of the collection to be approved
+          schema:
+            type: string
+        - name: X-Florence-Token
+          in: header
+          required: true
+          description: Auth Token for the currently used auth system
+          schema:
+            type: string
+      responses:
+        200:
+          description: Returns a boolean based on the success of approval
+          content:
+            text/plain:
+              example: true

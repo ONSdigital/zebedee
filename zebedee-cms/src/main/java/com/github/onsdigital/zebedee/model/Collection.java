@@ -73,6 +73,7 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
 
+import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.error;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.info;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.warn;
@@ -424,24 +425,29 @@ public class Collection {
 
     private static Set<String> setViewerTeams(CollectionDescription desc, Zebedee zebedee, Session session)
             throws IOException, ZebedeeException {
-        Set<String> teamIds = new HashSet<>();
-        List<String> teamNames = desc.getTeams();
+        Set<String> teamIds;
 
-        if (teamNames == null) {
-            teamNames = new ArrayList<>();
-        }
+        if (cmsFeatureFlags().isJwtSessionsEnabled()) {
+            teamIds = new HashSet<>(desc.getTeams());
+        } else {
+            teamIds = new HashSet<>();
+            List<String> teamNames = desc.getTeams();
 
-        // TODO: Remove the following transitional code once Florence is updated to send the team IDs rather than the team names.
-        TeamsService teams = zebedee.getTeamsService();
-        for (String teamName : teamNames) {
-            Team team = teams.findTeam(teamName);
-            if (team == null) {
-                throw new NotFoundException("team assigned to collection expected but does not exist");
+            if (teamNames == null) {
+                teamNames = new ArrayList<>();
             }
 
-            teamIds.add(team.getId());
+            TeamsService teams = zebedee.getTeamsService();
+            for (String teamName : teamNames) {
+                Team team = teams.findTeam(teamName);
+                if (team == null) {
+                    info().data("team", teamName).log("team assigned to collection expected but does not exist, skipping...");
+                    continue;
+                }
+
+                teamIds.add(team.getId());
+            }
         }
-        // end of transitional code
 
         PermissionsService permissions = zebedee.getPermissionsService();
         permissions.setViewerTeams(session, desc.getId(), teamIds);
@@ -453,7 +459,7 @@ public class Collection {
         return this.description;
     }
 
-    public Release populateRelease(CollectionReader reader, CollectionWriter collectionWriter, Iterable<ContentDetail> collectionContent) throws IOException, ZebedeeException {
+    private Release populateRelease(CollectionReader reader, CollectionWriter collectionWriter, Iterable<ContentDetail> collectionContent) throws IOException, ZebedeeException {
 
         if (StringUtils.isEmpty(this.getDescription().getReleaseUri())) {
             throw new BadRequestException("This collection is not associated with a release.");
@@ -465,18 +471,28 @@ public class Collection {
                 InputStream dataStream = resource.getData()
         ) {
             Release release = (Release) ContentUtil.deserialiseContent(dataStream);
-            info().data("collectionId", this.getDescription().getId()).data("title", release.getDescription().getTitle())
-                    .log("Release identified for collection");
-
             if (release == null) {
-                throw new BadRequestException("This collection is not associated with a release.");
+                throw new BadRequestException("Couldn't read release content: " + uri);
             }
+            info().data("collectionId", this.getDescription().getId()).data("title", release.getDescription().getTitle())
+                    .log("Release identified for collection, populating the page links");
 
             release = ReleasePopulator.populate(release, collectionContent);
             collectionWriter.getReviewed().writeObject(release, uri);
 
             return release;
         }
+    }
+
+    public Release populateReleaseQuietly(CollectionReader reader, CollectionWriter writer, Iterable<ContentDetail> collectionContent) throws IOException {
+        Release release = null;
+        try {
+            release = populateRelease(reader, writer, collectionContent);
+        } catch (ZebedeeException e) {
+            error().data("collectionId", this.getDescription().getId())
+                    .logException(e, "Failed to populate release page for collection");
+        }
+        return release;
     }
 
     /**

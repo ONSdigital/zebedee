@@ -2,6 +2,8 @@ package com.github.onsdigital.zebedee;
 
 import com.github.onsdigital.JWTVerifier;
 import com.github.onsdigital.JWTVerifierImpl;
+import com.github.onsdigital.dp.files.api.APIClient;
+import com.github.onsdigital.dp.files.api.Client;
 import com.github.onsdigital.dp.image.api.client.ImageAPIClient;
 import com.github.onsdigital.dp.image.api.client.ImageClient;
 import com.github.onsdigital.slack.Profile;
@@ -37,6 +39,8 @@ import com.github.onsdigital.zebedee.service.KafkaService;
 import com.github.onsdigital.zebedee.service.KafkaServiceImpl;
 import com.github.onsdigital.zebedee.service.NoOpKafkaService;
 import com.github.onsdigital.zebedee.service.ServiceStoreImpl;
+import com.github.onsdigital.zebedee.service.StaticFilesService;
+import com.github.onsdigital.zebedee.service.StaticFilesServiceImpl;
 import com.github.onsdigital.zebedee.service.ZebedeeDatasetService;
 import com.github.onsdigital.zebedee.session.service.JWTSessionsServiceImpl;
 import com.github.onsdigital.zebedee.session.service.Sessions;
@@ -85,18 +89,19 @@ import static com.github.onsdigital.zebedee.Zebedee.ZEBEDEE;
 import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getDatasetAPIAuthToken;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getDatasetAPIURL;
+import static com.github.onsdigital.zebedee.configuration.Configuration.getIdentityAPIURL;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getImageAPIURL;
+import static com.github.onsdigital.zebedee.configuration.Configuration.getInitialRetryInterval;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getKafkaContentPublishedTopic;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getKafkaURL;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getKeyringInitVector;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getKeyringSecretKey;
-import static com.github.onsdigital.zebedee.configuration.Configuration.getServiceAuthToken;
-import static com.github.onsdigital.zebedee.configuration.Configuration.getSlackSupportChannelID;
-import static com.github.onsdigital.zebedee.configuration.Configuration.slackChannelsToNotfiyOnStartUp;
-import static com.github.onsdigital.zebedee.configuration.Configuration.getIdentityAPIURL;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getMaxRetryInterval;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getMaxRetryTimeout;
-import static com.github.onsdigital.zebedee.configuration.Configuration.getInitialRetryInterval;
+import static com.github.onsdigital.zebedee.configuration.Configuration.getServiceAuthToken;
+import static com.github.onsdigital.zebedee.configuration.Configuration.getSlackSupportChannelID;
+import static com.github.onsdigital.zebedee.configuration.Configuration.getStaticFilesAPIURL;
+import static com.github.onsdigital.zebedee.configuration.Configuration.slackChannelsToNotfiyOnStartUp;
 import static com.github.onsdigital.zebedee.permissions.store.PermissionsStoreFileSystemImpl.initialisePermissions;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
@@ -129,6 +134,7 @@ public class ZebedeeConfiguration {
     private DatasetService datasetService;
     private ImageService imageService;
     private KafkaService kafkaService;
+    private StaticFilesService staticFilesService;
     private CollectionKeyring collectionKeyring;
     private CollectionKeyCache schedulerKeyCache;
     private EncryptionKeyFactory encryptionKeyFactory;
@@ -239,6 +245,8 @@ public class ZebedeeConfiguration {
         }
 
         imageService = new ImageServiceImpl(imageClient);
+
+        staticFilesService = new StaticFilesServiceImpl(new APIClient(getStaticFilesAPIURL(), getServiceAuthToken()));
 
         if (cmsFeatureFlags().isKafkaEnabled()) {
 
@@ -431,6 +439,10 @@ public class ZebedeeConfiguration {
 
     public ImageService getImageService() {
         return imageService;
+    }
+
+    public StaticFilesService getStaticFilesService() {
+        return staticFilesService;
     }
 
     public KafkaService getKafkaService() {

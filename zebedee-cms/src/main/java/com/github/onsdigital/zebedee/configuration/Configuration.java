@@ -17,7 +17,6 @@ import java.util.stream.Collectors;
 import static java.text.MessageFormat.format;
 import static org.apache.commons.lang3.StringUtils.defaultIfBlank;
 
-
 public class Configuration {
 
     private static final String DEFAULT_WEBSITE_URL = "http://localhost:8080";
@@ -36,7 +35,7 @@ public class Configuration {
     private static final String STATIC_FILES_API_URL = "http://localhost:26900";
     private static final String IDENTITY_API_URL = "http://localhost:25600";
     private static final String KAFKA_ADDR = "localhost:9092";
-    private static final String KAFKA_CONTENT_PUBLISHED_TOPIC = "content-published";
+    private static final String KAFKA_CONTENT_UPDATED_TOPIC = "content-updated";
     private static final String DATASET_API_AUTH_TOKEN = "FD0108EA-825D-411C-9B1D-41EF7727F465";
     private static final String SERVICE_AUTH_TOKEN = "15C0E4EE-777F-4C61-8CDB-2898CEB34657";
     private static final String DEFAULT_SLACK_USERNAME = "Zebedee";
@@ -44,10 +43,10 @@ public class Configuration {
     private static final String KEYRING_SECRET_KEY = "KEYRING_SECRET_KEY";
     private static final String KEYRING_INIT_VECTOR = "KEYRING_INIT_VECTOR";
 
-    private static final int VERIFY_RETRY_DELAY = 5000; //milliseconds
+    private static final int VERIFY_RETRY_DELAY = 5000; // milliseconds
     private static final int VERIFY_RETRY_COUNT = 10;
 
-    //Default retry configs to handle fetching jwt keys from identity api failure
+    // Default retry configs to handle fetching jwt keys from identity api failure
     private static final int DEFAULT_INITIAL_RETRY_INTERVAL = 500;
     private static final int DEFAULT_MAX_RETRY_ELAPSED_TIME = 900000;
     private static final int DEFAULT_MAX_RETRY_INTERVAL = 60000;
@@ -85,7 +84,8 @@ public class Configuration {
      * how many additional seconds after the publish should content be cached.
      */
     public static int getSecondsToCacheAfterScheduledPublish() {
-        return getIntWithDefault("seconds_to_cache_after_scheduled_publish", DEFAULT_SECONDS_TO_CACHE_AFTER_SCHEDULED_PUBLISH);
+        return getIntWithDefault("seconds_to_cache_after_scheduled_publish",
+                DEFAULT_SECONDS_TO_CACHE_AFTER_SCHEDULED_PUBLISH);
     }
 
     public static int getMaxRetryTimeout() {
@@ -162,8 +162,8 @@ public class Configuration {
         return StringUtils.defaultIfBlank(getValue("KAFKA_ADDR"), KAFKA_ADDR);
     }
 
-    public static String getKafkaContentPublishedTopic() {
-        return StringUtils.defaultIfBlank(getValue("KAFKA_CONTENT_PUBLISHED_TOPIC"), KAFKA_CONTENT_PUBLISHED_TOPIC);
+    public static String getKafkaContentUpdatedTopic() {
+        return StringUtils.defaultIfBlank(getValue("KAFKA_CONTENT_UPDATED_TOPIC"), KAFKA_CONTENT_UPDATED_TOPIC);
     }
 
     public static String getKafkaSecProtocol() {
@@ -277,14 +277,13 @@ public class Configuration {
      *
      * @param key The name of the configuration value.
      * @return The system property corresponding to the given key (e.g.
-     * -Dkey=value). If that is blank, the environment variable
-     * corresponding to the given key (e.g. EXPORT key=value). If that
-     * is blank, {@link org.apache.commons.lang3.StringUtils#EMPTY}.
+     *         -Dkey=value). If that is blank, the environment variable
+     *         corresponding to the given key (e.g. EXPORT key=value). If that
+     *         is blank, {@link org.apache.commons.lang3.StringUtils#EMPTY}.
      */
     static String getValue(String key) {
         return StringUtils.defaultIfBlank(System.getProperty(key), System.getenv(key));
     }
-
 
     /**
      * Gets a configured int value for the given key from either the system
@@ -294,9 +293,9 @@ public class Configuration {
      * @param key          The name of the configuration value.
      * @param defaultValue The default value to be used if configuration is missing.
      * @return The system property corresponding to the given key (e.g.
-     * -Dkey=value). If that is blank, the environment variable
-     * corresponding to the given key (e.g. EXPORT key=value). If that
-     * is blank, defaultValue passed to the method.
+     *         -Dkey=value). If that is blank, the environment variable
+     *         corresponding to the given key (e.g. EXPORT key=value). If that
+     *         is blank, defaultValue passed to the method.
      */
     static int getIntWithDefault(String key, int defaultValue) {
         try {

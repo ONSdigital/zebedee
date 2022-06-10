@@ -265,6 +265,7 @@ public class Collections {
                     case 4: // /collections/{collection_id}/interactives/{interactive_id}
 
                         removeInteractiveFromCollection(collection, resourceID);
+                        response.setStatus(HttpStatus.SC_NO_CONTENT);
                         break;
 
                     default:

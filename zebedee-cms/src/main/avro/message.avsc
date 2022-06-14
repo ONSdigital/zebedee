@@ -1,6 +1,6 @@
 {"namespace": "com.github.onsdigital.zebedee.avro",
  "type": "record",
- "name": "ContentPublished",
+ "name": "ContentUpdated",
  "fields": [
    {"name": "uri", "type": "string", "default": ""},
    {"name": "data_type", "type": "string", "default": ""},

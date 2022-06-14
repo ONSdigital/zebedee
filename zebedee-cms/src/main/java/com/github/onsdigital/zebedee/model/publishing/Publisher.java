@@ -69,7 +69,6 @@ import static com.github.onsdigital.zebedee.util.SlackNotification.StageStatus.S
 import static com.github.onsdigital.zebedee.util.SlackNotification.publishNotification;
 import static org.apache.commons.lang3.StringUtils.defaultIfBlank;
 
-
 public class Publisher {
 
     private static final List<Host> theTrainHosts;
@@ -82,7 +81,8 @@ public class Publisher {
     private static final String PUBLISH_ENDPOINT = "publish";
     private static final String COMMIT_ENDPOINT = "commit";
     private static final String ROLLBACK_ENDPOINT = "rollback";
-    private static final Pattern CMD_DATASET_URI_REGEX = Pattern.compile("^/datasets/[a-zA-Z0-9_\\._-]+/editions/[a-zA-Z0-9_\\._-]+/versions/\\w+");
+    private static final Pattern CMD_DATASET_URI_REGEX = Pattern
+            .compile("^/datasets/[a-zA-Z0-9_\\._-]+/editions/[a-zA-Z0-9_\\._-]+/versions/\\w+");
 
     // parameters
     private static final String TRANSACTION_ID_PARAM = "transactionId";
@@ -168,7 +168,8 @@ public class Publisher {
                 }
                 ImageServicePublishingResult result = imageFuture.get();
 
-                if (result != null && result.getUnpublishedImages() != null && result.getUnpublishedImages().size() > 0) {
+                if (result != null && result.getUnpublishedImages() != null
+                        && result.getUnpublishedImages().size() > 0) {
                     notifyUnpublishedImages(collection, result);
                 }
             } catch (Exception e) {
@@ -205,7 +206,8 @@ public class Publisher {
     }
 
     /**
-     * Sends a slack notification if there are any unpublished images in the collection
+     * Sends a slack notification if there are any unpublished images in the
+     * collection
      *
      * @param collection The collection being published
      * @param result     The result of calling publish on the image service
@@ -216,7 +218,8 @@ public class Publisher {
         msgs.add(new PostMessageField("Collection", collection.getDescription().getName(), true));
         msgs.add(new PostMessageField("Total images", String.valueOf(result.getTotalImages()), true));
         result.getUnpublishedImages().stream()
-                .map(i -> new PostMessageField("Unpublished image", String.format("%s [%s]", i.getId(), i.getStatus()), false))
+                .map(i -> new PostMessageField("Unpublished image", String.format("%s [%s]", i.getId(), i.getStatus()),
+                        false))
                 .forEach(msgs::add);
         Notifier notifier = Root.zebedee.getSlackNotifier();
         notifier.alarm("Some images failed to publish", msgs.stream().toArray(PostMessageField[]::new));
@@ -225,15 +228,16 @@ public class Publisher {
     /**
      * TODO
      */
-    public static boolean publish(Collection collection, String email, CollectionReader collectionReader) throws
-            IOException {
+    public static boolean publish(Collection collection, String email, CollectionReader collectionReader)
+            throws IOException {
         // FIXME using PostPublisher.getPublishedCollection feels a bit hacky
         publishNotification(getPublishedCollection(collection), PUBLISH, STARTED);
 
         boolean publishComplete = false;
 
         // First get the in-memory (within-JVM) lock.
-        // This will block attempts to write to the collection during the publishAction process
+        // This will block attempts to write to the collection during the publishAction
+        // process
         info().data("publishing", true).data("collectionId", collection.getDescription().getId())
                 .log("attempting to lock collection for publish");
 
@@ -250,13 +254,16 @@ public class Publisher {
                 return false;
             }
 
-            // Now attempt to get a file (inter-JVM) lock. This prevents Staging and Live attempting to publish the
-            // same collection at the same time. We specify WRITE so we can get a lock and CREATE to ensure the file
+            // Now attempt to get a file (inter-JVM) lock. This prevents Staging and Live
+            // attempting to publish the
+            // same collection at the same time. We specify WRITE so we can get a lock and
+            // CREATE to ensure the file
             // is created if it doesn't exist.
             Path collectionLock = collection.getPath().resolve(".lock");
 
-            try (FileChannel channel = FileChannel.open(collectionLock, StandardOpenOption.WRITE, StandardOpenOption.CREATE);
-                 FileLock lock = channel.tryLock()) {
+            try (FileChannel channel = FileChannel.open(collectionLock, StandardOpenOption.WRITE,
+                    StandardOpenOption.CREATE);
+                    FileLock lock = channel.tryLock()) {
 
                 if (lock != null) {
                     info().data("publishing", true).data("collectionId", collectionId)
@@ -297,7 +304,8 @@ public class Publisher {
     }
 
     /**
-     * Return true if the collection approval status equals {@link ApprovalStatus#COMPLETE}, return false otherwise.
+     * Return true if the collection approval status equals
+     * {@link ApprovalStatus#COMPLETE}, return false otherwise.
      */
     private static boolean isApproved(Collection collection) {
         if (collection.getDescription().getApprovalStatus() != ApprovalStatus.COMPLETE) {
@@ -309,7 +317,8 @@ public class Publisher {
     }
 
     /**
-     * Return true if collection is already marked as publish completed, return false otherwise
+     * Return true if collection is already marked as publish completed, return
+     * false otherwise
      */
     private static boolean isPublished(Collection collection) {
         if (collection.getDescription().isPublishComplete()) {
@@ -364,7 +373,8 @@ public class Publisher {
 
             rollbackPublish(collection);
         } else {
-            err.exception(ex).log("publish collection error. Unable rollback as no transaction IDs found for collection");
+            err.exception(ex)
+                    .log("publish collection error. Unable rollback as no transaction IDs found for collection");
         }
     }
 
@@ -380,8 +390,8 @@ public class Publisher {
             results.add(pool.submit(() -> {
                 IOException result = null;
                 try (Http http = new Http()) {
-                    info().data("publishing", true).data("trainHost", host).data("collectionId", collectionId).
-                            log("creating publish transaction for collection");
+                    info().data("publishing", true).data("trainHost", host).data("collectionId", collectionId)
+                            .log("creating publish transaction for collection");
 
                     Endpoint begin = new Endpoint(host, BEGIN_ENDPOINT);
 
@@ -390,12 +400,12 @@ public class Publisher {
                     hostToTransactionIDMap.put(host.toString(), response.body.transaction.id);
                 } catch (IOException e) {
                     Map<String, String> transactionIdMap = collection.getDescription().getPublishTransactionIds();
-                    error().data("publishing", true).data("trainHost", host).data("collectionId", collectionId).
-                            logException(e, "error while attempting to create new transactions for collection");
+                    error().data("publishing", true).data("trainHost", host).data("collectionId", collectionId)
+                            .logException(e, "error while attempting to create new transactions for collection");
 
                     if (transactionIdMap != null && !transactionIdMap.isEmpty()) {
-                        warn().data("publishing", true).data("trainHost", host).data("collectionId", collectionId).
-                                log("clearing existing transactionIDs from collection");
+                        warn().data("publishing", true).data("trainHost", host).data("collectionId", collectionId)
+                                .log("clearing existing transactionIDs from collection");
 
                         collection.getDescription().getPublishTransactionIds().clear();
                     }
@@ -424,13 +434,15 @@ public class Publisher {
      * @param collectionReader
      * @throws IOException
      */
-    public static void publishFilteredCollectionFiles(Collection collection, CollectionReader collectionReader) throws IOException {
-        // We do not want to send versioned files. They have already been taken care of via the manifest.
+    public static void publishFilteredCollectionFiles(Collection collection, CollectionReader collectionReader)
+            throws IOException {
+        // We do not want to send versioned files. They have already been taken care of
+        // via the manifest.
         // Pass the function to filter files into the publish method.
         Function<String, Boolean> versionedUriFilter = uri -> VersionedContentItem.isVersionedUri(uri);
         Function<String, Boolean> timeseriesUriFilter = uri -> uri.contains("/timeseries/");
 
-        Function<String, Boolean>[] filters = new Function[]{versionedUriFilter, timeseriesUriFilter};
+        Function<String, Boolean>[] filters = new Function[] { versionedUriFilter, timeseriesUriFilter };
 
         List<Future<IOException>> results = new ArrayList<>();
         long start = System.currentTimeMillis();
@@ -438,21 +450,23 @@ public class Publisher {
         // Publish each item of content:
         for (String uri : collection.getReviewed().uris()) {
             if (!shouldBeFiltered(filters, uri)) {
-                //publishFile(collection, encryptionPassword, results, uri, collectionReader);
+                // publishFile(collection, encryptionPassword, results, uri, collectionReader);
 
                 Path source = collection.getReviewed().get(uri);
                 if (source != null) {
                     boolean zipped = false;
                     String publishUri = uri;
 
-                    // if we have a recognised compressed file - set the zip header and set the correct uri so that the files
+                    // if we have a recognised compressed file - set the zip header and set the
+                    // correct uri so that the files
                     // are unzipped to the correct place.
                     if (source.getFileName().toString().equals("timeseries-to-publish.zip")) {
                         zipped = true;
                         publishUri = StringUtils.removeEnd(uri, "-to-publish.zip");
                     }
 
-                    for (Map.Entry<String, String> entry : collection.getDescription().getPublishTransactionIds().entrySet()) {
+                    for (Map.Entry<String, String> entry : collection.getDescription().getPublishTransactionIds()
+                            .entrySet()) {
                         Host theTrainHost = new Host(entry.getKey());
                         String transactionId = entry.getValue();
 
@@ -467,7 +481,8 @@ public class Publisher {
 
         info().data("publishing", true).data("collectionId", collection.getDescription().getId())
                 .data("hostToTransactionID", collection.getDescription().getPublishTransactionIds())
-                .data("timeTaken", (System.currentTimeMillis() - start)).log("successfully sent all publish file requests to the train");
+                .data("timeTaken", (System.currentTimeMillis() - start))
+                .log("successfully sent all publish file requests to the train");
     }
 
     private static Future<IOException> publishFile(
@@ -478,8 +493,7 @@ public class Publisher {
             final String publishUri,
             final boolean zipped,
             final Path source,
-            final CollectionReader reader
-    ) {
+            final CollectionReader reader) {
         return pool.submit(() -> {
             IOException result = null;
             try (Http http = new Http()) {
@@ -489,15 +503,15 @@ public class Publisher {
                         .setParameter(URI_PARAM, publishUri);
                 try (
                         Resource resource = reader.getResource(uri);
-                        InputStream dataStream = resource.getData()
-                ) {
+                        InputStream dataStream = resource.getData()) {
                     info().data("publishing", true).data("collectionId", collectionID)
                             .data("transactionId", transactionId)
                             .data("trainHost", host)
                             .data(URI_PARAM, uri).data("isZip", zipped)
                             .log("sending publish collection file request to train host");
 
-                    Response<Result> response = http.post(publish, dataStream, source.getFileName().toString(), Result.class);
+                    Response<Result> response = http.post(publish, dataStream, source.getFileName().toString(),
+                            Result.class);
                     checkResponse(response, transactionId, publish, collectionID);
                 }
             } catch (IOException e) {
@@ -540,7 +554,8 @@ public class Publisher {
 
                     error().data("publishing", true).data("collectionId", collectionId)
                             .data("trainHost", theTrainHost).data("transactionId", transactionId)
-                            .logException(e, "unexpected error while attempting to send publish manifest to train host");
+                            .logException(e,
+                                    "unexpected error while attempting to send publish manifest to train host");
                     result = e;
                 }
                 return result;
@@ -603,7 +618,8 @@ public class Publisher {
      *
      * @param transactionIds The {@link Host}s and transactions to publish to.
      * @return The {@link Result} returned by The Train
-     * @throws IOException If any errors are encountered in making the request or reported in the {@link Result}.
+     * @throws IOException If any errors are encountered in making the request or
+     *                     reported in the {@link Result}.
      */
     static List<Result> commitPublish(Map<String, String> transactionIds) throws IOException {
         List<Callable<Result>> commitTasks = transactionIds.entrySet()
@@ -629,7 +645,8 @@ public class Publisher {
                                 return response.body;
                             }
                         } catch (Exception e) {
-                            error().data("publishing", true).data("trainHost", host).data("transactionId", transactionId)
+                            error().data("publishing", true).data("trainHost", host)
+                                    .data("transactionId", transactionId)
                                     .logException(e, "error while sending commit transaction request to train host");
                             throw new IOException(e);
                         }
@@ -668,13 +685,15 @@ public class Publisher {
             }
         }
 
-        info().data("publishing", true).data("hostToTransactionId", transactionIds).log("successfully committed publishAction transaction");
+        info().data("publishing", true).data("hostToTransactionId", transactionIds)
+                .log("successfully committed publishAction transaction");
 
         return results;
     }
 
     /**
-     * Rolls back a publishAction transaction, suppressing any {@link IOException} and printing it out to the console instead.
+     * Rolls back a publishAction transaction, suppressing any {@link IOException}
+     * and printing it out to the console instead.
      *
      * @param collection the collection to roll back
      */
@@ -708,8 +727,8 @@ public class Publisher {
         }
     }
 
-    static void checkResponse(Response<Result> response, String TransactionID, Endpoint endpoint, String collectionID) throws
-            IOException {
+    static void checkResponse(Response<Result> response, String TransactionID, Endpoint endpoint, String collectionID)
+            throws IOException {
         if (response.statusLine.getStatusCode() != 200) {
             int code = response.statusLine.getStatusCode();
             String reason = response.statusLine.getReasonPhrase();
@@ -790,8 +809,9 @@ public class Publisher {
 
     private static Future<ImageServicePublishingResult> publishImages(Collection collection) {
         return apiPool.submit(() -> {
-            ImageServicePublishingResult result = imageServiceSupplier.getService().publishImagesInCollection(collection);
-            return result;  // Complete
+            ImageServicePublishingResult result = imageServiceSupplier.getService()
+                    .publishImagesInCollection(collection);
+            return result; // Complete
         });
     }
 
@@ -800,61 +820,64 @@ public class Publisher {
             List<String> datasetUris = collection.getDatasetVersionDetails()
                     .stream()
                     .map(content -> convertUriForEvent(content.uri))
-                    .filter (Publisher::isValidCMDDatasetURI)
+                    .filter(Publisher::isValidCMDDatasetURI)
                     .collect(Collectors.toList());
 
             info().data("collectionId", collection.getId())
                     .data("Dataset-uris", datasetUris)
                     .data("publishing", true)
                     .log("converted dataset valid URIs ready for kafka event");
-            sendMessage (collection, datasetUris, DATASETCONTENTFLAG);
+            sendMessage(collection, datasetUris, DATASETCONTENTFLAG);
         }
 
         List<String> reviewedUris = collection.getReviewed().uris()
-               .stream().map(temp -> convertUriForEvent(temp))
+                .stream().map(temp -> convertUriForEvent(temp))
                 .collect(Collectors.toList());
         info().data("collectionId", collection.getId())
                 .data("Reviewed-uris", reviewedUris)
                 .data("publishing", true)
                 .log("converted reviewed URIs for kafka event");
-        sendMessage (collection, reviewedUris, LEGACYCONTENTFLAG);
+        sendMessage(collection, reviewedUris, LEGACYCONTENTFLAG);
     }
 
-    // Valid CMDDataset uris for published CMD versions of a dataset (edition) - /dataset/{datatsetId}/editions/{edition}/versions/{version}/metadata
-    protected static boolean isValidCMDDatasetURI (String uri){
+    // Valid CMDDataset uris for published CMD versions of a dataset (edition) -
+    // /dataset/{datatsetId}/editions/{edition}/versions/{version}/metadata
+    protected static boolean isValidCMDDatasetURI(String uri) {
         return CMD_DATASET_URI_REGEX.matcher(uri).matches();
     }
 
     // Putting message on kafka
-    // This method is taking advantage of MDC to enrich log messages with traceId and passing to kafka events
-    private static void sendMessage (Collection collection, List<String> uris, String dataType) {
+    // This method is taking advantage of MDC to enrich log messages with traceId
+    // and passing to kafka events
+    private static void sendMessage(Collection collection, List<String> uris, String dataType) {
 
         String traceId = defaultIfBlank(MDC.get(TRACE_ID_HEADER), UUID.randomUUID().toString());
         info().data("traceId", traceId)
                 .log("traceId before sending event");
 
         try {
-            kafkaServiceSupplier.getService().produceContentPublished(collection.getId(), uris, dataType, "", SEARCHINDEX, traceId);
+            kafkaServiceSupplier.getService().produceContentUpdated(collection.getId(), uris, dataType, "",
+                    SEARCHINDEX, traceId);
         } catch (Exception e) {
             error()
                     .data("collectionId", collection.getDescription().getId())
                     .data("traceId", traceId)
                     .data("publishing", true)
-                    .logException(e, "failed to send content-published kafka events");
+                    .logException(e, "failed to send content-updated kafka events");
 
             String channel = Configuration.getDefaultSlackAlarmChannel();
             Notifier notifier = zebedee.getSlackNotifier();
-            notifier.sendCollectionAlarm(collection, channel, "Failed to send content-published kafka events", e);
+            notifier.sendCollectionAlarm(collection, channel, "Failed to send content-updated kafka events", e);
         }
     }
 
-
     /**
      * Prepare a uri for a kafka event
+     * 
      * @param uri The uri of the published content
      * @return String
      */
-    public static String convertUriForEvent(String uri){
+    public static String convertUriForEvent(String uri) {
         uri = uri.replaceAll("/data.json", "");
         uri.trim();
         return uri;

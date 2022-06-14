@@ -9,14 +9,16 @@ import java.util.List;
 public interface KafkaService {
 
     /**
-     * Produce kafka content-published events for a collection
+     * Produce kafka content-updated events for a collection
      *
-     * @param uris A list of uris modified/created in the collection
-     * @param dataType A string to identify if the list of uris are from datasetAPI
+     * @param uris         A list of uris modified/created in the collection
+     * @param dataType     A string to identify if the list of uris are from
+     *                     datasetAPI
      * @param collectionID The collection id of the collection being published
-     * @param jobID The job id of the collection being published
-     * @param searchIndex The search index of the collection being published
-     * @param traceID The trace id of the collection being published
+     * @param jobID        The job id of the collection being published
+     * @param searchIndex  The search index of the collection being published
+     * @param traceID      The trace id of the collection being published
      */
-    void produceContentPublished(String collectionID, List<String> uris, String dataType, String jobID, String searchIndex, String traceID) throws IOException;
+    void produceContentUpdated(String collectionID, List<String> uris, String dataType, String jobID,
+            String searchIndex, String traceID) throws IOException;
 }

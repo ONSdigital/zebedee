@@ -1,6 +1,6 @@
 package com.github.onsdigital.zebedee.kafka;
 
-import com.github.onsdigital.zebedee.avro.ContentPublished;
+import com.github.onsdigital.zebedee.avro.ContentUpdated;
 import com.github.onsdigital.zebedee.kafka.avro.AvroSerializer;
 import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.clients.producer.KafkaProducer;
@@ -19,13 +19,15 @@ import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getKafkaSecClientKey;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getKafkaSecClientCert;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getKafkaSecProtocol;
+
 /**
- * This class represents a client that actually interfaces with Kafka and creates a producer that allows sending of
+ * This class represents a client that actually interfaces with Kafka and
+ * creates a producer that allows sending of
  * kafka messages. The class initiates the producer on initialisation.
-  */
+ */
 public class KafkaClientImpl implements KafkaClient {
 
-    private final Producer<String, ContentPublished> producer;
+    private final Producer<String, ContentUpdated> producer;
     private String topic;
 
     public KafkaClientImpl(String kafkaAddr, String topic) {
@@ -44,20 +46,21 @@ public class KafkaClientImpl implements KafkaClient {
             }
         }
 
-        AvroSerializer<ContentPublished> avroSerializer = new AvroSerializer<>(ContentPublished.class);
+        AvroSerializer<ContentUpdated> avroSerializer = new AvroSerializer<>(ContentUpdated.class);
         this.producer = new KafkaProducer<>(props, new StringSerializer(), avroSerializer);
 
         Runtime.getRuntime().addShutdownHook(new Thread(producer::close));
     }
 
-
     /**
-     * Produce a content-published kafka message and return a future for that message result
+     * Produce a content-updated kafka message and return a future for that message
+     * result
      */
     @Override
-    public Future<RecordMetadata> produceContentPublished(String uri, String dataType, String collectionID, String jobId, String searchIndex,String traceID) {
-        ContentPublished value = new ContentPublished(uri,dataType,collectionID,jobId,searchIndex,traceID);
-        return producer.send(new ProducerRecord<>(topic,value));
+    public Future<RecordMetadata> produceContentUpdated(String uri, String dataType, String collectionID,
+            String jobId, String searchIndex, String traceID) {
+        ContentUpdated value = new ContentUpdated(uri, dataType, collectionID, jobId, searchIndex, traceID);
+        return producer.send(new ProducerRecord<>(topic, value));
     }
 
 }

@@ -95,7 +95,7 @@ import static com.github.onsdigital.zebedee.configuration.Configuration.getIdent
 import static com.github.onsdigital.zebedee.configuration.Configuration.getImageAPIURL;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getInitialRetryInterval;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getInteractivesAPIURL;
-import static com.github.onsdigital.zebedee.configuration.Configuration.getKafkaContentPublishedTopic;
+import static com.github.onsdigital.zebedee.configuration.Configuration.getKafkaContentUpdatedTopic;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getKafkaURL;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getKeyringInitVector;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getKeyringSecretKey;
@@ -109,8 +109,10 @@ import static com.github.onsdigital.zebedee.permissions.store.PermissionsStoreFi
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 /**
- * Object encapsulating the set up configuration required by {@link Zebedee}. Set paths to & create relevant
- * directories required by zebedee, create the service instances it requires etc.
+ * Object encapsulating the set up configuration required by {@link Zebedee}.
+ * Set paths to & create relevant
+ * directories required by zebedee, create the service instances it requires
+ * etc.
  */
 public class ZebedeeConfiguration {
     private Path rootPath;
@@ -201,11 +203,13 @@ public class ZebedeeConfiguration {
             this.permissionsService = new PermissionsServiceImpl(permissionsStore);
         }
 
-        InteractivesAPIClient interactivesClient = new InteractivesAPIClient(getInteractivesAPIURL(), getServiceAuthToken());
+        InteractivesAPIClient interactivesClient = new InteractivesAPIClient(getInteractivesAPIURL(),
+                getServiceAuthToken());
         interactivesService = new InteractivesServiceImpl(interactivesClient);
 
         VersionsService versionsService = new VersionsServiceImpl();
-        this.collections = new Collections(collectionsPath, permissionsService, versionsService, interactivesService, published);
+        this.collections = new Collections(collectionsPath, permissionsService, versionsService, interactivesService,
+                published);
 
         // TODO: Remove after migration to JWT sessions is complete
         if (cmsFeatureFlags().isJwtSessionsEnabled()) {
@@ -219,7 +223,8 @@ public class ZebedeeConfiguration {
         if (cmsFeatureFlags().isJwtSessionsEnabled()) {
             JWTVerifier jwtVerifier = null;
             try {
-                jwtVerifier = new JWTVerifierImpl(getIdentityAPIURL(), getInitialRetryInterval(), getMaxRetryTimeout(), getMaxRetryInterval());
+                jwtVerifier = new JWTVerifierImpl(getIdentityAPIURL(), getInitialRetryInterval(), getMaxRetryTimeout(),
+                        getMaxRetryInterval());
             } catch (Exception e) {
                 error().logException(e, "failed to initialise JWT validator");
                 throw new RuntimeException(e);
@@ -257,7 +262,7 @@ public class ZebedeeConfiguration {
 
         if (cmsFeatureFlags().isKafkaEnabled()) {
 
-            KafkaClient kafkaClient = new KafkaClientImpl(getKafkaURL(), getKafkaContentPublishedTopic());
+            KafkaClient kafkaClient = new KafkaClientImpl(getKafkaURL(), getKafkaContentUpdatedTopic());
             kafkaService = new KafkaServiceImpl(kafkaClient);
         } else {
             kafkaService = new NoOpKafkaService();
@@ -295,8 +300,10 @@ public class ZebedeeConfiguration {
     }
 
     /**
-     * Initalise the CMS's Slack integration. If the required configuration values are not available the CMS will
-     * default to No Op implementation - slack messages will be logged but sent to the Slack API.
+     * Initalise the CMS's Slack integration. If the required configuration values
+     * are not available the CMS will
+     * default to No Op implementation - slack messages will be logged but sent to
+     * the Slack API.
      */
     private void initSlackIntegration() {
         String slackToken = System.getenv("slack_api_token");
@@ -327,8 +334,7 @@ public class ZebedeeConfiguration {
             this.startUpNotifier = new SlackStartUpNotifier(
                     slackClient,
                     startUpNotificationRecipients,
-                    getSlackSupportChannelID()
-            );
+                    getSlackSupportChannelID());
 
         } else {
             warn().log("slack configuration missing/empty defaulting to No op implementation");

@@ -221,8 +221,8 @@ If this is fails try again after regenerating an override key as it may have exp
 [6]: https://github.com/ONSdigital/dp-compose
 [7]: collection-keyring-secrets-generator/README.md
 
-#### SERVICE_AUTH_TOKEN creation for Production
+#### SERVICE_AUTH_TOKEN creation for Sandbox/Prod
 
 Please see document in dp-operations:
 
-[dp-operations/guides SERVICE_AUTH_TOKEN-for-Production](https://github.com/ONSdigital/dp-operations/blob/main/guides/SERVICE_AUTH_TOKEN-for-Production.md)
+[dp-operations/guide Generate Service Auth Token](https://github.com/ONSdigital/dp-operations/blob/main/guides/generate-service-auth-token.md)

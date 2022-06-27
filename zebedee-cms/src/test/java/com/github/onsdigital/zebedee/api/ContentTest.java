@@ -19,6 +19,8 @@ import com.github.onsdigital.zebedee.user.service.UsersService;
 import com.github.onsdigital.zebedee.util.EncryptionUtils;
 import com.github.onsdigital.zebedee.util.slack.Notifier;
 import com.github.onsdigital.zebedee.util.versioning.VersionsServiceImpl;
+
+import org.apache.avro.data.Json;
 import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
 import org.junit.Before;
@@ -27,19 +29,15 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.WriteListener;
 import javax.servlet.http.HttpServletResponse;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -154,7 +152,7 @@ public class ContentTest {
 
         // Then I should receive a structured V1 content back with file download link
         verify(response).setStatus(200);
-        JSONAssert.assertEquals(EXPECTED_CONTENT_V1, content.toString(), false);
+        assertJsonEquals(EXPECTED_CONTENT_V1, content.toString());
     }
 
     @Test
@@ -194,7 +192,7 @@ public class ContentTest {
 
         // Then I should receive a structured V2 content back with uri download link
         verify(response).setStatus(200);
-        JSONAssert.assertEquals(EXPECTED_CONTENT_V2, content.toString(), false);
+        assertJsonEquals(EXPECTED_CONTENT_V2, content.toString());
     }
 
     private Path createCollectionAndPaths(String collectionId) throws IOException, ZebedeeException {
@@ -260,4 +258,8 @@ public class ContentTest {
                     "\"uri\":\"/peoplepopulationandcommunity/birthsdeathsandmarriages/livebirths/datasets/babynamesenglandandwalesbabynamesstatisticsboys/2022/previous/v1\"," +
                     "\"label\":\"Testing\"}]" +
                     "}";
+
+    private void assertJsonEquals(String expected, String actual) {
+        Assert.assertEquals(Json.parseJson(expected), Json.parseJson(actual));
+    }
 }

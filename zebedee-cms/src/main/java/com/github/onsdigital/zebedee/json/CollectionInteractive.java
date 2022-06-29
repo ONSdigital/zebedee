@@ -1,5 +1,7 @@
 package com.github.onsdigital.zebedee.json;
 
+import java.util.Date;
+
 /**
  * Represents a dataset that has been added to a collection.
  */
@@ -10,6 +12,7 @@ public class CollectionInteractive {
     private ContentStatus state;
     private String uri;
     private String lastEditedBy;
+    private Date lastEditedAt;
 
     private CollectionInteractiveFile[] files;
 
@@ -51,6 +54,14 @@ public class CollectionInteractive {
 
     public String getLastEditedBy() {
         return lastEditedBy;
+    }
+
+    public void setLastEditedAt(Date time) {
+        this.lastEditedAt = time;
+    }
+
+    public Date getLastEditedAt() {
+        return lastEditedAt;
     }
 
     public void setFiles(CollectionInteractiveFile[] files) { this.files = files; }

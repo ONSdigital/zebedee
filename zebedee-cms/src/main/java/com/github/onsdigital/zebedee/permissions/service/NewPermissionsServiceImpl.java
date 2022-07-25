@@ -30,6 +30,10 @@ public class NewPermissionsServiceImpl implements PermissionsService {
         this.permissionChecker = new PermissionChecker(permissionsAPIHost, Duration.standardSeconds(10), Duration.standardSeconds(20), Duration.standardMinutes(30));
     }
 
+    public NewPermissionsServiceImpl() {
+        this.permissionChecker = new PermissionChecker("", Duration.standardSeconds(10), Duration.standardSeconds(20), Duration.standardMinutes(30));
+    }
+
 
     @Override
     public boolean isPublisher(Session session) throws IOException {

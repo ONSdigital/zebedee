@@ -17,6 +17,7 @@ public class CMSFeatureFlags {
     private static final String ENABLE_CENTRALISED_KEYRING = "ENABLE_CENTRALISED_KEYRING";
     public static final String ENABLE_IMAGE_PUBLISHING = "ENABLE_IMAGE_PUBLISHING";
     private static final String ENABLE_JWT_SESSIONS = "ENABLE_JWT_SESSIONS";
+    private static final String ENABLE_PERMISSIONS_API = "ENABLE_PERMISSIONS_API";
     public static final String ENABLE_KAFKA = "ENABLE_KAFKA";
     public static final String ENABLE_STATIC_FILES_PUBLISHING = "ENABLE_STATIC_FILES_PUBLISHING";
     public static final String ENABLE_INTERACTIVES_PUBLISHING = "ENABLE_INTERACTIVES_PUBLISHING";
@@ -32,6 +33,7 @@ public class CMSFeatureFlags {
     private final boolean isCentralisedKeyringEnabled;
     private final boolean isImagePublishingEnabled;
     private final boolean isJwtSessionsEnabled;
+    private final boolean isPermissionsAPIEnabled;
     private final boolean isKafkaEnabled;
     private final boolean isStaticFilesPublishingEnabled;
     private final boolean isInteractivesPublishingEnabled;
@@ -48,6 +50,7 @@ public class CMSFeatureFlags {
         this.isCentralisedKeyringEnabled = Boolean.valueOf(getConfigValue(ENABLE_CENTRALISED_KEYRING));
         this.isImagePublishingEnabled = Boolean.valueOf(getConfigValue(ENABLE_IMAGE_PUBLISHING));
         this.isJwtSessionsEnabled = Boolean.valueOf(getConfigValue(ENABLE_JWT_SESSIONS));
+        this.isPermissionsAPIEnabled = Boolean.valueOf(getConfigValue(ENABLE_PERMISSIONS_API));
         this.isKafkaEnabled = Boolean.valueOf(getConfigValue(ENABLE_KAFKA));
         this.isStaticFilesPublishingEnabled = Boolean.valueOf(getConfigValue(ENABLE_STATIC_FILES_PUBLISHING));
         this.isInteractivesPublishingEnabled = Boolean.valueOf(getConfigValue(ENABLE_INTERACTIVES_PUBLISHING));
@@ -59,6 +62,7 @@ public class CMSFeatureFlags {
                 .data(ENABLE_CENTRALISED_KEYRING, isCentralisedKeyringEnabled)
                 .data(ENABLE_IMAGE_PUBLISHING, isImagePublishingEnabled)
                 .data(ENABLE_JWT_SESSIONS, isJwtSessionsEnabled)
+                .data(ENABLE_PERMISSIONS_API, isPermissionsAPIEnabled)
                 .data(ENABLE_KAFKA, isKafkaEnabled)
                 .data(ENABLE_STATIC_FILES_PUBLISHING, isStaticFilesPublishingEnabled)
                 .data(ENABLE_INTERACTIVES_PUBLISHING, isInteractivesPublishingEnabled)
@@ -111,6 +115,9 @@ public class CMSFeatureFlags {
 
     public boolean isJwtSessionsEnabled() {
         return isJwtSessionsEnabled;
+    }
+    public boolean isPermissionsAPIEnabled() {
+        return isPermissionsAPIEnabled;
     }
 
     public boolean isKafkaEnabled() {

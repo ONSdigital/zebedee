@@ -205,6 +205,13 @@
             <artifactId>dp-cryptolite-java</artifactId>
         </dependency>
 
+        <!-- Authorisation -->
+        <dependency>
+            <groupId>com.github.onsdigital</groupId>
+            <artifactId>dp-authorisation-java</artifactId>
+            <version>2.2.0</version>
+        </dependency>
+
         <!-- Spreadsheet generator -->
         <dependency>
             <groupId>org.apache.poi</groupId>

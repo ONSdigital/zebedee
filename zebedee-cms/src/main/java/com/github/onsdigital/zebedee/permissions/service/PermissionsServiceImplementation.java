@@ -19,18 +19,18 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import static java.text.MessageFormat.format;
 
-public class NewPermissionsServiceImpl implements PermissionsService {
+public class PermissionsServiceImplementation implements PermissionsService {
     private ReentrantReadWriteLock readWriteLock = new ReentrantReadWriteLock();
     private final Lock readLock = readWriteLock.readLock();
     private final Lock writeLock = readWriteLock.writeLock();
     private static final String UNSUPPORTED_ERROR = "New Permissions API is enabled: {0} is no longer supported";
     private PermissionChecker permissionChecker;
 
-    public NewPermissionsServiceImpl(String permissionsAPIHost ) {
+    public PermissionsServiceImplementation(String permissionsAPIHost ) {
         this.permissionChecker = new PermissionChecker(permissionsAPIHost, Duration.standardSeconds(10), Duration.standardSeconds(20), Duration.standardMinutes(30));
     }
 
-    public NewPermissionsServiceImpl() {
+    public PermissionsServiceImplementation() {
         this.permissionChecker = new PermissionChecker("", Duration.standardSeconds(10), Duration.standardSeconds(20), Duration.standardMinutes(30));
     }
 

@@ -17,6 +17,7 @@ import org.bouncycastle.util.Arrays;
 import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -60,6 +61,7 @@ public class InteractivesServiceImpl implements InteractivesService {
         }
 
         collectionInteractive.setLastEditedBy(user);
+        collectionInteractive.setLastEditedAt(new Date());
 
         Interactive interactive = interactivesClient.getInteractive(id);
         if (ObjectUtils.allNotNull(interactive, interactive.getMetadata())) {

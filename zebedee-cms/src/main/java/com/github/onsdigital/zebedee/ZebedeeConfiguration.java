@@ -27,6 +27,7 @@ import com.github.onsdigital.zebedee.model.encryption.EncryptionKeyFactoryImpl;
 import com.github.onsdigital.zebedee.model.publishing.PublishedCollections;
 import com.github.onsdigital.zebedee.notification.StartUpNotifier;
 import com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImpl;
+import com.github.onsdigital.zebedee.permissions.service.PermissionsServiceImplementation;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsServiceImpl;
 import com.github.onsdigital.zebedee.permissions.store.PermissionsStore;
@@ -199,6 +200,8 @@ public class ZebedeeConfiguration {
         PermissionsStore permissionsStore = new PermissionsStoreFileSystemImpl(permissionsPath);
         if (cmsFeatureFlags().isJwtSessionsEnabled()) {
             this.permissionsService = new JWTPermissionsServiceImpl(permissionsStore);
+        } else if (cmsFeatureFlags().isPermissionsAPIEnabled()) {
+            this.permissionsService = new PermissionsServiceImplementation();
         } else {
             this.permissionsService = new PermissionsServiceImpl(permissionsStore);
         }

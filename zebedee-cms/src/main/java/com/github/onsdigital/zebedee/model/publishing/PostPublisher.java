@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee.model.publishing;
 
 import com.github.onsdigital.zebedee.Zebedee;
+import com.github.onsdigital.zebedee.configuration.CMSFeatureFlags;
 import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
@@ -17,15 +18,20 @@ import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
 import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.search.indexing.Indexer;
+import com.github.onsdigital.zebedee.service.KafkaService;
+import com.github.onsdigital.zebedee.service.ServiceSupplier;
 import com.github.onsdigital.zebedee.service.content.navigation.ContentTreeNavigator;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.util.ContentTree;
 import com.github.onsdigital.zebedee.util.SlackNotification;
 import com.github.onsdigital.zebedee.util.URIUtils;
+import com.github.onsdigital.zebedee.util.ZebedeeCmsService;
+import com.github.onsdigital.zebedee.util.slack.Notifier;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.FastDateFormat;
+import org.slf4j.MDC;
 
 import java.io.File;
 import java.io.IOException;
@@ -36,11 +42,15 @@ import java.nio.file.Paths;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
+import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
+import static com.github.onsdigital.zebedee.api.Root.zebedee;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.error;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.info;
+import static org.apache.commons.lang3.StringUtils.defaultIfBlank;
 
 /**
  * Post publish functionality.
@@ -50,8 +60,15 @@ public class PostPublisher {
     // The date format including the BST timezone. Dates are stored at UTC and must be formated to take BST into account.
     private static FastDateFormat format = FastDateFormat.getInstance("yyyy-MM-dd-HH-mm", TimeZone.getTimeZone("Europe/London"));
     private static Session zebdeePublisherSession = null;
+    private static ServiceSupplier<KafkaService> kafkaServiceSupplier = () -> ZebedeeCmsService.getInstance().getKafkaService();
 
     private static final ExecutorService pool = Executors.newFixedThreadPool(10);
+
+    private static final String TRACE_ID_HEADER = "trace_id";
+    public static final String SEARCHINDEX = "ONS";
+
+    public static final String DATASETCONTENTFLAG = "datasets";
+    public static final String LEGACYCONTENTFLAG = "legacy";
 
     /**
      * Do tasks required after a publish takes place.
@@ -78,6 +95,11 @@ public class PostPublisher {
             copyFilesToMaster(zebedee, collection, collectionReader);
 
             reindexPublishingSearch(collection);
+
+            if (CMSFeatureFlags.cmsFeatureFlags().isKafkaEnabled()) {
+                System.out.println("Sending to Kafka");
+                sendToKafka(collection);
+            }
 
             Path collectionJsonPath = moveCollectionToArchive(zebedee, collection, collectionReader);
 
@@ -336,5 +358,67 @@ public class PostPublisher {
         }
 
         return collectionJsonDestination;
+    }
+
+    private static void sendToKafka(Collection collection) throws IOException {
+        if (collection.getDatasetVersionDetails() != null && !collection.getDatasetVersionDetails().isEmpty()) {
+            List<String> datasetUris = collection.getDatasetVersionDetails()
+                    .stream()
+                    .map(content -> convertUriForEvent(content.uri))
+                    .filter(Publisher::isValidCMDDatasetURI)
+                    .collect(Collectors.toList());
+
+            info().data("collectionId", collection.getId())
+                    .data("Dataset-uris", datasetUris)
+                    .data("publishing", true)
+                    .log("converted dataset valid URIs ready for kafka event");
+            sendMessage(collection, datasetUris, DATASETCONTENTFLAG);
+        }
+
+        List<String> reviewedUris = collection.getReviewed().uris()
+                .stream().map(temp -> convertUriForEvent(temp))
+                .collect(Collectors.toList());
+        info().data("collectionId", collection.getId())
+                .data("Reviewed-uris", reviewedUris)
+                .data("publishing", true)
+                .log("converted reviewed URIs for kafka event");
+        sendMessage(collection, reviewedUris, LEGACYCONTENTFLAG);
+    }
+
+    /**
+     * Prepare a uri for a kafka event
+     *
+     * @param uri The uri of the published content
+     * @return String
+     */
+    public static String convertUriForEvent(String uri) {
+        uri = uri.replaceAll("/data.json", "");
+        uri.trim();
+        return uri;
+    }
+
+    // Putting message on kafka
+    // This method is taking advantage of MDC to enrich log messages with traceId
+    // and passing to kafka events
+    private static void sendMessage(Collection collection, List<String> uris, String dataType) {
+
+        String traceId = defaultIfBlank(MDC.get(TRACE_ID_HEADER), UUID.randomUUID().toString());
+        info().data("traceId", traceId)
+                .log("traceId before sending event");
+
+        try {
+            kafkaServiceSupplier.getService().produceContentUpdated(collection.getId(), uris, dataType, "",
+                    SEARCHINDEX, traceId);
+        } catch (Exception e) {
+            error()
+                    .data("collectionId", collection.getDescription().getId())
+                    .data("traceId", traceId)
+                    .data("publishing", true)
+                    .logException(e, "failed to send content-updated kafka events");
+
+            String channel = Configuration.getDefaultSlackAlarmChannel();
+            Notifier notifier = zebedee.getSlackNotifier();
+            notifier.sendCollectionAlarm(collection, channel, "Failed to send content-updated kafka events", e);
+        }
     }
 }

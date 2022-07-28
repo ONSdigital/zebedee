@@ -30,36 +30,6 @@ public class PublisherTest {
         this.publisher = new Publisher();
     }
 
-
-    @Test
-    public void testConvertUriWithJsonForEvent() {
-
-        //Given {a single uri with data.json ready to be sent to kafka}
-        String testUri = "/testUri0/data.json";
-
-        //When {sending a uris to kafka}
-        String actual = publisher.convertUriForEvent(testUri);
-
-        System.out.println(actual);
-
-        //Then {uri does not have "data.json" string}
-        assertFalse(actual.contains("/testUri0/data.json"));
-        assertTrue(actual.contains("/testUri0"));
-    }
-
-    @Test
-    public void testConvertUriWithOutJsonForEvent() {
-
-        //Given {a single uri without data.json ready to be sent to kafka}
-        String testUri1 = "/testUri1";
-
-        //When {sending a uri to kafka}
-        String actual = publisher.convertUriForEvent(testUri1);
-
-        //Then {uris returns the original string}
-        assertTrue(actual.contains("/testUri1"));
-    }
-
     @Test
     public void testisValidCMDDatasetURISuccess() {
 

@@ -91,15 +91,8 @@ public class Publisher {
 
     private static ServiceSupplier<DatasetService> datasetServiceSupplier;
     private static ServiceSupplier<ImageService> imageServiceSupplier;
-    private static ServiceSupplier<KafkaService> kafkaServiceSupplier;
     static ServiceSupplier<StaticFilesService> staticFilesServiceSupplier;
     private static ServiceSupplier<InteractivesService> interactivesServiceSupplier;
-
-    private static final String TRACE_ID_HEADER = "trace_id";
-    public static final String SEARCHINDEX = "ONS";
-
-    public static final String DATASETCONTENTFLAG = "datasets";
-    public static final String LEGACYCONTENTFLAG = "legacy";
 
     static {
         theTrainHosts = Configuration.getTheTrainHosts();
@@ -108,7 +101,6 @@ public class Publisher {
         // lazy loaded approach for getting the datasetService.
         datasetServiceSupplier = () -> ZebedeeCmsService.getInstance().getDatasetService();
         imageServiceSupplier = () -> ZebedeeCmsService.getInstance().getImageService();
-        kafkaServiceSupplier = () -> ZebedeeCmsService.getInstance().getKafkaService();
         staticFilesServiceSupplier = () -> ZebedeeCmsService.getInstance().getStaticFilesService();
         interactivesServiceSupplier = () -> ZebedeeCmsService.getInstance().getInteractivesService();
     }
@@ -190,10 +182,6 @@ public class Publisher {
                 error().logException(e, "Exception thrown when performing interactives publish()");
                 success = false;
             }
-        }
-
-        if (CMSFeatureFlags.cmsFeatureFlags().isKafkaEnabled()) {
-            sendToKafka(collection);
         }
 
         info().data("milliseconds", collection.getPublishTimeMilliseconds())
@@ -815,72 +803,10 @@ public class Publisher {
         });
     }
 
-    private static void sendToKafka(Collection collection) throws IOException {
-        if (collection.getDatasetVersionDetails() != null && !collection.getDatasetVersionDetails().isEmpty()) {
-            List<String> datasetUris = collection.getDatasetVersionDetails()
-                    .stream()
-                    .map(content -> convertUriForEvent(content.uri))
-                    .filter(Publisher::isValidCMDDatasetURI)
-                    .collect(Collectors.toList());
-
-            info().data("collectionId", collection.getId())
-                    .data("Dataset-uris", datasetUris)
-                    .data("publishing", true)
-                    .log("converted dataset valid URIs ready for kafka event");
-            sendMessage(collection, datasetUris, DATASETCONTENTFLAG);
-        }
-
-        List<String> reviewedUris = collection.getReviewed().uris()
-                .stream().map(temp -> convertUriForEvent(temp))
-                .collect(Collectors.toList());
-        info().data("collectionId", collection.getId())
-                .data("Reviewed-uris", reviewedUris)
-                .data("publishing", true)
-                .log("converted reviewed URIs for kafka event");
-        sendMessage(collection, reviewedUris, LEGACYCONTENTFLAG);
-    }
-
     // Valid CMDDataset uris for published CMD versions of a dataset (edition) -
     // /dataset/{datatsetId}/editions/{edition}/versions/{version}/metadata
     protected static boolean isValidCMDDatasetURI(String uri) {
         return CMD_DATASET_URI_REGEX.matcher(uri).matches();
-    }
-
-    // Putting message on kafka
-    // This method is taking advantage of MDC to enrich log messages with traceId
-    // and passing to kafka events
-    private static void sendMessage(Collection collection, List<String> uris, String dataType) {
-
-        String traceId = defaultIfBlank(MDC.get(TRACE_ID_HEADER), UUID.randomUUID().toString());
-        info().data("traceId", traceId)
-                .log("traceId before sending event");
-
-        try {
-            kafkaServiceSupplier.getService().produceContentUpdated(collection.getId(), uris, dataType, "",
-                    SEARCHINDEX, traceId);
-        } catch (Exception e) {
-            error()
-                    .data("collectionId", collection.getDescription().getId())
-                    .data("traceId", traceId)
-                    .data("publishing", true)
-                    .logException(e, "failed to send content-updated kafka events");
-
-            String channel = Configuration.getDefaultSlackAlarmChannel();
-            Notifier notifier = zebedee.getSlackNotifier();
-            notifier.sendCollectionAlarm(collection, channel, "Failed to send content-updated kafka events", e);
-        }
-    }
-
-    /**
-     * Prepare a uri for a kafka event
-     * 
-     * @param uri The uri of the published content
-     * @return String
-     */
-    public static String convertUriForEvent(String uri) {
-        uri = uri.replaceAll("/data.json", "");
-        uri.trim();
-        return uri;
     }
 
     private static void saveCollection(Collection collection, boolean publishComplete) {

@@ -18,6 +18,7 @@ import java.util.List;
 public class Release extends Page{
 
     private List<String> markdown;
+    private List<Link> relatedArticles;
     private List<Link> relatedDocuments;
     private List<Link> relatedDatasets;
     private List<Link> relatedMethodology;
@@ -109,6 +110,14 @@ public class Release extends Page{
 
     public void setDateChanges(List<ReleaseDateChange> dateChanges) {
         this.dateChanges = dateChanges;
+    }
+
+    public List<Link> getRelatedArticles() {
+        return relatedArticles;
+    }
+
+    public void setRelatedArticles(List<Link> relatedArticles) {
+        this.relatedArticles = relatedArticles;
     }
 
     public List<Link> getRelatedDocuments() {

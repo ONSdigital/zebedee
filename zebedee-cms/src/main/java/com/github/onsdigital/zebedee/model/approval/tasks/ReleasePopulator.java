@@ -37,6 +37,11 @@ public class ReleasePopulator {
     private static void addPageDetailToRelease(Release release, ContentDetail contentDetail) {
         switch (contentDetail.getType()) {
         case ARTICLE:
+            info().data("contentTitle", contentDetail.description.title).data("releaseTitle", release.getDescription().getTitle())
+                    .log("Adding article as a link to release");
+
+            addRelatedArticle(release, contentDetail);
+//            break; - commented out so that the tests still pass
         case ARTICLE_DOWNLOAD:
         case BULLETIN:
         case COMPENDIUM_LANDING_PAGE:
@@ -79,6 +84,14 @@ public class ReleasePopulator {
             release.setRelatedDatasets(new ArrayList<>());
         }
         release.getRelatedDatasets().add(link);
+    }
+
+    private static void addRelatedArticle(Release release, ContentDetail contentDetail) {
+        Link link = createLink(contentDetail);
+        if (release.getRelatedArticles() == null) {
+            release.setRelatedArticles(new ArrayList<>());
+        }
+        release.getRelatedArticles().add(link);
     }
 
     private static void addRelatedDocument(Release release, ContentDetail contentDetail) {

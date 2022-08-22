@@ -18,7 +18,7 @@ import java.util.List;
 public class Release extends Page{
 
     private List<String> markdown;
-    private List<Link> relatedArticles;
+    private List<Link> relatedCantabularOrCMDDatasets;
     private List<Link> relatedDocuments;
     private List<Link> relatedDatasets;
     private List<Link> relatedMethodology;
@@ -112,12 +112,12 @@ public class Release extends Page{
         this.dateChanges = dateChanges;
     }
 
-    public List<Link> getRelatedArticles() {
-        return relatedArticles;
+    public List<Link> getRelatedCantabularOrCMDDatasets() {
+        return relatedCantabularOrCMDDatasets;
     }
 
-    public void setRelatedArticles(List<Link> relatedArticles) {
-        this.relatedArticles = relatedArticles;
+    public void setRelatedCantabularOrCMDDatasets(List<Link> relatedCantabularOrCMDDatasets) {
+        this.relatedCantabularOrCMDDatasets = relatedCantabularOrCMDDatasets;
     }
 
     public List<Link> getRelatedDocuments() {

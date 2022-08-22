@@ -37,11 +37,6 @@ public class ReleasePopulator {
     private static void addPageDetailToRelease(Release release, ContentDetail contentDetail) {
         switch (contentDetail.getType()) {
         case ARTICLE:
-            info().data("contentTitle", contentDetail.description.title).data("releaseTitle", release.getDescription().getTitle())
-                    .log("Adding article as a link to release");
-
-            addRelatedArticle(release, contentDetail);
-//            break; - commented out so that the tests still pass
         case ARTICLE_DOWNLOAD:
         case BULLETIN:
         case COMPENDIUM_LANDING_PAGE:
@@ -51,12 +46,18 @@ public class ReleasePopulator {
             addRelatedDocument(release, contentDetail);
             break;
         case DATASET_LANDING_PAGE:
-        case API_DATASET_LANDING_PAGE:
             info().data("contentTitle", contentDetail.description.title)
                     .data("releaseTitle", release.getDescription().getTitle())
                     .log("Adding dataset as a link to release");
 
             addRelatedDataset(release, contentDetail);
+            break;
+        case API_DATASET_LANDING_PAGE:
+            info().data("contentTitle", contentDetail.description.title)
+                    .data("releaseTitle", release.getDescription().getTitle())
+                    .log("Adding cantabular or cmd dataset as a link to release");
+
+            addRelatedCantabularOrCMDDataset(release, contentDetail);
             break;
         case STATIC_QMI:
             info().data("contentTitle", contentDetail.description.title)
@@ -73,7 +74,7 @@ public class ReleasePopulator {
 
             addRelatedMethodologyArticle(release, contentDetail);
             break;
-        default: // Do nothing fot other types
+        default: // Do nothing for other types
         }
     }
 
@@ -86,12 +87,12 @@ public class ReleasePopulator {
         release.getRelatedDatasets().add(link);
     }
 
-    private static void addRelatedArticle(Release release, ContentDetail contentDetail) {
+    private static void addRelatedCantabularOrCMDDataset(Release release, ContentDetail contentDetail) {
         Link link = createLink(contentDetail);
-        if (release.getRelatedArticles() == null) {
-            release.setRelatedArticles(new ArrayList<>());
+        if (release.getRelatedCantabularOrCMDDatasets() == null) {
+            release.setRelatedCantabularOrCMDDatasets(new ArrayList<>());
         }
-        release.getRelatedArticles().add(link);
+        release.getRelatedCantabularOrCMDDatasets().add(link);
     }
 
     private static void addRelatedDocument(Release release, ContentDetail contentDetail) {

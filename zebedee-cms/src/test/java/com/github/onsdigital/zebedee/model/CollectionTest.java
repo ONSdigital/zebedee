@@ -1398,6 +1398,50 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
     }
 
     @Test
+    public void populateReleaseQuietlyShouldAddLinksToReleasePageForCollectionContentCMD() throws ZebedeeException, IOException {
+        // Given a collection that is associated with a release and has a CMD dataset
+        String uri = String.format("/releases/%s", Random.id());
+        Release release = createRelease(uri, new DateTime().plusWeeks(4).toDate());
+
+        CollectionDescription description = new CollectionDescription();
+        description.setId(Random.id());
+        description.setName(description.getId());
+
+        collection.getDescription().setReleaseUri(uri);
+        collection.associateWithRelease(publisher1Session, release, collectionWriter);
+
+        String releaseJsonUri = uri + "/data.json";
+
+        collection.complete(publisher1Session, releaseJsonUri, recursive);
+        collection.review(publisher2Session, releaseJsonUri, recursive);
+
+        ContentDetail CMDDetail = new ContentDetail("My CMD dataset", "/some/uri", PageType.API_DATASET_LANDING_PAGE);
+        FileUtils.write(collection.getReviewed().getPath().resolve("some/uri/data.json").toFile(),
+                Serialiser.serialise(CMDDetail), Charset.defaultCharset());
+
+
+        // When we attempt to populate the release from the collection.
+
+        FakeCollectionReader collectionReader = new FakeCollectionReader(zebedee.getCollections().getPath().toString(),
+                collection.getDescription().getId());
+        FakeCollectionWriter collectionWriter = new FakeCollectionWriter(zebedee.getCollections().getPath().toString(),
+                collection.getDescription().getId());
+        Iterable<ContentDetail> collectionContent = ContentDetailUtil.resolveDetails(collection.getReviewed(),
+                collectionReader.getReviewed());
+
+        Release result = collection.populateReleaseQuietly(
+                collectionReader,
+                collectionWriter,
+                collectionContent);
+
+        // Then the release is now in progress for the collection and the published flag is set to true
+        assertNotNull(result);
+        assertEquals(1, result.getRelatedCantabularOrCMDDatasets().size());
+        assertEquals("My CMD dataset", result.getRelatedCantabularOrCMDDatasets().get(0).getTitle());
+        assertEquals("/some/uri", result.getRelatedCantabularOrCMDDatasets().get(0).getUri().toString());
+    }
+
+    @Test
     public void createCollectionShouldAssociateWithReleaseIfReleaseUriIsPresent() throws Exception {
         // Given an existing release page
         ReflectionTestUtils.setField(zebedee, "permissionsService", permissionsService);

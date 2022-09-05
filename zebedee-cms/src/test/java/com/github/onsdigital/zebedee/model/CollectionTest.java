@@ -1415,13 +1415,11 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         collection.complete(publisher1Session, releaseJsonUri, recursive);
         collection.review(publisher2Session, releaseJsonUri, recursive);
 
-        ContentDetail CMDDetail = new ContentDetail("My CMD dataset", "/some/uri", PageType.API_DATASET_LANDING_PAGE);
+        ContentDetail cmdDetail = new ContentDetail("My CMD dataset", "/some/uri", PageType.API_DATASET_LANDING_PAGE);
         FileUtils.write(collection.getReviewed().getPath().resolve("some/uri/data.json").toFile(),
-                Serialiser.serialise(CMDDetail), Charset.defaultCharset());
-
+                Serialiser.serialise(cmdDetail), Charset.defaultCharset());
 
         // When we attempt to populate the release from the collection.
-
         FakeCollectionReader collectionReader = new FakeCollectionReader(zebedee.getCollections().getPath().toString(),
                 collection.getDescription().getId());
         FakeCollectionWriter collectionWriter = new FakeCollectionWriter(zebedee.getCollections().getPath().toString(),

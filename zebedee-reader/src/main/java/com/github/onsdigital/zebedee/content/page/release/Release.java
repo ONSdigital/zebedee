@@ -14,11 +14,14 @@ import java.util.List;
 
 /**
  * Created by bren on 04/06/15.
+ *
+ * NB. A new List has been added named "relatedAPIDatasets". This is so that CMD and cantabular datasets, which are jointly referred to (in zebedee) as "API datsets", will be handled separately
+ * from legacy datasets, which are handled using the "relatedDatasets" List. - E Cook 05/09/22
  */
 public class Release extends Page{
 
     private List<String> markdown;
-    private List<Link> relatedCantabularOrCMDDatasets;
+    private List<Link> relatedAPIDatasets;
     private List<Link> relatedDocuments;
     private List<Link> relatedDatasets;
     private List<Link> relatedMethodology;
@@ -112,12 +115,12 @@ public class Release extends Page{
         this.dateChanges = dateChanges;
     }
 
-    public List<Link> getRelatedCantabularOrCMDDatasets() {
-        return relatedCantabularOrCMDDatasets;
+    public List<Link> getRelatedAPIDatasets() {
+        return relatedAPIDatasets;
     }
 
-    public void setRelatedCantabularOrCMDDatasets(List<Link> relatedCantabularOrCMDDatasets) {
-        this.relatedCantabularOrCMDDatasets = relatedCantabularOrCMDDatasets;
+    public void setRelatedAPIDatasets(List<Link> relatedAPIDatasets) {
+        this.relatedAPIDatasets = relatedAPIDatasets;
     }
 
     public List<Link> getRelatedDocuments() {

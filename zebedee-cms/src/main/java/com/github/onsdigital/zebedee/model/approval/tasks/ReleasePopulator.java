@@ -57,7 +57,7 @@ public class ReleasePopulator {
                     .data("releaseTitle", release.getDescription().getTitle())
                     .log("Adding cantabular or cmd dataset as a link to release");
 
-            addRelatedCantabularOrCMDDataset(release, contentDetail);
+            addRelatedAPIDataset(release, contentDetail);
             break;
         case STATIC_QMI:
             info().data("contentTitle", contentDetail.description.title)
@@ -87,12 +87,12 @@ public class ReleasePopulator {
         release.getRelatedDatasets().add(link);
     }
 
-    private static void addRelatedCantabularOrCMDDataset(Release release, ContentDetail contentDetail) {
+    private static void addRelatedAPIDataset(Release release, ContentDetail contentDetail) {
         Link link = createLink(contentDetail);
-        if (release.getRelatedCantabularOrCMDDatasets() == null) {
-            release.setRelatedCantabularOrCMDDatasets(new ArrayList<>());
+        if (release.getRelatedAPIDatasets() == null) {
+            release.setRelatedAPIDatasets(new ArrayList<>());
         }
-        release.getRelatedCantabularOrCMDDatasets().add(link);
+        release.getRelatedAPIDatasets().add(link);
     }
 
     private static void addRelatedDocument(Release release, ContentDetail contentDetail) {

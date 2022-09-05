@@ -1434,7 +1434,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
                 collectionWriter,
                 collectionContent);
 
-        // Then the release is now in progress for the collection and the published flag is set to true
+        // Then the release is populated with a link to the associated CMD dataset
         assertNotNull(result);
         assertEquals(1, result.getRelatedCantabularOrCMDDatasets().size());
         assertEquals("My CMD dataset", result.getRelatedCantabularOrCMDDatasets().get(0).getTitle());

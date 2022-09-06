@@ -267,8 +267,7 @@ public class ApproveTask implements Callable<Boolean> {
     }
 
     private void compressZipFiles(Collection collection, CollectionReader collectionReader, CollectionWriter collectionWriter) throws ZebedeeException, IOException {
-        TimeSeriesCompressionTask timeSeriesCompressionTask = new TimeSeriesCompressionTask();
-        boolean verified = timeSeriesCompressionTask.compressTimeseries(collection, collectionReader, collectionWriter);
+        boolean verified = getCompressionTask().compressTimeseries(collection, collectionReader, collectionWriter);
 
         if (!verified) {
             String channel = Configuration.getDefaultSlackAlarmChannel();
@@ -278,7 +277,7 @@ public class ApproveTask implements Callable<Boolean> {
         }
     }
 
-    public void approveCollection() throws IOException {
+    protected void approveCollection() throws IOException {
         // set the approved state on the collection
         try {
             collection.getDescription().setApprovalStatus(ApprovalStatus.COMPLETE);
@@ -292,14 +291,21 @@ public class ApproveTask implements Callable<Boolean> {
         }
     }
 
-    public void populateReleasePage(Iterable<ContentDetail> collectionContent) throws IOException {
+    private void populateReleasePage(Iterable<ContentDetail> collectionContent) throws IOException {
         // If the collection is associated with a release then populate the release page.
         collection.populateReleaseQuietly(collectionReader, collectionWriter, collectionContent);
     }
 
-    public void generatePdfFiles(List<ContentDetail> collectionContent) throws ZebedeeException {
-        CollectionPdfGenerator pdfGenerator = new CollectionPdfGenerator(new BabbagePdfService(session, collection));
-        pdfGenerator.generatePDFsForCollection(collection, collectionWriter, collectionContent);
+    private void generatePdfFiles(List<ContentDetail> collectionContent) throws ZebedeeException {
+        getPdfGenerator().generatePDFsForCollection(collection, collectionReader.getReviewed(), collectionWriter.getReviewed(), collectionContent);
+    }
+
+    protected CollectionPdfGenerator getPdfGenerator() {
+        return new CollectionPdfGenerator(new BabbagePdfService(session, collection));
+    }
+    
+    protected TimeSeriesCompressionTask getCompressionTask() {
+        return new TimeSeriesCompressionTask();
     }
 
     private static ContentDetailResolver getDefaultContentDetailResolver() {

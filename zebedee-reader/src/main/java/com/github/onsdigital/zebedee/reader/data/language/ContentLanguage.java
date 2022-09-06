@@ -4,16 +4,27 @@ package com.github.onsdigital.zebedee.reader.data.language;
  * Created by bren on 19/08/15.
  */
 public enum ContentLanguage {
-    en("data.json"),
-    cy("data_cy.json");
+    en("en", "data.json"),
+    cy("cy", "data_cy.json");
 
-    private final String DATA_FILE_NAME;
+    private final String id;
+    private final String dataFileName;
 
-    ContentLanguage(String dataFileName) {
-        this.DATA_FILE_NAME = dataFileName;
+    ContentLanguage(String id, String dataFileName) {
+        this.id = id;
+        this.dataFileName = dataFileName;
     }
 
     public String getDataFileName() {
-        return DATA_FILE_NAME;
+        return dataFileName;
+    }
+
+    public String getId() {
+        return id;
+    }
+    
+    @Override
+    public String toString() {
+        return id;
     }
 }

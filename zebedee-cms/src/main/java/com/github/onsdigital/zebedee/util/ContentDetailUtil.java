@@ -1,7 +1,6 @@
 package com.github.onsdigital.zebedee.util;
 
 import com.github.onsdigital.zebedee.content.page.base.Page;
-import com.github.onsdigital.zebedee.content.page.base.PageDescription;
 import com.github.onsdigital.zebedee.content.page.statistics.document.figure.chart.Chart;
 import com.github.onsdigital.zebedee.content.page.statistics.document.figure.image.Image;
 import com.github.onsdigital.zebedee.content.page.statistics.document.figure.table.Table;
@@ -42,7 +41,6 @@ public class ContentDetailUtil {
 
                         String pageUri = resource.getUri().toString();
                         page.setUri(resolveUri(pageUri, page));
-                        PageDescription description = page.getDescription();
                     } catch (Exception e) {
                         error().data("resourceUri", resource.getUri()).logException(e, "Failed to deserialise json");
                     }

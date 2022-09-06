@@ -3,6 +3,7 @@ package com.github.onsdigital.zebedee.service;
 import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.ContentWriter;
+import com.github.onsdigital.zebedee.reader.data.language.ContentLanguage;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.util.URIUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -23,6 +24,7 @@ public class BabbagePdfService implements PdfService {
 
     private static final String pdfEndpoint = "/pdf-new"; // only ever reading from local babbage instance
     private static final String PAGE_PDF_EXT = "/page.pdf";
+    private static final String PAGE_PDF_EXT_CY = "/page_cy.pdf";
 
     private final Session session;
     private Collection collection;
@@ -35,18 +37,20 @@ public class BabbagePdfService implements PdfService {
     /**
      * Render a PDF for the given page URI.
      *
-     * @param uri - the uri to generate the PDF for.
-     * @return - the input stream containing the PDF data.
+     * @param contentWriter Writer where the PDF will be written to
+     * @param uri           the uri to generate the PDF for.
+     * @param language      The language required for the content
+     * @return the input stream containing the PDF data.
      * @throws IOException
      */
     @Override
-    public void generatePdf(ContentWriter contentWriter, String uri) throws IOException {
+    public void generatePdf(ContentWriter contentWriter, String uri, ContentLanguage language) throws IOException {
         // no need to check locally here as on publishing we will always want to generate one for preview
         // we will check if one exists already in babbage
         // loop back to babbage to render PDF until we break out the HTML rendering / PDF generation into its own service.
         String trimmedUri = URIUtils.removeTrailingSlash(uri);
         String src = Configuration.getBabbageUrl() + trimmedUri + pdfEndpoint;
-        String pdfURI = uri + PAGE_PDF_EXT;
+        String pdfURI = uri + (language.equals(ContentLanguage.cy)? PAGE_PDF_EXT_CY : PAGE_PDF_EXT);
 
         info().data("src", src).log("Reading PDF");
 
@@ -54,6 +58,7 @@ public class BabbagePdfService implements PdfService {
             HttpGet httpGet = new HttpGet(src);
             httpGet.addHeader("Cookie", "access_token=" + session.getId());
             httpGet.addHeader("Cookie", "collection=" + collection.getDescription().getId());
+            httpGet.addHeader("Cookie", "lang=" + language.getId());
 
             try (CloseableHttpResponse response = client.execute(httpGet)) {
 

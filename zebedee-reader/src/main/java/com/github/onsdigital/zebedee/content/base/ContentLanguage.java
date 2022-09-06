@@ -1,28 +1,40 @@
 package com.github.onsdigital.zebedee.content.base;
 
-/**
- * Created by bren on 19/08/15.
- */
+import java.util.stream.Stream;
+
 public enum ContentLanguage {
-    ENGLISH("en", "data.json"),
-    WELSH("cy", "data_cy.json");
+    ENGLISH("en"), WELSH("cy");
+
+    private final static String DATA_FILE_NAME = "data%s.json";
+
+    public static ContentLanguage getById(final String id) {
+        return Stream.of(ContentLanguage.values()).filter(l -> l.getId().equalsIgnoreCase(id)).findAny().get();
+    }
 
     private final String id;
-    private final String dataFileName;
 
-    ContentLanguage(String id, String dataFileName) {
+    ContentLanguage(String id) {
         this.id = id;
-        this.dataFileName = dataFileName;
     }
 
     public String getDataFileName() {
-        return dataFileName;
+        return String.format(DATA_FILE_NAME, getFileSuffix());
     }
 
     public String getId() {
         return id;
     }
-    
+
+    public String getFileSuffix() {
+        switch (this) {
+        case ENGLISH:
+            // No suffix for English
+            return "";
+        default:
+            return "_" + id;
+        }
+    }
+
     @Override
     public String toString() {
         return id;

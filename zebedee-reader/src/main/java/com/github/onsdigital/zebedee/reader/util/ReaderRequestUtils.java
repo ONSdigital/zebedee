@@ -13,6 +13,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 /**
@@ -32,8 +33,8 @@ public class ReaderRequestUtils {
         }
 
         try {
-            return ContentLanguage.valueOf(lang);
-        } catch (IllegalArgumentException e) {
+            return ContentLanguage.getById(lang);
+        } catch (NoSuchElementException e) {
             return null;
         }
     }

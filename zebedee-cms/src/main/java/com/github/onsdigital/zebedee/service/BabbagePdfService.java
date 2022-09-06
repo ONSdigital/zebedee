@@ -23,8 +23,6 @@ import static java.text.MessageFormat.format;
 public class BabbagePdfService implements PdfService {
 
     private static final String pdfEndpoint = "/pdf-new"; // only ever reading from local babbage instance
-    private static final String PAGE_PDF_EXT = "/page.pdf";
-    private static final String PAGE_PDF_EXT_CY = "/page_cy.pdf";
 
     private final Session session;
     private Collection collection;
@@ -50,7 +48,7 @@ public class BabbagePdfService implements PdfService {
         // loop back to babbage to render PDF until we break out the HTML rendering / PDF generation into its own service.
         String trimmedUri = URIUtils.removeTrailingSlash(uri);
         String src = Configuration.getBabbageUrl() + trimmedUri + pdfEndpoint;
-        String pdfURI = uri + (language.equals(ContentLanguage.WELSH)? PAGE_PDF_EXT_CY : PAGE_PDF_EXT); // TODO tidy this
+        String pdfURI = String.format("%s/page%s.pdf", uri, language.getFileSuffix());
 
         info().data("src", src).log("Reading PDF");
 

@@ -61,19 +61,19 @@ public class CollectionPdfGenerator {
         for (ContentDetail detail : filtered) {
             generatePDFForContent(collection, contentWriter, detail.uri, detail.description.language);
 
-            if (!ContentLanguage.cy.getId().equals(detail.description.language)) {
+            if (!ContentLanguage.WELSH.getId().equals(detail.description.language)) {
                 // If this is an English version, check if a Welsh data file exists
 
                 Resource r;
                 try {
-                    r = contentReader.getResource(detail.uri + "/" + ContentLanguage.cy.getDataFileName());
+                    r = contentReader.getResource(detail.uri + "/" + ContentLanguage.WELSH.getDataFileName());
                 } catch (Exception e) {
                     // It's ok. If there is no Welsh data file, we won't generate a Welsh PDF
                     r = null;
                 }
 
                 if (r != null) {
-                    generatePDFForContent(collection, contentWriter, detail.uri, ContentLanguage.cy.getId());
+                    generatePDFForContent(collection, contentWriter, detail.uri, ContentLanguage.WELSH.getId());
                 }
             }
 
@@ -95,9 +95,9 @@ public class CollectionPdfGenerator {
 
     private boolean generatePDFForContent(Collection collection, ContentWriter writer, String uri, String language)
             throws InternalServerError {
-        ContentLanguage lang = ContentLanguage.en;
-        if (ContentLanguage.cy.getId().equalsIgnoreCase(language)) {
-            lang = ContentLanguage.cy;
+        ContentLanguage lang = ContentLanguage.ENGLISH;
+        if (ContentLanguage.WELSH.getId().equalsIgnoreCase(language)) {
+            lang = ContentLanguage.WELSH;
         }
         CMSLogEvent e = info().data("uri", uri).collectionID(collection);
         try {

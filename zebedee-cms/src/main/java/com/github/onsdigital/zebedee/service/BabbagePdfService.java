@@ -50,7 +50,7 @@ public class BabbagePdfService implements PdfService {
         // loop back to babbage to render PDF until we break out the HTML rendering / PDF generation into its own service.
         String trimmedUri = URIUtils.removeTrailingSlash(uri);
         String src = Configuration.getBabbageUrl() + trimmedUri + pdfEndpoint;
-        String pdfURI = uri + (language.equals(ContentLanguage.cy)? PAGE_PDF_EXT_CY : PAGE_PDF_EXT);
+        String pdfURI = uri + (language.equals(ContentLanguage.WELSH)? PAGE_PDF_EXT_CY : PAGE_PDF_EXT); // TODO tidy this
 
         info().data("src", src).log("Reading PDF");
 

@@ -56,7 +56,7 @@ public class ZebedeeReaderTest {
 
     @Test
     public void testReadWelshContent() throws ZebedeeException, IOException {
-        Content content = createReader(ContentLanguage.cy).getPublishedContent("peoplepopulationandcommunity");
+        Content content = createReader(ContentLanguage.WELSH).getPublishedContent("peoplepopulationandcommunity");
         assertTrue(content instanceof TaxonomyLandingPage);
         TaxonomyLandingPage landingPage = (TaxonomyLandingPage) content;
         assertEquals("Pobl, poblogaeth a chymuned", landingPage.getDescription().getTitle());
@@ -64,7 +64,7 @@ public class ZebedeeReaderTest {
 
     @Test
     public void testGetChildrenInWelsh() throws ZebedeeException, IOException {
-        Map<URI, ContentNode> children = createReader(ContentLanguage.cy).getPublishedContentChildren("peoplepopulationandcommunity/culturalidentity/ethnicity/articles/ethnicityandthelabourmarket2011censusenglandandwales");
+        Map<URI, ContentNode> children = createReader(ContentLanguage.WELSH).getPublishedContentChildren("peoplepopulationandcommunity/culturalidentity/ethnicity/articles/ethnicityandthelabourmarket2011censusenglandandwales");
         URI articleUri = URI.create("/peoplepopulationandcommunity/culturalidentity/ethnicity/articles/ethnicityandthelabourmarket2011censusenglandandwales/2014-11-13");
         assertTrue(children.containsKey(articleUri));
         ContentNode article = children.get(articleUri);

@@ -4,8 +4,8 @@ package com.github.onsdigital.zebedee.reader.data.language;
  * Created by bren on 19/08/15.
  */
 public enum ContentLanguage {
-    en("en", "data.json"),
-    cy("cy", "data_cy.json");
+    ENGLISH("en", "data.json"),
+    WELSH("cy", "data_cy.json");
 
     private final String id;
     private final String dataFileName;

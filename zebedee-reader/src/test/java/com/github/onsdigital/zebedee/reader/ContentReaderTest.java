@@ -159,7 +159,7 @@ public class ContentReaderTest {
 
     @Test
     public void testGetParentsInWelsh() throws ZebedeeException, IOException {
-        contentReader.setLanguage(ContentLanguage.cy);
+        contentReader.setLanguage(ContentLanguage.WELSH);
         //note that culturalidentity folder does not have data.json in test content, so it should be skipped
         Map<URI, ContentNode> parents = contentReader.getParents("peoplepopulationandcommunity/culturalidentity/ethnicity");
         assertTrue(parents.containsKey(URI.create("/")));

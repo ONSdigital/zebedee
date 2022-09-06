@@ -14,9 +14,10 @@ import com.github.onsdigital.zebedee.content.page.taxonomy.TaxonomyLandingPage;
 import com.github.onsdigital.zebedee.exceptions.CollectionNotFoundException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
+import com.github.onsdigital.zebedee.content.base.ContentLanguage;
 import com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration;
 import com.github.onsdigital.zebedee.reader.data.filter.DataFilter;
-import com.github.onsdigital.zebedee.reader.data.language.ContentLanguage;
+
 import org.junit.Test;
 
 import java.io.IOException;

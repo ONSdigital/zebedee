@@ -1,7 +1,8 @@
 package com.github.onsdigital.zebedee.reader.util;
 
+import com.github.onsdigital.zebedee.content.base.ContentLanguage;
 import com.github.onsdigital.zebedee.reader.data.filter.DataFilter;
-import com.github.onsdigital.zebedee.reader.data.language.ContentLanguage;
+
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 

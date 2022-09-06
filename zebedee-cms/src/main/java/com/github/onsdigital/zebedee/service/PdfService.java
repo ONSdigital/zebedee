@@ -1,7 +1,7 @@
 package com.github.onsdigital.zebedee.service;
 
+import com.github.onsdigital.zebedee.content.base.ContentLanguage;
 import com.github.onsdigital.zebedee.model.ContentWriter;
-import com.github.onsdigital.zebedee.reader.data.language.ContentLanguage;
 
 import java.io.IOException;
 

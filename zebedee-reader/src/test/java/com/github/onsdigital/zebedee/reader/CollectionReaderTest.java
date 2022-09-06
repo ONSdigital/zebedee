@@ -7,8 +7,9 @@ import com.github.onsdigital.zebedee.content.page.statistics.dataset.DatasetLand
 import com.github.onsdigital.zebedee.content.page.statistics.document.article.Article;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
+import com.github.onsdigital.zebedee.content.base.ContentLanguage;
 import com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration;
-import com.github.onsdigital.zebedee.reader.data.language.ContentLanguage;
+
 import org.junit.Before;
 import org.junit.Test;
 

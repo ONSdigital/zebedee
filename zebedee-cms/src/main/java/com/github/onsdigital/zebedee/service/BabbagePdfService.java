@@ -1,9 +1,9 @@
 package com.github.onsdigital.zebedee.service;
 
 import com.github.onsdigital.zebedee.configuration.Configuration;
+import com.github.onsdigital.zebedee.content.base.ContentLanguage;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.ContentWriter;
-import com.github.onsdigital.zebedee.reader.data.language.ContentLanguage;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.util.URIUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;

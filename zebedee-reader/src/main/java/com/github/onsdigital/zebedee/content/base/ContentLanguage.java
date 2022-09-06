@@ -1,4 +1,4 @@
-package com.github.onsdigital.zebedee.reader.data.language;
+package com.github.onsdigital.zebedee.content.base;
 
 /**
  * Created by bren on 19/08/15.

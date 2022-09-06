@@ -2,11 +2,12 @@ package com.github.onsdigital.zebedee.reader.api.endpoint;
 
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
+import com.github.onsdigital.zebedee.content.base.ContentLanguage;
 import com.github.onsdigital.zebedee.reader.FakeCollectionReaderFactory;
 import com.github.onsdigital.zebedee.reader.ZebedeeReader;
 import com.github.onsdigital.zebedee.reader.api.endpoint.PublishedData;
 import com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration;
-import com.github.onsdigital.zebedee.reader.data.language.ContentLanguage;
+
 import org.apache.http.HttpStatus;
 import org.junit.Before;
 import org.junit.Test;

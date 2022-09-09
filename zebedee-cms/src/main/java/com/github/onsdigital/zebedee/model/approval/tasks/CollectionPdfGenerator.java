@@ -61,6 +61,22 @@ public class CollectionPdfGenerator {
         for (ContentDetail detail : filtered) {
             generatePDFForContent(collection, contentWriter, detail.uri, detail.description.language);
 
+            // FIXME: This conditional section is a workaround to generate Welsh language
+            // PDFs when changes to content are made for both English and Welsh languages.
+            //
+            // In that case, collectionContent will contain a single entry for each url
+            // (instead of one for each language), and its description.language will be "".
+            //
+            // This is because ContentDetailUtil.resolveDetails returns a Set and
+            // ContentDetails objects are considered equals when they have the same url
+            // (ignoring the language)
+            //
+            // Ideally, the equals implementation should take language into account and we
+            // would receive here one ContentDetail for every language, making this
+            // conditional section unnecessary.
+            // However, zebedee heavily relies on that Set keeping one ContentDetail per url
+            // (for example for the content tree) and changing it will have a lot of
+            // unexpected implications
             if (!ContentLanguage.WELSH.getId().equals(detail.description.language)) {
                 // If this is an English version, check if a Welsh data file exists
 

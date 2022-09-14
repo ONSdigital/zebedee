@@ -263,7 +263,7 @@
         <dependency>
             <groupId>com.github.onsdigital</groupId>
             <artifactId>dp-interactives-api-client-java</artifactId>
-            <version>0.2.5</version>
+            <version>0.2.6</version>
         </dependency>
     </dependencies>
 

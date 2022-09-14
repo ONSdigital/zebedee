@@ -27,7 +27,7 @@
         <fasterxml.jackson.version>2.13.4</fasterxml.jackson.version>
         <apache.poi.version>3.17</apache.poi.version>
         <spring.version>5.3.20</spring.version>
-        <dp.logging.version>v2.0.0-beta</dp.logging.version>
+        <dp.logging.version>2.0.0-beta.3</dp.logging.version>
     </properties>
 
     <dependencyManagement>
@@ -105,12 +105,6 @@
             </dependency>
 
             <dependency>
-                <groupId>com.fasterxml.jackson.core</groupId>
-                <artifactId>jackson-annotations</artifactId>
-                <version>${fasterxml.jackson.version}</version>
-            </dependency>
-
-            <dependency>
                 <groupId>com.fasterxml.jackson.dataformat</groupId>
                 <artifactId>jackson-dataformat-smile</artifactId>
                 <version>${fasterxml.jackson.version}</version>
@@ -125,12 +119,6 @@
             <dependency>
                 <groupId>com.fasterxml.jackson.dataformat</groupId>
                 <artifactId>jackson-dataformat-cbor</artifactId>
-                <version>${fasterxml.jackson.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.fasterxml.jackson.core</groupId>
-                <artifactId>jackson-databind</artifactId>
                 <version>${fasterxml.jackson.version}</version>
             </dependency>
 
@@ -263,7 +251,7 @@
             <dependency>
                 <groupId>com.github.onsdigital</groupId>
                 <artifactId>dp-image-api-client-java</artifactId>
-                <version>0.1.0</version>
+                <version>0.1.1</version>
             </dependency>
 
             <dependency>
@@ -293,7 +281,7 @@
             <dependency>
                 <groupId>com.github.onsdigital</groupId>
                 <artifactId>dp-dataset-api-java-client</artifactId>
-                <version>v1.1.0</version>
+                <version>1.2.0</version>
             </dependency>
 
             <dependency>

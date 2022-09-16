@@ -10,6 +10,7 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
 
 import org.apache.kafka.common.config.SslConfigs;
+import org.apache.kafka.common.header.internals.RecordHeader;
 import org.apache.kafka.common.serialization.StringSerializer;
 
 import java.util.Properties;
@@ -59,8 +60,10 @@ public class KafkaClientImpl implements KafkaClient {
     @Override
     public Future<RecordMetadata> produceContentUpdated(String uri, String dataType, String collectionID,
             String jobId, String searchIndex, String traceID) {
-        ContentUpdated value = new ContentUpdated(uri, dataType, collectionID, jobId, searchIndex, traceID);
-        return producer.send(new ProducerRecord<>(topic, value));
+        ContentUpdated value = new ContentUpdated(uri, dataType, collectionID, jobId, searchIndex);
+        ProducerRecord<String, ContentUpdated> record = new ProducerRecord<>(topic, value);
+        record.headers().add(new RecordHeader("request-id", traceID.getBytes()));
+        return producer.send(record);
     }
 
 }

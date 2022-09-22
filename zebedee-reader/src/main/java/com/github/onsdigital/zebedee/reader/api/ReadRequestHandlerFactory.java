@@ -1,6 +1,6 @@
 package com.github.onsdigital.zebedee.reader.api;
 
-import com.github.onsdigital.zebedee.reader.data.language.ContentLanguage;
+import com.github.onsdigital.zebedee.content.base.ContentLanguage;
 
 /**
  * Created by dave on 09/05/2017.

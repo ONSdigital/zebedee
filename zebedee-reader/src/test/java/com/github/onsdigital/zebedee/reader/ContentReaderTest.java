@@ -8,7 +8,8 @@ import com.github.onsdigital.zebedee.content.page.statistics.document.figure.cha
 import com.github.onsdigital.zebedee.content.page.statistics.document.figure.table.Table;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
-import com.github.onsdigital.zebedee.reader.data.language.ContentLanguage;
+import com.github.onsdigital.zebedee.content.base.ContentLanguage;
+
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -159,7 +160,7 @@ public class ContentReaderTest {
 
     @Test
     public void testGetParentsInWelsh() throws ZebedeeException, IOException {
-        contentReader.setLanguage(ContentLanguage.cy);
+        contentReader.setLanguage(ContentLanguage.WELSH);
         //note that culturalidentity folder does not have data.json in test content, so it should be skipped
         Map<URI, ContentNode> parents = contentReader.getParents("peoplepopulationandcommunity/culturalidentity/ethnicity");
         assertTrue(parents.containsKey(URI.create("/")));

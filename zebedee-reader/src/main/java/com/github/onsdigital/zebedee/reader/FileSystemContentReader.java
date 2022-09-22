@@ -12,8 +12,8 @@ import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ResourceDirectoryNotFileException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
+import com.github.onsdigital.zebedee.content.base.ContentLanguage;
 import com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration;
-import com.github.onsdigital.zebedee.reader.data.language.ContentLanguage;
 import com.github.onsdigital.zebedee.reader.util.ReleaseDateComparator;
 import com.github.onsdigital.zebedee.util.PathUtils;
 import com.github.onsdigital.zebedee.util.URIUtils;
@@ -67,7 +67,7 @@ public class FileSystemContentReader implements ContentReader {
     private static Tika tika = new Tika();
 
     private final Path ROOT_FOLDER;
-    private ContentLanguage language = ContentLanguage.en;
+    private ContentLanguage language = ContentLanguage.ENGLISH;
 
     public FileSystemContentReader(String rootFolder) {
         this(StringUtils.isEmpty(rootFolder) ? null : Paths.get(rootFolder));
@@ -142,8 +142,6 @@ public class FileSystemContentReader implements ContentReader {
             }
             String uri = resource.getUri().toString();
             page.setUri(resolveUri(uri, page));
-            PageDescription description = page.getDescription();
-
             return page;
         }
     }
@@ -402,7 +400,7 @@ public class FileSystemContentReader implements ContentReader {
     private Path resolveDataFilePath(Path path) throws BadRequestException {
         Path dataFilePath = path.resolve(language.getDataFileName());
         if (!exists(dataFilePath)) {
-            dataFilePath = path.resolve(ContentLanguage.en.getDataFileName());
+            dataFilePath = path.resolve(ContentLanguage.ENGLISH.getDataFileName());
         }
         assertReleative(dataFilePath);
         return dataFilePath;

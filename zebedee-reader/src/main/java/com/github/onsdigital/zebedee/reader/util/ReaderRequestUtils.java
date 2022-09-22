@@ -1,7 +1,8 @@
 package com.github.onsdigital.zebedee.reader.util;
 
+import com.github.onsdigital.zebedee.content.base.ContentLanguage;
 import com.github.onsdigital.zebedee.reader.data.filter.DataFilter;
-import com.github.onsdigital.zebedee.reader.data.language.ContentLanguage;
+
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -12,6 +13,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 /**
@@ -31,8 +33,8 @@ public class ReaderRequestUtils {
         }
 
         try {
-            return ContentLanguage.valueOf(lang);
-        } catch (IllegalArgumentException e) {
+            return ContentLanguage.getById(lang);
+        } catch (NoSuchElementException e) {
             return null;
         }
     }

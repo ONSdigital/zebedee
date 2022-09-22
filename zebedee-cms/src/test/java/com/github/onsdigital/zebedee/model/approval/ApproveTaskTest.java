@@ -12,6 +12,10 @@ import com.github.onsdigital.zebedee.json.PendingDelete;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.CollectionTest;
 import com.github.onsdigital.zebedee.model.CollectionWriter;
+import com.github.onsdigital.zebedee.model.Content;
+import com.github.onsdigital.zebedee.model.ContentWriter;
+import com.github.onsdigital.zebedee.model.approval.tasks.CollectionPdfGenerator;
+import com.github.onsdigital.zebedee.model.approval.tasks.timeseries.TimeSeriesCompressionTask;
 import com.github.onsdigital.zebedee.model.publishing.PublishNotification;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
@@ -22,14 +26,19 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.InOrder;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.mockito.Spy;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.concurrent.Callable;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -37,19 +46,24 @@ import java.util.concurrent.Future;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class ApproveTaskTest {
 
-    static final String COLLECTION_ID = "138"; // we are 138
-    static final String EMAIL = "danzig@misfits.com";
+    private static final String COLLECTION_ID = "138"; // we are 138
+    private static final String EMAIL = "danzig@misfits.com";
 
     @Mock
     private Collection collection;
+
+    @Mock
+    private Content content;
 
     @Mock
     private CollectionDescription collectionDescription;
@@ -67,13 +81,29 @@ public class ApproveTaskTest {
     private ContentReader contentReader;
 
     @Mock
+    private ContentWriter contentWriter;
+
+    @Mock
     private DataIndex dataIndex;
 
     @Mock
     private ContentDetailResolver contentDetailResolver;
 
     @Mock
-    protected Notifier slackNotifier;
+    private Notifier slackNotifier;
+
+    @Mock
+    private CollectionPdfGenerator pdfGenerator;
+
+    @Mock
+    private TimeSeriesCompressionTask compressionTask;
+
+    @InjectMocks
+    @Spy
+    private ApproveTask task;
+    
+    @Captor
+    private ArgumentCaptor<Event> eventCaptor;
 
     private ExecutorService executorService;
 
@@ -81,6 +111,8 @@ public class ApproveTaskTest {
     public void setUp() throws Exception {
         MockitoAnnotations.openMocks(this);
         this.executorService = Executors.newSingleThreadExecutor();
+
+        when(session.getEmail()).thenReturn(EMAIL);
     }
 
     @After
@@ -117,7 +149,7 @@ public class ApproveTaskTest {
     }
 
     @Test
-    public void shouldReturnFalseIfCollecionDescriptionNull() throws Exception {
+    public void shouldReturnFalseIfCollectionDescriptionNull() throws Exception {
         Future<Boolean> result = executorService.submit(
                 new ApproveTask(collection, null, null, null, null, null, contentDetailResolver, slackNotifier));
         assertFalse(result.get());
@@ -125,10 +157,8 @@ public class ApproveTaskTest {
 
     @Test
     public void shouldReturnFalseIfSessionNull() throws Exception {
-        when(collection.getDescription())
-                .thenReturn(collectionDescription);
-        when(collectionDescription.getId())
-                .thenReturn(COLLECTION_ID);
+        when(collection.getDescription()).thenReturn(collectionDescription);
+        when(collectionDescription.getId()).thenReturn(COLLECTION_ID);
 
         Future<Boolean> result = executorService.submit(
                 new ApproveTask(collection, null, null, null, null, null, contentDetailResolver, slackNotifier));
@@ -137,12 +167,9 @@ public class ApproveTaskTest {
 
     @Test
     public void shouldReturnFalseIfSessionEmailNull() throws Exception {
-        when(collection.getDescription())
-                .thenReturn(collectionDescription);
-        when(collectionDescription.getId())
-                .thenReturn(COLLECTION_ID);
-        when(session.getEmail())
-                .thenReturn(null);
+        when(collection.getDescription()).thenReturn(collectionDescription);
+        when(collectionDescription.getId()).thenReturn(COLLECTION_ID);
+        when(session.getEmail()).thenReturn(null);
 
         Future<Boolean> result = executorService.submit(
                 new ApproveTask(collection, session, null, null, null, null, contentDetailResolver, slackNotifier));
@@ -151,80 +178,90 @@ public class ApproveTaskTest {
 
     @Test
     public void shouldReturnFalseIfContentResolveReturnsIOEx() throws Exception {
-        when(collection.getDescription())
-                .thenReturn(collectionDescription);
-        when(collectionDescription.getId())
-                .thenReturn(COLLECTION_ID);
-        when(session.getEmail())
-                .thenReturn(EMAIL);
-        when(contentDetailResolver.resolve(any(), any()))
-                .thenThrow(new IOException("CABOOOM!"));
+        when(collection.getDescription()).thenReturn(collectionDescription);
+        when(collectionDescription.getId()).thenReturn(COLLECTION_ID);
+        when(contentDetailResolver.resolve(any(), any())).thenThrow(new IOException("CABOOOM!"));
 
-        ArgumentCaptor<Event> eventTypeArgumentCaptor = ArgumentCaptor.forClass(Event.class);
-
-
-        doNothing().when(collectionDescription).addEvent(eventTypeArgumentCaptor.capture());
-
-        Callable<Boolean> task = new ApproveTask(collection, session, collectionReader, collectionWriter,
-                contentReader, dataIndex, contentDetailResolver, slackNotifier);
+        doNothing().when(collectionDescription).addEvent(eventCaptor.capture());
 
         Future<Boolean> result = executorService.submit(task);
         assertFalse(result.get());
-        assertThat(eventTypeArgumentCaptor.getValue().type, equalTo(EventType.APPROVAL_FAILED));
+        assertThat(eventCaptor.getValue().type, equalTo(EventType.APPROVAL_FAILED));
         verify(contentDetailResolver, times(1)).resolve(any(), any());
     }
 
     @Test
     public void shouldSetCollectionStateToApproved() throws IOException {
-        CollectionDescription description = new CollectionDescription();
+        when(collection.getDescription()).thenReturn(collectionDescription);
 
-        when(collection.getDescription())
-                .thenReturn(description);
-        when(session.getEmail())
-                .thenReturn("test@ons.gov.uk");
+        doNothing().when(collectionDescription).addEvent(eventCaptor.capture());
 
-        ApproveTask approveTask = new ApproveTask(collection, session, collectionReader, collectionWriter,
-                contentReader, dataIndex, contentDetailResolver, slackNotifier);
+        task.approveCollection();
 
-        approveTask.approveCollection();
+        verify(collectionDescription).setApprovalStatus(ApprovalStatus.COMPLETE);
 
-        assertThat(description.getApprovalStatus(), equalTo(ApprovalStatus.COMPLETE));
-        assertThat(description.getEvents().size(), equalTo(1));
+        List<Event> capturedEvents = eventCaptor.getAllValues();
+        assertThat(capturedEvents.size(), equalTo(1));
+        assertThat(capturedEvents.get(0).getEmail(), equalTo(EMAIL));
+        assertThat(capturedEvents.get(0).getType(), equalTo(EventType.APPROVED));
 
-        Event event = description.getEvents().get(0);
-        assertThat(event.getEmail(), equalTo("test@ons.gov.uk"));
-        assertThat(event.getType(), equalTo(EventType.APPROVED));
-
-        verify(collection, times(2)).getDescription();
+        verify(collection, times(1)).save();
     }
 
-    @Test(expected = IOException.class)
+    @Test
     public void shouldSetCollectionStateToErrorIfSaveFails() throws IOException {
-        CollectionDescription description = new CollectionDescription();
+        when(collection.getDescription()).thenReturn(collectionDescription);
+        when(collection.save()).thenThrow(new RuntimeException());
 
-        when(collection.getDescription())
-                .thenReturn(description);
-        when(session.getEmail())
-                .thenReturn("test@ons.gov.uk");
-        when(collection.save())
-                .thenThrow(new RuntimeException());
+        doNothing().when(collectionDescription).addEvent(eventCaptor.capture());
 
-        ApproveTask approveTask = new ApproveTask(collection, session, collectionReader, collectionWriter,
-                contentReader, dataIndex, contentDetailResolver, slackNotifier);
+        try {
+            task.approveCollection();
+            fail("Expected IOException");
+        } catch (IOException e) {
+            InOrder inOrder = Mockito.inOrder(collectionDescription);
+            inOrder.verify(collectionDescription).setApprovalStatus(ApprovalStatus.COMPLETE);
+            inOrder.verify(collectionDescription).setApprovalStatus(ApprovalStatus.ERROR);
 
-        approveTask.approveCollection();
+            List<Event> capturedEvents = eventCaptor.getAllValues();
+            assertThat(capturedEvents.size(), equalTo(2));
 
-        assertThat(description.getApprovalStatus(), equalTo(ApprovalStatus.ERROR));
-        assertThat(description.getEvents().size(), equalTo(2));
+            assertThat(capturedEvents.get(0).getEmail(), equalTo(EMAIL));
+            assertThat(capturedEvents.get(0).getType(), equalTo(EventType.APPROVED));
+            assertThat(capturedEvents.get(1).getEmail(), equalTo("system"));
+            assertThat(capturedEvents.get(1).getType(), equalTo(EventType.APPROVAL_FAILED));
+        }
+    }
 
-        Event event = description.getEvents().get(0);
-        assertThat(event.getEmail(), equalTo("test@ons.gov.uk"));
-        assertThat(event.getType(), equalTo(EventType.APPROVED));
+    @Test
+    public void shouldApproveSuccessfully() throws Exception {
+        when(collection.getDescription()).thenReturn(collectionDescription);
+        when(collectionReader.getReviewed()).thenReturn(contentReader);
+        when(collectionWriter.getReviewed()).thenReturn(contentWriter);
+        when(collection.getReviewed()).thenReturn(content);
 
-        Event errorEvent = description.getEvents().get(0);
-        assertThat(errorEvent.getEmail(), equalTo("system"));
-        assertThat(errorEvent.getType(), equalTo(EventType.APPROVAL_FAILED));
+        doReturn(pdfGenerator).when(task).getPdfGenerator();
+        doReturn(compressionTask).when(task).getCompressionTask();
+        doNothing().when(collectionDescription).addEvent(eventCaptor.capture());
 
-        verify(collection, times(4)).getDescription();
+        List<ContentDetail> collectionContent = new ArrayList<>();
+        collectionContent.add(new ContentDetail("Some article", "/the/uri", PageType.ARTICLE));
+        when(contentDetailResolver.resolve(content, contentReader)).thenReturn(collectionContent);
+
+        task.call();
+
+        verify(collection, times(1)).populateReleaseQuietly(collectionReader, collectionWriter, collectionContent);
+        verify(pdfGenerator, times(1)).generatePDFsForCollection(collection, contentReader, contentWriter,
+                collectionContent);
+        verify(compressionTask, times(1)).compressTimeseries(collection, collectionReader, collectionWriter);
+        //Verify the collection has been approved
+        verify(collectionDescription).setApprovalStatus(ApprovalStatus.COMPLETE);
+
+        List<Event> capturedEvents = eventCaptor.getAllValues();
+        assertThat(capturedEvents.size(), equalTo(1));
+        assertThat(capturedEvents.get(0).getEmail(), equalTo(EMAIL));
+        assertThat(capturedEvents.get(0).getType(), equalTo(EventType.APPROVED));
+
+        verify(collection, times(1)).save();
     }
 }

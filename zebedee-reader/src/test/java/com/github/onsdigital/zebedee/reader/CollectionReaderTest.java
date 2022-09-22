@@ -7,8 +7,9 @@ import com.github.onsdigital.zebedee.content.page.statistics.dataset.DatasetLand
 import com.github.onsdigital.zebedee.content.page.statistics.document.article.Article;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
+import com.github.onsdigital.zebedee.content.base.ContentLanguage;
 import com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration;
-import com.github.onsdigital.zebedee.reader.data.language.ContentLanguage;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -56,7 +57,7 @@ public class CollectionReaderTest {
 
     @Test
     public void testGetAvailableContentInWelsh() throws ZebedeeException, IOException {
-        collectionReader.setLanguage(ContentLanguage.cy);
+        collectionReader.setLanguage(ContentLanguage.WELSH);
         Page content = collectionReader.getContent("employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/articles/labourdisputes/2015-07-16");
         assertNotNull(content);
         assertEquals(content.getType(), PageType.ARTICLE);
@@ -66,7 +67,7 @@ public class CollectionReaderTest {
 
     @Test
     public void testFallbackToEnglish() throws ZebedeeException, IOException {
-        collectionReader.setLanguage(ContentLanguage.cy);
+        collectionReader.setLanguage(ContentLanguage.WELSH);
         Page content = collectionReader.getContent("employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/datasets/labourdisputesbysectorlabd02/");
         assertNotNull(content);
         assertEquals(content.getType(), PageType.DATASET_LANDING_PAGE);
@@ -80,7 +81,7 @@ public class CollectionReaderTest {
 
     @Test(expected = NotFoundException.class)
     public void testGetNonexistingContentInWelsh() throws ZebedeeException, IOException {
-        collectionReader.setLanguage(ContentLanguage.cy);
+        collectionReader.setLanguage(ContentLanguage.WELSH);
         Page content = collectionReader.getContent("madeupfoldername");
     }
 
@@ -103,7 +104,7 @@ public class CollectionReaderTest {
     @Test
     public void testXlsResourceInWelsh() throws ZebedeeException, IOException {
         //welsh language should not affect resource reads
-        collectionReader.setLanguage(ContentLanguage.cy);
+        collectionReader.setLanguage(ContentLanguage.WELSH);
         try (Resource resource = collectionReader.getResource("employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/datasets/labourdisputesbysectorlabd02/labd02jul2015_tcm77-408195.xls")) {
             assertNotNull(resource != null);
 //            assertEquals("application/vnd.ms-excel", resource.getMimeType());
@@ -142,7 +143,7 @@ public class CollectionReaderTest {
 
     @Test
     public void testGetChildrenInWelsh() throws ZebedeeException, IOException {
-        collectionReader.setLanguage(ContentLanguage.cy);
+        collectionReader.setLanguage(ContentLanguage.WELSH);
         Map<URI, ContentNode> children = collectionReader.getChildren("employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/articles/labourdisputes");
         URI labourDisputes = URI.create("/employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/articles/labourdisputes/2014-07-16");
         URI prifBwyntiau = URI.create("/employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/articles/labourdisputes/2015-07-16");

@@ -1,12 +1,15 @@
 package com.github.onsdigital.zebedee.model.approval.task;
 
+import com.github.onsdigital.zebedee.content.base.ContentLanguage;
 import com.github.onsdigital.zebedee.content.page.base.PageType;
+import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.ContentDetail;
 import com.github.onsdigital.zebedee.model.Collection;
-import com.github.onsdigital.zebedee.model.CollectionWriter;
 import com.github.onsdigital.zebedee.model.ContentWriter;
 import com.github.onsdigital.zebedee.model.approval.tasks.CollectionPdfGenerator;
+import com.github.onsdigital.zebedee.reader.ContentReader;
+import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.service.PdfService;
 import org.junit.Before;
 import org.junit.Test;
@@ -15,7 +18,9 @@ import org.mockito.MockitoAnnotations;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -24,13 +29,13 @@ import static org.mockito.Mockito.when;
 public class CollectionPdfGeneratorTest {
 
     @Mock
-    private PdfService mockPDFService;
+    private PdfService pdfService;
 
     @Mock
-    private CollectionWriter mockCollectionWriter;
+    private ContentReader contentReader;
 
     @Mock
-    private ContentWriter mockContentWriter;
+    private ContentWriter contentWriter;
 
     @Mock
     private Collection collection;
@@ -40,27 +45,87 @@ public class CollectionPdfGeneratorTest {
     @Before
     public void setUp() {
         MockitoAnnotations.openMocks(this);
-        generator = new CollectionPdfGenerator(mockPDFService);
+        generator = new CollectionPdfGenerator(pdfService);
     }
-
 
     @Test
     public void shouldGenerateNothingForAnEmptyCollection() throws Exception {
-        generator.generatePDFsForCollection(collection, mockCollectionWriter, new ArrayList<>());
-        verifyNoInteractions(mockPDFService);
+        generator.generatePDFsForCollection(collection, contentReader, contentWriter, new ArrayList<>());
+        verifyNoInteractions(pdfService);
     }
 
     @Test
-    public void shouldGeneratePdfForArticle() throws IOException, ZebedeeException {
-        when(mockCollectionWriter.getReviewed())
-                .thenReturn(mockContentWriter);
-
-        ArrayList<ContentDetail> collectionContent = new ArrayList<>();
+    public void shouldGeneratePdfForContentWithoutExplicitLanguage() throws IOException, ZebedeeException {
+        List<ContentDetail> collectionContent = new ArrayList<>();
         String uri = "/the/uri";
-        collectionContent.add(new ContentDetail("Some article", uri, PageType.ARTICLE));
+        
+        ContentDetail content = new ContentDetail("Some article", uri, PageType.ARTICLE);
+        content.description.language = null;
+        collectionContent.add(content);
 
-        generator.generatePDFsForCollection(collection, mockCollectionWriter, collectionContent);
+        // Mock there is not a Welsh resource for this content
+        when(contentReader.getResource(uri+"/data_cy.json")).thenThrow(new NotFoundException("Welsh data file not found"));
 
-        verify(mockCollectionWriter, times(1)).getReviewed();
+        generator.generatePDFsForCollection(collection, contentReader, contentWriter, collectionContent);
+
+        // Verify it generates the English version only
+        verify(pdfService, times(1)).generatePdf(contentWriter, uri, ContentLanguage.ENGLISH);
+        verify(pdfService, never()).generatePdf(contentWriter, uri, ContentLanguage.WELSH);
+    }
+
+    @Test
+    public void shouldGeneratePdfForEnglishOnlyContent() throws IOException, ZebedeeException {
+        List<ContentDetail> collectionContent = new ArrayList<>();
+        String uri = "/the/uri";
+        
+        ContentDetail content = new ContentDetail("Some article", uri, PageType.ARTICLE);
+        content.description.language = ContentLanguage.ENGLISH.getId();
+        collectionContent.add(content);
+
+        // Mock there is not a Welsh resource for this content
+        when(contentReader.getResource(uri+"/data_cy.json")).thenThrow(new NotFoundException("Welsh data file not found"));
+
+        generator.generatePDFsForCollection(collection, contentReader, contentWriter, collectionContent);
+
+        // Verify it generates the English version only
+        verify(pdfService, times(1)).generatePdf(contentWriter, uri, ContentLanguage.ENGLISH);
+        verify(pdfService, never()).generatePdf(contentWriter, uri, ContentLanguage.WELSH);
+    }
+
+    @Test
+    public void shouldGeneratePdfForWelshOnlyContent() throws IOException, ZebedeeException {
+        List<ContentDetail> collectionContent = new ArrayList<>();
+        String uri = "/the/uri";
+        
+        ContentDetail content = new ContentDetail("Some article", uri, PageType.ARTICLE);
+        content.description.language = ContentLanguage.WELSH.getId();
+        collectionContent.add(content);
+
+        generator.generatePDFsForCollection(collection, contentReader, contentWriter, collectionContent);
+
+        // If a Welsh version is requested, it means there is no English version (as it would override it)
+        verify(contentReader, never()).getResource(uri+"/data_cy.json");
+        // Verify it generates the Welsh version only
+        verify(pdfService, times(1)).generatePdf(contentWriter, uri, ContentLanguage.WELSH);
+        verify(pdfService, never()).generatePdf(contentWriter, uri, ContentLanguage.ENGLISH);
+    }
+
+    @Test
+    public void shouldGeneratePdfForEnglishAndWelshContent() throws IOException, ZebedeeException {
+        List<ContentDetail> collectionContent = new ArrayList<>();
+        String uri = "/the/uri";
+        
+        ContentDetail content = new ContentDetail("Some article", uri, PageType.ARTICLE);
+        content.description.language = ContentLanguage.ENGLISH.getId();
+        collectionContent.add(content);
+
+        // Mock there is a Welsh resource for this content
+        when(contentReader.getResource(uri+"/data_cy.json")).thenReturn(new Resource());
+
+        generator.generatePDFsForCollection(collection, contentReader, contentWriter, collectionContent);
+
+        // Verify it generates the English and Welsh version
+        verify(pdfService, times(1)).generatePdf(contentWriter, uri, ContentLanguage.WELSH);
+        verify(pdfService, times(1)).generatePdf(contentWriter, uri, ContentLanguage.ENGLISH);
     }
 }

@@ -107,11 +107,6 @@
         </dependency>
 
         <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-        </dependency>
-
-        <dependency>
             <groupId>org.elasticsearch</groupId>
             <artifactId>elasticsearch</artifactId>
         </dependency>
@@ -185,7 +180,6 @@
         <dependency>
             <groupId>com.github.onsdigital</groupId>
             <artifactId>dp-jwt-verifier-java</artifactId>
-            <version>0.5.0</version>
         </dependency>
 
         <!-- Kafka -->
@@ -219,13 +213,26 @@
         </dependency>
 
         <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi</artifactId>
+        </dependency>
+
+        <!-- API Clients -->
+        <dependency>
             <groupId>com.github.onsdigital</groupId>
             <artifactId>dp-dataset-api-java-client</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>org.apache.poi</groupId>
-            <artifactId>poi</artifactId>
+            <groupId>com.github.onsdigital</groupId>
+            <artifactId>dp-static-files-api-client-java</artifactId>
+            <version>1.1.3</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.onsdigital</groupId>
+            <artifactId>dp-interactives-api-client-java</artifactId>
+            <version>0.2.6</version>
         </dependency>
 
         <!-- Test -->
@@ -259,17 +266,6 @@
             <scope>test</scope>
         </dependency>
 
-        <dependency>
-            <groupId>com.github.onsdigital</groupId>
-            <artifactId>dp-static-files-api-client-java</artifactId>
-            <version>1.1.1</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.github.onsdigital</groupId>
-            <artifactId>dp-interactives-api-client-java</artifactId>
-            <version>0.2.5</version>
-        </dependency>
     </dependencies>
 
     <build>

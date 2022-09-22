@@ -27,8 +27,6 @@ import java.io.InputStream;
 @Api
 public class Content {
 
-    private static final String DATA_JSON = "data.json";
-
     /**
      * Retrieves file content for the endpoint <code>/Content/[CollectionName]/?uri=[uri]</code>
      * <p/>

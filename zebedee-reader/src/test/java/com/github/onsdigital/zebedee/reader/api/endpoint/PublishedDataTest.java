@@ -2,11 +2,12 @@ package com.github.onsdigital.zebedee.reader.api.endpoint;
 
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
+import com.github.onsdigital.zebedee.content.base.ContentLanguage;
 import com.github.onsdigital.zebedee.reader.FakeCollectionReaderFactory;
 import com.github.onsdigital.zebedee.reader.ZebedeeReader;
 import com.github.onsdigital.zebedee.reader.api.endpoint.PublishedData;
 import com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration;
-import com.github.onsdigital.zebedee.reader.data.language.ContentLanguage;
+
 import org.apache.http.HttpStatus;
 import org.junit.Before;
 import org.junit.Test;
@@ -53,7 +54,7 @@ public class PublishedDataTest {
         Map<String, String[]> filterType = new HashMap<String, String[]>();
         filterType.put("Title", new String[]{});
         when(request.getParameterMap()).thenReturn(filterType);
-        when(request.getParameter("lang")).thenReturn(ContentLanguage.en.toString());
+        when(request.getParameter("lang")).thenReturn(ContentLanguage.ENGLISH.toString());
         when(request.getParameter("uri")).thenReturn("/economy/environmentalaccounts/articles/uknaturalcapitallandcoverintheuk/2015-03-17");
         when(request.getParameter("edition")).thenReturn("1.0.1");
         when(request.getParameter("releaseDate")).thenReturn((new Date()).toString());
@@ -72,7 +73,7 @@ public class PublishedDataTest {
         Map<String, String[]> filterType = new HashMap<String, String[]>();
         filterType.put("Title", new String[]{});
         when(request.getParameterMap()).thenReturn(filterType);
-        when(request.getParameter("lang")).thenReturn(ContentLanguage.en.toString());
+        when(request.getParameter("lang")).thenReturn(ContentLanguage.ENGLISH.toString());
         when(request.getParameter("uri")).thenReturn("");
         when(request.getParameter("edition")).thenReturn("1.0.1");
         when(request.getParameter("releaseDate")).thenReturn((new Date()).toString());

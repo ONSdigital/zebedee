@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee.model;
 
 import com.github.davidcarboni.restolino.json.Serialiser;
+import com.github.onsdigital.zebedee.content.base.ContentLanguage;
 import com.github.onsdigital.zebedee.json.ContentDetail;
 import com.github.onsdigital.zebedee.json.ContentDetailDescription;
 import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
@@ -35,8 +36,6 @@ public class Content {
 
     private static final String DATA_VIS_DIR = "visualisations";
     private static final String TIME_SERIES_KEYWORD = "timeseries";
-    private static final String DATA_JSON = "data.json";
-    private static final String WELSH_DATA_JSON = "data_cy.json";
 
     private static final Predicate<Path> IS_DATA_VIZ_FILE = (p) -> p != null && p.toFile().isDirectory() &&
             DATA_VIS_DIR.equals(p.getFileName().toString());
@@ -506,7 +505,7 @@ public class Content {
     public static boolean isDataJsonFile(Path path) {
         boolean result = false;
         if (path != null) {
-            result = !Files.isDirectory(path) && DATA_JSON.equals(path.getFileName().toString());
+            result = !Files.isDirectory(path) && ContentLanguage.ENGLISH.getDataFileName().equals(path.getFileName().toString());
         }
         return result;
     }
@@ -523,7 +522,7 @@ public class Content {
         if (p == null) {
             canDelete = false;
         } else {
-            canDelete = !p.toFile().isDirectory() && !StringUtils.equals(p.toFile().getName(), WELSH_DATA_JSON);
+            canDelete = !p.toFile().isDirectory() && !StringUtils.equals(p.toFile().getName(), ContentLanguage.WELSH.getDataFileName());
         }
         return canDelete;
     }

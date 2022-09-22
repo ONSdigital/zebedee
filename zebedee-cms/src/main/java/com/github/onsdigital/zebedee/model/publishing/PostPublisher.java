@@ -97,7 +97,6 @@ public class PostPublisher {
             reindexPublishingSearch(collection);
 
             if (CMSFeatureFlags.cmsFeatureFlags().isKafkaEnabled()) {
-                System.out.println("Sending to Kafka");
                 sendToKafka(collection);
             }
 

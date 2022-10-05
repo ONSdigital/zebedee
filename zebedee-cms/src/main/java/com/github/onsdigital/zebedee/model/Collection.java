@@ -357,7 +357,7 @@ public class Collection {
     }
 
     private static Release getPublishedRelease(String uri, Zebedee zebedee) throws IOException, ZebedeeException {
-        Release release = (Release) new ZebedeeReader(zebedee.getPublished().getPath().toString(), null).getPublishedContent(uri);
+        Release release = (Release) new ZebedeeReader(zebedee.getPublished().getPath().toString()).getPublishedContent(uri);
         return release;
     }
 

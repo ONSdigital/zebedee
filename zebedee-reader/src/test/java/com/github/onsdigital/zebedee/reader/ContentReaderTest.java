@@ -18,6 +18,7 @@ import org.junit.Test;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 
@@ -37,12 +38,13 @@ import static org.junit.Assert.assertTrue;
  * */
 
 public class ContentReaderTest {
+    private static final String CONTENT_DIR = "target/test-classes/test-content/zebedee/master";
 
     private ContentReader contentReader;
 
     @BeforeClass
     public static void setUp() {
-        System.setProperty("content_dir", "target/test-classes/test-content/zebedee/master");
+        System.setProperty("content_dir", CONTENT_DIR);
     }
 
     @AfterClass
@@ -50,10 +52,9 @@ public class ContentReaderTest {
         System.clearProperty("content_dir");
     }
 
-
     @Before
     public void createContentReader() {
-        this.contentReader = new FileSystemContentReader("target/test-classes/test-content/zebedee/master");
+        this.contentReader = new FileSystemContentReader(Paths.get(CONTENT_DIR));
     }
 
     @Test
@@ -89,17 +90,17 @@ public class ContentReaderTest {
 
     @Test(expected = NotFoundException.class)
     public void testGetNonexistingContent() throws ZebedeeException, IOException {
-        Page content = contentReader.getContent("madeupfoldername");
+        contentReader.getContent("madeupfoldername");
     }
 
     @Test(expected = NotFoundException.class)
     public void testReadDataWithNoDataFile() throws ZebedeeException, IOException {
-        Page content = contentReader.getContent("about/testfolder////");
+        contentReader.getContent("about/testfolder////");
     }
 
     @Test
     public void testStartingWithForwardSlash() throws ZebedeeException, IOException {
-        Page content = contentReader.getContent("/about/accessibility");
+        contentReader.getContent("/about/accessibility");
     }
 
     @Test
@@ -146,7 +147,7 @@ public class ContentReaderTest {
 
     @Test(expected = NotFoundException.class)
     public void testNonExistingNodeChilren() throws ZebedeeException, IOException {
-        Map<URI, ContentNode> children = contentReader.getChildren("/nonexistingpath/test");
+        contentReader.getChildren("/nonexistingpath/test");
     }
 
     @Test
@@ -202,7 +203,7 @@ public class ContentReaderTest {
     public void listTimeseries_whereWeHaveTimeSeries_returnsTimeseriesDirectories() throws IOException {
         // Given
         //
-        ContentReader reader = new FileSystemContentReader(this.contentReader.getRootFolder().resolve("employmentandlabourmarket").toString());
+        ContentReader reader = new FileSystemContentReader(this.contentReader.getRootFolder().resolve("employmentandlabourmarket"));
 
         // When
         //

@@ -52,7 +52,7 @@ public class ZebedeeReader {
      * @param language The language for this content reader
      */
     public ZebedeeReader(ContentLanguage language) {
-        this(ReaderConfiguration.get().getContentDir());
+        this(Paths.get(ReaderConfiguration.get().getContentDir()));
         publishedContentReader.setLanguage(language);
     }
 
@@ -60,10 +60,10 @@ public class ZebedeeReader {
      * Create a zebedee reader using the given content dir. It defaults to English
      * language
      * 
-     * @param rootFolder Path to the folder where the content can be found
+     * @param rootPath Path to the folder where the content can be found
      */
-    public ZebedeeReader(String rootFolder) {
-        publishedContentReader = new FileSystemContentReader(rootFolder);
+    public ZebedeeReader(Path rootPath) {
+        publishedContentReader = new FileSystemContentReader(rootPath);
     }
 
     public static CollectionReaderFactory getCollectionReaderFactory() {

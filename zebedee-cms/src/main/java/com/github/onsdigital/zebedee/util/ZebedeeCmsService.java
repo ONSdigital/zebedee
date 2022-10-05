@@ -131,7 +131,7 @@ public class ZebedeeCmsService {
     }
 
     public ZebedeeReader getZebedeeReader() {
-        return new ZebedeeReader(getZebedee().getPublished().getPath().toString());
+        return new ZebedeeReader(getZebedee().getPublished().getPath());
     }
 
     public DatasetService getDatasetService() {

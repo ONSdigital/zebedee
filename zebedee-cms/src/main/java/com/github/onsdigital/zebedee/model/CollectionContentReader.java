@@ -7,6 +7,7 @@ import com.github.onsdigital.zebedee.util.EncryptionUtils;
 import org.apache.commons.io.IOUtils;
 
 import javax.crypto.SecretKey;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -58,5 +59,18 @@ public class CollectionContentReader extends FileSystemContentReader {
             inputStream = Files.newInputStream(path);
         }
         return inputStream;
+    }
+
+    /**
+     * When resolving the data file in a collection for Welsh language, 
+     * do not fall back to the English json if the Welsh file does not exist.
+     * This is so that we will try and find the published Welsh content 
+     * instead of the recently edited (in the collection) English version
+     */
+    @Override
+    protected Path resolveDataFilePath(Path path) {
+        Path dataFilePath = path.resolve(language.getDataFileName());
+        dataFilePath.normalize();
+        return dataFilePath;
     }
 }

@@ -67,7 +67,7 @@ public class FileSystemContentReader implements ContentReader {
     private static Tika tika = new Tika();
 
     private final Path ROOT_FOLDER;
-    private ContentLanguage language = ContentLanguage.ENGLISH;
+    protected ContentLanguage language = ContentLanguage.ENGLISH;
 
     public FileSystemContentReader(String rootFolder) {
         this(StringUtils.isEmpty(rootFolder) ? null : Paths.get(rootFolder));
@@ -102,7 +102,7 @@ public class FileSystemContentReader implements ContentReader {
     public Page getContent(String path) throws ZebedeeException, IOException {
         //Resolve to see if requested content is latest content, if so return latest, otherwise requested file
         Path contentPath = resolveContentPath(path);
-        if (isRootFolder(contentPath) == false) {
+        if (!isRootFolder(contentPath)) {
             String parentPath = URIUtils.removeLastSegment(path);
             try {
                 Page latestContent = getLatestContent(parentPath);
@@ -388,7 +388,7 @@ public class FileSystemContentReader implements ContentReader {
         return getRootFolder().resolve(removeLeadingSlash(path));
     }
 
-    Path resolveContentPath(String path) throws BadRequestException {
+    private Path resolveContentPath(String path) throws BadRequestException {
         String jsonPath = URIUtils.removeTrailingSlash(path) + ".json";
         Path json = resolvePath(jsonPath);
         if (!exists(json)) {
@@ -397,23 +397,13 @@ public class FileSystemContentReader implements ContentReader {
         return json;
     }
 
-    private Path resolveDataFilePath(Path path) throws BadRequestException {
+    protected Path resolveDataFilePath(Path path) {
         Path dataFilePath = path.resolve(language.getDataFileName());
         if (!exists(dataFilePath)) {
             dataFilePath = path.resolve(ContentLanguage.ENGLISH.getDataFileName());
         }
-        assertReleative(dataFilePath);
-        return dataFilePath;
-    }
-
-    /**
-     * Asserts requested file is under content folder
-     *
-     * @param dataFilePath
-     */
-    private void assertReleative(Path dataFilePath) {
         dataFilePath.normalize();
-
+        return dataFilePath;
     }
 
     /*Getters * Setters */

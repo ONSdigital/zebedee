@@ -68,14 +68,14 @@ public class FileSystemContentReader implements ContentReader {
      */
     private static Tika tika = new Tika();
 
-    private final Path ROOT_FOLDER;
+    private final Path rootFolder;
     private ContentLanguage language = ContentLanguage.ENGLISH;
 
     public FileSystemContentReader(Path rootFolder) {
         if (rootFolder == null || rootFolder.equals(EMPTY_PATH)) { 
             throw new NullPointerException("Root folder can not be null");
         }
-        this.ROOT_FOLDER = rootFolder;
+        this.rootFolder = rootFolder;
     }
 
     /**
@@ -416,7 +416,7 @@ public class FileSystemContentReader implements ContentReader {
     /*Getters * Setters */
     @Override
     public Path getRootFolder() {
-        return ROOT_FOLDER;
+        return rootFolder;
     }
 
 

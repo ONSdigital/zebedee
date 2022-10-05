@@ -90,9 +90,9 @@ public abstract class CollectionReader {
     public Map<URI, ContentNode> getChildren(String path) throws ZebedeeException, IOException {
         Map<URI, ContentNode> children = new HashMap<>();
         // Is there a validation mechanism ? Might be needed
-        children.putAll(getChildrenQuite(path, reviewed));
-        children.putAll(getChildrenQuite(path, complete));//overwrites reviewed content if appears in both places
-        children.putAll(getChildrenQuite(path, inProgress));//overwrites complete and reviewed content if appears in both places
+        children.putAll(getChildrenQuiet(path, reviewed));
+        children.putAll(getChildrenQuiet(path, complete));//overwrites reviewed content if appears in both places
+        children.putAll(getChildrenQuiet(path, inProgress));//overwrites complete and reviewed content if appears in both places
         return children;
     }
 
@@ -106,9 +106,9 @@ public abstract class CollectionReader {
     public Map<URI, ContentNode> getParents(String path) throws ZebedeeException, IOException {
         Map<URI, ContentNode> parents = new HashMap<>();
         // Is there a validation mechanism ? Might be needed
-        parents.putAll(getParentsQuite(path, reviewed));
-        parents.putAll(getParentsQuite(path, complete));//overwrites reviewed content if appears in both places
-        parents.putAll(getParentsQuite(path, inProgress));//overwrites complete and reviewed content if appears in both places
+        parents.putAll(getParentsQuiet(path, reviewed));
+        parents.putAll(getParentsQuiet(path, complete));//overwrites reviewed content if appears in both places
+        parents.putAll(getParentsQuiet(path, inProgress));//overwrites complete and reviewed content if appears in both places
         return parents;
     }
 
@@ -160,7 +160,7 @@ public abstract class CollectionReader {
     }
 
     //If content not found with given reader do not shout
-    private Page getLatestQuite(String path, ContentReader contentReader) throws ZebedeeException, IOException {
+    private Page getLatestQuiet(String path, ContentReader contentReader) throws ZebedeeException, IOException {
         try {
             return contentReader.getLatestContent(path);
         } catch (NotFoundException e) {
@@ -169,7 +169,7 @@ public abstract class CollectionReader {
     }
 
     //If content not found with given reader do not shout
-    private Map<URI, ContentNode> getChildrenQuite(String path, ContentReader contentReader) throws ZebedeeException, IOException {
+    private Map<URI, ContentNode> getChildrenQuiet(String path, ContentReader contentReader) throws ZebedeeException, IOException {
         try {
             return contentReader.getChildren(path);
         } catch (NotFoundException e) {
@@ -178,7 +178,7 @@ public abstract class CollectionReader {
     }
 
     //If content not found with given reader do not shout
-    private Map<URI, ContentNode> getParentsQuite(String path, ContentReader contentReader) throws ZebedeeException, IOException {
+    private Map<URI, ContentNode> getParentsQuiet(String path, ContentReader contentReader) throws ZebedeeException, IOException {
         try {
             return contentReader.getParents(path);
         } catch (NotFoundException e) {
@@ -187,9 +187,9 @@ public abstract class CollectionReader {
     }
 
     public Page getLatestContent(String path) throws ZebedeeException, IOException {
-        Page content = getLatestQuite(path, inProgress);
+        Page content = getLatestQuiet(path, inProgress);
         if (content == null) {
-            content = getLatestQuite(path, complete);
+            content = getLatestQuiet(path, complete);
             if (content == null) {
                 content = reviewed.getLatestContent(path);
             }

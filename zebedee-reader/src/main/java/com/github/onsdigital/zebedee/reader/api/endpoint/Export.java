@@ -48,7 +48,7 @@ public class Export {
         List<TimeSeries> timeSeriesList = new ArrayList<>();
         for (int i = 0; i < uris.length; i++) {
             String uri = uris[i];
-            timeSeriesList.add((TimeSeries) readRequestHandler.find(request, null, uri));
+            timeSeriesList.add((TimeSeries) readRequestHandler.findContent(request, null, uri));
         }
         try (com.github.onsdigital.zebedee.reader.Resource resource = dataGenerator.generateData(timeSeriesList,
                 format)) {

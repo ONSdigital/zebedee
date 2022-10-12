@@ -65,32 +65,28 @@ public class ReadRequestHandler {
      */
     public Content findContent(HttpServletRequest request, DataFilter dataFilter) throws ZebedeeException, IOException {
         String uri = extractUri(request);
-        return find(request, dataFilter, uri);
+        return findContent(request, dataFilter, uri);
     }
 
-    public Content find(HttpServletRequest request, DataFilter dataFilter, String uri) throws IOException, ZebedeeException {
+    public Content findContent(HttpServletRequest request, DataFilter dataFilter, String uri) throws IOException, ZebedeeException {
         String collectionId = getCollectionId(request);
-        String lastSegment = getLastSegment(uri);
-        info().data("uri", uri).data("collection_id", collectionId).log("finding requested content");
-        if (LATEST.equalsIgnoreCase(lastSegment)) {
-            return getLatestContent(request, collectionId, dataFilter, removeLastSegment(uri));
-        } else {
-            return getContent(request, collectionId, dataFilter, uri);
-        }
+        return findContent(request, collectionId, dataFilter, uri);
     }
 
     public Content findPublishedContent(HttpServletRequest request, DataFilter dataFilter) throws ZebedeeException, IOException {
         String uri = extractUri(request);
-        return findPublished(request, dataFilter, uri);
+        return findContent(request, null, dataFilter, uri);
     }
 
-    private Content findPublished(HttpServletRequest request, DataFilter dataFilter, String uri) throws IOException, ZebedeeException {
+    private Content findContent(HttpServletRequest request, String collectionId, DataFilter dataFilter, String uri) throws IOException, ZebedeeException {
         String lastSegment = getLastSegment(uri);
-        info().data("uri", uri).log("finding requested published content");
+        info().data("uri", uri)
+                .data("collection_id", collectionId)
+                .log("finding requested content");
         if (LATEST.equalsIgnoreCase(lastSegment)) {
-            return getLatestContent(request, null, dataFilter, removeLastSegment(uri));
+            return getLatestContent(request, collectionId, dataFilter, removeLastSegment(uri));
         } else {
-            return getContent(request, null, dataFilter, uri);
+            return getContent(request, collectionId, dataFilter, uri);
         }
     }
 
@@ -100,14 +96,13 @@ public class ReadRequestHandler {
     }
 
     private Content getLatestContent(HttpServletRequest request, String collectionId, DataFilter dataFilter, String uri) throws IOException, ZebedeeException {
-        return get(collectionId, uri, 
+        return get(collectionId, uri,
                 r -> r.getLatestCollectionContent(collectionId, RequestUtils.getSessionId(request), uri, dataFilter),
                 r -> r.getLatestPublishedContent(uri, dataFilter));
-
     }
 
-    public Content getContent(HttpServletRequest request, String collectionId, DataFilter dataFilter, String uri) throws IOException, ZebedeeException {
-        return get(collectionId, uri, 
+    private Content getContent(HttpServletRequest request, String collectionId, DataFilter dataFilter, String uri) throws IOException, ZebedeeException {
+        return get(collectionId, uri,
                 r -> r.getCollectionContent(collectionId, RequestUtils.getSessionId(request), uri, dataFilter),
                 r -> r.getPublishedContent(uri, dataFilter));
     }
@@ -126,7 +121,6 @@ public class ReadRequestHandler {
         return get(collectionId, uri, 
                 r -> r.getCollectionResource(collectionId, RequestUtils.getSessionId(request), uri),
                 r -> r.getPublishedResource(uri));
-
     }
 
     /**

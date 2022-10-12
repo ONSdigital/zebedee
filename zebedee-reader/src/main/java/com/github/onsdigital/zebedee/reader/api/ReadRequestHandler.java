@@ -131,11 +131,28 @@ public class ReadRequestHandler {
             } catch (NotFoundException e) {
                 info().data("uri", uri)
                         .data("collection_id", collectionId)
+                        .data("language", reader.getLanguage())
                         .log("Could not find resource in collection. Will try published content");
             }
         }
 
-        return reader.getPublishedContent(uri, dataFilter);
+        try {
+            return reader.getPublishedContent(uri, dataFilter);
+        } catch (NotFoundException e) {
+            // If searching for Welsh content which is not in the collection or published,
+            // we'll need to use the English content (looking in the collection first)
+            if (!ContentLanguage.ENGLISH.equals(reader.getLanguage())) {
+                info().data("uri", uri)
+                        .data("collection_id", collectionId)
+                        .data("language", reader.getLanguage())
+                        .log("Could not find resource in published content. Will try English");
+                return new ReadRequestHandler(ContentLanguage.ENGLISH).getContent(request, collectionId, dataFilter,
+                        uri);
+            } else {
+                throw e;
+            }
+        }
+
     }
 
     /**

@@ -37,7 +37,7 @@ public class ZebedeeReader {
      * If Zebedee Reader is running standalone, no reader factory registered, thus no collection reads are allowed
      */
     private static CollectionReaderFactory collectionReaderFactory;
-    private ContentReader publishedContentReader;
+    private final ContentReader publishedContentReader;
 
     /**
      * Create a zebedee reader using the default content dir and English
@@ -187,7 +187,6 @@ public class ZebedeeReader {
         }
     }
 
-
     public Map<URI, ContentNode> getCollectionContentChildren(String collectionId, String sessionId, String path) throws ZebedeeException, IOException {
         return createCollectionReader(collectionId, sessionId).getChildren(path);
     }
@@ -224,7 +223,6 @@ public class ZebedeeReader {
         }
     }
 
-
     private CollectionReader createCollectionReader(String collectionId, String sessionId) throws NotFoundException, IOException, UnauthorizedException, BadRequestException {
         if (collectionReaderFactory == null) {
             throw new UnauthorizedException("Collection reads are not available");
@@ -233,5 +231,9 @@ public class ZebedeeReader {
         CollectionReader collectionContentReader = collectionReaderFactory.createCollectionReader(collectionId, sessionId);
         collectionContentReader.setLanguage(publishedContentReader.getLanguage());
         return collectionContentReader;
+    }
+
+    public ContentLanguage getLanguage() {
+        return publishedContentReader.getLanguage();
     }
 }

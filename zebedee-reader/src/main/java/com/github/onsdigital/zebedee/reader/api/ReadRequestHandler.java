@@ -18,13 +18,13 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URLDecoder;
-import java.nio.file.NoSuchFileException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
 
+import static com.github.onsdigital.zebedee.logging.ReaderLogger.error;
 import static com.github.onsdigital.zebedee.logging.ReaderLogger.info;
 import static com.github.onsdigital.zebedee.util.URIUtils.getLastSegment;
 import static com.github.onsdigital.zebedee.util.URIUtils.removeLastSegment;
@@ -35,6 +35,11 @@ import static com.github.onsdigital.zebedee.util.URIUtils.removeLastSegment;
  * This class checks to see if zebedee cms is running to authorize collection views via registered AuthorisationHandler, if not serves published content
  */
 public class ReadRequestHandler {
+
+    @FunctionalInterface
+    private interface ResourceFinder<R> {
+        R find(ZebedeeReader reader) throws ZebedeeException, IOException ;
+    }
 
     private final static String LATEST = "latest";
     private ZebedeeReader reader;
@@ -90,69 +95,21 @@ public class ReadRequestHandler {
     }
 
     public Content getContent(String uri, HttpServletRequest request) throws ZebedeeException, IOException {
-        String sessionId = RequestUtils.getSessionId(request);
         String collectionId = getCollectionId(request);
-
-        if (collectionId != null) {
-            try {
-                return reader.getCollectionContent(collectionId, sessionId, uri, null);
-            } catch (NotFoundException e) {
-                info().data("uri", uri)
-                        .data("collection_id", collectionId)
-                        .log("Could not find resource in collection. Will try published content");
-            }
-        }
-
-        return reader.getPublishedContent(uri, null);
+        return getContent(request, collectionId, null, uri);
     }
 
-
     private Content getLatestContent(HttpServletRequest request, String collectionId, DataFilter dataFilter, String uri) throws IOException, ZebedeeException {
+        return get(collectionId, uri, 
+                r -> r.getLatestCollectionContent(collectionId, RequestUtils.getSessionId(request), uri, dataFilter),
+                r -> r.getLatestPublishedContent(uri, dataFilter));
 
-        if (collectionId != null) {
-            try {
-                String sessionId = RequestUtils.getSessionId(request);
-                return reader.getLatestCollectionContent(collectionId, sessionId, uri, dataFilter);
-            } catch (NotFoundException | NoSuchFileException e) {
-                info().data("resource_uri", uri)
-                        .data("collection_id", collectionId)
-                        .log("Could not find resource in collection. Will try published content");
-            }
-        }
-
-        return reader.getLatestPublishedContent(uri, dataFilter);
     }
 
     public Content getContent(HttpServletRequest request, String collectionId, DataFilter dataFilter, String uri) throws IOException, ZebedeeException {
-        if (collectionId != null) {
-            try {
-                String sessionId = RequestUtils.getSessionId(request);
-                return reader.getCollectionContent(collectionId, sessionId, uri, dataFilter);
-            } catch (NotFoundException e) {
-                info().data("uri", uri)
-                        .data("collection_id", collectionId)
-                        .data("language", reader.getLanguage())
-                        .log("Could not find resource in collection. Will try published content");
-            }
-        }
-
-        try {
-            return reader.getPublishedContent(uri, dataFilter);
-        } catch (NotFoundException e) {
-            // If searching for Welsh content which is not in the collection or published,
-            // we'll need to use the English content (looking in the collection first)
-            if (!ContentLanguage.ENGLISH.equals(reader.getLanguage())) {
-                info().data("uri", uri)
-                        .data("collection_id", collectionId)
-                        .data("language", reader.getLanguage())
-                        .log("Could not find resource in published content. Will try English");
-                return new ReadRequestHandler(ContentLanguage.ENGLISH).getContent(request, collectionId, dataFilter,
-                        uri);
-            } else {
-                throw e;
-            }
-        }
-
+        return get(collectionId, uri, 
+                r -> r.getCollectionContent(collectionId, RequestUtils.getSessionId(request), uri, dataFilter),
+                r -> r.getPublishedContent(uri, dataFilter));
     }
 
     /**
@@ -166,17 +123,10 @@ public class ReadRequestHandler {
     public Resource findResource(HttpServletRequest request) throws ZebedeeException, IOException {
         String uri = URLDecoder.decode(extractUri(request), "UTF-8");
         String collectionId = getCollectionId(request);
-        if (collectionId != null) {
-            try {
-                String sessionId = RequestUtils.getSessionId(request);
-                return reader.getCollectionResource(collectionId, sessionId, uri);
-            } catch (NotFoundException e) {
-                info().data("resource_uri", uri)
-                        .data("collection_id", collectionId)
-                        .log("Could not find resource under collection, trying published content");
-            }
-        }
-        return reader.getPublishedResource(uri);
+        return get(collectionId, uri, 
+                r -> r.getCollectionResource(collectionId, RequestUtils.getSessionId(request), uri),
+                r -> r.getPublishedResource(uri));
+
     }
 
     /**
@@ -190,17 +140,63 @@ public class ReadRequestHandler {
     public long getContentLength(HttpServletRequest request) throws ZebedeeException, IOException {
         String uri = extractUri(request);
         String collectionId = getCollectionId(request);
+
+        return get(collectionId, uri, 
+                r -> r.getCollectionContentLength(collectionId, RequestUtils.getSessionId(request), uri),
+                r -> r.getPublishedContentLength(uri));
+    }
+
+    /**
+     * Get a resource in either:
+     * <ol>
+     * <li>the given collection (if any) in the current language</li>
+     * <li>published content in the current language</li>
+     * <li>the given collection (if any) in English</li>
+     * <li>published content in English</li>
+     * </ol>
+     * 
+     * @param <T>                The type of the resource being searched
+     * @param collectionId       The collection id
+     * @param uri                The uri of the resource
+     * @param collectionSupplier A function to find the resource in the collection
+     * @param publishedSupplier  A function to find the resource in the published
+     *                           content
+     * @return The resource
+     * @throws ZebedeeException If an error occurs while finding the resource or if
+     *                          it couldn't be found
+     * @throws IOException      If an error occurs while finding the resource
+     */
+    private <T> T get(String collectionId, String uri,
+            ResourceFinder<T> collectionSupplier, ResourceFinder<T> publishedSupplier) throws ZebedeeException, IOException {
         if (collectionId != null) {
             try {
-                String sessionId = RequestUtils.getSessionId(request);
-                return reader.getCollectionContentLength(collectionId, sessionId, uri);
+                return collectionSupplier.find(reader);
             } catch (NotFoundException e) {
                 info().data("uri", uri)
                         .data("collection_id", collectionId)
+                        .data("language", reader.getLanguage())
                         .log("Could not find resource in collection. Will try published content");
             }
         }
-        return reader.getPublishedContentLength(uri);
+
+        try {
+            return publishedSupplier.find(reader);
+        } catch (NotFoundException e) {
+            if (!ContentLanguage.ENGLISH.equals(reader.getLanguage())) {
+                info().data("uri", uri)
+                        .data("collection_id", collectionId)
+                        .data("language", reader.getLanguage())
+                        .log("Could not find resource in published content. Will try English");
+                ReadRequestHandler englishHandler = new ReadRequestHandler(ContentLanguage.ENGLISH);
+                return englishHandler.get(collectionId, uri, collectionSupplier, publishedSupplier);
+            } else {
+                error().data("uri", uri)
+                        .data("collection_id", collectionId)
+                        .data("language", reader.getLanguage())
+                        .log("Could not find resource in published content.");
+                throw e;
+            }
+        } 
     }
 
     public Collection<ContentNode> getTaxonomy(HttpServletRequest request, int depth) throws ZebedeeException, IOException {

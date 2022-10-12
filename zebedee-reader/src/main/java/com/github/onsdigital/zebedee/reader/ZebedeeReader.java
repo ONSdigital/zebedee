@@ -21,7 +21,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static com.github.onsdigital.zebedee.logging.ReaderLogger.info;
-import static com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration.get;
 
 /**
  * Created by bren on 29/07/15.
@@ -39,22 +38,32 @@ public class ZebedeeReader {
      */
     private static CollectionReaderFactory collectionReaderFactory;
     private ContentReader publishedContentReader;
-    private ContentLanguage language;
 
+    /**
+     * Create a zebedee reader using the default content dir and English
+     */
     public ZebedeeReader() {
-        this(null);
+        this(ContentLanguage.ENGLISH);
     }
 
+    /**
+     * Create a zebedee reader using the default content dir and the given language
+     * 
+     * @param language The language for this content reader
+     */
     public ZebedeeReader(ContentLanguage language) {
-        ReaderConfiguration cfg = ReaderConfiguration.get();
-        publishedContentReader = new FileSystemContentReader(cfg.getContentDir());
+        this(Paths.get(ReaderConfiguration.get().getContentDir()));
         publishedContentReader.setLanguage(language);
-        this.language = language;
     }
 
-    public ZebedeeReader(String rootFolder, ContentLanguage language) {
-        publishedContentReader = new FileSystemContentReader(rootFolder);
-        this.language = language;
+    /**
+     * Create a zebedee reader using the given content dir. It defaults to English
+     * language
+     * 
+     * @param rootPath Path to the folder where the content can be found
+     */
+    public ZebedeeReader(Path rootPath) {
+        publishedContentReader = new FileSystemContentReader(rootPath);
     }
 
     public static CollectionReaderFactory getCollectionReaderFactory() {
@@ -222,7 +231,7 @@ public class ZebedeeReader {
         }
 
         CollectionReader collectionContentReader = collectionReaderFactory.createCollectionReader(collectionId, sessionId);
-        collectionContentReader.setLanguage(language);
+        collectionContentReader.setLanguage(publishedContentReader.getLanguage());
         return collectionContentReader;
     }
 }

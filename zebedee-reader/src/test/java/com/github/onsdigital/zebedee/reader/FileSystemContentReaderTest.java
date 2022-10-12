@@ -6,14 +6,35 @@ import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 public class FileSystemContentReaderTest {
 
     @Rule
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
+
+    @Test(expected = NullPointerException.class)
+    public void constructorShouldThrowExceptionIfPathNull() {
+        new FileSystemContentReader(null);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void constructorShouldThrowExceptionIfPathEmpty() {
+        new FileSystemContentReader(Paths.get(""));
+    }
+
+    @Test
+    public void constructorShouldCreateObject() {
+        Path rootFolder = Paths.get("path");
+        FileSystemContentReader reader = new FileSystemContentReader(rootFolder);
+        assertThat(reader, notNullValue());
+        assertThat(reader.getRootFolder(),  equalTo(rootFolder));
+    }
 
     @Test
     public void shouldReturnCorrectMimeType_forCssFile() throws Exception {

@@ -36,6 +36,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeSet;
 
 import static com.github.onsdigital.zebedee.logging.ReaderLogger.error;
@@ -58,6 +59,7 @@ import static org.apache.commons.lang3.StringUtils.removeEnd;
  */
 public class FileSystemContentReader implements ContentReader {
 
+    private static final Path EMPTY_PATH = Paths.get("");
     private static final String DEFAULT_MIME_TYPE = "application/octet-stream";
 
     /**
@@ -66,19 +68,14 @@ public class FileSystemContentReader implements ContentReader {
      */
     private static Tika tika = new Tika();
 
-    private final Path ROOT_FOLDER;
+    private final Path rootFolder;
     protected ContentLanguage language = ContentLanguage.ENGLISH;
 
-    public FileSystemContentReader(String rootFolder) {
-        this(StringUtils.isEmpty(rootFolder) ? null : Paths.get(rootFolder));
-    }
-
-
     public FileSystemContentReader(Path rootFolder) {
-        if (rootFolder == null) {
+        if (rootFolder == null || rootFolder.equals(EMPTY_PATH)) { 
             throw new NullPointerException("Root folder can not be null");
         }
-        this.ROOT_FOLDER = rootFolder;
+        this.rootFolder = rootFolder;
     }
 
     /**
@@ -301,12 +298,12 @@ public class FileSystemContentReader implements ContentReader {
             return null;
         }
 
-        TreeSet<ContentNode> sortedSet = sortByDate(children.values());
+        Set<ContentNode> sortedSet = sortByDate(children.values());
         return getPage(resolveDataFilePath(resolvePath(sortedSet.iterator().next().getUri().toString())));
     }
 
-    private TreeSet sortByDate(Collection set) {
-        TreeSet valueSet = new TreeSet(new ReleaseDateComparator());
+    private Set<ContentNode> sortByDate(Collection<ContentNode> set) {
+        Set<ContentNode> valueSet = new TreeSet<>(new ReleaseDateComparator());
         valueSet.addAll(set);
         return valueSet;
     }
@@ -409,7 +406,7 @@ public class FileSystemContentReader implements ContentReader {
     /*Getters * Setters */
     @Override
     public Path getRootFolder() {
-        return ROOT_FOLDER;
+        return rootFolder;
     }
 
 

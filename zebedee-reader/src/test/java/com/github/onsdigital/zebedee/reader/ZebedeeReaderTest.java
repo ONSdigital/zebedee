@@ -143,7 +143,7 @@ public class ZebedeeReaderTest {
 
     @Test(expected = CollectionNotFoundException.class)
     public void testNonExistingCollectionRead() throws ZebedeeException, IOException {
-        Content content = createReader().getCollectionContent("nonexistingcollection", TEST_SESSION_ID, "/employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/articles/labourdisputes/2015-07-16/0c908062.json");
+        createReader().getCollectionContent("nonexistingcollection", TEST_SESSION_ID, "/employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/articles/labourdisputes/2015-07-16/0c908062.json");
     }
 
     @Test

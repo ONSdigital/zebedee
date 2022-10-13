@@ -142,15 +142,15 @@
   ],
   "description": {
     "_abstract": "We take a look at land cover ecosystem accounts for the United Kingdom (UK). The land cover accounts based on data from the Countryside Survey show that the land cover changed significantly in the UK between 1998 and 2007.",
-    "edition": "2022",
-    "nationalStatistic": false,
+    "edition": "2022-1",
+    "nationalStatistic": true,
     "contact": {
-      "email": "vahe.nafilyan@ons.gsi.gov.uk",
-      "name": "Vahé Nafilyan",
-      "telephone": "+ 44 (0)1633 651764"
+      "email": "test@ons.gov.uk",
+      "name": "Test",
+      "telephone": "01633 651764"
     },
     "releaseDate": "2015-03-17T00:00:00.000Z",
-    "title": "UK Natural Capital Land Cover in the UK",
+    "title": "Edited in collection",
     "keywords": [
       "ecosystems",
       " cultivated land",
@@ -159,7 +159,7 @@
       " pasture",
       " grassland"
     ],
-    "metaDescription": "We take a look at land cover ecosystem accounts for the United Kingdom (UK). The land cover accounts based on data from the Countryside Survey show that the land cover changed significantly in the UK between 1998 and 2007."
+    "metaDescription": "Edited meta description"
   },
   "relatedArticles": [],
   "links": [],

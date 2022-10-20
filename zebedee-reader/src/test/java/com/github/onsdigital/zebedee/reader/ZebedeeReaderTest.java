@@ -35,7 +35,7 @@ import static org.junit.Assert.assertTrue;
  */
 
 public class ZebedeeReaderTest {
-    private final static String TEST_COLLECTION_ID = "testcollection-testid";
+    private final static String TEST_COLLECTION_ID = "testcollection-3ff3cfe6437e1b2e8fdde2a664cd3f9de239dd99e9acb109557f4a1089e48bd7";
     private final static String TEST_SESSION_ID = "testcollection-session";
 
 

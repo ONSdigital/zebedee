@@ -28,7 +28,7 @@
         <apache.poi.version>3.17</apache.poi.version>
         <spring.version>5.3.20</spring.version>
         <dp.logging.version>2.0.0-beta.3</dp.logging.version>
-        <batik.version>1.15</batik.version>
+        <batik.version>1.16</batik.version>
     </properties>
 
     <dependencyManagement>

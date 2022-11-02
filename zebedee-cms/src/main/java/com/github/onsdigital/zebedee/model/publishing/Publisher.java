@@ -23,7 +23,6 @@ import com.github.onsdigital.zebedee.service.DatasetService;
 import com.github.onsdigital.zebedee.service.ImageService;
 import com.github.onsdigital.zebedee.service.ImageServicePublishingResult;
 import com.github.onsdigital.zebedee.service.StaticFilesService;
-import com.github.onsdigital.zebedee.service.KafkaService;
 import com.github.onsdigital.zebedee.service.ServiceSupplier;
 import com.github.onsdigital.zebedee.service.InteractivesService;
 import com.github.onsdigital.zebedee.util.Http;
@@ -32,7 +31,6 @@ import com.github.onsdigital.zebedee.util.ZebedeeCmsService;
 import com.github.onsdigital.zebedee.util.slack.Notifier;
 import com.github.onsdigital.zebedee.util.slack.PostMessageField;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.MDC;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -45,7 +43,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
@@ -67,7 +64,6 @@ import static com.github.onsdigital.zebedee.util.SlackNotification.CollectionSta
 import static com.github.onsdigital.zebedee.util.SlackNotification.StageStatus.FAILED;
 import static com.github.onsdigital.zebedee.util.SlackNotification.StageStatus.STARTED;
 import static com.github.onsdigital.zebedee.util.SlackNotification.publishNotification;
-import static org.apache.commons.lang3.StringUtils.defaultIfBlank;
 
 public class Publisher {
 
@@ -120,6 +116,7 @@ public class Publisher {
     public static boolean executePublish(Collection collection, CollectionReader collectionReader, String email)
             throws IOException {
         boolean success = false;
+        final String collectionId = collection.getDescription().getId();
 
         Future<ImageServicePublishingResult> imageFuture = null;
         if (CMSFeatureFlags.cmsFeatureFlags().isImagePublishingEnabled()) {
@@ -148,7 +145,8 @@ public class Publisher {
                 staticFilesServiceSupplier.getService().publishCollection(collection);
                 success &= true;
             } catch (Exception e) {
-                error().logException(e, "Exception thrown when performing static file publish()");
+                error().data("collectionId", collectionId).data("publishing", true)
+                        .logException(e, "Exception thrown when performing static file publish()");
                 success = false;
             }
         }
@@ -165,7 +163,7 @@ public class Publisher {
                     notifyUnpublishedImages(collection, result);
                 }
             } catch (Exception e) {
-                error().data("collectionId", collection.getDescription().getId()).data("publishing", true)
+                error().data("collectionId", collectionId).data("publishing", true)
                         .logException(e, "Exception publishing images via image API");
                 String channel = Configuration.getDefaultSlackAlarmChannel();
                 Notifier notifier = zebedee.getSlackNotifier();
@@ -179,7 +177,8 @@ public class Publisher {
                 interactivesServiceSupplier.getService().publishCollection(collection);
                 success &= true;
             } catch (Exception e) {
-                error().logException(e, "Exception thrown when performing interactives publish()");
+                error().data("collectionId", collectionId).data("publishing", true)
+                        .logException(e,"Exception thrown when performing interactives publish()");
                 success = false;
             }
         }
@@ -187,7 +186,7 @@ public class Publisher {
         info().data("milliseconds", collection.getPublishTimeMilliseconds())
                 .data("publishComplete", success)
                 .data("publishing", true)
-                .data("collectionId", collection.getDescription().getId())
+                .data("collectionId", collectionId)
                 .log("collection publish time");
 
         return success;

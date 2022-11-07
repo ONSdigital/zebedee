@@ -52,7 +52,7 @@ public class ReleasePopulator {
 
             addRelatedDataset(release, contentDetail);
             break;
-        case API_DATASET:
+            case API_DATASET_LANDING_PAGE:
             info().data("contentTitle", contentDetail.description.title)
                     .data("releaseTitle", release.getDescription().getTitle())
                     .log("Adding cantabular or cmd dataset as a link to release");

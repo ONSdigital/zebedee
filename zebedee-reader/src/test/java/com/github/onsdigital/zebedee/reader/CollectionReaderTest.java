@@ -133,7 +133,7 @@ public class CollectionReaderTest {
     @Test
     public void testGetChildrenDirectories() throws ZebedeeException, IOException {
         Map<URI, ContentNode> children = collectionReader.getChildren("employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/datasets");
-        assertTrue(children.size() == 1);
+        assertTrue(children.size() == 2);
         Map.Entry<URI, ContentNode> contentNode = children.entrySet().iterator().next();
         assertEquals("Labour disputes by sector: LABD02", contentNode.getValue().getDescription().getTitle());
         assertEquals(PageType.DATASET_LANDING_PAGE, contentNode.getValue().getType());//type is null for directories with no data.json

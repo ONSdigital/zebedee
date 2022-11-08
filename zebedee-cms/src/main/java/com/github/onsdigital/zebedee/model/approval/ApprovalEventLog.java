@@ -5,7 +5,6 @@ import java.util.Date;
 import java.util.List;
 
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
-import static com.github.onsdigital.zebedee.model.approval.ApprovalEventType.ADD_DATASET_DETAILS;
 import static com.github.onsdigital.zebedee.model.approval.ApprovalEventType.ADD_DATASET_VERSION_DETAILS;
 import static com.github.onsdigital.zebedee.model.approval.ApprovalEventType.ADD_INTERACTIVE_DETAILS;
 import static com.github.onsdigital.zebedee.model.approval.ApprovalEventType.APPROVAL_COMPLETED;
@@ -51,10 +50,6 @@ public class ApprovalEventLog {
 
     public void resolvedDetails() {
         addEvent(RESOLVED_DETAILS);
-    }
-
-    public void addDatasetDetails() {
-        addEvent(ADD_DATASET_DETAILS);
     }
 
     public void addInteractiveDetails() {

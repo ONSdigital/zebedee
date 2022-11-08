@@ -8,8 +8,6 @@ public enum ApprovalEventType {
 
     ADD_INTERACTIVE_DETAILS("addInteractiveDetails"),
 
-    ADD_DATASET_DETAILS("addDatasetDetails"),
-
     ADD_DATASET_VERSION_DETAILS("addDatasetDetails"),
 
     POPULATED_RELEASE_PAGE("populatedReleasePage"),

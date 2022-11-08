@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee.model.approval;
 
 import com.github.davidcarboni.cryptolite.Random;
+import com.github.onsdigital.zebedee.configuration.CMSFeatureFlags;
 import com.github.onsdigital.zebedee.content.page.base.PageType;
 import com.github.onsdigital.zebedee.data.processing.DataIndex;
 import com.github.onsdigital.zebedee.json.ApprovalStatus;
@@ -44,10 +45,12 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
@@ -105,6 +108,9 @@ public class ApproveTaskTest {
     @Captor
     private ArgumentCaptor<Event> eventCaptor;
 
+    @Captor
+    private ArgumentCaptor<List<String>> stringListCaptor;
+
     private ExecutorService executorService;
 
     @Before
@@ -120,6 +126,7 @@ public class ApproveTaskTest {
         if (executorService != null) {
             executorService.shutdownNow();
         }
+        CMSFeatureFlags.reset();
     }
 
     @Test
@@ -133,7 +140,7 @@ public class ApproveTaskTest {
         collection.getDescription().getPendingDeletes().add(pendingDelete);
 
         // When the publish notification is created as part of the approval process.
-        PublishNotification publishNotification = ApproveTask.createPublishNotification(new ArrayList<>(), collection);
+        PublishNotification publishNotification = task.createPublishNotification(new ArrayList<>(), collection);
 
         // Then the publish notification contains the expected directory to delete.
         Assert.assertNotNull(publishNotification);
@@ -244,8 +251,11 @@ public class ApproveTaskTest {
         doReturn(compressionTask).when(task).getCompressionTask();
         doNothing().when(collectionDescription).addEvent(eventCaptor.capture());
 
+        doReturn(new PublishNotification(collection)).when(task).createPublishNotification(stringListCaptor.capture(), eq(collection));
+
         List<ContentDetail> collectionContent = new ArrayList<>();
-        collectionContent.add(new ContentDetail("Some article", "/the/uri", PageType.ARTICLE));
+        ContentDetail articleDetail = new ContentDetail("Some article", "/the/uri", PageType.ARTICLE);
+        collectionContent.add(articleDetail);
         when(contentDetailResolver.resolve(content, contentReader)).thenReturn(collectionContent);
 
         task.call();
@@ -262,6 +272,71 @@ public class ApproveTaskTest {
         assertThat(capturedEvents.get(0).getEmail(), equalTo(EMAIL));
         assertThat(capturedEvents.get(0).getType(), equalTo(EventType.APPROVED));
 
+        List<String> notificationUriList = stringListCaptor.getValue();
+        assertThat(notificationUriList, hasItem(articleDetail.uri));
+
         verify(collection, times(1)).save();
+    }
+    
+    @Test
+    public void shouldApproveCmdSuccessfully() throws Exception {
+        String datasetImportFlag = System.getProperty(CMSFeatureFlags.ENABLE_DATASET_IMPORT);
+        System.setProperty(CMSFeatureFlags.ENABLE_DATASET_IMPORT, "true");
+        CMSFeatureFlags.reset();
+        
+        when(collection.getDescription()).thenReturn(collectionDescription);
+        when(collectionReader.getReviewed()).thenReturn(contentReader);
+        when(collectionWriter.getReviewed()).thenReturn(contentWriter);
+        when(collection.getReviewed()).thenReturn(content);
+
+        List<ContentDetail> datasetVersionDetails = new ArrayList<>();
+        ContentDetail datasetVersionDetail = new ContentDetail("Dataset version", "/datasets/TS056/editions/2021/versions/4", PageType.API_DATASET_LANDING_PAGE);
+        datasetVersionDetails.add(datasetVersionDetail);
+        when(collection.getDatasetVersionDetails()).thenReturn(datasetVersionDetails);
+
+        List<ContentDetail> datasetDetails = new ArrayList<>();
+        ContentDetail datasetDetail = new ContentDetail("Dataset", "/datasets/TS056/", PageType.API_DATASET_LANDING_PAGE);
+        datasetDetails.add(datasetDetail);
+        when(collection.getDatasetDetails()).thenReturn(datasetDetails);
+
+        doReturn(pdfGenerator).when(task).getPdfGenerator();
+        doReturn(compressionTask).when(task).getCompressionTask();
+        doNothing().when(collectionDescription).addEvent(eventCaptor.capture());
+
+        doReturn(new PublishNotification(collection)).when(task).createPublishNotification(stringListCaptor.capture(), eq(collection));
+
+        List<ContentDetail> collectionContent = new ArrayList<>();
+        ContentDetail articleDetail = new ContentDetail("Some article", "/the/uri", PageType.ARTICLE);
+        collectionContent.add(articleDetail);
+        when(contentDetailResolver.resolve(content, contentReader)).thenReturn(collectionContent);
+
+        task.call();
+
+        assertThat(collectionContent, hasItem(datasetVersionDetail));
+
+        verify(collection, times(1)).populateReleaseQuietly(collectionReader, collectionWriter, collectionContent);
+        verify(pdfGenerator, times(1)).generatePDFsForCollection(collection, contentReader, contentWriter,
+                collectionContent);
+        verify(compressionTask, times(1)).compressTimeseries(collection, collectionReader, collectionWriter);
+        //Verify the collection has been approved
+        verify(collectionDescription).setApprovalStatus(ApprovalStatus.COMPLETE);
+
+        List<Event> capturedEvents = eventCaptor.getAllValues();
+        assertThat(capturedEvents.size(), equalTo(1));
+        assertThat(capturedEvents.get(0).getEmail(), equalTo(EMAIL));
+        assertThat(capturedEvents.get(0).getType(), equalTo(EventType.APPROVED));
+
+        List<String> notificationUriList = stringListCaptor.getValue();
+        assertThat(notificationUriList, hasItem(articleDetail.uri));
+        assertThat(notificationUriList, hasItem(datasetDetail.uri));
+        assertThat(notificationUriList, hasItem(datasetVersionDetail.uri));
+
+        verify(collection, times(1)).save();
+
+        if (datasetImportFlag == null) {
+            System.clearProperty(CMSFeatureFlags.ENABLE_DATASET_IMPORT);
+        } else {
+            System.setProperty(CMSFeatureFlags.ENABLE_DATASET_IMPORT, datasetImportFlag);
+        }
     }
 }

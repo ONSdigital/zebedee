@@ -1431,15 +1431,15 @@ public class Collection {
     /**
      * Return a list of ContentDetail items for each data set in the collection.
      */
-//    public List<ContentDetail> getDatasetDetails() {
-//
-//        return description.getDatasets().stream().map(ds -> {
-//
-//            String url = URI.create(ds.getUri()).getPath();
-//            return new ContentDetail(ds.getTitle(), url, PageType.API_DATASET_LANDING_PAGE);
-//
-//        }).collect(Collectors.toList());
-//    }
+    public List<ContentDetail> getDatasetDetails() {
+
+        return description.getDatasets().stream().map(ds -> {
+
+            String url = URI.create(ds.getUri()).getPath();
+            return new ContentDetail(ds.getTitle(), url, PageType.API_DATASET_LANDING_PAGE);
+
+        }).collect(Collectors.toList());
+    }
 
     /**
      * Return a list of ContentDetail. One for each data set version in the collection.

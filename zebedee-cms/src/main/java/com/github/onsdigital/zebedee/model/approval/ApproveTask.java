@@ -129,9 +129,6 @@ public class ApproveTask implements Callable<Boolean> {
             }
 
             if (cmsFeatureFlags().isEnableDatasetImport()) {
-//                collectionContent.addAll(collection.getDatasetDetails());
-//                eventLog.addDatasetDetails();
-
                 collectionContent.addAll(collection.getDatasetVersionDetails());
                 eventLog.addDatasetVersionDetails();
             }
@@ -144,6 +141,11 @@ public class ApproveTask implements Callable<Boolean> {
 
             generatePdfFiles(collectionContent);
             eventLog.generatedPDFs();
+
+            if (cmsFeatureFlags().isEnableDatasetImport()) {
+                collectionContent.addAll(collection.getDatasetDetails());
+                eventLog.addDatasetDetails();
+            }
 
             List<String> uriList = collectionContent.stream().map(c -> c.uri).collect(Collectors.toList());
             PublishNotification publishNotification = createPublishNotification(uriList, collection);

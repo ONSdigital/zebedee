@@ -132,7 +132,6 @@ public class ApproveTask implements Callable<Boolean> {
                 collectionContent.addAll(collection.getDatasetDetails());
                 eventLog.addDatasetDetails();
 
-                collectionContent.addAll(collection.getDatasetVersionDetails());
                 collectionContent.addAll(collection.getDatasetVersion());
                 eventLog.addDatasetVersionDetails();
             }

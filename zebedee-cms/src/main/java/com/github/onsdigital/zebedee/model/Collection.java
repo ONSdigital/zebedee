@@ -1431,44 +1431,25 @@ public class Collection {
     /**
      * Return a list of ContentDetail items for each data set in the collection.
      */
-    public List<ContentDetail> getDatasetDetails() {
-
-        return description.getDatasets().stream().map(ds -> {
-
-            String url = URI.create(ds.getUri()).getPath();
-            return new ContentDetail(ds.getTitle(), url, PageType.API_DATASET_LANDING_PAGE);
-
-        }).collect(Collectors.toList());
-    }
+//    public List<ContentDetail> getDatasetDetails() {
+//
+//        return description.getDatasets().stream().map(ds -> {
+//
+//            String url = URI.create(ds.getUri()).getPath();
+//            return new ContentDetail(ds.getTitle(), url, PageType.API_DATASET_LANDING_PAGE);
+//
+//        }).collect(Collectors.toList());
+//    }
 
     /**
-     * Return a list of ContentDetail items for each data set version in the collection.
+     * Return a list of ContentDetail. One for each data set version in the collection.
      */
-    public List<ContentDetail> getDatasetVersion() {
+    public List<ContentDetail> getDatasetVersionDetails() {
 
         return description.getDatasetVersions().stream().map(ds -> {
 
             String versionURL = "/datasets/" + ds.getId() + "/editions/" + ds.getEdition() + "/versions/" + ds.getVersion();
             return new ContentDetail(ds.getTitle(), versionURL, PageType.API_DATASET_LANDING_PAGE);
-
-        }).collect(Collectors.toList());
-    }
-
-    /**
-     * Return a list of ContentDetail. One for each data set version in the collection,
-     * and also one for each of the parent data sets for those versions
-     */
-    public List<ContentDetail> getDatasetVersionDetails() {
-
-        return description.getDatasetVersions().stream().flatMap(ds -> {
-
-            String datasetURL = "/datasets/" + ds.getId();
-            String versionURL = datasetURL + "/editions/" + ds.getEdition() + "/versions/" + ds.getVersion();
-
-            ContentDetail versionDetail = new ContentDetail(ds.getTitle(), versionURL, PageType.API_DATASET);
-            ContentDetail datasetDetail = new ContentDetail(ds.getTitle(), datasetURL, PageType.API_DATASET_LANDING_PAGE);
-
-            return (new ArrayList<>(Arrays.asList(versionDetail, datasetDetail))).stream();
 
         }).collect(Collectors.toList());
     }

@@ -1844,30 +1844,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
     }
 
     @Test
-    public void getDatasetDetails() throws IOException, ZebedeeException {
-
-        // Given a collection with a dataset.
-        Path collectionPath = Files.createTempDirectory(Random.id()); // create a temp directory to generate content into
-        Collection collection = CollectionTest.createCollection(collectionPath, "isAllContentReviewed");
-
-        CollectionDataset dataset = new CollectionDataset();
-        dataset.setUri("http://localhost:1234/datasets/123");
-        dataset.setTitle("dataset wut");
-        collection.getDescription().addDataset(dataset);
-
-        // When getDatasetDetails() is called
-        List<ContentDetail> datasetContent = collection.getDatasetDetails();
-
-        // Then the expected values have been set
-        ContentDetail datasetDetail = datasetContent.get(0);
-
-        assertEquals("/datasets/123", datasetDetail.uri);
-        assertEquals(PageType.API_DATASET_LANDING_PAGE, datasetDetail.getType());
-        assertEquals(dataset.getTitle(), datasetDetail.description.title);
-    }
-
-    @Test
-    public void getDatasetVersion() throws IOException, ZebedeeException {
+    public void getDatasetVersionDetails() throws IOException, ZebedeeException {
 
         // Given a collection with a dataset version.
         Path collectionPath = Files.createTempDirectory(Random.id()); // create a temp directory to generate content into
@@ -1881,7 +1858,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
             collection.getDescription().addDatasetVersion(datasetVersion);
 
         // When getDatasetVersion() is called
-        List<ContentDetail> datasetContent = collection.getDatasetVersion();
+        List<ContentDetail> datasetContent = collection.getDatasetVersionDetails();
 
         // Then the expected values have been set
         ContentDetail versionDetail = datasetContent.get(0);
@@ -1913,35 +1890,35 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         assertEquals(interactive.getTitle(), interactiveDetail.description.title);
     }
 
-    @Test
-    public void getDatasetVersionDetails() throws IOException, ZebedeeException {
-
-        // Given a collection with a dataset version.
-        Path collectionPath = Files.createTempDirectory(Random.id()); // create a temp directory to generate content into
-        Collection collection = CollectionTest.createCollection(collectionPath, "isAllContentReviewed");
-
-        CollectionDatasetVersion datasetVersion = new CollectionDatasetVersion();
-        datasetVersion.setId("123");
-        datasetVersion.setEdition("2015");
-        datasetVersion.setVersion("1");
-        datasetVersion.setTitle("dataset version wut");
-        collection.getDescription().addDatasetVersion(datasetVersion);
-
-        // When getDatasetVersionDetails() is called
-        List<ContentDetail> datasetContent = collection.getDatasetVersionDetails();
-
-        // Then the expected values have been set
-        ContentDetail versionDetail = datasetContent.get(0);
-        assertEquals("/datasets/123/editions/2015/versions/1", versionDetail.uri);
-        assertEquals(PageType.API_DATASET, versionDetail.getType());
-        assertEquals(datasetVersion.getTitle(), versionDetail.description.title);
-
-        // Then an entry for the parent dataset is also added
-        ContentDetail datasetDetail = datasetContent.get(1);
-        assertEquals("/datasets/123", datasetDetail.uri);
-        assertEquals(PageType.API_DATASET_LANDING_PAGE, datasetDetail.getType());
-        assertEquals(datasetVersion.getTitle(), datasetDetail.description.title);
-    }
+//    @Test
+//    public void getDatasetVersionDetails() throws IOException, ZebedeeException {
+//
+//        // Given a collection with a dataset version.
+//        Path collectionPath = Files.createTempDirectory(Random.id()); // create a temp directory to generate content into
+//        Collection collection = CollectionTest.createCollection(collectionPath, "isAllContentReviewed");
+//
+//        CollectionDatasetVersion datasetVersion = new CollectionDatasetVersion();
+//        datasetVersion.setId("123");
+//        datasetVersion.setEdition("2015");
+//        datasetVersion.setVersion("1");
+//        datasetVersion.setTitle("dataset version wut");
+//        collection.getDescription().addDatasetVersion(datasetVersion);
+//
+//        // When getDatasetVersionDetails() is called
+//        List<ContentDetail> datasetContent = collection.getDatasetVersionDetails();
+//
+//        // Then the expected values have been set
+//        ContentDetail versionDetail = datasetContent.get(0);
+//        assertEquals("/datasets/123/editions/2015/versions/1", versionDetail.uri);
+//        assertEquals(PageType.API_DATASET_LANDING_PAGE, versionDetail.getType());
+//        assertEquals(datasetVersion.getTitle(), versionDetail.description.title);
+//
+//        // Then an entry for the parent dataset is also added
+//        ContentDetail datasetDetail = datasetContent.get(1);
+//        assertEquals("/datasets/123", datasetDetail.uri);
+//        assertEquals(PageType.API_DATASET_LANDING_PAGE, datasetDetail.getType());
+//        assertEquals(datasetVersion.getTitle(), datasetDetail.description.title);
+//    }
 
     /**
      * deleteDataJSON should delete the data.json at the specified URI and any other files in the same directory.

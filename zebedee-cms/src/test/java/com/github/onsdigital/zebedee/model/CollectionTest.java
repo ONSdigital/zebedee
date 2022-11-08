@@ -1435,8 +1435,8 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         // Then the release is populated with a link to the associated CMD dataset
         assertNotNull(result);
         assertEquals(1, result.getRelatedAPIDatasets().size());
-        assertEquals("My CMD dataset", result.getRelatedAPIDatasets().get(0).getTitle());
-        assertEquals("/some/uri", result.getRelatedAPIDatasets().get(0).getUri().toString());
+        assertEquals(cmdDetail.description.title, result.getRelatedAPIDatasets().get(0).getTitle());
+        assertEquals(cmdDetail.uri, result.getRelatedAPIDatasets().get(0).getUri().toString());
     }
 
     @Test

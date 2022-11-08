@@ -129,11 +129,12 @@ public class ApproveTask implements Callable<Boolean> {
             }
 
             if (cmsFeatureFlags().isEnableDatasetImport()) {
-//                collectionContent.addAll(collection.getDatasetDetails());
-//                eventLog.addDatasetDetails();
-
-                collectionContent.addAll(collection.getDatasetVersion());
+                collectionContent.addAll(collection.getDatasetDetails());
                 eventLog.addDatasetDetails();
+
+                collectionContent.addAll(collection.getDatasetVersionDetails());
+                collectionContent.addAll(collection.getDatasetVersion());
+                eventLog.addDatasetVersionDetails();
             }
 
             populateReleasePage(collectionContent);

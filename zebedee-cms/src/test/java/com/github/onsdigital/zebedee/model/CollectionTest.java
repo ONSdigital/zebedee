@@ -1867,30 +1867,6 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
     }
 
     @Test
-    public void getDatasetVersionDetails() throws IOException, ZebedeeException {
-
-        // Given a collection with a dataset version.
-        Path collectionPath = Files.createTempDirectory(Random.id()); // create a temp directory to generate content into
-        Collection collection = CollectionTest.createCollection(collectionPath, "isAllContentReviewed");
-
-        CollectionDatasetVersion datasetVersion = new CollectionDatasetVersion();
-        datasetVersion.setId("123");
-        datasetVersion.setEdition("2015");
-        datasetVersion.setVersion("1");
-        datasetVersion.setTitle("dataset version wut");
-        collection.getDescription().addDatasetVersion(datasetVersion);
-
-        // When getDatasetVersion() is called
-        List<ContentDetail> datasetContent = collection.getDatasetVersionDetails();
-
-        // Then the expected values have been set
-        ContentDetail versionDetail = datasetContent.get(0);
-        assertEquals("/datasets/123/editions/2015/versions/1", versionDetail.uri);
-        assertEquals(PageType.API_DATASET_LANDING_PAGE, versionDetail.getType());
-        assertEquals(datasetVersion.getTitle(), versionDetail.description.title);
-    }
-
-    @Test
     public void getInteractiveDetails() throws IOException, ZebedeeException {
 
         // Given a collection with a dataset.
@@ -1911,6 +1887,30 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         assertEquals("/interactives/123", interactiveDetail.uri);
         assertEquals(PageType.INTERACTIVE, interactiveDetail.getType());
         assertEquals(interactive.getTitle(), interactiveDetail.description.title);
+    }
+
+    @Test
+    public void getDatasetVersionDetails() throws IOException, ZebedeeException {
+
+        // Given a collection with a dataset version.
+        Path collectionPath = Files.createTempDirectory(Random.id()); // create a temp directory to generate content into
+        Collection collection = CollectionTest.createCollection(collectionPath, "isAllContentReviewed");
+
+        CollectionDatasetVersion datasetVersion = new CollectionDatasetVersion();
+        datasetVersion.setId("123");
+        datasetVersion.setEdition("2015");
+        datasetVersion.setVersion("1");
+        datasetVersion.setTitle("dataset version wut");
+        collection.getDescription().addDatasetVersion(datasetVersion);
+
+        // When getDatasetVersionDetails() is called
+        List<ContentDetail> datasetContent = collection.getDatasetVersionDetails();
+
+        // Then the expected values have been set
+        ContentDetail versionDetail = datasetContent.get(0);
+        assertEquals("/datasets/123/editions/2015/versions/1", versionDetail.uri);
+        assertEquals(PageType.API_DATASET_LANDING_PAGE, versionDetail.getType());
+        assertEquals(datasetVersion.getTitle(), versionDetail.description.title);
     }
 
     /**

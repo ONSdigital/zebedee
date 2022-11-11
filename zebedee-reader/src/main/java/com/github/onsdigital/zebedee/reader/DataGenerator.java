@@ -526,7 +526,11 @@ public class DataGenerator {
 
         for (int i = minYear; i <= maxYear; i++) {
             for (int q = 0; q < 4; q++) {
-                if (i == minYear) {
+                if (i == minYear && i == maxYear) {
+                    if (q >= minQuarter && q <= maxQuarter) {
+                        quarterLabels.add(i + " " + QUARTERS[q]);
+                    }
+                } else if (i == minYear) {
                     if (q >= minQuarter) {
                         quarterLabels.add(i + " " + QUARTERS[q]);
                     }
@@ -582,7 +586,11 @@ public class DataGenerator {
 
         for (int i = minYear; i <= maxYear; i++) {
             for (int q = 0; q < 12; q++) {
-                if (i == minYear) {
+                if (i == minYear && i == maxYear) {
+                    if (q >= minMonth && q<= maxMonth) {
+                        monthLabels.add(i + " " + MONTHS[q]);
+                    }
+                } else if (i == minYear) {
                     if (q >= minMonth) {
                         monthLabels.add(i + " " + MONTHS[q]);
                     }

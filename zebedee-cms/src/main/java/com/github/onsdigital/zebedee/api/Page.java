@@ -289,10 +289,8 @@ public class Page {
         }
 
         try {
-            String uriToDelete = uri.replaceAll("/+$","") + zebedeeFileSuffix;
-
             boolean deleted = zebedeeCmsService.getZebedee().getCollections().deleteContent(
-                        collection, uriToDelete, session);
+                        collection, uri, session);
             if (deleted) {
                 Audit.Event.CONTENT_DELETED
                     .parameters()
@@ -306,7 +304,6 @@ public class Page {
                 error().data("collection_id", collection.getDescription().getId())
                     .data("user", session.getEmail())
                     .data("path", uri)
-                    .data("uriToDelete", uriToDelete)
                     .log("page delete endpoint: couldn't delete content");
                 response.setStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR);
             }

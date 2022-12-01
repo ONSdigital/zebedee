@@ -57,6 +57,8 @@ public class Configuration {
     // how many additional seconds after the publish
     private static final int DEFAULT_SECONDS_TO_CACHE_AFTER_SCHEDULED_PUBLISH = 30;
 
+
+
     public static boolean isSchedulingEnabled() {
         return BooleanUtils.toBoolean(StringUtils.defaultIfBlank(getValue("scheduled_publishing_enabled"), "true"));
     }
@@ -87,6 +89,9 @@ public class Configuration {
         return getIntWithDefault("seconds_to_cache_after_scheduled_publish",
                 DEFAULT_SECONDS_TO_CACHE_AFTER_SCHEDULED_PUBLISH);
     }
+
+
+
 
     public static int getMaxRetryTimeout() {
         return getIntWithDefault("MAX_RETRY_ELAPSED_TIME", DEFAULT_MAX_RETRY_ELAPSED_TIME);

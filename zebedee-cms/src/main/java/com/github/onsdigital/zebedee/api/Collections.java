@@ -170,7 +170,7 @@ public class Collections {
                             updateDatasetInCollection(collection, resourceID, request, user);
                             break;
 
-                        case 8: // /collections/{collection_id}/datasets/{dataset_id}/editions/{}/versions/{}
+                        case 8: // /collections/{collection_id}/datasets/{dataset_id}/editions/{edition}/versions/{version}
 
                             String edition = pathSegments.get(5);
                             String version = pathSegments.get(7);
@@ -250,7 +250,7 @@ public class Collections {
                     case 4: // /collections/{collection_id}/datasets/{dataset_id}
                         removeDatasetFromCollection(collection, resourceID);
                         break;
-                    case 8: // /collections/{collection_id}/datasets/{dataset_id}/editions/{}/versions/{}
+                    case 8: // /collections/{collection_id}/datasets/{dataset_id}/editions/{edition}/versions/{version}
                         String edition = pathSegments.get(5);
                         String version = pathSegments.get(7);
                         removeDatasetVersionFromCollection(collection, resourceID, edition, version);
@@ -285,7 +285,7 @@ public class Collections {
                 .data("edition", edition)
                 .data("version", version)
                 .data("user", user)
-                .log("PUT called on /collections/{}/datasets/{}/editions/{}/versions/{} endpoint");
+                .log("PUT called on /collections/{collection_id}/datasets/{dataset_id}/editions/{edition}/versions/{version} endpoint");
 
         try (InputStream body = request.getInputStream()) {
 
@@ -302,7 +302,7 @@ public class Collections {
         info().data("collectionId", collection.getId())
                 .data("datasetId", datasetID)
                 .data("user", user)
-                .log("PUT called on /collections/{}/datasets/{} endpoint");
+                .log("PUT called on /collections/{collection_id}/datasets/{dataset_id} endpoint");
 
         try (InputStream body = request.getInputStream()) {
 
@@ -319,7 +319,7 @@ public class Collections {
         info().data("collectionId", collection.getId())
                 .data("interactiveId", interactiveID)
                 .data("user", user)
-                .log("PUT called on /collections/{}/interactives/{} endpoint");
+                .log("PUT called on /collections/{collection_id}/interactives/{interactive_id} endpoint");
 
         try (InputStream body = request.getInputStream()) {
 
@@ -336,7 +336,7 @@ public class Collections {
                 .data("datasetId", datasetID)
                 .data("edition", edition)
                 .data("version", version)
-                .log("DELETE called on /collections/{collection_id}/datasets/{}/editions/{}/versions/{} endpoint");
+                .log("DELETE called on /collections/{collection_id}/datasets/{dataset_id}/editions/{edition}/versions/{version} endpoint");
 
         datasetService.removeDatasetVersionFromCollection(collection, datasetID, edition, version);
     }
@@ -345,7 +345,7 @@ public class Collections {
 
         info().data("collectionId", collection.getId())
                 .data("datasetId", datasetID)
-                .log("DELETE called on /collections/{collection_id}/datasets/{} endpoint");
+                .log("DELETE called on /collections/{collection_id}/datasets/{dataset_id} endpoint");
 
         datasetService.removeDatasetFromCollection(collection, datasetID);
     }
@@ -354,7 +354,7 @@ public class Collections {
 
         info().data("collectionId", collection.getId())
                 .data("interactiveId", interactiveID)
-                .log("DELETE called on /collections/{collection_id}/interactiveID/{} endpoint");
+                .log("DELETE called on /collections/{collection_id}/interactives/{interactive_id} endpoint");
 
         interactivesService.removeInteractiveFromCollection(collection, interactiveID);
     }
@@ -362,7 +362,7 @@ public class Collections {
     private boolean isValidPath(HttpServletResponse response, Path path, List<String> segments) {
 
         // /collections/{collection_id}/datasets/{dataset_id}
-        // /collections/{collection_id}/datasets/{dataset_id}/editions/{}/versions/{}
+        // /collections/{collection_id}/datasets/{dataset_id}/editions/{edition}/versions/{version}
         if (segments.size() < 4) {
             info().data("path", path).log("Endpoint for collections not found");
             response.setStatus(HttpStatus.SC_NOT_FOUND);

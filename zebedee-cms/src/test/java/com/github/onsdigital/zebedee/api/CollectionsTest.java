@@ -351,8 +351,10 @@ public class CollectionsTest {
     @Test
     public void testPutInteractiveInvalidPathSize() throws Exception {
 
-        // Given a PUT request with a bad json input
-        String url = String.format("/collections/%s/interactives/%s/more", collectionID, resourceID);
+        // Given a PUT request with an invalid interactives URL
+        String url = String.format("/collections/%s/interactives/%s/editions/%s/versions/%s",
+                collectionID, resourceID, edition, version);
+        when(request.getPathInfo()).thenReturn(url);
         when(request.getPathInfo()).thenReturn(url);
         when(session.getEmail()).thenReturn(user);
 
@@ -434,9 +436,9 @@ public class CollectionsTest {
     @Test
     public void testDeleteInteractiveInvalidPathSize() throws Exception {
 
-        // Given a DELETE request with a valid URL
-        String url = String.format("/collections/%s/interactives/%s/more",
-                collectionID, resourceID, edition);
+        // Given a DELETE request with an invalid interactives URL
+        String url = String.format("/collections/%s/interactives/%s/editions/%s/versions/%s",
+                collectionID, resourceID, edition, version);
         when(request.getPathInfo()).thenReturn(url);
 
         shouldAuthorise(request, true);

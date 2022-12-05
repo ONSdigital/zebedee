@@ -249,28 +249,26 @@ public class Collections {
                 switch (pathSegments.size()) {
                     case 4: // /collections/{collection_id}/datasets/{dataset_id}
                         removeDatasetFromCollection(collection, resourceID);
+                        response.setStatus(HttpStatus.SC_NO_CONTENT);
                         break;
                     case 8: // /collections/{collection_id}/datasets/{dataset_id}/editions/{edition}/versions/{version}
                         String edition = pathSegments.get(5);
                         String version = pathSegments.get(7);
                         removeDatasetVersionFromCollection(collection, resourceID, edition, version);
+                        response.setStatus(HttpStatus.SC_NO_CONTENT);
                         break;
                     default:
                         response.setStatus(HttpStatus.SC_NOT_FOUND);
-                        return;
                 }
                 break;
             case "interactives":
                 switch (pathSegments.size()) {
                     case 4: // /collections/{collection_id}/interactives/{interactive_id}
-
                         removeInteractiveFromCollection(collection, resourceID);
                         response.setStatus(HttpStatus.SC_NO_CONTENT);
                         break;
-
                     default:
                         response.setStatus(HttpStatus.SC_NOT_FOUND);
-                        return;
                 }
                 break;
             default:

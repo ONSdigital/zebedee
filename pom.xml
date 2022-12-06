@@ -25,7 +25,7 @@
         <project.reporting.outputEncoding>${encoding}</project.reporting.outputEncoding>
         <restolino.version>0.4.2</restolino.version>
         <fasterxml.jackson.version>2.14.1</fasterxml.jackson.version>
-        <apache.poi.version>3.17</apache.poi.version>
+        <apache.poi.version>5.2.1</apache.poi.version>
         <spring.version>5.3.20</spring.version>
         <dp.logging.version>2.0.0-beta.4</dp.logging.version>
         <batik.version>1.16</batik.version>

@@ -378,14 +378,14 @@ public class FileSystemContentReader implements ContentReader {
         throw new BadRequestException("Latest uri can not be resolved for this content type");
     }
 
-    private Path resolvePath(String path) throws BadRequestException {
+    private Path resolvePath(String path) {
         if (path == null) {
             throw new NullPointerException("Path can not be null");
         }
         return getRootFolder().resolve(removeLeadingSlash(path));
     }
 
-    private Path resolveContentPath(String path) throws BadRequestException {
+    private Path resolveContentPath(String path) {
         String jsonPath = URIUtils.removeTrailingSlash(path) + ".json";
         Path json = resolvePath(jsonPath);
         if (!exists(json)) {

@@ -2,6 +2,7 @@ package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
 import com.github.onsdigital.zebedee.audit.Audit;
+import com.github.onsdigital.zebedee.content.base.ContentLanguage;
 import com.github.onsdigital.zebedee.content.page.APIDatasetLandingPageCreationHook;
 import com.github.onsdigital.zebedee.content.page.APIDatasetLandingPageDeletionHook;
 import com.github.onsdigital.zebedee.content.page.PageTypeUpdateHook;
@@ -264,7 +265,12 @@ public class Page {
         com.github.onsdigital.zebedee.content.page.base.Page page;
 
         try {
-            page = collectionReader.getContent(uri);
+            page = collectionReader.getContentQuiet(uri);
+            if (page == null) {
+                // Couldn't find the content in English, try Welsh
+                collectionReader.setLanguage(ContentLanguage.WELSH);
+                page = collectionReader.getContent(uri);
+            }
         } catch (NotFoundException ex) {
             info().data("path", uri).data("collection_id", collection.getId())
                     .log("page delete endpoint: page is already deleted");

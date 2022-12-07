@@ -42,6 +42,8 @@ public class Taxonomy {
     @GET
     public void get(HttpServletRequest request, HttpServletResponse response) throws IOException, ZebedeeException {
         response.addHeader("Cache-Control", "max-age=" + cfg.getSecondsForCacheControl() + ", public");
+        System.out.println(response.getHeaderNames());
+
         ReaderResponseResponseUtils.sendResponse(new ReadRequestHandler(getRequestedLanguage(request)).getTaxonomy(request, getDepth(request)), response);
     }
 

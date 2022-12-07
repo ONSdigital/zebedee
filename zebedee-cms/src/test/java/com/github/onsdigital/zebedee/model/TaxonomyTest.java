@@ -22,10 +22,13 @@ import java.util.*;
 import java.util.Collection;
 
 import com.github.onsdigital.zebedee.ZebedeeConfiguration;
+import com.github.onsdigital.zebedee.content.dynamic.browse.ContentNode;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.model.Content;
+import com.github.onsdigital.zebedee.reader.api.ReadRequestHandler;
 import com.github.onsdigital.zebedee.reader.api.endpoint.Taxonomy;
 import com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration;
+import com.github.onsdigital.zebedee.reader.util.RequestUtils;
 import com.github.onsdigital.zebedee.user.model.User;
 import com.google.common.net.MediaType;
 import org.apache.commons.io.FileUtils;
@@ -34,6 +37,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.springframework.mock.web.MockHttpServletResponse;
 
 import javax.servlet.*;
@@ -41,21 +45,12 @@ import javax.servlet.http.*;
 import javax.ws.rs.HttpMethod;
 
 public class TaxonomyTest {
-	@Mock
-	private HttpServletRequest request;
-	@Mock
-	private HttpServletResponse response;
 
-	@Mock
-	private Taxonomy taxonomy1;
-
-	private static final String JWT_TOKEN             = "eyJhbGciOiJSUzI1NiIsImtpZCI6IjUxR3BvdHBTVGxtK3FjNXhOWUhzSko2S2tlT2JSZjlYSDQxYkhIS0JJOE09In0.eyJzdWIiOiJhYWFhYWFhYS1iYmJiLWNjY2MtZGRkZC1lZWVlZWVlZWVlZWUiLCJkZXZpY2Vfa2V5IjoiYWFhYWFhYWEtYmJiYi1jY2NjLWRkZGQtZWVlZWVlZWVlZWVlIiwiY29nbml0bzpncm91cHMiOlsiYWRtaW4iLCJwdWJsaXNoaW5nIiwiZGF0YSIsInRlc3QiXSwidG9rZW5fdXNlIjoiYWNjZXNzIiwic2NvcGUiOiJhd3MuY29nbml0by5zaWduaW4udXNlci5hZG1pbiIsImF1dGhfdGltZSI6MTU2MjE5MDUyNCwiaXNzIjoiaHR0cHM6Ly9jb2duaXRvLWlkcC51cy13ZXN0LTIuYW1hem9uYXdzLmNvbS91cy13ZXN0LTJfZXhhbXBsZSIsImV4cCI6OTk5OTk5OTk5OSwiaWF0IjoxNTYyMTkwNTI0LCJqdGkiOiJhYWFhYWFhYS1iYmJiLWNjY2MtZGRkZC1lZWVlZWVlZWVlZWUiLCJjbGllbnRfaWQiOiI1N2NiaXNoazRqMjRwYWJjMTIzNDU2Nzg5MCIsInVzZXJuYW1lIjoiamFuZWRvZUBleGFtcGxlLmNvbSJ9.fC3P6jnpnhmOxdlw0u4nOhehz7dCXsqX7RvqI1gEC4wrJoE6rlKH1mo7lR16K-EXWdXRoeN0_z0PZQzo__xOprAsY2XSNOexOcIo3hoydx6CkGWGmNNsLp35iGY3DgW6SLpQsdGF8HicJ9D9KCTPXKAGmOrkX3t92WSCLiQXXuER9gndzC6oLMU0akvKDstoTfwLWeSsogOQBn7_lUqGaHC8T06ZR37n_eOgUGSXwSFuYbg1zcY2xK3tMh4Wo8TOrADOrfLg660scpXuu-oDf0PNdgpXGU318IK1R0A2LiqqJWIV1sDE88uuPcX9-xgKc0eUn6qABXM9qhEyr6MS6g";
-	public static final String AUTH_HEADER = "Authorization";
-	Path path;
+	protected static final String COLLECTION_ID = "123456789";
 	Content taxonomy;
-	ReaderConfiguration cfg;
 
-	@Before
+	Path path;
+		@Before
 	public void setUp() throws Exception {
 		path = Files.createTempDirectory(this.getClass().getSimpleName());
 		taxonomy = new Content(path);
@@ -163,22 +158,5 @@ public class TaxonomyTest {
 		assertEquals(2, uris.size());
 		assertTrue(uris.contains(uri1));
 		assertTrue(uris.contains(uri2));
-	}
-
-	@Test
-	public void shouldGetAddCacheControl() {
-
-		when(response.getHeader(AUTH_HEADER)).thenReturn(JWT_TOKEN);
-		try {
-			doNothing().when(taxonomy1).get(request,response);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		} catch (ZebedeeException e) {
-			throw new RuntimeException(e);
-		}
-		verify(response, times(1)).addHeader(anyString(),anyString());
-
-		System.out.println(request);
-		System.out.println(response);
 	}
 }

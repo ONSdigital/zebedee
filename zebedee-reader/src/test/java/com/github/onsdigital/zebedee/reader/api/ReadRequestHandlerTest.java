@@ -602,4 +602,13 @@ public class ReadRequestHandlerTest {
         Resource resource = handler.findResource(request);
         assertEquals("/visualisations/test/content/has%20spaces/index.html", resource.getUri().toString());
     }
+
+    @Test
+    public void testTaxonomy() throws Exception {
+
+            Collection<ContentNode> children = handler.getTaxonomy(request, 1);
+            assertTrue(children.size() == 5);
+
+
+    }
 }

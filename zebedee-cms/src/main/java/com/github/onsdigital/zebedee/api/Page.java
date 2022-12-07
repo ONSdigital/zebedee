@@ -254,39 +254,39 @@ public class Page {
             return;
         }
 
-        CollectionReader collectionReader;
-        try {
-            collectionReader = zebedeeCmsService.getZebedeeCollectionReader(collection, session);
-        } catch (ZebedeeException e) {
-            handleZebdeeException("page delete endpoint: failed to get collection reader", e, response, uri, session, collection);
-            return;
-        }
-
-        com.github.onsdigital.zebedee.content.page.base.Page page;
-
-        try {
-            page = collectionReader.getContentQuiet(uri);
-            if (page == null) {
-                // Couldn't find the content in English, try Welsh
-                collectionReader.setLanguage(ContentLanguage.WELSH);
-                page = collectionReader.getContent(uri);
-            }
-        } catch (NotFoundException ex) {
-            info().data("path", uri).data("collection_id", collection.getId())
-                    .log("page delete endpoint: page is already deleted");
-            response.setStatus(HttpStatus.SC_NO_CONTENT);
-            return; // idempotent
-        } catch (ZebedeeException e) {
-            handleZebdeeException("page delete endpoint: exception when getting collection content", e, response, uri, session, collection);
-            return;
-        } catch (IOException e) {
-            error().data("collection_id", collection.getId()).data("user", session.getEmail()).data("path", uri)
-                    .logException(e, "page delete endpoint: exception when attempting to get collection content");
-            response.setStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR);
-            return;
-        }
-
         if (pageDeletionHook.isPresent()) {
+            CollectionReader collectionReader;
+            try {
+                collectionReader = zebedeeCmsService.getZebedeeCollectionReader(collection, session);
+            } catch (ZebedeeException e) {
+                handleZebdeeException("page delete endpoint: failed to get collection reader", e, response, uri, session, collection);
+                return;
+            }
+
+            com.github.onsdigital.zebedee.content.page.base.Page page;
+
+            try {
+                page = collectionReader.getContentQuiet(uri);
+                if (page == null) {
+                    // Couldn't find the content in English, try Welsh
+                    collectionReader.setLanguage(ContentLanguage.WELSH);
+                    page = collectionReader.getContent(uri);
+                }
+            } catch (NotFoundException ex) {
+                info().data("path", uri).data("collection_id", collection.getId())
+                        .log("page delete endpoint: page is already deleted");
+                response.setStatus(HttpStatus.SC_NO_CONTENT);
+                return; // idempotent
+            } catch (ZebedeeException e) {
+                handleZebdeeException("page delete endpoint: exception when getting collection content", e, response, uri, session, collection);
+                return;
+            } catch (IOException e) {
+                error().data("collection_id", collection.getId()).data("user", session.getEmail()).data("path", uri)
+                        .logException(e, "page delete endpoint: exception when attempting to get collection content");
+                response.setStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR);
+                return;
+            }
+
             boolean success = execDeletionHook(page, uri, collection, session);
             if (!success) {
                 response.setStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR);

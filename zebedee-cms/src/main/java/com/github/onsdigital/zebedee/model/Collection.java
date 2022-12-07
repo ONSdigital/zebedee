@@ -963,68 +963,6 @@ public class Collection {
     }
 
     /**
-     * Delete a data.json page and any related/generated files.
-     * <p>
-     * Delete the specified data.json and any other files in the same directory - non data.json files in the same
-     * directory are supplimentary files related to the page content - tables, charts, images etc. Also deletes any
-     * files in the reviewed dir that are version URIs and start with the same dir path.
-     *
-     * @return true the delete is successful, false otherwise.
-     */
-    public boolean deleteFileAndRelated(String uri) throws IOException {
-        boolean deleteSuccessful = false;
-
-        String checkURI = uri;
-        if (Content.isDataJsonFile(uri)) {
-            checkURI = Paths.get(uri).getParent().toString();
-        }
-
-        if (isInProgress(checkURI)) {
-            deleteSuccessful = inProgress.deleteContentJson(uri);
-        } else if (isComplete(checkURI)) {
-            deleteSuccessful = complete.deleteContentJson(uri);
-        } else if (isReviewed(checkURI)) {
-            deleteSuccessful = reviewed.deleteContentJson(uri);
-        }
-
-        if (deleteSuccessful) {
-            deleteSuccessful &= deletePreviousVersionFromReviewed(checkURI);
-        }
-
-        return deleteSuccessful;
-    }
-
-    /**
-     * Delete all previous version content that is a child of the privided URI from the collection reviewed dir.
-     * <p>
-     * When new version of certain content types is created the previous versions are automagically
-     * calculated and put straight into reviewed state. Previous versions are not visible via Florence so if the
-     * newly created version is delete from the collection we need to tidy up these files as they can block users
-     * from appoving the collection or adding the same content again.
-     *
-     * @param targetURI
-     * @return
-     * @throws IOException
-     */
-    private boolean deletePreviousVersionFromReviewed(String targetURI) throws IOException {
-        boolean deleteSuccessful = true;
-        List<String> versionedFiles = versionsService.getPreviousVersionsOf(targetURI, reviewed);
-
-        if (!versionedFiles.isEmpty()) {
-            info().collectionID(this)
-                    .uri(targetURI)
-                    .data("related_version_files", versionedFiles)
-                    .log("file deleted removing previous version content from collection reviewed dir");
-
-            for (String f : versionedFiles) {
-                deleteSuccessful &= deleteFile(f);
-            }
-        }
-
-        return deleteSuccessful;
-    }
-
-    /**
      * Delete all the content files in the directory of the given file.
      *
      * @param uri
@@ -1048,7 +986,9 @@ public class Collection {
             hasDeleted = true;
         }
 
-        if (hasDeleted) addEvent(uri, new Event(new Date(), EventType.DELETED, email));
+        if (hasDeleted) {
+            addEvent(uri, new Event(new Date(), EventType.DELETED, email));
+        }
         save();
 
         return hasDeleted;

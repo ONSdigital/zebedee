@@ -763,10 +763,6 @@ public class Collections {
         } else if (Files.isDirectory(contentTargetPath)) {
             event.log("deleting directory from collection content");
             deleted = collection.deleteContentDirectory(session.getEmail(), uri);
-        } else if (Content.isDataJsonFile(uri) && Paths.get(uri).getParent().getFileName() != null) {
-            // It is a data.json that does not live in the root folder
-            event.log("deleting data.json and related files from collection content");
-            deleted = collection.deleteFileAndRelated(uri);
         } else {
             event.log("deleting single file from collection content");
             deleted = collection.deleteFile(uri);

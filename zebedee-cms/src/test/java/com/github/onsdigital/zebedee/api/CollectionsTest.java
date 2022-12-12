@@ -25,6 +25,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 public class CollectionsTest {
@@ -407,11 +408,14 @@ public class CollectionsTest {
         // When the delete method is called
         collections.delete(request, response);
 
-        // The dataset service is called with the values extracted from the request URL.
-        verify(mockDatasetService, times(1)).removeDatasetFromCollection(mockCollection, resourceID);
-
         // Then a HTTP 204 is set on the response
         verify(response).setStatus(HttpStatus.SC_NO_CONTENT);
+
+        // The dataset service is called with the values extracted from the request URL.
+        verify(mockDatasetService, times(1)).removeDatasetFromCollection(mockCollection, resourceID);
+        verifyNoMoreInteractions(mockDatasetService);
+        // No calls to the interactives service
+        verifyNoInteractions(mockInteractivesService);
     }
 
     @Test
@@ -426,11 +430,14 @@ public class CollectionsTest {
         // When the delete method is called
         collections.delete(request, response);
 
-        // The dataset service is called with the values extracted from the request URL.
-        verify(mockInteractivesService, times(1)).removeInteractiveFromCollection(mockCollection, resourceID);
-
         // Then a HTTP 204 is set on the response
         verify(response).setStatus(HttpStatus.SC_NO_CONTENT);
+
+        // The interactives service is called with the values extracted from the request URL.
+        verify(mockInteractivesService, times(1)).removeInteractiveFromCollection(mockCollection, resourceID);
+        verifyNoMoreInteractions(mockInteractivesService);
+        // No calls to the dataset service
+        verifyNoInteractions(mockDatasetService);
     }
 
     @Test
@@ -448,6 +455,11 @@ public class CollectionsTest {
 
         // Then a HTTP 404 is set on the response
         verify(response).setStatus(HttpStatus.SC_NOT_FOUND);
+
+        // The dataset service is not called
+        verifyNoInteractions(mockDatasetService);
+        // No calls to the interactives service
+        verifyNoInteractions(mockInteractivesService);
     }
 
     @Test
@@ -463,12 +475,16 @@ public class CollectionsTest {
         // When the delete method is called
         collections.delete(request, response);
 
+        // Then a HTTP 204 is set on the response
+        verify(response).setStatus(HttpStatus.SC_NO_CONTENT);
+
         // The dataset service is called with the values extracted from the request URL.
         verify(mockDatasetService, times(1)).removeDatasetVersionFromCollection(
                 mockCollection, resourceID, edition, version);
 
-        // Then a HTTP 204 is set on the response
-        verify(response).setStatus(HttpStatus.SC_NO_CONTENT);
+        verifyNoMoreInteractions(mockDatasetService);
+        // No calls to the interactives service
+        verifyNoInteractions(mockInteractivesService);
     }
 
     @Test
@@ -484,11 +500,13 @@ public class CollectionsTest {
         // When the delete method is called
         collections.delete(request, response);
 
-        // The dataset service is not called
-        verifyNoInteractions(mockDatasetService);
-
         // Then a HTTP 404 is set on the response
         verify(response).setStatus(HttpStatus.SC_NOT_FOUND);
+
+        // The dataset service is not called
+        verifyNoInteractions(mockDatasetService);
+        // No calls to the interactives service
+        verifyNoInteractions(mockInteractivesService);
     }
 
     // mock the authorisation for the given request to authorise the request is the authorise param is true.

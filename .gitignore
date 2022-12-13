@@ -41,6 +41,7 @@ xcuserdata/
 
 \.vscode/
 
+content/
+
 run.sh
 run-cms.sh
-

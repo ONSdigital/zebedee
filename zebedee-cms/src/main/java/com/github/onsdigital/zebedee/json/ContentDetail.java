@@ -205,8 +205,33 @@ public class ContentDetail {
     public void setDeleteMarker(boolean hasDeleteMarker) {
         this.deleteMarker = hasDeleteMarker;
     }
-    
+
     public PageType getType() {
         return type;
     }
+
+    public String getContentPath() {
+        return contentPath;
+    }
+
+    public void setContentPath(String contentPath) {
+        this.contentPath = contentPath;
+    }
+
+    public ContentDetailDescription getDescription() {
+        return description;
+    }
+
+    public void setDescription(ContentDetailDescription description) {
+        this.description = description;
+    }
+
+    public String getUri() {
+        return uri;
+    }
+
+    public void setUri(String uri) {
+        this.uri = uri;
+    }
 }
+

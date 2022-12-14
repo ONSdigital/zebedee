@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
+import com.github.onsdigital.zebedee.content.base.ContentLanguage;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.CollectionDetail;
 import com.github.onsdigital.zebedee.json.ContentDetail;
@@ -135,16 +136,11 @@ public class CollectionDetails {
     ) {
 
         for (ContentDetail contentDetail : detailsToAddEventsFor) {
-            String language = contentDetail.description.language;
-            if (language == null) {
-                language = "";
-            } else {
-                language = "_" + contentDetail.description.language;
-            }
             if (collection.getDescription().getEventsByUri() != null) {
+                ContentLanguage language = contentDetail.getDescription().getLanguage();
                 Events eventsForFile = collection.getDescription()
                         .getEventsByUri()
-                        .get(contentDetail.uri + "/data" + language + ".json");
+                        .get(contentDetail.uri + "/" + language.getDataFileName());
                 contentDetail.events = eventsForFile;
             } else {
                 contentDetail.events = new Events();

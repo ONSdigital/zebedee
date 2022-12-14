@@ -394,6 +394,19 @@ public class FileSystemContentReader implements ContentReader {
         return json;
     }
 
+    /**
+     * resolveDataFilePath searches for a data file under the current directory, which is specified by the 'path' input parameter.
+     * It then joins the location of the data file to the current directory path to find (resolve) the whole path to the file, which it returns.
+     * 
+     * NB. If it cannot find the data file, for the current language value, then it looks for location of the English data file and uses that instead.
+     * 
+     * NB. The whole path, as it were, may or may not be an absolute path depending on what current directory path value was passed in.
+     * 
+     * @param   path
+     *          the path, of type Path, which specifies the path to the directory to search beneath (to locate the data.json or data_cy.json).
+     *
+     * @return  the whole path to the data.json or data_cy.json file.
+     * */
     protected Path resolveDataFilePath(Path path) {
         Path dataFilePath = path.resolve(language.getDataFileName());
         if (!exists(dataFilePath)) {

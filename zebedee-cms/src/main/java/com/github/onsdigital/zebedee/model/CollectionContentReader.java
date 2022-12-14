@@ -70,7 +70,6 @@ public class CollectionContentReader extends FileSystemContentReader {
     @Override
     protected Path resolveDataFilePath(Path path) {
         Path dataFilePath = path.resolve(language.getDataFileName());
-        assertRelative(dataFilePath);
         return dataFilePath;
     }
 }

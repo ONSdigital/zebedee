@@ -399,17 +399,7 @@ public class FileSystemContentReader implements ContentReader {
         if (!exists(dataFilePath)) {
             dataFilePath = path.resolve(ContentLanguage.ENGLISH.getDataFileName());
         }
-        assertRelative(dataFilePath);
         return dataFilePath;
-    }
-
-    /**
-     * Asserts requested file is under content folder
-     *
-     * @param dataFilePath
-     */
-    protected void assertRelative(Path dataFilePath) {
-        dataFilePath.normalize();
     }
 
     /*Getters * Setters */

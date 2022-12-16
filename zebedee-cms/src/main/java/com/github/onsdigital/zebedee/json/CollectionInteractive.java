@@ -3,7 +3,7 @@ package com.github.onsdigital.zebedee.json;
 import java.util.Date;
 
 /**
- * Represents a dataset that has been added to a collection.
+ * Represents an interactive that has been added to a collection.
  */
 public class CollectionInteractive {
 

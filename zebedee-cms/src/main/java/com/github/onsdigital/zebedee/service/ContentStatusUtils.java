@@ -34,8 +34,19 @@ public class ContentStatusUtils {
             return newState;
         }
 
+        // Can't skip the Complete state
+        if (currentState.equals(ContentStatus.InProgress) && newState.equals(ContentStatus.Reviewed)) {
+            info().data("user", user)
+                    .data("last edited by", lastEditedBy)
+                    .data("current state", currentState)
+                    .data("new state", newState)
+                    .log("User attempting to review resource in progress (should be Complete first)");
+
+            throw new ForbiddenException("Can't approve a resource in progress");
+        }
+
         // The same user can't review edits they've submitted for review
-        if (!currentState.equals(ContentStatus.Reviewed) && newState.equals(ContentStatus.Reviewed) && lastEditedBy.equalsIgnoreCase(user)) {
+        if (currentState.equals(ContentStatus.Complete) && newState.equals(ContentStatus.Reviewed) && lastEditedBy.equalsIgnoreCase(user)) {
             info().data("user", user)
                     .data("last edited by", lastEditedBy)
                     .data("current state", currentState)
@@ -65,17 +76,6 @@ public class ContentStatusUtils {
                     .data("new state", newState)
                     .log("A different user making updates to a resource whilst it is awaiting review");
             return ContentStatus.InProgress;
-        }
-
-        // Once reviewed any updates can be made to a dataset without the state changing
-        if (currentState.equals(ContentStatus.Reviewed)) {
-
-            info().data("user", user)
-                    .data("last edited by", lastEditedBy)
-                    .data("current state", currentState)
-                    .data("new state", newState)
-                    .log("Making updates to a review resource");
-            return ContentStatus.Reviewed;
         }
 
         info().data("user", user)

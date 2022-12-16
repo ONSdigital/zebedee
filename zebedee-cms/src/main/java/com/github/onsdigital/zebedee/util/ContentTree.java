@@ -6,7 +6,6 @@ import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.ContentDetail;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
-import com.github.onsdigital.zebedee.service.ContentDeleteService;
 import com.github.onsdigital.zebedee.service.ServiceSupplier;
 
 import java.io.IOException;
@@ -20,7 +19,6 @@ public class ContentTree {
 
     private static ContentDetail publishedContentTree;
 
-    private static ContentDeleteService contentDeleteService = ContentDeleteService.getInstance();
     private static ServiceSupplier<Zebedee> zebedeeServiceSupplier = () -> Root.zebedee;
 
     private ContentTree() {
@@ -56,7 +54,6 @@ public class ContentTree {
         publishedDetails.overlayDetails(ContentDetailUtil.resolveDetails(collection.getInProgress(), reader.getInProgress()));
         publishedDetails.overlayDetails(ContentDetailUtil.resolveDetails(collection.getComplete(), reader.getComplete()));
         publishedDetails.overlayDetails(ContentDetailUtil.resolveDetails(collection.getReviewed(), reader.getReviewed()));
-        contentDeleteService.overlayDeletedNodesInBrowseTree(publishedDetails);
         return publishedDetails;
     }
 

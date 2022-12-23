@@ -3,11 +3,13 @@ package com.github.onsdigital.zebedee.data.processing;
 import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.data.json.TimeSerieses;
+import com.github.onsdigital.zebedee.exceptions.BadTimeSeriesFileException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.Resource;
 import com.google.gson.JsonSyntaxException;
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URIBuilder;
@@ -22,6 +24,8 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Map;
+
+import static com.github.onsdigital.zebedee.logging.CMSLogEvent.error;
 
 public class DataLinkBrian implements DataLink {
     // Store env (for tests)
@@ -70,7 +74,7 @@ public class DataLinkBrian implements DataLink {
         }
     }
 
-    public TimeSerieses getTimeSeries(URI endpointUri, InputStream input, String name) throws IOException {
+    public TimeSerieses getTimeSeries(URI endpointUri, InputStream input, String name) throws IOException, BadTimeSeriesFileException {
         // Add csdb file as a binary
         HttpPost post = new HttpPost(endpointUri);
         MultipartEntityBuilder multipartEntityBuilder = MultipartEntityBuilder.create();
@@ -84,6 +88,11 @@ public class DataLinkBrian implements DataLink {
                 CloseableHttpClient client = HttpClients.createDefault();
                 CloseableHttpResponse response = client.execute(post)
         ) {
+            if (response.getStatusLine().getStatusCode() == HttpStatus.SC_BAD_REQUEST) {
+                error().data("filename", name).log("invalid time series file sent to brian");
+                throw new BadTimeSeriesFileException("invalid time series file sent to brian");
+            }
+
             TimeSerieses result = null;
             HttpEntity entity = response.getEntity();
 

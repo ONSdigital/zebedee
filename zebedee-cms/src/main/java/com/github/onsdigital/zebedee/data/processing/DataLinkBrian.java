@@ -5,6 +5,7 @@ import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.data.json.ApiError;
 import com.github.onsdigital.zebedee.data.json.TimeSerieses;
 import com.github.onsdigital.zebedee.exceptions.TimeSeriesConversionException;
+import com.github.onsdigital.zebedee.exceptions.UnexpectedErrorException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.Resource;
@@ -75,7 +76,7 @@ public class DataLinkBrian implements DataLink {
         }
     }
 
-    public TimeSerieses getTimeSeries(URI endpointUri, InputStream input, String name) throws IOException, TimeSeriesConversionException {
+    public TimeSerieses getTimeSeries(URI endpointUri, InputStream input, String name) throws IOException, ZebedeeException {
         // Add csdb file as a binary
         HttpPost post = new HttpPost(endpointUri);
         MultipartEntityBuilder multipartEntityBuilder = MultipartEntityBuilder.create();
@@ -89,39 +90,28 @@ public class DataLinkBrian implements DataLink {
                 CloseableHttpClient client = HttpClients.createDefault();
                 CloseableHttpResponse response = client.execute(post)
         ) {
-            if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
-                ApiError apiError = decodeErrorFromResponse(response);
-                error().data("api_error", apiError).data("filename", name).log("error sending time series file to brian");
-                throw new TimeSeriesConversionException("error sending time series file to brian");
+            switch (response.getStatusLine().getStatusCode()) {
+                case HttpStatus.SC_OK:
+                    return decodeBodyFromResponse(response, TimeSerieses.class);
+                case HttpStatus.SC_BAD_REQUEST:
+                    error().data("api_error", decodeBodyFromResponse(response, ApiError.class))
+                            .data("filename", name).log("error sending time series file to brian");
+                    throw new TimeSeriesConversionException("error with time series file sent to brian");
+                default:
+                    error().data("api_error", decodeBodyFromResponse(response, ApiError.class))
+                            .data("filename", name).log("unexpected error sending time series file to brian");
+                    throw new UnexpectedErrorException("unexpected error sending time series file to brian", HttpStatus.SC_SERVICE_UNAVAILABLE);
             }
-
-            TimeSerieses result = null;
-            HttpEntity entity = response.getEntity();
-
-            if (entity != null) {
-                try (InputStream inputStream = entity.getContent()) {
-                    try {
-                        result = ContentUtil.deserialise(inputStream, TimeSerieses.class);
-                    } catch (JsonSyntaxException e) {
-                        // This can happen if an error HTTP code is received and the
-                        // body of the response doesn't contain the expected object:
-                        result = null;
-                    }
-                }
-            } else {
-                EntityUtils.consume(entity);
-            }
-            return result;
         }
     }
 
-    private ApiError decodeErrorFromResponse(CloseableHttpResponse response) throws IOException {
-        ApiError result = null;
+    private <T> T decodeBodyFromResponse(CloseableHttpResponse response, Class<T> type) throws IOException {
+        T result = null;
         HttpEntity entity = response.getEntity();
         if (entity != null) {
             try (InputStream inputStream = entity.getContent()) {
                 try {
-                    result = ContentUtil.deserialise(inputStream, ApiError.class);
+                    result = ContentUtil.deserialise(inputStream, type);
                 } catch (JsonSyntaxException e) {
                     // This can happen if the body of the response doesn't contain the expected object:
                     result = null;

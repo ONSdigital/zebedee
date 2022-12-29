@@ -2,8 +2,9 @@ package com.github.onsdigital.zebedee.data.processing;
 
 import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
+import com.github.onsdigital.zebedee.data.json.ApiError;
 import com.github.onsdigital.zebedee.data.json.TimeSerieses;
-import com.github.onsdigital.zebedee.exceptions.BadTimeSeriesFileException;
+import com.github.onsdigital.zebedee.exceptions.TimeSeriesConversionException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.Resource;
@@ -74,7 +75,7 @@ public class DataLinkBrian implements DataLink {
         }
     }
 
-    public TimeSerieses getTimeSeries(URI endpointUri, InputStream input, String name) throws IOException, BadTimeSeriesFileException {
+    public TimeSerieses getTimeSeries(URI endpointUri, InputStream input, String name) throws IOException, TimeSeriesConversionException {
         // Add csdb file as a binary
         HttpPost post = new HttpPost(endpointUri);
         MultipartEntityBuilder multipartEntityBuilder = MultipartEntityBuilder.create();
@@ -88,9 +89,10 @@ public class DataLinkBrian implements DataLink {
                 CloseableHttpClient client = HttpClients.createDefault();
                 CloseableHttpResponse response = client.execute(post)
         ) {
-            if (response.getStatusLine().getStatusCode() == HttpStatus.SC_BAD_REQUEST) {
-                error().data("filename", name).log("invalid time series file sent to brian");
-                throw new BadTimeSeriesFileException("invalid time series file sent to brian");
+            if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
+                ApiError apiError = decodeErrorFromResponse(response);
+                error().data("api_error", apiError).data("filename", name).log("error sending time series file to brian");
+                throw new TimeSeriesConversionException("error sending time series file to brian");
             }
 
             TimeSerieses result = null;
@@ -111,6 +113,24 @@ public class DataLinkBrian implements DataLink {
             }
             return result;
         }
+    }
+
+    private ApiError decodeErrorFromResponse(CloseableHttpResponse response) throws IOException {
+        ApiError result = null;
+        HttpEntity entity = response.getEntity();
+        if (entity != null) {
+            try (InputStream inputStream = entity.getContent()) {
+                try {
+                    result = ContentUtil.deserialise(inputStream, ApiError.class);
+                } catch (JsonSyntaxException e) {
+                    // This can happen if the body of the response doesn't contain the expected object:
+                    result = null;
+                }
+            }
+        } else {
+            EntityUtils.consume(entity);
+        }
+        return result;
     }
 
     /**

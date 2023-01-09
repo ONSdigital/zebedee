@@ -23,6 +23,7 @@ public class ReleasePopulator {
     public static Release populate(Release release, Iterable<ContentDetail> collectionContent) throws IOException, ZebedeeException {
 
         release.setRelatedDatasets(new ArrayList<>());
+        release.setRelatedAPIDatasets(new ArrayList<>());
         release.setRelatedDocuments(new ArrayList<>());
         release.setRelatedMethodology(new ArrayList<>());
         release.setRelatedMethodologyArticle(new ArrayList<>());

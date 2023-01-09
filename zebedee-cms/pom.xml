@@ -232,7 +232,7 @@
         <dependency>
             <groupId>com.github.onsdigital</groupId>
             <artifactId>dp-interactives-api-client-java</artifactId>
-            <version>0.2.6</version>
+            <version>0.2.7</version>
         </dependency>
 
         <!-- Test -->

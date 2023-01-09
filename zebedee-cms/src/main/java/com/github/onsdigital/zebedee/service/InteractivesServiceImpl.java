@@ -2,6 +2,7 @@ package com.github.onsdigital.zebedee.service;
 
 import com.github.onsdigital.dp.interactives.api.InteractivesAPIClient;
 import com.github.onsdigital.dp.interactives.api.exceptions.NoInteractivesInCollectionException;
+import com.github.onsdigital.dp.interactives.api.exceptions.ForbiddenException;
 import com.github.onsdigital.dp.interactives.api.models.Interactive;
 import com.github.onsdigital.dp.interactives.api.models.InteractiveHTMLFile;
 import com.github.onsdigital.dp.interactives.api.models.InteractiveMetadata;
@@ -119,6 +120,10 @@ public class InteractivesServiceImpl implements InteractivesService {
             warn().data("collectionId", collection.getDescription().getId())
                 .data("interactiveId", interactiveID)
                 .log("Interactives api could not find interactive. Deleting it from collection.");
+        } catch (ForbiddenException e) {
+                    warn().data("collectionId", collection.getDescription().getId())
+                        .data("interactiveId", interactiveID)
+                        .log("Interactives api, cannot delete a published interactive. Removing it from collection.");
         } catch (Exception e) {
             error().data("collectionId", collection.getDescription().getId())
                 .data("interactiveId", interactiveID)

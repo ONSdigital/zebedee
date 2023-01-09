@@ -17,7 +17,6 @@ public class ContentDetail {
 
     public List<ContentDetail> children;
     public List<Event> events;
-    private boolean deleteMarker = false;
     public String contentPath;
 
     public ContentDetail() {
@@ -185,7 +184,6 @@ public class ContentDetail {
             // if child is still null then its a directory and needs creating and added as a child
             if (child == null) {
                 String directoryName = path.subpath(depth, depth + 1).toString();
-                String uri = "/" + path.subpath(0, depth + 1).toString();
 
                 // Create the new content
                 child = new ContentDetail(directoryName, "", null);
@@ -200,10 +198,6 @@ public class ContentDetail {
             if (child != null)
                 child.overlayContentDetail(contentDetail, depth + 1);
         }
-    }
-
-    public void setDeleteMarker(boolean hasDeleteMarker) {
-        this.deleteMarker = hasDeleteMarker;
     }
 
     public PageType getType() {

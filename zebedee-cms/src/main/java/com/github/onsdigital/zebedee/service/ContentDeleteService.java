@@ -27,7 +27,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Consumer;
 
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
@@ -111,7 +110,6 @@ public class ContentDeleteService {
         List<String> deletedUris = new ArrayList<>();
         contentTreeNavigator.applyAndPropagate(deleteImpact,
                 (node) -> {
-                    node.setDeleteMarker(true);
                     deletedUris.add(node.contentPath);
                     info().data("path", node.contentPath).log("Marking node as deleted");
                 }
@@ -135,7 +133,6 @@ public class ContentDeleteService {
         }
     }
 
-
     public void cancelPendingDelete(Collection collection, Session session, String contentUri) throws ZebedeeException {
         List<String> cancelledDeleteUris = new ArrayList<>();
         collection.getDescription()
@@ -149,41 +146,6 @@ public class ContentDeleteService {
         saveManifest(collection);
     }
 
-    public void overlayDeletedNodesInBrowseTree(ContentDetail browseTree) throws IOException {
-        getAllDeleteMarkerUris()
-                .stream()
-                .forEach(deletedUri ->
-                        contentTreeNavigator.updateNodeAndDescendants(browseTree,
-                                deletedUri, (node) -> node.setDeleteMarker(true)));
-    }
-
-    public List<Path> getAllDeleteMarkerUris() throws IOException {
-        // For each collection -> iterate over its pending deletes -> for each pending delete add its path to the
-        // result list & then do the same for each of its children recursively.
-        List<Path> allDeleteMarkers = new ArrayList<>();
-        zebedeeCmsService.getZebedee().getCollections().list()
-                .stream()
-                .forEach(collection -> {
-                    collection.getDescription()
-                            .getPendingDeletes()
-                            .stream()
-                            .forEach(contentDetailsToPathList(allDeleteMarkers));
-                });
-        return allDeleteMarkers;
-    }
-
-    public List<String> getCollectionDeleteUrisAsList(Collection collection) {
-        List<String> uris = new ArrayList<>();
-        collection.getDescription().getPendingDeletes().forEach(pendingDelete -> {
-            contentTreeNavigator.applyAndPropagate(pendingDelete.getRoot(), (node) -> {
-                if (node.getType() != null && StringUtils.isNotEmpty(node.uri)) {
-                    uris.add(node.uri);
-                }
-            });
-        });
-        return uris;
-    }
-
     private void saveManifest(Collection collection) throws ZebedeeException {
         try (OutputStream output = Files.newOutputStream(manifestPath(collection))) {
             Serialiser.serialise(output, collection.getDescription());
@@ -194,7 +156,7 @@ public class ContentDeleteService {
         }
     }
 
-    public ContentDetail getAllDeletesForNode(DeleteMarker nodeToDelete)
+    private ContentDetail getAllDeletesForNode(DeleteMarker nodeToDelete)
             throws IOException {
         ContentDetail wholeTree = ContentTree.get();
         Optional<ContentDetail> branch = contentTreeNavigator.findContentDetail(wholeTree, nodeToDelete.getPath());
@@ -208,12 +170,6 @@ public class ContentDeleteService {
         return Paths.get(collection.getPath().toString() + JSON_FILE_EXT);
     }
 
-    private Consumer<PendingDelete> contentDetailsToPathList(List<Path> resultsList) {
-        return (pendingDelete) ->
-                contentTreeNavigator.search(pendingDelete.getRoot(),
-                        (node) -> resultsList.add(Paths.get(node.contentPath)));
-    }
-
     private class LeafCounter {
 
         private int count;
@@ -224,10 +180,6 @@ public class ContentDeleteService {
 
         public void increment() {
             this.count++;
-        }
-
-        public int getCount() {
-            return count;
         }
     }
 

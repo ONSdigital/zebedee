@@ -2,6 +2,7 @@ package com.github.onsdigital.zebedee.service;
 
 import com.github.onsdigital.dp.interactives.api.InteractivesAPIClient;
 import com.github.onsdigital.dp.interactives.api.exceptions.NoInteractivesInCollectionException;
+import com.github.onsdigital.dp.interactives.api.exceptions.ForbiddenException;
 import com.github.onsdigital.dp.interactives.api.exceptions.UnauthorizedException;
 import com.github.onsdigital.dp.interactives.api.models.Interactive;
 import com.github.onsdigital.dp.interactives.api.models.InteractiveMetadata;
@@ -111,6 +112,18 @@ public class InteractivesServiceImplTest extends TestCase {
         service.removeInteractiveFromCollection(mockCollection, ID);
 
         // If the collection refers to a non existent interactive, remove it from the collection
+        verify(mockCollectionDescription).removeInteractive(interactive);
+        verify(mockCollection).save();
+    }
+
+    @Test
+    public void testRemovePublishedInteractiveForbiddenException() throws Exception {
+        when(mockCollectionDescription.getInteractive(ID)).thenReturn(Optional.of(interactive));
+        when(mockCollection.getDescription()).thenReturn(mockCollectionDescription);
+        doThrow(new ForbiddenException("published interactive")).when(mockApiClient).deleteInteractive(ID);
+
+        service.removeInteractiveFromCollection(mockCollection, ID);
+
         verify(mockCollectionDescription).removeInteractive(interactive);
         verify(mockCollection).save();
     }

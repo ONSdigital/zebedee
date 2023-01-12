@@ -1,5 +1,6 @@
 package com.github.onsdigital.zebedee.content.base;
 
+import java.util.Optional;
 import java.util.stream.Stream;
 
 public enum ContentLanguage {
@@ -7,8 +8,8 @@ public enum ContentLanguage {
 
     private final static String DATA_FILE_NAME = "data%s.json";
 
-    public static ContentLanguage getById(final String id) {
-        return Stream.of(ContentLanguage.values()).filter(l -> l.getId().equalsIgnoreCase(id)).findAny().get();
+    public static Optional<ContentLanguage> getById(final String id) {
+        return Stream.of(ContentLanguage.values()).filter(l -> l.getId().equalsIgnoreCase(id)).findAny();
     }
 
     private final String id;

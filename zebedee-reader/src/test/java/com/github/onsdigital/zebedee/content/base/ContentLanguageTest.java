@@ -2,7 +2,7 @@ package com.github.onsdigital.zebedee.content.base;
 
 import static org.junit.Assert.assertEquals;
 
-import java.util.NoSuchElementException;
+import java.util.Optional;
 
 import org.junit.Test;
 
@@ -10,17 +10,27 @@ public class ContentLanguageTest {
 
     @Test
     public void testGetByIdEnglish() {
-        assertEquals(ContentLanguage.ENGLISH, ContentLanguage.getById("en"));
+        assertEquals(Optional.of(ContentLanguage.ENGLISH), ContentLanguage.getById("en"));
     }
 
     @Test
     public void testGetByIdWelsh() {
-        assertEquals(ContentLanguage.WELSH, ContentLanguage.getById("cy"));
+        assertEquals(Optional.of(ContentLanguage.WELSH), ContentLanguage.getById("cy"));
     }
 
-    @Test(expected = NoSuchElementException.class)
+    @Test
     public void testGetByIdUnknown() {
-        ContentLanguage.getById("sc");
+        assertEquals(Optional.empty(), ContentLanguage.getById("sc"));
+    }
+
+    @Test
+    public void testGetByIdEmpty() {
+        assertEquals(Optional.empty(), ContentLanguage.getById(""));
+    }
+
+    @Test
+    public void testGetByIdNull() {
+        assertEquals(Optional.empty(), ContentLanguage.getById(null));
     }
 
     @Test

@@ -1,5 +1,6 @@
 package com.github.onsdigital.zebedee.util;
 
+import com.github.onsdigital.zebedee.content.base.ContentLanguage;
 import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.content.page.statistics.document.figure.chart.Chart;
 import com.github.onsdigital.zebedee.content.page.statistics.document.figure.image.Image;
@@ -48,9 +49,10 @@ public class ContentDetailUtil {
 
                 if (page != null) { //Contents without type is null when deserialised. There should not be no such data
                     ContentDetail contentDetail = new ContentDetail(page.getDescription().getTitle(), page.getUri().toString(), page.getType());
-                    contentDetail.contentPath = page.getUri().toString();
-                    contentDetail.description.edition = page.getDescription().getEdition();
-                    contentDetail.description.language = page.getDescription().getLanguage();
+                    contentDetail.setContentPath(page.getUri().toString());
+                    contentDetail.getDescription().setEdition(page.getDescription().getEdition());
+                    ContentLanguage lang = ContentLanguage.getById(page.getDescription().getLanguage()).orElse(ContentLanguage.ENGLISH);
+                    contentDetail.getDescription().setLanguage(lang);
                     details.add(contentDetail);
                 }
             }

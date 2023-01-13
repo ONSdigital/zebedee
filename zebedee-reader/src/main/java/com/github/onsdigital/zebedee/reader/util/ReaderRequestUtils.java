@@ -13,7 +13,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.Set;
 
 /**
@@ -28,17 +27,8 @@ public class ReaderRequestUtils {
      */
     public static ContentLanguage getRequestedLanguage(HttpServletRequest request) {
         String lang = request.getParameter("lang");
-        if (lang == null) {
-            return null;
-        }
-
-        try {
-            return ContentLanguage.getById(lang);
-        } catch (NoSuchElementException e) {
-            return null;
-        }
+        return ContentLanguage.getById(lang).orElse(null);
     }
-
 
     /**
      * Extracts the filter requested to be applied to content. Each request should have at most one filter, otherwise first filter found will be applied

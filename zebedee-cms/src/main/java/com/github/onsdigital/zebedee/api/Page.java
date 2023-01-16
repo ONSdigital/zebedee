@@ -2,6 +2,7 @@ package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
 import com.github.onsdigital.zebedee.audit.Audit;
+import com.github.onsdigital.zebedee.content.base.ContentLanguage;
 import com.github.onsdigital.zebedee.content.page.APIDatasetLandingPageCreationHook;
 import com.github.onsdigital.zebedee.content.page.APIDatasetLandingPageDeletionHook;
 import com.github.onsdigital.zebedee.content.page.PageTypeUpdateHook;
@@ -253,34 +254,39 @@ public class Page {
             return;
         }
 
-        CollectionReader collectionReader;
-        try {
-            collectionReader = zebedeeCmsService.getZebedeeCollectionReader(collection, session);
-        } catch (ZebedeeException e) {
-            handleZebdeeException("page delete endpoint: failed to get collection reader", e, response, uri, session, collection);
-            return;
-        }
-
-        com.github.onsdigital.zebedee.content.page.base.Page page;
-
-        try {
-            page = collectionReader.getContent(uri);
-        } catch (NotFoundException ex) {
-            info().data("path", uri).data("collection_id", collection.getId())
-                    .log("page delete endpoint: page is already deleted");
-            response.setStatus(HttpStatus.SC_NO_CONTENT);
-            return; // idempotent
-        } catch (ZebedeeException e) {
-            handleZebdeeException("page delete endpoint: exception when getting collection content", e, response, uri, session, collection);
-            return;
-        } catch (IOException e) {
-            error().data("collection_id", collection.getId()).data("user", session.getEmail()).data("path", uri)
-                    .logException(e, "page delete endpoint: exception when attempting to get collection content");
-            response.setStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR);
-            return;
-        }
-
         if (pageDeletionHook.isPresent()) {
+            CollectionReader collectionReader;
+            try {
+                collectionReader = zebedeeCmsService.getZebedeeCollectionReader(collection, session);
+            } catch (ZebedeeException e) {
+                handleZebdeeException("page delete endpoint: failed to get collection reader", e, response, uri, session, collection);
+                return;
+            }
+
+            com.github.onsdigital.zebedee.content.page.base.Page page;
+
+            try {
+                page = collectionReader.getContentQuiet(uri);
+                if (page == null) {
+                    // Couldn't find the content in English, try Welsh
+                    collectionReader.setLanguage(ContentLanguage.WELSH);
+                    page = collectionReader.getContent(uri);
+                }
+            } catch (NotFoundException ex) {
+                info().data("path", uri).data("collection_id", collection.getId())
+                        .log("page delete endpoint: page is already deleted");
+                response.setStatus(HttpStatus.SC_NO_CONTENT);
+                return; // idempotent
+            } catch (ZebedeeException e) {
+                handleZebdeeException("page delete endpoint: exception when getting collection content", e, response, uri, session, collection);
+                return;
+            } catch (IOException e) {
+                error().data("collection_id", collection.getId()).data("user", session.getEmail()).data("path", uri)
+                        .logException(e, "page delete endpoint: exception when attempting to get collection content");
+                response.setStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR);
+                return;
+            }
+
             boolean success = execDeletionHook(page, uri, collection, session);
             if (!success) {
                 response.setStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR);
@@ -289,10 +295,8 @@ public class Page {
         }
 
         try {
-            String uriToDelete = uri.replaceAll("/+$","") + zebedeeFileSuffix;
-
             boolean deleted = zebedeeCmsService.getZebedee().getCollections().deleteContent(
-                        collection, uriToDelete, session);
+                        collection, uri, session);
             if (deleted) {
                 Audit.Event.CONTENT_DELETED
                     .parameters()
@@ -306,7 +310,6 @@ public class Page {
                 error().data("collection_id", collection.getDescription().getId())
                     .data("user", session.getEmail())
                     .data("path", uri)
-                    .data("uriToDelete", uriToDelete)
                     .log("page delete endpoint: couldn't delete content");
                 response.setStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR);
             }

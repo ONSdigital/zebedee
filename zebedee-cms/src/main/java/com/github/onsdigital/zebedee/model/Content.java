@@ -1,7 +1,6 @@
 package com.github.onsdigital.zebedee.model;
 
 import com.github.davidcarboni.restolino.json.Serialiser;
-import com.github.onsdigital.zebedee.content.base.ContentLanguage;
 import com.github.onsdigital.zebedee.json.ContentDetail;
 import com.github.onsdigital.zebedee.json.ContentDetailDescription;
 import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
@@ -16,11 +15,9 @@ import java.net.URI;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
@@ -393,50 +390,6 @@ public class Content {
         return false;
     }
 
-    public boolean deleteContentJson(String uri) throws IOException {
-        boolean deleteSuccessful;
-
-        Path pathToDelete = toPath(uri);
-
-        if (!Files.exists(pathToDelete)) {
-            deleteSuccessful = false;
-        } else if (isDataJsonFile(pathToDelete)) {
-            Path parentDir = pathToDelete.getParent();
-            deleteSuccessful = deleteDataJsonFileAndRelatedPreviousVersionFiles(parentDir);
-        } else {
-            deleteSuccessful = Files.deleteIfExists(pathToDelete);
-        }
-
-        if (deleteSuccessful) {
-            deleteEmptyParentDirectories(pathToDelete);
-        }
-
-        return deleteSuccessful;
-    }
-
-    /**
-     * Delete files from the specified collection directory. directories and cy_data.json are exluded all other files
-     * will be deleted.
-     */
-    boolean deleteDataJsonFileAndRelatedPreviousVersionFiles(Path path) throws IOException {
-        boolean deleteSuccessful = true;
-
-        if (!Files.isDirectory(path)) {
-            return false;
-        } else {
-            List<Path> filesToDelete = Files
-                    .list(path)
-                    .filter(file -> canDeleteWithDataJson(file))
-                    .collect(Collectors.toList());
-
-            for (Path uri : filesToDelete) {
-                deleteSuccessful &= Files.deleteIfExists(uri);
-            }
-        }
-
-        return deleteSuccessful;
-    }
-
     /**
      * Delete any empty directories left in the folder tree by walking up the folder structure
      *
@@ -497,35 +450,4 @@ public class Content {
         return findByCriteria(path, IS_DATA_VIZ_FILE);
     }
 
-    public static boolean isDataJsonFile(String uri) {
-        if (StringUtils.isEmpty(uri)) {
-            return false;
-        }
-        return isDataJsonFile(Paths.get(uri));
-    }
-
-    public static boolean isDataJsonFile(Path path) {
-        boolean result = false;
-        if (path != null) {
-            result = !Files.isDirectory(path) && ContentLanguage.ENGLISH.getDataFileName().equals(path.getFileName().toString());
-        }
-        return result;
-    }
-
-    /**
-     * Determines if a file should also be deleted when a data.json file is delete from a collection.
-     * Returns true if the path is not null, is not for a directory and the file is not names cy_data.json.
-     *
-     * @param p the file path to evaluate.
-     * @return true or false.
-     */
-    static boolean canDeleteWithDataJson(Path p) {
-        boolean canDelete;
-        if (p == null) {
-            canDelete = false;
-        } else {
-            canDelete = !p.toFile().isDirectory() && !StringUtils.equals(p.toFile().getName(), ContentLanguage.WELSH.getDataFileName());
-        }
-        return canDelete;
-    }
 }

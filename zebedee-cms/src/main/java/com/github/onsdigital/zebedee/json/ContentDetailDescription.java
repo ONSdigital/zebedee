@@ -1,12 +1,14 @@
 package com.github.onsdigital.zebedee.json;
 
+import com.github.onsdigital.zebedee.content.base.ContentLanguage;
+
 /**
  * ContentDetail sub class that holds the title of the page.
  */
 public class ContentDetailDescription {
     public String title;
     public String edition;
-    public String language;
+    private ContentLanguage language;
 
     public ContentDetailDescription(String title) {
         this.title = title;
@@ -42,11 +44,11 @@ public class ContentDetailDescription {
         return this;
     }
 
-    public String getLanguage() {
+    public ContentLanguage getLanguage() {
         return language;
     }
 
-    public ContentDetailDescription setLanguage(String language) {
+    public ContentDetailDescription setLanguage(ContentLanguage language) {
         this.language = language;
         return this;
     }

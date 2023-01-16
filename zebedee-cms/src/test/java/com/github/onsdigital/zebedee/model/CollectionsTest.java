@@ -21,7 +21,6 @@ import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.ZebedeeReader;
-import com.github.onsdigital.zebedee.service.InteractivesService;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.user.model.User;
 import com.github.onsdigital.zebedee.user.service.UsersService;
@@ -106,9 +105,6 @@ public class CollectionsTest {
     private UsersService usersServiceMock;
 
     @Mock
-    InteractivesService interactivesService;
-
-    @Mock
     private Collection collectionMock;
 
     @Mock
@@ -163,7 +159,7 @@ public class CollectionsTest {
         collectionsPath = rootDir.newFolder("collections").toPath();
 
         // Test target.
-        collections = new Collections(collectionsPath, permissionsServiceMock, versionsService, interactivesService, publishedContentMock);
+        collections = new Collections(collectionsPath, permissionsServiceMock, versionsService, publishedContentMock);
 
         zebedeeSupplier = () -> zebedeeMock;
         publishingNotificationConsumer = (c, e) -> publishNotification.sendNotification(e);

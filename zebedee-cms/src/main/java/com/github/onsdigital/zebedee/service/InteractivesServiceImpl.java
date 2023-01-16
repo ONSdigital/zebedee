@@ -1,10 +1,13 @@
 package com.github.onsdigital.zebedee.service;
 
 import com.github.onsdigital.dp.interactives.api.InteractivesAPIClient;
+import com.github.onsdigital.dp.interactives.api.exceptions.NoInteractivesInCollectionException;
+import com.github.onsdigital.dp.interactives.api.exceptions.ForbiddenException;
 import com.github.onsdigital.dp.interactives.api.models.Interactive;
 import com.github.onsdigital.dp.interactives.api.models.InteractiveHTMLFile;
 import com.github.onsdigital.dp.interactives.api.models.InteractiveMetadata;
 import com.github.onsdigital.zebedee.exceptions.ConflictException;
+import com.github.onsdigital.zebedee.exceptions.InternalServerError;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.CollectionInteractive;
 import com.github.onsdigital.zebedee.json.CollectionInteractiveFile;
@@ -15,16 +18,17 @@ import org.apache.commons.lang3.StringUtils;
 import org.bouncycastle.util.Arrays;
 
 import java.io.IOException;
-import java.io.InvalidObjectException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.warn;
 
 /**
- * Dataset related services
+ * Interactives related services
  */
 public class InteractivesServiceImpl implements InteractivesService {
 
@@ -34,11 +38,8 @@ public class InteractivesServiceImpl implements InteractivesService {
         this.interactivesClient = interactivesClient;
     }
 
-    /**
-     * Add the dataset for the given datasetID to the collection for the collectionID.
-     */
     @Override
-    public CollectionInteractive updateInteractiveInCollection(Collection collection, String id, CollectionInteractive updatedInteractive, String user) throws ZebedeeException, IOException, RuntimeException {
+    public CollectionInteractive updateInteractiveInCollection(Collection collection, String id, CollectionInteractive updatedInteractive, String user) throws ZebedeeException, IOException {
 
         CollectionInteractive collectionInteractive;
 
@@ -81,7 +82,7 @@ public class InteractivesServiceImpl implements InteractivesService {
                 info().data("collectionId", collection.getDescription().getId())
                         .data("interactiveId", id)
                         .log("The interactive URL has not been set");
-                throw new InvalidObjectException("The interactive URL has not been set on the dataset response");
+                throw new InternalServerError("The interactive URL has not been set on the interactive response");
             }
 
             if (notAssociatedYet) {
@@ -105,7 +106,7 @@ public class InteractivesServiceImpl implements InteractivesService {
     }
 
     @Override
-    public void removeInteractiveFromCollection(Collection collection, String interactiveID) throws IOException, RuntimeException {
+    public void removeInteractiveFromCollection(Collection collection, String interactiveID) throws ZebedeeException, IOException {
 
         // if its not in the collection then just return.
         Optional<CollectionInteractive> existingInteractive = collection.getDescription().getInteractive(interactiveID);
@@ -115,8 +116,19 @@ public class InteractivesServiceImpl implements InteractivesService {
 
         try {
             interactivesClient.deleteInteractive(interactiveID);
+        } catch (NoInteractivesInCollectionException e) {
+            warn().data("collectionId", collection.getDescription().getId())
+                .data("interactiveId", interactiveID)
+                .log("Interactives api could not find interactive. Deleting it from collection.");
+        } catch (ForbiddenException e) {
+                    warn().data("collectionId", collection.getDescription().getId())
+                        .data("interactiveId", interactiveID)
+                        .log("Interactives api, cannot delete a published interactive. Removing it from collection.");
         } catch (Exception e) {
-            throw e;
+            error().data("collectionId", collection.getDescription().getId())
+                .data("interactiveId", interactiveID)
+                .log(e.getMessage());
+            throw new InternalServerError(e.getMessage(), e);
         }
 
         collection.getDescription().removeInteractive(existingInteractive.get());

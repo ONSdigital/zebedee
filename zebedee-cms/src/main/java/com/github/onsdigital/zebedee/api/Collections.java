@@ -146,10 +146,15 @@ public class Collections {
         String user = session.getEmail();
 
         Path path = Path.newInstance(request);
+        
+
+        if (!isValidPath(path)) {
+            info().data("path", path).data("method", request.getMethod()).log("Endpoint for collections not found");
+            response.setStatus(HttpStatus.SC_NOT_FOUND);
+            return;
+        }
+
         List<String> pathSegments = path.segments();
-
-        if (!isValidPath(response, path, pathSegments)) return;
-
         String collectionID = pathSegments.get(1);
         String resourceID = pathSegments.get(3);
 
@@ -170,7 +175,7 @@ public class Collections {
                             updateDatasetInCollection(collection, resourceID, request, user);
                             break;
 
-                        case 8: // /collections/{collection_id}/datasets/{dataset_id}/editions/{}/versions/{}
+                        case 8: // /collections/{collection_id}/datasets/{dataset_id}/editions/{edition}/versions/{version}
 
                             String edition = pathSegments.get(5);
                             String version = pathSegments.get(7);
@@ -179,8 +184,8 @@ public class Collections {
                             break;
 
                         default:
+                            // Should not happen, isValidPath would return false
                             response.setStatus(HttpStatus.SC_NOT_FOUND);
-                            return;
                     }
                     break;
                 case "interactives":
@@ -191,13 +196,13 @@ public class Collections {
                             break;
 
                         default:
+                            // Should not happen, isValidPath would return false
                             response.setStatus(HttpStatus.SC_NOT_FOUND);
-                            return;
                     }
                     break;
                 default:
+                    // Should not happen, isValidPath would return false
                     response.setStatus(HttpStatus.SC_NOT_FOUND);
-                    return;
             }
         } catch (UnexpectedResponseException e) {
             throw new UnexpectedErrorException(e.getMessage(), HttpStatus.SC_INTERNAL_SERVER_ERROR);
@@ -229,10 +234,14 @@ public class Collections {
         }
 
         Path path = Path.newInstance(request);
+
+        if (!isValidPath(path)) {
+            info().data("path", path).data("method", request.getMethod()).log("Endpoint for collections not found");
+            response.setStatus(HttpStatus.SC_NOT_FOUND);
+            return;
+        }
+
         List<String> pathSegments = path.segments();
-
-        if (!isValidPath(response, path, pathSegments)) return;
-
         String collectionID = pathSegments.get(1);
         String resourceID = pathSegments.get(3);
 
@@ -249,31 +258,32 @@ public class Collections {
                 switch (pathSegments.size()) {
                     case 4: // /collections/{collection_id}/datasets/{dataset_id}
                         removeDatasetFromCollection(collection, resourceID);
+                        response.setStatus(HttpStatus.SC_NO_CONTENT);
                         break;
-                    case 8: // /collections/{collection_id}/datasets/{dataset_id}/editions/{}/versions/{}
+                    case 8: // /collections/{collection_id}/datasets/{dataset_id}/editions/{edition}/versions/{version}
                         String edition = pathSegments.get(5);
                         String version = pathSegments.get(7);
                         removeDatasetVersionFromCollection(collection, resourceID, edition, version);
+                        response.setStatus(HttpStatus.SC_NO_CONTENT);
                         break;
                     default:
+                        // Should not happen, isValidPath would return false
                         response.setStatus(HttpStatus.SC_NOT_FOUND);
-                        return;
                 }
                 break;
             case "interactives":
                 switch (pathSegments.size()) {
                     case 4: // /collections/{collection_id}/interactives/{interactive_id}
-
                         removeInteractiveFromCollection(collection, resourceID);
                         response.setStatus(HttpStatus.SC_NO_CONTENT);
                         break;
-
                     default:
+                        // Should not happen, isValidPath would return false
                         response.setStatus(HttpStatus.SC_NOT_FOUND);
-                        return;
                 }
                 break;
             default:
+                // Should not happen, isValidPath would return false
                 response.setStatus(HttpStatus.SC_NOT_FOUND);
         }
     }
@@ -285,7 +295,7 @@ public class Collections {
                 .data("edition", edition)
                 .data("version", version)
                 .data("user", user)
-                .log("PUT called on /collections/{}/datasets/{}/editions/{}/versions/{} endpoint");
+                .log("PUT called on /collections/{collection_id}/datasets/{dataset_id}/editions/{edition}/versions/{version} endpoint");
 
         try (InputStream body = request.getInputStream()) {
 
@@ -302,7 +312,7 @@ public class Collections {
         info().data("collectionId", collection.getId())
                 .data("datasetId", datasetID)
                 .data("user", user)
-                .log("PUT called on /collections/{}/datasets/{} endpoint");
+                .log("PUT called on /collections/{collection_id}/datasets/{dataset_id} endpoint");
 
         try (InputStream body = request.getInputStream()) {
 
@@ -319,7 +329,7 @@ public class Collections {
         info().data("collectionId", collection.getId())
                 .data("interactiveId", interactiveID)
                 .data("user", user)
-                .log("PUT called on /collections/{}/interactives/{} endpoint");
+                .log("PUT called on /collections/{collection_id}/interactives/{interactive_id} endpoint");
 
         try (InputStream body = request.getInputStream()) {
 
@@ -336,7 +346,7 @@ public class Collections {
                 .data("datasetId", datasetID)
                 .data("edition", edition)
                 .data("version", version)
-                .log("DELETE called on /collections/{collection_id}/datasets/{}/editions/{}/versions/{} endpoint");
+                .log("DELETE called on /collections/{collection_id}/datasets/{dataset_id}/editions/{edition}/versions/{version} endpoint");
 
         datasetService.removeDatasetVersionFromCollection(collection, datasetID, edition, version);
     }
@@ -345,7 +355,7 @@ public class Collections {
 
         info().data("collectionId", collection.getId())
                 .data("datasetId", datasetID)
-                .log("DELETE called on /collections/{collection_id}/datasets/{} endpoint");
+                .log("DELETE called on /collections/{collection_id}/datasets/{dataset_id} endpoint");
 
         datasetService.removeDatasetFromCollection(collection, datasetID);
     }
@@ -354,30 +364,27 @@ public class Collections {
 
         info().data("collectionId", collection.getId())
                 .data("interactiveId", interactiveID)
-                .log("DELETE called on /collections/{collection_id}/interactiveID/{} endpoint");
+                .log("DELETE called on /collections/{collection_id}/interactives/{interactive_id} endpoint");
 
         interactivesService.removeInteractiveFromCollection(collection, interactiveID);
     }
 
-    private boolean isValidPath(HttpServletResponse response, Path path, List<String> segments) {
-
-        // /collections/{collection_id}/datasets/{dataset_id}
-        // /collections/{collection_id}/datasets/{dataset_id}/editions/{}/versions/{}
-        if (segments.size() < 4) {
-            info().data("path", path).log("Endpoint for collections not found");
-            response.setStatus(HttpStatus.SC_NOT_FOUND);
-            return false;
+    private boolean isValidPath(Path path) {
+        final List<String> segments = path.segments();
+        final int numberOfSegments = segments.size();
+        if (numberOfSegments > 2) {
+            String type = segments.get(2);
+            switch (type) {
+            case "datasets":
+                // /collections/{collection_id}/datasets/{dataset_id}
+                // /collections/{collection_id}/datasets/{dataset_id}/editions/{edition}/versions/{version}
+                return numberOfSegments == 4 || numberOfSegments == 8;
+            case "interactives":
+                // /collections/{collection_id}/interactives/{interactive_id}
+                return numberOfSegments == 4;
+            }
         }
-
-        boolean validResource = segments.get(2).equalsIgnoreCase("datasets") ||
-                segments.get(2).equalsIgnoreCase("interactives");
-        if(!validResource) {
-            info().data("path", path).log("Endpoint for collections not found");
-            response.setStatus(HttpStatus.SC_NOT_FOUND);
-            return false;
-        }
-
-        return true;
+        return false;
     }
 
     /**

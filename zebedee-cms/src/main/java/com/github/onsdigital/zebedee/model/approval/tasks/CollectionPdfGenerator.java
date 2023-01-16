@@ -14,6 +14,7 @@ import com.github.onsdigital.zebedee.service.PdfService;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -24,6 +25,8 @@ import static com.github.onsdigital.zebedee.content.page.base.PageType.COMPENDIU
 import static com.github.onsdigital.zebedee.content.page.base.PageType.STATIC_METHODOLOGY;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.info;
 import static java.text.MessageFormat.format;
+
+import java.security.InvalidParameterException;
 
 /**
  * Generates a PDF for each page in a collection that needs one.
@@ -59,13 +62,14 @@ public class CollectionPdfGenerator {
 
         int index = 1;
         for (ContentDetail detail : filtered) {
-            generatePDFForContent(collection, contentWriter, detail.uri, detail.description.language);
+            generatePDFForContent(collection, contentWriter, detail.getUri(), detail.getDescription().getLanguage());
 
-            // FIXME: This conditional section is a workaround to generate Welsh language
+            // FIXME: This conditional section is a workaround to generate both language
             // PDFs when changes to content are made for both English and Welsh languages.
             //
             // In that case, collectionContent will contain a single entry for each url
-            // (instead of one for each language), and its description.language will be "".
+            // (instead of one for each language), and the value of description.language
+            // can not be guaranteed (it could be either Welsh or English)
             //
             // This is because ContentDetailUtil.resolveDetails returns a Set and
             // ContentDetails objects are considered equals when they have the same url
@@ -77,20 +81,9 @@ public class CollectionPdfGenerator {
             // However, zebedee heavily relies on that Set keeping one ContentDetail per url
             // (for example for the content tree) and changing it will have a lot of
             // unexpected implications
-            if (!ContentLanguage.WELSH.getId().equals(detail.description.language)) {
-                // If this is an English version, check if a Welsh data file exists
-
-                Resource r;
-                try {
-                    r = contentReader.getResource(detail.uri + "/" + ContentLanguage.WELSH.getDataFileName());
-                } catch (Exception e) {
-                    // It's ok. If there is no Welsh data file, we won't generate a Welsh PDF
-                    r = null;
-                }
-
-                if (r != null) {
-                    generatePDFForContent(collection, contentWriter, detail.uri, ContentLanguage.WELSH.getId());
-                }
+            Optional<ContentLanguage> otherLanguage = getOtherLanguage(detail, contentReader);
+            if (otherLanguage.isPresent()) {
+                generatePDFForContent(collection, contentWriter, detail.getUri(), otherLanguage.get());
             }
 
             info().collectionID(collection)
@@ -109,15 +102,46 @@ public class CollectionPdfGenerator {
                 .collect(Collectors.toList());
     }
 
-    private boolean generatePDFForContent(Collection collection, ContentWriter writer, String uri, String language)
-            throws InternalServerError {
-        ContentLanguage lang = ContentLanguage.ENGLISH;
-        if (ContentLanguage.WELSH.getId().equalsIgnoreCase(language)) {
-            lang = ContentLanguage.WELSH;
+    /**
+     * Finds if there is a version of the given ContentDetail in the given
+     * ContentReader for another language. Ie if the ContentDetail is Welsh, it
+     * finds the English. It returns the other language if there is such a file
+     * 
+     * @param detail
+     * @param contentReader
+     * @return A ContentLanguage if there is a file for that language or empty if
+     *         there isn't
+     */
+    private static Optional<ContentLanguage> getOtherLanguage(ContentDetail detail, ContentReader contentReader) {
+        ContentLanguage otherLanguage;
+        switch (detail.getDescription().getLanguage()) {
+        case ENGLISH:
+            otherLanguage = ContentLanguage.WELSH;
+            break;
+        case WELSH:
+        default:
+            otherLanguage = ContentLanguage.ENGLISH;
         }
-        CMSLogEvent e = info().data("uri", uri).collectionID(collection);
+        
+        // Check if a data file for the other language exists
+        Resource r = null;
         try {
-            pdfService.generatePdf(writer, uri, lang);
+            r = contentReader.getResource(detail.getUri() + "/" + otherLanguage.getDataFileName());
+        } catch (Exception e) {
+            // It's ok. If there is no other language data file, we won't generate its PDF
+        }
+        
+        return r != null ? Optional.of(otherLanguage) : Optional.empty();
+    }
+
+    private boolean generatePDFForContent(Collection collection, ContentWriter writer, String uri, ContentLanguage language)
+            throws InternalServerError {
+        if (language == null) {
+            throw new InvalidParameterException("Language can't be null");
+        }
+        CMSLogEvent e = info().data("uri", uri).data("lang", language.toString()).collectionID(collection);
+        try {
+            pdfService.generatePdf(writer, uri, language);
             e.log("content PDF generated successfully");
             return true;
         } catch (Exception ex) {

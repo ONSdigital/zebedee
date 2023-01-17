@@ -47,7 +47,7 @@ public abstract class CollectionReader {
 
     /**
      * Reads content under a given collection root folder.
-     * Tries finding content under in progress, completePath and reviewedPath folders respectively. Throws not found exception if not found
+     * Tries finding content under in progress, complete and reviewed folders respectively. Throws not found exception if not found
      *
      * @param path path of requested content under requested root folder
      * @return
@@ -56,6 +56,24 @@ public abstract class CollectionReader {
      */
     public Page getContent(String path) throws ZebedeeException, IOException {
         return findContent(path);
+    }
+
+    /**
+     * Reads content under a given collection root folder. Tries finding content
+     * under in progress, complete and reviewed folders respectively. Returns null
+     * if not found
+     *
+     * @param path path of requested content under requested root folder
+     * @return
+     * @throws NotFoundException
+     * @throws IOException
+     */
+    public Page getContentQuiet(String path) throws ZebedeeException, IOException {
+        try {
+            return getContent(path);
+        } catch (NotFoundException e) {
+            return null;
+        }
     }
 
 

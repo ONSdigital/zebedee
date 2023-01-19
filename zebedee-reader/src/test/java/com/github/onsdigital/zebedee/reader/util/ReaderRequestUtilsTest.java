@@ -7,7 +7,6 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.mockito.Mockito.when;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

@@ -1,56 +1,29 @@
 package com.github.onsdigital.zebedee.model;
 
-import static com.github.onsdigital.zebedee.reader.util.RequestUtils.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.times;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.security.Principal;
-import java.util.*;
-import java.util.Collection;
+import java.util.List;
 
-import com.github.onsdigital.zebedee.ZebedeeConfiguration;
-import com.github.onsdigital.zebedee.content.dynamic.browse.ContentNode;
-import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.model.Content;
-import com.github.onsdigital.zebedee.reader.api.ReadRequestHandler;
-import com.github.onsdigital.zebedee.reader.api.endpoint.Taxonomy;
-import com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration;
-import com.github.onsdigital.zebedee.reader.util.RequestUtils;
-import com.github.onsdigital.zebedee.user.model.User;
-import com.google.common.net.MediaType;
 import org.apache.commons.io.FileUtils;
-import org.eclipse.jetty.http.HttpStatus;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.springframework.mock.web.MockHttpServletResponse;
-
-import javax.servlet.*;
-import javax.servlet.http.*;
-import javax.ws.rs.HttpMethod;
 
 public class TaxonomyTest {
 
-	protected static final String COLLECTION_ID = "123456789";
+	Path path;
 	Content taxonomy;
 
-	Path path;
-		@Before
+	@Before
 	public void setUp() throws Exception {
 		path = Files.createTempDirectory(this.getClass().getSimpleName());
 		taxonomy = new Content(path);
@@ -159,4 +132,5 @@ public class TaxonomyTest {
 		assertTrue(uris.contains(uri1));
 		assertTrue(uris.contains(uri2));
 	}
+
 }

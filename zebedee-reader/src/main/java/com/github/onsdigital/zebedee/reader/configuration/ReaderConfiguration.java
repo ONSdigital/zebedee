@@ -46,9 +46,12 @@ public class ReaderConfiguration {
     private static final String DATASET_API_URL_KEY = "DATASET_API_URL";
     private static final String DATASET_API_AUTH_TOKEN_KEY = "DATASET_API_AUTH_TOKEN";
     private static final String SERVICE_AUTH_TOKEN_KEY = "SERVICE_AUTH_TOKEN";
+    // how many seconds for Max_Age for cache
+    private static final int DEFAULT_CACHE_CONTROL_SECONDS = 1800;
 
     private String zebedeeRootDir;
     private String collectionsDir;
+    private int cacheControl;
     private String contentDir;
     private String inProgressDirName;
     private String completeDirName;
@@ -122,6 +125,7 @@ public class ReaderConfiguration {
         this.bulletinsDirName = BULLETINS_FOLDER_NAME;
         this.articlesDirName = ARTICLES_FOLDER_NAME;
         this.compendiumDirName = COMPENDIUM_FOLDER_NAME;
+        this.cacheControl = DEFAULT_CACHE_CONTROL_SECONDS;
 
         this.datasetImportEnabled = Boolean.valueOf(getVariableValue(ENABLE_DATASET_IMPORT));
 
@@ -149,6 +153,7 @@ public class ReaderConfiguration {
                 .data("articles_dir", articlesDirName)
                 .data("compendium_dir", compendiumDirName)
                 .data("dataset_import_enabled", datasetImportEnabled)
+                .data("cache_control", cacheControl)
                 .log("zebedee reader configuration");
     }
 
@@ -167,6 +172,7 @@ public class ReaderConfiguration {
     public String getCollectionsDir() {
         return collectionsDir;
     }
+    public int getSecondsForCacheControl() {return cacheControl;}
 
     public String getContentDir() {
         return contentDir;

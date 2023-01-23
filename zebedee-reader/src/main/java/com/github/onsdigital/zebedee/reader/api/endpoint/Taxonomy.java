@@ -4,6 +4,7 @@ import com.github.davidcarboni.restolino.framework.Api;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.reader.api.ReadRequestHandler;
+import com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration;
 import com.github.onsdigital.zebedee.reader.util.ReaderResponseResponseUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -11,7 +12,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
 import java.io.IOException;
-
 import static com.github.onsdigital.zebedee.reader.util.ReaderRequestUtils.getRequestedLanguage;
 
 /**
@@ -19,7 +19,7 @@ import static com.github.onsdigital.zebedee.reader.util.ReaderRequestUtils.getRe
  */
 @Api
 public class Taxonomy {
-
+    ReaderConfiguration cfg = ReaderConfiguration.get();
     /**
      * Retrieves content endpoint <code>/taxonomy[collectionId]/?uri=[uri]</code>
      * <p>
@@ -41,6 +41,7 @@ public class Taxonomy {
 
     @GET
     public void get(HttpServletRequest request, HttpServletResponse response) throws IOException, ZebedeeException {
+        response.addHeader("Cache-Control", "max-age=" + cfg.getSecondsForCacheControl() + ", public");
         ReaderResponseResponseUtils.sendResponse(new ReadRequestHandler(getRequestedLanguage(request)).getTaxonomy(request, getDepth(request)), response);
     }
 

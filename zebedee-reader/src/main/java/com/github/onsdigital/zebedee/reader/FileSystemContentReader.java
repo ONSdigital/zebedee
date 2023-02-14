@@ -340,7 +340,8 @@ public class FileSystemContentReader implements ContentReader {
 
     private void assertExists(Path path) throws ZebedeeException, IOException {
         if (!exists(path) || !isChild(path)) {
-            throw new NotFoundException("Could not find requested content, path:" + path.toUri().toString());
+//            TODO put this error back in when I have confirmed what would happen if it were not there - 14/02/23 - EC
+//            throw new NotFoundException("Could not find requested content, path:" + path.toUri().toString());
         }
     }
 

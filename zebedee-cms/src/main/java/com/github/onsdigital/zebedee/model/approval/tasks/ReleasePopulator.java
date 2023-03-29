@@ -121,7 +121,8 @@ public class ReleasePopulator {
     }
 
     private static Link createLink(ContentDetail contentDetail) {
-        Link link = new Link(URI.create(contentDetail.uri));
+        String result = contentDetail.uri.substring(0, contentDetail.uri.indexOf("/versions"));
+        Link link = new Link(URI.create(result));
         link.setTitle(contentDetail.description.title);
         return link;
     }

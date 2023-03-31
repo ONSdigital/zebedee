@@ -89,6 +89,7 @@ public class ReleasePopulator {
     }
 
     private static void addRelatedAPIDataset(Release release, ContentDetail contentDetail) {
+        contentDetail.setUri(contentDetail.uri.substring(0, contentDetail.uri.indexOf("/versions")));
         Link link = createLink(contentDetail);
         if (release.getRelatedAPIDatasets() == null) {
             release.setRelatedAPIDatasets(new ArrayList<>());
@@ -121,8 +122,7 @@ public class ReleasePopulator {
     }
 
     private static Link createLink(ContentDetail contentDetail) {
-        String result = contentDetail.uri.substring(0, contentDetail.uri.indexOf("/versions"));
-        Link link = new Link(URI.create(result));
+        Link link = new Link(URI.create(contentDetail.uri));
         link.setTitle(contentDetail.description.title);
         return link;
     }

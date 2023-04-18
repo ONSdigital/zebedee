@@ -22,7 +22,6 @@ import com.github.onsdigital.zebedee.search.indexing.Indexer;
 import com.github.onsdigital.zebedee.service.KafkaService;
 import com.github.onsdigital.zebedee.service.ServiceSupplier;
 import com.github.onsdigital.zebedee.service.content.navigation.ContentTreeNavigator;
-import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.util.ContentTree;
 import com.github.onsdigital.zebedee.util.SlackNotification;
 import com.github.onsdigital.zebedee.util.URIUtils;
@@ -60,7 +59,6 @@ public class PostPublisher {
 
     // The date format including the BST timezone. Dates are stored at UTC and must be formated to take BST into account.
     private static FastDateFormat format = FastDateFormat.getInstance("yyyy-MM-dd-HH-mm", TimeZone.getTimeZone("Europe/London"));
-    private static Session zebdeePublisherSession = null;
     private static ServiceSupplier<KafkaService> kafkaServiceSupplier = () -> ZebedeeCmsService.getInstance().getKafkaService();
 
     private static final ExecutorService pool = Executors.newFixedThreadPool(10);
@@ -121,18 +119,6 @@ public class PostPublisher {
         }
 
         return false;
-    }
-
-
-    /**
-     * Returns a session object with the email as the class name of {@link Publisher} - required by the history event
-     * logging.
-     */
-    private static Session getPublisherClassSession() {
-        if (zebdeePublisherSession == null) {
-            zebdeePublisherSession = new Session(null, Publisher.class.getName());
-        }
-        return zebdeePublisherSession;
     }
 
     private static void applyDeletesToPublishing(Collection collection, ContentReader contentReader, ContentWriter contentWriter) {

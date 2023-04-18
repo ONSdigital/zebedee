@@ -278,7 +278,7 @@ public class PostPublisher {
         });
     }
 
-    public static void copyFilesToMaster(Zebedee zebedee, Collection collection, CollectionReader collectionReader)
+    private static void copyFilesToMaster(Zebedee zebedee, Collection collection, CollectionReader collectionReader)
             throws IOException, ZebedeeException {
 
         info().collectionID(collection).log("Moving files from collection into master");
@@ -298,7 +298,7 @@ public class PostPublisher {
         }
     }
 
-    public static Path moveCollectionToArchive(Zebedee zebedee, Collection collection, CollectionReader collectionReader) throws IOException, ZebedeeException {
+    private static Path moveCollectionToArchive(Zebedee zebedee, Collection collection, CollectionReader collectionReader) throws IOException, ZebedeeException {
         info().collectionID(collection)
                 .log("moving collection files to archive for collection");
 
@@ -378,7 +378,7 @@ public class PostPublisher {
      * @param uri The uri of the published content
      * @return String
      */
-    public static String convertUriForEvent(String uri) {
+    static String convertUriForEvent(String uri) {
         uri = uri.replaceAll("/data.json", "");
         uri.trim();
         return uri;

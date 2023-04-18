@@ -58,16 +58,16 @@ import static org.apache.commons.lang3.StringUtils.defaultIfBlank;
 public class PostPublisher {
 
     // The date format including the BST timezone. Dates are stored at UTC and must be formated to take BST into account.
-    private static FastDateFormat format = FastDateFormat.getInstance("yyyy-MM-dd-HH-mm", TimeZone.getTimeZone("Europe/London"));
-    private static ServiceSupplier<KafkaService> kafkaServiceSupplier = () -> ZebedeeCmsService.getInstance().getKafkaService();
+    private static final FastDateFormat FORMAT = FastDateFormat.getInstance("yyyy-MM-dd-HH-mm", TimeZone.getTimeZone("Europe/London"));
+    private static final ServiceSupplier<KafkaService> KAFKA_SERVICE_SUPPLIER = () -> ZebedeeCmsService.getInstance().getKafkaService();
 
-    private static final ExecutorService pool = Executors.newFixedThreadPool(10);
+    private static final ExecutorService POOL = Executors.newFixedThreadPool(10);
 
     private static final String TRACE_ID_HEADER = "trace_id";
-    public static final String SEARCHINDEX = "ONS";
+    private static final String SEARCHINDEX = "ONS";
 
-    public static final String DATASETCONTENTFLAG = "datasets";
-    public static final String LEGACYCONTENTFLAG = "legacy";
+    private static final String DATASETCONTENTFLAG = "datasets";
+    private static final String LEGACYCONTENTFLAG = "legacy";
 
     /**
      * Do tasks required after a publish takes place.
@@ -210,7 +210,7 @@ public class PostPublisher {
 
 
     private static void indexPublishReport(final Zebedee zebedee, final Path collectionJsonPath, final CollectionReader collectionReader) {
-        pool.submit(() -> {
+        POOL.submit(() -> {
             info().log("Indexing publish report");
             PublishedCollection publishedCollection = zebedee.getPublishedCollections().add(collectionJsonPath);
             if (Configuration.isVerificationEnabled()) {
@@ -238,7 +238,7 @@ public class PostPublisher {
 
                 ContentTreeNavigator.getInstance().search(pendingDelete.getRoot(), node -> {
                     info().data("uri", node.uri).log("Deleting index from publishing search ");
-                    pool.submit(() -> {
+                    POOL.submit(() -> {
                         try {
                             Indexer.getInstance().deleteContentIndex(node.getType().getLabel(), node.uri);
                         } catch (Exception e) {
@@ -269,7 +269,7 @@ public class PostPublisher {
     }
 
     private static void reIndexPublishingSearch(final String uri) throws IOException {
-        pool.submit(() -> {
+        POOL.submit(() -> {
             try {
                 Indexer.getInstance().reloadContent(uri);
             } catch (Exception e) {
@@ -312,7 +312,7 @@ public class PostPublisher {
         }
 
         Date date = new Date();
-        String directoryName = format.format(date) + "-" + filename;
+        String directoryName = FORMAT.format(date) + "-" + filename;
         Path collectionFilesDestination = logPath.resolve(directoryName);
         Path collectionJsonDestination = logPath.resolve(directoryName + ".json");
 
@@ -394,7 +394,7 @@ public class PostPublisher {
                 .log("traceId before sending event");
 
         try {
-            kafkaServiceSupplier.getService().produceContentUpdated(collection.getId(), uris, dataType, "",
+            KAFKA_SERVICE_SUPPLIER.getService().produceContentUpdated(collection.getId(), uris, dataType, "",
                     SEARCHINDEX, traceId);
         } catch (Exception e) {
             error()

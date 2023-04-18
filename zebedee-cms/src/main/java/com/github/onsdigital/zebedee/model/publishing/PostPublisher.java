@@ -5,6 +5,7 @@ import com.github.onsdigital.zebedee.configuration.CMSFeatureFlags;
 import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
+import com.github.onsdigital.zebedee.json.ContentDetail;
 import com.github.onsdigital.zebedee.json.PendingDelete;
 import com.github.onsdigital.zebedee.json.publishing.PublishedCollection;
 import com.github.onsdigital.zebedee.json.publishing.request.FileCopy;
@@ -360,8 +361,9 @@ public class PostPublisher {
     }
 
     private static void sendToKafka(Collection collection) throws IOException {
-        if (collection.getDatasetVersionDetails() != null && !collection.getDatasetVersionDetails().isEmpty()) {
-            List<String> datasetUris = collection.getDatasetVersionDetails()
+        List<ContentDetail> datasetVersionDetails = collection.getDatasetVersionDetails();
+        if (datasetVersionDetails != null && !datasetVersionDetails.isEmpty()) {
+            List<String> datasetUris = datasetVersionDetails
                     .stream()
                     .map(content -> convertUriForEvent(content.uri))
                     .filter(Publisher::isValidCMDDatasetURI)

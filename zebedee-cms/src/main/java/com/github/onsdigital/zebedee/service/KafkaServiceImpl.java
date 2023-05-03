@@ -23,7 +23,6 @@ public class KafkaServiceImpl implements KafkaService {
     public void produceContentUpdated(String collectionId, List<String> uris, String dataType, String jobID,
             String searchIndex, String traceId) throws IOException {
         info().collectionID(collectionId)
-                .data("uris", uris)
                 .data("DataType", dataType)
                 .log("generating content-updated kafka events for published collection");
 

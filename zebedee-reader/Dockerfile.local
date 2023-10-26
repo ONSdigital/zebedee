@@ -18,5 +18,7 @@ ENTRYPOINT java $JAVA_OPTS \
      -Dcontent_dir=$CONTENT_DIR \
      -DSTART_EMBEDDED_SERVER=N \
      -Drestolino.packageprefix=$PACKAGE_PREFIX \
+     -javaagent:zebedee-cms/target/dependency/aws-opentelemetry-agent-1.30.0.jar \
+     -Dotel.propagators=tracecontext,baggage \
      -cp "target/dependency/*:target/classes/" \
      com.github.davidcarboni.restolino.Main

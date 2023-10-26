@@ -6,6 +6,8 @@ ADD dependency target/dependency
 ADD classes target/classes
 
 CMD java -Xmx2048m -cp "target/dependency/*:target/classes/"           \
+    -javaagent:zebedee-cms/target/dependency/aws-opentelemetry-agent-1.30.0.jar \
+    -Dotel.propagators=tracecontext,baggage \
     -Drestolino.packageprefix=com.github.onsdigital.zebedee.reader.api \
     -Drestolino.classes=target/classes                                 \
     com.github.davidcarboni.restolino.Main

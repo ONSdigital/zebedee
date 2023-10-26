@@ -304,6 +304,12 @@
                 <version>0.7.1</version>
             </dependency>
 
+            <dependency>
+                <groupId>software.amazon.opentelemetry</groupId>
+                <artifactId>aws-opentelemetry-agent</artifactId>
+                <version>1.30.0</version>
+            </dependency>
+
             <!-- Test -->
             <dependency>
                 <groupId>org.hamcrest</groupId>
@@ -340,6 +346,7 @@
                 <version>3.6.1</version>
                 <scope>test</scope>
             </dependency>
+
         </dependencies>
     </dependencyManagement>
 

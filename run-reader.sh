@@ -1,39 +1,33 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-export JAVA_OPTS=" -Xmx1204m -Xdebug -Xrunjdwp:transport=dt_socket,address=8002,server=y,suspend=n"
+export JAVA_OPTS="-Xdebug -Xrunjdwp:transport=dt_socket,address=8002,server=y,suspend=n"
 export PORT="${PORT:-8082}"
 
 # Restolino configuration
-export RESTOLINO_STATIC="src/main/resources/files"
 export RESTOLINO_CLASSES="zebedee-reader/target/classes"
-export PACKAGE_PREFIX=com.github.onsdigital.zebedee
-
+export PACKAGE_PREFIX=com.github.onsdigital.zebedee.reader.api
+export CONTENT_DIR="content"
 export FORMAT_LOGGING=true
 
 # CMD config (dev local values)
 export ENABLE_DATASET_IMPORT=true
-export ENABLE_PERMISSIONS_AUTH=true
-
-# Dev local defaults for Central Keyring (safe to commit).
-export ENABLE_CENTRALISED_KEYRING=false
-export KEYRING_SECRET_KEY="38c03PzhNuSrYV8J0537XQ=="
-export KEYRING_INIT_VECTOR="RkL9MmjfRcPB86alO82gHQ=="
-
 export DATASET_API_URL="http://localhost:22000"
 export DATASET_API_AUTH_TOKEN="FD0108EA-825D-411C-9B1D-41EF7727F465"
+
+export FORMAT_LOGGING=true
 
 # Development: reloadable
 mvn clean package dependency:copy-dependencies -Dmaven.test.skip=true -Dossindex.skip=true && \
 java $JAVA_OPTS \
- -Dlogback.configurationFile=zebedee-reader/target/classes/logback.xml \
  -DFORMAT_LOGGING=$FORMAT_LOGGING \
- -Drestolino.files=$RESTOLINO_STATIC \
- -Drestolino.files=$RESTOLINO_STATIC \
+ -Dlogback.configurationFile=zebedee-reader/target/classes/logback.xml \
  -Drestolino.classes=$RESTOLINO_CLASSES \
- -Drestolino.packageprefix=$PACKAGE_PREFIX \
+ -Dcontent_dir=$CONTENT_DIR \
  -DSTART_EMBEDDED_SERVER=N \
+ -Drestolino.packageprefix=$PACKAGE_PREFIX \
+ -DFORMAT_LOGGING=$FORMAT_LOGGING \
+ -javaagent:zebedee-cms/target/dependency/aws-opentelemetry-agent-1.30.0.jar \
  -Dotel.propagators=tracecontext,baggage \
-  -javaagent:zebedee-reader/target/dependency/aws-opentelemetry-agent-1.30.0.jar \
- -cp "zebedee-reader/target/classes:zebedee-cms/target/dependency/*" \
+ -cp "zebedee-reader/target/classes/:zebedee-reader/target/dependency/*" \
  com.github.davidcarboni.restolino.Main
 

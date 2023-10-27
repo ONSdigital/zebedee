@@ -130,6 +130,10 @@
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
         </dependency>
+        <dependency>
+            <groupId>software.amazon.opentelemetry</groupId>
+            <artifactId>aws-opentelemetry-agent</artifactId>
+        </dependency>
 
         <!-- JSON Serialisation -->
         <dependency>

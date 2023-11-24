@@ -27,7 +27,7 @@
         <fasterxml.jackson.version>2.15.0</fasterxml.jackson.version>
         <apache.poi.version>3.17</apache.poi.version>
         <spring.version>5.3.20</spring.version>
-        <dp.logging.version>2.0.0-beta.5</dp.logging.version>
+        <dp.logging.version>2.0.0-beta.8</dp.logging.version>
         <batik.version>1.16</batik.version>
     </properties>
 

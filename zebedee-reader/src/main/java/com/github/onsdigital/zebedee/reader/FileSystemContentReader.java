@@ -49,6 +49,12 @@ import static java.nio.file.Files.newInputStream;
 import static java.nio.file.Files.size;
 import static org.apache.commons.lang3.StringUtils.removeEnd;
 
+import io.opentelemetry.api.GlobalOpenTelemetry;
+import io.opentelemetry.api.trace.Tracer;
+import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.context.Scope;
+
+
 /**
  * Created by bren on 27/07/15.
  * <p>
@@ -70,6 +76,7 @@ public class FileSystemContentReader implements ContentReader {
 
     private final Path rootFolder;
     protected ContentLanguage language = ContentLanguage.ENGLISH;
+    Tracer tracer = GlobalOpenTelemetry.getTracer("zebedee", "version");
 
     public FileSystemContentReader(Path rootFolder) {
         if (rootFolder == null || rootFolder.equals(EMPTY_PATH)) { 
@@ -97,25 +104,39 @@ public class FileSystemContentReader implements ContentReader {
      */
     @Override
     public Page getContent(String path) throws ZebedeeException, IOException {
-        //Resolve to see if requested content is latest content, if so return latest, otherwise requested file
-        Path contentPath = resolveContentPath(path);
-        if (!isRootFolder(contentPath)) {
-            String parentPath = URIUtils.removeLastSegment(path);
-            try {
-                Page latestContent = getLatestContent(parentPath);
-                if (toRelativeUri(contentPath.getParent()).equals(latestContent.getUri())) {
-                    return latestContent;
+
+        Page page = null;
+        
+        Span span = tracer.spanBuilder("FileSystemContentReader.getContent()").startSpan();
+        span.setAttribute("Path", path.toString());
+
+        try (Scope scope = span.makeCurrent()) {
+            //Resolve to see if requested content is latest content, if so return latest, otherwise requested file
+            Path contentPath = resolveContentPath(path);
+            if (!isRootFolder(contentPath)) {
+                String parentPath = URIUtils.removeLastSegment(path);
+                try {
+                    Page latestContent = getLatestContent(parentPath);
+                    if (toRelativeUri(contentPath.getParent()).equals(latestContent.getUri())) {
+                        return latestContent;
+                    }
+                } catch (Exception e) {
                 }
-            } catch (Exception e) {
             }
-        }
-        Page page = getPage(contentPath);
-        if (page != null) {
-            PageDescription description = page.getDescription();
-            if (description != null) {
-                description.setLatestRelease(null); //overwrite existing latest flag if already in the data, might be old
+            page = getPage(contentPath);
+            if (page != null) {
+                PageDescription description = page.getDescription();
+                if (description != null) {
+                    description.setLatestRelease(null); //overwrite existing latest flag if already in the data, might be old
+                }
             }
+        } catch(Throwable t) {
+            span.recordException(t);
+            throw t;
+        } finally {
+            span.end();
         }
+    
         return page;
     }
 
@@ -131,16 +152,29 @@ public class FileSystemContentReader implements ContentReader {
     }
 
     private Page getPage(Path dataFile) throws IOException, ZebedeeException {
-        try (Resource resource = getResource(dataFile)) {
-//            checkJsonMime(resource, path);
-            Page page = deserialize(resource);
-            if (page == null) { //Contents without type is null when deserialised. There should not be no such data
-                return null;
+        Span span = tracer.spanBuilder("FileSystemContentReader.getPage()").startSpan();
+        span.setAttribute("Path", dataFile.toString());
+        Page page = null;
+
+        try (Scope scope = span.makeCurrent()) {
+            try (Resource resource = getResource(dataFile)) {
+    //            checkJsonMime(resource, path);
+                page = deserialize(resource);
+                if (page == null) { //Contents without type is null when deserialised. There should not be no such data
+                    return null;
+                }
+                String uri = resource.getUri().toString();
+                page.setUri(resolveUri(uri, page));
+             
             }
-            String uri = resource.getUri().toString();
-            page.setUri(resolveUri(uri, page));
-            return page;
+        } catch(Throwable t) {
+            span.recordException(t);
+            throw t;
+        } finally {
+            span.end();
         }
+        
+        return page;
     }
 
     private URI resolveUri(String uriString, Page page) {
@@ -155,11 +189,23 @@ public class FileSystemContentReader implements ContentReader {
 
     @Override
     public Page getLatestContent(String path) throws ZebedeeException, IOException {
-        Path contentPath = resolvePath(path);
-        Path parent = contentPath.getParent();
-        assertIsEditionsFolder(parent);
-        Page page = resolveLatest(contentPath);
-        page.getDescription().setLatestRelease(true);
+
+        Span span = tracer.spanBuilder("FileSystemContentReader.getLatestContent()").startSpan();
+        span.setAttribute("Path", path.toString());
+        Page page = null;
+
+        try (Scope scope = span.makeCurrent()) {
+            Path contentPath = resolvePath(path);
+            Path parent = contentPath.getParent();
+            assertIsEditionsFolder(parent);
+            page = resolveLatest(contentPath);
+            page.getDescription().setLatestRelease(true);
+        } catch(Throwable t) {
+            span.recordException(t);
+            throw t;
+        } finally {
+            span.end();
+        }
         return page;
     }
 
@@ -185,10 +231,24 @@ public class FileSystemContentReader implements ContentReader {
      */
     @Override
     public long getContentLength(String path) throws ZebedeeException, IOException {
-        Path resourcePath = resolvePath(path);
-        assertExists(resourcePath);
-        assertNotDirectory(resourcePath);
-        return calculateContentLength(resourcePath);
+
+        Span span = tracer.spanBuilder("FileSystemContentReader.getContentLength()").startSpan();
+        span.setAttribute("Path", path.toString());
+        long length = 0L;
+
+        try (Scope scope = span.makeCurrent()) {
+            Path resourcePath = resolvePath(path);
+            assertExists(resourcePath);
+            assertNotDirectory(resourcePath);
+            length = calculateContentLength(resourcePath);
+        }
+         catch(Throwable t) {
+            span.recordException(t);
+        throw t;
+        } finally {
+            span.end();
+        } 
+        return length;
     }
 
     protected long calculateContentLength(Path path) throws IOException {
@@ -321,21 +381,46 @@ public class FileSystemContentReader implements ContentReader {
     }
 
     protected Resource buildResource(Path path) throws IOException {
-        Resource resource = new Resource();
-        resource.setName(path.getFileName().toString());
-        resource.setMimeType(determineMimeType(path));
-        resource.setUri(toRelativeUri(path));
-        resource.setData(newInputStream(path));
+        Span span = tracer.spanBuilder("FileSystemContentReader.buildResource()").startSpan();
+        span.setAttribute("Path", path.toString());
+        Resource resource = null;
+        try (Scope scope = span.makeCurrent()) {
+            resource = new Resource();
+            resource.setName(path.getFileName().toString());
+            resource.setMimeType(determineMimeType(path));
+            resource.setUri(toRelativeUri(path));
+            resource.setData(newInputStream(path));
+        }
+        catch(Throwable t) {
+            span.recordException(t);
+        throw t;
+        } finally {
+            span.end();
+        }
         return resource;
     }
 
     protected Page deserialize(Resource resource) {
-        try {
-            return ContentUtil.deserialiseContent(resource.getData());
-        } catch (JsonSyntaxException e) {
-            throw error().data("resource_uri", resource.getUri())
-                    .logException(e, "Failed to deserialise resource");
+
+        Span span = tracer.spanBuilder("FileSystemContentReader.deserialize()").startSpan();
+        span.setAttribute("Resource", resource.toString());
+        Page page = null;
+        try (Scope scope = span.makeCurrent()) {
+            try {
+                page = ContentUtil.deserialiseContent(resource.getData());
+            } catch (JsonSyntaxException e) {
+                throw error().data("resource_uri", resource.getUri())
+                        .logException(e, "Failed to deserialise resource");
+            }
         }
+        catch(Throwable t) {
+            span.recordException(t);
+        throw t;
+        } finally {
+            span.end();
+        }
+        return page;
+
     }
 
     private void assertExists(Path path) throws ZebedeeException, IOException {

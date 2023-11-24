@@ -29,6 +29,11 @@ import static com.github.onsdigital.zebedee.logging.ReaderLogger.info;
 import static com.github.onsdigital.zebedee.util.URIUtils.getLastSegment;
 import static com.github.onsdigital.zebedee.util.URIUtils.removeLastSegment;
 
+import io.opentelemetry.api.GlobalOpenTelemetry;
+import io.opentelemetry.api.trace.Tracer;
+import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.context.Scope;
+
 /**
  * Created by bren on 31/07/15.
  * <p>
@@ -43,6 +48,7 @@ public class ReadRequestHandler {
 
     private final static String LATEST = "latest";
     private ZebedeeReader reader;
+    private Tracer tracer = GlobalOpenTelemetry.getTracer("zebedee", "");
 
     public ReadRequestHandler() {
         this(null);
@@ -64,8 +70,20 @@ public class ReadRequestHandler {
      * @throws IOException
      */
     public Content findContent(HttpServletRequest request, DataFilter dataFilter) throws ZebedeeException, IOException {
-        String uri = extractUri(request);
-        return findContent(request, dataFilter, uri);
+        Span span = tracer.spanBuilder("ReadRequestHandler.findContent()").startSpan();
+        Content content = null;
+
+        try (Scope scope = span.makeCurrent()) {
+            String uri = extractUri(request);
+            content = findContent(request, dataFilter, uri);
+        }
+        catch(Throwable t) {
+            span.recordException(t);
+        throw t;
+        } finally {
+            span.end();
+        }
+        return content;
     }
 
     public Content findContent(HttpServletRequest request, DataFilter dataFilter, String uri) throws IOException, ZebedeeException {

@@ -76,7 +76,7 @@ public class FileSystemContentReader implements ContentReader {
 
     private final Path rootFolder;
     protected ContentLanguage language = ContentLanguage.ENGLISH;
-    Tracer tracer = GlobalOpenTelemetry.getTracer("zebedee", "version");
+    private Tracer tracer = GlobalOpenTelemetry.getTracer("zebedee", "");
 
     public FileSystemContentReader(Path rootFolder) {
         if (rootFolder == null || rootFolder.equals(EMPTY_PATH)) { 
@@ -242,7 +242,7 @@ public class FileSystemContentReader implements ContentReader {
             assertNotDirectory(resourcePath);
             length = calculateContentLength(resourcePath);
         }
-         catch(Throwable t) {
+        catch(Throwable t) {
             span.recordException(t);
         throw t;
         } finally {

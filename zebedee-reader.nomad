@@ -50,7 +50,6 @@ job "zebedee-reader" {
           "-javaagent:target/dependency/aws-opentelemetry-agent-1.30.0.jar",
           "-Dotel.propagators=tracecontext,baggage",
           "-Dotel.service.name=zebedee",
-          "-Dotel.exporter.otlp.endpoint={{OTEL_ENDPOINT}}",    
           "-Drestolino.packageprefix=com.github.onsdigital.zebedee.reader.api",
           "com.github.davidcarboni.restolino.Main",
         ]

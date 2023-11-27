@@ -49,7 +49,7 @@ job "zebedee" {
           "-Xmx{{PUBLISHING_RESOURCE_HEAP_MEM}}m",
           "-cp target/dependency/*:target/classes/",
           "-Drestolino.classes=target/classes",
-          "-javaagent:target/dependency/aws-opentelemetry-agent-1.30.0.jar",
+          "-javaagent:target/dependency/aws-opentelemetry-agent-1.31.0.jar",
           "-Dotel.propagators=tracecontext,baggage",
           "-Dotel.service.name=zebedee",
           "-Drestolino.packageprefix=com.github.onsdigital.zebedee.api",

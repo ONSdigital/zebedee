@@ -76,7 +76,7 @@ public class FileSystemContentReader implements ContentReader {
 
     private final Path rootFolder;
     protected ContentLanguage language = ContentLanguage.ENGLISH;
-    private Tracer tracer = GlobalOpenTelemetry.getTracer("zebedee", "");
+    private Tracer tracer = GlobalOpenTelemetry.getTracer("zebedee-reader", "");
 
     public FileSystemContentReader(Path rootFolder) {
         if (rootFolder == null || rootFolder.equals(EMPTY_PATH)) { 

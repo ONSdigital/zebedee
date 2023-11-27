@@ -48,7 +48,7 @@ public class ReadRequestHandler {
 
     private final static String LATEST = "latest";
     private ZebedeeReader reader;
-    private Tracer tracer = GlobalOpenTelemetry.getTracer("zebedee", "");
+    private Tracer tracer = GlobalOpenTelemetry.getTracer("zebedee-reader", "");
 
     public ReadRequestHandler() {
         this(null);

@@ -32,7 +32,7 @@ java $JAVA_OPTS \
  -Drestolino.classes=$RESTOLINO_CLASSES \
  -Drestolino.packageprefix=$PACKAGE_PREFIX \
  -DSTART_EMBEDDED_SERVER=N \
-  -javaagent:zebedee-cms/target/dependency/aws-opentelemetry-agent-1.30.0.jar \
+  -javaagent:zebedee-cms/target/dependency/aws-opentelemetry-agent-1.31.0.jar \
   -Dotel.propagators=tracecontext,baggage \
  -cp "zebedee-cms/target/classes:zebedee-cms/target/dependency/*" \
  com.github.davidcarboni.restolino.Main

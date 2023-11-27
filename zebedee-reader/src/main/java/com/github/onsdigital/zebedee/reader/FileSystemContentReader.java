@@ -104,9 +104,7 @@ public class FileSystemContentReader implements ContentReader {
      */
     @Override
     public Page getContent(String path) throws ZebedeeException, IOException {
-
         Page page = null;
-        
         Span span = tracer.spanBuilder("FileSystemContentReader.getContent()").startSpan();
         span.setAttribute("Path", path.toString());
 
@@ -189,7 +187,6 @@ public class FileSystemContentReader implements ContentReader {
 
     @Override
     public Page getLatestContent(String path) throws ZebedeeException, IOException {
-
         Span span = tracer.spanBuilder("FileSystemContentReader.getLatestContent()").startSpan();
         span.setAttribute("Path", path.toString());
         Page page = null;
@@ -231,7 +228,6 @@ public class FileSystemContentReader implements ContentReader {
      */
     @Override
     public long getContentLength(String path) throws ZebedeeException, IOException {
-
         Span span = tracer.spanBuilder("FileSystemContentReader.getContentLength()").startSpan();
         span.setAttribute("Path", path.toString());
         long length = 0L;

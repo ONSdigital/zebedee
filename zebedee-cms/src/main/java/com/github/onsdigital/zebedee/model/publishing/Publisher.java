@@ -24,7 +24,6 @@ import com.github.onsdigital.zebedee.service.ImageService;
 import com.github.onsdigital.zebedee.service.ImageServicePublishingResult;
 import com.github.onsdigital.zebedee.service.StaticFilesService;
 import com.github.onsdigital.zebedee.service.ServiceSupplier;
-import com.github.onsdigital.zebedee.service.InteractivesService;
 import com.github.onsdigital.zebedee.util.Http;
 import com.github.onsdigital.zebedee.util.SlackNotification;
 import com.github.onsdigital.zebedee.util.ZebedeeCmsService;
@@ -88,7 +87,6 @@ public class Publisher {
     private static ServiceSupplier<DatasetService> datasetServiceSupplier;
     private static ServiceSupplier<ImageService> imageServiceSupplier;
     static ServiceSupplier<StaticFilesService> staticFilesServiceSupplier;
-    private static ServiceSupplier<InteractivesService> interactivesServiceSupplier;
 
     static {
         theTrainHosts = Configuration.getTheTrainHosts();
@@ -98,7 +96,6 @@ public class Publisher {
         datasetServiceSupplier = () -> ZebedeeCmsService.getInstance().getDatasetService();
         imageServiceSupplier = () -> ZebedeeCmsService.getInstance().getImageService();
         staticFilesServiceSupplier = () -> ZebedeeCmsService.getInstance().getStaticFilesService();
-        interactivesServiceSupplier = () -> ZebedeeCmsService.getInstance().getInteractivesService();
     }
 
     /**
@@ -168,17 +165,6 @@ public class Publisher {
                 String channel = Configuration.getDefaultSlackAlarmChannel();
                 Notifier notifier = zebedee.getSlackNotifier();
                 notifier.sendCollectionAlarm(collection, channel, "Error publishing images", e);
-                success = false;
-            }
-        }
-
-        if (CMSFeatureFlags.cmsFeatureFlags().isInteractivesPublishingEnabled()) {
-            try {
-                interactivesServiceSupplier.getService().publishCollection(collection);
-                success &= true;
-            } catch (Exception e) {
-                error().data("collectionId", collectionId).data("publishing", true)
-                        .logException(e,"Exception thrown when performing interactives publish()");
                 success = false;
             }
         }

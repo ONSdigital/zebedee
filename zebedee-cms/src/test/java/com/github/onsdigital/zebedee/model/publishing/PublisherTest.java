@@ -96,7 +96,6 @@ public class PublisherTest {
         System.setProperty(CMSFeatureFlags.ENABLE_VERIFY_PUBLISH_CONTENT, "false");
         System.setProperty(CMSFeatureFlags.ENABLE_KAFKA, "false");
         System.setProperty(CMSFeatureFlags.ENABLE_STATIC_FILES_PUBLISHING, "false");
-        System.setProperty(CMSFeatureFlags.ENABLE_INTERACTIVES_PUBLISHING, "false");
 
         Publisher.staticFilesServiceSupplier = () ->  mockFileService;
 

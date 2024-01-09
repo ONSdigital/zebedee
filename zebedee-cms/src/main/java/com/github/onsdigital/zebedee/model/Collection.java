@@ -1346,14 +1346,6 @@ public class Collection {
             isContentReviewed &= allDatasetsReviewed && allDatasetVersionsReviewed;
         }
 
-        if (cmsFeatureFlags().isInteractivesPublishingEnabled()) {
-            boolean allInteractivesReviewed = description.getInteractives()
-                    .stream()
-                    .allMatch(i -> i.getState().equals(ContentStatus.Reviewed));
-
-            isContentReviewed &= allInteractivesReviewed;
-        }
-
         return isContentReviewed;
     }
 

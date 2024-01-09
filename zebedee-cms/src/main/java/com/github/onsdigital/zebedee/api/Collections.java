@@ -12,10 +12,8 @@ import com.github.onsdigital.zebedee.json.CollectionDataset;
 import com.github.onsdigital.zebedee.json.CollectionDatasetVersion;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.CollectionDescriptions;
-import com.github.onsdigital.zebedee.json.CollectionInteractive;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.service.DatasetService;
-import com.github.onsdigital.zebedee.service.InteractivesService;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.util.ZebedeeCmsService;
 import com.google.gson.JsonSyntaxException;
@@ -47,7 +45,6 @@ public class Collections {
 
     private ZebedeeCmsService zebedeeCmsService;
     private DatasetService datasetService;
-    private InteractivesService interactivesService;
     private final boolean datasetImportEnabled;
     private static final String GET_COLLECTIONS_ERROR = "get collections endpoint: unexpected error while attempting to get collections";
 
@@ -57,7 +54,6 @@ public class Collections {
     public Collections() throws URISyntaxException {
         this.zebedeeCmsService = ZebedeeCmsService.getInstance();
         this.datasetService = zebedeeCmsService.getDatasetService();
-        this.interactivesService = zebedeeCmsService.getInteractivesService();
         this.datasetImportEnabled = cmsFeatureFlags().isEnableDatasetImport();
     }
 
@@ -66,11 +62,9 @@ public class Collections {
      */
     public Collections(ZebedeeCmsService zebedeeCmsService,
                        DatasetService datasetService,
-                       InteractivesService interactivesService,
                        boolean datasetImportEnabled) {
         this.zebedeeCmsService = zebedeeCmsService;
         this.datasetService = datasetService;
-        this.interactivesService = interactivesService;
         this.datasetImportEnabled = datasetImportEnabled;
     }
 
@@ -188,18 +182,6 @@ public class Collections {
                             response.setStatus(HttpStatus.SC_NOT_FOUND);
                     }
                     break;
-                case "interactives":
-                    switch (pathSegments.size()) {
-                        case 4: // /collections/{collection_id}/interactives/{interactive_id}
-
-                            updateInteractiveInCollection(collection, resourceID, request, user);
-                            break;
-
-                        default:
-                            // Should not happen, isValidPath would return false
-                            response.setStatus(HttpStatus.SC_NOT_FOUND);
-                    }
-                    break;
                 default:
                     // Should not happen, isValidPath would return false
                     response.setStatus(HttpStatus.SC_NOT_FOUND);
@@ -271,17 +253,6 @@ public class Collections {
                         response.setStatus(HttpStatus.SC_NOT_FOUND);
                 }
                 break;
-            case "interactives":
-                switch (pathSegments.size()) {
-                    case 4: // /collections/{collection_id}/interactives/{interactive_id}
-                        removeInteractiveFromCollection(collection, resourceID);
-                        response.setStatus(HttpStatus.SC_NO_CONTENT);
-                        break;
-                    default:
-                        // Should not happen, isValidPath would return false
-                        response.setStatus(HttpStatus.SC_NOT_FOUND);
-                }
-                break;
             default:
                 // Should not happen, isValidPath would return false
                 response.setStatus(HttpStatus.SC_NOT_FOUND);
@@ -324,23 +295,6 @@ public class Collections {
         }
     }
 
-    private void updateInteractiveInCollection(Collection collection, String interactiveID, HttpServletRequest request, String user) throws ZebedeeException, IOException, DatasetAPIException {
-
-        info().data("collectionId", collection.getId())
-                .data("interactiveId", interactiveID)
-                .data("user", user)
-                .log("PUT called on /collections/{collection_id}/interactives/{interactive_id} endpoint");
-
-        try (InputStream body = request.getInputStream()) {
-
-            CollectionInteractive interactive = ContentUtil.deserialise(body, CollectionInteractive.class);
-            interactivesService.updateInteractiveInCollection(collection, interactiveID, interactive, user);
-
-        } catch (JsonSyntaxException ex) {
-            throw new BadRequestException(ex.getMessage());
-        }
-    }
-
     private void removeDatasetVersionFromCollection(Collection collection, String datasetID, String edition, String version) throws ZebedeeException, IOException, DatasetAPIException {
         info().data("collectionId", collection.getId())
                 .data("datasetId", datasetID)
@@ -358,15 +312,6 @@ public class Collections {
                 .log("DELETE called on /collections/{collection_id}/datasets/{dataset_id} endpoint");
 
         datasetService.removeDatasetFromCollection(collection, datasetID);
-    }
-
-    private void removeInteractiveFromCollection(Collection collection, String interactiveID) throws ZebedeeException, IOException, DatasetAPIException {
-
-        info().data("collectionId", collection.getId())
-                .data("interactiveId", interactiveID)
-                .log("DELETE called on /collections/{collection_id}/interactives/{interactive_id} endpoint");
-
-        interactivesService.removeInteractiveFromCollection(collection, interactiveID);
     }
 
     private boolean isValidPath(Path path) {

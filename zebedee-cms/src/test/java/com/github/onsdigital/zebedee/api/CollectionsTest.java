@@ -3,10 +3,8 @@ package com.github.onsdigital.zebedee.api;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.CollectionDataset;
 import com.github.onsdigital.zebedee.json.CollectionDatasetVersion;
-import com.github.onsdigital.zebedee.json.CollectionInteractive;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.service.DatasetService;
-import com.github.onsdigital.zebedee.service.InteractivesService;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.util.ZebedeeCmsService;
 import org.apache.http.HttpStatus;
@@ -32,7 +30,6 @@ public class CollectionsTest {
 
     private ZebedeeCmsService mockZebedeeCmsService = mock(ZebedeeCmsService.class);
     private DatasetService mockDatasetService = mock(DatasetService.class);
-    private InteractivesService mockInteractivesService = mock(InteractivesService.class);
     private ServletInputStream mockServletInputStream = mock(ServletInputStream.class);
 
     private com.github.onsdigital.zebedee.model.Collection mockCollection =
@@ -42,7 +39,7 @@ public class CollectionsTest {
     private HttpServletResponse response = mock(HttpServletResponse.class);
     private Session session = mock(Session.class);
 
-    private Collections collections = new Collections(mockZebedeeCmsService, mockDatasetService, mockInteractivesService, true);
+    private Collections collections = new Collections(mockZebedeeCmsService, mockDatasetService, true);
     private String collectionID = "123";
     private String resourceID = "345";
     private String edition = "2014";
@@ -57,24 +54,24 @@ public class CollectionsTest {
 
     @Test
     public void testPut_DatasetImportDisabled() throws Exception {
-        collections = new Collections(mockZebedeeCmsService, mockDatasetService, mockInteractivesService, false);
+        collections = new Collections(mockZebedeeCmsService, mockDatasetService, false);
 
         // When the put method is called
         collections.put(request, response);
 
         verify(response, times(1)).setStatus(HttpServletResponse.SC_NOT_FOUND);
-        verifyNoInteractions(mockZebedeeCmsService, mockDatasetService, mockInteractivesService);
+        verifyNoInteractions(mockZebedeeCmsService, mockDatasetService);
     }
 
     @Test
     public void testDelete_DatasetImportDisabled() throws Exception {
-        collections = new Collections(mockZebedeeCmsService, mockDatasetService, mockInteractivesService, false);
+        collections = new Collections(mockZebedeeCmsService, mockDatasetService, false);
 
         // When the put method is called
         collections.delete(request, response);
 
         verify(response, times(1)).setStatus(HttpServletResponse.SC_NOT_FOUND);
-        verifyNoInteractions(mockZebedeeCmsService, mockDatasetService, mockInteractivesService);
+        verifyNoInteractions(mockZebedeeCmsService, mockDatasetService);
     }
 
     @Test
@@ -182,8 +179,6 @@ public class CollectionsTest {
 
         // The dataset service is not called
         verifyNoInteractions(mockDatasetService);
-        // The interactives service is not called
-        verifyNoInteractions(mockInteractivesService);
 
         // Then a HTTP 404 is set on the response.
         verify(response).setStatus(HttpStatus.SC_NOT_FOUND);
@@ -204,8 +199,6 @@ public class CollectionsTest {
 
         // The dataset service is not called
         verifyNoInteractions(mockDatasetService);
-        // The interactives service is not called
-        verifyNoInteractions(mockInteractivesService);
 
         // Then a HTTP 404 is set on the response.
         verify(response).setStatus(HttpStatus.SC_NOT_FOUND);
@@ -241,8 +234,6 @@ public class CollectionsTest {
 
         // The dataset service is not called
         verifyNoInteractions(mockDatasetService);
-        // The interactives service is not called
-        verifyNoInteractions(mockInteractivesService);
 
         // Then a HTTP 404 is set on the response.
         verify(response).setStatus(HttpStatus.SC_NOT_FOUND);
@@ -265,25 +256,6 @@ public class CollectionsTest {
 
         // The dataset service is called with the values extracted from the request URL.
         verify(mockDatasetService, times(1)).updateDatasetInCollection(mockCollection, resourceID, null, user);
-    }
-
-    @Test
-    public void testPutInteractive_EmptyJSON() throws Exception {
-
-        // Given a PUT request with a bad json input
-        String url = String.format("/collections/%s/interactives/%s", collectionID, resourceID);
-        when(request.getPathInfo()).thenReturn(url);
-        when(session.getEmail()).thenReturn(user);
-
-        mockRequestBody("");
-
-        shouldAuthorise(request, true);
-
-        // When the put method is called
-        collections.put(request, response);
-
-        // The dataset service is called with the values extracted from the request URL.
-        verify(mockInteractivesService, times(1)).updateInteractiveInCollection(mockCollection, resourceID, null, user);
     }
 
     @Test
@@ -330,51 +302,6 @@ public class CollectionsTest {
     }
 
     @Test
-    public void testPutInteractive() throws Exception {
-
-        // Given a PUT request with a bad json input
-        String url = String.format("/collections/%s/interactives/%s", collectionID, resourceID);
-        when(request.getPathInfo()).thenReturn(url);
-        when(session.getEmail()).thenReturn(user);
-
-        String json = "{ \"state\": \"inProgress\"}";
-        mockRequestBody(json);
-
-        shouldAuthorise(request, true);
-
-        // When the put method is called
-        collections.put(request, response);
-
-        // The dataset service is called with the values extracted from the request URL.
-        verify(mockInteractivesService, times(1)).updateInteractiveInCollection(mockCollection, resourceID, new CollectionInteractive(), user);
-    }
-
-    @Test
-    public void testPutInteractiveInvalidPathSize() throws Exception {
-
-        // Given a PUT request with an invalid interactives URL
-        String url = String.format("/collections/%s/interactives/%s/editions/%s/versions/%s",
-                collectionID, resourceID, edition, version);
-        when(request.getPathInfo()).thenReturn(url);
-        when(request.getPathInfo()).thenReturn(url);
-        when(session.getEmail()).thenReturn(user);
-
-        String json = "{ \"state\": \"inProgress\"}";
-        mockRequestBody(json);
-
-        shouldAuthorise(request, true);
-
-        // When the put method is called
-        collections.put(request, response);
-
-        // The dataset service is not called
-        verifyNoInteractions(mockInteractivesService);
-
-        // Then a HTTP 404 is set on the response
-        verify(response).setStatus(HttpStatus.SC_NOT_FOUND);
-    }
-
-    @Test
     public void testPutDatasetVersion() throws Exception {
 
         // Given a PUT request with a valid URL for a dataset
@@ -414,52 +341,6 @@ public class CollectionsTest {
         // The dataset service is called with the values extracted from the request URL.
         verify(mockDatasetService, times(1)).removeDatasetFromCollection(mockCollection, resourceID);
         verifyNoMoreInteractions(mockDatasetService);
-        // No calls to the interactives service
-        verifyNoInteractions(mockInteractivesService);
-    }
-
-    @Test
-    public void testDeleteInteractive() throws Exception {
-
-        // Given a DELETE request with a valid URL
-        String url = String.format("/collections/%s/interactives/%s", collectionID, resourceID);
-        when(request.getPathInfo()).thenReturn(url);
-
-        shouldAuthorise(request, true);
-
-        // When the delete method is called
-        collections.delete(request, response);
-
-        // Then a HTTP 204 is set on the response
-        verify(response).setStatus(HttpStatus.SC_NO_CONTENT);
-
-        // The interactives service is called with the values extracted from the request URL.
-        verify(mockInteractivesService, times(1)).removeInteractiveFromCollection(mockCollection, resourceID);
-        verifyNoMoreInteractions(mockInteractivesService);
-        // No calls to the dataset service
-        verifyNoInteractions(mockDatasetService);
-    }
-
-    @Test
-    public void testDeleteInteractiveInvalidPathSize() throws Exception {
-
-        // Given a DELETE request with an invalid interactives URL
-        String url = String.format("/collections/%s/interactives/%s/editions/%s/versions/%s",
-                collectionID, resourceID, edition, version);
-        when(request.getPathInfo()).thenReturn(url);
-
-        shouldAuthorise(request, true);
-
-        // When the delete method is called
-        collections.delete(request, response);
-
-        // Then a HTTP 404 is set on the response
-        verify(response).setStatus(HttpStatus.SC_NOT_FOUND);
-
-        // The dataset service is not called
-        verifyNoInteractions(mockDatasetService);
-        // No calls to the interactives service
-        verifyNoInteractions(mockInteractivesService);
     }
 
     @Test
@@ -483,8 +364,6 @@ public class CollectionsTest {
                 mockCollection, resourceID, edition, version);
 
         verifyNoMoreInteractions(mockDatasetService);
-        // No calls to the interactives service
-        verifyNoInteractions(mockInteractivesService);
     }
 
     @Test
@@ -505,8 +384,6 @@ public class CollectionsTest {
 
         // The dataset service is not called
         verifyNoInteractions(mockDatasetService);
-        // No calls to the interactives service
-        verifyNoInteractions(mockInteractivesService);
     }
 
     // mock the authorisation for the given request to authorise the request is the authorise param is true.

@@ -1350,16 +1350,6 @@ public class Collection {
     }
 
     /**
-     * Return a list of ContentDetail items for each interactive in the collection.
-     */
-    public List<ContentDetail> getInteractiveDetails() {
-
-        return description.getInteractives().stream()
-            .map(i -> new ContentDetail(i.getTitle(), i.getUri(), PageType.INTERACTIVE))
-            .collect(Collectors.toList());
-    }
-
-    /**
      * Return a list of ContentDetail items for each data set in the collection.
      */
     public List<ContentDetail> getDatasetDetails() {

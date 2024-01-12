@@ -324,9 +324,6 @@ public class Collections {
                 // /collections/{collection_id}/datasets/{dataset_id}
                 // /collections/{collection_id}/datasets/{dataset_id}/editions/{edition}/versions/{version}
                 return numberOfSegments == 4 || numberOfSegments == 8;
-            case "interactives":
-                // /collections/{collection_id}/interactives/{interactive_id}
-                return numberOfSegments == 4;
             }
         }
         return false;

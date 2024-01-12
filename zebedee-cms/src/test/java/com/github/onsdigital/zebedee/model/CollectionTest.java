@@ -19,7 +19,6 @@ import com.github.onsdigital.zebedee.json.ApprovalStatus;
 import com.github.onsdigital.zebedee.json.CollectionDataset;
 import com.github.onsdigital.zebedee.json.CollectionDatasetVersion;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
-import com.github.onsdigital.zebedee.json.CollectionInteractive;
 import com.github.onsdigital.zebedee.json.CollectionType;
 import com.github.onsdigital.zebedee.json.ContentDetail;
 import com.github.onsdigital.zebedee.json.ContentStatus;
@@ -1787,24 +1786,6 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
     }
 
     @Test
-    public void isAllContentReviewed_shouldReturnTrueWhenInteractiveIsReviewed() throws IOException, ZebedeeException {
-
-        // Given a collection with an interactive that has been set to reviewed.
-        Path collectionPath = Files.createTempDirectory(Random.id()); // create a temp directory to generate content into
-        Collection collection = CollectionTest.createCollection(collectionPath, "isAllContentReviewed");
-
-        CollectionInteractive interactive = new CollectionInteractive();
-        interactive.setState(ContentStatus.Reviewed);
-        collection.getDescription().addInteractive(interactive);
-
-        // When isAllContentReviewed() is called
-        boolean allContentReviewed = collection.isAllContentReviewed(false);
-
-        // Then the result is true
-        assertTrue(allContentReviewed);
-    }
-
-    @Test
     public void isAllContentReviewed_shouldReturnTrueWhenDatasetVersionIsReviewed() throws IOException, ZebedeeException {
 
         // Given a collection with a dataset version that has been set to reviewed.
@@ -1843,29 +1824,6 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         assertEquals("/datasets/123", datasetDetail.uri);
         assertEquals(PageType.API_DATASET_LANDING_PAGE, datasetDetail.getType());
         assertEquals(dataset.getTitle(), datasetDetail.description.title);
-    }
-
-    @Test
-    public void getInteractiveDetails() throws IOException, ZebedeeException {
-
-        // Given a collection with a dataset.
-        Path collectionPath = Files.createTempDirectory(Random.id()); // create a temp directory to generate content into
-        Collection collection = CollectionTest.createCollection(collectionPath, "isAllContentReviewed");
-
-        CollectionInteractive interactive = new CollectionInteractive();
-        interactive.setUri("/interactives/123");
-        interactive.setTitle("title");
-        collection.getDescription().addInteractive(interactive);
-
-        // When getDatasetDetails() is called
-        List<ContentDetail> interactiveContent = collection.getInteractiveDetails();
-
-        // Then the expected values have been set
-        ContentDetail interactiveDetail = interactiveContent.get(0);
-
-        assertEquals("/interactives/123", interactiveDetail.uri);
-        assertEquals(PageType.INTERACTIVE, interactiveDetail.getType());
-        assertEquals(interactive.getTitle(), interactiveDetail.description.title);
     }
 
     @Test

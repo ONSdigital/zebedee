@@ -125,8 +125,6 @@ public class CollectionDetails {
             result.datasetVersions = collection.getDescription().getDatasetVersions();
         }
 
-        result.interactives = collection.getDescription().getInteractives();
-
         return result;
     }
 

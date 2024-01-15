@@ -29,6 +29,7 @@
         <spring.version>5.3.20</spring.version>
         <dp.logging.version>2.0.0-beta.8</dp.logging.version>
         <batik.version>1.16</batik.version>
+        <logback.version>1.2.11</logback.version>
     </properties>
 
     <dependencyManagement>
@@ -295,7 +296,7 @@
             <dependency>
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-classic</artifactId>
-                <version>1.2.11</version>
+                <version>${logback.version}</version>
             </dependency>
 
             <dependency>
@@ -448,6 +449,20 @@
                             <groupId>org.apache.xmlgraphics</groupId>
                             <artifactId>batik-bridge</artifactId>
                             <version>${batik.version}</version>
+                        </exlude>
+
+                        <!-- exclude [CVE-2023-6378] CWE-502: Deserialization of Untrusted Data (7.5) -->
+                        <exlude>
+                            <groupId>ch.qos.logback</groupId>
+                            <artifactId>logback-classic</artifactId>
+                            <version>${logback.version}</version>
+                        </exlude>
+
+                        <!-- exclude [CVE-2023-6378] CWE-502: Deserialization of Untrusted Data (7.5) -->
+                        <exlude>
+                            <groupId>ch.qos.logback</groupId>
+                            <artifactId>logback-core</artifactId>
+                            <version>${logback.version}</version>
                         </exlude>
 
                     </excludeCoordinates>

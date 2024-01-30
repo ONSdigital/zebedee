@@ -28,6 +28,7 @@ java $JAVA_OPTS \
  -DFORMAT_LOGGING=$FORMAT_LOGGING \
  -javaagent:zebedee-cms/target/dependency/aws-opentelemetry-agent-1.31.0.jar \
  -Dotel.propagators=tracecontext,baggage \
+ -Dotel.javaagent.enabled=false \
  -cp "zebedee-reader/target/classes/:zebedee-reader/target/dependency/*" \
  com.github.davidcarboni.restolino.Main
 

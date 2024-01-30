@@ -52,6 +52,7 @@ job "zebedee" {
           "-javaagent:target/dependency/aws-opentelemetry-agent-1.31.0.jar",
           "-Dotel.propagators=tracecontext,baggage",
           "-Dotel.service.name=zebedee",
+          "-Dotel.javaagent.enabled=false",
           "-Drestolino.packageprefix=com.github.onsdigital.zebedee.api",
           "com.github.davidcarboni.restolino.Main",
         ]

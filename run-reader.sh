@@ -26,7 +26,7 @@ java $JAVA_OPTS \
  -DSTART_EMBEDDED_SERVER=N \
  -Drestolino.packageprefix=$PACKAGE_PREFIX \
  -DFORMAT_LOGGING=$FORMAT_LOGGING \
- -javaagent:zebedee-cms/target/dependency/aws-opentelemetry-agent-1.31.0.jar \
+ -javaagent:zebedee-cms/target/dependency/aws-opentelemetry-agent-1.32.0.jar \
  -Dotel.propagators=tracecontext,baggage \
  -Dotel.javaagent.enabled=false \
  -cp "zebedee-reader/target/classes/:zebedee-reader/target/dependency/*" \

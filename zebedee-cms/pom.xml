@@ -29,6 +29,11 @@
     </repositories>
 
     <dependencies>
+        <!-- Logging -->
+        <dependency>
+            <groupId>com.github.onsdigital</groupId>
+            <artifactId>dp-logging</artifactId>
+        </dependency>
 
         <!--Restolino-->
         <dependency>
@@ -74,11 +79,6 @@
             <artifactId>opencsv</artifactId>
         </dependency>
 
-        <!-- Logging -->
-        <dependency>
-            <groupId>com.github.onsdigital</groupId>
-            <artifactId>dp-logging</artifactId>
-        </dependency>
 
         <!-- Http -->
         <dependency>
@@ -148,11 +148,6 @@
         </dependency>
 
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-        </dependency>
-
-        <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
         </dependency>
@@ -208,7 +203,14 @@
         <dependency>
             <groupId>com.github.onsdigital</groupId>
             <artifactId>dp-authorisation-java</artifactId>
-            <version>2.2.0</version>
+            <version>2.6.0</version>
+        </dependency>
+
+        <!-- Threads -->
+        <dependency>
+            <groupId>net.jcip</groupId>
+            <artifactId>jcip-annotations</artifactId>
+            <version>1.0</version>
         </dependency>
 
         <!-- Spreadsheet generator -->
@@ -278,7 +280,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
-                <version>2.10</version>
+                <version>3.6.1</version>
                 <executions>
                     <execution>
                         <id>copy-dependencies</id>
@@ -294,7 +296,7 @@
             <plugin>
                 <groupId>org.apache.avro</groupId>
                 <artifactId>avro-maven-plugin</artifactId>
-                <version>1.10.2</version>
+                <version>1.11.3</version>
                 <executions>
                     <execution>
                         <phase>generate-sources</phase>

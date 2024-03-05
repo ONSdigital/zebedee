@@ -1,21 +1,21 @@
 package com.github.onsdigital.zebedee.model.publishing;
 
-import com.github.davidcarboni.httpino.Endpoint;
-import com.github.davidcarboni.httpino.Host;
-import com.github.davidcarboni.httpino.Http;
-import com.github.davidcarboni.httpino.Response;
+import com.github.davidcarboni.httpino.*;
 import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.json.ContentDetail;
 import com.github.onsdigital.zebedee.json.EventType;
 import com.github.onsdigital.zebedee.model.Collection;
+import com.github.onsdigital.zebedee.model.publishing.legacycacheapi.LegacyCacheApiClient;
+import com.github.onsdigital.zebedee.model.publishing.legacycacheapi.LegacyCacheApiPayload;
+import com.github.onsdigital.zebedee.model.publishing.legacycacheapi.LegacyCacheApiPayloadBuilder;
 import com.github.onsdigital.zebedee.util.SlackNotification;
 import com.github.onsdigital.zebedee.util.slack.PostMessageField;
 import org.joda.time.DateTime;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
@@ -27,21 +27,26 @@ import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
 public class PublishNotification {
 
     private static final List<Host> websiteHosts;
+    private static final Host legacyCacheApiHost;
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
     private NotificationPayload payload;
+    private java.util.Collection<LegacyCacheApiPayload> legacyCacheApiPayloads;
 
     static {
         websiteHosts = Configuration.getWebsiteHosts();
+        legacyCacheApiHost = new Host(Configuration.getLegacyCacheApiUrl());
     }
 
     public PublishNotification(Collection collection, List<String> urisToUpdate, List<ContentDetail> urisToDelete) {
-
         // Delay the clearing of the cache after publish to minimise load on the server while publishing.
         Date clearCacheDate = new DateTime(collection.getDescription().getPublishDate())
                 .plusSeconds(Configuration.getSecondsToCacheAfterScheduledPublish()).toDate();
 
-        this.payload = new NotificationPayload(collection.getDescription().getId(), urisToUpdate, urisToDelete,
-                clearCacheDate);
+        if (Configuration.isLegacyCacheAPIEnabled()) {
+            this.legacyCacheApiPayloads = new LegacyCacheApiPayloadBuilder.Builder().collection(collection).publishDate(clearCacheDate).build().getPayloads();
+        } else {
+            this.payload = new NotificationPayload(collection.getDescription().getId(), urisToUpdate, urisToDelete, clearCacheDate);
+        }
     }
 
     public PublishNotification(Collection collection) {
@@ -49,7 +54,15 @@ public class PublishNotification {
     }
 
     public void sendNotification(EventType eventType) {
-        Host host = null;
+        if (Configuration.isLegacyCacheAPIEnabled()) {
+            sendRequestToLegacyCacheApi(eventType);
+        } else {
+            sendNotificationToWebsite(eventType);
+        }
+    }
+
+    private void sendNotificationToWebsite(EventType eventType) {
+        Host host;
         try (Http http = new Http()) {
             for (Host h : websiteHosts) {
                 host = h;
@@ -96,6 +109,33 @@ public class PublishNotification {
         }
     }
 
+    private void sendRequestToLegacyCacheApi(EventType eventType) {
+        if (eventType.equals(EventType.PUBLISHED) || eventType.equals(EventType.UNLOCKED)) {
+            info().data("eventType", eventType.name()).log("sending request to Legacy Cache API");
+
+            removePublishDateForUnlockedEvents(eventType);
+
+            try (Http http = new Http()) {
+                LegacyCacheApiClient.sendPayloads(http, legacyCacheApiHost, legacyCacheApiPayloads);
+            } catch (IOException e) {
+                String collectionId = legacyCacheApiPayloads.stream().findFirst().map(p -> p.collectionId).orElse("");
+                String payloads = Serialiser.serialise(legacyCacheApiPayloads);
+
+                error().data("collectionId", collectionId)
+                        .data("payloads", payloads)
+                        .data("eventType", eventType)
+                        .logException(e, "failed to send request to Legacy Cache API");
+
+                SlackNotification.alarm(
+                        "Failed to send request to Legacy Cache API",
+                        new PostMessageField("Event", eventType.name(), true),
+                        new PostMessageField("Collection ID", collectionId, true),
+                        new PostMessageField("Payloads", payloads, false)
+                );
+            }
+        }
+    }
+
     /**
      * Returns website endpoint for sending notification to
      *
@@ -114,7 +154,7 @@ public class PublishNotification {
         }
     }
 
-    private String format(Date date) {
+    public static String format(Date date) {
         if (date == null) {
             return null;
         }
@@ -122,20 +162,19 @@ public class PublishNotification {
     }
 
     public boolean hasUriToDelete(String uriToDelete) {
-        return this.payload.urisToDelete.stream()
-                .filter(contentDetail -> contentDetail.uri.equals(uriToDelete))
-                .findFirst()
-                .isPresent();
+        return this.payload.urisToDelete.stream().anyMatch(contentDetail -> contentDetail.uri.equals(uriToDelete));
     }
 
-    /**
-     * return true if this PublishNotification has the given URI to update.
-     *
-     * @param uri - the URI to check.
-     * @return - true if the URI is in the list of URI's to update
-     */
-    public boolean hasUriToUpdate(String uri) {
-        return this.payload.urisToUpdate.contains(uri);
+    void removePublishDateForUnlockedEvents(EventType eventType) {
+        if (eventType.equals(EventType.UNLOCKED)) {
+            for (LegacyCacheApiPayload legacyCacheApiPayload : legacyCacheApiPayloads) {
+                legacyCacheApiPayload.publishDate = null;
+            }
+        }
+    }
+
+    java.util.Collection<LegacyCacheApiPayload> getLegacyCacheApiPayloads() {
+        return this.legacyCacheApiPayloads;
     }
 
     class NotificationPayload {

@@ -1,7 +1,5 @@
 package com.github.onsdigital.zebedee.util;
 
-import static org.junit.Assert.*;
-
 import com.github.davidcarboni.cryptolite.Keys;
 import org.apache.commons.io.IOUtils;
 import org.junit.After;
@@ -9,22 +7,22 @@ import org.junit.Before;
 import org.junit.Test;
 
 import javax.crypto.SecretKey;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
+
+import static org.junit.Assert.*;
 
 /**
  * Created by thomasridd on 25/11/2015.
  */
 public class EncryptionUtilsTest {
-Path path;
+    Path path;
 
     @Before
     public void setUp() throws Exception {
-        path = Files.createTempFile("EncryptionUtilsTest","txt");
+        path = Files.createTempFile("EncryptionUtilsTest", "txt");
     }
 
     @After
@@ -73,4 +71,16 @@ Path path;
         assertEquals(plain, value);
     }
 
+    @Test
+    public void givenValue_generatingChecksum_thenVerifying() {
+        String input = "hello world";
+        String expectedChecksum = "5eb63bbbe01eeed093cb22bb8f5acdc3";
+        String result = EncryptionUtils.createMD5Checksum(input);
+        assertEquals(expectedChecksum, result);
+    }
+
+    @Test
+    public void givenNullValue_generatingChecksum_throwsException() {
+        assertThrows(IllegalArgumentException.class, () -> EncryptionUtils.createMD5Checksum(null));
+    }
 }

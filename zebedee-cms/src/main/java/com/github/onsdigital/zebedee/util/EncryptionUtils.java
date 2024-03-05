@@ -4,11 +4,16 @@ import com.github.davidcarboni.cryptolite.Crypto;
 import org.apache.commons.io.FileUtils;
 
 import javax.crypto.SecretKey;
+import javax.xml.bind.DatatypeConverter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * Created by thomasridd on 25/11/2015.
@@ -63,5 +68,22 @@ public class EncryptionUtils {
      */
     public static InputStream encryptionInputStream(Path path, SecretKey key) throws IOException {
         return encryptionInputStream(Files.newInputStream(path), key);
+    }
+
+    public static String createMD5Checksum(String value) {
+        if (value == null){
+            throw new IllegalArgumentException("Input value cannot be null");
+        }
+
+        MessageDigest messageDigest;
+        try {
+            messageDigest = MessageDigest.getInstance("MD5");
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException("Error generating MD5 checksum", e);
+        }
+
+        byte[] byteEncodedMessage = value.getBytes(UTF_8);
+        byte[] md5Digest = messageDigest.digest(byteEncodedMessage);
+        return DatatypeConverter.printHexBinary(md5Digest).toLowerCase();
     }
 }

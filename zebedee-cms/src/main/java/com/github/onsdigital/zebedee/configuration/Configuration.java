@@ -20,6 +20,7 @@ import static org.apache.commons.lang3.StringUtils.defaultIfBlank;
 public class Configuration {
 
     private static final String DEFAULT_WEBSITE_URL = "http://localhost:8080";
+    private static final String DEFAULT_LEGACY_CACHE_API_URL = "http://localhost:29100";
     private static final String DEFAULT_SLACK_WARNING_CHANNEL = "slack-client-test";
     private static final String DEFAULT_SLACK_ALARM_CHANNEL = "slack-client-test";
     private static final String DEFAULT_PUBLIC_WEBSITE_URL = "http://localhost:8080";
@@ -37,6 +38,7 @@ public class Configuration {
     private static final String KAFKA_CONTENT_UPDATED_TOPIC = "content-updated";
     private static final String DATASET_API_AUTH_TOKEN = "FD0108EA-825D-411C-9B1D-41EF7727F465";
     private static final String SERVICE_AUTH_TOKEN = "15C0E4EE-777F-4C61-8CDB-2898CEB34657";
+    private static final String LEGACY_CACHE_API_AUTH_TOKEN = "748896205c3b42b43adb4b22fff11784c5d971187f280ab1b6f142c3d69e64e4";
     private static final String DEFAULT_SLACK_USERNAME = "Zebedee";
     private static final String SESSIONS_API_URL = "http://localhost:24400";
     private static final String KEYRING_SECRET_KEY = "KEYRING_SECRET_KEY";
@@ -55,6 +57,10 @@ public class Configuration {
 
     // how many additional seconds after the publish
     private static final int DEFAULT_SECONDS_TO_CACHE_AFTER_SCHEDULED_PUBLISH = 30;
+
+    public static boolean isLegacyCacheAPIEnabled() {
+        return BooleanUtils.toBoolean(StringUtils.defaultIfBlank(getValue("ENABLE_LEGACY_CACHE_API"), "false"));
+    }
 
     public static boolean isSchedulingEnabled() {
         return BooleanUtils.toBoolean(StringUtils.defaultIfBlank(getValue("scheduled_publishing_enabled"), "true"));
@@ -109,6 +115,10 @@ public class Configuration {
 
     public static String getFlorenceUrl() {
         return StringUtils.defaultIfBlank(getValue("FLORENCE_URL"), DEFAULT_FLORENCE_URL);
+    }
+
+    public static String getLegacyCacheApiUrl() {
+        return StringUtils.defaultIfBlank(getValue("LEGACY_CACHE_API_URL"), DEFAULT_LEGACY_CACHE_API_URL);
     }
 
     public static String getSlackUsername() {
@@ -182,6 +192,11 @@ public class Configuration {
     public static String getServiceAuthToken() {
         String serviceAuthToken = StringUtils.defaultIfBlank(getValue("SERVICE_AUTH_TOKEN"), SERVICE_AUTH_TOKEN);
         return "Bearer " + serviceAuthToken;
+    }
+
+    public static String getLegacyCacheAPIAuthToken() {
+        String authToken = StringUtils.defaultIfBlank(getValue("LEGACY_CACHE_API_AUTH_TOKEN"), LEGACY_CACHE_API_AUTH_TOKEN);
+        return "Bearer " + authToken;
     }
 
     public static String[] getTheTrainUrls() {

@@ -47,9 +47,10 @@ job "zebedee-reader" {
           "-Xmx{{WEB_RESOURCE_HEAP_MEM}}m",
           "-cp target/dependency/*:target/classes/",
           "-Drestolino.classes=target/classes",
-          "-javaagent:target/dependency/aws-opentelemetry-agent-1.31.0.jar",
+          "-javaagent:target/dependency/aws-opentelemetry-agent-1.32.0.jar",
           "-Dotel.propagators=tracecontext,baggage",
           "-Dotel.service.name=zebedee",
+          "-Dotel.javaagent.enabled=false",
           "-Drestolino.packageprefix=com.github.onsdigital.zebedee.reader.api",
           "com.github.davidcarboni.restolino.Main",
         ]

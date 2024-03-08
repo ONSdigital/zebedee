@@ -29,6 +29,12 @@
     </repositories>
 
     <dependencies>
+       <!-- Logging -->
+        <dependency>
+            <groupId>com.github.onsdigital</groupId>
+            <artifactId>dp-logging</artifactId>
+        </dependency>
+
         <!--Restolino-->
         <dependency>
             <groupId>com.github.onsdigital</groupId>
@@ -69,12 +75,6 @@
             <artifactId>opencsv</artifactId>
         </dependency>
 
-        <!-- Logging -->
-        <dependency>
-            <groupId>com.github.onsdigital</groupId>
-            <artifactId>dp-logging</artifactId>
-        </dependency>
-
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
@@ -99,11 +99,6 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
         </dependency>
 
         <dependency>
@@ -167,7 +162,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
-                <version>2.10</version>
+                <version>3.6.1</version>
                 <executions>
                     <execution>
                         <id>copy-dependencies</id>

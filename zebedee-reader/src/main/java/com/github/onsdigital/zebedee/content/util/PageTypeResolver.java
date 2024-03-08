@@ -107,7 +107,7 @@ class PageTypeResolver implements JsonDeserializer<Page> {
 
             ConfigurationBuilder configurationBuilder = new ConfigurationBuilder().addUrls(
                     PageTypeResolver.class.getProtectionDomain().getCodeSource().getLocation());
-            configurationBuilder.addClassLoader(PageTypeResolver.class.getClassLoader());
+            configurationBuilder.addClassLoaders(PageTypeResolver.class.getClassLoader());
             Set<Class<? extends Page>> classes = new Reflections(configurationBuilder).getSubTypesOf(Page.class);
 
             for (Class<? extends Page> contentClass : classes) {

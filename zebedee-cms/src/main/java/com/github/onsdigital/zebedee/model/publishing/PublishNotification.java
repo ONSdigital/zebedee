@@ -38,13 +38,12 @@ public class PublishNotification {
     }
 
     public PublishNotification(Collection collection, List<String> urisToUpdate, List<ContentDetail> urisToDelete) {
-        // Delay the clearing of the cache after publish to minimise load on the server while publishing.
-        Date clearCacheDate = new DateTime(collection.getDescription().getPublishDate())
-                .plusSeconds(Configuration.getSecondsToCacheAfterScheduledPublish()).toDate();
-
         if (Configuration.isLegacyCacheAPIEnabled()) {
-            this.legacyCacheApiPayloads = new LegacyCacheApiPayloadBuilder.Builder().collection(collection).publishDate(clearCacheDate).build().getPayloads();
+            this.legacyCacheApiPayloads = new LegacyCacheApiPayloadBuilder.Builder().collection(collection).build().getPayloads();
         } else {
+            // Delay the clearing of the cache after publish to minimise load on the server while publishing.
+            Date clearCacheDate = new DateTime(collection.getDescription().getPublishDate())
+                    .plusSeconds(Configuration.getSecondsToCacheAfterScheduledPublish()).toDate();
             this.payload = new NotificationPayload(collection.getDescription().getId(), urisToUpdate, urisToDelete, clearCacheDate);
         }
     }
@@ -110,7 +109,7 @@ public class PublishNotification {
     }
 
     private void sendRequestToLegacyCacheApi(EventType eventType) {
-        if (eventType.equals(EventType.PUBLISHED) || eventType.equals(EventType.UNLOCKED)) {
+        if (eventType.equals(EventType.APPROVED) || eventType.equals(EventType.UNLOCKED)) {
             info().data("eventType", eventType.name()).log("sending request to Legacy Cache API");
 
             removePublishDateForUnlockedEvents(eventType);

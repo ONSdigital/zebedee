@@ -7,8 +7,8 @@ import com.github.onsdigital.zebedee.json.ContentDetail;
 import com.github.onsdigital.zebedee.json.EventType;
 import com.github.onsdigital.zebedee.json.PendingDelete;
 import com.github.onsdigital.zebedee.model.Collection;
-import com.github.onsdigital.zebedee.model.publishing.legacycacheapi.LegacyCacheApiPayload;
 import com.github.onsdigital.zebedee.model.publishing.legacycacheapi.LegacyCacheApiClient;
+import com.github.onsdigital.zebedee.model.publishing.legacycacheapi.LegacyCacheApiPayload;
 import com.github.onsdigital.zebedee.util.EncryptionUtils;
 import org.apache.http.ProtocolVersion;
 import org.apache.http.message.BasicStatusLine;
@@ -21,7 +21,10 @@ import org.mockito.*;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.*;
@@ -75,10 +78,10 @@ public class PublishNotificationTest {
         when(collection.getDescription()).thenReturn(mockCollectionDescription);
         when(collection.reviewedUris()).thenReturn(urisToUpdate);
 
-        PendingDelete pendingDelete = mock (PendingDelete.class);
-        PendingDelete pendingDelete2 = mock (PendingDelete.class);
-        ContentDetail contentDetail = mock (ContentDetail.class);
-        ContentDetail contentDetail2 = mock (ContentDetail.class);
+        PendingDelete pendingDelete = mock(PendingDelete.class);
+        PendingDelete pendingDelete2 = mock(PendingDelete.class);
+        ContentDetail contentDetail = mock(ContentDetail.class);
+        ContentDetail contentDetail2 = mock(ContentDetail.class);
 
         when(pendingDelete.getRoot()).thenReturn(contentDetail);
         when(pendingDelete2.getRoot()).thenReturn(contentDetail2);
@@ -288,7 +291,7 @@ public class PublishNotificationTest {
     }
 
     @Test
-    public void publishNotificationWhenCacheAPIEnabledAndPUBLISHTest() throws IOException {
+    public void publishNotificationWhenCacheAPIEnabledAndCollectionHasBothUpdatesAndDeletesTest() throws IOException {
         when(Configuration.isLegacyCacheAPIEnabled()).thenReturn(true);
 
         assertEquals(3, collectionWithDeletes.reviewedUris().size());
@@ -342,6 +345,45 @@ public class PublishNotificationTest {
         LegacyCacheApiClient.sendPayloads(httpMock, legacyCacheApiHost, new ArrayList<>());
 
         verify(httpMock, never()).postJson(any(), any(), any());
+    }
+
+    @Test
+    public void publishNotificationWhenCacheAPIEnabledDoesNotSendRequestToAPIWhenEventTypeIsPublishedTest() {
+        when(Configuration.isLegacyCacheAPIEnabled()).thenReturn(true);
+
+        PublishNotification publishNotification = new PublishNotification(collection);
+
+        try (MockedStatic<LegacyCacheApiClient> ignored = mockStatic(LegacyCacheApiClient.class)) {
+            publishNotification.sendNotification(EventType.PUBLISHED);
+
+            verifyNoInteractions(LegacyCacheApiClient.class);
+        }
+    }
+
+    @Test
+    public void publishNotificationWhenCacheAPIEnabledSendsRequestToAPIWhenEventTypeIsApprovedTest() {
+        when(Configuration.isLegacyCacheAPIEnabled()).thenReturn(true);
+
+        PublishNotification publishNotification = new PublishNotification(collection);
+
+        try (MockedStatic<LegacyCacheApiClient> mockController = mockStatic(LegacyCacheApiClient.class)) {
+            publishNotification.sendNotification(EventType.APPROVED);
+
+            mockController.verify(() -> LegacyCacheApiClient.sendPayloads(any(), any(), any()));
+        }
+    }
+
+    @Test
+    public void publishNotificationWhenCacheAPIEnabledSendsRequestToAPIWhenEventTypeIsUnlockedTest() {
+        when(Configuration.isLegacyCacheAPIEnabled()).thenReturn(true);
+
+        PublishNotification publishNotification = new PublishNotification(collection);
+
+        try (MockedStatic<LegacyCacheApiClient> mockController = mockStatic(LegacyCacheApiClient.class)) {
+            publishNotification.sendNotification(EventType.UNLOCKED);
+
+            mockController.verify(() -> LegacyCacheApiClient.sendPayloads(any(), any(), any()));
+        }
     }
 
     @Test

@@ -271,7 +271,6 @@ public class LegacyCacheApiPayloadBuilderTest {
         @Mock
         private Collection collection;
         private List<String> urisToUpdate;
-        private final Date publishDate = new Date(1609866000000L);
         private AutoCloseable mockitoAnnotations;
 
         @Before
@@ -279,8 +278,11 @@ public class LegacyCacheApiPayloadBuilderTest {
             mockitoAnnotations = MockitoAnnotations.openMocks(this);
             urisToUpdate = new ArrayList<>();
 
+            Date publishDate = new Date(1609866000000L);
+
             CollectionDescription mockCollectionDescription = mock(CollectionDescription.class);
             when(mockCollectionDescription.getId()).thenReturn("cake-1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef");
+            when(mockCollectionDescription.getPublishDate()).thenReturn(publishDate);
 
             when(collection.getDescription()).thenReturn(mockCollectionDescription);
             when(collection.reviewedUris()).thenReturn(urisToUpdate);
@@ -297,7 +299,7 @@ public class LegacyCacheApiPayloadBuilderTest {
             String testUriBulletin = "/economy/inflationandpriceindices/bulletins/producerpriceinflation/october2022/30d7d6c2/";
             urisToUpdate.add(testUriBulletin);
 
-            java.util.Collection<LegacyCacheApiPayload> payloads = new LegacyCacheApiPayloadBuilder.Builder().collection(collection).publishDate(publishDate).build().getPayloads();
+            java.util.Collection<LegacyCacheApiPayload> payloads = new LegacyCacheApiPayloadBuilder.Builder().collection(collection).build().getPayloads();
             assertEquals(2, payloads.size());
 
             String expectedURI = "/economy/inflationandpriceindices/bulletins/producerpriceinflation/latest";
@@ -312,7 +314,7 @@ public class LegacyCacheApiPayloadBuilderTest {
 
             urisToUpdate.clear();
             urisToUpdate.add(testUriWithBulletinAsQueryParam);
-            java.util.Collection<LegacyCacheApiPayload> payloads = new LegacyCacheApiPayloadBuilder.Builder().collection(collection).publishDate(publishDate).build().getPayloads();
+            java.util.Collection<LegacyCacheApiPayload> payloads = new LegacyCacheApiPayloadBuilder.Builder().collection(collection).build().getPayloads();
             assertEquals(2, payloads.size());
 
             String expectedURI = "/economy/inflationandpriceindices/bulletins/producerpriceinflation/latest";
@@ -327,7 +329,7 @@ public class LegacyCacheApiPayloadBuilderTest {
 
             urisToUpdate.clear();
             urisToUpdate.add(testUriBulletinWithLatestString);
-            java.util.Collection<LegacyCacheApiPayload> payloads = new LegacyCacheApiPayloadBuilder.Builder().collection(collection).publishDate(publishDate).build().getPayloads();
+            java.util.Collection<LegacyCacheApiPayload> payloads = new LegacyCacheApiPayloadBuilder.Builder().collection(collection).build().getPayloads();
             assertEquals(1, payloads.size());
             assertTrue(payloads.iterator().next().uriToUpdate.contains("/economy/inflationandpriceindices/bulletins/producerpriceinflation/latest"));
         }
@@ -338,7 +340,7 @@ public class LegacyCacheApiPayloadBuilderTest {
 
             urisToUpdate.clear();
             urisToUpdate.add(testUriWithArticlesString);
-            java.util.Collection<LegacyCacheApiPayload> payloads = new LegacyCacheApiPayloadBuilder.Builder().collection(collection).publishDate(publishDate).build().getPayloads();
+            java.util.Collection<LegacyCacheApiPayload> payloads = new LegacyCacheApiPayloadBuilder.Builder().collection(collection).build().getPayloads();
             assertEquals(1, payloads.size());
             assertTrue(payloads.iterator().next().uriToUpdate.contains("/economy/inflationandpriceindices/articles/producerpriceinflation/october2022"));
         }

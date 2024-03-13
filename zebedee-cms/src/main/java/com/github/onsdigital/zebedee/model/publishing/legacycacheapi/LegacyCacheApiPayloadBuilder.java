@@ -21,7 +21,6 @@ public class LegacyCacheApiPayloadBuilder {
 
     public static class Builder {
         private Collection collection;
-        private Date publishDate;
         private final Map<String, LegacyCacheApiPayload> payloadsByPath = new HashMap<>();
 
         public Builder() {}
@@ -31,22 +30,18 @@ public class LegacyCacheApiPayloadBuilder {
             return this;
         }
 
-        public LegacyCacheApiPayloadBuilder.Builder publishDate(Date publishDate) {
-            this.publishDate = publishDate;
-            return this;
-        }
-
         public LegacyCacheApiPayloadBuilder build() {
             Objects.requireNonNull(this.collection);
             String collectionId = collection.getDescription().getId();
+            Date publishDate = collection.getDescription().getPublishDate();
             try {
                 collection.reviewedUris()
                         .forEach(uri -> {
                                     String pagePath = PayloadPathUpdater.getCanonicalPagePath(uri, collectionId);
-                                    LegacyCacheApiPayload legacyCacheApiPayload = new LegacyCacheApiPayload(collectionId, pagePath, this.publishDate);
+                                    LegacyCacheApiPayload legacyCacheApiPayload = new LegacyCacheApiPayload(collectionId, pagePath, publishDate);
                                     if (isValid(legacyCacheApiPayload)) {
                                         payloadsByPath.put(legacyCacheApiPayload.uriToUpdate, legacyCacheApiPayload);
-                                        addPayloadForBulletinLatest(legacyCacheApiPayload.uriToUpdate, collectionId, this.publishDate);
+                                        addPayloadForBulletinLatest(legacyCacheApiPayload.uriToUpdate, collectionId, publishDate);
                                     }
                                 }
                         );

@@ -23,7 +23,7 @@
         <encoding>UTF-8</encoding>
         <project.build.sourceEncoding>${encoding}</project.build.sourceEncoding>
         <project.reporting.outputEncoding>${encoding}</project.reporting.outputEncoding>
-        <restolino.version>0.7.1</restolino.version>
+        <restolino.version>0.8.0</restolino.version>
         <fasterxml.jackson.version>2.16.1</fasterxml.jackson.version>
         <apache.poi.version>3.17</apache.poi.version>
         <spring.version>5.3.31</spring.version>

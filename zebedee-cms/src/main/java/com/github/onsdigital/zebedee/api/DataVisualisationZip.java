@@ -181,9 +181,18 @@ public class DataVisualisationZip {
             List<String> filesWritten = new ArrayList<>();
             while (zipEntry != null) {
 
+                if (zipEntry.isDirectory() && zipEntry.getName().endsWith("/timeseries/"))
+                    throw new BadRequestException("visualisation cannot contain a dir named timeseries");
+
+                if (!zipEntry.isDirectory() && zipEntry.getName().endsWith("/data.json"))
+                    throw new BadRequestException("visualisation cannot contain a file named timeseries");
+
                 if (isValidDataVisContentFile.test(zipEntry)) {
                     filePath = zipDir.resolve(zipEntry.getName());
-                    contentWriter.write(zipInputStream, filePath.toString());
+                    long size = contentWriter.write(zipInputStream, filePath.toString());
+                    if (size >= 157286400) {
+                        throw new BadRequestException("visualisation cannot contain a file >150MB");
+                    }
                     filesWritten.add(filePath.toString());
                 }
                 zipEntry = zipInputStream.getNextEntry();

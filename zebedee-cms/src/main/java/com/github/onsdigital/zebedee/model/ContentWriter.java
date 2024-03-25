@@ -43,13 +43,16 @@ public class ContentWriter {
      *
      * @param input
      * @param uri
+     * @return Number of bytes written
      * @throws BadRequestException
      * @throws IOException
      */
-    public void write(InputStream input, String uri) throws IOException, BadRequestException {
+    public long write(InputStream input, String uri) throws IOException, BadRequestException {
+        long size = -1;
         try (OutputStream output = getOutputStream(uri)) {
-            org.apache.commons.io.IOUtils.copy(input, output);
+             size = org.apache.commons.io.IOUtils.copyLarge(input, output);
         }
+        return size;
     }
 
     /**

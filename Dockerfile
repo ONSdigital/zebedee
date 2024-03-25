@@ -9,7 +9,7 @@ ADD ./zebedee-cms/target/classes /usr/src/target/classes
 EXPOSE 9200
 
 # Update the entry point script
-ENTRYPOINT java -Xmx2048m \
+ENTRYPOINT java -Xmx2048m -agentlib:jdwp=transport=dt_socket,address=8002,server=y,suspend=n \
           -Drestolino.classes=target/classes \
           -Drestolino.packageprefix=com.github.onsdigital.zebedee.api \
           -javaagent:target/dependency/aws-opentelemetry-agent-1.32.0.jar \

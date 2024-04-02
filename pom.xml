@@ -24,6 +24,7 @@
         <project.build.sourceEncoding>${encoding}</project.build.sourceEncoding>
         <project.reporting.outputEncoding>${encoding}</project.reporting.outputEncoding>
         <restolino.version>0.8.0</restolino.version>
+        <httpino.version>0.0.8</httpino.version>
         <fasterxml.jackson.version>2.16.1</fasterxml.jackson.version>
         <apache.poi.version>3.17</apache.poi.version>
         <spring.version>5.3.31</spring.version>
@@ -194,9 +195,9 @@
 
             <!-- Http -->
             <dependency>
-                <groupId>com.github.davidcarboni</groupId>
+                <groupId>com.github.onsdigital</groupId>
                 <artifactId>httpino</artifactId>
-                <version>0.0.8</version>
+                <version>${httpino.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.httpcomponents</groupId>

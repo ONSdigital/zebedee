@@ -82,7 +82,7 @@
 
         <!-- Http -->
         <dependency>
-            <groupId>com.github.davidcarboni</groupId>
+            <groupId>com.github.onsdigital</groupId>
             <artifactId>httpino</artifactId>
         </dependency>
 

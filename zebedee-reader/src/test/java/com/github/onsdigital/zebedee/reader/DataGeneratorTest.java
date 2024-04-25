@@ -4,12 +4,7 @@ import au.com.bytecode.opencsv.CSVWriter;
 import com.github.onsdigital.zebedee.content.base.Content;
 import com.github.onsdigital.zebedee.content.page.statistics.document.bulletin.Bulletin;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.DataFormat;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.*;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -45,7 +40,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * Test cases verifying the behaviour of the the {@link DataGenerator}.
+ * Test cases verifying the behaviour of the  {@link DataGenerator}.
  */
 public class DataGeneratorTest {
 
@@ -169,8 +164,8 @@ public class DataGeneratorTest {
 
         // 8 meta rows containing a label and a value & 1 data row containing a label and a number == 17 string cells
         // & 1 numeric cell.
-        verify(cellMock, times(17)).setCellType(Cell.CELL_TYPE_STRING);
-        verify(cellMock, times(1)).setCellType(Cell.CELL_TYPE_NUMERIC);
+        verify(cellMock, times(17)).setCellType(CellType.STRING);
+        verify(cellMock, times(1)).setCellType(CellType.NUMERIC);
         verify(xlsWorkbookMock, times(1)).write(any(OutputStream.class));
     }
 
@@ -194,8 +189,8 @@ public class DataGeneratorTest {
 
         // 8 meta rows containing a label and a value & 1 data row containing a label and a number == 17 string cells
         // & 1 numeric cell.
-        verify(cellMock, times(17)).setCellType(Cell.CELL_TYPE_STRING);
-        verify(cellMock, times(1)).setCellType(Cell.CELL_TYPE_NUMERIC);
+        verify(cellMock, times(17)).setCellType(CellType.STRING);
+        verify(cellMock, times(1)).setCellType(CellType.NUMERIC);
         verify(xlsWorkbookMock, times(1)).write(any(OutputStream.class));
     }
 
@@ -216,8 +211,8 @@ public class DataGeneratorTest {
         verify(sheetMock, times(9)).createRow(anyInt());
         verify(xlsWorkbookMock, never()).createCellStyle();
         verify(dataFormatMock, never()).getFormat(any());
-        verify(cellMock, times(18)).setCellType(Cell.CELL_TYPE_STRING);
-        verify(cellMock, never()).setCellType(Cell.CELL_TYPE_NUMERIC);
+        verify(cellMock, times(18)).setCellType(CellType.STRING);
+        verify(cellMock, never()).setCellType(CellType.NUMERIC);
         verify(xlsWorkbookMock, times(1)).write(any(OutputStream.class));
     }
 
@@ -238,8 +233,8 @@ public class DataGeneratorTest {
         verify(sheetMock, times(9)).createRow(anyInt());
         verify(xlsWorkbookMock, never()).createCellStyle();
         verify(dataFormatMock, never()).getFormat(any());
-        verify(cellMock, times(18)).setCellType(Cell.CELL_TYPE_STRING);
-        verify(cellMock, never()).setCellType(Cell.CELL_TYPE_NUMERIC);
+        verify(cellMock, times(18)).setCellType(CellType.STRING);
+        verify(cellMock, never()).setCellType(CellType.NUMERIC);
         verify(xlsWorkbookMock, times(1)).write(any(OutputStream.class));
     }
 
@@ -260,8 +255,8 @@ public class DataGeneratorTest {
         verify(sheetMock, times(9)).createRow(anyInt());
         verify(xlsWorkbookMock, never()).createCellStyle();
         verify(dataFormatMock, never()).getFormat(any());
-        verify(cellMock, times(18)).setCellType(Cell.CELL_TYPE_STRING);
-        verify(cellMock, never()).setCellType(Cell.CELL_TYPE_NUMERIC);
+        verify(cellMock, times(18)).setCellType(CellType.STRING);
+        verify(cellMock, never()).setCellType(CellType.NUMERIC);
         verify(xlsWorkbookMock, times(1)).write(any(OutputStream.class));
     }
 

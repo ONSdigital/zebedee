@@ -14,11 +14,7 @@ import com.github.onsdigital.zebedee.reader.util.factory.CSVWriterFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.FastDateFormat;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 
 import java.io.ByteArrayInputStream;
@@ -42,8 +38,6 @@ import java.util.regex.Pattern;
 import static com.github.onsdigital.zebedee.logging.ReaderLogger.info;
 import static java.util.Arrays.asList;
 import static org.apache.commons.io.FilenameUtils.getExtension;
-import static org.apache.poi.ss.usermodel.Cell.CELL_TYPE_NUMERIC;
-import static org.apache.poi.ss.usermodel.Cell.CELL_TYPE_STRING;
 
 /**
  * Created by thomasridd on 07/10/15.
@@ -211,7 +205,7 @@ public class DataGenerator {
                 for (String cellValueStr : gridRow) {
                     Cell cell = r.createCell(columnIndex);
 
-                    if (CELL_TYPE_NUMERIC == determineCellType(rowIndex, columnIndex, cellValueStr)) {
+                    if (CellType.NUMERIC.equals(determineCellType(rowIndex, columnIndex, cellValueStr))) {
                         if (DECIMAL_REGEX.matcher(cellValueStr).matches()) {
                             // Little bit nasty but even with the cell type set as numeric adding a value where
                             // the decimal value is 0 it will remove the decimal value displaying it as an int
@@ -228,10 +222,10 @@ public class DataGenerator {
 
                             cell.setCellStyle(stylesMap.get(cellFormat));
                         }
-                        cell.setCellType(CELL_TYPE_NUMERIC);
+                        cell.setCellType(CellType.NUMERIC);
                         cell.setCellValue(Double.parseDouble(cellValueStr));
                     } else {
-                        cell.setCellType(CELL_TYPE_STRING);
+                        cell.setCellType(CellType.STRING);
                         cell.setCellValue(cellValueStr);
                     }
                     columnIndex++;
@@ -277,18 +271,18 @@ public class DataGenerator {
         return format.toString();
     }
 
-    private int determineCellType(int rowIndex, int cellIndex, String callValue) {
+    private CellType determineCellType(int rowIndex, int cellIndex, String callValue) {
         if (rowIndex <= METADATA_ROWS || cellIndex == 0 || StringUtils.isEmpty(callValue)) {
-            return Cell.CELL_TYPE_STRING;
+            return CellType.STRING;
         }
         try {
             Float.parseFloat(callValue);
         } catch (NumberFormatException e) {
             info().data("non_numeric_value", callValue)
                     .log("XLS Cell value could not be parsed to Float, value will be written as String.");
-            return CELL_TYPE_STRING;
+            return CellType.STRING;
         }
-        return CELL_TYPE_NUMERIC;
+        return CellType.NUMERIC;
     }
 
 

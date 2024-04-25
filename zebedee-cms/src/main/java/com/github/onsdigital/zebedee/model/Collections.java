@@ -1,6 +1,6 @@
 package com.github.onsdigital.zebedee.model;
 
-import com.github.davidcarboni.encryptedfileupload.EncryptedFileItemFactory;
+import com.github.davidcarboni.fileupload.encrypted.EncryptedFileItemFactory;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;

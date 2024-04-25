@@ -436,6 +436,11 @@
                             <artifactId>lucene-queryparser</artifactId>
                             <version>5.5.4</version>
                         </exlude>
+                        <exlude>
+                            <groupId>commons-fileupload</groupId>
+                            <artifactId>commons-fileupload</artifactId>
+                            <version>1.5</version>
+                        </exlude>
                     </excludeCoordinates>
                 </configuration>
             </plugin>

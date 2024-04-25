@@ -436,6 +436,8 @@
                             <artifactId>lucene-queryparser</artifactId>
                             <version>5.5.4</version>
                         </exlude>
+
+                        <!-- https://trello.com/c/X1I21WBt/2147-zebedee-vulnerabilitues-with-commons-fileupload-15 -->
                         <exlude>
                             <groupId>commons-fileupload</groupId>
                             <artifactId>commons-fileupload</artifactId>

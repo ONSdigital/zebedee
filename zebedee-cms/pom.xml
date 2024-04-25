@@ -64,7 +64,7 @@
         </dependency>
 
         <dependency>
-            <groupId>com.github.davidcarboni</groupId>
+            <groupId>com.github.onsdigital</groupId>
             <artifactId>resource-utils</artifactId>
         </dependency>
 

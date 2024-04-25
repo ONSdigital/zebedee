@@ -23,7 +23,8 @@
         <encoding>UTF-8</encoding>
         <project.build.sourceEncoding>${encoding}</project.build.sourceEncoding>
         <project.reporting.outputEncoding>${encoding}</project.reporting.outputEncoding>
-        <restolino.version>0.7.1</restolino.version>
+        <restolino.version>0.8.0</restolino.version>
+        <httpino.version>0.0.8</httpino.version>
         <fasterxml.jackson.version>2.16.1</fasterxml.jackson.version>
         <apache.poi.version>5.2.5</apache.poi.version>
         <spring.version>5.3.31</spring.version>
@@ -159,9 +160,9 @@
             </dependency>
 
             <dependency>
-                <groupId>com.github.davidcarboni</groupId>
+                <groupId>com.github.onsdigital</groupId>
                 <artifactId>resource-utils</artifactId>
-                <version>1.2.2</version>
+                <version>resource-utils-1.2.2</version>
             </dependency>
 
             <dependency>
@@ -188,7 +189,7 @@
             <dependency>
                 <groupId>com.github.onsdigital</groupId>
                 <artifactId>httpino</artifactId>
-                <version>0.0.9</version>
+                <version>${httpino.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.httpcomponents</groupId>

@@ -24,7 +24,7 @@
         <project.build.sourceEncoding>${encoding}</project.build.sourceEncoding>
         <project.reporting.outputEncoding>${encoding}</project.reporting.outputEncoding>
         <restolino.version>0.8.0</restolino.version>
-        <httpino.version>0.0.8</httpino.version>
+        <httpino.version>0.0.9</httpino.version>
         <fasterxml.jackson.version>2.16.1</fasterxml.jackson.version>
         <apache.poi.version>5.2.5</apache.poi.version>
         <spring.version>5.3.31</spring.version>

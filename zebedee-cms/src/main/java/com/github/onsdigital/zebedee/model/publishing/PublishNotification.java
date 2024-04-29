@@ -40,12 +40,12 @@ public class PublishNotification {
     public PublishNotification(Collection collection, List<String> urisToUpdate, List<ContentDetail> urisToDelete) {
         if (Configuration.isLegacyCacheAPIEnabled()) {
             this.legacyCacheApiPayloads = new LegacyCacheApiPayloadBuilder.Builder().collection(collection).build().getPayloads();
-        } else {
+        }
             // Delay the clearing of the cache after publish to minimise load on the server while publishing.
             Date clearCacheDate = new DateTime(collection.getDescription().getPublishDate())
                     .plusSeconds(Configuration.getSecondsToCacheAfterScheduledPublish()).toDate();
             this.payload = new NotificationPayload(collection.getDescription().getId(), urisToUpdate, urisToDelete, clearCacheDate);
-        }
+
     }
 
     public PublishNotification(Collection collection) {
@@ -55,6 +55,11 @@ public class PublishNotification {
     public void sendNotification(EventType eventType) {
         if (Configuration.isLegacyCacheAPIEnabled()) {
             sendRequestToLegacyCacheApi(eventType);
+            if (eventType.equals(EventType.PUBLISHED)) {
+                // Babbage still reindexes on a published event.
+                // TODO: remove this when it doesn't anymore.
+                sendNotificationToWebsite(eventType);
+            }
         } else {
             sendNotificationToWebsite(eventType);
         }

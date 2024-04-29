@@ -40,12 +40,12 @@ public class PublishNotification {
     public PublishNotification(Collection collection, List<String> urisToUpdate, List<ContentDetail> urisToDelete) {
         if (Configuration.isLegacyCacheAPIEnabled()) {
             this.legacyCacheApiPayloads = new LegacyCacheApiPayloadBuilder.Builder().collection(collection).build().getPayloads();
-        } else {
+        }
             // Delay the clearing of the cache after publish to minimise load on the server while publishing.
             Date clearCacheDate = new DateTime(collection.getDescription().getPublishDate())
                     .plusSeconds(Configuration.getSecondsToCacheAfterScheduledPublish()).toDate();
             this.payload = new NotificationPayload(collection.getDescription().getId(), urisToUpdate, urisToDelete, clearCacheDate);
-        }
+
     }
 
     public PublishNotification(Collection collection) {

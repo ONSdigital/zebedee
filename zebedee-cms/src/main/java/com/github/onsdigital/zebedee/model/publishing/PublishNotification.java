@@ -55,6 +55,11 @@ public class PublishNotification {
     public void sendNotification(EventType eventType) {
         if (Configuration.isLegacyCacheAPIEnabled()) {
             sendRequestToLegacyCacheApi(eventType);
+            if (eventType.equals(EventType.PUBLISHED)) {
+                // Babbage still reindexes on a published event.
+                // TODO: remove this when it doesn't anymore.
+                sendNotificationToWebsite(eventType);
+            }
         } else {
             sendNotificationToWebsite(eventType);
         }

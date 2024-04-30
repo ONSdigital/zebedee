@@ -246,7 +246,6 @@ public class DataGenerator {
     /**
      * Output a grid of strings to CSV
      *
-     * @param csvPath path to write to
      * @param grid    grid to output to
      * @throws IOException
      */

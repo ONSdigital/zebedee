@@ -119,7 +119,7 @@ Otherwise :violin: kindly ask someone from the dev team to help troubleshoot.
 | DEFAULT_SLACK_USERNAME                           | "Zebedee"                                                          | Slack user                                                                   |
 | DEFAULT_PUBLIC_WEBSITE_URL                       | "http://localhost:8080"                                            | Service public URL                                                           |
 | DEFAULT_FLORENCE_URL                             | "http://localhost:8081"                                            | Florence URL                                                                 |
-| DEFAULT_BRIAN_URL                                | "http://localhost:8083"                                            | Brian URL                                                                    |
+| brian_url                                        | "http://localhost:8083"                                            | Brian URL                                                                    |
 | DEFAULT_TRAIN_URL                                | "http://localhost:8084"                                            | Train URL                                                                    |
 | DEFAULT_DYLAN_URL                                | "http://localhost:8085"                                            | Dylan URL                                                                    |
 | CONTENT_DIRECTORY                                | "content"                                                          | Content directory                                                            |

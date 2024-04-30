@@ -41,11 +41,13 @@ public class PublishNotification {
         if (Configuration.isLegacyCacheAPIEnabled()) {
             this.legacyCacheApiPayloads = new LegacyCacheApiPayloadBuilder.Builder().collection(collection).build().getPayloads();
         }
-            // Delay the clearing of the cache after publish to minimise load on the server while publishing.
-            Date clearCacheDate = new DateTime(collection.getDescription().getPublishDate())
-                    .plusSeconds(Configuration.getSecondsToCacheAfterScheduledPublish()).toDate();
-            this.payload = new NotificationPayload(collection.getDescription().getId(), urisToUpdate, urisToDelete, clearCacheDate);
 
+        // Babbage still reindexes on a published event.
+        // TODO: remove this when it doesn't anymore.
+        // Delay the clearing of the cache after publish to minimise load on the server while publishing.
+        Date clearCacheDate = new DateTime(collection.getDescription().getPublishDate())
+                .plusSeconds(Configuration.getSecondsToCacheAfterScheduledPublish()).toDate();
+        this.payload = new NotificationPayload(collection.getDescription().getId(), urisToUpdate, urisToDelete, clearCacheDate);
     }
 
     public PublishNotification(Collection collection) {
@@ -55,8 +57,10 @@ public class PublishNotification {
     public void sendNotification(EventType eventType) {
         if (Configuration.isLegacyCacheAPIEnabled()) {
             sendRequestToLegacyCacheApi(eventType);
-            if (eventType.equals(EventType.PUBLISHED)) {
-                // Babbage still reindexes on a published event.
+            if (eventType.equals(EventType.APPROVED) || eventType.equals(EventType.PUBLISHED)) {
+                // Babbage still relies on
+                //   1. 'approved' for storing list of (upcoming) pages
+                //   2. 'published' event for reindexing pages from 1.
                 // TODO: remove this when it doesn't anymore.
                 sendNotificationToWebsite(eventType);
             }

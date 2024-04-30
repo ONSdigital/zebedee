@@ -57,8 +57,10 @@ public class PublishNotification {
     public void sendNotification(EventType eventType) {
         if (Configuration.isLegacyCacheAPIEnabled()) {
             sendRequestToLegacyCacheApi(eventType);
-            if (eventType.equals(EventType.PUBLISHED)) {
-                // Babbage still reindexes on a published event.
+            if (eventType.equals(EventType.APPROVED) || eventType.equals(EventType.PUBLISHED)) {
+                // Babbage still relies on
+                //   1. 'approved' for storing list of (upcoming) pages
+                //   2. 'published' event for reindexing pages from 1.
                 // TODO: remove this when it doesn't anymore.
                 sendNotificationToWebsite(eventType);
             }

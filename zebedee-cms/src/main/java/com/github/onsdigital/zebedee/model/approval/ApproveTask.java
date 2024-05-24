@@ -195,21 +195,14 @@ public class ApproveTask implements Callable<Boolean> {
                         fileName = string.substring(1);
                         break;
                     }
-                    // if (string.contains("bulletins")){
-                    //     System.out.println("FOUND THE BULLETIN");
-                    //     fileName = string.substring(1);
-                    //     break;
-                    // }
+                  
                     if (string.contains("pdf")){
                         System.out.println("FOUND THE PDF");
                         fileName = string.substring(1);
                         break;
                     }
                   }
-                  // datasets folder i need -e.g collections/testingtimeseries50/reviewed/economy/grossdomesticproductgdp/datasets/testunihishdid/test
-                //System.out.println(collectionReader.getReviewed().listUris());
-               // createCollectionReader(collection.getDescription().getId(), session.getId()).getResource(collectionReader.getRoot().listTimeSeriesDirectories());
-                Resource myFile = collectionReader.getResource(fileName);
+                    Resource myFile = collectionReader.getResource(fileName);
                 System.out.println("GETTING THE NAME OF A FILE");
                 System.out.println(myFile.getName());
 
@@ -234,10 +227,7 @@ params.add(new BasicNameValuePair("licence", "fran"));
 params.add(new BasicNameValuePair("licenceUrl", "google"));
 params.add(new BasicNameValuePair("collectionId", collection.getDescription().getId()));
 
-//httppost.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
-//httppost.setHeader("Content-Type", "multipart/form-data");
-// httppost.setHeader("boundary", "--TFJ5T8Nl2Py-S_BZXD5_FaEzCCuRXVXL0--[\\r][\\n" + //
-//         "]");
+
 
 URIBuilder uriBuilder = new URIBuilder("http://dp-upload-service:25100/upload-new");
     uriBuilder.addParameters(params);
@@ -245,18 +235,7 @@ URIBuilder uriBuilder = new URIBuilder("http://dp-upload-service:25100/upload-ne
 
     HttpPost httppost = new HttpPost(uriBuilder.build());
 final MultipartEntityBuilder builder = MultipartEntityBuilder.create();
-// Resource resource = contentReader.getResource(xlsPath);
-// Path absolutePath = Paths.get("file://" + resource.getUri()).toAbsolutePath();
 
-//     System.out.println("RESOURCE IS NOT NULL");
-    
-//     System.out.println(absolutePath);
-//     ByteArrayOutputStream baos = new ByteArrayOutputStream(); 
-//     baos.writeTo(stream); 
-//     baos.close();
-//     byte[] myarray = baos.toByteArray();
-// System.out.println("THE BYTE ARRAY IS");
-// System.out.println(stream.toString());
 System.out.println("JUST CHECKING THERE IS SOMETHING IN THE STREAM");
 System.out.println(myFile.getData().toString());
 
@@ -268,16 +247,9 @@ try(FileOutputStream outputStream = new FileOutputStream(file)){
 } catch (IOException e) {
     System.out.println("SOMETHING ELSE WENT WRONG");
 }
-// File tempFile = File.createTempFile("stuff", "mystuff", null);
-// try (FileOutputStream fos = new FileOutputStream(tempFile)) {
-//     fos.write(myarray);
-// }
-//final File file = new File(absolutePath.toUri());
-//builder.addPart("file", baos);
+
 builder.addBinaryBody("bob", file);
-//builder.addBinaryBody("file", fos, ContentType.MULTIPART_FORM_DATA, "filename");
 builder.setBoundary("--TFJ5T8Nl2Py-S_BZXD5_FaEzCCuRXVXL0--[\\r][\\n]");
-//builder.addTextBody("type", "file");
 final HttpEntity entityReq = builder.build();
 httppost.setEntity(entityReq);
 
@@ -435,7 +407,7 @@ if (entity != null) {
     }
 
     private void generatePdfFiles(List<ContentDetail> collectionContent) throws ZebedeeException {
-        getPdfGenerator().generatePDFsForCollection(collection, collectionReader.getReviewed(), collectionWriter.getReviewed(), collectionContent);
+        getPdfGenerator().ForCollection(collection, collectionReader.getReviewed(), collectionWriter.getReviewed(), collectionContent);
     }
 
     protected CollectionPdfGenerator getPdfGenerator() {

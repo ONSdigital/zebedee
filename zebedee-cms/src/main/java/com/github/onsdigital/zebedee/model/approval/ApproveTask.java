@@ -6,6 +6,9 @@ import com.github.onsdigital.zebedee.data.importing.CsvTimeseriesUpdateImporter;
 import com.github.onsdigital.zebedee.data.importing.TimeseriesUpdateCommand;
 import com.github.onsdigital.zebedee.data.importing.TimeseriesUpdateImporter;
 import com.github.onsdigital.zebedee.data.processing.DataIndex;
+import com.github.onsdigital.zebedee.exceptions.BadRequestException;
+import com.github.onsdigital.zebedee.exceptions.NotFoundException;
+import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.ApprovalStatus;
 import com.github.onsdigital.zebedee.json.ContentDetail;
@@ -22,21 +25,41 @@ import com.github.onsdigital.zebedee.model.publishing.PublishNotification;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.Resource;
+import com.github.onsdigital.zebedee.reader.util.RequestUtils;
 import com.github.onsdigital.zebedee.service.BabbagePdfService;
 import com.github.onsdigital.zebedee.service.content.navigation.ContentTreeNavigator;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.util.ContentDetailUtil;
 import com.github.onsdigital.zebedee.util.slack.Notifier;
-import org.apache.commons.lang3.StringUtils;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpRequest;
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.message.BasicNameValuePair;
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
+
+import javax.servlet.http.HttpServletRequest;
 
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
@@ -56,6 +79,8 @@ public class ApproveTask implements Callable<Boolean> {
     private final DataIndex dataIndex;
     private final ContentDetailResolver contentDetailResolver;
     private final Notifier notifier;
+
+    
 
     /**
      * @param collection
@@ -151,6 +176,8 @@ public class ApproveTask implements Callable<Boolean> {
             approveCollection();
             eventLog.approvalStateSet();
 
+          
+
             // Send a notification to the website with the publish date for caching.
             publishNotification.sendNotification(EventType.APPROVED);
             eventLog.sentPublishNotification();
@@ -158,6 +185,114 @@ public class ApproveTask implements Callable<Boolean> {
             eventLog.approvalCompleted();
             info().data("user", session.getEmail()).data("collectionId", collection.getDescription().getId())
                     .log("approve task: collection approve task completed successfully");
+
+                  // Maybe get files here?
+                  System.out.println("READING THE TIMESERIES DIRECTORY LIST");
+                  String fileName = "";
+                  for (String string : collectionReader.getReviewed().listUris()) {
+                    System.out.println(string);
+                    if (string.contains("csv")){
+                        fileName = string.substring(1);
+                        break;
+                    }
+                    // if (string.contains("bulletins")){
+                    //     System.out.println("FOUND THE BULLETIN");
+                    //     fileName = string.substring(1);
+                    //     break;
+                    // }
+                    if (string.contains("pdf")){
+                        System.out.println("FOUND THE PDF");
+                        fileName = string.substring(1);
+                        break;
+                    }
+                  }
+                  // datasets folder i need -e.g collections/testingtimeseries50/reviewed/economy/grossdomesticproductgdp/datasets/testunihishdid/test
+                //System.out.println(collectionReader.getReviewed().listUris());
+               // createCollectionReader(collection.getDescription().getId(), session.getId()).getResource(collectionReader.getRoot().listTimeSeriesDirectories());
+                Resource myFile = collectionReader.getResource(fileName);
+                System.out.println("GETTING THE NAME OF A FILE");
+                System.out.println(myFile.getName());
+
+
+                System.out.println("POSTING THE REQUEST");
+HttpClient httpclient = HttpClients.createDefault();
+
+
+
+// Request parameters and other properties.
+List<NameValuePair> params = new ArrayList<NameValuePair>(12);
+params.add(new BasicNameValuePair("resumableFilename", fileName));
+params.add(new BasicNameValuePair("resumableChunkNumber", "1"));
+params.add(new BasicNameValuePair("resumableType", "text/plain"));
+params.add(new BasicNameValuePair("resumableTotalChunks", "1"));
+params.add(new BasicNameValuePair("resumableChunkSize", "1000000"));
+params.add(new BasicNameValuePair("path", "testing"));
+params.add(new BasicNameValuePair("isPublishable", "false"));
+params.add(new BasicNameValuePair("resumableTotalSize", "500000"));
+params.add(new BasicNameValuePair("type", "text/plain"));
+params.add(new BasicNameValuePair("licence", "fran"));
+params.add(new BasicNameValuePair("licenceUrl", "google"));
+params.add(new BasicNameValuePair("collectionId", collection.getDescription().getId()));
+
+//httppost.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
+//httppost.setHeader("Content-Type", "multipart/form-data");
+// httppost.setHeader("boundary", "--TFJ5T8Nl2Py-S_BZXD5_FaEzCCuRXVXL0--[\\r][\\n" + //
+//         "]");
+
+URIBuilder uriBuilder = new URIBuilder("http://dp-upload-service:25100/upload-new");
+    uriBuilder.addParameters(params);
+
+
+    HttpPost httppost = new HttpPost(uriBuilder.build());
+final MultipartEntityBuilder builder = MultipartEntityBuilder.create();
+// Resource resource = contentReader.getResource(xlsPath);
+// Path absolutePath = Paths.get("file://" + resource.getUri()).toAbsolutePath();
+
+//     System.out.println("RESOURCE IS NOT NULL");
+    
+//     System.out.println(absolutePath);
+//     ByteArrayOutputStream baos = new ByteArrayOutputStream(); 
+//     baos.writeTo(stream); 
+//     baos.close();
+//     byte[] myarray = baos.toByteArray();
+// System.out.println("THE BYTE ARRAY IS");
+// System.out.println(stream.toString());
+System.out.println("JUST CHECKING THERE IS SOMETHING IN THE STREAM");
+System.out.println(myFile.getData().toString());
+
+File file = new File("afile"); 
+try(FileOutputStream outputStream = new FileOutputStream(file)){
+    IOUtils.copy(myFile.getData(), outputStream);
+} catch (FileNotFoundException e) {
+    System.out.println("CAN'T FIND IT");
+} catch (IOException e) {
+    System.out.println("SOMETHING ELSE WENT WRONG");
+}
+// File tempFile = File.createTempFile("stuff", "mystuff", null);
+// try (FileOutputStream fos = new FileOutputStream(tempFile)) {
+//     fos.write(myarray);
+// }
+//final File file = new File(absolutePath.toUri());
+//builder.addPart("file", baos);
+builder.addBinaryBody("bob", file);
+//builder.addBinaryBody("file", fos, ContentType.MULTIPART_FORM_DATA, "filename");
+builder.setBoundary("--TFJ5T8Nl2Py-S_BZXD5_FaEzCCuRXVXL0--[\\r][\\n]");
+//builder.addTextBody("type", "file");
+final HttpEntity entityReq = builder.build();
+httppost.setEntity(entityReq);
+
+//Execute and get the response.
+HttpResponse response = httpclient.execute(httppost);
+HttpEntity entity = response.getEntity();
+
+if (entity != null) {
+    try (InputStream instream = entity.getContent()) {
+            System.out.println("THE RESPONSE IS");
+            System.out.println(response);
+            System.out.println(instream.read());
+    }
+}
+
 
             return collection != null;
 
@@ -195,6 +330,10 @@ public class ApproveTask implements Callable<Boolean> {
             DataIndex dataIndex
     ) throws IOException, ZebedeeException, URISyntaxException {
 
+        System.out.println("GENERATING TIMESERIES");
+        info().data("collectionId", collection.getDescription().getId())
+        .log("GENERATING TIMESERIES");
+
         // Import any time series update CSV file
         List<TimeseriesUpdateCommand> updateCommands = importUpdateCommandCsvs(collection, publishedReader, collectionReader);
 
@@ -204,6 +343,7 @@ public class ApproveTask implements Callable<Boolean> {
                 collectionReader,
                 collectionWriter.getReviewed(), true, dataIndex, updateCommands);
     }
+
 
     public static List<TimeseriesUpdateCommand> importUpdateCommandCsvs(Collection collection, ContentReader publishedReader,
                                                                         CollectionReader collectionReader)
@@ -219,9 +359,11 @@ public class ApproveTask implements Callable<Boolean> {
             for (String importFile : collection.getDescription().getTimeseriesImportFiles()) {
                 CompoundContentReader compoundContentReader = new CompoundContentReader(publishedReader);
                 compoundContentReader.add(collectionReader.getReviewed());
-
+                System.out.println("AT THE START OF GENERATE FILES");
+                System.out.println(importFile);
                 try (
                         Resource resource = collectionReader.getRoot().getResource(importFile);
+                     
                         InputStream csvInput = resource.getData()
                 ) {
                     // read the CSV and update the timeseries titles.
@@ -287,7 +429,7 @@ public class ApproveTask implements Callable<Boolean> {
         }
     }
 
-    private void populateReleasePage(Iterable<ContentDetail> collectionContent) throws IOException {
+    private void populateReleasePage(Iterable<ContentDetail> collectionContent) throws IOException, URISyntaxException {
         // If the collection is associated with a release then populate the release page.
         collection.populateReleaseQuietly(collectionReader, collectionWriter, collectionContent);
     }

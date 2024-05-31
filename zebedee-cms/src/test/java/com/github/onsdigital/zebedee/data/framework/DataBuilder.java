@@ -65,8 +65,9 @@ public class DataBuilder {
      * @param uri  the uri to publish to
      * @throws IOException
      * @throws BadRequestException
+     * @throws URISyntaxException 
      */
-    public void publishPage(Page page, String uri) throws IOException, BadRequestException {
+    public void publishPage(Page page, String uri) throws IOException, BadRequestException, URISyntaxException {
         String publishTo = uri;
         if (publishTo.startsWith("/"))
             publishTo = publishTo.substring(1);
@@ -75,7 +76,7 @@ public class DataBuilder {
         writer.writeObject(page, publishTo + "/data.json");
     }
 
-    public Collection createCollection(String name) throws IOException, ZebedeeException {
+    public Collection createCollection(String name) throws IOException, ZebedeeException, URISyntaxException {
         // Create the description:
         CollectionDescription description = new CollectionDescription();
         description.setName(name);
@@ -92,8 +93,9 @@ public class DataBuilder {
      * @param collectionWriter a collection writer with permissions for the collection
      * @throws IOException
      * @throws BadRequestException
+     * @throws URISyntaxException 
      */
-    public void addReviewedDataPagesSet(DataPagesSet dataPagesSet, Collection collection, CollectionWriter collectionWriter) throws IOException, BadRequestException {
+    public void addReviewedDataPagesSet(DataPagesSet dataPagesSet, Collection collection, CollectionWriter collectionWriter) throws IOException, BadRequestException, URISyntaxException {
         if (dataPagesSet.datasetLandingPage != null)
             addReviewedPage(dataPagesSet.datasetLandingPage.getUri().toString(), dataPagesSet.datasetLandingPage, collection, collectionWriter);
         if (dataPagesSet.timeSeriesDataset != null)
@@ -102,19 +104,19 @@ public class DataBuilder {
             addReviewedFile(dataPagesSet.fileUri, collection.find(dataPagesSet.timeSeriesDataset.getUri().toString()).resolve("data.json"), collection, collectionWriter);
     }
 
-    public void addReviewedPage(String uri, Page page, Collection collection, CollectionWriter collectionWriter) throws IOException, BadRequestException {
+    public void addReviewedPage(String uri, Page page, Collection collection, CollectionWriter collectionWriter) throws IOException, BadRequestException, URISyntaxException {
 
         collectionWriter.getReviewed().writeObject(page, uri + "/data.json");
         addReviewEventsToCollectionJson(uri, collection);
     }
 
-    public void addInProgressPage(String uri, Page page, Collection collection, CollectionWriter collectionWriter) throws IOException, BadRequestException {
+    public void addInProgressPage(String uri, Page page, Collection collection, CollectionWriter collectionWriter) throws IOException, BadRequestException, URISyntaxException {
 
         collectionWriter.getInProgress().writeObject(page, uri + "/data.json");
         addReviewEventsToCollectionJson(uri, collection);
     }
 
-    public void addCompletedPage(String uri, Page page, Collection collection, CollectionWriter collectionWriter) throws IOException, BadRequestException {
+    public void addCompletedPage(String uri, Page page, Collection collection, CollectionWriter collectionWriter) throws IOException, BadRequestException, URISyntaxException {
 
         collectionWriter.getComplete().writeObject(page, uri + "/data.json");
         addReviewEventsToCollectionJson(uri, collection);

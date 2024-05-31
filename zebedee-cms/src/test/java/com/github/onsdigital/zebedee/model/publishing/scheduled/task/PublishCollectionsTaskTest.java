@@ -15,6 +15,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -31,7 +32,7 @@ public class PublishCollectionsTaskTest extends ZebedeeTestBaseFixture {
     }
 
     @Test
-    public void shouldCancelTask() throws IOException, ZebedeeException {
+    public void shouldCancelTask() throws IOException, ZebedeeException, URISyntaxException {
 
         CollectionDescription collectionDescription = new CollectionDescription("FirstCollection");
         collectionDescription.setPublishDate(new Date());

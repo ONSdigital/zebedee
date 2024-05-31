@@ -26,6 +26,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import java.io.IOException;
+import java.net.URISyntaxException;
 
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.error;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.info;
@@ -144,11 +145,12 @@ public class Collection {
      * @param collectionDescription
      * @return
      * @throws IOException
+     * @throws URISyntaxException 
      */
     @POST
     public CollectionDescription create(HttpServletRequest request, HttpServletResponse response,
                                         CollectionDescription collectionDescription)
-            throws IOException, ZebedeeException {
+            throws IOException, ZebedeeException, URISyntaxException {
         info().log("create collection endpoint: request received");
 
         Session session = sessionsService.get();

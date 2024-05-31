@@ -27,6 +27,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.core.Response;
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -137,10 +138,11 @@ public class DataVisualisationZip {
 
     /**
      * Data Visualisation Zip API for unzipping a data visualisation zip file.
+     * @throws URISyntaxException 
      */
     @POST
     public SimpleZebedeeResponse unpackDataVisualizationZip(HttpServletRequest request, HttpServletResponse response)
-            throws ZebedeeException {
+            throws ZebedeeException, URISyntaxException {
         String zipPath = request.getParameter(ZIP_PATH);
 
         if (StringUtils.isEmpty(zipPath)) {
@@ -200,7 +202,7 @@ public class DataVisualisationZip {
     private void updatePageJson(
             Collection collection, CollectionReader collectionReader, ContentReader publishedContentReader, CollectionWriter collectionWriter,
             Path zipPath, Session session
-    ) throws ZebedeeException {
+    ) throws ZebedeeException, URISyntaxException {
         try {
             String dataJsonPath = zipPath.getParent().getParent().toString();
             Visualisation pageJson;

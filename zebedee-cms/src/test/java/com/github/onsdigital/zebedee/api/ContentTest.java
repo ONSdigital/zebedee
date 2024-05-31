@@ -37,6 +37,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -192,7 +193,7 @@ public class ContentTest {
         assertJsonEquals(EXPECTED_CONTENT_V2, content.toString());
     }
 
-    private Path createCollectionAndPaths(String collectionId) throws IOException, ZebedeeException {
+    private Path createCollectionAndPaths(String collectionId) throws IOException, ZebedeeException, URISyntaxException {
         Collection.create(collectionDescription, mockZebedee, mockSession);
         Path pathToCreate = Paths.get(tempBasePath.toString(), collectionId, "inprogress","peoplepopulationandcommunity", "birthsdeathsandmarriages", "livebirths", "datasets", "babynamesenglandandwalesbabynamesstatisticsboys", "2022");
         Path datasetPath = Files.createDirectories(pathToCreate);

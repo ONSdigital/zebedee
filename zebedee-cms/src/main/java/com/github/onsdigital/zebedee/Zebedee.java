@@ -113,6 +113,7 @@ public class Zebedee {
         this.imageService = cfg.getImageService();
         this.kafkaService = cfg.getKafkaService();
         this.staticFilesService = cfg.getStaticFilesService();
+  
         this.serviceStoreImpl = cfg.getServiceStore();
         this.collectionKeyring = cfg.getCollectionKeyring();
         this.encryptionKeyFactory = cfg.getEncryptionKeyFactory();

@@ -1,19 +1,46 @@
 package com.github.onsdigital.zebedee.data.processing;
 
 import au.com.bytecode.opencsv.CSVWriter;
+
+import com.github.onsdigital.zebedee.api.Content;
 import com.github.onsdigital.zebedee.content.page.statistics.dataset.DownloadSection;
 import com.github.onsdigital.zebedee.data.json.TimeSerieses;
 import com.github.onsdigital.zebedee.data.processing.xls.TimeSeriesCellWriter;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
+import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.model.ContentWriter;
+import com.github.onsdigital.zebedee.reader.ContentReader;
+import com.github.onsdigital.zebedee.reader.Resource;
+
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpRequest;
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.mime.Header;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.http.entity.mime.content.FileBody;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.message.BasicNameValuePair;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.charset.Charset;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,11 +54,17 @@ public class DataFileGenerator {
     private static final String DEFAULT_FILENAME = "data";
 
     ContentWriter contentWriter;
+    ContentReader contentReader;
 
     static TimeSeriesCellWriter xlsCellWriter = TimeSeriesCellWriter.getInstance();
 
-    public DataFileGenerator(ContentWriter collectionWriter) {
+    // public DataFileGenerator(ContentWriter collectionWriter) {
+    //     this.contentWriter = collectionWriter;
+    // }
+
+    public DataFileGenerator(ContentWriter collectionWriter, ContentReader contentReader) {
         this.contentWriter = collectionWriter;
+        this.contentReader = contentReader;
     }
 
     /**
@@ -39,8 +72,10 @@ public class DataFileGenerator {
      *
      * @param details  details about the publication to derive the save path
      * @param serieses the timeseries
+     * @throws ZebedeeException 
+     * @throws URISyntaxException 
      */
-    public List<DownloadSection> generateDataDownloads(DataPublicationDetails details, TimeSerieses serieses) throws IOException, BadRequestException {
+    public List<DownloadSection> generateDataDownloads(DataPublicationDetails details, TimeSerieses serieses) throws IOException, ZebedeeException, URISyntaxException {
 
         // turn our list of timeseries into a grid to write to file
         DataGrid grid = new DataGrid(serieses);
@@ -49,6 +84,7 @@ public class DataFileGenerator {
         String root = fileRoot(details);
 
 
+        System.out.println("GENERATING DATA DOWNLOADS");
         // write the files
         List<DownloadSection> sections = new ArrayList<>();
         sections.add(writeCSV(grid, this.contentWriter, root + ".csv"));
@@ -72,9 +108,10 @@ public class DataFileGenerator {
      * @param contentWriter
      * @param xlsPath
      * @throws IOException
-     * @throws BadRequestException
+     * @throws ZebedeeException 
+     * @throws URISyntaxException 
      */
-    DownloadSection writeXLS(DataGrid dataGrid, ContentWriter contentWriter, String xlsPath) throws IOException, BadRequestException {
+    DownloadSection writeXLS(DataGrid dataGrid, ContentWriter contentWriter, String xlsPath) throws IOException, ZebedeeException, URISyntaxException {
         info().data("path", xlsPath).log("Writing XLS file from DataGrid.");
         try (
                 Workbook wb = new SXSSFWorkbook(30);
@@ -94,6 +131,14 @@ public class DataFileGenerator {
             wb.write(stream);
 
             info().data("path", xlsPath).log("Complete.");
+     
+        //   contentWriter.getOutputStream(xlsPath);
+        //    Resource resource = contentReader.getResource(zipData.zipPath.toString());
+        //     System.out.println(thisFile.getAbsolutePath());
+        //     if (!thisFile.exists()){
+        //         System.out.println("CANT FIND THE FILE");
+        //         System.out.println(xlsPath);
+        //     }
             return newDownloadSection("xlsx download", xlsPath);
         }
     }

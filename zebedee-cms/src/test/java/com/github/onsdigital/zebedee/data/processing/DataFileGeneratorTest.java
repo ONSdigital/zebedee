@@ -130,7 +130,7 @@ public class DataFileGeneratorTest {
         this.timeSeriesList = new TimeSerieses();
         this.timeSeriesList.add(timeSeries);
         this.dataGrid = new DataGrid(timeSeriesList);
-        this.dataFileGenerator = new DataFileGenerator(null);
+        this.dataFileGenerator = new DataFileGenerator(null, null);
         //reset xslCellWriter.. some how as its static it gets substituted for an invalid one.
         DataFileGenerator.xlsCellWriter  = TimeSeriesCellWriter.getInstance();
         this.xlsExpectations = XLSExpectations.get(timeSeries);

@@ -116,6 +116,8 @@ public class DataPublication {
             // Save files
             if (saveTimeSeries) {
                 DataWriter writer = new DataWriter(reviewedContentWriter, reviewedContentReader, publishedContentReader);
+                System.out.println("THIS IS WHERE I SAVE THE FILES");
+                System.out.println(details);
                 writer.versionAndSave(processor, details);
             }
 
@@ -124,7 +126,7 @@ public class DataPublication {
         }
 
         // Generate data files
-        DataFileGenerator generator = new DataFileGenerator(reviewedContentWriter);
+        DataFileGenerator generator = new DataFileGenerator(reviewedContentWriter, reviewedContentReader);
         List<DownloadSection> downloadSections = generator.generateDataDownloads(this.details, this.results);
         downloadSections.add(newDownloadSection("csdb", details.fileUri));
 
@@ -152,8 +154,9 @@ public class DataPublication {
          * @param contentWriter
          * @throws IOException
          * @throws BadRequestException
+         * @throws URISyntaxException 
          */
-    void checkLandingPageDatasetId(ContentWriter contentWriter) throws IOException, BadRequestException {
+    void checkLandingPageDatasetId(ContentWriter contentWriter) throws IOException, BadRequestException, URISyntaxException {
 
         String currentId = details.landingPage.getDescription().getDatasetId();
 
@@ -171,9 +174,18 @@ public class DataPublication {
      * @param contentWriter a contentwriter for the collection
      * @param details details that contain the original timeseries
      * @param downloads the downloads section that needs to be updated
+     * @throws URISyntaxException 
      */
-    private void writeDatasetPage(ContentWriter contentWriter, DataPublicationDetails details, List<DownloadSection> downloads) throws IOException, BadRequestException {
+    private void writeDatasetPage(ContentWriter contentWriter, DataPublicationDetails details, List<DownloadSection> downloads) throws IOException, BadRequestException, URISyntaxException {
         details.datasetPage.setDownloads(downloads);
+        System.out.println("THIS IS SOME STUFF ABOUT THE DATASET TO TRY AND GET THE FILE");
+        System.out.println("dataset page url " + details.fileUri);
+        System.out.println("Each download is");
+        for (DownloadSection downloadSection : downloads) {
+            System.out.println(downloadSection.getUrl());
+            System.out.println(downloadSection.getFile());
+        }
+        System.out.println(downloads.get(0).getUrl());
         contentWriter.writeObject(details.datasetPage, details.datasetPage.getUri().toString() + "/data.json");
     }
 

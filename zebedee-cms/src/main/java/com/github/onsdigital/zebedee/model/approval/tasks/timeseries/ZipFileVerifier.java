@@ -60,8 +60,13 @@ public class ZipFileVerifier {
     ) throws ZebedeeException, IOException {
         try (
                 Resource resource = contentReader.getResource(zipData.zipPath.toString());
+             
                 InputStream inputStream = resource.getData()
         ) {
+
+            System.out.println("THE ZIP FILE LOCATION IS ");
+            System.out.println(zipData.zipPath.toString());
+
             String verificationPath = "verification/" + Random.id();
             List<String> unzipped = ZipUtils.unzip(inputStream, verificationPath, verificationContentWriter);
 

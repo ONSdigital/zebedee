@@ -60,7 +60,7 @@ public class DataPublisher {
         applyUpdateCommands(publishedContentReader, collectionReader, collectionContentWriter, dataIndex, updateCommands);
     }
 
-    public void applyUpdateCommands(ContentReader publishedContentReader, CollectionReader collectionReader, ContentWriter collectionContentWriter, DataIndex dataIndex, List<TimeseriesUpdateCommand> updateCommands) throws ZebedeeException, IOException {
+    public void applyUpdateCommands(ContentReader publishedContentReader, CollectionReader collectionReader, ContentWriter collectionContentWriter, DataIndex dataIndex, List<TimeseriesUpdateCommand> updateCommands) throws ZebedeeException, IOException, URISyntaxException {
         for (TimeseriesUpdateCommand updateCommand : updateCommands) {
 
             // see if the timeseries is already in the reviewed section
@@ -80,7 +80,7 @@ public class DataPublisher {
         }
     }
 
-    public void updateTitle(ContentWriter collectionContentWriter, TimeseriesUpdateCommand updateCommand, String uriForCdid, Page content) throws IOException, BadRequestException {
+    public void updateTitle(ContentWriter collectionContentWriter, TimeseriesUpdateCommand updateCommand, String uriForCdid, Page content) throws IOException, BadRequestException, URISyntaxException {
         if (!updateCommand.title.equals(content.getDescription().getTitle())) {
             content.getDescription().setTitle(updateCommand.title);
             collectionContentWriter.writeObject(content, uriForCdid + "/data.json");

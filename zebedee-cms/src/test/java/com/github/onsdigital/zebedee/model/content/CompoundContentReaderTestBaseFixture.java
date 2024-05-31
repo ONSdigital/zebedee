@@ -21,6 +21,7 @@ import org.junit.Test;
 
 import javax.crypto.SecretKey;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.Date;
 
 import static org.junit.Assert.assertEquals;
@@ -128,7 +129,7 @@ public class CompoundContentReaderTestBaseFixture extends ZebedeeTestBaseFixture
     }
 
     @Test
-    public void compoundReader_givenMultilevelCollectionReader_readsContentFromTop() throws IOException, BadRequestException, NotFoundException {
+    public void compoundReader_givenMultilevelCollectionReader_readsContentFromTop() throws IOException, BadRequestException, NotFoundException, URISyntaxException {
         // Given
         // we put another version of the published page which we put into inProgress
         TimeSeries duplicatePage = generator.exampleTimeseries("duplicate", "abcd");

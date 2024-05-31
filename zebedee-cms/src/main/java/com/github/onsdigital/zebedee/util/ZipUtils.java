@@ -106,6 +106,7 @@ public class ZipUtils {
             if (file.isFile() && !shouldBeFiltered(filters, file.toString())) {
                 final ZipEntry zipEntry = new ZipEntry(file.getPath().substring(prefixLength));
                 zipOutputStream.putNextEntry(zipEntry);
+               
                 try (FileInputStream inputStream = new FileInputStream(file)) {
                     IOUtils.copy(inputStream, zipOutputStream);
                 }

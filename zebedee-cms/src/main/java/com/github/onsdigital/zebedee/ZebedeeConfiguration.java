@@ -253,7 +253,7 @@ public class ZebedeeConfiguration {
         imageService = new ImageServiceImpl(imageClient);
 
         staticFilesService = new StaticFilesServiceImpl(new APIClient(getStaticFilesAPIURL(), getServiceAuthToken()));
-
+    
         if (cmsFeatureFlags().isKafkaEnabled()) {
 
             KafkaClient kafkaClient = new KafkaClientImpl(getKafkaURL(), getKafkaContentUpdatedTopic());

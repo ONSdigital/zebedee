@@ -56,6 +56,7 @@ public class Approve {
             throw new NotFoundException("The collection you are trying to approve was not found.");
         }
 
+
         String collectionId = Collections.getCollectionId(request);
         info().data("collectionId", collectionId).data("user", session.getEmail()).log("approve endpoint: submitting approve request");
 

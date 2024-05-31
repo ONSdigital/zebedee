@@ -45,6 +45,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Writer;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -1258,7 +1259,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
     }
 
     @Test
-    public void associateWithReleaseShouldUseExistingReleaseIfItsAlreadyInCollection() throws NotFoundException, IOException, BadRequestException {
+    public void associateWithReleaseShouldUseExistingReleaseIfItsAlreadyInCollection() throws NotFoundException, IOException, BadRequestException, URISyntaxException {
 
         // Given
         // There is a release already in progress
@@ -1274,7 +1275,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
     }
 
     @Test
-    public void associateWithReleaseShouldSetReleaseToPublished() throws NotFoundException, IOException, BadRequestException {
+    public void associateWithReleaseShouldSetReleaseToPublished() throws NotFoundException, IOException, BadRequestException, URISyntaxException {
 
         // Given a release that is announced
         String uri = String.format("/releases/%s", Random.id());
@@ -1290,7 +1291,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
     }
 
     @Test
-    public void populateReleaseQuietlyShouldReturnNullWhenCollectionNotAssociatedToRelease() throws ZebedeeException, IOException {
+    public void populateReleaseQuietlyShouldReturnNullWhenCollectionNotAssociatedToRelease() throws ZebedeeException, IOException, URISyntaxException {
         // Given a collection that is NOT associated with a release
         String releaseUri = "";
         collection.getDescription().setReleaseUri(releaseUri);
@@ -1313,7 +1314,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
     }
 
     @Test
-    public void populateReleaseQuietlyShouldReturnNullWhenReleaseJsonInvalid() throws ZebedeeException, IOException {
+    public void populateReleaseQuietlyShouldReturnNullWhenReleaseJsonInvalid() throws ZebedeeException, IOException, URISyntaxException {
         // Given a collection that is associated with a release and has an article
         String uri = String.format("/releases/%s", Random.id());
         Release release = createRelease(uri, new DateTime().plusWeeks(4).toDate());
@@ -1352,7 +1353,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
     }
 
     @Test
-    public void populateReleaseQuietlyShouldAddLinksToReleasePageForCollectionContent() throws ZebedeeException, IOException {
+    public void populateReleaseQuietlyShouldAddLinksToReleasePageForCollectionContent() throws ZebedeeException, IOException, URISyntaxException {
         // Given a collection that is associated with a release and has an article
         String uri = String.format("/releases/%s", Random.id());
         Release release = createRelease(uri, new DateTime().plusWeeks(4).toDate());
@@ -1396,7 +1397,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
     }
 
     @Test
-    public void populateReleaseQuietlyShouldAddLinksToReleasePageForCollectionContentCMD() throws ZebedeeException, IOException {
+    public void populateReleaseQuietlyShouldAddLinksToReleasePageForCollectionContentCMD() throws ZebedeeException, IOException, URISyntaxException {
         // Given a collection that is associated with a release and has a CMD dataset
         String uri = String.format("/releases/%s", Random.id());
         Release release = createRelease(uri, new DateTime().plusWeeks(4).toDate());

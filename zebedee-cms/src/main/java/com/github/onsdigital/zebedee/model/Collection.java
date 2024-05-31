@@ -49,6 +49,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -159,9 +160,10 @@ public class Collection {
      * @param zebedee
      * @return
      * @throws IOException
+     * @throws URISyntaxException 
      */
     public static Collection create(CollectionDescription collectionDescription, Zebedee zebedee, Session session)
-            throws IOException, ZebedeeException {
+            throws IOException, ZebedeeException, URISyntaxException {
 
         collectionDescription.setEncrypted(true); // force encryption on new collections.
         collectionDescription.setApprovalStatus(ApprovalStatus.NOT_STARTED);
@@ -457,7 +459,7 @@ public class Collection {
         return this.description;
     }
 
-    private Release populateRelease(CollectionReader reader, CollectionWriter collectionWriter, Iterable<ContentDetail> collectionContent) throws IOException, ZebedeeException {
+    private Release populateRelease(CollectionReader reader, CollectionWriter collectionWriter, Iterable<ContentDetail> collectionContent) throws IOException, ZebedeeException, URISyntaxException {
 
         if (StringUtils.isEmpty(this.getDescription().getReleaseUri())) {
             throw new BadRequestException("This collection is not associated with a release.");
@@ -482,7 +484,7 @@ public class Collection {
         }
     }
 
-    public Release populateReleaseQuietly(CollectionReader reader, CollectionWriter writer, Iterable<ContentDetail> collectionContent) throws IOException {
+    public Release populateReleaseQuietly(CollectionReader reader, CollectionWriter writer, Iterable<ContentDetail> collectionContent) throws IOException, URISyntaxException {
         Release release = null;
         try {
             release = populateRelease(reader, writer, collectionContent);
@@ -1105,8 +1107,9 @@ public class Collection {
      * @return
      * @throws NotFoundException
      * @throws IOException
+     * @throws URISyntaxException 
      */
-    public Release associateWithRelease(Session session, Release release, CollectionWriter collectionWriter) throws IOException, BadRequestException {
+    public Release associateWithRelease(Session session, Release release, CollectionWriter collectionWriter) throws IOException, BadRequestException, URISyntaxException {
 
         String uri = release.getUri().toString() + "/data.json";
 

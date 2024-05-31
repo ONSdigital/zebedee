@@ -13,6 +13,7 @@ import org.junit.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.Date;
 import java.util.List;
 
@@ -37,7 +38,7 @@ public class PublishSchedulerTest extends ZebedeeTestBaseFixture {
     }
 
     @Test
-    public void scheduledPublish() throws IOException, ZebedeeException, InterruptedException {
+    public void scheduledPublish() throws IOException, ZebedeeException, InterruptedException, URISyntaxException {
 
         // Given a scheduled collection
         DateTime publishDateTime = DateTime.now().plusSeconds(2000).withMillisOfSecond(0);
@@ -67,7 +68,7 @@ public class PublishSchedulerTest extends ZebedeeTestBaseFixture {
     }
 
     @Test
-    public void cancelPublishShouldRemoveCollection() throws IOException, ZebedeeException, InterruptedException {
+    public void cancelPublishShouldRemoveCollection() throws IOException, ZebedeeException, InterruptedException, URISyntaxException {
 
         // Given a scheduled collection
         CollectionDescription description = new CollectionDescription("collectionName");
@@ -91,7 +92,7 @@ public class PublishSchedulerTest extends ZebedeeTestBaseFixture {
     }
 
     @Test
-    public void deletedCollectionShouldRemoveCollectionIfOtherCollectionsAreScheduledFirst() throws IOException, ZebedeeException, InterruptedException {
+    public void deletedCollectionShouldRemoveCollectionIfOtherCollectionsAreScheduledFirst() throws IOException, ZebedeeException, InterruptedException, URISyntaxException {
 
         // Given two scheduled collections
         CollectionDescription description = new CollectionDescription("collectionName");

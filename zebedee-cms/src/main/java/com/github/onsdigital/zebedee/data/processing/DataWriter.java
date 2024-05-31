@@ -10,6 +10,7 @@ import com.github.onsdigital.zebedee.reader.ContentReader;
 
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -27,7 +28,7 @@ public class DataWriter {
         this.pubishedReader = publishedReader;
     }
 
-    public void versionAndSave(DataProcessor processor, DataPublicationDetails details) throws ZebedeeException, IOException {
+    public void versionAndSave(DataProcessor processor, DataPublicationDetails details) throws ZebedeeException, IOException, URISyntaxException {
         // If no change then don't update anything
         int dataChanges = processor.insertions + processor.corrections;
 

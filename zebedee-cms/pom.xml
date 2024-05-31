@@ -29,6 +29,10 @@
     </repositories>
 
     <dependencies>
+        <dependency>
+            <groupId>com.github.onsdigital</groupId>
+            <artifactId>dp-upload-service-client-java</artifactId>
+        </dependency>
         <!-- Logging -->
         <dependency>
             <groupId>com.github.onsdigital</groupId>

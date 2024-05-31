@@ -1,5 +1,6 @@
 package com.github.onsdigital.zebedee.model.approval;
 
+import com.github.onsdigital.dp.uploadservice.api.APIClient;
 import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.data.DataPublisher;
 import com.github.onsdigital.zebedee.data.importing.CsvTimeseriesUpdateImporter;
@@ -65,6 +66,8 @@ import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
 import static com.github.onsdigital.zebedee.json.EventType.APPROVAL_FAILED;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.error;
+
+import com.github.onsdigital.dp.uploadservice.api.Client;
 
 /**
  * Callable implementation for the approval process.
@@ -239,12 +242,12 @@ params.add(new BasicNameValuePair("collectionId", collection.getDescription().ge
 // httppost.setHeader("boundary", "--TFJ5T8Nl2Py-S_BZXD5_FaEzCCuRXVXL0--[\\r][\\n" + //
 //         "]");
 
-URIBuilder uriBuilder = new URIBuilder("http://dp-upload-service:25100/upload-new");
-    uriBuilder.addParameters(params);
-
-
-    HttpPost httppost = new HttpPost(uriBuilder.build());
-final MultipartEntityBuilder builder = MultipartEntityBuilder.create();
+//URIBuilder uriBuilder = new URIBuilder("http://dp-upload-service:25100/upload-new");
+//    uriBuilder.addParameters(params);
+//
+//
+//    HttpPost httppost = new HttpPost(uriBuilder.build());
+//final MultipartEntityBuilder builder = MultipartEntityBuilder.create();
 // Resource resource = contentReader.getResource(xlsPath);
 // Path absolutePath = Paths.get("file://" + resource.getUri()).toAbsolutePath();
 
@@ -268,30 +271,21 @@ try(FileOutputStream outputStream = new FileOutputStream(file)){
 } catch (IOException e) {
     System.out.println("SOMETHING ELSE WENT WRONG");
 }
-// File tempFile = File.createTempFile("stuff", "mystuff", null);
-// try (FileOutputStream fos = new FileOutputStream(tempFile)) {
-//     fos.write(myarray);
-// }
-//final File file = new File(absolutePath.toUri());
-//builder.addPart("file", baos);
-builder.addBinaryBody("bob", file);
-//builder.addBinaryBody("file", fos, ContentType.MULTIPART_FORM_DATA, "filename");
-builder.setBoundary("--TFJ5T8Nl2Py-S_BZXD5_FaEzCCuRXVXL0--[\\r][\\n]");
-//builder.addTextBody("type", "file");
-final HttpEntity entityReq = builder.build();
-httppost.setEntity(entityReq);
 
-//Execute and get the response.
-HttpResponse response = httpclient.execute(httppost);
-HttpEntity entity = response.getEntity();
+Client uploadServiceClient = new APIClient("", "664bff26407d60d5605f64379e47495c0c533c1565042d70653f31c0c705726f");
+uploadServiceClient.uploadFile(file, params);
 
-if (entity != null) {
-    try (InputStream instream = entity.getContent()) {
-            System.out.println("THE RESPONSE IS");
-            System.out.println(response);
-            System.out.println(instream.read());
-    }
-}
+////Execute and get the response.
+//HttpResponse response = httpclient.execute(httppost);
+//HttpEntity entity = response.getEntity();
+//
+//if (entity != null) {
+//    try (InputStream instream = entity.getContent()) {
+//            System.out.println("THE RESPONSE IS");
+//            System.out.println(response);
+//            System.out.println(instream.read());
+//    }
+//}
 
 
             return collection != null;

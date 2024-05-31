@@ -35,6 +35,11 @@
 
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>com.github.onsdigital</groupId>
+                <artifactId>dp-upload-service-client-java</artifactId>
+                <version>1.0.0-SNAPSHOT</version>
+            </dependency>
             <!-- Keep logging at the beginning of the file so that org.slf4j dependency is imported at its latest version required by logging to work -->
             <dependency>
                 <groupId>com.github.onsdigital</groupId>

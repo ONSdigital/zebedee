@@ -228,10 +228,10 @@ params.add(new BasicNameValuePair("resumableFilename", fileName));
 params.add(new BasicNameValuePair("resumableChunkNumber", "1"));
 params.add(new BasicNameValuePair("resumableType", "text/plain"));
 params.add(new BasicNameValuePair("resumableTotalChunks", "1"));
-params.add(new BasicNameValuePair("resumableChunkSize", "1000000"));
+params.add(new BasicNameValuePair("resumableChunkSize", "1048576"));
 params.add(new BasicNameValuePair("path", "testing"));
 params.add(new BasicNameValuePair("isPublishable", "false"));
-params.add(new BasicNameValuePair("resumableTotalSize", "500000"));
+params.add(new BasicNameValuePair("resumableTotalSize", "9000000")); // the total size of the file
 params.add(new BasicNameValuePair("type", "text/plain"));
 params.add(new BasicNameValuePair("licence", "fran"));
 params.add(new BasicNameValuePair("licenceUrl", "google"));
@@ -273,7 +273,7 @@ try(FileOutputStream outputStream = new FileOutputStream(file)){
 }
 
 Client uploadServiceClient = new APIClient("http://dp-upload-service:25100/upload-new", "664bff26407d60d5605f64379e47495c0c533c1565042d70653f31c0c705726f");
-uploadServiceClient.uploadFile(file, params);
+uploadServiceClient.uploadFile(file, params, true);
 
 ////Execute and get the response.
 //HttpResponse response = httpclient.execute(httppost);

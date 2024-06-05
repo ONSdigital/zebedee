@@ -59,9 +59,9 @@ public class Configuration {
     // how many additional seconds after the publish
     private static final int DEFAULT_SECONDS_TO_CACHE_AFTER_SCHEDULED_PUBLISH = 30;
 
-    public static boolean isLegacyCacheAPIEnabled() {
-        return BooleanUtils.toBoolean(StringUtils.defaultIfBlank(getValue("ENABLE_LEGACY_CACHE_API"), "false"));
-    }
+//    public static boolean isLegacyCacheAPIEnabled() {
+//        return BooleanUtils.toBoolean(StringUtils.defaultIfBlank(getValue("ENABLE_LEGACY_CACHE_API"), "false"));
+//    }
 
     public static boolean isSchedulingEnabled() {
         return BooleanUtils.toBoolean(StringUtils.defaultIfBlank(getValue("scheduled_publishing_enabled"), "true"));

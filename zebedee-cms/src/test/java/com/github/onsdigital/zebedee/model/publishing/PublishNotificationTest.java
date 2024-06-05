@@ -105,7 +105,7 @@ public class PublishNotificationTest {
 
     @Test
     public void payloadCacheAPIIsCorrect() {
-        when(Configuration.isLegacyCacheAPIEnabled()).thenReturn(true);
+//        when(Configuration.isLegacyCacheAPIEnabled()).thenReturn(true);
 
         PublishNotification publishNotification = new PublishNotification(collection, null, null);
 
@@ -125,7 +125,7 @@ public class PublishNotificationTest {
 
     @Test
     public void payloadCacheAPIIsCorrectWithDeletes() {
-        when(Configuration.isLegacyCacheAPIEnabled()).thenReturn(true);
+//        when(Configuration.isLegacyCacheAPIEnabled()).thenReturn(true);
 
         PublishNotification publishNotification = new PublishNotification(collectionWithDeletes);
         assertEquals(5, publishNotification.getLegacyCacheApiPayloads().size());
@@ -155,24 +155,24 @@ public class PublishNotificationTest {
 
     @Test
     public void canCreatePublishNotificationWithURLsSetToNullWhenCacheEnabled() {
-        when(Configuration.isLegacyCacheAPIEnabled()).thenReturn(true);
+//        when(Configuration.isLegacyCacheAPIEnabled()).thenReturn(true);
 
         PublishNotification publishNotification = new PublishNotification(collection, null, null);
         assertNotNull(publishNotification);
     }
 
-    @Test
-    public void canCreatePublishNotificationWithURLsSetToNullWhenCacheDisabled() {
-        when(Configuration.isLegacyCacheAPIEnabled()).thenReturn(false);
-
-        PublishNotification publishNotification = new PublishNotification(collection, null, null);
-        assertNotNull(publishNotification);
-    }
+//    @Test
+//    public void canCreatePublishNotificationWithURLsSetToNullWhenCacheDisabled() {
+//        when(Configuration.isLegacyCacheAPIEnabled()).thenReturn(false);
+//
+//        PublishNotification publishNotification = new PublishNotification(collection, null, null);
+//        assertNotNull(publishNotification);
+//    }
 
 
     @Test
     public void publishNotificationWhenCacheAPIEnabledReturns5PayloadsTest() throws IOException {
-        when(Configuration.isLegacyCacheAPIEnabled()).thenReturn(true);
+//        when(Configuration.isLegacyCacheAPIEnabled()).thenReturn(true);
         urisToUpdate.add("/economy/inflationandpriceindices/bulletins/producerpriceinflation/october2022/30d7d6c2/");
         when(collection.reviewedUris()).thenReturn(urisToUpdate);
 
@@ -198,7 +198,7 @@ public class PublishNotificationTest {
 
     @Test
     public void publishNotificationWhenCacheAPIEnabledTest() throws IOException {
-        when(Configuration.isLegacyCacheAPIEnabled()).thenReturn(true);
+//        when(Configuration.isLegacyCacheAPIEnabled()).thenReturn(true);
 
         assertEquals(3, collection.reviewedUris().size());
 
@@ -252,7 +252,7 @@ public class PublishNotificationTest {
 
     @Test
     public void publishNotificationWhenCacheAPIEnabledAndUNLOCKTest() throws IOException {
-        when(Configuration.isLegacyCacheAPIEnabled()).thenReturn(true);
+//        when(Configuration.isLegacyCacheAPIEnabled()).thenReturn(true);
 
         assertEquals(3, collectionWithDeletes.reviewedUris().size());
         assertEquals(2, collectionWithDeletes.getDescription().getPendingDeletes().size());
@@ -292,7 +292,7 @@ public class PublishNotificationTest {
 
     @Test
     public void publishNotificationWhenCacheAPIEnabledAndCollectionHasBothUpdatesAndDeletesTest() throws IOException {
-        when(Configuration.isLegacyCacheAPIEnabled()).thenReturn(true);
+//        when(Configuration.isLegacyCacheAPIEnabled()).thenReturn(true);
 
         assertEquals(3, collectionWithDeletes.reviewedUris().size());
         assertEquals(2, collectionWithDeletes.getDescription().getPendingDeletes().size());
@@ -332,7 +332,7 @@ public class PublishNotificationTest {
 
     @Test
     public void publishNotificationNoClientCallsWhenNoUrlsWhenCacheAPIEnabledTest() throws IOException {
-        when(Configuration.isLegacyCacheAPIEnabled()).thenReturn(true);
+//        when(Configuration.isLegacyCacheAPIEnabled()).thenReturn(true);
 
         urisToUpdate = new ArrayList<>();
         when(collection.reviewedUris()).thenReturn(urisToUpdate);
@@ -349,7 +349,7 @@ public class PublishNotificationTest {
 
     @Test
     public void publishNotificationWhenCacheAPIEnabledDoesNotSendRequestToAPIWhenEventTypeIsPublishedTest() {
-        when(Configuration.isLegacyCacheAPIEnabled()).thenReturn(true);
+//        when(Configuration.isLegacyCacheAPIEnabled()).thenReturn(true);
 
         PublishNotification publishNotification = new PublishNotification(collection);
 
@@ -362,7 +362,7 @@ public class PublishNotificationTest {
 
     @Test
     public void publishNotificationWhenCacheAPIEnabledSendsRequestToAPIWhenEventTypeIsApprovedTest() {
-        when(Configuration.isLegacyCacheAPIEnabled()).thenReturn(true);
+//        when(Configuration.isLegacyCacheAPIEnabled()).thenReturn(true);
 
         PublishNotification publishNotification = new PublishNotification(collection);
 
@@ -375,7 +375,7 @@ public class PublishNotificationTest {
 
     @Test
     public void publishNotificationWhenCacheAPIEnabledSendsRequestToAPIWhenEventTypeIsUnlockedTest() {
-        when(Configuration.isLegacyCacheAPIEnabled()).thenReturn(true);
+//        when(Configuration.isLegacyCacheAPIEnabled()).thenReturn(true);
 
         PublishNotification publishNotification = new PublishNotification(collection);
 
@@ -392,13 +392,13 @@ public class PublishNotificationTest {
         urisToUpdate.add(null);
         when(collection.reviewedUris()).thenReturn(urisToUpdate);
 
-        when(Configuration.isLegacyCacheAPIEnabled()).thenReturn(true);
+//        when(Configuration.isLegacyCacheAPIEnabled()).thenReturn(true);
 
         List<Host> hosts = new ArrayList<>();
         hosts.add(new Host("http://localhost:29100"));
         when(Configuration.getWebsiteHosts()).thenReturn(hosts);
 
-        assertTrue(Configuration.isLegacyCacheAPIEnabled());
+//        assertTrue(Configuration.isLegacyCacheAPIEnabled());
 
         PublishNotification publishNotification = new PublishNotification(collection, null, null);
 
@@ -407,7 +407,7 @@ public class PublishNotificationTest {
 
     @Test
     public void checkZebedeeCodeChecksumIsSameAsProxyCodeChecksum() throws IOException {
-        when(Configuration.isLegacyCacheAPIEnabled()).thenReturn(true);
+//        when(Configuration.isLegacyCacheAPIEnabled()).thenReturn(true);
 
         String uri = "/file?uri=/economy/inflationandpriceindices/adhocs/009581cpiinflationbetween2010and2018/cpiinflationbetween2010and2018.xls";
         urisToUpdate = new ArrayList<>();

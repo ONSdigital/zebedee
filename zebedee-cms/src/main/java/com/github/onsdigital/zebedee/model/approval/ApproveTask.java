@@ -225,13 +225,13 @@ HttpClient httpclient = HttpClients.createDefault();
 // Request parameters and other properties.
 List<NameValuePair> params = new ArrayList<NameValuePair>(12);
 params.add(new BasicNameValuePair("resumableFilename", fileName));
-params.add(new BasicNameValuePair("resumableChunkNumber", "1"));
+//params.add(new BasicNameValuePair("resumableChunkNumber", "1"));
 params.add(new BasicNameValuePair("resumableType", "text/plain"));
-params.add(new BasicNameValuePair("resumableTotalChunks", "1"));
-params.add(new BasicNameValuePair("resumableChunkSize", "1048576"));
+//params.add(new BasicNameValuePair("resumableTotalChunks", "1"));
+//params.add(new BasicNameValuePair("resumableChunkSize", "1048576"));
 params.add(new BasicNameValuePair("path", "testing"));
-params.add(new BasicNameValuePair("isPublishable", "false"));
-params.add(new BasicNameValuePair("resumableTotalSize", "9000000")); // the total size of the file
+params.add(new BasicNameValuePair("isPublishable", "true"));
+//params.add(new BasicNameValuePair("resumableTotalSize", "9000000")); // the total size of the file
 params.add(new BasicNameValuePair("type", "text/plain"));
 params.add(new BasicNameValuePair("licence", "fran"));
 params.add(new BasicNameValuePair("licenceUrl", "google"));

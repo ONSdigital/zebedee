@@ -273,7 +273,7 @@ try(FileOutputStream outputStream = new FileOutputStream(file)){
 }
 
 Client uploadServiceClient = new APIClient("http://dp-upload-service:25100/upload-new", "664bff26407d60d5605f64379e47495c0c533c1565042d70653f31c0c705726f");
-uploadServiceClient.uploadFile(file, params, true);
+uploadServiceClient.uploadFile(file, params);
 
 ////Execute and get the response.
 //HttpResponse response = httpclient.execute(httppost);

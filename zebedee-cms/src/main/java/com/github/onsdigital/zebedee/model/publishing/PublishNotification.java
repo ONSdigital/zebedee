@@ -38,10 +38,8 @@ public class PublishNotification {
     }
 
     public PublishNotification(Collection collection, List<String> urisToUpdate, List<ContentDetail> urisToDelete) {
-        this.legacyCacheApiPayloads = new LegacyCacheApiPayloadBuilder.Builder().collection(collection).build().getPayloads();
-        // Babbage still reindexes on a published event.
-        // TODO: remove this when it doesn't anymore.
-        // Delay the clearing of the cache after publish to minimise load on the server while publishing.
+        this.legacyCacheApiPayloads = new
+                LegacyCacheApiPayloadBuilder.Builder().collection(collection).build().getPayloads();
         Date clearCacheDate = new DateTime(collection.getDescription().getPublishDate())
                 .plusSeconds(Configuration.getSecondsToCacheAfterScheduledPublish()).toDate();
         this.payload = new NotificationPayload(collection.getDescription().getId(), urisToUpdate, urisToDelete, clearCacheDate);

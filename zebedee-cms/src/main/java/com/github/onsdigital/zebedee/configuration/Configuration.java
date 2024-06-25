@@ -245,6 +245,10 @@ public class Configuration {
         return StringUtils.defaultIfBlank(getValue("SESSIONS_API_URL"), SESSIONS_API_URL);
     }
 
+    public static boolean isUploadNewEndpointEnabled() {
+        return BooleanUtils.toBoolean(StringUtils.defaultIfBlank(getValue("ENABLE_UPLOAD_NEW_ENDPOINT"), "false"));
+    }
+
     /**
      * Get collection keyring encryption key
      */

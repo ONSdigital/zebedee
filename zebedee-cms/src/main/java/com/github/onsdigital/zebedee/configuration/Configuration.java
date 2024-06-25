@@ -44,6 +44,8 @@ public class Configuration {
     private static final String KEYRING_SECRET_KEY = "KEYRING_SECRET_KEY";
     private static final String KEYRING_INIT_VECTOR = "KEYRING_INIT_VECTOR";
 
+
+
     private static final int VERIFY_RETRY_DELAY = 5000; // milliseconds
     private static final int VERIFY_RETRY_COUNT = 10;
 
@@ -243,6 +245,10 @@ public class Configuration {
 
     public static String getSessionsApiUrl() {
         return StringUtils.defaultIfBlank(getValue("SESSIONS_API_URL"), SESSIONS_API_URL);
+    }
+
+    public static boolean isUploadNewEndpointEnabled() {
+        return BooleanUtils.toBoolean(StringUtils.defaultIfBlank(getValue("ENABLE_UPLOAD_NEW_ENDPOINT"), "false"));
     }
 
     /**

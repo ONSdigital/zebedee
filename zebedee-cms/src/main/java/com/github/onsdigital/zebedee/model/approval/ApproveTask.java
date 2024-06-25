@@ -43,6 +43,8 @@ import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFea
 import static com.github.onsdigital.zebedee.json.EventType.APPROVAL_FAILED;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.error;
 
+
+
 /**
  * Callable implementation for the approval process.
  */
@@ -156,6 +158,8 @@ public class ApproveTask implements Callable<Boolean> {
             eventLog.sentPublishNotification();
 
             eventLog.approvalCompleted();
+            
+
             info().data("user", session.getEmail()).data("collectionId", collection.getDescription().getId())
                     .log("approve task: collection approve task completed successfully");
 

@@ -28,7 +28,10 @@ import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.util.ContentDetailUtil;
 import com.github.onsdigital.zebedee.util.slack.Notifier;
 import org.apache.commons.lang3.StringUtils;
+import com.github.onsdigital.zebedee.util.DatasetWhitelistChecker;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
@@ -42,8 +45,6 @@ import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
 import static com.github.onsdigital.zebedee.json.EventType.APPROVAL_FAILED;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.error;
-
-
 
 /**
  * Callable implementation for the approval process.
@@ -68,7 +69,7 @@ public class ApproveTask implements Callable<Boolean> {
      * @param dataIndex
      */
     public ApproveTask(Collection collection, Session session, CollectionReader collectionReader,
-                       CollectionWriter collectionWriter, ContentReader publishedReader, DataIndex dataIndex, Notifier notifier) {
+            CollectionWriter collectionWriter, ContentReader publishedReader, DataIndex dataIndex, Notifier notifier) {
         this(collection, session, collectionReader, collectionWriter, publishedReader, dataIndex,
                 getDefaultContentDetailResolver(), notifier);
     }
@@ -83,8 +84,8 @@ public class ApproveTask implements Callable<Boolean> {
      * @param contentDetailResolver
      */
     ApproveTask(Collection collection, Session session, CollectionReader collectionReader,
-                CollectionWriter collectionWriter, ContentReader publishedReader, DataIndex dataIndex,
-                ContentDetailResolver contentDetailResolver, Notifier notifier) {
+            CollectionWriter collectionWriter, ContentReader publishedReader, DataIndex dataIndex,
+            ContentDetailResolver contentDetailResolver, Notifier notifier) {
         this.collection = collection;
         this.session = session;
         this.collectionReader = collectionReader;
@@ -158,10 +159,29 @@ public class ApproveTask implements Callable<Boolean> {
             eventLog.sentPublishNotification();
 
             eventLog.approvalCompleted();
-            
 
             info().data("user", session.getEmail()).data("collectionId", collection.getDescription().getId())
                     .log("approve task: collection approve task completed successfully");
+
+            // Do not enable the feature flag (Use only for upload new endpoint)
+            if (Configuration.isUploadNewEndpointEnabled()) {
+                // get files here?
+                System.out.println("READING THE TIMESERIES DIRECTORY LIST");
+                String fileName = "";
+                for (String string : collectionReader.getReviewed().listUris()) {
+                    System.out.println(string);
+                    if (string.contains("csv") || string.contains("xlsl")) {
+                        fileName = string.substring(1);
+                        Resource myFile = collectionReader.getResource(fileName);
+                        if (DatasetWhitelistChecker.isWhitelisted(myFile.getName())) {
+                            System.out.println("File is whitelisted");
+                        } else {
+                            System.out.println("File is not whitelisted");
+                        }
+                        break;
+                    }
+                }
+            }
 
             return collection != null;
 
@@ -176,7 +196,8 @@ public class ApproveTask implements Callable<Boolean> {
             if (eventLog != null) {
                 errorLog.data("approvalEvents", eventLog != null ? eventLog.logDetails() : null);
             }
-            errorLog.logException(e, "approve task: error approving collection reverting collection approval status to ERROR");
+            errorLog.logException(e,
+                    "approve task: error approving collection reverting collection approval status to ERROR");
 
             collection.getDescription().setApprovalStatus(ApprovalStatus.ERROR);
             collection.getDescription().addEvent(new Event(APPROVAL_FAILED, session.getEmail(), e));
@@ -184,8 +205,9 @@ public class ApproveTask implements Callable<Boolean> {
                 collection.save();
             } catch (Exception e1) {
                 error().data("collectionId", collection.getDescription().getId()).data("user", session.getEmail())
-                        .logException(e, "approve task: error writing collection to disk after approval exception, you may be " +
-                                "required to manually set the collection status to error");
+                        .logException(e,
+                                "approve task: error writing collection to disk after approval exception, you may be " +
+                                        "required to manually set the collection status to error");
             }
             return false;
         }
@@ -196,11 +218,11 @@ public class ApproveTask implements Callable<Boolean> {
             ContentReader publishedReader,
             CollectionReader collectionReader,
             CollectionWriter collectionWriter,
-            DataIndex dataIndex
-    ) throws IOException, ZebedeeException, URISyntaxException {
+            DataIndex dataIndex) throws IOException, ZebedeeException, URISyntaxException {
 
         // Import any time series update CSV file
-        List<TimeseriesUpdateCommand> updateCommands = importUpdateCommandCsvs(collection, publishedReader, collectionReader);
+        List<TimeseriesUpdateCommand> updateCommands = importUpdateCommandCsvs(collection, publishedReader,
+                collectionReader);
 
         // Generate time series if required.
         new DataPublisher().preprocessCollection(
@@ -209,8 +231,9 @@ public class ApproveTask implements Callable<Boolean> {
                 collectionWriter.getReviewed(), true, dataIndex, updateCommands);
     }
 
-    public static List<TimeseriesUpdateCommand> importUpdateCommandCsvs(Collection collection, ContentReader publishedReader,
-                                                                        CollectionReader collectionReader)
+    public static List<TimeseriesUpdateCommand> importUpdateCommandCsvs(Collection collection,
+            ContentReader publishedReader,
+            CollectionReader collectionReader)
             throws ZebedeeException, IOException {
 
         List<TimeseriesUpdateCommand> updateCommands = new ArrayList<>();
@@ -226,8 +249,7 @@ public class ApproveTask implements Callable<Boolean> {
 
                 try (
                         Resource resource = collectionReader.getRoot().getResource(importFile);
-                        InputStream csvInput = resource.getData()
-                ) {
+                        InputStream csvInput = resource.getData()) {
                     // read the CSV and update the timeseries titles.
                     TimeseriesUpdateImporter importer = new CsvTimeseriesUpdateImporter(csvInput);
 
@@ -246,15 +268,16 @@ public class ApproveTask implements Callable<Boolean> {
             Collection collection) {
 
         // only provide relevent uri's
-        //  - remove versioned uris
-        //  - add associated uris? /previous /data etc?
+        // - remove versioned uris
+        // - add associated uris? /previous /data etc?
 
         List<ContentDetail> contentToDelete = new ArrayList<>();
         List<PendingDelete> pendingDeletes = collection.getDescription().getPendingDeletes();
 
         for (PendingDelete pendingDelete : pendingDeletes) {
             ContentTreeNavigator.getInstance().search(pendingDelete.getRoot(), node -> {
-                info().data("collectionId", collection.getDescription().getId()).log("adding uri to delete to the publish notification " + node.uri);
+                info().data("collectionId", collection.getDescription().getId())
+                        .log("adding uri to delete to the publish notification " + node.uri);
 
                 if (!contentToDelete.contains(node.uri)) {
                     ContentDetail contentDetailToDelete = new ContentDetail(node.uri, node.getType());
@@ -266,7 +289,8 @@ public class ApproveTask implements Callable<Boolean> {
         return new PublishNotification(collection, uriList, contentToDelete);
     }
 
-    private void compressZipFiles(Collection collection, CollectionReader collectionReader, CollectionWriter collectionWriter) throws ZebedeeException, IOException {
+    private void compressZipFiles(Collection collection, CollectionReader collectionReader,
+            CollectionWriter collectionWriter) throws ZebedeeException, IOException {
         boolean verified = getCompressionTask().compressTimeseries(collection, collectionReader, collectionWriter);
 
         if (!verified) {
@@ -292,18 +316,20 @@ public class ApproveTask implements Callable<Boolean> {
     }
 
     private void populateReleasePage(Iterable<ContentDetail> collectionContent) throws IOException {
-        // If the collection is associated with a release then populate the release page.
+        // If the collection is associated with a release then populate the release
+        // page.
         collection.populateReleaseQuietly(collectionReader, collectionWriter, collectionContent);
     }
 
     private void generatePdfFiles(List<ContentDetail> collectionContent) throws ZebedeeException {
-        getPdfGenerator().generatePDFsForCollection(collection, collectionReader.getReviewed(), collectionWriter.getReviewed(), collectionContent);
+        getPdfGenerator().generatePDFsForCollection(collection, collectionReader.getReviewed(),
+                collectionWriter.getReviewed(), collectionContent);
     }
 
     protected CollectionPdfGenerator getPdfGenerator() {
         return new CollectionPdfGenerator(new BabbagePdfService(session, collection));
     }
-    
+
     protected TimeSeriesCompressionTask getCompressionTask() {
         return new TimeSeriesCompressionTask();
     }
@@ -324,7 +350,8 @@ public class ApproveTask implements Callable<Boolean> {
             throw new IllegalArgumentException("approval task unsuccesful: as session required but was null");
         }
         if (StringUtils.isEmpty(session.getEmail())) {
-            throw new IllegalArgumentException("approval task unsuccesful: as session.email required but was null/empty");
+            throw new IllegalArgumentException(
+                    "approval task unsuccesful: as session.email required but was null/empty");
         }
         info().data("collectionId", collection.getDescription().getId()).log("approval task: validation sucessful");
     }

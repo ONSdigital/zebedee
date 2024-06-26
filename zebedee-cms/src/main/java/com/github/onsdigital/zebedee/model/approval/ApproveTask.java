@@ -26,6 +26,7 @@ import com.github.onsdigital.zebedee.service.BabbagePdfService;
 import com.github.onsdigital.zebedee.service.content.navigation.ContentTreeNavigator;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.util.ContentDetailUtil;
+import com.github.onsdigital.zebedee.util.DatasetWhitelistChecker;
 import com.github.onsdigital.zebedee.util.slack.Notifier;
 import org.apache.commons.lang3.StringUtils;
 
@@ -158,6 +159,24 @@ public class ApproveTask implements Callable<Boolean> {
             eventLog.approvalCompleted();
             info().data("user", session.getEmail()).data("collectionId", collection.getDescription().getId())
                     .log("approve task: collection approve task completed successfully");
+
+            // Use only for upload new endpoint
+            if (Configuration.isUploadNewEndpointEnabled()) {
+                // get files here?
+                String fileName = "";
+                for (String string : collectionReader.getReviewed().listUris()) {
+                    if (string.contains("csv") || string.contains("xlsl")) {
+                        fileName = string.substring(1);
+                        Resource myFile = collectionReader.getResource(fileName);
+                        if (DatasetWhitelistChecker.isWhitelisted(myFile.getName())) {
+                            info().log("File is whitelisted");
+                        } else {
+                            info().log("File is not whitelisted");
+                        }
+                        break;
+                    }
+                }
+            }
 
             return collection != null;
 

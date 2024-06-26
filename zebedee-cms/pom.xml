@@ -35,6 +35,11 @@
             <artifactId>dp-logging</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.github.onsdigital</groupId>
+            <artifactId>dp-upload-service-client-java</artifactId>
+        </dependency>
+
         <!--Restolino-->
         <dependency>
             <groupId>com.github.onsdigital</groupId>

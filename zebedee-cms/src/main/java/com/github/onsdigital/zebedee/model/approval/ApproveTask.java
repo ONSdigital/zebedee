@@ -28,10 +28,15 @@ import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.util.ContentDetailUtil;
 import com.github.onsdigital.zebedee.util.DatasetWhitelistChecker;
 import com.github.onsdigital.zebedee.util.slack.Notifier;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import com.github.onsdigital.dp.uploadservice.api.Client;
+import com.github.onsdigital.dp.uploadservice.api.APIClient;
+import org.apache.hc.core5.http.NameValuePair;
+import org.apache.hc.core5.http.message.BasicNameValuePair;
 
-import java.io.IOException;
-import java.io.InputStream;
+
+import java.io.*;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -170,6 +175,34 @@ public class ApproveTask implements Callable<Boolean> {
                         Resource myFile = collectionReader.getResource(fileName);
                         if (DatasetWhitelistChecker.isWhitelisted(myFile.getName())) {
                             info().log("File is whitelisted");
+
+                            File file = new File("afile");
+                            try(FileOutputStream outputStream = new FileOutputStream(file)){
+                                IOUtils.copy(myFile.getData(), outputStream);
+                            } catch (FileNotFoundException e) {
+                                System.out.println("CAN'T FIND IT");
+                            } catch (IOException e) {
+                                System.out.println("SOMETHING ELSE WENT WRONG");
+                            }
+
+                            // Request parameters and other properties.
+                            List<NameValuePair> params = new ArrayList<NameValuePair>(12);
+                            params.add(new BasicNameValuePair("resumableFilename", fileName));
+//params.add(new BasicNameValuePair("resumableChunkNumber", "1"));
+                            params.add(new BasicNameValuePair("resumableType", "text/plain"));
+//params.add(new BasicNameValuePair("resumableTotalChunks", "1"));
+//params.add(new BasicNameValuePair("resumableChunkSize", "1048576"));
+                            params.add(new BasicNameValuePair("path", "testing"));
+                            params.add(new BasicNameValuePair("isPublishable", "true"));
+//params.add(new BasicNameValuePair("resumableTotalSize", "9000000")); // the total size of the file
+                            params.add(new BasicNameValuePair("type", "text/plain"));
+                            params.add(new BasicNameValuePair("licence", "fran"));
+                            params.add(new BasicNameValuePair("licenceUrl", "google"));
+                            params.add(new BasicNameValuePair("collectionId", collection.getDescription().getId()));
+
+                            Client uploadServiceClient = new APIClient("http://dp-upload-service:25100/upload-new", "664bff26407d60d5605f64379e47495c0c533c1565042d70653f31c0c705726f");
+                            uploadServiceClient.uploadResumableFile(file, params);
+
                         } else {
                             info().log("File is not whitelisted");
                         }

@@ -43,6 +43,12 @@
                 <version>${dp.logging.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>com.github.onsdigital</groupId>
+                <artifactId>dp-upload-service-client-java</artifactId>
+                <version>1.0.0-SNAPSHOT</version>
+            </dependency>
+
             <!-- Main -->
             <dependency>
                 <groupId>com.github.onsdigital</groupId>

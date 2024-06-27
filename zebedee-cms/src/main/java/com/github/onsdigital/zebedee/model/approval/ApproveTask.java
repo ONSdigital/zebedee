@@ -175,6 +175,7 @@ public class ApproveTask implements Callable<Boolean> {
                         if (DatasetWhitelistChecker.isWhitelisted(myFile.getName())) {
                             info().log("File is whitelisted");
 
+                            //File upload functionality
                             File file = new File("afile");
                             try (FileOutputStream outputStream = new FileOutputStream(file)) {
                                 IOUtils.copy(myFile.getData(), outputStream);
@@ -381,13 +382,15 @@ public class ApproveTask implements Callable<Boolean> {
             String collectionId) {
         List<NameValuePair> params = new ArrayList<>(8);
         params.add(new BasicNameValuePair("resumableFilename", resumableFilename));
-        params.add(new BasicNameValuePair("resumableType", resumableType));
         params.add(new BasicNameValuePair("path", path));
+        params.add(new BasicNameValuePair("collectionId", collectionId));
+
+        //Get the following values from the config
+        params.add(new BasicNameValuePair("resumableType", resumableType));
         params.add(new BasicNameValuePair("isPublishable", isPublishable));
         params.add(new BasicNameValuePair("type", type));
         params.add(new BasicNameValuePair("licence", licence));
         params.add(new BasicNameValuePair("licenceUrl", licenceUrl));
-        params.add(new BasicNameValuePair("collectionId", collectionId));
         return params;
     }
 }

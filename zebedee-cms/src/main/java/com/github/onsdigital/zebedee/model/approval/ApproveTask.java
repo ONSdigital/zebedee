@@ -165,7 +165,7 @@ public class ApproveTask implements Callable<Boolean> {
                 // get files here?
                 String fileName = "";
                 for (String string : collectionReader.getReviewed().listUris()) {
-                    if (string.contains("csv") || string.contains("xlsl")) {
+                    if (string.contains("csv") || string.contains("xlsx") || string.contains("csdb") || string.contains("xls")) {
                         fileName = string.substring(1);
                         Resource myFile = collectionReader.getResource(fileName);
                         if (DatasetWhitelistChecker.isWhitelisted(myFile.getName())) {

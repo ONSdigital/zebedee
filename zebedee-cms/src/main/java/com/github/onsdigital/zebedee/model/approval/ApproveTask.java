@@ -35,7 +35,6 @@ import com.github.onsdigital.dp.uploadservice.api.APIClient;
 import org.apache.hc.core5.http.NameValuePair;
 import org.apache.hc.core5.http.message.BasicNameValuePair;
 
-
 import java.io.*;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -72,7 +71,7 @@ public class ApproveTask implements Callable<Boolean> {
      * @param dataIndex
      */
     public ApproveTask(Collection collection, Session session, CollectionReader collectionReader,
-                       CollectionWriter collectionWriter, ContentReader publishedReader, DataIndex dataIndex, Notifier notifier) {
+            CollectionWriter collectionWriter, ContentReader publishedReader, DataIndex dataIndex, Notifier notifier) {
         this(collection, session, collectionReader, collectionWriter, publishedReader, dataIndex,
                 getDefaultContentDetailResolver(), notifier);
     }
@@ -87,8 +86,8 @@ public class ApproveTask implements Callable<Boolean> {
      * @param contentDetailResolver
      */
     ApproveTask(Collection collection, Session session, CollectionReader collectionReader,
-                CollectionWriter collectionWriter, ContentReader publishedReader, DataIndex dataIndex,
-                ContentDetailResolver contentDetailResolver, Notifier notifier) {
+            CollectionWriter collectionWriter, ContentReader publishedReader, DataIndex dataIndex,
+            ContentDetailResolver contentDetailResolver, Notifier notifier) {
         this.collection = collection;
         this.session = session;
         this.collectionReader = collectionReader;
@@ -177,7 +176,7 @@ public class ApproveTask implements Callable<Boolean> {
                             info().log("File is whitelisted");
 
                             File file = new File("afile");
-                            try(FileOutputStream outputStream = new FileOutputStream(file)){
+                            try (FileOutputStream outputStream = new FileOutputStream(file)) {
                                 IOUtils.copy(myFile.getData(), outputStream);
                             } catch (FileNotFoundException e) {
                                 System.out.println("CAN'T FIND IT");
@@ -185,22 +184,10 @@ public class ApproveTask implements Callable<Boolean> {
                                 System.out.println("SOMETHING ELSE WENT WRONG");
                             }
 
-                            // Request parameters and other properties.
-                            List<NameValuePair> params = new ArrayList<NameValuePair>(12);
-                            params.add(new BasicNameValuePair("resumableFilename", fileName));
-//params.add(new BasicNameValuePair("resumableChunkNumber", "1"));
-                            params.add(new BasicNameValuePair("resumableType", "text/plain"));
-//params.add(new BasicNameValuePair("resumableTotalChunks", "1"));
-//params.add(new BasicNameValuePair("resumableChunkSize", "1048576"));
-                            params.add(new BasicNameValuePair("path", "testing"));
-                            params.add(new BasicNameValuePair("isPublishable", "true"));
-//params.add(new BasicNameValuePair("resumableTotalSize", "9000000")); // the total size of the file
-                            params.add(new BasicNameValuePair("type", "text/plain"));
-                            params.add(new BasicNameValuePair("licence", "fran"));
-                            params.add(new BasicNameValuePair("licenceUrl", "google"));
-                            params.add(new BasicNameValuePair("collectionId", collection.getDescription().getId()));
+                            List<NameValuePair> params = createUploadParams(fileName, "text/plain", "testing", "true", "text/plain", "TestLicence", "google", collection.getDescription().getId());
 
-                            Client uploadServiceClient = new APIClient("http://dp-upload-service:25100/upload-new", "664bff26407d60d5605f64379e47495c0c533c1565042d70653f31c0c705726f");
+                            Client uploadServiceClient = new APIClient("http://dp-upload-service:25100/upload-new",
+                                    "664bff26407d60d5605f64379e47495c0c533c1565042d70653f31c0c705726f");
                             uploadServiceClient.uploadResumableFile(file, params);
 
                         } else {
@@ -224,7 +211,8 @@ public class ApproveTask implements Callable<Boolean> {
             if (eventLog != null) {
                 errorLog.data("approvalEvents", eventLog != null ? eventLog.logDetails() : null);
             }
-            errorLog.logException(e, "approve task: error approving collection reverting collection approval status to ERROR");
+            errorLog.logException(e,
+                    "approve task: error approving collection reverting collection approval status to ERROR");
 
             collection.getDescription().setApprovalStatus(ApprovalStatus.ERROR);
             collection.getDescription().addEvent(new Event(APPROVAL_FAILED, session.getEmail(), e));
@@ -232,8 +220,9 @@ public class ApproveTask implements Callable<Boolean> {
                 collection.save();
             } catch (Exception e1) {
                 error().data("collectionId", collection.getDescription().getId()).data("user", session.getEmail())
-                        .logException(e, "approve task: error writing collection to disk after approval exception, you may be " +
-                                "required to manually set the collection status to error");
+                        .logException(e,
+                                "approve task: error writing collection to disk after approval exception, you may be " +
+                                        "required to manually set the collection status to error");
             }
             return false;
         }
@@ -244,11 +233,11 @@ public class ApproveTask implements Callable<Boolean> {
             ContentReader publishedReader,
             CollectionReader collectionReader,
             CollectionWriter collectionWriter,
-            DataIndex dataIndex
-    ) throws IOException, ZebedeeException, URISyntaxException {
+            DataIndex dataIndex) throws IOException, ZebedeeException, URISyntaxException {
 
         // Import any time series update CSV file
-        List<TimeseriesUpdateCommand> updateCommands = importUpdateCommandCsvs(collection, publishedReader, collectionReader);
+        List<TimeseriesUpdateCommand> updateCommands = importUpdateCommandCsvs(collection, publishedReader,
+                collectionReader);
 
         // Generate time series if required.
         new DataPublisher().preprocessCollection(
@@ -257,8 +246,9 @@ public class ApproveTask implements Callable<Boolean> {
                 collectionWriter.getReviewed(), true, dataIndex, updateCommands);
     }
 
-    public static List<TimeseriesUpdateCommand> importUpdateCommandCsvs(Collection collection, ContentReader publishedReader,
-                                                                        CollectionReader collectionReader)
+    public static List<TimeseriesUpdateCommand> importUpdateCommandCsvs(Collection collection,
+            ContentReader publishedReader,
+            CollectionReader collectionReader)
             throws ZebedeeException, IOException {
 
         List<TimeseriesUpdateCommand> updateCommands = new ArrayList<>();
@@ -274,8 +264,7 @@ public class ApproveTask implements Callable<Boolean> {
 
                 try (
                         Resource resource = collectionReader.getRoot().getResource(importFile);
-                        InputStream csvInput = resource.getData()
-                ) {
+                        InputStream csvInput = resource.getData()) {
                     // read the CSV and update the timeseries titles.
                     TimeseriesUpdateImporter importer = new CsvTimeseriesUpdateImporter(csvInput);
 
@@ -294,15 +283,16 @@ public class ApproveTask implements Callable<Boolean> {
             Collection collection) {
 
         // only provide relevent uri's
-        //  - remove versioned uris
-        //  - add associated uris? /previous /data etc?
+        // - remove versioned uris
+        // - add associated uris? /previous /data etc?
 
         List<ContentDetail> contentToDelete = new ArrayList<>();
         List<PendingDelete> pendingDeletes = collection.getDescription().getPendingDeletes();
 
         for (PendingDelete pendingDelete : pendingDeletes) {
             ContentTreeNavigator.getInstance().search(pendingDelete.getRoot(), node -> {
-                info().data("collectionId", collection.getDescription().getId()).log("adding uri to delete to the publish notification " + node.uri);
+                info().data("collectionId", collection.getDescription().getId())
+                        .log("adding uri to delete to the publish notification " + node.uri);
 
                 if (!contentToDelete.contains(node.uri)) {
                     ContentDetail contentDetailToDelete = new ContentDetail(node.uri, node.getType());
@@ -314,7 +304,8 @@ public class ApproveTask implements Callable<Boolean> {
         return new PublishNotification(collection, uriList, contentToDelete);
     }
 
-    private void compressZipFiles(Collection collection, CollectionReader collectionReader, CollectionWriter collectionWriter) throws ZebedeeException, IOException {
+    private void compressZipFiles(Collection collection, CollectionReader collectionReader,
+            CollectionWriter collectionWriter) throws ZebedeeException, IOException {
         boolean verified = getCompressionTask().compressTimeseries(collection, collectionReader, collectionWriter);
 
         if (!verified) {
@@ -340,18 +331,20 @@ public class ApproveTask implements Callable<Boolean> {
     }
 
     private void populateReleasePage(Iterable<ContentDetail> collectionContent) throws IOException {
-        // If the collection is associated with a release then populate the release page.
+        // If the collection is associated with a release then populate the release
+        // page.
         collection.populateReleaseQuietly(collectionReader, collectionWriter, collectionContent);
     }
 
     private void generatePdfFiles(List<ContentDetail> collectionContent) throws ZebedeeException {
-        getPdfGenerator().generatePDFsForCollection(collection, collectionReader.getReviewed(), collectionWriter.getReviewed(), collectionContent);
+        getPdfGenerator().generatePDFsForCollection(collection, collectionReader.getReviewed(),
+                collectionWriter.getReviewed(), collectionContent);
     }
 
     protected CollectionPdfGenerator getPdfGenerator() {
         return new CollectionPdfGenerator(new BabbagePdfService(session, collection));
     }
-    
+
     protected TimeSeriesCompressionTask getCompressionTask() {
         return new TimeSeriesCompressionTask();
     }
@@ -372,8 +365,29 @@ public class ApproveTask implements Callable<Boolean> {
             throw new IllegalArgumentException("approval task unsuccesful: as session required but was null");
         }
         if (StringUtils.isEmpty(session.getEmail())) {
-            throw new IllegalArgumentException("approval task unsuccesful: as session.email required but was null/empty");
+            throw new IllegalArgumentException(
+                    "approval task unsuccesful: as session.email required but was null/empty");
         }
         info().data("collectionId", collection.getDescription().getId()).log("approval task: validation sucessful");
+    }
+
+    protected static List<NameValuePair> createUploadParams(String resumableFilename,
+            String resumableType,
+            String path,
+            String isPublishable,
+            String type,
+            String licence,
+            String licenceUrl,
+            String collectionId) {
+        List<NameValuePair> params = new ArrayList<>(8);
+        params.add(new BasicNameValuePair("resumableFilename", resumableFilename));
+        params.add(new BasicNameValuePair("resumableType", resumableType));
+        params.add(new BasicNameValuePair("path", path));
+        params.add(new BasicNameValuePair("isPublishable", isPublishable));
+        params.add(new BasicNameValuePair("type", type));
+        params.add(new BasicNameValuePair("licence", licence));
+        params.add(new BasicNameValuePair("licenceUrl", licenceUrl));
+        params.add(new BasicNameValuePair("collectionId", collectionId));
+        return params;
     }
 }

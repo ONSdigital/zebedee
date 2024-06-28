@@ -185,8 +185,7 @@ public class ApproveTask implements Callable<Boolean> {
                                 System.out.println("SOMETHING ELSE WENT WRONG");
                             }
 
-                            List<NameValuePair> params = createUploadParams(fileName, "text/plain", "testing", "true",
-                                    "text/plain", "TestLicence", "google", collection.getDescription().getId());
+                            List<NameValuePair> params = createUploadParams(fileName,  collection.getDescription().getId());
 
                             Client uploadServiceClient = new APIClient("http://dp-upload-service:25100/upload-new",
                                     "664bff26407d60d5605f64379e47495c0c533c1565042d70653f31c0c705726f");
@@ -373,10 +372,7 @@ public class ApproveTask implements Callable<Boolean> {
         info().data("collectionId", collection.getDescription().getId()).log("approval task: validation sucessful");
     }
 
-    protected static List<NameValuePair> createUploadParams(String resumableFilename,
-            String path,
-            //String type,
-            String collectionId) {
+    protected static List<NameValuePair> createUploadParams(String resumableFilename, String path, String collectionId) {
 
         // Get the following values from the config
         String resumableType = Configuration.getResumableType();
@@ -390,7 +386,6 @@ public class ApproveTask implements Callable<Boolean> {
         params.add(new BasicNameValuePair("collectionId", collectionId));
         params.add(new BasicNameValuePair("resumableType", resumableType));
         params.add(new BasicNameValuePair("isPublishable", isPublishable));
-        // params.add(new BasicNameValuePair("type", type));
         params.add(new BasicNameValuePair("licence", licence));
         params.add(new BasicNameValuePair("licenceUrl", licenceURL));
         return params;

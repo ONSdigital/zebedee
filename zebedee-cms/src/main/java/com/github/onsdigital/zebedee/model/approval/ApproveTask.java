@@ -168,7 +168,7 @@ public class ApproveTask implements Callable<Boolean> {
             if (Configuration.isUploadNewEndpointEnabled()) {
                 // get files here?
                 for (String uri : collectionReader.getReviewed().listUris()) {
-                    if (uri.endsWith("csv") || uri.endsWith("xlsl")) {
+                    if (uri.endsWith("csv") || uri.endsWith("xlsx")) {
                         String fileName = uri.substring(1);
                         Resource myFile = collectionReader.getResource(fileName);
                         if (DatasetWhitelistChecker.isWhitelisted(myFile.getName())) {

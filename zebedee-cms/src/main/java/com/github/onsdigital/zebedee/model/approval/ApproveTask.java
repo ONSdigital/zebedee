@@ -164,7 +164,7 @@ public class ApproveTask implements Callable<Boolean> {
             info().data("user", session.getEmail()).data("collectionId", collection.getDescription().getId())
                     .log("approve task: collection approve task completed successfully");
 
-            uploadNewEndpoint(collection, collectionReader); //
+            uploadNewEndpoint(collection, collectionReader);
             
             // Use only for upload new endpoint
             

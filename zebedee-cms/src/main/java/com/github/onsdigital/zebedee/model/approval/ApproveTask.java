@@ -173,7 +173,6 @@ public class ApproveTask implements Callable<Boolean> {
                         Resource myFile = collectionReader.getResource(fileName);
                         if (DatasetWhitelistChecker.isWhitelisted(myFile.getName())) {
                             info().log("File is whitelisted");
-
                             // File upload functionality
                             File file = new File("afile");
                             try (FileOutputStream outputStream = new FileOutputStream(file)) {
@@ -183,13 +182,10 @@ public class ApproveTask implements Callable<Boolean> {
                             } catch (IOException e) {
                                 System.out.println("SOMETHING ELSE WENT WRONG");
                             }
-
                             List<NameValuePair> params = createUploadParams(fileName, "path", collection.getDescription().getId());
-
                             Client uploadServiceClient = new APIClient("http://dp-upload-service:25100/upload-new",
                                     "664bff26407d60d5605f64379e47495c0c533c1565042d70653f31c0c705726f");
                             uploadServiceClient.uploadResumableFile(file, params);
-
                         } else {
                             info().log("File is not whitelisted");
                         }

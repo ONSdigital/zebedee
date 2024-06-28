@@ -59,6 +59,11 @@ public class Configuration {
     // how many additional seconds after the publish
     private static final int DEFAULT_SECONDS_TO_CACHE_AFTER_SCHEDULED_PUBLISH = 30;
 
+    private static final String RESUMABLE_TYPE = "text/plain";
+    private static final String IS_PUBLISHABLE = "true";
+    private static final String LICENCE = "Open Government Licence v3.0";
+    private static final String LICENCE_URL = "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/";
+
     public static boolean isLegacyCacheAPIEnabled() {
         return BooleanUtils.toBoolean(StringUtils.defaultIfBlank(getValue("ENABLE_LEGACY_CACHE_API"), "false"));
     }
@@ -256,6 +261,23 @@ public class Configuration {
         return StringUtils.defaultIfBlank(getValue("DATASET_WHITELIST"), DATASET_WHITELIST);
     }
     
+    // Changeable upload-new endpoint parameters
+    public static String getResumableType() {
+        return StringUtils.defaultIfBlank(getValue("RESUMABLE_TYPE"), RESUMABLE_TYPE);
+    }
+
+    public static String getIsPublishable() {
+        return StringUtils.defaultIfBlank(getValue("IS_PUBLISHABLE"), IS_PUBLISHABLE);
+    }
+ 
+    public static String getLicence() {
+        return StringUtils.defaultIfBlank(getValue("LICENCE"), LICENCE);
+    }
+
+    public static String getLicenceURL() {
+        return StringUtils.defaultIfBlank(getValue("LICENCE_URL"), LICENCE_URL);
+    }
+
     /**
      * Get collection keyring encryption key
      */

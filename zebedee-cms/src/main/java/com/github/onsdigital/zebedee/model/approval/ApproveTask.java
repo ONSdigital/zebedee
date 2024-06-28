@@ -175,7 +175,7 @@ public class ApproveTask implements Callable<Boolean> {
                         if (DatasetWhitelistChecker.isWhitelisted(myFile.getName())) {
                             info().log("File is whitelisted");
 
-                            //File upload functionality
+                            // File upload functionality
                             File file = new File("afile");
                             try (FileOutputStream outputStream = new FileOutputStream(file)) {
                                 IOUtils.copy(myFile.getData(), outputStream);
@@ -185,7 +185,8 @@ public class ApproveTask implements Callable<Boolean> {
                                 System.out.println("SOMETHING ELSE WENT WRONG");
                             }
 
-                            List<NameValuePair> params = createUploadParams(fileName, "text/plain", "testing", "true", "text/plain", "TestLicence", "google", collection.getDescription().getId());
+                            List<NameValuePair> params = createUploadParams(fileName, "text/plain", "testing", "true",
+                                    "text/plain", "TestLicence", "google", collection.getDescription().getId());
 
                             Client uploadServiceClient = new APIClient("http://dp-upload-service:25100/upload-new",
                                     "664bff26407d60d5605f64379e47495c0c533c1565042d70653f31c0c705726f");
@@ -373,24 +374,26 @@ public class ApproveTask implements Callable<Boolean> {
     }
 
     protected static List<NameValuePair> createUploadParams(String resumableFilename,
-            String resumableType,
             String path,
-            String isPublishable,
-            String type,
-            String licence,
-            String licenceUrl,
+            //String type,
             String collectionId) {
+
+        // Get the following values from the config
+        String resumableType = Configuration.getResumableType();
+        String isPublishable = Configuration.getIsPublishable();
+        String licence = Configuration.getLicence();
+        String licenceURL= Configuration.getLicenceURL();
+
         List<NameValuePair> params = new ArrayList<>(8);
         params.add(new BasicNameValuePair("resumableFilename", resumableFilename));
         params.add(new BasicNameValuePair("path", path));
         params.add(new BasicNameValuePair("collectionId", collectionId));
-
-        //Get the following values from the config
         params.add(new BasicNameValuePair("resumableType", resumableType));
         params.add(new BasicNameValuePair("isPublishable", isPublishable));
-        params.add(new BasicNameValuePair("type", type));
+        // params.add(new BasicNameValuePair("type", type));
         params.add(new BasicNameValuePair("licence", licence));
-        params.add(new BasicNameValuePair("licenceUrl", licenceUrl));
+        params.add(new BasicNameValuePair("licenceUrl", licenceURL));
         return params;
     }
 }
+

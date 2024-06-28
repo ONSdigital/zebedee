@@ -168,9 +168,9 @@ public class ApproveTask implements Callable<Boolean> {
             if (Configuration.isUploadNewEndpointEnabled()) {
                 // get files here?
                 String fileName = "";
-                for (String string : collectionReader.getReviewed().listUris()) {
-                    if (string.endsWith("csv") || string.endsWith("xlsl")) {
-                        fileName = string.substring(1);
+                for (String uri : collectionReader.getReviewed().listUris()) {
+                    if (uri.endsWith("csv") || uri.endsWith("xlsl")) {
+                        fileName = uri.substring(1);
                         Resource myFile = collectionReader.getResource(fileName);
                         if (DatasetWhitelistChecker.isWhitelisted(myFile.getName())) {
                             info().log("File is whitelisted");

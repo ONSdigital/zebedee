@@ -185,7 +185,7 @@ public class ApproveTask implements Callable<Boolean> {
                                 System.out.println("SOMETHING ELSE WENT WRONG");
                             }
 
-                            List<NameValuePair> params = createUploadParams(fileName,  collection.getDescription().getId());
+                            List<NameValuePair> params = createUploadParams(fileName, "path", collection.getDescription().getId());
 
                             Client uploadServiceClient = new APIClient("http://dp-upload-service:25100/upload-new",
                                     "664bff26407d60d5605f64379e47495c0c533c1565042d70653f31c0c705726f");

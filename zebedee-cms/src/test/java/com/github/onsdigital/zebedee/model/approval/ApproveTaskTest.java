@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee.model.approval;
 
 import com.github.davidcarboni.cryptolite.Random;
+import com.github.onsdigital.dp.uploadservice.api.APIClient;
 import com.github.onsdigital.zebedee.configuration.CMSFeatureFlags;
 import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.content.page.base.PageType;
@@ -353,17 +354,41 @@ public class ApproveTaskTest {
     // new unit tests
 
     @Test
-    public void testUploadNewEndpoint() throws ZebedeeException, IOException {
+    public void testUploadNewEndpoint_HappyPath() throws ZebedeeException, IOException {
         // Given
         Collection collection = Mockito.mock(Collection.class);
         CollectionReader collectionReader = Mockito.mock(CollectionReader.class);
-        when(Configuration.isUploadNewEndpointEnabled()).thenReturn(true);
+        System.setProperty("ENABLE_UPLOAD_NEW_ENDPOINT", "true");
+
+        when(collection.getDescription()).thenReturn(collectionDescription);
+        when(collectionReader.getReviewed()).thenReturn(contentReader);
+        when(collectionWriter.getReviewed()).thenReturn(contentWriter);
+        when(collection.getReviewed()).thenReturn(content);
 
         // When
         task.uploadNewEndpoint(collection, collectionReader);
 
         // Then
         verify(task, times(1)).uploadWhitelistedFiles(collection, collectionReader);
+    }
+
+    @Test
+    public void testUploadNewEndpoint_UnHappyPath() throws ZebedeeException, IOException {
+        // Given
+        Collection collection = Mockito.mock(Collection.class);
+        CollectionReader collectionReader = Mockito.mock(CollectionReader.class);
+        System.setProperty("ENABLE_UPLOAD_NEW_ENDPOINT", "false");
+
+        when(collection.getDescription()).thenReturn(collectionDescription);
+        when(collectionReader.getReviewed()).thenReturn(contentReader);
+        when(collectionWriter.getReviewed()).thenReturn(contentWriter);
+        when(collection.getReviewed()).thenReturn(content);
+
+        // When
+        task.uploadNewEndpoint(collection, collectionReader);
+
+        // Then
+        verify(task, times(0)).uploadWhitelistedFiles(collection, collectionReader);
     }
 
     @Test

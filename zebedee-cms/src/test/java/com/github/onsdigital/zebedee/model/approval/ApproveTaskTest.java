@@ -398,6 +398,7 @@ public class ApproveTaskTest {
         verify(task, times(0)).uploadWhitelistedFiles(collection, collectionReader);
     }
 
+    // errors to check 
     @Test
     public void testUploadWhitelistedFiles() throws ZebedeeException, IOException {
         // Given
@@ -416,6 +417,7 @@ public class ApproveTaskTest {
         verify(task, times(1)).uploadFile(myFile, uri, collection.getDescription().getId());
     }
 
+    // errors to check
     @Test
     public void testUploadFile() throws ZebedeeException, IOException {
         // Given
@@ -433,7 +435,7 @@ public class ApproveTaskTest {
         verify(uploadServiceClient, times(1)).uploadResumableFile(file, ApproveTask.createUploadParams(fileName, "path", collectionId));
     }
 
-    // working tests
+    // test params
 
     @Test
     public void testCreateUploadParams() {

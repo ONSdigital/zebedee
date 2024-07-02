@@ -2,8 +2,10 @@ package com.github.onsdigital.zebedee.model.approval;
 
 import com.github.davidcarboni.cryptolite.Random;
 import com.github.onsdigital.zebedee.configuration.CMSFeatureFlags;
+import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.content.page.base.PageType;
 import com.github.onsdigital.zebedee.data.processing.DataIndex;
+import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.ApprovalStatus;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.ContentDetail;
@@ -20,8 +22,13 @@ import com.github.onsdigital.zebedee.model.approval.tasks.timeseries.TimeSeriesC
 import com.github.onsdigital.zebedee.model.publishing.PublishNotification;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
+import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.session.model.Session;
+import com.github.onsdigital.zebedee.util.DatasetWhitelistChecker;
 import com.github.onsdigital.zebedee.util.slack.Notifier;
+import com.github.onsdigital.dp.uploadservice.api.Client;
+
+import org.apache.hc.core5.http.NameValuePair;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -35,10 +42,13 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
 
+import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -338,5 +348,56 @@ public class ApproveTaskTest {
         } else {
             System.setProperty(CMSFeatureFlags.ENABLE_DATASET_IMPORT, datasetImportFlag);
         }
+    }
+
+    // new unit tests
+
+    @Test
+    public void testUploadNewEndpoint() throws ZebedeeException, IOException {
+        // Given
+        Collection collection = Mockito.mock(Collection.class);
+        CollectionReader collectionReader = Mockito.mock(CollectionReader.class);
+        when(Configuration.isUploadNewEndpointEnabled()).thenReturn(true);
+
+        // When
+        task.uploadNewEndpoint(collection, collectionReader);
+
+        // Then
+        verify(task, times(1)).uploadWhitelistedFiles(collection, collectionReader);
+    }
+
+    @Test
+    public void testUploadWhitelistedFiles() throws ZebedeeException, IOException {
+        // Given
+        Collection collection = Mockito.mock(Collection.class);
+        CollectionReader collectionReader = Mockito.mock(CollectionReader.class);
+        String uri = "some/uri";
+        Resource myFile = Mockito.mock(Resource.class);
+        when(collectionReader.getReviewed().listUris()).thenReturn(Collections.singletonList(uri));
+        when(collectionReader.getResource(uri)).thenReturn(myFile);
+        when(DatasetWhitelistChecker.isWhitelisted(myFile.getName())).thenReturn(true);
+
+        // When
+        task.uploadWhitelistedFiles(collection, collectionReader);
+
+        // Then
+        verify(task, times(1)).uploadFile(myFile, uri, collection.getDescription().getId());
+    }
+
+    @Test
+    public void testUploadFile() throws ZebedeeException, IOException {
+        // Given
+        Resource myFile = Mockito.mock(Resource.class);
+        String fileName = "filename.drsi"; 
+        String collectionId = "123";
+        File file = new File("afile");
+        when(myFile.getData()).thenReturn(new ByteArrayInputStream("some data".getBytes()));
+        Client uploadServiceClient = Mockito.mock(Client.class);
+        
+        // When
+        task.uploadFile(myFile, fileName, collectionId);
+
+        // Then
+        verify(uploadServiceClient, times(1)).uploadResumableFile(file, ApproveTask.createUploadParams(fileName, "path", collectionId));
     }
 }

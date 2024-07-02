@@ -30,7 +30,7 @@ import com.github.onsdigital.zebedee.util.DatasetWhitelistChecker;
 import com.github.onsdigital.zebedee.util.slack.Notifier;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import com.github.onsdigital.dp.uploadservice.api.Client;
+import com.github.onsdigital.dp.uploadservice.api.Client; 
 import com.github.onsdigital.dp.uploadservice.api.APIClient;
 import org.apache.hc.core5.http.NameValuePair;
 import org.apache.hc.core5.http.message.BasicNameValuePair;
@@ -166,37 +166,6 @@ public class ApproveTask implements Callable<Boolean> {
 
             uploadNewEndpoint(collection, collectionReader);
             
-            // Use only for upload new endpoint
-            
-      /*       if (Configuration.isUploadNewEndpointEnabled()) {
-                // get files here?
-                for (String uri : collectionReader.getReviewed().listUris()) {
-                    if (uri.endsWith("csv") || uri.endsWith("xlsx")) {
-                        String fileName = uri.substring(1);
-                        Resource myFile = collectionReader.getResource(fileName);
-                        if (DatasetWhitelistChecker.isWhitelisted(myFile.getName())) {
-                            info().log("File is whitelisted");
-                            // File upload functionality
-                            File file = new File("afile");
-                            try (FileOutputStream outputStream = new FileOutputStream(file)) {
-                                IOUtils.copy(myFile.getData(), outputStream);
-                            } catch (FileNotFoundException e) {
-                                System.out.println("CAN'T FIND IT");
-                            } catch (IOException e) {
-                                System.out.println("SOMETHING ELSE WENT WRONG");
-                            }
-                            List<NameValuePair> params = createUploadParams(fileName, "path", collection.getDescription().getId());
-                            Client uploadServiceClient = new APIClient("http://dp-upload-service:25100/upload-new",
-                                    "664bff26407d60d5605f64379e47495c0c533c1565042d70653f31c0c705726f");
-                            uploadServiceClient.uploadResumableFile(file, params);
-                        } else {
-                            info().log("File is not whitelisted");
-                        }
-                        break;
-                    }
-                }
-            } */
-
             return collection != null;
 
         } catch (Exception e) {
@@ -370,7 +339,7 @@ public class ApproveTask implements Callable<Boolean> {
         info().data("collectionId", collection.getDescription().getId()).log("approval task: validation sucessful");
     }
 
-    private void uploadNewEndpoint(Collection collection, CollectionReader collectionReader) throws ZebedeeException, IOException {
+/*      private void uploadNewEndpoint(Collection collection, CollectionReader collectionReader) throws ZebedeeException, IOException {
         if (Configuration.isUploadNewEndpointEnabled()) {
             for (String uri : collectionReader.getReviewed().listUris()) {
                 if (uri.endsWith("csv") || uri.endsWith("xlsx")) {
@@ -397,7 +366,44 @@ public class ApproveTask implements Callable<Boolean> {
                 }
             }
         }
+    }  */
+
+    protected void uploadNewEndpoint(Collection collection, CollectionReader collectionReader) throws ZebedeeException, IOException {
+        if (Configuration.isUploadNewEndpointEnabled()) {
+            uploadWhitelistedFiles(collection, collectionReader);
+        }
     }
+    
+    protected void uploadWhitelistedFiles(Collection collection, CollectionReader collectionReader) throws ZebedeeException, IOException {
+        for (String uri : collectionReader.getReviewed().listUris()) {
+            if (uri.endsWith(".csv") || uri.endsWith(".xlsx")) {
+                String fileName = uri.substring(1);
+                Resource myFile = collectionReader.getResource(fileName);
+                if (DatasetWhitelistChecker.isWhitelisted(myFile.getName())) {
+                    info().log("File is whitelisted");
+                    uploadFile(myFile, fileName, collection.getDescription().getId());
+                } else {
+                    info().log("File is not whitelisted");
+                }
+                break;
+            }
+        }
+    }
+    
+    protected void uploadFile(Resource myFile, String fileName, String collectionId) throws ZebedeeException, IOException {
+        File file = new File("afile");
+        try (FileOutputStream outputStream = new FileOutputStream(file)) {
+            IOUtils.copy(myFile.getData(), outputStream);
+        } catch (FileNotFoundException e) {
+            System.out.println("CAN'T FIND IT");
+        } catch (IOException e) {
+            System.out.println("SOMETHING ELSE WENT WRONG");
+        }
+        List<NameValuePair> params = createUploadParams(fileName, "path", collectionId);
+        Client uploadServiceClient = new APIClient("http://dp-upload-service:25100/upload-new",
+                "664bff26407d60d5605f64379e47495c0c533c1565042d70653f31c0c705726f");
+        uploadServiceClient.uploadResumableFile(file, params);
+    } 
 
     protected static List<NameValuePair> createUploadParams(String resumableFilename, String path, String collectionId) {
 

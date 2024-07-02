@@ -58,6 +58,7 @@ import java.util.concurrent.Future;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
@@ -112,6 +113,9 @@ public class ApproveTaskTest {
     @Mock
     private TimeSeriesCompressionTask compressionTask;
 
+    @Mock
+    private Client uploadServiceClient; // Inject the mock Client
+
     @InjectMocks
     @Spy
     private ApproveTask task;
@@ -121,6 +125,9 @@ public class ApproveTaskTest {
 
     @Captor
     private ArgumentCaptor<List<String>> stringListCaptor;
+
+    @Captor // Declare the ArgumentCaptor
+    private ArgumentCaptor<List<NameValuePair>> paramsCaptor; 
 
     private ExecutorService executorService;
 
@@ -425,4 +432,68 @@ public class ApproveTaskTest {
         // Then
         verify(uploadServiceClient, times(1)).uploadResumableFile(file, ApproveTask.createUploadParams(fileName, "path", collectionId));
     }
+
+    // working tests
+
+    @Test
+    public void testCreateUploadParams() {
+        String resumableFilename = "test_file.csv";
+        String path = "/path/to/file";
+        String collectionId = "12345";
+
+        List<NameValuePair> params = ApproveTask.createUploadParams(resumableFilename, path, collectionId);
+
+        assertEquals(7, params.size());
+
+        NameValuePair resumableFilenameParam = params.stream().filter(p -> p.getName().equals("resumableFilename")).findFirst().get();
+        assertEquals(resumableFilename, resumableFilenameParam.getValue());
+
+        NameValuePair pathParam = params.stream().filter(p -> p.getName().equals("path")).findFirst().get();
+        assertEquals(path, pathParam.getValue());
+
+        NameValuePair collectionIdParam = params.stream().filter(p -> p.getName().equals("collectionId")).findFirst().get();
+        assertEquals(collectionId, collectionIdParam.getValue());
+
+        NameValuePair resumableTypeParam = params.stream().filter(p -> p.getName().equals("resumableType")).findFirst().get();
+        assertEquals(Configuration.getResumableType(), resumableTypeParam.getValue());
+        
+        NameValuePair isPublishableParam = params.stream().filter(p -> p.getName().equals("isPublishable")).findFirst().get();
+        assertEquals(Configuration.getIsPublishable(), isPublishableParam.getValue());
+
+        NameValuePair licenceParam = params.stream().filter(p -> p.getName().equals("licence")).findFirst().get();
+        assertEquals(Configuration.getLicence(), licenceParam.getValue());
+
+        NameValuePair licenceURLParam = params.stream().filter(p -> p.getName().equals("licenceUrl")).findFirst().get();
+        assertEquals(Configuration.getLicenceURL(), licenceURLParam.getValue());
+
+    }
+    
+
+
+    @Test
+    public void shouldCreateUploadParams() {
+        List<NameValuePair> params = ApproveTask.createUploadParams("test.dsri", "path/to/file", "12345");
+
+        assertThat(params.get(0).getName(), equalTo("resumableFilename"));
+        assertThat(params.get(0).getValue(), equalTo("test.dsri"));
+
+        assertThat(params.get(1).getName(), equalTo("path"));
+        assertThat(params.get(1).getValue(), equalTo("path/to/file"));
+
+        assertThat(params.get(2).getName(), equalTo("collectionId"));
+        assertThat(params.get(2).getValue(), equalTo("12345"));
+
+        assertThat(params.get(3).getName(), equalTo("resumableType"));
+        assertThat(params.get(3).getValue(), equalTo("text/plain"));
+
+        assertThat(params.get(4).getName(), equalTo("isPublishable"));
+        assertThat(params.get(4).getValue(), equalTo("true"));
+
+        assertThat(params.get(5).getName(), equalTo("licence"));
+        assertThat(params.get(5).getValue(), equalTo("Open Government Licence v3.0"));
+
+        assertThat(params.get(6).getName(), equalTo("licenceUrl"));
+        assertThat(params.get(6).getValue(), equalTo("https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"));
+    }
+
 }

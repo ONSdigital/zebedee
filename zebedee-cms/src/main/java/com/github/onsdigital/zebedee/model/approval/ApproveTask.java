@@ -395,15 +395,17 @@ public class ApproveTask implements Callable<Boolean> {
         try (FileOutputStream outputStream = new FileOutputStream(file)) {
             IOUtils.copy(myFile.getData(), outputStream);
         } catch (FileNotFoundException e) {
-            System.out.println("CAN'T FIND IT");
+            info().log("file not found");
+            throw e;
         } catch (IOException e) {
-            System.out.println("SOMETHING ELSE WENT WRONG");
+            info().log("input/output error");
+            throw e;
         }
         List<NameValuePair> params = createUploadParams(fileName, "path", collectionId);
-        Client uploadServiceClient = new APIClient("http://dp-upload-service:25100/upload-new",
-                "664bff26407d60d5605f64379e47495c0c533c1565042d70653f31c0c705726f");
+        String uploadServiceURL = Configuration.getUploadServiceApiUrl() + "upload-new";
+        Client uploadServiceClient = new APIClient(uploadServiceURL, Configuration.getServiceAuthToken());
         uploadServiceClient.uploadResumableFile(file, params);
-    } 
+    }
 
     protected static List<NameValuePair> createUploadParams(String resumableFilename, String path, String collectionId) {
 

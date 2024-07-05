@@ -130,7 +130,6 @@ Otherwise :violin: kindly ask someone from the dev team to help troubleshoot.
 | DATASET_API_URL                                  | "http://localhost:22000"                                           | Dataset API URL                                                              |
 | IMAGE_API_URL                                    | "http://localhost:24700"                                           | Image API URL                                                                |
 | ENABLE_KAFKA                                     | false                                                              | Feature flag to send kafka messages when a collection is published           |
-| ENABLE_LEGACY_CACHE_API                          | false                                                              | Feature flag to enable Cache API                                             |
 | KAFKA_ADDR                                       | "localhost:9092"                                                   | Comma seperated list of kafka brokers                                        |
 | KAFKA_CONTENT_UPDATED_TOPIC                      | content-updated                                                    | Kafka topic to send content updated event to                                 |
 | DATASET_API_AUTH_TOKEN                           | "FD0108EA-825D-411C-9B1D-41EF7727F465"                             | Dataset API authentication token                                             |

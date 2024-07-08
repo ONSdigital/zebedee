@@ -339,35 +339,6 @@ public class ApproveTask implements Callable<Boolean> {
         info().data("collectionId", collection.getDescription().getId()).log("approval task: validation sucessful");
     }
 
-/*      private void uploadNewEndpoint(Collection collection, CollectionReader collectionReader) throws ZebedeeException, IOException {
-        if (Configuration.isUploadNewEndpointEnabled()) {
-            for (String uri : collectionReader.getReviewed().listUris()) {
-                if (uri.endsWith("csv") || uri.endsWith("xlsx")) {
-                    String fileName = uri.substring(1);
-                    Resource myFile = collectionReader.getResource(fileName);
-                    if (DatasetWhitelistChecker.isWhitelisted(myFile.getName())) {
-                        info().log("File is whitelisted");
-                        File file = new File("afile");
-                        try (FileOutputStream outputStream = new FileOutputStream(file)) {
-                            IOUtils.copy(myFile.getData(), outputStream);
-                        } catch (FileNotFoundException e) {
-                            System.out.println("CAN'T FIND IT");
-                        } catch (IOException e) {
-                            System.out.println("SOMETHING ELSE WENT WRONG");
-                        }
-                        List<NameValuePair> params = createUploadParams(fileName, "path", collection.getDescription().getId());
-                        Client uploadServiceClient = new APIClient("http://dp-upload-service:25100/upload-new",
-                                "664bff26407d60d5605f64379e47495c0c533c1565042d70653f31c0c705726f");
-                        uploadServiceClient.uploadResumableFile(file, params);
-                    } else {
-                        info().log("File is not whitelisted");
-                    }
-                    break;
-                }
-            }
-        }
-    }  */
-
     protected void uploadNewEndpoint(Collection collection, CollectionReader collectionReader) throws ZebedeeException, IOException {
         if (Configuration.isUploadNewEndpointEnabled()) {
             uploadWhitelistedFiles(collection, collectionReader);

@@ -323,20 +323,20 @@ public class ApproveTask implements Callable<Boolean> {
 
     private void validate() {
         if (collection == null) {
-            throw new IllegalArgumentException("approval task unsuccesful: collection required but was null");
+            throw new IllegalArgumentException("approval task unsuccessful: collection required but was null");
         }
         if (collection.getDescription() == null) {
-            throw new IllegalArgumentException("approval task unsuccesful: collection.description required but was " +
+            throw new IllegalArgumentException("approval task unsuccessful: collection.description required but was " +
                     "null");
         }
         if (session == null) {
-            throw new IllegalArgumentException("approval task unsuccesful: as session required but was null");
+            throw new IllegalArgumentException("approval task unsuccessful: as session required but was null");
         }
         if (StringUtils.isEmpty(session.getEmail())) {
             throw new IllegalArgumentException(
-                    "approval task unsuccesful: as session.email required but was null/empty");
+                    "approval task unsuccessful: as session.email required but was null/empty");
         }
-        info().data("collectionId", collection.getDescription().getId()).log("approval task: validation sucessful");
+        info().data("collectionId", collection.getDescription().getId()).log("approval task: validation successful");
     }
 
     protected void uploadNewEndpoint(Collection collection, CollectionReader collectionReader) throws ZebedeeException, IOException {

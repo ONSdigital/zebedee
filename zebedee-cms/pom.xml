@@ -38,6 +38,7 @@
         <dependency>
             <groupId>com.github.onsdigital</groupId>
             <artifactId>dp-upload-service-client-java</artifactId>
+            <version>1.0.0</version>
         </dependency>
 
         <!--Restolino-->

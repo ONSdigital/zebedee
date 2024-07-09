@@ -21,7 +21,7 @@ the published site content as JSON.
 
 Zebedee-cms is an extension of zebedee-reader. It's used by [Florence][2] and provides API endpoints for managing
 content, users, teams and publishing collecions. Zebedee-CMS is not public facing and requires authentication for the
-majority functionality. Pre-release content is encrypted and requries the appropriate permissions to be able to
+majority functionality. Pre-release content is encrypted and requires the appropriate permissions to be able to
 access it.
 
 ## Prerequisites

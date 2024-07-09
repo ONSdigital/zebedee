@@ -373,7 +373,7 @@ public class ApproveTask implements Callable<Boolean> {
             throw e;
         }
         List<NameValuePair> params = createUploadParams(fileName, "path", collectionId);
-        String uploadServiceURL = Configuration.getUploadServiceApiUrl() + "upload-new";
+        String uploadServiceURL = Configuration.getUploadServiceApiUrl();
         Client uploadServiceClient = new APIClient(uploadServiceURL, Configuration.getServiceAuthToken());
         uploadServiceClient.uploadResumableFile(file, params);
     }

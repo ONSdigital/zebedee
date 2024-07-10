@@ -124,39 +124,44 @@ Otherwise :violin: kindly ask someone from the dev team to help troubleshoot.
 
 ### Optional configuration options
 
-| Environment variable                             | Default                                                            | Description                                                                  |
-|--------------------------------------------------|--------------------------------------------------------------------|------------------------------------------------------------------------------|
-| DEFAULT_WEBSITE_URL                              | "http://localhost:8080"                                            | Service URL                                                                  |
-| DEFAULT_LEGACY_CACHE_API_URL                     | "http://localhost:29100"                                           | Cache API Service URL                                                        |
-| DEFAULT_SLACK_WARNING_CHANNEL                    | "slack-client-test"                                                | Slack channel                                                                |
-| DEFAULT_SLACK_ALARM_CHANNEL                      | "slack-client-test"                                                | Slack alarm channel                                                          |
-| DEFAULT_SLACK_USERNAME                           | "Zebedee"                                                          | Slack user                                                                   |
-| DEFAULT_PUBLIC_WEBSITE_URL                       | "http://localhost:8080"                                            | Service public URL                                                           |
-| DEFAULT_FLORENCE_URL                             | "http://localhost:8081"                                            | Florence URL                                                                 |
-| brian_url                                        | "http://localhost:8083"                                            | Brian URL                                                                    |
-| DEFAULT_TRAIN_URL                                | "http://localhost:8084"                                            | Train URL                                                                    |
-| DEFAULT_DYLAN_URL                                | "http://localhost:8085"                                            | Dylan URL                                                                    |
-| CONTENT_DIRECTORY                                | "content"                                                          | Content directory                                                            |
-| KAFKA_SEC_PROTO                                  | _unset_                                                            | if set to "TLS", kafka connections will use TLS                              |
-| KAFKA_SEC_CLIENT_CERT                            | _unset_                                                            | PEM for the client certificate [1]                                           |
-| KAFKA_SEC_CLIENT_KEY                             | _unset_                                                            | PEM for the client key [1]                                                   |
-| MATHJAX_SERVICE_URL                              | "http://localhost:8888"                                            | Mathjax service URL                                                          |
-| DATASET_API_URL                                  | "http://localhost:22000"                                           | Dataset API URL                                                              |
-| IMAGE_API_URL                                    | "http://localhost:24700"                                           | Image API URL                                                                |
-| ENABLE_KAFKA                                     | false                                                              | Feature flag to send kafka messages when a collection is published           |
-| KAFKA_ADDR                                       | "localhost:9092"                                                   | Comma seperated list of kafka brokers                                        |
-| KAFKA_CONTENT_UPDATED_TOPIC                      | content-updated                                                    | Kafka topic to send content updated event to                                 |
-| DATASET_API_AUTH_TOKEN                           | "FD0108EA-825D-411C-9B1D-41EF7727F465"                             | Dataset API authentication token                                             |
-| SERVICE_AUTH_TOKEN                               | "15C0E4EE-777F-4C61-8CDB-2898CEB34657"                             | Service API authentication token                                             |
-| LEGACY_CACHE_API_AUTH_TOKEN                      | "748896205c3b42b43adb4b22fff11784c5d971187f280ab1b6f142c3d69e64e4" | Legacy Cache API authentication token                                        |
-| SESSIONS_API_URL                                 | "http://localhost:24400"                                           | Session API URL                                                              |
-| KEYRING_SECRET_KEY                               | "KEYRING_SECRET_KEY";                                              | Keyring encryption key                                                       |
-| KEYRING_INIT_VECTOR                              | "KEYRING_INIT_VECTOR"                                              | Keyring init vector                                                          |
-| VERIFY_RETRY_DELAY                               | 5000; //milliseconds                                               | Retry delay duration                                                         |
-| VERIFY_RETRY_COUNT                               | 10                                                                 | Retry count for how long, in seconds, to wait for retry                      |
-| DEFAULT_PREPROCESS_SECONDS_BEFORE_PUBLISH        | 30                                                                 | how many seconds before the actual publish time should we run the preprocess |
-| DEFAULT_SECONDS_TO_CACHE_AFTER_SCHEDULED_PUBLISH | 30                                                                 | how many additional seconds after the publi                                  |
-| IDENTITY_API_URL                                 | "http://localhost:25600"                                           | Identity API URL                                                             |
+| Environment variable                             | Default                                                                      | Description                                                                  |
+|--------------------------------------------------|------------------------------------------------------------------------------|------------------------------------------------------------------------------|
+| DEFAULT_WEBSITE_URL                              | "http://localhost:8080"                                                      | Service URL                                                                  |
+| DEFAULT_LEGACY_CACHE_API_URL                     | "http://localhost:29100"                                                     | Cache API Service URL                                                        |
+| DEFAULT_SLACK_WARNING_CHANNEL                    | "slack-client-test"                                                          | Slack channel                                                                |
+| DEFAULT_SLACK_ALARM_CHANNEL                      | "slack-client-test"                                                          | Slack alarm channel                                                          |
+| DEFAULT_SLACK_USERNAME                           | "Zebedee"                                                                    | Slack user                                                                   |
+| DEFAULT_PUBLIC_WEBSITE_URL                       | "http://localhost:8080"                                                      | Service public URL                                                           |
+| DEFAULT_FLORENCE_URL                             | "http://localhost:8081"                                                      | Florence URL                                                                 |
+| brian_url                                        | "http://localhost:8083"                                                      | Brian URL                                                                    |
+| DEFAULT_TRAIN_URL                                | "http://localhost:8084"                                                      | Train URL                                                                    |
+| DEFAULT_DYLAN_URL                                | "http://localhost:8085"                                                      | Dylan URL                                                                    |
+| CONTENT_DIRECTORY                                | "content"                                                                    | Content directory                                                            |
+| KAFKA_SEC_PROTO                                  | _unset_                                                                      | if set to "TLS", kafka connections will use TLS                              |
+| KAFKA_SEC_CLIENT_CERT                            | _unset_                                                                      | PEM for the client certificate [1]                                           |
+| KAFKA_SEC_CLIENT_KEY                             | _unset_                                                                      | PEM for the client key [1]                                                   |
+| MATHJAX_SERVICE_URL                              | "http://localhost:8888"                                                      | Mathjax service URL                                                          |
+| DATASET_API_URL                                  | "http://localhost:22000"                                                     | Dataset API URL                                                              |
+| IMAGE_API_URL                                    | "http://localhost:24700"                                                     | Image API URL                                                                |
+| ENABLE_KAFKA                                     | false                                                                        | Feature flag to send kafka messages when a collection is published           |
+| KAFKA_ADDR                                       | "localhost:9092"                                                             | Comma seperated list of kafka brokers                                        |
+| KAFKA_CONTENT_UPDATED_TOPIC                      | content-updated                                                              | Kafka topic to send content updated event to                                 |
+| DATASET_API_AUTH_TOKEN                           | "FD0108EA-825D-411C-9B1D-41EF7727F465"                                       | Dataset API authentication token                                             |
+| SERVICE_AUTH_TOKEN                               | "15C0E4EE-777F-4C61-8CDB-2898CEB34657"                                       | Service API authentication token                                             |
+| LEGACY_CACHE_API_AUTH_TOKEN                      | "748896205c3b42b43adb4b22fff11784c5d971187f280ab1b6f142c3d69e64e4"           | Legacy Cache API authentication token                                        |
+| SESSIONS_API_URL                                 | "http://localhost:24400"                                                     | Session API URL                                                              |
+| KEYRING_SECRET_KEY                               | "KEYRING_SECRET_KEY";                                                        | Keyring encryption key                                                       |
+| KEYRING_INIT_VECTOR                              | "KEYRING_INIT_VECTOR"                                                        | Keyring init vector                                                          |
+| VERIFY_RETRY_DELAY                               | 5000; //milliseconds                                                         | Retry delay duration                                                         |
+| VERIFY_RETRY_COUNT                               | 10                                                                           | Retry count for how long, in seconds, to wait for retry                      |
+| DEFAULT_PREPROCESS_SECONDS_BEFORE_PUBLISH        | 30                                                                           | how many seconds before the actual publish time should we run the preprocess |
+| DEFAULT_SECONDS_TO_CACHE_AFTER_SCHEDULED_PUBLISH | 30                                                                           | how many additional seconds after the publi                                  |
+| IDENTITY_API_URL                                 | "http://localhost:25600"                                                     | Identity API URL                                                             |
+| RESUMABLE_TYPE                                   | "text/plain"                                                                 | Resumable file type                                                          |
+| IS_PUBLISHABLE                                   | true                                                                         | The file is publishable or not                                               |
+| LICENCE                                          | "Open Government Licence v3.0"                                               | The liecence we are using                                                    |
+| LICENCE_URL                                      | "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" | The liecence URL                                                             |
+| UPLOAD_SERVICE_API_URL                           | "http://localhost:25100"                                                     | The upload service api URL                                                   |
 
 ### New Central Keyring configuration
 

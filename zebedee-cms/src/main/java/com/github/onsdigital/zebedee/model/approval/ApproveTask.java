@@ -357,7 +357,7 @@ public class ApproveTask implements Callable<Boolean> {
                 String fileName = uri.substring(1);
                 Resource myFile = collectionReader.getResource(fileName);
                 if (DatasetWhitelistChecker.isWhitelisted(myFile.getName())) {
-                    info().log("File is whitelisted");
+                    info().data("filename", fileName).data("collectionId", collection.getDescription().getId()).log("File is whitelisted");
                     uploadFile(myFile, fileName, collection.getDescription().getId());
                 }
             }
@@ -369,10 +369,12 @@ public class ApproveTask implements Callable<Boolean> {
         try (FileOutputStream outputStream = new FileOutputStream(file)) {
             IOUtils.copy(myFile.getData(), outputStream);
         } catch (FileNotFoundException e) {
-            info().log("file not found");
+            error().data("collectionId", collection).data("user", session.getEmail())
+                    .logException(e, "file not found");
             throw e;
         } catch (IOException e) {
-            info().log("input/output error");
+            error().data("collectionId", collection).data("user", session.getEmail())
+                            .logException(e, "input/output error");
             throw e;
         }
         List<NameValuePair> params = createUploadParams(fileName, "", collectionId);

@@ -23,15 +23,16 @@ import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.service.BabbagePdfService;
+import com.github.onsdigital.zebedee.service.ServiceSupplier;
+import com.github.onsdigital.zebedee.service.UploadService;
 import com.github.onsdigital.zebedee.service.content.navigation.ContentTreeNavigator;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.util.ContentDetailUtil;
 import com.github.onsdigital.zebedee.util.DatasetWhitelistChecker;
+import com.github.onsdigital.zebedee.util.ZebedeeCmsService;
 import com.github.onsdigital.zebedee.util.slack.Notifier;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import com.github.onsdigital.dp.uploadservice.api.Client; 
-import com.github.onsdigital.dp.uploadservice.api.APIClient;
 import org.apache.hc.core5.http.NameValuePair;
 import org.apache.hc.core5.http.message.BasicNameValuePair;
 
@@ -61,6 +62,11 @@ public class ApproveTask implements Callable<Boolean> {
     private final DataIndex dataIndex;
     private final ContentDetailResolver contentDetailResolver;
     private final Notifier notifier;
+    static ServiceSupplier<UploadService> uploadServiceSupplier;
+
+    static {
+        uploadServiceSupplier = () -> ZebedeeCmsService.getInstance().getUploadService();
+    }
 
     /**
      * @param collection
@@ -373,9 +379,7 @@ public class ApproveTask implements Callable<Boolean> {
             throw e;
         }
         List<NameValuePair> params = createUploadParams(fileName, "path", collectionId);
-        String uploadServiceURL = Configuration.getUploadServiceApiUrl();
-        Client uploadServiceClient = new APIClient(uploadServiceURL, Configuration.getServiceAuthToken());
-        uploadServiceClient.uploadResumableFile(file, params);
+        uploadServiceSupplier.getService().uploadResumableFile(file, params);
     }
 
     protected static List<NameValuePair> createUploadParams(String resumableFilename, String path, String collectionId) {

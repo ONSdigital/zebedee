@@ -42,6 +42,8 @@ import com.github.onsdigital.zebedee.service.ServiceStoreImpl;
 import com.github.onsdigital.zebedee.service.StaticFilesService;
 import com.github.onsdigital.zebedee.service.StaticFilesServiceImpl;
 import com.github.onsdigital.zebedee.service.ZebedeeDatasetService;
+import com.github.onsdigital.zebedee.service.UploadService;
+import com.github.onsdigital.zebedee.service.UploadServiceImpl;
 import com.github.onsdigital.zebedee.session.service.JWTSessionsServiceImpl;
 import com.github.onsdigital.zebedee.session.service.Sessions;
 import com.github.onsdigital.zebedee.session.service.ThreadLocalSessionsServiceImpl;
@@ -102,6 +104,7 @@ import static com.github.onsdigital.zebedee.configuration.Configuration.getServi
 import static com.github.onsdigital.zebedee.configuration.Configuration.getSlackSupportChannelID;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getStaticFilesAPIURL;
 import static com.github.onsdigital.zebedee.configuration.Configuration.slackChannelsToNotfiyOnStartUp;
+import static com.github.onsdigital.zebedee.configuration.Configuration.getUploadServiceApiUrl;
 import static com.github.onsdigital.zebedee.permissions.store.PermissionsStoreFileSystemImpl.initialisePermissions;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
@@ -137,6 +140,7 @@ public class ZebedeeConfiguration {
     private ImageService imageService;
     private KafkaService kafkaService;
     private StaticFilesService staticFilesService;
+    private UploadService uploadService;
     private CollectionKeyring collectionKeyring;
     private CollectionKeyCache schedulerKeyCache;
     private EncryptionKeyFactory encryptionKeyFactory;
@@ -253,6 +257,8 @@ public class ZebedeeConfiguration {
         imageService = new ImageServiceImpl(imageClient);
 
         staticFilesService = new StaticFilesServiceImpl(new APIClient(getStaticFilesAPIURL(), getServiceAuthToken()));
+
+        uploadService = new UploadServiceImpl(new com.github.onsdigital.dp.uploadservice.api.APIClient(getUploadServiceApiUrl(), getServiceAuthToken()));
 
         if (cmsFeatureFlags().isKafkaEnabled()) {
 
@@ -450,6 +456,10 @@ public class ZebedeeConfiguration {
 
     public StaticFilesService getStaticFilesService() {
         return staticFilesService;
+    }
+
+    public UploadService getUploadService() {
+        return uploadService;
     }
 
     public KafkaService getKafkaService() {

@@ -23,6 +23,7 @@ import com.github.onsdigital.zebedee.service.DatasetService;
 import com.github.onsdigital.zebedee.service.ImageService;
 import com.github.onsdigital.zebedee.service.KafkaService;
 import com.github.onsdigital.zebedee.service.StaticFilesService;
+import com.github.onsdigital.zebedee.service.UploadService;
 import com.github.onsdigital.zebedee.session.model.Session;
 import dp.api.dataset.DatasetAPIClient;
 import dp.api.dataset.DatasetClient;
@@ -144,6 +145,8 @@ public class ZebedeeCmsService {
     public KafkaService getKafkaService() { return Root.zebedee.getKafkaService(); }
 
     public StaticFilesService getStaticFilesService() { return Root.zebedee.getStaticFilesService(); }
+
+    public UploadService getUploadService() { return Root.zebedee.getUploadService(); }
 
     public DatasetClient getDatasetClient() throws URISyntaxException {
         return new DatasetAPIClient(

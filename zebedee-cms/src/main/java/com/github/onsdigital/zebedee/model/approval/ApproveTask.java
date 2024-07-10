@@ -359,8 +359,6 @@ public class ApproveTask implements Callable<Boolean> {
                 if (DatasetWhitelistChecker.isWhitelisted(myFile.getName())) {
                     info().log("File is whitelisted");
                     uploadFile(myFile, fileName, collection.getDescription().getId());
-                } else {
-                    info().log("File is not whitelisted");
                 }
             }
         }
@@ -377,7 +375,7 @@ public class ApproveTask implements Callable<Boolean> {
             info().log("input/output error");
             throw e;
         }
-        List<NameValuePair> params = createUploadParams(fileName, "path", collectionId);
+        List<NameValuePair> params = createUploadParams(fileName, "", collectionId);
         uploadServiceSupplier.getService().uploadResumableFile(file, params);
     }
 

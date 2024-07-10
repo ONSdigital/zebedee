@@ -170,7 +170,9 @@ public class ApproveTask implements Callable<Boolean> {
             info().data("user", session.getEmail()).data("collectionId", collection.getDescription().getId())
                     .log("approve task: collection approve task completed successfully");
 
-            uploadNewEndpoint(collection, collectionReader);
+            if (Configuration.isUploadNewEndpointEnabled()) {
+                uploadNewEndpoint(collection, collectionReader);
+            }
             
             return collection != null;
 
@@ -346,9 +348,7 @@ public class ApproveTask implements Callable<Boolean> {
     }
 
     protected void uploadNewEndpoint(Collection collection, CollectionReader collectionReader) throws ZebedeeException, IOException {
-        if (Configuration.isUploadNewEndpointEnabled()) {
-            uploadWhitelistedFiles(collection, collectionReader);
-        }
+        uploadWhitelistedFiles(collection, collectionReader);
     }
     
     protected void uploadWhitelistedFiles(Collection collection, CollectionReader collectionReader) throws ZebedeeException, IOException {

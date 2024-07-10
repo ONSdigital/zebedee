@@ -159,8 +159,8 @@ Otherwise :violin: kindly ask someone from the dev team to help troubleshoot.
 | IDENTITY_API_URL                                 | "http://localhost:25600"                                                     | Identity API URL                                                             |
 | RESUMABLE_TYPE                                   | "text/plain"                                                                 | Resumable file type                                                          |
 | IS_PUBLISHABLE                                   | true                                                                         | The file is publishable or not                                               |
-| LICENCE                                          | "Open Government Licence v3.0"                                               | The liecence we are using                                                    |
-| LICENCE_URL                                      | "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" | The liecence URL                                                             |
+| LICENCE                                          | "Open Government Licence v3.0"                                               | The licence we are using                                                     |
+| LICENCE_URL                                      | "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" | The licence URL                                                              |
 | UPLOAD_SERVICE_API_URL                           | "http://localhost:25100"                                                     | The upload service api URL                                                   |
 
 ### New Central Keyring configuration

@@ -366,7 +366,7 @@ public class ApproveTaskTest {
         task.uploadNewEndpoint(collection, collectionReader);
 
         // Then
-        verify(task, times(0)).uploadWhitelistedFiles(collection, collectionReader);
+        verify(task, times(1)).uploadWhitelistedFiles(collection, collectionReader);
     }
 
     @Test

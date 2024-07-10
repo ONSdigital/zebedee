@@ -353,7 +353,7 @@ public class ApproveTask implements Callable<Boolean> {
     
     protected void uploadWhitelistedFiles(Collection collection, CollectionReader collectionReader) throws ZebedeeException, IOException {
         for (String uri : collectionReader.getReviewed().listUris()) {
-            if (uri.endsWith(".csv") || uri.endsWith(".xlsx")) {
+            if (uri.endsWith(".csv") || uri.endsWith(".xlsx") || uri.endsWith(".xls") || uri.endsWith(".csdb")) {
                 String fileName = uri.substring(1);
                 Resource myFile = collectionReader.getResource(fileName);
                 if (DatasetWhitelistChecker.isWhitelisted(myFile.getName())) {
@@ -362,7 +362,6 @@ public class ApproveTask implements Callable<Boolean> {
                 } else {
                     info().log("File is not whitelisted");
                 }
-                break;
             }
         }
     }

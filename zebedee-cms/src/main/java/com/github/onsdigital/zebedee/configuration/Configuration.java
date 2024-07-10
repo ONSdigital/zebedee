@@ -63,7 +63,7 @@ public class Configuration {
     private static final String IS_PUBLISHABLE = "true";
     private static final String LICENCE = "Open Government Licence v3.0";
     private static final String LICENCE_URL = "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/";
-    private static final String UPLOAD_SERVICE_API_URL = "http://dp-upload-service:25100";
+    private static final String UPLOAD_SERVICE_API_URL = "http://localhost:25100";
 
     public static boolean isLegacyCacheAPIEnabled() {
         return BooleanUtils.toBoolean(StringUtils.defaultIfBlank(getValue("ENABLE_LEGACY_CACHE_API"), "false"));

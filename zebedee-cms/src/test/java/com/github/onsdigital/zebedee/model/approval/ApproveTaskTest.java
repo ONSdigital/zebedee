@@ -441,57 +441,57 @@ public class ApproveTaskTest {
     @Test
     public void testExtractDatasetId() {
         String fileName = "economy/grossdomesticproductgdp/datasets/mycollectionq10/jun2024/mret.csv";
-        String datasetId = task.extractDatasetId(fileName);
+        String result = task.extractDatasetId(fileName);
         String expected = "mret";
-        assertThat(datasetId, equalTo(expected));
+        assertThat(result, equalTo(expected));
     }
 
     @Test
     public void testExtractDatasetVersion() {
         String fileName = "economy/grossdomesticproductgdp/datasets/mycollectionq10/jun2024/mret.csv";
-        String datasetId = task.extractDatasetVersion(fileName);
+        String result = task.extractDatasetVersion(fileName);
         String expected = "jun2024";
-        assertThat(datasetId, equalTo(expected));
+        assertThat(result, equalTo(expected));
     }
 
     @Test
     public void testExtractDatasetVersion_Simple() {
         String fileName = "jun2024/mret.csv";
-        String datasetId = task.extractDatasetVersion(fileName);
+        String result = task.extractDatasetVersion(fileName);
         String expected = "jun2024";
-        assertThat(datasetId, equalTo(expected));
+        assertThat(result, equalTo(expected));
     }
 
     @Test
     public void testExtractFileName() {
         String fileName = "economy/grossdomesticproductgdp/datasets/mycollectionq10/jun2024/mret.csv";
-        String datasetId = task.extractFileName(fileName);
+        String result = task.extractFileName(fileName);
         String expected = "mret.csv";
-        assertThat(datasetId, equalTo(expected));
+        assertThat(result, equalTo(expected));
     }
 
     @Test
     public void testExtractFileName_Simple() {
         String fileName = "mret.csv";
-        String datasetId = task.extractFileName(fileName);
+        String result = task.extractFileName(fileName);
         String expected = "mret.csv";
-        assertThat(datasetId, equalTo(expected));
+        assertThat(result, equalTo(expected));
     }
 
     @Test
     public void testExtractFileName_AnotherSimple() {
         String fileName = "a/b/mret.csv";
-        String datasetId = task.extractFileName(fileName);
+        String result = task.extractFileName(fileName);
         String expected = "mret.csv";
-        assertThat(datasetId, equalTo(expected));
+        assertThat(result, equalTo(expected));
     }
 
     @Test
     public void testExtractFileName_YetAnotherSimple() {
         String fileName = "/a/mret.csv";
-        String datasetId = task.extractFileName(fileName);
+        String result = task.extractFileName(fileName);
         String expected = "mret.csv";
-        assertThat(datasetId, equalTo(expected));
+        assertThat(result, equalTo(expected));
     }
 
 }

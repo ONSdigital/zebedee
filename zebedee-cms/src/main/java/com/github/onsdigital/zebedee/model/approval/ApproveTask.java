@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee.model.approval;
 
 import com.github.onsdigital.zebedee.configuration.Configuration;
+import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.data.DataPublisher;
 import com.github.onsdigital.zebedee.data.importing.CsvTimeseriesUpdateImporter;
 import com.github.onsdigital.zebedee.data.importing.TimeseriesUpdateCommand;
@@ -38,7 +39,10 @@ import org.apache.hc.core5.http.message.BasicNameValuePair;
 
 import java.io.*;
 import java.net.URISyntaxException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -377,7 +381,10 @@ public class ApproveTask implements Callable<Boolean> {
                             .logException(e, "input/output error");
             throw e;
         }
-        List<NameValuePair> params = createUploadParams(fileName, "", collectionId);
+
+        List<NameValuePair> params = createUploadParams(
+                extractFileName(fileName), "timeseries-datasets/"+extractDatasetId(fileName)+"/"+extractDatasetVersion(fileName), collectionId
+        );
         uploadServiceSupplier.getService().uploadResumableFile(file, params);
     }
 
@@ -398,5 +405,38 @@ public class ApproveTask implements Callable<Boolean> {
         params.add(new BasicNameValuePair("licence", licence));
         params.add(new BasicNameValuePair("licenceUrl", licenceURL));
         return params;
+    }
+
+    protected String baseName(String filePath) {
+        Path path = Paths.get(filePath);
+        return path.getFileName().toString();
+    }
+
+    protected String extractDatasetId(String fileName) {
+        String[] tokens = fileName.split("\\.(?=[^\\.]+$)");
+        return baseName(tokens[0]);
+    }
+
+    protected String extractDatasetVersion(String fileName) {
+        String[] tokens = fileName.split("\\.(?=[^\\.]+$)");
+
+        // remove the filename and it's extension
+        int index = tokens[0].lastIndexOf('/');
+        String result = "";
+        if (index != -1) {
+            result = tokens[0].substring(0, index);
+        } else {
+            result = fileName;
+        }
+
+        return baseName(result);
+    }
+
+    protected String extractFileName(String fileName) {
+        String[] tokens = fileName.split(".+?/(?=[^/]+$)");
+        if (tokens.length >= 2) {
+            return tokens[1];
+        }
+        return fileName;
     }
 }

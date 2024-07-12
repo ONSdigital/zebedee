@@ -430,4 +430,68 @@ public class ApproveTaskTest {
         assertThat(params.get(6).getValue(), equalTo("https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"));
     }
 
+    @Test
+    public void testBaseName() {
+        String fileName = "economy/grossdomesticproductgdp/datasets/mycollectionq10/jun2024/mret.csv";
+        String baseName = task.baseName(fileName);
+        String expected = "mret.csv";
+        assertThat(baseName, equalTo(expected));
+    }
+
+    @Test
+    public void testExtractDatasetId() {
+        String fileName = "economy/grossdomesticproductgdp/datasets/mycollectionq10/jun2024/mret.csv";
+        String datasetId = task.extractDatasetId(fileName);
+        String expected = "mret";
+        assertThat(datasetId, equalTo(expected));
+    }
+
+    @Test
+    public void testExtractDatasetVersion() {
+        String fileName = "economy/grossdomesticproductgdp/datasets/mycollectionq10/jun2024/mret.csv";
+        String datasetId = task.extractDatasetVersion(fileName);
+        String expected = "jun2024";
+        assertThat(datasetId, equalTo(expected));
+    }
+
+    @Test
+    public void testExtractDatasetVersion_Simple() {
+        String fileName = "jun2024/mret.csv";
+        String datasetId = task.extractDatasetVersion(fileName);
+        String expected = "jun2024";
+        assertThat(datasetId, equalTo(expected));
+    }
+
+    @Test
+    public void testExtractFileName() {
+        String fileName = "economy/grossdomesticproductgdp/datasets/mycollectionq10/jun2024/mret.csv";
+        String datasetId = task.extractFileName(fileName);
+        String expected = "mret.csv";
+        assertThat(datasetId, equalTo(expected));
+    }
+
+    @Test
+    public void testExtractFileName_Simple() {
+        String fileName = "mret.csv";
+        String datasetId = task.extractFileName(fileName);
+        String expected = "mret.csv";
+        assertThat(datasetId, equalTo(expected));
+    }
+
+    @Test
+    public void testExtractFileName_AnotherSimple() {
+        String fileName = "a/b/mret.csv";
+        String datasetId = task.extractFileName(fileName);
+        String expected = "mret.csv";
+        assertThat(datasetId, equalTo(expected));
+    }
+
+    @Test
+    public void testExtractFileName_YetAnotherSimple() {
+        String fileName = "/a/mret.csv";
+        String datasetId = task.extractFileName(fileName);
+        String expected = "mret.csv";
+        assertThat(datasetId, equalTo(expected));
+    }
+
 }

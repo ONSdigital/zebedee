@@ -382,10 +382,15 @@ public class ApproveTask implements Callable<Boolean> {
             throw e;
         }
 
+        String datasetId = extractDatasetId(fileName);
+        String datasetVersion = extractDatasetVersion(fileName);
         List<NameValuePair> params = createUploadParams(
-                extractFileName(fileName), "timeseries-datasets/"+extractDatasetId(fileName)+"/"+extractDatasetVersion(fileName), collectionId
+                extractFileName(fileName), "timeseries-datasets/"+datasetId+"/"+datasetVersion, collectionId
         );
-        uploadServiceSupplier.getService().uploadResumableFile(file, params);
+
+        if (!datasetId.contains("upload") && !datasetVersion.equals("current")) {
+            uploadServiceSupplier.getService().uploadResumableFile(file, params);
+        }
     }
 
     protected static List<NameValuePair> createUploadParams(String resumableFilename, String path, String collectionId) {

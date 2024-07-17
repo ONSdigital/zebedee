@@ -34,4 +34,40 @@ public class DatasetWhitelistCheckerTest {
     public void testIsWhitelistedWithDifferentExtension() {
         assertTrue(DatasetWhitelistChecker.isWhitelisted("upload-mm22.xlsx"));
     }
+
+    @Test
+    public void testIsWhitelistedWithx09() {
+        assertTrue(DatasetWhitelistChecker.isWhitelisted("x09jul2025.xlsx"));
+    }
+
+    @Test
+    public void testIsWhitelistedWithx09WithFalseDate() {
+        assertFalse(DatasetWhitelistChecker.isWhitelisted("x09jul2025AVX.xlsx"));
+    }
+
+    @Test
+    public void testIsWhitelistedWithx09WithFalseDateWithUpload() {
+        assertTrue(DatasetWhitelistChecker.isWhitelisted("upload-x09jul2025.xlsx"));
+    }
+
+    @Test
+    public void testIsWhitelistedWithdataset1() {
+        assertTrue(DatasetWhitelistChecker.isWhitelisted("dataset1.xlsx"));
+    }
+
+    @Test
+    public void testIsWhitelistedWitha01() {
+        assertTrue(DatasetWhitelistChecker.isWhitelisted("a01jul2025.xlsx"));
+    }
+
+    @Test
+    public void testIsWhitelistedWithmm22withExtraChar() {
+        assertFalse(DatasetWhitelistChecker.isWhitelisted("mm22ABC.csv"));
+    }
+
+    @Test
+    public void testIsWhitelistedWithrtisa() {
+        assertTrue(DatasetWhitelistChecker.isWhitelisted("rtisa.csv"));
+    }
+
 }

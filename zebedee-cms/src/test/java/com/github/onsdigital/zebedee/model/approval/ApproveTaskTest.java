@@ -17,6 +17,7 @@ import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.util.slack.Notifier;
 import org.apache.hc.core5.http.NameValuePair;
+import org.joda.time.LocalDate;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -26,7 +27,11 @@ import org.mockito.*;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -494,4 +499,25 @@ public class ApproveTaskTest {
         assertThat(result, equalTo(expected));
     }
 
+    @Test
+    public void testfilePathGenerator(){
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        Date publishDate;
+        String today;
+        try {
+            publishDate = sdf.parse("2024-07-18");
+            today = sdf.format(new Date());
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
+
+        
+        assertEquals(task.filePathGenerator("mm22", publishDate, "v123"), "timeseries-datasets/mm22/v123");
+        assertEquals(task.filePathGenerator("a01jul2025", null, "v123"), "timeseries-datasets/other/" + today);
+        assertEquals(task.filePathGenerator("x09jul2025", publishDate, "v123"), "timeseries-datasets/other/2024-07-18");
+        assertEquals(task.filePathGenerator("dataset1", publishDate, "v123"), "timeseries-datasets/other/2024-07-18");
+        assertEquals(task.filePathGenerator("rtisa", publishDate, "v123"), "timeseries-datasets/other/2024-07-18");
+        assertEquals(task.filePathGenerator("cla01", publishDate, "v123"), "timeseries-datasets/other/2024-07-18");
+    }
 }

@@ -36,15 +36,20 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hc.core5.http.NameValuePair;
 import org.apache.hc.core5.http.message.BasicNameValuePair;
+import org.apache.kafka.common.protocol.types.Field.Str;
 
 import java.io.*;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
@@ -177,7 +182,7 @@ public class ApproveTask implements Callable<Boolean> {
             if (Configuration.isUploadNewEndpointEnabled()) {
                 uploadNewEndpoint(collection, collectionReader);
             }
-            
+
             return collection != null;
 
         } catch (Exception e) {
@@ -351,24 +356,28 @@ public class ApproveTask implements Callable<Boolean> {
         info().data("collectionId", collection.getDescription().getId()).log("approval task: validation successful");
     }
 
-    protected void uploadNewEndpoint(Collection collection, CollectionReader collectionReader) throws ZebedeeException, IOException {
+    protected void uploadNewEndpoint(Collection collection, CollectionReader collectionReader)
+            throws ZebedeeException, IOException {
         uploadWhitelistedFiles(collection, collectionReader);
     }
-    
-    protected void uploadWhitelistedFiles(Collection collection, CollectionReader collectionReader) throws ZebedeeException, IOException {
+
+    protected void uploadWhitelistedFiles(Collection collection, CollectionReader collectionReader)
+            throws ZebedeeException, IOException {
         for (String uri : collectionReader.getReviewed().listUris()) {
             if (uri.endsWith(".csv") || uri.endsWith(".xlsx") || uri.endsWith(".xls") || uri.endsWith(".csdb")) {
                 String fileName = uri.substring(1);
                 Resource myFile = collectionReader.getResource(fileName);
                 if (DatasetWhitelistChecker.isWhitelisted(myFile.getName())) {
-                    info().data("filename", fileName).data("collectionId", collection.getDescription().getId()).log("File is whitelisted");
+                    info().data("filename", fileName).data("collectionId", collection.getDescription().getId())
+                            .log("File is whitelisted");
                     uploadFile(myFile, fileName, collection.getDescription().getId());
                 }
             }
         }
     }
-    
-    protected void uploadFile(Resource myFile, String fileName, String collectionId) throws ZebedeeException, IOException {
+
+    protected void uploadFile(Resource myFile, String fileName, String collectionId)
+            throws ZebedeeException, IOException {
         File file = new File("afile");
         try (FileOutputStream outputStream = new FileOutputStream(file)) {
             IOUtils.copy(myFile.getData(), outputStream);
@@ -378,28 +387,36 @@ public class ApproveTask implements Callable<Boolean> {
             throw e;
         } catch (IOException e) {
             error().data("collectionId", collection).data("user", session.getEmail())
-                            .logException(e, "input/output error");
+                    .logException(e, "input/output error");
             throw e;
         }
 
         String datasetId = extractDatasetId(fileName);
         String datasetVersion = extractDatasetVersion(fileName);
+        if (collection.getDescription().getPublishDate() == null) {
+            System.out.println("Publish Date is: null");
+
+        }else{
+            System.out.println("Publish Date is: " + collection.getDescription().getPublishDate());
+        }
+        String generatedPath = filePathGenerator(datasetId, collection.getDescription().getPublishDate(),
+                datasetVersion);
         List<NameValuePair> params = createUploadParams(
-                extractFileName(fileName), "timeseries-datasets/"+datasetId+"/"+datasetVersion, collectionId
-        );
+                extractFileName(fileName), generatedPath, collectionId);
 
         if (!datasetId.contains("upload") && !datasetVersion.equals("current")) {
             uploadServiceSupplier.getService().uploadResumableFile(file, params);
         }
     }
 
-    protected static List<NameValuePair> createUploadParams(String resumableFilename, String path, String collectionId) {
+    protected static List<NameValuePair> createUploadParams(String resumableFilename, String path,
+            String collectionId) {
 
         // Get the following values from the config
         String resumableType = Configuration.getResumableType();
         String isPublishable = Configuration.getIsPublishable();
         String licence = Configuration.getLicence();
-        String licenceURL= Configuration.getLicenceURL();
+        String licenceURL = Configuration.getLicenceURL();
 
         List<NameValuePair> params = new ArrayList<>();
         params.add(new BasicNameValuePair("resumableFilename", resumableFilename));
@@ -409,6 +426,7 @@ public class ApproveTask implements Callable<Boolean> {
         params.add(new BasicNameValuePair("isPublishable", isPublishable));
         params.add(new BasicNameValuePair("licence", licence));
         params.add(new BasicNameValuePair("licenceUrl", licenceURL));
+
         return params;
     }
 
@@ -443,5 +461,24 @@ public class ApproveTask implements Callable<Boolean> {
             return tokens[1];
         }
         return fileName;
+    }
+
+    protected String filePathGenerator(String datasetId, Date publishDate, String DatasetVersion) {
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        if (publishDate == null){
+            publishDate = new Date();
+        }
+        String formattedDate = sdf.format(publishDate);
+        Set<String> OtherArray = new HashSet<>(Arrays.asList("dataset1", "a01", "x09", "cla01", "rtisa"));
+        String baseFilename = datasetId.replaceAll("(?i)(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)20[2-9][4-9]","");
+        String finalPath;
+
+        if (OtherArray.contains(baseFilename)) {
+            finalPath = "timeseries-datasets/" + "other" + "/" + formattedDate;
+        } else {
+            finalPath = "timeseries-datasets/" + baseFilename + "/" + DatasetVersion;
+        }
+        return finalPath;
     }
 }

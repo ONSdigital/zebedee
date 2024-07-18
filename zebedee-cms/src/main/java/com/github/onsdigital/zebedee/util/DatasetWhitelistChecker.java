@@ -9,9 +9,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class DatasetWhitelistChecker {
-
-    //drsi,mm23,mm22,ppi,dataset1,pusf,a01,x09,cla01,pn2,mgdp,diop,ios1,mret,mq10
-
+    
     public static Set<String> getWhitelistSet() {
 
         //Retrieve the whitelist from zebedee configuration

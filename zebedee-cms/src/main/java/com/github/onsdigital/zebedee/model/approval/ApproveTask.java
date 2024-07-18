@@ -393,12 +393,6 @@ public class ApproveTask implements Callable<Boolean> {
 
         String datasetId = extractDatasetId(fileName);
         String datasetVersion = extractDatasetVersion(fileName);
-        if (collection.getDescription().getPublishDate() == null) {
-            System.out.println("Publish Date is: null");
-
-        }else{
-            System.out.println("Publish Date is: " + collection.getDescription().getPublishDate());
-        }
         String generatedPath = filePathGenerator(datasetId, collection.getDescription().getPublishDate(),
                 datasetVersion);
         List<NameValuePair> params = createUploadParams(
@@ -464,11 +458,11 @@ public class ApproveTask implements Callable<Boolean> {
     }
 
     protected String filePathGenerator(String datasetId, Date publishDate, String DatasetVersion) {
-
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         if (publishDate == null){
             publishDate = new Date();
         }
+
         String formattedDate = sdf.format(publishDate);
         Set<String> OtherArray = new HashSet<>(Arrays.asList("dataset1", "a01", "x09", "cla01", "rtisa"));
         String baseFilename = datasetId.replaceAll("(?i)(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)20[2-9][4-9]","");

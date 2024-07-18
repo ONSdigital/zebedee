@@ -505,13 +505,13 @@ public class ApproveTaskTest {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         Date publishDate;
         String today;
+        
         try {
             publishDate = sdf.parse("2024-07-18");
             today = sdf.format(new Date());
         } catch (ParseException e) {
             throw new RuntimeException(e);
         }
-
         
         assertEquals(task.filePathGenerator("mm22", publishDate, "v123"), "timeseries-datasets/mm22/v123");
         assertEquals(task.filePathGenerator("a01jul2025", null, "v123"), "timeseries-datasets/other/" + today);

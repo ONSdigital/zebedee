@@ -363,6 +363,9 @@ public class ApproveTask implements Callable<Boolean> {
         for (String uri : collectionReader.getReviewed().listUris()) {
             if (uri.endsWith(".csv") || uri.endsWith(".xlsx") || uri.endsWith(".xls") || uri.endsWith(".csdb")) {
                 String fileName = uri.substring(1);
+                if (fileName.contains("previous")) {
+                    continue;
+                }
                 Resource myFile = collectionReader.getResource(fileName);
                 if (DatasetWhitelistChecker.isWhitelisted(myFile.getName())) {
                     info().data("filename", fileName).data("collectionId", collection.getDescription().getId())

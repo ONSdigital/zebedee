@@ -14,10 +14,8 @@ job "zebedee" {
   group "publishing" {
     count = "{{PUBLISHING_TASK_COUNT}}"
 
-    spread {
-      attribute = "${node.unique.id}"
-      weight    = 100
-      # with `target` omitted, Nomad will spread allocations evenly across all values of the attribute.
+    constraint {
+      distinct_hosts = true
     }
     spread {
       attribute = "${attr.platform.aws.placement.availability-zone}"

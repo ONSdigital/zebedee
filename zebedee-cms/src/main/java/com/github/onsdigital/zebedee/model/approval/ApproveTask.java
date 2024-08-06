@@ -399,7 +399,7 @@ public class ApproveTask implements Callable<Boolean> {
         // if we have a non-timeseries dataset
         Set<String> OtherArray = new HashSet<>(Arrays.asList("dataset1", "a01", "x09", "cla01", "rtisa"));
         if (OtherArray.contains(datasetId)) {
-            if (!datasetId.contains("upload")) {
+            if (!datasetId.contains("upload") && !fileName.contains("previous")) {
                 uploadServiceSupplier.getService().uploadResumableFile(file, params);
             }
         } else { // if we have a timeseries dataset

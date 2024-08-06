@@ -396,8 +396,16 @@ public class ApproveTask implements Callable<Boolean> {
         List<NameValuePair> params = createUploadParams(
                 extractFileName(fileName), generatedPath, collectionId);
 
-        if (!datasetId.contains("upload")) {
-            uploadServiceSupplier.getService().uploadResumableFile(file, params);
+        // if we have a non-timeseries dataset
+        Set<String> OtherArray = new HashSet<>(Arrays.asList("dataset1", "a01", "x09", "cla01", "rtisa"));
+        if (OtherArray.contains(datasetId)) {
+            if (!datasetId.contains("upload")) {
+                uploadServiceSupplier.getService().uploadResumableFile(file, params);
+            }
+        } else { // if we have a timeseries dataset
+            if (!datasetId.contains("upload") && !datasetVersion.equals("current")) {
+                uploadServiceSupplier.getService().uploadResumableFile(file, params);
+            }
         }
     }
 

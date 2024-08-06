@@ -363,9 +363,6 @@ public class ApproveTask implements Callable<Boolean> {
         for (String uri : collectionReader.getReviewed().listUris()) {
             if (uri.endsWith(".csv") || uri.endsWith(".xlsx") || uri.endsWith(".xls") || uri.endsWith(".csdb")) {
                 String fileName = uri.substring(1);
-                if (fileName.contains("previous")) {
-                    continue;
-                }
                 Resource myFile = collectionReader.getResource(fileName);
                 if (DatasetWhitelistChecker.isWhitelisted(myFile.getName())) {
                     info().data("filename", fileName).data("collectionId", collection.getDescription().getId())
@@ -395,10 +392,11 @@ public class ApproveTask implements Callable<Boolean> {
         String datasetVersion = extractDatasetVersion(fileName);
         String generatedPath = filePathGenerator(datasetId, collection.getDescription().getPublishDate(),
                 datasetVersion);
+        info().data("datasetId", datasetId).data("datasetVersion", datasetVersion).data("generatedPath", generatedPath).log("file info");
         List<NameValuePair> params = createUploadParams(
                 extractFileName(fileName), generatedPath, collectionId);
 
-        if (!datasetId.contains("upload") && !datasetVersion.equals("current")) {
+        if (!datasetId.contains("upload")) {
             uploadServiceSupplier.getService().uploadResumableFile(file, params);
         }
     }

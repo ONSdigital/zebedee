@@ -389,6 +389,7 @@ public class ApproveTask implements Callable<Boolean> {
         }
 
         String datasetId = extractDatasetId(fileName);
+        String baseFilename = datasetId.replaceAll("(?i)(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)20[2-9][4-9]","");
         String datasetVersion = extractDatasetVersion(fileName);
         String generatedPath = filePathGenerator(datasetId, collection.getDescription().getPublishDate(),
                 datasetVersion);
@@ -398,7 +399,7 @@ public class ApproveTask implements Callable<Boolean> {
 
         // if we have a non-timeseries dataset
         Set<String> OtherArray = new HashSet<>(Arrays.asList("dataset1", "a01", "x09", "cla01", "rtisa"));
-        if (OtherArray.contains(datasetId)) {
+        if (OtherArray.contains(baseFilename)) {
             if (!datasetId.contains("upload") && !fileName.contains("previous")) {
                 uploadServiceSupplier.getService().uploadResumableFile(file, params);
             }

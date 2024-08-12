@@ -476,9 +476,9 @@ public class ApproveTask implements Callable<Boolean> {
         String finalPath;
 
         if (OtherArray.contains(baseFilename)) {
-            finalPath = "timeseries-datasets/" + "other" + "/" + formattedDate;
+            finalPath = "ts-datasets/" + "other" + "/" + formattedDate;
         } else {
-            finalPath = "timeseries-datasets/" + baseFilename + "/" + DatasetVersion;
+            finalPath = "ts-datasets/" + baseFilename + "/" + DatasetVersion;
         }
         return finalPath;
     }

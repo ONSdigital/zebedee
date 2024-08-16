@@ -389,19 +389,31 @@ public class ApproveTask implements Callable<Boolean> {
         }
 
         String datasetId = extractDatasetId(fileName);
-        String baseFilename = datasetId.replaceAll("(?i)(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)20[2-9][4-9]","");
+        String baseFilename = datasetId.replaceAll("(?i)(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)20[2-9][4-9]",
+                "");
         String datasetVersion = extractDatasetVersion(fileName);
         String generatedPath = filePathGenerator(datasetId, collection.getDescription().getPublishDate(),
                 datasetVersion);
-        info().data("datasetId", datasetId).data("datasetVersion", datasetVersion).data("generatedPath", generatedPath).log("file info");
+        info().data("datasetId", datasetId).data("datasetVersion", datasetVersion).data("generatedPath", generatedPath)
+                .log("file info");
         List<NameValuePair> params = createUploadParams(
                 extractFileName(fileName), generatedPath, collectionId);
 
         // if we have a non-timeseries dataset
         Set<String> OtherArray = new HashSet<>(Arrays.asList("dataset1", "a01", "x09", "cla01", "rtisa"));
+        String expectedDataset1Path = "economy/inflationandpriceindices/datasets/growthratesofoutputandinputproducerpriceinflation";
         if (OtherArray.contains(baseFilename)) {
-            if (!datasetId.contains("upload") && !fileName.contains("previous")) {
-                uploadServiceSupplier.getService().uploadResumableFile(file, params);
+            if (baseFilename == "dataset1") {
+                // identify if its the PPI dataset
+                if (fileName.contains(expectedDataset1Path)) {
+                    if (!datasetId.contains("upload") && !fileName.contains("previous")) {
+                        uploadServiceSupplier.getService().uploadResumableFile(file, params);
+                    }
+                }
+            } else {
+                if (!datasetId.contains("upload") && !fileName.contains("previous")) {
+                    uploadServiceSupplier.getService().uploadResumableFile(file, params);
+                }
             }
         } else { // if we have a timeseries dataset
             if (!datasetId.contains("upload") && !datasetVersion.equals("current")) {
@@ -466,13 +478,14 @@ public class ApproveTask implements Callable<Boolean> {
 
     protected String filePathGenerator(String datasetId, Date publishDate, String DatasetVersion) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        if (publishDate == null){
+        if (publishDate == null) {
             publishDate = new Date();
         }
 
         String formattedDate = sdf.format(publishDate);
         Set<String> OtherArray = new HashSet<>(Arrays.asList("dataset1", "a01", "x09", "cla01", "rtisa"));
-        String baseFilename = datasetId.replaceAll("(?i)(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)20[2-9][4-9]","");
+        String baseFilename = datasetId.replaceAll("(?i)(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)20[2-9][4-9]",
+                "");
         String finalPath;
 
         if (OtherArray.contains(baseFilename)) {

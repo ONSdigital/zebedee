@@ -403,7 +403,7 @@ public class ApproveTask implements Callable<Boolean> {
         Set<String> OtherArray = new HashSet<>(Arrays.asList("dataset1", "a01", "x09", "cla01", "rtisa"));
         String expectedDataset1Path = "economy/inflationandpriceindices/datasets/growthratesofoutputandinputproducerpriceinflation";
         if (OtherArray.contains(baseFilename)) {
-            if (baseFilename == "dataset1") {
+            if (baseFilename.contains("dataset1")) {
                 // identify if its the PPI dataset
                 if (fileName.contains(expectedDataset1Path)) {
                     if (!datasetId.contains("upload") && !fileName.contains("previous")) {

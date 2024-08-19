@@ -403,7 +403,8 @@ public class ApproveTask implements Callable<Boolean> {
         String nonTsDatasetWhitelist = Configuration.getNonTsDatasetWhitelist();
         Set<String> nonTsDatasetWhitelistSet = Arrays.stream(nonTsDatasetWhitelist.split(","))
                 .collect(Collectors.toSet());
-        String expectedDataset1Path = "economy/inflationandpriceindices/datasets/growthratesofoutputandinputproducerpriceinflation";
+
+        String expectedDataset1Path = Configuration.getDataset1ExpectedPath();
         if (nonTsDatasetWhitelistSet.contains(baseFilename)) {
             if (baseFilename.contains("dataset1")) {
                 // identify if its the PPI dataset

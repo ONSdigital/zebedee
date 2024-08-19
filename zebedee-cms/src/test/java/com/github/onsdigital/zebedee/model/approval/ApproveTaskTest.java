@@ -17,7 +17,6 @@ import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.util.slack.Notifier;
 import org.apache.hc.core5.http.NameValuePair;
-import org.joda.time.LocalDate;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -29,7 +28,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -520,4 +518,22 @@ public class ApproveTaskTest {
         assertEquals(task.filePathGenerator("rtisa", publishDate, "v123"), "ts-datasets/other/2024-07-18");
         assertEquals(task.filePathGenerator("cla01", publishDate, "v123"), "ts-datasets/other/2024-07-18");
     }
+
+    @Test
+    public void testfilePathGenerator_check_default_value_dataset1() {
+        String actual = Configuration.getDataset1ExpectedPath();
+        String expected = "economy/inflationandpriceindices/datasets/growthratesofoutputandinputproducerpriceinflation";
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testfilePathGenerator_check_configured_value_dataset1() {
+        System.setProperty("EXPECTED_DATASET1_PATH", "economy/inflationandpriceindices/datasets/");
+        String actual = Configuration.getDataset1ExpectedPath();
+        String expected = "economy/inflationandpriceindices/datasets/";
+
+        assertEquals(expected, actual);
+    }
+
 }

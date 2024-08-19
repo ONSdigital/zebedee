@@ -400,9 +400,11 @@ public class ApproveTask implements Callable<Boolean> {
                 extractFileName(fileName), generatedPath, collectionId);
 
         // if we have a non-timeseries dataset
-        Set<String> OtherArray = new HashSet<>(Arrays.asList("dataset1", "a01", "x09", "cla01", "rtisa"));
+        String nonTsDatasetWhitelist = Configuration.getNonTsDatasetWhitelist();
+        Set<String> nonTsDatasetWhitelistSet = Arrays.stream(nonTsDatasetWhitelist.split(","))
+                .collect(Collectors.toSet());
         String expectedDataset1Path = "economy/inflationandpriceindices/datasets/growthratesofoutputandinputproducerpriceinflation";
-        if (OtherArray.contains(baseFilename)) {
+        if (nonTsDatasetWhitelistSet.contains(baseFilename)) {
             if (baseFilename.contains("dataset1")) {
                 // identify if its the PPI dataset
                 if (fileName.contains(expectedDataset1Path)) {
@@ -483,12 +485,14 @@ public class ApproveTask implements Callable<Boolean> {
         }
 
         String formattedDate = sdf.format(publishDate);
-        Set<String> OtherArray = new HashSet<>(Arrays.asList("dataset1", "a01", "x09", "cla01", "rtisa"));
+        String nonTsDatasetWhitelist = Configuration.getNonTsDatasetWhitelist();
+        Set<String> nonTsDatasetWhitelistSet = Arrays.stream(nonTsDatasetWhitelist.split(","))
+                .collect(Collectors.toSet());
         String baseFilename = datasetId.replaceAll("(?i)(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)20[2-9][4-9]",
                 "");
         String finalPath;
 
-        if (OtherArray.contains(baseFilename)) {
+        if (nonTsDatasetWhitelistSet.contains(baseFilename)) {
             finalPath = "ts-datasets/" + "other" + "/" + formattedDate;
         } else {
             finalPath = "ts-datasets/" + baseFilename + "/" + DatasetVersion;

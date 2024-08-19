@@ -44,6 +44,7 @@ public class Configuration {
     private static final String KEYRING_SECRET_KEY = "KEYRING_SECRET_KEY";
     private static final String KEYRING_INIT_VECTOR = "KEYRING_INIT_VECTOR";
     private static final String DATASET_WHITELIST = "drsi,mm23,mm22,ppi,dataset1,pusf,a01,x09,cla01,pn2,mgdp,diop,ios1,mret,mq10,rtisa";
+    private static final String NON_TS_DATASET_WHITELIST = "dataset1, a01, x09, cla01, rtisa";
 
     private static final int VERIFY_RETRY_DELAY = 5000; // milliseconds
     private static final int VERIFY_RETRY_COUNT = 10;
@@ -260,6 +261,11 @@ public class Configuration {
     // Get whitelist from dp-configs
     public static String getDatasetWhitelist() {
         return StringUtils.defaultIfBlank(getValue("DATASET_WHITELIST"), DATASET_WHITELIST);
+    }
+
+    // Get non timeseries whitelist from dp-configs
+    public static String getNonTsDatasetWhitelist() {
+        return StringUtils.defaultIfBlank(getValue("NON_TS_DATASET_WHITELIST"), NON_TS_DATASET_WHITELIST);
     }
     
     // Changeable upload-new endpoint parameters

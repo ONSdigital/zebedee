@@ -360,8 +360,13 @@ public class ApproveTask implements Callable<Boolean> {
 
     protected void uploadWhitelistedFiles(Collection collection, CollectionReader collectionReader)
             throws ZebedeeException, IOException {
-        for (String uri : collectionReader.getReviewed().listUris()) {
+        System.out.println("\nLIST OF URIS\n");
+        List<String> listUris = collectionReader.getReviewed().listUris();
+        listUris.removeIf(s -> s.contains("previous"));
+        System.out.println(listUris);
+        for (String uri : listUris) {
             if (uri.endsWith(".csv") || uri.endsWith(".xlsx") || uri.endsWith(".xls") || uri.endsWith(".csdb")) {
+                System.out.println("uri ==> " + uri);
                 String fileName = uri.substring(1);
                 Resource myFile = collectionReader.getResource(fileName);
                 if (DatasetWhitelistChecker.isWhitelisted(myFile.getName())) {
@@ -419,7 +424,7 @@ public class ApproveTask implements Callable<Boolean> {
                 }
             }
         } else { // if we have a timeseries dataset
-            if (!datasetId.contains("upload") && !datasetVersion.equals("current")) {
+            if (!datasetId.contains("upload") && !datasetVersion.equals("previous")) {
                 uploadServiceSupplier.getService().uploadResumableFile(file, params);
             }
         }

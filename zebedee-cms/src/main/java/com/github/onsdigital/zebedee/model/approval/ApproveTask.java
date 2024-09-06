@@ -369,6 +369,8 @@ public class ApproveTask implements Callable<Boolean> {
                 System.out.println("uri ==> " + uri);
                 String fileName = uri.substring(1);
                 Resource myFile = collectionReader.getResource(fileName);
+                System.out.println("file name = " + myFile.getName());
+                System.out.println("is whitelisted = " + DatasetWhitelistChecker.isWhitelisted(myFile.getName()));
                 if (DatasetWhitelistChecker.isWhitelisted(myFile.getName())) {
                     info().data("filename", fileName).data("collectionId", collection.getDescription().getId())
                             .log("File is whitelisted");
@@ -394,8 +396,7 @@ public class ApproveTask implements Callable<Boolean> {
         }
 
         String datasetId = extractDatasetId(fileName);
-        String baseFilename = datasetId.replaceAll("(?i)(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)20[2-9][4-9]",
-                "");
+        String baseFilename = datasetId.replaceAll(DatasetWhitelistChecker.REG_EX_STR, "");
         String datasetVersion = extractDatasetVersion(fileName);
         String generatedPath = filePathGenerator(datasetId, collection.getDescription().getPublishDate(),
                 datasetVersion);
@@ -414,12 +415,12 @@ public class ApproveTask implements Callable<Boolean> {
             if (baseFilename.contains("dataset1")) {
                 // identify if its the PPI dataset
                 if (fileName.contains(expectedDataset1Path)) {
-                    if (!datasetId.contains("upload") && !fileName.contains("previous")) {
+                    if (!datasetId.contains("upload")) {
                         uploadServiceSupplier.getService().uploadResumableFile(file, params);
                     }
                 }
             } else {
-                if (!datasetId.contains("upload") && !fileName.contains("previous")) {
+                if (!datasetId.contains("upload")) {
                     uploadServiceSupplier.getService().uploadResumableFile(file, params);
                 }
             }
@@ -494,8 +495,7 @@ public class ApproveTask implements Callable<Boolean> {
         String nonTsDatasetWhitelist = Configuration.getNonTsDatasetWhitelist();
         Set<String> nonTsDatasetWhitelistSet = Arrays.stream(nonTsDatasetWhitelist.split(","))
                 .collect(Collectors.toSet());
-        String baseFilename = datasetId.replaceAll("(?i)(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)20[2-9][4-9]",
-                "");
+        String baseFilename = datasetId.replaceAll(DatasetWhitelistChecker.REG_EX_STR, "");
         String finalPath;
 
         if (nonTsDatasetWhitelistSet.contains(baseFilename)) {

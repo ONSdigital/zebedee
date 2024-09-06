@@ -485,7 +485,7 @@ public class ApproveTask implements Callable<Boolean> {
     }
 
     protected String filePathGenerator(String datasetId, Date publishDate, String DatasetVersion) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd-HH-mm");
         if (publishDate == null) {
             publishDate = new Date();
         }
@@ -501,7 +501,7 @@ public class ApproveTask implements Callable<Boolean> {
         if (nonTsDatasetWhitelistSet.contains(baseFilename)) {
             finalPath = "ts-datasets/" + "other" + "/" + formattedDate;
         } else {
-            finalPath = "ts-datasets/" + baseFilename + "/" + DatasetVersion;
+            finalPath = "ts-datasets/" + formattedDate + "/" + baseFilename + "/" + DatasetVersion;
         }
         return finalPath;
     }

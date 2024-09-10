@@ -366,7 +366,7 @@ public class PostPublisher {
                 .stream().map(temp -> convertUriForEvent(temp))
                 .collect(Collectors.toList());
         info().data("collectionId", collection.getId())
-                .data("Reviewed-uris", reviewedUris)
+                .data("reviewed-uris-count", reviewedUris.size())
                 .data("publishing", true)
                 .log("converted reviewed URIs for kafka event");
         sendMessage(collection, reviewedUris, LEGACYCONTENTFLAG);

@@ -44,7 +44,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
@@ -69,9 +68,11 @@ public class ApproveTask implements Callable<Boolean> {
     private final ContentDetailResolver contentDetailResolver;
     private final Notifier notifier;
     static ServiceSupplier<UploadService> uploadServiceSupplier;
+    private static String correctDatasetVersion;
 
     static {
         uploadServiceSupplier = () -> ZebedeeCmsService.getInstance().getUploadService();
+        correctDatasetVersion = "";
     }
 
     /**
@@ -365,12 +366,16 @@ public class ApproveTask implements Callable<Boolean> {
                 String fileName = uri.substring(1);
                 Resource myFile = collectionReader.getResource(fileName);
                 if (DatasetWhitelistChecker.isWhitelisted(myFile.getName())) {
+                    if (fileName.contains("previous")) {
+                        correctDatasetVersion = extractDatasetVersion(fileName);
+                    }
                     info().data("filename", fileName).data("collectionId", collection.getDescription().getId())
                             .log("File is whitelisted");
                     uploadFile(myFile, fileName, collection.getDescription().getId());
                 }
             }
         }
+        correctDatasetVersion = "";
     }
 
     protected void uploadFile(Resource myFile, String fileName, String collectionId)
@@ -389,12 +394,11 @@ public class ApproveTask implements Callable<Boolean> {
         }
 
         String datasetId = extractDatasetId(fileName);
-        String baseFilename = datasetId.replaceAll("(?i)(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)20[2-9][4-9]",
-                "");
+        String baseFilename = datasetId.replaceAll(DatasetWhitelistChecker.REG_EX_STR, "");
         String datasetVersion = extractDatasetVersion(fileName);
         String generatedPath = filePathGenerator(datasetId, collection.getDescription().getPublishDate(),
                 datasetVersion);
-        info().data("datasetId", datasetId).data("datasetVersion", datasetVersion).data("generatedPath", generatedPath)
+        info().data("datasetId", datasetId).data("datasetVersion", datasetVersion).data("baseFilename", baseFilename).data("generatedPath", generatedPath)
                 .log("file info");
         List<NameValuePair> params = createUploadParams(
                 extractFileName(fileName), generatedPath, collectionId);
@@ -419,7 +423,7 @@ public class ApproveTask implements Callable<Boolean> {
                 }
             }
         } else { // if we have a timeseries dataset
-            if (!datasetId.contains("upload") && !datasetVersion.equals("current")) {
+            if (!datasetId.contains("upload") && !fileName.contains("previous")) {
                 uploadServiceSupplier.getService().uploadResumableFile(file, params);
             }
         }
@@ -489,15 +493,34 @@ public class ApproveTask implements Callable<Boolean> {
         String nonTsDatasetWhitelist = Configuration.getNonTsDatasetWhitelist();
         Set<String> nonTsDatasetWhitelistSet = Arrays.stream(nonTsDatasetWhitelist.split(","))
                 .collect(Collectors.toSet());
-        String baseFilename = datasetId.replaceAll("(?i)(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)20[2-9][4-9]",
-                "");
+        String baseFilename = datasetId.replaceAll(DatasetWhitelistChecker.REG_EX_STR, "");
         String finalPath;
 
         if (nonTsDatasetWhitelistSet.contains(baseFilename)) {
             finalPath = "ts-datasets/" + "other" + "/" + formattedDate;
         } else {
-            finalPath = "ts-datasets/" + baseFilename + "/" + DatasetVersion;
+            finalPath = "ts-datasets/" + baseFilename + "/" + (!correctDatasetVersion.equals("")? incrementDatasetVersionByOne(correctDatasetVersion) : DatasetVersion);
         }
         return finalPath;
+    }
+
+    protected String incrementDatasetVersionByOne(String datasetVersion) {
+        if (datasetVersion == null || datasetVersion.isEmpty()) {
+            throw new IllegalArgumentException("input string can't be empty");
+        }
+        char letter = datasetVersion.charAt(0);
+        String numberStr = datasetVersion.substring(1);
+
+        int number;
+
+        try {
+            number = Integer.parseInt(numberStr);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("input string is not in the correct format");
+        }
+
+        number++;
+
+        return letter + Integer.toString(number);
     }
 }

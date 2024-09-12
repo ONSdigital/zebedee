@@ -404,8 +404,6 @@ public class ApproveTaskTest {
         assertEquals(Configuration.getLicenceURL(), licenceURLParam.getValue());
 
     }
-    
-
 
     @Test
     public void shouldCreateUploadParams() {
@@ -533,6 +531,39 @@ public class ApproveTaskTest {
         String actual = Configuration.getDataset1ExpectedPath();
         String expected = "economy/inflationandpriceindices/datasets/";
 
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testIncrementDatasetVersionByOne_emptyInput() {
+        String datasetVersion = "";
+
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> task.incrementDatasetVersionByOne(datasetVersion));
+        assertThat(ex.getMessage(), equalTo("input string can't be empty"));
+    }
+
+    @Test
+    public void testIncrementDatasetVersionByOne_nullInput() {
+        String datasetVersion = null;
+
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> task.incrementDatasetVersionByOne(datasetVersion));
+        assertThat(ex.getMessage(), equalTo("input string can't be empty"));
+    }
+
+    @Test
+    public void testIncrementDatasetVersionByOne_badInput() {
+        String datasetVersion = "v123abc";
+
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> task.incrementDatasetVersionByOne(datasetVersion));
+        assertThat(ex.getMessage(), equalTo("input string is not in the correct format"));
+    }
+
+    @Test
+    public void testIncrementDatasetVersionByOne_HappyPath() {
+        String datasetVersion = "v123";
+        String expected = "v124";
+
+        String actual = task.incrementDatasetVersionByOne(datasetVersion);
         assertEquals(expected, actual);
     }
 

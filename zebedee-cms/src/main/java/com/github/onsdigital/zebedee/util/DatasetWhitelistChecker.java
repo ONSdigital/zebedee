@@ -3,13 +3,12 @@ package com.github.onsdigital.zebedee.util;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getDatasetWhitelist;
 
 import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 public class DatasetWhitelistChecker {
-    
+    public static final String REG_EX_STR = "(?i)(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)20[2-9][0-9]";
+
     public static Set<String> getWhitelistSet() {
 
         //Retrieve the whitelist from zebedee configuration
@@ -31,7 +30,7 @@ public class DatasetWhitelistChecker {
             filename = filename.substring(0, dotIndex);
         }
 
-        String baseFilename = filename.replaceAll("(?i)(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)20[2-9][4-9]", "");
+        String baseFilename = filename.replaceAll(REG_EX_STR,"");
 
         return whitelist.contains(baseFilename);
     }

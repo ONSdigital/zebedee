@@ -68,11 +68,9 @@ public class ApproveTask implements Callable<Boolean> {
     private final ContentDetailResolver contentDetailResolver;
     private final Notifier notifier;
     static ServiceSupplier<UploadService> uploadServiceSupplier;
-    private static String correctDatasetVersion;
 
     static {
         uploadServiceSupplier = () -> ZebedeeCmsService.getInstance().getUploadService();
-        correctDatasetVersion = "";
     }
 
     /**
@@ -361,24 +359,21 @@ public class ApproveTask implements Callable<Boolean> {
 
     protected void uploadWhitelistedFiles(Collection collection, CollectionReader collectionReader)
             throws ZebedeeException, IOException {
+        String correctDatasetVersion = findCorrectDatasetVersion(collectionReader.getReviewed().listUris());
         for (String uri : collectionReader.getReviewed().listUris()) {
             if (uri.endsWith(".csv") || uri.endsWith(".xlsx") || uri.endsWith(".xls") || uri.endsWith(".csdb")) {
                 String fileName = uri.substring(1);
                 Resource myFile = collectionReader.getResource(fileName);
                 if (DatasetWhitelistChecker.isWhitelisted(myFile.getName())) {
-                    if (fileName.contains("previous")) {
-                        correctDatasetVersion = extractDatasetVersion(fileName);
-                    }
                     info().data("filename", fileName).data("collectionId", collection.getDescription().getId())
                             .log("File is whitelisted");
-                    uploadFile(myFile, fileName, collection.getDescription().getId());
+                    uploadFile(myFile, fileName, collection.getDescription().getId(), correctDatasetVersion);
                 }
             }
         }
-        correctDatasetVersion = "";
     }
 
-    protected void uploadFile(Resource myFile, String fileName, String collectionId)
+    protected void uploadFile(Resource myFile, String fileName, String collectionId, String correctDatasetVersion)
             throws ZebedeeException, IOException {
         File file = new File("afile");
         try (FileOutputStream outputStream = new FileOutputStream(file)) {
@@ -397,7 +392,7 @@ public class ApproveTask implements Callable<Boolean> {
         String baseFilename = datasetId.replaceAll(DatasetWhitelistChecker.REG_EX_STR, "");
         String datasetVersion = extractDatasetVersion(fileName);
         String generatedPath = filePathGenerator(datasetId, collection.getDescription().getPublishDate(),
-                datasetVersion);
+                datasetVersion, correctDatasetVersion);
         info().data("datasetId", datasetId).data("datasetVersion", datasetVersion).data("baseFilename", baseFilename).data("generatedPath", generatedPath)
                 .log("file info");
         List<NameValuePair> params = createUploadParams(
@@ -483,7 +478,7 @@ public class ApproveTask implements Callable<Boolean> {
         return fileName;
     }
 
-    protected String filePathGenerator(String datasetId, Date publishDate, String DatasetVersion) {
+    protected String filePathGenerator(String datasetId, Date publishDate, String DatasetVersion, String correctDatasetVersion) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         if (publishDate == null) {
             publishDate = new Date();
@@ -522,5 +517,20 @@ public class ApproveTask implements Callable<Boolean> {
         number++;
 
         return letter + Integer.toString(number);
+    }
+
+    protected String findCorrectDatasetVersion(List<String> listOfUris) {
+        if (listOfUris == null) {
+            throw new IllegalArgumentException("input array can't be null");
+        }
+
+        String datasetVersion = "";
+        for (String uri : listOfUris) {
+            if (uri.contains("previous")) {
+                datasetVersion = extractDatasetVersion(uri);
+                return datasetVersion;
+            }
+        }
+        return datasetVersion;
     }
 }

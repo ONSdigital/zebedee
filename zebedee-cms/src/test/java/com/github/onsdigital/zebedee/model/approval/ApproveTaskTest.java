@@ -509,12 +509,16 @@ public class ApproveTaskTest {
             throw new RuntimeException(e);
         }
         
-        assertEquals(task.filePathGenerator("mm22", publishDate, "v123"), "ts-datasets/mm22/v123");
-        assertEquals(task.filePathGenerator("a01jul2025", null, "v123"), "ts-datasets/other/" + today);
-        assertEquals(task.filePathGenerator("x09jul2025", publishDate, "v123"), "ts-datasets/other/2024-07-18");
-        assertEquals(task.filePathGenerator("dataset1", publishDate, "v123"), "ts-datasets/other/2024-07-18");
-        assertEquals(task.filePathGenerator("rtisa", publishDate, "v123"), "ts-datasets/other/2024-07-18");
-        assertEquals(task.filePathGenerator("cla01", publishDate, "v123"), "ts-datasets/other/2024-07-18");
+        assertEquals(task.filePathGenerator("mm22", publishDate, "v123", ""), "ts-datasets/mm22/v123");
+        assertEquals(task.filePathGenerator("a01jul2025", null, "v123", ""), "ts-datasets/other/" + today);
+        assertEquals(task.filePathGenerator("x09jul2025", publishDate, "v123", ""), "ts-datasets/other/2024-07-18");
+        assertEquals(task.filePathGenerator("dataset1", publishDate, "v123", ""), "ts-datasets/other/2024-07-18");
+        assertEquals(task.filePathGenerator("rtisa", publishDate, "v123", ""), "ts-datasets/other/2024-07-18");
+        assertEquals(task.filePathGenerator("cla01", publishDate, "v123", ""), "ts-datasets/other/2024-07-18");
+
+        assertEquals(task.filePathGenerator("mm22", publishDate, "v123", "v321"), "ts-datasets/mm22/v322");
+        assertEquals(task.filePathGenerator("drsi", publishDate, "v456", "v654"), "ts-datasets/drsi/v655");
+        assertEquals(task.filePathGenerator("pn2", publishDate, "current", ""), "ts-datasets/pn2/current");
     }
 
     @Test
@@ -564,6 +568,59 @@ public class ApproveTaskTest {
         String expected = "v124";
 
         String actual = task.incrementDatasetVersionByOne(datasetVersion);
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testfindCorrectDatasetVersion_nullInput() {
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> task.findCorrectDatasetVersion(null));
+        assertThat(ex.getMessage(), equalTo("input array can't be null"));
+    }
+
+    @Test
+    public void testfindCorrectDatasetVersion_correctInput() {
+        List<String> listOfUris = new ArrayList<>();
+        listOfUris.add("/economy/grossdomesticproductgdp/datasets/mycollectionpagedltest1/augusttoseptember2024/diop.csv");
+        listOfUris.add("/economy/grossdomesticproductgdp/datasets/mycollectionpagedltest1/augusttoseptember2024/diop.xlsx");
+        listOfUris.add("/economy/grossdomesticproductgdp/datasets/mycollectionpagedltest1/augusttoseptember2024/previous/v1/data.json");
+        listOfUris.add("/economy/grossdomesticproductgdp/datasets/mycollectionpagedltest1/augusttoseptember2024/previous/v1/diop.csv");
+
+        String expected = "v1";
+        String actual = task.findCorrectDatasetVersion(listOfUris);
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testfindCorrectDatasetVersion_anotherCorrectInput_previousVersionExist() {
+        List<String> listOfUris = new ArrayList<>();
+        listOfUris.add("/economy/grossdomesticproductgdp/datasets/mycollectionpagedltest1/current/diop.csv");
+        listOfUris.add("/economy/grossdomesticproductgdp/datasets/mycollectionpagedltest1/current/diop.xlsx");
+        listOfUris.add("/economy/grossdomesticproductgdp/datasets/mycollectionpagedltest1/current/previous/v123/data.json");
+        listOfUris.add("/economy/grossdomesticproductgdp/datasets/mycollectionpagedltest1/current/previous/v123/diop.csv");
+
+        String expected = "v123";
+        String actual = task.findCorrectDatasetVersion(listOfUris);
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testfindCorrectDatasetVersion_anotherCorrectInput_previousVersionDoesNotExist() {
+        List<String> listOfUris = new ArrayList<>();
+        listOfUris.add("/economy/grossdomesticproductgdp/datasets/mycollectionpagedltest1/current/diop.csv");
+        listOfUris.add("/economy/grossdomesticproductgdp/datasets/mycollectionpagedltest1/current/diop.xlsx");
+        listOfUris.add("/economy/grossdomesticproductgdp/datasets/mycollectionpagedltest1/september2024/diop.xlsx");
+
+        String expected = "";
+        String actual = task.findCorrectDatasetVersion(listOfUris);
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testfindCorrectDatasetVersion_emptyList() {
+        List<String> listOfUris = new ArrayList<>();
+
+        String expected = "";
+        String actual = task.findCorrectDatasetVersion(listOfUris);
         assertEquals(expected, actual);
     }
 

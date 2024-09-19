@@ -510,11 +510,12 @@ public class ApproveTaskTest {
         }
         
         assertEquals(task.filePathGenerator("mm22", publishDate, "v123", ""), "ts-datasets/mm22/v123");
-        assertEquals(task.filePathGenerator("a01jul2025", null, "v123", ""), "ts-datasets/other/" + today);
-        assertEquals(task.filePathGenerator("x09jul2025", publishDate, "v123", ""), "ts-datasets/other/2024-07-18");
-        assertEquals(task.filePathGenerator("dataset1", publishDate, "v123", ""), "ts-datasets/other/2024-07-18");
-        assertEquals(task.filePathGenerator("rtisa", publishDate, "v123", ""), "ts-datasets/other/2024-07-18");
-        assertEquals(task.filePathGenerator("cla01", publishDate, "v123", ""), "ts-datasets/other/2024-07-18");
+        assertEquals(task.filePathGenerator("a01jul2025", null, "v123", ""), "ts-datasets/other/2024-09-19/v123");
+        assertEquals(task.filePathGenerator("a01jul2025", null, "v123", "v124"), "ts-datasets/other/2024-09-19/v125");
+        assertEquals(task.filePathGenerator("x09jul2025", publishDate, "v123", ""), "ts-datasets/other/2024-07-18/v123");
+        assertEquals(task.filePathGenerator("dataset1", publishDate, "v123", ""), "ts-datasets/other/2024-07-18/v123");
+        assertEquals(task.filePathGenerator("rtisa", publishDate, "v123", ""), "ts-datasets/other/2024-07-18/v123");
+        assertEquals(task.filePathGenerator("cla01", publishDate, "v123", ""), "ts-datasets/other/2024-07-18/v123");
 
         assertEquals(task.filePathGenerator("mm22", publishDate, "v123", "v321"), "ts-datasets/mm22/v322");
         assertEquals(task.filePathGenerator("drsi", publishDate, "v456", "v654"), "ts-datasets/drsi/v655");

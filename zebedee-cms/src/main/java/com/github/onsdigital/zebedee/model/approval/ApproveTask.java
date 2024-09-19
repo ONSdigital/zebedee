@@ -492,7 +492,7 @@ public class ApproveTask implements Callable<Boolean> {
         String finalPath;
 
         if (nonTsDatasetWhitelistSet.contains(baseFilename)) {
-            finalPath = "ts-datasets/" + "other" + "/" + formattedDate;
+            finalPath = "ts-datasets/" + "other" + "/" + formattedDate + "/" +(!correctDatasetVersion.equals("")? incrementDatasetVersionByOne(correctDatasetVersion) : DatasetVersion);
         } else {
             finalPath = "ts-datasets/" + baseFilename + "/" + (!correctDatasetVersion.equals("")? incrementDatasetVersionByOne(correctDatasetVersion) : DatasetVersion);
         }

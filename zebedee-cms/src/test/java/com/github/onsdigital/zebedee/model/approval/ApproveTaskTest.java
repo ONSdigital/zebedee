@@ -508,10 +508,11 @@ public class ApproveTaskTest {
         } catch (ParseException e) {
             throw new RuntimeException(e);
         }
+        System.out.println(publishDate);
         
         assertEquals(task.filePathGenerator("mm22", publishDate, "v123", ""), "ts-datasets/mm22/v123");
-        assertEquals(task.filePathGenerator("a01jul2025", null, "v123", ""), "ts-datasets/other/2024-09-19/v123");
-        assertEquals(task.filePathGenerator("a01jul2025", null, "v123", "v124"), "ts-datasets/other/2024-09-19/v125");
+        assertEquals(task.filePathGenerator("a01jul2025", null, "v123", ""), "ts-datasets/other/" + today + "/v123");
+        assertEquals(task.filePathGenerator("a01jul2025", null, "v123", "v124"), "ts-datasets/other/" + today + "/v125");
         assertEquals(task.filePathGenerator("x09jul2025", publishDate, "v123", ""), "ts-datasets/other/2024-07-18/v123");
         assertEquals(task.filePathGenerator("dataset1", publishDate, "v123", ""), "ts-datasets/other/2024-07-18/v123");
         assertEquals(task.filePathGenerator("rtisa", publishDate, "v123", ""), "ts-datasets/other/2024-07-18/v123");

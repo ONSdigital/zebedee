@@ -492,13 +492,23 @@ public class ApproveTask implements Callable<Boolean> {
         String finalPath;
 
         if (nonTsDatasetWhitelistSet.contains(baseFilename)) {
-            finalPath = "ts-datasets/" + "other" + "/" + formattedDate + "/" +(!correctDatasetVersion.equals("")? incrementDatasetVersionByOne(correctDatasetVersion) : DatasetVersion);
+            finalPath = "ts-datasets/" + "other" + "/" + formattedDate + "/" + pickCorrectDatasetVersion(correctDatasetVersion, DatasetVersion);
         } else {
-            finalPath = "ts-datasets/" + baseFilename + "/" + (!correctDatasetVersion.equals("")? incrementDatasetVersionByOne(correctDatasetVersion) : DatasetVersion);
+            finalPath = "ts-datasets/" + baseFilename + "/" + pickCorrectDatasetVersion(correctDatasetVersion, DatasetVersion);
         }
         return finalPath;
     }
 
+    protected String pickCorrectDatasetVersion(String correctDatasetVersion, String datasetVersion) {
+        if (datasetVersion == null) {
+            throw new IllegalArgumentException("input can't be null");
+        }
+        if (correctDatasetVersion == null) {
+            throw new IllegalArgumentException("input can't be null");
+        }
+        return (!correctDatasetVersion.equals("")? incrementDatasetVersionByOne(correctDatasetVersion) : datasetVersion);
+    }
+    
     protected String incrementDatasetVersionByOne(String datasetVersion) {
         if (datasetVersion == null || datasetVersion.isEmpty()) {
             throw new IllegalArgumentException("input string can't be empty");

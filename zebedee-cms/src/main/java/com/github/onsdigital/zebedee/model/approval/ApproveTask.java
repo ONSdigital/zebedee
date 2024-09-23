@@ -499,11 +499,11 @@ public class ApproveTask implements Callable<Boolean> {
         return finalPath;
     }
 
-    protected String pickCorrectDatasetVersion(String correctDatasetVersion, String datasetVersion) {
-        if (datasetVersion == null || correctDatasetVersion == null) {
+    protected String pickCorrectDatasetVersion(String currentDatasetVersion, String defaultDatasetVersion) throws IllegalArgumentException {
+        if (defaultDatasetVersion == null || currentDatasetVersion == null) {
             throw new IllegalArgumentException("input can't be null");
         }
-        return (!correctDatasetVersion.equals("")? incrementDatasetVersionByOne(correctDatasetVersion) : datasetVersion);
+        return (!currentDatasetVersion.equals("") ? incrementDatasetVersionByOne(currentDatasetVersion) : defaultDatasetVersion);
     }
     
     protected String incrementDatasetVersionByOne(String datasetVersion) {
@@ -526,16 +526,17 @@ public class ApproveTask implements Callable<Boolean> {
         return letter + Integer.toString(number);
     }
 
-    protected String findCorrectDatasetVersion(List<String> listOfUris) {
+    protected String findCorrectDatasetVersion(List<String> listOfUris) throws IllegalArgumentException {
         if (listOfUris == null) {
             throw new IllegalArgumentException("input array can't be null");
         }
-
         String datasetVersion = "";
         for (String uri : listOfUris) {
-            if (uri.contains("previous")) {
-                datasetVersion = extractDatasetVersion(uri);
-                return datasetVersion;
+            if (uri.endsWith(".csv") || uri.endsWith(".xlsx") || uri.endsWith(".xls") || uri.endsWith(".csdb")) {
+                if (uri.contains("previous")) {
+                    datasetVersion = extractDatasetVersion(uri);
+                    return datasetVersion;
+                }
             }
         }
         return datasetVersion;

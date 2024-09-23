@@ -500,10 +500,7 @@ public class ApproveTask implements Callable<Boolean> {
     }
 
     protected String pickCorrectDatasetVersion(String correctDatasetVersion, String datasetVersion) {
-        if (datasetVersion == null) {
-            throw new IllegalArgumentException("input can't be null");
-        }
-        if (correctDatasetVersion == null) {
+        if (datasetVersion == null || correctDatasetVersion == null) {
             throw new IllegalArgumentException("input can't be null");
         }
         return (!correctDatasetVersion.equals("")? incrementDatasetVersionByOne(correctDatasetVersion) : datasetVersion);

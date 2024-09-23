@@ -508,7 +508,6 @@ public class ApproveTaskTest {
         } catch (ParseException e) {
             throw new RuntimeException(e);
         }
-        System.out.println(publishDate);
         
         assertEquals(task.filePathGenerator("mm22", publishDate, "v123", ""), "ts-datasets/mm22/v123");
         assertEquals(task.filePathGenerator("a01jul2025", null, "v123", ""), "ts-datasets/other/" + today + "/v123");

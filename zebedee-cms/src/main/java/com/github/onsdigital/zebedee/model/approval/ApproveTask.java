@@ -499,7 +499,7 @@ public class ApproveTask implements Callable<Boolean> {
         return finalPath;
     }
 
-    protected String pickCorrectDatasetVersion(String currentDatasetVersion, String defaultDatasetVersion) throws IllegalArgumentException {
+    protected String pickCorrectDatasetVersion(String currentDatasetVersion, String defaultDatasetVersion) {
         if (defaultDatasetVersion == null || currentDatasetVersion == null) {
             throw new IllegalArgumentException("input can't be null");
         }
@@ -526,7 +526,7 @@ public class ApproveTask implements Callable<Boolean> {
         return letter + Integer.toString(number);
     }
 
-    protected String findCorrectDatasetVersion(List<String> listOfUris) throws IllegalArgumentException {
+    protected String findCorrectDatasetVersion(List<String> listOfUris) {
         if (listOfUris == null) {
             throw new IllegalArgumentException("input array can't be null");
         }

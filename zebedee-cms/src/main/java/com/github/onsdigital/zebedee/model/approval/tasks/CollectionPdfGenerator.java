@@ -141,13 +141,14 @@ public class CollectionPdfGenerator {
         if (language == null) {
             throw new InvalidParameterException("Language can't be null");
         }
-        CMSLogEvent e = info().data("uri", uri).data("lang", language.toString()).collectionID(collection);
         try {
             pdfService.generatePdf(writer, uri, language);
-            e.log("content PDF generated successfully");
+            info().data("uri", uri).data("lang", language.toString()).collectionID(collection)
+                    .log("content PDF generated successfully");
             return true;
         } catch (Exception ex) {
-            e.exception(ex).log("error generating PDF content");
+            info().data("uri", uri).data("lang", language.toString()).collectionID(collection)
+                    .exception(ex).log("error generating PDF content");
             throw new InternalServerError("error generating PDF content", ex);
         }
     }

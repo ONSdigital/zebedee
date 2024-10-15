@@ -24,7 +24,6 @@ import static com.github.onsdigital.zebedee.content.page.base.PageType.COMPENDIU
 import static com.github.onsdigital.zebedee.content.page.base.PageType.COMPENDIUM_LANDING_PAGE;
 import static com.github.onsdigital.zebedee.content.page.base.PageType.STATIC_METHODOLOGY;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.info;
-import static java.text.MessageFormat.format;
 
 import java.security.InvalidParameterException;
 
@@ -88,12 +87,15 @@ public class CollectionPdfGenerator {
 
             info().collectionID(collection)
                     .data("uri", detail.uri)
-                    .log(format("successfully generated collection content PDF {0}/{1}", index, filtered.size()));
+                    .data("pdf_index",index)
+                    .data("pdf_count",filtered.size())
+                    .log("successfully generated collection content PDF");
             index++;
         }
 
         info().collectionID(collection)
-                .log(format("successfully generated {0}/{0} PDFs for collection content", filtered.size()));
+                .data("pdf_count",filtered.size())
+                .log("successfully generated PDFs for collection content");
     }
 
     private List<ContentDetail> filterPDFContent(List<ContentDetail> content) {

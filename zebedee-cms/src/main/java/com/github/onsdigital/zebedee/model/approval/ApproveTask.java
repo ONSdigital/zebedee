@@ -175,7 +175,7 @@ public class ApproveTask implements Callable<Boolean> {
             info().data("user", session.getEmail()).data("collectionId", collection.getDescription().getId())
                     .log("approve task: collection approve task completed successfully");
 
-            if (Configuration.isUploadNewEndpointEnabled()) {
+            if (Configuration.isUploadNewEndpointEnabled() && DatasetWhitelistChecker.isURIWhitelisted(collectionReader)) {
                 uploadNewEndpoint(collection, collectionReader);
             }
 

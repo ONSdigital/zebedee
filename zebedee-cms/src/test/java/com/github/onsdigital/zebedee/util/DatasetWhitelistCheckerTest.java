@@ -2,13 +2,37 @@ package com.github.onsdigital.zebedee.util;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.when;
 
+import java.util.Arrays;
+import java.util.List;
+
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+
+import com.github.onsdigital.zebedee.reader.CollectionReader;
+import com.github.onsdigital.zebedee.reader.ContentReader;
 
 @RunWith(MockitoJUnitRunner.class)
 public class DatasetWhitelistCheckerTest {
+
+    @Mock
+    private CollectionReader collectionReader;
+
+    @Mock
+    private ContentReader reviewedContentReader;
+
+    @InjectMocks
+    private DatasetWhitelistChecker checker;
+    
+    @Before
+    public void setUp() {
+        when(collectionReader.getReviewed()).thenReturn(reviewedContentReader);
+    }
 
     @Test
     public void testIsWhitelistedWithValidFilename() {
@@ -70,4 +94,19 @@ public class DatasetWhitelistCheckerTest {
         assertTrue(DatasetWhitelistChecker.isWhitelisted("rtisa.csv"));
     }
 
+    @Test
+    public void testIsURIWhitelisted_WithWhitelistedURI() {
+        List<String> uris = Arrays.asList("/path/to/upload-mm22.csv");
+        when(reviewedContentReader.listUris()).thenReturn(uris);
+
+        assertTrue("Expected URI to be whitelisted", DatasetWhitelistChecker.isURIWhitelisted(collectionReader));
+    }
+
+    @Test
+    public void testIsURIWhitelisted_WithNonWhitelistedURI() {
+        List<String> uris = Arrays.asList("/visualisations/dvc3069/Occupation%2520graphics%2520for%2520data%2520vis.xlsx");
+        when(reviewedContentReader.listUris()).thenReturn(uris);
+
+        assertFalse("Expected URI to not be whitelisted", DatasetWhitelistChecker.isURIWhitelisted(collectionReader));
+    }
 }

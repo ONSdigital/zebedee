@@ -5,6 +5,7 @@ import static com.github.onsdigital.zebedee.configuration.Configuration.getDatas
 import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
+import com.github.onsdigital.zebedee.reader.CollectionReader;
 
 public class DatasetWhitelistChecker {
     public static final String REG_EX_STR = "(?i)(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)20[2-9][0-9]";
@@ -33,5 +34,17 @@ public class DatasetWhitelistChecker {
         String baseFilename = filename.replaceAll(REG_EX_STR,"");
 
         return whitelist.contains(baseFilename);
+    }
+
+    public static boolean isURIWhitelisted(CollectionReader collectionReader) {
+        for (String uri : collectionReader.getReviewed().listUris()) {
+            String fileName = uri.substring(uri.lastIndexOf('/') + 1);
+            
+            if (isWhitelisted(fileName)) {
+                return true; 
+            }
+        }
+
+        return false;
     }
 }

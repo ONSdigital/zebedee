@@ -164,6 +164,10 @@ public class ApproveTask implements Callable<Boolean> {
             compressZipFiles(collection, collectionReader, collectionWriter);
             eventLog.compressedZipFiles();
 
+            if (Configuration.isUploadNewEndpointEnabled() && DatasetWhitelistChecker.isURIWhitelisted(collectionReader)) {
+                uploadNewEndpoint(collection, collectionReader);
+            }
+            
             approveCollection();
             eventLog.approvalStateSet();
 
@@ -174,10 +178,6 @@ public class ApproveTask implements Callable<Boolean> {
             eventLog.approvalCompleted();
             info().data("user", session.getEmail()).data("collectionId", collection.getDescription().getId())
                     .log("approve task: collection approve task completed successfully");
-
-            if (Configuration.isUploadNewEndpointEnabled() && DatasetWhitelistChecker.isURIWhitelisted(collectionReader)) {
-                uploadNewEndpoint(collection, collectionReader);
-            }
 
             return collection != null;
 

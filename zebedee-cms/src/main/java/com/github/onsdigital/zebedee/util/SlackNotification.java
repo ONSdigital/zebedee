@@ -286,7 +286,7 @@ public class SlackNotification {
                         break;
                     case COMPLETED:
                         pm.setText("Pre-publish completed for collection");
-                        attch.setColor("good");
+                        attch.setColor("warning");
                         break;
                     case FAILED:
                         pm.setText("Pre-publish *failed* for collection");
@@ -306,7 +306,7 @@ public class SlackNotification {
                         break;
                     case COMPLETED:
                         pm.setText("Publish completed for collection");
-                        attch.setColor("good");
+                        attch.setColor("warning");
                         break;
                     case FAILED:
                         pm.setText("Publish *failed* for collection");

@@ -367,11 +367,11 @@ public class ApproveTask implements Callable<Boolean> {
             if (uri.endsWith(".csv") || uri.endsWith(".xlsx") || uri.endsWith(".xls") || uri.endsWith(".csdb")) {
                 String fileName = uri.substring(1);
                 String decodedFilename = removeEncoding(fileName);
-                Resource myFile = collectionReader.getResource(decodedFilename);
-                if (DatasetWhitelistChecker.isWhitelisted(myFile.getName())) {
+                Resource decodedFile = collectionReader.getResource(decodedFilename);
+                if (DatasetWhitelistChecker.isWhitelisted(decodedFile.getName())) {
                     info().data("filename", decodedFilename).data("collectionId", collection.getDescription().getId())
                             .log("File is whitelisted");
-                    uploadFile(myFile, decodedFilename, collection.getDescription().getId(), correctDatasetVersion);
+                    uploadFile(decodedFile, decodedFilename, collection.getDescription().getId(), correctDatasetVersion);
                 }
             }
         }
@@ -546,14 +546,14 @@ public class ApproveTask implements Callable<Boolean> {
         return datasetVersion;
     }
 
-    protected String removeEncoding(String filename) {
-        if (filename == null || filename.isEmpty()) {
+    protected String removeEncoding(String fileName) {
+        if (fileName == null || fileName.isEmpty()) {
             throw new IllegalArgumentException("input string can't be empty");
         }
 
         // Check if file name has encoded characters like %20 and decode them
         Pattern pattern = Pattern.compile("%[0-9A-Fa-f]{2}");
-        Matcher matcher = pattern.matcher(filename);
+        Matcher matcher = pattern.matcher(fileName);
 
         StringBuffer resultString = new StringBuffer();
 
@@ -561,7 +561,7 @@ public class ApproveTask implements Callable<Boolean> {
         while (matcher.find()) {
             // print log only once and only if we find a match to reduce noise
             if (i == 0) {
-                info().data("filename", filename).log("Decoding file name");
+                info().data("filename", fileName).log("Decoding file name");
                 i++;
             }
             try {
@@ -572,7 +572,7 @@ public class ApproveTask implements Callable<Boolean> {
                 matcher.appendReplacement(resultString, decodedSubstring);
             } catch (UnsupportedEncodingException e) {
                 info().log("Unsupported Encoding Exception while trying to decode the file name: returning the original file name");
-                return filename;
+                return fileName;
             }
         }
 

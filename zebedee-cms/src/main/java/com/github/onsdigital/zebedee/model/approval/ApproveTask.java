@@ -38,7 +38,6 @@ import org.apache.hc.core5.http.message.BasicNameValuePair;
 
 import java.io.*;
 import java.net.URISyntaxException;
-import java.net.URLDecoder;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
@@ -48,8 +47,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
@@ -366,12 +363,11 @@ public class ApproveTask implements Callable<Boolean> {
         for (String uri : collectionReader.getReviewed().listUris()) {
             if (uri.endsWith(".csv") || uri.endsWith(".xlsx") || uri.endsWith(".xls") || uri.endsWith(".csdb")) {
                 String fileName = uri.substring(1);
-                String decodedFilename = removeEncoding(fileName);
-                Resource decodedFile = collectionReader.getResource(decodedFilename);
-                if (DatasetWhitelistChecker.isWhitelisted(decodedFile.getName())) {
-                    info().data("filename", decodedFilename).data("collectionId", collection.getDescription().getId())
+                Resource myFile = collectionReader.getResource(fileName);
+                if (DatasetWhitelistChecker.isWhitelisted(myFile.getName())) {
+                    info().data("filename", fileName).data("collectionId", collection.getDescription().getId())
                             .log("File is whitelisted");
-                    uploadFile(decodedFile, decodedFilename, collection.getDescription().getId(), correctDatasetVersion);
+                    uploadFile(myFile, fileName, collection.getDescription().getId(), correctDatasetVersion);
                 }
             }
         }
@@ -545,38 +541,5 @@ public class ApproveTask implements Callable<Boolean> {
         }
         return datasetVersion;
     }
-
-    protected String removeEncoding(String fileName) {
-        if (fileName == null || fileName.isEmpty()) {
-            throw new IllegalArgumentException("input string can't be empty");
-        }
-
-        // Check if file name has encoded characters like %20 and decode them
-        Pattern pattern = Pattern.compile("%[0-9A-Fa-f]{2}");
-        Matcher matcher = pattern.matcher(fileName);
-
-        StringBuffer resultString = new StringBuffer();
-
-        int i = 0;
-        while (matcher.find()) {
-            // print log only once and only if we find a match to reduce noise
-            if (i == 0) {
-                info().data("filename", fileName).log("Decoding file name");
-                i++;
-            }
-            try {
-                String encodedSubstring = matcher.group();
-
-                String decodedSubstring = URLDecoder.decode(encodedSubstring, "UTF-8");
-
-                matcher.appendReplacement(resultString, decodedSubstring);
-            } catch (UnsupportedEncodingException e) {
-                info().log("Unsupported Encoding Exception while trying to decode the file name: returning the original file name");
-                return fileName;
-            }
-        }
-
-        matcher.appendTail(resultString);
-        return resultString.toString();
-    }
 }
+

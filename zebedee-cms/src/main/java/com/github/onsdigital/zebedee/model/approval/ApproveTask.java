@@ -51,6 +51,7 @@ import java.util.stream.Collectors;
 
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
+import static com.github.onsdigital.zebedee.configuration.Configuration.getDatasetWhitelist;
 import static com.github.onsdigital.zebedee.json.EventType.APPROVAL_FAILED;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.error;
 
@@ -165,7 +166,11 @@ public class ApproveTask implements Callable<Boolean> {
             eventLog.compressedZipFiles();
 
             if (Configuration.isUploadNewEndpointEnabled() && DatasetWhitelistChecker.isURIWhitelisted(collectionReader)) {
-                uploadNewEndpoint(collection, collectionReader);
+                List<String> reviewedList = collection.getReviewed().uris().stream().filter(i -> i.contains("datasets")).collect(Collectors.toList());
+                String whitelist = getDatasetWhitelist();
+                List<String> allowed = Arrays.asList(whitelist.split(","));
+                reviewedList = reviewedList.stream().filter(j -> allowed.stream().anyMatch(j::contains)).collect(Collectors.toList());
+                uploadWhitelistedFiles(collectionReader, reviewedList, collection.getDescription().getId());
             }
             
             approveCollection();
@@ -352,22 +357,17 @@ public class ApproveTask implements Callable<Boolean> {
         info().data("collectionId", collection.getDescription().getId()).log("approval task: validation successful");
     }
 
-    protected void uploadNewEndpoint(Collection collection, CollectionReader collectionReader)
+    protected void uploadWhitelistedFiles(CollectionReader collectionReader, List<String> urisToCheck, String description)
             throws ZebedeeException, IOException {
-        uploadWhitelistedFiles(collection, collectionReader);
-    }
-
-    protected void uploadWhitelistedFiles(Collection collection, CollectionReader collectionReader)
-            throws ZebedeeException, IOException {
-        String correctDatasetVersion = findCorrectDatasetVersion(collectionReader.getReviewed().listUris());
-        for (String uri : collectionReader.getReviewed().listUris()) {
+        for (String uri : urisToCheck) {
             if (uri.endsWith(".csv") || uri.endsWith(".xlsx") || uri.endsWith(".xls") || uri.endsWith(".csdb")) {
                 String fileName = uri.substring(1);
                 Resource myFile = collectionReader.getResource(fileName);
                 if (DatasetWhitelistChecker.isWhitelisted(myFile.getName())) {
-                    info().data("filename", fileName).data("collectionId", collection.getDescription().getId())
+                    info().data("filename", fileName).data("collectionId", description)
                             .log("File is whitelisted");
-                    uploadFile(myFile, fileName, collection.getDescription().getId(), correctDatasetVersion);
+                    String correctDatasetVersion = findCorrectDatasetVersion(urisToCheck, fileName);
+                    uploadFile(myFile, fileName, description, correctDatasetVersion);
                 }
             }
         }
@@ -526,14 +526,14 @@ public class ApproveTask implements Callable<Boolean> {
         return letter + Integer.toString(number);
     }
 
-    protected String findCorrectDatasetVersion(List<String> listOfUris) {
+    protected String findCorrectDatasetVersion(List<String> listOfUris, String fileName) {
         if (listOfUris == null) {
             throw new IllegalArgumentException("input array can't be null");
         }
         String datasetVersion = "";
         for (String uri : listOfUris) {
             if (uri.endsWith(".csv") || uri.endsWith(".xlsx") || uri.endsWith(".xls") || uri.endsWith(".csdb")) {
-                if (uri.contains("previous")) {
+                if (uri.contains("previous") && uri.contains(extractFileName(fileName))) {
                     datasetVersion = extractDatasetVersion(uri);
                     return datasetVersion;
                 }

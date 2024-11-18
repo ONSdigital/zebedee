@@ -332,46 +332,6 @@ public class ApproveTaskTest {
         }
     }
 
-    // new unit tests
-
-    @Test
-    public void testUploadNewEndpoint_HappyPath() throws ZebedeeException, IOException {
-        // Given
-        Collection collection = Mockito.mock(Collection.class);
-        CollectionReader collectionReader = Mockito.mock(CollectionReader.class);
-        System.setProperty("ENABLE_UPLOAD_NEW_ENDPOINT", "true");
-
-        when(collection.getDescription()).thenReturn(collectionDescription);
-        when(collectionReader.getReviewed()).thenReturn(contentReader);
-        when(collectionWriter.getReviewed()).thenReturn(contentWriter);
-        when(collection.getReviewed()).thenReturn(content);
-
-        // When
-        task.uploadNewEndpoint(collection, collectionReader);
-
-        // Then
-        verify(task, times(1)).uploadWhitelistedFiles(collection, collectionReader);
-    }
-
-    @Test
-    public void testUploadNewEndpoint_UnHappyPath() throws ZebedeeException, IOException {
-        // Given
-        Collection collection = Mockito.mock(Collection.class);
-        CollectionReader collectionReader = Mockito.mock(CollectionReader.class);
-        System.setProperty("ENABLE_UPLOAD_NEW_ENDPOINT", "false");
-
-        when(collection.getDescription()).thenReturn(collectionDescription);
-        when(collectionReader.getReviewed()).thenReturn(contentReader);
-        when(collectionWriter.getReviewed()).thenReturn(contentWriter);
-        when(collection.getReviewed()).thenReturn(content);
-
-        // When
-        task.uploadNewEndpoint(collection, collectionReader);
-
-        // Then
-        verify(task, times(1)).uploadWhitelistedFiles(collection, collectionReader);
-    }
-
     @Test
     public void testCreateUploadParams() {
         String resumableFilename = "test_file.csv";
@@ -574,7 +534,7 @@ public class ApproveTaskTest {
 
     @Test
     public void testfindCorrectDatasetVersion_nullInput() {
-        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> task.findCorrectDatasetVersion(null));
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> task.findCorrectDatasetVersion(null, ""));
         assertThat(ex.getMessage(), equalTo("input array can't be null"));
     }
 
@@ -587,7 +547,7 @@ public class ApproveTaskTest {
         listOfUris.add("/economy/grossdomesticproductgdp/datasets/mycollectionpagedltest1/augusttoseptember2024/previous/v1/diop.csv");
 
         String expected = "v1";
-        String actual = task.findCorrectDatasetVersion(listOfUris);
+        String actual = task.findCorrectDatasetVersion(listOfUris, "diop.csv");
         assertEquals(expected, actual);
     }
 
@@ -600,7 +560,7 @@ public class ApproveTaskTest {
         listOfUris.add("/economy/grossdomesticproductgdp/datasets/mycollectionpagedltest1/current/previous/v123/diop.csv");
 
         String expected = "v123";
-        String actual = task.findCorrectDatasetVersion(listOfUris);
+        String actual = task.findCorrectDatasetVersion(listOfUris, "diop.csv");
         assertEquals(expected, actual);
     }
 
@@ -612,7 +572,7 @@ public class ApproveTaskTest {
         listOfUris.add("/economy/grossdomesticproductgdp/datasets/mycollectionpagedltest1/september2024/diop.xlsx");
 
         String expected = "";
-        String actual = task.findCorrectDatasetVersion(listOfUris);
+        String actual = task.findCorrectDatasetVersion(listOfUris, "diop.csv");
         assertEquals(expected, actual);
     }
 
@@ -621,7 +581,7 @@ public class ApproveTaskTest {
         List<String> listOfUris = new ArrayList<>();
 
         String expected = "";
-        String actual = task.findCorrectDatasetVersion(listOfUris);
+        String actual = task.findCorrectDatasetVersion(listOfUris, "diop.csv");
         assertEquals(expected, actual);
     }
 }

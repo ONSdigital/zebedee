@@ -170,7 +170,11 @@ public class ApproveTask implements Callable<Boolean> {
                 String whitelist = getDatasetWhitelist();
                 List<String> allowed = Arrays.asList(whitelist.split(","));
                 reviewedList = reviewedList.stream().filter(j -> allowed.stream().anyMatch(j::contains)).collect(Collectors.toList());
-                uploadWhitelistedFiles(collectionReader, reviewedList, collection.getDescription().getId());
+                if (reviewedList.size() > 0) {
+                    uploadWhitelistedFiles(collectionReader, reviewedList, collection.getDescription().getId());
+                } else {
+                    info().log("The list of reviewed URIs is empty: files not uploaded");
+                }
             }
             
             approveCollection();

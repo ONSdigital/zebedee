@@ -534,10 +534,14 @@ public class ApproveTask implements Callable<Boolean> {
         if (listOfUris == null) {
             throw new IllegalArgumentException("input array can't be null");
         }
+
+        String datasetId = extractDatasetId(fileName);
+        String baseFilename = datasetId.replaceAll(DatasetWhitelistChecker.REG_EX_STR, "");
+
         String datasetVersion = "";
         for (String uri : listOfUris) {
             if (uri.endsWith(".csv") || uri.endsWith(".xlsx") || uri.endsWith(".xls") || uri.endsWith(".csdb")) {
-                if (uri.contains("previous") && uri.contains(extractFileName(fileName))) {
+                if (uri.contains("previous") && uri.contains(baseFilename)) {
                     datasetVersion = extractDatasetVersion(uri);
                     return datasetVersion;
                 }

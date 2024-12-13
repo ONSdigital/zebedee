@@ -336,7 +336,8 @@ public class Collections {
      * @return
      * @throws IOException
      */
-    public static Collection getCollection(HttpServletRequest request)
+    public static Collection
+    getCollection(HttpServletRequest request)
             throws IOException {
         String collectionId = getCollectionId(request);
         return Root.zebedee.getCollections().getCollection(collectionId);

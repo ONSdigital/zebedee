@@ -5,6 +5,7 @@ image_resource:
   type: docker-image
   source:
     repository: onsdigital/dp-concourse-tools-java
+    tag: 3.8.8-eclipse-temurin-8
 
 inputs:
   - name: zebedee

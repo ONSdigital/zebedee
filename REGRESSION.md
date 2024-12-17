@@ -25,6 +25,11 @@ functionality is decommissioned.
 
 ## Functionality
 
+### Page rendering functionality (web and publishing)
+For standard content pages, there exists a `data.json` in Zebedee with a `type` that corresponds to the handlebars
+template that will render it in Babbage.
+
+
 ### Reader functionality (web and publishing)
 
 #### Serving page content
@@ -50,10 +55,8 @@ Unauthenticated endpoints that only return published data from the master conten
 - Index of Published Content (`/publishedindex`)
 - Get an item of published Content Data (`/publisheddata`)
 
-### CMS functionality (publishing only)
 
-For standard content pages, there exists a `data.json` in Zebedee with a `type` that corresponds to the handlebars
-template that will render it.
+### CMS functionality (publishing)
 
 #### Managing collections
 
@@ -77,7 +80,7 @@ Publishing Collections
 
 - OnPublishComplete
 - Publish
--
+
 
 #### Content functionality
 

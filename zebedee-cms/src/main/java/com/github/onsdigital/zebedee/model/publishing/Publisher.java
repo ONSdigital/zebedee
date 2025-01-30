@@ -115,6 +115,11 @@ public class Publisher {
         boolean success = false;
         final String collectionId = collection.getDescription().getId();
 
+        Future<Boolean> staticFilesPublishingFuture = null;
+        if (CMSFeatureFlags.cmsFeatureFlags().isStaticFilesPublishingEnabled()) {
+            staticFilesPublishingFuture = performStaticFilesPublish(collection);
+        }
+
         Future<ImageServicePublishingResult> imageFuture = null;
         if (CMSFeatureFlags.cmsFeatureFlags().isImagePublishingEnabled()) {
             imageFuture = publishImages(collection);
@@ -139,11 +144,13 @@ public class Publisher {
 
         if (CMSFeatureFlags.cmsFeatureFlags().isStaticFilesPublishingEnabled()) {
             try {
-                staticFilesServiceSupplier.getService().publishCollection(collection);
-                success &= true;
+                if (staticFilesPublishingFuture == null) {
+                    throw new Exception("static files publishing future unexpectedly null on completion of publishing");
+                }
+                success &= staticFilesPublishingFuture.get();
             } catch (Exception e) {
                 error().data("collectionId", collectionId).data("publishing", true)
-                        .logException(e, "Exception thrown when performing static file publish()");
+                        .logException(e, "Exception thrown when completing static file publish()");
                 success = false;
             }
         }
@@ -785,6 +792,19 @@ public class Publisher {
             ImageServicePublishingResult result = imageServiceSupplier.getService()
                     .publishImagesInCollection(collection);
             return result; // Complete
+        });
+    }
+
+    private static Future<Boolean> performStaticFilesPublish(Collection collection) {
+        return apiPool.submit(() -> {
+            try {
+                staticFilesServiceSupplier.getService().publishCollection(collection);
+                return true;
+            } catch (Exception e) {
+                error().data("collectionId", collection.getDescription().getId()).data("publishing", true)
+                        .logException(e, "Exception thrown when performing static file publish()");
+                return false;
+            }
         });
     }
 

@@ -1,11 +1,11 @@
 index :
     number_of_shards : 3
     number_of_replicas : 0
-    max_result_window : 20000
+    max_result_window : 30000
 analysis :
   analyzer :
     #Overwriting default index analyzer
-    #Makes all fields filterable with exact word matching, it is used to make filtering available on all fields by default
+    #Makes all fields filterable with exact word matching. It is used to make filtering available on all fields by default
     #Searchable fields uses ons_standard_analyzer and ons_detailed_analyzer
     default_index :
       tokenizer : keyword

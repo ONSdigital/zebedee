@@ -21,7 +21,6 @@ import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class TaxonomyTest {
-    private Taxonomy taxonomy = new Taxonomy();
     @Mock
     private HttpServletRequest mockRequest;
 
@@ -36,7 +35,9 @@ public class TaxonomyTest {
     }
 
     @Test
-    public void taxonomy() throws ZebedeeException, IOException {
+    public void taxonomy() {
+        Taxonomy taxonomy = new Taxonomy();
+
         assertThrows(RuntimeException.class, () -> {
             taxonomy.get(mockRequest, mockResponse);
         });

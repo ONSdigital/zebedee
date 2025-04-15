@@ -1,5 +1,8 @@
 package com.github.onsdigital.zebedee.model.content.item;
 
+import com.github.onsdigital.zebedee.content.page.base.Page;
+import com.github.onsdigital.zebedee.content.page.statistics.dataset.Dataset;
+import com.github.onsdigital.zebedee.content.page.statistics.dataset.DownloadSection;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.model.Content;
@@ -17,6 +20,9 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import static com.github.onsdigital.zebedee.util.URIUtils.removeLeadingSlash;
@@ -158,8 +164,10 @@ public class VersionedContentItem extends ContentItem {
      */
     private void copyFilesIntoVersionDirectory(Path contentRoot, String versionUri, ContentReader contentReader,
                                                ContentWriter contentWriter) throws IOException, ZebedeeException {
+
+
         // Iterate the files in the source directory.
-        try (DirectoryStream<Path> stream = Files.newDirectoryStream(contentRoot.resolve(removeLeadingSlash(getUri())))) {
+        try (DirectoryStream<Path> stream = filesToCopyIntoVersion(contentRoot, versionUri, contentReader, contentWriter)) {
             for (Path path : stream) {
                 if (!Files.isDirectory(path)) { // ignore directories
                     String uri = contentRoot.relativize(path).toString();
@@ -173,6 +181,43 @@ public class VersionedContentItem extends ContentItem {
                         contentWriter.write(inputStream, versionPath.toString());
                     }
                 }
+            }
+        }
+    }
+
+    private DirectoryStream<Path> filesToCopyIntoVersion(Path contentRoot, String versionUri, ContentReader contentReader,
+                                                         ContentWriter contentWriter) throws IOException, ZebedeeException {
+        DirectoryStream.Filter<Path> filter = null;
+        try {
+            Page page = contentReader.getContent(getUri());
+
+            if (page instanceof Dataset) {
+                filter = new DatasetVersionFilter((Dataset) page);
+            }
+        } catch (ZebedeeException e) {
+            return Files.newDirectoryStream(contentRoot.resolve(removeLeadingSlash(getUri())));
+        }
+
+        return (filter != null) ?
+                Files.newDirectoryStream(contentRoot.resolve(removeLeadingSlash(getUri())),filter) :
+                Files.newDirectoryStream(contentRoot.resolve(removeLeadingSlash(getUri())));
+    }
+
+    private class DatasetVersionFilter implements DirectoryStream.Filter<Path> {
+        private Set<String> filesToCopy;
+
+        @Override
+        public boolean accept(Path entry) throws IOException {
+            return filesToCopy.contains(entry.getFileName().toString());
+        }
+
+        public DatasetVersionFilter(Dataset page) {
+            this.filesToCopy = new HashSet<>();
+            filesToCopy.add("data.json");
+            filesToCopy.add("data_cy.json");
+            List<DownloadSection> downloads = page.getDownloads();
+            for (DownloadSection dl : downloads) {
+                filesToCopy.add(dl.getFile());
             }
         }
     }

@@ -2,6 +2,8 @@ package com.github.onsdigital.zebedee.reader.api.endpoint;
 
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.reader.api.bean.PublishedIndexResponse;
+import com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -20,7 +22,10 @@ public class PublishedIndexTest {
     private HttpServletResponse response = mock(HttpServletResponse.class);
 
     @Before
-    public void initialize(){ publishedIndex = new PublishedIndex();}
+    public void initialize(){ 
+        publishedIndex = new PublishedIndex();
+        ReaderConfiguration.init("target/test-classes/test-content/");
+    }
 
     @Test
     public void readReturnsSuccess() throws ZebedeeException, IOException {

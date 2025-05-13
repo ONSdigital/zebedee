@@ -13,7 +13,6 @@ public class CMSFeatureFlags {
     public static final String ENABLE_DATASET_IMPORT = "ENABLE_DATASET_IMPORT";
     public static final String ENABLE_VERIFY_PUBLISH_CONTENT = "ENABLE_VERIFY_PUBLISH_CONTENT";
     private static final String ENABLE_DATASET_VERSION_VERIFICATION = "ENABLE_DATASET_VERSION_VERIFICATION";
-    private static final String ENABLE_SESSIONS_API = "ENABLE_SESSIONS_API";
     private static final String ENABLE_CENTRALISED_KEYRING = "ENABLE_CENTRALISED_KEYRING";
     public static final String ENABLE_IMAGE_PUBLISHING = "ENABLE_IMAGE_PUBLISHING";
     private static final String ENABLE_JWT_SESSIONS = "ENABLE_JWT_SESSIONS";
@@ -28,7 +27,6 @@ public class CMSFeatureFlags {
     private final boolean isDatasetImportEnabled;
     private final boolean isVerifyPublishEnabled;
     private final boolean isDatasetVersionVerificationEnabled;
-    private final boolean isSessionAPIEnabled;
     private final boolean isCentralisedKeyringEnabled;
     private final boolean isImagePublishingEnabled;
     private final boolean isJwtSessionsEnabled;
@@ -43,7 +41,6 @@ public class CMSFeatureFlags {
         this.isDatasetImportEnabled = Boolean.valueOf(getConfigValue(ENABLE_DATASET_IMPORT));
         this.isVerifyPublishEnabled = Boolean.valueOf(getConfigValue(ENABLE_VERIFY_PUBLISH_CONTENT));
         this.isDatasetVersionVerificationEnabled = Boolean.valueOf(getConfigValue(ENABLE_DATASET_VERSION_VERIFICATION));
-        this.isSessionAPIEnabled = Boolean.valueOf(getConfigValue(ENABLE_SESSIONS_API));
         this.isCentralisedKeyringEnabled = Boolean.valueOf(getConfigValue(ENABLE_CENTRALISED_KEYRING));
         this.isImagePublishingEnabled = Boolean.valueOf(getConfigValue(ENABLE_IMAGE_PUBLISHING));
         this.isJwtSessionsEnabled = Boolean.valueOf(getConfigValue(ENABLE_JWT_SESSIONS));
@@ -54,7 +51,6 @@ public class CMSFeatureFlags {
         info().data(ENABLE_DATASET_IMPORT, isDatasetImportEnabled)
                 .data(ENABLE_VERIFY_PUBLISH_CONTENT, isVerifyPublishEnabled)
                 .data(ENABLE_DATASET_VERSION_VERIFICATION, isDatasetVersionVerificationEnabled)
-                .data(ENABLE_SESSIONS_API, isSessionAPIEnabled)
                 .data(ENABLE_CENTRALISED_KEYRING, isCentralisedKeyringEnabled)
                 .data(ENABLE_IMAGE_PUBLISHING, isImagePublishingEnabled)
                 .data(ENABLE_JWT_SESSIONS, isJwtSessionsEnabled)
@@ -94,10 +90,6 @@ public class CMSFeatureFlags {
      */
     public boolean isDatasetVersionVerificationEnabled() {
         return this.isDatasetVersionVerificationEnabled;
-    }
-
-    public boolean isSessionAPIEnabled() {
-        return this.isSessionAPIEnabled;
     }
 
     public boolean isCentralisedKeyringEnabled() {

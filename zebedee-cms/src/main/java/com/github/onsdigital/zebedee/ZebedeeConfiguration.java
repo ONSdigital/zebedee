@@ -277,12 +277,10 @@ public class ZebedeeConfiguration {
                 .data("collections_path", collectionsPath.toString())
                 .data("published_collections_path", publishedCollectionsPath.toString())
                 .data("users_path", usersPath.toString())
-                .data("sessions_path", sessionsPath.toString())
                 .data("permissions_path", permissionsPath.toString())
                 .data("teams_path", teamsPath.toString())
                 .data("services_path", servicePath.toString())
                 .data("enable_verification_agent", useVerificationAgent)
-                .data("sessions_api_enabled", cmsFeatureFlags().isSessionAPIEnabled())
                 .log("zebedee configuration creation complete");
     }
 

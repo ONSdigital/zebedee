@@ -40,7 +40,6 @@ public class Configuration {
     private static final String SERVICE_AUTH_TOKEN = "15C0E4EE-777F-4C61-8CDB-2898CEB34657";
     private static final String LEGACY_CACHE_API_AUTH_TOKEN = "748896205c3b42b43adb4b22fff11784c5d971187f280ab1b6f142c3d69e64e4";
     private static final String DEFAULT_SLACK_USERNAME = "Zebedee";
-    private static final String SESSIONS_API_URL = "http://localhost:24400";
     private static final String KEYRING_SECRET_KEY = "KEYRING_SECRET_KEY";
     private static final String KEYRING_INIT_VECTOR = "KEYRING_INIT_VECTOR";
     private static final String DATASET_WHITELIST = "drsi,mm23,mm22,ppi,dataset1,pusf,a01,x09,cla01,pn2,mgdp,diop,ios1,mret,mq10,rtisa";
@@ -248,10 +247,6 @@ public class Configuration {
 
     public static String getReindexKey() {
         return StringUtils.defaultIfBlank(getValue("website_reindex_key"), "");
-    }
-
-    public static String getSessionsApiUrl() {
-        return StringUtils.defaultIfBlank(getValue("SESSIONS_API_URL"), SESSIONS_API_URL);
     }
 
     //Enable upload-new endpoint

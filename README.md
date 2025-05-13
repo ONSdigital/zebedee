@@ -149,7 +149,6 @@ Otherwise :violin: kindly ask someone from the dev team to help troubleshoot.
 | DATASET_API_AUTH_TOKEN                           | "FD0108EA-825D-411C-9B1D-41EF7727F465"                                       | Dataset API authentication token                                             |
 | SERVICE_AUTH_TOKEN                               | "15C0E4EE-777F-4C61-8CDB-2898CEB34657"                                       | Service API authentication token                                             |
 | LEGACY_CACHE_API_AUTH_TOKEN                      | "748896205c3b42b43adb4b22fff11784c5d971187f280ab1b6f142c3d69e64e4"           | Legacy Cache API authentication token                                        |
-| SESSIONS_API_URL                                 | "http://localhost:24400"                                                     | Session API URL                                                              |
 | KEYRING_SECRET_KEY                               | "KEYRING_SECRET_KEY";                                                        | Keyring encryption key                                                       |
 | KEYRING_INIT_VECTOR                              | "KEYRING_INIT_VECTOR"                                                        | Keyring init vector                                                          |
 | VERIFY_RETRY_DELAY                               | 5000; //milliseconds                                                         | Retry delay duration                                                         |

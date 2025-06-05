@@ -74,10 +74,6 @@ public class Configuration {
         return BooleanUtils.toBoolean(StringUtils.defaultIfBlank(getValue("scheduled_publishing_enabled"), "true"));
     }
 
-    public static boolean isVerificationEnabled() {
-        return BooleanUtils.toBoolean(StringUtils.defaultIfBlank(getValue("publish_verification_enabled"), "false"));
-    }
-
     public static String getDefaultSlackWarningChannel() {
         return StringUtils.defaultIfBlank(getValue("slack_default_channel"), DEFAULT_SLACK_WARNING_CHANNEL);
     }

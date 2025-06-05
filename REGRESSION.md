@@ -4,15 +4,16 @@
 
 <!-- TOC -->
 * [Regression testing](#regression-testing)
- * [Table of contents](#table-of-contents)
- * [Background](#background)
- * [Functionality](#functionality)
+* [Table of contents](#table-of-contents)
+* [Background](#background)
+* [Functionality](#functionality)
   * [Reader functionality (web and publishing)](#reader-functionality-web-and-publishing)
-   * [Serving page content](#serving-page-content)
-   * [Published content retrieval](#published-content-retrieval)
-  * [CMS functionality (publishing only)](#cms-functionality-publishing-only)
-   * [Managing collections](#managing-collections)
-  * [Other functionality (including deprecated enpoints)](#other-functionality-including-deprecated-enpoints)
+  * [Serving page content](#serving-page-content)
+  * [Published content retrieval](#published-content-retrieval)
+* [CMS functionality (publishing only)](#cms-functionality-publishing-only)
+  * [Managing collections](#managing-collections)
+  * [Content functionality](#content-functionality)
+* [Other functionality (including deprecated endpoints)](#other-functionality-including-deprecated-endpoints)
 <!-- TOC -->
 
 ## Background
@@ -26,93 +27,89 @@ functionality is decommissioned.
 ## Functionality
 
 ### Page rendering functionality (web and publishing)
+
 For standard content pages, there exists a `data.json` in Zebedee with a `type` that corresponds to the handlebars
 template that will render it in Babbage.
-
 
 ### Reader functionality (web and publishing)
 
 #### Serving page content
 
-- Data `/data` get
-- Export
-- FileSize
-- Generator
-- Parents
-- ResolveDatasets
-- Resource
-- Taxonomy
+* Data `/data` get
+* Export
+* FileSize
+* Generator
+* Parents
+* ResolveDatasets
+* Resource
+* Taxonomy
 
 #### Other
 
-- Health
-- ReIndex
+* Health
+* ReIndex
 
 #### Published content retrieval
 
 Unauthenticated endpoints that only return published data from the master content directory
 
-- Index of Published Content (`/publishedindex`)
-- Get an item of published Content Data (`/publisheddata`)
+* Index of Published Content (`/publishedindex`)
+* Get an item of published Content Data (`/publisheddata`)
 
-
-### CMS functionality (publishing)
+### CMS functionality (publishing only)
 
 #### Managing collections
 
-- Approve `/approve`
-- CheckCollectionsForURI
-- Collection
-- CollectionBrowseTree
-- CollectionDetails
-- Collections
-- Complete
-- Content
-- ContentMove
-- ContentRename
-- DataVisualisationZip
-- DeleteContent
-- PublishedCollections
-- Review
-- Unlock
+* Approve `/approve`
+* CheckCollectionsForURI
+* Collection
+* CollectionBrowseTree
+* CollectionDetails
+* Collections
+* Complete
+* Content
+* ContentMove
+* ContentRename
+* DataVisualisationZip
+* DeleteContent
+* Review
+* Unlock
 
 Publishing Collections
 
-- OnPublishComplete
-- Publish
-
+* OnPublishComplete
+* Publish
 
 #### Content functionality
 
-- Equation
-- EquationPreview
-- File
-- ModifyTable
-- Page
-- Table
-- TimeseriesImport
-- Transfer
-- Version
+* Equation
+* EquationPreview
+* File
+* ModifyTable
+* Page
+* Table
+* TimeseriesImport
+* Transfer
+* Version
 
 ### Other functionality (including deprecated endpoints)
 
-- Deprecated auth endpoints
- - Identity
- - ListKeyring
- - Login (`/login`)
- - Password
- - Permission
- - Ping
- - Service
- - Teams
- - TeamsReport
- - Users
- - CMD Specific auth
-  - ServiceDatasetPermissions
-  - ServiceInstancePermissions
-  - UserDatasetPermissions
-  - UserInstancePermissions
-- Other
- - ClickEventLog
- - DataServices
-
+* Deprecated auth endpoints
+* Identity
+* ListKeyring
+* Login (`/login`)
+* Password
+* Permission
+* Ping
+* Service
+* Teams
+* TeamsReport
+* Users
+* CMD Specific auth
+  * ServiceDatasetPermissions
+  * ServiceInstancePermissions
+  * UserDatasetPermissions
+  * UserInstancePermissions
+* Other
+* ClickEventLog
+* DataServices

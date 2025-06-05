@@ -223,7 +223,7 @@ public class Root {
 
     private static Zebedee initialiseZebedee(Path root) throws IOException, NotFoundException, BadRequestException,
             UnauthorizedException {
-        zebedee = new Zebedee(new ZebedeeConfiguration(root, true));
+        zebedee = new Zebedee(new ZebedeeConfiguration(root));
 
         // TODO: Remove this logic after migration to using the dp-identity-api
         if (!cmsFeatureFlags().isJwtSessionsEnabled()) {

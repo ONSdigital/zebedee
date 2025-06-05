@@ -204,7 +204,7 @@ public class Builder {
         accessMapping.setCollections(new HashMap<>());
 
 
-        ZebedeeConfiguration configuration = new ZebedeeConfiguration(parent, false);
+        ZebedeeConfiguration configuration = new ZebedeeConfiguration(parent);
         ReflectionTestUtils.setField(configuration,"slackClient",slackClient);
         this.zebedee = new Zebedee(configuration);
 

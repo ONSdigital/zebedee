@@ -65,7 +65,6 @@ import com.github.onsdigital.zebedee.util.slack.SlackNotifier;
 import com.github.onsdigital.zebedee.util.slack.SlackStartUpNotifier;
 import com.github.onsdigital.zebedee.util.versioning.VersionsService;
 import com.github.onsdigital.zebedee.util.versioning.VersionsServiceImpl;
-import com.github.onsdigital.zebedee.verification.VerificationAgent;
 import dp.api.dataset.DatasetAPIClient;
 import dp.api.dataset.DatasetClient;
 
@@ -127,7 +126,6 @@ public class ZebedeeConfiguration {
     private Path redirectPath;
     private Path servicePath;
     private Path keyRingPath;
-    private boolean useVerificationAgent;
     private PublishedCollections publishedCollections;
     private Collections collections;
     private Content published;
@@ -152,10 +150,9 @@ public class ZebedeeConfiguration {
      * Create a new configuration object.
      *
      * @param rootPath
-     * @param enableVerificationAgent
      * @throws IOException
      */
-    public ZebedeeConfiguration(Path rootPath, boolean enableVerificationAgent) throws IOException {
+    public ZebedeeConfiguration(Path rootPath) throws IOException {
         if (Files.exists(rootPath)) {
             info().data("path", rootPath.toString()).log("setting Zebedee root directory");
         } else {
@@ -178,7 +175,6 @@ public class ZebedeeConfiguration {
         if (!Files.exists(redirectPath)) {
             Files.createFile(redirectPath);
         }
-        this.useVerificationAgent = enableVerificationAgent;
 
         // Create the services and objects...
         this.dataIndex = new DataIndex(new FileSystemContentReader(publishedContentPath));
@@ -280,7 +276,6 @@ public class ZebedeeConfiguration {
                 .data("permissions_path", permissionsPath.toString())
                 .data("teams_path", teamsPath.toString())
                 .data("services_path", servicePath.toString())
-                .data("enable_verification_agent", useVerificationAgent)
                 .log("zebedee configuration creation complete");
     }
 
@@ -341,10 +336,6 @@ public class ZebedeeConfiguration {
             this.slackNotifier = new NopNotifierImpl();
             this.startUpNotifier = new NopStartUpNotifier();
         }
-    }
-
-    public boolean isUseVerificationAgent() {
-        return useVerificationAgent;
     }
 
     public Path getZebedeePath() {
@@ -438,10 +429,6 @@ public class ZebedeeConfiguration {
 
     public UsersService getUsersService() {
         return this.usersService;
-    }
-
-    public VerificationAgent getVerificationAgent(boolean verificationIsEnabled, Zebedee z) {
-        return isUseVerificationAgent() && verificationIsEnabled ? new VerificationAgent(z) : null;
     }
 
     public DatasetService getDatasetService() {

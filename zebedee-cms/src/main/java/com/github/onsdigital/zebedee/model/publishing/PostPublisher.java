@@ -101,11 +101,6 @@ public class PostPublisher {
 
             Path collectionJsonPath = moveCollectionToArchive(zebedee, collection, collectionReader);
 
-            if (!skipVerification) {
-                // add to published collections list
-                indexPublishReport(zebedee, collectionJsonPath, collectionReader);
-            }
-
             collection.delete();
             ContentTree.dropCache();
             zebedee.getSchedulerKeyCache().remove(collection.getId());
@@ -206,17 +201,6 @@ public class PostPublisher {
                     .log("An error occurred trying apply the publish manifest to publishing content");
         }
 
-    }
-
-
-    private static void indexPublishReport(final Zebedee zebedee, final Path collectionJsonPath, final CollectionReader collectionReader) {
-        POOL.submit(() -> {
-            info().log("Indexing publish report");
-            PublishedCollection publishedCollection = zebedee.getPublishedCollections().add(collectionJsonPath);
-            if (Configuration.isVerificationEnabled()) {
-                zebedee.getVerificationAgent().submitForVerification(publishedCollection, collectionJsonPath, collectionReader);
-            }
-        });
     }
 
     private static void reindexPublishingSearch(Collection collection) throws IOException {

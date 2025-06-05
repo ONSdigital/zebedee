@@ -29,7 +29,6 @@ import com.github.onsdigital.zebedee.teams.service.TeamsService;
 import com.github.onsdigital.zebedee.user.model.User;
 import com.github.onsdigital.zebedee.user.service.UsersService;
 import com.github.onsdigital.zebedee.util.slack.Notifier;
-import com.github.onsdigital.zebedee.verification.VerificationAgent;
 
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
@@ -38,7 +37,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
 
-import static com.github.onsdigital.zebedee.configuration.Configuration.isVerificationEnabled;
 import static com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedException.beingEditedByAnotherCollectionError;
 import static com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedException.beingEditedByThisCollectionError;
 import static com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedException.markedDeleteInAnotherCollectionError;
@@ -69,7 +67,6 @@ public class Zebedee {
     private final Path servicePath;
     private final Path keyRingPath;
 
-    private final VerificationAgent verificationAgent;
     private final PublishedCollections publishedCollections;
     private final Collections collections;
     private final Content published;
@@ -110,7 +107,6 @@ public class Zebedee {
         this.publishedCollections = cfg.getPublishCollections();
         this.teamsService = cfg.getTeamsService();
         this.usersService = cfg.getUsersService();
-        this.verificationAgent = cfg.getVerificationAgent(isVerificationEnabled(), this);
         this.datasetService = cfg.getDatasetService();
         this.imageService = cfg.getImageService();
         this.kafkaService = cfg.getKafkaService();
@@ -353,10 +349,6 @@ public class Zebedee {
 
     public Sessions getSessions() {
         return this.sessions;
-    }
-
-    public VerificationAgent getVerificationAgent() {
-        return this.verificationAgent;
     }
 
     public DataIndex getDataIndex() {

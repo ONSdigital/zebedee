@@ -196,7 +196,9 @@ public class FileSystemContentReader implements ContentReader {
             Path parent = contentPath.getParent();
             assertIsEditionsFolder(parent);
             page = resolveLatest(contentPath);
-            page.getDescription().setLatestRelease(true);
+            if (page.getDescription().getMigrationLink() == null || page.getDescription().getMigrationLink().isEmpty()){
+                page.getDescription().setLatestRelease(true);
+            }
         } catch(Throwable t) {
             span.recordException(t);
             throw t;

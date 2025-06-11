@@ -11,28 +11,33 @@ import java.util.List;
 /**
  * Created by bren on 04/06/15.
  * <p/>
- * A wrapper class that holds all possible description fields used in all page types.
- * Instead of creating a hierarchy of description object ( as it was done initially ),
- * we accumulate all description fields of all page in this folder to avoid serialising/deserialising pitfalls
+ * A wrapper class that holds all possible description fields used in all page
+ * types.
+ * Instead of creating a hierarchy of description object ( as it was done
+ * initially ),
+ * we accumulate all description fields of all page in this folder to avoid
+ * serialising/deserialising pitfalls
  * <p/>
  */
 public class PageDescription extends Content implements Comparable<PageDescription> {
 
-    /*Release fields*/
+    /* Release fields */
     public Boolean finalised;
-    /*Migration Data*/
+    /* Migration Data */
     public transient String theme;
     public transient String level2;
     public transient String level3;
-    //Index is used for ordering if set
+    // Index is used for ordering if set
     private Integer index;
     private String title;
-    //Below fields are not common for all page types. But there is no immediate generic type to put these fields in
-    //These fields won't be serialised into json if empty
+    // Below fields are not common for all page types. But there is no immediate
+    // generic type to put these fields in
+    // These fields won't be serialised into json if empty
     private String summary;
-    private List<String> keywords; //Used for search engines to read ?
+    private List<String> keywords; // Used for search engines to read ?
     private String metaDescription;
-    /*Statistics Description*/
+    private String migrationLink;
+    /* Statistics Description */
     private Boolean nationalStatistic;
     private Boolean latestRelease;
     private Contact contact;
@@ -42,14 +47,14 @@ public class PageDescription extends Content implements Comparable<PageDescripti
     private String edition;
     private String _abstract;
     private List<String> authors;
-    private String headline;//Used in compendium
-    /*Bulletin headlines*/
+    private String headline;// Used in compendium
+    /* Bulletin headlines */
     private String headline1;
     private String headline2;
     private String headline3;
     private String datasetId;
     private URI datasetUri;
-    /*Statistical Data description*/
+    /* Statistical Data description */
     private String cdid;
     // We provide a minimal default for the unit, otherwise highcharts shows
     // "undefined":
@@ -57,7 +62,7 @@ public class PageDescription extends Content implements Comparable<PageDescripti
     private String preUnit = "";
     private String source = ""; // Where a statistic comes from. Typically "Office for National Statistics"
     private String monthLabelStyle;
-    //Below fields appear on references to time series on other content types
+    // Below fields appear on references to time series on other content types
     private String date;
     private String number;
     private String mainMeasure;
@@ -65,14 +70,14 @@ public class PageDescription extends Content implements Comparable<PageDescripti
     private String keyNote;
     /** This value is displayed beneath the time series title: */
     private String additionalText;
-    /*QMI Description*/
+    /* QMI Description */
     private String surveyName;
     private String frequency;
     private String compilation;
     private String geographicCoverage;
     private String sampleSize;
     private Date lastRevised;
-    /*Adhoc content reference*/
+    /* Adhoc content reference */
     private String reference;
     private Boolean cancelled;
     private List<String> cancellationNotice;
@@ -90,7 +95,7 @@ public class PageDescription extends Content implements Comparable<PageDescripti
 
     @Override
     public int compareTo(PageDescription o) {
-        //nulls last or first
+        // nulls last or first
         if (this.index == null) {
             return -1;
         }
@@ -129,6 +134,14 @@ public class PageDescription extends Content implements Comparable<PageDescripti
         this.metaDescription = metaDescription;
     }
 
+    public String getMigrationLink() {
+        return migrationLink;
+    }
+
+    public void setMigrationLink(String migrationLink) {
+        this.migrationLink = migrationLink;
+    }
+
     public boolean isNationalStatistic() {
         return nationalStatistic != null && nationalStatistic;
     }
@@ -145,12 +158,12 @@ public class PageDescription extends Content implements Comparable<PageDescripti
         this.monthLabelStyle = monthLabelStyle;
     }
 
-    public Boolean isLatestRelease() { 
-        return latestRelease != null && latestRelease; 
+    public Boolean isLatestRelease() {
+        return latestRelease != null && latestRelease;
     }
 
-    public void setLatestRelease(Boolean latestRelease) { 
-        this.latestRelease = latestRelease; 
+    public void setLatestRelease(Boolean latestRelease) {
+        this.latestRelease = latestRelease;
     }
 
     public Contact getContact() {
@@ -454,7 +467,7 @@ public class PageDescription extends Content implements Comparable<PageDescripti
     }
 
     public void setApiDatasetId(String apiDatasetId) {
-      this.apiDatasetId = apiDatasetId;
+        this.apiDatasetId = apiDatasetId;
     }
 
     public String getCanonicalTopic() {

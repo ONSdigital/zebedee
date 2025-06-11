@@ -191,6 +191,13 @@ public class ContentReaderTest {
     public void testGetLatestContent() throws ZebedeeException, IOException {
         Page latestContent = contentReader.getLatestContent("/economy/environmentalaccounts/bulletins/ukenvironmentalaccounts");
         assertEquals("2015", latestContent.getDescription().getEdition());
+        assertEquals(true, latestContent.getDescription().isLatestRelease());
+    }
+
+    @Test
+    public void testGetLatestContentMigration() throws ZebedeeException, IOException {
+        Page latestContent = contentReader.getLatestContent("/economy/environmentalaccounts/articles/uknaturalcapitallandcoverintheuk");
+        assertEquals(false, latestContent.getDescription().isLatestRelease());
     }
 
     @Test

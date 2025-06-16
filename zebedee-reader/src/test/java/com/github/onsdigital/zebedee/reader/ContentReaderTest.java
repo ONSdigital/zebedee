@@ -227,15 +227,4 @@ public class ContentReaderTest {
         assertEquals(1, timeSeriesDirectories.size());
         assertTrue(timeSeriesDirectories.get(0).endsWith("timeseries"));
     }
-//    @Test
-//    public void mimeTypeShouldNotBeEmptyForXls() throws IOException {
-//        String mimeType = ContentReader.determineMimeType(Paths.get("/some/path/data.xls"));
-//        assertNotNull(mimeType);
-//    }
-//
-//    @Test
-//    public void mimeTypeShouldNotBeEmptyForXlsx() throws IOException {
-//        String mimeType = ContentReader.determineMimeType(Paths.get("/some/path/data.xlsx"));
-//        assertNotNull(mimeType);
-//    }
 }

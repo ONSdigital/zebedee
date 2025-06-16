@@ -201,6 +201,12 @@ public class ContentReaderTest {
     }
 
     @Test
+    public void testGetLatestContentMigrationWhenLatestReleaseSet() throws ZebedeeException, IOException {
+        Page latestContent = contentReader.getLatestContent("/peoplepopulationandcommunity/culturalidentity/ethnicity/bulletins/detailedcharacteristicsforenglandandwales");
+        assertEquals(false, latestContent.getDescription().isLatestRelease());
+    }
+
+    @Test
     public void testGetContentLength() throws ZebedeeException, IOException {
         long contentLength = contentReader.getContentLength("economy/environmentalaccounts/articles/uknaturalcapitallandcoverintheuk/2015-03-17/4f5b14cb.xls");
         assertEquals(56320, contentLength);

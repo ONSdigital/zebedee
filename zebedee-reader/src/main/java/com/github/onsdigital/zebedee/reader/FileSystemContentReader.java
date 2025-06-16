@@ -39,6 +39,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import static com.github.onsdigital.zebedee.logging.ReaderLogger.info;
 import static com.github.onsdigital.zebedee.logging.ReaderLogger.error;
 import static com.github.onsdigital.zebedee.util.URIUtils.removeLastSegment;
 import static com.github.onsdigital.zebedee.util.URIUtils.removeLeadingSlash;
@@ -198,6 +199,8 @@ public class FileSystemContentReader implements ContentReader {
             page = resolveLatest(contentPath);
             if (StringUtils.isBlank(page.getDescription().getMigrationLink())){
                 page.getDescription().setLatestRelease(true);
+            } else {
+                page.getDescription().setLatestRelease(null);
             }
         } catch(Throwable t) {
             span.recordException(t);

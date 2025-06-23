@@ -169,7 +169,7 @@
             <dependency>
                 <groupId>com.github.onsdigital</groupId>
                 <artifactId>resource-utils</artifactId>
-                <version>resource-utils-1.2.2</version>
+                <version>resource-utils-1.2.3</version>
             </dependency>
 
             <dependency>

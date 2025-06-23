@@ -157,15 +157,7 @@
             <dependency>
                 <groupId>com.github.onsdigital</groupId>
                 <artifactId>encrypted-file-upload</artifactId>
-                <version>2.1.1</version>
-                <exclusions>
-                    <!-- Brings in an older version of davidcarboni/cryptolite which conflicts
-                         with the onsdigital fork. This stops the old version being imported. -->
-                    <exclusion>
-                        <groupId>com.github.davidcarboni</groupId>
-                        <artifactId>cryptolite</artifactId>
-                    </exclusion>
-                </exclusions>
+                <version>2.3.0</version>
             </dependency>
 
             <dependency>

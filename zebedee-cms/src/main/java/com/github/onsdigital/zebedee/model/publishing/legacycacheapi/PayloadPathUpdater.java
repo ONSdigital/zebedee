@@ -13,6 +13,7 @@ public class PayloadPathUpdater {
     private static final String BULLETIN_SEGMENT = "/bulletins";
     private static final String ADHOC_SEGMENT = "/adhocs";
     private static final String ARTICLE_SEGMENT = "/articles";
+    private static final String COMPENDIUM_SEGMENT = "/compendium";
     private static final String DATA_SEGMENT_WITHOUT_SLASH = "data";
     private static final String DATASETS_SEGMENT = "/datasets";
     private static final String LINE_CHART_CONFIG_SEGMENT_WITHOUT_SLASH = "linechartconfig";
@@ -69,12 +70,15 @@ public class PayloadPathUpdater {
                 }
             }
 
-            // 3. If bulletin or article then /xxxx/bulletin/xxxx1/xxxx2/xxxx3 --> /bulletin/xxxx1/xxxx2  (keep 2 segment) & RETURN modified
+            // 3. If bulletin, article or compendia then /xxxx/bulletin/xxxx1/xxxx2/xxxx3 --> /bulletin/xxxx1/xxxx2  (keep 2 segment) & RETURN modified
             if (updatedUri.contains(ARTICLE_SEGMENT)) {
                 return URIUtils.getNSegmentsAfterSegmentInput(updatedUri, ARTICLE_SEGMENT, 2);
             }
             if (updatedUri.contains(BULLETIN_SEGMENT)) {
                 return URIUtils.getNSegmentsAfterSegmentInput(updatedUri, BULLETIN_SEGMENT, 2);
+            }
+            if (updatedUri.contains(COMPENDIUM_SEGMENT)) {
+                return URIUtils.getNSegmentsAfterSegmentInput(updatedUri, COMPENDIUM_SEGMENT, 2);
             }
             // 4. If qmis or adhoc or methodologies then /xxxx/qmis/xxx1/xxx2 --> /qmis/xxx1 & RETURNS modified
             if (updatedUri.contains(ADHOC_SEGMENT)) {
@@ -128,10 +132,24 @@ public class PayloadPathUpdater {
     public static boolean isPayloadPathBulletinLatest(String uriToUpdate) {
         return uriToUpdate != null && uriToUpdate.contains(BULLETIN_SEGMENT) && !uriToUpdate.endsWith("/latest");
     }
+    
+    public static boolean isPayloadPathArticleLatest(String uriToUpdate) {
+        return uriToUpdate != null && uriToUpdate.contains(ARTICLE_SEGMENT) && !uriToUpdate.endsWith("/latest");
+    }
+    
+    public static boolean isPayloadPathCompendiaLatest(String uriToUpdate) {
+        return uriToUpdate != null && uriToUpdate.contains(COMPENDIUM_SEGMENT) && !uriToUpdate.endsWith("/latest");
+    }
 
-    public static String getPathForBulletinLatest(String uriToUpdate) {
+    public static String getPathForLatest(String uriToUpdate) {
         if (uriToUpdate.contains(PayloadPathUpdater.BULLETIN_SEGMENT)) {
             return URIUtils.getNSegmentsAfterSegmentInput(uriToUpdate, BULLETIN_SEGMENT, 1) + "/latest";
+        }
+        if (uriToUpdate.contains(PayloadPathUpdater.ARTICLE_SEGMENT)) {
+            return URIUtils.getNSegmentsAfterSegmentInput(uriToUpdate, ARTICLE_SEGMENT, 1) + "/latest";
+        }
+        if (uriToUpdate.contains(PayloadPathUpdater.COMPENDIUM_SEGMENT)) {
+            return URIUtils.getNSegmentsAfterSegmentInput(uriToUpdate, COMPENDIUM_SEGMENT, 1) + "/latest";
         }
         return null;
     }

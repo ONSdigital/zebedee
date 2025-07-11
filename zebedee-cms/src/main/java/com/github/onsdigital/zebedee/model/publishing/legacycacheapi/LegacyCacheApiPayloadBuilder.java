@@ -22,6 +22,9 @@ public class LegacyCacheApiPayloadBuilder {
     public static class Builder {
         private Collection collection;
         private final Map<String, LegacyCacheApiPayload> payloadsByPath = new HashMap<>();
+        private enum PayloadType {
+            BULLETIN, ARTICLE, COMPENDIA, NONE
+        }
 
         public Builder() {}
 
@@ -41,7 +44,7 @@ public class LegacyCacheApiPayloadBuilder {
                                     LegacyCacheApiPayload legacyCacheApiPayload = new LegacyCacheApiPayload(collectionId, pagePath, publishDate);
                                     if (isValid(legacyCacheApiPayload)) {
                                         payloadsByPath.put(legacyCacheApiPayload.uriToUpdate, legacyCacheApiPayload);
-                                        addPayloadForBulletinLatest(legacyCacheApiPayload.uriToUpdate, collectionId, publishDate);
+                                        addPayloadForLatest(legacyCacheApiPayload.uriToUpdate, collectionId, publishDate);
                                     }
                                 }
                         );
@@ -62,14 +65,30 @@ public class LegacyCacheApiPayloadBuilder {
             return new LegacyCacheApiPayloadBuilder(this.payloadsByPath.values());
         }
 
-        private void addPayloadForBulletinLatest(String uriToUpdate, String collectionId, Date clearCacheDate) {
-            if (PayloadPathUpdater.isPayloadPathBulletinLatest(uriToUpdate)) {
-                // first apply updatePath on uriToUpdate
-                LegacyCacheApiPayload legacyCacheApiPayloadLatest = new LegacyCacheApiPayload(collectionId, uriToUpdate, clearCacheDate);
-                // then add latest when updated path contains a bulletins
-                legacyCacheApiPayloadLatest.uriToUpdate = PayloadPathUpdater.getPathForBulletinLatest(legacyCacheApiPayloadLatest.uriToUpdate);
-                payloadsByPath.put(legacyCacheApiPayloadLatest.uriToUpdate, legacyCacheApiPayloadLatest);
-            }
+        private PayloadType getPayloadType(String uriToUpdate) {
+            if (PayloadPathUpdater.isPayloadPathBulletinLatest(uriToUpdate))
+                return PayloadType.BULLETIN;
+            if (PayloadPathUpdater.isPayloadPathArticleLatest(uriToUpdate))
+                return PayloadType.ARTICLE;
+            if (PayloadPathUpdater.isPayloadPathCompendiaLatest(uriToUpdate))
+                return PayloadType.COMPENDIA;
+            return PayloadType.NONE;
+        }
+
+        /**
+         * Adds a payload for the 'latest' version if the URI matches a known type.
+         */
+        private void addPayloadForLatest(String uriToUpdate, String collectionId, Date clearCacheDate) {
+            PayloadType type = getPayloadType(uriToUpdate);
+            if (type == PayloadType.NONE)
+                return;
+            addLatestPayload(uriToUpdate, collectionId, clearCacheDate);
+        }
+
+        private void addLatestPayload(String uriToUpdate, String collectionId, Date clearCacheDate) {
+            LegacyCacheApiPayload payloadLatest = new LegacyCacheApiPayload(collectionId, uriToUpdate, clearCacheDate);
+            payloadLatest.uriToUpdate = PayloadPathUpdater.getPathForLatest(payloadLatest.uriToUpdate);
+            payloadsByPath.put(payloadLatest.uriToUpdate, payloadLatest);
         }
 
         private boolean isValid(LegacyCacheApiPayload payload) {

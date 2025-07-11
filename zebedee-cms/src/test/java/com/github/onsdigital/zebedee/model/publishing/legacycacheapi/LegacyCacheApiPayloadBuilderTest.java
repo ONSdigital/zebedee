@@ -307,6 +307,34 @@ public class LegacyCacheApiPayloadBuilderTest {
 
             assertTrue(hasExpectedURI);
         }
+       
+        @Test
+        public void NotificationPayloadCacheApiForArticleLatestReturnsTwoTest() {
+            String testUriArticle = "/economy/inflationandpriceindices/articles/consumerpricesdevelopmentplan/updatedaugust2024";
+            urisToUpdate.add(testUriArticle);
+
+            java.util.Collection<LegacyCacheApiPayload> payloads = new LegacyCacheApiPayloadBuilder.Builder().collection(collection).build().getPayloads();
+            assertEquals(2, payloads.size());
+
+            String expectedURI = "/economy/inflationandpriceindices/articles/consumerpricesdevelopmentplan/latest";
+            boolean hasExpectedURI = payloads.stream().map(payload -> payload.uriToUpdate).anyMatch(uri -> uri.equals(expectedURI));
+
+            assertTrue(hasExpectedURI);
+        }
+       
+        @Test
+        public void NotificationPayloadCacheApiForCompendiaLatestReturnsTwoTest() {
+            String testUriCompendia = "/economy/grossdomesticproductgdp/compendium/unitedkingdomnationalaccountsthebluebook/2024/";
+            urisToUpdate.add(testUriCompendia);
+
+            java.util.Collection<LegacyCacheApiPayload> payloads = new LegacyCacheApiPayloadBuilder.Builder().collection(collection).build().getPayloads();
+            assertEquals(2, payloads.size());
+
+            String expectedURI = "/economy/grossdomesticproductgdp/compendium/unitedkingdomnationalaccountsthebluebook/latest";
+            boolean hasExpectedURI = payloads.stream().map(payload -> payload.uriToUpdate).anyMatch(uri -> uri.equals(expectedURI));
+
+            assertTrue(hasExpectedURI);
+        }
 
         @Test
         public void NotificationPayloadCacheApiForBulletinLatestReturnsTwoFromParamUrlTest() {
@@ -333,21 +361,32 @@ public class LegacyCacheApiPayloadBuilderTest {
             assertEquals(1, payloads.size());
             assertTrue(payloads.iterator().next().uriToUpdate.contains("/economy/inflationandpriceindices/bulletins/producerpriceinflation/latest"));
         }
-
+       
         @Test
-        public void NotificationPayloadCacheApiForBulletinLatestReturnsOneForNoBulletinsTest() {
-            String testUriWithArticlesString = "/economy/inflationandpriceindices/articles/producerpriceinflation/october2022/30d7d6c2/";
+        public void NotificationPayloadCacheApiForArticleLatestReturnsOneTest() {
+            String testUriArticleWithLatestString = "/economy/inflationandpriceindices/articles/consumerpricesdevelopmentplan/latest/updatedaugust2024/";
 
             urisToUpdate.clear();
-            urisToUpdate.add(testUriWithArticlesString);
+            urisToUpdate.add(testUriArticleWithLatestString);
             java.util.Collection<LegacyCacheApiPayload> payloads = new LegacyCacheApiPayloadBuilder.Builder().collection(collection).build().getPayloads();
             assertEquals(1, payloads.size());
-            assertTrue(payloads.iterator().next().uriToUpdate.contains("/economy/inflationandpriceindices/articles/producerpriceinflation/october2022"));
+            assertTrue(payloads.iterator().next().uriToUpdate.contains("/economy/inflationandpriceindices/articles/consumerpricesdevelopmentplan/latest"));
         }
+        
+        @Test
+        public void NotificationPayloadCacheApiForCompendiaLatestReturnsOneTest() {
+            String testUriCompendiaWithLatestString = "/economy/grossdomesticproductgdp/compendium/unitedkingdomnationalaccountsthebluebook/latest/2025/";
 
+            urisToUpdate.clear();
+            urisToUpdate.add(testUriCompendiaWithLatestString);
+            java.util.Collection<LegacyCacheApiPayload> payloads = new LegacyCacheApiPayloadBuilder.Builder().collection(collection).build().getPayloads();
+            assertEquals(1, payloads.size());
+            assertTrue(payloads.iterator().next().uriToUpdate.contains("/economy/grossdomesticproductgdp/compendium/unitedkingdomnationalaccountsthebluebook/latest"));
+        }
+        
         @Test
         public void testGetPathForBulletinLatest() {
-            String result = PayloadPathUpdater.getPathForBulletinLatest("/economy/inflationandpriceindices/bulletins/producerpriceinflation/october2022/30d7d6c2/");
+            String result = PayloadPathUpdater.getPathForLatest("/economy/inflationandpriceindices/bulletins/producerpriceinflation/october2022/30d7d6c2/");
             assertEquals("/economy/inflationandpriceindices/bulletins/producerpriceinflation/latest", result);
         }
 
@@ -363,10 +402,57 @@ public class LegacyCacheApiPayloadBuilderTest {
             assertFalse(result);
         }
 
-
         @Test
         public void testIsPathBulletinLatestFalse() {
             boolean result = PayloadPathUpdater.isPayloadPathBulletinLatest("/economy/inflationandpriceindices/bulletins/producerpriceinflation/latest");
+            assertFalse(result);
+        }
+       
+        @Test
+        public void testGetPathForArticleLatest() {
+            String result = PayloadPathUpdater.getPathForLatest("/economy/inflationandpriceindices/articles/consumerpricesdevelopmentplan/updatedaugust2024/");
+            assertEquals("/economy/inflationandpriceindices/articles/consumerpricesdevelopmentplan/latest", result);
+        }
+
+        @Test
+        public void testIsPathArticleLatest() {
+            boolean result = PayloadPathUpdater.isPayloadPathArticleLatest("/economy/inflationandpriceindices/articles/consumerpricesdevelopmentplan/updatedaugust2024/");
+            assertTrue(result);
+        }
+
+        @Test
+        public void testIsPathArticleLatestFalseForBulletinsPath() {
+            boolean result = PayloadPathUpdater.isPayloadPathArticleLatest("/economy/inflationandpriceindices/bulletins/producerpriceinflation/october2022/30d7d6c2/");
+            assertFalse(result);
+        }
+
+        @Test
+        public void testIsPathArticleLatestFalse() {
+            boolean result = PayloadPathUpdater.isPayloadPathArticleLatest("/economy/inflationandpriceindices/articles/consumerpricesdevelopmentplan/latest");
+            assertFalse(result);
+        }
+       
+        @Test
+        public void testGetPathForCompendiaLatest() {
+            String result = PayloadPathUpdater.getPathForLatest("/economy/grossdomesticproductgdp/compendium/unitedkingdomnationalaccountsthebluebook/2024/");
+            assertEquals("/economy/grossdomesticproductgdp/compendium/unitedkingdomnationalaccountsthebluebook/latest", result);
+        }
+
+        @Test
+        public void testIsPathCompendiaLatest() {
+            boolean result = PayloadPathUpdater.isPayloadPathCompendiaLatest("/economy/grossdomesticproductgdp/compendium/unitedkingdomnationalaccountsthebluebook/2024/");
+            assertTrue(result);
+        }
+
+        @Test
+        public void testIsPathCompendiaLatestFalseForBulletinsPath() {
+            boolean result = PayloadPathUpdater.isPayloadPathCompendiaLatest("/economy/inflationandpriceindices/bulletins/producerpriceinflation/october2022/30d7d6c2/");
+            assertFalse(result);
+        }
+
+        @Test
+        public void testIsPathCompendiaLatestFalse() {
+            boolean result = PayloadPathUpdater.isPayloadPathCompendiaLatest("/economy/grossdomesticproductgdp/compendium/unitedkingdomnationalaccountsthebluebook/latest");
             assertFalse(result);
         }
     }

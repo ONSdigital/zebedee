@@ -1,5 +1,6 @@
 package com.github.onsdigital.zebedee.kafka;
 
+import com.github.onsdigital.zebedee.avro.ContentDeleted;
 import com.github.onsdigital.zebedee.avro.ContentUpdated;
 import com.github.onsdigital.zebedee.kafka.avro.AvroSerializer;
 import org.apache.kafka.clients.CommonClientConfigs;
@@ -27,11 +28,14 @@ import static com.github.onsdigital.zebedee.configuration.Configuration.getKafka
  */
 public class KafkaClientImpl implements KafkaClient {
 
-    private final Producer<String, ContentUpdated> producer;
-    private String topic;
+    private final Producer<String, ContentUpdated> updateProducer;
+    private final Producer<String, ContentDeleted> deletedProducer;
+    private String updateTopic;
+    private String deletedTopic;
 
-    public KafkaClientImpl(String kafkaAddr, String topic) {
-        this.topic = topic;
+    public KafkaClientImpl(String kafkaAddr, String updateTopic, String deletedTopic) {
+        this.updateTopic = updateTopic;
+        this.deletedTopic = deletedTopic;
 
         Properties props = new Properties();
         props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaAddr);
@@ -46,10 +50,18 @@ public class KafkaClientImpl implements KafkaClient {
             }
         }
 
-        AvroSerializer<ContentUpdated> avroSerializer = new AvroSerializer<>(ContentUpdated.class);
-        this.producer = new KafkaProducer<>(props, new StringSerializer(), avroSerializer);
+        // Producer for ContentUpdated
+        AvroSerializer<ContentUpdated> updatedSerializer = new AvroSerializer<>(ContentUpdated.class);
+        this.updateProducer = new KafkaProducer<>(props, new StringSerializer(), updatedSerializer);
 
-        Runtime.getRuntime().addShutdownHook(new Thread(producer::close));
+        // Producer for ContentDeleted
+        AvroSerializer<ContentDeleted> deletedSerializer = new AvroSerializer<>(ContentDeleted.class);
+        this.deletedProducer = new KafkaProducer<>(props, new StringSerializer(), deletedSerializer);
+
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            updateProducer.close();
+            deletedProducer.close();
+        }));
     }
 
     /**
@@ -60,7 +72,12 @@ public class KafkaClientImpl implements KafkaClient {
     public Future<RecordMetadata> produceContentUpdated(String uri, String dataType, String collectionID,
             String jobId, String searchIndex, String traceID) {
         ContentUpdated value = new ContentUpdated(uri, dataType, collectionID, jobId, searchIndex, traceID);
-        return producer.send(new ProducerRecord<>(topic, value));
+        return updateProducer.send(new ProducerRecord<>(updateTopic, value));
     }
 
+    @Override
+    public Future<RecordMetadata> produceContentDeleted(String uri, String searchIndex, String collectionID, String traceID) {
+        ContentDeleted value = new ContentDeleted(uri, collectionID, searchIndex, traceID);
+        return deletedProducer.send(new ProducerRecord<>(deletedTopic, value));
+    }
 }

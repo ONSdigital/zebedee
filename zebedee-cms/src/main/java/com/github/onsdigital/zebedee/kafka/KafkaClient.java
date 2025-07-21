@@ -22,4 +22,15 @@ public interface KafkaClient {
      */
     public Future<RecordMetadata> produceContentUpdated(String uri, String dataType, String collectionID,
             String jobID, String searchIndex, String traceID);
+
+    /**
+     * Produce a 'content-deleted' kafka message for the given parameters
+     *
+     * @param uri          The URI of the deleted content
+     * @param searchIndex  The search index to remove it from
+     * @param collectionID The ID of the collection that triggered the deletion
+     * @param traceID      The trace ID for distributed tracing/logging
+     * @return a Future for the Kafka result
+     */
+    Future<RecordMetadata> produceContentDeleted(String uri, String searchIndex, String collectionID, String traceID);
 }

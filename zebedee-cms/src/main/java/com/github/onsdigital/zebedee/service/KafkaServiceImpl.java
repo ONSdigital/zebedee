@@ -40,4 +40,26 @@ public class KafkaServiceImpl implements KafkaService {
             }
         }
     }
+
+    @Override
+    public void produceContentDeleted(String collectionId, List<String> uris, String indexName, String traceId) {
+        info().collectionID(collectionId)
+                .data("index", indexName)
+                .log("generating search-content-deleted kafka events for published collection");
+
+        List<Future<RecordMetadata>> futureList = uris.stream()
+                .map(uri -> kafkaClient.produceContentDeleted(uri, indexName, collectionId, traceId))
+                .collect(Collectors.toList());
+
+        for (Future<RecordMetadata> future : futureList) {
+            try {
+                future.get();
+            } catch (InterruptedException | ExecutionException e) {
+                error().collectionID(collectionId)
+                        .data("uri", "see loop context")
+                        .exception(e)
+                        .log("unable to send search-content-deleted kafka message");
+            }
+        }
+    }
 }

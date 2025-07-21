@@ -39,10 +39,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Date;
-import java.util.List;
-import java.util.TimeZone;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
@@ -93,11 +90,8 @@ public class PostPublisher {
             processManifestForMaster(collection, contentReader, contentWriter);
             copyFilesToMaster(zebedee, collection, collectionReader);
 
-            reindexPublishingSearch(collection);
-
-            if (CMSFeatureFlags.cmsFeatureFlags().isKafkaEnabled()) {
-                sendToKafka(collection);
-            }
+            List<String> deletedUris = reindexPublishingSearch(collection);
+            publishKafkaMessagesForCollection(collection, deletedUris);
 
             Path collectionJsonPath = moveCollectionToArchive(zebedee, collection, collectionReader);
 
@@ -114,6 +108,18 @@ public class PostPublisher {
         }
 
         return false;
+    }
+
+    private static void publishKafkaMessagesForCollection(Collection collection, List<String> deletedUris) throws IOException {
+        if (!CMSFeatureFlags.cmsFeatureFlags().isKafkaEnabled()) {
+            return;
+        }
+
+        sendContentUpdatedEvents(collection); // for content-updated
+
+        if (!deletedUris.isEmpty()) {
+            sendContentDeletedEventsToKafka(collection, deletedUris);// for content-deleted
+        }
     }
 
     private static void applyDeletesToPublishing(Collection collection, ContentReader contentReader, ContentWriter contentWriter) {
@@ -203,13 +209,14 @@ public class PostPublisher {
 
     }
 
-    private static void reindexPublishingSearch(Collection collection) throws IOException {
-
+    private static List<String> reindexPublishingSearch(Collection collection) {
+        List<String> deletedUris = new ArrayList<>();
         info().collectionID(collection).log("Reindexing search");
-        try {
 
+        try {
             long start = System.currentTimeMillis();
 
+            // Reindex updated content
             List<String> uris = collection.getReviewed().uris("*data.json");
             for (String uri : uris) {
                 if (isIndexedUri(uri)) {
@@ -218,10 +225,12 @@ public class PostPublisher {
                 }
             }
 
+            // Capture deleted URIs for later use
             for (PendingDelete pendingDelete : collection.getDescription().getPendingDeletes()) {
-
                 ContentTreeNavigator.getInstance().search(pendingDelete.getRoot(), node -> {
-                    info().data("uri", node.uri).log("Deleting index from publishing search ");
+                    info().data("uri", node.uri).log("Deleting index from publishing search");
+                    deletedUris.add(node.uri);
+
                     POOL.submit(() -> {
                         try {
                             Indexer.getInstance().deleteContentIndex(node.getType().getLabel(), node.uri);
@@ -234,13 +243,15 @@ public class PostPublisher {
 
             info().collectionID(collection)
                     .data("timeTaken", (System.currentTimeMillis() - start))
-                    .log("Redindex search completed");
-
-        } catch (Exception exception) {
+                    .log("Reindex search completed");
+        } catch (Exception e) {
             error().collectionID(collection)
-                    .logException(exception, "An error occurred during the search reindex");
+                    .logException(e, "An error occurred during the search reindex");
         }
+
+        return deletedUris;
     }
+
 
     /**
      * Method to determine if a URI is one that should be indexed in search.
@@ -330,7 +341,7 @@ public class PostPublisher {
         return collectionJsonDestination;
     }
 
-    private static void sendToKafka(Collection collection) throws IOException {
+    private static void sendContentUpdatedEvents(Collection collection) throws IOException {
         List<ContentDetail> datasetVersionDetails = collection.getDatasetVersionDetails();
         if (datasetVersionDetails != null && !datasetVersionDetails.isEmpty()) {
             List<String> datasetUris = datasetVersionDetails
@@ -392,4 +403,27 @@ public class PostPublisher {
             notifier.sendCollectionAlarm(collection, channel, "Failed to send content-updated kafka events", e);
         }
     }
+
+    private static void sendContentDeletedEventsToKafka(Collection collection, List<String> uris) {
+        String traceId = defaultIfBlank(MDC.get(TRACE_ID_HEADER), UUID.randomUUID().toString());
+
+        try {
+            KAFKA_SERVICE_SUPPLIER.getService().produceContentDeleted(collection.getId(), uris, SEARCHINDEX, traceId);
+            info().data("traceId", traceId)
+                    .data("uris", uris)
+                    .log("Successfully sent search-content-deleted kafka event");
+        } catch (Exception e) {
+            error()
+                    .data("collectionId", collection.getDescription().getId())
+                    .data("traceId", traceId)
+                    .data("publishing", true)
+                    .data("deletedURIs", uris)
+                    .logException(e, "Failed to send search-content-deleted kafka events");
+
+            String channel = Configuration.getDefaultSlackAlarmChannel();
+            Notifier notifier = zebedee.getSlackNotifier();
+            notifier.sendCollectionAlarm(collection, channel, "Failed to send search-content-deleted kafka events", e);
+        }
+    }
+
 }

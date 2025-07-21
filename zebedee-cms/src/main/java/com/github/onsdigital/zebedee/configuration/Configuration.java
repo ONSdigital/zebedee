@@ -36,6 +36,7 @@ public class Configuration {
     private static final String IDENTITY_API_URL = "http://localhost:25600";
     private static final String KAFKA_ADDR = "localhost:9092";
     private static final String KAFKA_CONTENT_UPDATED_TOPIC = "content-updated";
+    private static final String KAFKA_CONTENT_DELETED_TOPIC = "search-content-deleted";
     private static final String DATASET_API_AUTH_TOKEN = "FD0108EA-825D-411C-9B1D-41EF7727F465";
     private static final String SERVICE_AUTH_TOKEN = "15C0E4EE-777F-4C61-8CDB-2898CEB34657";
     private static final String LEGACY_CACHE_API_AUTH_TOKEN = "748896205c3b42b43adb4b22fff11784c5d971187f280ab1b6f142c3d69e64e4";
@@ -177,6 +178,10 @@ public class Configuration {
 
     public static String getKafkaContentUpdatedTopic() {
         return StringUtils.defaultIfBlank(getValue("KAFKA_CONTENT_UPDATED_TOPIC"), KAFKA_CONTENT_UPDATED_TOPIC);
+    }
+
+    public static String getKafkaContentDeletedTopic() {
+        return StringUtils.defaultIfBlank(getValue("KAFKA_CONTENT_DELETED_TOPIC"), KAFKA_CONTENT_DELETED_TOPIC);
     }
 
     public static String getKafkaSecProtocol() {

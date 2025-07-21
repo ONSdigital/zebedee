@@ -93,23 +93,7 @@ import static com.github.onsdigital.zebedee.Zebedee.TEAMS;
 import static com.github.onsdigital.zebedee.Zebedee.USERS;
 import static com.github.onsdigital.zebedee.Zebedee.ZEBEDEE;
 import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
-import static com.github.onsdigital.zebedee.configuration.Configuration.getDatasetAPIAuthToken;
-import static com.github.onsdigital.zebedee.configuration.Configuration.getDatasetAPIURL;
-import static com.github.onsdigital.zebedee.configuration.Configuration.getIdentityAPIURL;
-import static com.github.onsdigital.zebedee.configuration.Configuration.getImageAPIURL;
-import static com.github.onsdigital.zebedee.configuration.Configuration.getInitialRetryInterval;
-import static com.github.onsdigital.zebedee.configuration.Configuration.getKafkaContentUpdatedTopic;
-import static com.github.onsdigital.zebedee.configuration.Configuration.getKafkaURL;
-import static com.github.onsdigital.zebedee.configuration.Configuration.getKeyringInitVector;
-import static com.github.onsdigital.zebedee.configuration.Configuration.getKeyringSecretKey;
-import static com.github.onsdigital.zebedee.configuration.Configuration.getMaxRetryInterval;
-import static com.github.onsdigital.zebedee.configuration.Configuration.getMaxRetryTimeout;
-import static com.github.onsdigital.zebedee.configuration.Configuration.getRedirectApiUrl;
-import static com.github.onsdigital.zebedee.configuration.Configuration.getServiceAuthToken;
-import static com.github.onsdigital.zebedee.configuration.Configuration.getSlackSupportChannelID;
-import static com.github.onsdigital.zebedee.configuration.Configuration.getStaticFilesAPIURL;
-import static com.github.onsdigital.zebedee.configuration.Configuration.slackChannelsToNotfiyOnStartUp;
-import static com.github.onsdigital.zebedee.configuration.Configuration.getUploadServiceApiUrl;
+import static com.github.onsdigital.zebedee.configuration.Configuration.*;
 import static com.github.onsdigital.zebedee.permissions.store.PermissionsStoreFileSystemImpl.initialisePermissions;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
@@ -265,7 +249,7 @@ public class ZebedeeConfiguration {
 
         if (cmsFeatureFlags().isKafkaEnabled()) {
 
-            KafkaClient kafkaClient = new KafkaClientImpl(getKafkaURL(), getKafkaContentUpdatedTopic());
+            KafkaClient kafkaClient = new KafkaClientImpl(getKafkaURL(), getKafkaContentUpdatedTopic(), getKafkaContentDeletedTopic());
             kafkaService = new KafkaServiceImpl(kafkaClient);
         } else {
             kafkaService = new NoOpKafkaService();

@@ -14,4 +14,9 @@ public class NoOpKafkaService implements KafkaService {
             String searchIndex, String traceId) throws IOException {
         return;
     }
+
+    @Override
+    public void produceContentDeleted(String collectionId, List<String> uris, String indexName, String traceId) {
+        return;
+    }
 }

@@ -21,4 +21,16 @@ public interface KafkaService {
      */
     void produceContentUpdated(String collectionID, List<String> uris, String dataType, String jobID,
             String searchIndex, String traceID) throws IOException;
+
+
+    /**
+     * Produce 'content-deleted' Kafka events for a collection.
+     *
+     * @param uris         A list of URIs that were deleted from publishing
+     * @param collectionID The collection ID that triggered the event
+     * @param indexName    The search index name where deletions should occur
+     * @param traceID      Trace ID for correlation and logging
+     */
+    void produceContentDeleted(String collectionID, List<String> uris, String indexName, String traceID);
+
 }

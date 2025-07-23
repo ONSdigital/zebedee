@@ -2,8 +2,6 @@ package com.github.onsdigital.zebedee.service;
 
 import com.github.onsdigital.dis.redirect.api.sdk.RedirectClient;
 import com.github.onsdigital.dis.redirect.api.sdk.model.Redirect;
-import com.github.onsdigital.dp.image.api.client.exception.ImageAPIException;
-import com.github.onsdigital.zebedee.model.Collection;
 import org.junit.Before;
 import org.junit.Test;
 

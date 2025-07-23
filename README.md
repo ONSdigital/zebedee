@@ -135,7 +135,6 @@ Otherwise :violin: kindly ask someone from the dev team to help troubleshoot.
 | DEFAULT_FLORENCE_URL                             | "http://localhost:8081"                                                      | Florence URL                                                                 |
 | brian_url                                        | "http://localhost:8083"                                                      | Brian URL                                                                    |
 | DEFAULT_TRAIN_URL                                | "http://localhost:8084"                                                      | Train URL                                                                    |
-| DEFAULT_DYLAN_URL                                | "http://localhost:8085"                                                      | Dylan URL                                                                    |
 | CONTENT_DIRECTORY                                | "content"                                                                    | Content directory                                                            |
 | KAFKA_SEC_PROTO                                  | _unset_                                                                      | if set to "TLS", kafka connections will use TLS                              |
 | KAFKA_SEC_CLIENT_CERT                            | _unset_                                                                      | PEM for the client certificate [1]                                           |
@@ -143,6 +142,8 @@ Otherwise :violin: kindly ask someone from the dev team to help troubleshoot.
 | MATHJAX_SERVICE_URL                              | "http://localhost:8888"                                                      | Mathjax service URL                                                          |
 | DATASET_API_URL                                  | "http://localhost:22000"                                                     | Dataset API URL                                                              |
 | IMAGE_API_URL                                    | "http://localhost:24700"                                                     | Image API URL                                                                |
+| REDIRECT_API_URL                                 | "http://localhost:29900"                                                     | Redirect API URL                                                             |
+| ENABLE_REDIRECT_API                              | false                                                                        | Enable redirect API processing functionality                                 |
 | ENABLE_KAFKA                                     | false                                                                        | Feature flag to send kafka messages when a collection is published           |
 | KAFKA_ADDR                                       | "localhost:9092"                                                             | Comma seperated list of kafka brokers                                        |
 | KAFKA_CONTENT_UPDATED_TOPIC                      | content-updated                                                              | Kafka topic to send content updated event to                                 |

@@ -19,6 +19,7 @@ public class CMSFeatureFlags {
     private static final String ENABLE_PERMISSIONS_API = "ENABLE_PERMISSIONS_API";
     public static final String ENABLE_KAFKA = "ENABLE_KAFKA";
     public static final String ENABLE_STATIC_FILES_PUBLISHING = "ENABLE_STATIC_FILES_PUBLISHING";
+    public static final String ENABLE_REDIRECT_API = "ENABLE_REDIRECT_API";
 
     /**
      * Singleton instance
@@ -33,6 +34,7 @@ public class CMSFeatureFlags {
     private final boolean isPermissionsAPIEnabled;
     private final boolean isKafkaEnabled;
     private final boolean isStaticFilesPublishingEnabled;
+    private final boolean isRedirectAPIEnabled;
 
     /**
      * Construct a new feature flags instance.
@@ -47,6 +49,7 @@ public class CMSFeatureFlags {
         this.isPermissionsAPIEnabled = Boolean.valueOf(getConfigValue(ENABLE_PERMISSIONS_API));
         this.isKafkaEnabled = Boolean.valueOf(getConfigValue(ENABLE_KAFKA));
         this.isStaticFilesPublishingEnabled = Boolean.valueOf(getConfigValue(ENABLE_STATIC_FILES_PUBLISHING));
+        this.isRedirectAPIEnabled = Boolean.valueOf(getConfigValue(ENABLE_REDIRECT_API));
 
         info().data(ENABLE_DATASET_IMPORT, isDatasetImportEnabled)
                 .data(ENABLE_VERIFY_PUBLISH_CONTENT, isVerifyPublishEnabled)
@@ -57,6 +60,7 @@ public class CMSFeatureFlags {
                 .data(ENABLE_PERMISSIONS_API, isPermissionsAPIEnabled)
                 .data(ENABLE_KAFKA, isKafkaEnabled)
                 .data(ENABLE_STATIC_FILES_PUBLISHING, isStaticFilesPublishingEnabled)
+                .data(ENABLE_REDIRECT_API, isRedirectAPIEnabled)
                 .log("CMS feature flags configurations");
     }
 
@@ -113,6 +117,10 @@ public class CMSFeatureFlags {
 
     public boolean isStaticFilesPublishingEnabled() {
         return isStaticFilesPublishingEnabled;
+    }
+
+    public boolean isRedirectAPIEnabled() {
+        return isRedirectAPIEnabled;
     }
 
     public static String getConfigValue(String name) {

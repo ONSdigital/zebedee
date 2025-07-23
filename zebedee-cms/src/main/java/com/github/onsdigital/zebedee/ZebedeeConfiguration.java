@@ -2,6 +2,8 @@ package com.github.onsdigital.zebedee;
 
 import com.github.onsdigital.JWTVerifier;
 import com.github.onsdigital.JWTVerifierImpl;
+import com.github.onsdigital.dis.redirect.api.sdk.RedirectClient;
+import com.github.onsdigital.dis.redirect.api.sdk.RedirectAPIClient;
 import com.github.onsdigital.dp.files.api.APIClient;
 import com.github.onsdigital.dp.image.api.client.ImageAPIClient;
 import com.github.onsdigital.dp.image.api.client.ImageClient;
@@ -35,6 +37,9 @@ import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
 import com.github.onsdigital.zebedee.service.DatasetService;
 import com.github.onsdigital.zebedee.service.ImageService;
 import com.github.onsdigital.zebedee.service.ImageServiceImpl;
+import com.github.onsdigital.zebedee.service.RedirectService;
+import com.github.onsdigital.zebedee.service.RedirectServiceImpl;
+import com.github.onsdigital.zebedee.service.NoOpRedirectService;
 import com.github.onsdigital.zebedee.service.KafkaService;
 import com.github.onsdigital.zebedee.service.KafkaServiceImpl;
 import com.github.onsdigital.zebedee.service.NoOpKafkaService;
@@ -99,6 +104,7 @@ import static com.github.onsdigital.zebedee.configuration.Configuration.getKeyri
 import static com.github.onsdigital.zebedee.configuration.Configuration.getKeyringSecretKey;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getMaxRetryInterval;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getMaxRetryTimeout;
+import static com.github.onsdigital.zebedee.configuration.Configuration.getRedirectApiUrl;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getServiceAuthToken;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getSlackSupportChannelID;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getStaticFilesAPIURL;
@@ -136,6 +142,7 @@ public class ZebedeeConfiguration {
     private DataIndex dataIndex;
     private DatasetService datasetService;
     private ImageService imageService;
+    private RedirectService redirectService;
     private KafkaService kafkaService;
     private StaticFilesService staticFilesService;
     private UploadService uploadService;
@@ -262,6 +269,19 @@ public class ZebedeeConfiguration {
             kafkaService = new KafkaServiceImpl(kafkaClient);
         } else {
             kafkaService = new NoOpKafkaService();
+        }
+
+        if (cmsFeatureFlags().isRedirectAPIEnabled()) {
+            RedirectClient redirectClient;
+            try {
+                redirectClient = new RedirectAPIClient(getRedirectApiUrl(), getServiceAuthToken());
+                redirectService = new RedirectServiceImpl(redirectClient);
+            } catch (URISyntaxException e) {
+                error().logException(e, "failed to initialise redirect api client - invalid URI");
+                throw new RuntimeException(e);
+            }
+        } else {
+            redirectService = new NoOpRedirectService();
         }
 
         initSlackIntegration();
@@ -437,6 +457,10 @@ public class ZebedeeConfiguration {
 
     public ImageService getImageService() {
         return imageService;
+    }
+
+    public RedirectService getRedirectService() {
+        return redirectService;
     }
 
     public StaticFilesService getStaticFilesService() {

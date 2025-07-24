@@ -14,6 +14,8 @@ public enum ApprovalEventType {
 
     GENERATED_PDFS("generatedPDFs"),
 
+    GENERATED_REDIRECT_LIST("generatedRedirectList"),
+
     CREATED_PUBLISH_NOTIFICATION("createdPublishNotification"),
 
     COMPRESSED_ZIP_FILES("compressedZipFiles"),

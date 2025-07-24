@@ -1,9 +1,11 @@
 package com.github.onsdigital.zebedee.service;
 
-import com.github.onsdigital.dis.redirect.api.sdk.exception.RedirectAPIException;
-import com.github.onsdigital.dis.redirect.api.sdk.exception.RedirectNotFoundException;
-import com.github.onsdigital.dis.redirect.api.sdk.exception.BadRequestException;
+import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
+import com.github.onsdigital.zebedee.model.Collection;
+import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.dis.redirect.api.sdk.model.Redirect;
+import com.github.onsdigital.zebedee.json.CollectionRedirect;
+
 
 import java.io.IOException;
 
@@ -12,10 +14,8 @@ import java.io.IOException;
  */
 public interface RedirectService {
 
-    /**
-     * Get a redirect
-     */
-    Redirect getRedirect(String redirectID)
-        throws IOException, BadRequestException, RedirectNotFoundException,
-        RedirectAPIException;
+    void generateRedirectListForCollection(Collection collection, CollectionReader collectionReader)
+        throws IOException, ZebedeeException;
+    
+    public CollectionRedirect getCollectionRedirect(Redirect redirect) throws ZebedeeException;
 }

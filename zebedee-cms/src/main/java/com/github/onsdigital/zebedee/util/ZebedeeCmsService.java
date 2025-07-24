@@ -22,6 +22,7 @@ import com.github.onsdigital.zebedee.reader.ZebedeeReader;
 import com.github.onsdigital.zebedee.service.DatasetService;
 import com.github.onsdigital.zebedee.service.ImageService;
 import com.github.onsdigital.zebedee.service.KafkaService;
+import com.github.onsdigital.zebedee.service.RedirectService;
 import com.github.onsdigital.zebedee.service.StaticFilesService;
 import com.github.onsdigital.zebedee.service.UploadService;
 import com.github.onsdigital.zebedee.session.model.Session;
@@ -147,6 +148,8 @@ public class ZebedeeCmsService {
     public StaticFilesService getStaticFilesService() { return Root.zebedee.getStaticFilesService(); }
 
     public UploadService getUploadService() { return Root.zebedee.getUploadService(); }
+
+    public RedirectService getRedirectService() { return Root.zebedee.getRedirectService(); }
 
     public DatasetClient getDatasetClient() throws URISyntaxException {
         return new DatasetAPIClient(

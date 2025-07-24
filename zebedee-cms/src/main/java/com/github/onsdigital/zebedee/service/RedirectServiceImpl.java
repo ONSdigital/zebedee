@@ -58,11 +58,6 @@ public class RedirectServiceImpl implements RedirectService {
                         Redirect redirect = new Redirect(pageUri, migrationPath);
                         CollectionRedirect collectionRedirect = getCollectionRedirect(redirect);
                         if (collectionRedirect.getAction() != CollectionRedirectAction.NO_ACTION){
-                            System.out.println(collectionRedirect.getFrom());
-                            System.out.println(collectionRedirect.getAction());
-
-                            System.out.println(collectionRedirect.getTo());
-
                             collection.getDescription().addRedirect(collectionRedirect);
                         }
                     }
@@ -72,7 +67,6 @@ public class RedirectServiceImpl implements RedirectService {
 
     public CollectionRedirect getCollectionRedirect(Redirect redirect) throws ZebedeeException {
 
-        System.out.println("I'm actually running this function");
         CollectionRedirectAction collectionRedirectAction = CollectionRedirectAction.NO_ACTION;
 
         try {

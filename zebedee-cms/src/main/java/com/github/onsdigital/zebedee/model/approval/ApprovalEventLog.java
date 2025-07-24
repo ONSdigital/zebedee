@@ -12,6 +12,7 @@ import static com.github.onsdigital.zebedee.model.approval.ApprovalEventType.APP
 import static com.github.onsdigital.zebedee.model.approval.ApprovalEventType.COMPRESSED_ZIP_FILES;
 import static com.github.onsdigital.zebedee.model.approval.ApprovalEventType.CREATED_PUBLISH_NOTIFICATION;
 import static com.github.onsdigital.zebedee.model.approval.ApprovalEventType.GENERATED_PDFS;
+import static com.github.onsdigital.zebedee.model.approval.ApprovalEventType.GENERATED_REDIRECT_LIST;
 import static com.github.onsdigital.zebedee.model.approval.ApprovalEventType.GENERATED_TIME_SERIES;
 import static com.github.onsdigital.zebedee.model.approval.ApprovalEventType.POPULATED_RELEASE_PAGE;
 import static com.github.onsdigital.zebedee.model.approval.ApprovalEventType.RESOLVED_DETAILS;
@@ -55,7 +56,7 @@ public class ApprovalEventLog {
         addEvent(ADD_DATASET_VERSION_DETAILS);
     }
 
-    public void populatedResleasePage() {
+    public void populatedReleasePage() {
         addEvent(POPULATED_RELEASE_PAGE);
     }
 
@@ -65,6 +66,10 @@ public class ApprovalEventLog {
 
     public void generatedPDFs() {
         addEvent(GENERATED_PDFS);
+    }
+
+    public void generatedRedirectList() {
+        addEvent(GENERATED_REDIRECT_LIST);
     }
 
     public void createdPublishNotificaion() {

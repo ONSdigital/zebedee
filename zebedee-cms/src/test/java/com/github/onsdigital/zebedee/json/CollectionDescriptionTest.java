@@ -3,6 +3,7 @@ package com.github.onsdigital.zebedee.json;
 import org.junit.Test;
 
 import java.util.Optional;
+import java.util.List;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -96,5 +97,21 @@ public class CollectionDescriptionTest {
         Optional<CollectionDatasetVersion> option = collection.getDatasetVersion(datasetID, edition, version);
         assertFalse(option.isPresent());
         assertFalse(collection.getDatasetVersions().contains(datasetVersion));
+    }
+
+    @Test
+    public void testAddRedirect() {
+
+        // Given a collection description and a CollectionRedirect
+        CollectionDescription collection = new CollectionDescription();
+
+        CollectionRedirect redirect = new CollectionRedirect("/from", "/to", CollectionRedirectAction.CREATE);
+
+        // When a redirect is added
+        collection.addRedirect(redirect);
+
+        // Then the dataset is in the collection description
+        List<CollectionRedirect> collectionRedirects = collection.getRedirects();
+        assertTrue(collectionRedirects.contains(redirect));
     }
 }

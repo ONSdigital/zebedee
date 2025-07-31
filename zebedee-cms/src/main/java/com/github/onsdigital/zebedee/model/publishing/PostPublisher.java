@@ -90,7 +90,12 @@ public class PostPublisher {
             processManifestForMaster(collection, contentReader, contentWriter);
             copyFilesToMaster(zebedee, collection, collectionReader);
 
-            List<String> deletedUris = reindexPublishingSearch(collection);
+            reindexPublishingSearch(collection);
+
+            // Extract deleted URIs for Kafka
+            List<String> deletedUris = extractDeletedUris(collection);
+
+            // Publish content-updated and content-deleted events
             publishKafkaMessagesForCollection(collection, deletedUris);
 
             Path collectionJsonPath = moveCollectionToArchive(zebedee, collection, collectionReader);
@@ -209,14 +214,12 @@ public class PostPublisher {
 
     }
 
-    private static List<String> reindexPublishingSearch(Collection collection) {
-        List<String> deletedUris = new ArrayList<>();
+    private static void reindexPublishingSearch(Collection collection) throws IOException {
         info().collectionID(collection).log("Reindexing search");
-
         try {
+
             long start = System.currentTimeMillis();
 
-            // Reindex updated content
             List<String> uris = collection.getReviewed().uris("*data.json");
             for (String uri : uris) {
                 if (isIndexedUri(uri)) {
@@ -225,12 +228,9 @@ public class PostPublisher {
                 }
             }
 
-            // Capture deleted URIs for later use
             for (PendingDelete pendingDelete : collection.getDescription().getPendingDeletes()) {
                 ContentTreeNavigator.getInstance().search(pendingDelete.getRoot(), node -> {
-                    info().data("uri", node.uri).log("Deleting index from publishing search");
-                    deletedUris.add(node.uri);
-
+                    info().data("uri", node.uri).log("Deleting index from publishing search ");
                     POOL.submit(() -> {
                         try {
                             Indexer.getInstance().deleteContentIndex(node.getType().getLabel(), node.uri);
@@ -243,12 +243,22 @@ public class PostPublisher {
 
             info().collectionID(collection)
                     .data("timeTaken", (System.currentTimeMillis() - start))
-                    .log("Reindex search completed");
+                    .log("Redindex search completed");
+
         } catch (Exception e) {
             error().collectionID(collection)
                     .logException(e, "An error occurred during the search reindex");
         }
+    }
 
+    public static List<String> extractDeletedUris(Collection collection) {
+        List<String> deletedUris = new ArrayList<>();
+        for (PendingDelete pendingDelete : collection.getDescription().getPendingDeletes()) {
+            ContentDetail root = pendingDelete.getRoot();
+            ContentTreeNavigator.getInstance().search(root, node -> {
+                deletedUris.add(node.uri);
+            });
+        }
         return deletedUris;
     }
 

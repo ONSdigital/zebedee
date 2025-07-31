@@ -2,6 +2,8 @@ package com.github.onsdigital.zebedee.model.publishing;
 
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.configuration.CMSFeatureFlags;
+import com.github.onsdigital.zebedee.json.ContentDetail;
+import com.github.onsdigital.zebedee.json.PendingDelete;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.Content;
 import com.github.onsdigital.zebedee.model.ContentWriter;
@@ -10,10 +12,15 @@ import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.service.KafkaService;
 import com.github.onsdigital.zebedee.service.ServiceSupplier;
+import com.github.onsdigital.zebedee.json.CollectionDescription;
 
+import com.github.onsdigital.zebedee.service.content.navigation.ContentDetailSearch;
+import com.github.onsdigital.zebedee.service.content.navigation.ContentTreeNavigator;
+import com.github.onsdigital.zebedee.util.ContentTree;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.MDC;
 
@@ -23,6 +30,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.nio.file.*;
 import java.util.*;
+import java.util.function.Consumer;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
@@ -290,6 +298,53 @@ public class PostPublisherTest {
         verify(mockReader).getResource("/source/file.txt");
         verify(mockResource).getData();
         verify(mockWriter).write(any(InputStream.class), eq("/target/file.txt"));
+    }
+
+    @Test
+    public void testExtractDeletedUris() {
+        // Setup mocked PendingDeletes
+        PendingDelete pd1 = mock(PendingDelete.class);
+        PendingDelete pd2 = mock(PendingDelete.class);
+
+        ContentDetail root1 = new ContentDetail();
+        root1.uri = "/delete1";
+
+        ContentDetail root2 = new ContentDetail();
+        root2.uri = "/delete2";
+
+        when(pd1.getRoot()).thenReturn(root1);
+        when(pd2.getRoot()).thenReturn(root2);
+
+        // Mock collection and its description
+        CollectionDescription mockDescription = mock(CollectionDescription.class);
+        when(mockDescription.getPendingDeletes()).thenReturn(Arrays.asList(pd1, pd2));
+
+        Collection mockCollection = mock(Collection.class);
+        when(mockCollection.getDescription()).thenReturn(mockDescription);
+
+        // Mock ContentTreeNavigator.getInstance()
+        ContentTreeNavigator navigator = mock(ContentTreeNavigator.class);
+
+        try (MockedStatic<ContentTreeNavigator> mockedStatic = mockStatic(ContentTreeNavigator.class)) {
+            mockedStatic.when(ContentTreeNavigator::getInstance).thenReturn(navigator);
+
+            // Simulate search() calling the ContentDetailSearch implementation
+            doAnswer(invocation -> {
+                ContentDetail root = invocation.getArgument(0);
+                ContentDetailSearch searcher = invocation.getArgument(1);
+
+                ContentDetail child = new ContentDetail();
+                child.uri = root.uri + "/uri";
+                searcher.search(child);
+                return null;
+            }).when(navigator).search(any(ContentDetail.class), any(ContentDetailSearch.class));
+
+            // Act
+            List<String> result = PostPublisher.extractDeletedUris(mockCollection);
+
+            // Assert
+            assertEquals(Arrays.asList("/delete1/uri", "/delete2/uri"), result);
+        }
     }
 
     private static void setKafkaServiceSupplier(KafkaService kafkaService) throws Exception {

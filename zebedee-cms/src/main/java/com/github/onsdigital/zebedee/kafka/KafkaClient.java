@@ -32,5 +32,5 @@ public interface KafkaClient {
      * @param traceID      The trace ID for distributed tracing/logging
      * @return a Future for the Kafka result
      */
-    Future<RecordMetadata> produceContentDeleted(String uri, String searchIndex, String collectionID, String traceID);
+   public Future<RecordMetadata> produceContentDeleted(String uri, String searchIndex, String collectionID, String traceID);
 }

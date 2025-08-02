@@ -81,7 +81,7 @@ public class PostPublisher {
             PublishedCollection publishedCollection = getPublishedCollection(collection);
 
             // FIXME using PostPublisher.getPublishedCollection feels a bit hacky
-            SlackNotification.publishNotification(publishedCollection,SlackNotification.CollectionStage.POST_PUBLISH, SlackNotification.StageStatus.STARTED);
+            SlackNotification.publishNotification(publishedCollection, SlackNotification.CollectionStage.POST_PUBLISH, SlackNotification.StageStatus.STARTED);
 
             ContentReader contentReader = new FileSystemContentReader(zebedee.getPublished().getPath());
             ContentWriter contentWriter = new ContentWriter(zebedee.getPublished().getPath());
@@ -92,11 +92,10 @@ public class PostPublisher {
 
             reindexPublishingSearch(collection);
 
-            // Extract deleted URIs for Kafka
-            List<String> deletedUris = extractDeletedUris(collection);
-
             // Publish content-updated and content-deleted events
-            publishKafkaMessagesForCollection(collection, deletedUris);
+            if (CMSFeatureFlags.cmsFeatureFlags().isKafkaEnabled()) {
+                publishKafkaMessages(collection);
+            }
 
             Path collectionJsonPath = moveCollectionToArchive(zebedee, collection, collectionReader);
 
@@ -104,24 +103,22 @@ public class PostPublisher {
             ContentTree.dropCache();
             zebedee.getSchedulerKeyCache().remove(collection.getId());
 
-            SlackNotification.publishNotification(publishedCollection,SlackNotification.CollectionStage.POST_PUBLISH, SlackNotification.StageStatus.COMPLETED);
+            SlackNotification.publishNotification(publishedCollection, SlackNotification.CollectionStage.POST_PUBLISH, SlackNotification.StageStatus.COMPLETED);
 
             return true;
         } catch (Exception exception) {
             error().collectionID(collection).exception(exception).log("An error occurred during the publish cleanup");
-            SlackNotification.publishNotification(getPublishedCollection(collection),SlackNotification.CollectionStage.POST_PUBLISH, SlackNotification.StageStatus.FAILED);
+            SlackNotification.publishNotification(getPublishedCollection(collection), SlackNotification.CollectionStage.POST_PUBLISH, SlackNotification.StageStatus.FAILED);
         }
 
         return false;
     }
 
-    private static void publishKafkaMessagesForCollection(Collection collection, List<String> deletedUris) throws IOException {
-        if (!CMSFeatureFlags.cmsFeatureFlags().isKafkaEnabled()) {
-            return;
-        }
-
+    private static void publishKafkaMessages(Collection collection) throws IOException {
         sendContentUpdatedEvents(collection); // for content-updated
 
+        // Extract deleted URIs for Kafka
+        List<String> deletedUris = extractDeletedUris(collection);
         if (!deletedUris.isEmpty()) {
             sendContentDeletedEventsToKafka(collection, deletedUris);// for content-deleted
         }
@@ -251,7 +248,7 @@ public class PostPublisher {
         }
     }
 
-    public static List<String> extractDeletedUris(Collection collection) {
+    private static List<String> extractDeletedUris(Collection collection) {
         List<String> deletedUris = new ArrayList<>();
         for (PendingDelete pendingDelete : collection.getDescription().getPendingDeletes()) {
             ContentDetail root = pendingDelete.getRoot();
@@ -393,7 +390,6 @@ public class PostPublisher {
     // This method is taking advantage of MDC to enrich log messages with traceId
     // and passing to kafka events
     private static void sendMessage(Collection collection, List<String> uris, String dataType) {
-
         String traceId = defaultIfBlank(MDC.get(TRACE_ID_HEADER), UUID.randomUUID().toString());
         info().data("traceId", traceId)
                 .log("traceId before sending event");
@@ -416,23 +412,25 @@ public class PostPublisher {
 
     private static void sendContentDeletedEventsToKafka(Collection collection, List<String> uris) {
         String traceId = defaultIfBlank(MDC.get(TRACE_ID_HEADER), UUID.randomUUID().toString());
+        info().data("traceId", traceId)
+                .log("traceId before sending event");
 
         try {
             KAFKA_SERVICE_SUPPLIER.getService().produceContentDeleted(collection.getId(), uris, SEARCHINDEX, traceId);
-            info().data("traceId", traceId)
-                    .data("uris", uris)
-                    .log("Successfully sent search-content-deleted kafka event");
+            info().data("uris", uris)
+                    .data("traceId", traceId)
+                    .log("successfully sent search-content-deleted kafka events");
         } catch (Exception e) {
             error()
                     .data("collectionId", collection.getDescription().getId())
                     .data("traceId", traceId)
                     .data("publishing", true)
                     .data("deletedURIs", uris)
-                    .logException(e, "Failed to send search-content-deleted kafka events");
+                    .logException(e, "failed to send search-content-deleted kafka events");
 
             String channel = Configuration.getDefaultSlackAlarmChannel();
             Notifier notifier = zebedee.getSlackNotifier();
-            notifier.sendCollectionAlarm(collection, channel, "Failed to send search-content-deleted kafka events", e);
+            notifier.sendCollectionAlarm(collection, channel, "failed to send search-content-deleted kafka events", e);
         }
     }
 

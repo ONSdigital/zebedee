@@ -301,14 +301,13 @@ public class PostPublisherTest {
     }
 
     @Test
-    public void testExtractDeletedUris() {
+    public void testExtractDeletedUris() throws Exception {
         // Setup mocked PendingDeletes
         PendingDelete pd1 = mock(PendingDelete.class);
         PendingDelete pd2 = mock(PendingDelete.class);
 
         ContentDetail root1 = new ContentDetail();
         root1.uri = "/delete1";
-
         ContentDetail root2 = new ContentDetail();
         root2.uri = "/delete2";
 
@@ -328,10 +327,10 @@ public class PostPublisherTest {
         try (MockedStatic<ContentTreeNavigator> mockedStatic = mockStatic(ContentTreeNavigator.class)) {
             mockedStatic.when(ContentTreeNavigator::getInstance).thenReturn(navigator);
 
-            // Simulate search() calling the ContentDetailSearch implementation
+            // Simulate search() calling the ContentDetailSearch with a child per root
             doAnswer(invocation -> {
-                ContentDetail root = invocation.getArgument(0);
-                ContentDetailSearch searcher = invocation.getArgument(1);
+                ContentDetail root = invocation.getArgument(0, ContentDetail.class);
+                ContentDetailSearch searcher = invocation.getArgument(1, ContentDetailSearch.class);
 
                 ContentDetail child = new ContentDetail();
                 child.uri = root.uri + "/uri";
@@ -339,8 +338,11 @@ public class PostPublisherTest {
                 return null;
             }).when(navigator).search(any(ContentDetail.class), any(ContentDetailSearch.class));
 
-            // Act
-            List<String> result = PostPublisher.extractDeletedUris(mockCollection);
+            // Reflectively invoke the private method
+            Method m = PostPublisher.class.getDeclaredMethod("extractDeletedUris", Collection.class);
+            m.setAccessible(true);
+            @SuppressWarnings("unchecked")
+            List<String> result = (List<String>) m.invoke(null, mockCollection);
 
             // Assert
             assertEquals(Arrays.asList("/delete1/uri", "/delete2/uri"), result);

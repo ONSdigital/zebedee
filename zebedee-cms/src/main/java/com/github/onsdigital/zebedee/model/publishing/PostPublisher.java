@@ -5,6 +5,7 @@ import com.github.onsdigital.zebedee.configuration.CMSFeatureFlags;
 import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
+import com.github.onsdigital.zebedee.json.CollectionRedirect;
 import com.github.onsdigital.zebedee.json.ContentDetail;
 import com.github.onsdigital.zebedee.json.PendingDelete;
 import com.github.onsdigital.zebedee.json.publishing.PublishedCollection;
@@ -20,6 +21,7 @@ import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
 import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.search.indexing.Indexer;
 import com.github.onsdigital.zebedee.service.KafkaService;
+import com.github.onsdigital.zebedee.service.RedirectService;
 import com.github.onsdigital.zebedee.service.ServiceSupplier;
 import com.github.onsdigital.zebedee.service.content.navigation.ContentTreeNavigator;
 import com.github.onsdigital.zebedee.util.ContentTree;
@@ -94,6 +96,10 @@ public class PostPublisher {
             copyFilesToMaster(zebedee, collection, collectionReader);
 
             reindexPublishingSearch(collection);
+
+            List<CollectionRedirect> redirects = collection.getDescription().getRedirects();
+            RedirectService redirectService = ZebedeeCmsService.getInstance().getRedirectService();
+            redirectService.publishRedirects(redirects, collection.getId());
 
             if (CMSFeatureFlags.cmsFeatureFlags().isKafkaEnabled()) {
                 sendToKafka(collection);

@@ -8,6 +8,7 @@ import com.github.onsdigital.zebedee.json.CollectionRedirect;
 
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * Provides high level redirect functionality
@@ -18,4 +19,6 @@ public interface RedirectService {
         throws IOException, ZebedeeException;
     
     public CollectionRedirect getCollectionRedirect(Redirect redirect) throws ZebedeeException;
+
+    void publishRedirects(List<CollectionRedirect> redirects, String collectionId) throws IOException;
 }

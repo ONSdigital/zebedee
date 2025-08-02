@@ -1,6 +1,8 @@
 package com.github.onsdigital.zebedee.service;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.github.onsdigital.dis.redirect.api.sdk.RedirectClient;
 import com.github.onsdigital.dis.redirect.api.sdk.exception.BadRequestException;
@@ -88,4 +90,61 @@ public class RedirectServiceImpl implements RedirectService {
 
         return new CollectionRedirect(redirect.getFrom(), redirect.getTo(), collectionRedirectAction);
     }
+
+    @Override
+    public void publishRedirects(List<CollectionRedirect> redirects, String collectionId) throws IOException {
+        if (redirects == null || redirects.isEmpty()) {
+            return;
+        }
+
+        List<String> failures = new ArrayList<>();
+
+        for (CollectionRedirect r : redirects) {
+            if (r == null || r.getAction() == null || r.getAction() == CollectionRedirectAction.NO_ACTION) {
+                continue;
+            }
+
+            final String from = normaliseFrom(r.getFrom());
+            final String to   = r.getTo();
+
+            try {
+                switch (r.getAction()) {
+                    case CREATE:
+                    case UPDATE:
+                        redirectClient.putRedirect(new Redirect(from, to));
+                        break;
+
+                    case DELETE:
+                        try {
+                            redirectClient.deleteRedirect(from);
+                        } catch (RedirectAPIException e) {
+                            // Idempotent delete: treat 404 as success, fail otherwise
+                            int status = e.getCode();
+                            if (status != 404) {
+                                throw e;
+                            }
+                        }
+                        break;
+
+                    default:
+                        break;
+                }
+            } catch (RedirectAPIException | IOException e) {
+                failures.add(summary(r, from, e.getMessage()));
+            }
+        }
+
+        if (!failures.isEmpty()) {
+            throw new IOException("Redirect operations failed: " + String.join(" | ", failures));
+        }
+    }
+
+    private static String normaliseFrom(String from) {
+        if (from == null || from.isEmpty()) return "/";
+        return from.startsWith("/") ? from : "/" + from;
+    }
+    private static String summary(CollectionRedirect r, String from, String msg) {
+        return r.getAction() + " " + from + " -> " + r.getTo() + " : " + msg;
+    }
+
 }

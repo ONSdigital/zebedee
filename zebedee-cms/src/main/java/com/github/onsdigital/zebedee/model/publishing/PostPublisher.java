@@ -50,6 +50,7 @@ import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 import static com.github.onsdigital.zebedee.api.Root.zebedee;
+import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.error;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.info;
 import static org.apache.commons.lang3.StringUtils.defaultIfBlank;
@@ -97,11 +98,13 @@ public class PostPublisher {
 
             reindexPublishingSearch(collection);
 
-            List<CollectionRedirect> redirects = collection.getDescription().getRedirects();
-            RedirectService redirectService = ZebedeeCmsService.getInstance().getRedirectService();
-            redirectService.publishRedirectsForCollection(redirects, collection.getId());
+            if (cmsFeatureFlags().isRedirectAPIEnabled()) {
+                List<CollectionRedirect> redirects = collection.getDescription().getRedirects();
+                RedirectService redirectService = ZebedeeCmsService.getInstance().getRedirectService();
+                redirectService.publishRedirectsForCollection(redirects, collection.getId());
+            }
 
-            if (CMSFeatureFlags.cmsFeatureFlags().isKafkaEnabled()) {
+            if (cmsFeatureFlags().isKafkaEnabled()) {
                 sendToKafka(collection);
             }
 

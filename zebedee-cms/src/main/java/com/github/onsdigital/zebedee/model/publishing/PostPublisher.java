@@ -99,7 +99,7 @@ public class PostPublisher {
 
             List<CollectionRedirect> redirects = collection.getDescription().getRedirects();
             RedirectService redirectService = ZebedeeCmsService.getInstance().getRedirectService();
-            redirectService.publishRedirects(redirects, collection.getId());
+            redirectService.publishRedirectsForCollection(redirects, collection.getId());
 
             if (CMSFeatureFlags.cmsFeatureFlags().isKafkaEnabled()) {
                 sendToKafka(collection);

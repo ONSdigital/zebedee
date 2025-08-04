@@ -92,7 +92,7 @@ public class RedirectServiceImpl implements RedirectService {
     }
 
     @Override
-    public void publishRedirects(List<CollectionRedirect> redirects, String collectionId) throws IOException {
+    public void publishRedirectsForCollection(List<CollectionRedirect> redirects, String collectionId) throws IOException {
         if (redirects == null || redirects.isEmpty()) {
             return;
         }

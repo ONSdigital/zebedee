@@ -25,7 +25,7 @@ public class NoOpRedirectService implements RedirectService {
     }
 
     @Override
-    public void publishRedirects(List<CollectionRedirect> redirects, String collectionId) throws IOException {
+    public void publishRedirectsForCollection(List<CollectionRedirect> redirects, String collectionId) throws IOException {
         // NoOp implementation
     }
 }

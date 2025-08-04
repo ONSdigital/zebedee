@@ -289,7 +289,7 @@ public class RedirectServiceImplTest {
                 new CollectionRedirect("/old-site/bulletin-series/latest/relateddata", "/new-site/bulletin-series/relateddata", CollectionRedirectAction.CREATE)
         );
 
-        redirectService.publishRedirects(redirects, TEST_COLLECTION_ID);
+        redirectService.publishRedirectsForCollection(redirects, TEST_COLLECTION_ID);
 
         verify(mockRedirectAPI, times(1)).putRedirect(argThat(r ->
                 "/old-site/bulletin-series/latest".equals(r.getFrom()) &&
@@ -309,7 +309,7 @@ public class RedirectServiceImplTest {
                 new CollectionRedirect("/old-site/releases/my-release", "/new-site/releases/my-release2", CollectionRedirectAction.UPDATE)
         );
 
-        redirectService.publishRedirects(redirects, TEST_COLLECTION_ID);
+        redirectService.publishRedirectsForCollection(redirects, TEST_COLLECTION_ID);
 
         verify(mockRedirectAPI, times(1)).putRedirect(argThat(r ->
                 "/old-site/releases/my-release".equals(r.getFrom()) &&
@@ -324,7 +324,7 @@ public class RedirectServiceImplTest {
         );
 
         // default mock: do nothing → simulate 204
-        redirectService.publishRedirects(redirects, TEST_COLLECTION_ID);
+        redirectService.publishRedirectsForCollection(redirects, TEST_COLLECTION_ID);
 
         verify(mockRedirectAPI, times(1)).deleteRedirect("/old-site/releases/my-release");
         verifyNoMoreInteractions(mockRedirectAPI);
@@ -339,7 +339,7 @@ public class RedirectServiceImplTest {
         doThrow(new RedirectAPIException("not found", 404))
                 .when(mockRedirectAPI).deleteRedirect("/old-site/releases/missing");
 
-        redirectService.publishRedirects(redirects, TEST_COLLECTION_ID);
+        redirectService.publishRedirectsForCollection(redirects, TEST_COLLECTION_ID);
 
         verify(mockRedirectAPI, times(1)).deleteRedirect("/old-site/releases/missing");
         verifyNoMoreInteractions(mockRedirectAPI);
@@ -347,7 +347,7 @@ public class RedirectServiceImplTest {
 
     @Test
     public void testPublishRedirectsNoRedirects() throws Exception {
-        redirectService.publishRedirects(Collections.emptyList(), TEST_COLLECTION_ID);
+        redirectService.publishRedirectsForCollection(Collections.emptyList(), TEST_COLLECTION_ID);
         verifyNoInteractions(mockRedirectAPI);
     }
 
@@ -357,7 +357,7 @@ public class RedirectServiceImplTest {
                 new CollectionRedirect("economy", "/business", CollectionRedirectAction.CREATE) // no leading slash
         );
 
-        redirectService.publishRedirects(redirects, TEST_COLLECTION_ID);
+        redirectService.publishRedirectsForCollection(redirects, TEST_COLLECTION_ID);
 
         verify(mockRedirectAPI).putRedirect(argThat(r ->
                 "/economy".equals(r.getFrom()) && "/business".equals(r.getTo())));
@@ -381,7 +381,7 @@ public class RedirectServiceImplTest {
                 .when(mockRedirectAPI).deleteRedirect("/fail-delete");
 
         IOException ex = assertThrows(IOException.class,
-                () -> redirectService.publishRedirects(redirects, TEST_COLLECTION_ID));
+                () -> redirectService.publishRedirectsForCollection(redirects, TEST_COLLECTION_ID));
 
         String msg = ex.getMessage();
         assertTrue(msg.contains("/fail-update"));
@@ -399,7 +399,7 @@ public class RedirectServiceImplTest {
                 new CollectionRedirect("/x", "/y", CollectionRedirectAction.NO_ACTION)
         );
 
-        redirectService.publishRedirects(redirects, TEST_COLLECTION_ID);
+        redirectService.publishRedirectsForCollection(redirects, TEST_COLLECTION_ID);
         verifyNoInteractions(mockRedirectAPI);
     }
 }

@@ -20,5 +20,5 @@ public interface RedirectService {
     
     public CollectionRedirect getCollectionRedirect(Redirect redirect) throws ZebedeeException;
 
-    void publishRedirects(List<CollectionRedirect> redirects, String collectionId) throws IOException;
+    void publishRedirectsForCollection(List<CollectionRedirect> redirects, String collectionId) throws IOException;
 }

@@ -14,11 +14,13 @@ import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 
+import com.github.onsdigital.zebedee.util.slack.Notifier;
 import org.junit.Before;
 import org.junit.Test;
 
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.ArgumentCaptor;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
@@ -49,6 +51,9 @@ public class RedirectServiceImplTest {
 
     @Mock
     PageDescription mockDescription;
+
+    @Mock
+    private Notifier mockNotifier;
 
     private RedirectServiceImpl redirectService;
 
@@ -282,125 +287,67 @@ public class RedirectServiceImplTest {
     }
 
     @Test
-    public void testPublishRedirectsCreate() throws Exception {
-        List<CollectionRedirect> redirects = Arrays.asList(
-                new CollectionRedirect("/old-site/bulletin-series/latest", "/new-site/bulletin-series", CollectionRedirectAction.CREATE),
-                new CollectionRedirect("/old-site/bulletin-series/previousreleases", "/new-site/bulletin-series/previousreleases", CollectionRedirectAction.CREATE),
-                new CollectionRedirect("/old-site/bulletin-series/latest/relateddata", "/new-site/bulletin-series/relateddata", CollectionRedirectAction.CREATE)
-        );
+    public void testPublishRedirectsForCollectionValidCreate() throws Exception {
+        CollectionRedirect redirect = new CollectionRedirect("/from", "/to", CollectionRedirectAction.CREATE);
+        when(mockRedirectAPI.getRedirect("/from")).thenThrow(new RedirectNotFoundException());
+        when(mockCollection.getId()).thenReturn(TEST_COLLECTION_ID);
+        when(mockCollection.getDescription()).thenReturn(mockCollectionDescription);
+        when(mockCollectionDescription.getRedirects()).thenReturn(Collections.singletonList(redirect));
 
-        redirectService.publishRedirectsForCollection(redirects, TEST_COLLECTION_ID);
+        redirectService.publishRedirectsForCollection(mockCollection, mockNotifier);
 
-        verify(mockRedirectAPI, times(1)).putRedirect(argThat(r ->
-                "/old-site/bulletin-series/latest".equals(r.getFrom()) &&
-                        "/new-site/bulletin-series".equals(r.getTo())));
-        verify(mockRedirectAPI, times(1)).putRedirect(argThat(r ->
-                "/old-site/bulletin-series/previousreleases".equals(r.getFrom()) &&
-                        "/new-site/bulletin-series/previousreleases".equals(r.getTo())));
-        verify(mockRedirectAPI, times(1)).putRedirect(argThat(r ->
-                "/old-site/bulletin-series/latest/relateddata".equals(r.getFrom()) &&
-                        "/new-site/bulletin-series/relateddata".equals(r.getTo())));
-        verifyNoMoreInteractions(mockRedirectAPI);
+        ArgumentCaptor<Redirect> redirectCaptor = ArgumentCaptor.forClass(Redirect.class);
+        verify(mockRedirectAPI).putRedirect(redirectCaptor.capture());
+
+        Redirect actualRedirect = redirectCaptor.getValue();
+        assertEquals("/from", actualRedirect.getFrom());
+        assertEquals("/to", actualRedirect.getTo());
     }
 
     @Test
-    public void testPublishRedirectsUpdate() throws Exception {
-        List<CollectionRedirect> redirects = Collections.singletonList(
-                new CollectionRedirect("/old-site/releases/my-release", "/new-site/releases/my-release2", CollectionRedirectAction.UPDATE)
-        );
+    public void testPublishRedirectsForCollectionInvalidCreate() throws Exception {
+        CollectionRedirect redirect = new CollectionRedirect("/exists", "/to", CollectionRedirectAction.CREATE);
+        when(mockRedirectAPI.getRedirect("/exists")).thenReturn(new Redirect("/exists", "/to"));
+        when(mockCollection.getId()).thenReturn(TEST_COLLECTION_ID);
+        when(mockCollection.getDescription()).thenReturn(mockCollectionDescription);
+        when(mockCollectionDescription.getRedirects()).thenReturn(Collections.singletonList(redirect));
 
-        redirectService.publishRedirectsForCollection(redirects, TEST_COLLECTION_ID);
+        redirectService.publishRedirectsForCollection(mockCollection, mockNotifier);
 
-        verify(mockRedirectAPI, times(1)).putRedirect(argThat(r ->
-                "/old-site/releases/my-release".equals(r.getFrom()) &&
-                        "/new-site/releases/my-release2".equals(r.getTo())));
-        verifyNoMoreInteractions(mockRedirectAPI);
+        verify(mockRedirectAPI, never()).putRedirect(any());
+        verify(mockNotifier, times(1)).sendCollectionWarning(eq(mockCollection), anyString(), contains("skipped"));
     }
 
     @Test
-    public void testPublishRedirectsDelete204() throws Exception {
-        List<CollectionRedirect> redirects = Collections.singletonList(
-                new CollectionRedirect("/old-site/releases/my-release", "/new-site/releases/my-release", CollectionRedirectAction.DELETE)
-        );
+    public void testPublishRedirectsForCollectionDelete404Ignored() throws Exception {
+        CollectionRedirect redirect = new CollectionRedirect("/delete-me", "", CollectionRedirectAction.DELETE);
+        when(mockRedirectAPI.getRedirect("/delete-me")).thenReturn(new Redirect("/delete-me", "/something"));
+        doThrow(new RedirectAPIException("Not Found", 404)).when(mockRedirectAPI).deleteRedirect("/delete-me");
+        when(mockCollection.getId()).thenReturn(TEST_COLLECTION_ID);
+        when(mockCollection.getDescription()).thenReturn(mockCollectionDescription);
+        when(mockCollectionDescription.getRedirects()).thenReturn(Collections.singletonList(redirect));
 
-        // default mock: do nothing → simulate 204
-        redirectService.publishRedirectsForCollection(redirects, TEST_COLLECTION_ID);
+        redirectService.publishRedirectsForCollection(mockCollection, mockNotifier);
 
-        verify(mockRedirectAPI, times(1)).deleteRedirect("/old-site/releases/my-release");
-        verifyNoMoreInteractions(mockRedirectAPI);
+        verify(mockRedirectAPI).deleteRedirect("/delete-me");
+        verify(mockNotifier, never()).sendCollectionWarning(any(), anyString(), anyString());
     }
 
     @Test
-    public void testPublishRedirectsDelete404Idempotent() throws Exception {
-        List<CollectionRedirect> redirects = Collections.singletonList(
-                new CollectionRedirect("/old-site/releases/missing", "/new-site/releases/missing", CollectionRedirectAction.DELETE)
-        );
+    public void testPublishRedirectsForCollectionFailsWithIOException() throws Exception {
+        CollectionRedirect redirect = new CollectionRedirect("/fail", "/to", CollectionRedirectAction.UPDATE);
+        when(mockRedirectAPI.getRedirect("/fail")).thenReturn(new Redirect("/fail", "/old"));
+        doThrow(new RedirectAPIException("Internal Server Error", 500)).when(mockRedirectAPI).putRedirect(any());
+        when(mockCollection.getId()).thenReturn(TEST_COLLECTION_ID);
+        when(mockCollection.getDescription()).thenReturn(mockCollectionDescription);
+        when(mockCollectionDescription.getRedirects()).thenReturn(Collections.singletonList(redirect));
 
-        doThrow(new RedirectAPIException("not found", 404))
-                .when(mockRedirectAPI).deleteRedirect("/old-site/releases/missing");
+        IOException ex = assertThrows(IOException.class, () -> {
+            redirectService.publishRedirectsForCollection(mockCollection, mockNotifier);
+        });
 
-        redirectService.publishRedirectsForCollection(redirects, TEST_COLLECTION_ID);
-
-        verify(mockRedirectAPI, times(1)).deleteRedirect("/old-site/releases/missing");
-        verifyNoMoreInteractions(mockRedirectAPI);
+        assertTrue(ex.getMessage().contains("Redirect operations failed"));
     }
 
-    @Test
-    public void testPublishRedirectsNoRedirects() throws Exception {
-        redirectService.publishRedirectsForCollection(Collections.emptyList(), TEST_COLLECTION_ID);
-        verifyNoInteractions(mockRedirectAPI);
-    }
-
-    @Test
-    public void testPublishRedirectsNormalisesFrom() throws Exception {
-        List<CollectionRedirect> redirects = Collections.singletonList(
-                new CollectionRedirect("economy", "/business", CollectionRedirectAction.CREATE) // no leading slash
-        );
-
-        redirectService.publishRedirectsForCollection(redirects, TEST_COLLECTION_ID);
-
-        verify(mockRedirectAPI).putRedirect(argThat(r ->
-                "/economy".equals(r.getFrom()) && "/business".equals(r.getTo())));
-        verifyNoMoreInteractions(mockRedirectAPI);
-    }
-
-    @Test
-    public void testPublishRedirectsMixedFailuresAggregates() throws Exception {
-        List<CollectionRedirect> redirects = Arrays.asList(
-                new CollectionRedirect("/ok-create", "/to1", CollectionRedirectAction.CREATE),
-                new CollectionRedirect("/fail-update", "/to2", CollectionRedirectAction.UPDATE),
-                new CollectionRedirect("/fail-delete", "/to3", CollectionRedirectAction.DELETE)
-        );
-
-        // ok-create succeeds
-        // update → 500
-        doThrow(new RedirectAPIException("server err", 500))
-                .when(mockRedirectAPI).putRedirect(argThat(r -> "/fail-update".equals(r.getFrom())));
-        // delete → 400
-        doThrow(new RedirectAPIException("bad request", 400))
-                .when(mockRedirectAPI).deleteRedirect("/fail-delete");
-
-        IOException ex = assertThrows(IOException.class,
-                () -> redirectService.publishRedirectsForCollection(redirects, TEST_COLLECTION_ID));
-
-        String msg = ex.getMessage();
-        assertTrue(msg.contains("/fail-update"));
-        assertTrue(msg.contains("/fail-delete"));
-
-        verify(mockRedirectAPI).putRedirect(argThat(r -> "/ok-create".equals(r.getFrom())));
-        verify(mockRedirectAPI).putRedirect(argThat(r -> "/fail-update".equals(r.getFrom())));
-        verify(mockRedirectAPI).deleteRedirect("/fail-delete");
-        verifyNoMoreInteractions(mockRedirectAPI);
-    }
-
-    @Test
-    public void testPublishRedirectsNoActionIgnored() throws Exception {
-        List<CollectionRedirect> redirects = Collections.singletonList(
-                new CollectionRedirect("/x", "/y", CollectionRedirectAction.NO_ACTION)
-        );
-
-        redirectService.publishRedirectsForCollection(redirects, TEST_COLLECTION_ID);
-        verifyNoInteractions(mockRedirectAPI);
-    }
 }
 

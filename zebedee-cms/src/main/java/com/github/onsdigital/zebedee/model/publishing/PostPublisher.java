@@ -1,10 +1,10 @@
 package com.github.onsdigital.zebedee.model.publishing;
 
 import com.github.onsdigital.zebedee.Zebedee;
+import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
-import com.github.onsdigital.zebedee.json.CollectionRedirect;
 import com.github.onsdigital.zebedee.json.ContentDetail;
 import com.github.onsdigital.zebedee.json.PendingDelete;
 import com.github.onsdigital.zebedee.json.publishing.PublishedCollection;
@@ -34,6 +34,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.FastDateFormat;
 import org.slf4j.MDC;
 
+import javax.naming.ldap.Rdn;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -43,6 +44,7 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static com.github.onsdigital.zebedee.api.Root.zebedee;
@@ -59,6 +61,8 @@ public class PostPublisher {
     // The date format including the BST timezone. Dates are stored at UTC and must be formated to take BST into account.
     private static final FastDateFormat FORMAT = FastDateFormat.getInstance("yyyy-MM-dd-HH-mm", TimeZone.getTimeZone("Europe/London"));
     private static final ServiceSupplier<KafkaService> KAFKA_SERVICE_SUPPLIER = () -> ZebedeeCmsService.getInstance().getKafkaService();
+
+    private static final Supplier<Zebedee> zebedeeSupplier = () -> Root.zebedee;
 
     private static final ExecutorService POOL = Executors.newFixedThreadPool(10);
 
@@ -96,9 +100,8 @@ public class PostPublisher {
             reindexPublishingSearch(collection);
 
             if (cmsFeatureFlags().isRedirectAPIEnabled()) {
-                List<CollectionRedirect> redirects = collection.getDescription().getRedirects();
                 RedirectService redirectService = ZebedeeCmsService.getInstance().getRedirectService();
-                redirectService.publishRedirectsForCollection(redirects, collection.getId());
+                redirectService.publishRedirectsForCollection(collection, zebedeeSupplier.get().getSlackNotifier());
             }
 
             // Publish content-updated and content-deleted events for search service.
@@ -442,5 +445,4 @@ public class PostPublisher {
             notifier.sendCollectionAlarm(collection, channel, "failed to send search-content-deleted kafka events", e);
         }
     }
-
 }

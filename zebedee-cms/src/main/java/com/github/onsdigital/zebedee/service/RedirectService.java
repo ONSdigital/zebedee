@@ -5,6 +5,7 @@ import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.dis.redirect.api.sdk.model.Redirect;
 import com.github.onsdigital.zebedee.json.CollectionRedirect;
+import com.github.onsdigital.zebedee.util.slack.Notifier;
 
 
 import java.io.IOException;
@@ -20,5 +21,5 @@ public interface RedirectService {
     
     public CollectionRedirect getCollectionRedirect(Redirect redirect) throws ZebedeeException;
 
-    void publishRedirectsForCollection(List<CollectionRedirect> redirects, String collectionId) throws IOException;
+    void publishRedirectsForCollection(Collection collection, Notifier notifier) throws IOException;
 }

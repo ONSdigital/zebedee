@@ -90,9 +90,10 @@ public class PostPublisher {
             processManifestForMaster(collection, contentReader, contentWriter);
             copyFilesToMaster(zebedee, collection, collectionReader);
 
+            // TODO deprecated elastic search 2.42. Should be removed during decommissioning
             reindexPublishingSearch(collection);
 
-            // Publish content-updated and content-deleted events
+            // Publish content-updated and content-deleted events for search service.
             if (CMSFeatureFlags.cmsFeatureFlags().isKafkaEnabled()) {
                 publishKafkaMessages(collection);
             }

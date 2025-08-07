@@ -3,6 +3,7 @@ package com.github.onsdigital.zebedee.service;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -16,6 +17,7 @@ import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.content.page.base.Page;
+import com.github.onsdigital.zebedee.content.page.base.PageType;
 import com.github.onsdigital.zebedee.exceptions.InternalServerError;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.CollectionRedirect;
@@ -27,7 +29,9 @@ import com.github.onsdigital.zebedee.util.slack.Notifier;
 import org.apache.commons.lang.StringUtils;
 
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.error;
-
+import static com.github.onsdigital.zebedee.content.page.base.PageType.ARTICLE;
+import static com.github.onsdigital.zebedee.content.page.base.PageType.BULLETIN;
+import static com.github.onsdigital.zebedee.content.page.base.PageType.COMPENDIUM_LANDING_PAGE;
 /**
  * Redirect related services
  */
@@ -38,6 +42,20 @@ public class RedirectServiceImpl implements RedirectService {
     private Supplier<Zebedee> zebedeeSupplier = () -> Root.zebedee;
 
     /**
+     * These content types are ones that are serialised and therefore need different redirects.
+     */
+    private static final List<PageType> SERIES_CONTENT_TYPES = Arrays.asList(ARTICLE, BULLETIN, COMPENDIUM_LANDING_PAGE);
+
+    private boolean isSeriesContentType(PageType pageType) { return SERIES_CONTENT_TYPES.contains(pageType);}
+
+    private static final String LATEST_PATH = "/latest";
+    private static final String RELATED_DATA_MIGRATION_FROM = "/relateddata";
+    private static final String RELATED_DATA_MIGRATION_TO = "/related-data";
+    private static final String PREVIOUS_RELEASES_MIGRATION_FROM = "/previousreleases";
+    private static final String PREVIOUS_RELEASES_MIGRATION_TO = "/editions";
+
+
+    /**
      * Construct a new instance of the the redirect service
      *
      * @param redirectClient An instance of an Redirect API client to be used by the service
@@ -46,6 +64,76 @@ public class RedirectServiceImpl implements RedirectService {
         this.redirectClient = redirectClient;
     }
 
+    /**
+     * createPreviousReleasesRedirect constructs a redirect for the previous releases path
+     * @param pageUri
+     * @param migrationUri
+     * @return Redirect
+     */
+    private Redirect createPreviousReleasesRedirect(String pageUri, String migrationUri) {
+        String parentUri = pageUri.substring(0, pageUri.lastIndexOf('/'));
+        String from = String.format("%s%s", parentUri, PREVIOUS_RELEASES_MIGRATION_FROM);
+        String to = StringUtils.isBlank(migrationUri) ? "" : String.format("%s%s", migrationUri, PREVIOUS_RELEASES_MIGRATION_TO);
+
+        return new Redirect(from, to);
+    }
+
+    /**
+     * createRelatedDataRedirect constructs a redirect for the related data path for the 'latest' edition
+     * @param pageUri
+     * @param migrationUri
+     * @return Redirect
+     */
+    private Redirect createRelatedDataRedirect(String pageUri, String migrationUri) {
+        String parentUri = pageUri.substring(0, pageUri.lastIndexOf('/'));
+        String from = String.format("%s%s%s", parentUri, LATEST_PATH, RELATED_DATA_MIGRATION_FROM);
+        String to = StringUtils.isBlank(migrationUri) ? "" : String.format("%s%s", migrationUri, RELATED_DATA_MIGRATION_TO);
+
+        return new Redirect(from, to);
+    }
+
+    /**
+     * createLatestRedirect constructs a redirect for the 'latest' edition
+     * @param pageUri
+     * @param migrationUri
+     * @return Redirect
+     */
+    private Redirect createLatestRedirect(String pageUri, String migrationUri) {
+        String parentUri = pageUri.substring(0, pageUri.lastIndexOf('/'));
+        String from = String.format("%s%s", parentUri, LATEST_PATH);
+        return new Redirect(from, migrationUri);
+    }
+
+    /**
+     * Takes page data and creates a list of redirects for it.
+     * @param page
+     * @return
+     * @throws ZebedeeException
+     */
+    private List<CollectionRedirect> createRedirectsForPage(Page page) throws ZebedeeException {
+        List<CollectionRedirect> collectionRedirects = new ArrayList<>();
+
+        String migrationPath = page.getDescription().getMigrationLink();
+        String pageUri = page.getUri().toString();
+        if (migrationPath != null) {
+            if (isSeriesContentType(page.getType())) {
+                collectionRedirects.add(getCollectionRedirect(createLatestRedirect(pageUri, migrationPath)));
+                collectionRedirects.add(getCollectionRedirect(createRelatedDataRedirect(pageUri, migrationPath)));
+                collectionRedirects.add(getCollectionRedirect(createPreviousReleasesRedirect(pageUri, migrationPath)));
+            } else {
+                collectionRedirects.add(getCollectionRedirect(new Redirect(pageUri, migrationPath)));
+            }
+        }
+
+        return collectionRedirects;
+    }
+
+    /**
+     * generateRedirectListForCollection creates a list of redirects for a particular collection
+     * @param pageUri
+     * @param migrationUri
+     * @return Redirect
+     */
     public void generateRedirectListForCollection(Collection collection, CollectionReader collectionReader)
             throws IOException, ZebedeeException {
         ContentReader reviewedContentReader = collectionReader.getReviewed();
@@ -53,28 +141,28 @@ public class RedirectServiceImpl implements RedirectService {
         // Loop through the uri's in the collection
         for (String reviewedUri : reviewedContentReader.listUris()) {
 
-            // Ignoring previous versions loop through the pages
             if (reviewedUri.toLowerCase().endsWith("data.json")) {
 
                 // Strip off data.json
                 String pageUri = reviewedUri.substring(0, reviewedUri.length() - "/data.json".length());
 
-                // Find all pages
+                // Find page content
                 Page page = reviewedContentReader.getContent(pageUri);
 
-                String migrationPath = page.getDescription().getMigrationLink();
+                List<CollectionRedirect> collectionRedirects = createRedirectsForPage(page);
 
-                if (migrationPath != null) {
-                    Redirect redirect = new Redirect(pageUri, migrationPath);
-                    CollectionRedirect collectionRedirect = getCollectionRedirect(redirect);
-                    if (collectionRedirect.getAction() != CollectionRedirectAction.NO_ACTION) {
+                collectionRedirects.stream().forEach(collectionRedirect -> {
+                    if (collectionRedirect.getAction() != CollectionRedirectAction.NO_ACTION){
                         collection.getDescription().addRedirect(collectionRedirect);
                     }
-                }
+                });
             }
         }
     }
 
+    /**
+     * Gets a collection redirect by querying the proposed redirect with the Redirect API.
+     */
     public CollectionRedirect getCollectionRedirect(Redirect redirect) throws ZebedeeException {
 
         CollectionRedirectAction collectionRedirectAction = CollectionRedirectAction.NO_ACTION;

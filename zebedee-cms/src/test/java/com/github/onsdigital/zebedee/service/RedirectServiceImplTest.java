@@ -22,10 +22,13 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.ArgumentCaptor;
 
+import static com.github.onsdigital.zebedee.content.page.base.PageType.BULLETIN;
+import static com.github.onsdigital.zebedee.content.page.base.PageType.PRODUCT_PAGE;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -74,6 +77,8 @@ public class RedirectServiceImplTest {
         List<String> uris = Arrays.asList("/origin/data.json");
         when(mockDescription.getMigrationLink()).thenReturn("/destination");
         when(mockPage.getDescription()).thenReturn(mockDescription);
+        when(mockPage.getType()).thenReturn(PRODUCT_PAGE);
+        when(mockPage.getUri()).thenReturn(new URI("/origin"));
         when(mockContentReader.listUris()).thenReturn(uris);
         when(mockCollectionReader.getReviewed()).thenReturn(mockContentReader);
         when(mockContentReader.getContent("/origin")).thenReturn(mockPage);
@@ -89,19 +94,21 @@ public class RedirectServiceImplTest {
 
     @Test
     public void testGenerateRedirectListForCollectionUpdate() throws Exception {
-        // Given a redirect API that doesn't have any redirects in it
+        // Given a redirect API that returns a redirect for our links
         when(mockRedirectAPI.getRedirect(any())).thenReturn(new Redirect("/origin", "/originaldestination"));
 
         // And a collection with a migrationLink
         List<String> uris = Arrays.asList("/origin/data.json");
         when(mockDescription.getMigrationLink()).thenReturn("/destination");
         when(mockPage.getDescription()).thenReturn(mockDescription);
+        when(mockPage.getType()).thenReturn(PRODUCT_PAGE);
+        when(mockPage.getUri()).thenReturn(new URI("/origin"));
+
         when(mockContentReader.listUris()).thenReturn(uris);
         when(mockCollectionReader.getReviewed()).thenReturn(mockContentReader);
         when(mockContentReader.getContent("/origin")).thenReturn(mockPage);
 
         when(mockCollection.getDescription()).thenReturn(mockCollectionDescription);
-
 
         // When generateRedirectListForCollection is called
         redirectService.generateRedirectListForCollection(mockCollection, mockCollectionReader);
@@ -113,13 +120,15 @@ public class RedirectServiceImplTest {
 
     @Test
     public void testGenerateRedirectListForCollectionNoAction() throws Exception {
-        // Given a redirect API that doesn't have any redirects in it
+        // Given a redirect API that returns a redirect for the migration links
         when(mockRedirectAPI.getRedirect(any())).thenReturn(new Redirect("/origin", "/destination"));
 
         // And a collection with a migrationLink
         List<String> uris = Arrays.asList("/origin/data.json");
         when(mockDescription.getMigrationLink()).thenReturn("/destination");
         when(mockPage.getDescription()).thenReturn(mockDescription);
+        when(mockPage.getType()).thenReturn(PRODUCT_PAGE);
+        when(mockPage.getUri()).thenReturn(new URI("/origin"));
         when(mockContentReader.listUris()).thenReturn(uris);
         when(mockCollectionReader.getReviewed()).thenReturn(mockContentReader);
         when(mockContentReader.getContent("/origin")).thenReturn(mockPage);
@@ -135,13 +144,15 @@ public class RedirectServiceImplTest {
 
     @Test
     public void testGenerateRedirectListForCollectionNoLink() throws Exception {
-        // Given a redirect API that doesn't have any redirects in it
+        // Given a redirect API returns a 404 for the redirect requested
         when(mockRedirectAPI.getRedirect(any())).thenThrow(new RedirectNotFoundException());
 
         // And a collection with a blank migrationLink
         List<String> uris = Arrays.asList("/origin/data.json");
         when(mockDescription.getMigrationLink()).thenReturn("");
         when(mockPage.getDescription()).thenReturn(mockDescription);
+        when(mockPage.getType()).thenReturn(PRODUCT_PAGE);
+        when(mockPage.getUri()).thenReturn(new URI("/origin"));
         when(mockContentReader.listUris()).thenReturn(uris);
         when(mockCollectionReader.getReviewed()).thenReturn(mockContentReader);
         when(mockContentReader.getContent("/origin")).thenReturn(mockPage);
@@ -157,13 +168,15 @@ public class RedirectServiceImplTest {
 
     @Test
     public void testGenerateRedirectListForCollectionDelete() throws Exception {
-        // Given a redirect API that doesn't have any redirects in it
+        // Given a redirect API that returns a redirect
         when(mockRedirectAPI.getRedirect(any())).thenReturn(new Redirect("/origin", "/destination"));
 
         // And a collection with a blank migrationLink
         List<String> uris = Arrays.asList("/origin/data.json");
         when(mockDescription.getMigrationLink()).thenReturn("");
         when(mockPage.getDescription()).thenReturn(mockDescription);
+        when(mockPage.getType()).thenReturn(PRODUCT_PAGE);
+        when(mockPage.getUri()).thenReturn(new URI("/origin"));
         when(mockContentReader.listUris()).thenReturn(uris);
         when(mockCollectionReader.getReviewed()).thenReturn(mockContentReader);
         when(mockContentReader.getContent("/origin")).thenReturn(mockPage);
@@ -180,13 +193,15 @@ public class RedirectServiceImplTest {
 
     @Test
     public void testGenerateRedirectListForCollectionError() throws Exception {
-        // Given a redirect API that doesn't have any redirects in it
+        // Given a redirect API that throws an error on request
         when(mockRedirectAPI.getRedirect(any())).thenThrow(new RedirectAPIException());
 
         // And a collection with a blank migrationLink
         List<String> uris = Arrays.asList("/origin/data.json");
         when(mockDescription.getMigrationLink()).thenReturn("");
         when(mockPage.getDescription()).thenReturn(mockDescription);
+        when(mockPage.getType()).thenReturn(PRODUCT_PAGE);
+        when(mockPage.getUri()).thenReturn(new URI("/origin"));
         when(mockContentReader.listUris()).thenReturn(uris);
         when(mockCollectionReader.getReviewed()).thenReturn(mockContentReader);
         when(mockContentReader.getContent("/origin")).thenReturn(mockPage);
@@ -198,6 +213,130 @@ public class RedirectServiceImplTest {
 
         // Then the message should show what has happened
         assertEquals("couldn't generate redirect from redirect API data", ex.getMessage());
+    }
+
+    @Test
+    public void testGenerateRedirectListForCollectionCreateSeries() throws Exception {
+        // Given a redirect API that doesn't have any redirects in it
+        when(mockRedirectAPI.getRedirect(any())).thenThrow(new RedirectNotFoundException());
+        RedirectService redirectService = new RedirectServiceImpl(mockRedirectAPI);
+
+        // And a collection with a migrationLink for a series content type
+        List<String> uris = Arrays.asList("/series/edition/data.json");
+        when(mockDescription.getMigrationLink()).thenReturn("/destination");
+        when(mockPage.getDescription()).thenReturn(mockDescription);
+        when(mockPage.getType()).thenReturn(BULLETIN);
+        when(mockPage.getUri()).thenReturn(new URI("/series/edition"));
+        when(mockContentReader.listUris()).thenReturn(uris);
+        when(mockCollectionReader.getReviewed()).thenReturn(mockContentReader);
+        when(mockContentReader.getContent("/series/edition")).thenReturn(mockPage);
+        when(mockCollection.getDescription()).thenReturn(mockCollectionDescription);
+
+        // When generateRedirectListForCollection is called
+        redirectService.generateRedirectListForCollection(mockCollection, mockCollectionReader);
+
+        // Then the expected CollectionRedirects should be added in the collection description 
+        CollectionRedirect expectedCollectionRedirectLatest = new CollectionRedirect("/series/latest", "/destination", CollectionRedirectAction.CREATE);
+        CollectionRedirect expectedCollectionRedirectRelated = new CollectionRedirect("/series/latest/relateddata", "/destination/related-data", CollectionRedirectAction.CREATE);
+        CollectionRedirect expectedCollectionRedirectPrevious = new CollectionRedirect("/series/previousreleases", "/destination/editions", CollectionRedirectAction.CREATE);
+        verify(mockCollectionDescription, times(1)).addRedirect(expectedCollectionRedirectLatest);
+        verify(mockCollectionDescription, times(1)).addRedirect(expectedCollectionRedirectRelated);
+        verify(mockCollectionDescription, times(1)).addRedirect(expectedCollectionRedirectPrevious);
+    }
+
+    @Test
+    public void testGenerateRedirectListForCollectionUpdateSeries() throws Exception {
+        // Given a redirect API that doesn't have any redirects in it
+        when(mockRedirectAPI.getRedirect(any())).thenReturn(new Redirect("/origin", "/originaldestination"));
+        RedirectService redirectService = new RedirectServiceImpl(mockRedirectAPI);
+
+        // And a collection with a migrationLink for a series content type
+        List<String> uris = Arrays.asList("/series/edition/data.json");
+        when(mockDescription.getMigrationLink()).thenReturn("/destination");
+        when(mockPage.getDescription()).thenReturn(mockDescription);
+        when(mockPage.getType()).thenReturn(BULLETIN);
+        when(mockPage.getUri()).thenReturn(new URI("/series/edition"));
+        when(mockContentReader.listUris()).thenReturn(uris);
+        when(mockCollectionReader.getReviewed()).thenReturn(mockContentReader);
+        when(mockContentReader.getContent("/series/edition")).thenReturn(mockPage);
+        when(mockCollection.getDescription()).thenReturn(mockCollectionDescription);
+
+        // When generateRedirectListForCollection is called
+        redirectService.generateRedirectListForCollection(mockCollection, mockCollectionReader);
+
+        // Then the expected CollectionRedirects should be added in the collection description 
+        CollectionRedirect expectedCollectionRedirectLatest = new CollectionRedirect("/series/latest", "/destination", CollectionRedirectAction.UPDATE);
+        CollectionRedirect expectedCollectionRedirectRelated = new CollectionRedirect("/series/latest/relateddata", "/destination/related-data", CollectionRedirectAction.UPDATE);
+        CollectionRedirect expectedCollectionRedirectPrevious = new CollectionRedirect("/series/previousreleases", "/destination/editions", CollectionRedirectAction.UPDATE);
+        verify(mockCollectionDescription, times(1)).addRedirect(expectedCollectionRedirectLatest);
+        verify(mockCollectionDescription, times(1)).addRedirect(expectedCollectionRedirectRelated);
+        verify(mockCollectionDescription, times(1)).addRedirect(expectedCollectionRedirectPrevious);
+    }
+
+    @Test
+    public void testGenerateRedirectListForCollectionNoActionSeries() throws Exception {
+        // Given a redirect API that already has the redirects
+        Redirect existingRedirectLatest = new Redirect("/series/latest", "/destination");
+        Redirect existingRedirectRelated = new Redirect("/series/latest/relateddata", "/destination/related-data");
+        Redirect existingRedirectPrevious = new Redirect("/series/previousreleases", "/destination/editions");
+        when(mockRedirectAPI.getRedirect(existingRedirectLatest.getFrom())).thenReturn(existingRedirectLatest);
+        when(mockRedirectAPI.getRedirect(existingRedirectRelated.getFrom())).thenReturn(existingRedirectRelated);
+        when(mockRedirectAPI.getRedirect(existingRedirectPrevious.getFrom())).thenReturn(existingRedirectPrevious);
+
+        RedirectService redirectService = new RedirectServiceImpl(mockRedirectAPI);
+
+        // And a collection with a migrationLink for a series content type
+        List<String> uris = Arrays.asList("/series/edition/data.json");
+        when(mockDescription.getMigrationLink()).thenReturn("/destination");
+        when(mockPage.getDescription()).thenReturn(mockDescription);
+        when(mockPage.getType()).thenReturn(BULLETIN);
+        when(mockPage.getUri()).thenReturn(new URI("/series/edition"));
+        when(mockContentReader.listUris()).thenReturn(uris);
+        when(mockCollectionReader.getReviewed()).thenReturn(mockContentReader);
+        when(mockContentReader.getContent("/series/edition")).thenReturn(mockPage);
+        when(mockCollection.getDescription()).thenReturn(mockCollectionDescription);
+
+        // When generateRedirectListForCollection is called
+        redirectService.generateRedirectListForCollection(mockCollection, mockCollectionReader);
+
+        // Then no CollectionRedirect should be added in the collection description 
+        verify(mockCollectionDescription, times(0)).addRedirect(any());
+    }
+
+    @Test
+    public void testGenerateRedirectListForCollectionDeleteSeries() throws Exception {
+        // Given a redirect API that already has the redirects
+        Redirect existingRedirectLatest = new Redirect("/series/latest", "/destination");
+        Redirect existingRedirectRelated = new Redirect("/series/latest/relateddata", "/destination/related-data");
+        Redirect existingRedirectPrevious = new Redirect("/series/previousreleases", "/destination/editions");
+        when(mockRedirectAPI.getRedirect(existingRedirectLatest.getFrom())).thenReturn(existingRedirectLatest);
+        when(mockRedirectAPI.getRedirect(existingRedirectRelated.getFrom())).thenReturn(existingRedirectRelated);
+        when(mockRedirectAPI.getRedirect(existingRedirectPrevious.getFrom())).thenReturn(existingRedirectPrevious);
+
+        RedirectService redirectService = new RedirectServiceImpl(mockRedirectAPI);
+
+        // And a collection with a blank migrationLink for a series page type
+        List<String> uris = Arrays.asList("/series/edition/data.json");
+        when(mockDescription.getMigrationLink()).thenReturn("");
+        when(mockPage.getDescription()).thenReturn(mockDescription);
+        when(mockPage.getType()).thenReturn(BULLETIN);
+        when(mockPage.getUri()).thenReturn(new URI("/series/edition"));
+        when(mockContentReader.listUris()).thenReturn(uris);
+        when(mockCollectionReader.getReviewed()).thenReturn(mockContentReader);
+        when(mockContentReader.getContent("/series/edition")).thenReturn(mockPage);
+        when(mockCollection.getDescription()).thenReturn(mockCollectionDescription);
+
+        // When generateRedirectListForCollection is called
+        redirectService.generateRedirectListForCollection(mockCollection, mockCollectionReader);
+
+        // Then the expected CollectionRedirect should be added in the collection description 
+        CollectionRedirect expectedCollectionRedirectLatest = new CollectionRedirect("/series/latest", "", CollectionRedirectAction.DELETE);
+        CollectionRedirect expectedCollectionRedirectRelated = new CollectionRedirect("/series/latest/relateddata", "", CollectionRedirectAction.DELETE);
+        CollectionRedirect expectedCollectionRedirectPrevious = new CollectionRedirect("/series/previousreleases", "", CollectionRedirectAction.DELETE);
+
+        verify(mockCollectionDescription, times(1)).addRedirect(expectedCollectionRedirectLatest);
+        verify(mockCollectionDescription, times(1)).addRedirect(expectedCollectionRedirectRelated);
+        verify(mockCollectionDescription, times(1)).addRedirect(expectedCollectionRedirectPrevious);
     }
 
     @Test

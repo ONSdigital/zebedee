@@ -25,6 +25,7 @@ import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.service.BabbagePdfService;
 import com.github.onsdigital.zebedee.service.ServiceSupplier;
 import com.github.onsdigital.zebedee.service.UploadService;
+import com.github.onsdigital.zebedee.service.RedirectService;
 import com.github.onsdigital.zebedee.service.content.navigation.ContentTreeNavigator;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.util.ContentDetailUtil;
@@ -69,9 +70,11 @@ public class ApproveTask implements Callable<Boolean> {
     private final ContentDetailResolver contentDetailResolver;
     private final Notifier notifier;
     static ServiceSupplier<UploadService> uploadServiceSupplier;
+    static ServiceSupplier<RedirectService> redirectServiceSupplier;
 
     static {
         uploadServiceSupplier = () -> ZebedeeCmsService.getInstance().getUploadService();
+        redirectServiceSupplier = () -> ZebedeeCmsService.getInstance().getRedirectService();
     }
 
     /**
@@ -146,7 +149,7 @@ public class ApproveTask implements Callable<Boolean> {
             }
 
             populateReleasePage(collectionContent);
-            eventLog.populatedResleasePage();
+            eventLog.populatedReleasePage();
 
             generateTimeseries(collection, publishedReader, collectionReader, collectionWriter, dataIndex);
             eventLog.generatedTimeSeries();
@@ -175,6 +178,12 @@ public class ApproveTask implements Callable<Boolean> {
                 } else {
                     info().log("The list of reviewed URIs is empty: files not uploaded");
                 }
+            }
+
+            if (cmsFeatureFlags().isRedirectAPIEnabled()) {
+                RedirectService redirectService = redirectServiceSupplier.getService();
+                redirectService.generateRedirectListForCollection(collection, collectionReader);
+                eventLog.generatedRedirectList();
             }
             
             approveCollection();

@@ -6,7 +6,6 @@ import com.github.onsdigital.zebedee.configuration.CMSFeatureFlags;
 import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.content.page.base.PageType;
 import com.github.onsdigital.zebedee.data.processing.DataIndex;
-import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.*;
 import com.github.onsdigital.zebedee.model.*;
 import com.github.onsdigital.zebedee.model.approval.tasks.CollectionPdfGenerator;
@@ -14,7 +13,10 @@ import com.github.onsdigital.zebedee.model.approval.tasks.timeseries.TimeSeriesC
 import com.github.onsdigital.zebedee.model.publishing.PublishNotification;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
+import com.github.onsdigital.zebedee.service.RedirectService;
+import com.github.onsdigital.zebedee.service.ServiceSupplier;
 import com.github.onsdigital.zebedee.session.model.Session;
+import com.github.onsdigital.zebedee.teams.service.TeamsService;
 import com.github.onsdigital.zebedee.util.slack.Notifier;
 import org.apache.hc.core5.http.NameValuePair;
 import org.junit.After;
@@ -22,6 +24,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.*;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -105,10 +108,16 @@ public class ApproveTaskTest {
 
     private ExecutorService executorService;
 
+    @Mock
+    private RedirectService mockRedirectService;
+
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.openMocks(this);
         this.executorService = Executors.newSingleThreadExecutor();
+
+        ServiceSupplier<RedirectService> redirectServiceSupplier = () -> mockRedirectService;
+        ReflectionTestUtils.setField(task, "redirectServiceSupplier", redirectServiceSupplier);
 
         when(session.getEmail()).thenReturn(EMAIL);
     }
@@ -234,6 +243,9 @@ public class ApproveTaskTest {
 
     @Test
     public void shouldApproveSuccessfully() throws Exception {
+        System.setProperty(CMSFeatureFlags.ENABLE_REDIRECT_API, "true");
+        CMSFeatureFlags.reset();
+
         when(collection.getDescription()).thenReturn(collectionDescription);
         when(collectionReader.getReviewed()).thenReturn(contentReader);
         when(collectionWriter.getReviewed()).thenReturn(contentWriter);
@@ -256,6 +268,7 @@ public class ApproveTaskTest {
         verify(pdfGenerator, times(1)).generatePDFsForCollection(collection, contentReader, contentWriter,
                 collectionContent);
         verify(compressionTask, times(1)).compressTimeseries(collection, collectionReader, collectionWriter);
+        verify(mockRedirectService, times(1)).generateRedirectListForCollection(collection, collectionReader);
         //Verify the collection has been approved
         verify(collectionDescription).setApprovalStatus(ApprovalStatus.COMPLETE);
 

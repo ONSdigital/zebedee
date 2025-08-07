@@ -39,6 +39,7 @@ public class CollectionDescription extends CollectionBase {
     private Date publishEndDate;
     private boolean isEncrypted;
     private Events events;
+    private List<CollectionRedirect> redirects;
 
     /**
      * Default constuructor for serialisation.
@@ -54,6 +55,7 @@ public class CollectionDescription extends CollectionBase {
         this.eventsByUri = new HashMap<>();
         this.datasets = new HashSet<>();
         this.datasetVersions = new HashSet<>();
+        this.redirects = new ArrayList<>();
     }
 
     /**
@@ -73,6 +75,7 @@ public class CollectionDescription extends CollectionBase {
         this.eventsByUri = new HashMap<>();
         this.datasets = new HashSet<>();
         this.datasetVersions = new HashSet<>();
+        this.redirects = new ArrayList<>();
     }
 
 
@@ -358,5 +361,23 @@ public class CollectionDescription extends CollectionBase {
 
     public void setPublishResults(final List<Result> publishResults) {
         this.publishResults = publishResults;
+    }
+
+    public List<CollectionRedirect> getRedirects() {
+        if (this.redirects == null) {
+            this.redirects = new ArrayList<>();
+        }
+        return this.redirects;
+    }
+
+    public void setRedirects(final List<CollectionRedirect> redirects) {
+        this.redirects = redirects;
+    }
+
+    public void addRedirect(final CollectionRedirect redirect) {
+        if (this.redirects == null) {
+            this.redirects = new ArrayList<>();
+        }
+        this.redirects.add(redirect);
     }
 }

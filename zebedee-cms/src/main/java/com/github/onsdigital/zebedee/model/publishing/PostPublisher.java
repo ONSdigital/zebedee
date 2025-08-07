@@ -1,10 +1,10 @@
 package com.github.onsdigital.zebedee.model.publishing;
 
 import com.github.onsdigital.zebedee.Zebedee;
-import com.github.onsdigital.zebedee.configuration.CMSFeatureFlags;
 import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
+import com.github.onsdigital.zebedee.json.CollectionRedirect;
 import com.github.onsdigital.zebedee.json.ContentDetail;
 import com.github.onsdigital.zebedee.json.PendingDelete;
 import com.github.onsdigital.zebedee.json.publishing.PublishedCollection;
@@ -20,6 +20,7 @@ import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
 import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.search.indexing.Indexer;
 import com.github.onsdigital.zebedee.service.KafkaService;
+import com.github.onsdigital.zebedee.service.RedirectService;
 import com.github.onsdigital.zebedee.service.ServiceSupplier;
 import com.github.onsdigital.zebedee.service.content.navigation.ContentTreeNavigator;
 import com.github.onsdigital.zebedee.util.ContentTree;
@@ -45,6 +46,7 @@ import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 import static com.github.onsdigital.zebedee.api.Root.zebedee;
+import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.error;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.info;
 import static org.apache.commons.lang3.StringUtils.defaultIfBlank;
@@ -93,8 +95,14 @@ public class PostPublisher {
             // TODO deprecated elastic search 2.42. Should be removed during decommissioning
             reindexPublishingSearch(collection);
 
+            if (cmsFeatureFlags().isRedirectAPIEnabled()) {
+                List<CollectionRedirect> redirects = collection.getDescription().getRedirects();
+                RedirectService redirectService = ZebedeeCmsService.getInstance().getRedirectService();
+                redirectService.publishRedirectsForCollection(redirects, collection.getId());
+            }
+
             // Publish content-updated and content-deleted events for search service.
-            if (CMSFeatureFlags.cmsFeatureFlags().isKafkaEnabled()) {
+            if (cmsFeatureFlags().isKafkaEnabled()) {
                 publishKafkaMessages(collection);
             }
 

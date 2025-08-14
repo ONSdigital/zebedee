@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Supplier;
+import java.net.URI;
 
 import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.dis.redirect.api.sdk.RedirectClient;
@@ -17,6 +18,7 @@ import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.content.page.base.Page;
+import com.github.onsdigital.zebedee.content.page.base.PageDescription;
 import com.github.onsdigital.zebedee.content.page.base.PageType;
 import com.github.onsdigital.zebedee.exceptions.InternalServerError;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
@@ -113,15 +115,21 @@ public class RedirectServiceImpl implements RedirectService {
     private List<CollectionRedirect> createRedirectsForPage(Page page) throws ZebedeeException {
         List<CollectionRedirect> collectionRedirects = new ArrayList<>();
 
-        String migrationPath = page.getDescription().getMigrationLink();
-        String pageUri = page.getUri().toString();
-        if (migrationPath != null) {
-            if (isSeriesContentType(page.getType())) {
-                collectionRedirects.add(getCollectionRedirect(createLatestRedirect(pageUri, migrationPath)));
-                collectionRedirects.add(getCollectionRedirect(createRelatedDataRedirect(pageUri, migrationPath)));
-                collectionRedirects.add(getCollectionRedirect(createPreviousReleasesRedirect(pageUri, migrationPath)));
-            } else {
-                collectionRedirects.add(getCollectionRedirect(new Redirect(pageUri, migrationPath)));
+        PageDescription pageDescription = page.getDescription();
+        URI pageUri = page.getUri();
+
+        if (pageDescription != null && pageUri != null) {
+            String migrationPath = pageDescription.getMigrationLink();
+            String pageUriString = page.getUri().toString();
+
+            if (migrationPath != null) {
+                if (isSeriesContentType(page.getType())) {
+                    collectionRedirects.add(getCollectionRedirect(createLatestRedirect(pageUriString, migrationPath)));
+                    collectionRedirects.add(getCollectionRedirect(createRelatedDataRedirect(pageUriString, migrationPath)));
+                    collectionRedirects.add(getCollectionRedirect(createPreviousReleasesRedirect(pageUriString, migrationPath)));
+                } else {
+                    collectionRedirects.add(getCollectionRedirect(new Redirect(pageUriString, migrationPath)));
+                }
             }
         }
 
@@ -130,9 +138,9 @@ public class RedirectServiceImpl implements RedirectService {
 
     /**
      * generateRedirectListForCollection creates a list of redirects for a particular collection
-     * @param pageUri
-     * @param migrationUri
-     * @return Redirect
+     * @param collection the collection metadata for modifying
+     * @param collectionReader a collectionReader with which to get information from the collection 
+     * @return void
      */
     public void generateRedirectListForCollection(Collection collection, CollectionReader collectionReader)
             throws IOException, ZebedeeException {

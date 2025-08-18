@@ -435,6 +435,14 @@
                             <artifactId>lucene-queryparser</artifactId>
                             <version>5.5.4</version>
                         </exlude>
+
+                        <!-- This is only used by spring-test for testing and the 
+                         next major version requires Java 17 -->
+                        <exlude>
+                            <groupId>org.springframework</groupId>
+                            <artifactId>spring-core</artifactId>
+                            <version>5.3.39</version>
+                        </exlude>
                     </excludeCoordinates>
                 </configuration>
             </plugin>

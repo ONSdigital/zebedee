@@ -27,7 +27,7 @@
         <httpino.version>0.0.10</httpino.version>
         <fasterxml.jackson.version>2.16.1</fasterxml.jackson.version>
         <apache.poi.version>3.17</apache.poi.version>
-        <spring.version>5.3.31</spring.version>
+        <spring.version>5.3.39</spring.version>
         <dp.logging.version>v2.0.0-beta.11</dp.logging.version>
         <batik.version>1.17</batik.version>
         <logback.version>1.3.14</logback.version>

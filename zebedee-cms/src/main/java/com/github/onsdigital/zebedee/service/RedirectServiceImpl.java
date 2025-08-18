@@ -120,9 +120,9 @@ public class RedirectServiceImpl implements RedirectService {
 
         if (pageDescription != null && pageUri != null) {
             String migrationPath = pageDescription.getMigrationLink();
-            String pageUriString = page.getUri().toString();
+            String pageUriString = pageUri.toString();
 
-            if (migrationPath != null) {
+            if (migrationPath != null && !migrationPath.equals(pageUriString)) {
                 if (isSeriesContentType(page.getType())) {
                     collectionRedirects.add(getCollectionRedirect(createLatestRedirect(pageUriString, migrationPath)));
                     collectionRedirects.add(getCollectionRedirect(createRelatedDataRedirect(pageUriString, migrationPath)));

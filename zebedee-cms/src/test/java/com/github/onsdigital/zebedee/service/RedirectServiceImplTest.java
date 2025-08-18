@@ -192,6 +192,28 @@ public class RedirectServiceImplTest {
     }
 
     @Test
+    public void testGenerateRedirectListForCollectionSame() throws Exception {
+        // Given a collection with a migrationLink that is for the same page
+        List<String> uris = Arrays.asList("/origin/data.json");
+        when(mockDescription.getMigrationLink()).thenReturn("/origin");
+        when(mockPage.getDescription()).thenReturn(mockDescription);
+        when(mockPage.getType()).thenReturn(PRODUCT_PAGE);
+        when(mockPage.getUri()).thenReturn(new URI("/origin"));
+        when(mockContentReader.listUris()).thenReturn(uris);
+        when(mockCollectionReader.getReviewed()).thenReturn(mockContentReader);
+        when(mockContentReader.getContent("/origin")).thenReturn(mockPage);
+
+        when(mockCollection.getDescription()).thenReturn(mockCollectionDescription);
+
+        // When generateRedirectListForCollection is called
+        redirectService.generateRedirectListForCollection(mockCollection, mockCollectionReader);
+
+        // Then no CollectionRedirect should be added to the collection 
+        verify(mockCollectionDescription, times(0)).addRedirect(any());
+    }
+
+
+    @Test
     public void testGenerateRedirectListForCollectionError() throws Exception {
         // Given a redirect API that throws an error on request
         when(mockRedirectAPI.getRedirect(any())).thenThrow(new RedirectAPIException());

@@ -409,38 +409,38 @@
                         <!--
                             Jira epic to remove the following three exclusions: DIS-1050
                          -->
-                        <exlude>
+                        <exclude>
                             <groupId>io.netty</groupId>
                             <artifactId>netty</artifactId>
                             <version>3.10.6.Final</version>
-                        </exlude>
-                        <exlude>
+                        </exclude>
+                        <exclude>
                             <groupId>org.elasticsearch</groupId>
                             <artifactId>elasticsearch</artifactId>
                             <version>2.4.6</version>
-                        </exlude>
-                        <exlude>
+                        </exclude>
+                        <exclude>
                             <groupId>org.apache.lucene</groupId>
                             <artifactId>lucene-queryparser</artifactId>
                             <version>5.5.4</version>
-                        </exlude>
+                        </exclude>
                         <!-- End DIS-1050 -->
 
                         <!-- Jira ticket to upgrade: DIS-3661 -->
-                        <exlude>
+                        <exclude>
                             <groupId>org.apache.xmlbeans</groupId>
                             <artifactId>xmlbeans</artifactId>
                             <version>2.6.0</version>
-                        </exlude>
+                        </exclude>
                         <!-- End DIS-3661 -->
 
                         <!-- This is only used by spring-test for testing and the 
                          next major version requires Java 17 -->
-                        <exlude>
+                        <exclude>
                             <groupId>org.springframework</groupId>
                             <artifactId>spring-core</artifactId>
                             <version>5.3.39</version>
-                        </exlude>
+                        </exclude>
                     </excludeCoordinates>
                 </configuration>
             </plugin>

@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.Supplier;
 import java.net.URI;
 
 import com.github.onsdigital.zebedee.configuration.Configuration;
@@ -14,8 +13,6 @@ import com.github.onsdigital.dis.redirect.api.sdk.exception.BadRequestException;
 import com.github.onsdigital.dis.redirect.api.sdk.exception.RedirectAPIException;
 import com.github.onsdigital.dis.redirect.api.sdk.exception.RedirectNotFoundException;
 import com.github.onsdigital.dis.redirect.api.sdk.model.Redirect;
-import com.github.onsdigital.zebedee.Zebedee;
-import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.content.page.base.PageDescription;
@@ -40,8 +37,6 @@ import static com.github.onsdigital.zebedee.content.page.base.PageType.COMPENDIU
 public class RedirectServiceImpl implements RedirectService {
 
     private RedirectClient redirectClient;
-
-    private Supplier<Zebedee> zebedeeSupplier = () -> Root.zebedee;
 
     /**
      * These content types are ones that are serialised and therefore need different redirects.

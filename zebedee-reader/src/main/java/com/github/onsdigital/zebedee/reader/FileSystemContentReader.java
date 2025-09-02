@@ -71,7 +71,7 @@ public class FileSystemContentReader implements ContentReader {
 
     /**
      * Apache TIKA is a library providing helper methods for determining the MIME type of files. Using this in place
-     * of {@link Files#probeContentType(Path)} due to know issues and bugs depending on the OS its used on.
+     * of {@link Files#probeContentType(Path)} due to known issues and bugs depending on the OS its used on.
      */
     private static Tika tika = new Tika();
 

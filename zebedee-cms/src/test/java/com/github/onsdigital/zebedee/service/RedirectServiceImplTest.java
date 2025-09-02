@@ -30,6 +30,7 @@ import static org.mockito.Mockito.*;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -476,7 +477,22 @@ public class RedirectServiceImplTest {
         redirectService.publishRedirectsForCollection(mockCollection, mockNotifier);
 
         verify(mockRedirectAPI, never()).putRedirect(any());
-        verify(mockNotifier, times(1)).sendCollectionWarning(eq(mockCollection), anyString(), contains("skipped"));
+        verify(mockNotifier, times(1)).sendCollectionWarning(eq(mockCollection), anyString(), contains("1 error validating redirects for collection"));
+    }
+
+    @Test
+    public void testPublishRedirectsForCollectionInvalidCreateMultiples() throws Exception {
+        CollectionRedirect redirect = new CollectionRedirect("/exists", "/to", CollectionRedirectAction.CREATE);
+        when(mockRedirectAPI.getRedirect("/exists")).thenReturn(new Redirect("/exists", "/to"));
+        when(mockCollection.getId()).thenReturn(TEST_COLLECTION_ID);
+        when(mockCollection.getDescription()).thenReturn(mockCollectionDescription);
+        when(mockCollectionDescription.getRedirects()).thenReturn(new ArrayList<CollectionRedirect>(Arrays.asList(redirect, redirect)));
+
+        redirectService.publishRedirectsForCollection(mockCollection, mockNotifier);
+
+        verify(mockRedirectAPI, never()).putRedirect(any());
+        // Only sends one notification, even if many failures.
+        verify(mockNotifier, times(1)).sendCollectionWarning(eq(mockCollection), anyString(), contains("2 errors validating redirects for collection"));
     }
 
     @Test

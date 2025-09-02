@@ -197,6 +197,8 @@ public class RedirectServiceImpl implements RedirectService {
 
         List<CollectionRedirect> validRedirects = new ArrayList<>();
 
+        int validationErrors = 0;
+
         for (CollectionRedirect r : redirects) {
             boolean exists = false;
             try {
@@ -205,25 +207,41 @@ public class RedirectServiceImpl implements RedirectService {
             } catch (RedirectNotFoundException nf) {
                 exists = false;
             } catch (BadRequestException bre) {
-                sendRedirectWarning(collection, r, "Bad request querying Redirect API: " + bre.getMessage(), notifier);
+                error()
+                    .data("message", bre.getMessage())
+                    .logException(bre, "bad request quering redirect API");
+
+                validationErrors++;
                 continue;
             } catch (RedirectAPIException | IOException e) {
-                sendRedirectWarning(collection, r, "Error querying Redirect API: " + e.getMessage(), notifier);
+                error()
+                    .data("message", e.getMessage())
+                    .logException(e, "error querying Redirect API");
+
+                validationErrors++;
                 continue;
             }
 
             if (isValidForAction(r, exists)) {
                 validRedirects.add(r);
             } else {
-                sendRedirectWarning(
-                        collection,
-                        r,
-                        "State mismatch. Expected for " + r.getAction() + " that redirect "
-                                + (r.getAction() == CollectionRedirectAction.CREATE ? "does NOT exist" : "exists")
-                                + " but exists=" + exists,
-                        notifier
-                );
+                error()
+                    .data("action", r.getAction())
+                    .data("from", r.getFrom())
+                    .data("to", r.getTo())
+                    .data("exists", exists)
+                    .log("redirect state mismatch");
+
+                validationErrors++;
             }
+        }
+
+        if (validationErrors > 0){
+            sendRedirectWarning(
+                collection,
+                String.format("%d %s validating redirects for collection", validationErrors, validationErrors == 1 ? "error": "errors"),
+                notifier
+            );
         }
 
         return validRedirects;
@@ -295,16 +313,11 @@ public class RedirectServiceImpl implements RedirectService {
         }
     }
 
-    private void sendRedirectWarning(Collection collection, CollectionRedirect r, String reason, Notifier notifier) {
-        String msg = String.format(
-                "Redirect %s %s -> %s skipped: %s",
-                r.getAction(), r.getFrom(), r.getTo(), reason
-        );
-
+    private void sendRedirectWarning(Collection collection, String reason, Notifier notifier) {
         notifier.sendCollectionWarning(
                 collection,
                 Configuration.getDefaultSlackWarningChannel(),
-                msg
+                reason
         );
     }
 

@@ -441,6 +441,14 @@
                             <artifactId>spring-core</artifactId>
                             <version>5.3.39</version>
                         </exclude>
+
+                        <!-- We're only using this to detect mime types of files. 
+                         Vulnerability is only if external PDFS are submitted. -->
+                        <exclude>
+                            <groupId>org.apache.tika</groupId>
+                            <artifactId>tika-core</artifactId>
+                            <version>1.28.5</version>
+                        </exclude>
                     </excludeCoordinates>
                 </configuration>
             </plugin>

@@ -100,8 +100,10 @@ public class PostPublisher {
             reindexPublishingSearch(collection);
 
             if (cmsFeatureFlags().isRedirectAPIEnabled()) {
+                info().log("publishing redirects for collection");
                 RedirectService redirectService = ZebedeeCmsService.getInstance().getRedirectService();
                 redirectService.publishRedirectsForCollection(collection, zebedeeSupplier.get().getSlackNotifier());
+                info().log("redirect processing complete");
             }
 
             // Publish content-updated and content-deleted events for search service.

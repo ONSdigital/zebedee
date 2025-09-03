@@ -643,10 +643,11 @@ public class CollectionsTest {
 
         assertThat(result, is(true));
         verify(permissionsServiceMock, times(1)).canEdit(sessionMock);
-        verify(collectionMock, times(3)).getDescription();
+        verify(collectionMock, times(4)).getDescription();
         verify(collectionDescriptionMock, times(1)).getApprovalStatus();
         verify(collectionDescriptionMock, times(1)).setApprovalStatus(ApprovalStatus.NOT_STARTED);
         verify(collectionDescriptionMock, times(1)).addEvent(any(Event.class));
+        verify(collectionDescriptionMock, times(1)).setRedirects(new ArrayList<>());
         verify(publishNotification, times(1)).sendNotification(EventType.UNLOCKED);
         verify(collectionMock, times(1)).save();
     }

@@ -420,6 +420,9 @@ public class Collections {
         collection.getDescription().setApprovalStatus(ApprovalStatus.NOT_STARTED);
         collection.getDescription().addEvent(new Event(new Date(), EventType.UNLOCKED, session.getEmail()));
 
+        // Remove redirects
+        collection.getDescription().setRedirects(new ArrayList<>());
+
         publishingNotificationConsumer.accept(collection, EventType.UNLOCKED);
         return collection.save();
     }

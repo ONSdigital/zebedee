@@ -2,6 +2,7 @@ package com.github.onsdigital.zebedee.model;
 
 import com.github.davidcarboni.cryptolite.Keys;
 import com.github.onsdigital.zebedee.Zebedee;
+import com.github.onsdigital.zebedee.configuration.CMSFeatureFlags;
 import com.github.onsdigital.zebedee.data.json.DirectoryListing;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.ConflictException;
@@ -643,6 +644,30 @@ public class CollectionsTest {
 
         assertThat(result, is(true));
         verify(permissionsServiceMock, times(1)).canEdit(sessionMock);
+        verify(collectionMock, times(3)).getDescription();
+        verify(collectionDescriptionMock, times(1)).getApprovalStatus();
+        verify(collectionDescriptionMock, times(1)).setApprovalStatus(ApprovalStatus.NOT_STARTED);
+        verify(collectionDescriptionMock, times(1)).addEvent(any(Event.class));
+        verify(collectionDescriptionMock, never()).setRedirects(any());
+        verify(publishNotification, times(1)).sendNotification(EventType.UNLOCKED);
+        verify(collectionMock, times(1)).save();
+    }
+
+    @Test
+    public void shouldUnlockCollectionWithRedirects() throws IOException, ZebedeeException, ExecutionException, InterruptedException {
+        when(permissionsServiceMock.canEdit(sessionMock))
+                .thenReturn(true);
+        when(collectionDescriptionMock.getApprovalStatus())
+                .thenReturn(ApprovalStatus.COMPLETE);
+        when(collectionMock.save())
+                .thenReturn(true);
+        System.setProperty(CMSFeatureFlags.ENABLE_REDIRECT_API, "true");
+        CMSFeatureFlags.reset();
+
+        boolean result = collections.unlock(collectionMock, sessionMock);
+
+        assertThat(result, is(true));
+        verify(permissionsServiceMock, times(1)).canEdit(sessionMock);
         verify(collectionMock, times(4)).getDescription();
         verify(collectionDescriptionMock, times(1)).getApprovalStatus();
         verify(collectionDescriptionMock, times(1)).setApprovalStatus(ApprovalStatus.NOT_STARTED);
@@ -650,6 +675,8 @@ public class CollectionsTest {
         verify(collectionDescriptionMock, times(1)).setRedirects(new ArrayList<>());
         verify(publishNotification, times(1)).sendNotification(EventType.UNLOCKED);
         verify(collectionMock, times(1)).save();
+
+        System.clearProperty("REDIRECT_API_URL");
     }
 
     @Test

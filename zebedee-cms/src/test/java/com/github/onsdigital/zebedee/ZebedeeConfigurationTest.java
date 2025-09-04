@@ -26,7 +26,8 @@ public class ZebedeeConfigurationTest extends ZebedeeTestBaseFixture {
 
     @After
     public void tearDown() throws Exception {
-        System.clearProperty("REDIRECT_API_URL");
+        System.clearProperty(CMSFeatureFlags.ENABLE_REDIRECT_API);
+        CMSFeatureFlags.reset();
     }
 
     @Test

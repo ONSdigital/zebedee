@@ -127,6 +127,7 @@ public class ApproveTaskTest {
         if (executorService != null) {
             executorService.shutdownNow();
         }
+        System.clearProperty(CMSFeatureFlags.ENABLE_REDIRECT_API);
         CMSFeatureFlags.reset();
     }
 

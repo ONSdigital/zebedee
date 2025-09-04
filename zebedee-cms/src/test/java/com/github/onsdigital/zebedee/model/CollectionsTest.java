@@ -28,6 +28,7 @@ import com.github.onsdigital.zebedee.user.service.UsersService;
 import com.github.onsdigital.zebedee.util.ZebedeeCmsService;
 import com.github.onsdigital.zebedee.util.versioning.VersionsService;
 import org.apache.commons.fileupload.FileUploadException;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -178,6 +179,12 @@ public class CollectionsTest {
         ReflectionTestUtils.setField(collections, "collectionReaderWriterFactory", collectionReaderWriterFactoryMock);
         ReflectionTestUtils.setField(collections, "publishingNotificationConsumer", publishingNotificationConsumer);
         ReflectionTestUtils.setField(collections, "zebedeeCmsService", zebedeeCmsService);
+    }
+
+    @After
+    public void tearDown() {
+        System.clearProperty(CMSFeatureFlags.ENABLE_REDIRECT_API);
+        CMSFeatureFlags.reset();
     }
 
     @Test
@@ -639,7 +646,7 @@ public class CollectionsTest {
                 .thenReturn(ApprovalStatus.COMPLETE);
         when(collectionMock.save())
                 .thenReturn(true);
-
+        
         boolean result = collections.unlock(collectionMock, sessionMock);
 
         assertThat(result, is(true));
@@ -676,7 +683,8 @@ public class CollectionsTest {
         verify(publishNotification, times(1)).sendNotification(EventType.UNLOCKED);
         verify(collectionMock, times(1)).save();
 
-        System.clearProperty("REDIRECT_API_URL");
+        System.clearProperty(CMSFeatureFlags.ENABLE_REDIRECT_API);
+        CMSFeatureFlags.reset();
     }
 
     @Test

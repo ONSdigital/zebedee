@@ -403,6 +403,7 @@
                 <!-- configuration for mvn ossindex:audit -->
                 <configuration>
                     <!-- if CVSS >= 7.0 (high or critical) then ERROR else WARN -->
+                    <authId>ossindex</authId>
                     <fail>true</fail>
                     <cvssScoreThreshold>7.0</cvssScoreThreshold>
                     <excludeCoordinates>
@@ -434,7 +435,7 @@
                         </exclude>
                         <!-- End DIS-3661 -->
 
-                        <!-- This is only used by spring-test for testing and the 
+                        <!-- This is only used by spring-test for testing and the
                          next major version requires Java 17 -->
                         <exclude>
                             <groupId>org.springframework</groupId>

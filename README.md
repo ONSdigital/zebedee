@@ -58,6 +58,26 @@ Getting the code:
 git clone git@github.com:ONSdigital/zebedee.git
 ```
 
+### Tools
+
+To run some of our tests you will need additional tooling:
+
+#### Audit
+
+For Java auditing we use mvn `ossindex:audit` which requires you
+to [setup an OSS Index account](https://github.com/ONSdigital/dp/blob/main/guides/MAC_SETUP.md#oss-index-account-and-configuration)
+and make some updates
+to [Maven: Local Setup for ossindex:audit](https://github.com/ONSdigital/dp/blob/main/guides/MAC_SETUP.md#maven-local-setup-for-ossindexaudit)
+
+#### Testing
+
+To run unit tests:
+
+`make test`
+
+There is also a [guide for regression testing](REGRESSION.md). This is not complete and should not be seen as
+definitive.
+
 ### Database...
 
 Zebedee isn't backed by a database instead it uses a file system to store json files on disk ***. As a result it

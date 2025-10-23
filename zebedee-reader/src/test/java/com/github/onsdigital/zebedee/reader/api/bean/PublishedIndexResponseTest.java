@@ -98,7 +98,7 @@ public class PublishedIndexResponseTest {
 
     private List<Document> listOfDocuments(String... uris) {
         return Arrays.stream(uris)
-                .map(u -> new Document(u, null))
+                .map(u -> new Document(u))
                 .collect(Collectors.toList());
     }
 }

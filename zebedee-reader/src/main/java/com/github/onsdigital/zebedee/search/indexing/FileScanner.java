@@ -9,11 +9,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static com.github.onsdigital.zebedee.search.indexing.SearchBoostTermsResolver.getSearchTermResolver;
 import static com.github.onsdigital.zebedee.util.PathUtils.toRelativeUri;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
@@ -60,30 +58,20 @@ public class FileScanner {
                     "List of fileNames and Path dir cannot be null");
         }
 
-        if (searchTerms == null) {
-            searchTerms = new HashSet<>();
-        }
-
         // java 7 try-with-resources automatically closes streams after use
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(dir)) {
             for (Path path : stream) {
                 String uri = toRelativeUri(root, path.getParent()).toString();
                 if (path.toFile().isDirectory()) {
                     if (isNotPreviousVersion(path.getFileName().toString())) {
-                        List<String> termsForPrefix = getSearchTermResolver().getTermsForPrefix(uri);
-                        searchTerms.add(termsForPrefix);
                         getFileNames(fileNames, path, searchTerms);
-                        searchTerms.remove(termsForPrefix);
                     } else {
                         continue;//skip versions
                     }
                 } else {
                     String fullPath = toUri(path);
                     if (isDataFile(fullPath)) {
-                        List<String> terms = getSearchTermResolver().getTerms(uri);
-                        searchTerms.add(terms);
-                        fileNames.add(new Document(uri, searchTerms));
-                        searchTerms.remove(terms);
+                        fileNames.add(new Document(uri));
                     }
                 }
             }

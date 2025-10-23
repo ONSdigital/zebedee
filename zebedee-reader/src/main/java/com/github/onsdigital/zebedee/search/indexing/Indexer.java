@@ -277,26 +277,24 @@ public class Indexer {
         Page page = getPage(document.getUri());
         if (page != null && page.getType() != null) {
             IndexRequestBuilder indexRequestBuilder = searchUtils.prepareIndex(indexName, page.getType().getLabel(), page.getUri().toString());
-            indexRequestBuilder.setSource(serialise(toSearchDocument(page, document.getSearchTerms())));
+            indexRequestBuilder.setSource(serialise(toSearchDocument(page)));
             return indexRequestBuilder;
         }
         return null;
     }
 
     private void indexSingleContent(String indexName, Page page) throws IOException {
-        List<String> terms = resolveSearchTerms(page.getUri().toString());
-        searchUtils.createDocument(indexName, page.getType().getLabel(), page.getUri().toString(), serialise(toSearchDocument(page, terms)));
+        searchUtils.createDocument(indexName, page.getType().getLabel(), page.getUri().toString(), serialise(toSearchDocument(page)));
     }
 
-    private SearchDocument toSearchDocument(Page page, List<String> searchTerms) {
+    private SearchDocument toSearchDocument(Page page) {
         SearchDocument indexDocument = new SearchDocument();
         indexDocument.setUri(page.getUri());
         indexDocument.setDescription(page.getDescription());
         indexDocument.setTopics(getTopics(page.getTopics()));
         indexDocument.setType(page.getType());
-        indexDocument.setSearchBoost(searchTerms);
         return indexDocument;
-    }
+    } 
 
     private ArrayList<URI> getTopics(List<Link> topics) {
         if (topics == null) {

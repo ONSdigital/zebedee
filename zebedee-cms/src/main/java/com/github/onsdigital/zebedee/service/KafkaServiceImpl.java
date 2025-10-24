@@ -42,7 +42,7 @@ public class KafkaServiceImpl implements KafkaService {
     }
 
     @Override
-    public void produceContentDeleted(String collectionId, List<String> uris, String indexName, String traceId) {
+    public void produceContentDeleted(String collectionId, List<String> uris, String indexName, String traceId) throws IOException {
         info().collectionID(collectionId)
                 .data("index", indexName)
                 .log("generating search-content-deleted kafka events for published collection");
@@ -59,6 +59,7 @@ public class KafkaServiceImpl implements KafkaService {
                         .data("uri", "see loop context")
                         .exception(e)
                         .log("unable to send search-content-deleted kafka message");
+                throw new IOException("unable to process kafka message", e);
             }
         }
     }

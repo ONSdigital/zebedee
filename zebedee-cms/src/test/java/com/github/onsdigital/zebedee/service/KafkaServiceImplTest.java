@@ -35,6 +35,9 @@ public class KafkaServiceImplTest {
         when(mockKafkaClient.produceContentUpdated(anyString(), anyString(), anyString(), anyString(), anyString(),
                 anyString()))
                         .thenReturn(mockFuture);
+        when(mockKafkaClient.produceContentDeleted(
+                anyString(), anyString(), anyString(), anyString()))
+                .thenReturn(mockFuture);
     }
 
     @Test
@@ -104,4 +107,80 @@ public class KafkaServiceImplTest {
         // Then a timeout exception is thrown.
         assertEquals(thrown.getMessage(), "unable to process kafka message");
     }
+
+    @Test
+    public void testProduceContentDeleted_threeURIs() throws Exception {
+        // Given
+        KafkaService kafkaService = new KafkaServiceImpl(mockKafkaClient);
+        List<String> uris = Arrays.asList(URI1, URI2, URI3);
+
+        Future<RecordMetadata> ok = mock(Future.class);
+        when(ok.get()).thenReturn(new RecordMetadata(null, 0, 0, 0, null, 0, 0));
+        when(mockKafkaClient.produceContentDeleted(anyString(), anyString(), anyString(), anyString()))
+                .thenReturn(ok);
+
+        // When
+        kafkaService.produceContentDeleted(COLLECTION_ID, uris, TEST_SEARCHINDEX, TEST_TRACE_ID);
+
+        // Then
+        ArgumentCaptor<String> uriCaptor = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<String> indexCaptor = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<String> colCaptor = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<String> traceCaptor = ArgumentCaptor.forClass(String.class);
+
+        verify(mockKafkaClient, times(3))
+                .produceContentDeleted(uriCaptor.capture(), indexCaptor.capture(),
+                        colCaptor.capture(), traceCaptor.capture());
+
+        Set<String> calledUris = new HashSet<>(uriCaptor.getAllValues());
+        assertEquals(3, calledUris.size());
+        assertTrue(calledUris.contains(URI1));
+        assertTrue(calledUris.contains(URI2));
+        assertTrue(calledUris.contains(URI3));
+
+        // all calls should carry consistent metadata
+        assertEquals(Arrays.asList(TEST_SEARCHINDEX, TEST_SEARCHINDEX, TEST_SEARCHINDEX), indexCaptor.getAllValues());
+        assertEquals(Arrays.asList(COLLECTION_ID, COLLECTION_ID, COLLECTION_ID), colCaptor.getAllValues());
+        assertEquals(Arrays.asList(TEST_TRACE_ID, TEST_TRACE_ID, TEST_TRACE_ID), traceCaptor.getAllValues());
+    }
+
+    @Test
+    public void testProduceContentDeleted_zeroURIs() throws IOException {
+        // Given
+        KafkaService kafkaService = new KafkaServiceImpl(mockKafkaClient);
+
+        // When
+        kafkaService.produceContentDeleted(COLLECTION_ID, Collections.emptyList(), TEST_SEARCHINDEX, TEST_TRACE_ID);
+
+        // Then
+        verify(mockKafkaClient, never()).produceContentDeleted(anyString(), anyString(), anyString(), anyString());
+    }
+
+    @Test
+    public void testProduceContentDeleted_clientException() throws Exception {
+        // Given
+        KafkaService kafkaService = new KafkaServiceImpl(mockKafkaClient);
+        List<String> uris = Arrays.asList(URI1, URI2);
+
+        @SuppressWarnings("unchecked")
+        Future<RecordMetadata> failing = mock(Future.class);
+        when(failing.get()).thenThrow(new ExecutionException(new RuntimeException("boom")));
+
+        // Return a success for the first, then a failure for the second (ordering isn’t guaranteed to matter,
+        // the loop will hit the failing one and throw).
+        Future<RecordMetadata> ok = mock(Future.class);
+        when(ok.get()).thenReturn(new RecordMetadata(null, 0, 0, 0, null, 0, 0));
+
+        when(mockKafkaClient.produceContentDeleted(eq(URI1), anyString(), anyString(), anyString())).thenReturn(ok);
+        when(mockKafkaClient.produceContentDeleted(eq(URI2), anyString(), anyString(), anyString())).thenReturn(failing);
+
+        // When / Then
+        IOException ex = assertThrows(IOException.class,
+                () -> kafkaService.produceContentDeleted(COLLECTION_ID, uris, TEST_SEARCHINDEX, TEST_TRACE_ID));
+        assertEquals("unable to process kafka message", ex.getMessage());
+
+        // We still attempted both sends
+        verify(mockKafkaClient, times(2)).produceContentDeleted(anyString(), anyString(), anyString(), anyString());
+    }
+
 }

@@ -31,6 +31,6 @@ public interface KafkaService {
      * @param indexName    The search index name where deletions should occur
      * @param traceID      Trace ID for correlation and logging
      */
-    void produceContentDeleted(String collectionID, List<String> uris, String indexName, String traceID);
+    void produceContentDeleted(String collectionID, List<String> uris, String indexName, String traceID) throws IOException;
 
 }

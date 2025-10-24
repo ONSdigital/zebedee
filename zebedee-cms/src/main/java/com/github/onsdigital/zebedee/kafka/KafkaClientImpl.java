@@ -1,6 +1,9 @@
 package com.github.onsdigital.zebedee.kafka;
 
-import com.github.onsdigital.zebedee.avro.ContentDeleted;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.github.onsdigital.zebedee.kafka.model.ContentDeleted;
 import com.github.onsdigital.zebedee.avro.ContentUpdated;
 import com.github.onsdigital.zebedee.kafka.avro.AvroSerializer;
 import org.apache.kafka.clients.CommonClientConfigs;
@@ -13,6 +16,7 @@ import org.apache.kafka.clients.producer.RecordMetadata;
 import org.apache.kafka.common.config.SslConfigs;
 import org.apache.kafka.common.serialization.StringSerializer;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 import java.util.concurrent.Future;
 
@@ -20,6 +24,7 @@ import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getKafkaSecClientKey;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getKafkaSecClientCert;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getKafkaSecProtocol;
+import static com.github.onsdigital.zebedee.logging.CMSLogEvent.error;
 
 /**
  * This class represents a client that actually interfaces with Kafka and
@@ -29,9 +34,24 @@ import static com.github.onsdigital.zebedee.configuration.Configuration.getKafka
 public class KafkaClientImpl implements KafkaClient {
 
     private final Producer<String, ContentUpdated> updateProducer;
-    private final Producer<String, ContentDeleted> deletedProducer;
+    private final Producer<String, String> deletedProducer;
     private String updateTopic;
     private String deletedTopic;
+
+    private static final ObjectMapper MAPPER = new ObjectMapper()
+            .findAndRegisterModules()
+            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+
+
+    KafkaClientImpl(Producer<String, ContentUpdated> updateProducer,
+                    Producer<String, String> deletedProducer,
+                    String updateTopic,
+                    String deletedTopic) {
+        this.updateProducer = updateProducer;
+        this.deletedProducer = deletedProducer;
+        this.updateTopic = updateTopic;
+        this.deletedTopic = deletedTopic;
+    }
 
     public KafkaClientImpl(String kafkaAddr, String updateTopic, String deletedTopic) {
         this.updateTopic = updateTopic;
@@ -50,17 +70,12 @@ public class KafkaClientImpl implements KafkaClient {
             }
         }
 
-        // Producer for ContentUpdated
-        AvroSerializer<ContentUpdated> updatedSerializer = new AvroSerializer<>(ContentUpdated.class);
-        this.updateProducer = new KafkaProducer<>(props, new StringSerializer(), updatedSerializer);
-
-        // Producer for ContentDeleted
-        AvroSerializer<ContentDeleted> deletedSerializer = new AvroSerializer<>(ContentDeleted.class);
-        this.deletedProducer = new KafkaProducer<>(props, new StringSerializer(), deletedSerializer);
+        this.updateProducer  = new KafkaProducer<>(props, new StringSerializer(), new AvroSerializer<>(ContentUpdated.class));
+        this.deletedProducer = new KafkaProducer<>(props, new StringSerializer(), new StringSerializer());
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            updateProducer.close();
-            deletedProducer.close();
+            try { updateProducer.close(); }  catch (Exception ignored) {}
+            try { deletedProducer.close(); } catch (Exception ignored) {}
         }));
     }
 
@@ -77,7 +92,25 @@ public class KafkaClientImpl implements KafkaClient {
 
     @Override
     public Future<RecordMetadata> produceContentDeleted(String uri, String searchIndex, String collectionID, String traceID) {
-        ContentDeleted value = new ContentDeleted(uri, collectionID, searchIndex, traceID);
-        return deletedProducer.send(new ProducerRecord<>(deletedTopic, value));
+        ContentDeleted payload = new ContentDeleted(uri, collectionID, searchIndex, traceID);
+
+        try {
+            String json = MAPPER.writeValueAsString(payload);
+
+            ProducerRecord<String, String> record =
+                    new ProducerRecord<>(deletedTopic, uri, json);
+
+            record.headers().add("content-type", "application/json".getBytes(StandardCharsets.UTF_8));
+
+            return deletedProducer.send(record);
+        } catch (JsonProcessingException e) {
+            error().data("uri", uri)
+                    .data("index", searchIndex)
+                    .data("collectionId", collectionID)
+                    .data("traceId", traceID)
+                    .exception(e)
+                    .log("failed to serialize payload to JSON");
+            throw new RuntimeException("JSON marshal failed for topic " + deletedTopic, e);
+        }
     }
 }

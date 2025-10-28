@@ -42,6 +42,8 @@ public class ReaderConfiguration {
     private static final String BULLETINS_FOLDER_NAME = "bulletins";
     private static final String ARTICLES_FOLDER_NAME = "articles";
     private static final String COMPENDIUM_FOLDER_NAME = "compendium";
+    private static final String TIMESERIES_FOLDER_NAME = "timeseries";
+
 
     private static final String DATASET_API_URL_KEY = "DATASET_API_URL";
     private static final String DATASET_API_AUTH_TOKEN_KEY = "DATASET_API_AUTH_TOKEN";
@@ -59,6 +61,7 @@ public class ReaderConfiguration {
     private String bulletinsDirName;
     private String articlesDirName;
     private String compendiumDirName;
+    private String timeseriesDirName;
     private String datasetAPIHost;
     private String datasetAPIAuthToken;
     private String serviceAuthToken;
@@ -125,6 +128,7 @@ public class ReaderConfiguration {
         this.bulletinsDirName = BULLETINS_FOLDER_NAME;
         this.articlesDirName = ARTICLES_FOLDER_NAME;
         this.compendiumDirName = COMPENDIUM_FOLDER_NAME;
+        this.timeseriesDirName = TIMESERIES_FOLDER_NAME;
         this.cacheControl = DEFAULT_CACHE_CONTROL_SECONDS;
 
         this.datasetImportEnabled = Boolean.valueOf(getVariableValue(ENABLE_DATASET_IMPORT));
@@ -151,6 +155,7 @@ public class ReaderConfiguration {
                 .data("reviewed_dir", reviewedDirName)
                 .data("bulletins_dir", bulletinsDirName)
                 .data("articles_dir", articlesDirName)
+                .data("timeseries_dir", timeseriesDirName)
                 .data("compendium_dir", compendiumDirName)
                 .data("dataset_import_enabled", datasetImportEnabled)
                 .data("cache_control", cacheControl)
@@ -200,6 +205,10 @@ public class ReaderConfiguration {
 
     public String getCompendiumFolderName() {
         return compendiumDirName;
+    }
+
+    public String getTimeseriesFolderName() {
+        return timeseriesDirName;
     }
 
     public boolean isDatasetImportEnabled() {

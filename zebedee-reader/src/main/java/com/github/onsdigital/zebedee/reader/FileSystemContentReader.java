@@ -197,12 +197,13 @@ public class FileSystemContentReader implements ContentReader {
             Path parent = contentPath.getParent();
             assertIsEditionsFolder(parent);
             page = resolveLatest(contentPath);
-            if (StringUtils.isBlank(page.getDescription().getMigrationLink())){
+            if (!path.contains(ReaderConfiguration.get().getTimeseriesFolderName())
+                    && StringUtils.isBlank(page.getDescription().getMigrationLink())) {
                 page.getDescription().setLatestRelease(true);
             } else {
                 page.getDescription().setLatestRelease(null);
             }
-        } catch(Throwable t) {
+        } catch (Throwable t) {
             span.recordException(t);
             throw t;
         } finally {
@@ -458,7 +459,8 @@ public class FileSystemContentReader implements ContentReader {
         ReaderConfiguration cfg = ReaderConfiguration.get();
         if (cfg.getBulletinsFolderName().equals(fileName) ||
                 cfg.getArticlesFolderName().equals(fileName) ||
-                cfg.getCompendiumFolderName().equals(fileName)) {
+                cfg.getCompendiumFolderName().equals(fileName) ||
+                cfg.getTimeseriesFolderName().equals(fileName)) {
             return;
         }
         throw new BadRequestException("Latest uri can not be resolved for this content type");

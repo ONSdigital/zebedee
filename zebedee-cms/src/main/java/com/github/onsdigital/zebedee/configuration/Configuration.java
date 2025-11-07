@@ -43,9 +43,9 @@ public class Configuration {
     private static final String DEFAULT_SLACK_USERNAME = "Zebedee";
     private static final String KEYRING_SECRET_KEY = "KEYRING_SECRET_KEY";
     private static final String KEYRING_INIT_VECTOR = "KEYRING_INIT_VECTOR";
-    private static final String DATASET_WHITELIST = "drsi,mm23,mm22,ppi,dataset1,pusf,a01,x09,cla01,pn2,mgdp,diop,ios1,mret,mq10,rtisa";
-    private static final String NON_TS_DATASET_WHITELIST = "dataset1,a01,x09,cla01,rtisa";
-    private static final String EXPECTED_DATASET1_PATH = "economy/inflationandpriceindices/datasets/growthratesofoutputandinputproducerpriceinflation";
+    private static final String DATASET_WHITELIST = "drsi,mm23,mm22,ppi,ppistatistics,pusf,a01,x09,cla01,pn2,mgdp,diop,ios1,mret,mq10,rtisa";
+    private static final String NON_TS_DATASET_WHITELIST = "ppistatistics,a01,x09,cla01,rtisa";
+    private static final String EXPECTED_PPISTATISTICS_PATH = "economy/inflationandpriceindices/datasets/growthratesofoutputandinputproducerpriceinflation";
 
     private static final int VERIFY_RETRY_DELAY = 5000; // milliseconds
     private static final int VERIFY_RETRY_COUNT = 10;
@@ -265,9 +265,9 @@ public class Configuration {
         return StringUtils.defaultIfBlank(getValue("NON_TS_DATASET_WHITELIST"), NON_TS_DATASET_WHITELIST);
     }
     
-    // Get dataset1 path from dp-configs
-    public static String getDataset1ExpectedPath() {
-        return StringUtils.defaultIfBlank(getValue("EXPECTED_DATASET1_PATH"), EXPECTED_DATASET1_PATH);
+    // Get ppistatistics path from dp-configs
+    public static String getPpistatisticsExpectedPath() {
+        return StringUtils.defaultIfBlank(getValue("EXPECTED_PPISTATISTICS_PATH"), EXPECTED_PPISTATISTICS_PATH);
     }
 
     // Changeable upload-new endpoint parameters

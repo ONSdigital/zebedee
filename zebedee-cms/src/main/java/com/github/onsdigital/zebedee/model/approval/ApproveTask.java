@@ -416,11 +416,11 @@ public class ApproveTask implements Callable<Boolean> {
         Set<String> nonTsDatasetWhitelistSet = Arrays.stream(nonTsDatasetWhitelist.split(","))
                 .collect(Collectors.toSet());
 
-        String expectedDataset1Path = Configuration.getDataset1ExpectedPath();
+        String expectedPpistatisticsPath = Configuration.getPpistatisticsExpectedPath();
         if (nonTsDatasetWhitelistSet.contains(baseFilename)) {
-            if (baseFilename.contains("dataset1")) {
+            if (baseFilename.contains("ppistatistics")) {
                 // identify if its the PPI dataset
-                if (fileName.contains(expectedDataset1Path)) {
+                if (fileName.contains(expectedPpistatisticsPath)) {
                     if (!datasetId.contains("upload") && !fileName.contains("previous")) {
                         uploadServiceSupplier.getService().uploadResumableFile(file, params);
                     }

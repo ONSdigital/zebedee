@@ -75,8 +75,8 @@ public class DatasetWhitelistCheckerTest {
     }
 
     @Test
-    public void testIsWhitelistedWithdataset1() {
-        assertTrue(DatasetWhitelistChecker.isWhitelisted("dataset1.xlsx"));
+    public void testIsWhitelistedWithppistatistics() {
+        assertTrue(DatasetWhitelistChecker.isWhitelisted("ppistatistics.xlsx"));
     }
 
     @Test

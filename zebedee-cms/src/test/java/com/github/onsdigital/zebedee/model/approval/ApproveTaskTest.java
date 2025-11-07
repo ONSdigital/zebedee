@@ -487,7 +487,7 @@ public class ApproveTaskTest {
         assertEquals(task.filePathGenerator("a01jul2025", null, "v123", ""), "ts-datasets/other/" + today + "/v123");
         assertEquals(task.filePathGenerator("a01jul2025", null, "v123", "v124"), "ts-datasets/other/" + today + "/v125");
         assertEquals(task.filePathGenerator("x09jul2025", publishDate, "v123", ""), "ts-datasets/other/2024-07-18/v123");
-        assertEquals(task.filePathGenerator("dataset1", publishDate, "v123", ""), "ts-datasets/other/2024-07-18/v123");
+        assertEquals(task.filePathGenerator("ppistatistics", publishDate, "v123", ""), "ts-datasets/other/2024-07-18/v123");
         assertEquals(task.filePathGenerator("rtisa", publishDate, "v123", ""), "ts-datasets/other/2024-07-18/v123");
         assertEquals(task.filePathGenerator("cla01", publishDate, "v123", ""), "ts-datasets/other/2024-07-18/v123");
 
@@ -497,17 +497,17 @@ public class ApproveTaskTest {
     }
 
     @Test
-    public void testfilePathGenerator_check_default_value_dataset1() {
-        String actual = Configuration.getDataset1ExpectedPath();
+    public void testfilePathGenerator_check_default_value_ppistatistics() {
+        String actual = Configuration.getPpistatisticsExpectedPath();
         String expected = "economy/inflationandpriceindices/datasets/growthratesofoutputandinputproducerpriceinflation";
 
         assertEquals(expected, actual);
     }
 
     @Test
-    public void testfilePathGenerator_check_configured_value_dataset1() {
-        System.setProperty("EXPECTED_DATASET1_PATH", "economy/inflationandpriceindices/datasets/");
-        String actual = Configuration.getDataset1ExpectedPath();
+    public void testfilePathGenerator_check_configured_value_ppistatistics() {
+        System.setProperty("EXPECTED_PPISTATISTICS_PATH", "economy/inflationandpriceindices/datasets/");
+        String actual = Configuration.getPpistatisticsExpectedPath();
         String expected = "economy/inflationandpriceindices/datasets/";
 
         assertEquals(expected, actual);

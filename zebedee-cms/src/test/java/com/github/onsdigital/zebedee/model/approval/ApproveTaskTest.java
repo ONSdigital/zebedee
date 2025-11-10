@@ -499,7 +499,7 @@ public class ApproveTaskTest {
     @Test
     public void testfilePathGenerator_check_default_value_ppistatistics() {
         String actual = Configuration.getPpistatisticsExpectedPath();
-        String expected = "economy/inflationandpriceindices/datasets/growthratesofoutputandinputproducerpriceinflation";
+        String expected = "economy/inflationandpriceindices/datasets/producerpriceinflationstatistics";
 
         assertEquals(expected, actual);
     }

@@ -16,7 +16,6 @@ import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.service.RedirectService;
 import com.github.onsdigital.zebedee.service.ServiceSupplier;
 import com.github.onsdigital.zebedee.session.model.Session;
-import com.github.onsdigital.zebedee.teams.service.TeamsService;
 import com.github.onsdigital.zebedee.util.slack.Notifier;
 import org.apache.hc.core5.http.NameValuePair;
 import org.junit.After;
@@ -142,11 +141,10 @@ public class ApproveTaskTest {
         collection.getDescription().getPendingDeletes().add(pendingDelete);
 
         // When the publish notification is created as part of the approval process.
-        PublishNotification publishNotification = task.createPublishNotification(new ArrayList<>(), collection);
+        PublishNotification publishNotification = task.createPublishNotification(collection);
 
         // Then the publish notification contains the expected directory to delete.
         Assert.assertNotNull(publishNotification);
-        Assert.assertTrue(publishNotification.hasUriToDelete(uriToDelete));
     }
 
     @Test
@@ -256,7 +254,7 @@ public class ApproveTaskTest {
         doReturn(compressionTask).when(task).getCompressionTask();
         doNothing().when(collectionDescription).addEvent(eventCaptor.capture());
 
-        doReturn(new PublishNotification(collection)).when(task).createPublishNotification(stringListCaptor.capture(), eq(collection));
+        doReturn(new PublishNotification(collection)).when(task).createPublishNotification(eq(collection));
 
         List<ContentDetail> collectionContent = new ArrayList<>();
         ContentDetail articleDetail = new ContentDetail("Some article", "/the/uri", PageType.ARTICLE);
@@ -277,9 +275,6 @@ public class ApproveTaskTest {
         assertThat(capturedEvents.size(), equalTo(1));
         assertThat(capturedEvents.get(0).getEmail(), equalTo(EMAIL));
         assertThat(capturedEvents.get(0).getType(), equalTo(EventType.APPROVED));
-
-        List<String> notificationUriList = stringListCaptor.getValue();
-        assertThat(notificationUriList, hasItem(articleDetail.uri));
 
         verify(collection, times(1)).save();
     }
@@ -309,7 +304,7 @@ public class ApproveTaskTest {
         doReturn(compressionTask).when(task).getCompressionTask();
         doNothing().when(collectionDescription).addEvent(eventCaptor.capture());
 
-        doReturn(new PublishNotification(collection)).when(task).createPublishNotification(stringListCaptor.capture(), eq(collection));
+        doReturn(new PublishNotification(collection)).when(task).createPublishNotification(eq(collection));
 
         List<ContentDetail> collectionContent = new ArrayList<>();
         ContentDetail articleDetail = new ContentDetail("Some article", "/the/uri", PageType.ARTICLE);
@@ -331,11 +326,6 @@ public class ApproveTaskTest {
         assertThat(capturedEvents.size(), equalTo(1));
         assertThat(capturedEvents.get(0).getEmail(), equalTo(EMAIL));
         assertThat(capturedEvents.get(0).getType(), equalTo(EventType.APPROVED));
-
-        List<String> notificationUriList = stringListCaptor.getValue();
-        assertThat(notificationUriList, hasItem(articleDetail.uri));
-        assertThat(notificationUriList, hasItem(datasetDetail.uri));
-        assertThat(notificationUriList, hasItem(datasetVersionDetail.uri));
 
         verify(collection, times(1)).save();
 

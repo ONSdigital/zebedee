@@ -11,7 +11,6 @@ import com.github.onsdigital.zebedee.json.ApprovalStatus;
 import com.github.onsdigital.zebedee.json.ContentDetail;
 import com.github.onsdigital.zebedee.json.Event;
 import com.github.onsdigital.zebedee.json.EventType;
-import com.github.onsdigital.zebedee.json.PendingDelete;
 import com.github.onsdigital.zebedee.logging.CMSLogEvent;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.CollectionWriter;
@@ -26,7 +25,6 @@ import com.github.onsdigital.zebedee.service.BabbagePdfService;
 import com.github.onsdigital.zebedee.service.ServiceSupplier;
 import com.github.onsdigital.zebedee.service.UploadService;
 import com.github.onsdigital.zebedee.service.RedirectService;
-import com.github.onsdigital.zebedee.service.content.navigation.ContentTreeNavigator;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.util.ContentDetailUtil;
 import com.github.onsdigital.zebedee.util.DatasetWhitelistChecker;
@@ -162,7 +160,7 @@ public class ApproveTask implements Callable<Boolean> {
                 // Add dataset page to list of uris to be updated
                 uriList.addAll(collection.getDatasetDetails().stream().map(c -> c.uri).collect(Collectors.toList()));
             }
-            PublishNotification publishNotification = createPublishNotification(uriList, collection);
+            PublishNotification publishNotification = createPublishNotification(collection);
             eventLog.createdPublishNotificaion();
 
             compressZipFiles(collection, collectionReader, collectionWriter);
@@ -278,29 +276,9 @@ public class ApproveTask implements Callable<Boolean> {
     }
 
     protected PublishNotification createPublishNotification(
-            List<String> uriList,
             Collection collection) {
 
-        // only provide relevent uri's
-        // - remove versioned uris
-        // - add associated uris? /previous /data etc?
-
-        List<ContentDetail> contentToDelete = new ArrayList<>();
-        List<PendingDelete> pendingDeletes = collection.getDescription().getPendingDeletes();
-
-        for (PendingDelete pendingDelete : pendingDeletes) {
-            ContentTreeNavigator.getInstance().search(pendingDelete.getRoot(), node -> {
-                info().data("collectionId", collection.getDescription().getId())
-                        .log("adding uri to delete to the publish notification " + node.uri);
-
-                if (!contentToDelete.contains(node.uri)) {
-                    ContentDetail contentDetailToDelete = new ContentDetail(node.uri, node.getType());
-                    contentToDelete.add(contentDetailToDelete);
-                }
-            });
-        }
-
-        return new PublishNotification(collection, uriList, contentToDelete);
+        return new PublishNotification(collection);
     }
 
     private void compressZipFiles(Collection collection, CollectionReader collectionReader,

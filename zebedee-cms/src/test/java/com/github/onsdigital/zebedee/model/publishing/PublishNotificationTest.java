@@ -105,7 +105,7 @@ public class PublishNotificationTest {
 
     @Test
     public void payloadCacheAPIIsCorrect() {
-        PublishNotification publishNotification = new PublishNotification(collection, null, null);
+        PublishNotification publishNotification = new PublishNotification(collection);
 
         String expectedPayload = "{" +
                 "\"collection_id\":\"cake-1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef\"," +
@@ -151,13 +151,13 @@ public class PublishNotificationTest {
 
     @Test
     public void canCreatePublishNotificationWithURLsSetToNullWhenCacheEnabled() {
-        PublishNotification publishNotification = new PublishNotification(collection, null, null);
+        PublishNotification publishNotification = new PublishNotification(collection);
         assertNotNull(publishNotification);
     }
 
     @Test
     public void canCreatePublishNotificationWithURLsSetToNullWhenCacheDisabled() {
-        PublishNotification publishNotification = new PublishNotification(collection, null, null);
+        PublishNotification publishNotification = new PublishNotification(collection);
         assertNotNull(publishNotification);
     }
 
@@ -375,7 +375,7 @@ public class PublishNotificationTest {
         List<Host> hosts = new ArrayList<>();
         hosts.add(new Host("http://localhost:29100"));
         when(Configuration.getWebsiteHosts()).thenReturn(hosts);
-        PublishNotification publishNotification = new PublishNotification(collection, null, null);
+        PublishNotification publishNotification = new PublishNotification(collection);
 
         assertNotNull(publishNotification);
     }

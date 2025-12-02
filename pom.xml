@@ -363,6 +363,13 @@
                 <scope>test</scope>
             </dependency>
 
+            <!-- lz4-java: upgraded to 1.8.1 to address CVE-2025-12183 -->
+            <dependency>
+                <groupId>org.lz4</groupId>
+                <artifactId>lz4-java</artifactId>
+                <version>1.8.1</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 

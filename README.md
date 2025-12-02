@@ -49,7 +49,7 @@ _If you encounter any issues or notice anything missing from this guide please u
 _Much appreciated._
 _The Dev team_
 ***
-_NOTE_: The following set guide will set up Zebedee in **"CMS"** mode as this is typically how the devlopers will run 
+_NOTE_: The following set guide will set up Zebedee in **"CMS"** mode as this is typically how the developers will run
 the stack locally.
 
 Getting the code:
@@ -78,7 +78,7 @@ To run unit tests:
 There is also a [guide for regression testing](REGRESSION.md). This is not complete and should not be seen as
 definitive.
 
-### Database...
+### Database
 
 Zebedee isn't backed by a database instead it uses a file system to store json files on disk ***. As a result it
 requires a specific directory structure in order to function correctly.
@@ -146,23 +146,22 @@ Otherwise :violin: kindly ask someone from the dev team to help troubleshoot.
 
 | Environment variable                             | Default                                                                      | Description                                                                  |
 |--------------------------------------------------|------------------------------------------------------------------------------|------------------------------------------------------------------------------|
-| DEFAULT_WEBSITE_URL                              | "http://localhost:8080"                                                      | Service URL                                                                  |
-| DEFAULT_LEGACY_CACHE_API_URL                     | "http://localhost:29100"                                                     | Cache API Service URL                                                        |
+| DEFAULT_WEBSITE_URL                              | "<http://localhost:8080>"                                                    | Service URL                                                                  |
+| DEFAULT_LEGACY_CACHE_API_URL                     | "<http://localhost:29100>"                                                   | Cache API Service URL                                                        |
 | DEFAULT_SLACK_WARNING_CHANNEL                    | "slack-client-test"                                                          | Slack channel                                                                |
 | DEFAULT_SLACK_ALARM_CHANNEL                      | "slack-client-test"                                                          | Slack alarm channel                                                          |
 | DEFAULT_SLACK_USERNAME                           | "Zebedee"                                                                    | Slack user                                                                   |
-| DEFAULT_PUBLIC_WEBSITE_URL                       | "http://localhost:8080"                                                      | Service public URL                                                           |
-| DEFAULT_FLORENCE_URL                             | "http://localhost:8081"                                                      | Florence URL                                                                 |
-| brian_url                                        | "http://localhost:8083"                                                      | Brian URL                                                                    |
-| DEFAULT_TRAIN_URL                                | "http://localhost:8084"                                                      | Train URL                                                                    |
+| DEFAULT_FLORENCE_URL                             | "<http://localhost:8081>"                                                    | Florence URL                                                                 |
+| brian_url                                        | "<http://localhost:8083>"                                                    | Brian URL                                                                    |
+| DEFAULT_TRAIN_URL                                | "<http://localhost:8084>"                                                    | Train URL                                                                    |
 | CONTENT_DIRECTORY                                | "content"                                                                    | Content directory                                                            |
 | KAFKA_SEC_PROTO                                  | _unset_                                                                      | if set to "TLS", kafka connections will use TLS                              |
 | KAFKA_SEC_CLIENT_CERT                            | _unset_                                                                      | PEM for the client certificate [1]                                           |
 | KAFKA_SEC_CLIENT_KEY                             | _unset_                                                                      | PEM for the client key [1]                                                   |
-| MATHJAX_SERVICE_URL                              | "http://localhost:8888"                                                      | Mathjax service URL                                                          |
-| DATASET_API_URL                                  | "http://localhost:22000"                                                     | Dataset API URL                                                              |
-| IMAGE_API_URL                                    | "http://localhost:24700"                                                     | Image API URL                                                                |
-| REDIRECT_API_URL                                 | "http://localhost:29900"                                                     | Redirect API URL                                                             |
+| MATHJAX_SERVICE_URL                              | "<http://localhost:8888>"                                                    | Mathjax service URL                                                          |
+| DATASET_API_URL                                  | "<http://localhost:22000>"                                                   | Dataset API URL                                                              |
+| IMAGE_API_URL                                    | "<http://localhost:24700>"                                                   | Image API URL                                                                |
+| REDIRECT_API_URL                                 | "<http://localhost:29900>"                                                   | Redirect API URL                                                             |
 | ENABLE_REDIRECT_API                              | false                                                                        | Enable redirect API processing functionality                                 |
 | ENABLE_KAFKA                                     | false                                                                        | Feature flag to send kafka messages when a collection is published           |
 | KAFKA_ADDR                                       | "localhost:9092"                                                             | Comma seperated list of kafka brokers                                        |
@@ -177,12 +176,12 @@ Otherwise :violin: kindly ask someone from the dev team to help troubleshoot.
 | VERIFY_RETRY_COUNT                               | 10                                                                           | Retry count for how long, in seconds, to wait for retry                      |
 | DEFAULT_PREPROCESS_SECONDS_BEFORE_PUBLISH        | 30                                                                           | how many seconds before the actual publish time should we run the preprocess |
 | DEFAULT_SECONDS_TO_CACHE_AFTER_SCHEDULED_PUBLISH | 30                                                                           | how many additional seconds after the publi                                  |
-| IDENTITY_API_URL                                 | "http://localhost:25600"                                                     | Identity API URL                                                             |
+| IDENTITY_API_URL                                 | "<http://localhost:25600>"                                                   | Identity API URL                                                             |
 | RESUMABLE_TYPE                                   | "text/plain"                                                                 | Resumable file type                                                          |
 | IS_PUBLISHABLE                                   | true                                                                         | The file is publishable or not                                               |
 | LICENCE                                          | "Open Government Licence v3.0"                                               | The licence we are using                                                     |
-| LICENCE_URL                                      | "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" | The licence URL                                                              |
-| UPLOAD_SERVICE_API_URL                           | "http://localhost:25100"                                                     | The upload service api URL                                                   |
+| LICENCE_URL                                      | "<https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/>" | The licence URL                                                              |
+| UPLOAD_SERVICE_API_URL                           | "<http://localhost:25100>"                                                   | The upload service api URL                                                   |
 
 ### New Central Keyring configuration
 

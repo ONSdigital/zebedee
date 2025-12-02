@@ -61,10 +61,6 @@ public class PublishNotificationTest {
         legacyCacheApiHost = new Host(legacyCacheApiUrl);
         when(Configuration.getLegacyCacheApiUrl()).thenReturn(legacyCacheApiUrl);
 
-        List<Host> websiteHosts = new ArrayList<>();
-        websiteHosts.add(new Host("http://localhost:8080"));
-        when(Configuration.getWebsiteHosts()).thenReturn(websiteHosts);
-
         Date publishDate = new Date(1609866000000L);
         Date clearCacheDateTime = new DateTime(publishDate).plusSeconds(Configuration.getSecondsToCacheAfterScheduledPublish()).toDate();
 
@@ -372,9 +368,6 @@ public class PublishNotificationTest {
         urisToUpdate.add(null);
         when(collection.reviewedUris()).thenReturn(urisToUpdate);
 
-        List<Host> hosts = new ArrayList<>();
-        hosts.add(new Host("http://localhost:29100"));
-        when(Configuration.getWebsiteHosts()).thenReturn(hosts);
         PublishNotification publishNotification = new PublishNotification(collection);
 
         assertNotNull(publishNotification);

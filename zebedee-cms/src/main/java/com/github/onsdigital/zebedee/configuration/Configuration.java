@@ -23,7 +23,6 @@ public class Configuration {
     private static final String DEFAULT_LEGACY_CACHE_API_URL = "http://localhost:29100";
     private static final String DEFAULT_SLACK_WARNING_CHANNEL = "slack-client-test";
     private static final String DEFAULT_SLACK_ALARM_CHANNEL = "slack-client-test";
-    private static final String DEFAULT_PUBLIC_WEBSITE_URL = "http://localhost:8080";
     private static final String DEFAULT_FLORENCE_URL = "http://localhost:8081";
     private static final String DEFAULT_BRIAN_URL = "http://localhost:8083";
     private static final String DEFAULT_TRAIN_URL = "http://localhost:8084";
@@ -107,10 +106,6 @@ public class Configuration {
 
     public static int getMaxRetryInterval() {
         return getIntWithDefault("MAX_RETRY_INTERVAL", DEFAULT_MAX_RETRY_INTERVAL);
-    }
-
-    public static String getPublicWebsiteUrl() {
-        return StringUtils.defaultIfBlank(getValue("PUBLIC_WEBSITE_URL"), DEFAULT_PUBLIC_WEBSITE_URL);
     }
 
     public static String getBabbageUrl() {
@@ -222,19 +217,8 @@ public class Configuration {
                 .collect(Collectors.toList());
     }
 
-    public static List<Host> getWebsiteHosts() {
-        return Arrays.asList(StringUtils.split(defaultIfBlank(getValue("website_url"), DEFAULT_WEBSITE_URL), ","))
-                .stream()
-                .map(url -> new Host(url))
-                .collect(Collectors.toList());
-    }
-
     public static String getBrianUrl() {
         return StringUtils.defaultIfBlank(getValue("brian_url"), DEFAULT_BRIAN_URL);
-    }
-
-    public static String getDefaultVerificationUrl() {
-        return StringUtils.defaultIfBlank(getValue("verification_url"), DEFAULT_WEBSITE_URL);
     }
 
     public static int getVerifyRetryDelay() {

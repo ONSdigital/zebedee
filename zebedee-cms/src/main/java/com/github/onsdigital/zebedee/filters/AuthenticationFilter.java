@@ -19,7 +19,6 @@ import com.github.onsdigital.zebedee.reader.api.endpoint.Health;
 import com.github.onsdigital.zebedee.reader.api.endpoint.PublishedData;
 import com.github.onsdigital.zebedee.reader.api.endpoint.PublishedIndex;
 import com.github.onsdigital.zebedee.reader.util.RequestUtils;
-import com.github.onsdigital.zebedee.search.api.endpoint.ReIndex;
 import com.github.onsdigital.zebedee.session.service.Sessions;
 import com.github.onsdigital.zebedee.session.service.SessionsException;
 import com.google.common.collect.ImmutableList;
@@ -62,7 +61,6 @@ public class AuthenticationFilter implements PreFilter {
     private static final ImmutableList<Class> NO_AUTH_REQUIRED = new ImmutableList.Builder<Class>()
             .add(Login.class)
             .add(Password.class)
-            .add(ReIndex.class)
             .add(Ping.class)
             .add(ClickEventLog.class)
             .add(Identity.class)

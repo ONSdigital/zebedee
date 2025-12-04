@@ -47,7 +47,6 @@ template that will render it in Babbage.
 #### Other
 
 * Health
-* ReIndex
 
 #### Published content retrieval
 

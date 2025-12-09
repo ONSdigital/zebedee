@@ -5,9 +5,6 @@ WORKDIR /usr/src
 ADD ./zebedee-cms/target/dependency /usr/src/target/dependency
 ADD ./zebedee-cms/target/classes /usr/src/target/classes
 
-# Temporary: expose Elasticsearch
-EXPOSE 9200
-
 ARG DOCKER_DEBUGGING_PORT=8002
 ENV DEBUGGING_PORT=$DOCKER_DEBUGGING_PORT
 ENV JAVA_OPTS="-Xmx2048m -agentlib:jdwp=transport=dt_socket,address=$DEBUGGING_PORT,server=y,suspend=n"

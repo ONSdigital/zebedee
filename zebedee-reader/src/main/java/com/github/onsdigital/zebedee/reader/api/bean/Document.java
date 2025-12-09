@@ -2,7 +2,7 @@ package com.github.onsdigital.zebedee.reader.api.bean;
 
 /**
  * Created by bren on 25/01/16.
- *  */
+ */
 public class Document {
     private String uri;
 

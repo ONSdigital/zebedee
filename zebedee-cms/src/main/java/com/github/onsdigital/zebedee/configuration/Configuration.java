@@ -229,10 +229,6 @@ public class Configuration {
         return VERIFY_RETRY_COUNT;
     }
 
-    public static String getReindexKey() {
-        return StringUtils.defaultIfBlank(getValue("website_reindex_key"), "");
-    }
-
     //Enable upload-new endpoint
     public static boolean isUploadNewEndpointEnabled() {
         return BooleanUtils.toBoolean(StringUtils.defaultIfBlank(getValue("ENABLE_UPLOAD_NEW_ENDPOINT"), "false"));

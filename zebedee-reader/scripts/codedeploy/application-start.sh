@@ -13,16 +13,8 @@ CONFIG=$(aws --region $AWS_REGION ec2 describe-tags --filters "Name=resource-id,
 
 source $CONFIG
 
-if [[ $INSTANCE_NUMBER == 1 ]]; then
-  ELASTICSEARCH_HOST=$ELASTICSEARCH_1
-else
-  ELASTICSEARCH_HOST=$ELASTICSEARCH_2
-fi
-
 docker run -d                                                                           \
   --env=content_dir=/content                                                            \
-  --env=ELASTIC_SEARCH_CLUSTER=cluster                                                  \
-  --env=ELASTIC_SEARCH_SERVER=$ELASTICSEARCH_HOST                                       \
   --name=zebedee-reader                                                                 \
   --net=website                                                                         \
   --restart=always                                                                      \

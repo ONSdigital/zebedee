@@ -1,4 +1,4 @@
-package com.github.onsdigital.zebedee.search.indexing;
+package com.github.onsdigital.zebedee.reader.api.bean;
 
 import com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration;
 import com.github.onsdigital.zebedee.util.URIUtils;
@@ -33,7 +33,7 @@ public class FileScanner {
     public List<Document> scan(String path) throws IOException {
 
         Path dir = root;
-        if (isEmpty(path) == false) {
+        if (!isEmpty(path)) {
             dir = root.resolve(URIUtils.removeLeadingSlash(path));
         }
 

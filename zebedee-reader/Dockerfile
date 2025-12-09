@@ -5,9 +5,6 @@ WORKDIR /usr/src
 ADD ./target/dependency /usr/src/target/dependency
 ADD ./target/classes /usr/src/target/classes
 
-# Temporary: expose Elasticsearch
-EXPOSE 9200
-
 # Update the entry point script
 ENTRYPOINT java -Xmx2048m \
           -Drestolino.classes=target/classes \

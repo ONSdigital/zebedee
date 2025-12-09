@@ -1,6 +1,5 @@
 package com.github.onsdigital.zebedee.reader.api.bean;
 
-import com.github.onsdigital.zebedee.search.indexing.Document;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.junit.Test;

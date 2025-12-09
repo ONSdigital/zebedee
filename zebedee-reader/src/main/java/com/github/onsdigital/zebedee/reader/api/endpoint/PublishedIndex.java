@@ -1,9 +1,9 @@
 package com.github.onsdigital.zebedee.reader.api.endpoint;
 
 import com.github.davidcarboni.restolino.framework.Api;
+import com.github.onsdigital.zebedee.reader.api.bean.Document;
+import com.github.onsdigital.zebedee.reader.api.bean.FileScanner;
 import com.github.onsdigital.zebedee.reader.api.bean.PublishedIndexResponse;
-import com.github.onsdigital.zebedee.search.indexing.Document;
-import com.github.onsdigital.zebedee.search.indexing.FileScanner;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

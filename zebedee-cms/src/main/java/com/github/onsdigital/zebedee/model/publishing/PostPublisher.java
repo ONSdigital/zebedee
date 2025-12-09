@@ -18,7 +18,6 @@ import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
 import com.github.onsdigital.zebedee.reader.Resource;
-import com.github.onsdigital.zebedee.search.indexing.Indexer;
 import com.github.onsdigital.zebedee.service.KafkaService;
 import com.github.onsdigital.zebedee.service.RedirectService;
 import com.github.onsdigital.zebedee.service.ServiceSupplier;
@@ -34,7 +33,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.FastDateFormat;
 import org.slf4j.MDC;
 
-import javax.naming.ldap.Rdn;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -96,9 +94,6 @@ public class PostPublisher {
             processManifestForMaster(collection, contentReader, contentWriter);
             copyFilesToMaster(zebedee, collection, collectionReader);
 
-            // TODO deprecated elastic search 2.42. Should be removed during decommissioning
-            reindexPublishingSearch(collection);
-
             if (cmsFeatureFlags().isRedirectAPIEnabled()) {
                 info().log("publishing redirects for collection");
                 RedirectService redirectService = ZebedeeCmsService.getInstance().getRedirectService();
@@ -136,6 +131,17 @@ public class PostPublisher {
         if (!deletedUris.isEmpty()) {
             sendContentDeletedEventsToKafka(collection, deletedUris);// for content-deleted
         }
+    }
+
+    private static List<String> extractDeletedUris(Collection collection) {
+        List<String> deletedUris = new ArrayList<>();
+        for (PendingDelete pendingDelete : collection.getDescription().getPendingDeletes()) {
+            ContentDetail root = pendingDelete.getRoot();
+            ContentTreeNavigator.getInstance().search(root, node -> {
+                deletedUris.add(node.uri);
+            });
+        }
+        return deletedUris;
     }
 
     private static void applyDeletesToPublishing(Collection collection, ContentReader contentReader, ContentWriter contentWriter) {
@@ -223,75 +229,6 @@ public class PostPublisher {
                     .log("An error occurred trying apply the publish manifest to publishing content");
         }
 
-    }
-
-    private static void reindexPublishingSearch(Collection collection) throws IOException {
-        info().collectionID(collection).log("Reindexing search");
-        try {
-
-            long start = System.currentTimeMillis();
-
-            List<String> uris = collection.getReviewed().uris("*data.json");
-            for (String uri : uris) {
-                if (isIndexedUri(uri)) {
-                    String contentUri = URIUtils.removeLastSegment(uri);
-                    reIndexPublishingSearch(contentUri);
-                }
-            }
-
-            for (PendingDelete pendingDelete : collection.getDescription().getPendingDeletes()) {
-                ContentTreeNavigator.getInstance().search(pendingDelete.getRoot(), node -> {
-                    info().data("uri", node.uri).log("Deleting index from publishing search ");
-                    POOL.submit(() -> {
-                        try {
-                            Indexer.getInstance().deleteContentIndex(node.getType().getLabel(), node.uri);
-                        } catch (Exception e) {
-                            error().logException(e, "Exception reloading search index:");
-                        }
-                    });
-                });
-            }
-
-            info().collectionID(collection)
-                    .data("timeTaken", (System.currentTimeMillis() - start))
-                    .log("Redindex search completed");
-
-        } catch (Exception e) {
-            error().collectionID(collection)
-                    .logException(e, "An error occurred during the search reindex");
-        }
-    }
-
-    private static List<String> extractDeletedUris(Collection collection) {
-        List<String> deletedUris = new ArrayList<>();
-        for (PendingDelete pendingDelete : collection.getDescription().getPendingDeletes()) {
-            ContentDetail root = pendingDelete.getRoot();
-            ContentTreeNavigator.getInstance().search(root, node -> {
-                deletedUris.add(node.uri);
-            });
-        }
-        return deletedUris;
-    }
-
-
-    /**
-     * Method to determine if a URI is one that should be indexed in search.
-     *
-     * @param uri
-     * @return
-     */
-    static boolean isIndexedUri(String uri) {
-        return !VersionedContentItem.isVersionedUri(uri);
-    }
-
-    private static void reIndexPublishingSearch(final String uri) throws IOException {
-        POOL.submit(() -> {
-            try {
-                Indexer.getInstance().reloadContent(uri);
-            } catch (Exception e) {
-                error().exception(e).log("error reloading search index");
-            }
-        });
     }
 
     private static void copyFilesToMaster(Zebedee zebedee, Collection collection, CollectionReader collectionReader)

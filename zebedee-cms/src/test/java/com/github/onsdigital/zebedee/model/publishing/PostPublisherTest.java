@@ -16,7 +16,6 @@ import com.github.onsdigital.zebedee.json.CollectionDescription;
 
 import com.github.onsdigital.zebedee.service.content.navigation.ContentDetailSearch;
 import com.github.onsdigital.zebedee.service.content.navigation.ContentTreeNavigator;
-import com.github.onsdigital.zebedee.util.ContentTree;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -66,32 +65,6 @@ public class PostPublisherTest {
     public void setup() throws Exception {
         MDC.clear();
         setKafkaServiceSupplier(kafkaService);
-    }
-
-    @Test
-    public void isIndexedUriShouldBeTrueIfNotVersioned() {
-
-        // Given a URI that is not that of a versioned file
-        String uri = "/some/unversioned/uri";
-
-        // When the isIndexedUri method is called
-        boolean isIndexed = PostPublisher.isIndexedUri(uri);
-
-        // Then the result should be true, ie, it should be indexed.
-        assertTrue(isIndexed);
-    }
-
-    @Test
-    public void isIndexedUriShouldBeFalseIfVersioned() {
-
-        // Given a URI that is that of a versioned file
-        String uri = "/some/versioned/uri/previous/v1";
-
-        // When the isIndexedUri method is called
-        boolean isIndexed = PostPublisher.isIndexedUri(uri);
-
-        // Then the result should be false, ie, it should not be indexed.
-        assertFalse(isIndexed);
     }
 
     @Test

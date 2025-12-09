@@ -109,7 +109,7 @@
             </dependency>
 
             <!-- Fasterxml Jackson dependencies - overrides vulnerable transitive dependencies
-           and declared explicitly to resolve conflicts in elasticsearch and dp-logging -->
+           and declared explicitly to resolve conflicts in dp-logging -->
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-core</artifactId>
@@ -134,7 +134,7 @@
                 <version>${fasterxml.jackson.version}</version>
             </dependency>
 
-            <!-- override the Guava version used by reflections and elasticsearch -->
+            <!-- override the Guava version used by reflections -->
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
@@ -213,11 +213,6 @@
                 <groupId>xml-apis</groupId>
                 <artifactId>xml-apis</artifactId>
                 <version>1.4.01</version>
-            </dependency>
-            <dependency>
-                <groupId>org.elasticsearch</groupId>
-                <artifactId>elasticsearch</artifactId>
-                <version>2.4.6</version>
             </dependency>
             <dependency>
                 <groupId>org.yaml</groupId>
@@ -305,12 +300,6 @@
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-classic</artifactId>
                 <version>${logback.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.carrotsearch</groupId>
-                <artifactId>hppc</artifactId>
-                <version>0.9.1</version>
             </dependency>
 
             <dependency>
@@ -407,22 +396,12 @@
                     <cvssScoreThreshold>7.0</cvssScoreThreshold>
                     <excludeCoordinates>
                         <!--
-                            Jira epic to remove the following three exclusions: DIS-1050
+                            Jira epic to remove the following exclusion: DIS-1050
                          -->
                         <exclude>
                             <groupId>io.netty</groupId>
                             <artifactId>netty</artifactId>
                             <version>3.10.6.Final</version>
-                        </exclude>
-                        <exclude>
-                            <groupId>org.elasticsearch</groupId>
-                            <artifactId>elasticsearch</artifactId>
-                            <version>2.4.6</version>
-                        </exclude>
-                        <exclude>
-                            <groupId>org.apache.lucene</groupId>
-                            <artifactId>lucene-queryparser</artifactId>
-                            <version>5.5.4</version>
                         </exclude>
                         <!-- End DIS-1050 -->
 

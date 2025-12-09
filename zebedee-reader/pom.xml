@@ -51,12 +51,6 @@
             <artifactId>javax.servlet-api</artifactId>
         </dependency>
 
-        <!-- Elastic Search -->
-        <dependency>
-            <groupId>org.elasticsearch</groupId>
-            <artifactId>elasticsearch</artifactId>
-        </dependency>
-
         <!-- Encryption -->
         <dependency>
             <groupId>com.github.onsdigital</groupId>
@@ -104,11 +98,6 @@
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.carrotsearch</groupId>
-            <artifactId>hppc</artifactId>
         </dependency>
 
         <dependency>

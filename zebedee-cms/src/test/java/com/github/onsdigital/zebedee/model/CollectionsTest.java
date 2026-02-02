@@ -1255,7 +1255,7 @@ public class CollectionsTest {
     public void skipDatasetVersionsValidation_sessionNull_shouldReturnFalse() throws IOException {
         Session expectedSession = null;
 
-        when(permissionsServiceMock.isPublisher(expectedSession))
+        when(permissionsServiceMock.canEdit(expectedSession))
                 .thenReturn(false);
 
         assertFalse(collections.skipDatasetVersionsValidation(666L, 666L, expectedSession));
@@ -1263,7 +1263,7 @@ public class CollectionsTest {
 
     @Test
     public void skipDatasetVersionsValidation_userNotPublisher_shouldReturnFalse() throws IOException {
-        when(permissionsServiceMock.isPublisher(sessionMock))
+        when(permissionsServiceMock.canEdit(sessionMock))
                 .thenReturn(false);
 
         assertFalse(collections.skipDatasetVersionsValidation(666L, 666L, sessionMock));
@@ -1271,7 +1271,7 @@ public class CollectionsTest {
 
     @Test
     public void skipDatasetVersionsValidation_incorrectKey_shouldReturnFalse() throws IOException {
-        when(permissionsServiceMock.isPublisher(sessionMock))
+        when(permissionsServiceMock.canEdit(sessionMock))
                 .thenReturn(true);
 
         assertFalse(collections.skipDatasetVersionsValidation(123L, 666L, sessionMock));
@@ -1279,7 +1279,7 @@ public class CollectionsTest {
 
     @Test
     public void skipDatasetVersionsValidation_correctKey_shouldReturnTrue() throws IOException {
-        when(permissionsServiceMock.isPublisher(sessionMock))
+        when(permissionsServiceMock.canEdit(sessionMock))
                 .thenReturn(true);
 
         long actual = 666;
@@ -1289,7 +1289,7 @@ public class CollectionsTest {
 
     @Test
     public void skipDatasetVersionsValidation_correctKeyInvalidPermssions_shouldReturnFalse() throws IOException {
-        when(permissionsServiceMock.isPublisher(sessionMock))
+        when(permissionsServiceMock.canEdit(sessionMock))
                 .thenReturn(false);
 
         assertFalse(collections.skipDatasetVersionsValidation(666L, 666L, sessionMock));

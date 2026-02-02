@@ -185,7 +185,7 @@ public class ZebedeeConfiguration {
         initialisePermissions(permissionsPath);
         PermissionsStore permissionsStore = new PermissionsStoreFileSystemImpl(permissionsPath);
         if (cmsFeatureFlags().isPermissionsAPIEnabled()) {
-            this.permissionsService = new PermissionsServiceImplementation();
+            this.permissionsService = new PermissionsServiceImplementation(getPermissionsAPIURL());
         } else if (cmsFeatureFlags().isJwtSessionsEnabled()) {
             this.permissionsService = new JWTPermissionsServiceImpl(permissionsStore);
         } else {

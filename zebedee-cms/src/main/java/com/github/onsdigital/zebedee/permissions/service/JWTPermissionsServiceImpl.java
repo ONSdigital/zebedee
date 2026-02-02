@@ -22,9 +22,8 @@ import static com.github.onsdigital.zebedee.configuration.Configuration.getUnaut
 import static java.text.MessageFormat.format;
 
 /**
- * this has been implemented for the migration to using JWT Session
- * to implement 'PermissionStore' modules when the jwt is enabled
- * Update Zebedee permissions service to get list of groups for user from JWT session store
+ * This is a transitional implementation for the migration to using JWT sessions and will be removed once migration
+ * using permissions API is complete.
  */
 public class JWTPermissionsServiceImpl implements PermissionsService {
     // TODO: change the following constant to private once migrtion to JWT sessions is complete and the PermissionsServiceImpl is removed
@@ -39,9 +38,7 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
     private final Lock writeLock = readWriteLock.writeLock();
 
     /**
-     * this has been implemented for the migration to using JWT Session
-     * to implement 'PermissionStore' modules when the jwt is enabled
-     * Update Zebedee permissions service to get list of groups for user from JWT session store
+     * This is a transitional implementation for the migration to using JWT sessions.
      *
      * @param permissionsStore - {@link PermissionsStore}
      */

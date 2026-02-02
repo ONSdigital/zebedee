@@ -11,27 +11,19 @@ import com.github.onsdigital.zebedee.session.model.Session;
 import org.joda.time.Duration;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Set;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import static java.text.MessageFormat.format;
 
 public class PermissionsServiceImplementation implements PermissionsService {
-    private ReentrantReadWriteLock readWriteLock = new ReentrantReadWriteLock();
-    private final Lock readLock = readWriteLock.readLock();
-    private final Lock writeLock = readWriteLock.writeLock();
+    private static final String ADMIN_GROUP = "role-admin";
     private static final String UNSUPPORTED_ERROR = "Permissions API is enabled: {0} is no longer supported";
+
     private PermissionChecker permissionChecker;
 
     public PermissionsServiceImplementation(String permissionsAPIHost ) {
         this.permissionChecker = new PermissionChecker(permissionsAPIHost, Duration.standardSeconds(10), Duration.standardSeconds(20), Duration.standardMinutes(30));
-    }
-
-    public PermissionsServiceImplementation() {
-        this.permissionChecker = new PermissionChecker("", Duration.standardSeconds(10), Duration.standardSeconds(20), Duration.standardMinutes(30));
     }
 
     @Override
@@ -58,14 +50,15 @@ public class PermissionsServiceImplementation implements PermissionsService {
 
     @Override
     public boolean canEdit(Session session) throws IOException {
-        boolean has_permission = false;
+        boolean has_permission;
         try {
             has_permission = hasPermission(session, "legacy:edit", "");
 
         } catch (Exception e){
             return false;
         }
-        return has_permission;    }
+        return has_permission;
+    }
 
 
     @Override
@@ -82,15 +75,11 @@ public class PermissionsServiceImplementation implements PermissionsService {
 
     @Override
     public boolean canView(Session session, String collectionId) throws IOException {
-        boolean has_permission = false;
-        readLock.lock();
+        boolean has_permission;
         try {
             has_permission = hasPermission(session, "legacy:read", collectionId);
-
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        } finally {
-            readLock.unlock();
+        } catch (Exception e){
+            return false;
         }
         return has_permission;
     }
@@ -113,17 +102,12 @@ public class PermissionsServiceImplementation implements PermissionsService {
 
     @Override
     public PermissionDefinition userPermissions(Session session) throws IOException {
-        readLock.lock();
-        try {
-            boolean isEditor = canEdit(session);
-            boolean isAdmin = canUpdate(session);
+        boolean isEditor = canEdit(session);
+        boolean isAdmin = session.getGroups().contains(ADMIN_GROUP);
 
-            return new PermissionDefinition()
-                    .isAdmin(isAdmin)
-                    .isEditor(isEditor);
-        } finally {
-            readLock.unlock();
-        }
+        return new PermissionDefinition()
+                .isAdmin(isAdmin)
+                .isEditor(isEditor);
     }
 
     private Boolean hasPermission(Session session, String permissionString, String collectionId) throws Exception {
@@ -131,25 +115,8 @@ public class PermissionsServiceImplementation implements PermissionsService {
             put("collection_id", collectionId);
         }};
 
+        UserDataPayload userDataPayload =  new UserDataPayload(session.getId(),session.getEmail(), session.getGroups());
 
-        UserDataPayload userDataPayload =  new UserDataPayload(session.getId(),session.getEmail(), Arrays.asList(new String[]{"admin"}));
-
-        Boolean hasPermission = permissionChecker.hasPermission(userDataPayload, permissionString, attributes);
-
-        return hasPermission;
+        return permissionChecker.hasPermission(userDataPayload, permissionString, attributes);
     }
-    private boolean canUpdate(Session session) throws IOException {
-        boolean has_permission = false;
-        readLock.lock();
-        try {
-            has_permission = hasPermission(session, "users:update", "");
-
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        } finally {
-            readLock.unlock();
-        }
-        return has_permission;
-    }
-
 }

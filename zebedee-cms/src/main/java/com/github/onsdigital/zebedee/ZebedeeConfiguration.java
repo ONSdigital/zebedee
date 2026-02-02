@@ -184,10 +184,10 @@ public class ZebedeeConfiguration {
 
         initialisePermissions(permissionsPath);
         PermissionsStore permissionsStore = new PermissionsStoreFileSystemImpl(permissionsPath);
-        if (cmsFeatureFlags().isJwtSessionsEnabled()) {
-            this.permissionsService = new JWTPermissionsServiceImpl(permissionsStore);
-        } else if (cmsFeatureFlags().isPermissionsAPIEnabled()) {
+        if (cmsFeatureFlags().isPermissionsAPIEnabled()) {
             this.permissionsService = new PermissionsServiceImplementation();
+        } else if (cmsFeatureFlags().isJwtSessionsEnabled()) {
+            this.permissionsService = new JWTPermissionsServiceImpl(permissionsStore);
         } else {
             this.permissionsService = new PermissionsServiceImpl(permissionsStore);
         }

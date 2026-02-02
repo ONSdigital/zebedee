@@ -27,8 +27,9 @@ import static java.text.MessageFormat.format;
  * Update Zebedee permissions service to get list of groups for user from JWT session store
  */
 public class JWTPermissionsServiceImpl implements PermissionsService {
+    // TODO: change the following constant to private once migrtion to JWT sessions is complete and the PermissionsServiceImpl is removed
+    protected static final String ADMIN_GROUP = "role-admin";
     private static final String PUBLISHER_GROUP = "role-publisher";
-    private static final String ADMIN_GROUP = "role-admin";
     private static final String UNSUPPORTED_ERROR = "JWT sessions are enabled: {0} is no longer supported";
 
     // TODO: change the following field to private once migration to JWT sessions is complete and the PermissionsServiceImpl is removed
@@ -44,21 +45,8 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
      *
      * @param permissionsStore - {@link PermissionsStore}
      */
-
     public JWTPermissionsServiceImpl(PermissionsStore permissionsStore) {
         this.permissionsStore = permissionsStore;
-    }
-
-    /**
-     * Determines whether the specified user has publisher permissions
-     *
-     * @param session The user's login {@link Session}.
-     * @return <code>true</code> the user is a publisher or <code>false</code> otherwise.
-     *
-     * TODO: remove this method once migration to JWT sessions is complete
-     */
-    protected boolean isPublisher(Session session) {
-        return session != null && isGroupMember(session, PUBLISHER_GROUP);
     }
 
     /**
@@ -70,19 +58,6 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
     @Override
     public boolean isAdministrator(Session session) {
         throw new UnsupportedOperationException(format(UNSUPPORTED_ERROR, "isAdministrator"));
-    }
-
-    /**
-     * Transitional logic providing the equivelent isAdministrator functionality for internal use by the
-     * PermissionsService.
-     *
-     * @param session The user's login {@link Session}.
-     * @return <code>true</code> the user is an administrator or <code>false</code> otherwise.
-     *
-     * TODO: remove this method once migration to JWT sessions is complete
-     */
-    protected boolean isAdminUser(Session session) {
-        return session != null && isGroupMember(session, ADMIN_GROUP);
     }
 
     /**
@@ -337,8 +312,10 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
      * @param session the {@link Session} to check
      * @param group   the group to check membership of
      * @return <code>true</code> if the user is a member of the group, <code>false</code> otherwise.
+     *
+     * TODO: change the following method to private once migration to JWT sessions is complete and the PermissionsServiceImpl is removed
      */
-    private boolean isGroupMember(Session session, String group) {
+    protected boolean isGroupMember(Session session, String group) {
         return session.getGroups().contains(group);
     }
 }

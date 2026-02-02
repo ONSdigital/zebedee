@@ -51,9 +51,8 @@ public class PermissionsServiceImplementation implements PermissionsService {
         this.permissionAPIClient = permissionAPIClient;
     }
 
-    @Override
-    public boolean isPublisher(Session session) throws IOException {
-        throw new UnsupportedOperationException(format(UNSUPPORTED_ERROR, "isPublisher"));
+    public PermissionsServiceImplementation() {
+        this.permissionChecker = new PermissionChecker("", DEFAULT_CACHE_UPDATE_INTERVAL, DEFAULT_EXPIRY_CHECK_INTERVAL, DEFAULT_MAX_CACHE_TIME);
     }
 
     @Override

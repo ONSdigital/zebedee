@@ -56,9 +56,10 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
      *
      * @param session The user's login {@link Session}.
      * @return <code>true</code> the user is a publisher or <code>false</code> otherwise.
+     *
+     * TODO: remove this method once migration to JWT sessions is complete
      */
-    @Override
-    public boolean isPublisher(Session session) {
+    protected boolean isPublisher(Session session) {
         return session != null && isGroupMember(session, PUBLISHER_GROUP);
     }
 
@@ -70,6 +71,19 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
      */
     @Override
     public boolean isAdministrator(Session session) {
+        throw new UnsupportedOperationException(format(UNSUPPORTED_ERROR, "isAdministrator"));
+    }
+
+    /**
+     * Transitional logic providing the equivelent isAdministrator functionality for internal use by the
+     * PermissionsService.
+     *
+     * @param session The user's login {@link Session}.
+     * @return <code>true</code> the user is an administrator or <code>false</code> otherwise.
+     *
+     * TODO: remove this method once migration to JWT sessions is complete
+     */
+    protected boolean isAdminUser(Session session) {
         return session != null && isGroupMember(session, ADMIN_GROUP);
     }
 
@@ -246,8 +260,8 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
     /**
      * Returns a {@link List} of IDs of teams that have viewer permissions on the specified collection.
      *
-     * @param collectionId          the ID of the collection to get the viewer teams for.
-     * @param session               the {@link Session} of the user requesting this information.
+     * @param collectionId the ID of the collection to get the viewer teams for.
+     * @param session      the {@link Session} of the user requesting this information.
      * @return Returns a {@link List} of IDs of teams that have viewer permissions on the specified collection.
      * @throws IOException           unexpected error while checking permissions.
      * @throws UnauthorizedException unexpected error while checking permissions.
@@ -284,7 +298,7 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
      * @param collectionID    the ID of the collection collection to set viewer permissions for.
      * @param collectionTeams the set of team IDs for which viewer permissions should be granted to the collection.
      * @param session         the session of the user that is attempting to set the viewer permissions.
-     * @throws IOException if reading or writing the access mapping fails.
+     * @throws IOException           if reading or writing the access mapping fails.
      * @throws UnauthorizedException if the users' session isn't authorised to edit collections.
      *
      * @deprecated this is deprecated in favour of the dp-permissions-api and will be removed once full migration to
@@ -338,15 +352,18 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
      */
     @Override
     public PermissionDefinition userPermissions(Session session) throws IOException {
-        return new PermissionDefinition()
-                .setEmail(session.getEmail())
-                .isAdmin(isAdministrator(session))
-                .isEditor(canEdit(session));
+        PermissionDefinition permissions = new PermissionDefinition();
+        if (session != null) {
+            permissions.setEmail(session.getEmail())
+                    .isAdmin(isGroupMember(session, ADMIN_GROUP))
+                    .isEditor(canEdit(session));
+        }
+        return permissions;
     }
 
     /**
-     * @param session  the {@link Session} to check
-     * @param group    the group to check membership of
+     * @param session the {@link Session} to check
+     * @param group   the group to check membership of
      * @return <code>true</code> if the user is a member of the group, <code>false</code> otherwise.
      */
     private boolean isGroupMember(Session session, String group) {

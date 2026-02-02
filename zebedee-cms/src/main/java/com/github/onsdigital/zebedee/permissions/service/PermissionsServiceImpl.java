@@ -45,7 +45,7 @@ public class PermissionsServiceImpl extends JWTPermissionsServiceImpl {
      */
     @Override
     public boolean isAdministrator(Session session) {
-        return isAdminUser(session);
+        return session != null && isGroupMember(session, ADMIN_GROUP);
     }
 
     /**
@@ -176,8 +176,7 @@ public class PermissionsServiceImpl extends JWTPermissionsServiceImpl {
     @Override
     public PermissionDefinition userPermissions(String email, Session session) throws IOException,
             UnauthorizedException {
-        if ((session == null) ||
-                !(isAdministrator(session) || isPublisher(session) || session.getEmail().equalsIgnoreCase(email))) {
+        if ((session == null) || !(canEdit(session) || session.getEmail().equalsIgnoreCase(email))) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 

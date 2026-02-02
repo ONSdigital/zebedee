@@ -22,18 +22,13 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
-import static com.github.onsdigital.zebedee.logging.CMSLogEvent.info;
-import static com.github.onsdigital.zebedee.logging.CMSLogEvent.warn;
-import static com.github.onsdigital.zebedee.logging.CMSLogEvent.error;
 
 import static java.text.MessageFormat.format;
 
 public class PermissionsServiceImplementation implements PermissionsService {
-    private ReentrantReadWriteLock readWriteLock = new ReentrantReadWriteLock();
-    private final Lock readLock = readWriteLock.readLock();
+    private static final String ADMIN_GROUP = "role-admin";
     private static final String UNSUPPORTED_ERROR = "Permissions API is enabled: {0} is no longer supported";
+
     private PermissionChecker permissionChecker;
     /** 
      * permissionsAPIClient is used for managing collection based permissions policies, which are currently only used for viewer teams.
@@ -116,14 +111,11 @@ public class PermissionsServiceImplementation implements PermissionsService {
     @Override
     public boolean canView(Session session, String collectionId, CollectionType collectionType) throws IOException {
         boolean authorised = false;
-        readLock.lock();
         try {
             authorised = hasPermission(session, Permissions.LEGACY_READ, collectionId, Optional.ofNullable(collectionType));
         } catch (Exception e) {
             throw new RuntimeException(e);
-        } finally {
-            readLock.unlock();
-        }
+        } 
         return authorised;
     }
 

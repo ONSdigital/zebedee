@@ -19,7 +19,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.ws.rs.HEAD;
 
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -100,51 +99,59 @@ public class JWTPermissionsServiceImplTest {
     }
 
     @Test
-    public void isAdministrator_Session_Admin_ShouldReturnTrue() throws Exception {
+    public void isAdministrator_Session_ShouldError() throws Exception {
+        Session session = new Session(TEST_SESSION_ID, TEST_USER_EMAIL);
+        UnsupportedOperationException exception = assertThrows(UnsupportedOperationException.class, () ->
+                jwtPermissionsService.isAdministrator(session));
+        assertEquals("JWT sessions are enabled: isAdministrator is no longer supported", exception.getMessage());
+    }
+
+    @Test
+    public void isAdminUser_Session_Admin_ShouldReturnTrue() throws Exception {
         List<String> sessionGroups = new ArrayList<>();
         sessionGroups.add(ADMIN);
 
         Session session = new Session(TEST_SESSION_ID, TEST_USER_EMAIL, sessionGroups);
-        assertTrue(jwtPermissionsService.isAdministrator(session));
+        assertTrue(jwtPermissionsService.isAdminUser(session));
     }
 
     @Test
-    public void isAdministrator_Session_Publisher_ShouldReturnFalse() throws Exception {
+    public void isAdminUser_Session_Publisher_ShouldReturnFalse() throws Exception {
         List<String> sessionGroups = new ArrayList<>();
         sessionGroups.add(PUBLISHER);
 
         Session session = new Session(TEST_SESSION_ID, TEST_USER_EMAIL, sessionGroups);
-        assertFalse(jwtPermissionsService.isAdministrator(session));
+        assertFalse(jwtPermissionsService.isAdminUser(session));
     }
 
     @Test
-    public void isAdministrator_SessionNull_ShouldReturnFalse() throws Exception {
+    public void isAdminUser_SessionNull_ShouldReturnFalse() throws Exception {
         Session session = null;
-        assertFalse(jwtPermissionsService.isAdministrator(session));
+        assertFalse(jwtPermissionsService.isAdminUser(session));
         verifyNoInteractions(jwtPermissionStore);
     }
 
     @Test
-    public void isAdministrator_Session_EmailNull_ShouldReturnFalse() throws Exception {
+    public void isAdminUser_Session_EmailNull_ShouldReturnFalse() throws Exception {
         List<String> sessionGroups = new ArrayList<>();
         sessionGroups.add(PUBLISHER);
 
         Session session = new Session(TEST_SESSION_ID, null, sessionGroups);
-        assertFalse(jwtPermissionsService.isAdministrator(session));
+        assertFalse(jwtPermissionsService.isAdminUser(session));
         verifyNoInteractions(jwtPermissionStore);
     }
 
     @Test
-    public void isAdministrator_Session_NotAdmin_ShouldReturnFalse() throws Exception {
+    public void isAdminUser_Session_NotAdmin_ShouldReturnFalse() throws Exception {
         Session session = new Session(TEST_SESSION_ID, TEST_USER_EMAIL, new ArrayList<>());
-        assertFalse(jwtPermissionsService.isAdministrator(session));
+        assertFalse(jwtPermissionsService.isAdminUser(session));
         verifyNoInteractions(jwtPermissionStore);
     }
 
     @Test
-    public void isAdministrator_Session_NullGroup_ShouldReturnFalse() throws Exception {
+    public void isAdminUser_Session_NullGroup_ShouldReturnFalse() throws Exception {
         Session session = new Session(TEST_SESSION_ID, TEST_USER_EMAIL, null);
-        assertFalse(jwtPermissionsService.isAdministrator(session));
+        assertFalse(jwtPermissionsService.isAdminUser(session));
         verifyNoInteractions(jwtPermissionStore);
     }
 
@@ -476,6 +483,6 @@ public class JWTPermissionsServiceImplTest {
         PermissionDefinition actual = jwtPermissionsService.userPermissions(session);
         assertTrue(actual.isAdmin());
         assertTrue(actual.isEditor());
-        assertTrue(actual.getEmail() == TEST_USER_EMAIL);
+        assertEquals(TEST_USER_EMAIL, actual.getEmail());
     }
 }

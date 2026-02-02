@@ -38,6 +38,17 @@ public class PermissionsServiceImpl extends JWTPermissionsServiceImpl {
     }
 
     /**
+     * Determines whether the specified user has administator permissions.
+     *
+     * @param session The user's login {@link Session}.
+     * @return <code>true</code> the user is an administrator or <code>false</code> otherwise.
+     */
+    @Override
+    public boolean isAdministrator(Session session) {
+        return isAdminUser(session);
+    }
+
+    /**
      * Determines whether an administator exists.
      *
      * @return True if at least one administrator exists.

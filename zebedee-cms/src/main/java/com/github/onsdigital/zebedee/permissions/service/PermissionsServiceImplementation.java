@@ -34,12 +34,6 @@ public class PermissionsServiceImplementation implements PermissionsService {
         this.permissionChecker = new PermissionChecker("", Duration.standardSeconds(10), Duration.standardSeconds(20), Duration.standardMinutes(30));
     }
 
-
-    @Override
-    public boolean isPublisher(Session session) throws IOException {
-        throw new UnsupportedOperationException(format(UNSUPPORTED_ERROR, "isPublisher"));
-    }
-
     @Override
     public boolean isAdministrator(Session session) throws IOException {
         throw new UnsupportedOperationException(format(UNSUPPORTED_ERROR, "isAdministrator"));

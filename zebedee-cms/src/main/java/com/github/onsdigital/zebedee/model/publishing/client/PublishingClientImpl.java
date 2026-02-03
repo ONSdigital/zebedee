@@ -1,11 +1,11 @@
 package com.github.onsdigital.zebedee.model.publishing.client;
 
 import com.google.gson.Gson;
-import org.apache.http.HttpEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.client5.http.classic.methods.HttpUriRequest;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -64,8 +64,8 @@ public class PublishingClientImpl implements PublishingClient {
                     .transactionId(transactionId)
                     .log("execute get content hash request completed");
 
-            if (response.getStatusLine().getStatusCode() != 200) {
-                throw non200ResponseStatusException(host, transactionId, uri, response.getStatusLine().getStatusCode());
+            if (response.getCode() != 200) {
+                throw non200ResponseStatusException(host, transactionId, uri, response.getCode());
             }
             return getResponseEntity(response.getEntity(), GetContentHashEntity.class);
         }

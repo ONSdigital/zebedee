@@ -1,6 +1,6 @@
 package com.github.onsdigital.zebedee.model.publishing.client;
 
-import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.hc.client5.http.classic.methods.HttpUriRequest;
 
 import java.net.URISyntaxException;
 

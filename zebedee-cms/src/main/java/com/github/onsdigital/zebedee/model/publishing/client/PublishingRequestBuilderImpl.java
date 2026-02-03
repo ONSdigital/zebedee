@@ -1,11 +1,11 @@
 package com.github.onsdigital.zebedee.model.publishing.client;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.Header;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.message.BasicHeader;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.classic.methods.HttpUriRequest;
+import org.apache.hc.core5.http.Header;
+import org.apache.hc.core5.http.message.BasicHeader;
+import org.apache.hc.core5.net.URIBuilder;
 import org.slf4j.MDC;
 
 import java.net.URISyntaxException;
@@ -34,7 +34,7 @@ public class PublishingRequestBuilderImpl implements PublishingRequestBuilder {
 
         HttpGet httpGet = new HttpGet(host + GET_CONTENT_HASH_URI);
 
-        httpGet.setURI(new URIBuilder(httpGet.getURI())
+        httpGet.setUri(new URIBuilder(httpGet.getUri())
                 .setParameter(TRANSACTION_ID_PARAM, transactionId)
                 .addParameter(URI_PARAM, uri)
                 .build());

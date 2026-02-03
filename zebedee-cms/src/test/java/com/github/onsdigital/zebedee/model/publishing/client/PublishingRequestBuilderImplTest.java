@@ -1,6 +1,6 @@
 package com.github.onsdigital.zebedee.model.publishing.client;
 
-import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.hc.client5.http.classic.methods.HttpUriRequest;
 import org.hamcrest.core.IsNull;
 import org.junit.Before;
 import org.junit.Test;
@@ -83,9 +83,9 @@ public class PublishingRequestBuilderImplTest {
         HttpUriRequest getRequest = requestBuilder.createGetContentHashRequest("http://localhost:8080",
                 "transactionId", "uri");
 
-        assertThat(getRequest.getURI().getHost(), equalTo("localhost"));
-        assertThat(getRequest.getURI().getPath(), equalTo("/contentHash"));
-        assertThat(getRequest.getURI().getQuery(), equalTo("transactionId=transactionId&uri=uri"));
+        assertThat(getRequest.getUri().getHost(), equalTo("localhost"));
+        assertThat(getRequest.getUri().getPath(), equalTo("/contentHash"));
+        assertThat(getRequest.getUri().getQuery(), equalTo("transactionId=transactionId&uri=uri"));
         assertThat(getRequest.getFirstHeader("X-Request-Id"), is(IsNull.notNullValue()));
     }
 }

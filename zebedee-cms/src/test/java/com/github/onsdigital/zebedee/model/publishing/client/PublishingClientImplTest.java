@@ -1,12 +1,11 @@
 package com.github.onsdigital.zebedee.model.publishing.client;
 
 import com.google.gson.Gson;
-import org.apache.http.HttpEntity;
-import org.apache.http.StatusLine;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.hc.client5.http.ClientProtocolException;
+import org.apache.hc.client5.http.classic.methods.HttpUriRequest;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.core5.http.HttpEntity;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -81,7 +80,6 @@ public class PublishingClientImplTest {
     public void testGetContentHash_non200Status() throws Exception {
         HttpUriRequest request = mock(HttpUriRequest.class);
         CloseableHttpResponse response = mock(CloseableHttpResponse.class);
-        StatusLine statusLine = mock(StatusLine.class);
 
         when(requestBuilder.createGetContentHashRequest("host", "transactionId", "uri"))
                 .thenReturn(request);
@@ -89,11 +87,9 @@ public class PublishingClientImplTest {
         when(httpClient.execute(request))
                 .thenReturn(response);
 
-        when(response.getStatusLine())
-                .thenReturn(statusLine);
-
-        when(statusLine.getStatusCode())
+        when(response.getCode())
                 .thenReturn(400);
+
 
         try {
             client.getContentHash("host", "transactionId", "uri");
@@ -120,11 +116,7 @@ public class PublishingClientImplTest {
             when(httpClient.execute(request))
                     .thenReturn(response);
 
-            StatusLine statusLine = mock(StatusLine.class);
-            when(response.getStatusLine())
-                    .thenReturn(statusLine);
-
-            when(statusLine.getStatusCode())
+            when(response.getCode())
                     .thenReturn(200);
 
             HttpEntity entity = mock(HttpEntity.class);

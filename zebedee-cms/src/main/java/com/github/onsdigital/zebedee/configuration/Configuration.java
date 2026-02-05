@@ -33,6 +33,7 @@ public class Configuration {
     private static final String IMAGE_API_URL = "http://localhost:24700";
     private static final String STATIC_FILES_API_URL = "http://localhost:26900";
     private static final String IDENTITY_API_URL = "http://localhost:25600";
+    private static final String PERMISSIONS_API_URL = "http://localhost:25400";
     private static final String KAFKA_ADDR = "localhost:9092";
     private static final String KAFKA_CONTENT_UPDATED_TOPIC = "content-updated";
     private static final String KAFKA_CONTENT_DELETED_TOPIC = "search-content-deleted";
@@ -164,6 +165,10 @@ public class Configuration {
 
     public static String getIdentityAPIURL() {
         return StringUtils.defaultIfBlank(getValue("IDENTITY_API_URL"), IDENTITY_API_URL);
+    }
+
+    public static String getPermissionsAPIURL() {
+        return StringUtils.defaultIfBlank(getValue("PERMISSIONS_API_URL"), PERMISSIONS_API_URL);
     }
 
     public static String getKafkaURL() {

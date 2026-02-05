@@ -20,7 +20,7 @@ import com.google.gson.JsonSyntaxException;
 import dp.api.dataset.exception.DatasetAPIException;
 import dp.api.dataset.exception.DatasetNotFoundException;
 import dp.api.dataset.exception.UnexpectedResponseException;
-import org.apache.http.HttpStatus;
+import org.apache.hc.core5.http.HttpStatus;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -38,7 +38,7 @@ import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFea
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.warn;
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
-import static org.apache.http.HttpStatus.SC_NOT_FOUND;
+import static org.apache.hc.core5.http.HttpStatus.SC_NOT_FOUND;
 
 @Api
 public class Collections {

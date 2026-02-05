@@ -6,8 +6,6 @@ import com.github.davidcarboni.httpino.Response;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.publishing.WebsiteResponse;
-import org.apache.http.ProtocolVersion;
-import org.apache.http.message.BasicStatusLine;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -76,12 +74,9 @@ public class LegacyCacheApiClientTest {
     public void sendNotificationPUTCalledWhenPayloadIsSetTest() throws IOException {
         payloads.get(0).uriToUpdate = "/economy/inflationandprices/bulletins/latest";
 
-        ProtocolVersion version = new ProtocolVersion("1", 1, 0);
-        BasicStatusLine basicStatusLine = new BasicStatusLine(version, 200, "OK");
-
         WebsiteResponse websiteResponse = new WebsiteResponse();
         websiteResponse.setMessage("OK");
-        Response<Object> response = new Response<>(basicStatusLine, websiteResponse);
+        Response<Object> response = new Response<>(200, "OK", websiteResponse);
 
         when(httpMock.put(any(), any(), any(), any())).thenReturn(response);
 

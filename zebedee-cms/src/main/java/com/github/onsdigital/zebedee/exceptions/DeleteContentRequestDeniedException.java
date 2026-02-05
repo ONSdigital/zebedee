@@ -3,7 +3,7 @@ package com.github.onsdigital.zebedee.exceptions;
 import com.github.onsdigital.zebedee.content.page.base.PageType;
 import com.github.onsdigital.zebedee.json.DeleteMarkerJson;
 import com.github.onsdigital.zebedee.model.Collection;
-import org.apache.http.HttpStatus;
+import org.apache.hc.core5.http.HttpStatus;
 
 import java.util.Arrays;
 

@@ -1,24 +1,24 @@
 package com.github.onsdigital.zebedee.verification.http;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpEntity;
-import org.apache.http.NameValuePair;
-import org.apache.http.StatusLine;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpResponseException;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpRequestBase;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.conn.HttpClientConnectionManager;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
-import org.apache.http.util.EntityUtils;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.http.NameValuePair;
+import org.apache.hc.client5.http.ClientProtocolException;
+import org.apache.hc.client5.http.HttpResponseException;
+import org.apache.hc.client5.http.entity.UrlEncodedFormEntity;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase;
+import org.apache.hc.core5.net.URIBuilder;
+import org.apache.hc.core5.http.io.entity.StringEntity;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.pool.ConnPoolControl;
+import org.apache.hc.core5.util.TimeValue;
 
 import java.io.IOException;
 import java.net.URI;
@@ -26,7 +26,6 @@ import java.net.URISyntaxException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
@@ -135,7 +134,7 @@ public class PooledHttpClient {
         return validate(httpClient.execute(request));
     }
 
-    private void addHeaders(Map<String, String> headers, HttpRequestBase request) {
+    private void addHeaders(Map<String, String> headers, HttpUriRequestBase request) {
         if (headers != null) {
             Iterator<Map.Entry<String, String>> headerIterator = headers.entrySet().iterator();
             while (headerIterator.hasNext()) {
@@ -186,13 +185,13 @@ public class PooledHttpClient {
      * Throws appropriate errors if response is not successful
      */
     private CloseableHttpResponse validate(CloseableHttpResponse response) throws ClientProtocolException {
-        StatusLine statusLine = response.getStatusLine();
+        int statusCode = response.getCode();
         HttpEntity entity = response.getEntity();
-        if (statusLine.getStatusCode() > 302) {
+        if (statusCode > 302) {
             String errorMessage = getErrorMessage(entity);
             throw new HttpResponseException(
-                    statusLine.getStatusCode(),
-                    errorMessage == null ? statusLine.getReasonPhrase() : errorMessage);
+                    statusCode,
+                    errorMessage == null ? response.getReasonPhrase() : errorMessage);
         }
         if (entity == null) {
             throw new ClientProtocolException("Response contains no content");
@@ -220,9 +219,9 @@ public class PooledHttpClient {
     private class IdleConnectionMonitorThread extends Thread {
 
         private boolean shutdown;
-        private HttpClientConnectionManager connMgr;
+        private ConnPoolControl<?> connMgr;
 
-        public IdleConnectionMonitorThread(HttpClientConnectionManager connMgr) {
+        public IdleConnectionMonitorThread(ConnPoolControl<?> connMgr) {
             super();
             this.connMgr = connMgr;
         }
@@ -235,10 +234,10 @@ public class PooledHttpClient {
                     synchronized (this) {
                         wait(5000);
                         // Close expired connections every 5 seconds
-                        connMgr.closeExpiredConnections();
+                        connMgr.closeExpired();
                         // Close connections
                         // that have been idle longer than 30 sec
-                        connMgr.closeIdleConnections(60, TimeUnit.SECONDS);
+                        connMgr.closeIdle(TimeValue.ofSeconds(60));
                     }
                 }
             } catch (InterruptedException ex) {

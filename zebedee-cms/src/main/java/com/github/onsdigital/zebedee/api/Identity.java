@@ -22,8 +22,8 @@ import static com.github.onsdigital.zebedee.service.ServiceTokenUtils.extractSer
 import static com.github.onsdigital.zebedee.service.ServiceTokenUtils.isValidServiceAuthorizationHeader;
 import static com.github.onsdigital.zebedee.service.ServiceTokenUtils.isValidServiceToken;
 import static com.github.onsdigital.zebedee.util.JsonUtils.writeResponseEntity;
-import static org.apache.http.HttpStatus.SC_OK;
-import static org.apache.http.HttpStatus.SC_UNAUTHORIZED;
+import static org.apache.hc.core5.http.HttpStatus.SC_OK;
+import static org.apache.hc.core5.http.HttpStatus.SC_UNAUTHORIZED;
 
 /**
  * @deprecated The GET /identity endpoint is deprecated in favour of the new JWT sessions. Validating the JWT signature

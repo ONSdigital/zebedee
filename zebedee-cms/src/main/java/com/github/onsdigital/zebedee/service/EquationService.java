@@ -5,8 +5,9 @@ import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.verification.http.ClientConfiguration;
 import com.github.onsdigital.zebedee.verification.http.PooledHttpClient;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.util.EntityUtils;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.core5.http.ParseException;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -30,7 +31,7 @@ public class EquationService {
      * @param input - The string containing the LaTex equations to render.
      * @return
      */
-    public static EquationServiceResponse render(String input) throws IOException {
+    public static EquationServiceResponse render(String input) throws IOException, ParseException {
 
         // Only attempt to render the equation if the export server url has been defined in the environment
         if (StringUtils.isNotEmpty(exportServerUrl)) {
@@ -63,7 +64,7 @@ public class EquationService {
         return configuration;
     }
 
-    private EquationServiceResponse sendPost(String path, String input) throws IOException {
+    private EquationServiceResponse sendPost(String path, String input) throws IOException, ParseException {
         try (CloseableHttpResponse response = client.sendPost(path, new HashMap<>(), input)) {
             String responseString = EntityUtils.toString(response.getEntity());
             return ContentUtil.deserialise(responseString, EquationServiceResponse.class);

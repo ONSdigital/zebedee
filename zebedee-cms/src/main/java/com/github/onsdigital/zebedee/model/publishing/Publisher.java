@@ -377,7 +377,7 @@ public class Publisher {
 
                     Response<Result> response = http.post(begin, Result.class);
                     checkResponse(response, null, begin, collection.getDescription().getId());
-                    hostToTransactionIDMap.put(host.toString(), response.body.transaction.id);
+                    hostToTransactionIDMap.put(host.toString(), response.getBody().transaction.id);
                 } catch (IOException e) {
                     Map<String, String> transactionIdMap = collection.getDescription().getPublishTransactionIds();
                     error().data("publishing", true).data("trainHost", host).data("collectionId", collectionId)
@@ -622,7 +622,7 @@ public class Publisher {
 
                                 Response<Result> response = http.post(endpoint, Result.class);
                                 checkResponse(response, transactionId, endpoint, null);
-                                return response.body;
+                                return response.getBody();
                             }
                         } catch (Exception e) {
                             error().data("publishing", true).data("trainHost", host)
@@ -709,10 +709,10 @@ public class Publisher {
 
     static void checkResponse(Response<Result> response, String TransactionID, Endpoint endpoint, String collectionID)
             throws IOException {
-        if (response.statusLine.getStatusCode() != 200) {
-            int code = response.statusLine.getStatusCode();
-            String reason = response.statusLine.getReasonPhrase();
-            String message = response.body != null ? response.body.message : "";
+        if (response.getStatusCode() != 200) {
+            int code = response.getStatusCode();
+            String reason = response.getReasonPhrase();
+            String message = response.getBody() != null ? response.getBody().message : "";
 
             URI uri = endpoint.url();
 
@@ -728,13 +728,13 @@ public class Publisher {
                     .logException(io, "request was unsuccessful");
             throw io;
 
-        } else if (response.body.error == true) {
-            throw new IOException("Result error: " + response.body.message);
-        } else if (response.body.transaction.errors != null && response.body.transaction.errors.size() > 0) {
-            throw new IOException("Transaction error: " + response.body.transaction.errors);
-        } else if (response.body.transaction.uriInfos != null) {
+        } else if (response.getBody().error == true) {
+            throw new IOException("Result error: " + response.getBody().message);
+        } else if (response.getBody().transaction.errors != null && response.getBody().transaction.errors.size() > 0) {
+            throw new IOException("Transaction error: " + response.getBody().transaction.errors);
+        } else if (response.getBody().transaction.uriInfos != null) {
             List<String> messages = new ArrayList<>();
-            for (UriInfo uriInfo : response.body.transaction.uriInfos) {
+            for (UriInfo uriInfo : response.getBody().transaction.uriInfos) {
                 if (StringUtils.isNotBlank(uriInfo.error)) {
                     messages.add("URI error for " + uriInfo.uri + " (" + uriInfo.status + "): " + uriInfo.error);
                 }

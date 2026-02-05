@@ -1,7 +1,7 @@
 package com.github.onsdigital.zebedee.reader.api.endpoint;
 
 import com.github.davidcarboni.restolino.framework.Api;
-import org.apache.http.HttpStatus;
+import org.apache.hc.core5.http.HttpStatus;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

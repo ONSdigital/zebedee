@@ -6,10 +6,10 @@ import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.ContentWriter;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.util.URIUtils;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
 
 import java.io.IOException;
 
@@ -60,7 +60,7 @@ public class BabbagePdfService implements PdfService {
 
             try (CloseableHttpResponse response = client.execute(httpGet)) {
 
-                int status = response.getStatusLine().getStatusCode();
+                int status = response.getCode();
                 if (status != 200) {
                     String body = response.toString();
                     error().data("status_code", status)

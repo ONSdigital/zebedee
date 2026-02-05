@@ -24,7 +24,7 @@
         <project.build.sourceEncoding>${encoding}</project.build.sourceEncoding>
         <project.reporting.outputEncoding>${encoding}</project.reporting.outputEncoding>
         <restolino.version>0.8.2</restolino.version>
-        <httpino.version>0.0.10</httpino.version>
+        <httpino.version>0.0.11</httpino.version>
         <fasterxml.jackson.version>2.16.1</fasterxml.jackson.version>
         <apache.poi.version>3.17</apache.poi.version>
         <spring.version>5.3.39</spring.version>
@@ -281,7 +281,7 @@
             <dependency>
                 <groupId>com.github.onsdigital</groupId>
                 <artifactId>dp-dataset-api-java-client</artifactId>
-                <version>1.2.0</version>
+                <version>1.3.0</version>
             </dependency>
 
             <dependency>

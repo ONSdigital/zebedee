@@ -2,10 +2,10 @@ package com.github.onsdigital.zebedee.permissions.cmd;
 
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 
-import static org.apache.http.HttpStatus.SC_BAD_REQUEST;
-import static org.apache.http.HttpStatus.SC_INTERNAL_SERVER_ERROR;
-import static org.apache.http.HttpStatus.SC_NOT_FOUND;
-import static org.apache.http.HttpStatus.SC_UNAUTHORIZED;
+import static org.apache.hc.core5.http.HttpStatus.SC_BAD_REQUEST;
+import static org.apache.hc.core5.http.HttpStatus.SC_INTERNAL_SERVER_ERROR;
+import static org.apache.hc.core5.http.HttpStatus.SC_NOT_FOUND;
+import static org.apache.hc.core5.http.HttpStatus.SC_UNAUTHORIZED;
 
 /**
  * @deprecated in favour of the dp-permissions-api. Once all dataset related APIs have been updated to use the

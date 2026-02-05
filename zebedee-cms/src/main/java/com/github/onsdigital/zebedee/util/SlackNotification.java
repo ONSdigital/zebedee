@@ -15,7 +15,7 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.gson.JsonObject;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.message.BasicNameValuePair;
+import org.apache.hc.core5.http.message.BasicNameValuePair;
 
 import java.text.SimpleDateFormat;
 import java.util.AbstractMap;
@@ -171,15 +171,15 @@ public class SlackNotification {
                         new BasicNameValuePair("Authorization", "Bearer " + slackToken),
                         new BasicNameValuePair("Content-Type", "application/json"));
 
-                if (!response.body.get("ok").getAsBoolean()) {
-                    info().data("error", response.body.get("error").getAsString())
-                            .data("responseStatusCode", response.statusLine.getStatusCode())
+                if (!response.getBody().get("ok").getAsBoolean()) {
+                    info().data("error", response.getBody().get("error").getAsString())
+                            .data("responseStatusCode", response.getStatusCode())
                             .log("sendSlackMessage");
                     return result;
                 }
 
-                String messageTs = response.body.get("ts").getAsString();
-                String channelID = response.body.get("channel").getAsString();
+                String messageTs = response.getBody().get("ts").getAsString();
+                String channelID = response.getBody().get("channel").getAsString();
                 // message.ts is null if we're doing the initial postMessage rather than an update
                 if (message.getTs() == null && collectionID != null && messageTs != null && channelID != null) {
                     // chat.update API doesn't support channel names, so we also store the channel ID
@@ -190,7 +190,7 @@ public class SlackNotification {
 
                 info().data("messageTimestamp", messageTs)
                         .data("updateTimestamp", message.getTs())
-                        .data("responseStatusCode", response.statusLine.getStatusCode())
+                        .data("responseStatusCode", response.getStatusCode())
                         .log("sendSlackMessage");
             } catch (Exception e) {
                 result = e;

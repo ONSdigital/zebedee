@@ -16,7 +16,7 @@ import com.github.onsdigital.zebedee.model.Collections;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.util.ZebedeeCmsService;
 import org.apache.commons.fileupload.FileUploadException;
-import org.apache.http.HttpStatus;
+import org.apache.hc.core5.http.HttpStatus;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;

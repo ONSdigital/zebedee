@@ -1,6 +1,6 @@
 package com.github.onsdigital.zebedee.reader.api.endpoint;
 
-import org.apache.http.HttpStatus;
+import org.apache.hc.core5.http.HttpStatus;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;

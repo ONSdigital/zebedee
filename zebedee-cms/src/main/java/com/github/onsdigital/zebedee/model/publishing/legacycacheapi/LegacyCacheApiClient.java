@@ -4,8 +4,8 @@ import com.github.davidcarboni.httpino.*;
 import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.model.publishing.WebsiteResponse;
 import com.github.onsdigital.zebedee.util.EncryptionUtils;
-import org.apache.http.NameValuePair;
-import org.apache.http.message.BasicNameValuePair;
+import org.apache.hc.core5.http.NameValuePair;
+import org.apache.hc.core5.http.message.BasicNameValuePair;
 
 import java.io.IOException;
 
@@ -37,9 +37,9 @@ public class LegacyCacheApiClient {
     }
 
     private static void logResponse(Response<WebsiteResponse> response, String collectionId) {
-        String responseMessage = response.body == null ? response.statusLine.getReasonPhrase() : response.body.getMessage();
+        String responseMessage = response.getBody() == null ? response.getReasonPhrase() : response.getBody().getMessage();
 
-        if (response.statusLine.getStatusCode() > 302) {
+        if (response.getStatusCode() > 302) {
             error().data("responseMessage", responseMessage)
                     .data("collectionId", collectionId)
                     .log("Error response from Legacy Cache API");

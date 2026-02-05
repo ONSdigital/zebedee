@@ -17,7 +17,7 @@ import java.io.IOException;
 import java.util.function.Supplier;
 
 import static com.github.onsdigital.zebedee.util.JsonUtils.writeResponseEntity;
-import static org.apache.http.HttpStatus.SC_CREATED;
+import static org.apache.hc.core5.http.HttpStatus.SC_CREATED;
 
 /**
  * @deprecated The POST /service endpoint is deprecated in favour of the dp-identity-api. Once the migration of all

@@ -10,8 +10,6 @@ import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.publishing.legacycacheapi.LegacyCacheApiClient;
 import com.github.onsdigital.zebedee.model.publishing.legacycacheapi.LegacyCacheApiPayload;
 import com.github.onsdigital.zebedee.util.EncryptionUtils;
-import org.apache.http.ProtocolVersion;
-import org.apache.http.message.BasicStatusLine;
 import org.joda.time.DateTime;
 import org.junit.After;
 import org.junit.Before;
@@ -192,12 +190,10 @@ public class PublishNotificationTest {
         assertEquals(3, publishNotification.getLegacyCacheApiPayloads().size());
 
         Http mockHttp = mock(Http.class);
-        ProtocolVersion version = new ProtocolVersion("1", 1, 0);
-        BasicStatusLine basicStatusLine = new BasicStatusLine(version, 200, "OK");
 
         WebsiteResponse websiteResponse = new WebsiteResponse();
         websiteResponse.setMessage("OK");
-        Response<Object> response = new Response<>(basicStatusLine, websiteResponse);
+        Response<Object> response = new Response<>(200, "OK", websiteResponse);
         when(mockHttp.put(any(), any(), any(), any())).thenReturn(response);
 
         LegacyCacheApiClient.sendPayloads(mockHttp, legacyCacheApiHost, publishNotification.getLegacyCacheApiPayloads());
@@ -245,12 +241,10 @@ public class PublishNotificationTest {
         assertEquals(5, publishNotification.getLegacyCacheApiPayloads().size());
 
         Http mockHttp = mock(Http.class);
-        ProtocolVersion version = new ProtocolVersion("1", 1, 0);
-        BasicStatusLine basicStatusLine = new BasicStatusLine(version, 200, "OK");
 
         WebsiteResponse websiteResponse = new WebsiteResponse();
         websiteResponse.setMessage("OK");
-        Response<Object> response = new Response<>(basicStatusLine, websiteResponse);
+        Response<Object> response = new Response<>(200, "OK", websiteResponse);
         when(mockHttp.put(any(), any(), any(), any())).thenReturn(response);
 
         publishNotification.removePublishDateForUnlockedEvents(EventType.UNLOCKED);
@@ -284,12 +278,10 @@ public class PublishNotificationTest {
         assertEquals(5, publishNotification.getLegacyCacheApiPayloads().size());
 
         Http mockHttp = mock(Http.class);
-        ProtocolVersion version = new ProtocolVersion("1", 1, 0);
-        BasicStatusLine basicStatusLine = new BasicStatusLine(version, 200, "OK");
 
         WebsiteResponse websiteResponse = new WebsiteResponse();
         websiteResponse.setMessage("OK");
-        Response<Object> response = new Response<>(basicStatusLine, websiteResponse);
+        Response<Object> response = new Response<>(200, "OK", websiteResponse);
         when(mockHttp.put(any(), any(), any(), any())).thenReturn(response);
 
         LegacyCacheApiClient.sendPayloads(mockHttp, legacyCacheApiHost, publishNotification.getLegacyCacheApiPayloads());

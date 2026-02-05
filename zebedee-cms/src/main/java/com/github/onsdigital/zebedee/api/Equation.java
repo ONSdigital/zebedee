@@ -17,6 +17,7 @@ import com.github.onsdigital.zebedee.service.EquationServiceResponse;
 import com.github.onsdigital.zebedee.service.SvgService;
 import org.apache.batik.transcoder.TranscoderException;
 import org.apache.commons.fileupload.FileUploadException;
+import org.apache.hc.core5.http.ParseException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -41,7 +42,7 @@ public class Equation {
             HttpServletRequest request,
             HttpServletResponse response,
             com.github.onsdigital.zebedee.content.page.statistics.document.figure.equation.Equation equation
-    ) throws IOException, ZebedeeException, FileUploadException, TranscoderException {
+    ) throws IOException, ParseException, ZebedeeException, FileUploadException, TranscoderException {
 
         Session session = Root.zebedee.getSessions().get();
         com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request);

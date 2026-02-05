@@ -16,8 +16,8 @@ import javax.ws.rs.GET;
 import java.io.IOException;
 
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
-import static org.apache.http.HttpStatus.SC_INTERNAL_SERVER_ERROR;
-import static org.apache.http.HttpStatus.SC_OK;
+import static org.apache.hc.core5.http.HttpStatus.SC_INTERNAL_SERVER_ERROR;
+import static org.apache.hc.core5.http.HttpStatus.SC_OK;
 
 /**
  * @deprecated the permissions APIs are deprecated in favour of the new dp-permissions-api. Once the migration of all

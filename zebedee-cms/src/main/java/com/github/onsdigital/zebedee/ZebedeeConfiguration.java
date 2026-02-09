@@ -216,7 +216,7 @@ public class ZebedeeConfiguration {
                 error().logException(e, "failed to initialise JWT validator");
                 throw new RuntimeException(e);
             }
-            this.sessions = new JWTSessionsServiceImpl(jwtVerifier);
+            this.sessions = new JWTSessionsServiceImpl(jwtVerifier, this.getServiceStore());
         } else {
             LegacySessionsStore legacySessionsStore = new LegacySessionsStoreImpl(sessionsPath);
             this.sessions = new ThreadLocalSessionsServiceImpl(legacySessionsStore, permissionsService, teamsService);

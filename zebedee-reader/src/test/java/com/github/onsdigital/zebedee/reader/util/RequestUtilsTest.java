@@ -58,7 +58,7 @@ public class RequestUtilsTest {
         when(mockRequest.getHeader(RequestUtils.AUTH_HEADER))
                 .thenReturn(String.format(BEARER, SERVICE_TOKEN));
 
-        assertThat(RequestUtils.getSessionId(mockRequest), is(nullValue()));
+        assertThat(RequestUtils.getSessionId(mockRequest), is(SERVICE_TOKEN));
     }
 
     @Test

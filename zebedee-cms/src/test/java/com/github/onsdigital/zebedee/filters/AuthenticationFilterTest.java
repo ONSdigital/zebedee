@@ -167,34 +167,15 @@ public class AuthenticationFilterTest extends ZebedeeTestBaseFixture {
     }
 
     @Test
-    public void filter_shouldUseFlorenceToken_whenValidFlorenceAndServiceTokensProvided() throws Exception {
-        when(request.getHeader(FLORENCE_TOKEN_HEADER)).thenReturn(LEGACY_TOKEN);
+    public void filter_shouldUseAuthToken_whenValidFlorenceAndAuthTokensProvided() throws Exception {
+        when(request.getHeader(FLORENCE_TOKEN_HEADER)).thenReturn(BEARER_PREFIX + JWT_TOKEN);
         when(request.getHeader(AUTH_HEADER)).thenReturn(BEARER_PREFIX + SERVICE_TOKEN);
         when(request.getPathInfo()).thenReturn(AUTHENTICATED_PATH);
-        doNothing().when(sessions).set(LEGACY_TOKEN);
+        doNothing().when(sessions).set(SERVICE_TOKEN);
 
         assertTrue(authenticationFilter.filter(request, response));
 
-        verify(sessions, times(1)).set(LEGACY_TOKEN);
-        verify(sessions, times(1)).resetThread();
-    }
-
-    @Test
-    public void filter_shouldIgnoreServiceToken_whenServiceTokenProvidedForAuthenticatedPath() throws Exception {
-        when(request.getHeader(AUTH_HEADER)).thenReturn(SERVICE_TOKEN);
-        when(request.getPathInfo()).thenReturn(AUTHENTICATED_PATH);
-        doThrow(new SessionsException(SOME_VALIDATION_ERROR)).when(sessions).set(null);
-
-        assertFalse(authenticationFilter.filter(request, response));
-
-        verify(sessions, times(1)).set(null);
-        verify(response, times(1)).setContentType(MediaType.JSON_UTF_8.toString());
-        verify(response, times(1)).setStatus(HttpStatus.UNAUTHORIZED_401);
-        verify(outputStream).write(responseBodyCaptor.capture(), responseBodyOffset.capture(), responseBodyLength.capture());
-
-        String responseBody = new String(responseBodyCaptor.getValue(), responseBodyOffset.getValue(),
-                responseBodyLength.getValue(), StandardCharsets.UTF_8);
-        assertEquals(doubleQuoted(SOME_VALIDATION_ERROR), responseBody);
+        verify(sessions, times(1)).set(SERVICE_TOKEN);
         verify(sessions, times(1)).resetThread();
     }
 

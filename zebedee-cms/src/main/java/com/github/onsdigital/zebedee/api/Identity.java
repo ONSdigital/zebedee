@@ -69,27 +69,33 @@ public class Identity {
     @GET
     public void identifyUser(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String sessionID = RequestUtils.getSessionId(request);
-        if (!StringUtils.isBlank(sessionID)) {
-            try {
-                UserIdentity identity = findUser(sessionID);
-                writeResponseEntity(response, identity, SC_OK);
-            } catch (UserIdentityException e) {
-                warn().log(e.getMessage());
-                writeResponseEntity(response, new Error(e.getMessage()), e.getResponseCode());
+        if (StringUtils.isNotBlank(sessionID)) {
+            // If JWT Token then it will contain a "."
+            // This logic removes the option to provide a legacy 'florence' token but is a transitional step
+            // due to the complications of completely extricating the legacy auth code from zebedee.
+            if (sessionID.contains(".")) {
+                try {
+                    UserIdentity identity = findUser(sessionID);
+                    writeResponseEntity(response, identity, SC_OK);
+                    return;
+                } catch (UserIdentityException e) {
+                    warn().log(e.getMessage());
+                    writeResponseEntity(response, new Error(e.getMessage()), e.getResponseCode());
+                    return;
+                }
+            } else {
+                // TODO: Remove after new service user JWT auth is implemented
+                ServiceAccount serviceAccount = handleServiceAccountRequest(sessionID);
+                if (serviceAccount != null) {
+                    writeResponseEntity(response, new UserIdentity(serviceAccount.getID()), SC_OK);
+                    return;
+                } else {
+                    writeResponseEntity(response, new Error("service not authenticated"), SC_UNAUTHORIZED);
+                    return;
+                }
             }
-            return;
         }
-
-        // TODO: Remove after new service user JWT auth is implemented
-        String authHeader = request.getHeader(AUTHORIZATION_HEADER);
-        if (StringUtils.isNotBlank(authHeader)) {
-            ServiceAccount serviceAccount = handleServiceAccountRequest(authHeader);
-            if (serviceAccount != null) {
-                writeResponseEntity(response, new UserIdentity(serviceAccount.getID()), SC_OK);
-                return;
-            }
-        }
-        writeResponseEntity(response, new Error("service not authenticated"), SC_UNAUTHORIZED);
+        writeResponseEntity(response, new Error("no authentication provided"), SC_UNAUTHORIZED);
     }
 
     private UserIdentity findUser(String sessionID) throws UserIdentityException {
@@ -108,15 +114,11 @@ public class Identity {
         return identity;
     }
 
-    private ServiceAccount handleServiceAccountRequest(String authHeader) throws IOException {
+    private ServiceAccount handleServiceAccountRequest(String serviceToken) throws IOException {
         ServiceAccount serviceAccount = null;
 
-        if (isValidServiceAuthorizationHeader(authHeader)) {
-            String serviceToken = extractServiceAccountTokenFromAuthHeader(authHeader);
-
-            if (isValidServiceToken(serviceToken)) {
-                serviceAccount = getServiceAccount(serviceToken);
-            }
+        if (isValidServiceToken(serviceToken)) {
+            serviceAccount = getServiceAccount(serviceToken);
         }
         return serviceAccount;
     }

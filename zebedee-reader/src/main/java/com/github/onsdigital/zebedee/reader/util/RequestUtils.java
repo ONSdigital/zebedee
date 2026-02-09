@@ -43,8 +43,8 @@ public final class RequestUtils {
         String florenceHeader = request.getHeader(FLORENCE_TOKEN_HEADER);
         String authHeader = request.getHeader(AUTH_HEADER);
         String sessionId = null;
-        // If the Authorization header contains a '.' then it is a JWT session token rather than a service token
-        if (StringUtils.isNotBlank(authHeader) && authHeader.contains(".")) {
+        // Prefer Authorization header over legacy X-Florence-Token if both are provided.
+        if (StringUtils.isNotBlank(authHeader)) {
             sessionId = removeBearerPrefixIfPresent(authHeader);
         } else if (StringUtils.isNotBlank(florenceHeader)) {
             sessionId = removeBearerPrefixIfPresent(florenceHeader);

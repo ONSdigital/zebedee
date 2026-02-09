@@ -5,10 +5,14 @@ import com.github.onsdigital.UserDataPayload;
 import com.github.onsdigital.exceptions.JWTDecodeException;
 import com.github.onsdigital.exceptions.JWTTokenExpiredException;
 import com.github.onsdigital.exceptions.JWTVerificationException;
+import com.github.onsdigital.zebedee.model.ServiceAccount;
+import com.github.onsdigital.zebedee.service.ServiceStore;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.gson.Gson;
 import org.apache.commons.lang3.StringUtils;
+
+import static com.github.onsdigital.zebedee.service.ServiceTokenUtils.isValidServiceToken;
 
 import java.io.IOException;
 
@@ -31,6 +35,7 @@ public class JWTSessionsServiceImpl implements Sessions {
 
     private static ThreadLocal<Session> store = new ThreadLocal<>();
     private JWTVerifier jwtVerifier;
+    private ServiceStore serviceStore;
     private Gson gson;
 
     /**
@@ -38,8 +43,9 @@ public class JWTSessionsServiceImpl implements Sessions {
      *
      * @param jwtVerifier the {@link JWTVerifier} implementation to use to verify JWTs
      */
-    public JWTSessionsServiceImpl(JWTVerifier jwtVerifier) {
+    public JWTSessionsServiceImpl(JWTVerifier jwtVerifier, ServiceStore serviceStore) {
         this.jwtVerifier = jwtVerifier;
+        this.serviceStore = serviceStore;
         this.gson = new Gson();
     }
 
@@ -81,15 +87,43 @@ public class JWTSessionsServiceImpl implements Sessions {
         if (StringUtils.isBlank(token)) {
             throw new SessionsException(ACCESS_TOKEN_REQUIRED_ERROR);
         }
-
-        try {
-            UserDataPayload jwtData = jwtVerifier.verify(token);
-            store.set(new Session(token, jwtData.getEmail(), jwtData.getGroups()));
-        } catch (JWTTokenExpiredException e) {
-            throw new SessionsException(ACCESS_TOKEN_EXPIRED_ERROR);
-        } catch (JWTVerificationException | JWTDecodeException e) {
-            throw new SessionsException(e.getMessage(), e);
+        if (StringUtils.contains(token, ".")) {
+            // This is a user token
+            try {
+                UserDataPayload jwtData = jwtVerifier.verify(token);
+                store.set(new Session(token, jwtData.getEmail(), jwtData.getGroups()));
+            } catch (JWTTokenExpiredException e) {
+                throw new SessionsException(ACCESS_TOKEN_EXPIRED_ERROR);
+            } catch (JWTVerificationException | JWTDecodeException e) {
+                throw new SessionsException(e.getMessage(), e);
+            }
+        } else {
+            // This might be a service token.
+            try {
+                if (isValidServiceToken(token)) {
+                    ServiceAccount serviceAccount = getServiceAccount(token);
+                    if (serviceAccount == null) {
+                        throw new SessionsException("invalid service token - no matching service account found");
+                    }
+                    store.set(new Session(token, serviceAccount.getID()));
+                } else {
+                    throw new SessionsException("invalid service token format");
+                }
+            } catch (IOException e) {
+                throw new SessionsException("error retrieving service account for service token", e);
+            }   
         }
+    }
+
+    private ServiceAccount getServiceAccount(String serviceToken) throws IOException {
+        ServiceAccount serviceAccount = null;
+        try {
+            serviceAccount = serviceStore.get(serviceToken);
+        } catch (Exception ex) {
+            error().exception(ex).log("unexpected error getting service account from service store");
+            throw new IOException(ex);
+        }
+        return serviceAccount;
     }
 
     /**

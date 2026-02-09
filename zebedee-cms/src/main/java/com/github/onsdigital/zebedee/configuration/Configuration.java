@@ -45,6 +45,7 @@ public class Configuration {
     private static final String DATASET_WHITELIST = "drsi,mm23,mm22,ppi,ppistatistics,pusf,a01,x09,cla01,pn2,mgdp,diop,ios1,mret,mq10,rtisa";
     private static final String NON_TS_DATASET_WHITELIST = "ppistatistics,a01,x09,cla01,rtisa";
     private static final String EXPECTED_PPISTATISTICS_PATH = "economy/inflationandpriceindices/datasets/producerpriceinflationstatistics";
+    private static final String DEFAULT_PERMISSIONS_API_URL = "http://localhost:25400";
     private static final int VERIFY_RETRY_DELAY = 5000; // milliseconds
     private static final int VERIFY_RETRY_COUNT = 10;
 
@@ -122,6 +123,10 @@ public class Configuration {
 
     public static String getRedirectApiUrl() {
         return StringUtils.defaultIfBlank(getValue("REDIRECT_API_URL"), DEFAULT_REDIRECT_API_URL);
+    }
+
+    public static String getPermissionsApiUrl() {
+        return StringUtils.defaultIfBlank(getValue("PERMISSIONS_API_URL"), DEFAULT_PERMISSIONS_API_URL);
     }
 
     public static String getSlackUsername() {

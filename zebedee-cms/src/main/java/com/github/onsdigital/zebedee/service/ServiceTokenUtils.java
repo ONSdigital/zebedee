@@ -5,7 +5,6 @@ import org.apache.commons.lang3.StringUtils;
 import java.nio.file.Path;
 import java.util.regex.Pattern;
 
-import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.warn;
 
 /**

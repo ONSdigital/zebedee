@@ -31,12 +31,11 @@ import static org.mockito.Mockito.when;
 
 public class IdentityTest {
 
-    private static final String FLORENCE_TOKEN = "666";
     private static final String FLORENCE_TOKEN_HEADER = "X-Florence-Token";
-    private static final String AUTH_TOKEN = "Bearer d8b90a24c3d247.aeaf84731e4e69dd6f";
+    private static final String AUTH_TOKEN = "Bearer thisisatest.tokenonlyandnotasecret";
     private static final String AUTH_TOKEN_NO_BEARER = AUTH_TOKEN.replaceFirst("Bearer ", "");
     private static final String SERVICE_NAME = "dp-dataset-api";
-    private static final String SERVICE_AUTH_TOKEN = "Bearer d8b90a24c3d247aeaf84731e4e69dd6f";
+    private static final String SERVICE_AUTH_TOKEN = "Bearer thisisatestservicetokenonlyandnotasecret";
     private static final String SERVICE_AUTH_TOKEN_NO_BEARER = SERVICE_AUTH_TOKEN.replaceFirst("Bearer ", "");
 
     @Mock

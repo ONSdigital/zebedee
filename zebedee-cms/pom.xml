@@ -239,7 +239,7 @@
         <dependency>
             <groupId>com.github.onsdigital.dis-redirect-api</groupId>
             <artifactId>dis-redirect-api-sdk-java</artifactId>
-            <version>v0.3.5</version>
+            <version>v0.7.0</version>
         </dependency>
 
         <!-- Test -->

@@ -26,6 +26,7 @@ import com.github.onsdigital.zebedee.reader.ContentReader;
 
 import com.github.onsdigital.zebedee.util.slack.Notifier;
 import org.apache.commons.lang.StringUtils;
+import org.apache.hc.core5.http.ParseException;
 
 import static com.github.onsdigital.zebedee.logging.CMSLogEvent.error;
 import static com.github.onsdigital.zebedee.content.page.base.PageType.ARTICLE;
@@ -182,7 +183,7 @@ public class RedirectServiceImpl implements RedirectService {
             if (StringUtils.isNotBlank(redirect.getTo())) {
                 collectionRedirectAction = CollectionRedirectAction.CREATE;
             }
-        } catch (BadRequestException | RedirectAPIException | IOException ex) {
+        } catch (BadRequestException | RedirectAPIException | ParseException | IOException ex) {
             error().exception(ex).log("error communicating with redirect API");
             throw new InternalServerError("couldn't generate redirect from redirect API data");
         }
@@ -213,7 +214,7 @@ public class RedirectServiceImpl implements RedirectService {
 
                 validationErrors++;
                 continue;
-            } catch (RedirectAPIException | IOException e) {
+            } catch (RedirectAPIException |  ParseException | IOException e) {
                 error()
                     .data("message", e.getMessage())
                     .logException(e, "error querying Redirect API");

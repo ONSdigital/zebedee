@@ -52,7 +52,6 @@ public class PermissionsServiceImplementation implements PermissionsService {
     @Override
     public void addAdministrator(String email, Session session) throws IOException, UnauthorizedException {
         throw new UnsupportedOperationException(format(UNSUPPORTED_ERROR, "addAdministrator"));
-
     }
 
     @Override
@@ -70,7 +69,8 @@ public class PermissionsServiceImplementation implements PermissionsService {
         } catch (Exception e){
             return false;
         }
-        return authorised;    }
+        return authorised;    
+    }
 
 
     @Override

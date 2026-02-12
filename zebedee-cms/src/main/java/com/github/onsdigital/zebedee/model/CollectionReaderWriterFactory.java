@@ -32,7 +32,7 @@ public class CollectionReaderWriterFactory {
     public CollectionWriter getWriter(Zebedee zebedee, Collection collection, Session session) throws NotFoundException,
             BadRequestException, UnauthorizedException, IOException {
         requireNonNull(zebedee, "Zebedee is a required parameter for CollectionReader.");
-        requireNonNull(collection, "Collections is a required parameter for CollectionReader.");
+        requireNonNull(collection, "Collection is a required parameter for CollectionReader.");
         requireNonNull(session, "Session is a required parameter for CollectionReader.");
         return new ZebedeeCollectionWriter(zebedee, collection, session);
     }
@@ -40,7 +40,7 @@ public class CollectionReaderWriterFactory {
     public CollectionReader getReader(Zebedee zebedee, Collection collection, Session session) throws NotFoundException,
             BadRequestException, UnauthorizedException, IOException {
         requireNonNull(zebedee, "Zebedee is a required parameter for CollectionReader.");
-        requireNonNull(collection, "Collections is a required parameter for CollectionReader.");
+        requireNonNull(collection, "Collection is a required parameter for CollectionReader.");
         requireNonNull(session, "Session is a required parameter for CollectionReader.");
         return new ZebedeeCollectionReader(zebedee, collection, session);
     }

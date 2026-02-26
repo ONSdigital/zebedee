@@ -447,8 +447,10 @@ public class Collection {
             }
         }
 
-        PermissionsService permissions = zebedee.getPermissionsService();
-        permissions.setViewerTeams(session, desc.getId(), teamIds);
+        if (!cmsFeatureFlags().isPermissionsAPIEnabled()){
+            PermissionsService permissions = zebedee.getPermissionsService();
+            permissions.setViewerTeams(session, desc.getId(), teamIds);
+        }
 
         return teamIds;
     }

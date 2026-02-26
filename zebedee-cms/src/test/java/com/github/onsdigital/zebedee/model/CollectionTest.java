@@ -5,6 +5,7 @@ import com.github.davidcarboni.cryptolite.Random;
 import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.ZebedeeTestBaseFixture;
+import com.github.onsdigital.zebedee.configuration.CMSFeatureFlags;
 import com.github.onsdigital.zebedee.content.page.base.PageDescription;
 import com.github.onsdigital.zebedee.content.page.base.PageType;
 import com.github.onsdigital.zebedee.content.page.release.Release;
@@ -342,6 +343,40 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         assertEquals(updatedDescription.getTeams(), updatedCollectionDescription.getTeams());
         verify(permissionsService, times(1)).setViewerTeams(
                 publisher1Session, collection.getDescription().getId(), teamIds);
+    }
+
+    @Test
+    public void shouldNotCallPermissionsServiceWhenPermissionsApiEnabled() throws Exception {
+        System.setProperty("ENABLE_PERMISSIONS_API", "true");
+        CMSFeatureFlags.reset();
+
+        try {
+            when(teamsService.findTeam(teamName))
+                    .thenReturn(team);
+            when(team.getId())
+                    .thenReturn(teamId);
+
+            // Given an existing collection
+            String name = "Population Release";
+            CollectionDescription collectionDescription = new CollectionDescription(name);
+            collectionDescription.setType(CollectionType.manual);
+            collectionDescription.setPublishDate(new Date());
+            collectionDescription.setTeams(new ArrayList<>());
+            Collection collection = Collection.create(collectionDescription, zebedee, publisher1Session);
+
+            // When the collection is updated
+            CollectionDescription updatedDescription = new CollectionDescription(name);
+            updatedDescription.setId(collectionDescription.getId());
+            updatedDescription.setTeams(Arrays.asList(teamName));
+
+            Collection.update(collection, updatedDescription, zebedee, new DummyScheduler(), publisher1Session);
+
+            // Then permissions service is not invoked when Permissions API is enabled
+            verify(permissionsService, times(0)).setViewerTeams(any(), any(), any());
+        } finally {
+            System.clearProperty("ENABLE_PERMISSIONS_API");
+            CMSFeatureFlags.reset();
+        }
     }
 
     @Test

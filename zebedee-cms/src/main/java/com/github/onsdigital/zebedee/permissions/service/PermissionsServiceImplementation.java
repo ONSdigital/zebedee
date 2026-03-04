@@ -26,11 +26,11 @@ public class PermissionsServiceImplementation implements PermissionsService {
     private PermissionChecker permissionChecker;
 
     public PermissionsServiceImplementation(String permissionsAPIHost ) {
-        this.permissionChecker = new PermissionChecker(permissionsAPIHost, Duration.standardSeconds(10), Duration.standardSeconds(20), Duration.standardMinutes(30));
+        this.permissionChecker = new PermissionChecker(permissionsAPIHost, Duration.standardSeconds(60), Duration.standardSeconds(60), Duration.standardMinutes(5));
     }
 
     public PermissionsServiceImplementation() {
-        this.permissionChecker = new PermissionChecker("", Duration.standardSeconds(10), Duration.standardSeconds(20), Duration.standardMinutes(30));
+        this.permissionChecker = new PermissionChecker("", Duration.standardSeconds(60), Duration.standardSeconds(60), Duration.standardMinutes(5));
     }
 
 

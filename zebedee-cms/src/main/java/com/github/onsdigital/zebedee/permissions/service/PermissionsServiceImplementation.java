@@ -25,12 +25,16 @@ public class PermissionsServiceImplementation implements PermissionsService {
     private static final String UNSUPPORTED_ERROR = "Permissions API is enabled: {0} is no longer supported";
     private PermissionChecker permissionChecker;
 
+    private static final Duration DEFAULT_CACHE_UPDATE_INTERVAL = Duration.standardSeconds(60);
+    private static final Duration DEFAULT_EXPIRY_CHECK_INTERVAL = Duration.standardSeconds(60);
+    private static final Duration DEFAULT_MAX_CACHE_TIME = Duration.standardMinutes(5);
+
     public PermissionsServiceImplementation(String permissionsAPIHost ) {
-        this.permissionChecker = new PermissionChecker(permissionsAPIHost, Duration.standardSeconds(60), Duration.standardSeconds(60), Duration.standardMinutes(5));
+        this.permissionChecker = new PermissionChecker(permissionsAPIHost, DEFAULT_CACHE_UPDATE_INTERVAL, DEFAULT_EXPIRY_CHECK_INTERVAL, DEFAULT_MAX_CACHE_TIME);
     }
 
     public PermissionsServiceImplementation() {
-        this.permissionChecker = new PermissionChecker("", Duration.standardSeconds(60), Duration.standardSeconds(60), Duration.standardMinutes(5));
+        this.permissionChecker = new PermissionChecker("", DEFAULT_CACHE_UPDATE_INTERVAL, DEFAULT_EXPIRY_CHECK_INTERVAL, DEFAULT_MAX_CACHE_TIME);
     }
 
 

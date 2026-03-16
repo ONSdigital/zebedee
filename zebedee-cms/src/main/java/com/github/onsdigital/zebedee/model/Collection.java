@@ -413,7 +413,7 @@ public class Collection {
         }
 
         if (collectionDescription.getTeams() != null) {
-            Set<String> teamIds = setViewerTeams(collectionDescription, zebedee, session);
+            setViewerTeams(collectionDescription, zebedee, session);
             updatedCollection.getDescription().setTeams(collectionDescription.getTeams());
         }
 

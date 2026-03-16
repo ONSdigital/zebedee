@@ -294,8 +294,7 @@ public class Collections {
             throws IOException {
         try {
             String collectionName = getCollectionNameFromId(collectionId);
-            Collection collection = getCollectionByName(collectionName);
-            return collection;
+            return getCollectionByName(collectionName);
         } catch (IOException | CollectionNotFoundException e) {
             return list().getCollection(collectionId);
         }

@@ -62,45 +62,6 @@ public class JWTPermissionsServiceImplTest {
     }
 
     @Test
-    public void isPublisher_Session_Publisher_ShouldReturnTrue() {
-        List<String> sessionGroups = new ArrayList<>();
-        sessionGroups.add(PUBLISHER);
-
-        Session session = new Session(TEST_SESSION_ID, TEST_USER_EMAIL, sessionGroups);
-        assertTrue(jwtPermissionsService.isPublisher(session));
-    }
-
-    @Test
-    public void isPublisher_Session_Admin_ShouldReturnFalse() {
-        List<String> sessionGroups = new ArrayList<>();
-        sessionGroups.add(ADMIN);
-
-        Session session = new Session(TEST_SESSION_ID, TEST_USER_EMAIL, sessionGroups);
-        assertFalse(jwtPermissionsService.isPublisher(session));
-    }
-
-    @Test
-    public void isPublisher_SessionNull_ShouldReturnFalse() {
-        Session session = null;
-        assertFalse(jwtPermissionsService.isPublisher(session));
-        verifyNoInteractions(jwtPermissionStore);
-    }
-
-    @Test
-    public void isPublisher_Session_NotPublisher_ShouldReturnFalse() {
-        Session session = new Session(TEST_SESSION_ID, TEST_USER_EMAIL, new ArrayList<>());
-        assertFalse(jwtPermissionsService.isPublisher(session));
-        verifyNoInteractions(jwtPermissionStore);
-    }
-
-    @Test
-    public void isPublisher_Session_NullGroup_ShouldReturnFalse() {
-        Session session = new Session(TEST_SESSION_ID, TEST_USER_EMAIL, null);
-        assertFalse(jwtPermissionsService.isPublisher(session));
-        verifyNoInteractions(jwtPermissionStore);
-    }
-
-    @Test
     public void isAdministrator_Session_Admin_ShouldReturnTrue() {
         List<String> sessionGroups = new ArrayList<>();
         sessionGroups.add(ADMIN);
@@ -147,6 +108,14 @@ public class JWTPermissionsServiceImplTest {
         Session session = new Session(TEST_SESSION_ID, TEST_USER_EMAIL, null);
         assertFalse(jwtPermissionsService.isAdministrator(session));
         verifyNoInteractions(jwtPermissionStore);
+    }
+
+    @Test
+    public void isAdministrator_Session_ShouldError() {
+        Session session = new Session(TEST_SESSION_ID, TEST_USER_EMAIL);
+        UnsupportedOperationException exception = assertThrows(UnsupportedOperationException.class, () ->
+                jwtPermissionsService.isAdministrator(session));
+        assertEquals("JWT sessions are enabled: isAdministrator is no longer supported", exception.getMessage());
     }
 
     @Test
@@ -506,6 +475,6 @@ public class JWTPermissionsServiceImplTest {
         PermissionDefinition actual = jwtPermissionsService.userPermissions(session);
         assertTrue(actual.isAdmin());
         assertTrue(actual.isEditor());
-        assertTrue(actual.getEmail() == TEST_USER_EMAIL);
+        assertEquals(TEST_USER_EMAIL, actual.getEmail());
     }
 }

@@ -17,15 +17,12 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import static java.text.MessageFormat.format;
 
 public class PermissionsServiceImplementation implements PermissionsService {
-    private ReentrantReadWriteLock readWriteLock = new ReentrantReadWriteLock();
-    private final Lock readLock = readWriteLock.readLock();
     private static final String UNSUPPORTED_ERROR = "Permissions API is enabled: {0} is no longer supported";
+
     private PermissionChecker permissionChecker;
 
     private static final Duration DEFAULT_CACHE_UPDATE_INTERVAL = Duration.standardSeconds(60);
@@ -38,12 +35,6 @@ public class PermissionsServiceImplementation implements PermissionsService {
 
     public PermissionsServiceImplementation() {
         this.permissionChecker = new PermissionChecker("", DEFAULT_CACHE_UPDATE_INTERVAL, DEFAULT_EXPIRY_CHECK_INTERVAL, DEFAULT_MAX_CACHE_TIME);
-    }
-
-
-    @Override
-    public boolean isPublisher(Session session) throws IOException {
-        throw new UnsupportedOperationException(format(UNSUPPORTED_ERROR, "isPublisher"));
     }
 
     @Override
@@ -107,13 +98,10 @@ public class PermissionsServiceImplementation implements PermissionsService {
     @Override
     public boolean canView(Session session, String collectionId, CollectionType collectionType) throws IOException {
         boolean authorised = false;
-        readLock.lock();
         try {
             authorised = hasPermission(session, Permissions.LEGACY_READ, collectionId, Optional.ofNullable(collectionType));
         } catch (Exception e) {
             throw new RuntimeException(e);
-        } finally {
-            readLock.unlock();
         }
         return authorised;
     }

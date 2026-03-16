@@ -783,7 +783,7 @@ public class Collection {
         }
 
         boolean contentWasCompleted = contentWasCompleted(uri);
-        if (contentWasCompleted == false) {
+        if (!contentWasCompleted) {
             throw new BadRequestException("Item has not been marked completed");
         }
 
@@ -796,26 +796,23 @@ public class Collection {
             throw new BadRequestException("Item has already been reviewed");
         }
 
-        if (permission && !userCompletedContent) {
+        // Move the complete copy to reviewed:
+        Path source = complete.get(uri);
 
-            // Move the complete copy to reviewed:
-            Path source = complete.get(uri);
-
-            if (source == null) {
-                source = inProgress.get(uri);
-            }
-
-            Path destination = reviewed.toPath(uri);
-
-            if (recursive) {
-                reviewRecursive(source, destination, session);
-            } else {
-                reviewSingleFile(source, destination);
-            }
-
-            addEvent(uri, new Event(new Date(), EventType.REVIEWED, session.getEmail()));
-            result = true;
+        if (source == null) {
+            source = inProgress.get(uri);
         }
+
+        Path destination = reviewed.toPath(uri);
+
+        if (recursive) {
+            reviewRecursive(source, destination, session);
+        } else {
+            reviewSingleFile(source, destination);
+        }
+
+        addEvent(uri, new Event(new Date(), EventType.REVIEWED, session.getEmail()));
+        result = true;
 
         return result;
     }

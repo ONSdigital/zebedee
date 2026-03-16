@@ -900,6 +900,42 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         // expect a Forbidden error
     }
 
+    @Test
+    public void shouldAllowSelfApproveForAutomatedCollection() throws Exception {
+
+        // Given an automated collection
+        collection.getDescription().setType(CollectionType.automated);
+        // And an authorised user
+        when(permissionsService.canSelfApprove(publisher1Session, CollectionType.automated))
+                .thenReturn(true);
+        String uri = CreateCompleteContent();
+
+        // When the collection is reviewed
+        boolean reviewed = collection.review(publisher1Session, uri, recursive);
+
+        // Then the collection is successfully reviewed
+        assertTrue(reviewed);
+        Path reviewedPath = builder.collections.get(1).resolve(Collection.REVIEWED);
+        assertTrue(Files.exists(reviewedPath.resolve(uri.substring(1))));
+    }
+
+    @Test(expected = BadRequestException.class)
+    public void shouldNotSelfApproveForNonAutomatedCollection() throws Exception {
+
+        // Given a non-automated collection
+        collection.getDescription().setType(CollectionType.manual);
+        // And a user with the self approve permission
+        when(permissionsService.canSelfApprove(publisher1Session, CollectionType.manual))
+                .thenReturn(true);
+        String uri = CreateCompleteContent();
+
+        // When the collection is reviewed
+        collection.review(publisher1Session, uri, recursive);
+
+        // Then
+        // expect a BadRequestException
+    }
+
     @Test(expected = ForbiddenException.class)
     public void shouldNotReviewWhenEditPermissionDenied() throws Exception {
 

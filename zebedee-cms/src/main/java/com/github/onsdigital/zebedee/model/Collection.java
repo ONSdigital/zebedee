@@ -789,7 +789,15 @@ public class Collection {
 
         boolean userCompletedContent = didUserCompleteContent(session.getEmail(), uri);
         if (userCompletedContent) {
-            throw new UnauthorizedException("Reviewer must be a second set of eyes");
+            boolean selfApprovePermission = zebedee.getPermissionsService().canSelfApprove(session, this.getDescription().getType());
+            boolean isAutomatedCollection = this.getDescription().getType() == CollectionType.automated;
+            if (!selfApprovePermission) {
+                throw new ForbiddenException("Reviewer must be a second set of eyes");
+            }
+
+            if (!isAutomatedCollection) {
+                throw new BadRequestException("Only automated collections can be self-approved");
+            }
         }
 
         if (reviewed.get(uri) != null) {

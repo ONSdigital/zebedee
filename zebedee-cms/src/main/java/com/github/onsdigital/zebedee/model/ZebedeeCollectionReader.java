@@ -56,7 +56,7 @@ public class ZebedeeCollectionReader extends CollectionReader {
      *                   {@link CollectionKeyring}.
      * @param collection the {@link Collection} the reader will read the content from
      * @param session    the {@link Session} of the {@link User} who will use the reader.
-     * @throws IOException           problem creating the read.
+     * @throws IOException           problem creating the reader.
      * @throws NotFoundException     the collection is not found
      * @throws UnauthorizedException the user is not authorised to read the collection content
      */

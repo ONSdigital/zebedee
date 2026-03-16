@@ -96,10 +96,8 @@ public class ContentTest {
         content = new com.github.onsdigital.zebedee.model.Content(tempBasePath);
         collections = new Collections(tempBasePath, mockPermissionsService, versionsService, content);
 
-        when(mockPermissionsService.canEdit(mockSession)).thenReturn(true);
         when(mockPermissionsService.canEdit(mockSession, collectionType)).thenReturn(true);
 
-        when(mockPermissionsService.canView(any(), any())).thenReturn(true);
         when(mockPermissionsService.canView(any(), any(), any())).thenReturn(true);
 
         when(mockSessions.get()).thenReturn(mockSession);

@@ -190,18 +190,9 @@ Otherwise :violin: kindly ask someone from the dev team to help troubleshoot.
 | VERIFY_RETRY_COUNT                               | 10                                                                             | Retry count for how long, in seconds, to wait for retry                      |
 | VERIFY_RETRY_DELAY                               | 5000; //milliseconds                                                           | Retry delay duration                                                         |
 
-### New Central Keyring configuration
+### Central Keyring configuration
 
-The new central keyring feature is currently behind a feature flag:
-
-```bash
-export ENABLE_CENTRALISED_KEYRING=true/false
-```
-
-- If enabled Zebedee will attempt to read/write from the new central keyring and default to the legacy keyring if
-unsuccessful.
-- If disabled Zebedee will add/remove keys from both legacy and central keyring implementations but will
-only read from the legacy keyring.
+Zebedee will read/write from the central keyring for encrypting collections.
 
 The central keyring requires encryption config to be provided in app configutation. These secrets can be generated
 using the [collection-keyring-secrets-generator][7].

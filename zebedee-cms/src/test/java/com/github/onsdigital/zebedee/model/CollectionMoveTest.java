@@ -84,7 +84,7 @@ public class CollectionMoveTest extends ZebedeeTestBaseFixture {
     }
 
     @Test
-    public void shouldChangeReferencesInFileOnMoveContent() throws URISyntaxException, IOException, ZebedeeException {
+    public void shouldChangeReferencesInFileOnMoveContent() throws IOException, ZebedeeException {
         // Given
         // an item of content that references something
         martin.getRelatedArticles().add(new Link(bedford.getUri()));

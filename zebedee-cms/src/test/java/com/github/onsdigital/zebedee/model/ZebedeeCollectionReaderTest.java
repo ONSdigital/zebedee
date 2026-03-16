@@ -205,14 +205,14 @@ public class ZebedeeCollectionReaderTest extends ZebedeeTestBaseFixture {
     }
 
     @Test
-    public void testNew_zebedeeNull_shouldThrowException() throws Exception {
+    public void testNew_zebedeeNull_shouldThrowException() {
         IOException ex = assertThrows(IOException.class, () -> newReader(null, null, null));
 
         assertThat(ex.getMessage(), equalTo(ZEBEDEE_NULL_ERR));
     }
 
     @Test
-    public void testNew_permissionsServiceNull_shouldThrowException() throws Exception {
+    public void testNew_permissionsServiceNull_shouldThrowException() {
         when(zebedeeMock.getPermissionsService())
                 .thenReturn(null);
 
@@ -223,7 +223,7 @@ public class ZebedeeCollectionReaderTest extends ZebedeeTestBaseFixture {
     }
 
     @Test
-    public void testNew_keyringNull_shouldThrowException() throws Exception {
+    public void testNew_keyringNull_shouldThrowException() {
         when(zebedeeMock.getCollectionKeyring())
                 .thenReturn(null);
 
@@ -236,7 +236,7 @@ public class ZebedeeCollectionReaderTest extends ZebedeeTestBaseFixture {
 
 
     @Test
-    public void testNew_usersServiceNull_shouldThrowException() throws Exception {
+    public void testNew_usersServiceNull_shouldThrowException() {
         when(zebedeeMock.getUsersService())
                 .thenReturn(null);
 
@@ -250,7 +250,7 @@ public class ZebedeeCollectionReaderTest extends ZebedeeTestBaseFixture {
 
 
     @Test
-    public void testNew_collectionNull_shouldThrowException() throws Exception {
+    public void testNew_collectionNull_shouldThrowException() {
         NotFoundException ex = assertThrows(NotFoundException.class, () -> newReader(zebedeeMock, null, null));
 
         assertThat(ex.getMessage(), equalTo(COLLECTION_NULL_ERR));
@@ -259,7 +259,7 @@ public class ZebedeeCollectionReaderTest extends ZebedeeTestBaseFixture {
     }
 
     @Test
-    public void testNew_sessionNull_shouldThrowException() throws Exception {
+    public void testNew_sessionNull_shouldThrowException() {
         UnauthorizedException ex = assertThrows(UnauthorizedException.class,
                 () -> newReader(zebedeeMock, mockCollection, null));
 

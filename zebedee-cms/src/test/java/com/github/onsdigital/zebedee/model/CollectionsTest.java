@@ -50,7 +50,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -235,7 +234,7 @@ public class CollectionsTest {
 
     @Test(expected = BadRequestException.class)
     public void shouldThrowBadRequestForNullCollectionOnListDirectory() throws IOException, UnauthorizedException,
-            BadRequestException, ConflictException, NotFoundException {
+            BadRequestException, NotFoundException {
         collections.listDirectory(null, "somefile.json", sessionMock);
     }
 
@@ -329,7 +328,7 @@ public class CollectionsTest {
     @Test(expected = UnauthorizedException.class)
     public void shouldThrowUnauthorizedIfNotLoggedInOnListDirectory() throws IOException, UnauthorizedException,
             BadRequestException,
-            ConflictException, NotFoundException {
+            NotFoundException {
         when(permissionsServiceMock.canView(sessionMock, COLLECTION_ID, TEST_COLLECTION_TYPE))
                 .thenReturn(false);
 
@@ -638,10 +637,7 @@ public class CollectionsTest {
     }
 
     @Test
-    public void shouldApproveCollection() throws IOException, ZebedeeException, ExecutionException,
-            InterruptedException {
-        Function<Path, ContentReader> contentReaderFunction = (p) -> contentReaderMock;
-        Function<ApproveTask, Future<Boolean>> addTaskToQueue = (t) -> futureMock;
+    public void shouldApproveCollection() throws IOException, ZebedeeException {
 
         ReflectionTestUtils.setField(collections, "contentReaderFactory", contentReaderFunction);
         ReflectionTestUtils.setField(collections, "addTaskToQueue", addTaskToQueue);
@@ -691,7 +687,7 @@ public class CollectionsTest {
     }
 
     @Test
-    public void shouldUnlockCollectionWithRedirects() throws IOException, ZebedeeException, ExecutionException, InterruptedException {
+    public void shouldUnlockCollectionWithRedirects() throws IOException, ZebedeeException {
         when(permissionsServiceMock.canEdit(sessionMock, TEST_COLLECTION_TYPE))
                 .thenReturn(true);
         when(collectionDescriptionMock.getApprovalStatus())
@@ -776,7 +772,7 @@ public class CollectionsTest {
 
     @Test(expected = NotFoundException.class)
     public void shouldGetNotFoundIfAttemptingToListNonexistentDirectory() throws IOException, UnauthorizedException,
-            BadRequestException, ConflictException, NotFoundException {
+            BadRequestException, NotFoundException {
         String uri = "someURI";
         when(permissionsServiceMock.canView(sessionMock, COLLECTION_ID, TEST_COLLECTION_TYPE))
                 .thenReturn(true);
@@ -793,7 +789,7 @@ public class CollectionsTest {
 
     @Test(expected = BadRequestException.class)
     public void shouldGetBadRequestIfAttemptingToListDirectoryOnAFile() throws IOException, UnauthorizedException,
-            BadRequestException, ConflictException, NotFoundException {
+            BadRequestException, NotFoundException {
         Path uri = rootDir.newFile("data.json").toPath();
         when(permissionsServiceMock.canView(sessionMock, COLLECTION_ID, TEST_COLLECTION_TYPE))
                 .thenReturn(true);
@@ -809,8 +805,7 @@ public class CollectionsTest {
     }
 
     @Test
-    public void shouldListDirectory() throws IOException, UnauthorizedException, BadRequestException, ConflictException,
-            NotFoundException {
+    public void shouldListDirectory() throws IOException, UnauthorizedException, BadRequestException, NotFoundException {
         Path file1 = rootDir.newFile("data.json").toPath();
         Path file2 = rootDir.newFile("chart.png").toPath();
 

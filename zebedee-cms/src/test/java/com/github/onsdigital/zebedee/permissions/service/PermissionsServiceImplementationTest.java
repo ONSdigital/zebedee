@@ -54,7 +54,7 @@ public class PermissionsServiceImplementationTest {
     }
 
     @Test
-    public void isPublisher_ShouldThrowUnsupportedOperation() throws Exception {
+    public void isPublisher_ShouldThrowUnsupportedOperation() {
         UnsupportedOperationException exception = assertThrows(UnsupportedOperationException.class, () ->
                 permissionsService.isPublisher(session));
 
@@ -62,7 +62,7 @@ public class PermissionsServiceImplementationTest {
     }
 
     @Test
-    public void addAdministrator_ShouldThrowUnsupportedOperation() throws Exception {
+    public void addAdministrator_ShouldThrowUnsupportedOperation() {
         UnsupportedOperationException exception = assertThrows(UnsupportedOperationException.class, () ->
                 permissionsService.addAdministrator(USER_EMAIL, session));
 

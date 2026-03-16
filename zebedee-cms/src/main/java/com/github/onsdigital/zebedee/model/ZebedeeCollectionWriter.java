@@ -52,7 +52,7 @@ public class ZebedeeCollectionWriter extends CollectionWriter {
      * Create a new instance of CollectionWriter for the given Zebedee instance, collection, and session.
      */
     public ZebedeeCollectionWriter(Zebedee zebedee, Collection collection, Session session)
-            throws BadRequestException, IOException, UnauthorizedException, NotFoundException {
+            throws IOException, UnauthorizedException, NotFoundException {
         validateParams(zebedee, collection, session);
         this.zebedee = zebedee;
         checkUserAuthorisedToAccessCollection(zebedee, session, collection.getDescription().getType());

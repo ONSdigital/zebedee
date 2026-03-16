@@ -43,7 +43,7 @@ public class ZebedeeCollectionReader extends CollectionReader {
     static final String COLLECTION_KEY_NULL_ERR =
             "error constructing ZebedeeCollectionReader key required but keyring returned null";
 
-    public ZebedeeCollectionReader(Collection collection, SecretKey key) throws BadRequestException, IOException, UnauthorizedException, NotFoundException {
+    public ZebedeeCollectionReader(Collection collection, SecretKey key) throws IOException, UnauthorizedException, NotFoundException {
         init(collection, key);
     }
 

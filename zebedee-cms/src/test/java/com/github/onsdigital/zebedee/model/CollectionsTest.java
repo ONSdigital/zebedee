@@ -638,6 +638,8 @@ public class CollectionsTest {
 
     @Test
     public void shouldApproveCollection() throws IOException, ZebedeeException {
+        Function<Path, ContentReader> contentReaderFunction = p -> contentReaderMock;
+        Function<ApproveTask, Future<Boolean>> addTaskToQueue = t -> futureMock;
 
         ReflectionTestUtils.setField(collections, "contentReaderFactory", contentReaderFunction);
         ReflectionTestUtils.setField(collections, "addTaskToQueue", addTaskToQueue);

@@ -21,14 +21,12 @@ import java.io.IOException;
 
 import static com.github.onsdigital.zebedee.model.ZebedeeCollectionWriter.COLLECTION_KEY_NULL_ERR;
 import static com.github.onsdigital.zebedee.model.ZebedeeCollectionWriter.COLLECTION_NULL_ERR;
-import static com.github.onsdigital.zebedee.model.ZebedeeCollectionWriter.GET_USER_ERR;
 import static com.github.onsdigital.zebedee.model.ZebedeeCollectionWriter.KEYRING_NULL_ERR;
 import static com.github.onsdigital.zebedee.model.ZebedeeCollectionWriter.PERMISSIONS_CHECK_ERR;
 import static com.github.onsdigital.zebedee.model.ZebedeeCollectionWriter.PERMISSIONS_SERVICE_NULL_ERR;
 import static com.github.onsdigital.zebedee.model.ZebedeeCollectionWriter.PERMISSION_DENIED_ERR;
 import static com.github.onsdigital.zebedee.model.ZebedeeCollectionWriter.SESSION_NULL_ERR;
 import static com.github.onsdigital.zebedee.model.ZebedeeCollectionWriter.USERS_SERVICE_NULL_ERR;
-import static com.github.onsdigital.zebedee.model.ZebedeeCollectionWriter.USER_NULL_ERR;
 import static com.github.onsdigital.zebedee.model.ZebedeeCollectionWriter.ZEBEDEE_NULL_ERR;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;

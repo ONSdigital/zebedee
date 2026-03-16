@@ -13,8 +13,8 @@ import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.CollectionNotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ConflictException;
+import com.github.onsdigital.zebedee.exceptions.ForbiddenException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
-import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.ApprovalStatus;
 import com.github.onsdigital.zebedee.json.CollectionDataset;
@@ -66,6 +66,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
@@ -87,6 +88,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
     private static final String teamName = "some team";
     private static final String teamId = "12";
     private static final boolean recursive = false;
+    private static final CollectionType TEST_COLLECTION_TYPE = CollectionType.manual;
     Collection collection;
     Session publisher1Session;
     Session publisher2Session;
@@ -97,6 +99,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         rootDir.create();
 
         collection = new Collection(builder.collections.get(1), zebedee);
+        collection.getDescription().setType(TEST_COLLECTION_TYPE);
 
         publisher1Session = new Session("5678", builder.publisher1.getEmail());
         publisher2Session = new Session("5678", builder.publisher2.getEmail());
@@ -104,9 +107,13 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         setUpPermissionsServiceMockForLegacyTests(zebedee, publisher1Session);
         ReflectionTestUtils.setField(zebedee, "teamsService", teamsService);
 
+        when(permissionsService.canEdit(publisher1Session))
+                .thenReturn(true);
+        when(permissionsService.canEdit(eq(publisher1Session), any(CollectionType.class)))
+                .thenReturn(true);  
         when(permissionsService.canEdit(publisher2Session))
                 .thenReturn(true);
-        when(permissionsService.canEdit(publisher1Session))
+        when(permissionsService.canEdit(eq(publisher2Session), any(CollectionType.class)))
                 .thenReturn(true);
 
         publisher1Email = builder.publisher1.getEmail();
@@ -878,7 +885,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         collection.getDescription().getEventsByUri().get(uri).hasEventForType(EventType.REVIEWED);
     }
 
-    @Test(expected = UnauthorizedException.class)
+    @Test(expected = ForbiddenException.class)
     public void shouldNotReviewAsPublisher() throws IOException, ZebedeeException {
 
         // Given
@@ -890,7 +897,59 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         collection.review(publisher1Session, uri, recursive);
 
         // Then
-        // expect an Unauthorized error
+        // expect a Forbidden error
+    }
+
+    @Test
+    public void shouldAllowSelfApproveForAutomatedCollection() throws Exception {
+
+        // Given an automated collection
+        collection.getDescription().setType(CollectionType.automated);
+        // And an authorised user
+        when(permissionsService.canSelfApprove(publisher1Session, CollectionType.automated))
+                .thenReturn(true);
+        String uri = CreateCompleteContent();
+
+        // When the collection is reviewed
+        boolean reviewed = collection.review(publisher1Session, uri, recursive);
+
+        // Then the collection is successfully reviewed
+        assertTrue(reviewed);
+        Path reviewedPath = builder.collections.get(1).resolve(Collection.REVIEWED);
+        assertTrue(Files.exists(reviewedPath.resolve(uri.substring(1))));
+    }
+
+    @Test(expected = BadRequestException.class)
+    public void shouldNotSelfApproveForNonAutomatedCollection() throws Exception {
+
+        // Given a non-automated collection
+        collection.getDescription().setType(CollectionType.manual);
+        // And a user with the self approve permission
+        when(permissionsService.canSelfApprove(publisher1Session, CollectionType.manual))
+                .thenReturn(true);
+        String uri = CreateCompleteContent();
+
+        // When the collection is reviewed
+        collection.review(publisher1Session, uri, recursive);
+
+        // Then
+        // expect a BadRequestException
+    }
+
+    @Test(expected = ForbiddenException.class)
+    public void shouldNotReviewWhenEditPermissionDenied() throws Exception {
+
+        // Given some content that has been edited and complete
+        String uri = CreateCompleteContent();
+        // And a user without edit permissions for the collection
+        when(permissionsService.canEdit(eq(publisher2Session), any(CollectionType.class)))
+                .thenReturn(false);
+
+        // When the collection is reviewed
+        collection.review(publisher2Session, uri, recursive);
+
+        // Then
+        // expect a ForbiddenException
     }
 
     private String CreatePublishedContent() throws IOException {
@@ -920,7 +979,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         collection.edit(publisher1Session, uri, collectionWriter, recursive);
 
         // When - A reviewer edits reviews content
-        boolean reviewed = collection.review(publisher2Session, uri, recursive);
+        collection.review(publisher2Session, uri, recursive);
 
         // Then
         // Expect an error

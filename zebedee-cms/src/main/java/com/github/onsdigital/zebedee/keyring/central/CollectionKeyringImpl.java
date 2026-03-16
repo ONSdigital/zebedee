@@ -1,9 +1,9 @@
 package com.github.onsdigital.zebedee.keyring.central;
 
-import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.keyring.CollectionKeyring;
 import com.github.onsdigital.zebedee.keyring.CollectionKeyCache;
 import com.github.onsdigital.zebedee.keyring.KeyringException;
+import com.github.onsdigital.zebedee.json.CollectionType;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.Collections;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
@@ -76,7 +76,7 @@ public class CollectionKeyringImpl implements CollectionKeyring {
         validateSession(session);
         validateCollection(collection);
 
-        boolean hasPermission = hasViewPermissions(session, collection.getDescription().getId());
+        boolean hasPermission = hasViewPermissionsForType(session, collection.getDescription().getId(), collection.getDescription().getType());
 
         if (!hasPermission) {
             return null;
@@ -90,7 +90,7 @@ public class CollectionKeyringImpl implements CollectionKeyring {
         validateSession(session);
         validateCollection(collection);
 
-        boolean hasPermission = hasEditPermissions(session);
+        boolean hasPermission = hasEditPermissionsForType(session, collection.getDescription().getType());
 
         if (!hasPermission) {
             return;
@@ -105,7 +105,7 @@ public class CollectionKeyringImpl implements CollectionKeyring {
         validateCollection(collection);
         validateKey(key);
 
-        boolean hasPermission = hasEditPermissions(session);
+        boolean hasPermission = hasEditPermissionsForType(session, collection.getDescription().getType());
 
         if (!hasPermission) {
             return;
@@ -163,9 +163,17 @@ public class CollectionKeyringImpl implements CollectionKeyring {
         }
     }
 
-    private boolean hasViewPermissions(Session session, String collectionId) throws KeyringException {
+    private boolean hasViewPermissionsForType(Session session, String collectionId, CollectionType collectionType) throws KeyringException {
         try {
-            return permissionsService.canView(session, collectionId);
+            return permissionsService.canView(session, collectionId, collectionType);
+        } catch (IOException ex) {
+            throw new KeyringException(ex);
+        }
+    }
+
+    private boolean hasEditPermissionsForType(Session session, CollectionType collectionType) throws KeyringException {
+        try {
+            return permissionsService.canEdit(session, collectionType);
         } catch (IOException ex) {
             throw new KeyringException(ex);
         }

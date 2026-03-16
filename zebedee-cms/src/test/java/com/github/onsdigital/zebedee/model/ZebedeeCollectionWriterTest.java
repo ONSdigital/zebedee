@@ -4,6 +4,7 @@ import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
+import com.github.onsdigital.zebedee.json.CollectionType;
 import com.github.onsdigital.zebedee.keyring.CollectionKeyring;
 import com.github.onsdigital.zebedee.keyring.KeyringException;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
@@ -20,14 +21,12 @@ import java.io.IOException;
 
 import static com.github.onsdigital.zebedee.model.ZebedeeCollectionWriter.COLLECTION_KEY_NULL_ERR;
 import static com.github.onsdigital.zebedee.model.ZebedeeCollectionWriter.COLLECTION_NULL_ERR;
-import static com.github.onsdigital.zebedee.model.ZebedeeCollectionWriter.GET_USER_ERR;
 import static com.github.onsdigital.zebedee.model.ZebedeeCollectionWriter.KEYRING_NULL_ERR;
 import static com.github.onsdigital.zebedee.model.ZebedeeCollectionWriter.PERMISSIONS_CHECK_ERR;
 import static com.github.onsdigital.zebedee.model.ZebedeeCollectionWriter.PERMISSIONS_SERVICE_NULL_ERR;
 import static com.github.onsdigital.zebedee.model.ZebedeeCollectionWriter.PERMISSION_DENIED_ERR;
 import static com.github.onsdigital.zebedee.model.ZebedeeCollectionWriter.SESSION_NULL_ERR;
 import static com.github.onsdigital.zebedee.model.ZebedeeCollectionWriter.USERS_SERVICE_NULL_ERR;
-import static com.github.onsdigital.zebedee.model.ZebedeeCollectionWriter.USER_NULL_ERR;
 import static com.github.onsdigital.zebedee.model.ZebedeeCollectionWriter.ZEBEDEE_NULL_ERR;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -39,6 +38,7 @@ import static org.mockito.Mockito.when;
 public class ZebedeeCollectionWriterTest {
 
     static final String EMAIL = "ellen.ripley@weyland-yutanicopr.com";
+    static final CollectionType TEST_COLLECTION_TYPE = CollectionType.manual;
 
     @Mock
     private Zebedee zebedee;
@@ -87,7 +87,10 @@ public class ZebedeeCollectionWriterTest {
         when(collection.getDescription())
                 .thenReturn(description);
 
-        when(permissionsService.canEdit(session))
+        when(description.getType())
+                .thenReturn(TEST_COLLECTION_TYPE);
+
+        when(permissionsService.canEdit(session, TEST_COLLECTION_TYPE))
                 .thenReturn(true);
 
         when(collectionKeyring.get(session, collection))
@@ -102,14 +105,14 @@ public class ZebedeeCollectionWriterTest {
     }
 
     @Test
-    public void testNew_ZebedeeNull_shouldThrowException() throws Exception {
+    public void testNew_ZebedeeNull_shouldThrowException() {
         IOException ex = assertThrows(IOException.class, () -> newCollectionWriter(null, null, null));
 
         assertThat(ex.getMessage(), equalTo(ZEBEDEE_NULL_ERR));
     }
 
     @Test
-    public void testNew_permissionsServiceNull_shouldThrowException() throws Exception {
+    public void testNew_permissionsServiceNull_shouldThrowException() {
         when(zebedee.getPermissionsService())
                 .thenReturn(null);
 
@@ -119,7 +122,7 @@ public class ZebedeeCollectionWriterTest {
     }
 
     @Test
-    public void testNew_usersServiceNull_shouldThrowException() throws Exception {
+    public void testNew_usersServiceNull_shouldThrowException() {
         when(zebedee.getUsersService())
                 .thenReturn(null);
 
@@ -129,7 +132,7 @@ public class ZebedeeCollectionWriterTest {
     }
 
     @Test
-    public void testNew_keyringNull_shouldThrowException() throws Exception {
+    public void testNew_keyringNull_shouldThrowException() {
         when(zebedee.getCollectionKeyring())
                 .thenReturn(null);
 
@@ -139,14 +142,14 @@ public class ZebedeeCollectionWriterTest {
     }
 
     @Test
-    public void testNew_collectionNull_shouldThrowException() throws Exception {
+    public void testNew_collectionNull_shouldThrowException() {
         NotFoundException ex = assertThrows(NotFoundException.class, () -> newCollectionWriter(zebedee, null, null));
 
         assertThat(ex.getMessage(), equalTo(COLLECTION_NULL_ERR));
     }
 
     @Test
-    public void testNew_sessionNull_shouldThrowException() throws Exception {
+    public void testNew_sessionNull_shouldThrowException() {
         UnauthorizedException ex = assertThrows(UnauthorizedException.class, () -> newCollectionWriter(zebedee, collection, null));
 
         assertThat(ex.getMessage(), equalTo(SESSION_NULL_ERR));
@@ -154,26 +157,26 @@ public class ZebedeeCollectionWriterTest {
 
     @Test
     public void testNew_permissionDenied_shouldThrowException() throws Exception {
-        when(permissionsService.canEdit(session))
+        when(permissionsService.canEdit(session, TEST_COLLECTION_TYPE))
                 .thenReturn(false);
 
         UnauthorizedException ex = assertThrows(UnauthorizedException.class,
                 () -> newCollectionWriter(zebedee, collection, session));
 
         assertThat(ex.getMessage(), equalTo(PERMISSION_DENIED_ERR));
-        verify(permissionsService, times(1)).canEdit(session);
+        verify(permissionsService, times(1)).canEdit(session, TEST_COLLECTION_TYPE);
     }
 
     @Test
     public void testNew_canEditReturnsError_shouldThrowException() throws Exception {
-        when(permissionsService.canEdit(session))
+        when(permissionsService.canEdit(session, TEST_COLLECTION_TYPE))
                 .thenThrow(IOException.class);
 
         IOException ex = assertThrows(IOException.class,
                 () -> newCollectionWriter(zebedee, collection, session));
 
         assertThat(ex.getMessage(), equalTo(PERMISSIONS_CHECK_ERR));
-        verify(permissionsService, times(1)).canEdit(session);
+        verify(permissionsService, times(1)).canEdit(session, TEST_COLLECTION_TYPE);
     }
 
     @Test
@@ -181,10 +184,10 @@ public class ZebedeeCollectionWriterTest {
         when(collectionKeyring.get(session, collection))
                 .thenThrow(KeyringException.class);
 
-        IOException ex = assertThrows(IOException.class,
+        assertThrows(IOException.class,
                 () -> newCollectionWriter(zebedee, collection, session));
 
-        verify(permissionsService, times(1)).canEdit(session);
+        verify(permissionsService, times(1)).canEdit(session, TEST_COLLECTION_TYPE);
         verify(collectionKeyring, times(1)).get(session, collection);
     }
 
@@ -197,7 +200,7 @@ public class ZebedeeCollectionWriterTest {
                 () -> newCollectionWriter(zebedee, collection, session));
 
         assertThat(ex.getMessage(), equalTo(COLLECTION_KEY_NULL_ERR));
-        verify(permissionsService, times(1)).canEdit(session);
+        verify(permissionsService, times(1)).canEdit(session, TEST_COLLECTION_TYPE);
         verify(collectionKeyring, times(1)).get(session, collection);
     }
 }

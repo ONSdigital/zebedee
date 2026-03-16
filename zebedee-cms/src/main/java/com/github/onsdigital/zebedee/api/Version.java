@@ -2,8 +2,9 @@ package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
 import com.github.onsdigital.zebedee.audit.Audit;
-import com.github.onsdigital.zebedee.exceptions.BadRequestException;
-import com.github.onsdigital.zebedee.exceptions.NotFoundException;
+import com.github.onsdigital.zebedee.json.CollectionDescription;
+import com.github.onsdigital.zebedee.exceptions.ForbiddenException;
+import com.github.onsdigital.zebedee.exceptions.InternalServerError;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.model.Collection;
@@ -44,6 +45,15 @@ public class Version {
         Collection collection = Collections.getCollection(request);
         String uri = request.getParameter("uri");
 
+        CollectionDescription collectionDescription = collection.getDescription();
+        if (collectionDescription == null) {
+            throw new InternalServerError("Collection description is missing");
+        }
+
+        if (!Root.zebedee.getPermissionsService().canEdit(session, collectionDescription.getType())) {
+            throw new UnauthorizedException("You are not authorised to edit content for this collection type.");
+        }
+
         ContentItemVersion version = null;
         try {
             CollectionWriter collectionWriter = new ZebedeeCollectionWriter(Root.zebedee, collection, session);
@@ -78,7 +88,7 @@ public class Version {
      *                 Returns HTTP 401 if the user is not authorised to edit content.
      */
     @DELETE
-    public boolean delete(HttpServletRequest request, HttpServletResponse response) throws IOException, BadRequestException, NotFoundException, UnauthorizedException {
+    public boolean delete(HttpServletRequest request, HttpServletResponse response) throws IOException, ZebedeeException {
 
         Session session = Root.zebedee.getSessions().get();
         if (session == null || !Root.zebedee.getPermissionsService().canEdit(session)) {
@@ -87,6 +97,15 @@ public class Version {
 
         Collection collection = Collections.getCollection(request);
         String uri = request.getParameter("uri");
+
+        CollectionDescription collectionDescription = collection.getDescription();
+        if (collectionDescription == null) {
+            throw new InternalServerError("Collection description is missing");
+        }
+
+        if (!Root.zebedee.getPermissionsService().canEdit(session, collectionDescription.getType())) {
+            throw new ForbiddenException("You are not authorised to edit content for this collection type.");
+        }
 
         try {
             info().uri(uri).collectionID(collection).user(session).log("deleting collection version content");

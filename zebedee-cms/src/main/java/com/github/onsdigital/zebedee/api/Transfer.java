@@ -17,35 +17,44 @@ import java.nio.file.Path;
 
 /**
  * Created by kanemorgan on 24/03/2015.
+ * TODO:I don't believe this is used and so could be removed LM 16/03/2026
  */
 @Api
 public class Transfer {
 
     /**
-     * Moves files between collections using the endpoint <code>/Transfer/[CollectionName]</code>
+     * Moves files between collections using the endpoint
+     * <code>/Transfer/[CollectionName]</code>
      *
-     * @param request This should contain a X-Florence-Token header for the current session
-     * @param response <ul>
-     *                 <li>If the either collection does not exist:  {@link HttpStatus#NOT_FOUND_404}</li>
-     *                 <li>If the file does not exist:  {@link HttpStatus#NOT_FOUND_404}</li>
-     *                 <li>If user not authorised to transfer:  {@link HttpStatus#UNAUTHORIZED_401}</li>
-     *                 <li>A file with that name already exists in the second collection:  {@link HttpStatus#CONFLICT_409}</li>
-     * @param params A {@link TransferRequest} object
+     * @param request  This should contain a X-Florence-Token header for the current
+     *                 session
+     * @param response
+     *                 <ul>
+     *                 <li>If the either collection does not exist:
+     *                 {@link HttpStatus#NOT_FOUND_404}</li>
+     *                 <li>If the file does not exist:
+     *                 {@link HttpStatus#NOT_FOUND_404}</li>
+     *                 <li>If user not authorised to transfer:
+     *                 {@link HttpStatus#UNAUTHORIZED_401}</li>
+     *                 <li>A file with that name already exists in the second
+     *                 collection: {@link HttpStatus#CONFLICT_409}</li>
+     * @param params   A {@link TransferRequest} object
      * @return success true/false
      * @throws IOException
      */
     @POST
-    public boolean move(HttpServletRequest request, HttpServletResponse response, TransferRequest params) throws IOException {
+    public boolean move(HttpServletRequest request, HttpServletResponse response, TransferRequest params)
+            throws IOException {
         // user has permission
         Session session = Root.zebedee.getSessions().get();
-        if (!Root.zebedee.getPermissionsService().canEdit(session)){
-            response.setStatus(HttpStatus.UNAUTHORIZED_401);
+        if (!Root.zebedee.getPermissionsService().canEdit(session)) {
+            response.setStatus(HttpStatus.FORBIDDEN_403);
             return false;
         }
 
         // get the source collection
-        Collection source = getSource(params,request);
-        if(source == null) {
+        Collection source = getSource(params, request);
+        if (source == null) {
             response.setStatus(HttpStatus.NOT_FOUND_404);
             return false;
         }
@@ -63,9 +72,15 @@ public class Transfer {
             return false;
         }
 
+        if (!Root.zebedee.getPermissionsService().canEdit(session, destination.getDescription().getType()) ||
+                !Root.zebedee.getPermissionsService().canEdit(session, source.getDescription().getType())) {
+            response.setStatus(HttpStatus.FORBIDDEN_403);
+            return false;
+        }
+
         Path destinationPath = destination.getInProgressPath(params.uri);
 
-        if (Files.exists(destinationPath)){
+        if (Files.exists(destinationPath)) {
             response.setStatus(HttpStatus.CONFLICT_409);
             return false;
         }
@@ -80,7 +95,8 @@ public class Transfer {
         return true;
     }
 
-    private Collection getSource(TransferRequest params, HttpServletRequest request) throws  IOException{
-        return params.source == null ? Collections.getCollection(request) : Root.zebedee.getCollections().list().getCollection(params.source);
+    private Collection getSource(TransferRequest params, HttpServletRequest request) throws IOException {
+        return params.source == null ? Collections.getCollection(request)
+                : Root.zebedee.getCollections().list().getCollection(params.source);
     }
 }

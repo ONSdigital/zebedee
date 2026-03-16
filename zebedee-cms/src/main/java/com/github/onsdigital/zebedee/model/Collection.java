@@ -11,6 +11,7 @@ import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.CollectionNotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ConflictException;
 import com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedException;
+import com.github.onsdigital.zebedee.exceptions.ForbiddenException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
@@ -412,7 +413,7 @@ public class Collection {
         }
 
         if (collectionDescription.getTeams() != null) {
-            Set<String> teamIds = setViewerTeams(collectionDescription, zebedee, session);
+            setViewerTeams(collectionDescription, zebedee, session);
             updatedCollection.getDescription().setTeams(collectionDescription.getTeams());
         }
 
@@ -631,7 +632,7 @@ public class Collection {
         }
 
         // Does the current user have permission to edit?
-        boolean permission = zebedee.getPermissionsService().canEdit(session);
+        boolean permission = zebedee.getPermissionsService().canEdit(session, this.getDescription().getType());
 
         if (!isBeingEdited && !hasDeleteMarker && !exists && permission) {
             // Copy from Published to in progress:
@@ -683,7 +684,7 @@ public class Collection {
 
 
         // Does the user have permission to edit?
-        boolean permission = zebedee.getPermissionsService().canEdit(session);
+        boolean permission = zebedee.getPermissionsService().canEdit(session, this.getDescription().getType());
         if (!permission) {
             info().data("path", uri).data("collectionId", this.getDescription().getId()).data("user", session.getEmail())
                     .log("Content was not saved as user does not have EDIT permission");
@@ -729,7 +730,7 @@ public class Collection {
 
     public boolean complete(Session session, String uri, boolean recursive) throws IOException {
         boolean result = false;
-        boolean permission = zebedee.getPermissionsService().canEdit(session);
+        boolean permission = zebedee.getPermissionsService().canEdit(session, this.getDescription().getType());
 
         if (isInProgress(uri) && permission) {
             // Move the in-progress copy to completed:
@@ -772,9 +773,9 @@ public class Collection {
             throw new NotFoundException("File not found");
         }
 
-        boolean permission = zebedee.getPermissionsService().canEdit(session);
+        boolean permission = zebedee.getPermissionsService().canEdit(session, this.getDescription().getType());
         if (!permission) {
-            throw new UnauthorizedException("Insufficient permissions");
+            throw new ForbiddenException("Insufficient permissions for this collection type");
         }
 
         if (Files.isDirectory(this.find(uri))) {
@@ -782,39 +783,44 @@ public class Collection {
         }
 
         boolean contentWasCompleted = contentWasCompleted(uri);
-        if (contentWasCompleted == false) {
+        if (!contentWasCompleted) {
             throw new BadRequestException("Item has not been marked completed");
         }
 
         boolean userCompletedContent = didUserCompleteContent(session.getEmail(), uri);
         if (userCompletedContent) {
-            throw new UnauthorizedException("Reviewer must be a second set of eyes");
+            boolean selfApprovePermission = zebedee.getPermissionsService().canSelfApprove(session, this.getDescription().getType());
+            boolean isAutomatedCollection = this.getDescription().getType() == CollectionType.automated;
+            if (!selfApprovePermission) {
+                throw new ForbiddenException("Reviewer must be a second set of eyes");
+            }
+
+            if (!isAutomatedCollection) {
+                throw new BadRequestException("Only automated collections can be self-approved");
+            }
         }
 
         if (reviewed.get(uri) != null) {
             throw new BadRequestException("Item has already been reviewed");
         }
 
-        if (permission && !userCompletedContent) {
+        // Move the complete copy to reviewed:
+        Path source = complete.get(uri);
 
-            // Move the complete copy to reviewed:
-            Path source = complete.get(uri);
-
-            if (source == null) {
-                source = inProgress.get(uri);
-            }
-
-            Path destination = reviewed.toPath(uri);
-
-            if (recursive) {
-                reviewRecursive(source, destination, session);
-            } else {
-                reviewSingleFile(source, destination);
-            }
-
-            addEvent(uri, new Event(new Date(), EventType.REVIEWED, session.getEmail()));
-            result = true;
+        if (source == null) {
+            source = inProgress.get(uri);
         }
+
+        Path destination = reviewed.toPath(uri);
+
+        if (recursive) {
+            reviewRecursive(source, destination, session);
+        } else {
+            reviewSingleFile(source, destination);
+        }
+
+        addEvent(uri, new Event(new Date(), EventType.REVIEWED, session.getEmail()));
+        result = true;
 
         return result;
     }

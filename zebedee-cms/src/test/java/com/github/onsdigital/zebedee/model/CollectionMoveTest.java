@@ -63,10 +63,10 @@ public class CollectionMoveTest extends ZebedeeTestBaseFixture {
         ReflectionTestUtils.setField(zebedee, "permissionsService", permissionsService);
         ReflectionTestUtils.setField(zebedee, "collectionKeyring", keyring);
 
-        when(permissionsService.canView(session, collection.getDescription().getId()))
+        when(permissionsService.canView(session, collection.getDescription().getId(), collection.getDescription().getType()))
                 .thenReturn(true);
 
-        when(permissionsService.canEdit(session))
+        when(permissionsService.canEdit(session, collection.getDescription().getType()))
                 .thenReturn(true);
 
         SecretKey key = Keys.newSecretKey();
@@ -84,7 +84,7 @@ public class CollectionMoveTest extends ZebedeeTestBaseFixture {
     }
 
     @Test
-    public void shouldChangeReferencesInFileOnMoveContent() throws URISyntaxException, IOException, ZebedeeException {
+    public void shouldChangeReferencesInFileOnMoveContent() throws IOException, ZebedeeException {
         // Given
         // an item of content that references something
         martin.getRelatedArticles().add(new Link(bedford.getUri()));

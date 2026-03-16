@@ -92,7 +92,8 @@ public class DataProcessorTestBaseFixture extends ZebedeeTestBaseFixture {
         CollectionDescription collectionDescription = new CollectionDescription();
         collectionDescription.setName("DataPublicationDetails");
         collectionDescription.setEncrypted(true);
-        collectionDescription.setType(CollectionType.scheduled);
+        CollectionType testCollectionType = CollectionType.scheduled;
+        collectionDescription.setType(testCollectionType);
         collectionDescription.setPublishDate(new Date());
 
         collection = Collection.create(collectionDescription, zebedee, publisher);
@@ -113,7 +114,7 @@ public class DataProcessorTestBaseFixture extends ZebedeeTestBaseFixture {
     }
 
     @Test
-    public void getDatasetBasedUriForTimeseries_givenUnindexed_returnsExpectedUrl() throws ParseException, URISyntaxException, IOException, ZebedeeException {
+    public void getDatasetBasedUriForTimeseries_givenUnindexed_returnsExpectedUrl() throws IOException, ZebedeeException {
         // Given
         // A timeseries from our reviewed dataset
         DataPublicationDetails details = inReview.getDetails(publishedReader, collectionReader.getReviewed());
@@ -133,7 +134,7 @@ public class DataProcessorTestBaseFixture extends ZebedeeTestBaseFixture {
     }
 
     @Test
-    public void getDatasetBasedUriForTimeseries_givenIndexed_returnsExpectedUrl() throws ParseException, URISyntaxException, IOException, ZebedeeException {
+    public void getDatasetBasedUriForTimeseries_givenIndexed_returnsExpectedUrl() throws IOException, ZebedeeException {
         // Given
         // A timeseries from our reviewed dataset
         DataPublicationDetails details = inReview.getDetails(publishedReader, collectionReader.getReviewed());
@@ -156,7 +157,7 @@ public class DataProcessorTestBaseFixture extends ZebedeeTestBaseFixture {
 
 
     @Test
-    public void initialTimeseries_givenNewTimeseries_returnsEmptyTimeseries() throws IOException, ParseException, URISyntaxException, ZebedeeException {
+    public void initialTimeseries_givenNewTimeseries_returnsEmptyTimeseries() throws IOException, URISyntaxException, ZebedeeException {
         // Given
         // We upload a data collection to a zebedee instance where we don't have current published content
         DataPublicationDetails details = inReview.getDetails(publishedReader, collectionReader.getReviewed());
@@ -198,7 +199,7 @@ public class DataProcessorTestBaseFixture extends ZebedeeTestBaseFixture {
     }
 
     @Test
-    public void syncMetadata_givenVariedDetailSet_takesContactsFromLandingPage() throws IOException, ZebedeeException, ParseException, URISyntaxException {
+    public void syncMetadata_givenVariedDetailSet_takesContactsFromLandingPage() throws IOException, ZebedeeException, URISyntaxException {
 
         // Given
         // A timeseries and the initial timeseries
@@ -230,7 +231,7 @@ public class DataProcessorTestBaseFixture extends ZebedeeTestBaseFixture {
     }
 
     @Test
-    public void syncMetadata_givenVariedDetailSet_takesDatesFromLandingPage() throws IOException, ZebedeeException, ParseException, URISyntaxException {
+    public void syncMetadata_givenVariedDetailSet_takesDatesFromLandingPage() throws IOException, ZebedeeException, URISyntaxException {
 
         // Given
         // A timeseries and the initial timeseries

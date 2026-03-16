@@ -5,6 +5,7 @@ import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
+import com.github.onsdigital.zebedee.json.CollectionType;
 import com.github.onsdigital.zebedee.json.PermissionDefinition;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.session.model.Session;
@@ -89,7 +90,26 @@ public interface PermissionsService {
      * @return true if the user can edit content, false otherwise.
      * @throws IOException unexpected error while checking permissions.
      */
+    boolean canEdit(Session session, CollectionType collectionType) throws IOException;
+
+    /**
+     * Check if the {@link User} has permissions to edit content.
+     *
+     * @param session the {@link Session} of the user to check.
+     * @return true if the user can edit content, false otherwise.
+     * @throws IOException unexpected error while checking permissions.
+     */
     boolean canEdit(Session session) throws IOException;
+
+    /**
+     * Check if the {@link User} has permissions to self-approve content.
+     *
+     * @param session the {@link Session} of the user to check.
+     * @return true if the user can self-approve content, false otherwise.
+     * @throws IOException unexpected error while checking permissions.
+     */
+    boolean canSelfApprove(Session session, CollectionType collectionType) throws IOException;
+
 
     /**
      * Grant editor permission to a user.
@@ -126,6 +146,16 @@ public interface PermissionsService {
      */
     @Deprecated
     void removeEditor(String email, Session session) throws IOException, UnauthorizedException;
+
+    /**
+     * Check if a {@link User} can view unpublished content.
+     *
+     * @param session      the {@link Session} to get the user details from.
+     * @param collectionId the ID of the {@link Collection} to check.
+     * @return true of the user has view permission for the content, false otherwise.
+     * @throws IOException unexpected error while checking permissions.
+     */
+    boolean canView(Session session, String collectionId, CollectionType collectionType) throws IOException;
 
     /**
      * Check if a {@link User} can view unpublished content.

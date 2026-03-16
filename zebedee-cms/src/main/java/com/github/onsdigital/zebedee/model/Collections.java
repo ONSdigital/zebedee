@@ -199,7 +199,7 @@ public class Collections {
         }
 
         // Check authorisation
-        if (!permissionsService.canEdit(session)) {
+        if (!permissionsService.canEdit(session, collection.getDescription().getType())) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
@@ -294,8 +294,7 @@ public class Collections {
             throws IOException {
         try {
             String collectionName = getCollectionNameFromId(collectionId);
-            Collection collection = getCollectionByName(collectionName);
-            return collection;
+            return getCollectionByName(collectionName);
         } catch (IOException | CollectionNotFoundException e) {
             return list().getCollection(collectionId);
         }
@@ -329,7 +328,7 @@ public class Collections {
         }
 
         // User has permission
-        if (session == null || !permissionsService.canEdit(session)) {
+        if (session == null || !permissionsService.canEdit(session, collection.getDescription().getType())) {
             error().log("approve collection: user permission check failed");
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
@@ -406,23 +405,28 @@ public class Collections {
             throw new BadRequestException("Please provide a valid collection.");
         }
 
+        CollectionDescription collectionDescription = collection.getDescription();
+        if (collectionDescription == null) {
+            throw new BadRequestException("Collection description not found for collection");
+        }
+
         // User has permission
-        if (session == null || !permissionsService.canEdit(session)) {
+        if (session == null || !permissionsService.canEdit(session, collectionDescription.getType())) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
         // don't do anything if the approval status is not complete.
-        if (collection.getDescription().getApprovalStatus() != ApprovalStatus.COMPLETE) {
+        if (collectionDescription.getApprovalStatus() != ApprovalStatus.COMPLETE) {
             return true;
         }
 
         // Go ahead
-        collection.getDescription().setApprovalStatus(ApprovalStatus.NOT_STARTED);
-        collection.getDescription().addEvent(new Event(new Date(), EventType.UNLOCKED, session.getEmail()));
+        collectionDescription.setApprovalStatus(ApprovalStatus.NOT_STARTED);
+        collectionDescription.addEvent(new Event(new Date(), EventType.UNLOCKED, session.getEmail()));
 
         // Remove redirects
         if (cmsFeatureFlags().isRedirectAPIEnabled()){
-            collection.getDescription().setRedirects(new ArrayList<>());
+            collectionDescription.setRedirects(new ArrayList<>());
         }
         
         publishingNotificationConsumer.accept(collection, EventType.UNLOCKED);
@@ -450,13 +454,18 @@ public class Collections {
             throw new BadRequestException("Please provide a valid collection.");
         }
 
+        CollectionDescription collectionDescription = collection.getDescription();
+        if (collectionDescription == null) {
+            throw new BadRequestException("Collection description not found for collection");
+        }
+
         // User has permission
-        if (session == null || !permissionsService.canEdit(session)) {
+        if (session == null || !permissionsService.canEdit(session, collectionDescription.getType())) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
         // Check approval status
-        if (collection.getDescription().getApprovalStatus() != ApprovalStatus.COMPLETE) {
+        if (collectionDescription.getApprovalStatus() != ApprovalStatus.COMPLETE) {
             throw new ConflictException("This collection cannot be published because it is not approved");
         }
 
@@ -496,12 +505,17 @@ public class Collections {
             IOException, BadRequestException {
 
         if (collection == null) {
-            throw new BadRequestException("Please specify a valid collection.");
+            throw new BadRequestException("Please provide a valid collection.");
         }
 
-        // Check view permissionsServiceImpl
+        CollectionDescription collectionDescription = collection.getDescription();
+        if (collectionDescription == null) {
+            throw new BadRequestException("Collection description not found for collection");
+        }
+
+        // Check view permissions
         if (!permissionsService.canView(session,
-                collection.getDescription().getId())) {
+                collectionDescription.getId(), collectionDescription.getType())) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
@@ -554,11 +568,16 @@ public class Collections {
 
         // Collection exists
         if (collection == null) {
-            throw new BadRequestException("Please specify a valid collection");
+            throw new BadRequestException("Please provide a valid collection.");
+        }
+
+        CollectionDescription collectionDescription = collection.getDescription();
+        if (collectionDescription == null) {
+            throw new BadRequestException("Collection description not found for collection");
         }
 
         // User has permission
-        if (!permissionsService.canEdit(session)) {
+        if (!permissionsService.canEdit(session, collectionDescription.getType())) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
@@ -722,11 +741,16 @@ public class Collections {
 
         // Collection (null check before authorisation check)
         if (collection == null) {
-            throw new BadRequestException("Please specify a collection");
+            throw new BadRequestException("Please provide a valid collection.");
+        }
+
+        CollectionDescription collectionDescription = collection.getDescription();
+        if (collectionDescription == null) {
+            throw new BadRequestException("Collection description not found for collection");
         }
 
         // Authorisation
-        if (session == null || !permissionsService.canEdit(session)) {
+        if (session == null || !permissionsService.canEdit(session, collectionDescription.getType())) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
@@ -848,11 +872,16 @@ public class Collections {
     public void moveContent(Session session, Collection collection, String uri, String newUri) throws ZebedeeException, IOException {
 
         if (collection == null) {
-            throw new BadRequestException("Please specify a collection");
+            throw new BadRequestException("Please provide a valid collection.");
+        }
+
+        CollectionDescription collectionDescription = collection.getDescription();
+        if (collectionDescription == null) {
+            throw new BadRequestException("Collection description not found for collection");
         }
 
         // Authorisation
-        if (session == null || !permissionsService.canEdit(session)) {
+        if (session == null || !permissionsService.canEdit(session, collectionDescription.getType())) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
@@ -876,11 +905,16 @@ public class Collections {
             ZebedeeException {
 
         if (collection == null) {
-            throw new BadRequestException("Please specify a collection");
+            throw new BadRequestException("Please provide a valid collection.");
+        }
+
+        CollectionDescription collectionDescription = collection.getDescription();
+        if (collectionDescription == null) {
+            throw new BadRequestException("Collection description not found for collection");
         }
 
         // Authorisation
-        if (session == null || !permissionsService.canEdit(session)) {
+        if (session == null || !permissionsService.canEdit(session, collectionDescription.getType())) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 

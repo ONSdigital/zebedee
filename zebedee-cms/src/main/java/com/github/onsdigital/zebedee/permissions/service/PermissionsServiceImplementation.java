@@ -6,13 +6,16 @@ import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
+import com.github.onsdigital.zebedee.json.CollectionType;
 import com.github.onsdigital.zebedee.json.PermissionDefinition;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.permissions.model.Permissions;
+
 import org.joda.time.Duration;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -65,43 +68,59 @@ public class PermissionsServiceImplementation implements PermissionsService {
     }
 
     @Override
-    public boolean canEdit(Session session) throws IOException {
+    public boolean canEdit(Session session, CollectionType collectionType) throws IOException {
         boolean authorised = false;
         try {
-            authorised = hasPermission(session, Permissions.LEGACY_EDIT, "");
+            authorised = hasPermission(session, Permissions.LEGACY_EDIT, "", Optional.ofNullable(collectionType));
+        } catch (Exception e){
+            return false;
+        }
+        return authorised;   
+    }
 
+    @Override
+    public boolean canEdit(Session session) throws IOException {
+        return canEdit(session, null);
+    }
+
+    @Override
+    public boolean canSelfApprove(Session session, CollectionType collectionType) throws IOException {
+        boolean authorised = false;
+        try {
+            authorised = hasPermission(session, Permissions.LEGACY_SELF_APPROVE, "", Optional.ofNullable(collectionType));
         } catch (Exception e){
             return false;
         }
         return authorised;    
     }
 
-
     @Override
     public void addEditor(String email, Session session) throws IOException, UnauthorizedException, NotFoundException, BadRequestException {
         throw new UnsupportedOperationException(format(UNSUPPORTED_ERROR, "addEditor"));
-
     }
 
     @Override
     public void removeEditor(String email, Session session) throws IOException, UnauthorizedException {
         throw new UnsupportedOperationException(format(UNSUPPORTED_ERROR, "removeEditor"));
-
     }
 
     @Override
-    public boolean canView(Session session, String collectionId) throws IOException {
+    public boolean canView(Session session, String collectionId, CollectionType collectionType) throws IOException {
         boolean authorised = false;
         readLock.lock();
         try {
-            authorised = hasPermission(session, Permissions.LEGACY_READ, collectionId);
-
+            authorised = hasPermission(session, Permissions.LEGACY_READ, collectionId, Optional.ofNullable(collectionType));
         } catch (Exception e) {
             throw new RuntimeException(e);
         } finally {
             readLock.unlock();
         }
         return authorised;
+    }
+
+    @Override
+    public boolean canView(Session session, String collectionId) throws IOException {
+        return canView(session, collectionId, null);
     }
 
     @Override
@@ -125,11 +144,17 @@ public class PermissionsServiceImplementation implements PermissionsService {
         throw new UnsupportedOperationException(format(UNSUPPORTED_ERROR, "userPermissions"));
     }
 
-    private Boolean hasPermission(Session session, String permissionString, String collectionId) throws Exception {
+    private Boolean hasPermission(Session session, String permissionString, String collectionId, Optional<CollectionType> collectionType) throws Exception {
         HashMap<String, String> attributes = new HashMap<>();
         attributes.put("collection_id", collectionId);
 
-        UserDataPayload userDataPayload = new UserDataPayload(session.getId(),session.getEmail(), session.getGroups());
+        if (collectionType.isPresent()) {
+            attributes.put("collection_type", collectionType.get().name());
+        } else {
+            attributes.put("collection_type", "");
+        }
+ 
+        UserDataPayload userDataPayload = new UserDataPayload(session.getId(), session.getEmail(), session.getGroups());
 
         return permissionChecker.hasPermission(userDataPayload, permissionString, attributes);
     }

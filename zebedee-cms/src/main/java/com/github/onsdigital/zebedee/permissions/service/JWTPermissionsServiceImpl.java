@@ -3,6 +3,7 @@ package com.github.onsdigital.zebedee.permissions.service;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
+import com.github.onsdigital.zebedee.json.CollectionType;
 import com.github.onsdigital.zebedee.json.PermissionDefinition;
 import com.github.onsdigital.zebedee.permissions.model.AccessMapping;
 import com.github.onsdigital.zebedee.permissions.store.PermissionsStore;
@@ -118,6 +119,13 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
         throw new UnsupportedOperationException(format(UNSUPPORTED_ERROR, "removeAdministrator"));
     }
 
+ 
+    @Override
+    public boolean canEdit(Session session, CollectionType collectionType) throws IOException {
+        // Checking for permission on collection type is not implemented here, so just check the session as before.
+        return canEdit(session);
+    }
+
     /**
      * implemented as part of session migration to JWT
      * previous version flow...
@@ -126,12 +134,21 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
      * after migration to dp-identity this translates to isPublisher
      *
      * @param session the {@link Session} of the user to check.
-     * @return null
+     * @return true if the user can edit content, false otherwise.
      * @throws IOException If a filesystem error occurs.
      */
     @Override
     public boolean canEdit(Session session) {
         return session != null && (isGroupMember(session, PUBLISHER_GROUP) || isGroupMember(session, ADMIN_GROUP));
+    }
+
+    /**
+     * canSelfApprove is a permission that allows a user to approve their own content. This is not functional
+     * with this implementation - see {@link PermissionsServiceImplementation#canSelfApprove(Session)}
+     */
+    @Override
+    public boolean canSelfApprove(Session session, CollectionType collectionType) throws IOException {
+        return false;
     }
 
     /**
@@ -165,6 +182,16 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
     @Override
     public void removeEditor(String email, Session session) throws IOException, UnauthorizedException {
         throw new UnsupportedOperationException(format(UNSUPPORTED_ERROR, "removeEditor"));
+    }
+
+    /**
+     * This is only implemented within the new {@link PermissionsServiceImplementation} and is not functional with this implementation.
+     */
+    @Override
+    public boolean canView(Session session, String collectionId, CollectionType collectionType) throws IOException {
+        // Checking for permission on collection type is not implemented here, so just 
+        // check the collectionid as before.
+        return canView(session, collectionId);
     }
 
     /**

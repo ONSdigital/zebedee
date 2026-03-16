@@ -3,6 +3,7 @@ package com.github.onsdigital.zebedee.api;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
+import com.github.onsdigital.zebedee.json.CollectionType;
 import com.github.onsdigital.zebedee.keyring.CollectionKeyring;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.Collections;
@@ -86,6 +87,8 @@ public class ContentTest {
         System.setProperty("zebedee_root", tempBasePath.toString());
 
         collectionDescription = new CollectionDescription("AK Testing");
+        CollectionType collectionType = CollectionType.manual;
+        collectionDescription.setType(collectionType);
         encryptionKeyFactory = new EncryptionKeyFactoryImpl();
         secretKey = KeyGenerator.getInstance("AES").generateKey();
         versionsService = new VersionsServiceImpl();
@@ -93,8 +96,9 @@ public class ContentTest {
         content = new com.github.onsdigital.zebedee.model.Content(tempBasePath);
         collections = new Collections(tempBasePath, mockPermissionsService, versionsService, content);
 
-        when(mockPermissionsService.canEdit(mockSession)).thenReturn(true);
-        when(mockPermissionsService.canView(any(), any())).thenReturn(true);
+        when(mockPermissionsService.canEdit(mockSession, collectionType)).thenReturn(true);
+
+        when(mockPermissionsService.canView(any(), any(), any())).thenReturn(true);
 
         when(mockSessions.get()).thenReturn(mockSession);
 

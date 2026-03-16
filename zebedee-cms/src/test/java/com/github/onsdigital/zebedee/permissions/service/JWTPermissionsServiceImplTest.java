@@ -2,6 +2,7 @@ package com.github.onsdigital.zebedee.permissions.service;
 
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
+import com.github.onsdigital.zebedee.json.CollectionType;
 import com.github.onsdigital.zebedee.json.PermissionDefinition;
 import com.github.onsdigital.zebedee.permissions.model.AccessMapping;
 import com.github.onsdigital.zebedee.permissions.store.PermissionsStore;
@@ -16,10 +17,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.ws.rs.HEAD;
 
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -34,12 +35,12 @@ import static org.mockito.Mockito.when;
 public class JWTPermissionsServiceImplTest {
     
     private static final List<String> ADMIN_PUBLISHER_GROUPS = Arrays.asList("123456", "role-publisher", "role-admin", "789012345", "testgroup0");
-    private static final List<String> NON_ADMIN_PUBLISHER_GROUPS = Arrays.asList("123456", "789012345");
     private static final String COLLECTION_ID = "1234";
     private static final String TEST_SESSION_ID = "666";
     private static final String TEST_USER_EMAIL = "other123@ons.gov.uk";
     private static final String PUBLISHER = "role-publisher";
     private static final String ADMIN = "role-admin";
+    private static final CollectionType TEST_COLLECTION_TYPE = CollectionType.manual;
 
     /**
      * Class under test
@@ -61,7 +62,7 @@ public class JWTPermissionsServiceImplTest {
     }
 
     @Test
-    public void isPublisher_Session_Publisher_ShouldReturnTrue() throws Exception {
+    public void isPublisher_Session_Publisher_ShouldReturnTrue() {
         List<String> sessionGroups = new ArrayList<>();
         sessionGroups.add(PUBLISHER);
 
@@ -70,7 +71,7 @@ public class JWTPermissionsServiceImplTest {
     }
 
     @Test
-    public void isPublisher_Session_Admin_ShouldReturnFalse() throws Exception {
+    public void isPublisher_Session_Admin_ShouldReturnFalse() {
         List<String> sessionGroups = new ArrayList<>();
         sessionGroups.add(ADMIN);
 
@@ -79,28 +80,28 @@ public class JWTPermissionsServiceImplTest {
     }
 
     @Test
-    public void isPublisher_SessionNull_ShouldReturnFalse() throws Exception {
+    public void isPublisher_SessionNull_ShouldReturnFalse() {
         Session session = null;
         assertFalse(jwtPermissionsService.isPublisher(session));
         verifyNoInteractions(jwtPermissionStore);
     }
 
     @Test
-    public void isPublisher_Session_NotPublisher_ShouldReturnFalse() throws Exception {
+    public void isPublisher_Session_NotPublisher_ShouldReturnFalse() {
         Session session = new Session(TEST_SESSION_ID, TEST_USER_EMAIL, new ArrayList<>());
         assertFalse(jwtPermissionsService.isPublisher(session));
         verifyNoInteractions(jwtPermissionStore);
     }
 
     @Test
-    public void isPublisher_Session_NullGroup_ShouldReturnFalse() throws Exception {
+    public void isPublisher_Session_NullGroup_ShouldReturnFalse() {
         Session session = new Session(TEST_SESSION_ID, TEST_USER_EMAIL, null);
         assertFalse(jwtPermissionsService.isPublisher(session));
         verifyNoInteractions(jwtPermissionStore);
     }
 
     @Test
-    public void isAdministrator_Session_Admin_ShouldReturnTrue() throws Exception {
+    public void isAdministrator_Session_Admin_ShouldReturnTrue() {
         List<String> sessionGroups = new ArrayList<>();
         sessionGroups.add(ADMIN);
 
@@ -109,7 +110,7 @@ public class JWTPermissionsServiceImplTest {
     }
 
     @Test
-    public void isAdministrator_Session_Publisher_ShouldReturnFalse() throws Exception {
+    public void isAdministrator_Session_Publisher_ShouldReturnFalse() {
         List<String> sessionGroups = new ArrayList<>();
         sessionGroups.add(PUBLISHER);
 
@@ -118,14 +119,14 @@ public class JWTPermissionsServiceImplTest {
     }
 
     @Test
-    public void isAdministrator_SessionNull_ShouldReturnFalse() throws Exception {
+    public void isAdministrator_SessionNull_ShouldReturnFalse() {
         Session session = null;
         assertFalse(jwtPermissionsService.isAdministrator(session));
         verifyNoInteractions(jwtPermissionStore);
     }
 
     @Test
-    public void isAdministrator_Session_EmailNull_ShouldReturnFalse() throws Exception {
+    public void isAdministrator_Session_EmailNull_ShouldReturnFalse() {
         List<String> sessionGroups = new ArrayList<>();
         sessionGroups.add(PUBLISHER);
 
@@ -135,28 +136,28 @@ public class JWTPermissionsServiceImplTest {
     }
 
     @Test
-    public void isAdministrator_Session_NotAdmin_ShouldReturnFalse() throws Exception {
+    public void isAdministrator_Session_NotAdmin_ShouldReturnFalse() {
         Session session = new Session(TEST_SESSION_ID, TEST_USER_EMAIL, new ArrayList<>());
         assertFalse(jwtPermissionsService.isAdministrator(session));
         verifyNoInteractions(jwtPermissionStore);
     }
 
     @Test
-    public void isAdministrator_Session_NullGroup_ShouldReturnFalse() throws Exception {
+    public void isAdministrator_Session_NullGroup_ShouldReturnFalse() {
         Session session = new Session(TEST_SESSION_ID, TEST_USER_EMAIL, null);
         assertFalse(jwtPermissionsService.isAdministrator(session));
         verifyNoInteractions(jwtPermissionStore);
     }
 
     @Test
-    public void hasAdministrator_ShouldError() throws Exception {
+    public void hasAdministrator_ShouldError() {
         UnsupportedOperationException exception = assertThrows(UnsupportedOperationException.class, () ->
                 jwtPermissionsService.hasAdministrator());
         assertEquals("JWT sessions are enabled: hasAdministrator is no longer supported", exception.getMessage());
     }
 
     @Test
-    public void addAdministrator_Email_Sessions_ShouldError() throws Exception {
+    public void addAdministrator_Email_Sessions_ShouldError() {
         Session session = new Session(TEST_SESSION_ID, TEST_USER_EMAIL);
         UnsupportedOperationException exception = assertThrows(UnsupportedOperationException.class, () ->
                 jwtPermissionsService.addAdministrator(TEST_USER_EMAIL, session));
@@ -164,7 +165,7 @@ public class JWTPermissionsServiceImplTest {
     }
 
     @Test
-    public void removeAdministrator_Email_Sessions_ShouldError() throws Exception {
+    public void removeAdministrator_Email_Sessions_ShouldError() {
         Session session = new Session(TEST_SESSION_ID, TEST_USER_EMAIL);
         UnsupportedOperationException exception = assertThrows(UnsupportedOperationException.class, () ->
                 jwtPermissionsService.removeAdministrator(TEST_USER_EMAIL, session));
@@ -172,7 +173,7 @@ public class JWTPermissionsServiceImplTest {
     }
 
     @Test
-    public void canEdit_Session_Publisher_ShouldReturnTrue() throws Exception {
+    public void canEdit_Session_Publisher_ShouldReturnTrue() {
         List<String> sessionGroups = new ArrayList<>();
         sessionGroups.add(PUBLISHER);
 
@@ -181,14 +182,14 @@ public class JWTPermissionsServiceImplTest {
     }
 
     @Test
-    public void canEdit_SessionNull_ShouldReturnFalse() throws Exception {
+    public void canEdit_SessionNull_ShouldReturnFalse() {
         Session session = null;
         assertFalse(jwtPermissionsService.canEdit(session));
         verifyNoInteractions(jwtPermissionStore);
     }
 
     @Test
-    public void canEdit_Session_NotPublisher_ShouldReturnFalse() throws Exception {
+    public void canEdit_Session_NotPublisher_ShouldReturnFalse() {
         Session session = new Session(TEST_SESSION_ID, TEST_USER_EMAIL, new ArrayList<>());
 
         assertFalse(jwtPermissionsService.canEdit(session));
@@ -196,14 +197,34 @@ public class JWTPermissionsServiceImplTest {
     }
 
     @Test
-    public void canEdit_Session_NullGroup_ShouldReturnFalse() throws Exception {
+    public void canEdit_Session_NullGroup_ShouldReturnFalse() {
         Session session = new Session(TEST_SESSION_ID, TEST_USER_EMAIL, null);
         assertFalse(jwtPermissionsService.canEdit(session));
         verifyNoInteractions(jwtPermissionStore);
     }
 
     @Test
-    public void addEditor_Email_Session_ShouldError() throws Exception {
+    public void canEdit_WithCollectionType_ShouldDelegateToSessionCheck() throws IOException {
+        List<String> sessionGroups = new ArrayList<>();
+        sessionGroups.add(PUBLISHER);
+
+        Session session = new Session(TEST_SESSION_ID, TEST_USER_EMAIL, sessionGroups);
+
+        assertTrue(jwtPermissionsService.canEdit(session, TEST_COLLECTION_TYPE));
+    }
+
+    @Test
+    public void canSelfApprove_WithCollectionType_ShouldReturnFalse() throws IOException {
+        List<String> sessionGroups = new ArrayList<>();
+        sessionGroups.add(PUBLISHER);
+
+        Session session = new Session(TEST_SESSION_ID, TEST_USER_EMAIL, sessionGroups);
+
+        assertFalse(jwtPermissionsService.canSelfApprove(session, TEST_COLLECTION_TYPE));
+    }
+
+    @Test
+    public void addEditor_Email_Session_ShouldError() {
         Session session = new Session(TEST_SESSION_ID, TEST_USER_EMAIL);
         UnsupportedOperationException exception = assertThrows(UnsupportedOperationException.class, () ->
                 jwtPermissionsService.addEditor(TEST_USER_EMAIL, session));
@@ -211,7 +232,7 @@ public class JWTPermissionsServiceImplTest {
     }
 
     @Test
-    public void removeEditor_Email_Session_ShouldError() throws Exception {
+    public void removeEditor_Email_Session_ShouldError() {
         Session session = new Session(TEST_SESSION_ID, TEST_USER_EMAIL);
         UnsupportedOperationException exception = assertThrows(UnsupportedOperationException.class, () ->
                 jwtPermissionsService.removeEditor(TEST_USER_EMAIL, session));
@@ -225,6 +246,15 @@ public class JWTPermissionsServiceImplTest {
         Session session = new Session(TEST_SESSION_ID, TEST_USER_EMAIL, sessionGroups);
 
         assertTrue(jwtPermissionsService.canView(session, COLLECTION_ID));
+    }
+
+    @Test
+    public void canView_WithCollectionType_ShouldDelegateToCollectionIdCheck() throws IOException {
+        List<String> sessionGroups = new ArrayList<>();
+        sessionGroups.add(PUBLISHER);
+        Session session = new Session(TEST_SESSION_ID, TEST_USER_EMAIL, sessionGroups);
+
+        assertTrue(jwtPermissionsService.canView(session, COLLECTION_ID, TEST_COLLECTION_TYPE));
     }
 
     @Test
@@ -314,7 +344,7 @@ public class JWTPermissionsServiceImplTest {
     }
 
     @Test
-    public void setViewerTeams_Session_Null_CollectionId_TeamIds() throws Exception {
+    public void setViewerTeams_Session_Null_CollectionId_TeamIds() {
         Session session = new Session(null, null, null);
 
         Exception exception = assertThrows(UnauthorizedException.class, () ->
@@ -370,7 +400,7 @@ public class JWTPermissionsServiceImplTest {
     }
 
     @Test
-    public void listViewerTeams_session_collectionId_noPermissions() throws Exception {
+    public void listViewerTeams_session_collectionId_noPermissions() {
         Session session = new Session(TEST_SESSION_ID, TEST_USER_EMAIL, new ArrayList<>());
 
         Map<String, Set<String>> collectionMapping = new HashMap<>();
@@ -384,7 +414,7 @@ public class JWTPermissionsServiceImplTest {
     }
 
     @Test
-    public void listViewerTeams_Session_Null_CollectionId() throws Exception {
+    public void listViewerTeams_Session_Null_CollectionId() {
         Exception exception = assertThrows(UnauthorizedException.class, () ->
                 jwtPermissionsService.listViewerTeams(null, COLLECTION_ID));
         assertEquals("Please log in", exception.getMessage());
@@ -455,7 +485,7 @@ public class JWTPermissionsServiceImplTest {
     }
     
     @Test
-    public void setViewerTeams_CollectionDescription_Team_Session_viewer_collectionTeam() throws Exception {
+    public void setViewerTeams_CollectionDescription_Team_Session_viewer_collectionTeam() {
         Session session = new Session(TEST_SESSION_ID, TEST_USER_EMAIL, new ArrayList<>());
 
         Exception exception = assertThrows(UnauthorizedException.class, () ->
@@ -463,7 +493,7 @@ public class JWTPermissionsServiceImplTest {
     }
 
     @Test
-    public void userPermissions_Email_Sessions_ShouldError() throws Exception {
+    public void userPermissions_Email_Sessions_ShouldError() {
         Session session = new Session(TEST_SESSION_ID, TEST_USER_EMAIL);
         Exception exception = assertThrows(UnsupportedOperationException.class, () ->
                 jwtPermissionsService.userPermissions(TEST_USER_EMAIL, session));

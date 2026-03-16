@@ -5,6 +5,7 @@ import com.github.onsdigital.zebedee.audit.Audit;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.ConflictException;
 import com.github.onsdigital.zebedee.exceptions.InternalServerError;
+import com.github.onsdigital.zebedee.exceptions.ForbiddenException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
@@ -105,24 +106,29 @@ public class Collection {
             throw new NotFoundException("The collection you are trying to get was not found.");
         }
 
-        requireViewPermission(session, collectionID);
+        CollectionDescription description = collection.getDescription();
+        if (description == null) {
+            info().log("get collection endpoint: request unsuccessful collection description not found");
+            throw new InternalServerError("The collection description was not found.");
+        }
+
+        requireViewPermission(session, collectionID, description.getType());
 
         // TODO: Question - I am not sure why it's necessary to duplicate the description instead of just returning it?
         // Collate the result:
         CollectionDescription result = new CollectionDescription();
-        result.setId(collection.getDescription().getId());
-        result.setName(collection.getDescription().getName());
-        result.setPublishDate(collection.getDescription().getPublishDate());
+        result.setId(description.getId());
+        result.setName(description.getName());
+        result.setPublishDate(description.getPublishDate());
         result.setInProgressUris(collection.inProgressUris());
         result.setCompleteUris(collection.completeUris());
         result.setReviewedUris(collection.reviewedUris());
-        result.setEventsByUri(collection.getDescription().getEventsByUri());
-        result.setApprovalStatus(collection.getDescription().getApprovalStatus());
-        result.setType(collection.getDescription().getType());
-        result.setTeams(collection.getDescription().getTeams());
-        result.setEncrypted(collection.getDescription().isEncrypted());
-        result.setReleaseUri(collection.getDescription().getReleaseUri());
-
+        result.setEventsByUri(description.getEventsByUri());
+        result.setApprovalStatus(description.getApprovalStatus());
+        result.setType(description.getType());
+        result.setTeams(description.getTeams());
+        result.setEncrypted(description.isEncrypted());
+        result.setReleaseUri(description.getReleaseUri());
         info().user(session.getEmail())
                 .collectionID(collectionID)
                 .log("get collection endpoint: request compeleted successfully");
@@ -163,7 +169,7 @@ public class Collection {
             return null;
         }
 
-        requireEditPermission(session);
+        requireEditPermission(session, collectionDescription.getType());
 
         info().user(session.getEmail()).log("create collection endpoint: user granted canEdit permission");
 
@@ -225,7 +231,11 @@ public class Collection {
             throw new UnauthorizedException("You are not authorised to update collections.");
         }
 
-        requireEditPermission(session);
+        CollectionDescription currentCollectionDescription = collection.getDescription();
+
+        // Check user has permission to edit the collection type both currently and in the update request (in case of type change).
+        requireEditPermission(session, currentCollectionDescription.getType());
+        requireEditPermission(session, collectionDescription.getType());
 
         info().user(session.getEmail())
                 .collectionID(collectionId)
@@ -284,6 +294,17 @@ public class Collection {
             throw new NotFoundException("The collection you are trying to delete was not found");
         }
 
+        CollectionDescription description = collection.getDescription();
+        if (description == null) {
+            info().log("delete collection endpoint: request unsuccessful collection description not found");
+            throw new InternalServerError("The collection description was not found.");
+        }
+
+        //TODO: This should really be requireDeletePermission but this not currently supported
+        // and we would need to implement it in three different ways. Come back to this post 
+        // migration to the decentralised permissions model.
+        requireEditPermission(session, description.getType());
+
         deleteCollection(collection, session);
 
         Audit.Event.COLLECTION_DELETED
@@ -300,7 +321,7 @@ public class Collection {
     }
 
     private void deleteCollection(com.github.onsdigital.zebedee.model.Collection c, Session s)
-            throws InternalServerError, NotFoundException, BadRequestException {
+            throws InternalServerError {
         // Delete the collection.
         try {
             collections.delete(c, s);
@@ -321,12 +342,12 @@ public class Collection {
         }
     }
 
-    private void requireViewPermission(Session session, String collectionId) throws UnauthorizedException {
+    private void requireViewPermission(Session session, String collectionId, CollectionType collectionType) throws ForbiddenException {
         boolean canView = false;
         try {
-            canView = permissionsService.canView(session, collectionId);
+            canView = permissionsService.canView(session, collectionId, collectionType);
         } catch (IOException ex) {
-            throw new UnauthorizedException("You are not authorised to view this collection");
+            throw new ForbiddenException("You are not authorised to view this collection");
         }
 
         if (!canView) {
@@ -334,23 +355,23 @@ public class Collection {
                     .collectionID(collectionId)
                     .log("request unsuccessful user denied view permission");
 
-            throw new UnauthorizedException("You are not authorised to view this collection");
+            throw new ForbiddenException("You are not authorised to view this collection");
         }
     }
 
-    private void requireEditPermission(Session session) throws UnauthorizedException {
+    private void requireEditPermission(Session session, CollectionType collectionType) throws ForbiddenException {
         boolean canEdit = false;
         try {
-            canEdit = permissionsService.canEdit(session);
+            canEdit = permissionsService.canEdit(session, collectionType);
         } catch (IOException ex) {
-            throw new UnauthorizedException("You are not authorised to edit collections.");
+            throw new ForbiddenException("You are not authorised to edit this type of collection.");
         }
 
         if (!canEdit) {
             warn().user(session.getEmail())
                     .log("request unsuccessful user denied edit permission");
 
-            throw new UnauthorizedException("You are not authorised to edit collections.");
+            throw new ForbiddenException("You are not authorised to edit this type of collection.");
         }
     }
 

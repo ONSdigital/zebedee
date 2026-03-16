@@ -4,6 +4,7 @@ public class Permissions {
     private Permissions() {
     }
 
-    public static final String LEGACY_READ = "legacy:read";
     public static final String LEGACY_EDIT = "legacy:edit";
+    public static final String LEGACY_READ = "legacy:read";
+    public static final String LEGACY_SELF_APPROVE = "legacy:self-approve";
 }

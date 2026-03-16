@@ -163,7 +163,7 @@ public class PrePublishCollectionsTask extends ScheduledTask {
                         SlackNotification.publishNotification(PostPublisher.getPublishedCollection(collection), SlackNotification.CollectionStage.PRE_PUBLISH, SlackNotification.StageStatus.COMPLETED);
 
                         return true;
-                    } catch (BadRequestException | IOException | UnauthorizedException | NotFoundException e) {
+                    } catch (IOException | UnauthorizedException | NotFoundException e) {
                         // FIXME using PostPublisher.getPublishedCollection feels a bit hacky
                         // TODO pass through the error?
                         SlackNotification.publishNotification(PostPublisher.getPublishedCollection(collection), SlackNotification.CollectionStage.PRE_PUBLISH,SlackNotification.StageStatus.FAILED);

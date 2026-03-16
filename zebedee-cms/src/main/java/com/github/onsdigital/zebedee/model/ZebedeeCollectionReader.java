@@ -6,6 +6,7 @@ import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.keyring.CollectionKeyring;
 import com.github.onsdigital.zebedee.keyring.KeyringException;
+import com.github.onsdigital.zebedee.json.CollectionType;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.session.model.Session;
@@ -29,6 +30,8 @@ public class ZebedeeCollectionReader extends CollectionReader {
             "error constructing ZebedeeCollectionReader keyring required but was null";
     static final String COLLECTION_NULL_ERR =
             "error constructing ZebedeeCollectionReader collection required but was null";
+    static final String COLLECTION_DESCRIPTION_NULL_ERR =
+            "error constructing ZebedeeCollectionReader collection description required but was null";
     static final String SESSION_NULL_ERR =
             "error constructing ZebedeeCollectionReader session required but was null";
     static final String GET_USER_ERR =
@@ -40,7 +43,7 @@ public class ZebedeeCollectionReader extends CollectionReader {
     static final String COLLECTION_KEY_NULL_ERR =
             "error constructing ZebedeeCollectionReader key required but keyring returned null";
 
-    public ZebedeeCollectionReader(Collection collection, SecretKey key) throws BadRequestException, IOException, UnauthorizedException, NotFoundException {
+    public ZebedeeCollectionReader(Collection collection, SecretKey key) throws IOException, UnauthorizedException, NotFoundException {
         init(collection, key);
     }
 
@@ -53,7 +56,7 @@ public class ZebedeeCollectionReader extends CollectionReader {
      *                   {@link CollectionKeyring}.
      * @param collection the {@link Collection} the reader will read the content from
      * @param session    the {@link Session} of the {@link User} who will use the reader.
-     * @throws IOException           problem creating the read.
+     * @throws IOException           problem creating the reader.
      * @throws NotFoundException     the collection is not found
      * @throws UnauthorizedException the user is not authorised to read the collection content
      */
@@ -61,7 +64,7 @@ public class ZebedeeCollectionReader extends CollectionReader {
             throws IOException, NotFoundException, UnauthorizedException {
         validate(zebedee, collection, session);
 
-        checkUserAuthorisedToAccessCollection(zebedee, collection.getDescription().getId(), session);
+        checkUserAuthorisedToAccessCollection(zebedee, collection.getDescription().getId(), collection.getDescription().getType(), session);
 
         SecretKey key = getCollectionKey(zebedee, collection, session);
 
@@ -90,16 +93,20 @@ public class ZebedeeCollectionReader extends CollectionReader {
             throw new NotFoundException(COLLECTION_NULL_ERR);
         }
 
+        if (collection.getDescription() == null) {
+            throw new NotFoundException(COLLECTION_NULL_ERR);
+        }
+
         if (session == null) {
             throw new UnauthorizedException(SESSION_NULL_ERR);
         }
     }
 
-    private void checkUserAuthorisedToAccessCollection(Zebedee zebedee, String collectionId, Session session)
+    private void checkUserAuthorisedToAccessCollection(Zebedee zebedee, String collectionId, CollectionType collectionType, Session session)
             throws IOException, UnauthorizedException {
         boolean isAuthorised = false;
         try {
-            isAuthorised = zebedee.getPermissionsService().canView(session, collectionId);
+            isAuthorised = zebedee.getPermissionsService().canView(session, collectionId, collectionType);
         } catch (Exception ex) {
             throw new IOException(PERMISSIONS_CHECK_ERR, ex);
         }

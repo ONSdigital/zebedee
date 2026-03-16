@@ -143,6 +143,15 @@ public class JWTPermissionsServiceImpl implements PermissionsService {
     }
 
     /**
+     * canSelfApprove is a permission that allows a user to approve their own content. This is not functional
+     * with this implementation - see {@link PermissionsServiceImplementation#canSelfApprove(Session)}
+     */
+    @Override
+    public boolean canSelfApprove(Session session, CollectionType collectionType) throws IOException {
+        return false;
+    }
+
+    /**
      * implemented as part of session migration to JWT
      * will not be required once jwt has been migrated but will error if invoked
      *

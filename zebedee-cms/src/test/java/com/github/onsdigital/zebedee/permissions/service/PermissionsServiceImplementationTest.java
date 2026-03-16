@@ -103,6 +103,24 @@ public class PermissionsServiceImplementationTest {
                 .hasPermission(any(UserDataPayload.class), eq(Permissions.LEGACY_EDIT), eq(expectedAttributes));
     }
 
+    @Test
+    public void canSelfApprove_WithCollectionType_ShouldReturnTrueWhenUserHasPermission() throws Exception {
+        when(permissionChecker.hasPermission(any(UserDataPayload.class), eq(Permissions.LEGACY_SELF_APPROVE), anyMap()))
+                .thenReturn(true);
+
+        assertTrue(permissionsService.canSelfApprove(session, TEST_COLLECTION_TYPE));
+
+        verify(permissionChecker, times(1))
+                .hasPermission(any(UserDataPayload.class), eq(Permissions.LEGACY_SELF_APPROVE), anyMap());
+    }
+
+    @Test
+    public void canSelfApprove_WithCollectionType_ShouldReturnFalseWhenPermissionCheckThrows() throws Exception {
+        when(permissionChecker.hasPermission(any(UserDataPayload.class), eq(Permissions.LEGACY_SELF_APPROVE), anyMap()))
+                .thenThrow(new Exception("boom"));
+
+        assertFalse(permissionsService.canSelfApprove(session, TEST_COLLECTION_TYPE));
+    }
 
     @Test
     public void canView_ShouldReturnTrueAndUseCollectionId() throws Exception {

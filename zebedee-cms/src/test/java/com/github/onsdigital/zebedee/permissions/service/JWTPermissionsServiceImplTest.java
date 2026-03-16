@@ -35,7 +35,6 @@ import static org.mockito.Mockito.when;
 public class JWTPermissionsServiceImplTest {
     
     private static final List<String> ADMIN_PUBLISHER_GROUPS = Arrays.asList("123456", "role-publisher", "role-admin", "789012345", "testgroup0");
-    private static final List<String> NON_ADMIN_PUBLISHER_GROUPS = Arrays.asList("123456", "789012345");
     private static final String COLLECTION_ID = "1234";
     private static final String TEST_SESSION_ID = "666";
     private static final String TEST_USER_EMAIL = "other123@ons.gov.uk";
@@ -213,6 +212,17 @@ public class JWTPermissionsServiceImplTest {
 
         assertTrue(jwtPermissionsService.canEdit(session, TEST_COLLECTION_TYPE));
     }
+
+    @Test
+    public void canSelfApprove_WithCollectionType_ShouldReturnFalse() throws IOException {
+        List<String> sessionGroups = new ArrayList<>();
+        sessionGroups.add(PUBLISHER);
+
+        Session session = new Session(TEST_SESSION_ID, TEST_USER_EMAIL, sessionGroups);
+
+        assertFalse(jwtPermissionsService.canSelfApprove(session, TEST_COLLECTION_TYPE));
+    }
+
     @Test
     public void addEditor_Email_Session_ShouldError() {
         Session session = new Session(TEST_SESSION_ID, TEST_USER_EMAIL);

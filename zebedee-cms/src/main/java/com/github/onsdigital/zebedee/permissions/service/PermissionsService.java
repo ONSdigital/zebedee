@@ -102,6 +102,16 @@ public interface PermissionsService {
     boolean canEdit(Session session) throws IOException;
 
     /**
+     * Check if the {@link User} has permissions to self-approve content.
+     *
+     * @param session the {@link Session} of the user to check.
+     * @return true if the user can self-approve content, false otherwise.
+     * @throws IOException unexpected error while checking permissions.
+     */
+    boolean canSelfApprove(Session session, CollectionType collectionType) throws IOException;
+
+
+    /**
      * Grant editor permission to a user.
      *
      * @param email   the email of the user to permit the permission to.

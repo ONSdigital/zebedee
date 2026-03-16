@@ -6,13 +6,16 @@ import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
+import com.github.onsdigital.zebedee.json.CollectionType;
 import com.github.onsdigital.zebedee.json.PermissionDefinition;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.permissions.model.Permissions;
+
 import org.joda.time.Duration;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -78,6 +81,17 @@ public class PermissionsServiceImplementation implements PermissionsService {
     @Override
     public boolean canEdit(Session session) throws IOException {
         return canEdit(session, null);
+    }
+
+    @Override
+    public boolean canSelfApprove(Session session, CollectionType collectionType) throws IOException {
+        boolean authorised = false;
+        try {
+            authorised = hasPermission(session, Permissions.LEGACY_SELF_APPROVE, "", Optional.ofNullable(collectionType));
+        } catch (Exception e){
+            return false;
+        }
+        return authorised;    
     }
 
     @Override

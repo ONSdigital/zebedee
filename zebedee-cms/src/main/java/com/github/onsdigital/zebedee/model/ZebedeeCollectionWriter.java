@@ -5,6 +5,7 @@ import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
+import com.github.onsdigital.zebedee.json.CollectionType;
 import com.github.onsdigital.zebedee.keyring.KeyringException;
 import com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration;
 import com.github.onsdigital.zebedee.session.model.Session;
@@ -36,6 +37,8 @@ public class ZebedeeCollectionWriter extends CollectionWriter {
             "error constructing ZebedeeCollectionWriter user required but was null";
     static final String COLLECTION_NULL_ERR =
             "error constructing ZebedeeCollectionWriter collection required but was null";
+    static final String COLLECTION_DESCRIPTION_NULL_ERR =
+            "error constructing ZebedeeCollectionWriter collection description required but was null";
     static final String PERMISSION_DENIED_ERR =
             "error constructing ZebedeeCollectionWriter user does not have edit permission for collection";
     static final String PERMISSIONS_CHECK_ERR =
@@ -52,8 +55,7 @@ public class ZebedeeCollectionWriter extends CollectionWriter {
             throws BadRequestException, IOException, UnauthorizedException, NotFoundException {
         validateParams(zebedee, collection, session);
         this.zebedee = zebedee;
-
-        checkUserAuthorisedToAccessCollection(zebedee, session);
+        checkUserAuthorisedToAccessCollection(zebedee, session, collection.getDescription().getType());
 
         SecretKey key = getCollectionKey(zebedee, collection, session);
 
@@ -98,16 +100,20 @@ public class ZebedeeCollectionWriter extends CollectionWriter {
             throw new NotFoundException(COLLECTION_NULL_ERR);
         }
 
+        if (collection.getDescription() == null) {
+            throw new NotFoundException(COLLECTION_DESCRIPTION_NULL_ERR);
+        }
+
         if (session == null) {
             throw new UnauthorizedException(SESSION_NULL_ERR);
         }
     }
 
-    private void checkUserAuthorisedToAccessCollection(Zebedee zebedee, Session session)
+    private void checkUserAuthorisedToAccessCollection(Zebedee zebedee, Session session, CollectionType collectionType)
             throws IOException, UnauthorizedException {
         boolean isAuthorised = false;
         try {
-            isAuthorised = zebedee.getPermissionsService().canEdit(session);
+            isAuthorised = zebedee.getPermissionsService().canEdit(session, collectionType);
         } catch (Exception ex) {
             throw new IOException(PERMISSIONS_CHECK_ERR, ex);
         }

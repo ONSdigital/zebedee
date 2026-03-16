@@ -2,6 +2,7 @@ package com.github.onsdigital.zebedee.permissions.service;
 
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
+import com.github.onsdigital.zebedee.json.CollectionType;
 import com.github.onsdigital.zebedee.json.PermissionDefinition;
 import com.github.onsdigital.zebedee.permissions.model.AccessMapping;
 import com.github.onsdigital.zebedee.permissions.store.PermissionsStore;
@@ -16,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -40,6 +42,7 @@ public class JWTPermissionsServiceImplTest {
     private static final String TEST_USER_EMAIL = "other123@ons.gov.uk";
     private static final String PUBLISHER = "role-publisher";
     private static final String ADMIN = "role-admin";
+    private static final CollectionType TEST_COLLECTION_TYPE = CollectionType.manual;
 
     /**
      * Class under test
@@ -203,7 +206,16 @@ public class JWTPermissionsServiceImplTest {
     }
 
     @Test
-    public void addEditor_Email_Session_ShouldError() throws Exception {
+    public void canEdit_WithCollectionType_ShouldDelegateToSessionCheck() throws IOException {
+        List<String> sessionGroups = new ArrayList<>();
+        sessionGroups.add(PUBLISHER);
+
+        Session session = new Session(TEST_SESSION_ID, TEST_USER_EMAIL, sessionGroups);
+
+        assertTrue(jwtPermissionsService.canEdit(session, TEST_COLLECTION_TYPE));
+    }
+    @Test
+    public void addEditor_Email_Session_ShouldError() {
         Session session = new Session(TEST_SESSION_ID, TEST_USER_EMAIL);
         UnsupportedOperationException exception = assertThrows(UnsupportedOperationException.class, () ->
                 jwtPermissionsService.addEditor(TEST_USER_EMAIL, session));
@@ -225,6 +237,15 @@ public class JWTPermissionsServiceImplTest {
         Session session = new Session(TEST_SESSION_ID, TEST_USER_EMAIL, sessionGroups);
 
         assertTrue(jwtPermissionsService.canView(session, COLLECTION_ID));
+    }
+
+    @Test
+    public void canView_WithCollectionType_ShouldDelegateToCollectionIdCheck() throws IOException {
+        List<String> sessionGroups = new ArrayList<>();
+        sessionGroups.add(PUBLISHER);
+        Session session = new Session(TEST_SESSION_ID, TEST_USER_EMAIL, sessionGroups);
+
+        assertTrue(jwtPermissionsService.canView(session, COLLECTION_ID, TEST_COLLECTION_TYPE));
     }
 
     @Test

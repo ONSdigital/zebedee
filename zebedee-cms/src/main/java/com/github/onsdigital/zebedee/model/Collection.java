@@ -11,6 +11,7 @@ import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.CollectionNotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ConflictException;
 import com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedException;
+import com.github.onsdigital.zebedee.exceptions.ForbiddenException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
@@ -631,7 +632,7 @@ public class Collection {
         }
 
         // Does the current user have permission to edit?
-        boolean permission = zebedee.getPermissionsService().canEdit(session);
+        boolean permission = zebedee.getPermissionsService().canEdit(session, this.getDescription().getType());
 
         if (!isBeingEdited && !hasDeleteMarker && !exists && permission) {
             // Copy from Published to in progress:
@@ -683,7 +684,7 @@ public class Collection {
 
 
         // Does the user have permission to edit?
-        boolean permission = zebedee.getPermissionsService().canEdit(session);
+        boolean permission = zebedee.getPermissionsService().canEdit(session, this.getDescription().getType());
         if (!permission) {
             info().data("path", uri).data("collectionId", this.getDescription().getId()).data("user", session.getEmail())
                     .log("Content was not saved as user does not have EDIT permission");
@@ -729,7 +730,7 @@ public class Collection {
 
     public boolean complete(Session session, String uri, boolean recursive) throws IOException {
         boolean result = false;
-        boolean permission = zebedee.getPermissionsService().canEdit(session);
+        boolean permission = zebedee.getPermissionsService().canEdit(session, this.getDescription().getType());
 
         if (isInProgress(uri) && permission) {
             // Move the in-progress copy to completed:
@@ -772,9 +773,9 @@ public class Collection {
             throw new NotFoundException("File not found");
         }
 
-        boolean permission = zebedee.getPermissionsService().canEdit(session);
+        boolean permission = zebedee.getPermissionsService().canEdit(session, this.getDescription().getType());
         if (!permission) {
-            throw new UnauthorizedException("Insufficient permissions");
+            throw new ForbiddenException("Insufficient permissions for this collection type");
         }
 
         if (Files.isDirectory(this.find(uri))) {

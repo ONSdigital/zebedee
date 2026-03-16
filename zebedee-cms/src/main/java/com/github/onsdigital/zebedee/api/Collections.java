@@ -132,7 +132,7 @@ public class Collections {
 
         Session session = zebedeeCmsService.getSession();
         if (session == null || !zebedeeCmsService.getPermissions().canEdit(session)) {
-            info().log("Forbidden request made to the collection endpoint");
+            info().log("user is not authorised to edit collections");
             response.setStatus(HttpStatus.SC_FORBIDDEN);
             return;
         }
@@ -140,7 +140,6 @@ public class Collections {
         String user = session.getEmail();
 
         Path path = Path.newInstance(request);
-        
 
         if (!isValidPath(path)) {
             info().data("path", path).data("method", request.getMethod()).log("Endpoint for collections not found");
@@ -154,8 +153,21 @@ public class Collections {
 
         Collection collection = zebedeeCmsService.getCollection(collectionID);
         if (collection == null) {
-            info().data("collectionId", collectionID).log("Collection not found");
+            info().data("collection_id", collectionID).log("collection not found");
             response.setStatus(HttpStatus.SC_NOT_FOUND);
+            return;
+        }
+
+        CollectionDescription collectionDescription = collection.getDescription();
+        if (collectionDescription == null || collectionDescription.getType() == null) {
+            info().data("collection_id", collectionID).log("collection description or type not found");
+            response.setStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR);
+            return;
+        }
+
+        if (!zebedeeCmsService.getPermissions().canEdit(session, collectionDescription.getType())) {
+            info().data("collection_type", collectionDescription.getType()).log("user is not authorised to edit collections of this type");
+            response.setStatus(HttpStatus.SC_FORBIDDEN);
             return;
         }
 
@@ -231,6 +243,19 @@ public class Collections {
         if (collection == null) {
             info().data("collectionId", collectionID).log("Collection not found");
             response.setStatus(HttpStatus.SC_NOT_FOUND);
+            return;
+        }
+
+        CollectionDescription collectionDescription = collection.getDescription();
+        if (collectionDescription == null) {
+            info().data("collectionId", collectionID).log("collection description not found");
+            response.setStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR);
+            return;
+        }
+
+        if (!zebedeeCmsService.getPermissions().canEdit(session, collectionDescription.getType())) {
+            info().log("user is not authorised to edit collections of this type");
+            response.setStatus(HttpStatus.SC_FORBIDDEN);
             return;
         }
 

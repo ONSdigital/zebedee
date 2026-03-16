@@ -63,10 +63,10 @@ public class CollectionMoveTest extends ZebedeeTestBaseFixture {
         ReflectionTestUtils.setField(zebedee, "permissionsService", permissionsService);
         ReflectionTestUtils.setField(zebedee, "collectionKeyring", keyring);
 
-        when(permissionsService.canView(session, collection.getDescription().getId()))
+        when(permissionsService.canView(session, collection.getDescription().getId(), collection.getDescription().getType()))
                 .thenReturn(true);
 
-        when(permissionsService.canEdit(session))
+        when(permissionsService.canEdit(session, collection.getDescription().getType()))
                 .thenReturn(true);
 
         SecretKey key = Keys.newSecretKey();

@@ -3,6 +3,7 @@ package com.github.onsdigital.zebedee.permissions.service;
 import com.github.onsdigital.UserDataPayload;
 import com.github.onsdigital.dp.authorisation.permissions.PermissionChecker;
 import com.github.onsdigital.zebedee.permissions.model.Permissions;
+import com.github.onsdigital.zebedee.json.CollectionType;
 import com.github.onsdigital.zebedee.session.model.Session;
 import org.junit.Before;
 import org.junit.Test;
@@ -12,6 +13,7 @@ import org.mockito.MockitoAnnotations;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
@@ -30,6 +32,7 @@ public class PermissionsServiceImplementationTest {
     private static final String USER_ID = "user-id";
     private static final String USER_EMAIL = "user@ons.gov.uk";
     private static final String COLLECTION_ID = "collection-id";
+    private static final CollectionType TEST_COLLECTION_TYPE = CollectionType.manual;
 
     private PermissionsServiceImplementation permissionsService;
 
@@ -86,6 +89,22 @@ public class PermissionsServiceImplementationTest {
     }
 
     @Test
+    public void canEdit_WithCollectionType_ShouldIncludeCollectionTypeAttribute() throws Exception {
+        when(permissionChecker.hasPermission(any(UserDataPayload.class), eq(Permissions.LEGACY_EDIT), anyMap()))
+                .thenReturn(true);
+
+        assertTrue(permissionsService.canEdit(session, TEST_COLLECTION_TYPE));
+
+        Map<String, String> expectedAttributes = new HashMap<>();
+        expectedAttributes.put("collection_type", TEST_COLLECTION_TYPE.name());
+        expectedAttributes.put("collection_id", "");
+
+        verify(permissionChecker, times(1))
+                .hasPermission(any(UserDataPayload.class), eq(Permissions.LEGACY_EDIT), eq(expectedAttributes));
+    }
+
+
+    @Test
     public void canView_ShouldReturnTrueAndUseCollectionId() throws Exception {
         when(permissionChecker.hasPermission(any(UserDataPayload.class), eq(Permissions.LEGACY_READ), anyMap()))
                 .thenReturn(true);
@@ -98,6 +117,20 @@ public class PermissionsServiceImplementationTest {
 
         Map<String, String> attributes = attributesCaptor.getValue();
         assertEquals(COLLECTION_ID, attributes.get("collection_id"));
+    }
+
+    @Test
+    public void canView_WithCollectionType_ShouldIncludeCollectionTypeAttribute() throws Exception {
+        when(permissionChecker.hasPermission(any(UserDataPayload.class), eq(Permissions.LEGACY_READ), anyMap()))
+                .thenReturn(true);
+
+        assertTrue(permissionsService.canView(session, COLLECTION_ID, TEST_COLLECTION_TYPE));
+        Map<String, String> expectedAttributes = new HashMap<>();
+        expectedAttributes.put("collection_type", TEST_COLLECTION_TYPE.name());
+        expectedAttributes.put("collection_id", COLLECTION_ID);
+
+        verify(permissionChecker, times(1))
+                .hasPermission(any(UserDataPayload.class), eq(Permissions.LEGACY_READ), eq(expectedAttributes));
     }
 
     @Test

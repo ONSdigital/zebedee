@@ -8,6 +8,7 @@ import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
+import com.github.onsdigital.zebedee.json.CollectionType;
 import com.github.onsdigital.zebedee.keyring.CollectionKeyring;
 import com.github.onsdigital.zebedee.keyring.KeyringException;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
@@ -26,7 +27,6 @@ import java.io.IOException;
 
 import static com.github.onsdigital.zebedee.model.ZebedeeCollectionReader.COLLECTION_KEY_NULL_ERR;
 import static com.github.onsdigital.zebedee.model.ZebedeeCollectionReader.COLLECTION_NULL_ERR;
-import static com.github.onsdigital.zebedee.model.ZebedeeCollectionReader.GET_USER_ERR;
 import static com.github.onsdigital.zebedee.model.ZebedeeCollectionReader.KEYRING_NULL_ERR;
 import static com.github.onsdigital.zebedee.model.ZebedeeCollectionReader.PERMISSIONS_CHECK_ERR;
 import static com.github.onsdigital.zebedee.model.ZebedeeCollectionReader.PERMISSIONS_SERVICE_NULL_ERR;
@@ -42,7 +42,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -50,6 +49,7 @@ import static org.mockito.Mockito.when;
 public class ZebedeeCollectionReaderTest extends ZebedeeTestBaseFixture {
 
     static final String COLLECTION_ID = "1234";
+    static final CollectionType TEST_COLLECTION_TYPE = CollectionType.manual;
 
     @Rule
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
@@ -64,7 +64,7 @@ public class ZebedeeCollectionReaderTest extends ZebedeeTestBaseFixture {
     private CollectionKeyring keyring;
 
     @Mock
-    private Collection collection;
+    private Collection mockCollection;
 
     @Mock
     private CollectionDescription description;
@@ -86,19 +86,22 @@ public class ZebedeeCollectionReaderTest extends ZebedeeTestBaseFixture {
         when(zebedeeMock.getUsersService())
                 .thenReturn(usersService);
 
-        when(collection.getDescription())
+        when(mockCollection.getDescription())
                 .thenReturn(description);
 
         when(description.getId())
                 .thenReturn(COLLECTION_ID);
 
-        when(permissionsService.canView(userSession, COLLECTION_ID))
+        when(description.getType())
+                .thenReturn(TEST_COLLECTION_TYPE);
+
+        when(permissionsService.canView(userSession, COLLECTION_ID, TEST_COLLECTION_TYPE))
                 .thenReturn(true);
 
-        when(keyring.get(userSession, collection))
+        when(keyring.get(userSession, mockCollection))
                 .thenReturn(key);
 
-        when(collection.getPath())
+        when(mockCollection.getPath())
                 .thenReturn(temporaryFolder.getRoot().toPath());
 
         when(userSession.getEmail())
@@ -106,6 +109,7 @@ public class ZebedeeCollectionReaderTest extends ZebedeeTestBaseFixture {
 
         Session session = zebedee.openSession(builder.publisher1Credentials);
         Collection collection = new Collection(builder.collections.get(0), zebedee);
+        collection.getDescription().setType(TEST_COLLECTION_TYPE);
 
         setUpPermissionsServiceMockForLegacyTests(zebedee, session);
 
@@ -158,7 +162,9 @@ public class ZebedeeCollectionReaderTest extends ZebedeeTestBaseFixture {
         // A uri that defines a directory
         String uri = "/this/is/a/directory/";
         Collection collection = new Collection(builder.collections.get(0), zebedee);
-        when(permissionsService.canEdit(userSession))
+        collection.getDescription().setType(TEST_COLLECTION_TYPE);
+
+        when(permissionsService.canEdit(userSession, TEST_COLLECTION_TYPE))
                 .thenReturn(true);
         ReflectionTestUtils.setField(zebedee, "permissionsService", permissionsService);
 
@@ -176,7 +182,7 @@ public class ZebedeeCollectionReaderTest extends ZebedeeTestBaseFixture {
     public void shouldReadFile()
             throws IOException, ZebedeeException {
 
-        when(permissionsService.canEdit(userSession))
+        when(permissionsService.canEdit(userSession, TEST_COLLECTION_TYPE))
                 .thenReturn(true);
 
         ReflectionTestUtils.setField(zebedee, "permissionsService", permissionsService);
@@ -185,6 +191,7 @@ public class ZebedeeCollectionReaderTest extends ZebedeeTestBaseFixture {
         // A nonexistent file
         String uri = "/file.json";
         Collection collection = new Collection(builder.collections.get(0), zebedee);
+        collection.getDescription().setType(TEST_COLLECTION_TYPE);
         assertTrue(collection.create(userSession, uri));
 
         // When
@@ -254,7 +261,7 @@ public class ZebedeeCollectionReaderTest extends ZebedeeTestBaseFixture {
     @Test
     public void testNew_sessionNull_shouldThrowException() throws Exception {
         UnauthorizedException ex = assertThrows(UnauthorizedException.class,
-                () -> newReader(zebedeeMock, collection, null));
+                () -> newReader(zebedeeMock, mockCollection, null));
 
         assertThat(ex.getMessage(), equalTo(SESSION_NULL_ERR));
         verify(zebedeeMock, times(1)).getPermissionsService();
@@ -263,59 +270,59 @@ public class ZebedeeCollectionReaderTest extends ZebedeeTestBaseFixture {
 
     @Test
     public void testNew_checkUserAuthError_shouldThrowException() throws Exception {
-        when(permissionsService.canView(userSession, COLLECTION_ID))
+        when(permissionsService.canView(userSession, COLLECTION_ID, TEST_COLLECTION_TYPE))
                 .thenThrow(IOException.class);
 
         IOException ex = assertThrows(IOException.class,
-                () -> newReader(zebedeeMock, collection, userSession));
+                () -> newReader(zebedeeMock, mockCollection, userSession));
 
         assertThat(ex.getMessage(), equalTo(PERMISSIONS_CHECK_ERR));
-        verify(permissionsService, times(1)).canView(userSession, COLLECTION_ID);
+        verify(permissionsService, times(1)).canView(userSession, COLLECTION_ID, TEST_COLLECTION_TYPE);
     }
 
     @Test
     public void testNew_userAuthDenied_shouldThrowException() throws Exception {
-        when(permissionsService.canView(userSession, COLLECTION_ID))
+        when(permissionsService.canView(userSession, COLLECTION_ID, TEST_COLLECTION_TYPE))
                 .thenReturn(false);
 
         UnauthorizedException ex = assertThrows(UnauthorizedException.class,
-                () -> newReader(zebedeeMock, collection, userSession));
+                () -> newReader(zebedeeMock, mockCollection, userSession));
 
         assertThat(ex.getMessage(), equalTo(PERMISSION_DENIED_ERR));
-        verify(permissionsService, times(1)).canView(userSession, COLLECTION_ID);
+        verify(permissionsService, times(1)).canView(userSession, COLLECTION_ID, TEST_COLLECTION_TYPE);
     }
 
     @Test
     public void testNew_getKeyError_shouldThrowException() throws Exception {
-        when(keyring.get(userSession, collection))
+        when(keyring.get(userSession, mockCollection))
                 .thenThrow(KeyringException.class);
 
-        assertThrows(KeyringException.class, () -> newReader(zebedeeMock, collection, userSession));
+        assertThrows(KeyringException.class, () -> newReader(zebedeeMock, mockCollection, userSession));
 
-        verify(permissionsService, times(1)).canView(userSession, COLLECTION_ID);
-        verify(keyring, times(1)).get(userSession, collection);
+        verify(permissionsService, times(1)).canView(userSession, COLLECTION_ID, TEST_COLLECTION_TYPE);
+        verify(keyring, times(1)).get(userSession, mockCollection);
     }
 
     @Test
     public void testNew_getKeyReturnsNull_shouldThrowException() throws Exception {
-        when(keyring.get(userSession, collection))
+        when(keyring.get(userSession, mockCollection))
                 .thenReturn(null);
 
         UnauthorizedException ex = assertThrows(UnauthorizedException.class,
-                () -> newReader(zebedeeMock, collection, userSession));
+                () -> newReader(zebedeeMock, mockCollection, userSession));
 
         assertThat(ex.getMessage(), equalTo(COLLECTION_KEY_NULL_ERR));
-        verify(permissionsService, times(1)).canView(userSession, COLLECTION_ID);
-        verify(keyring, times(1)).get(userSession, collection);
+        verify(permissionsService, times(1)).canView(userSession, COLLECTION_ID, TEST_COLLECTION_TYPE);
+        verify(keyring, times(1)).get(userSession, mockCollection);
     }
 
     @Test
     public void testNew_success_shouldCreateNewReader() throws Exception {
-        CollectionReader reader = newReader(zebedeeMock, collection, userSession);
+        CollectionReader reader = newReader(zebedeeMock, mockCollection, userSession);
 
         assertThat(reader, is(notNullValue()));
-        verify(permissionsService, times(1)).canView(userSession, COLLECTION_ID);
-        verify(keyring, times(1)).get(userSession, collection);
+        verify(permissionsService, times(1)).canView(userSession, COLLECTION_ID, TEST_COLLECTION_TYPE);
+        verify(keyring, times(1)).get(userSession, mockCollection);
     }
 
     private CollectionReader newReader(Zebedee z, Collection c, Session s) throws Exception {

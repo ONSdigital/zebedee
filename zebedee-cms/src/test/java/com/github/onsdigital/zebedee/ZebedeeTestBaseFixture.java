@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee;
 
 import com.github.onsdigital.zebedee.json.Credentials;
+import com.github.onsdigital.zebedee.json.CollectionType;
 import com.github.onsdigital.zebedee.keyring.CollectionKeyring;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.encryption.EncryptionKeyFactory;
@@ -163,8 +164,14 @@ public abstract class ZebedeeTestBaseFixture {
     protected void setUpPermissionsServiceMockForLegacyTests(Zebedee instance, Session session) throws Exception {
         when(permissionsService.canView(eq(session), anyString()))
                 .thenReturn(true);
+        
+        when(permissionsService.canView(eq(session), anyString(), any(CollectionType.class)))
+                .thenReturn(true);
 
         when(permissionsService.canEdit(session))
+                .thenReturn(true);
+        
+        when(permissionsService.canEdit(eq(session), any(CollectionType.class)))
                 .thenReturn(true);
 
         ReflectionTestUtils.setField(instance, "permissionsService", permissionsService);

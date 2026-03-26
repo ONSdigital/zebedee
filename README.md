@@ -197,60 +197,7 @@ Zebedee will read/write from the central keyring for encrypting collections.
 The central keyring requires encryption config to be provided in app configuration. These secrets can be generated
 using the [collection-keyring-secrets-generator][7].
 
-## Service auth token generation
-
-API requests resulting directly from a user action are authorised using the user's JWT token. Service auth tokens are used to authorise autonomous, inter-service requests (e.g. requests triggered as part of a pipeline or cron timer).
-
-While management of user auth has been moved out of zebedee to the Auth Service, service auth is still provided by zebedee. Any service that will initiate an autonomous action that involves inter-service requests requires a service identity in zebedee. Creating a service identity and corresponding auth token in zebedee is a fully manual process.
-
-To generate service identity and auth token in zebedee:
-
-1. Install `pwgen`:
-
-   ```shell
-   brew install pwgen
-   ```
-
-2. Create a `$SERVICE_TOKEN` that is base 62 \[a-zA-Z0-9\] using:
-
-   ```shell
-   pwgen 64 1
-   ```
-
-   Copy this 64 character string for later step.
-
-3. Open the `services` directory under the zebedee content directory:
-
-   ```shell
-   cd $ZEBEDEE_ROOT/services
-   ```
-
-4. Create the service token record:
-
-   ```shell
-   sudo echo "{\"id\":\"$SERVICE_NAME\"}" > $SERVICE_TOKEN.json
-   ```
-
-5. You can now test the token using:
-
-   ```shell
-   curl -i -X GET <http://localhost:8082/identity> -H "Authorization: Bearer $SERVICE_TOKEN"
-   ```
-
-   You should get back something like:
-
-   ```text
-   HTTP/1.1 200 OK
-   Date: Wed, 21 Jul 2021 07:15:34 GMT
-   Content-Type: application/json;charset=utf-8
-   Content-Length: 55
-   Connection: keep-alive
-   Vary: Accept-Encoding, User-Agent
-
-   {"identifier":"my-service-name"}
-   ```
-
-   where \<service repo name\> is the name of your new service.
+## References
 
 [1]: https://github.com/ONSdigital/babbage
 [2]: https://github.com/ONSdigital/florence

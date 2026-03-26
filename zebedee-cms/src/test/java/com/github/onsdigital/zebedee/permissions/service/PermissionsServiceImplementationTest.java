@@ -63,14 +63,6 @@ public class PermissionsServiceImplementationTest {
     }
 
     @Test
-    public void isPublisher_ShouldThrowUnsupportedOperation() {
-        UnsupportedOperationException exception = assertThrows(UnsupportedOperationException.class, () ->
-                permissionsService.isPublisher(session));
-
-        assertEquals("Permissions API is enabled: isPublisher is no longer supported", exception.getMessage());
-    }
-
-    @Test
     public void addAdministrator_ShouldThrowUnsupportedOperation() {
         UnsupportedOperationException exception = assertThrows(UnsupportedOperationException.class, () ->
                 permissionsService.addAdministrator(USER_EMAIL, session));

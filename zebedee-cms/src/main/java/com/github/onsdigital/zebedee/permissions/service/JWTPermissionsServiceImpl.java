@@ -28,7 +28,7 @@ import static java.text.MessageFormat.format;
  * using permissions API is complete.
  */
 public class JWTPermissionsServiceImpl implements PermissionsService {
-    // TODO: change the following constant to private once migrtion to JWT sessions is complete and the PermissionsServiceImpl is removed
+    // TODO: change the following constant to private once migration to JWT sessions is complete and the PermissionsServiceImpl is removed
     protected static final String ADMIN_GROUP = "role-admin";
     private static final String PUBLISHER_GROUP = "role-publisher";
     private static final String UNSUPPORTED_ERROR = "JWT sessions are enabled: {0} is no longer supported";

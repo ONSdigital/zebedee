@@ -23,6 +23,9 @@ import java.util.HashMap;
 import java.util.Optional;
 import java.util.Set;
 
+import static com.github.onsdigital.zebedee.logging.CMSLogEvent.error;
+import static com.github.onsdigital.zebedee.logging.CMSLogEvent.info;
+import static com.github.onsdigital.zebedee.logging.CMSLogEvent.warn;
 import static java.text.MessageFormat.format;
 
 public class PermissionsServiceImplementation implements PermissionsService {

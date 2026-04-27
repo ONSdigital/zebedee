@@ -29,10 +29,18 @@ public class Unlock {
     @POST
     public boolean unlockCollection(HttpServletRequest request, HttpServletResponse response) throws IOException,
             ZebedeeException {
+        boolean result = false;
 
-        com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request);
+        com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request, true);
         Session session = Root.zebedee.getSessions().get();
-        boolean result = Root.zebedee.getCollections().unlock(collection, session);
+
+        try {
+            result = Root.zebedee.getCollections().unlock(collection, session);
+        } finally {
+            // close collection writelock
+            collection.close();
+        }
+
         if (result) {
             Audit.Event.COLLECTION_UNLOCKED
                     .parameters()

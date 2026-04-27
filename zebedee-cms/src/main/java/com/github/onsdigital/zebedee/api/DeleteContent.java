@@ -44,15 +44,20 @@ public class DeleteContent {
             return new DeleteContentResponse(HttpStatus.SC_BAD_REQUEST);
         }
         com.github.onsdigital.zebedee.model.Collection collection = zebedeeCmsService.getCollection(
-                deleteMarkerJson.getCollectionId());
+                deleteMarkerJson.getCollectionId(), true);
         Session session = zebedeeCmsService.getSession();
 
-        if (!zebedeeCmsService.getPermissions().canView(session, collection.getDescription().getId())) {
-            return new DeleteContentResponse(HttpStatus.SC_UNAUTHORIZED);
-        }
+        try {
+            if (!zebedeeCmsService.getPermissions().canView(session, collection.getDescription().getId())) {
+                return new DeleteContentResponse(HttpStatus.SC_UNAUTHORIZED);
+            }
 
-        deleteService.addDeleteMarkerToCollection(session, collection, jsonToMarker(deleteMarkerJson));
-        return new DeleteContentResponse(HttpStatus.SC_CREATED);
+            deleteService.addDeleteMarkerToCollection(session, collection, jsonToMarker(deleteMarkerJson));
+            return new DeleteContentResponse(HttpStatus.SC_CREATED);
+        } finally {
+            // clear collection writelock
+            collection.close();
+        }
     }
 
     @GET
@@ -85,19 +90,25 @@ public class DeleteContent {
     @DELETE
     public DeleteContentResponse removeDeleteMarker(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ZebedeeException {
-        com.github.onsdigital.zebedee.model.Collection collection = zebedeeCmsService.getCollection(request);
+        com.github.onsdigital.zebedee.model.Collection collection = zebedeeCmsService.getCollection(request, true);
         Session session = zebedeeCmsService.getSession();
 
-        if (!zebedeeCmsService.getPermissions().canView(session, collection.getDescription().getId())) {
-            return new DeleteContentResponse(HttpStatus.SC_UNAUTHORIZED);
+        try {
+            if (!zebedeeCmsService.getPermissions().canView(session, collection.getDescription().getId())) {
+                return new DeleteContentResponse(HttpStatus.SC_UNAUTHORIZED);
+            }
+
+            Optional<String> contentUri = RequestUtils.getURIParameter(request);
+            if (!contentUri.isPresent()) {
+                return new DeleteContentResponse(HttpStatus.SC_BAD_REQUEST);
+            }
+
+            deleteService.cancelPendingDelete(collection, session, contentUri.get());
+            return new DeleteContentResponse(HttpStatus.SC_OK);
+        } finally {
+            // release collection writelock
+            collection.close();
         }
 
-        Optional<String> contentUri = RequestUtils.getURIParameter(request);
-        if (!contentUri.isPresent()) {
-            return new DeleteContentResponse(HttpStatus.SC_BAD_REQUEST);
-        }
-
-        deleteService.cancelPendingDelete(collection, session, contentUri.get());
-        return new DeleteContentResponse(HttpStatus.SC_OK);
     }
 }

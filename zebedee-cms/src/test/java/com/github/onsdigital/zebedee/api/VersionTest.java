@@ -51,7 +51,7 @@ public class VersionTest extends ZebedeeAPIBaseTestCase {
         when(zebedee.getCollections()).thenReturn(collections);
         when(sessions.get()).thenReturn(mockSession);
 
-        when(collections.getCollection(COLLECTION_ID)).thenReturn(collection);
+        when(collections.getCollection(COLLECTION_ID, false)).thenReturn(collection);
         when(collection.getDescription()).thenReturn(description);
         when(description.getType()).thenReturn(TEST_COLLECTION_TYPE);
         when(mockRequest.getPathInfo()).thenReturn("/version/" + COLLECTION_ID);

@@ -23,12 +23,17 @@ public class ContentMove {
     public boolean MoveContent(HttpServletRequest request, HttpServletResponse response) throws IOException, ZebedeeException {
 
         Session session = Root.zebedee.getSessions().get();
-        Collection collection = Collections.getCollection(request);
+        Collection collection = Collections.getCollection(request, true);
 
         String uri = request.getParameter("uri");
         String toUri = request.getParameter("toUri");
 
-        Root.zebedee.getCollections().moveContent(session, collection, uri, toUri);
+        try {
+            Root.zebedee.getCollections().moveContent(session, collection, uri, toUri);
+        } finally {
+            // close collection writelock
+            collection.close();
+        }
 
         Audit.Event.CONTENT_MOVED
                 .parameters()

@@ -358,15 +358,30 @@ public class Collections {
      * Get the collection defined by the given HttpServletRequest
      *
      * @param request the request containing the id of the collection to get.
+     * @param writeable whether the collection should be writeable.
+     * @return
+     * @throws IOException
+     */
+    public static Collection
+    getCollection(HttpServletRequest request, boolean writeable)
+            throws IOException {
+        String collectionId = getCollectionId(request);
+        return Root.zebedee.getCollections().getCollection(collectionId, writeable);
+    }
+
+    /**
+     * Get the collection defined by the given HttpServletRequest
+     *
+     * @param request the request containing the id of the collection to get.
      * @return
      * @throws IOException
      */
     public static Collection
     getCollection(HttpServletRequest request)
             throws IOException {
-        String collectionId = getCollectionId(request);
-        return Root.zebedee.getCollections().getCollection(collectionId);
+        return getCollection(request, false);
     }
+
 
     public static String getCollectionId(HttpServletRequest request) {
         Path path = Path.newInstance(request);

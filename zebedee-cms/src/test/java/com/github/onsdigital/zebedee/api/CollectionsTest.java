@@ -1,5 +1,6 @@
 package com.github.onsdigital.zebedee.api;
 
+import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.CollectionDataset;
 import com.github.onsdigital.zebedee.json.CollectionDatasetVersion;
@@ -13,6 +14,7 @@ import com.github.onsdigital.zebedee.util.ZebedeeCmsService;
 import org.apache.hc.core5.http.HttpStatus;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.mock.web.MockHttpServletRequest;
 
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
@@ -20,6 +22,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
@@ -87,7 +91,7 @@ public class CollectionsTest {
         String url = String.format("/collections/%s/anything/%s", collectionID, resourceID);
         when(request.getPathInfo()).thenReturn(url);
 
-        shouldAuthorise(request, false, mockCollectionType);
+        shouldAuthorise(false, mockCollectionType);
 
         // When the put method is called
         collections.put(request, response);
@@ -104,7 +108,7 @@ public class CollectionsTest {
         when(request.getPathInfo()).thenReturn(url);
         when(mockCollection.getDescription()).thenReturn(null);
 
-        shouldAuthorise(request, true, mockCollectionType);
+        shouldAuthorise(true, mockCollectionType);
 
         // When the put method is called
         collections.put(request, response);
@@ -120,7 +124,7 @@ public class CollectionsTest {
         String url = String.format("/collections/%s/anything/%s", collectionID, resourceID);
         when(request.getPathInfo()).thenReturn(url);
 
-        shouldAuthorise(request, false, mockCollectionType);
+        shouldAuthorise(false, mockCollectionType);
 
         // When the delete method is called
         collections.delete(request, response);
@@ -137,7 +141,7 @@ public class CollectionsTest {
         when(request.getPathInfo()).thenReturn(url);
         when(mockCollection.getDescription()).thenReturn(null);
 
-        shouldAuthorise(request, true, mockCollectionType);
+        shouldAuthorise(true, mockCollectionType);
 
         // When the delete method is called
         collections.delete(request, response);
@@ -154,7 +158,7 @@ public class CollectionsTest {
 
         String url = String.format("/collections/%s/anything/%s", collectionID, resourceID);
         when(request.getPathInfo()).thenReturn(url);
-        shouldAuthorise(request, true, mockCollectionType);
+        shouldAuthorise(true, mockCollectionType);
 
         // When the delete method is called
         collections.put(request, response);
@@ -171,7 +175,7 @@ public class CollectionsTest {
 
         String url = String.format("/collections/%s/anything/%s", collectionID, resourceID);
         when(request.getPathInfo()).thenReturn(url);
-        shouldAuthorise(request, true, mockCollectionType);
+        shouldAuthorise(true, mockCollectionType);
 
         // When the delete method is called
         collections.delete(request, response);
@@ -208,7 +212,7 @@ public class CollectionsTest {
     @Test
     public void testPutReturnBadRequestURLSegments() throws Exception {
 
-        shouldAuthorise(request, true, mockCollectionType);
+        shouldAuthorise(true, mockCollectionType);
 
         // Given a PUT request with a URL that contains less than the expected 4 segments
         String url = "/collections/123/anything";
@@ -227,7 +231,7 @@ public class CollectionsTest {
     @Test
     public void testDeleteReturnBadRequestURLSegments() throws Exception {
 
-        shouldAuthorise(request, true, mockCollectionType);
+        shouldAuthorise(true, mockCollectionType);
 
         // Given a PUT request with a URL that contains less than the expected number of segments
         String url = "/collections/123/anything";
@@ -247,7 +251,7 @@ public class CollectionsTest {
     @Test
     public void testPut_ReturnBadRequest_NotValidEndpoint() throws Exception {
 
-        shouldAuthorise(request, true, mockCollectionType);
+        shouldAuthorise(true, mockCollectionType);
 
         // Given a PUT request with a URL that contains something other than /collections/{}/{datasets|interactives}/{}
         String url = "/collections/123/anything/345";
@@ -263,7 +267,7 @@ public class CollectionsTest {
     @Test
     public void testDeleteReturnBadRequestNotValidEndpoint() throws Exception {
 
-        shouldAuthorise(request, true, CollectionType.manual);
+        shouldAuthorise(true, CollectionType.manual);
 
         // Given a PUT request with a URL that contains something other than /collections/{}/{datasets|interactives}/{}
         String url = "/collections/123/anything/345";
@@ -289,7 +293,7 @@ public class CollectionsTest {
 
         mockRequestBody("");
 
-        shouldAuthorise(request, true, mockCollectionType);
+        shouldAuthorise(true, mockCollectionType);
 
         // When the put method is called
         collections.put(request, response);
@@ -309,7 +313,7 @@ public class CollectionsTest {
         String json = "{ \"state\": \"inProgress\"}";
         mockRequestBody(json);
 
-        shouldAuthorise(request, true, mockCollectionType);
+        shouldAuthorise(true, mockCollectionType);
 
         // When the put method is called
         collections.put(request, response);
@@ -329,7 +333,7 @@ public class CollectionsTest {
         String json = "{ \"state\": \"inProgress\"}";
         mockRequestBody(json);
 
-        shouldAuthorise(request, true, mockCollectionType);
+        shouldAuthorise(true, mockCollectionType);
 
         // When the put method is called
         collections.put(request, response);
@@ -353,7 +357,7 @@ public class CollectionsTest {
         String json = "{ \"state\": \"inProgress\"}";
         mockRequestBody(json);
 
-        shouldAuthorise(request, true, mockCollectionType);
+        shouldAuthorise(true, mockCollectionType);
 
         // When the put method is called
         collections.put(request, response);
@@ -370,7 +374,7 @@ public class CollectionsTest {
         String url = String.format("/collections/%s/datasets/%s", collectionID, resourceID);
         when(request.getPathInfo()).thenReturn(url);
 
-        shouldAuthorise(request, true, mockCollectionType);
+        shouldAuthorise(true, mockCollectionType);
 
         // When the delete method is called
         collections.delete(request, response);
@@ -391,7 +395,7 @@ public class CollectionsTest {
                 collectionID, resourceID, edition, version);
         when(request.getPathInfo()).thenReturn(url);
 
-        shouldAuthorise(request, true, mockCollectionType);
+        shouldAuthorise(true, mockCollectionType);
 
         // When the delete method is called
         collections.delete(request, response);
@@ -414,7 +418,7 @@ public class CollectionsTest {
                 collectionID, resourceID, edition);
         when(request.getPathInfo()).thenReturn(url);
 
-        shouldAuthorise(request, true, mockCollectionType);
+        shouldAuthorise(true, mockCollectionType);
 
         // When the delete method is called
         collections.delete(request, response);
@@ -426,8 +430,44 @@ public class CollectionsTest {
         verifyNoInteractions(mockDatasetService);
     }
 
+    @Test
+    public void getCollection_withWriteableTrue_shouldDelegateToModelCollections() throws Exception {
+        Zebedee zebedee = mock(Zebedee.class);
+        com.github.onsdigital.zebedee.model.Collections modelCollections = mock(com.github.onsdigital.zebedee.model.Collections.class);
+        Collection expected = mock(Collection.class);
+        MockHttpServletRequest actualRequest = new MockHttpServletRequest();
+        actualRequest.setPathInfo("/collections/" + collectionID);
+
+        Root.zebedee = zebedee;
+        when(zebedee.getCollections()).thenReturn(modelCollections);
+        when(modelCollections.getCollection(collectionID, true)).thenReturn(expected);
+
+        Collection actual = Collections.getCollection(actualRequest, true);
+
+        assertThat(actual, is(expected));
+        verify(modelCollections).getCollection(collectionID, true);
+    }
+
+    @Test
+    public void getCollection_withoutWriteable_shouldDefaultToFalse() throws Exception {
+        Zebedee zebedee = mock(Zebedee.class);
+        com.github.onsdigital.zebedee.model.Collections modelCollections = mock(com.github.onsdigital.zebedee.model.Collections.class);
+        Collection expected = mock(Collection.class);
+        MockHttpServletRequest actualRequest = new MockHttpServletRequest();
+        actualRequest.setPathInfo("/collections/" + collectionID);
+
+        Root.zebedee = zebedee;
+        when(zebedee.getCollections()).thenReturn(modelCollections);
+        when(modelCollections.getCollection(collectionID, false)).thenReturn(expected);
+
+        Collection actual = Collections.getCollection(actualRequest);
+
+        assertThat(actual, is(expected));
+        verify(modelCollections).getCollection(collectionID, false);
+    }
+
     // mock the authorisation for the given request to authorise the request is the authorise param is true.
-    private void shouldAuthorise(HttpServletRequest request, boolean authorise, CollectionType collectionType) throws ZebedeeException, IOException {
+    private void shouldAuthorise(boolean authorise, CollectionType collectionType) throws ZebedeeException, IOException {
 
         when(mockZebedeeCmsService.getSession()).thenReturn(session);
 

@@ -29,12 +29,17 @@ public class ContentRename {
             ZebedeeException {
 
         Session session = Root.zebedee.getSessions().get();
-        com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request);
+        com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request, true);
 
         String uri = request.getParameter("uri");
         String toUri = request.getParameter("toUri");
 
-        Root.zebedee.getCollections().renameContent(session, collection, uri, toUri);
+        try {
+            Root.zebedee.getCollections().renameContent(session, collection, uri, toUri);
+        } finally {
+            // close collection writelock
+            collection.close();
+        }
         Audit.Event.CONTENT_RENAMED
                 .parameters()
                 .host(request)

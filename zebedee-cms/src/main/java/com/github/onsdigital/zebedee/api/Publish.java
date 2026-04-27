@@ -46,7 +46,7 @@ public class Publish {
     public boolean publish(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ZebedeeException {
 
-        com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request);
+        com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request, true);
         Session session = zebedeeCmsService.getSession();
 
         String breakBeforePublish = request.getParameter("breakbeforefiletransfer");
@@ -63,6 +63,9 @@ public class Publish {
         } catch (ZebedeeException | IOException ex) {
             logPublishResult(request, collection, session, false, ex);
             throw ex;
+        } finally {
+            // close collection writelock
+            collection.close();
         }
     }
 

@@ -27,6 +27,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -38,11 +39,15 @@ import javax.servlet.http.HttpServletResponse;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -70,6 +75,10 @@ public class ContentTest {
     UsersService mockUsersService;
     @Mock
     Notifier mockNotifier;
+    @Mock
+    private Collections mockCollectionsService;
+    @Mock
+    private Collection lockedCollection;
     Path tempBasePath;
 
     CollectionDescription collectionDescription;
@@ -144,16 +153,16 @@ public class ContentTest {
         ZebedeeReader.setCollectionReaderFactory(factory);
 
         HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
-        ByteArrayOutputStream content = new ByteArrayOutputStream(1024);
+        ByteArrayOutputStream responseBody = new ByteArrayOutputStream(1024);
         when(response.getOutputStream())
-                .thenReturn(new StubServletOutputStream(content));
+            .thenReturn(new StubServletOutputStream(responseBody));
 
         Data dataAPI = new Data();
         dataAPI.read(dataRequest, response);
 
         // Then I should receive a structured V1 content back with file download link
         verify(response).setStatus(200);
-        assertJsonEquals(EXPECTED_CONTENT_V1, content.toString());
+        assertJsonEquals(EXPECTED_CONTENT_V1, responseBody.toString());
     }
 
     @Test
@@ -184,16 +193,115 @@ public class ContentTest {
         ZebedeeReader.setCollectionReaderFactory(factory);
 
         HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
-        ByteArrayOutputStream content = new ByteArrayOutputStream(1024);
+        ByteArrayOutputStream responseBody = new ByteArrayOutputStream(1024);
         when(response.getOutputStream())
-                .thenReturn(new StubServletOutputStream(content));
+            .thenReturn(new StubServletOutputStream(responseBody));
 
         Data dataAPI = new Data();
         dataAPI.read(dataRequest, response);
 
         // Then I should receive a structured V2 content back with uri download link
         verify(response).setStatus(200);
-        assertJsonEquals(EXPECTED_CONTENT_V2, content.toString());
+        assertJsonEquals(EXPECTED_CONTENT_V2, responseBody.toString());
+    }
+
+    @Test
+    public void saveContent_shouldGetWritableCollectionAndCloseOnOverwriteSuccess() throws Exception {
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.setContent("{}".getBytes());
+        request.addParameter("uri", "/test-uri");
+
+        when(mockZebedee.getCollections()).thenReturn(mockCollectionsService);
+
+        try (MockedStatic<com.github.onsdigital.zebedee.api.Collections> collectionsApi = mockStatic(com.github.onsdigital.zebedee.api.Collections.class)) {
+            collectionsApi.when(() -> com.github.onsdigital.zebedee.api.Collections.getCollection(request, true)).thenReturn(lockedCollection);
+
+            boolean result = new Content().saveContent(request, new MockHttpServletResponse());
+
+            Assert.assertTrue(result);
+            verify(mockCollectionsService).writeContent(eq(lockedCollection), eq("/test-uri"), eq(mockSession), eq(request), any(InputStream.class), eq(false), eq(true));
+            verify(lockedCollection).close();
+        }
+    }
+
+    @Test
+    public void saveContent_shouldGetWritableCollectionAndCloseOnCreateSuccess() throws Exception {
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.setContent("{}".getBytes());
+        request.addParameter("uri", "/test-uri");
+        request.addParameter("overwriteExisting", "false");
+
+        when(mockZebedee.getCollections()).thenReturn(mockCollectionsService);
+
+        try (MockedStatic<com.github.onsdigital.zebedee.api.Collections> collectionsApi = mockStatic(com.github.onsdigital.zebedee.api.Collections.class)) {
+            collectionsApi.when(() -> com.github.onsdigital.zebedee.api.Collections.getCollection(request, true)).thenReturn(lockedCollection);
+
+            boolean result = new Content().saveContent(request, new MockHttpServletResponse());
+
+            Assert.assertTrue(result);
+            verify(mockCollectionsService).createContent(eq(lockedCollection), eq("/test-uri"), eq(mockSession), eq(request), any(InputStream.class), eq(true));
+            verify(lockedCollection).close();
+        }
+    }
+
+    @Test
+    public void saveContent_shouldCloseCollectionWhenWriteThrows() throws Exception {
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.setContent("{}".getBytes());
+        request.addParameter("uri", "/test-uri");
+
+        when(mockZebedee.getCollections()).thenReturn(mockCollectionsService);
+
+        try (MockedStatic<com.github.onsdigital.zebedee.api.Collections> collectionsApi = mockStatic(com.github.onsdigital.zebedee.api.Collections.class)) {
+            collectionsApi.when(() -> com.github.onsdigital.zebedee.api.Collections.getCollection(request, true)).thenReturn(lockedCollection);
+            doThrow(new com.github.onsdigital.zebedee.exceptions.ConflictException("write failed"))
+                    .when(mockCollectionsService)
+                    .writeContent(eq(lockedCollection), eq("/test-uri"), eq(mockSession), eq(request), any(InputStream.class), eq(false), eq(true));
+
+            org.junit.Assert.assertThrows(com.github.onsdigital.zebedee.exceptions.ConflictException.class,
+                    () -> new Content().saveContent(request, new MockHttpServletResponse()));
+
+            verify(lockedCollection).close();
+        }
+    }
+
+    @Test
+    public void delete_shouldGetWritableCollectionAndCloseOnSuccess() throws Exception {
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.addParameter("uri", "/test-uri");
+
+        when(mockZebedee.getCollections()).thenReturn(mockCollectionsService);
+        when(mockCollectionsService.deleteContent(lockedCollection, "/test-uri", mockSession)).thenReturn(true);
+
+        try (MockedStatic<com.github.onsdigital.zebedee.api.Collections> collectionsApi = mockStatic(com.github.onsdigital.zebedee.api.Collections.class)) {
+            collectionsApi.when(() -> com.github.onsdigital.zebedee.api.Collections.getCollection(request, true)).thenReturn(lockedCollection);
+
+            boolean result = new Content().delete(request, new MockHttpServletResponse());
+
+            Assert.assertTrue(result);
+            verify(mockCollectionsService).deleteContent(lockedCollection, "/test-uri", mockSession);
+            verify(lockedCollection).close();
+        }
+    }
+
+    @Test
+    public void delete_shouldCloseCollectionWhenDeleteThrows() throws Exception {
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.addParameter("uri", "/test-uri");
+
+        when(mockZebedee.getCollections()).thenReturn(mockCollectionsService);
+
+        try (MockedStatic<com.github.onsdigital.zebedee.api.Collections> collectionsApi = mockStatic(com.github.onsdigital.zebedee.api.Collections.class)) {
+            collectionsApi.when(() -> com.github.onsdigital.zebedee.api.Collections.getCollection(request, true)).thenReturn(lockedCollection);
+            doThrow(new com.github.onsdigital.zebedee.exceptions.ConflictException("delete failed"))
+                    .when(mockCollectionsService)
+                    .deleteContent(lockedCollection, "/test-uri", mockSession);
+
+            org.junit.Assert.assertThrows(com.github.onsdigital.zebedee.exceptions.ConflictException.class,
+                    () -> new Content().delete(request, new MockHttpServletResponse()));
+
+            verify(lockedCollection).close();
+        }
     }
 
     private Path createCollectionAndPaths(String collectionId) throws IOException, ZebedeeException {

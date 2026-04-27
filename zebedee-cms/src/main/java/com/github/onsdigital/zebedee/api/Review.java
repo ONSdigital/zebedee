@@ -36,7 +36,7 @@ public class Review {
             ZebedeeException {
 
         // Collate parameters
-        com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request);
+        com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request, true);
         if(collection == null) {
             throw new NotFoundException("Collection not found");
         }
@@ -46,10 +46,15 @@ public class Review {
 
         Boolean recursive = BooleanUtils.toBoolean(StringUtils.defaultIfBlank(request.getParameter("recursive"), "false"));
 
-        // Run the review
-        collection.review(session, uri, recursive);
-        collection.save();
-
+        try {
+            // Run the review
+            collection.review(session, uri, recursive);
+            collection.save();
+        } finally {
+            // close collection writelock
+            collection.close();
+        }
+  
         Audit.Event.COLLECTION_MOVED_TO_REVIEWED
                 .parameters()
                 .host(request)

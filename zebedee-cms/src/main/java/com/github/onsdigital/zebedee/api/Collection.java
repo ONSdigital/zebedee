@@ -215,7 +215,7 @@ public class Collection {
 
         info().log("update collection endpoint: request received");
 
-        com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request);
+        com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request, true);
         if (collection == null) {
             warn().log("update collection endpoint: request unsuccessful collection not found");
             throw new NotFoundException("The collection you are trying to update was not found.");
@@ -223,42 +223,51 @@ public class Collection {
 
         String collectionId = Collections.getCollectionId(request);
 
-        Session session = sessionsService.get();
-        if (session == null) {
-            warn().user(session.getEmail())
+        try {
+            Session session = sessionsService.get();
+            if (session == null) {
+                warn().user(session.getEmail())
+                        .collectionID(collectionId)
+                        .log("update collection endpoint: request unsuccessful no valid session found");
+                throw new UnauthorizedException("You are not authorised to update collections.");
+            }
+
+            CollectionDescription currentCollectionDescription = collection.getDescription();
+
+            // Check user has permission to edit the collection type both currently and in the update request (in case of type change).
+            requireEditPermission(session, currentCollectionDescription.getType());
+            requireEditPermission(session, collectionDescription.getType());
+
+            info().user(session.getEmail())
                     .collectionID(collectionId)
-                    .log("update collection endpoint: request unsuccessful no valid session found");
-            throw new UnauthorizedException("You are not authorised to update collections.");
+                    .log("update collection endpoint: user granted canEdit permission");
+
+            com.github.onsdigital.zebedee.model.Collection updatedCollection = collection.update(
+                    collection,
+                    collectionDescription,
+                    Root.zebedee,
+                    Root.getScheduler(),
+                    session);
+
+            Audit.Event.COLLECTION_UPDATED
+                    .parameters()
+                    .host(request)
+                    .fromTo(collection.getPath().toString(), updatedCollection.getPath().toString())
+                    .actionedBy(session.getEmail())
+                    .log();
+
+            // close collection writelock
+            collection.close();
+
+            info().user(session.getEmail())
+                    .collectionID(collectionId)
+                    .log("update collection endpoint: request completed successfully");
+
+            return updatedCollection.getDescription();
+        } finally {
+            // close collection writelock
+            collection.close();
         }
-
-        CollectionDescription currentCollectionDescription = collection.getDescription();
-
-        // Check user has permission to edit the collection type both currently and in the update request (in case of type change).
-        requireEditPermission(session, currentCollectionDescription.getType());
-        requireEditPermission(session, collectionDescription.getType());
-
-        info().user(session.getEmail())
-                .collectionID(collectionId)
-                .log("update collection endpoint: user granted canEdit permission");
-
-        com.github.onsdigital.zebedee.model.Collection updatedCollection = collection.update(
-                collection,
-                collectionDescription,
-                Root.zebedee,
-                Root.getScheduler(),
-                session);
-
-        Audit.Event.COLLECTION_UPDATED
-                .parameters()
-                .host(request)
-                .fromTo(collection.getPath().toString(), updatedCollection.getPath().toString())
-                .actionedBy(session.getEmail())
-                .log();
-
-        info().user(session.getEmail())
-                .collectionID(collectionId)
-                .log("update collection endpoint: request completed successfully");
-        return updatedCollection.getDescription();
     }
 
     /**
@@ -286,7 +295,7 @@ public class Collection {
 
         String collectionId = Collections.getCollectionId(request);
 
-        com.github.onsdigital.zebedee.model.Collection collection = collections.getCollection(collectionId);
+        com.github.onsdigital.zebedee.model.Collection collection = collections.getCollection(collectionId, true);
         if (collection == null) {
             warn().user(session.getEmail())
                     .collectionID(collectionId)
@@ -294,30 +303,38 @@ public class Collection {
             throw new NotFoundException("The collection you are trying to delete was not found");
         }
 
-        CollectionDescription description = collection.getDescription();
-        if (description == null) {
-            info().log("delete collection endpoint: request unsuccessful collection description not found");
-            throw new InternalServerError("The collection description was not found.");
+        try {
+            CollectionDescription description = collection.getDescription();
+            if (description == null) {
+                info().log("delete collection endpoint: request unsuccessful collection description not found");
+                throw new InternalServerError("The collection description was not found.");
+            }
+
+            //TODO: This should really be requireDeletePermission but this not currently supported
+            // and we would need to implement it in three different ways. Come back to this post 
+            // migration to the decentralised permissions model.
+            requireEditPermission(session, description.getType());
+
+            deleteCollection(collection, session);
+
+            // close collection writelock
+            collection.close();
+
+            Audit.Event.COLLECTION_DELETED
+                    .parameters()
+                    .host(request)
+                    .collection(collection)
+                    .actionedBy(session.getEmail())
+                    .log();
+
+            info().user(session.getEmail())
+                    .collectionID(collectionId)
+                    .log("delete collection endpoint: request completed successfully");
+            return true;
+        } finally {
+          // close collection writelock
+            collection.close();
         }
-
-        //TODO: This should really be requireDeletePermission but this not currently supported
-        // and we would need to implement it in three different ways. Come back to this post 
-        // migration to the decentralised permissions model.
-        requireEditPermission(session, description.getType());
-
-        deleteCollection(collection, session);
-
-        Audit.Event.COLLECTION_DELETED
-                .parameters()
-                .host(request)
-                .collection(collection)
-                .actionedBy(session.getEmail())
-                .log();
-
-        info().user(session.getEmail())
-                .collectionID(collectionId)
-                .log("delete collection endpoint: request completed successfully");
-        return true;
     }
 
     private void deleteCollection(com.github.onsdigital.zebedee.model.Collection c, Session s)

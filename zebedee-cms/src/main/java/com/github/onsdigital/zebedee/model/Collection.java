@@ -99,6 +99,8 @@ public class Collection {
     private final Content complete;
     private final Content inProgress;
 
+    private boolean isWriteable;
+
     private final Zebedee zebedee;
 
     private final Path collectionJsonPath;
@@ -112,9 +114,13 @@ public class Collection {
      *
      * @param path    The {@link Path} of the {@link Collection}.
      * @param zebedee The containing {@link Zebedee}.
+     * @param writeable If true, a write lock will be acquired on the collection for the duration of the 
+     *  Collection's lifecycle. If false, no locks will be acquired. The caller is responsible for ensuring
+     *  the lock is released. It is still possible to write to the collection when this is false, for backwards
+     *  compatibility reasons, but it is recommended to set this to true for any new code to ensure locks are correctly processed.
      * @throws IOException
      */
-    public Collection(Path path, Zebedee zebedee) throws IOException, CollectionNotFoundException {
+    public Collection(Path path, Zebedee zebedee, boolean writeable) throws IOException, CollectionNotFoundException {
 
         this.zebedee = zebedee;
 
@@ -135,10 +141,23 @@ public class Collection {
 
         // Deserialise the description:
         collectionLocks.putIfAbsent(this.path, new ReentrantReadWriteLock());
+        if (writeable) {
+            this.isWriteable = true;
+            info().data("path", this.path).log("acquiring collection write lock");
+            collectionLocks.get(this.path).writeLock().lock();
+        }
+
         collectionLocks.get(this.path).readLock().lock();
+
         try (InputStream input = Files.newInputStream(this.collectionJsonPath)) {
             this.description = Serialiser.deserialise(input,
                     CollectionDescription.class);
+        } catch (IOException | RuntimeException e) {
+            // only clear the write lock if we throw an exception here.
+            if (writeable) {
+                collectionLocks.get(this.path).writeLock().unlock();
+            }
+            throw new IOException("Failed to deserialise collection description", e);
         } finally {
             collectionLocks.get(this.path).readLock().unlock();
         }
@@ -150,6 +169,10 @@ public class Collection {
 
         this.versionsService = new VersionsServiceImpl();
     }
+
+    public Collection(Path path, Zebedee zebedee) throws IOException, CollectionNotFoundException {
+        this(path, zebedee, false);
+    }   
 
     /**
      * Deconstructs a {@link Collection} in the given {@link Zebedee},
@@ -1436,5 +1459,11 @@ public class Collection {
 
     public Content getInProgress() {
         return this.inProgress;
+    }
+
+    public void close() {
+        if (this.isWriteable){
+            this.getWriteLock().unlock();
+        }
     }
 }

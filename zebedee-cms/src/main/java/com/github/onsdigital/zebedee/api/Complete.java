@@ -35,13 +35,18 @@ public class Complete {
             ZebedeeException{
 
         // Locate the collection:
-        com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request);
+        com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request, true);
         Session session = Root.zebedee.getSessions().get();
         String uri = request.getParameter("uri");
 
         Boolean recursive = BooleanUtils.toBoolean(StringUtils.defaultIfBlank(request.getParameter("recursive"), "false"));
 
-        Root.zebedee.getCollections().complete(collection, uri, session, recursive);
+        try {
+            Root.zebedee.getCollections().complete(collection, uri, session, recursive);
+        } finally {
+            // close collection writelock
+            collection.close();
+        }
 
         Audit.Event.COLLECTION_MOVED_TO_REVIEWED
                 .parameters()

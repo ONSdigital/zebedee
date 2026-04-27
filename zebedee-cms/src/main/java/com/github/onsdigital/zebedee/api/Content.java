@@ -74,33 +74,38 @@ public class Content {
 
         Session session = Root.zebedee.getSessions().get();
 
-        Collection collection = Collections.getCollection(request);
+        Collection collection = Collections.getCollection(request, true);
 
         String uri = request.getParameter("uri");
         Boolean overwriteExisting = BooleanUtils.toBoolean(StringUtils.defaultIfBlank(request.getParameter("overwriteExisting"), "true"));
         Boolean recursive = BooleanUtils.toBoolean(StringUtils.defaultIfBlank(request.getParameter("recursive"), "false"));
         Boolean validateJson = BooleanUtils.toBoolean(StringUtils.defaultIfBlank(request.getParameter("validateJson"), "true"));
 
-        if (overwriteExisting) {
-            Root.zebedee.getCollections().writeContent(collection, uri, session, request, requestBody, recursive, validateJson);
-            Audit.Event.CONTENT_OVERWRITTEN
-                    .parameters()
-                    .host(request)
-                    .collection(collection)
-                    .content(uri)
-                    .user(session.getEmail())
-                    .log();
-        } else {
-            Root.zebedee.getCollections().createContent(collection, uri, session, request, requestBody, validateJson);
-            Audit.Event.CONTENT_SAVED
-                    .parameters()
-                    .host(request)
-                    .collection(collection)
-                    .content(uri)
-                    .user(session.getEmail())
-                    .log();
+        try {
+            if (overwriteExisting) {
+                Root.zebedee.getCollections().writeContent(collection, uri, session, request, requestBody, recursive, validateJson);
+                Audit.Event.CONTENT_OVERWRITTEN
+                        .parameters()
+                        .host(request)
+                        .collection(collection)
+                        .content(uri)
+                        .user(session.getEmail())
+                        .log();
+            } else {
+                Root.zebedee.getCollections().createContent(collection, uri, session, request, requestBody, validateJson);
+                Audit.Event.CONTENT_SAVED
+                        .parameters()
+                        .host(request)
+                        .collection(collection)
+                        .content(uri)
+                        .user(session.getEmail())
+                        .log();
+            }
+        } finally {
+            // close the collection write lock.
+            collection.close();
         }
-
+      
         return true;
     }
 
@@ -122,18 +127,25 @@ public class Content {
 
         Session session = Root.zebedee.getSessions().get();
 
-        Collection collection = Collections.getCollection(request);
+        Collection collection = Collections.getCollection(request, true);
         String uri = request.getParameter("uri");
 
-        boolean result = Root.zebedee.getCollections().deleteContent(collection, uri, session);
-        if (result) {
-            Audit.Event.CONTENT_DELETED
-                    .parameters()
-                    .host(request)
-                    .collection(collection)
-                    .content(uri)
-                    .user(session.getEmail())
-                    .log();
+        boolean result = false;
+
+        try {
+            result = Root.zebedee.getCollections().deleteContent(collection, uri, session);
+            if (result) {
+                Audit.Event.CONTENT_DELETED
+                        .parameters()
+                        .host(request)
+                        .collection(collection)
+                        .content(uri)
+                        .user(session.getEmail())
+                        .log();
+            }
+        } finally {
+            // close the collection write lock.
+            collection.close();
         }
 
         return result;

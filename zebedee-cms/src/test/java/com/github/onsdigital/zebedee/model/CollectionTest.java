@@ -58,7 +58,10 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -548,6 +551,94 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
 
         // check an event has been created for the content being created.
         assertTrue(collection.getDescription().getEventsByUri().get(uri).hasEventForType(EventType.CREATED));
+    }
+
+    @Test
+    public void shouldAllowWritableCollectionWhenReadOnlyCollectionExists() throws Exception {
+
+        Collection readOnlyCollection = new Collection(builder.collections.get(1), zebedee);
+        Collection writeableCollection = null;
+
+        try {
+            writeableCollection = new Collection(builder.collections.get(1), zebedee, true);
+
+            assertNotNull(writeableCollection);
+            assertEquals(readOnlyCollection.getDescription().getId(), writeableCollection.getDescription().getId());
+        } finally {
+            if (writeableCollection != null) {
+                writeableCollection.close();
+            }
+        }
+    }
+
+    @Test
+    public void shouldBlockSecondWritableCollectionUntilFirstIsClosed() throws Exception {
+
+        Collection firstWriteableCollection = new Collection(builder.collections.get(1), zebedee, true);
+        CountDownLatch secondConstructorStarted = new CountDownLatch(1);
+        CountDownLatch secondConstructorFinished = new CountDownLatch(1);
+        AtomicBoolean secondCollectionCreated = new AtomicBoolean(false);
+        AtomicReference<Throwable> threadFailure = new AtomicReference<>();
+
+        Thread secondCollectionThread = new Thread(() -> {
+            secondConstructorStarted.countDown();
+            try {
+                Collection secondWriteableCollection = new Collection(builder.collections.get(1), zebedee, true);
+                try {
+                    secondCollectionCreated.set(true);
+                } finally {
+                    secondWriteableCollection.close();
+                }
+            } catch (Throwable t) {
+                threadFailure.set(t);
+            } finally {
+                secondConstructorFinished.countDown();
+            }
+        });
+
+        secondCollectionThread.start();
+
+        try {
+            assertTrue(secondConstructorStarted.await(1, TimeUnit.SECONDS));
+            assertFalse(secondConstructorFinished.await(200, TimeUnit.MILLISECONDS));
+
+            firstWriteableCollection.close();
+
+            assertTrue(secondConstructorFinished.await(2, TimeUnit.SECONDS));
+            assertNull(threadFailure.get());
+            assertTrue(secondCollectionCreated.get());
+        } finally {
+            secondCollectionThread.join(TimeUnit.SECONDS.toMillis(2));
+        }
+    }
+
+    @Test
+    public void shouldReleaseWriteLockWhenWritableConstructionFails() throws Exception {
+
+        Path collectionPath = builder.collections.get(1);
+        Path collectionJsonPath = collectionPath.getParent().resolve(collectionPath.getFileName() + ".json");
+
+        FileUtils.write(collectionJsonPath.toFile(), "not valid json", Charset.defaultCharset());
+
+        try {
+            new Collection(collectionPath, zebedee, true);
+        } catch (IOException expected) {
+            // expected
+        }
+
+        try (OutputStream outputStream = Files.newOutputStream(collectionJsonPath)) {
+            Serialiser.serialise(outputStream, collection.getDescription());
+        }
+
+        Collection writeableCollection = null;
+        try {
+            writeableCollection = new Collection(collectionPath, zebedee, true);
+            assertNotNull(writeableCollection);
+        } finally {
+            if (writeableCollection != null) {
+                writeableCollection.close();
+            }
+        }
     }
 
     @Test

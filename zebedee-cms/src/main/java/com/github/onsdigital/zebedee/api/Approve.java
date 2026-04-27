@@ -50,7 +50,7 @@ public class Approve {
             throw new UnauthorizedException("You are not authorized to approve collections");
         }
 
-        com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request);
+        com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request, true);
         if (collection == null) {
             warn().log("approve request: request unsuccessful valid user session not found");
             throw new NotFoundException("The collection you are trying to approve was not found.");
@@ -66,6 +66,9 @@ public class Approve {
         } catch (Exception e) {
             error().data("collectionId", collectionId).data("user", session.getEmail()).log("approve endpoint: request unsuccessful error while approving collection");
             throw e;
+        } finally {
+            // close collection writelock
+            collection.close();
         }
 
         Audit.Event.COLLECTION_APPROVED

@@ -292,16 +292,31 @@ public class Collections {
      */
     public Collection getCollection(String collectionId)
             throws IOException {
+        return getCollection(collectionId, false);
+    }
+
+    /**
+     * Get the collection with the given collection ID.
+     *
+     * @param collectionId
+     * @return
+     * @throws IOException
+     */
+    public Collection getCollection(String collectionId, boolean writeable)
+            throws IOException {
         try {
             String collectionName = getCollectionNameFromId(collectionId);
-            return getCollectionByName(collectionName);
+            return getCollectionByName(collectionName, writeable);
         } catch (IOException | CollectionNotFoundException e) {
             return list().getCollection(collectionId);
         }
     }
-
     public Collection getCollectionByName(String collectionName) throws IOException, CollectionNotFoundException {
-        return new Collection(this.path.resolve(collectionName), zebedeeSupplier.get());
+        return getCollectionByName(collectionName, false);
+    }
+
+    public Collection getCollectionByName(String collectionName, boolean writeable) throws IOException, CollectionNotFoundException {
+        return new Collection(this.path.resolve(collectionName), zebedeeSupplier.get(), writeable);
     }
 
     /**

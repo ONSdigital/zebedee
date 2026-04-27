@@ -101,9 +101,22 @@ public class ZebedeeCmsService {
         }
     }
 
-    public Collection getCollection(HttpServletRequest request) throws ZebedeeException {
+    public Collection getCollection(HttpServletRequest request, boolean writeable) throws ZebedeeException {
         try {
-            return Collections.getCollection(request);
+            return Collections.getCollection(request, writeable);
+        } catch (IOException e) {
+            error().logException(e, COLLECTION_NOT_FOUND_MSG);
+            throw new NotFoundException(COLLECTION_NOT_FOUND_MSG);
+        }
+    }
+
+    public Collection getCollection(HttpServletRequest request) throws ZebedeeException {
+        return getCollection(request, false);
+    }
+
+    public Collection getCollection(String collectionId, boolean writeable) throws ZebedeeException {
+        try {
+            return Root.zebedee.getCollections().getCollection(collectionId, writeable);
         } catch (IOException e) {
             error().logException(e, COLLECTION_NOT_FOUND_MSG);
             throw new NotFoundException(COLLECTION_NOT_FOUND_MSG);
@@ -111,12 +124,7 @@ public class ZebedeeCmsService {
     }
 
     public Collection getCollection(String collectionId) throws ZebedeeException {
-        try {
-            return Root.zebedee.getCollections().getCollection(collectionId);
-        } catch (IOException e) {
-            error().logException(e, COLLECTION_NOT_FOUND_MSG);
-            throw new NotFoundException(COLLECTION_NOT_FOUND_MSG);
-        }
+        return getCollection(collectionId, false);
     }
 
     public PermissionsService getPermissions() {

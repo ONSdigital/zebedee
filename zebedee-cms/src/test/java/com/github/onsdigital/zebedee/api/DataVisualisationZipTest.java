@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -41,7 +40,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * Tests Verifies the {@link DataVisualisationZip} endpoint behaves correctly in the happy path scenario.
+ * Tests Verifies the {@link DataVisualisationZip} dataVisualisationZipEndpoint behaves correctly in the happy path scenario.
  */
 public class DataVisualisationZipTest {
 
@@ -52,7 +51,7 @@ public class DataVisualisationZipTest {
 
     private static Set<String> filenamesSet = new HashSet<>(Arrays.asList(new String[]{"unitTest.html"}));
 
-    private DataVisualisationZip endpoint;
+    private DataVisualisationZip dataVisualisationZipEndpoint;
 
     @Mock
     private HttpServletRequest mockRequest;
@@ -91,12 +90,12 @@ public class DataVisualisationZipTest {
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.openMocks(this);
-        endpoint = new DataVisualisationZip();
+        dataVisualisationZipEndpoint = new DataVisualisationZip();
         zipResource = new Resource();
         visualisation = new Visualisation();
         visualisation.setUid("1234657890");
-        ReflectionTestUtils.setField(endpoint, "zebedeeCmsService", zebedeeCmsServiceMock);
-        ReflectionTestUtils.setField(endpoint, "extractHtmlFilenames", extractHtmlFilenames);
+        ReflectionTestUtils.setField(dataVisualisationZipEndpoint, "zebedeeCmsService", zebedeeCmsServiceMock);
+        ReflectionTestUtils.setField(dataVisualisationZipEndpoint, "extractHtmlFilenames", extractHtmlFilenames);
     }
 
     /**
@@ -130,7 +129,7 @@ public class DataVisualisationZipTest {
         zipResource.setData(getZipInputStream());
 
         // Run the test.
-        SimpleZebedeeResponse response = endpoint.unpackDataVisualizationZip(mockRequest, mockResponse);
+        SimpleZebedeeResponse response = dataVisualisationZipEndpoint.unpackDataVisualizationZip(mockRequest, mockResponse);
 
         // Verify
         verify(mockCollectionWriter, times(2)).getInProgress();
@@ -161,7 +160,7 @@ public class DataVisualisationZipTest {
         when(zebedeeCmsServiceMock.getCollection(mockRequest))
                 .thenReturn(mockCollection);
 
-        assertThat(endpoint.deleteZipAndContent(mockRequest, mockResponse),
+        assertThat(dataVisualisationZipEndpoint.deleteZipAndContent(mockRequest, mockResponse),
                 is(equalTo(DataVisualisationZip.deleteContentSuccessResponse)));
 
         verify(mockRequest, times(1)).getParameter(ZIP_PATH_KEY);
@@ -177,7 +176,7 @@ public class DataVisualisationZipTest {
     @Test(expected = BadRequestException.class)
     public void shouldThrowBadRequestExWhenZipParamIsMissing() throws Exception {
         try {
-            endpoint.deleteZipAndContent(mockRequest, mockResponse);
+            dataVisualisationZipEndpoint.deleteZipAndContent(mockRequest, mockResponse);
         } catch (BadRequestException br) {
             assertThat(br.getMessage(), equalTo("Please specify the zip file path."));
 
@@ -206,7 +205,7 @@ public class DataVisualisationZipTest {
                     .thenThrow(new UnexpectedErrorException(null, 0));
 
             // Run the test.
-            endpoint.deleteZipAndContent(mockRequest, mockResponse);
+            dataVisualisationZipEndpoint.deleteZipAndContent(mockRequest, mockResponse);
 
         } catch (UnexpectedErrorException ex) {
             verify(mockRequest, times(1)).getParameter(ZIP_PATH_KEY);
@@ -234,7 +233,7 @@ public class DataVisualisationZipTest {
                 .thenThrow(new IOException());
 
         try {
-            endpoint.deleteZipAndContent(mockRequest, mockResponse);
+            dataVisualisationZipEndpoint.deleteZipAndContent(mockRequest, mockResponse);
         } catch (ZebedeeException ex) {
             verify(mockRequest, times(1)).getParameter(ZIP_PATH_KEY);
             verify(zebedeeCmsServiceMock, times(1)).getCollection(mockRequest);

@@ -22,13 +22,13 @@ public class ListKeyringTest extends ZebedeeAPIBaseTestCase {
     @Mock
     private Sessions sessions;
 
-    private ListKeyring endpoint;
+    private ListKeyring listKeyringEndpoint;
 
     private String email;
 
     @Override
     protected void customSetUp() throws Exception {
-        endpoint = new ListKeyring(centralKeyring, sessions);
+        listKeyringEndpoint = new ListKeyring(centralKeyring, sessions);
         email = "123@test.com";
 
         when(sessions.get())
@@ -48,7 +48,7 @@ public class ListKeyringTest extends ZebedeeAPIBaseTestCase {
         when(sessions.get())
                 .thenReturn(null);
 
-        assertThrows(UnauthorizedException.class, () -> endpoint.listUserKeys(mockRequest, mockResponse));
+        assertThrows(UnauthorizedException.class, () -> listKeyringEndpoint.listUserKeys(mockRequest, mockResponse));
     }
 
     @Test
@@ -59,7 +59,7 @@ public class ListKeyringTest extends ZebedeeAPIBaseTestCase {
         when(centralKeyring.list(mockSession))
                 .thenReturn(userKeys);
 
-        Set<String> actual = endpoint.listUserKeys(mockRequest, mockResponse);
+        Set<String> actual = listKeyringEndpoint.listUserKeys(mockRequest, mockResponse);
 
         assertThat(actual, equalTo(userKeys));
     }

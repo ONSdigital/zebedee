@@ -135,8 +135,8 @@ public class ContentTest {
         Path versionFile = createCollectionAndPaths(collectionId);
 
         // Given V1 Of the JSON was written
-        Content contentApi = new Content();
-        contentApi.saveContent(request, new MockHttpServletResponse());
+        Content contentEndpoint = new Content();
+        contentEndpoint.saveContent(request, new MockHttpServletResponse());
 
 
         byte[] bytes = IOUtils.toByteArray(EncryptionUtils.encryptionInputStream(versionFile, secretKey));
@@ -176,8 +176,8 @@ public class ContentTest {
 
         Path versionFile = createCollectionAndPaths(collectionId);
 
-        Content contentApi = new Content();
-        contentApi.saveContent(request, new MockHttpServletResponse());
+        Content contentEndpoint = new Content();
+        contentEndpoint.saveContent(request, new MockHttpServletResponse());
 
         byte[] bytes = IOUtils.toByteArray(EncryptionUtils.encryptionInputStream(versionFile, secretKey));
         Assert.assertEquals(EXPECTED_CONTENT_V2, new String(bytes));
@@ -197,8 +197,8 @@ public class ContentTest {
         when(response.getOutputStream())
             .thenReturn(new StubServletOutputStream(responseBody));
 
-        Data dataAPI = new Data();
-        dataAPI.read(dataRequest, response);
+        Data dataEndpoint = new Data();
+        dataEndpoint.read(dataRequest, response);
 
         // Then I should receive a structured V2 content back with uri download link
         verify(response).setStatus(200);
@@ -233,8 +233,8 @@ public class ContentTest {
 
         when(mockZebedee.getCollections()).thenReturn(mockCollectionsService);
 
-        try (MockedStatic<com.github.onsdigital.zebedee.api.Collections> collectionsApi = mockStatic(com.github.onsdigital.zebedee.api.Collections.class)) {
-            collectionsApi.when(() -> com.github.onsdigital.zebedee.api.Collections.getCollection(request, true)).thenReturn(lockedCollection);
+        try (MockedStatic<com.github.onsdigital.zebedee.api.Collections> collectionsEndpoint = mockStatic(com.github.onsdigital.zebedee.api.Collections.class)) {
+            collectionsEndpoint.when(() -> com.github.onsdigital.zebedee.api.Collections.getCollection(request, true)).thenReturn(lockedCollection);
 
             boolean result = new Content().saveContent(request, new MockHttpServletResponse());
 
@@ -252,8 +252,8 @@ public class ContentTest {
 
         when(mockZebedee.getCollections()).thenReturn(mockCollectionsService);
 
-        try (MockedStatic<com.github.onsdigital.zebedee.api.Collections> collectionsApi = mockStatic(com.github.onsdigital.zebedee.api.Collections.class)) {
-            collectionsApi.when(() -> com.github.onsdigital.zebedee.api.Collections.getCollection(request, true)).thenReturn(lockedCollection);
+        try (MockedStatic<com.github.onsdigital.zebedee.api.Collections> collectionsEndpoint = mockStatic(com.github.onsdigital.zebedee.api.Collections.class)) {
+            collectionsEndpoint.when(() -> com.github.onsdigital.zebedee.api.Collections.getCollection(request, true)).thenReturn(lockedCollection);
             doThrow(new com.github.onsdigital.zebedee.exceptions.ConflictException("write failed"))
                     .when(mockCollectionsService)
                     .writeContent(eq(lockedCollection), eq("/test-uri"), eq(mockSession), eq(request), any(InputStream.class), eq(false), eq(true));
@@ -273,8 +273,8 @@ public class ContentTest {
         when(mockZebedee.getCollections()).thenReturn(mockCollectionsService);
         when(mockCollectionsService.deleteContent(lockedCollection, "/test-uri", mockSession)).thenReturn(true);
 
-        try (MockedStatic<com.github.onsdigital.zebedee.api.Collections> collectionsApi = mockStatic(com.github.onsdigital.zebedee.api.Collections.class)) {
-            collectionsApi.when(() -> com.github.onsdigital.zebedee.api.Collections.getCollection(request, true)).thenReturn(lockedCollection);
+        try (MockedStatic<com.github.onsdigital.zebedee.api.Collections> collectionsEndpoint = mockStatic(com.github.onsdigital.zebedee.api.Collections.class)) {
+            collectionsEndpoint.when(() -> com.github.onsdigital.zebedee.api.Collections.getCollection(request, true)).thenReturn(lockedCollection);
 
             boolean result = new Content().delete(request, new MockHttpServletResponse());
 

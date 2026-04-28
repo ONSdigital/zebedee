@@ -47,7 +47,7 @@ public class CollectionsTest {
     private HttpServletResponse response = mock(HttpServletResponse.class);
     private Session session = mock(Session.class);
 
-    private Collections collections = new Collections(mockZebedeeCmsService, mockDatasetService, true);
+    private Collections collectionsEndpoint = new Collections(mockZebedeeCmsService, mockDatasetService, true);
     private String collectionID = "123";
     private String resourceID = "345";
     private String edition = "2014";
@@ -64,10 +64,10 @@ public class CollectionsTest {
 
     @Test
     public void testPut_DatasetImportDisabled() throws Exception {
-        collections = new Collections(mockZebedeeCmsService, mockDatasetService, false);
+        collectionsEndpoint = new Collections(mockZebedeeCmsService, mockDatasetService, false);
 
         // When the put method is called
-        collections.put(request, response);
+        collectionsEndpoint.put(request, response);
 
         verify(response, times(1)).setStatus(HttpServletResponse.SC_NOT_FOUND);
         verifyNoInteractions(mockZebedeeCmsService, mockDatasetService);
@@ -75,10 +75,10 @@ public class CollectionsTest {
 
     @Test
     public void testDelete_DatasetImportDisabled() throws Exception {
-        collections = new Collections(mockZebedeeCmsService, mockDatasetService, false);
+        collectionsEndpoint = new Collections(mockZebedeeCmsService, mockDatasetService, false);
 
         // When the put method is called
-        collections.delete(request, response);
+        collectionsEndpoint.delete(request, response);
 
         verify(response, times(1)).setStatus(HttpServletResponse.SC_NOT_FOUND);
         verifyNoInteractions(mockZebedeeCmsService, mockDatasetService);
@@ -94,7 +94,7 @@ public class CollectionsTest {
         shouldAuthorise(false, mockCollectionType);
 
         // When the put method is called
-        collections.put(request, response);
+        collectionsEndpoint.put(request, response);
 
         // a HTTP 403 is set on the response
         verify(response).setStatus(HttpStatus.SC_FORBIDDEN);
@@ -111,7 +111,7 @@ public class CollectionsTest {
         shouldAuthorise(true, mockCollectionType);
 
         // When the put method is called
-        collections.put(request, response);
+        collectionsEndpoint.put(request, response);
 
         // a HTTP 500 is set on the response
         verify(response).setStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR);
@@ -127,7 +127,7 @@ public class CollectionsTest {
         shouldAuthorise(false, mockCollectionType);
 
         // When the delete method is called
-        collections.delete(request, response);
+        collectionsEndpoint.delete(request, response);
 
         // a HTTP 403 is set on the response
         verify(response).setStatus(HttpStatus.SC_FORBIDDEN);
@@ -144,7 +144,7 @@ public class CollectionsTest {
         shouldAuthorise(true, mockCollectionType);
 
         // When the delete method is called
-        collections.delete(request, response);
+        collectionsEndpoint.delete(request, response);
 
         // a HTTP 500 is set on the response
         verify(response).setStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR);
@@ -161,7 +161,7 @@ public class CollectionsTest {
         shouldAuthorise(true, mockCollectionType);
 
         // When the delete method is called
-        collections.put(request, response);
+        collectionsEndpoint.put(request, response);
 
         // The expected response code is set on the response
         verify(response, times(1)).setStatus(HttpStatus.SC_NOT_FOUND);
@@ -178,7 +178,7 @@ public class CollectionsTest {
         shouldAuthorise(true, mockCollectionType);
 
         // When the delete method is called
-        collections.delete(request, response);
+        collectionsEndpoint.delete(request, response);
 
         // The expected response code is set on the response
         verify(response, times(1)).setStatus(HttpStatus.SC_NOT_FOUND);
@@ -190,7 +190,7 @@ public class CollectionsTest {
         when(mockZebedeeCmsService.getSession()).thenReturn(null);
 
         // When the put method is called
-        collections.put(request, response);
+        collectionsEndpoint.put(request, response);
 
         // The dataset service is called with the values extracted from the request URL.
         verify(response, times(1)).setStatus(HttpStatus.SC_FORBIDDEN);
@@ -203,7 +203,7 @@ public class CollectionsTest {
         when(mockZebedeeCmsService.getSession()).thenReturn(null);
 
         // When the delete method is called
-        collections.delete(request, response);
+        collectionsEndpoint.delete(request, response);
 
         // The expected response code is set on the response
         verify(response, times(1)).setStatus(HttpStatus.SC_FORBIDDEN);
@@ -219,7 +219,7 @@ public class CollectionsTest {
         when(request.getPathInfo()).thenReturn(url);
 
         // When the put method is called
-        collections.put(request, response);
+        collectionsEndpoint.put(request, response);
 
         // The dataset service is not called
         verifyNoInteractions(mockDatasetService);
@@ -239,7 +239,7 @@ public class CollectionsTest {
         when(request.getPathInfo()).thenReturn(url);
 
         // When the delete method is called
-        collections.delete(request, response);
+        collectionsEndpoint.delete(request, response);
 
         // The dataset service is not called
         verifyNoInteractions(mockDatasetService);
@@ -258,7 +258,7 @@ public class CollectionsTest {
         when(request.getPathInfo()).thenReturn(url);
 
         // When the put method is called
-        collections.put(request, response);
+        collectionsEndpoint.put(request, response);
 
         // Then a HTTP 404 is set on the response.
         verify(response).setStatus(HttpStatus.SC_NOT_FOUND);
@@ -274,7 +274,7 @@ public class CollectionsTest {
         when(request.getPathInfo()).thenReturn(url);
 
         // When the delete method is called
-        collections.delete(request, response);
+        collectionsEndpoint.delete(request, response);
 
         // The dataset service is not called
         verifyNoInteractions(mockDatasetService);
@@ -296,7 +296,7 @@ public class CollectionsTest {
         shouldAuthorise(true, mockCollectionType);
 
         // When the put method is called
-        collections.put(request, response);
+        collectionsEndpoint.put(request, response);
 
         // The dataset service is called with the values extracted from the request URL.
         verify(mockDatasetService, times(1)).updateDatasetInCollection(mockCollection, resourceID, null, user);
@@ -316,7 +316,7 @@ public class CollectionsTest {
         shouldAuthorise(true, mockCollectionType);
 
         // When the put method is called
-        collections.put(request, response);
+        collectionsEndpoint.put(request, response);
 
         // The dataset service is called with the values extracted from the request URL.
         verify(mockDatasetService, times(1)).updateDatasetInCollection(mockCollection, resourceID, new CollectionDataset(), user);
@@ -336,7 +336,7 @@ public class CollectionsTest {
         shouldAuthorise(true, mockCollectionType);
 
         // When the put method is called
-        collections.put(request, response);
+        collectionsEndpoint.put(request, response);
 
         // The dataset service is not called
         verifyNoInteractions(mockDatasetService);
@@ -360,7 +360,7 @@ public class CollectionsTest {
         shouldAuthorise(true, mockCollectionType);
 
         // When the put method is called
-        collections.put(request, response);
+        collectionsEndpoint.put(request, response);
 
         // The dataset service is called with the values extracted from the request URL.
         verify(mockDatasetService, times(1)).updateDatasetVersionInCollection(
@@ -377,7 +377,7 @@ public class CollectionsTest {
         shouldAuthorise(true, mockCollectionType);
 
         // When the delete method is called
-        collections.delete(request, response);
+        collectionsEndpoint.delete(request, response);
 
         // Then a HTTP 204 is set on the response
         verify(response).setStatus(HttpStatus.SC_NO_CONTENT);
@@ -398,7 +398,7 @@ public class CollectionsTest {
         shouldAuthorise(true, mockCollectionType);
 
         // When the delete method is called
-        collections.delete(request, response);
+        collectionsEndpoint.delete(request, response);
 
         // Then a HTTP 204 is set on the response
         verify(response).setStatus(HttpStatus.SC_NO_CONTENT);
@@ -421,7 +421,7 @@ public class CollectionsTest {
         shouldAuthorise(true, mockCollectionType);
 
         // When the delete method is called
-        collections.delete(request, response);
+        collectionsEndpoint.delete(request, response);
 
         // Then a HTTP 404 is set on the response
         verify(response).setStatus(HttpStatus.SC_NOT_FOUND);

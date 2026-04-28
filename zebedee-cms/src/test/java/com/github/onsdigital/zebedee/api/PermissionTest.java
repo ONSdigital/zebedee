@@ -57,7 +57,7 @@ public class PermissionTest extends ZebedeeAPIBaseTestCase {
 
     private PermissionDefinition permission;
 
-    private Permission endpoint;
+    private Permission permissionEndpoint;
 
     @Override
     protected void customSetUp() throws Exception {
@@ -79,7 +79,7 @@ public class PermissionTest extends ZebedeeAPIBaseTestCase {
         permission = new PermissionDefinition();
         permission.setEmail(USER_EMAIL);
 
-        endpoint = new Permission(sessionsService, permissionsService, usersService, collections, collectionKeyring);
+        permissionEndpoint = new Permission(sessionsService, permissionsService, usersService, collections, collectionKeyring);
     }
 
     @Override
@@ -93,7 +93,7 @@ public class PermissionTest extends ZebedeeAPIBaseTestCase {
                 .thenReturn(null);
 
         UnauthorizedException ex = assertThrows(UnauthorizedException.class,
-                () -> endpoint.grantPermission(mockRequest, mockResponse, permission));
+                () -> permissionEndpoint.grantPermission(mockRequest, mockResponse, permission));
 
         assertThat(ex.getMessage(), equalTo("error expected user session but was null"));
         verify(sessionsService, times(1)).get();
@@ -108,7 +108,7 @@ public class PermissionTest extends ZebedeeAPIBaseTestCase {
         permission.isAdmin(true);
 
         assertThrows(UnauthorizedException.class,
-                () -> endpoint.grantPermission(mockRequest, mockResponse, permission));
+                () -> permissionEndpoint.grantPermission(mockRequest, mockResponse, permission));
 
         verify(sessionsService, times(1)).get();
         verify(permissionsService, times(1)).addAdministrator(USER_EMAIL, mockSession);
@@ -118,7 +118,7 @@ public class PermissionTest extends ZebedeeAPIBaseTestCase {
     public void testGrant_addAdminAssignSuccess_shouldAssignPermissionsAndKeys() throws Exception {
         permission.isAdmin(true);
 
-        endpoint.grantPermission(mockRequest, mockResponse, permission);
+        permissionEndpoint.grantPermission(mockRequest, mockResponse, permission);
 
         verify(sessionsService, times(1)).get();
         verify(permissionsService, times(1)).addAdministrator(USER_EMAIL, mockSession);
@@ -133,7 +133,7 @@ public class PermissionTest extends ZebedeeAPIBaseTestCase {
                 .removeAdministrator(USER_EMAIL, mockSession);
 
         assertThrows(UnauthorizedException.class,
-                () -> endpoint.grantPermission(mockRequest, mockResponse, permission));
+                () -> permissionEndpoint.grantPermission(mockRequest, mockResponse, permission));
 
         verify(sessionsService, times(1)).get();
         verify(permissionsService, times(1)).removeAdministrator(USER_EMAIL, mockSession);
@@ -149,7 +149,7 @@ public class PermissionTest extends ZebedeeAPIBaseTestCase {
                 .addEditor(USER_EMAIL, mockSession);
 
         assertThrows(UnauthorizedException.class,
-                () -> endpoint.grantPermission(mockRequest, mockResponse, permission));
+                () -> permissionEndpoint.grantPermission(mockRequest, mockResponse, permission));
 
         verify(sessionsService, times(1)).get();
         verify(permissionsService, times(1)).addEditor(USER_EMAIL, mockSession);
@@ -166,7 +166,7 @@ public class PermissionTest extends ZebedeeAPIBaseTestCase {
                 .removeEditor(USER_EMAIL, mockSession);
 
         assertThrows(UnauthorizedException.class,
-                () -> endpoint.grantPermission(mockRequest, mockResponse, permission));
+                () -> permissionEndpoint.grantPermission(mockRequest, mockResponse, permission));
 
         verify(sessionsService, times(1)).get();
         verify(permissionsService, times(1)).removeEditor(USER_EMAIL, mockSession);
@@ -178,7 +178,7 @@ public class PermissionTest extends ZebedeeAPIBaseTestCase {
         permission.isAdmin(false);
         permission.isEditor(false);
 
-        String actual = endpoint.grantPermission(mockRequest, mockResponse, permission);
+        String actual = permissionEndpoint.grantPermission(mockRequest, mockResponse, permission);
         String expected = "Permissions updated for " + USER_EMAIL;
 
         assertThat(actual, equalTo(expected));

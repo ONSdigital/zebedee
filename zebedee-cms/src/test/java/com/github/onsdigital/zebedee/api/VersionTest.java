@@ -38,12 +38,12 @@ public class VersionTest extends ZebedeeAPIBaseTestCase {
     @Mock
     private CollectionDescription description;
 
-    private Version endpoint;
+    private Version versionEndpoint;
 
     @Override
     protected void customSetUp() throws Exception {
         MockitoAnnotations.openMocks(this);
-        endpoint = new Version();
+        versionEndpoint = new Version();
         Root.zebedee = zebedee;
 
         when(zebedee.getSessions()).thenReturn(sessions);
@@ -68,7 +68,7 @@ public class VersionTest extends ZebedeeAPIBaseTestCase {
         when(permissionsService.canEdit(mockSession)).thenReturn(true);
         when(permissionsService.canEdit(mockSession, TEST_COLLECTION_TYPE)).thenReturn(false);
 
-        assertThrows(UnauthorizedException.class, () -> endpoint.create(mockRequest, mockResponse));
+        assertThrows(UnauthorizedException.class, () -> versionEndpoint.create(mockRequest, mockResponse));
     }
 
     @Test
@@ -76,6 +76,6 @@ public class VersionTest extends ZebedeeAPIBaseTestCase {
         when(permissionsService.canEdit(mockSession)).thenReturn(true);
         when(permissionsService.canEdit(mockSession, TEST_COLLECTION_TYPE)).thenReturn(false);
 
-        assertThrows(ForbiddenException.class, () -> endpoint.delete(mockRequest, mockResponse));
+        assertThrows(ForbiddenException.class, () -> versionEndpoint.delete(mockRequest, mockResponse));
     }
 }

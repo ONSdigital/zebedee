@@ -76,7 +76,7 @@ public class CollectionTest extends ZebedeeAPIBaseTestCase {
     @Mock
     private Zebedee zebedee;
 
-    private Collection endpoint;
+    private Collection collectionEndpoint;
 
     @Override
     protected void customSetUp() throws Exception {
@@ -115,7 +115,7 @@ public class CollectionTest extends ZebedeeAPIBaseTestCase {
         when(description.getType())
                 .thenReturn(TEST_COLLECTION_TYPE);
 
-        this.endpoint = new Collection(sessions, permissionsService, collections, usersService,
+        this.collectionEndpoint = new Collection(sessions, permissionsService, collections, usersService,
                 collectionKeyring,
                 scheduleCanceller);
 
@@ -134,7 +134,7 @@ public class CollectionTest extends ZebedeeAPIBaseTestCase {
                 .thenReturn(null);
 
         UnauthorizedException actual = assertThrows(UnauthorizedException.class,
-                () -> endpoint.get(mockRequest, mockResponse));
+                () -> collectionEndpoint.get(mockRequest, mockResponse));
 
         assertThat(actual.getMessage(), equalTo("You are not authorised to view collections."));
         verify(sessions, times(1)).get();
@@ -146,7 +146,7 @@ public class CollectionTest extends ZebedeeAPIBaseTestCase {
                 .thenReturn("");
 
         BadRequestException actual = assertThrows(BadRequestException.class,
-                () -> endpoint.get(mockRequest, mockResponse));
+                () -> collectionEndpoint.get(mockRequest, mockResponse));
 
         assertThat(actual.getMessage(), equalTo("collection ID required but was null/empty"));
         verify(sessions, times(1)).get();
@@ -161,7 +161,7 @@ public class CollectionTest extends ZebedeeAPIBaseTestCase {
                 .thenReturn(null);
 
         InternalServerError actual = assertThrows(InternalServerError.class,
-                () -> endpoint.get(mockRequest, mockResponse));
+                () -> collectionEndpoint.get(mockRequest, mockResponse));
 
         assertThat(actual.getMessage(), equalTo("The collection description was not found."));
         verify(sessions, times(1)).get();
@@ -174,7 +174,7 @@ public class CollectionTest extends ZebedeeAPIBaseTestCase {
                 .thenThrow(IOException.class);
 
         assertThrows(IOException.class,
-                () -> endpoint.get(mockRequest, mockResponse));
+                () -> collectionEndpoint.get(mockRequest, mockResponse));
 
         verify(sessions, times(1)).get();
         verify(collections, times(1)).getCollection(COLLECTION_ID);
@@ -186,7 +186,7 @@ public class CollectionTest extends ZebedeeAPIBaseTestCase {
                 .thenReturn(null);
 
         NotFoundException actual = assertThrows(NotFoundException.class,
-                () -> endpoint.get(mockRequest, mockResponse));
+                () -> collectionEndpoint.get(mockRequest, mockResponse));
 
         assertThat(actual.getMessage(), equalTo("The collection you are trying to get was not found."));
         verify(sessions, times(1)).get();
@@ -199,7 +199,7 @@ public class CollectionTest extends ZebedeeAPIBaseTestCase {
                 .thenThrow(IOException.class);
 
         ForbiddenException actual = assertThrows(ForbiddenException.class,
-                () -> endpoint.get(mockRequest, mockResponse));
+                () -> collectionEndpoint.get(mockRequest, mockResponse));
 
         assertThat(actual.getMessage(), equalTo("You are not authorised to view this collection"));
         verify(sessions, times(1)).get();
@@ -213,7 +213,7 @@ public class CollectionTest extends ZebedeeAPIBaseTestCase {
                 .thenReturn(false);
 
         ForbiddenException actual = assertThrows(ForbiddenException.class,
-                () -> endpoint.get(mockRequest, mockResponse));
+                () -> collectionEndpoint.get(mockRequest, mockResponse));
 
         assertThat(actual.getMessage(), equalTo("You are not authorised to view this collection"));
         verify(sessions, times(1)).get();
@@ -223,7 +223,7 @@ public class CollectionTest extends ZebedeeAPIBaseTestCase {
 
     @Test
     public void testGet_success_shouldNotThrowException() throws Exception {
-        CollectionDescription actual = endpoint.get(mockRequest, mockResponse);
+        CollectionDescription actual = collectionEndpoint.get(mockRequest, mockResponse);
 
         assertThat(actual, is(notNullValue()));
         verify(sessions, times(1)).get();
@@ -237,7 +237,7 @@ public class CollectionTest extends ZebedeeAPIBaseTestCase {
                 .thenReturn(null);
 
         UnauthorizedException ex = assertThrows(UnauthorizedException.class,
-                () -> endpoint.create(mockRequest, mockResponse, description));
+                () -> collectionEndpoint.create(mockRequest, mockResponse, description));
 
         assertThat(ex.getMessage(), equalTo("You are not authorised to create collections."));
         verify(sessions, times(1)).get();
@@ -248,7 +248,7 @@ public class CollectionTest extends ZebedeeAPIBaseTestCase {
         when(description.getName())
                 .thenReturn(null);
 
-        endpoint.create(mockRequest, mockResponse, description);
+        collectionEndpoint.create(mockRequest, mockResponse, description);
 
         verify(sessions, times(1)).get();
         verify(mockResponse, times(1)).setStatus(HttpStatus.SC_BAD_REQUEST);
@@ -260,7 +260,7 @@ public class CollectionTest extends ZebedeeAPIBaseTestCase {
         when(description.getName())
                 .thenReturn("");
 
-        endpoint.create(mockRequest, mockResponse, description);
+        collectionEndpoint.create(mockRequest, mockResponse, description);
 
         verify(sessions, times(1)).get();
         verify(mockResponse, times(1)).setStatus(HttpStatus.SC_BAD_REQUEST);
@@ -273,7 +273,7 @@ public class CollectionTest extends ZebedeeAPIBaseTestCase {
                 .thenThrow(IOException.class);
 
         ForbiddenException ex = assertThrows(ForbiddenException.class,
-                () -> endpoint.create(mockRequest, mockResponse, description));
+                () -> collectionEndpoint.create(mockRequest, mockResponse, description));
 
         assertThat(ex.getMessage(), equalTo("You are not authorised to edit this type of collection."));
         verify(sessions, times(1)).get();
@@ -287,7 +287,7 @@ public class CollectionTest extends ZebedeeAPIBaseTestCase {
                 .thenReturn(false);
 
         ForbiddenException ex = assertThrows(ForbiddenException.class,
-                () -> endpoint.create(mockRequest, mockResponse, description));
+                () -> collectionEndpoint.create(mockRequest, mockResponse, description));
 
         assertThat(ex.getMessage(), equalTo("You are not authorised to edit this type of collection."));
         verify(sessions, times(1)).get();
@@ -318,7 +318,7 @@ public class CollectionTest extends ZebedeeAPIBaseTestCase {
                     updatedDescription, zebedee, Root.getScheduler(), mockSession))
                     .thenReturn(updatedCollection);
 
-            CollectionDescription actual = endpoint.update(mockRequest, mockResponse, updatedDescription);
+            CollectionDescription actual = collectionEndpoint.update(mockRequest, mockResponse, updatedDescription);
 
             assertThat(actual, is(persistedDescription));
             verify(collections, times(1)).getCollection(COLLECTION_ID, true);
@@ -341,7 +341,7 @@ public class CollectionTest extends ZebedeeAPIBaseTestCase {
                     .thenReturn(String.format("collections/%s", COLLECTION_ID));
 
             assertThrows(IOException.class,
-                    () -> endpoint.update(mockRequest, mockResponse, updatedDescription));
+                    () -> collectionEndpoint.update(mockRequest, mockResponse, updatedDescription));
 
             verify(collections, times(1)).getCollection(COLLECTION_ID, true);
             verify(collection, atLeastOnce()).close();
@@ -354,7 +354,7 @@ public class CollectionTest extends ZebedeeAPIBaseTestCase {
                 .thenReturn(null);
 
         UnauthorizedException ex = assertThrows(UnauthorizedException.class,
-                () -> endpoint.deleteCollection(mockRequest, mockResponse));
+                () -> collectionEndpoint.deleteCollection(mockRequest, mockResponse));
 
         assertThat(ex.getMessage(), equalTo("You are not authorised to delete collections."));
         verify(sessions, times(1)).get();
@@ -371,7 +371,7 @@ public class CollectionTest extends ZebedeeAPIBaseTestCase {
         when(collections.getCollection("1234", true))
                 .thenThrow(IOException.class);
 
-        assertThrows(IOException.class, () -> endpoint.deleteCollection(mockRequest, mockResponse));
+        assertThrows(IOException.class, () -> collectionEndpoint.deleteCollection(mockRequest, mockResponse));
 
         verify(sessions, times(1)).get();
         verify(collections, times(1)).getCollection("1234", true);
@@ -389,7 +389,7 @@ public class CollectionTest extends ZebedeeAPIBaseTestCase {
                 .thenReturn(null);
 
         NotFoundException ex = assertThrows(NotFoundException.class,
-                () -> endpoint.deleteCollection(mockRequest, mockResponse));
+                () -> collectionEndpoint.deleteCollection(mockRequest, mockResponse));
 
         assertThat(ex.getMessage(), equalTo("The collection you are trying to delete was not found"));
         verify(sessions, times(1)).get();
@@ -408,7 +408,7 @@ public class CollectionTest extends ZebedeeAPIBaseTestCase {
                 .thenReturn(collection);
 
         InternalServerError actual = assertThrows(InternalServerError.class,
-                () -> endpoint.deleteCollection(mockRequest, mockResponse));
+                () -> collectionEndpoint.deleteCollection(mockRequest, mockResponse));
 
         assertThat(actual.getMessage(), equalTo("The collection description was not found."));
         verify(sessions, times(1)).get();
@@ -435,7 +435,7 @@ public class CollectionTest extends ZebedeeAPIBaseTestCase {
                 .delete(collection, mockSession);
 
         InternalServerError ex = assertThrows(InternalServerError.class,
-                () -> endpoint.deleteCollection(mockRequest, mockResponse));
+                () -> collectionEndpoint.deleteCollection(mockRequest, mockResponse));
 
         assertThat(ex.getMessage(),
                 equalTo(format("error attempting to delete collection: {0}", COLLECTION_ID)));
@@ -464,7 +464,7 @@ public class CollectionTest extends ZebedeeAPIBaseTestCase {
                 .remove(mockSession, collection);
 
         InternalServerError ex = assertThrows(InternalServerError.class,
-                () -> endpoint.deleteCollection(mockRequest, mockResponse));
+                () -> collectionEndpoint.deleteCollection(mockRequest, mockResponse));
 
         assertThat(ex.getMessage(), equalTo(
                 format("error attempting to remove collection key from keyring: {0}", COLLECTION_ID)));
@@ -486,7 +486,7 @@ public class CollectionTest extends ZebedeeAPIBaseTestCase {
         when(collections.getCollection("1234", true))
                 .thenReturn(collection);
 
-        boolean result = endpoint.deleteCollection(mockRequest, mockResponse);
+        boolean result = collectionEndpoint.deleteCollection(mockRequest, mockResponse);
 
         assertTrue(result);
         verify(collections, times(1)).delete(collection, mockSession);

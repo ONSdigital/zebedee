@@ -41,7 +41,7 @@ public class DeleteContentTest {
     @Mock
     private Session session;
 
-    private DeleteContent endpoint;
+    private DeleteContent deleteContentEndpoint;
 
     @Before
     public void setUp() throws Exception {
@@ -49,7 +49,7 @@ public class DeleteContentTest {
         ReflectionTestUtils.setField(DeleteContent.class, "zebedeeCmsService", zebedeeCmsService);
         ReflectionTestUtils.setField(DeleteContent.class, "deleteService", deleteService);
 
-        endpoint = new DeleteContent();
+        deleteContentEndpoint = new DeleteContent();
 
         when(zebedeeCmsService.getSession()).thenReturn(session);
         when(zebedeeCmsService.getPermissions()).thenReturn(permissionsService);
@@ -67,7 +67,7 @@ public class DeleteContentTest {
                 .setUser("test@ons.gov.uk");
         when(zebedeeCmsService.getCollection("123", true)).thenReturn(collection);
 
-        endpoint.createDeleteMarker(new MockHttpServletRequest(), new MockHttpServletResponse(), json);
+        deleteContentEndpoint.createDeleteMarker(new MockHttpServletRequest(), new MockHttpServletResponse(), json);
 
         verify(zebedeeCmsService).getCollection("123", true);
         verify(deleteService).addDeleteMarkerToCollection(eq(session), eq(collection), any());
@@ -79,7 +79,7 @@ public class DeleteContentTest {
         MockHttpServletRequest request = new MockHttpServletRequest();
         when(zebedeeCmsService.getCollection(request, true)).thenReturn(collection);
 
-        endpoint.removeDeleteMarker(request, new MockHttpServletResponse());
+        deleteContentEndpoint.removeDeleteMarker(request, new MockHttpServletResponse());
 
         verify(zebedeeCmsService).getCollection(request, true);
         verify(deleteService, never()).cancelPendingDelete(eq(collection), eq(session), any());

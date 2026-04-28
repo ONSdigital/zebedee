@@ -47,12 +47,12 @@ public class CompleteTest {
     @Mock
     private Session session;
 
-    private Complete api;
+    private Complete completeEndpoint;
 
     @Before
     public void setUp() {
         MockitoAnnotations.openMocks(this);
-        api = new Complete();
+        completeEndpoint = new Complete();
 
         Root.zebedee = zebedee;
         when(zebedee.getSessions()).thenReturn(sessions);
@@ -67,7 +67,7 @@ public class CompleteTest {
         try (MockedStatic<com.github.onsdigital.zebedee.api.Collections> collectionsApi = mockStatic(com.github.onsdigital.zebedee.api.Collections.class)) {
             collectionsApi.when(() -> com.github.onsdigital.zebedee.api.Collections.getCollection(request, true)).thenReturn(collection);
 
-            ResultMessage result = api.complete(request, response);
+            ResultMessage result = completeEndpoint.complete(request, response);
 
             assertThat(result.message, is(equalTo("URI reviewed.")));
             collectionsApi.verify(() -> com.github.onsdigital.zebedee.api.Collections.getCollection(request, true));
@@ -83,7 +83,7 @@ public class CompleteTest {
         try (MockedStatic<com.github.onsdigital.zebedee.api.Collections> collectionsApi = mockStatic(com.github.onsdigital.zebedee.api.Collections.class)) {
             collectionsApi.when(() -> com.github.onsdigital.zebedee.api.Collections.getCollection(request, true)).thenReturn(collection);
 
-            api.complete(request, response);
+            completeEndpoint.complete(request, response);
 
             verify(collections).complete(collection, "/test-uri", session, true);
             verify(collection).close();
@@ -96,7 +96,7 @@ public class CompleteTest {
             collectionsApi.when(() -> com.github.onsdigital.zebedee.api.Collections.getCollection(request, true)).thenReturn(collection);
             doThrow(new ConflictException("complete failed")).when(collections).complete(collection, "/test-uri", session, false);
 
-            assertThrows(ConflictException.class, () -> api.complete(request, response));
+            assertThrows(ConflictException.class, () -> completeEndpoint.complete(request, response));
 
             collectionsApi.verify(() -> com.github.onsdigital.zebedee.api.Collections.getCollection(request, true));
             verify(collection).close();

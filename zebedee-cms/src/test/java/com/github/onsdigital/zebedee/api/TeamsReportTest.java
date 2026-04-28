@@ -43,19 +43,19 @@ public class TeamsReportTest extends ZebedeeAPIBaseTestCase {
     @Mock
     private Sessions sessions;
 
-    private TeamsReport api;
+    private TeamsReport teamsReportEndpoint;
 
     private Team teamA, teamB, teamC;
 
     @Override
     protected void customSetUp() throws Exception {
-        api = new TeamsReport();
+        teamsReportEndpoint = new TeamsReport();
 
         ServiceSupplier<TeamsService> teamsServiceSupplier = () -> teamsService;
         ServiceSupplier<Sessions> sessionsServiceSupplier = () -> sessions;
 
-        ReflectionTestUtils.setField(api, "teamsServiceSupplier", teamsServiceSupplier);
-        ReflectionTestUtils.setField(api, "serviceServiceSupplier", sessionsServiceSupplier);
+        ReflectionTestUtils.setField(teamsReportEndpoint, "teamsServiceSupplier", teamsServiceSupplier);
+        ReflectionTestUtils.setField(teamsReportEndpoint, "serviceServiceSupplier", sessionsServiceSupplier);
     }
 
     @Override
@@ -71,7 +71,7 @@ public class TeamsReportTest extends ZebedeeAPIBaseTestCase {
                 .thenThrow(new UnauthorizedException(""));
 
         try {
-            api.getReport(mockRequest, mockResponse);
+            teamsReportEndpoint.getReport(mockRequest, mockResponse);
         } catch (UnauthorizedException e) {
             verify(sessions, times(1)).get();
             verify(teamsService, times(1)).getTeamMembersSummary(mockSession);
@@ -99,7 +99,7 @@ public class TeamsReportTest extends ZebedeeAPIBaseTestCase {
         when(mockResponse.getOutputStream())
                 .thenReturn(new StubServletOutputStream(content));
 
-        api.getReport(mockRequest, mockResponse);
+        teamsReportEndpoint.getReport(mockRequest, mockResponse);
 
         HSSFWorkbook result = new HSSFWorkbook(new ByteArrayInputStream(content.toByteArray()));
         HSSFSheet sheet = result.getSheetAt(0);

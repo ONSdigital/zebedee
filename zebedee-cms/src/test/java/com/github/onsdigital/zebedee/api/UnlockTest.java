@@ -44,12 +44,12 @@ public class UnlockTest {
     @Mock
     private Session session;
 
-    private Unlock api;
+    private Unlock unlockEndpoint;
 
     @Before
     public void setUp() {
         MockitoAnnotations.openMocks(this);
-        api = new Unlock();
+        unlockEndpoint = new Unlock();
 
         Root.zebedee = zebedee;
         when(zebedee.getSessions()).thenReturn(sessions);
@@ -64,7 +64,7 @@ public class UnlockTest {
             collectionsApi.when(() -> com.github.onsdigital.zebedee.api.Collections.getCollection(request, true)).thenReturn(collection);
             when(collections.unlock(collection, session)).thenReturn(true);
 
-            boolean result = api.unlockCollection(request, response);
+            boolean result = unlockEndpoint.unlockCollection(request, response);
 
             org.hamcrest.MatcherAssert.assertThat(result, is(true));
             collectionsApi.verify(() -> com.github.onsdigital.zebedee.api.Collections.getCollection(request, true));
@@ -79,7 +79,7 @@ public class UnlockTest {
             collectionsApi.when(() -> com.github.onsdigital.zebedee.api.Collections.getCollection(request, true)).thenReturn(collection);
             when(collections.unlock(collection, session)).thenReturn(false);
 
-            boolean result = api.unlockCollection(request, response);
+            boolean result = unlockEndpoint.unlockCollection(request, response);
 
             org.hamcrest.MatcherAssert.assertThat(result, is(false));
             verify(collection).close();
@@ -92,7 +92,7 @@ public class UnlockTest {
             collectionsApi.when(() -> com.github.onsdigital.zebedee.api.Collections.getCollection(request, true)).thenReturn(collection);
             doThrow(new ConflictException("unlock failed")).when(collections).unlock(collection, session);
 
-            assertThrows(ConflictException.class, () -> api.unlockCollection(request, response));
+            assertThrows(ConflictException.class, () -> unlockEndpoint.unlockCollection(request, response));
 
             verify(collection).close();
         }

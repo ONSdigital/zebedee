@@ -20,17 +20,17 @@ public class HealthTest {
     @Mock
     private HttpServletResponse response;
 
-    private Health api;
+    private Health healthEndpoint;
 
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.openMocks(this);
-        this.api = new Health();
+        this.healthEndpoint = new Health();
     }
 
     @Test
     public void getHealth_shouldReturnStatusOK() {
-        api.getHealth(request, response);
+        healthEndpoint.getHealth(request, response);
 
         verify(response, times(1)).setStatus(HttpStatus.SC_OK);
     }

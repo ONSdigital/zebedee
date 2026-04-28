@@ -52,12 +52,12 @@ public class UserInstancePermissionsTest {
     @Mock
     HttpResponseWriter httpResponseWriter;
 
-    UserInstancePermissions api;
+    UserInstancePermissions userInstancePermissionsEndpoint;
 
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.openMocks(this);
-        api = new UserInstancePermissions(permissionsService, httpResponseWriter, sessions);
+        userInstancePermissionsEndpoint = new UserInstancePermissions(permissionsService, httpResponseWriter, sessions);
 
         when(sessions.get()).thenReturn(session);
         when(session.getId()).thenReturn(SESSION_ID);
@@ -72,7 +72,7 @@ public class UserInstancePermissionsTest {
         when(permissionsService.getUserInstancePermissions(getPermissionsRequest))
                 .thenReturn(expected);
 
-        api.handle(request, response);
+        userInstancePermissionsEndpoint.handle(request, response);
 
         verify(permissionsService, times(1)).getUserInstancePermissions(getPermissionsRequest);
         verify(httpResponseWriter, times(1)).writeJSONResponse(response, expected, SC_OK);
@@ -82,7 +82,7 @@ public class UserInstancePermissionsTest {
     public void givenRequestDoesNotContainASession() throws Exception {
         when(sessions.get()).thenReturn(null);
 
-        api.handle(request, response);
+        userInstancePermissionsEndpoint.handle(request, response);
 
         Error expected = new Error(sessionNotProvidedException().getMessage());
 
@@ -97,7 +97,7 @@ public class UserInstancePermissionsTest {
         when(permissionsService.getUserInstancePermissions(getPermissionsRequest))
                 .thenThrow(internalServerErrorException());
 
-        api.handle(request, response);
+        userInstancePermissionsEndpoint.handle(request, response);
 
         Error expected = new Error(internalServerErrorException().getMessage());
 

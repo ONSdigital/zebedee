@@ -48,20 +48,20 @@ public class ServiceInstancePermissionsTest {
     @Mock
     HttpResponseWriter httpResponseWriter;
 
-    ServiceInstancePermissions api;
+    ServiceInstancePermissions serviceInstancePermissionsEndpoint;
 
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.openMocks(this);
 
-        api = new ServiceInstancePermissions(cmdPermissionsService, httpResponseWriter, sessions);
+        serviceInstancePermissionsEndpoint = new ServiceInstancePermissions(cmdPermissionsService, httpResponseWriter, sessions);
     }
 
     @Test
     public void givenARequestWithNoServiceTokenHeader() throws Exception {
         when(request.getHeader(SERVICE_AUTH_HEADER)).thenReturn(null);
 
-        api.handle(request, response);
+        serviceInstancePermissionsEndpoint.handle(request, response);
 
         Error expected = new Error(serviceTokenNotProvidedException().getMessage());
 
@@ -78,7 +78,7 @@ public class ServiceInstancePermissionsTest {
         when(cmdPermissionsService.getServiceInstancePermissions(getPermissionsRequest))
                 .thenThrow(internalServerErrorException());
 
-        api.handle(request, response);
+        serviceInstancePermissionsEndpoint.handle(request, response);
 
         Error expected = new Error(internalServerErrorException().getMessage());
 
@@ -96,7 +96,7 @@ public class ServiceInstancePermissionsTest {
 
         when(cmdPermissionsService.getServiceInstancePermissions(getPermissionsRequest)).thenReturn(expected);
 
-        api.handle(request, response);
+        serviceInstancePermissionsEndpoint.handle(request, response);
 
         verify(cmdPermissionsService, times(1)).getServiceInstancePermissions(getPermissionsRequest);
         verify(httpResponseWriter, times(1)).writeJSONResponse(response, expected, SC_OK);

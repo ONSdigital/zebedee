@@ -44,12 +44,12 @@ public class ContentRenameTest {
     @Mock
     private Session session;
 
-    private ContentRename api;
+    private ContentRename contentRenameEndpoint;
 
     @Before
     public void setUp() {
         MockitoAnnotations.openMocks(this);
-        api = new ContentRename();
+        contentRenameEndpoint = new ContentRename();
 
         Root.zebedee = zebedee;
         when(zebedee.getSessions()).thenReturn(sessions);
@@ -65,7 +65,7 @@ public class ContentRenameTest {
         try (MockedStatic<com.github.onsdigital.zebedee.api.Collections> collectionsApi = mockStatic(com.github.onsdigital.zebedee.api.Collections.class)) {
             collectionsApi.when(() -> com.github.onsdigital.zebedee.api.Collections.getCollection(request, true)).thenReturn(collection);
 
-            boolean result = api.RenameContent(request, response);
+            boolean result = contentRenameEndpoint.RenameContent(request, response);
 
             org.hamcrest.MatcherAssert.assertThat(result, is(true));
             collectionsApi.verify(() -> com.github.onsdigital.zebedee.api.Collections.getCollection(request, true));
@@ -80,7 +80,7 @@ public class ContentRenameTest {
             collectionsApi.when(() -> com.github.onsdigital.zebedee.api.Collections.getCollection(request, true)).thenReturn(collection);
             doThrow(new ConflictException("rename failed")).when(collections).renameContent(session, collection, "/from-uri", "/to-uri");
 
-            assertThrows(ConflictException.class, () -> api.RenameContent(request, response));
+            assertThrows(ConflictException.class, () -> contentRenameEndpoint.RenameContent(request, response));
 
             verify(collection).close();
         }

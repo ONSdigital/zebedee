@@ -47,7 +47,7 @@ public class ResolveDatasetsTest {
     @Mock
     private ResponseWriter responseWriter;
 
-    private ResolveDatasets api;
+    private ResolveDatasets resolveDatasetsEndpoint;
 
     private ProductPage productPage;
 
@@ -56,12 +56,12 @@ public class ResolveDatasetsTest {
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.openMocks(this);
-        api = new ResolveDatasets(datasetSummaryResolver, responseWriter, (lang) -> handler);
+        resolveDatasetsEndpoint = new ResolveDatasets(datasetSummaryResolver, responseWriter, (lang) -> handler);
     }
 
     @Test
     public void shouldReturnBadRequestIfURIParamIsNull() throws Exception {
-        api.handle(request, response);
+        resolveDatasetsEndpoint.handle(request, response);
 
         ArgumentCaptor<BadRequestException> captor = ArgumentCaptor.forClass(BadRequestException.class);
 
@@ -78,7 +78,7 @@ public class ResolveDatasetsTest {
         when(handler.findContent(request, null))
                 .thenReturn(new HomePage());
 
-        api.handle(request, response);
+        resolveDatasetsEndpoint.handle(request, response);
 
         ArgumentCaptor<BadRequestException> captor = ArgumentCaptor.forClass(BadRequestException.class);
 
@@ -100,7 +100,7 @@ public class ResolveDatasetsTest {
         when(handler.findContent(request, null))
                 .thenReturn(productPage);
 
-        api.handle(request, response);
+        resolveDatasetsEndpoint.handle(request, response);
 
         verify(handler, times(1)).findContent(request, null);
         verify(responseWriter, times(1)).sendResponse(new ArrayList<DatasetSummary>(), response);
@@ -119,7 +119,7 @@ public class ResolveDatasetsTest {
         when(handler.findContent(request, null))
                 .thenReturn(productPage);
 
-        api.handle(request, response);
+        resolveDatasetsEndpoint.handle(request, response);
 
         verify(handler, times(1)).findContent(request, null);
         verify(responseWriter, times(1)).sendResponse(new ArrayList<DatasetSummary>(), response);
@@ -145,7 +145,7 @@ public class ResolveDatasetsTest {
         when(datasetSummaryResolver.resolve(URI, datasetLink, request, handler))
                 .thenReturn(null);
 
-        api.handle(request, response);
+        resolveDatasetsEndpoint.handle(request, response);
 
         verify(handler, times(1)).findContent(request, null);
         verify(responseWriter, times(1)).sendResponse(new ArrayList<DatasetSummary>(), response);
@@ -186,7 +186,7 @@ public class ResolveDatasetsTest {
         when(datasetSummaryResolver.resolve(URI, cpih02, request, handler))
                 .thenReturn(summaryCpih02);
 
-        api.handle(request, response);
+        resolveDatasetsEndpoint.handle(request, response);
 
         verify(handler, times(1)).findContent(request, null);
         verify(datasetSummaryResolver, times(1)).resolve(URI, cpih01, request, handler);

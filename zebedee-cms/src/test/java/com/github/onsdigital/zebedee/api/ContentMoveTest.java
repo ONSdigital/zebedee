@@ -44,12 +44,12 @@ public class ContentMoveTest {
     @Mock
     private Session session;
 
-    private ContentMove api;
+    private ContentMove contentMoveEndpoint;
 
     @Before
     public void setUp() {
         MockitoAnnotations.openMocks(this);
-        api = new ContentMove();
+        contentMoveEndpoint = new ContentMove();
 
         Root.zebedee = zebedee;
         when(zebedee.getSessions()).thenReturn(sessions);
@@ -65,7 +65,7 @@ public class ContentMoveTest {
         try (MockedStatic<com.github.onsdigital.zebedee.api.Collections> collectionsApi = mockStatic(com.github.onsdigital.zebedee.api.Collections.class)) {
             collectionsApi.when(() -> com.github.onsdigital.zebedee.api.Collections.getCollection(request, true)).thenReturn(collection);
 
-            boolean result = api.MoveContent(request, response);
+            boolean result = contentMoveEndpoint.MoveContent(request, response);
 
             org.hamcrest.MatcherAssert.assertThat(result, is(true));
             collectionsApi.verify(() -> com.github.onsdigital.zebedee.api.Collections.getCollection(request, true));
@@ -80,7 +80,7 @@ public class ContentMoveTest {
             collectionsApi.when(() -> com.github.onsdigital.zebedee.api.Collections.getCollection(request, true)).thenReturn(collection);
             doThrow(new ConflictException("move failed")).when(collections).moveContent(session, collection, "/from-uri", "/to-uri");
 
-            assertThrows(ConflictException.class, () -> api.MoveContent(request, response));
+            assertThrows(ConflictException.class, () -> contentMoveEndpoint.MoveContent(request, response));
 
             verify(collection).close();
         }

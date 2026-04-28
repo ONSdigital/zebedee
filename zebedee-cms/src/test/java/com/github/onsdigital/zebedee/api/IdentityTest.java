@@ -52,17 +52,17 @@ public class IdentityTest {
     @Mock
     private ServiceStore serviceStore;
 
-    private Identity api;
+    private Identity identityEndpoint;
 
     @Before
     public void setUp() throws Exception {
-        api = new Identity(serviceStore, authorisationService); // enable feature by default
+        identityEndpoint = new Identity(serviceStore, authorisationService); // enable feature by default
 
         MockitoAnnotations.openMocks(this);
 
-        ReflectionTestUtils.setField(api, "authorisationService", authorisationService);
+        ReflectionTestUtils.setField(identityEndpoint, "authorisationService", authorisationService);
 
-        ReflectionTestUtils.setField(api, "serviceStore", serviceStore);
+        ReflectionTestUtils.setField(identityEndpoint, "serviceStore", serviceStore);
     }
 
     @Test
@@ -70,7 +70,7 @@ public class IdentityTest {
         when(mockResponse.getWriter())
                 .thenReturn(printWriterMock);
 
-        api.identifyUser(mockRequest, mockResponse);
+        identityEndpoint.identifyUser(mockRequest, mockResponse);
 
         verifyNoInteractions(authorisationService);
         verifyResponseInteractions(new Error("no authentication provided"), SC_UNAUTHORIZED);
@@ -85,7 +85,7 @@ public class IdentityTest {
         when(mockResponse.getWriter())
                 .thenReturn(printWriterMock);
 
-        api.identifyUser(mockRequest, mockResponse);
+        identityEndpoint.identifyUser(mockRequest, mockResponse);
 
         verify(authorisationService, times(1)).identifyUser(TEST_AUTH_TOKEN);
         verifyResponseInteractions(new Error("bang!"), SC_FORBIDDEN);
@@ -103,7 +103,7 @@ public class IdentityTest {
         when(mockResponse.getWriter())
                 .thenReturn(printWriterMock);
 
-        api.identifyUser(mockRequest, mockResponse);
+        identityEndpoint.identifyUser(mockRequest, mockResponse);
 
         verifyNoInteractions(serviceStore);
         verify(authorisationService, times(1)).identifyUser(TEST_AUTH_TOKEN);
@@ -119,7 +119,7 @@ public class IdentityTest {
         when(mockResponse.getWriter())
                 .thenReturn(printWriterMock);
 
-        api.identifyUser(mockRequest, mockResponse);
+        identityEndpoint.identifyUser(mockRequest, mockResponse);
 
         verify(serviceStore, times(1)).get(TEST_SERVICE_AUTH_TOKEN);
         verifyNoInteractions(authorisationService);
@@ -142,7 +142,7 @@ public class IdentityTest {
                 .thenThrow(new IOException("BOOM!"));
 
         try {
-            api.identifyUser(mockRequest, mockResponse);
+            identityEndpoint.identifyUser(mockRequest, mockResponse);
         } catch (IOException e) {
             verify(authorisationService, times(1)).identifyUser(TEST_AUTH_TOKEN);
             verify(mockResponse, times(1)).getWriter();
@@ -161,8 +161,8 @@ public class IdentityTest {
         when(mockResponse.getWriter())
                 .thenReturn(printWriterMock);
 
-        api = new Identity(serviceStore, authorisationService);
-        api.identifyUser(mockRequest, mockResponse);
+        identityEndpoint = new Identity(serviceStore, authorisationService);
+        identityEndpoint.identifyUser(mockRequest, mockResponse);
 
         verifyNoInteractions(serviceStore, authorisationService);
         verifyResponseInteractions(new Error("service not authenticated"), SC_UNAUTHORIZED);

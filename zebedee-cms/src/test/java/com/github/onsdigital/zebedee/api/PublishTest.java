@@ -42,14 +42,14 @@ public class PublishTest {
     @Mock
     private Session session;
 
-    private Publish api;
+    private Publish publishEndpoint;
 
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.openMocks(this);
-        api = new Publish();
+        publishEndpoint = new Publish();
 
-        ReflectionTestUtils.setField(api, "zebedeeCmsService", zebedeeCmsService);
+        ReflectionTestUtils.setField(publishEndpoint, "zebedeeCmsService", zebedeeCmsService);
         when(zebedeeCmsService.getSession()).thenReturn(session);
         when(zebedeeCmsService.getCollections()).thenReturn(collections);
         when(session.getEmail()).thenReturn("test@ons.gov.uk");
@@ -64,7 +64,7 @@ public class PublishTest {
             collectionsApi.when(() -> com.github.onsdigital.zebedee.api.Collections.getCollection(request, true)).thenReturn(collection);
             when(collections.publish(collection, session, true, true)).thenReturn(true);
 
-            boolean result = api.publish(request, response);
+            boolean result = publishEndpoint.publish(request, response);
 
             org.hamcrest.MatcherAssert.assertThat(result, is(true));
             collectionsApi.verify(() -> com.github.onsdigital.zebedee.api.Collections.getCollection(request, true));
@@ -79,7 +79,7 @@ public class PublishTest {
             collectionsApi.when(() -> com.github.onsdigital.zebedee.api.Collections.getCollection(request, true)).thenReturn(collection);
             doThrow(new ConflictException("publish failed")).when(collections).publish(collection, session, false, false);
 
-            assertThrows(ConflictException.class, () -> api.publish(request, response));
+            assertThrows(ConflictException.class, () -> publishEndpoint.publish(request, response));
 
             verify(collection).close();
         }
@@ -91,7 +91,7 @@ public class PublishTest {
             collectionsApi.when(() -> com.github.onsdigital.zebedee.api.Collections.getCollection(request, true)).thenReturn(collection);
             doThrow(new IOException("publish failed")).when(collections).publish(collection, session, false, false);
 
-            assertThrows(IOException.class, () -> api.publish(request, response));
+            assertThrows(IOException.class, () -> publishEndpoint.publish(request, response));
 
             verify(collection).close();
         }

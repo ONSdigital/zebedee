@@ -46,12 +46,12 @@ public class ReviewTest {
     @Mock
     private Session session;
 
-    private Review api;
+    private Review reviewEndpoint;
 
     @Before
     public void setUp() {
         MockitoAnnotations.openMocks(this);
-        api = new Review();
+        reviewEndpoint = new Review();
 
         Root.zebedee = zebedee;
         when(zebedee.getSessions()).thenReturn(sessions);
@@ -65,7 +65,7 @@ public class ReviewTest {
         try (MockedStatic<com.github.onsdigital.zebedee.api.Collections> collectionsApi = mockStatic(com.github.onsdigital.zebedee.api.Collections.class)) {
             collectionsApi.when(() -> com.github.onsdigital.zebedee.api.Collections.getCollection(request, true)).thenReturn(collection);
 
-            ResultMessage result = api.review(request, response);
+            ResultMessage result = reviewEndpoint.review(request, response);
 
             assertThat(result.message, is(equalTo("URI reviewed.")));
             collectionsApi.verify(() -> com.github.onsdigital.zebedee.api.Collections.getCollection(request, true));
@@ -82,7 +82,7 @@ public class ReviewTest {
         try (MockedStatic<com.github.onsdigital.zebedee.api.Collections> collectionsApi = mockStatic(com.github.onsdigital.zebedee.api.Collections.class)) {
             collectionsApi.when(() -> com.github.onsdigital.zebedee.api.Collections.getCollection(request, true)).thenReturn(collection);
 
-            api.review(request, response);
+            reviewEndpoint.review(request, response);
 
             verify(collection).review(session, "/test-uri", true);
             verify(collection).close();
@@ -94,7 +94,7 @@ public class ReviewTest {
         try (MockedStatic<com.github.onsdigital.zebedee.api.Collections> collectionsApi = mockStatic(com.github.onsdigital.zebedee.api.Collections.class)) {
             collectionsApi.when(() -> com.github.onsdigital.zebedee.api.Collections.getCollection(request, true)).thenReturn(null);
 
-            NotFoundException ex = assertThrows(NotFoundException.class, () -> api.review(request, response));
+            NotFoundException ex = assertThrows(NotFoundException.class, () -> reviewEndpoint.review(request, response));
 
             assertThat(ex.getMessage(), is(equalTo("Collection not found")));
         }
@@ -106,7 +106,7 @@ public class ReviewTest {
             collectionsApi.when(() -> com.github.onsdigital.zebedee.api.Collections.getCollection(request, true)).thenReturn(collection);
             doThrow(new IOException("save failed")).when(collection).save();
 
-            assertThrows(IOException.class, () -> api.review(request, response));
+            assertThrows(IOException.class, () -> reviewEndpoint.review(request, response));
 
             verify(collection).close();
         }
@@ -118,7 +118,7 @@ public class ReviewTest {
             collectionsApi.when(() -> com.github.onsdigital.zebedee.api.Collections.getCollection(request, true)).thenReturn(collection);
             doThrow(new ConflictException("review failed")).when(collection).review(session, "/test-uri", false);
 
-            assertThrows(ConflictException.class, () -> api.review(request, response));
+            assertThrows(ConflictException.class, () -> reviewEndpoint.review(request, response));
 
             verify(collection).close();
         }

@@ -58,7 +58,7 @@ public class ServiceDatasetPermissionsTest {
 
     GetPermissionsRequest getPermissionsRequest;
 
-    ServiceDatasetPermissions api;
+    ServiceDatasetPermissions serviceDatasetPermissionsEndpoint;
 
     CRUD fullPermissions;
 
@@ -69,7 +69,7 @@ public class ServiceDatasetPermissionsTest {
 
         getPermissionsRequest = new GetPermissionsRequest(session, "222", "333", "444");
 
-        api = new ServiceDatasetPermissions(cmdPermissionsService, httpResponseWriter, sessions);
+        serviceDatasetPermissionsEndpoint = new ServiceDatasetPermissions(cmdPermissionsService, httpResponseWriter, sessions);
     }
 
     @Test
@@ -83,7 +83,7 @@ public class ServiceDatasetPermissionsTest {
         when(cmdPermissionsService.getServiceDatasetPermissions(any(GetPermissionsRequest.class)))
                 .thenReturn(fullPermissions);
 
-        api.handle(req, resp);
+        serviceDatasetPermissionsEndpoint.handle(req, resp);
 
         verify(cmdPermissionsService, times(1))
                 .getServiceDatasetPermissions(any(GetPermissionsRequest.class));
@@ -103,7 +103,7 @@ public class ServiceDatasetPermissionsTest {
         when(cmdPermissionsService.getServiceDatasetPermissions(any(GetPermissionsRequest.class)))
                 .thenThrow(new PermissionsException("boom", 500));
 
-        api.handle(req, resp);
+        serviceDatasetPermissionsEndpoint.handle(req, resp);
 
         verify(cmdPermissionsService, times(1))
                 .getServiceDatasetPermissions(any(GetPermissionsRequest.class));
@@ -114,7 +114,7 @@ public class ServiceDatasetPermissionsTest {
 
     @Test
     public void testGetDatasetPermissions_BadRequest() throws Exception {
-        api.handle(req, resp);
+        serviceDatasetPermissionsEndpoint.handle(req, resp);
 
         verifyNoInteractions(cmdPermissionsService);
 
@@ -147,7 +147,7 @@ public class ServiceDatasetPermissionsTest {
                 statusCaptor.capture()
         );
 
-        api.handle(req, resp);
+        serviceDatasetPermissionsEndpoint.handle(req, resp);
 
         verify(cmdPermissionsService, times(1))
                 .getServiceDatasetPermissions(any());
@@ -188,7 +188,7 @@ public class ServiceDatasetPermissionsTest {
                 statusCaptor.capture()
         );
 
-        api.handle(req, resp);
+        serviceDatasetPermissionsEndpoint.handle(req, resp);
 
         verify(cmdPermissionsService, times(1))
                 .getServiceDatasetPermissions(any());
@@ -215,7 +215,7 @@ public class ServiceDatasetPermissionsTest {
         when(cmdPermissionsService.getUserDatasetPermissions(any(GetPermissionsRequest.class)))
                 .thenReturn(fullPermissions);
 
-        api.handle(req, resp);
+        serviceDatasetPermissionsEndpoint.handle(req, resp);
 
         verifyNoInteractions(cmdPermissionsService);
 
@@ -232,7 +232,7 @@ public class ServiceDatasetPermissionsTest {
         when(cmdPermissionsService.getUserDatasetPermissions(any(GetPermissionsRequest.class)))
                 .thenReturn(fullPermissions);
 
-        api.handle(req, resp);
+        serviceDatasetPermissionsEndpoint.handle(req, resp);
 
         verifyNoInteractions(cmdPermissionsService);
 

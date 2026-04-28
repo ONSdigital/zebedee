@@ -27,7 +27,7 @@ import static org.mockito.Mockito.when;
 
 public class ServiceTest {
 
-    private Service api;
+    private Service serviceEndpoint;
 
     @Mock
     private HttpServletRequest mockRequest;
@@ -49,13 +49,13 @@ public class ServiceTest {
 
     @Before
     public void setUp() throws Exception {
-        api = new Service(); // enable the dataset import feature
+        serviceEndpoint = new Service(); // enable the dataset import feature
 
         MockitoAnnotations.openMocks(this);
 
-        ReflectionTestUtils.setField(api, "serviceStore", serviceStore);
-        ReflectionTestUtils.setField(api, "permissionsService", permissionsService);
-        ReflectionTestUtils.setField(api, "sessions", sessions);
+        ReflectionTestUtils.setField(serviceEndpoint, "serviceStore", serviceStore);
+        ReflectionTestUtils.setField(serviceEndpoint, "permissionsService", permissionsService);
+        ReflectionTestUtils.setField(serviceEndpoint, "sessions", sessions);
     }
 
     @Test
@@ -66,7 +66,7 @@ public class ServiceTest {
         when(permissionsService.isAdministrator(session)).thenReturn(true);
         when(serviceStore.store(Mockito.anyString(), any())).thenReturn(new ServiceAccount("123"));
         when(mockResponse.getWriter()).thenReturn(printWriterMock);
-        api.createService(mockRequest, mockResponse);
+        serviceEndpoint.createService(mockRequest, mockResponse);
         verify(sessions, times(1)).get();
         verify(permissionsService, times(1)).isAdministrator(session);
         verify(serviceStore, times(1)).store(Mockito.anyString(), any());
@@ -80,7 +80,7 @@ public class ServiceTest {
         when(sessions.get()).thenReturn(session);
         when(permissionsService.isAdministrator(session)).thenReturn(false);
         when(serviceStore.store(Mockito.anyString(), any())).thenReturn(new ServiceAccount("123"));
-        api.createService(mockRequest, mockResponse);
+        serviceEndpoint.createService(mockRequest, mockResponse);
         verify(sessions, times(1)).get();
         verify(permissionsService, times(1)).isAdministrator(session);
         verify(serviceStore, times(0)).store(Mockito.anyString(), any());

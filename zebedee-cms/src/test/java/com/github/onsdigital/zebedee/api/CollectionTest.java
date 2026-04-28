@@ -73,8 +73,8 @@ public class CollectionTest extends ZebedeeAPIBaseTestCase {
     @Mock
     private User user;
 
-        @Mock
-        private Zebedee zebedee;
+    @Mock
+    private Zebedee zebedee;
 
     private Collection endpoint;
 
@@ -99,7 +99,7 @@ public class CollectionTest extends ZebedeeAPIBaseTestCase {
 
         when(permissionsService.canView(mockSession, COLLECTION_ID))
                 .thenReturn(true);
-        
+
         when(permissionsService.canView(mockSession, COLLECTION_ID, TEST_COLLECTION_TYPE))
                 .thenReturn(true);
 
@@ -115,7 +115,8 @@ public class CollectionTest extends ZebedeeAPIBaseTestCase {
         when(description.getType())
                 .thenReturn(TEST_COLLECTION_TYPE);
 
-        this.endpoint = new Collection(sessions, permissionsService, collections, usersService, collectionKeyring,
+        this.endpoint = new Collection(sessions, permissionsService, collections, usersService,
+                collectionKeyring,
                 scheduleCanceller);
 
         Root.zebedee = zebedee;
@@ -151,7 +152,6 @@ public class CollectionTest extends ZebedeeAPIBaseTestCase {
         verify(sessions, times(1)).get();
         verify(collections, never()).getCollection(anyString());
     }
-
 
     @Test
     public void testGet_CollectionDescriptionMissing_shouldThrowException() throws Exception {
@@ -300,7 +300,8 @@ public class CollectionTest extends ZebedeeAPIBaseTestCase {
         CollectionDescription updatedDescription = new CollectionDescription("updated name");
         updatedDescription.setType(TEST_COLLECTION_TYPE);
 
-        com.github.onsdigital.zebedee.model.Collection updatedCollection = org.mockito.Mockito.mock(com.github.onsdigital.zebedee.model.Collection.class);
+        com.github.onsdigital.zebedee.model.Collection updatedCollection = org.mockito.Mockito
+                .mock(com.github.onsdigital.zebedee.model.Collection.class);
         CollectionDescription persistedDescription = new CollectionDescription("persisted name");
         persistedDescription.setType(TEST_COLLECTION_TYPE);
 
@@ -311,8 +312,10 @@ public class CollectionTest extends ZebedeeAPIBaseTestCase {
         when(updatedCollection.getPath()).thenReturn(Paths.get("/after"));
         when(updatedCollection.getDescription()).thenReturn(persistedDescription);
 
-        try (MockedStatic<com.github.onsdigital.zebedee.model.Collection> mockedCollection = mockStatic(com.github.onsdigital.zebedee.model.Collection.class)) {
-            mockedCollection.when(() -> com.github.onsdigital.zebedee.model.Collection.update(collection, updatedDescription, zebedee, Root.getScheduler(), mockSession))
+        try (MockedStatic<com.github.onsdigital.zebedee.model.Collection> mockedCollection = mockStatic(
+                com.github.onsdigital.zebedee.model.Collection.class)) {
+            mockedCollection.when(() -> com.github.onsdigital.zebedee.model.Collection.update(collection,
+                    updatedDescription, zebedee, Root.getScheduler(), mockSession))
                     .thenReturn(updatedCollection);
 
             CollectionDescription actual = endpoint.update(mockRequest, mockResponse, updatedDescription);
@@ -328,14 +331,17 @@ public class CollectionTest extends ZebedeeAPIBaseTestCase {
         CollectionDescription updatedDescription = new CollectionDescription("updated name");
         updatedDescription.setType(TEST_COLLECTION_TYPE);
 
-        try (MockedStatic<com.github.onsdigital.zebedee.model.Collection> mockedCollection = mockStatic(com.github.onsdigital.zebedee.model.Collection.class)) {
-            mockedCollection.when(() -> com.github.onsdigital.zebedee.model.Collection.update(collection, updatedDescription, zebedee, Root.getScheduler(), mockSession))
+        try (MockedStatic<com.github.onsdigital.zebedee.model.Collection> mockedCollection = mockStatic(
+                com.github.onsdigital.zebedee.model.Collection.class)) {
+            mockedCollection.when(() -> com.github.onsdigital.zebedee.model.Collection.update(collection,
+                    updatedDescription, zebedee, Root.getScheduler(), mockSession))
                     .thenThrow(new IOException("update failed"));
 
             when(mockRequest.getPathInfo())
-                .thenReturn(String.format("collections/%s", COLLECTION_ID));
+                    .thenReturn(String.format("collections/%s", COLLECTION_ID));
 
-            assertThrows(IOException.class, () -> endpoint.update(mockRequest, mockResponse, updatedDescription));
+            assertThrows(IOException.class,
+                    () -> endpoint.update(mockRequest, mockResponse, updatedDescription));
 
             verify(collections, times(1)).getCollection(COLLECTION_ID, true);
             verify(collection, atLeastOnce()).close();
@@ -387,7 +393,7 @@ public class CollectionTest extends ZebedeeAPIBaseTestCase {
 
         assertThat(ex.getMessage(), equalTo("The collection you are trying to delete was not found"));
         verify(sessions, times(1)).get();
-                verify(collections, times(1)).getCollection("1234", true);
+        verify(collections, times(1)).getCollection("1234", true);
     }
 
     @Test
@@ -406,8 +412,8 @@ public class CollectionTest extends ZebedeeAPIBaseTestCase {
 
         assertThat(actual.getMessage(), equalTo("The collection description was not found."));
         verify(sessions, times(1)).get();
-                verify(collections, times(1)).getCollection(anyString(), any(Boolean.class));
-                verify(collection, atLeastOnce()).close();
+        verify(collections, times(1)).getCollection(anyString(), any(Boolean.class));
+        verify(collection, atLeastOnce()).close();
     }
 
     @Test
@@ -431,11 +437,12 @@ public class CollectionTest extends ZebedeeAPIBaseTestCase {
         InternalServerError ex = assertThrows(InternalServerError.class,
                 () -> endpoint.deleteCollection(mockRequest, mockResponse));
 
-        assertThat(ex.getMessage(), equalTo(format("error attempting to delete collection: {0}", COLLECTION_ID)));
+        assertThat(ex.getMessage(),
+                equalTo(format("error attempting to delete collection: {0}", COLLECTION_ID)));
         verify(sessions, times(1)).get();
-                verify(collections, times(1)).getCollection(COLLECTION_ID, true);
+        verify(collections, times(1)).getCollection(COLLECTION_ID, true);
         verify(collections, times(1)).delete(collection, mockSession);
-                verify(collection, atLeastOnce()).close();
+        verify(collection, atLeastOnce()).close();
     }
 
     @Test
@@ -459,12 +466,13 @@ public class CollectionTest extends ZebedeeAPIBaseTestCase {
         InternalServerError ex = assertThrows(InternalServerError.class,
                 () -> endpoint.deleteCollection(mockRequest, mockResponse));
 
-        assertThat(ex.getMessage(), equalTo(format("error attempting to remove collection key from keyring: {0}", COLLECTION_ID)));
+        assertThat(ex.getMessage(), equalTo(
+                format("error attempting to remove collection key from keyring: {0}", COLLECTION_ID)));
         verify(sessions, times(1)).get();
-                verify(collections, times(1)).getCollection(COLLECTION_ID, true);
+        verify(collections, times(1)).getCollection(COLLECTION_ID, true);
         verify(collections, times(1)).delete(collection, mockSession);
         verify(collectionKeyring, times(1)).remove(mockSession, collection);
-                verify(collection, atLeastOnce()).close();
+        verify(collection, atLeastOnce()).close();
     }
 
     @Test
@@ -484,6 +492,6 @@ public class CollectionTest extends ZebedeeAPIBaseTestCase {
         verify(collections, times(1)).delete(collection, mockSession);
         verify(scheduleCanceller, times(1)).cancel(collection);
         verify(collectionKeyring, times(1)).remove(mockSession, collection);
-                verify(collection, atLeastOnce()).close();
+        verify(collection, atLeastOnce()).close();
     }
 }

@@ -620,11 +620,9 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
 
         FileUtils.write(collectionJsonPath.toFile(), "not valid json", Charset.defaultCharset());
 
-        try {
+        assertThrows(IOException.class,() -> {
             new Collection(collectionPath, zebedee, true);
-        } catch (IOException expected) {
-            // expected
-        }
+        });
 
         try (OutputStream outputStream = Files.newOutputStream(collectionJsonPath)) {
             Serialiser.serialise(outputStream, collection.getDescription());

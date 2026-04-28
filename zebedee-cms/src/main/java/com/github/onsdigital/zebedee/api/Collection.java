@@ -256,9 +256,6 @@ public class Collection {
                     .actionedBy(session.getEmail())
                     .log();
 
-            // close collection writelock
-            collection.close();
-
             info().user(session.getEmail())
                     .collectionID(collectionId)
                     .log("update collection endpoint: request completed successfully");
@@ -316,9 +313,6 @@ public class Collection {
             requireEditPermission(session, description.getType());
 
             deleteCollection(collection, session);
-
-            // close collection writelock
-            collection.close();
 
             Audit.Event.COLLECTION_DELETED
                     .parameters()

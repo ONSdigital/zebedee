@@ -100,6 +100,7 @@ public class Collection {
     private final Content inProgress;
 
     private boolean isWriteable;
+    private boolean hasWriteLock;
 
     private final Zebedee zebedee;
 
@@ -145,6 +146,7 @@ public class Collection {
             this.isWriteable = true;
             info().data("path", this.path).log("acquiring collection write lock");
             collectionLocks.get(this.path).writeLock().lock();
+            this.hasWriteLock = true;
         }
 
         collectionLocks.get(this.path).readLock().lock();
@@ -154,9 +156,7 @@ public class Collection {
                     CollectionDescription.class);
         } catch (IOException | RuntimeException e) {
             // only clear the write lock if we throw an exception here.
-            if (writeable) {
-                collectionLocks.get(this.path).writeLock().unlock();
-            }
+            this.close();
             throw new IOException("Failed to deserialise collection description", e);
         } finally {
             collectionLocks.get(this.path).readLock().unlock();
@@ -1463,7 +1463,12 @@ public class Collection {
 
     public void close() {
         if (this.isWriteable){
-            this.getWriteLock().unlock();
+            if (this.hasWriteLock) {
+                this.getWriteLock().unlock();
+                this.hasWriteLock = false;
+            } else {
+                warn().collectionID(this).log("collection closed without write lock held - this should not happen");
+            }
         }
     }
 }

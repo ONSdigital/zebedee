@@ -67,6 +67,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -113,7 +114,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         when(permissionsService.canEdit(publisher1Session))
                 .thenReturn(true);
         when(permissionsService.canEdit(eq(publisher1Session), any(CollectionType.class)))
-                .thenReturn(true);  
+                .thenReturn(true);
         when(permissionsService.canEdit(publisher2Session))
                 .thenReturn(true);
         when(permissionsService.canEdit(eq(publisher2Session), any(CollectionType.class)))
@@ -138,7 +139,6 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         // When
 
         Collection.create(collectionDescription, zebedee, publisher1Session);
-
 
         // Then
         Path rootPath = builder.zebedeeRootPath.resolve(Zebedee.COLLECTIONS);
@@ -506,7 +506,8 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         Collection collection = null;
 
         // When we call the static update method
-        Collection.update(collection, new CollectionDescription("name"), zebedee, new DummyScheduler(), publisher1Session);
+        Collection.update(collection, new CollectionDescription("name"), zebedee, new DummyScheduler(),
+                publisher1Session);
 
         // Then the expected exception is thrown.
     }
@@ -879,7 +880,8 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         Path inProgress = builder.collections.get(1).resolve(Collection.IN_PROGRESS);
         assertTrue(Files.exists(inProgress.resolve(uri.substring(1))));
 
-        // check the file no longer exists in complete, the previous version is no longer wanted.
+        // check the file no longer exists in complete, the previous version is no
+        // longer wanted.
         Path complete = builder.collections.get(1).resolve(Collection.COMPLETE);
         assertFalse(Files.exists(complete.resolve(uri.substring(1))));
     }
@@ -904,7 +906,8 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         Path inProgress = builder.collections.get(1).resolve(Collection.IN_PROGRESS);
         assertTrue(Files.exists(inProgress.resolve(uri.substring(1))));
 
-        // check the file no longer exists in reviewed, the previous version is no longer wanted.
+        // check the file no longer exists in reviewed, the previous version is no
+        // longer wanted.
         Path reviewed = builder.collections.get(1).resolve(Collection.REVIEWED);
         assertFalse(Files.exists(reviewed.resolve(uri.substring(1))));
     }
@@ -1458,7 +1461,8 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
     }
 
     @Test
-    public void associateWithReleaseShouldUseExistingReleaseIfItsAlreadyInCollection() throws NotFoundException, IOException, BadRequestException {
+    public void associateWithReleaseShouldUseExistingReleaseIfItsAlreadyInCollection()
+            throws NotFoundException, IOException, BadRequestException {
 
         // Given
         // There is a release already in progress
@@ -1474,7 +1478,8 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
     }
 
     @Test
-    public void associateWithReleaseShouldSetReleaseToPublished() throws NotFoundException, IOException, BadRequestException {
+    public void associateWithReleaseShouldSetReleaseToPublished()
+            throws NotFoundException, IOException, BadRequestException {
 
         // Given a release that is announced
         String uri = String.format("/releases/%s", Random.id());
@@ -1483,14 +1488,16 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         // When we attempt to associate the collection with a release
         Release result = collection.associateWithRelease(publisher1Session, release, collectionWriter);
 
-        // Then the release is now in progress for the collection and the published flag is set to true
+        // Then the release is now in progress for the collection and the published flag
+        // is set to true
         assertTrue(collection.isInProgress(uri));
         assertTrue(result.getDescription().getPublished());
         assertEquals(URI.create(uri), result.getUri());
     }
 
     @Test
-    public void populateReleaseQuietlyShouldReturnNullWhenCollectionNotAssociatedToRelease() throws ZebedeeException, IOException {
+    public void populateReleaseQuietlyShouldReturnNullWhenCollectionNotAssociatedToRelease()
+            throws ZebedeeException, IOException {
         // Given a collection that is NOT associated with a release
         String releaseUri = "";
         collection.getDescription().setReleaseUri(releaseUri);
@@ -1533,7 +1540,6 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         FileUtils.write(collection.getReviewed().getPath().resolve(releaseJsonUri.substring(1)).toFile(),
                 Serialiser.serialise(new Object()), Charset.defaultCharset());
 
-
         // When we attempt to populate the release from the collection.
         FakeCollectionReader collectionReader = new FakeCollectionReader(zebedee.getCollections().getPath().toString(),
                 collection.getDescription().getId());
@@ -1552,7 +1558,8 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
     }
 
     @Test
-    public void populateReleaseQuietlyShouldAddLinksToReleasePageForCollectionContent() throws ZebedeeException, IOException {
+    public void populateReleaseQuietlyShouldAddLinksToReleasePageForCollectionContent()
+            throws ZebedeeException, IOException {
         // Given a collection that is associated with a release and has an article
         String uri = String.format("/releases/%s", Random.id());
         Release release = createRelease(uri, new DateTime().plusWeeks(4).toDate());
@@ -1573,7 +1580,6 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         FileUtils.write(collection.getReviewed().getPath().resolve("some/uri/data.json").toFile(),
                 Serialiser.serialise(articleDetail), Charset.defaultCharset());
 
-
         // When we attempt to populate the release from the collection.
 
         FakeCollectionReader collectionReader = new FakeCollectionReader(zebedee.getCollections().getPath().toString(),
@@ -1588,7 +1594,8 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
                 collectionWriter,
                 collectionContent);
 
-        // Then the release is now in progress for the collection and the published flag is set to true
+        // Then the release is now in progress for the collection and the published flag
+        // is set to true
         assertNotNull(result);
         assertEquals(1, result.getRelatedDocuments().size());
         assertEquals("My article", result.getRelatedDocuments().get(0).getTitle());
@@ -1596,7 +1603,8 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
     }
 
     @Test
-    public void populateReleaseQuietlyShouldAddLinksToReleasePageForCollectionContentCMD() throws ZebedeeException, IOException {
+    public void populateReleaseQuietlyShouldAddLinksToReleasePageForCollectionContentCMD()
+            throws ZebedeeException, IOException {
         // Given a collection that is associated with a release and has a CMD dataset
         String uri = String.format("/releases/%s", Random.id());
         Release release = createRelease(uri, new DateTime().plusWeeks(4).toDate());
@@ -1657,7 +1665,8 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
 
         Collection collection = Collection.create(collectionDescription, zebedee, publisher1Session);
 
-        // The release page is in progress within the collection and the collection publish date has been
+        // The release page is in progress within the collection and the collection
+        // publish date has been
         // taken from the release page date.
         assertTrue(collection.isInProgress(uri));
         assertEquals(collection.getDescription().getPublishDate(), release.getDescription().getReleaseDate());
@@ -1676,13 +1685,13 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
 
         Collection.create(collectionDescription, zebedee, publisher1Session);
 
-
         // Then the expected exception is thrown
     }
 
     @Test(expected = ConflictException.class)
     public void createCollectionShouldThrowExceptionIfReleaseIsInAnotherCollection() throws Exception {
-        // Given an existing release page which is associated with an existing collection
+        // Given an existing release page which is associated with an existing
+        // collection
         String uri = String.format("/releases/%s", Random.id());
         Release release = createRelease(uri, new DateTime().plusWeeks(4).toDate());
         CollectionDescription collectionDescription = new CollectionDescription(Random.id());
@@ -1704,10 +1713,8 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
 
         Collection.create(collectionDescription, zebedee, publisher1Session);
 
-
         // Then the expected exception is thrown
     }
-
 
     @Test(expected = NotFoundException.class)
     public void versionShouldThrowNotFoundIfContentIsNotPublished() throws Exception {
@@ -1745,22 +1752,26 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         // When the version function is called for the URI
         ContentItemVersion version = collection.version(publisher1Email, uri, collectionWriter);
 
-        // Then the version directory is created, with the page and associated files copied into it
+        // Then the version directory is created, with the page and associated files
+        // copied into it
         // check versions file exists
-        Path versionsDirectoryPath = collection.getReviewed().get(Paths.get(uri).resolve(VersionedContentItem.getVersionDirectoryName()).toUri());
+        Path versionsDirectoryPath = collection.getReviewed()
+                .get(Paths.get(uri).resolve(VersionedContentItem.getVersionDirectoryName()).toUri());
         assertTrue(Files.exists(versionsDirectoryPath));
 
         // check the json file is in there
         assertTrue(Files.exists(collection.getReviewed().get(version.getUri())));
 
         // check for an associated file
-        assertTrue(Files.exists(collection.getReviewed().get(Paths.get(version.getUri()).resolve("data.json").toString())));
+        assertTrue(Files
+                .exists(collection.getReviewed().get(Paths.get(version.getUri()).resolve("data.json").toString())));
     }
 
     @Test(expected = NotFoundException.class)
     public void deleteVersionShouldThrowNotFoundIfVersionDoesNotExistInCollection() throws Exception {
 
-        // Given a collection and a URI of a version that does not exist in the collection.
+        // Given a collection and a URI of a version that does not exist in the
+        // collection.
         String uri = String.format("/economy/inflationandpriceindices/timeseries/%s/previous/v1", Random.id());
 
         // When we attempt to delete a version
@@ -1887,7 +1898,8 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
     public void isAllContentReviewed_shouldReturnTrueWhenEmpty() throws IOException, ZebedeeException {
 
         // Given an empty collection
-        Path collectionPath = Files.createTempDirectory(Random.id()); // create a temp directory to generate content into
+        Path collectionPath = Files.createTempDirectory(Random.id()); // create a temp directory to generate content
+                                                                      // into
         Collection collection = CollectionTest.createCollection(collectionPath, "isAllContentReviewed");
 
         // When isAllContentReviewed() is called
@@ -1901,7 +1913,8 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
     public void isAllContentReviewed_shouldReturnFalseWhenFileInProgress() throws IOException, ZebedeeException {
 
         // Given a collection with a file in progress
-        Path collectionPath = Files.createTempDirectory(Random.id()); // create a temp directory to generate content into
+        Path collectionPath = Files.createTempDirectory(Random.id()); // create a temp directory to generate content
+                                                                      // into
         Collection collection = spy(
                 CollectionTest.createCollection(collectionPath, "isAllContentReviewed"));
 
@@ -1919,7 +1932,8 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
     public void isAllContentReviewed_shouldReturnFalseWhenFileComplete() throws IOException, ZebedeeException {
 
         // Given a collection with a file in complete
-        Path collectionPath = Files.createTempDirectory(Random.id()); // create a temp directory to generate content into
+        Path collectionPath = Files.createTempDirectory(Random.id()); // create a temp directory to generate content
+                                                                      // into
         Collection collection = spy(
                 CollectionTest.createCollection(collectionPath, "isAllContentReviewed"));
 
@@ -1935,43 +1949,47 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
 
     @Test
     public void isAllContentReviewed_shouldReturnFalseWhenDatasetNotReviewed() throws IOException, ZebedeeException {
-            // Given a collection with a dataset that has not been set to reviewed.
-            Path collectionPath = Files.createTempDirectory(Random.id()); // create a temp directory to generate content into
-            Collection collection = CollectionTest.createCollection(collectionPath, "isAllContentReviewed");
+        // Given a collection with a dataset that has not been set to reviewed.
+        Path collectionPath = Files.createTempDirectory(Random.id()); // create a temp directory to generate content
+                                                                      // into
+        Collection testCollection = CollectionTest.createCollection(collectionPath, "isAllContentReviewed");
 
-            CollectionDataset dataset = new CollectionDataset();
-            dataset.setState(ContentStatus.Complete);
-            collection.getDescription().addDataset(dataset);
+        CollectionDataset dataset = new CollectionDataset();
+        dataset.setState(ContentStatus.Complete);
+        testCollection.getDescription().addDataset(dataset);
 
-            // When isAllContentReviewed() is called
-            boolean allContentReviewed = collection.isAllContentReviewed(true);
+        // When isAllContentReviewed() is called
+        boolean allContentReviewed = testCollection.isAllContentReviewed(true);
 
-            // Then the result is false
-            assertFalse(allContentReviewed);
+        // Then the result is false
+        assertFalse(allContentReviewed);
     }
 
     @Test
-    public void isAllContentReviewed_shouldReturnFalseWhenDatasetVersionNotReviewed() throws IOException, ZebedeeException {
-            // Given a collection with a dataset version that has not been set to reviewed.
-            Path collectionPath = Files.createTempDirectory(Random.id()); // create a temp directory to generate content into
-            Collection collection = CollectionTest.createCollection(collectionPath, "isAllContentReviewed");
+    public void isAllContentReviewed_shouldReturnFalseWhenDatasetVersionNotReviewed()
+            throws IOException, ZebedeeException {
+        // Given a collection with a dataset version that has not been set to reviewed.
+        Path collectionPath = Files.createTempDirectory(Random.id()); // create a temp directory to generate content
+                                                                      // into
+        Collection testCollection = CollectionTest.createCollection(collectionPath, "isAllContentReviewed");
 
-            CollectionDatasetVersion datasetVersion = new CollectionDatasetVersion();
-            datasetVersion.setState(ContentStatus.Complete);
-            collection.getDescription().addDatasetVersion(datasetVersion);
+        CollectionDatasetVersion datasetVersion = new CollectionDatasetVersion();
+        datasetVersion.setState(ContentStatus.Complete);
+        testCollection.getDescription().addDatasetVersion(datasetVersion);
 
-            // When isAllContentReviewed() is called
-            boolean allContentReviewed = collection.isAllContentReviewed(true);
+        // When isAllContentReviewed() is called
+        boolean allContentReviewed = testCollection.isAllContentReviewed(true);
 
-            // Then the result is false
-            assertFalse(allContentReviewed);
+        // Then the result is false
+        assertFalse(allContentReviewed);
     }
 
     @Test
     public void isAllContentReviewed_shouldReturnTrueWhenDatasetIsReviewed() throws IOException, ZebedeeException {
 
         // Given a collection with a dataset that has been set to reviewed.
-        Path collectionPath = Files.createTempDirectory(Random.id()); // create a temp directory to generate content into
+        Path collectionPath = Files.createTempDirectory(Random.id()); // create a temp directory to generate content
+                                                                      // into
         Collection collection = CollectionTest.createCollection(collectionPath, "isAllContentReviewed");
 
         CollectionDataset dataset = new CollectionDataset();
@@ -1986,10 +2004,12 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
     }
 
     @Test
-    public void isAllContentReviewed_shouldReturnTrueWhenDatasetVersionIsReviewed() throws IOException, ZebedeeException {
+    public void isAllContentReviewed_shouldReturnTrueWhenDatasetVersionIsReviewed()
+            throws IOException, ZebedeeException {
 
         // Given a collection with a dataset version that has been set to reviewed.
-        Path collectionPath = Files.createTempDirectory(Random.id()); // create a temp directory to generate content into
+        Path collectionPath = Files.createTempDirectory(Random.id()); // create a temp directory to generate content
+                                                                      // into
         Collection collection = CollectionTest.createCollection(collectionPath, "isAllContentReviewed");
 
         CollectionDatasetVersion datasetVersion = new CollectionDatasetVersion();
@@ -2007,7 +2027,8 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
     public void getDatasetDetails() throws IOException, ZebedeeException {
 
         // Given a collection with a dataset.
-        Path collectionPath = Files.createTempDirectory(Random.id()); // create a temp directory to generate content into
+        Path collectionPath = Files.createTempDirectory(Random.id()); // create a temp directory to generate content
+                                                                      // into
         Collection collection = CollectionTest.createCollection(collectionPath, "isAllContentReviewed");
 
         CollectionDataset dataset = new CollectionDataset();
@@ -2030,7 +2051,8 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
     public void getDatasetVersionDetails() throws IOException, ZebedeeException {
 
         // Given a collection with a dataset version.
-        Path collectionPath = Files.createTempDirectory(Random.id()); // create a temp directory to generate content into
+        Path collectionPath = Files.createTempDirectory(Random.id()); // create a temp directory to generate content
+                                                                      // into
         Collection collection = CollectionTest.createCollection(collectionPath, "isAllContentReviewed");
 
         CollectionDatasetVersion datasetVersion = new CollectionDatasetVersion();
@@ -2050,7 +2072,8 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         assertEquals(datasetVersion.getTitle(), versionDetail.description.title);
     }
 
-    public static Collection createCollection(Path destination, String collectionName) throws CollectionNotFoundException, IOException {
+    public static Collection createCollection(Path destination, String collectionName)
+            throws CollectionNotFoundException, IOException {
 
         CollectionDescription collection = new CollectionDescription(collectionName);
         collection.setType(CollectionType.manual);

@@ -49,12 +49,12 @@ public class ApproveTest {
     @Mock
     private Session session;
 
-    private Approve api;
+    private Approve approveEndpoint;
 
     @Before
     public void setUp() {
         MockitoAnnotations.openMocks(this);
-        api = new Approve();
+        approveEndpoint = new Approve();
 
         Root.zebedee = zebedee;
         when(zebedee.getSessions()).thenReturn(sessions);
@@ -70,7 +70,7 @@ public class ApproveTest {
         when(request.getParameter(OVERRIDE_KEY_PARAM))
                 .thenReturn(null);
 
-        Long key = api.getOverrideKey(request);
+        Long key = approveEndpoint.getOverrideKey(request);
         assertThat(key, is(nullValue()));
     }
 
@@ -79,7 +79,7 @@ public class ApproveTest {
         when(request.getParameter(OVERRIDE_KEY_PARAM))
                 .thenReturn("");
 
-        Long key = api.getOverrideKey(request);
+        Long key = approveEndpoint.getOverrideKey(request);
         assertThat(key, is(nullValue()));
     }
 
@@ -88,7 +88,7 @@ public class ApproveTest {
         when(request.getParameter(OVERRIDE_KEY_PARAM))
                 .thenReturn("abc");
 
-        Long key = api.getOverrideKey(request);
+        Long key = approveEndpoint.getOverrideKey(request);
         assertThat(key, is(nullValue()));
     }
 
@@ -97,7 +97,7 @@ public class ApproveTest {
         when(request.getParameter(OVERRIDE_KEY_PARAM))
                 .thenReturn("666");
 
-        Long key = api.getOverrideKey(request);
+        Long key = approveEndpoint.getOverrideKey(request);
         assertThat(key, equalTo(666L));
     }
 
@@ -105,7 +105,7 @@ public class ApproveTest {
     public void approveCollection_shouldCloseCollectionOnSuccess() throws Exception {
         when(collections.getCollection(COLLECTION_ID, true)).thenReturn(collection);
 
-        boolean approved = api.approveCollection(request, response);
+        boolean approved = approveEndpoint.approveCollection(request, response);
 
         assertThat(approved, is(true));
         verify(collections).approve(collection, session, null);
@@ -117,7 +117,7 @@ public class ApproveTest {
         when(collections.getCollection(COLLECTION_ID, true)).thenReturn(collection);
         doThrow(new ConflictException("approval failed")).when(collections).approve(collection, session, null);
 
-        assertThrows(ConflictException.class, () -> api.approveCollection(request, response));
+        assertThrows(ConflictException.class, () -> approveEndpoint.approveCollection(request, response));
 
         verify(collection).close();
     }
@@ -126,6 +126,6 @@ public class ApproveTest {
     public void approveCollection_withoutSession_shouldThrowUnauthorized() {
         when(sessions.get()).thenReturn(null);
 
-        assertThrows(UnauthorizedException.class, () -> api.approveCollection(request, response));
+        assertThrows(UnauthorizedException.class, () -> approveEndpoint.approveCollection(request, response));
     }
 }

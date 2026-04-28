@@ -524,7 +524,6 @@ public class CollectionsTest {
                 .thenReturn(inProg);
         when(inProg.get(p.toString()))
                 .thenReturn(p);
-        ;
         when(collectionDescriptionMock.getName())
                 .thenReturn("AGirlIsNoOne");
         when(collectionDescriptionMock.getId())

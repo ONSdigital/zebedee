@@ -76,7 +76,7 @@ public class CollectionDetails {
         }
 
         Session session = zebedeeCmsService.getSession();
-        if (!zebedeeCmsService.getPermissions().canView(session, collection.getDescription().getId())) {
+        if (!zebedeeCmsService.getPermissions().canView(session, collection.getDescription().getId(), collection.getDescription().getType())) {
             response.setStatus(HttpStatus.UNAUTHORIZED_401);
             return null;
         }

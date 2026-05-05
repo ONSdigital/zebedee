@@ -542,6 +542,9 @@ public class Collection {
 
         // remove the lock for the collection
         collectionLocks.remove(path);
+
+        // remove write lock for the collection
+        this.hasWriteLock = false;
     }
 
     /**
@@ -1462,9 +1465,12 @@ public class Collection {
     }
 
     public void close() {
-        if (this.isWriteable){
+        if (this.isWriteable) {
             if (this.hasWriteLock) {
-                this.getWriteLock().unlock();
+                ReadWriteLock collectionLock = collectionLocks.get(this.path);
+                if (collectionLock != null) {
+                    collectionLock.writeLock().unlock();
+                }
                 this.hasWriteLock = false;
             } else {
                 warn().collectionID(this).log("collection closed without write lock held - this should not happen");

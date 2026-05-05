@@ -641,6 +641,19 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
     }
 
     @Test
+    public void shouldNotThrowWhenClosingWritableCollectionAfterDelete() throws Exception {
+
+        Path collectionPath = builder.collections.get(1);
+        Path collectionJsonPath = collectionPath.getParent().resolve(collectionPath.getFileName() + ".json");
+        Collection writeableCollection = new Collection(collectionPath, zebedee, true);
+
+        writeableCollection.delete();
+        assertFalse(Files.exists(collectionPath));
+        assertFalse(Files.exists(collectionJsonPath));
+        writeableCollection.close();
+    }
+
+    @Test
     public void shouldNotCreateIfPublished() throws IOException {
 
         // Given

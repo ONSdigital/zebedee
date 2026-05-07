@@ -24,31 +24,19 @@ import org.springframework.test.util.ReflectionTestUtils;
 import javax.crypto.SecretKey;
 import java.io.IOException;
 
-import static com.github.onsdigital.zebedee.model.ZebedeeCollectionReader.COLLECTION_KEY_NULL_ERR;
-import static com.github.onsdigital.zebedee.model.ZebedeeCollectionReader.COLLECTION_NULL_ERR;
-import static com.github.onsdigital.zebedee.model.ZebedeeCollectionReader.KEYRING_NULL_ERR;
-import static com.github.onsdigital.zebedee.model.ZebedeeCollectionReader.PERMISSIONS_CHECK_ERR;
-import static com.github.onsdigital.zebedee.model.ZebedeeCollectionReader.PERMISSIONS_SERVICE_NULL_ERR;
-import static com.github.onsdigital.zebedee.model.ZebedeeCollectionReader.PERMISSION_DENIED_ERR;
-import static com.github.onsdigital.zebedee.model.ZebedeeCollectionReader.SESSION_NULL_ERR;
-import static com.github.onsdigital.zebedee.model.ZebedeeCollectionReader.USERS_SERVICE_NULL_ERR;
-import static com.github.onsdigital.zebedee.model.ZebedeeCollectionReader.ZEBEDEE_NULL_ERR;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
+import static com.github.onsdigital.zebedee.model.ZebedeeCollectionReader.*;
+import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class ZebedeeCollectionReaderTest extends ZebedeeTestBaseFixture {
 
     static final String COLLECTION_ID = "1234";
     static final CollectionType TEST_COLLECTION_TYPE = CollectionType.manual;
+    private static final String SESSION_ID = "session-id";
+    private static final String PUBLISHER_EMAIL = "publisher@example.com";
 
     @Rule
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
@@ -106,7 +94,8 @@ public class ZebedeeCollectionReaderTest extends ZebedeeTestBaseFixture {
         when(userSession.getEmail())
                 .thenReturn(builder.publisher1.getEmail());
 
-        Session session = zebedee.openSession(builder.publisher1Credentials);
+        Session session = new Session(SESSION_ID, PUBLISHER_EMAIL);
+
         Collection collection = new Collection(builder.collections.get(0), zebedee);
         collection.getDescription().setType(TEST_COLLECTION_TYPE);
 

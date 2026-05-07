@@ -35,9 +35,6 @@ public class DataIndexTest extends ZebedeeTestBaseFixture {
      */
     public void setUp() throws Exception {
 
-        publisher = zebedee.openSession(builder.publisher1Credentials);
-        reviewer = zebedee.openSession(builder.reviewer1Credentials);
-
         dataBuilder = new DataBuilder(zebedee, publisher, reviewer);
         generator = new DataPagesGenerator();
 

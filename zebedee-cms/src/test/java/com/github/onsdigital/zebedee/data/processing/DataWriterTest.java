@@ -12,7 +12,6 @@ import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.CollectionType;
-import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.CollectionWriter;
 import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
@@ -21,6 +20,7 @@ import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
+import com.github.onsdigital.zebedee.session.model.Session;
 import org.junit.Test;
 
 import javax.crypto.SecretKey;
@@ -34,8 +34,12 @@ import static org.junit.Assert.*;
 
 public class DataWriterTest extends ZebedeeTestBaseFixture {
 
-    Session publisher;
-    Session reviewer;
+    private static final String SESSION_ID = "session-id";
+    private static final String PUBLISHER_EMAIL = "publisher@example.com";
+    private static final String VIEWER_EMAIL = "viewer@example.com";
+
+    Session publisherSession;
+    Session reviewerSession;
 
     Collection collection;
     ContentReader publishedReader;
@@ -59,13 +63,13 @@ public class DataWriterTest extends ZebedeeTestBaseFixture {
 
         secretKey = Keys.newSecretKey();
 
-        publisher = zebedee.openSession(builder.publisher1Credentials);
-        reviewer = zebedee.openSession(builder.reviewer1Credentials);
+        publisherSession = new Session(SESSION_ID, PUBLISHER_EMAIL);
+        reviewerSession = new Session(SESSION_ID, VIEWER_EMAIL);
 
-        setUpKeyringMockForLegacyTests(zebedee, publisher, secretKey);
-        setUpPermissionsServiceMockForLegacyTests(zebedee, publisher);
+        setUpKeyringMockForLegacyTests(zebedee, publisherSession, secretKey);
+        setUpPermissionsServiceMockForLegacyTests(zebedee, publisherSession);
 
-        dataBuilder = new DataBuilder(zebedee, publisher, reviewer);
+        dataBuilder = new DataBuilder(zebedee, publisherSession, reviewerSession);
         generator = new DataPagesGenerator();
 
         CollectionDescription collectionDescription = new CollectionDescription();
@@ -73,11 +77,11 @@ public class DataWriterTest extends ZebedeeTestBaseFixture {
         collectionDescription.setEncrypted(true);
         collectionDescription.setType(CollectionType.scheduled);
         collectionDescription.setPublishDate(new Date());
-        collection = Collection.create(collectionDescription, zebedee, publisher);
+        collection = Collection.create(collectionDescription, zebedee, publisherSession);
 
         publishedReader = new FileSystemContentReader(zebedee.getPublished().getPath());
-        collectionReader = new ZebedeeCollectionReader(zebedee, collection, publisher);
-        collectionWriter = new ZebedeeCollectionWriter(zebedee, collection, publisher);
+        collectionReader = new ZebedeeCollectionReader(zebedee, collection, publisherSession);
+        collectionWriter = new ZebedeeCollectionWriter(zebedee, collection, publisherSession);
 
         // add a set of data in a collection
         unpublished = generator.generateDataPagesSet("dataprocessor", "inreview", 2015, 2, "");

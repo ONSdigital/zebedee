@@ -347,4 +347,24 @@ public class ZebedeeTest extends ZebedeeTestBaseFixture {
         verify(usersService, times(1)).getUserByEmail(TEST_EMAIL);
         verify(sessions, times(1)).create(TEST_EMAIL);
     }
+
+    private void setUpOpenSessionsTestMocks() {
+        when(zebCfg.getSessions())
+                .thenReturn(sessions);
+
+        when(zebCfg.getUsersService())
+                .thenReturn(usersService);
+
+        when(zebCfg.getCollectionKeyring())
+                .thenReturn(collectionKeyring);
+
+        when(zebCfg.getStartUpNotifier())
+                .thenReturn(startUpNotifier);
+
+        when(zebCfg.getPermissionsService())
+                .thenReturn(permissionsService);
+
+        when(zebCfg.getSlackNotifier())
+                .thenReturn(slackNotifier);
+    }
 }

@@ -10,7 +10,6 @@ import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.Tim
 import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeriesValue;
 import com.github.onsdigital.zebedee.exceptions.CollectionNotFoundException;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
-import com.github.onsdigital.zebedee.json.Credentials;
 import com.github.onsdigital.zebedee.json.serialiser.IsoDateSerializer;
 import com.github.onsdigital.zebedee.keyring.CollectionKeyring;
 import com.github.onsdigital.zebedee.model.Collection;
@@ -80,12 +79,6 @@ public class Builder {
     public User dataVis;
     public User reviewer1;
     public User reviewer2;
-    public Credentials administratorCredentials;
-    public Credentials publisher1Credentials;
-    public Credentials publisher2Credentials;
-    public Credentials dataVisCredentials;
-    public Credentials reviewer1Credentials;
-    public Credentials reviewer2Credentials;
     public Team labourMarketTeam;
     public Team inflationTeam;
 
@@ -173,16 +166,6 @@ public class Builder {
         try (OutputStream outputStream = Files.newOutputStream(users.resolve(PathUtils.toFilename(dataVis.getEmail()) + ".json"))) {
             Serialiser.serialise(outputStream, dataVis);
         }
-
-        administratorCredentials = userCredentials(administrator);
-        publisher1Credentials = userCredentials(publisher1);
-        publisher2Credentials = userCredentials(publisher2);
-        reviewer1Credentials = userCredentials(reviewer1);
-        reviewer2Credentials = userCredentials(reviewer2);
-        dataVisCredentials = userCredentials(dataVis);
-
-        Path sessions = zebedeeRootPath.resolve(Zebedee.SESSIONS);
-        Files.createDirectories(sessions);
 
         // Set up some permissions:
         Path permissions = zebedeeRootPath.resolve(Zebedee.PERMISSIONS);
@@ -285,7 +268,6 @@ public class Builder {
             jukesie.setEmail("jukesie@example.com");
             jukesie.setInactive(false);
             administratorTemplate = jukesie;
-            jukesie.resetPassword("password");
 
             User patricia = clone(jukesie);
             patricia.setName("Patricia Pumpkin");
@@ -317,13 +299,6 @@ public class Builder {
             dataVis.setInactive(false);
             dataVisTemplate = dataVis;
         }
-    }
-
-    private Credentials userCredentials(User user) {
-        Credentials credentials = new Credentials();
-        credentials.setEmail(user.getEmail());
-        credentials.setPassword("password");
-        return credentials;
     }
 
     private Set<String> set(Team team) {
@@ -439,42 +414,10 @@ public class Builder {
         Files.createFile(content);
     }
 
-    public Session createSession(String email) throws IOException {
+    public Session createSession(String email) {
 
         // Build the session object
-        Session session = new Session(Random.id(), email);
-
-        // Determine the path in which to create the session Json
-        Path sessionPath;
-        String sessionFileName = PathUtils.toFilename(session.getId());
-        sessionFileName += ".json";
-        sessionPath = zebedeeRootPath.resolve(Zebedee.SESSIONS).resolve(sessionFileName);
-
-        // Serialise
-        try (OutputStream output = Files.newOutputStream(sessionPath)) {
-            Serialiser.serialise(output, session);
-        }
-
-        return session;
-    }
-
-    public Session createSession(User user) throws IOException {
-
-        // Build the session object
-        Session session = new Session(Random.id(), user.getEmail());
-
-        // Determine the path in which to create the session Json
-        Path sessionPath;
-        String sessionFileName = PathUtils.toFilename(session.getId());
-        sessionFileName += ".json";
-        sessionPath = zebedeeRootPath.resolve(Zebedee.SESSIONS).resolve(sessionFileName);
-
-        // Serialise
-        try (OutputStream output = Files.newOutputStream(sessionPath)) {
-            Serialiser.serialise(output, session);
-        }
-
-        return session;
+        return new Session(Random.id(), email);
     }
 
     /**
@@ -492,7 +435,6 @@ public class Builder {
         Path path = Files.createDirectory(parent.resolve(Zebedee.ZEBEDEE));
         Files.createDirectory(path.resolve(Zebedee.PUBLISHED));
         Files.createDirectory(path.resolve(Zebedee.COLLECTIONS));
-        Files.createDirectory(path.resolve(Zebedee.SESSIONS));
         Files.createDirectory(path.resolve(Zebedee.PERMISSIONS));
         Files.createDirectory(path.resolve(Zebedee.TEAMS));
         Files.createDirectory(path.resolve(Zebedee.LAUNCHPAD));
@@ -535,157 +477,6 @@ public class Builder {
         }
 
         return collection;
-    }
-
-    /**
-     * Builds simple random walk timeseries to
-     *
-     * @param name
-     * @return
-     */
-    public Path randomWalkTimeSeries(String name) {
-        return randomWalkTimeSeries(name, true, true, true, 10, 2015);
-    }
-
-    public Path randomWalkTimeSeries(String name, boolean withYears, boolean withQuarters, boolean withMonths, int yearsToGenerate) {
-        return randomWalkTimeSeries(name, withYears, withQuarters, withMonths, yearsToGenerate, 2015);
-    }
-
-    public Path randomWalkTimeSeries(String name, boolean withYears, boolean withQuarters, boolean withMonths, int yearsToGenerate, int finalYear) {
-        TimeSeries timeSeries = new TimeSeries();
-        timeSeries.setDescription(new PageDescription());
-
-        timeSeries.getDescription().setCdid(name);
-        timeSeries.getDescription().setTitle(name);
-
-        String[] months = "JAN,FEB,MAR,APR,MAY,JUN,JUL,AUG,SEP,OCT,NOV,DEC".split(",");
-        String[] quarters = "Q1,Q2,Q3,Q4".split(",");
-
-        double val = 100.0;
-        NormalDistribution distribution = new NormalDistribution(0, 10);
-        for (int y = finalYear - yearsToGenerate + 1; y <= finalYear; y++) {
-            if (withYears) {
-                TimeSeriesValue value = new TimeSeriesValue();
-
-                value.date = y + "";
-                value.year = y + "";
-                value.value = String.format("%.1f", val);
-                timeSeries.years.add(value);
-            }
-            for (int q = 0; q < 4; q++) {
-                if (withQuarters) {
-                    TimeSeriesValue value = new TimeSeriesValue();
-                    value.year = y + "";
-                    value.quarter = quarters[q];
-
-                    value.date = y + " " + quarters[q];
-                    value.value = String.format("%.1f", val);
-                    timeSeries.quarters.add(value);
-                }
-                for (int mInQ = 0; mInQ < 3; mInQ++) {
-                    if (withMonths) {
-                        TimeSeriesValue value = new TimeSeriesValue();
-                        value.month = months[3 * q + mInQ];
-                        value.year = y + "";
-
-                        value.date = y + " " + months[3 * q + mInQ];
-                        value.value = String.format("%.1f", val);
-                        timeSeries.months.add(value);
-                    }
-                    val = val + distribution.sample();
-                }
-            }
-        }
-
-
-        // Save the timeseries
-        Path path = null;
-        try {
-            path = Files.createTempFile(name, ".json");
-            try (OutputStream output = Files.newOutputStream(path)) {
-                Serialiser.serialise(output, timeSeries);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return path;
-    }
-
-    public Path randomWalkQuarters(String name, int startYear, int startQuarter, int datapoints) {
-        TimeSeries timeSeries = new TimeSeries();
-        timeSeries.setDescription(new PageDescription());
-
-        timeSeries.getDescription().setCdid(name);
-        timeSeries.getDescription().setTitle(name);
-
-        String[] quarters = "Q1,Q2,Q3,Q4".split(",");
-
-        double val = 100.0;
-        NormalDistribution distribution = new NormalDistribution(0, 10);
-        for (int pt = 0; pt < datapoints; pt++) {
-            val = val + distribution.sample();
-
-            TimeSeriesValue value = new TimeSeriesValue();
-            int quarter = (startQuarter + pt) % 4;
-            int year = startYear + ((pt + startQuarter) / 4);
-
-            value.date = year + " " + quarters[quarter];
-            value.value = String.format("%.1f", val);
-
-            timeSeries.quarters.add(value);
-
-        }
-
-        // Save the timeseries
-        Path path = null;
-        try {
-            path = Files.createTempFile(name, ".json");
-            try (OutputStream output = Files.newOutputStream(path)) {
-                Serialiser.serialise(output, timeSeries);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return path;
-    }
-
-
-    public Path randomWalkMonths(String name, int startYear, int startMonth, int datapoints) {
-        TimeSeries timeSeries = new TimeSeries();
-        timeSeries.setDescription(new PageDescription());
-
-        timeSeries.getDescription().setCdid(name);
-        timeSeries.getDescription().setTitle(name);
-
-        String[] months = "JAN,FEB,MAR,APR,MAY,JUN,JUL,AUG,SEP,OCT,NOV,DEC".split(",");
-
-        double val = 100.0;
-        NormalDistribution distribution = new NormalDistribution(0, 10);
-        for (int pt = 0; pt < datapoints; pt++) {
-            val = val + distribution.sample();
-
-            TimeSeriesValue value = new TimeSeriesValue();
-            int month = (startMonth + pt) % 12;
-            int year = startYear + ((pt + startMonth) / 12);
-
-            value.date = year + " " + months[month];
-            value.value = String.format("%.1f", val);
-
-            timeSeries.months.add(value);
-
-        }
-
-        // Save the timeseries
-        Path path = null;
-        try {
-            path = Files.createTempFile(name, ".json");
-            try (OutputStream output = Files.newOutputStream(path)) {
-                Serialiser.serialise(output, timeSeries);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return path;
     }
 
     public Zebedee getZebedee() {

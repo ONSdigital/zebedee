@@ -16,18 +16,18 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.when;
 
 public class PublishSchedulerTest extends ZebedeeTestBaseFixture {
 
+    private static final String SESSION_ID = "session-id";
+    private static final String PUBLISHER_EMAIL = "publisher@example.com";
+
     private Session session;
     private PublishScheduler scheduler;
 
-
     public void setUp() throws Exception {
-        session = zebedee.openSession(builder.publisher1Credentials);
+        session = new Session(SESSION_ID, PUBLISHER_EMAIL);
         scheduler = new PublishScheduler();
 
         when(permissionsService.canEdit(session))

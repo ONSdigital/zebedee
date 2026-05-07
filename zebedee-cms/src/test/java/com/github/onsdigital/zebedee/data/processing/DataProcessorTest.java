@@ -31,9 +31,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Optional;
+import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
@@ -49,10 +47,14 @@ import static org.junit.Assert.assertNotEquals;
  *
  *
  */
-public class DataProcessorTestBaseFixture extends ZebedeeTestBaseFixture {
+public class DataProcessorTest extends ZebedeeTestBaseFixture {
 
-    Session publisher;
-    Session reviewer;
+    private static final String SESSION_ID = "1234";
+    private static final String PUBLISHER_EMAIL = "publisher@example.com";
+    private static final String VIEWER_EMAIL = "viewer@example.com";
+
+    Session publisherSession;
+    Session reviewerSession;
 
     Collection collection;
     ContentReader publishedReader;
@@ -80,13 +82,15 @@ public class DataProcessorTestBaseFixture extends ZebedeeTestBaseFixture {
         secretKey = Keys.newSecretKey();
 
         processor = new DataProcessor();
-        publisher = zebedee.openSession(builder.publisher1Credentials);
-        reviewer = zebedee.openSession(builder.reviewer1Credentials);
 
-        setUpKeyringMockForLegacyTests(zebedee, publisher, secretKey);
-        setUpPermissionsServiceMockForLegacyTests(zebedee, publisher);
+        publisherSession = new Session(SESSION_ID, PUBLISHER_EMAIL);
 
-        dataBuilder = new DataBuilder(zebedee, publisher, reviewer);
+        reviewerSession = new Session(SESSION_ID, VIEWER_EMAIL);
+
+        setUpKeyringMockForLegacyTests(zebedee, publisherSession, secretKey);
+        setUpPermissionsServiceMockForLegacyTests(zebedee, publisherSession);
+
+        dataBuilder = new DataBuilder(zebedee, publisherSession, reviewerSession);
         generator = new DataPagesGenerator();
 
         CollectionDescription collectionDescription = new CollectionDescription();
@@ -96,11 +100,11 @@ public class DataProcessorTestBaseFixture extends ZebedeeTestBaseFixture {
         collectionDescription.setType(testCollectionType);
         collectionDescription.setPublishDate(new Date());
 
-        collection = Collection.create(collectionDescription, zebedee, publisher);
+        collection = Collection.create(collectionDescription, zebedee, publisherSession);
 
         publishedReader = new FileSystemContentReader(zebedee.getPublished().getPath());
-        collectionReader = new ZebedeeCollectionReader(zebedee, collection, publisher);
-        collectionWriter = new ZebedeeCollectionWriter(zebedee, collection, publisher);
+        collectionReader = new ZebedeeCollectionReader(zebedee, collection, publisherSession);
+        collectionWriter = new ZebedeeCollectionWriter(zebedee, collection, publisherSession);
 
         // add a set of data in a collection
         inReview = generator.generateDataPagesSet("dataprocessor", "thedatasetid", 2015, 2, "");

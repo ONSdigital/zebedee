@@ -37,6 +37,9 @@ import static org.mockito.Mockito.when;
  */
 public class CollectionMoveTest extends ZebedeeTestBaseFixture {
 
+    private static final String SESSION_ID = "session-id";
+    private static final String PUBLISHER_EMAIL = "publisher@example.com";
+
     @Mock
     private CollectionKeyring keyring;
 
@@ -56,7 +59,8 @@ public class CollectionMoveTest extends ZebedeeTestBaseFixture {
     Session session;
 
     public void setUp() throws Exception {
-        session = zebedee.openSession(builder.publisher1Credentials);
+        session = new Session(SESSION_ID, PUBLISHER_EMAIL);
+
         collection = new Collection(builder.collections.get(1), zebedee);
 
         ReflectionTestUtils.setField(zebedee, "usersService", usersService);
@@ -159,12 +163,6 @@ public class CollectionMoveTest extends ZebedeeTestBaseFixture {
         writePageToContent(collection.getInProgress(), martin);
         writePageToContent(collection.getInProgress(), bedford);
         writePageToContent(collection.getInProgress(), bedfordshire);
-    }
-
-    void reloadPages() throws IOException {
-        martin = (Article) readPageFromCollection(collection, martin.getUri().toString());
-        bedford = (Article) readPageFromCollection(collection, bedford.getUri().toString());
-        bedfordshire = (Article) readPageFromCollection(collection, bedfordshire.getUri().toString());
     }
 
     Page readPageFromCollection(Collection collection, String uri) throws IOException {

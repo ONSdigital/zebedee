@@ -127,51 +127,20 @@ public abstract class ZebedeeTestBaseFixture {
         when(usersService.getUserByEmail(builder.administrator.getEmail()))
                 .thenReturn(builder.administrator);
 
-        Session session = new Session("1234", builder.publisher1.getEmail());
-
-        when(sessionsService.create(anyString())).thenReturn(session);
-
-        Map<String, String> emailToCreds = new HashMap<>();
-        emailToCreds.put(builder.publisher1.getEmail(), builder.publisher1Credentials.password);
-
         setUp();
     }
 
-    protected void setUpOpenSessionsTestMocks() {
-        when(zebCfg.getSessions())
-                .thenReturn(sessions);
-
-        when(zebCfg.getUsersService())
-                .thenReturn(usersService);
-
-        when(zebCfg.getCollectionKeyring())
-                .thenReturn(collectionKeyring);
-
-        when(zebCfg.getStartUpNotifier())
-                .thenReturn(startUpNotifier);
-
-        when(zebCfg.getPermissionsService())
-                .thenReturn(permissionsService);
-
-        when(zebCfg.getSlackNotifier())
-                .thenReturn(slackNotifier);
-    }
-
-    protected void verifyKeyAddedToCollectionKeyring() throws Exception {
-        verify(collectionKeyring, times(1)).add(any(), any(), any());
-    }
-
-    protected void setUpPermissionsServiceMockForLegacyTests(Zebedee instance, Session session) throws Exception {
-        when(permissionsService.canView(eq(session), anyString()))
+    protected void setUpPermissionsServiceMockForLegacyTests(Zebedee instance, Session publisherSession) throws Exception {
+        when(permissionsService.canView(eq(publisherSession), anyString()))
                 .thenReturn(true);
         
-        when(permissionsService.canView(eq(session), anyString(), any(CollectionType.class)))
+        when(permissionsService.canView(eq(publisherSession), anyString(), any(CollectionType.class)))
                 .thenReturn(true);
 
-        when(permissionsService.canEdit(session))
+        when(permissionsService.canEdit(publisherSession))
                 .thenReturn(true);
         
-        when(permissionsService.canEdit(eq(session), any(CollectionType.class)))
+        when(permissionsService.canEdit(eq(publisherSession), any(CollectionType.class)))
                 .thenReturn(true);
 
         ReflectionTestUtils.setField(instance, "permissionsService", permissionsService);

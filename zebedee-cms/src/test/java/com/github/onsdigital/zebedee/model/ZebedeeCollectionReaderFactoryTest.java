@@ -1,20 +1,19 @@
 package com.github.onsdigital.zebedee.model;
 
-import com.github.onsdigital.zebedee.Builder;
-import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.ZebedeeTestBaseFixture;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
-import com.github.onsdigital.zebedee.exceptions.ConflictException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.session.model.Session;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
 
 public class ZebedeeCollectionReaderFactoryTest extends ZebedeeTestBaseFixture {
+
+    private static final String SESSION_ID = "1234";
+    private static final String SESSION_EMAIL = "user@example.com";
+    private static final Session SESSION = new Session(SESSION_ID, SESSION_EMAIL);
 
     ZebedeeCollectionReaderFactory factory;
 
@@ -24,12 +23,11 @@ public class ZebedeeCollectionReaderFactoryTest extends ZebedeeTestBaseFixture {
 
     @Test(expected = NotFoundException.class)
     public void shouldThrowNotFoundForNullCollection()
-            throws IOException, UnauthorizedException, BadRequestException,
-            ConflictException, NotFoundException {
+            throws IOException, UnauthorizedException, BadRequestException, NotFoundException {
 
         // Given a null collection
         Collection collection = null;
-        Session session = zebedee.openSession(builder.administratorCredentials);
+        Session session = SESSION;
 
         // When we attempt to create a collection reader.
         factory.getCollectionReader(collection, session);
@@ -39,8 +37,7 @@ public class ZebedeeCollectionReaderFactoryTest extends ZebedeeTestBaseFixture {
 
     @Test(expected = UnauthorizedException.class)
     public void shouldThrowUnauthorizedIfNotLoggedInOnReadContent()
-            throws IOException, UnauthorizedException, BadRequestException,
-            ConflictException, NotFoundException {
+            throws IOException, UnauthorizedException, BadRequestException, NotFoundException {
 
         // Given a null session
         Session session = null;

@@ -1,33 +1,33 @@
 package com.github.onsdigital.zebedee.model.publishing.scheduled.task;
 
-import com.github.onsdigital.zebedee.Builder;
-import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.ZebedeeTestBaseFixture;
 import com.github.onsdigital.zebedee.exceptions.CollectionNotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.CollectionType;
-import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.model.Collection;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
+import com.github.onsdigital.zebedee.session.model.Session;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import static junit.framework.TestCase.assertFalse;
 import static junit.framework.TestCase.assertTrue;
 
 public class PublishCollectionsTaskTest extends ZebedeeTestBaseFixture {
 
+    private static final String SESSION_ID = "session-id";
+    private static final String ADMIN_EMAIL = "admin@example.com";
+
     Session session;
 
     @Override
     public void setUp() throws Exception {
-        session = zebedee.openSession(builder.administratorCredentials);
+        List<String> sessionGroups = new ArrayList<>();
+        session = new Session(SESSION_ID, ADMIN_EMAIL);
     }
 
     @Test

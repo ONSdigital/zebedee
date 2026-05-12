@@ -109,6 +109,20 @@ public class Configuration {
         return getIntWithDefault("MAX_RETRY_INTERVAL", DEFAULT_MAX_RETRY_INTERVAL);
     }
 
+    /**
+     * Get the JWT key ID used to sign auth tokens. Typically for test use only.
+     */
+    public static String getJWTVerifierKeyID() {
+        return StringUtils.defaultIfBlank(getValue("JWT_VERIFIER_KEY_ID"),"");
+    }
+
+    /**
+     * Get the base64 encoded DER formatted JWT public key used to sign auth tokens. Typically for test use only.
+     */
+    public static String getJWTVerifierPublicKey() {
+        return StringUtils.defaultIfBlank(getValue("JWT_VERIFIER_PUBLIC_KEY"),"");
+    }
+
     public static String getBabbageUrl() {
         return StringUtils.defaultIfBlank(getValue("BABBAGE_URL"), DEFAULT_WEBSITE_URL);
     }

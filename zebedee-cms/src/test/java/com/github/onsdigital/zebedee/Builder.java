@@ -5,13 +5,9 @@ import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.slack.Profile;
 import com.github.onsdigital.slack.client.SlackClient;
 import com.github.onsdigital.zebedee.api.Root;
-import com.github.onsdigital.zebedee.content.page.base.PageDescription;
-import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeries;
-import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeriesValue;
 import com.github.onsdigital.zebedee.exceptions.CollectionNotFoundException;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.serialiser.IsoDateSerializer;
-import com.github.onsdigital.zebedee.keyring.CollectionKeyring;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.PathUtils;
 import com.github.onsdigital.zebedee.permissions.model.AccessMapping;
@@ -19,7 +15,6 @@ import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.teams.model.Team;
 import com.github.onsdigital.zebedee.user.model.User;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.math3.distribution.NormalDistribution;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -29,12 +24,7 @@ import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 import static org.mockito.Mockito.when;
@@ -44,12 +34,6 @@ import static org.mockito.Mockito.when;
  */
 @Deprecated
 public class Builder {
-
-    public static final String COLLECTION_ONE_NAME = "inflationq22015";
-    public static final String COLLECTION_TWO_NAME = "labourmarketq22015";
-
-    @Mock
-    private CollectionKeyring collectionKeyringMock;
 
     @Mock
     private SlackClient slackClient;

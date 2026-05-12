@@ -2,16 +2,16 @@ package com.github.onsdigital.zebedee;
 
 import com.github.onsdigital.JWTVerifier;
 import com.github.onsdigital.JWTVerifierImpl;
-import com.github.onsdigital.dis.redirect.api.sdk.RedirectClient;
 import com.github.onsdigital.dis.redirect.api.sdk.RedirectAPIClient;
+import com.github.onsdigital.dis.redirect.api.sdk.RedirectClient;
 import com.github.onsdigital.dp.files.api.APIClient;
 import com.github.onsdigital.dp.image.api.client.ImageAPIClient;
 import com.github.onsdigital.dp.image.api.client.ImageClient;
+import com.github.onsdigital.dp.permissions.api.sdk.PermissionsAPIClient;
+import com.github.onsdigital.dp.permissions.api.sdk.PermissionsClient;
 import com.github.onsdigital.slack.Profile;
 import com.github.onsdigital.slack.client.SlackClient;
 import com.github.onsdigital.slack.client.SlackClientImpl;
-import com.github.onsdigital.dp.permissions.api.sdk.PermissionsClient;
-import com.github.onsdigital.dp.permissions.api.sdk.PermissionsAPIClient;
 import com.github.onsdigital.zebedee.data.processing.DataIndex;
 import com.github.onsdigital.zebedee.kafka.KafkaClient;
 import com.github.onsdigital.zebedee.kafka.KafkaClientImpl;
@@ -30,27 +30,13 @@ import com.github.onsdigital.zebedee.model.encryption.EncryptionKeyFactoryImpl;
 import com.github.onsdigital.zebedee.model.publishing.PublishedCollections;
 import com.github.onsdigital.zebedee.notification.StartUpNotifier;
 import com.github.onsdigital.zebedee.permissions.service.JWTPermissionsServiceImpl;
-import com.github.onsdigital.zebedee.permissions.service.PermissionsServiceImplementation;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsServiceImpl;
+import com.github.onsdigital.zebedee.permissions.service.PermissionsServiceImplementation;
 import com.github.onsdigital.zebedee.permissions.store.PermissionsStore;
 import com.github.onsdigital.zebedee.permissions.store.PermissionsStoreFileSystemImpl;
 import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
-import com.github.onsdigital.zebedee.service.DatasetService;
-import com.github.onsdigital.zebedee.service.ImageService;
-import com.github.onsdigital.zebedee.service.ImageServiceImpl;
-import com.github.onsdigital.zebedee.service.RedirectService;
-import com.github.onsdigital.zebedee.service.RedirectServiceImpl;
-import com.github.onsdigital.zebedee.service.NoOpRedirectService;
-import com.github.onsdigital.zebedee.service.KafkaService;
-import com.github.onsdigital.zebedee.service.KafkaServiceImpl;
-import com.github.onsdigital.zebedee.service.NoOpKafkaService;
-import com.github.onsdigital.zebedee.service.ServiceStoreImpl;
-import com.github.onsdigital.zebedee.service.StaticFilesService;
-import com.github.onsdigital.zebedee.service.StaticFilesServiceImpl;
-import com.github.onsdigital.zebedee.service.ZebedeeDatasetService;
-import com.github.onsdigital.zebedee.service.UploadService;
-import com.github.onsdigital.zebedee.service.UploadServiceImpl;
+import com.github.onsdigital.zebedee.service.*;
 import com.github.onsdigital.zebedee.session.service.JWTSessionsServiceImpl;
 import com.github.onsdigital.zebedee.session.service.Sessions;
 import com.github.onsdigital.zebedee.session.service.ThreadLocalSessionsServiceImpl;
@@ -64,12 +50,7 @@ import com.github.onsdigital.zebedee.user.service.StubbedUsersServiceImpl;
 import com.github.onsdigital.zebedee.user.service.UsersService;
 import com.github.onsdigital.zebedee.user.service.UsersServiceImpl;
 import com.github.onsdigital.zebedee.user.store.UserStoreFileSystemImpl;
-import com.github.onsdigital.zebedee.util.slack.NopNotifierImpl;
-import com.github.onsdigital.zebedee.util.slack.NopSlackClientImpl;
-import com.github.onsdigital.zebedee.util.slack.NopStartUpNotifier;
-import com.github.onsdigital.zebedee.util.slack.Notifier;
-import com.github.onsdigital.zebedee.util.slack.SlackNotifier;
-import com.github.onsdigital.zebedee.util.slack.SlackStartUpNotifier;
+import com.github.onsdigital.zebedee.util.slack.*;
 import com.github.onsdigital.zebedee.util.versioning.VersionsService;
 import com.github.onsdigital.zebedee.util.versioning.VersionsServiceImpl;
 import dp.api.dataset.DatasetAPIClient;
@@ -79,21 +60,12 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
-import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
-import static com.github.onsdigital.logging.v2.event.SimpleEvent.warn;
-import static com.github.onsdigital.zebedee.Zebedee.COLLECTIONS;
-import static com.github.onsdigital.zebedee.Zebedee.KEYRING;
-import static com.github.onsdigital.zebedee.Zebedee.PERMISSIONS;
-import static com.github.onsdigital.zebedee.Zebedee.PUBLISHED;
-import static com.github.onsdigital.zebedee.Zebedee.PUBLISHED_COLLECTIONS;
-import static com.github.onsdigital.zebedee.Zebedee.SERVICES;
-import static com.github.onsdigital.zebedee.Zebedee.SESSIONS;
-import static com.github.onsdigital.zebedee.Zebedee.TEAMS;
-import static com.github.onsdigital.zebedee.Zebedee.USERS;
-import static com.github.onsdigital.zebedee.Zebedee.ZEBEDEE;
+import static com.github.onsdigital.logging.v2.event.SimpleEvent.*;
+import static com.github.onsdigital.zebedee.Zebedee.*;
 import static com.github.onsdigital.zebedee.configuration.CMSFeatureFlags.cmsFeatureFlags;
 import static com.github.onsdigital.zebedee.configuration.Configuration.*;
 import static com.github.onsdigital.zebedee.permissions.store.PermissionsStoreFileSystemImpl.initialisePermissions;
@@ -215,14 +187,7 @@ public class ZebedeeConfiguration {
 
         // Configure the sessions
         if (cmsFeatureFlags().isJwtSessionsEnabled()) {
-            JWTVerifier jwtVerifier = null;
-            try {
-                jwtVerifier = new JWTVerifierImpl(getIdentityAPIURL(), getInitialRetryInterval(), getMaxRetryTimeout(),
-                        getMaxRetryInterval());
-            } catch (Exception e) {
-                error().logException(e, "failed to initialise JWT validator");
-                throw new RuntimeException(e);
-            }
+            JWTVerifier jwtVerifier = initJWTVerifier();
             this.sessions = new JWTSessionsServiceImpl(jwtVerifier, this.getServiceStore());
         } else {
             LegacySessionsStore legacySessionsStore = new LegacySessionsStoreImpl(sessionsPath);
@@ -290,6 +255,24 @@ public class ZebedeeConfiguration {
                 .data("teams_path", teamsPath.toString())
                 .data("services_path", servicePath.toString())
                 .log("zebedee configuration creation complete");
+    }
+
+    private JWTVerifier initJWTVerifier() {
+        JWTVerifier jwtVerifier;
+        if (!getJWTVerifierKeyID().isEmpty() && !getJWTVerifierPublicKey().isEmpty()) {
+            Map<String, String> signingKeys = new HashMap<>();
+            signingKeys.put(getJWTVerifierKeyID(),getJWTVerifierPublicKey());
+            jwtVerifier = new JWTVerifierImpl(signingKeys);
+        } else {
+            try {
+                jwtVerifier = new JWTVerifierImpl(getIdentityAPIURL(), getInitialRetryInterval(), getMaxRetryTimeout(),
+                        getMaxRetryInterval());
+            } catch (Exception e) {
+                error().logException(e, "failed to initialise JWT validator");
+                throw new RuntimeException(e);
+            }
+        }
+        return jwtVerifier;
     }
 
     private void initCollectionKeyring() throws KeyringException {

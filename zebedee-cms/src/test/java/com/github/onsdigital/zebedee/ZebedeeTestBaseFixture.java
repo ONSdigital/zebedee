@@ -1,11 +1,9 @@
 package com.github.onsdigital.zebedee;
 
-import com.github.onsdigital.zebedee.json.Credentials;
 import com.github.onsdigital.zebedee.json.CollectionType;
 import com.github.onsdigital.zebedee.keyring.CollectionKeyring;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.encryption.EncryptionKeyFactory;
-import com.github.onsdigital.zebedee.notification.StartUpNotifier;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.service.ServiceSupplier;
 import com.github.onsdigital.zebedee.session.model.Session;
@@ -14,7 +12,6 @@ import com.github.onsdigital.zebedee.session.service.Sessions;
 import com.github.onsdigital.zebedee.user.model.User;
 import com.github.onsdigital.zebedee.user.model.UserList;
 import com.github.onsdigital.zebedee.user.service.UsersService;
-import com.github.onsdigital.zebedee.util.slack.Notifier;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -31,19 +28,13 @@ import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 
 /**
  * Common set up required by tests using {@link Builder} (Hide some of the nastiness).
  */
 public abstract class ZebedeeTestBaseFixture {
-
-    static final String TEST_EMAIL = "test@ons.gov.uk";
 
     @Mock
     protected UsersService usersService;
@@ -52,19 +43,10 @@ public abstract class ZebedeeTestBaseFixture {
     private JWTSessionsServiceImpl sessionsService;
 
     @Mock
-    protected ZebedeeConfiguration zebCfg;
-
-    @Mock
-    protected Notifier slackNotifier;
-
-    @Mock
     protected Sessions sessions;
 
     @Mock
     protected CollectionKeyring collectionKeyring;
-
-    @Mock
-    protected Credentials credentials;
 
     @Mock
     protected User user;
@@ -77,9 +59,6 @@ public abstract class ZebedeeTestBaseFixture {
 
     @Mock
     protected EncryptionKeyFactory encryptionKeyFactory;
-
-    @Mock
-    protected StartUpNotifier startUpNotifier;
 
     protected Zebedee zebedee;
     protected Builder builder;

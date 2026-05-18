@@ -25,6 +25,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import static com.github.onsdigital.zebedee.logging.CMSLogEvent.info;
 import static com.github.onsdigital.zebedee.util.versioning.VersionNotFoundException.versionsNotFoundException;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
@@ -183,10 +184,13 @@ public class VersionsServiceImpl implements VersionsService {
 
         List<MissingVersion> missingVersions = new ArrayList<>();
 
-        for (Version version : dataset.getVersions()) {
+        List<Version> versions = dataset.getVersions();
 
-            if (!versionExists(cmsReader, collection, session, version)) {
-                missingVersions.add(new MissingVersion(dataset, version));
+        if (versions != null) {
+            for (Version version : versions) {
+                if (!versionExists(cmsReader, collection, session, version)) {
+                    missingVersions.add(new MissingVersion(dataset, version));
+                }
             }
         }
 

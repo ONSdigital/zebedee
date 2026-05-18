@@ -237,6 +237,18 @@ public class VersionsServiceImplTest {
         service.verifyCollectionDatasets(cmsReader, collection, collectionReader, session);
     }
 
+    @Test
+    public void getMissingVersions_nullDatasetVersions_shouldReturnEmptyList() throws Exception {
+        Dataset datasetWithoutVersions = new Dataset();
+        datasetWithoutVersions.setUri(new URI(CONTENT_URI));
+        datasetWithoutVersions.setVersions(null);
+
+        List<MissingVersion> result = service.getMissingVersions(
+                cmsReader, collection, session, datasetWithoutVersions);
+
+        assertTrue(result.isEmpty());
+    }
+
     @Test(expected = VersionNotFoundException.class)
     public void verifyCollectionDatasets_containsDatasetMissingVersion_shouldThrowException() throws Exception {
         when(collectionReader.getReviewed())

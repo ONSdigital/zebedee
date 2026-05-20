@@ -11,7 +11,6 @@ import com.github.onsdigital.zebedee.json.serialiser.IsoDateSerializer;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.PathUtils;
 import com.github.onsdigital.zebedee.permissions.model.AccessMapping;
-import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.teams.model.Team;
 import com.github.onsdigital.zebedee.user.model.User;
 import org.apache.commons.io.FileUtils;
@@ -55,8 +54,6 @@ public class Builder {
     public Path parent;
     public Path zebedeeRootPath;
     public List<Path> collections;
-    public List<String> teams;
-    public List<String> contentUris;
     public User administrator;
     public User publisher1;
     public User publisher2;
@@ -94,12 +91,8 @@ public class Builder {
             collections.add(collection);
         }
 
-        // Create the teams
-        teams = new ArrayList<>();
-
         // Create some published content:
         Path folder = zebedeeRootPath.resolve(Zebedee.PUBLISHED);
-        contentUris = new ArrayList<>();
         String contentUri;
         Path contentPath;
 
@@ -108,14 +101,12 @@ public class Builder {
         contentPath = folder.resolve(contentUri.substring(1));
         Files.createDirectories(contentPath.getParent());
         Files.createFile(contentPath);
-        contentUris.add(contentUri);
 
         // Something for Labour market:
         contentUri = "/employmentandlabourmarket/peopleinwork/earningsandworkinghours/bulletins/uklabourmarketjuly2014.html";
         contentPath = folder.resolve(contentUri.substring(1));
         Files.createDirectories(contentPath.getParent());
         Files.createFile(contentPath);
-        contentUris.add(contentUri);
 
         // A couple of users:
         Path users = zebedeeRootPath.resolve(Zebedee.USERS);
@@ -215,7 +206,7 @@ public class Builder {
         }
     }
 
-    public static User clone(User user) {
+    private static User clone(User user) {
         User clone = new User();
 
         clone.setName(user.getName());
@@ -227,7 +218,7 @@ public class Builder {
         return clone;
     }
 
-    static void clone(User clone, User user, String fieldName) {
+    private static void clone(User clone, User user, String fieldName) {
         try {
             Field field = User.class.getDeclaredField(fieldName);
             field.setAccessible(true);
@@ -319,96 +310,7 @@ public class Builder {
     }
 
     /**
-     * Creates a published file.
-     *
-     * @param uri The URI to be created.
-     * @throws IOException If a filesystem error occurs.
-     */
-    public Path createPublishedFile(String uri) throws IOException {
-
-        Path published = zebedeeRootPath.resolve(Zebedee.PUBLISHED);
-        Path content = published.resolve(uri.substring(1));
-        Files.createDirectories(content.getParent());
-        Files.createFile(content);
-        return content;
-    }
-
-    /**
-     * Creates an reviewed file.
-     *
-     * @param uri The URI to be created.
-     * @throws IOException If a filesystem error occurs.
-     */
-    public Path createReviewedFile(String uri) throws IOException {
-
-        return createFile(Collection.REVIEWED, uri);
-    }
-
-    /**
-     * Creates a complete file.
-     *
-     * @param uri The URI to be created.
-     * @throws IOException If a filesystem error occurs.
-     */
-    public Path createCompleteFile(String uri) throws IOException {
-
-        return createFile(Collection.COMPLETE, uri);
-    }
-
-    /**
-     * Creates a complete file.
-     *
-     * @param uri The URI to be created.
-     * @throws IOException If a filesystem error occurs.
-     */
-    public Path createInProgressFile(String uri) throws IOException {
-
-        return createFile(Collection.IN_PROGRESS, uri);
-    }
-
-    /**
-     * Creates a file in the given directory.
-     *
-     * @param directory The directory to be created.
-     * @param uri       The URI to be created.
-     * @throws IOException If a filesystem error occurs.
-     */
-    private Path createFile(String directory, String uri) throws IOException {
-
-        Path inProgress = collections.get(1).resolve(directory);
-        Path content = inProgress.resolve(uri.substring(1));
-        Files.createDirectories(content.getParent());
-        Files.createFile(content);
-        return content;
-    }
-
-    /**
-     * Creates an reviewed file in a different {@link com.github.onsdigital.zebedee.model.Collection}.
-     *
-     * @param uri        The URI to be created.
-     * @param collection The {@link com.github.onsdigital.zebedee.model.Collection} in which to create the content.
-     * @throws IOException If a filesystem error occurs.
-     */
-    public void isBeingEditedElsewhere(String uri, int collection) throws IOException {
-
-        Path reviewed = collections.get(collection)
-                .resolve(com.github.onsdigital.zebedee.model.Collection.REVIEWED);
-        Path content = reviewed.resolve(uri.substring(1));
-        Files.createDirectories(content.getParent());
-        Files.createFile(content);
-    }
-
-    public Session createSession(String email) {
-
-        // Build the session object
-        return new Session(Random.id(), email);
-    }
-
-    /**
      * This method creates the expected set of folders for a Zebedee structure.
-     * This code is intentionaly copied from {@link Zebedee#create(Path)}. This
-     * ensures there's a fixed expectation, rather than relying on a method that
-     * will be tested as part of the test suite.
      *
      * @param parent The parent folder, in which the {@link Zebedee} structure will
      *               be built.

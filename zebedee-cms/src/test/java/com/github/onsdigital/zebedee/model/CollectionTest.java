@@ -774,7 +774,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         // Given
         // The content already exists:
         String uri = "/economy/inflationandpriceindices/timeseries/abmi.html";
-        builder.createPublishedFile(uri);
+        createPublishedFile(uri);
 
         // When
         boolean created = collection.create(publisher1Session, uri);
@@ -791,7 +791,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         // Given
         // The content already exists:
         String uri = "/economy/inflationandpriceindices/timeseries/abmi.html";
-        builder.createReviewedFile(uri);
+        createReviewedFile(uri);
 
         // When
         boolean created = collection.create(publisher1Session, uri);
@@ -808,7 +808,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         // Given
         // The content already exists:
         String uri = "/economy/inflationandpriceindices/timeseries/abmi.html";
-        builder.createReviewedFile(uri);
+        createReviewedFile(uri);
 
         // When
         boolean created = collection.create(publisher1Session, uri);
@@ -825,7 +825,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         // Given
         // The content already exists:
         String uri = "/economy/inflationandpriceindices/timeseries/abmi.html";
-        builder.createInProgressFile(uri);
+        createInProgressFile(uri);
 
         // When
         boolean created = collection.create(publisher1Session, uri);
@@ -841,8 +841,8 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         String jsonFile = Random.id() + ".json";
         String csvFile = Random.id() + ".csv";
 
-        builder.createInProgressFile("/" + jsonFile);
-        builder.createInProgressFile("/" + csvFile);
+        createInProgressFile("/" + jsonFile);
+        createInProgressFile("/" + csvFile);
 
         Path inProgress = builder.collections.get(1).resolve(Collection.IN_PROGRESS);
 
@@ -864,8 +864,8 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         String jsonFile = Random.id() + ".json";
         String csvFile = Random.id() + ".csv";
 
-        builder.createCompleteFile("/" + jsonFile);
-        builder.createCompleteFile("/" + csvFile);
+        createCompleteFile("/" + jsonFile);
+        createCompleteFile("/" + csvFile);
 
         Path root = builder.collections.get(1).resolve(Collection.COMPLETE);
 
@@ -886,8 +886,8 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         String jsonFile = Random.id() + ".json";
         String csvFile = Random.id() + ".csv";
 
-        builder.createReviewedFile("/" + jsonFile);
-        builder.createReviewedFile("/" + csvFile);
+        createReviewedFile("/" + jsonFile);
+        createReviewedFile("/" + csvFile);
 
         Path root = builder.collections.get(1).resolve(Collection.REVIEWED);
 
@@ -908,8 +908,8 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         String jsonFile = Random.id() + ".json";
         String csvFile = Random.id() + ".csv";
 
-        builder.createReviewedFile("/" + jsonFile);
-        builder.createReviewedFile("/" + csvFile);
+        createReviewedFile("/" + jsonFile);
+        createReviewedFile("/" + csvFile);
 
         Path root = builder.collections.get(1).resolve(Collection.REVIEWED);
 
@@ -929,8 +929,8 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         String jsonFile = Random.id() + ".json";
         String csvFile = Random.id() + ".csv";
 
-        builder.createCompleteFile("/" + jsonFile);
-        builder.createCompleteFile("/" + csvFile);
+        createCompleteFile("/" + jsonFile);
+        createCompleteFile("/" + csvFile);
 
         Path root = builder.collections.get(1).resolve(Collection.COMPLETE);
 
@@ -950,8 +950,8 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         String jsonFile = Random.id() + ".json";
         String csvFile = Random.id() + ".csv";
 
-        builder.createInProgressFile("/" + jsonFile);
-        builder.createInProgressFile("/" + csvFile);
+        createInProgressFile("/" + jsonFile);
+        createInProgressFile("/" + csvFile);
 
         Path root = builder.collections.get(1).resolve(Collection.IN_PROGRESS);
 
@@ -970,7 +970,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         // Given
         // The content exists publicly:
         String uri = "/economy/inflationandpriceindices/timeseries/a9er.html";
-        builder.createPublishedFile(uri);
+        createPublishedFile(uri);
 
         // When
         boolean edited = collection.edit(publisher1Session, uri, collectionWriter, recursive);
@@ -994,8 +994,8 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         // Given
         // The content exists, has been edited and completed:
         String uri = "/economy/inflationandpriceindices/timeseries/a9er.html";
-        builder.createPublishedFile(uri);
-        builder.createCompleteFile(uri);
+        createPublishedFile(uri);
+        createCompleteFile(uri);
 
         // When
         boolean edited = collection.edit(publisher1Session, uri, collectionWriter, recursive);
@@ -1020,8 +1020,8 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         // Given
         // The content exists, has been edited and reviewed:
         String uri = "/economy/inflationandpriceindices/timeseries/a9er.html";
-        builder.createPublishedFile(uri);
-        builder.createReviewedFile(uri);
+        createPublishedFile(uri);
+        createReviewedFile(uri);
 
         // When
         boolean edited = collection.edit(publisher1Session, uri, collectionWriter, recursive);
@@ -1046,7 +1046,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         // Given
         // The content already exists:
         String uri = "/economy/inflationandpriceindices/timeseries/a9er.html";
-        builder.createInProgressFile(uri);
+        createInProgressFile(uri);
 
         // When
         boolean edited = collection.edit(publisher1Session, uri, collectionWriter, recursive);
@@ -1061,7 +1061,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         // Given
         // The content already exists in another release:
         String uri = "/economy/inflationandpriceindices/timeseries/a9er.html";
-        builder.isBeingEditedElsewhere(uri, 0);
+        isBeingEditedElsewhere(uri, 0);
 
         // When
         boolean edited = collection.edit(publisher1Session, uri, collectionWriter, recursive);
@@ -1191,7 +1191,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
 
     private String CreatePublishedContent() throws IOException {
         String uri = "/economy/inflationandpriceindices/timeseries/a9er.html";
-        builder.createPublishedFile(uri);
+        createPublishedFile(uri);
         return uri;
     }
 
@@ -1212,7 +1212,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
 
         // Given some content that has been edited by a publisher:
         String uri = "/economy/inflationandpriceindices/timeseries/a9er.html";
-        builder.createPublishedFile(uri);
+        createPublishedFile(uri);
         collection.edit(publisher1Session, uri, collectionWriter, recursive);
 
         // When - A reviewer edits reviews content
@@ -1228,8 +1228,8 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         // Given
         // The content exists, has been edited and complete:
         String uri = "/economy/inflationandpriceindices/timeseries/a9er.html";
-        builder.createPublishedFile(uri);
-        builder.createInProgressFile(uri);
+        createPublishedFile(uri);
+        createInProgressFile(uri);
 
         // When
         boolean complete = collection.complete(publisher1Session, uri, recursive);
@@ -1249,7 +1249,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         // Given
         // The content exists, has been edited and complete:
         String uri = "/economy/inflationandpriceindices/timeseries/fileWithNoExtension";
-        builder.createInProgressFile(uri);
+        createInProgressFile(uri);
 
         // When
         boolean complete = collection.complete(publisher1Session, uri, recursive);
@@ -1271,7 +1271,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         // Given
         // The content already exists:
         String uri = "/economy/inflationandpriceindices/timeseries/a9er.html";
-        builder.createReviewedFile(uri);
+        createReviewedFile(uri);
 
         // When
         boolean isComplete = collection.complete(publisher1Session, uri, recursive);
@@ -1286,7 +1286,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         // Given
         // The content already exists:
         String uri = "/economy/inflationandpriceindices/timeseries/a9er.html";
-        builder.createCompleteFile(uri);
+        createCompleteFile(uri);
 
         // When
         boolean isComplete = collection.complete(publisher1Session, uri, recursive);
@@ -1301,7 +1301,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         // Given
         // The content already exists:
         String uri = "/economy/inflationandpriceindices/timeseries/a9er.html";
-        builder.createCompleteFile(uri);
+        createCompleteFile(uri);
 
         // When
         boolean isComplete = collection.complete(publisher1Session, uri, recursive);
@@ -1316,7 +1316,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         // Given
         // The content already exists:
         String uri = CreateCompleteContent();
-        builder.createReviewedFile(uri);
+        createReviewedFile(uri);
 
         // When
         // An alternative publisher reviews the content
@@ -1335,7 +1335,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         collection.edit(publisher1Session, uri, collectionWriter, recursive);
 
         // When content is trying to be reviewed before being completed
-        boolean reviewed = collection.review(builder.createSession(publisher1Email), uri, recursive);
+        boolean reviewed = collection.review(new Session(Random.id(), publisher1Email), uri, recursive);
 
         // Then the expected exception is thrown.
     }
@@ -1346,7 +1346,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         // Given
         // The content is currently being edited:
         String uri = "/economy/inflationandpriceindices/timeseries/d7g7.html";
-        builder.createInProgressFile(uri);
+        createInProgressFile(uri);
 
         // When
         boolean inProgress = collection.isInProgress(uri);
@@ -1363,7 +1363,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         // Given
         // The content has been completed:
         String uri = "/economy/inflationandpriceindices/timeseries/d7g7.html";
-        builder.createCompleteFile(uri);
+        createCompleteFile(uri);
 
         // When
         boolean complete = collection.isComplete(uri);
@@ -1380,7 +1380,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         // Given
         // The content has been reviewed:
         String uri = "/economy/inflationandpriceindices/timeseries/d7g7.html";
-        builder.createReviewedFile(uri);
+        createReviewedFile(uri);
 
         // When
         boolean reviewed = collection.isReviewed(uri);
@@ -1397,8 +1397,8 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         // Given
         // The content has been reviewed:
         String uri = "/economy/inflationandpriceindices/timeseries/d7g7.html";
-        builder.createCompleteFile(uri);
-        builder.createInProgressFile(uri);
+        createCompleteFile(uri);
+        createInProgressFile(uri);
 
         // When
         boolean isComplete = collection.isComplete(uri);
@@ -1415,8 +1415,8 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         // Given
         // The content has been complete:
         String uri = "/economy/inflationandpriceindices/timeseries/d7g7.html";
-        builder.createReviewedFile(uri);
-        builder.createCompleteFile(uri);
+        createReviewedFile(uri);
+        createCompleteFile(uri);
 
         // When
         boolean reviewed = collection.isReviewed(uri);
@@ -1433,8 +1433,8 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         // Given
         // The content has been reviewed:
         String uri = "/economy/inflationandpriceindices/timeseries/d7g7.html";
-        builder.createReviewedFile(uri);
-        builder.createInProgressFile(uri);
+        createReviewedFile(uri);
+        createInProgressFile(uri);
 
         // When
         boolean reviewed = collection.isReviewed(uri);
@@ -1451,9 +1451,9 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         // Given
         // We're editing some content:
         String uri = "/economy/inflationandpriceindices/timeseries/beer.html";
-        builder.createPublishedFile(uri);
-        builder.createReviewedFile(uri);
-        builder.createInProgressFile(uri);
+        createPublishedFile(uri);
+        createReviewedFile(uri);
+        createInProgressFile(uri);
 
         // When
         // We write some output to the content:
@@ -1477,8 +1477,8 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         // There are these files in progress:
         String uri = "/economy/inflationandpriceindices/timeseries/d7g7.html";
         String uri2 = "/economy/someotherthing/timeseries/e4c4.html";
-        builder.createInProgressFile(uri);
-        builder.createInProgressFile(uri2);
+        createInProgressFile(uri);
+        createInProgressFile(uri2);
 
         // When
         // We attempt to get the in progress files.
@@ -1500,8 +1500,8 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         // There are these files complete:
         String uri = "/economy/inflationandpriceindices/timeseries/d7g7.html";
         String uri2 = "/economy/someotherthing/timeseries/e4c4.html";
-        builder.createCompleteFile(uri);
-        builder.createCompleteFile(uri2);
+        createCompleteFile(uri);
+        createCompleteFile(uri2);
 
         // When
         // We attempt to get the complete files.
@@ -1523,8 +1523,8 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         // There are these files reviewed:
         String uri = "/economy/inflationandpriceindices/timeseries/d7g7.html";
         String uri2 = "/economy/someotherthing/timeseries/e4c4.html";
-        builder.createReviewedFile(uri);
-        builder.createReviewedFile(uri2);
+        createReviewedFile(uri);
+        createReviewedFile(uri2);
 
         // When
         // We attempt to get the reviewed files.
@@ -1545,7 +1545,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         // Given
         // There is a file in progress
         String uri = "/economy/inflationandpriceindices/timeseries/d7g7.html";
-        builder.createInProgressFile(uri);
+        createInProgressFile(uri);
 
         // When
         // We attempt to find the file.
@@ -1561,7 +1561,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         // Given
         // There is a file in progress
         String uri = "/economy/inflationandpriceindices/timeseries/d7g7.html";
-        builder.createCompleteFile(uri);
+        createCompleteFile(uri);
 
         // When
         // We attempt to find the file.
@@ -1577,7 +1577,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         // Given
         // There is a file in progress
         String uri = "/economy/inflationandpriceindices/timeseries/d7g7.html";
-        builder.createReviewedFile(uri);
+        createReviewedFile(uri);
 
         // When
         // We attempt to find the file.
@@ -1861,7 +1861,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
 
         // Given a URI that has been published and already versioned in a collection.
         String uri = String.format("/economy/inflationandpriceindices/timeseries/%s", Random.id());
-        builder.createPublishedFile(uri + "/data.json");
+        createPublishedFile(uri + "/data.json");
         collection.version(publisher1Email, uri, collectionWriter);
 
         // When we attempt to create a version for the page for a second time
@@ -1875,7 +1875,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
 
         // Given an existing uri that has been publised.
         String uri = String.format("/economy/inflationandpriceindices/timeseries/%s", Random.id());
-        builder.createPublishedFile(uri + "/data.json");
+        createPublishedFile(uri + "/data.json");
 
         // When the version function is called for the URI
         ContentItemVersion version = collection.version(publisher1Email, uri, collectionWriter);
@@ -1925,7 +1925,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
 
         // Given an existing version URI
         String uri = String.format("/economy/inflationandpriceindices/timeseries/%s", Random.id());
-        builder.createPublishedFile(uri + "/data.json");
+        createPublishedFile(uri + "/data.json");
         ContentItemVersion version = collection.version(publisher1Email, uri, collectionWriter);
 
         assertTrue(Files.exists(collection.getReviewed().get(version.getUri())));
@@ -1958,7 +1958,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         // Given the content already exists:
         String uri = "/economy/inflationandpriceindices/timeseries/a9er.html";
         String toUri = "/economy/inflationandpriceindices/timeseries/a9errenamed.html";
-        builder.createInProgressFile(uri);
+        createInProgressFile(uri);
 
         setUpKeyringMocks();
 
@@ -1981,7 +1981,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         // Given the content already exists:
         String uri = "/economy/inflationandpriceindices/timeseries/a9er.html";
         String toUri = "/economy/inflationandpriceindices/timeseries/a9errenamed.html";
-        builder.createCompleteFile(uri);
+        createCompleteFile(uri);
 
         setUpKeyringMocks();
 
@@ -2004,8 +2004,8 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         // Given some existing content in progress.
         String uri = "/economy/inflationandpriceindices/timeseries/a9er.html";
         String toUri = "/economy/inflationandpriceindices/timeseries/a9errenamed.html";
-        builder.createInProgressFile(uri);
-        builder.createInProgressFile(toUri);
+        createInProgressFile(uri);
+        createInProgressFile(toUri);
 
         setUpKeyringMocks();
 
@@ -2232,5 +2232,83 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
 
     private void verifyKeyAddedToCollectionKeyring() throws Exception {
         verify(collectionKeyring, times(1)).add(any(), any(), any());
+    }
+
+    /**
+     * Creates a published file.
+     *
+     * @param uri The URI to be created.
+     * @throws IOException If a filesystem error occurs.
+     */
+    private void createPublishedFile(String uri) throws IOException {
+        Path published = builder.zebedeeRootPath.resolve(Zebedee.PUBLISHED);
+        Path content = published.resolve(uri.substring(1));
+        Files.createDirectories(content.getParent());
+        Files.createFile(content);
+    }
+
+    /**
+     * Creates a reviewed file.
+     *
+     * @param uri The URI to be created.
+     * @throws IOException If a filesystem error occurs.
+     */
+    public Path createReviewedFile(String uri) throws IOException {
+
+        return createFile(Collection.REVIEWED, uri);
+    }
+
+    /**
+     * Creates a complete file.
+     *
+     * @param uri The URI to be created.
+     * @throws IOException If a filesystem error occurs.
+     */
+    public Path createCompleteFile(String uri) throws IOException {
+
+        return createFile(Collection.COMPLETE, uri);
+    }
+
+    /**
+     * Creates an in progress file.
+     *
+     * @param uri The URI to be created.
+     * @throws IOException If a filesystem error occurs.
+     */
+    public Path createInProgressFile(String uri) throws IOException {
+
+        return createFile(Collection.IN_PROGRESS, uri);
+    }
+
+    /**
+     * Creates a file in the given directory.
+     *
+     * @param directory The directory to be created.
+     * @param uri       The URI to be created.
+     * @throws IOException If a filesystem error occurs.
+     */
+    private Path createFile(String directory, String uri) throws IOException {
+
+        Path inProgress = builder.collections.get(1).resolve(directory);
+        Path content = inProgress.resolve(uri.substring(1));
+        Files.createDirectories(content.getParent());
+        Files.createFile(content);
+        return content;
+    }
+
+    /**
+     * Creates an reviewed file in a different {@link com.github.onsdigital.zebedee.model.Collection}.
+     *
+     * @param uri        The URI to be created.
+     * @param collection The {@link com.github.onsdigital.zebedee.model.Collection} in which to create the content.
+     * @throws IOException If a filesystem error occurs.
+     */
+    private void isBeingEditedElsewhere(String uri, int collection) throws IOException {
+
+        Path reviewed = builder.collections.get(collection)
+                .resolve(com.github.onsdigital.zebedee.model.Collection.REVIEWED);
+        Path content = reviewed.resolve(uri.substring(1));
+        Files.createDirectories(content.getParent());
+        Files.createFile(content);
     }
 }

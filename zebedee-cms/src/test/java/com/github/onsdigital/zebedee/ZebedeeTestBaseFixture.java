@@ -43,13 +43,7 @@ public abstract class ZebedeeTestBaseFixture {
     private JWTSessionsServiceImpl sessionsService;
 
     @Mock
-    protected Sessions sessions;
-
-    @Mock
     protected CollectionKeyring collectionKeyring;
-
-    @Mock
-    protected User user;
 
     @Mock
     protected PermissionsService permissionsService;

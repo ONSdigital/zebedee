@@ -1,15 +1,12 @@
 package com.github.onsdigital.zebedee.json.publishing.request;
 
-import com.github.onsdigital.zebedee.Builder;
-import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.ZebedeeTestBaseFixture;
-import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.json.CollectionType;
-import org.junit.After;
-import org.junit.Before;
+import com.github.onsdigital.zebedee.model.Collection;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 import static junit.framework.TestCase.assertTrue;
@@ -69,7 +66,7 @@ public class ManifestTest extends ZebedeeTestBaseFixture {
         collection.getDescription().setType(CollectionType.manual);
 
         // And a versioned URI in the reviewed content
-        builder.createReviewedFile("/some/content/previous/v1/data.json");
+        createReviewedFile("/some/content/previous/v1/data.json");
 
         // When the manifest is created
         Manifest manifest = Manifest.get(collection);
@@ -84,12 +81,25 @@ public class ManifestTest extends ZebedeeTestBaseFixture {
         collection.getDescription().setType(CollectionType.automated);
 
         // And a versioned URI in the reviewed content
-        builder.createReviewedFile("/some/content/previous/v1/data.json");
+        createReviewedFile("/some/content/previous/v1/data.json");
 
         // When the manifest is created
         Manifest manifest = Manifest.get(collection);
 
         // Then no file copies are added
         assertEquals(0, manifest.filesToCopy.size());
+    }
+
+    /**
+     * Creates a reviewed file.
+     *
+     * @param uri The URI to be created.
+     * @throws IOException If a filesystem error occurs.
+     */
+    public void createReviewedFile(String uri) throws IOException {
+        Path inProgress = builder.collections.get(1).resolve(Collection.REVIEWED);
+        Path content = inProgress.resolve(uri.substring(1));
+        Files.createDirectories(content.getParent());
+        Files.createFile(content);
     }
 }

@@ -1,224 +1,201 @@
 package com.github.onsdigital.zebedee.data.processing;
 
-import com.github.davidcarboni.cryptolite.Keys;
-import com.github.onsdigital.zebedee.ZebedeeTestBaseFixture;
-import com.github.onsdigital.zebedee.data.framework.DataBuilder;
+import com.github.onsdigital.zebedee.content.page.statistics.dataset.DownloadSection;
+import com.github.onsdigital.zebedee.content.page.statistics.dataset.TimeSeriesDataset;
 import com.github.onsdigital.zebedee.data.framework.DataPagesGenerator;
 import com.github.onsdigital.zebedee.data.framework.DataPagesSet;
 import com.github.onsdigital.zebedee.data.importing.TimeseriesUpdateCommand;
+import com.github.onsdigital.zebedee.data.json.TimeSerieses;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
-import com.github.onsdigital.zebedee.json.CollectionDescription;
-import com.github.onsdigital.zebedee.json.CollectionType;
-import com.github.onsdigital.zebedee.model.*;
-import com.github.onsdigital.zebedee.reader.CollectionReader;
+import com.github.onsdigital.zebedee.model.ContentWriter;
 import com.github.onsdigital.zebedee.reader.ContentReader;
-import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
-import com.github.onsdigital.zebedee.session.model.Session;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
+import org.mockito.*;
 
-import javax.crypto.SecretKey;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.*;
 
 /**
- * Created by thomasridd on 1/24/16.
- *
  * Tests for the data publication object
  */
-public class DataPublicationTest extends ZebedeeTestBaseFixture {
+public class DataPublicationTest {
 
-    private static final String SESSION_ID = "session-id";
-    private static final String PUBLISHER_EMAIL = "publisher@example.com";
-    private static final String VIEWER_EMAIL = "viewer@example.com";
+    @Mock
+    private ContentReader publishedContentReader;
 
-    final List<TimeseriesUpdateCommand> updateCommands = new ArrayList<>();
-    Session publisherSession;
-    Session reviewerSession;
-    Collection collection;
-    ContentReader publishedReader;
-    CollectionReader collectionReader;
-    CollectionWriter collectionWriter;
-    DataBuilder dataBuilder;
-    DataPagesGenerator generator;
-    DataPagesSet published;
-    DataPagesSet unpublished;
-    DataPagesSet republish;
-    SecretKey secretKey;
+    @Mock
+    private ContentReader reviewedContentReader;
+
+    @Mock
+    private ContentWriter reviewedContentWriter;
+
+    @Mock
+    private DataIndex dataIndex;
+
+    @Mock
+    private DataLink dataLink;
+
+    private final List<TimeseriesUpdateCommand> updateCommands = new ArrayList<>();
+    private DataPagesSet csdbPageSet;
+    private DataPagesSet csvPageSet;
+    private List<DownloadSection> downloadSections;
+
+    private MockedConstruction<DataProcessor> dataProcessorMock;
+    private MockedConstruction<DataWriter> dataWriterMock;
+    private MockedConstruction<DataFileGenerator> dataFileGeneratorMock;
 
     /**
      * Setup generates an instance of zebedee, a collection, and various DataPagesSet objects (that are test framework generators)
      *
      * @throws Exception
      */
+    @Before
     public void setUp() throws Exception {
-        secretKey = Keys.newSecretKey();
+        MockitoAnnotations.openMocks(this);
 
-        publisherSession = new Session(SESSION_ID, PUBLISHER_EMAIL);
-        reviewerSession = new Session(SESSION_ID, VIEWER_EMAIL);
+        // Generate example sets of dataset pages
+        DataPagesGenerator generator = new DataPagesGenerator();
+        csdbPageSet = generator.generateDataPagesSet("datasetIds", "temp", 2015, 2, "abcd.csdb");
+        csvPageSet = generator.generateDataPagesSet("datasetIds", "temp", 2015, 2, "upload-abcd.csv");
 
-        setUpKeyringMockForLegacyTests(zebedee, publisherSession, secretKey);
-        setUpPermissionsServiceMockForLegacyTests(zebedee, publisherSession);
+        // Generate an example set of download sections
+        DownloadSection downloadSection1 = new DownloadSection();
+        downloadSection1.setTitle("Download 1");
+        DownloadSection downloadSection2 = new DownloadSection();
+        downloadSection2.setTitle("Download 2");
+        downloadSections = new ArrayList<>();
+        downloadSections.add(downloadSection1);
+        downloadSections.add(downloadSection2);
 
-        dataBuilder = new DataBuilder(zebedee, publisherSession, reviewerSession);
-        generator = new DataPagesGenerator();
+        // Mock classes that are instantiated by the process function rather than refactoring the app code to use dependency
+        // injection as there is no scope for the manual regression testing required should these changes be made
+        dataProcessorMock = Mockito.mockConstruction(DataProcessor.class, (mock, context) -> {});
+        dataWriterMock = Mockito.mockConstruction(DataWriter.class, (mock, context) -> {});
+        dataFileGeneratorMock = Mockito.mockConstruction(DataFileGenerator.class, (mock, context) -> {
+            when(mock.generateDataDownloads(any(DataPublicationDetails.class), any(TimeSerieses.class))).thenReturn(downloadSections);
+        });
 
-        CollectionDescription collectionDescription = new CollectionDescription();
-        collectionDescription.setName("DataPublicationDetails");
-        collectionDescription.setEncrypted(true);
-        collectionDescription.setType(CollectionType.scheduled);
-        collectionDescription.setPublishDate(new Date());
-        collection = Collection.create(collectionDescription, zebedee, publisherSession);
+        when(dataLink.callCSDBProcessor(anyString(),any(ContentReader.class))).thenReturn(csdbPageSet.getTimeSerieses());
+        when(dataLink.callCSVProcessor(anyString(),any(ContentReader.class))).thenReturn(csdbPageSet.getTimeSerieses());
+    }
 
-        publishedReader = new FileSystemContentReader(zebedee.getPublished().getPath());
-        collectionReader = new ZebedeeCollectionReader(zebedee, collection, publisherSession);
-        collectionWriter = new ZebedeeCollectionWriter(zebedee, collection, publisherSession);
-
-        // add a set of data in a collection
-        unpublished = generator.generateDataPagesSet("dataprocessor", "inreview", 2015, 2, "inreview.csdb");
-        dataBuilder.addReviewedDataPagesSet(unpublished, collection, collectionWriter);
-
-        // add a set of data to published
-        published = generator.generateDataPagesSet("dataprocessor", "published", 2015, 2, "");
-        dataBuilder.publishDataPagesSet(published);
-
-        // generate a set of data that will replace the data in published
-        republish = generator.generateDataPagesSet("dataprocessor", "published", 2016, 2, "");
-
+    @After
+    public void tearDown() {
+        dataProcessorMock.close();
+        dataWriterMock.close();
+        dataFileGeneratorMock.close();
     }
 
     @Test
-    public void publication_givenPublicationInReview_doesInitialise() throws ZebedeeException, IOException {
+    public void process_givenPublicationInReview_isSuccessful() throws ZebedeeException, IOException, URISyntaxException {
         // Given
         // our data in review
-        DataPublicationDetails details = unpublished.getDetails(publishedReader, collectionReader.getReviewed());
+        DataPublicationDetails publicationDetails = new DataPublicationDetails(csdbPageSet.timeSeriesDataset, csdbPageSet.datasetLandingPage, csdbPageSet.fileUri);
+
+        DataPublication publication = new DataPublication(publicationDetails);
+        publication.setDataLink(dataLink);
 
         // When
         // we initialise publication
-        DataPublication publication = new DataPublication(publishedReader, collectionReader.getReviewed(), details.datasetUri);
+        publication.process(publishedContentReader, reviewedContentReader, reviewedContentWriter, dataIndex, updateCommands);
 
         // Then
-        // we expect it to be not null
-        assertNotNull(publication);
+        // the processing runs successfully
+        ArgumentCaptor<TimeSeriesDataset> timeSeriesDatasetArgumentCaptor = ArgumentCaptor.forClass(TimeSeriesDataset.class);
+        verify(reviewedContentWriter, times(1)).writeObject(timeSeriesDatasetArgumentCaptor.capture(), anyString());
+        List<DownloadSection> actualDownloadSections = timeSeriesDatasetArgumentCaptor.getValue().getDownloads();
+        for (int i=0; i < downloadSections.size(); i++) {
+            assertEquals(downloadSections.get(i).getTitle(), actualDownloadSections.get(i).getTitle());
+        }
     }
 
     @Test
-    public void publication_givenPublicationInReview_doesProcess() throws ZebedeeException, IOException, URISyntaxException {
-        // Given
-        // our data in review
-        DataPublicationDetails details = unpublished.getDetails(publishedReader, collectionReader.getReviewed());
-        DataPublication publication = new DataPublication(publishedReader, collectionReader.getReviewed(), details.datasetUri);
-        publication.setDataLink(new DataLinkMock(unpublished.getTimeSerieses()));
-
-        // When
-        // we initialise publication
-        publication.process(publishedReader, collectionReader.getReviewed(), collectionWriter.getReviewed(), zebedee.getDataIndex(), updateCommands);
-
-        // Then
-        // we expect it to be not null
-        assertNotNull(publication);
-
-        // generate the files uncoded for checking
-        Path idiotCheck = generateIdiotCheck(collectionReader.getReviewed());
-    }
-
-    @Test
-    public void publication_givenLandingPageWithoutDatasetId_generatesFromCSDBFileName() throws IOException, ParseException, URISyntaxException, ZebedeeException {
+    public void process_givenLandingPageWithoutDatasetId_generatesFromCSDBFileName() throws IOException, ParseException, URISyntaxException, ZebedeeException {
         // Given
         // we generate a publish with a fresh csdb upload
-        DataPagesSet pagesSet = generator.generateDataPagesSet("datasetIds", "temp", 2015, 2, "abcd.csdb");
+        DataPagesSet pagesSet = csdbPageSet;
         pagesSet.datasetLandingPage.getDescription().setDatasetId("");
-        dataBuilder.addReviewedDataPagesSet(pagesSet, collection, collectionWriter);
 
-        DataPublicationDetails details = pagesSet.getDetails(publishedReader, collectionReader.getReviewed());
-        DataPublication publication = new DataPublication(publishedReader, collectionReader.getReviewed(), details.datasetUri);
-        publication.setDataLink(new DataLinkMock(pagesSet.getTimeSerieses()));
+        DataPublicationDetails publicationDetails = new DataPublicationDetails(pagesSet.timeSeriesDataset, pagesSet.datasetLandingPage, pagesSet.fileUri);
+        DataPublication publication = new DataPublication(publicationDetails);
+        publication.setDataLink(dataLink);
 
         // When
         // we process the publish
-        publication.process(publishedReader, collectionReader.getReviewed(), collectionWriter.getReviewed(), zebedee.getDataIndex(), updateCommands);
+        publication.process(publishedContentReader, reviewedContentReader, reviewedContentWriter, dataIndex, updateCommands);
 
         // Then
         // we expect datasetId to be extracted using the [datasetId].csdb pattern
-        DataPublicationDetails reloaded = pagesSet.getDetails(publishedReader, collectionReader.getReviewed());
-        assertEquals("abcd", reloaded.landingPage.getDescription().getDatasetId());
+        assertEquals("abcd", publication.getDetails().landingPage.getDescription().getDatasetId());
     }
 
     @Test
-    public void publication_givenLandingPageWithoutDatasetId_generatesFromCSVFileName() throws IOException, ParseException, URISyntaxException, ZebedeeException {
+    public void process_givenLandingPageWithoutDatasetId_generatesFromCSVFileName() throws IOException, ParseException, URISyntaxException, ZebedeeException {
         // Given
         // we generate a publish with a fresh csv upload
-        DataPagesSet pagesSet = generator.generateDataPagesSet("datasetIds", "temp", 2015, 2, "upload-abcd.csv");
+        DataPagesSet pagesSet = csvPageSet;
         pagesSet.datasetLandingPage.getDescription().setDatasetId("");
-        dataBuilder.addReviewedDataPagesSet(pagesSet, collection, collectionWriter);
 
-        DataPublicationDetails details = pagesSet.getDetails(publishedReader, collectionReader.getReviewed());
-        DataPublication publication = new DataPublication(publishedReader, collectionReader.getReviewed(), details.datasetUri);
-        publication.setDataLink(new DataLinkMock(pagesSet.getTimeSerieses()));
+        DataPublicationDetails publicationDetails = new DataPublicationDetails(pagesSet.timeSeriesDataset, pagesSet.datasetLandingPage, pagesSet.fileUri);
+        DataPublication publication = new DataPublication(publicationDetails);
+        publication.setDataLink(dataLink);
 
         // When
         // we process the publish
-        publication.process(publishedReader, collectionReader.getReviewed(), collectionWriter.getReviewed(), zebedee.getDataIndex(), updateCommands);
+        publication.process(publishedContentReader, reviewedContentReader, reviewedContentWriter, dataIndex, updateCommands);
 
         // Then
-        // we expect datasetId to be extracted using the upload.[datasetId].csv pattern
-        DataPublicationDetails reloaded = pagesSet.getDetails(publishedReader, collectionReader.getReviewed());
-        assertEquals("abcd", reloaded.landingPage.getDescription().getDatasetId());
+        // we expect datasetId to be extracted using the upload-[datasetId].csv pattern
+        assertEquals("abcd", publication.getDetails().landingPage.getDescription().getDatasetId());
     }
 
     @Test
-    public void publication_givenCSDBFile_callsCSDBDataLink() throws IOException, ParseException, URISyntaxException, ZebedeeException {
+    public void process_givenCSDBFile_callsCSDBDataLink() throws IOException, ParseException, URISyntaxException, ZebedeeException {
         // Given
         // we generate a publish with a csdb upload
-        DataPagesSet pagesSet = generator.generateDataPagesSet("uploads", "temp", 2015, 2, "abcd.csdb");
-        dataBuilder.addReviewedDataPagesSet(pagesSet, collection, collectionWriter);
+        DataPagesSet pagesSet = csdbPageSet;
+        pagesSet.datasetLandingPage.getDescription().setDatasetId("");
 
-        DataPublicationDetails details = pagesSet.getDetails(publishedReader, collectionReader.getReviewed());
-        DataPublication publication = new DataPublication(publishedReader, collectionReader.getReviewed(), details.datasetUri);
-        publication.setDataLink(new DataLinkMock(pagesSet.getTimeSerieses()));
+        DataPublicationDetails publicationDetails = new DataPublicationDetails(pagesSet.timeSeriesDataset, pagesSet.datasetLandingPage, pagesSet.fileUri);
+        DataPublication publication = new DataPublication(publicationDetails);
+        publication.setDataLink(dataLink);
 
         // When
         // we process the publish
-        publication.process(publishedReader, collectionReader.getReviewed(), collectionWriter.getReviewed(), zebedee.getDataIndex(), updateCommands);
+        publication.process(publishedContentReader, reviewedContentReader, reviewedContentWriter, dataIndex, updateCommands);
 
         // Then
         // we expect the csdb datalink to be called
-        DataLinkMock mock = (DataLinkMock) publication.dataLink;
-        assertEquals("csdb", mock.lastCall);
+        verify(dataLink, times(1)).callCSDBProcessor(anyString(),any(ContentReader.class));
     }
 
     @Test
-    public void publication_givenCSVFile_callsCSVDataLink() throws IOException, ParseException, URISyntaxException, ZebedeeException {
+    public void process_givenCSVFile_callsCSVDataLink() throws IOException, ParseException, URISyntaxException, ZebedeeException {
         // Given
         // we generate a publish with a csv upload
-        DataPagesSet pagesSet = generator.generateDataPagesSet("datasetIds", "temp", 2015, 2, "upload-abcd.csv");
-        dataBuilder.addReviewedDataPagesSet(pagesSet, collection, collectionWriter);
+        DataPagesSet pagesSet = csvPageSet;
+        pagesSet.datasetLandingPage.getDescription().setDatasetId("");
 
-        DataPublicationDetails details = pagesSet.getDetails(publishedReader, collectionReader.getReviewed());
-        DataPublication publication = new DataPublication(publishedReader, collectionReader.getReviewed(), details.datasetUri);
-        publication.setDataLink(new DataLinkMock(pagesSet.getTimeSerieses()));
+        DataPublicationDetails publicationDetails = new DataPublicationDetails(pagesSet.timeSeriesDataset, pagesSet.datasetLandingPage, pagesSet.fileUri);
+        DataPublication publication = new DataPublication(publicationDetails);
+        publication.setDataLink(dataLink);
 
         // When
         // we process the publish
-        publication.process(publishedReader, collectionReader.getReviewed(), collectionWriter.getReviewed(), zebedee.getDataIndex(), updateCommands);
+        publication.process(publishedContentReader, reviewedContentReader, reviewedContentWriter, dataIndex, updateCommands);
 
         // Then
         // we expect the csv datalink to be called
-        DataLinkMock mock = (DataLinkMock) publication.dataLink;
-        assertEquals("csv", mock.lastCall);
-    }
-
-    private Path generateIdiotCheck(ContentReader contentReader) throws IOException, ZebedeeException {
-        Path temp = Files.createTempDirectory("temp");
-        ContentIOUtils.copy(contentReader, new ContentWriter(temp));
-        return temp;
+        verify(dataLink, times(1)).callCSVProcessor(anyString(),any(ContentReader.class));
     }
 }

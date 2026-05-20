@@ -1,185 +1,129 @@
 package com.github.onsdigital.zebedee.data.processing;
 
-import com.github.davidcarboni.cryptolite.Keys;
-import com.github.onsdigital.zebedee.ZebedeeTestBaseFixture;
 import com.github.onsdigital.zebedee.content.page.base.PageType;
-import com.github.onsdigital.zebedee.data.framework.DataBuilder;
 import com.github.onsdigital.zebedee.data.framework.DataPagesGenerator;
 import com.github.onsdigital.zebedee.data.framework.DataPagesSet;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
-import com.github.onsdigital.zebedee.json.CollectionDescription;
-import com.github.onsdigital.zebedee.json.CollectionType;
-import com.github.onsdigital.zebedee.model.Collection;
-import com.github.onsdigital.zebedee.model.CollectionWriter;
-import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
-import com.github.onsdigital.zebedee.model.ZebedeeCollectionWriter;
-import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
-import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
-import com.github.onsdigital.zebedee.session.model.Session;
+import org.apache.commons.io.FileUtils;
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
-import javax.crypto.SecretKey;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.ParseException;
-import java.util.Date;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
-/**
- * Created by thomasridd on 1/18/16.
- */
-public class DataPublicationDetailsTest extends ZebedeeTestBaseFixture {
+public class DataPublicationDetailsTest {
 
-    private static final String SESSION_ID = "1234";
-    private static final String PUBLISHER_EMAIL = "publisher@example.com";
-    private static final String VIEWER_EMAIL = "viewer@example.com";
+    @Mock
+    private ContentReader publishedContentReader;
 
-    Session publisherSession;
-    Session reviewerSession;
+    @Mock
+    private ContentReader reviewedContentReader;
 
-    Collection collection;
-    ContentReader publishedReader;
-    CollectionReader collectionReader;
-    CollectionWriter collectionWriter;
-    DataBuilder dataBuilder;
-    DataPagesGenerator generator;
-    SecretKey secretKey;
+    private DataPagesSet pagesSet;
+    private Path reviewedPath;
+    private String datasetURI;
+    private String landingPageURI;
 
-
+    /**
+     * Setup common test data and mocks.
+     *
+     * @throws Exception
+     */
+    @Before
     public void setUp() throws Exception {
-        secretKey = Keys.newSecretKey();
+        MockitoAnnotations.openMocks(this);
 
-        publisherSession = new Session(SESSION_ID, PUBLISHER_EMAIL);
-        reviewerSession = new Session(SESSION_ID, VIEWER_EMAIL);
+        // Create a fake reviewed path
+        reviewedPath = Paths.get("/some/path");
+        when(reviewedContentReader.getRootFolder()).thenReturn(reviewedPath);
 
-        setUpKeyringMockForLegacyTests(zebedee, publisherSession, secretKey);
-        setUpPermissionsServiceMockForLegacyTests(zebedee, publisherSession);
+        // Generate an example set of dataset page details
+        DataPagesGenerator generator = new DataPagesGenerator();
+        pagesSet = generator.generateDataPagesSet("mynode", "mydata", 2015, 2, "mydata.csdb");
+        datasetURI = pagesSet.timeSeriesDataset.getUri().toString();
+        landingPageURI = pagesSet.datasetLandingPage.getUri().toString();
 
-        dataBuilder = new DataBuilder(zebedee, publisherSession, reviewerSession);
-        generator = new DataPagesGenerator();
-
-        CollectionDescription collectionDescription = new CollectionDescription();
-        collectionDescription.setName("DataPublicationDetails");
-        collectionDescription.setType(CollectionType.scheduled);
-        collectionDescription.setPublishDate(new Date());
-        collection = Collection.create(collectionDescription, zebedee, publisherSession);
-
-        publishedReader = new FileSystemContentReader(zebedee.getPublished().getPath());
-        collectionReader = new ZebedeeCollectionReader(zebedee, collection, publisherSession);
-        collectionWriter = new ZebedeeCollectionWriter(zebedee, collection, publisherSession);
+        /*
+         Mock ContentReader.getDirectoryStream for the findFileUri method to avoid refactoring the app code.
+         The getDirectoryStream method should not exist as it is exposing the underlying filestore to other classes
+         when this should be abstracted. Unfortunately the testing required for this wider refactor is not possible
+         at this time so this mocking approach is used to work around this failed abstraction for testing purposes.
+         */
+        List<Path> fileList = new ArrayList<>();
+        fileList.add(reviewedPath.resolve(reviewedPath + pagesSet.fileUri));
+        DirectoryStream<Path> ds = mock(DirectoryStream.class);
+        when(ds.iterator()).thenReturn(fileList.iterator());
+        when(reviewedContentReader.getDirectoryStream(anyString())).thenReturn(ds);
     }
 
     @After
     public void tearDown() throws IOException {
-        builder.delete();
+        FileUtils.deleteDirectory(reviewedPath.toFile());
     }
 
     @Test
-    public void initialiser_givenReviewedDataPageSet_identifiesLandingPage() throws IOException, ParseException, URISyntaxException, ZebedeeException {
+    public void initialiser_givenReviewedDataPageSet_shouldSucceed() throws IOException, ParseException, URISyntaxException, ZebedeeException {
         // Given
-        // a reviewed dataPageSet
-        DataPagesSet example = generator.generateDataPagesSet("mynode", "mydata", 2015, 2, "mydata.csdb");
-        dataBuilder.addReviewedDataPagesSet(example, collection, collectionWriter);
+        // a reviewed dataset page and landing page
+        when(reviewedContentReader.getContent(eq(datasetURI))).thenReturn(pagesSet.timeSeriesDataset);
+        when(reviewedContentReader.getContent(eq(landingPageURI))).thenReturn(pagesSet.datasetLandingPage);
 
         // When
         // we initialise details
-        DataPublicationDetails details = new DataPublicationDetails(publishedReader,
-                collectionReader.getReviewed(),
-                example.timeSeriesDataset.getUri().toString());
-
+        DataPublicationDetails actual = new DataPublicationDetails(publishedContentReader, reviewedContentReader, datasetURI);
 
         // Then
-        // details landing page should be identified
-        assertEquals(PageType.DATASET_LANDING_PAGE, details.landingPage.getType());
-        assertEquals(example.datasetLandingPage.getUri().toString(), details.landingPageUri);
-    }
+        // landing page should be correctly identified
+        assertEquals(PageType.DATASET_LANDING_PAGE, actual.landingPage.getType());
+        assertEquals(pagesSet.datasetLandingPage.getUri().toString(), actual.landingPageUri);
 
-    @Test
-    public void initialiser_givenReviewedDataPageSet_identifiesTimeseries() throws IOException, ParseException, URISyntaxException, ZebedeeException {
-        // Given
-        // a reviewed dataPageSet
-        DataPagesSet example = generator.generateDataPagesSet("mynode", "mydata", 2015, 2, "mydata.csdb");
-        dataBuilder.addReviewedDataPagesSet(example, collection, collectionWriter);
+        // And
+        // dataset page should be correctly identified
+        assertEquals(PageType.TIMESERIES_DATASET, actual.datasetPage.getType());
+        assertEquals(pagesSet.timeSeriesDataset.getUri().toString(), actual.datasetUri);
 
-        // When
-        // we initialise details
-        DataPublicationDetails details = new DataPublicationDetails(publishedReader,
-                collectionReader.getReviewed(),
-                example.timeSeriesDataset.getUri().toString());
-
-
-        // Then
-        // details landing page should be identified
-        assertEquals(PageType.TIMESERIES_DATASET, details.datasetPage.getType());
-        assertEquals(example.timeSeriesDataset.getUri().toString(), details.datasetUri);
-    }
-
-    @Test
-    public void initialiser_givenReviewedDataPageSet_identifiesParentUri() throws IOException, ParseException, URISyntaxException, ZebedeeException {
-        // Given
-        // a reviewed dataPageSet
-        DataPagesSet example = generator.generateDataPagesSet("mynode", "mydata", 2015, 2, "mydata.csdb");
-        dataBuilder.addReviewedDataPagesSet(example, collection, collectionWriter);
-
-        // When
-        // we initialise details
-        DataPublicationDetails details = new DataPublicationDetails(publishedReader,
-                collectionReader.getReviewed(),
-                example.timeSeriesDataset.getUri().toString());
-
-
-        // Then
-        // details landing page should be identified
-        assertEquals("/mynode/timeseries", details.getTimeseriesFolder());
-    }
-
-    @Test
-    public void initialiser_ifLandingPageNotPresent_pullsItFromPublished() throws IOException, ParseException, URISyntaxException, ZebedeeException {
-        // Given
-        // a reviewed dataPageSet
-        DataPagesSet published = generator.generateDataPagesSet("mynode", "mydata", 2015, 2, "mydata.csdb");
-        dataBuilder.publishDataPagesSet(published);
-
-        DataPagesSet reviewed = generator.generateDataPagesSet("mynode", "mydata", 2016, 2, "mydata.csdb");
-        reviewed.datasetLandingPage = null;
-        dataBuilder.addReviewedDataPagesSet(reviewed, collection, collectionWriter);
-
-        // When
-        // we initialise details
-        DataPublicationDetails details = new DataPublicationDetails(publishedReader,
-                collectionReader.getReviewed(),
-                reviewed.timeSeriesDataset.getUri().toString());
-
-
-        // Then
-        // details landing page should be identified
-        assertEquals(PageType.TIMESERIES_DATASET, details.datasetPage.getType());
-        assertEquals(reviewed.timeSeriesDataset.getUri().toString(), details.datasetUri);
-
-    }
-
-    @Test
-    public void initialiser_ifCSDBFilePresent_setsFileUri() throws IOException, ZebedeeException, ParseException, URISyntaxException {
-        // Given
-        // a set of data pages in review
-        String filename = "mydata.csdb";
-        DataPagesSet reviewed = generator.generateDataPagesSet("mynode", "mydata", 2016, 2, filename);
-        dataBuilder.addReviewedDataPagesSet(reviewed, collection, collectionWriter);
-
-        // When
-        // we initialise details
-        DataPublicationDetails details = new DataPublicationDetails(publishedReader,
-                collectionReader.getReviewed(),
-                reviewed.timeSeriesDataset.getUri().toString());
-
-        // Then
+        // And
         // we expect the uri for the csdb file to be set
-        assertNotNull(details.fileUri);
-        assertEquals(reviewed.timeSeriesDataset.getUri().toString() + "/" + filename, details.fileUri);
+        assertNotNull(actual.fileUri);
+        assertEquals(pagesSet.fileUri, actual.fileUri);
+
+        // And
+        // timeseries parent directory should be correctly identified
+        assertEquals("/mynode/timeseries", actual.getTimeseriesFolder());
+    }
+
+    @Test
+    public void initialiser_ifReviewedLandingPageNotPresent_pullsItFromPublished() throws IOException, ParseException, URISyntaxException, ZebedeeException {
+        // Given
+        // a reviewed dataset page but no reviewed landing page (only published)
+        when(reviewedContentReader.getContent(eq(datasetURI))).thenReturn(pagesSet.timeSeriesDataset);
+        when(publishedContentReader.getContent(eq(landingPageURI))).thenReturn(pagesSet.datasetLandingPage);
+
+        // When
+        // we initialise details
+        DataPublicationDetails details = new DataPublicationDetails(publishedContentReader, reviewedContentReader, datasetURI);
+
+        // Then
+        // published landing page should be identified
+        assertEquals(PageType.TIMESERIES_DATASET, details.datasetPage.getType());
+        assertEquals(pagesSet.timeSeriesDataset.getUri().toString(), details.datasetUri);
     }
 }
 

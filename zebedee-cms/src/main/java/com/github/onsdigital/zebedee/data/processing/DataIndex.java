@@ -54,7 +54,7 @@ public class DataIndex {
     /**
      * Build the data index
      */
-    public void reindex() {
+    private void reindex() {
         indexBuilt = false;
         Runnable build = () -> {
             info().log("Start building data index.");

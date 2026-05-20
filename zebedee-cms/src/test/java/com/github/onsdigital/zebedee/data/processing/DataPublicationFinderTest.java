@@ -1,84 +1,62 @@
 package com.github.onsdigital.zebedee.data.processing;
 
-import com.github.davidcarboni.cryptolite.Keys;
-import com.github.onsdigital.zebedee.ZebedeeTestBaseFixture;
-import com.github.onsdigital.zebedee.data.framework.DataBuilder;
 import com.github.onsdigital.zebedee.data.framework.DataPagesGenerator;
 import com.github.onsdigital.zebedee.data.framework.DataPagesSet;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
-import com.github.onsdigital.zebedee.json.CollectionDescription;
-import com.github.onsdigital.zebedee.json.CollectionType;
-import com.github.onsdigital.zebedee.model.Collection;
-import com.github.onsdigital.zebedee.model.CollectionWriter;
-import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
-import com.github.onsdigital.zebedee.model.ZebedeeCollectionWriter;
-import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
-import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
-import com.github.onsdigital.zebedee.session.model.Session;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.MockedConstruction;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 
-import javax.crypto.SecretKey;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.text.ParseException;
-import java.util.Date;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
 
-/**
- * Created by thomasridd on 1/19/16.
- */
-public class DataPublicationFinderTest extends ZebedeeTestBaseFixture {
+public class DataPublicationFinderTest {
 
-    private static final String SESSION_ID = "1234";
-    private static final String PUBLISHER_EMAIL = "publisher@example.com";
-    private static final String VIEWER_EMAIL = "viewer@example.com";
+    @Mock
+    private ContentReader reviewedContentReader;
 
-    Session publisherSession;
-    Session reviewerSession;
+    @Mock
+    private DataIndex dataIndex;
 
-    Collection collection;
-    ContentReader publishedReader;
-    CollectionReader collectionReader;
-    CollectionWriter collectionWriter;
-    DataBuilder dataBuilder;
-    DataPagesGenerator generator;
-    SecretKey secretKey;
+    private MockedConstruction<DataPublication> dataPublicationMock;
+    private DataPagesGenerator generator;
+    private ContentReader publishedReader;
 
+    @Before
     public void setUp() throws Exception {
-        secretKey = Keys.newSecretKey();
+        MockitoAnnotations.openMocks(this);
 
-        publisherSession = new Session(SESSION_ID, PUBLISHER_EMAIL);
-        reviewerSession = new Session(SESSION_ID, VIEWER_EMAIL);
-
-        setUpKeyringMockForLegacyTests(zebedee, publisherSession, secretKey);
-        setUpPermissionsServiceMockForLegacyTests(zebedee, publisherSession);
-
-        dataBuilder = new DataBuilder(zebedee, publisherSession, reviewerSession);
         generator = new DataPagesGenerator();
+    }
 
-        CollectionDescription collectionDescription = new CollectionDescription();
-        collectionDescription.setName("DataPublicationFinder");
-        collectionDescription.setType(CollectionType.scheduled);
-        collectionDescription.setPublishDate(new Date());
-        collection = Collection.create(collectionDescription, zebedee, publisherSession);
-
-        publishedReader = new FileSystemContentReader(zebedee.getPublished().getPath());
-        collectionReader = new ZebedeeCollectionReader(zebedee, collection, publisherSession);
-        collectionWriter = new ZebedeeCollectionWriter(zebedee, collection, publisherSession);
+    @After
+    public void tearDown() throws Exception {
+        if (dataPublicationMock != null) {
+            dataPublicationMock.close();
+        }
     }
 
     @Test
     public void findPublications_givenCollectionWithNoData_returnsEmptyList() throws IOException, ZebedeeException {
         // Given
-        // One of the default collections built by Builder
-        Collection collection = zebedee.getCollections().list().get(0);
+        // An empty collection
+        when(reviewedContentReader.listUris()).thenReturn(new ArrayList<>());
 
         // When
         // we search for publications
-        List<DataPublication> publications = new DataPublicationFinder().findPublications(publishedReader, collectionReader.getReviewed());
+        List<DataPublication> publications = new DataPublicationFinder().findPublications(publishedReader, reviewedContentReader);
 
         // Then
         // no data turns up
@@ -88,38 +66,87 @@ public class DataPublicationFinderTest extends ZebedeeTestBaseFixture {
     @Test
     public void findPublications_givenCollectionWithData_returnsPublication() throws IOException, ZebedeeException, ParseException, URISyntaxException {
         // Given
-        // One of the default collections built by Builder that we add data to
+        // One of the time series dataset built by Builder in a collection
         DataPagesSet dataPagesSet = generator.generateDataPagesSet("node", "test", 2015, 2, "data.csdb");
-        dataBuilder.addReviewedDataPagesSet(dataPagesSet, collection, collectionWriter);
+        DataPublicationDetails expected = new DataPublicationDetails(dataPagesSet.timeSeriesDataset, dataPagesSet.datasetLandingPage, dataPagesSet.fileUri);
+        when(reviewedContentReader.getContent(dataPagesSet.timeSeriesDataset.getUri().toString()))
+                .thenReturn(dataPagesSet.timeSeriesDataset);
+
+        ArrayList<String> uris = new ArrayList<>();
+        uris.add(dataPagesSet.datasetLandingPage.getUri().toString() + "/data.json");
+        uris.add(dataPagesSet.timeSeriesDataset.getUri().toString() + "/data.json");
+        uris.add(dataPagesSet.fileUri);
+        when(reviewedContentReader.listUris()).thenReturn(uris);
+
+        dataPublicationMock = Mockito.mockConstruction(DataPublication.class, (mock, context) -> {
+            String fileUri = (String) context.arguments().get(2);
+            DataPublicationDetails details = null;
+            if (fileUri.equals(dataPagesSet.timeSeriesDataset.getUri().toString())) {
+                details = expected;
+            }
+            when(mock.getDetails()).thenReturn(details);
+        });
 
         // When
         // we search for publications
-        List<DataPublication> publications = new DataPublicationFinder().findPublications(publishedReader, collectionReader.getReviewed());
+        List<DataPublication> publications = new DataPublicationFinder().findPublications(publishedReader, reviewedContentReader);
 
         // Then
-        // the publication is identified
+        // the correct dataset publication is identified
         assertEquals(1, publications.size());
-        assertEquals(dataPagesSet.timeSeriesDataset.getUri().toString(), publications.get(0).getDetails().datasetUri);
-
+        assertEquals(expected, publications.get(0).getDetails());
     }
 
     @Test
     public void findPublications_givenCollectionWithTwoDataPublications_returnsBoth() throws IOException, ZebedeeException, ParseException, URISyntaxException {
         // Given
-        // One of the default collections built by Builder that we add data to
-        DataPagesSet dataPagesSet = generator.generateDataPagesSet("node", "test", 2015, 2, "data.csdb");
-        dataBuilder.addReviewedDataPagesSet(dataPagesSet, collection, collectionWriter);
+        // Two of the time series dataset built by Builder in the same collection
+        DataPagesSet dataPagesSet1 = generator.generateDataPagesSet("node", "test", 2015, 2, "data.csdb");
+        DataPublicationDetails expected1 = new DataPublicationDetails(dataPagesSet1.timeSeriesDataset, dataPagesSet1.datasetLandingPage, dataPagesSet1.fileUri);
+        when(reviewedContentReader.getContent(dataPagesSet1.datasetLandingPage.getUri().toString()))
+                .thenReturn(dataPagesSet1.datasetLandingPage);
+        when(reviewedContentReader.getContent(dataPagesSet1.timeSeriesDataset.getUri().toString()))
+                .thenReturn(dataPagesSet1.timeSeriesDataset);
+        when(dataIndex.getUriForCdid(eq(dataPagesSet1.getTimeSerieses().get(0).getCdid())))
+                .thenReturn(dataPagesSet1.getTimeSerieses().get(0).getUri().resolve(".").toString());
 
         DataPagesSet dataPagesSet2 = generator.generateDataPagesSet("node2", "test", 2015, 2, "data.csdb");
-        dataBuilder.addReviewedDataPagesSet(dataPagesSet2, collection, collectionWriter);
+        DataPublicationDetails expected2 = new DataPublicationDetails(dataPagesSet2.timeSeriesDataset, dataPagesSet2.datasetLandingPage, dataPagesSet2.fileUri);
+        when(reviewedContentReader.getContent(dataPagesSet2.datasetLandingPage.getUri().toString()))
+                .thenReturn(dataPagesSet2.datasetLandingPage);
+        when(reviewedContentReader.getContent(dataPagesSet2.timeSeriesDataset.getUri().toString()))
+                .thenReturn(dataPagesSet2.timeSeriesDataset);
+        when(dataIndex.getUriForCdid(eq(dataPagesSet2.getTimeSerieses().get(0).getCdid())))
+                .thenReturn(dataPagesSet2.getTimeSerieses().get(0).getUri().resolve(".").toString());
+
+        ArrayList<String> uris = new ArrayList<>();
+        uris.add(dataPagesSet1.datasetLandingPage.getUri().toString() + "/data.json");
+        uris.add(dataPagesSet1.timeSeriesDataset.getUri().toString() + "/data.json");
+        uris.add(dataPagesSet1.fileUri);
+        uris.add(dataPagesSet2.datasetLandingPage.getUri().toString() + "/data.json");
+        uris.add(dataPagesSet2.timeSeriesDataset.getUri().toString() + "/data.json");
+        uris.add(dataPagesSet2.fileUri);
+        when(reviewedContentReader.listUris()).thenReturn(uris);
+
+        dataPublicationMock = Mockito.mockConstruction(DataPublication.class, (mock, context) -> {
+            String fileUri = (String) context.arguments().get(2);
+            DataPublicationDetails details = null;
+            if (fileUri.equals(dataPagesSet1.timeSeriesDataset.getUri().toString())) {
+                details = expected1;
+            } else if (fileUri.equals(dataPagesSet2.timeSeriesDataset.getUri().toString())) {
+                details = expected2;
+            }
+            when(mock.getDetails()).thenReturn(details);
+        });
 
         // When
         // we search for publications
-        List<DataPublication> publications = new DataPublicationFinder().findPublications(publishedReader, collectionReader.getReviewed());
+        List<DataPublication> publications = new DataPublicationFinder().findPublications(publishedReader, reviewedContentReader);
 
         // Then
-        // the publication is identified
+        // the correct dataset publications are identified
         assertEquals(2, publications.size());
-
+        assertEquals(expected1, publications.get(0).getDetails());
+        assertEquals(expected2, publications.get(1).getDetails());
     }
 }

@@ -1,40 +1,35 @@
 package com.github.onsdigital.zebedee.data.processing;
 
-import com.github.davidcarboni.cryptolite.Keys;
 import com.github.davidcarboni.cryptolite.Random;
-import com.github.onsdigital.zebedee.ZebedeeTestBaseFixture;
 import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.content.page.base.PageDescription;
 import com.github.onsdigital.zebedee.content.page.base.PageType;
 import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeries;
-import com.github.onsdigital.zebedee.data.framework.DataBuilder;
+import com.github.onsdigital.zebedee.content.partial.Link;
 import com.github.onsdigital.zebedee.data.framework.DataPagesGenerator;
 import com.github.onsdigital.zebedee.data.framework.DataPagesSet;
 import com.github.onsdigital.zebedee.data.importing.TimeseriesUpdateCommand;
+import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
-import com.github.onsdigital.zebedee.json.CollectionDescription;
-import com.github.onsdigital.zebedee.json.CollectionType;
-import com.github.onsdigital.zebedee.session.model.Session;
-import com.github.onsdigital.zebedee.model.Collection;
-import com.github.onsdigital.zebedee.model.CollectionWriter;
-import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
-import com.github.onsdigital.zebedee.model.ZebedeeCollectionWriter;
-import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
-import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
-import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
-import javax.crypto.SecretKey;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
 
 /**
  * DataProcessor is the workhorse of the Data Publisher
@@ -47,129 +42,87 @@ import static org.junit.Assert.assertNotEquals;
  *
  *
  */
-public class DataProcessorTest extends ZebedeeTestBaseFixture {
+public class DataProcessorTest {
 
-    private static final String SESSION_ID = "1234";
-    private static final String PUBLISHER_EMAIL = "publisher@example.com";
-    private static final String VIEWER_EMAIL = "viewer@example.com";
+    @Mock
+    private DataIndex dataIndex;
 
-    Session publisherSession;
-    Session reviewerSession;
+    @Mock
+    private ContentReader publishedReader;
 
-    Collection collection;
-    ContentReader publishedReader;
-    CollectionReader collectionReader;
-    CollectionWriter collectionWriter;
-    DataBuilder dataBuilder;
-    DataPagesGenerator generator;
-
-    DataPagesSet published;
-    DataPagesSet inReview;
-
-    Date date;
-    SecretKey secretKey;
-
-    private DataProcessor processor;
+    private DataPagesGenerator generator;
+    private DataPublicationDetails exampleDataPublication;
+    private TimeSeries exampleTimeSeries;
 
     /**
-     * Setup generates an instance of zebedee plus a collection
-     *
-     * It
+     * Setup common test data and mocks.
      *
      * @throws Exception
      */
+    @Before
     public void setUp() throws Exception {
-        secretKey = Keys.newSecretKey();
+        MockitoAnnotations.openMocks(this);
 
-        processor = new DataProcessor();
-
-        publisherSession = new Session(SESSION_ID, PUBLISHER_EMAIL);
-
-        reviewerSession = new Session(SESSION_ID, VIEWER_EMAIL);
-
-        setUpKeyringMockForLegacyTests(zebedee, publisherSession, secretKey);
-        setUpPermissionsServiceMockForLegacyTests(zebedee, publisherSession);
-
-        dataBuilder = new DataBuilder(zebedee, publisherSession, reviewerSession);
         generator = new DataPagesGenerator();
 
-        CollectionDescription collectionDescription = new CollectionDescription();
-        collectionDescription.setName("DataPublicationDetails");
-        collectionDescription.setEncrypted(true);
-        CollectionType testCollectionType = CollectionType.scheduled;
-        collectionDescription.setType(testCollectionType);
-        collectionDescription.setPublishDate(new Date());
+        // Generate an example set of time series dataset pages with some custom metadata
+        DataPagesSet dataPagesSet = generator.generateDataPagesSet("dataprocessor", "thedatasetid", 2015, 2, "file.csdb");
+        exampleDataPublication = new DataPublicationDetails(dataPagesSet.timeSeriesDataset, dataPagesSet.datasetLandingPage, dataPagesSet.fileUri);
+        setRandomContact(exampleDataPublication.landingPage);
+        exampleDataPublication.landingPage.getDescription().setNextRelease(Random.id());
+        exampleDataPublication.landingPage.getDescription().setReleaseDate(new Date());
+        List<Link> relatedDocs = new ArrayList<>();
+        relatedDocs.add(new Link(URI.create("/testing/123")));
+        exampleDataPublication.landingPage.setRelatedDatasets(relatedDocs);
 
-        collection = Collection.create(collectionDescription, zebedee, publisherSession);
-
-        publishedReader = new FileSystemContentReader(zebedee.getPublished().getPath());
-        collectionReader = new ZebedeeCollectionReader(zebedee, collection, publisherSession);
-        collectionWriter = new ZebedeeCollectionWriter(zebedee, collection, publisherSession);
-
-        // add a set of data in a collection
-        inReview = generator.generateDataPagesSet("dataprocessor", "thedatasetid", 2015, 2, "");
-        dataBuilder.addReviewedDataPagesSet(inReview, collection, collectionWriter);
-
-        // add a set of data to published
-        published = generator.generateDataPagesSet("dataprocessor", "published", 2015, 2, "");
-        dataBuilder.publishDataPagesSet(published);
-
-        date = new SimpleDateFormat("dd MMM yyyy").parse("01 JAN 1978");
+        // Extract an example time series and set some further custom metadata
+        exampleTimeSeries = dataPagesSet.timeSeriesList.get(0);
+        exampleTimeSeries.getDescription().setUnit(Random.id());
+        exampleTimeSeries.getDescription().setPreUnit(Random.id());
+        exampleTimeSeries.getDescription().setNationalStatistic(true);
     }
 
     @Test
-    public void getDatasetBasedUriForTimeseries_givenUnindexed_returnsExpectedUrl() throws IOException, ZebedeeException {
+    public void getDatasetBasedUriForTimeseries_givenUnindexed_returnsExpectedUrl() {
         // Given
-        // A timeseries from our reviewed dataset
-        DataPublicationDetails details = inReview.getDetails(publishedReader, collectionReader.getReviewed());
-        TimeSeries series = inReview.timeSeriesList.get(0);
+        // A timeseries from a reviewed dataset that is unindexed
+        when(dataIndex.getUriForCdid(eq(exampleTimeSeries.getCdid()))).thenReturn(null);
 
         // When
-        // we get the publish uri for a timeseries
-        String publishUri = new DataProcessor().getDatasetBasedUriForTimeseries(series, details, zebedee.getDataIndex());
+        // we get the uri for a timeseries with the dataset ID included
+        String actual = new DataProcessor().getDatasetBasedUriForTimeseries(exampleTimeSeries, exampleDataPublication, dataIndex);
 
         // Then
-        // we expect it to be the cdid at the same root
-        String cdid = series.getCdid();
-
-        String expectedUri = String.format("%s/timeseries/%s/%s", details.parentFolderUri, cdid, details.landingPage.getDescription().getDatasetId().toLowerCase());
-
-        assertEquals(expectedUri, publishUri);
+        // we get the expected URI with correct dataset ID
+        assertEquals(exampleTimeSeries.getUri().toString(), actual);
     }
 
     @Test
-    public void getDatasetBasedUriForTimeseries_givenIndexed_returnsExpectedUrl() throws IOException, ZebedeeException {
+    public void getDatasetBasedUriForTimeseries_givenIndexed_returnsExpectedUrl() {
         // Given
         // A timeseries from our reviewed dataset
-        DataPublicationDetails details = inReview.getDetails(publishedReader, collectionReader.getReviewed());
-        TimeSeries series = inReview.timeSeriesList.get(0);
-        DataIndex dataIndex = new DataIndex(); // empty data index.
-        dataIndex.setUriForCdid(series.getCdid(), series.getUri().resolve(".").toString());
+        when(dataIndex.getUriForCdid(eq(exampleTimeSeries.getCdid()))).thenReturn(exampleTimeSeries.getUri().resolve(".").toString());
 
         // When
-        // we get the publish uri for a timeseries
-        String publishUri = new DataProcessor().getDatasetBasedUriForTimeseries(series, details, dataIndex);
+        // we get the uri for a timeseries with the dataset ID included
+        String actual = new DataProcessor().getDatasetBasedUriForTimeseries(exampleTimeSeries, exampleDataPublication, dataIndex);
 
         // Then
-        // we expect it to be the cdid at the same root
-        String cdid = series.getCdid();
-
-        String expectedUri = String.format("%s/timeseries/%s/%s", details.parentFolderUri, cdid, details.landingPage.getDescription().getDatasetId().toLowerCase());
-
-        assertEquals(expectedUri, publishUri);
+        // we get the expected URI with correct dataset ID
+        assertEquals(exampleTimeSeries.getUri().toString(), actual);
     }
 
 
     @Test
     public void initialTimeseries_givenNewTimeseries_returnsEmptyTimeseries() throws IOException, URISyntaxException, ZebedeeException {
         // Given
-        // We upload a data collection to a zebedee instance where we don't have current published content
-        DataPublicationDetails details = inReview.getDetails(publishedReader, collectionReader.getReviewed());
-        TimeSeries timeSeries = inReview.timeSeriesList.get(0);
+        // A new time series that does not exist
+        when(dataIndex.getUriForCdid(eq(exampleTimeSeries.getCdid()))).thenReturn(null);
+        when(publishedReader.getContent(eq(exampleTimeSeries.getUri().toString()))).thenThrow(new NotFoundException("not here"));
 
         // When
         // we get the initialTimeseries
-        TimeSeries initial = new DataProcessor().initialTimeseries(timeSeries, publishedReader, details, zebedee.getDataIndex());
+        TimeSeries initial = new DataProcessor().initialTimeseries(exampleTimeSeries, publishedReader, exampleDataPublication, dataIndex);
 
         // Then
         // we expect it to be a skeleton timeseries
@@ -180,233 +133,109 @@ public class DataProcessorTest extends ZebedeeTestBaseFixture {
     }
 
     @Test
-    public void initialTimeseries_givenExistingTimeseries_returnsCurrentTimeseries() throws IOException, ParseException, URISyntaxException, ZebedeeException {
+    public void initialTimeseries_givenExistingTimeseries_returnsCurrentTimeseries() throws IOException, URISyntaxException, ZebedeeException {
         // Given
-        // We upload a data collection to a zebedee instance with current published content
-        DataPagesSet republish = generator.generateDataPagesSet("dataprocessor", "published", 2016, 2, "");
-        dataBuilder.addReviewedDataPagesSet(republish, collection, collectionWriter);
-
-        DataPublicationDetails details = republish.getDetails(publishedReader, collectionReader.getReviewed());
-        TimeSeries timeSeries = republish.timeSeriesList.get(0);
+        // A time series that already exists
+        when(dataIndex.getUriForCdid(eq(exampleTimeSeries.getCdid()))).thenReturn(exampleTimeSeries.getUri().resolve(".").toString());
+        when(publishedReader.getContent(eq(exampleTimeSeries.getUri().toString()))).thenReturn(exampleTimeSeries);
 
         // When
         // we get the initialTimeseries
-        TimeSeries initial = new DataProcessor().initialTimeseries(timeSeries, publishedReader, details, zebedee.getDataIndex());
+        TimeSeries initial = new DataProcessor().initialTimeseries(exampleTimeSeries, publishedReader, exampleDataPublication, dataIndex);
 
         // Then
         // we expect it to be the published timeseries complete with existing data
         assertEquals(PageType.TIMESERIES, initial.getType());
-        assertEquals(republish.timeSeriesList.get(0).getUri(), initial.getUri());
+        assertEquals(exampleTimeSeries.getUri(), initial.getUri());
         assertNotEquals(0, initial.years.size());
         assertNotEquals(0, initial.months.size());
         assertNotEquals(0, initial.quarters.size());
     }
 
     @Test
-    public void syncMetadata_givenVariedDetailSet_takesContactsFromLandingPage() throws IOException, ZebedeeException, URISyntaxException {
-
+    public void syncLandingPageMetadata_correctlySyncsMetadata() throws URISyntaxException {
         // Given
-        // A timeseries and the initial timeseries
-        DataPublicationDetails details = inReview.getDetails(publishedReader, collectionReader.getReviewed());
-        TimeSeries timeSeries = inReview.timeSeriesList.get(0);
-
-        DataProcessor processor = new DataProcessor();
-        TimeSeries initial = processor.initialTimeseries(timeSeries, publishedReader, details, zebedee.getDataIndex());
-
-        // If
-        // we randomise contacts
-        setRandomContact(timeSeries);
-        setRandomContact(initial);
-        setRandomContact(details.landingPage);
-        setRandomContact(details.datasetPage);
-
+        // A new timeseries
+        TimeSeries newTimeSeries = new TimeSeries();
 
         // When
-        // we sync details
-        TimeSeries synced = processor.syncLandingPageMetadata(initial, details);
-        synced = processor.syncTimeSeriesMetadata(synced, timeSeries);
+        // process the timeseries
+        TimeSeries synced = new DataProcessor().syncLandingPageMetadata(newTimeSeries, exampleDataPublication);
 
         // Then
-        // the timeseries should have contact details from the landing page
-        assertEquals(details.landingPage.getDescription().getContact().getName(), synced.getDescription().getContact().getName());
-        assertEquals(details.landingPage.getDescription().getContact().getEmail(), synced.getDescription().getContact().getEmail());
-        assertEquals(details.landingPage.getDescription().getContact().getTelephone(), synced.getDescription().getContact().getTelephone());
-        assertEquals(details.landingPage.getDescription().getContact().getOrganisation(), synced.getDescription().getContact().getOrganisation());
+        // the timeseries should have the metadata synced from the landing page
+        assertEquals(exampleDataPublication.landingPage.getDescription().getContact().getName(), synced.getDescription().getContact().getName());
+        assertEquals(exampleDataPublication.landingPage.getDescription().getContact().getEmail(), synced.getDescription().getContact().getEmail());
+        assertEquals(exampleDataPublication.landingPage.getDescription().getContact().getTelephone(), synced.getDescription().getContact().getTelephone());
+        assertEquals(exampleDataPublication.landingPage.getDescription().getContact().getOrganisation(), synced.getDescription().getContact().getOrganisation());
+        assertEquals(exampleDataPublication.landingPage.getDescription().getNextRelease(), synced.getDescription().getNextRelease());
+        assertEquals(exampleDataPublication.landingPage.getDescription().getReleaseDate(), synced.getDescription().getReleaseDate());
+        assertEquals(exampleDataPublication.landingPage.getDescription().getDatasetId(), synced.getDescription().getDatasetId());
+        assertEquals(exampleDataPublication.landingPage.getUri(), synced.getDescription().getDatasetUri());
+        assertEquals(exampleDataPublication.landingPage.getUri(), synced.getRelatedDatasets().get(0).getUri());
+        assertEquals(exampleDataPublication.landingPage.getRelatedDocuments(), synced.getRelatedDocuments());
     }
 
     @Test
-    public void syncMetadata_givenVariedDetailSet_takesDatesFromLandingPage() throws IOException, ZebedeeException, URISyntaxException {
-
+    public void syncTimeSeriesMetadata_correctlySyncsMetadata() {
         // Given
-        // A timeseries and the initial timeseries
-        DataPublicationDetails details = inReview.getDetails(publishedReader, collectionReader.getReviewed());
-        TimeSeries timeSeries = inReview.timeSeriesList.get(0);
-
-        DataProcessor processor = new DataProcessor();
-        TimeSeries initial = processor.initialTimeseries(timeSeries, publishedReader, details, zebedee.getDataIndex());
-
-        // If
-        // we ensure distinct dates for all the pages
-        setDistinctDates(timeSeries);
-        setDistinctDates(initial);
-        setDistinctDates(details.landingPage);
-        setDistinctDates(details.datasetPage);
-
+        // A new timeseries
+        TimeSeries newTimeSeries = new TimeSeries();
+        newTimeSeries.setDescription(new PageDescription());
 
         // When
-        // we sync details
-        TimeSeries synced = processor.syncLandingPageMetadata(initial, details);
-        synced = processor.syncTimeSeriesMetadata(synced, timeSeries);
+        // process the timeseries
+        TimeSeries synced = new DataProcessor().syncTimeSeriesMetadata(newTimeSeries, exampleTimeSeries);
 
         // Then
-        // the timeseries should have date details from the landing page
-        assertEquals(details.landingPage.getDescription().getReleaseDate().toString(), synced.getDescription().getReleaseDate().toString());
-        assertEquals(details.landingPage.getDescription().getNextRelease(), synced.getDescription().getNextRelease());
-    }
-
-    @Test
-    public void syncMetadata_givenNewTimeseries_shouldTransferSeasonalAdjustmentAndCDID() throws IOException, ZebedeeException, URISyntaxException {
-        // Given
-        // A currently unpublished timeseries
-        DataPublicationDetails details = inReview.getDetails(publishedReader, collectionReader.getReviewed());
-        TimeSeries timeSeries = inReview.timeSeriesList.get(0);
-
-        DataProcessor processor = new DataProcessor();
-        TimeSeries initial = processor.initialTimeseries(timeSeries, publishedReader, details, zebedee.getDataIndex());
-
-        // When
-        // we sync details
-        TimeSeries synced = processor.syncLandingPageMetadata(initial, details);
-        synced = processor.syncTimeSeriesMetadata(synced, timeSeries);
-
-        // Then
-        // we expect the newPage to have copied details from the
-        assertEquals(timeSeries.getCdid(), synced.getCdid());
-    }
-
-    @Test
-    public void syncMetadata_overExistingTimeSeries_shouldTransferNameFromTimeSeriesIfNameBlank() throws IOException, ZebedeeException, ParseException, URISyntaxException {
-        // Given
-        // The initial timeseries generated by a publish over existing data
-        DataPagesSet republish = generator.generateDataPagesSet("dataprocessor", "published", 2016, 2, "");
-        dataBuilder.addReviewedDataPagesSet(republish, collection, collectionWriter);
-
-        DataPublicationDetails details = republish.getDetails(publishedReader, collectionReader.getReviewed());
-        TimeSeries timeSeries = republish.timeSeriesList.get(0);
-
-        DataProcessor processor = new DataProcessor();
-        TimeSeries initial = processor.initialTimeseries(timeSeries, publishedReader, details, zebedee.getDataIndex());
-        initial.getDescription().setTitle("");
-
-        // When
-        // we sync details
-        TimeSeries synced = processor.syncLandingPageMetadata(initial, details);
-        synced = processor.syncTimeSeriesMetadata(synced, timeSeries);
-
-        // Then
-        // we expect the name to come from the new timeseries
-        assertEquals(timeSeries.getDescription().getTitle(), synced.getDescription().getTitle());
-    }
-
-    @Test
-    public void syncMetadata_overExistingTimeSeries_shouldTransferDatasetUri() throws IOException, ParseException, URISyntaxException, ZebedeeException {
-        // Given
-        // We create a publish over an existing dataset
-        DataPagesSet republish = generator.generateDataPagesSet("dataprocessor", "published", 2016, 2, "");
-        dataBuilder.addReviewedDataPagesSet(republish, collection, collectionWriter);
-
-        DataPublicationDetails details = republish.getDetails(publishedReader, collectionReader.getReviewed());
-        TimeSeries timeSeries = republish.timeSeriesList.get(0);
-
-        DataProcessor processor = new DataProcessor();
-        TimeSeries initial = processor.initialTimeseries(timeSeries, publishedReader, details, zebedee.getDataIndex());
-
-        // When
-        // we sync details
-        TimeSeries synced = processor.syncLandingPageMetadata(initial, details);
-
-        // Then
-        // we expect the name to come from the old timeseries
-        assertEquals(details.landingPage.getUri(), synced.getDescription().getDatasetUri());
+        // the timeseries should have the metadata synced from the other time series
+        assertEquals(exampleTimeSeries.getDescription().getCdid(), synced.getDescription().getCdid());
+        assertEquals(exampleTimeSeries.getDescription().getTitle(), synced.getDescription().getTitle());
+        assertEquals(exampleTimeSeries.getDescription().getDate(), synced.getDescription().getDate());
+        assertEquals(exampleTimeSeries.getDescription().getNumber(), synced.getDescription().getNumber());
     }
 
     @Test
     public void processTimeseries_overExistingTimeSeries_persistsManualSetFields() throws ParseException, URISyntaxException, ZebedeeException, IOException {
         // Given
-        // We create a published dataset with distinct manual metadata
-        DataPagesSet manual = generator.generateDataPagesSet("dataprocessor", "manual", 2015, 2, "");
-        TimeSeries manualSeries = manual.timeSeriesList.get(0);
-        manualSeries.getDescription().setUnit(Random.id());
-        manualSeries.getDescription().setPreUnit(Random.id());
-        manualSeries.getDescription().setNationalStatistic(true);
-        dataBuilder.publishDataPagesSet(manual);
+        // A previously published time series dataset with distinct manual metadata and a new time series dataset being imported
+        DataPagesSet newPageSet = generator.generateDataPagesSet("dataprocessor", "thedatasetid", 2016, 2, "");
+        DataPublicationDetails newDataPublication = new DataPublicationDetails(newPageSet.timeSeriesDataset, newPageSet.datasetLandingPage, newPageSet.fileUri);
+        TimeSeries newSeries = newPageSet.timeSeriesList.get(0);
 
-        DataPagesSet review = generator.generateDataPagesSet("dataprocessor", "manual", 2016, 2, "");
-        dataBuilder.addReviewedDataPagesSet(review, collection, collectionWriter);
-        TimeSeries series = review.timeSeriesList.get(0);
+        when(dataIndex.getUriForCdid(eq(newSeries.getCdid()))).thenReturn(exampleTimeSeries.getUri().resolve(".").toString());
+        when(publishedReader.getContent(eq(newSeries.getUri().toString()))).thenReturn(exampleTimeSeries);
 
         // When
-        // we sync details
-        TimeSeries processed = new DataProcessor().processTimeseries(publishedReader, review.getDetails(publishedReader, collectionReader.getReviewed()), series, zebedee.getDataIndex());
+        // process the importing dataset
+        TimeSeries processed = new DataProcessor().processTimeseries(publishedReader, newDataPublication, newSeries, dataIndex);
 
         // Then
         // we expect the manual data to be persisted
-        assertEquals(manualSeries.getDescription().getUnit(), processed.getDescription().getUnit());
-        assertEquals(manualSeries.getDescription().getPreUnit(), processed.getDescription().getPreUnit());
-        assertEquals(manualSeries.getDescription().isNationalStatistic(), processed.getDescription().isNationalStatistic());
+        assertEquals(exampleTimeSeries.getDescription().getUnit(), processed.getDescription().getUnit());
+        assertEquals(exampleTimeSeries.getDescription().getPreUnit(), processed.getDescription().getPreUnit());
+        assertEquals(exampleTimeSeries.getDescription().isNationalStatistic(), processed.getDescription().isNationalStatistic());
     }
 
     @Test
     public void processTimeseries_withUpdateCommands_updatesTitles() throws IOException, ZebedeeException, URISyntaxException, ParseException {
         // Given
         // We publish a timeseries with update commands to update the title.
-        String cdid = "abcd";
-        String title = "The new title from update command.";
-        String datasetId = "original";
-        DataPagesSet pagesSet = generator.generateDataPagesSet("pages", datasetId, 2015, 0, "file.csdb");
+        String newTitle = "The new title from update command.";
 
-        TimeSeries timeSeries = generator.exampleTimeseries(cdid, datasetId);
-        timeSeries.setUri(new URI("pages/timeseries/" + timeSeries.getCdid().toLowerCase()));
-        timeSeries.years.stream().forEach(value -> value.value = datasetId);
+        Optional<TimeseriesUpdateCommand> command = Optional.of(new TimeseriesUpdateCommand(exampleTimeSeries.getCdid(), exampleTimeSeries.getDescription().getDatasetId(), newTitle));
 
-        dataBuilder.addReviewedDataPagesSet(pagesSet, collection, collectionWriter);
-
-        Optional<TimeseriesUpdateCommand> command = Optional.of(new TimeseriesUpdateCommand(cdid, datasetId, title));
+        when(dataIndex.getUriForCdid(eq(exampleTimeSeries.getCdid()))).thenReturn(exampleTimeSeries.getUri().resolve(".").toString());
+        when(publishedReader.getContent(eq(exampleTimeSeries.getUri().toString()))).thenReturn(exampleTimeSeries);
 
         // When
         // we run a process
         DataProcessor processor = new DataProcessor();
-        processor.processTimeseries(publishedReader,
-                pagesSet.getDetails(publishedReader, collectionReader.getReviewed()),
-                timeSeries,
-                zebedee.getDataIndex(),
-                command);
+        processor.processTimeseries(publishedReader, exampleDataPublication, exampleTimeSeries, dataIndex, command);
 
         // Then
         // we expect the title to be that of the update command.
-        assertEquals(title, processor.timeSeries.getDescription().getTitle());
-    }
-
-    @Test
-    public void metadataIsSynced() {
-
-        // Given an existing timeseries
-        TimeSeries existingSeries = new TimeSeries();
-        existingSeries.setDescription(new PageDescription());
-        existingSeries.getDescription().setTitle("oldTitle");
-
-        // and a new time series with a new title
-        TimeSeries newSeries = new TimeSeries();
-        newSeries.setDescription(new PageDescription());
-        newSeries.getDescription().setTitle("newTitle");
-        newSeries.getDescription().setCdid("WUT");
-
-        // When sync is called
-        new DataProcessor().syncTimeSeriesMetadata(existingSeries, newSeries);
-
-        // Then the title is updated.
-        Assert.assertEquals("newTitle", existingSeries.getDescription().getTitle());
-        Assert.assertEquals("WUT", existingSeries.getDescription().getCdid());
+        assertEquals(newTitle, processor.getTimeSeries().getDescription().getTitle());
     }
 
     /**
@@ -418,24 +247,4 @@ public class DataProcessorTest extends ZebedeeTestBaseFixture {
         page.getDescription().getContact().setOrganisation(Random.id());
         page.getDescription().getContact().setTelephone(Random.id());
     }
-
-    /**
-     * Helper method to set distinct dates to pages that can be tested
-     * @param page
-     */
-    private void setDistinctDates(Page page) {
-        page.getDescription().setReleaseDate(nextDate());
-        page.getDescription().setNextRelease(new SimpleDateFormat("dd MMM yyyy").format(nextDate()));
-    }
-
-    private Date nextDate() {
-        Calendar c = Calendar.getInstance();
-        c.setTime(this.date);
-        c.add(Calendar.YEAR, 1);
-        this.date = c.getTime();
-        return this.date;
-    }
-
-
-
 }

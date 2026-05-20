@@ -36,6 +36,16 @@ public class DataPublication {
     }
 
     /**
+     * Initialise a new DataPublication using the provided DataPublicationDetails.
+     * Primarily intended for use in testing.
+     *
+     * @param details the DataPublicationDetails of the publication
+     */
+    public DataPublication(DataPublicationDetails details) {
+        this.details = details;
+    }
+
+    /**
      * Get the dataset id from a file
      *
      * Filename should be of the form [datasetId].csdb or upload.[datasetId].csv
@@ -120,7 +130,7 @@ public class DataPublication {
             }
 
             // Retain the result to be added to any generated spreadsheet
-            results.add(processor.timeSeries);
+            results.add(processor.getTimeSeries());
         }
 
         // Generate data files

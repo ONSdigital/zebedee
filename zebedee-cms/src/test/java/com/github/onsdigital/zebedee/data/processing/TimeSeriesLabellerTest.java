@@ -1,21 +1,18 @@
 package com.github.onsdigital.zebedee.data.processing;
 
 import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeries;
-import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeriesValue;
-import com.github.onsdigital.zebedee.data.framework.DataBuilder;
 import com.github.onsdigital.zebedee.data.framework.DataPagesGenerator;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.util.Date;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-/**
- * Created by thomasridd on 1/26/16.
- */
 public class TimeSeriesLabellerTest {
-    DataPagesGenerator generator = new DataPagesGenerator();
+
+    private DataPagesGenerator generator = new DataPagesGenerator();
 
     @Test
     public void labeller_forNullMonthStyle_relabels() throws IOException {

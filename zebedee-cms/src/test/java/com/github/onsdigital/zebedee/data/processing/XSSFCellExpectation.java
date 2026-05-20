@@ -7,8 +7,8 @@ import org.apache.poi.xssf.usermodel.XSSFCell;
  */
 public class XSSFCellExpectation<T> {
 
-    protected T value;
-    protected int cellType;
+    private  T value;
+    private  int cellType;
 
     protected XSSFCellExpectation(T value) {
         this.value = value;

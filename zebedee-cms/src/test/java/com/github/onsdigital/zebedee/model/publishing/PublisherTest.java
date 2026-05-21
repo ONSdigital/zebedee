@@ -7,7 +7,9 @@ import com.github.onsdigital.zebedee.model.Content;
 import com.github.onsdigital.zebedee.service.StaticFilesService;
 import org.apache.commons.lang.RandomStringUtils;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -18,6 +20,7 @@ import java.util.TreeMap;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -25,6 +28,9 @@ public class PublisherTest {
 
     private Publisher publisher;
 
+    @Rule
+    public TemporaryFolder temporaryFolder = new TemporaryFolder();
+    
     @Before
     public void setup() throws IOException {
         this.publisher = new Publisher();
@@ -89,6 +95,7 @@ public class PublisherTest {
 
         when(mockCollection.getReviewed()).thenReturn(mockContent);
         when(mockCollection.getDescription()).thenReturn(mockCollectionDescription);
+        when(mockCollection.getPath()).thenReturn(temporaryFolder.getRoot().toPath());
 
         // And {features are disabled except static files}
         System.setProperty(CMSFeatureFlags.ENABLE_DATASET_IMPORT, "false");

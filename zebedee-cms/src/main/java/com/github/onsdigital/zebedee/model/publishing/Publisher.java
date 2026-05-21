@@ -124,7 +124,6 @@ public class Publisher {
         if (CMSFeatureFlags.cmsFeatureFlags().isImagePublishingEnabled()) {
             imageFuture = publishImages(collection);
         }
-
         publishFilteredCollectionFiles(collection, collectionReader);
 
         if (CMSFeatureFlags.cmsFeatureFlags().isVerifyPublishEnabled()) {
@@ -416,13 +415,15 @@ public class Publisher {
      */
     public static void publishFilteredCollectionFiles(Collection collection, CollectionReader collectionReader)
             throws IOException {
-        // We do not want to send versioned files. They have already been taken care of
-        // via the manifest.
+        // We do not want to send files that are already handled by the manifest.
         // Pass the function to filter files into the publish method.
-        Function<String, Boolean> versionedUriFilter = uri -> VersionedContentItem.isVersionedUri(uri);
+        
+        Manifest manifest = Manifest.get(collection);
+
+        Function<String, Boolean> manifestFilter = uri -> manifest.filesToCopy.stream().anyMatch(fileCopy -> fileCopy.target.equals(uri));
         Function<String, Boolean> timeseriesUriFilter = uri -> uri.contains("/timeseries/");
 
-        Function<String, Boolean>[] filters = new Function[] { versionedUriFilter, timeseriesUriFilter };
+        Function<String, Boolean>[] filters = new Function[] { manifestFilter, timeseriesUriFilter };
 
         List<Future<IOException>> results = new ArrayList<>();
         long start = System.currentTimeMillis();

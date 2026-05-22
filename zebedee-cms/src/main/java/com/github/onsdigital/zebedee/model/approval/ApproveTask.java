@@ -16,7 +16,6 @@ import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.CollectionWriter;
 import com.github.onsdigital.zebedee.model.approval.tasks.CollectionPdfGenerator;
 import com.github.onsdigital.zebedee.model.approval.tasks.timeseries.TimeSeriesCompressionTask;
-import com.github.onsdigital.zebedee.model.content.CompoundContentReader;
 import com.github.onsdigital.zebedee.model.publishing.PublishNotification;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
@@ -256,9 +255,6 @@ public class ApproveTask implements Callable<Boolean> {
                     .log("approve collection: collection contains time series data processing importing CSDB file");
 
             for (String importFile : collection.getDescription().getTimeseriesImportFiles()) {
-                CompoundContentReader compoundContentReader = new CompoundContentReader(publishedReader);
-                compoundContentReader.add(collectionReader.getReviewed());
-
                 try (
                         Resource resource = collectionReader.getRoot().getResource(importFile);
                         InputStream csvInput = resource.getData()) {

@@ -1,6 +1,5 @@
 package com.github.onsdigital.zebedee.filters;
 
-import com.github.onsdigital.zebedee.ZebedeeTestBaseFixture;
 import com.github.onsdigital.zebedee.session.service.Sessions;
 import com.github.onsdigital.zebedee.session.service.SessionsException;
 import com.google.common.net.MediaType;
@@ -18,20 +17,12 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.HttpMethod;
 import java.nio.charset.StandardCharsets;
 
-import static com.github.onsdigital.zebedee.reader.util.RequestUtils.AUTH_HEADER;
-import static com.github.onsdigital.zebedee.reader.util.RequestUtils.BEARER_PREFIX;
-import static com.github.onsdigital.zebedee.reader.util.RequestUtils.FLORENCE_TOKEN_HEADER;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static com.github.onsdigital.zebedee.reader.util.RequestUtils.*;
+import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
-public class AuthenticationFilterTest extends ZebedeeTestBaseFixture {
+public class AuthenticationFilterTest {
 
     private static final String UNAUTHENTICATED_PATH  = "/health";
     private static final String AUTHENTICATED_PATH    = "/this/is/a/dummy/path";

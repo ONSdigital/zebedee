@@ -1,43 +1,32 @@
 package com.github.onsdigital.zebedee.model.publishing.scheduled.task;
 
-import com.github.onsdigital.zebedee.ZebedeeTestBaseFixture;
 import com.github.onsdigital.zebedee.exceptions.CollectionNotFoundException;
-import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
-import com.github.onsdigital.zebedee.json.CollectionDescription;
-import com.github.onsdigital.zebedee.json.CollectionType;
 import com.github.onsdigital.zebedee.model.Collection;
-import com.github.onsdigital.zebedee.session.model.Session;
+import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 
 import static junit.framework.TestCase.assertFalse;
 import static junit.framework.TestCase.assertTrue;
 
-public class PublishCollectionsTaskTest extends ZebedeeTestBaseFixture {
+public class PublishCollectionsTaskTest {
 
-    private static final String SESSION_ID = "session-id";
-    private static final String ADMIN_EMAIL = "admin@example.com";
+    @Mock
+    private Collection collection;
 
-    Session session;
-
-    @Override
+    @Before
     public void setUp() throws Exception {
-        List<String> sessionGroups = new ArrayList<>();
-        session = new Session(SESSION_ID, ADMIN_EMAIL);
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test
-    public void shouldCancelTask() throws IOException, ZebedeeException {
+    public void removeCollection_givenAScheduledCollectionPublish_shouldCancelCollectionTasks() {
 
-        CollectionDescription collectionDescription = new CollectionDescription("FirstCollection");
-        collectionDescription.setPublishDate(new Date());
-        collectionDescription.setType(CollectionType.scheduled);
-        Collection collection = Collection.create(collectionDescription, zebedee, session);
-
+        // Given a scheduled publish collection task
         ArrayList<PublishCollectionTask> publishCollectionTasks = new ArrayList<>();
         DummyPublishCollectionTask publish1 = new DummyPublishCollectionTask(collection, 0);
         publishCollectionTasks.add(publish1);
@@ -51,17 +40,16 @@ public class PublishCollectionsTaskTest extends ZebedeeTestBaseFixture {
         assertTrue(publishCollectionTasks.contains(publish1));
         assertTrue(postPublishCollectionTasks.contains(postPublish1));
 
+        // When collection publish is cancelled
         task.removeCollection(collection);
 
+        // Then all publish and post-publish tasks for the collection should be removed
         assertFalse(publishCollectionTasks.contains(publish1));
         assertFalse(postPublishCollectionTasks.contains(postPublish1));
     }
 
     @Test
-    public void shouldRunInTheCorrectOrder() throws IOException, CollectionNotFoundException {
-
-        Collection collection = new Collection(builder.collections.get(0), zebedee);
-
+    public void run_givenTwoScheduledPublishes_shouldRunInTheCorrectOrder() throws IOException, CollectionNotFoundException {
         // Given 2 publish tasks and 2 post publish tasks in a PublishCollectionsTask.
         ArrayList<PublishCollectionTask> publishCollectionTasks = new ArrayList<>();
         DummyPublishCollectionTask publish1 = new DummyPublishCollectionTask(collection, 10);

@@ -283,7 +283,7 @@ public class PostPublisher {
 
         Files.copy(collectionJsonSource, collectionJsonDestination);
 
-        Path manifestDestination = collectionFilesDestination.resolve(Manifest.filename);
+        Path manifestDestination = collectionFilesDestination.resolve(Manifest.FILENAME);
         info().data("from", Manifest.getManifestPath(collection).toString())
                 .data("to", manifestDestination.toString())
                 .log("moving manifest json");

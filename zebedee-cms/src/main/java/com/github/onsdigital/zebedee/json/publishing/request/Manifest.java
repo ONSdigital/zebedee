@@ -20,7 +20,7 @@ import java.util.Set;
  */
 public class Manifest {
 
-    public static final String filename = "manifest.json";
+    public static final String FILENAME = "manifest.json";
 
     public Set<FileCopy> filesToCopy = new HashSet<>();
     public Set<String> urisToDelete = new HashSet<>();
@@ -113,7 +113,7 @@ public class Manifest {
     }
 
     public static Path getManifestPath(Collection collection) {
-        return collection.getPath().resolve(filename);
+        return collection.getPath().resolve(FILENAME);
     }
 
     void addDelete(String uri) {

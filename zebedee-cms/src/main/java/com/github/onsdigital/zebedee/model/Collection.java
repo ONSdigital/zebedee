@@ -231,7 +231,7 @@ public class Collection {
         return collection;
     }
 
-    public static void CreateCollectionFolders(String filename, Path rootCollectionsPath) throws IOException {
+    static void CreateCollectionFolders(String filename, Path rootCollectionsPath) throws IOException {
         Path collectionPath = rootCollectionsPath.resolve(filename);
         Files.createDirectory(collectionPath);
         Files.createDirectory(collectionPath.resolve(REVIEWED));
@@ -276,7 +276,7 @@ public class Collection {
         return release;
     }
 
-    public static Collection rename(CollectionDescription collectionDescription, String newCollectionName, Zebedee zebedee)
+    static Collection rename(CollectionDescription collectionDescription, String newCollectionName, Zebedee zebedee)
             throws IOException, CollectionNotFoundException {
         String currentName = collectionDescription.getName();
         String currentCollectionNameClean = PathUtils.toFilename(currentName);
@@ -763,7 +763,7 @@ public class Collection {
                 } else {
                     PathUtils.moveFilesInDirectory(source, destination);
                 }
-                zebedee.getCollections().removeEmptyCollectionDirectories(source);
+                Collections.removeEmptyCollectionDirectories(source);
             } else {
                 try (InputStream inputStream = new FileInputStream(source.toFile())) {
                     collectionWriter.getInProgress().write(inputStream, uri);
@@ -1176,7 +1176,7 @@ public class Collection {
      * @throws NotFoundException
      * @throws IOException
      */
-    public Release associateWithRelease(Session session, Release release, CollectionWriter collectionWriter) throws IOException, BadRequestException {
+    Release associateWithRelease(Session session, Release release, CollectionWriter collectionWriter) throws IOException, BadRequestException {
 
         String uri = release.getUri().toString() + "/data.json";
 

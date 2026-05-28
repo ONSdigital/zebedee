@@ -2,31 +2,16 @@ package com.github.onsdigital.zebedee;
 
 import com.github.davidcarboni.cryptolite.Random;
 import com.github.davidcarboni.restolino.json.Serialiser;
-import com.github.onsdigital.slack.Profile;
-import com.github.onsdigital.slack.client.SlackClient;
-import com.github.onsdigital.zebedee.api.Root;
-import com.github.onsdigital.zebedee.exceptions.CollectionNotFoundException;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
-import com.github.onsdigital.zebedee.json.serialiser.IsoDateSerializer;
-import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.PathUtils;
-import com.github.onsdigital.zebedee.permissions.model.AccessMapping;
-import com.github.onsdigital.zebedee.teams.model.Team;
-import com.github.onsdigital.zebedee.user.model.User;
 import org.apache.commons.io.FileUtils;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
-
-import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
-import static org.mockito.Mockito.when;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * {@link Deprecated} Please do not use this any more.
@@ -34,34 +19,10 @@ import static org.mockito.Mockito.when;
 @Deprecated
 public class Builder {
 
-    @Mock
-    private SlackClient slackClient;
-
-    @Mock
-    private Profile slackProfile;
-
-    private static String teamId;
-    private static User administratorTemplate;
-    private static User publisher1Template;
-    private static User publisher2Template;
-    private static User reviewer1Template;
-    private static User reviewer2Template;
-    private static User dataVisTemplate;
-    private static boolean usersInitialised = false;
-
     public String[] collectionNames = {"Inflation Q2 2015", "Labour Market Q2 2015"};
-    public String[] teamNames = {"Economy Team", "Labour Market Team"};
     public Path parent;
     public Path zebedeeRootPath;
     public List<Path> collections;
-    public User administrator;
-    public User publisher1;
-    public User publisher2;
-    public User dataVis;
-    public User reviewer1;
-    public User reviewer2;
-    public Team labourMarketTeam;
-    public Team inflationTeam;
 
     private Zebedee zebedee;
 
@@ -70,19 +31,12 @@ public class Builder {
      *
      * @throws IOException
      */
-    public Builder() throws IOException, CollectionNotFoundException {
-        MockitoAnnotations.openMocks(this);
-
-        when(slackClient.getProfile())
-                .thenReturn(slackProfile);
-
-        setupUsers();
-
-        Root.env = new HashMap<>();
+    public Builder() throws IOException {
 
         // Create the structure:
         parent = Files.createTempDirectory(Random.id());
-        zebedeeRootPath = createZebedee(parent);
+        zebedeeRootPath = Files.createDirectory(parent.resolve(Zebedee.ZEBEDEE));
+        Files.createDirectory(zebedeeRootPath.resolve(Zebedee.COLLECTIONS));
 
         // Create the collections:
         collections = new ArrayList<>();
@@ -91,91 +45,12 @@ public class Builder {
             collections.add(collection);
         }
 
-        // Create some published content:
-        Path folder = zebedeeRootPath.resolve(Zebedee.PUBLISHED);
-        String contentUri;
-        Path contentPath;
-
-        // Something for Economy:
-        contentUri = "/economy/inflationandpriceindices/bulletins/consumerpriceinflationjune2014.html";
-        contentPath = folder.resolve(contentUri.substring(1));
-        Files.createDirectories(contentPath.getParent());
-        Files.createFile(contentPath);
-
-        // Something for Labour market:
-        contentUri = "/employmentandlabourmarket/peopleinwork/earningsandworkinghours/bulletins/uklabourmarketjuly2014.html";
-        contentPath = folder.resolve(contentUri.substring(1));
-        Files.createDirectories(contentPath.getParent());
-        Files.createFile(contentPath);
-
-        // A couple of users:
-        Path users = zebedeeRootPath.resolve(Zebedee.USERS);
-        Files.createDirectories(users);
-
-        administrator = clone(administratorTemplate);
-        try (OutputStream outputStream = Files.newOutputStream(users.resolve(PathUtils.toFilename(administrator.getEmail()) + ".json"))) {
-            Serialiser.serialise(outputStream, administrator);
-        }
-
-        publisher1 = clone(publisher1Template);
-        try (OutputStream outputStream = Files.newOutputStream(users.resolve(PathUtils.toFilename(publisher1.getEmail()) + ".json"))) {
-            Serialiser.serialise(outputStream, publisher1);
-        }
-
-        publisher2 = clone(publisher2Template);
-        try (OutputStream outputStream = Files.newOutputStream(users.resolve(PathUtils.toFilename(publisher2.getEmail()) + ".json"))) {
-            Serialiser.serialise(outputStream, publisher2);
-        }
-
-        reviewer1 = clone(reviewer1Template);
-        try (OutputStream outputStream = Files.newOutputStream(users.resolve(PathUtils.toFilename(reviewer1.getEmail()) + ".json"))) {
-            Serialiser.serialise(outputStream, reviewer1);
-        }
-
-        reviewer2 = clone(reviewer2Template);
-        try (OutputStream outputStream = Files.newOutputStream(users.resolve(PathUtils.toFilename(reviewer2.getEmail()) + ".json"))) {
-            Serialiser.serialise(outputStream, reviewer2);
-        }
-
-        dataVis = clone(dataVisTemplate);
-        try (OutputStream outputStream = Files.newOutputStream(users.resolve(PathUtils.toFilename(dataVis.getEmail()) + ".json"))) {
-            Serialiser.serialise(outputStream, dataVis);
-        }
-
         // Set up some permissions:
         Path permissions = zebedeeRootPath.resolve(Zebedee.PERMISSIONS);
         Files.createDirectories(permissions);
-        Path teams = zebedeeRootPath.resolve(Zebedee.TEAMS);
-        Files.createDirectories(teams);
-
-        AccessMapping accessMapping = new AccessMapping();
-
-        accessMapping.setAdministrators(new HashSet<>());
-        accessMapping.setDigitalPublishingTeam(new HashSet<>());
-
-        accessMapping.getAdministrators().add(administrator.getEmail());
-        accessMapping.getDigitalPublishingTeam().add(publisher1.getEmail());
-        accessMapping.getDigitalPublishingTeam().add(publisher2.getEmail());
-
-        CollectionDescription collectionDescription = new CollectionDescription();
-        collectionDescription.setId(Random.id());
-        accessMapping.setCollections(new HashMap<>());
-
 
         ZebedeeConfiguration configuration = new ZebedeeConfiguration(parent);
-        ReflectionTestUtils.setField(configuration,"slackClient",slackClient);
         this.zebedee = new Zebedee(configuration);
-
-        inflationTeam = createTeam(reviewer1, teamNames[0], teams);
-        labourMarketTeam = createTeam(reviewer2, teamNames[1], teams);
-        accessMapping.getCollections().put(new Collection(collections.get(0), zebedee).getDescription().getId(), set(inflationTeam));
-        accessMapping.getCollections().put(new Collection(collections.get(1), zebedee).getDescription().getId(),
-                set(labourMarketTeam));
-
-        Path path = permissions.resolve("accessMapping.json");
-        try (OutputStream output = Files.newOutputStream(path)) {
-            Serialiser.serialise(output, accessMapping);
-        }
     }
 
     /**
@@ -184,149 +59,17 @@ public class Builder {
      * @param bootStrap
      * @throws IOException
      */
-    public Builder(Path bootStrap) throws IOException, CollectionNotFoundException {
+    public Builder(Path bootStrap) throws IOException {
         this();
 
-        FileUtils.deleteDirectory(this.zebedeeRootPath.resolve(Zebedee.PUBLISHED).toFile());
-        FileUtils.deleteDirectory(this.zebedeeRootPath.resolve(Zebedee.LAUNCHPAD).toFile());
         FileUtils.deleteDirectory(this.zebedeeRootPath.resolve(Zebedee.COLLECTIONS).toFile());
-        Files.createDirectory(this.zebedeeRootPath.resolve(Zebedee.PUBLISHED));
-        Files.createDirectory(this.zebedeeRootPath.resolve(Zebedee.LAUNCHPAD));
         Files.createDirectory(this.zebedeeRootPath.resolve(Zebedee.COLLECTIONS));
 
         FileUtils.copyDirectory(bootStrap.resolve(Zebedee.PUBLISHED).toFile(), this.zebedeeRootPath.resolve(Zebedee.PUBLISHED).toFile());
-        if (Files.exists(bootStrap.resolve(Zebedee.LAUNCHPAD))) {
-            FileUtils.copyDirectory(bootStrap.resolve(Zebedee.LAUNCHPAD).toFile(), this.zebedeeRootPath.resolve(Zebedee.LAUNCHPAD).toFile());
-        } else {
-            FileUtils.copyDirectory(bootStrap.resolve(Zebedee.PUBLISHED).toFile(), this.zebedeeRootPath.resolve(Zebedee.LAUNCHPAD).toFile()); // Not bothering with distinct launchpad
-        }
-
-        if (Files.exists(bootStrap.resolve(Zebedee.COLLECTIONS))) {
-            FileUtils.copyDirectory(bootStrap.resolve(Zebedee.COLLECTIONS).toFile(), this.zebedeeRootPath.resolve(Zebedee.COLLECTIONS).toFile());
-        }
-    }
-
-    private static User clone(User user) {
-        User clone = new User();
-
-        clone.setName(user.getName());
-        clone.setEmail(user.getEmail());
-        clone.setInactive(user.getInactive());
-        clone.setTemporaryPassword(user.getTemporaryPassword());
-        clone.setLastAdmin(user.getLastAdmin());
-        clone(clone, user, "passwordHash");
-        return clone;
-    }
-
-    private static void clone(User clone, User user, String fieldName) {
-        try {
-            Field field = User.class.getDeclaredField(fieldName);
-            field.setAccessible(true);
-            field.set(clone, field.get(user));
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            throw new RuntimeException("Error cloning user", e);
-        }
-    }
-
-    private synchronized void setupUsers() {
-
-        if (!usersInitialised) {
-            usersInitialised = true;
-
-            // Set ISO date formatting in Gson to match Javascript Date.toISODate()
-            Serialiser.getBuilder().registerTypeAdapter(Date.class, new IsoDateSerializer());
-
-            info().log("Generating test users and keys...");
-
-            User jukesie = new User();
-            jukesie.setName("Matt Jukes");
-            jukesie.setEmail("jukesie@example.com");
-            jukesie.setInactive(false);
-            administratorTemplate = jukesie;
-
-            User patricia = clone(jukesie);
-            patricia.setName("Patricia Pumpkin");
-            patricia.setEmail("patricia@example.com");
-            patricia.setInactive(false);
-            publisher1Template = patricia;
-
-            User bernard = clone(jukesie);
-            bernard.setName("Bernard Black");
-            bernard.setEmail("bernard@example.com");
-            bernard.setInactive(false);
-            publisher2Template = bernard;
-
-            User freddy = clone(jukesie);
-            freddy.setName("freddy Pumpkin");
-            freddy.setEmail("freddy@example.com");
-            freddy.setInactive(false);
-            reviewer1Template = freddy;
-
-            User ronny = clone(jukesie);
-            ronny.setName("Ronny Roller");
-            ronny.setName("ronny@example.com");
-            ronny.setInactive(false);
-            reviewer2Template = ronny;
-
-            User dataVis = clone(jukesie);
-            dataVis.setName("dataVis");
-            dataVis.setEmail("datavis@example.com");
-            dataVis.setInactive(false);
-            dataVisTemplate = dataVis;
-        }
-    }
-
-    private Set<String> set(Team team) {
-        Set<String> ids = new HashSet<>();
-        ids.add(team.getId());
-        return ids;
-    }
-
-    private Team createTeam(User user, String name, Path teams) throws IOException {
-        Team team = new Team();
-
-        int teamId_int;
-        try {
-            teamId_int = Integer.parseInt(teamId);
-            teamId_int += 1;
-            team.setId(String.valueOf(teamId_int));
-
-        } catch (NumberFormatException e) {
-            info().exception(e).log("failed to convert teamId");
-        }
-
-        team.setName(name);
-        team.addMember(user.getEmail());
-        Path labourMarketTeamPath = teams.resolve(PathUtils.toFilename(team.getName() + ".json"));
-        try (OutputStream output = Files.newOutputStream(labourMarketTeamPath)) {
-            Serialiser.serialise(output, team);
-        }
-
-        return team;
     }
 
     public void delete() throws IOException {
         FileUtils.deleteDirectory(parent.toFile());
-    }
-
-    /**
-     * This method creates the expected set of folders for a Zebedee structure.
-     *
-     * @param parent The parent folder, in which the {@link Zebedee} structure will
-     *               be built.
-     * @return The root {@link Zebedee} path.
-     * @throws IOException If a filesystem error occurs.
-     */
-    private Path createZebedee(Path parent) throws IOException {
-        Path path = Files.createDirectory(parent.resolve(Zebedee.ZEBEDEE));
-        Files.createDirectory(path.resolve(Zebedee.PUBLISHED));
-        Files.createDirectory(path.resolve(Zebedee.COLLECTIONS));
-        Files.createDirectory(path.resolve(Zebedee.PERMISSIONS));
-        Files.createDirectory(path.resolve(Zebedee.TEAMS));
-        Files.createDirectory(path.resolve(Zebedee.LAUNCHPAD));
-        Files.createDirectory(path.resolve(Zebedee.PUBLISHED_COLLECTIONS));
-        Files.createDirectory(path.resolve(Zebedee.APPLICATION_KEYS));
-        return path;
     }
 
     /**

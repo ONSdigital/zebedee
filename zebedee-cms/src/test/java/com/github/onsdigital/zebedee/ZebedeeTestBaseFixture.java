@@ -1,62 +1,25 @@
 package com.github.onsdigital.zebedee;
 
-import com.github.onsdigital.zebedee.json.CollectionType;
-import com.github.onsdigital.zebedee.keyring.CollectionKeyring;
-import com.github.onsdigital.zebedee.model.Collection;
-import com.github.onsdigital.zebedee.model.encryption.EncryptionKeyFactory;
-import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
-import com.github.onsdigital.zebedee.service.ServiceSupplier;
-import com.github.onsdigital.zebedee.session.model.Session;
-import com.github.onsdigital.zebedee.session.service.JWTSessionsServiceImpl;
-import com.github.onsdigital.zebedee.session.service.Sessions;
-import com.github.onsdigital.zebedee.user.model.User;
-import com.github.onsdigital.zebedee.user.model.UserList;
-import com.github.onsdigital.zebedee.user.service.UsersService;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import java.security.SecureRandom;
 import java.util.Base64;
-import java.util.HashMap;
-import java.util.Map;
-
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.when;
 
 /**
- * Common set up required by tests using {@link Builder} (Hide some of the nastiness).
+ * {@link Deprecated} Please do not use this any more.
  */
+@Deprecated
 public abstract class ZebedeeTestBaseFixture {
-
-    @Mock
-    protected UsersService usersService;
-
-    @Mock
-    private JWTSessionsServiceImpl sessionsService;
-
-    @Mock
-    protected CollectionKeyring collectionKeyring;
-
-    @Mock
-    protected PermissionsService permissionsService;
-
-    @Mock
-    protected Session userSession;
-
-    @Mock
-    protected EncryptionKeyFactory encryptionKeyFactory;
 
     protected Zebedee zebedee;
     protected Builder builder;
-    protected Map<String, User> usersMap;
 
     @BeforeClass
     public static void setUpKeyringEnvVars() throws Exception {
@@ -73,57 +36,11 @@ public abstract class ZebedeeTestBaseFixture {
     @Before
     public void init() throws Exception {
         MockitoAnnotations.openMocks(this);
-        TestUtils.initReaderConfig();
 
         builder = new Builder();
         zebedee = builder.getZebedee();
 
-        UserList usersList = new UserList();
-        usersList.add(builder.publisher1);
-
-        ServiceSupplier<UsersService> usersServiceServiceSupplier = () -> usersService;
-
-        ReflectionTestUtils.setField(zebedee, "usersService", usersService);
-        ReflectionTestUtils.setField(zebedee, "sessions", sessionsService);
-        ReflectionTestUtils.setField(zebedee, "collectionKeyring", collectionKeyring);
-        ReflectionTestUtils.setField(zebedee, "encryptionKeyFactory", encryptionKeyFactory);
-
-        usersMap = new HashMap<>();
-        usersMap.put(builder.publisher1.getEmail(), builder.publisher1);
-
-        when(usersService.getUserByEmail(builder.publisher1.getEmail()))
-                .thenReturn(builder.publisher1);
-        when(usersService.getUserByEmail(builder.publisher2.getEmail()))
-                .thenReturn(builder.publisher2);
-        when(usersService.getUserByEmail(builder.reviewer1.getEmail()))
-                .thenReturn(builder.reviewer1);
-        when(usersService.getUserByEmail(builder.administrator.getEmail()))
-                .thenReturn(builder.administrator);
-
         setUp();
-    }
-
-    protected void setUpPermissionsServiceMockForLegacyTests(Zebedee instance, Session publisherSession) throws Exception {
-        when(permissionsService.canView(eq(publisherSession), anyString()))
-                .thenReturn(true);
-        
-        when(permissionsService.canView(eq(publisherSession), anyString(), any(CollectionType.class)))
-                .thenReturn(true);
-
-        when(permissionsService.canEdit(publisherSession))
-                .thenReturn(true);
-        
-        when(permissionsService.canEdit(eq(publisherSession), any(CollectionType.class)))
-                .thenReturn(true);
-
-        ReflectionTestUtils.setField(instance, "permissionsService", permissionsService);
-    }
-
-    protected void setUpKeyringMockForLegacyTests(Zebedee instance, Session someSession, SecretKey key) throws Exception {
-        when(collectionKeyring.get(eq(someSession), any(Collection.class)))
-                .thenReturn(key);
-
-        ReflectionTestUtils.setField(instance, "collectionKeyring", collectionKeyring);
     }
 
     private static String createCollectionKeyStoreKey() throws Exception {
@@ -132,7 +49,7 @@ public abstract class ZebedeeTestBaseFixture {
         return Base64.getEncoder().encodeToString(secretKey.getEncoded());
     }
 
-    private static String createCollectionKeyStoreIV() throws Exception {
+    private static String createCollectionKeyStoreIV() {
         byte[] iv = new byte[16];
         SecureRandom random = new SecureRandom();
         random.nextBytes(iv);

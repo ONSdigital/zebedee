@@ -66,7 +66,7 @@ public class DataPublicationFinderTest {
     @Test
     public void findPublications_givenCollectionWithData_returnsPublication() throws IOException, ZebedeeException, ParseException, URISyntaxException {
         // Given
-        // One of the time series dataset built by Builder in a collection
+        // A time series dataset in a collection
         DataPagesSet dataPagesSet = generator.generateDataPagesSet("node", "test", 2015, 2, "data.csdb");
         DataPublicationDetails expected = new DataPublicationDetails(dataPagesSet.timeSeriesDataset, dataPagesSet.datasetLandingPage, dataPagesSet.fileUri);
         when(reviewedContentReader.getContent(dataPagesSet.timeSeriesDataset.getUri().toString()))
@@ -100,7 +100,7 @@ public class DataPublicationFinderTest {
     @Test
     public void findPublications_givenCollectionWithTwoDataPublications_returnsBoth() throws IOException, ZebedeeException, ParseException, URISyntaxException {
         // Given
-        // Two of the time series dataset built by Builder in the same collection
+        // Two time series dataset in the same collection
         DataPagesSet dataPagesSet1 = generator.generateDataPagesSet("node", "test", 2015, 2, "data.csdb");
         DataPublicationDetails expected1 = new DataPublicationDetails(dataPagesSet1.timeSeriesDataset, dataPagesSet1.datasetLandingPage, dataPagesSet1.fileUri);
         when(reviewedContentReader.getContent(dataPagesSet1.datasetLandingPage.getUri().toString()))

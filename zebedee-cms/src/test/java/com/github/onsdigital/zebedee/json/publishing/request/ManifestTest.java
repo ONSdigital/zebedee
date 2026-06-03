@@ -4,6 +4,7 @@ import com.github.onsdigital.zebedee.Builder;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.ZebedeeTestBaseFixture;
 import com.github.onsdigital.zebedee.model.Collection;
+import com.github.onsdigital.zebedee.json.CollectionType;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -45,17 +46,50 @@ public class ManifestTest extends ZebedeeTestBaseFixture {
         // When the save method is called
         boolean saved = Manifest.save(manifest, collection);
 
-        // Then we can load the manifest and it has the same content as the saved manifest.
+        // Then we can load the manifest and it has the same content as the saved
+        // manifest.
         Manifest loadedManifest = Manifest.load(collection);
 
         assertTrue(saved);
         assertEquals(manifest.filesToCopy.size(), loadedManifest.filesToCopy.size());
 
         // check the file copy is persisted
-        assertEquals(manifest.filesToCopy.iterator().next().source, loadedManifest.filesToCopy.iterator().next().source);
-        assertEquals(manifest.filesToCopy.iterator().next().target, loadedManifest.filesToCopy.iterator().next().target);
+        assertEquals(manifest.filesToCopy.iterator().next().source,
+                loadedManifest.filesToCopy.iterator().next().source);
+        assertEquals(manifest.filesToCopy.iterator().next().target,
+                loadedManifest.filesToCopy.iterator().next().target);
 
         // check the delete is persisted
         assertEquals(manifest.urisToDelete.iterator().next(), loadedManifest.urisToDelete.iterator().next());
+    }
+
+    @Test
+    public void shouldAddFileCopiesForNonAutomatedCollection() throws IOException {
+        // Given a manual collection
+        collection.getDescription().setType(CollectionType.manual);
+
+        // And a versioned URI in the reviewed content
+        builder.createReviewedFile("/some/content/previous/v1/data.json");
+
+        // When the manifest is created
+        Manifest manifest = Manifest.get(collection);
+
+        // Then file copies are added
+        assertEquals(1, manifest.filesToCopy.size());
+    }
+
+    @Test
+    public void shouldNotAddFileCopiesForAutomatedCollection() throws IOException {
+        // Given an automated collection
+        collection.getDescription().setType(CollectionType.automated);
+
+        // And a versioned URI in the reviewed content
+        builder.createReviewedFile("/some/content/previous/v1/data.json");
+
+        // When the manifest is created
+        Manifest manifest = Manifest.get(collection);
+
+        // Then no file copies are added
+        assertEquals(0, manifest.filesToCopy.size());
     }
 }

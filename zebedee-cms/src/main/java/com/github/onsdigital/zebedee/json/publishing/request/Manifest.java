@@ -3,6 +3,8 @@ package com.github.onsdigital.zebedee.json.publishing.request;
 import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.json.PendingDelete;
 import com.github.onsdigital.zebedee.model.Collection;
+import com.github.onsdigital.zebedee.json.CollectionDescription;
+import com.github.onsdigital.zebedee.json.CollectionType;
 import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
 
 import java.io.IOException;
@@ -24,7 +26,8 @@ public class Manifest {
     public Set<String> urisToDelete = new HashSet<>();
 
     /**
-     * Loads the manifest if it exists already for a collection. If no manifest exists it creates a new manifest.
+     * Loads the manifest if it exists already for a collection. If no manifest
+     * exists it creates a new manifest.
      *
      * @param collection
      * @return
@@ -58,12 +61,17 @@ public class Manifest {
     }
 
     private static void updateManifest(Collection collection, Manifest manifest) throws IOException {
-        for (String uri : collection.getReviewed().uris()) {
-            if (VersionedContentItem.isVersionedUri(uri)) {
-                manifest.addFileCopy(VersionedContentItem.resolveBaseUri(uri), uri);
+        // TODO: short term exception for automated (migration) collections
+        CollectionDescription desc = collection.getDescription();
+
+        if (desc != null && desc.getType() != CollectionType.automated) {
+            for (String uri : collection.getReviewed().uris()) {
+                if (VersionedContentItem.isVersionedUri(uri)) {
+                    manifest.addFileCopy(VersionedContentItem.resolveBaseUri(uri), uri);
+                }
             }
         }
-
+        
         for (PendingDelete delete : collection.getDescription().getPendingDeletes()) {
             manifest.addDelete(delete.getRoot().uri);
         }

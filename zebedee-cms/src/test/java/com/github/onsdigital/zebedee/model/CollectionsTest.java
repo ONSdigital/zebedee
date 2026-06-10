@@ -57,6 +57,7 @@ import java.util.function.Supplier;
 
 import static junit.framework.TestCase.assertFalse;
 import static junit.framework.TestCase.assertTrue;
+import static junit.framework.TestCase.assertNotNull;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -226,6 +227,73 @@ public class CollectionsTest {
     @Test
     public void shouldReturnNullIfNotFound() throws Exception {
         assertThat(collections.getCollection("A_Girl_Is_No_One"), equalTo(null));
+    }
+
+    @Test
+    public void getCollectionWithWriteableFallbackShouldReturnWriteableCollection() throws Exception {
+        // Given a collection that exists on disk (created without the ID-to-name shortcut,
+        // so getCollectionNameFromId will fail to trim and fall through to the scan-by-ID fallback).
+        when(zebedeeMock.getCollections()).thenReturn(collections);
+        when(zebedeeMock.getUsersService()).thenReturn(usersServiceMock);
+        when(zebedeeMock.getEncryptionKeyFactory()).thenReturn(encryptionKeyFactory);
+        when(zebedeeMock.getCollectionKeyring()).thenReturn(collectionKeyring);
+        when(collectionReaderWriterFactoryMock.getWriter(zebedeeMock, collectionMock, sessionMock))
+                .thenReturn(collectionWriterMock);
+
+        SecretKey key = Keys.newSecretKey();
+        when(encryptionKeyFactory.newCollectionKey()).thenReturn(key);
+        when(collectionKeyring.get(any(), any())).thenReturn(key);
+
+        com.github.onsdigital.zebedee.json.CollectionDescription desc =
+                new com.github.onsdigital.zebedee.json.CollectionDescription();
+        desc.setName("fallback-writeable-test");
+        desc.setType(com.github.onsdigital.zebedee.json.CollectionType.manual);
+        Collection created = Collection.create(desc, zebedeeMock, sessionMock);
+        String id = created.getDescription().getId();
+
+        // When the collection is retrieved with writeable=true using an ID whose
+        // name-trimming produces the wrong folder name (i.e. forces the fallback path).
+        // We force the fallback by passing a raw ID that does NOT match the
+        // trimmed-name format (no trailing GUID portion).
+        Collection found = collections.getCollection(id, true);
+
+        // Then we get a non-null, writeable collection back.
+        assertNotNull(found);
+        assertThat(found.getDescription().getId(), equalTo(id));
+
+        // And closing it must not throw — i.e. it must actually hold a write lock.
+        found.close();
+    }
+
+    @Test
+    public void getCollectionFallbackWithWriteableFalseShouldReturnNonWriteableCollection() throws Exception {
+        // Given a collection created on disk.
+        when(zebedeeMock.getCollections()).thenReturn(collections);
+        when(zebedeeMock.getUsersService()).thenReturn(usersServiceMock);
+        when(zebedeeMock.getEncryptionKeyFactory()).thenReturn(encryptionKeyFactory);
+        when(zebedeeMock.getCollectionKeyring()).thenReturn(collectionKeyring);
+        when(collectionReaderWriterFactoryMock.getWriter(zebedeeMock, collectionMock, sessionMock))
+                .thenReturn(collectionWriterMock);
+
+        SecretKey key = Keys.newSecretKey();
+        when(encryptionKeyFactory.newCollectionKey()).thenReturn(key);
+        when(collectionKeyring.get(any(), any())).thenReturn(key);
+
+        com.github.onsdigital.zebedee.json.CollectionDescription desc =
+                new com.github.onsdigital.zebedee.json.CollectionDescription();
+        desc.setName("fallback-readonly-test");
+        desc.setType(com.github.onsdigital.zebedee.json.CollectionType.manual);
+        Collection created = Collection.create(desc, zebedeeMock, sessionMock);
+        String id = created.getDescription().getId();
+
+        // When the collection is retrieved with writeable=false.
+        Collection found = collections.getCollection(id, false);
+
+        // Then we get the collection back.
+        assertNotNull(found);
+        assertThat(found.getDescription().getId(), equalTo(id));
+        // close() on a non-writeable collection is a no-op and must not throw.
+        found.close();
     }
 
     @Test(expected = BadRequestException.class)

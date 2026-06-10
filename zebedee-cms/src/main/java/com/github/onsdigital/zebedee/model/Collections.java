@@ -308,7 +308,17 @@ public class Collections {
             String collectionName = getCollectionNameFromId(collectionId);
             return getCollectionByName(collectionName, writeable);
         } catch (IOException | CollectionNotFoundException e) {
-            return list().getCollection(collectionId);
+            // Fallback: scan all collections by ID. The list() entries are non-writeable so if
+            // the caller requested a write lock we must re-open with writeable=true.
+            Collection found = list().getCollection(collectionId);
+            if (found == null || !writeable) {
+                return found;
+            }
+            try {
+                return new Collection(found.getPath(), zebedeeSupplier.get(), true);
+            } catch (CollectionNotFoundException ex) {
+                return null;
+            }
         }
     }
     public Collection getCollectionByName(String collectionName) throws IOException, CollectionNotFoundException {

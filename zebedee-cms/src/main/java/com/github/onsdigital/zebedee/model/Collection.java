@@ -540,11 +540,19 @@ public class Collection {
             Files.delete(collectionDescriptionPath);
         }
 
+        // Release the write lock before removing it from the map. If this is skipped, any thread
+        // that acquired a reference to the lock and is currently blocked on lock() will wait forever
+        // because close() will see hasWriteLock=false and skip the unlock.
+        if (this.isWriteable && this.hasWriteLock) {
+            ReadWriteLock lock = collectionLocks.get(this.path);
+            if (lock != null) {
+                lock.writeLock().unlock();
+            }
+            this.hasWriteLock = false;
+        }
+
         // remove the lock for the collection
         collectionLocks.remove(path);
-
-        // remove write lock for the collection
-        this.hasWriteLock = false;
     }
 
     /**
@@ -1472,8 +1480,6 @@ public class Collection {
                     collectionLock.writeLock().unlock();
                 }
                 this.hasWriteLock = false;
-            } else {
-                warn().collectionID(this).log("collection closed without write lock held - this should not happen");
             }
         }
     }

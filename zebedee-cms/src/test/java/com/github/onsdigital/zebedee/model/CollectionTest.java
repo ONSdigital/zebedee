@@ -62,6 +62,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.locks.Lock;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -651,6 +652,58 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         assertFalse(Files.exists(collectionPath));
         assertFalse(Files.exists(collectionJsonPath));
         writeableCollection.close();
+    }
+
+    @Test
+    public void deleteShouldReleaseLockSoWaitingThreadIsUnblocked() throws Exception {
+        // Given a writeable collection held open by one thread (simulating a publish)
+        Path collectionPath = builder.collections.get(1);
+        Collection writeableCollection = new Collection(collectionPath, zebedee, true);
+
+        // Grab the write lock reference now, before delete() removes it from the map.
+        // This mirrors the Publisher pattern: it calls collection.getWriteLock().lock()
+        // on a reference it already holds, concurrent with another thread that may call delete().
+        Lock writeLock = writeableCollection.getWriteLock();
+
+        CountDownLatch waitingThreadStarted = new CountDownLatch(1);
+        CountDownLatch waitingThreadFinished = new CountDownLatch(1);
+        AtomicBoolean lockAcquired = new AtomicBoolean(false);
+        AtomicReference<Throwable> threadFailure = new AtomicReference<>();
+
+        // A second thread blocks on the same write lock, simulating any concurrent
+        // request (content save, review, etc.) that is waiting while a publish/delete runs.
+        Thread waitingThread = new Thread(() -> {
+            waitingThreadStarted.countDown();
+            try {
+                writeLock.lock(); // blocks because writeableCollection holds it
+                lockAcquired.set(true);
+            } catch (Throwable t) {
+                threadFailure.set(t);
+            } finally {
+                if (lockAcquired.get()) {
+                    writeLock.unlock();
+                }
+                waitingThreadFinished.countDown();
+            }
+        });
+
+        waitingThread.start();
+        assertTrue("waiting thread did not start", waitingThreadStarted.await(1, TimeUnit.SECONDS));
+
+        // The second thread should be blocked waiting for the write lock.
+        assertFalse("second thread acquired lock before delete - test precondition failed",
+                waitingThreadFinished.await(200, TimeUnit.MILLISECONDS));
+
+        // When delete() is called it must release the write lock.
+        writeableCollection.delete();
+
+        // Then the waiting thread should be unblocked.
+        assertTrue("waiting thread was not unblocked after delete()",
+                waitingThreadFinished.await(3, TimeUnit.SECONDS));
+        assertNull("waiting thread threw an exception: " + threadFailure.get(), threadFailure.get());
+        assertTrue(lockAcquired.get());
+
+        waitingThread.join(TimeUnit.SECONDS.toMillis(3));
     }
 
     @Test

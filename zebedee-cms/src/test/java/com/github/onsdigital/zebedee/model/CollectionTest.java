@@ -624,6 +624,75 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
     }
 
     @Test
+    public void concurrentWriteLocksOnDifferentCollectionsShouldNotDeadlockWhenCallingList() throws Exception {
+
+        // Given collection write locking is enabled
+        System.setProperty(CMSFeatureFlags.ENABLE_COLLECTION_WRITE_LOCKING, "true");
+        CMSFeatureFlags.reset();
+
+        try {
+            // Two different collections - each thread holds a write lock on one
+            // and then calls collections.list(), which previously tried to acquire
+            // a read lock on every collection including the one the other thread
+            // holds a write lock on, causing circular wait.
+            Path collectionPath1 = builder.collections.get(0);
+            Path collectionPath2 = builder.collections.get(1);
+
+            CountDownLatch bothLocksHeld = new CountDownLatch(2);
+            CountDownLatch bothListsDone = new CountDownLatch(2);
+            AtomicReference<Throwable> failure = new AtomicReference<>();
+
+            Thread thread1 = new Thread(() -> {
+                try {
+                    Collection c1 = new Collection(collectionPath1, zebedee, true);
+                    bothLocksHeld.countDown();
+                    bothLocksHeld.await(); // don't call list() until both write locks are held
+                    try {
+                        zebedee.getCollections().list();
+                    } finally {
+                        c1.close();
+                    }
+                } catch (Throwable t) {
+                    failure.set(t);
+                } finally {
+                    bothListsDone.countDown();
+                }
+            });
+
+            Thread thread2 = new Thread(() -> {
+                try {
+                    Collection c2 = new Collection(collectionPath2, zebedee, true);
+                    bothLocksHeld.countDown();
+                    bothLocksHeld.await();
+                    try {
+                        zebedee.getCollections().list();
+                    } finally {
+                        c2.close();
+                    }
+                } catch (Throwable t) {
+                    failure.set(t);
+                } finally {
+                    bothListsDone.countDown();
+                }
+            });
+
+            thread1.start();
+            thread2.start();
+
+            // If this times out the threads are deadlocked
+            assertTrue("Deadlock detected: threads did not complete within timeout",
+                    bothListsDone.await(5, TimeUnit.SECONDS));
+            assertNull("Thread threw unexpected exception: " + failure.get(), failure.get());
+
+            thread1.join(TimeUnit.SECONDS.toMillis(5));
+            thread2.join(TimeUnit.SECONDS.toMillis(5));
+        } finally {
+            System.clearProperty(CMSFeatureFlags.ENABLE_COLLECTION_WRITE_LOCKING);
+            CMSFeatureFlags.reset();
+        }
+    }
+
+    @Test
     public void shouldReleaseWriteLockWhenWritableConstructionFails() throws Exception {
 
         Path collectionPath = builder.collections.get(1);

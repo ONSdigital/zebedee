@@ -54,6 +54,7 @@ import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -149,8 +150,11 @@ public class Collection {
             this.lockForWriting();
         }
 
-        collectionLocks.get(this.path).readLock().lock();
-
+        // No read lock here: save() writes atomically via a tmp-file rename, so
+        // readers always see a complete file and a read lock is not needed for safety.
+        // Removing the read lock also prevents the deadlock where two threads each hold
+        // a write lock on different collections and block on each other's read lock
+        // inside collections.list().
         try (InputStream input = Files.newInputStream(this.collectionJsonPath)) {
             this.description = Serialiser.deserialise(input,
                     CollectionDescription.class);
@@ -158,8 +162,6 @@ public class Collection {
             // only clear the write lock if we throw an exception here.
             this.close();
             throw new IOException("Failed to deserialise collection description", e);
-        } finally {
-            collectionLocks.get(this.path).readLock().unlock();
         }
 
         // Set fields:
@@ -587,16 +589,22 @@ public class Collection {
     public boolean save() throws IOException {
         // The lock / unlock here needs to be separate to the Collection lock / unlock
         collectionLocks.get(this.path).writeLock().lock();
-        try (OutputStream output = Files.newOutputStream(this.descriptionPath())) {
-            Serialiser.serialise(output, this.description);
+        // By creating a temporary file and then copying it over in an 
+        // atomic move, we can ensure that readers will always see a complete 
+        // file and not a partially written one, so we don't need to hold a 
+        // lock when reading the file.
+        try {
+            Path tmp = this.collectionJsonPath.resolveSibling(
+                    this.collectionJsonPath.getFileName() + ".tmp");
+            try (OutputStream output = Files.newOutputStream(tmp)) {
+                Serialiser.serialise(output, this.description);
+            }
+            Files.move(tmp, this.collectionJsonPath,
+                    StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
             return true;
         } finally {
             collectionLocks.get(this.path).writeLock().unlock();
         }
-    }
-
-    private Path descriptionPath() {
-        return this.collectionJsonPath;
     }
 
     /**

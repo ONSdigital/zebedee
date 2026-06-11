@@ -235,7 +235,7 @@ public class Collections {
                 if (Files.isDirectory(path)) {
                     try {
                         result.add(new Collection(path, zebedeeSupplier.get()));
-                    } catch (CollectionNotFoundException e) {
+                    } catch (CollectionNotFoundException | IOException e) {
                         error().data("collection_path", path.toString())
                                 .logException(e, "failed to deserialise collection");
                     }

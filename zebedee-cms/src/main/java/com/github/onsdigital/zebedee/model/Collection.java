@@ -574,7 +574,7 @@ public class Collection {
      * Releases the write lock on the collection if it is currently held.
      */
     private void unlockForWriting() {
-        if (this.hasWriteLock && this.shouldWriteLock) {
+        if (this.hasWriteLock) {
             info().data("path", this.path).log("releasing collection write lock");
             ReadWriteLock collectionLock = collectionLocks.get(this.path);
             if (collectionLock != null) {

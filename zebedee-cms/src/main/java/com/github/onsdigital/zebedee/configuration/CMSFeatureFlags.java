@@ -19,6 +19,7 @@ public class CMSFeatureFlags {
     public static final String ENABLE_KAFKA = "ENABLE_KAFKA";
     public static final String ENABLE_STATIC_FILES_PUBLISHING = "ENABLE_STATIC_FILES_PUBLISHING";
     public static final String ENABLE_REDIRECT_API = "ENABLE_REDIRECT_API";
+    public static final String ENABLE_COLLECTION_WRITE_LOCKING = "ENABLE_COLLECTION_WRITE_LOCKING";
 
     /**
      * Singleton instance
@@ -33,7 +34,7 @@ public class CMSFeatureFlags {
     private final boolean isKafkaEnabled;
     private final boolean isStaticFilesPublishingEnabled;
     private final boolean isRedirectAPIEnabled;
-
+    private final boolean isCollectionWriteLockingEnabled;
     /**
      * Construct a new feature flags instance.
      */
@@ -47,6 +48,7 @@ public class CMSFeatureFlags {
         this.isKafkaEnabled = Boolean.valueOf(getConfigValue(ENABLE_KAFKA));
         this.isStaticFilesPublishingEnabled = Boolean.valueOf(getConfigValue(ENABLE_STATIC_FILES_PUBLISHING));
         this.isRedirectAPIEnabled = Boolean.valueOf(getConfigValue(ENABLE_REDIRECT_API));
+        this.isCollectionWriteLockingEnabled = Boolean.valueOf(getConfigValue(ENABLE_COLLECTION_WRITE_LOCKING));
 
         info().data(ENABLE_DATASET_IMPORT, isDatasetImportEnabled)
                 .data(ENABLE_VERIFY_PUBLISH_CONTENT, isVerifyPublishEnabled)
@@ -57,6 +59,7 @@ public class CMSFeatureFlags {
                 .data(ENABLE_KAFKA, isKafkaEnabled)
                 .data(ENABLE_STATIC_FILES_PUBLISHING, isStaticFilesPublishingEnabled)
                 .data(ENABLE_REDIRECT_API, isRedirectAPIEnabled)
+                .data(ENABLE_COLLECTION_WRITE_LOCKING, isCollectionWriteLockingEnabled)
                 .log("CMS feature flags configurations");
     }
 
@@ -113,6 +116,10 @@ public class CMSFeatureFlags {
 
     public boolean isRedirectAPIEnabled() {
         return isRedirectAPIEnabled;
+    }
+
+    public boolean isCollectionWriteLockingEnabled() {
+        return isCollectionWriteLockingEnabled;
     }
 
     public static String getConfigValue(String name) {

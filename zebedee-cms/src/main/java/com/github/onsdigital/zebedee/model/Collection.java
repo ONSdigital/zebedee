@@ -4,6 +4,7 @@ package com.github.onsdigital.zebedee.model;
 import com.github.davidcarboni.cryptolite.Random;
 import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.Zebedee;
+import com.github.onsdigital.zebedee.configuration.CMSFeatureFlags;
 import com.github.onsdigital.zebedee.content.page.base.PageType;
 import com.github.onsdigital.zebedee.content.page.release.Release;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
@@ -99,8 +100,8 @@ public class Collection {
     private final Content complete;
     private final Content inProgress;
 
-    private boolean isWriteable;
     private boolean hasWriteLock;
+    private boolean shouldWriteLock;
 
     private final Zebedee zebedee;
 
@@ -124,6 +125,7 @@ public class Collection {
     public Collection(Path path, Zebedee zebedee, boolean writeable) throws IOException, CollectionNotFoundException {
 
         this.zebedee = zebedee;
+        this.shouldWriteLock = CMSFeatureFlags.cmsFeatureFlags().isCollectionWriteLockingEnabled();
 
         // Validate the directory:
         this.path = path;
@@ -142,11 +144,9 @@ public class Collection {
 
         // Deserialise the description:
         collectionLocks.putIfAbsent(this.path, new ReentrantReadWriteLock());
+
         if (writeable) {
-            this.isWriteable = true;
-            info().data("path", this.path).log("acquiring collection write lock");
-            collectionLocks.get(this.path).writeLock().lock();
-            this.hasWriteLock = true;
+            this.lockForWriting();
         }
 
         collectionLocks.get(this.path).readLock().lock();
@@ -540,16 +540,7 @@ public class Collection {
             Files.delete(collectionDescriptionPath);
         }
 
-        // Release the write lock before removing it from the map. If this is skipped, any thread
-        // that acquired a reference to the lock and is currently blocked on lock() will wait forever
-        // because close() will see hasWriteLock=false and skip the unlock.
-        if (this.isWriteable && this.hasWriteLock) {
-            ReadWriteLock lock = collectionLocks.get(this.path);
-            if (lock != null) {
-                lock.writeLock().unlock();
-            }
-            this.hasWriteLock = false;
-        }
+        this.unlockForWriting();
 
         // remove the lock for the collection
         collectionLocks.remove(path);
@@ -565,7 +556,36 @@ public class Collection {
         return collectionLocks.get(this.path).writeLock();
     }
 
+    /**
+     * Acquires a write lock on the collection if it should be write-locked.
+     */
+    private void lockForWriting() {
+        if (this.shouldWriteLock) {
+            info().data("path", this.path).log("acquiring collection write lock");
+            ReadWriteLock collectionLock = collectionLocks.get(this.path);
+            if (collectionLock != null) {
+                collectionLock.writeLock().lock();
+            }
+            this.hasWriteLock = true;
+        }
+    }
+
+    /**
+     * Releases the write lock on the collection if it is currently held.
+     */
+    private void unlockForWriting() {
+        if (this.hasWriteLock && this.shouldWriteLock) {
+            info().data("path", this.path).log("releasing collection write lock");
+            ReadWriteLock collectionLock = collectionLocks.get(this.path);
+            if (collectionLock != null) {
+                collectionLock.writeLock().unlock();
+            }
+            this.hasWriteLock = false;
+        }
+    }
+
     public boolean save() throws IOException {
+        // The lock / unlock here needs to be separate to the Collection lock / unlock
         collectionLocks.get(this.path).writeLock().lock();
         try (OutputStream output = Files.newOutputStream(this.descriptionPath())) {
             Serialiser.serialise(output, this.description);
@@ -1473,14 +1493,6 @@ public class Collection {
     }
 
     public void close() {
-        if (this.isWriteable) {
-            if (this.hasWriteLock) {
-                ReadWriteLock collectionLock = collectionLocks.get(this.path);
-                if (collectionLock != null) {
-                    collectionLock.writeLock().unlock();
-                }
-                this.hasWriteLock = false;
-            }
-        }
+        this.unlockForWriting();
     }
 }

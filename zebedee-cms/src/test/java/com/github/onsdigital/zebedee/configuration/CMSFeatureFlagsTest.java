@@ -42,4 +42,18 @@ public class CMSFeatureFlagsTest {
         // Then the default of true is returned
         assertTrue(isRedirectAPIEnabled);
     }
+
+    @Test
+    public void shouldGetCollectionWriteLockingFlagIfSet() {
+        // Given an env var set to true
+        System.setProperty(CMSFeatureFlags.ENABLE_COLLECTION_WRITE_LOCKING, "true");
+        CMSFeatureFlags.reset();
+        CMSFeatureFlags cmsFeatureFlags = cmsFeatureFlags();
+
+        // When collection write locking feature flag is requested
+        boolean isCollectionWriteLockingEnabled = cmsFeatureFlags.isCollectionWriteLockingEnabled();
+
+        // Then the default of true is returned
+        assertTrue(isCollectionWriteLockingEnabled);
+    }
 }

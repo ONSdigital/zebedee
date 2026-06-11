@@ -163,6 +163,7 @@ Otherwise :violin: kindly ask someone from the dev team to help troubleshoot.
 | IMAGE_API_URL                                    | "<http://localhost:24700>"                                                     | Image API URL                                                                |
 | REDIRECT_API_URL                                 | "<http://localhost:29900>"                                                     | Redirect API URL                                                             |
 | ENABLE_REDIRECT_API                              | false                                                                          | Enable redirect API processing functionality                                 |
+| ENABLE_COLLECTION_WRITE_LOCKING                  | false                                                                          | Enable prototype collection write locking                                    |
 | ENABLE_KAFKA                                     | false                                                                          | Feature flag to send kafka messages when a collection is published           |
 | KAFKA_ADDR                                       | "localhost:9092"                                                               | Comma seperated list of kafka brokers                                        |
 | KAFKA_CONTENT_UPDATED_TOPIC                      | content-updated                                                                | Kafka topic to send content updated event to                                 |

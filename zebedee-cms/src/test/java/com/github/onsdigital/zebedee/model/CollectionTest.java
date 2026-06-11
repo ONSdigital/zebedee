@@ -576,41 +576,50 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
     @Test
     public void shouldBlockSecondWritableCollectionUntilFirstIsClosed() throws Exception {
 
-        Collection firstWriteableCollection = new Collection(builder.collections.get(1), zebedee, true);
-        CountDownLatch secondConstructorStarted = new CountDownLatch(1);
-        CountDownLatch secondConstructorFinished = new CountDownLatch(1);
-        AtomicBoolean secondCollectionCreated = new AtomicBoolean(false);
-        AtomicReference<Throwable> threadFailure = new AtomicReference<>();
-
-        Thread secondCollectionThread = new Thread(() -> {
-            secondConstructorStarted.countDown();
-            try {
-                Collection secondWriteableCollection = new Collection(builder.collections.get(1), zebedee, true);
-                try {
-                    secondCollectionCreated.set(true);
-                } finally {
-                    secondWriteableCollection.close();
-                }
-            } catch (Throwable t) {
-                threadFailure.set(t);
-            } finally {
-                secondConstructorFinished.countDown();
-            }
-        });
-
-        secondCollectionThread.start();
+        // Given collection write locking is enabled
+        System.setProperty(CMSFeatureFlags.ENABLE_COLLECTION_WRITE_LOCKING, "true");
+        CMSFeatureFlags.reset();
 
         try {
-            assertTrue(secondConstructorStarted.await(1, TimeUnit.SECONDS));
-            assertFalse(secondConstructorFinished.await(200, TimeUnit.MILLISECONDS));
+            Collection firstWriteableCollection = new Collection(builder.collections.get(1), zebedee, true);
+            CountDownLatch secondConstructorStarted = new CountDownLatch(1);
+            CountDownLatch secondConstructorFinished = new CountDownLatch(1);
+            AtomicBoolean secondCollectionCreated = new AtomicBoolean(false);
+            AtomicReference<Throwable> threadFailure = new AtomicReference<>();
 
-            firstWriteableCollection.close();
+            Thread secondCollectionThread = new Thread(() -> {
+                secondConstructorStarted.countDown();
+                try {
+                    Collection secondWriteableCollection = new Collection(builder.collections.get(1), zebedee, true);
+                    try {
+                        secondCollectionCreated.set(true);
+                    } finally {
+                        secondWriteableCollection.close();
+                    }
+                } catch (Throwable t) {
+                    threadFailure.set(t);
+                } finally {
+                    secondConstructorFinished.countDown();
+                }
+            });
 
-            assertTrue(secondConstructorFinished.await(2, TimeUnit.SECONDS));
-            assertNull(threadFailure.get());
-            assertTrue(secondCollectionCreated.get());
-        } finally {
-            secondCollectionThread.join(TimeUnit.SECONDS.toMillis(2));
+            secondCollectionThread.start();
+
+            try {
+                assertTrue(secondConstructorStarted.await(1, TimeUnit.SECONDS));
+                assertFalse(secondConstructorFinished.await(200, TimeUnit.MILLISECONDS));
+
+                firstWriteableCollection.close();
+
+                assertTrue(secondConstructorFinished.await(2, TimeUnit.SECONDS));
+                assertNull(threadFailure.get());
+                assertTrue(secondCollectionCreated.get());
+            } finally {
+                secondCollectionThread.join(TimeUnit.SECONDS.toMillis(2));
+            }
+        } finally {            
+            System.clearProperty(CMSFeatureFlags.ENABLE_COLLECTION_WRITE_LOCKING);
+            CMSFeatureFlags.reset();
         }
     }
 
@@ -656,54 +665,65 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
 
     @Test
     public void deleteShouldReleaseLockSoWaitingThreadIsUnblocked() throws Exception {
-        // Given a writeable collection held open by one thread (simulating a publish)
-        Path collectionPath = builder.collections.get(1);
-        Collection writeableCollection = new Collection(collectionPath, zebedee, true);
 
-        // Grab the write lock reference now, before delete() removes it from the map.
-        // This mirrors the Publisher pattern: it calls collection.getWriteLock().lock()
-        // on a reference it already holds, concurrent with another thread that may call delete().
-        Lock writeLock = writeableCollection.getWriteLock();
+        // Given collection write locking is enabled
+        System.setProperty(CMSFeatureFlags.ENABLE_COLLECTION_WRITE_LOCKING, "true");
+        CMSFeatureFlags.reset();
 
-        CountDownLatch waitingThreadStarted = new CountDownLatch(1);
-        CountDownLatch waitingThreadFinished = new CountDownLatch(1);
-        AtomicBoolean lockAcquired = new AtomicBoolean(false);
-        AtomicReference<Throwable> threadFailure = new AtomicReference<>();
+        try {
 
-        // A second thread blocks on the same write lock, simulating any concurrent
-        // request (content save, review, etc.) that is waiting while a publish/delete runs.
-        Thread waitingThread = new Thread(() -> {
-            waitingThreadStarted.countDown();
-            try {
-                writeLock.lock(); // blocks because writeableCollection holds it
-                lockAcquired.set(true);
-            } catch (Throwable t) {
-                threadFailure.set(t);
-            } finally {
-                if (lockAcquired.get()) {
-                    writeLock.unlock();
+            // Given a writeable collection held open by one thread (simulating a publish)
+            Path collectionPath = builder.collections.get(1);
+            Collection writeableCollection = new Collection(collectionPath, zebedee, true);
+
+            // Grab the write lock reference now, before delete() removes it from the map.
+            // This mirrors the Publisher pattern: it calls collection.getWriteLock().lock()
+            // on a reference it already holds, concurrent with another thread that may call delete().
+            Lock writeLock = writeableCollection.getWriteLock();
+
+            CountDownLatch waitingThreadStarted = new CountDownLatch(1);
+            CountDownLatch waitingThreadFinished = new CountDownLatch(1);
+            AtomicBoolean lockAcquired = new AtomicBoolean(false);
+            AtomicReference<Throwable> threadFailure = new AtomicReference<>();
+
+            // A second thread blocks on the same write lock, simulating any concurrent
+            // request (content save, review, etc.) that is waiting while a publish/delete runs.
+            Thread waitingThread = new Thread(() -> {
+                waitingThreadStarted.countDown();
+                try {
+                    writeLock.lock(); // blocks because writeableCollection holds it
+                    lockAcquired.set(true);
+                } catch (Throwable t) {
+                    threadFailure.set(t);
+                } finally {
+                    if (lockAcquired.get()) {
+                        writeLock.unlock();
+                    }
+                    waitingThreadFinished.countDown();
                 }
-                waitingThreadFinished.countDown();
-            }
-        });
+            });
 
-        waitingThread.start();
-        assertTrue("waiting thread did not start", waitingThreadStarted.await(1, TimeUnit.SECONDS));
+            waitingThread.start();
+            assertTrue("waiting thread did not start", waitingThreadStarted.await(1, TimeUnit.SECONDS));
 
-        // The second thread should be blocked waiting for the write lock.
-        assertFalse("second thread acquired lock before delete - test precondition failed",
-                waitingThreadFinished.await(200, TimeUnit.MILLISECONDS));
+            // The second thread should be blocked waiting for the write lock.
+            assertFalse("second thread acquired lock before delete - test precondition failed",
+                    waitingThreadFinished.await(200, TimeUnit.MILLISECONDS));
 
-        // When delete() is called it must release the write lock.
-        writeableCollection.delete();
+            // When delete() is called it must release the write lock.
+            writeableCollection.delete();
 
-        // Then the waiting thread should be unblocked.
-        assertTrue("waiting thread was not unblocked after delete()",
-                waitingThreadFinished.await(3, TimeUnit.SECONDS));
-        assertNull("waiting thread threw an exception: " + threadFailure.get(), threadFailure.get());
-        assertTrue(lockAcquired.get());
+            // Then the waiting thread should be unblocked.
+            assertTrue("waiting thread was not unblocked after delete()",
+                    waitingThreadFinished.await(3, TimeUnit.SECONDS));
+            assertNull("waiting thread threw an exception: " + threadFailure.get(), threadFailure.get());
+            assertTrue(lockAcquired.get());
 
-        waitingThread.join(TimeUnit.SECONDS.toMillis(3));
+            waitingThread.join(TimeUnit.SECONDS.toMillis(3));
+        } finally {
+            System.clearProperty(CMSFeatureFlags.ENABLE_COLLECTION_WRITE_LOCKING);
+            CMSFeatureFlags.reset();
+        }
     }
 
     @Test

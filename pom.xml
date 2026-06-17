@@ -25,10 +25,10 @@
         <project.reporting.outputEncoding>${encoding}</project.reporting.outputEncoding>
         <restolino.version>v0.8.3</restolino.version>
         <httpino.version>0.0.11</httpino.version>
-        <fasterxml.jackson.version>2.16.1</fasterxml.jackson.version>
+        <fasterxml.jackson.version>2.21.4</fasterxml.jackson.version>
         <apache.poi.version>3.17</apache.poi.version>
         <spring.version>5.3.39</spring.version>
-        <dp.logging.version>v2.0.0-beta.16</dp.logging.version>
+        <dp.logging.version>v2.0.0-beta.18</dp.logging.version>
         <batik.version>1.17</batik.version>
         <logback.version>1.3.16</logback.version>
         <mockito.version>3.12.4</mockito.version>

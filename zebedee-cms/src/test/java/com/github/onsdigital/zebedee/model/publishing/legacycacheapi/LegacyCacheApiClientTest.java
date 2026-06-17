@@ -22,7 +22,6 @@ import java.util.List;
 import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.times;
 
 @RunWith(MockitoJUnitRunner.class)
 public class LegacyCacheApiClientTest {
@@ -40,7 +39,7 @@ public class LegacyCacheApiClientTest {
         CollectionDescription cdmock = mock(CollectionDescription.class);
         when(collection.getDescription()).thenReturn(cdmock);
 
-        LegacyCacheApiPayload legacyCacheApiPayload = new LegacyCacheApiPayload(collection.getDescription().getId(), null, new Date());
+        LegacyCacheApiPayload legacyCacheApiPayload = new LegacyCacheApiPayload(collection.getDescription().getId(), collection.getDescription().getName(), null, new Date());
         payloads = new ArrayList<>();
         payloads.add(legacyCacheApiPayload);
 

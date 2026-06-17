@@ -8,19 +8,23 @@ import java.util.Date;
 public class LegacyCacheApiPayload {
     @SerializedName("collection_id")
     public String collectionId;
+    @SerializedName("collection_title")
+    public String collectionTitle;
     @SerializedName("release_time")
     public String publishDate;
     @SerializedName("path")
     public String uriToUpdate;
 
-    public LegacyCacheApiPayload(String collectionId, String uriToUpdate, Date publishDate) {
+    public LegacyCacheApiPayload(String collectionId, String collectionTitle, String uriToUpdate, Date publishDate) {
         this.collectionId = collectionId;
+        this.collectionTitle = collectionTitle;
         this.publishDate = PublishNotification.format(publishDate);
         this.uriToUpdate = uriToUpdate;
     }
 
-    public LegacyCacheApiPayload(String collectionId, String uriToUpdate) {
+    public LegacyCacheApiPayload(String collectionId, String collectionTitle, String uriToUpdate) {
         this.collectionId = collectionId;
+        this.collectionTitle = collectionTitle;
         this.uriToUpdate = uriToUpdate;
     }
 }

@@ -29,6 +29,9 @@ public class LegacyCacheApiPayloadBuilderTest {
         private List<String> urisToUpdate;
         private AutoCloseable mockitoAnnotations;
 
+        private String testCollectionID = "cake-1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef";
+        private String testCollectionName = "The Cake Collection";
+
         @Before
         public void setUp() throws IOException {
             mockitoAnnotations = MockitoAnnotations.openMocks(this);
@@ -37,7 +40,9 @@ public class LegacyCacheApiPayloadBuilderTest {
             Date publishDate = new Date(1609866000000L);
 
             CollectionDescription mockCollectionDescription = mock(CollectionDescription.class);
-            when(mockCollectionDescription.getId()).thenReturn("cake-1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef");
+            when(mockCollectionDescription.getId()).thenReturn(testCollectionID);
+            when(mockCollectionDescription.getName()).thenReturn(testCollectionName);
+
             when(mockCollectionDescription.getPublishDate()).thenReturn(publishDate);
 
             when(collection.getDescription()).thenReturn(mockCollectionDescription);
@@ -157,6 +162,22 @@ public class LegacyCacheApiPayloadBuilderTest {
 
             assertTrue(hasExpectedFileURI);
             assertTrue(hasExpectedURI);
+        }
+
+        @Test
+        public void NotificationPayloadCacheApiForFileReturnsCollectionDetailsTest() {
+            String testUriFile = "/economy/grossdomesticproductgdp/compendium/unitedkingdomnationalaccountsthebluebook/latest/2025/test.csv";
+
+            urisToUpdate.clear();
+            urisToUpdate.add(testUriFile);
+            java.util.Collection<LegacyCacheApiPayload> payloads = new LegacyCacheApiPayloadBuilder.Builder().collection(collection).build().getPayloads();
+            assertEquals(2, payloads.size());
+
+            boolean hasExpectedCollectionId = payloads.stream().map(payload -> payload.collectionId).anyMatch(id -> id.equals(testCollectionID));
+            boolean hasExpectedCollectionName = payloads.stream().map(payload -> payload.collectionTitle).anyMatch(name -> name.equals(testCollectionName));
+
+            assertTrue(hasExpectedCollectionId);
+            assertTrue(hasExpectedCollectionName);
         }
     }
 }

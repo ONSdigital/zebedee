@@ -40,17 +40,18 @@ public class LegacyCacheApiPayloadBuilder {
         public LegacyCacheApiPayloadBuilder build() {
             Objects.requireNonNull(this.collection);
             String collectionId = collection.getDescription().getId();
+            String collectionTitle = collection.getDescription().getName();
             Date publishDate = collection.getDescription().getPublishDate();
             try {
                 collection.reviewedUris()
                         .forEach(uri -> {
                             String pagePath = PayloadPathUpdater.getCanonicalPagePath(uri, collectionId);
                             LegacyCacheApiPayload legacyCacheApiPayload = new LegacyCacheApiPayload(collectionId,
-                                    pagePath, publishDate);
+                                    collectionTitle, pagePath, publishDate);
                             if (isValid(legacyCacheApiPayload)) {
                                 payloadsByPath.put(legacyCacheApiPayload.uriToUpdate, legacyCacheApiPayload);
-                                addPayloadForFile(uri, collectionId, publishDate);
-                                addPayloadForLatest(legacyCacheApiPayload.uriToUpdate, collectionId, publishDate);
+                                addPayloadForFile(uri, collectionId, collectionTitle, publishDate);
+                                addPayloadForLatest(legacyCacheApiPayload.uriToUpdate, collectionId, collectionTitle, publishDate);
 
                             }
                         });
@@ -59,7 +60,7 @@ public class LegacyCacheApiPayloadBuilder {
                             String uriToDelete = pendingDelete.getRoot().getUri();
                             uriToDelete = PayloadPathUpdater.getCanonicalPagePath(uriToDelete, collectionId);
                             LegacyCacheApiPayload legacyCacheApiPayload = new LegacyCacheApiPayload(collectionId,
-                                    uriToDelete);
+                                    collectionTitle, uriToDelete);
                             if (isValid(legacyCacheApiPayload)) {
                                 payloadsByPath.put(legacyCacheApiPayload.uriToUpdate, legacyCacheApiPayload);
                             }
@@ -87,11 +88,12 @@ public class LegacyCacheApiPayloadBuilder {
          * Adds a payload for a specific file if the URI matches a file type.
          * @param uriToUpdate the URI of the file to update
          * @param collectionId the ID of the collection
+         * @param collectionTitle the title of the collection
          * @param clearCacheDate the date to clear the cache
          */
-        private void addPayloadForFile(String uriToUpdate, String collectionId, Date clearCacheDate) {
+        private void addPayloadForFile(String uriToUpdate, String collectionId, String collectionTitle, Date clearCacheDate) {
             if (URIUtils.isLastSegmentFileExtension(uriToUpdate)) {
-                addFilePayload(uriToUpdate, collectionId, clearCacheDate);
+                addFilePayload(uriToUpdate, collectionId, collectionTitle, clearCacheDate);
             }
         }
 
@@ -99,11 +101,12 @@ public class LegacyCacheApiPayloadBuilder {
          * Adds a payload for a specific file.
          * @param uriToUpdate the URI of the file to update
          * @param collectionId the ID of the collection
+         * @param collectionTitle the title of the collection
          * @param clearCacheDate the date to clear the cache
          */
-        private void addFilePayload(String uriToUpdate, String collectionId, Date clearCacheDate) {
+        private void addFilePayload(String uriToUpdate, String collectionId, String collectionTitle, Date clearCacheDate) {
             String payloadPath = PayloadPathUpdater.getPathForFile(uriToUpdate);
-            LegacyCacheApiPayload payloadFile = new LegacyCacheApiPayload(collectionId, payloadPath, clearCacheDate);
+            LegacyCacheApiPayload payloadFile = new LegacyCacheApiPayload(collectionId, collectionTitle, payloadPath, clearCacheDate);
             payloadsByPath.put(payloadFile.uriToUpdate, payloadFile);
         }
 
@@ -111,23 +114,25 @@ public class LegacyCacheApiPayloadBuilder {
          * Adds a payload for the 'latest' version if the URI matches a known type.
          * @param uriToUpdate the URI of the resource to update
          * @param collectionId the ID of the collection
+         * @param collectionTitle the title of the collection
          * @param clearCacheDate the date to clear the cache
          */
-        private void addPayloadForLatest(String uriToUpdate, String collectionId, Date clearCacheDate) {
+        private void addPayloadForLatest(String uriToUpdate, String collectionId, String collectionTitle, Date clearCacheDate) {
             PayloadType type = getPayloadType(uriToUpdate);
             if (type == PayloadType.NONE)
                 return;
-            addLatestPayload(uriToUpdate, collectionId, clearCacheDate);
+            addLatestPayload(uriToUpdate, collectionId, collectionTitle, clearCacheDate);
         }
 
         /**
          * Adds a payload for the 'latest' version of a resource.
          * @param uriToUpdate the URI of the resource to update
          * @param collectionId the ID of the collection
+         * @param collectionTitle the title of the collection
          * @param clearCacheDate the date to clear the cache
          */
-        private void addLatestPayload(String uriToUpdate, String collectionId, Date clearCacheDate) {
-            LegacyCacheApiPayload payloadLatest = new LegacyCacheApiPayload(collectionId, uriToUpdate, clearCacheDate);
+        private void addLatestPayload(String uriToUpdate, String collectionId, String collectionTitle, Date clearCacheDate) {
+            LegacyCacheApiPayload payloadLatest = new LegacyCacheApiPayload(collectionId, collectionTitle, uriToUpdate, clearCacheDate);
             payloadLatest.uriToUpdate = PayloadPathUpdater.getPathForLatest(payloadLatest.uriToUpdate);
             payloadsByPath.put(payloadLatest.uriToUpdate, payloadLatest);
         }

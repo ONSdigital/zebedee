@@ -239,13 +239,13 @@
         <dependency>
             <groupId>com.github.onsdigital.dis-redirect-api</groupId>
             <artifactId>dis-redirect-api-sdk-java</artifactId>
-            <version>v0.7.0</version>
+            <version>v1.0.1</version>
         </dependency>
 
         <dependency>
             <groupId>com.github.onsdigital.dp-permissions-api</groupId>
             <artifactId>dp-permissions-api-sdk-java</artifactId>
-            <version>v1.13.0</version>
+            <version>v1.15.0</version>
         </dependency>
 
         <!-- Test -->

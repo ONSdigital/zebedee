@@ -94,9 +94,6 @@ public class CollectionsTest {
     private ZebedeeCmsService zebedeeCmsService;
 
     @Mock
-    private VersionsService versionsService;
-
-    @Mock
     private ZebedeeReader zebedeeReader;
 
     @Mock
@@ -163,7 +160,7 @@ public class CollectionsTest {
         collectionsPath = rootDir.newFolder("collections").toPath();
 
         // Test target.
-        collections = new Collections(collectionsPath, permissionsServiceMock, versionsService, publishedContentMock);
+        collections = new Collections(collectionsPath, permissionsServiceMock, publishedContentMock);
 
         zebedeeSupplier = () -> zebedeeMock;
         publishingNotificationConsumer = (c, e) -> publishNotification.sendNotification(e);
@@ -298,7 +295,7 @@ public class CollectionsTest {
 
     @Test(expected = BadRequestException.class)
     public void shouldThrowBadRequestForNullCollectionOnApprove() throws IOException, ZebedeeException {
-        collections.approve(null, sessionMock, null);
+        collections.approve(null, sessionMock);
     }
 
     @Test(expected = BadRequestException.class)
@@ -382,7 +379,7 @@ public class CollectionsTest {
         when(permissionsServiceMock.canEdit(sessionMock, TEST_COLLECTION_TYPE))
                 .thenReturn(false);
         try {
-            collections.approve(collectionMock, sessionMock, null);
+            collections.approve(collectionMock, sessionMock);
         } catch (UnauthorizedException e) {
             verify(permissionsServiceMock, times(1))
                     .canEdit(sessionMock, TEST_COLLECTION_TYPE);
@@ -659,7 +656,7 @@ public class CollectionsTest {
         doNothing().when(description).addEvent(eventCaptor.capture());
 
         try {
-            collections.approve(collectionMock, sessionMock, null);
+            collections.approve(collectionMock, sessionMock);
         } catch (ConflictException e) {
             verify(permissionsServiceMock, times(1)).canEdit(sessionMock, TEST_COLLECTION_TYPE);
             verify(collectionMock, times(1)).inProgressUris();
@@ -692,7 +689,7 @@ public class CollectionsTest {
         doNothing().when(description).addEvent(eventCaptor.capture());
 
         try {
-            collections.approve(collectionMock, sessionMock, null);
+            collections.approve(collectionMock, sessionMock);
         } catch (ConflictException e) {
             verify(permissionsServiceMock, times(1)).canEdit(sessionMock, TEST_COLLECTION_TYPE);
             verify(collectionMock, times(1)).inProgressUris();
@@ -724,7 +721,7 @@ public class CollectionsTest {
         when(zebedeeCmsService.getZebedeeReader())
                 .thenReturn(zebedeeReader);
 
-        assertThat(futureMock, equalTo(collections.approve(collectionMock, sessionMock, null)));
+        assertThat(futureMock, equalTo(collections.approve(collectionMock, sessionMock)));
 
         verify(permissionsServiceMock, times(1)).canEdit(sessionMock, TEST_COLLECTION_TYPE);
         verify(collectionMock, times(1)).isAllContentReviewed(anyBoolean());
@@ -1307,75 +1304,6 @@ public class CollectionsTest {
         verify(collectionMock, times(1)).save();
         verify(collectionMock, never()).deleteDataVisContent(sessionMock, path);
         verify(collectionMock, never()).deleteFile(anyString());
-    }
-
-    @Test
-    public void skipDatasetVersionsValidation_userKeyNull_shouldReturnFalse() throws IOException {
-        assertFalse(collections.skipDatasetVersionsValidation(null, null, null));
-    }
-
-    @Test
-    public void skipDatasetVersionsValidation_overrideKeyNull_shouldReturnFalse() throws IOException {
-        assertFalse(collections.skipDatasetVersionsValidation(666L, null, null));
-    }
-
-    @Test
-    public void skipDatasetVersionsValidation_sessionNull_shouldReturnFalse() throws IOException {
-        Session expectedSession = null;
-
-        when(permissionsServiceMock.canEdit(expectedSession))
-                .thenReturn(false);
-
-        assertFalse(collections.skipDatasetVersionsValidation(666L, 666L, expectedSession));
-    }
-
-    @Test
-    public void skipDatasetVersionsValidation_userNotPublisher_shouldReturnFalse() throws IOException {
-        when(permissionsServiceMock.canEdit(sessionMock))
-                .thenReturn(false);
-
-        assertFalse(collections.skipDatasetVersionsValidation(666L, 666L, sessionMock));
-    }
-
-    @Test
-    public void skipDatasetVersionsValidation_incorrectKey_shouldReturnFalse() throws IOException {
-        when(permissionsServiceMock.canEdit(sessionMock))
-                .thenReturn(true);
-
-        assertFalse(collections.skipDatasetVersionsValidation(123L, 666L, sessionMock));
-    }
-
-    @Test
-    public void skipDatasetVersionsValidation_correctKey_shouldReturnTrue() throws IOException {
-        when(permissionsServiceMock.canEdit(sessionMock))
-                .thenReturn(true);
-
-        long actual = 666;
-        long user = 666;
-        assertTrue(collections.skipDatasetVersionsValidation(user, actual, sessionMock));
-    }
-
-    @Test
-    public void skipDatasetVersionsValidation_correctKeyInvalidPermssions_shouldReturnFalse() throws IOException {
-        when(permissionsServiceMock.canEdit(sessionMock))
-                .thenReturn(false);
-
-        assertFalse(collections.skipDatasetVersionsValidation(666L, 666L, sessionMock));
-    }
-
-    @Test
-    public void skipDatasetVersionsValidation_success() throws IOException {
-        CollectionDescription description = new CollectionDescription();
-
-        when(collectionMock.getDescription())
-                .thenReturn(description);
-
-        collections.skipDatasetVersionsValidation(collectionMock, sessionMock);
-
-        assertThat(description.getEvents().size(), equalTo(1));
-
-        Event event = description.getEvents().get(0);
-        assertThat(event.getType(), equalTo(EventType.VERSION_VERIFICATION_BYPASSED));
     }
 
     @Test

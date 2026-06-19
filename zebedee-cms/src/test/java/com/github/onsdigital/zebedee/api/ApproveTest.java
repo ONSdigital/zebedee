@@ -14,7 +14,6 @@ import org.mockito.MockitoAnnotations;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import static com.github.onsdigital.zebedee.api.Approve.OVERRIDE_KEY_PARAM;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsNull.nullValue;
@@ -66,56 +65,20 @@ public class ApproveTest {
     }
 
     @Test
-    public void getOverrideKey_paramNull_shouldReturnNull() {
-        when(request.getParameter(OVERRIDE_KEY_PARAM))
-                .thenReturn(null);
-
-        Long key = approveEndpoint.getOverrideKey(request);
-        assertThat(key, is(nullValue()));
-    }
-
-    @Test
-    public void getOverrideKey_paramEmpty_shouldReturnNull() {
-        when(request.getParameter(OVERRIDE_KEY_PARAM))
-                .thenReturn("");
-
-        Long key = approveEndpoint.getOverrideKey(request);
-        assertThat(key, is(nullValue()));
-    }
-
-    @Test
-    public void getOverrideKey_nonNumericValue_shouldReturnNull() {
-        when(request.getParameter(OVERRIDE_KEY_PARAM))
-                .thenReturn("abc");
-
-        Long key = approveEndpoint.getOverrideKey(request);
-        assertThat(key, is(nullValue()));
-    }
-
-    @Test
-    public void getOverrideKey_numericValue_shouldReturnValueAsLong() {
-        when(request.getParameter(OVERRIDE_KEY_PARAM))
-                .thenReturn("666");
-
-        Long key = approveEndpoint.getOverrideKey(request);
-        assertThat(key, equalTo(666L));
-    }
-
-    @Test
     public void approveCollection_shouldCloseCollectionOnSuccess() throws Exception {
         when(collections.getCollection(COLLECTION_ID, true)).thenReturn(collection);
 
         boolean approved = approveEndpoint.approveCollection(request, response);
 
         assertThat(approved, is(true));
-        verify(collections).approve(collection, session, null);
+        verify(collections).approve(collection, session);
         verify(collection).close();
     }
 
     @Test
     public void approveCollection_shouldCloseCollectionWhenApproveThrows() throws Exception {
         when(collections.getCollection(COLLECTION_ID, true)).thenReturn(collection);
-        doThrow(new ConflictException("approval failed")).when(collections).approve(collection, session, null);
+        doThrow(new ConflictException("approval failed")).when(collections).approve(collection, session);
 
         assertThrows(ConflictException.class, () -> approveEndpoint.approveCollection(request, response));
 

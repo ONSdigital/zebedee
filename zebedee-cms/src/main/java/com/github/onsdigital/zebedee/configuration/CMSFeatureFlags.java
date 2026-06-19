@@ -12,7 +12,6 @@ public class CMSFeatureFlags {
 
     public static final String ENABLE_DATASET_IMPORT = "ENABLE_DATASET_IMPORT";
     public static final String ENABLE_VERIFY_PUBLISH_CONTENT = "ENABLE_VERIFY_PUBLISH_CONTENT";
-    private static final String ENABLE_DATASET_VERSION_VERIFICATION = "ENABLE_DATASET_VERSION_VERIFICATION";
     public static final String ENABLE_IMAGE_PUBLISHING = "ENABLE_IMAGE_PUBLISHING";
     private static final String ENABLE_JWT_SESSIONS = "ENABLE_JWT_SESSIONS";
     private static final String ENABLE_PERMISSIONS_API = "ENABLE_PERMISSIONS_API";
@@ -27,7 +26,6 @@ public class CMSFeatureFlags {
     private static CMSFeatureFlags instance = null;
     private final boolean isDatasetImportEnabled;
     private final boolean isVerifyPublishEnabled;
-    private final boolean isDatasetVersionVerificationEnabled;
     private final boolean isImagePublishingEnabled;
     private final boolean isJwtSessionsEnabled;
     private final boolean isPermissionsAPIEnabled;
@@ -41,7 +39,6 @@ public class CMSFeatureFlags {
     private CMSFeatureFlags() {
         this.isDatasetImportEnabled = Boolean.valueOf(getConfigValue(ENABLE_DATASET_IMPORT));
         this.isVerifyPublishEnabled = Boolean.valueOf(getConfigValue(ENABLE_VERIFY_PUBLISH_CONTENT));
-        this.isDatasetVersionVerificationEnabled = Boolean.valueOf(getConfigValue(ENABLE_DATASET_VERSION_VERIFICATION));
         this.isImagePublishingEnabled = Boolean.valueOf(getConfigValue(ENABLE_IMAGE_PUBLISHING));
         this.isJwtSessionsEnabled = Boolean.valueOf(getConfigValue(ENABLE_JWT_SESSIONS));
         this.isPermissionsAPIEnabled = Boolean.valueOf(getConfigValue(ENABLE_PERMISSIONS_API));
@@ -52,7 +49,6 @@ public class CMSFeatureFlags {
 
         info().data(ENABLE_DATASET_IMPORT, isDatasetImportEnabled)
                 .data(ENABLE_VERIFY_PUBLISH_CONTENT, isVerifyPublishEnabled)
-                .data(ENABLE_DATASET_VERSION_VERIFICATION, isDatasetVersionVerificationEnabled)
                 .data(ENABLE_IMAGE_PUBLISHING, isImagePublishingEnabled)
                 .data(ENABLE_JWT_SESSIONS, isJwtSessionsEnabled)
                 .data(ENABLE_PERMISSIONS_API, isPermissionsAPIEnabled)
@@ -82,17 +78,6 @@ public class CMSFeatureFlags {
      */
     public boolean isVerifyPublishEnabled() {
         return this.isVerifyPublishEnabled;
-    }
-
-    /**
-     * If true collection approval requests will verify each version of dataset page exists in either the collection
-     * reviewed dir or in the published content. If not the approval with be prevented. This is a temp fix to help
-     * identify the cause of Trello #4687.
-     *
-     * @return true if enabled false otherwise.
-     */
-    public boolean isDatasetVersionVerificationEnabled() {
-        return this.isDatasetVersionVerificationEnabled;
     }
 
     public boolean isImagePublishingEnabled() {

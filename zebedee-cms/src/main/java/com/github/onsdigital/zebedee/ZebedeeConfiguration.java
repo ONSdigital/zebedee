@@ -202,8 +202,7 @@ public class ZebedeeConfiguration {
             this.permissionsService = new PermissionsServiceImpl(permissionsStore);
         }
 
-        VersionsService versionsService = new VersionsServiceImpl();
-        this.collections = new Collections(collectionsPath, permissionsService, versionsService,
+        this.collections = new Collections(collectionsPath, permissionsService,
                 published);
 
         // TODO: Remove after migration to JWT sessions is complete

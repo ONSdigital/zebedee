@@ -84,7 +84,6 @@ public class ContentTest {
     CollectionDescription collectionDescription;
     private EncryptionKeyFactory encryptionKeyFactory;
     private SecretKey secretKey;
-    private VersionsServiceImpl versionsService;
     private com.github.onsdigital.zebedee.model.Content content;
     private Collections collections;
 
@@ -100,10 +99,9 @@ public class ContentTest {
         collectionDescription.setType(collectionType);
         encryptionKeyFactory = new EncryptionKeyFactoryImpl();
         secretKey = KeyGenerator.getInstance("AES").generateKey();
-        versionsService = new VersionsServiceImpl();
 
         content = new com.github.onsdigital.zebedee.model.Content(tempBasePath);
-        collections = new Collections(tempBasePath, mockPermissionsService, versionsService, content);
+        collections = new Collections(tempBasePath, mockPermissionsService, content);
 
         when(mockPermissionsService.canEdit(mockSession, collectionType)).thenReturn(true);
 

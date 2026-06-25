@@ -36,7 +36,6 @@ public class DataPublisherTest {
     @Mock
     private ReaderConfiguration configuration;
 
-
     @Before
     public void setUp() {
         MockitoAnnotations.openMocks(this);
@@ -70,8 +69,8 @@ public class DataPublisherTest {
         // readers and writers for published and collection.
         ContentWriter publishedContentWriter = new ContentWriter(publishedDirectory);
         ContentReader publishedContentReader = new FileSystemContentReader(publishedDirectory);
-        CollectionReader collectionReader = new DummyCollectionReader(collectionDirectory, configuration);
-        CollectionWriter collectionWriter = new DummyCollectionWriter(collectionDirectory, configuration);
+        CollectionReader collectionReader = new DummyCollectionReader(collectionDirectory);
+        CollectionWriter collectionWriter = new DummyCollectionWriter(collectionDirectory);
 
 
         String expectedTitle = "the updated title";

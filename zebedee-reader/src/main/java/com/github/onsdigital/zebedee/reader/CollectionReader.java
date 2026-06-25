@@ -55,7 +55,14 @@ public abstract class CollectionReader {
      * @throws IOException
      */
     public Page getContent(String path) throws ZebedeeException, IOException {
-        return findContent(path);
+        Page page = getContentQuiet(path, inProgress);
+        if (page == null) {
+            page = getContentQuiet(path, complete);
+            if (page == null) {
+                page = reviewed.getContent(path);
+            }
+        }
+        return page;
     }
 
     /**
@@ -130,21 +137,10 @@ public abstract class CollectionReader {
         return parents;
     }
 
-    private Page findContent(String path) throws IOException, ZebedeeException {
-        Page page = getContentQuiet(path, inProgress);
-        if (page == null) {
-            page = getContentQuiet(path, complete);
-            if (page == null) {
-                page = reviewed.getContent(path);
-            }
-        }
-        return page;
-    }
-
     private Resource findResource(String path) throws IOException, ZebedeeException {
-        Resource resource = getQuiet(path, inProgress);
+        Resource resource = getResourceQuiet(path, inProgress);
         if (resource == null) {
-            resource = getQuiet(path, complete);
+            resource = getResourceQuiet(path, complete);
             if (resource == null) {
                 resource = reviewed.getResource(path);
             }
@@ -153,7 +149,7 @@ public abstract class CollectionReader {
     }
 
     //If content not found with given reader do not shout
-    private Resource getQuiet(String path, ContentReader contentReader) throws ZebedeeException, IOException {
+    private Resource getResourceQuiet(String path, ContentReader contentReader) throws ZebedeeException, IOException {
         try {
             return contentReader.getResource(path);
         } catch (NotFoundException e) {

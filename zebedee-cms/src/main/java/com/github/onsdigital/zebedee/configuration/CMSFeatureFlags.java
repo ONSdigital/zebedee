@@ -37,20 +37,19 @@ public class CMSFeatureFlags {
      * Construct a new feature flags instance.
      */
     private CMSFeatureFlags() {
-        this.isDatasetImportEnabled = Boolean.valueOf(getConfigValue(ENABLE_DATASET_IMPORT));
-        this.isVerifyPublishEnabled = Boolean.valueOf(getConfigValue(ENABLE_VERIFY_PUBLISH_CONTENT));
-        this.isImagePublishingEnabled = Boolean.valueOf(getConfigValue(ENABLE_IMAGE_PUBLISHING));
-        this.isJwtSessionsEnabled = Boolean.valueOf(getConfigValue(ENABLE_JWT_SESSIONS));
-        this.isPermissionsAPIEnabled = Boolean.valueOf(getConfigValue(ENABLE_PERMISSIONS_API));
-        this.isKafkaEnabled = Boolean.valueOf(getConfigValue(ENABLE_KAFKA));
-        this.isStaticFilesPublishingEnabled = Boolean.valueOf(getConfigValue(ENABLE_STATIC_FILES_PUBLISHING));
-        this.isRedirectAPIEnabled = Boolean.valueOf(getConfigValue(ENABLE_REDIRECT_API));
-        this.isCollectionWriteLockingEnabled = Boolean.valueOf(getConfigValue(ENABLE_COLLECTION_WRITE_LOCKING));
+        this.isDatasetImportEnabled = getBooleanConfigValue(ENABLE_DATASET_IMPORT);
+        this.isVerifyPublishEnabled = getBooleanConfigValue(ENABLE_VERIFY_PUBLISH_CONTENT);
+        this.isImagePublishingEnabled = getBooleanConfigValue(ENABLE_IMAGE_PUBLISHING);
+        this.isJwtSessionsEnabled = getBooleanConfigValue(ENABLE_JWT_SESSIONS, false);
+        this.isPermissionsAPIEnabled = getBooleanConfigValue(ENABLE_PERMISSIONS_API);
+        this.isKafkaEnabled = getBooleanConfigValue(ENABLE_KAFKA);
+        this.isStaticFilesPublishingEnabled = getBooleanConfigValue(ENABLE_STATIC_FILES_PUBLISHING);
+        this.isRedirectAPIEnabled = getBooleanConfigValue(ENABLE_REDIRECT_API);
+        this.isCollectionWriteLockingEnabled = getBooleanConfigValue(ENABLE_COLLECTION_WRITE_LOCKING);
 
         info().data(ENABLE_DATASET_IMPORT, isDatasetImportEnabled)
                 .data(ENABLE_VERIFY_PUBLISH_CONTENT, isVerifyPublishEnabled)
                 .data(ENABLE_IMAGE_PUBLISHING, isImagePublishingEnabled)
-                .data(ENABLE_JWT_SESSIONS, isJwtSessionsEnabled)
                 .data(ENABLE_PERMISSIONS_API, isPermissionsAPIEnabled)
                 .data(ENABLE_KAFKA, isKafkaEnabled)
                 .data(ENABLE_STATIC_FILES_PUBLISHING, isStaticFilesPublishingEnabled)
@@ -107,20 +106,24 @@ public class CMSFeatureFlags {
         return isCollectionWriteLockingEnabled;
     }
 
-    public static String getConfigValue(String name) {
+    public static boolean getBooleanConfigValue(String name) {
+        return getBooleanConfigValue(name, false);
+    }
+
+    public static boolean getBooleanConfigValue(String name, boolean defaultValue) {
         String value = System.getProperty(name);
         if (StringUtils.isNoneEmpty(value)) {
             info().data(name, value).log("applying CMS feature flag config value from system.properties");
-            return value;
+            return Boolean.parseBoolean(value);
         }
 
         value = System.getenv(name);
         if (StringUtils.isNoneEmpty(value)) {
             info().data(name, value).log("applying CMS feature flag config value from system.env");
-            return value;
+            return Boolean.parseBoolean(value);
         }
         warn().data("name", name).log("CMS config value not found in system.properties or system.env default will be applied");
-        return "";
+        return defaultValue;
     }
 
     /**

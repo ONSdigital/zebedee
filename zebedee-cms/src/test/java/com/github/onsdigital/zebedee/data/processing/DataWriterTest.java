@@ -1,264 +1,233 @@
 package com.github.onsdigital.zebedee.data.processing;
 
-import com.github.davidcarboni.cryptolite.Keys;
 import com.github.davidcarboni.cryptolite.Random;
-import com.github.onsdigital.zebedee.ZebedeeTestBaseFixture;
 import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeries;
 import com.github.onsdigital.zebedee.content.page.statistics.dataset.Version;
-import com.github.onsdigital.zebedee.data.framework.DataBuilder;
 import com.github.onsdigital.zebedee.data.framework.DataPagesGenerator;
 import com.github.onsdigital.zebedee.data.framework.DataPagesSet;
-import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
-import com.github.onsdigital.zebedee.json.CollectionDescription;
-import com.github.onsdigital.zebedee.json.CollectionType;
-import com.github.onsdigital.zebedee.session.model.Session;
-import com.github.onsdigital.zebedee.model.Collection;
-import com.github.onsdigital.zebedee.model.CollectionWriter;
-import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
-import com.github.onsdigital.zebedee.model.ZebedeeCollectionWriter;
+import com.github.onsdigital.zebedee.model.ContentWriter;
+import com.github.onsdigital.zebedee.model.content.item.ContentItemVersion;
 import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
-import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
-import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
+import org.mockito.*;
 
-import javax.crypto.SecretKey;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 
 import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
-public class DataWriterTest extends ZebedeeTestBaseFixture {
+public class DataWriterTest {
 
-    Session publisher;
-    Session reviewer;
+    @Mock
+    private ContentReader publishedContentReader;
 
-    Collection collection;
-    ContentReader publishedReader;
-    CollectionReader collectionReader;
-    CollectionWriter collectionWriter;
-    DataBuilder dataBuilder;
-    DataPagesGenerator generator;
+    @Mock
+    private ContentReader reviewedContentReader;
 
-    DataPagesSet published;
-    DataPagesSet unpublished;
-    DataPagesSet republish;
+    @Mock
+    private ContentWriter reviewedContentWriter;
 
-    SecretKey secretKey;
+    @Mock
+    private DataProcessor dataProcessor;
+
+    private MockedConstruction<VersionedContentItem> versionedContentItemMock;
+
+    private DataPagesSet pageSet;
+    private DataPublicationDetails publicationDetails;
+    private TimeSeries timeSeries;
 
     /**
-     * Setup generates an instance of zebedee plus a collection
+     * Setup common test data and mocks.
      *
      * @throws Exception
      */
+    @Before
     public void setUp() throws Exception {
+        MockitoAnnotations.openMocks(this);
 
-        secretKey = Keys.newSecretKey();
+        // Generate example sets of published and unpublished data pages
+        DataPagesGenerator generator = new DataPagesGenerator();
+        pageSet = generator.generateDataPagesSet("dataprocessor", "inreview", 2015, 2, "");
+        pageSet.timeSeriesDataset.getDescription().setReleaseDate(new Date());
 
-        publisher = zebedee.openSession(builder.publisher1Credentials);
-        reviewer = zebedee.openSession(builder.reviewer1Credentials);
+        Path rootPath = Files.createTempDirectory(Random.id());
+        when(reviewedContentReader.getRootFolder()).thenReturn(rootPath);
 
-        setUpKeyringMockForLegacyTests(zebedee, publisher, secretKey);
-        setUpPermissionsServiceMockForLegacyTests(zebedee, publisher);
-
-        dataBuilder = new DataBuilder(zebedee, publisher, reviewer);
-        generator = new DataPagesGenerator();
-
-        CollectionDescription collectionDescription = new CollectionDescription();
-        collectionDescription.setName("DataPublicationDetails");
-        collectionDescription.setEncrypted(true);
-        collectionDescription.setType(CollectionType.scheduled);
-        collectionDescription.setPublishDate(new Date());
-        collection = Collection.create(collectionDescription, zebedee, publisher);
-
-        publishedReader = new FileSystemContentReader(zebedee.getPublished().getPath());
-        collectionReader = new ZebedeeCollectionReader(zebedee, collection, publisher);
-        collectionWriter = new ZebedeeCollectionWriter(zebedee, collection, publisher);
-
-        // add a set of data in a collection
-        unpublished = generator.generateDataPagesSet("dataprocessor", "inreview", 2015, 2, "");
-        dataBuilder.addReviewedDataPagesSet(unpublished, collection, collectionWriter);
-
-        // add a set of data to published
-        published = generator.generateDataPagesSet("dataprocessor", "published", 2015, 2, "");
-        dataBuilder.publishDataPagesSet(published);
-
-        // add a set of data to published over the existing set
-        republish = generator.generateDataPagesSet("dataprocessor", "published", 2016, 2, "");
-        dataBuilder.addReviewedDataPagesSet(republish, collection, collectionWriter);
+        publicationDetails = new DataPublicationDetails(pageSet.timeSeriesDataset, pageSet.datasetLandingPage, pageSet.fileUri);
+        timeSeries = pageSet.timeSeriesList.get(0);
+        when(dataProcessor.getTimeSeries()).thenReturn(timeSeries);
     }
 
-    @Test
-    public void versionAndSave_forBrandNewData_doesCreateFileInReviewed() throws ZebedeeException, IOException, URISyntaxException {
-        // Given
-        // a processor for a brand new timeseries
-        DataPublicationDetails details = unpublished.getDetails(publishedReader, collectionReader.getReviewed());
-        TimeSeries timeSeries = unpublished.timeSeriesList.get(0);
-
-        DataProcessor processor = new DataProcessor();
-        processor.processTimeseries(publishedReader, details, timeSeries, zebedee.getDataIndex());
-
-        // When
-        // we version and save
-        DataWriter dataWriter = new DataWriter(collectionWriter.getReviewed(), collectionReader.getReviewed(), publishedReader);
-        dataWriter.versionAndSave(processor, details);
-
-        // Then
-        // the new file should save
-        assertTrue(fileExists(collectionReader.getReviewed(), timeSeries.getUri().toString()));
-    }
-
-    boolean fileExists(ContentReader reader, String path) throws ZebedeeException, IOException {
-        try {
-            reader.getContent(path);
-            return true;
-        } catch (NotFoundException e) {
-            return false;
+    @After
+    public void tearDown() {
+        if (versionedContentItemMock != null) {
+            versionedContentItemMock.close();
         }
     }
 
     @Test
-    public void versionAndSave_forAlreadyPublishedData_shouldCreateFileInReviewed() throws ZebedeeException,
-            IOException, URISyntaxException {
+    public void versionAndSave_forBrandNewData_doesNotVersion() throws ZebedeeException, IOException {
         // Given
-        // we republish a published timeseries with identical values
-        TimeSeries timeSeries = published.timeSeriesList.get(0);
-        DataPublicationDetails details = published.getDetails(publishedReader, collectionReader.getReviewed());
+        // A completed processor for a brand new timeseries (i.e. no corrections and all data points are new insertions)
+        when(publishedContentReader.getContent(timeSeries.getUri().toString())).thenThrow(new IOException("file not found"));
+        when(dataProcessor.getCorrections()).thenReturn(0);
+        when(dataProcessor.getInsertions()).thenReturn(10);
 
-        DataProcessor processor = new DataProcessor();
-        processor.processTimeseries(publishedReader, details, timeSeries, zebedee.getDataIndex());
+        // Mock the VersionedContentItem that gets instantiated inside the DataWriter code as it is tangled with the file
+        // system content access which is not in the scope of these tests
+        versionedContentItemMock = Mockito.mockConstruction(VersionedContentItem.class, (mock, context) -> {});
 
         // When
         // we version and save
-        DataWriter dataWriter = new DataWriter(collectionWriter.getReviewed(), collectionReader.getReviewed(), publishedReader);
-        dataWriter.versionAndSave(processor, details);
-
-        // Then
-        // we expect an addition to the collection -  as the date will have been modified.
-        assertTrue(timeSeries.getUri().toString(), fileExists(collectionReader.getReviewed(), timeSeries.getUri()
-                .toString()));
-    }
-
-    @Test
-    public void versionAndSave_forUpdatedData_doesCreateFileInReviewed() throws ZebedeeException, IOException, URISyntaxException {
-        // Given
-        // a processor for updates to an old timeseries
-        DataPublicationDetails details = republish.getDetails(publishedReader, collectionReader.getReviewed());
-        TimeSeries timeSeries = republish.timeSeriesList.get(0);
-
-        DataProcessor processor = new DataProcessor();
-        processor.processTimeseries(publishedReader, details, timeSeries, zebedee.getDataIndex());
-
-        // When
-        // we version and save
-        DataWriter dataWriter = new DataWriter(collectionWriter.getReviewed(), collectionReader.getReviewed(), publishedReader);
-        dataWriter.versionAndSave(processor, details);
+        DataWriter dataWriter = new DataWriter(reviewedContentWriter, reviewedContentReader, publishedContentReader);
+        dataWriter.versionAndSave(dataProcessor, publicationDetails);
 
         // Then
         // the new file should save
-        assertTrue(fileExists(collectionReader.getReviewed(), timeSeries.getUri().toString()));
+        ArgumentCaptor<TimeSeries> argCaptor = ArgumentCaptor.forClass(TimeSeries.class);
+        verify(reviewedContentWriter, times(1)).writeObject(argCaptor.capture(), anyString());
+        TimeSeries writtenTimeseries = argCaptor.getValue();
+
+        assertEquals(timeSeries.getUri(), writtenTimeseries.getUri());
+
+        // And
+        // the time series should not be versioned
+        assertTrue(versionedContentItemMock.constructed().isEmpty());
+        assertNull(writtenTimeseries.getVersions());
     }
 
     @Test
-    public void versionTimeseries_forNewTimeSeries_doesntCreateVersion() throws ZebedeeException, IOException, URISyntaxException {
+    public void versionAndSave_forIdenticalData_shouldNotVersion() throws ZebedeeException, IOException {
         // Given
-        // a previously unpublished timeseries
-        TimeSeries timeSeries = unpublished.timeSeriesList.get(0);
-        DataPublicationDetails details = unpublished.getDetails(publishedReader, collectionReader.getReviewed());
+        // we republish a published timeseries with identical values (i.e. no corrections or insertions)
+        when(publishedContentReader.getContent(timeSeries.getUri().toString())).thenReturn(timeSeries);
+        when(dataProcessor.getCorrections()).thenReturn(0);
+        when(dataProcessor.getInsertions()).thenReturn(0);
 
-        DataProcessor processor = new DataProcessor();
-        processor.processTimeseries(publishedReader, details, timeSeries, zebedee.getDataIndex());
+        // Mock the VersionedContentItem that gets instantiated inside the DataWriter code as it is tangled with the file
+        // system content access which is not in the scope of these tests
+        versionedContentItemMock = Mockito.mockConstruction(VersionedContentItem.class, (mock, context) -> {});
 
         // When
         // we version and save
-        DataWriter dataWriter = new DataWriter(collectionWriter.getReviewed(), collectionReader.getReviewed(), publishedReader);
-        dataWriter.versionAndSave(processor, details);
+        DataWriter dataWriter = new DataWriter(reviewedContentWriter, reviewedContentReader, publishedContentReader);
+        dataWriter.versionAndSave(dataProcessor, publicationDetails);
 
         // Then
-        // we expect no version path to have been created
-        String versionPath = VersionedContentItem.getVersionUri(timeSeries.getUri().toString(), 1);
-        assertFalse(fileExists(collectionReader.getReviewed(), versionPath));
+        // the new file should save
+        ArgumentCaptor<TimeSeries> argCaptor = ArgumentCaptor.forClass(TimeSeries.class);
+        verify(reviewedContentWriter, times(1)).writeObject(argCaptor.capture(), anyString());
+        TimeSeries writtenTimeseries = argCaptor.getValue();
+
+        assertEquals(timeSeries.getUri(), writtenTimeseries.getUri());
+
+        // And
+        // the time series should not be versioned
+        assertTrue(versionedContentItemMock.constructed().isEmpty());
+        assertNull(writtenTimeseries.getVersions());
     }
 
     @Test
-    public void versionTimeseries_forPublishedTimeSeries_doesntCreateVersionFiles() throws ZebedeeException, IOException, URISyntaxException {
+    public void versionAndSave_forAppendedData_shouldVersion() throws ZebedeeException, IOException {
         // Given
-        // a previously published timeseries
-        TimeSeries timeSeries = published.timeSeriesList.get(0);
-        DataPublicationDetails details = published.getDetails(publishedReader, collectionReader.getReviewed());
+        // we republish a published timeseries to append new data (i.e. no corrections and all data points are new insertions)
+        when(publishedContentReader.getContent(timeSeries.getUri().toString())).thenReturn(timeSeries);
+        when(dataProcessor.getCorrections()).thenReturn(0);
+        when(dataProcessor.getInsertions()).thenReturn(10);
 
-        DataProcessor processor = new DataProcessor();
-        processor.processTimeseries(publishedReader, details, timeSeries, zebedee.getDataIndex());
+        // Mock the VersionedContentItem that gets instantiated inside the DataWriter code as it is tangled with the file
+        // system content access which is not in the scope of these tests
+        String versionIdentifier = "v1";
+        versionedContentItemMock = Mockito.mockConstruction(VersionedContentItem.class, (mock, context) -> {
+            String uri = (String) context.arguments().get(0);
+            String versionUri = String.format("%s/%s/%s", uri, VersionedContentItem.getVersionDirectoryName(), versionIdentifier);
+
+            ContentItemVersion contentItemVersion = new ContentItemVersion(versionIdentifier, mock, versionUri);
+
+            // And given version not yet created in collection
+            when(mock.versionExists(any(ContentReader.class))).thenReturn(false);
+
+            // Then when versioning create v1
+            when(mock.createVersion(any(ContentReader.class), any(ContentWriter.class))).thenReturn(contentItemVersion);
+        });
 
         // When
         // we version and save
-        DataWriter dataWriter = new DataWriter(collectionWriter.getReviewed(), collectionReader.getReviewed(), publishedReader);
-        dataWriter.versionAndSave(processor, details);
+        DataWriter dataWriter = new DataWriter(reviewedContentWriter, reviewedContentReader, publishedContentReader);
+        dataWriter.versionAndSave(dataProcessor, publicationDetails);
 
         // Then
-        // we expect no version path to have been created
-        String versionPath = VersionedContentItem.getVersionUri(timeSeries.getUri().toString(), 1);
-        assertFalse(fileExists(collectionReader.getReviewed(), versionPath));
+        // the new file should save
+        ArgumentCaptor<TimeSeries> argCaptor = ArgumentCaptor.forClass(TimeSeries.class);
+        verify(reviewedContentWriter, times(1)).writeObject(argCaptor.capture(), anyString());
+        TimeSeries writtenTimeseries = argCaptor.getValue();
+
+        // And
+        // the time series should have one version
+        assertEquals(timeSeries.getUri(), writtenTimeseries.getUri());
+        assertEquals(1, writtenTimeseries.getVersions().size());
+        assertEquals(versionIdentifier, writtenTimeseries.getVersions().get(0).getLabel());
+        assertEquals(pageSet.datasetLandingPage.getDescription().getReleaseDate(), writtenTimeseries.getVersions().get(0).getUpdateDate());
     }
 
     @Test
-    public void versionTimeseries_forUpdatedTimeSeries_doesCreateVersionFiles() throws ZebedeeException, IOException, URISyntaxException {
-        // Given
-        // a previously published timeseries
-        TimeSeries timeSeries = republish.timeSeriesList.get(0);
-        DataPublicationDetails details = republish.getDetails(publishedReader, collectionReader.getReviewed());
-
-        DataProcessor processor = new DataProcessor();
-        processor.processTimeseries(publishedReader, details, timeSeries, zebedee.getDataIndex());
-
-        // When
-        // we version and save
-        DataWriter dataWriter = new DataWriter(collectionWriter.getReviewed(), collectionReader.getReviewed(), publishedReader);
-        dataWriter.versionAndSave(processor, details);
-
-        // Then
-        // we expect no version path to have been created
-        String versionPath = VersionedContentItem.getVersionUri(timeSeries.getUri().toString(), 1);
-        assertTrue(fileExists(collectionReader.getReviewed(), versionPath));
-    }
-
-    @Test
-    public void versionTimeseries_forUpdatedTimeSeries_doesCreateVersionData() throws ZebedeeException, IOException, URISyntaxException, ParseException {
+    public void versionAndSave_forUpdatedTimeSeriesWithCorrection_shouldVersionWithCorrectDetails() throws ZebedeeException, IOException, URISyntaxException, ParseException {
         // Given
         // an updated timeseries with known version information in the dataset
-        DataPagesSet original = generator.generateDataPagesSet("dataprocessor", "corrections", 2015, 2, "");
-        dataBuilder.publishDataPagesSet(original);
+        when(publishedContentReader.getContent(timeSeries.getUri().toString())).thenReturn(timeSeries);
+        when(dataProcessor.getCorrections()).thenReturn(2);
+        when(dataProcessor.getInsertions()).thenReturn(0);
 
-        DataPagesSet corrected = generator.generateDataPagesSet("dataprocessor", "corrections", 2016, 2, "");
-        Version datasetVersion = new Version();
-        datasetVersion.setCorrectionNotice(Random.id());
-        corrected.timeSeriesDataset.setVersions(new ArrayList<>());
-        corrected.timeSeriesDataset.getVersions().add(datasetVersion);
-        dataBuilder.addReviewedDataPagesSet(corrected, this.collection, this.collectionWriter);
+        Version version = new Version();
+        version.setUpdateDate(new Date());
+        version.setCorrectionNotice("correction notice");
+        publicationDetails.datasetPage.setVersions(new ArrayList<>());
+        publicationDetails.datasetPage.getVersions().add(version);
 
-        TimeSeries timeSeries = corrected.timeSeriesList.get(0);
-        DataPublicationDetails details = corrected.getDetails(publishedReader, collectionReader.getReviewed());
+        // Mock the VersionedContentItem that gets instantiated inside the DataWriter code as it is tangled with the file
+        // system content access which is not in the scope of these tests
+        String versionIdentifier = "v2";
+        versionedContentItemMock = Mockito.mockConstruction(VersionedContentItem.class, (mock, context) -> {
+            String uri = (String) context.arguments().get(0);
+            String versionUri = String.format("%s/%s/%s", uri, VersionedContentItem.getVersionDirectoryName(), versionIdentifier);
 
-        DataProcessor processor = new DataProcessor();
-        processor.processTimeseries(publishedReader, details, timeSeries, zebedee.getDataIndex());
+            ContentItemVersion contentItemVersion = new ContentItemVersion(versionIdentifier, mock, versionUri);
+
+            // And given version not yet created in collection
+            when(mock.versionExists(any(ContentReader.class))).thenReturn(false);
+
+            // Then when versioning create v1
+            when(mock.createVersion(any(ContentReader.class), any(ContentWriter.class))).thenReturn(contentItemVersion);
+        });
 
         // When
         // we version and save
-        DataWriter dataWriter = new DataWriter(collectionWriter.getReviewed(), collectionReader.getReviewed(), publishedReader);
-        dataWriter.versionAndSave(processor, details);
+        DataWriter dataWriter = new DataWriter(reviewedContentWriter, reviewedContentReader, publishedContentReader);
+        dataWriter.versionAndSave(dataProcessor, publicationDetails);
 
         // Then
-        // we expect version information to have been created with the collection information
-        TimeSeries versionedSeries = (TimeSeries) collectionReader.getReviewed().getContent(timeSeries.getUri().toString());
+        // the new file should save
+        ArgumentCaptor<TimeSeries> argCaptor = ArgumentCaptor.forClass(TimeSeries.class);
+        verify(reviewedContentWriter, times(1)).writeObject(argCaptor.capture(), anyString());
+        TimeSeries writtenTimeseries = argCaptor.getValue();
 
-        assertNotNull(versionedSeries.getVersions());
-        assertEquals(1, versionedSeries.getVersions().size());
-
-        Version version = versionedSeries.getVersions().get(0);
-        assertEquals(datasetVersion.getCorrectionNotice(), version.getCorrectionNotice());
+        // And
+        // the time series should have one version
+        assertEquals(timeSeries.getUri(), writtenTimeseries.getUri());
+        assertEquals(1, writtenTimeseries.getVersions().size());
+        assertEquals(versionIdentifier, writtenTimeseries.getVersions().get(0).getLabel());
+        assertEquals(version.getUpdateDate(), writtenTimeseries.getVersions().get(0).getUpdateDate());
+        assertEquals(version.getCorrectionNotice(), writtenTimeseries.getVersions().get(0).getCorrectionNotice());
     }
 }

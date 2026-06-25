@@ -12,11 +12,9 @@ import java.util.TreeSet;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-/**
- * Created by thomasridd on 1/21/16.
- */
 public class DataMergeTest {
-    DataPagesGenerator generator;
+
+    private DataPagesGenerator generator;
 
     @Before
     public void setUp() throws Exception {

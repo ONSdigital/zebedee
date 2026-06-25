@@ -48,30 +48,24 @@ import static org.mockito.Mockito.when;
 @RunWith(Parameterized.class)
 public class DataFileGeneratorTest {
 
-    static final String XLS_PATH = "xls";
-    static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd-MM-yy");
-    static String TITLE = "CPI INDEX 07.1 : PURCHASE OF VEHICLES 2015=100";
-    static String CDID = "D7CO";
-    static String PRE_UNIT = "";
-    static String UNIT = "Index, base year = 100";
-    static String RELEASE_DATE = "14-06-2016";
-    static String NEXT_RELEASE = "19 July  2016";
-    static int YEAR = 1990;
+    private static final String XLS_PATH = "xls";
+    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd-MM-yy");
+    private static String TITLE = "CPI INDEX 07.1 : PURCHASE OF VEHICLES 2015=100";
+    private static String CDID = "D7CO";
+    private static String PRE_UNIT = "";
+    private static String UNIT = "Index, base year = 100";
+    private static String RELEASE_DATE = "14-06-2016";
+    private static String NEXT_RELEASE = "19 July  2016";
+    private static int YEAR = 1990;
 
     @Rule
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
+
     @Mock
     private ContentWriter contentWriterMock;
+
     @Mock
     private OutputStream outputStreamMock;
-    @Mock
-    private TimeSeriesCellWriter intWriterMock;
-    @Mock
-    private TimeSeriesCellWriter decimalWriterMock;
-    @Mock
-    private TimeSeriesCellWriter stringWriterMock;
-    @Mock
-    private Cell cellMock;
 
     private TimeSeries timeSeries;
     private TimeSerieses timeSeriesList;

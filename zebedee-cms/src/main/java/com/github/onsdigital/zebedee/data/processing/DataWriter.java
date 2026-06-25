@@ -13,9 +13,6 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Date;
 
-/**
- * Created by thomasridd on 1/21/16.
- */
 public class DataWriter {
     private ContentWriter contentWriter;
     private ContentReader contentReader;
@@ -29,15 +26,15 @@ public class DataWriter {
 
     public void versionAndSave(DataProcessor processor, DataPublicationDetails details) throws ZebedeeException, IOException {
         // If no change then don't update anything
-        int dataChanges = processor.insertions + processor.corrections;
+        int dataChanges = processor.getInsertions() + processor.getCorrections();
 
         if (dataChanges > 0) {
             // Version the timeseries
-            versionTimeseries(processor.timeSeries, details.getLastDatasetVersion());
+            versionTimeseries(processor.getTimeSeries(), details.getLastDatasetVersion());
         }
 
         // Save the new page to reviewed
-        this.contentWriter.writeObject(processor.timeSeries, processor.timeSeries.getUri().toString() + "/data.json");
+        this.contentWriter.writeObject(processor.getTimeSeries(), processor.getTimeSeries().getUri().toString() + "/data.json");
     }
 
     void versionTimeseries(
@@ -57,7 +54,7 @@ public class DataWriter {
         VersionedContentItem versionedContentItem = new VersionedContentItem(uri);
 
         // build a version if it doesn't exist
-        if (versionedContentItem.versionExists(this.contentReader) == false) {
+        if (!versionedContentItem.versionExists(this.contentReader)) {
             ContentItemVersion contentItemVersion = versionedContentItem.createVersion(pubishedReader, this.contentWriter);
 
             String correctionNotice = datasetVersion != null ? datasetVersion.getCorrectionNotice() : "";

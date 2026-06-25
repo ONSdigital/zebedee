@@ -7,11 +7,8 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
-/**
- * Created by thomasridd on 1/19/16.
- */
 public class DataLinkTest {
 
     /**

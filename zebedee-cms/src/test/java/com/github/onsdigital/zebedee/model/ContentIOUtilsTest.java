@@ -1,131 +1,79 @@
 package com.github.onsdigital.zebedee.model;
 
-import com.github.davidcarboni.cryptolite.Keys;
-import com.github.onsdigital.zebedee.ZebedeeTestBaseFixture;
-import com.github.onsdigital.zebedee.data.framework.DataBuilder;
+import com.github.onsdigital.zebedee.content.page.base.Page;
+import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeries;
 import com.github.onsdigital.zebedee.data.framework.DataPagesGenerator;
 import com.github.onsdigital.zebedee.data.framework.DataPagesSet;
+import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
-import com.github.onsdigital.zebedee.json.CollectionDescription;
-import com.github.onsdigital.zebedee.json.CollectionType;
-import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
-import com.github.onsdigital.zebedee.session.model.Session;
-import org.apache.commons.io.FileUtils;
+import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
-import javax.crypto.SecretKey;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Date;
+import java.nio.file.Paths;
 
 import static org.junit.Assert.assertTrue;
 
-/**
- * Created by thomasridd on 1/24/16.
- */
-public class ContentIOUtilsTest extends ZebedeeTestBaseFixture {
+public class ContentIOUtilsTest {
 
-    private SecretKey secretKey;
+    @Rule
+    public TemporaryFolder rootDir = new TemporaryFolder();
 
-    Session publisher;
-    Session reviewer;
+    private Path sourcePath;
+    private Path targetPath;
 
-    Path copy;
-
-    Collection collection;
-    ContentReader publishedReader;
-    CollectionReader collectionReader;
-    CollectionWriter collectionWriter;
-    DataBuilder dataBuilder;
-    DataPagesGenerator generator;
-
-    DataPagesSet published;
-    DataPagesSet encrypted;
+    private DataPagesSet dataPagesSet;
 
     /**
-     * Setup generates an instance of zebedee, a collection, and various DataPagesSet objects (that are test framework generators)
+     * Setup generates directory structure and test content
      *
      * @throws Exception
      */
-    @Override
+    @Before
     public void setUp() throws Exception {
-        secretKey = Keys.newSecretKey();
 
-        publisher = zebedee.openSession(builder.publisher1Credentials);
-        reviewer = zebedee.openSession(builder.reviewer1Credentials);
+        // Create necessary directory structure
+        rootDir.create();
+        Path rootPath = Paths.get(rootDir.getRoot().getPath());
+        sourcePath = Files.createDirectory(rootPath.resolve("source"));
+        targetPath = Files.createDirectory(rootPath.resolve("target"));
 
-        setUpKeyringMockForLegacyTests(zebedee, publisher, secretKey);
-        setUpPermissionsServiceMockForLegacyTests(zebedee, publisher);
+        // I'm using DataPagesGenerator to speed up generation but this could use any pages
+        DataPagesGenerator generator = new DataPagesGenerator();
+        dataPagesSet = generator.generateDataPagesSet("dataprocessor", "published", 2015, 2, "");
+        writePage(sourcePath, dataPagesSet.datasetLandingPage, dataPagesSet.datasetLandingPage.getUri().toString());
+        writePage(sourcePath, dataPagesSet.timeSeriesDataset, dataPagesSet.timeSeriesDataset.getUri().toString());
 
-        // create a copy destination
-        copy = Files.createTempDirectory("ContentIOUtils");
-
-        // I'm using dataBuilder to speed up generation but this could use any files
-        dataBuilder = new DataBuilder(zebedee, publisher, reviewer);
-        generator = new DataPagesGenerator();
-
-        CollectionDescription collectionDescription = new CollectionDescription();
-        collectionDescription.setName("ContentIOUtils");
-        collectionDescription.setEncrypted(true);
-        collectionDescription.setType(CollectionType.scheduled);
-        collectionDescription.setPublishDate(new Date());
-        collection = Collection.create(collectionDescription, zebedee, publisher);
-
-        publishedReader = new FileSystemContentReader(zebedee.getPublished().getPath());
-        collectionReader = new ZebedeeCollectionReader(zebedee, collection, publisher);
-        collectionWriter = new ZebedeeCollectionWriter(zebedee, collection, publisher);
-
-        // add a set of data in a collection
-        encrypted = generator.generateDataPagesSet("dataprocessor", "encrypted", 2015, 2, "inreview.csdb");
-        dataBuilder.addReviewedDataPagesSet(encrypted, collection, collectionWriter);
-
-        // add a set of data to published
-        published = generator.generateDataPagesSet("dataprocessor", "published", 2015, 2, "");
-        dataBuilder.publishDataPagesSet(published);
-
-    }
-
-    @Override
-    public void tearDown() throws IOException {
-        FileUtils.deleteDirectory(copy.toFile());
-
+        for (TimeSeries timeSeries : dataPagesSet.timeSeriesList) {
+            writePage(sourcePath, timeSeries, timeSeries.getUri().toString());
+        }
     }
 
     @Test
-    public void copyContent_givenPlainContent_doesRunCopy() throws IOException, ZebedeeException {
+    public void copy_withoutDirectorySpecified_shouldCopyAll() throws IOException, ZebedeeException {
         // Given
-        // a reader for
-        ContentWriter writer = new ContentWriter(copy);
-        ContentReader reader = publishedReader;
-        String example = published.datasetLandingPage.getUri().toString() + "/data.json";
+        // a reader pointing to some content and a writer pointing to an empty directory
+        ContentWriter writer = new ContentWriter(targetPath);
+        ContentReader reader = new FileSystemContentReader(sourcePath);
+        String landingPage = dataPagesSet.datasetLandingPage.getUri().toString() + "/data.json";
+        String datasetPage = dataPagesSet.timeSeriesDataset.getUri().toString() + "/data.json";
+        String timeSeriesPage = dataPagesSet.timeSeriesList.get(0).getUri().toString() + "/data.json";
 
         // When
         // we run the copy
         ContentIOUtils.copy(reader, writer);
 
         // Then
-        // we expect the uri's from our published set to have been copied
-        assertTrue(Files.exists(uriResolve(copy, example)));
-    }
-
-    @Test
-    public void copyContent_givenCollectionContent_doesRunCopy() throws IOException, ZebedeeException {
-        // Given
-        // a reader for
-        ContentWriter writer = new ContentWriter(copy);
-        ContentReader reader = collectionReader.getReviewed();
-        String example = encrypted.datasetLandingPage.getUri().toString() + "/data.json";
-
-        // When
-        // we run the copy
-        ContentIOUtils.copy(reader, writer);
-
-        // Then
-        // we expect the uri's from our published set to have been copied
-        assertTrue(Files.exists(uriResolve(copy, example)));
+        // we expect all content to have been copied
+        assertTrue(Files.exists(uriResolve(targetPath, landingPage)));
+        assertTrue(Files.exists(uriResolve(targetPath, datasetPage)));
+        assertTrue(Files.exists(uriResolve(targetPath, timeSeriesPage)));
     }
 
     private Path uriResolve(Path root, String uri) {
@@ -134,5 +82,23 @@ public class ContentIOUtilsTest extends ZebedeeTestBaseFixture {
         } else {
             return root.resolve(uri);
         }
+    }
+
+    /**
+     * Write a page object to the specified content path.
+     *
+     * @param contentPath the content root path to write to
+     * @param page        any zebedee page
+     * @param uri         the page uri
+     * @throws IOException
+     * @throws BadRequestException
+     */
+    private void writePage(Path contentPath, Page page, String uri) throws IOException, BadRequestException {
+        String path = uri;
+        if (path.startsWith("/"))
+            path = path.substring(1);
+        ContentWriter writer = new ContentWriter(contentPath);
+
+        writer.writeObject(page, path + "/data.json");
     }
 }

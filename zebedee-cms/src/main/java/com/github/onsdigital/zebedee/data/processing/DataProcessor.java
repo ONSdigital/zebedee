@@ -27,10 +27,9 @@ import static com.github.onsdigital.logging.v2.event.SimpleEvent.error;
  * Processes a single timeseries
  */
 public class DataProcessor {
-    public int corrections = 0;
-    public int insertions = 0;
-    public boolean titleUpdated = false;
-    public TimeSeries timeSeries = null;
+    private int corrections = 0;
+    private int insertions = 0;
+    private TimeSeries timeSeries = null;
 
     public DataProcessor() {
 
@@ -134,10 +133,9 @@ public class DataProcessor {
         return this.timeSeries;
     }
 
-    public void applyUpdateCommand(Optional<TimeseriesUpdateCommand> updateCommand) {
+    private void applyUpdateCommand(Optional<TimeseriesUpdateCommand> updateCommand) {
         if (updateCommand.isPresent() && !updateCommand.get().title.equals(this.timeSeries.getDescription().getTitle())) {
             this.timeSeries.getDescription().setTitle(updateCommand.get().title);
-            this.titleUpdated = true;
         }
     }
 
@@ -175,6 +173,9 @@ public class DataProcessor {
     }
 
     /**
+     * Copy metadata from newly imported time series to initial in progress time series. Allows manually entered
+     * metadata to be carried over where those fields are not overwritten.
+     *
      * @param inProgress
      * @param newSeries
      * @return
@@ -248,5 +249,32 @@ public class DataProcessor {
             throw e;
         }
 
+    }
+
+    /**
+     * Get the count of time series values corrected (i.e. amended) in the series during processing.
+     *
+     * @return Count of corrections
+     */
+    public int getCorrections() {
+        return this.corrections;
+    }
+
+    /**
+     * Get the count of time series values inserted to the series during processing.
+     *
+     * @return Count of insertions
+     */
+    public int getInsertions() {
+        return this.insertions;
+    }
+
+    /**
+     * Get time series being processed.
+     *
+     * @return TimeSeries being processed
+     */
+    public TimeSeries getTimeSeries() {
+        return this.timeSeries;
     }
 }

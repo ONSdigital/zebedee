@@ -8,13 +8,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeSet;
 
-/**
- * Created by dave on 7/11/16.
- */
 public class XLSExpectations {
 
-    static int NO_META_ROWS = 7;
-    static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd-MM-yyyy");
+    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd-MM-yyyy");
 
     private static final int TITLE_INDEX = 0;
     private static final int CDID_INDEX = 1;

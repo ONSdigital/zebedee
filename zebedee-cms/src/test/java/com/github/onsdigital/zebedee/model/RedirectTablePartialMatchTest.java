@@ -1,34 +1,25 @@
 package com.github.onsdigital.zebedee.model;
 
 import com.github.davidcarboni.ResourceUtils;
-import com.github.onsdigital.zebedee.Builder;
-import com.github.onsdigital.zebedee.Zebedee;
-import com.github.onsdigital.zebedee.ZebedeeTestBaseFixture;
-import org.apache.commons.io.FileUtils;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.nio.file.Path;
-
 import static org.junit.Assert.*;
 
-/**
- * Created by thomasridd on 17/08/15.
- */
-public class RedirectTablePartialMatchTest extends ZebedeeTestBaseFixture {
+public class RedirectTablePartialMatchTest {
 
-    @Override
+    Content publishedContent;
+
+    @Before
     public void setUp() throws Exception {
-        builder = new Builder(ResourceUtils.getPath("/bootstraps/basic"));
-        zebedee = builder.getZebedee();
+        publishedContent = new Content(ResourceUtils.getPath("/bootstraps/basic/master"));
     }
 
     @Test
     public void redirectTable_whenSetup_shouldNotBeNull() {
         // Given
         // Content to set up the redirect
-        RedirectTable table = new RedirectTablePartialMatch(zebedee.getPublished());
+        RedirectTable table = new RedirectTablePartialMatch(publishedContent);
 
         // When
         // We initialise a redirect
@@ -42,7 +33,7 @@ public class RedirectTablePartialMatchTest extends ZebedeeTestBaseFixture {
     public void get_forExistingContent_shouldReturnUri() {
         // Given
         // a table with a redirect
-        RedirectTable table = new RedirectTablePartialMatch(zebedee.getPublished());
+        RedirectTable table = new RedirectTablePartialMatch(publishedContent);
 
         // When
         // We get the redirect
@@ -58,7 +49,7 @@ public class RedirectTablePartialMatchTest extends ZebedeeTestBaseFixture {
     public void get_forRedirectWhereContentExists_shouldReturnExistingUri() {
         // Given
         // a table with a redirect from existing data
-        RedirectTable table = new RedirectTablePartialMatch(zebedee.getPublished());
+        RedirectTable table = new RedirectTablePartialMatch(publishedContent);
         table.addRedirect("themea/data.json", "themeb/data.json");
 
         // When
@@ -75,7 +66,7 @@ public class RedirectTablePartialMatchTest extends ZebedeeTestBaseFixture {
     public void get_whereRedirectExistsToContent_shouldRedirect() {
         // Given
         // a table with a redirect to real content
-        RedirectTable table = new RedirectTablePartialMatch(zebedee.getPublished());
+        RedirectTable table = new RedirectTablePartialMatch(publishedContent);
         table.addRedirect("redirect/data.json", "themea/data.json");
 
         // When
@@ -92,7 +83,7 @@ public class RedirectTablePartialMatchTest extends ZebedeeTestBaseFixture {
     public void get_whereRedirectContentDoesntExist_shouldReturnNull() {
         // Given
         // a table with a redirect to something that doesn't exist
-        RedirectTable table = new RedirectTablePartialMatch(zebedee.getPublished());
+        RedirectTable table = new RedirectTablePartialMatch(publishedContent);
         table.addRedirect("redirect/data.json", "does/not/exist/data.json");
 
         // When
@@ -108,7 +99,7 @@ public class RedirectTablePartialMatchTest extends ZebedeeTestBaseFixture {
     public void get_whereMultipleRedirectsExistFromPartialMatchOrigin_shouldRedirect() {
         // Given
         // a quite complicated situation...
-        RedirectTable table = new RedirectTablePartialMatch(zebedee.getPublished());
+        RedirectTable table = new RedirectTablePartialMatch(publishedContent);
 
         // Take a top level node and move it
         table.addRedirect("business", "themea");
@@ -131,7 +122,7 @@ public class RedirectTablePartialMatchTest extends ZebedeeTestBaseFixture {
     public void add_redirectToEmptyTable_storesRedirect() {
         // Given
         // A standard setup
-        RedirectTable table = new RedirectTablePartialMatch(zebedee.getPublished());
+        RedirectTable table = new RedirectTablePartialMatch(publishedContent);
 
         // When
         // We add a link
@@ -146,7 +137,7 @@ public class RedirectTablePartialMatchTest extends ZebedeeTestBaseFixture {
     public void addSecondRedirect_FromSameOrigin_storesBothRedirects() {
         // Given
         // A standard setup
-        RedirectTable table = new RedirectTablePartialMatch(zebedee.getPublished());
+        RedirectTable table = new RedirectTablePartialMatch(publishedContent);
 
         // When
         // We add two links from the same origin
@@ -163,7 +154,7 @@ public class RedirectTablePartialMatchTest extends ZebedeeTestBaseFixture {
     public void addSecondRedirect_ThatNullifiesExisting_updatesTheRedirect() {
         // Given
         // A standard setup with a redirect
-        RedirectTable table = new RedirectTablePartialMatch(zebedee.getPublished());
+        RedirectTable table = new RedirectTablePartialMatch(publishedContent);
         table.addRedirect("custard tarts", "apples");
 
         // When
@@ -179,7 +170,7 @@ public class RedirectTablePartialMatchTest extends ZebedeeTestBaseFixture {
     public void addSecondRedirect_ThatImpactsExisting_updatesTheRedirect() {
         // Given
         // A standard setup with a redirect
-        RedirectTable table = new RedirectTablePartialMatch(zebedee.getPublished());
+        RedirectTable table = new RedirectTablePartialMatch(publishedContent);
         table.addRedirect("carrot/cake", "poached/pears");
 
         // When
@@ -196,7 +187,7 @@ public class RedirectTablePartialMatchTest extends ZebedeeTestBaseFixture {
     public void addSecondRedirect_ThatImpactsExistingBuriedInAMultidirect_updatesTheRedirect() {
         // Given
         // A standard setup with a redirect
-        RedirectTable table = new RedirectTablePartialMatch(zebedee.getPublished());
+        RedirectTable table = new RedirectTablePartialMatch(publishedContent);
         table.addRedirect("carrot/cake", "sloe gin/eton mess");
         table.addRedirect("carrot/cake", "stewed/rhubarb");
         table.addRedirect("carrot/cake", "poached/pears");
@@ -215,11 +206,11 @@ public class RedirectTablePartialMatchTest extends ZebedeeTestBaseFixture {
     public void mergeTable_intoCurrentTable_addsLinksIntoCurrentTable() {
         // Given
         // A couple of redirect table
-        RedirectTable currentTable = new RedirectTablePartialMatch(zebedee.getPublished());
+        RedirectTable currentTable = new RedirectTablePartialMatch(publishedContent);
         currentTable.addRedirect("beef", "lentils");
         currentTable.addRedirect("chicken", "tofu");
 
-        RedirectTable mergeTable = new RedirectTablePartialMatch(zebedee.getPublished());
+        RedirectTable mergeTable = new RedirectTablePartialMatch(publishedContent);
         mergeTable.addRedirect("lamb", "chickpea");
         mergeTable.addRedirect("bacon", "egg");
 
@@ -239,11 +230,11 @@ public class RedirectTablePartialMatchTest extends ZebedeeTestBaseFixture {
     public void mergeTable_intoCurrentTable_doesntUpdateMergeTable() {
         // Given
         // A couple of redirect table
-        RedirectTable currentTable = new RedirectTablePartialMatch(zebedee.getPublished());
+        RedirectTable currentTable = new RedirectTablePartialMatch(publishedContent);
         currentTable.addRedirect("beef", "lentils");
         currentTable.addRedirect("chicken", "tofu");
 
-        RedirectTable mergeTable = new RedirectTablePartialMatch(zebedee.getPublished());
+        RedirectTable mergeTable = new RedirectTablePartialMatch(publishedContent);
         mergeTable.addRedirect("lamb", "chickpea");
         mergeTable.addRedirect("bacon", "egg");
 
@@ -263,11 +254,11 @@ public class RedirectTablePartialMatchTest extends ZebedeeTestBaseFixture {
     public void mergeTable_whereCurrentTableHasSameOriginLinks_includesAllLinks() {
         // Given
         // A couple of redirect table
-        RedirectTable currentTable = new RedirectTablePartialMatch(zebedee.getPublished());
+        RedirectTable currentTable = new RedirectTablePartialMatch(publishedContent);
         currentTable.addRedirect("beef", "lentils");
         currentTable.addRedirect("chicken", "tofu");
 
-        RedirectTable mergeTable = new RedirectTablePartialMatch(zebedee.getPublished());
+        RedirectTable mergeTable = new RedirectTablePartialMatch(publishedContent);
         mergeTable.addRedirect("chicken", "chickpea");
         mergeTable.addRedirect("beef", "egg");
 
@@ -287,11 +278,11 @@ public class RedirectTablePartialMatchTest extends ZebedeeTestBaseFixture {
     public void mergeTable_whereMergeTableImpactsCurrentTable_updatesLinks() {
         // Given
         // A couple of redirect table
-        RedirectTable currentTable = new RedirectTablePartialMatch(zebedee.getPublished());
+        RedirectTable currentTable = new RedirectTablePartialMatch(publishedContent);
         currentTable.addRedirect("roast/beef", "morrocan/lentils");
         currentTable.addRedirect("roast/chicken", "stirfry/tofu");
 
-        RedirectTable mergeTable = new RedirectTablePartialMatch(zebedee.getPublished());
+        RedirectTable mergeTable = new RedirectTablePartialMatch(publishedContent);
         mergeTable.addRedirect("morrocan", "curried");
         mergeTable.addRedirect("stirfry", "no");
 

@@ -113,13 +113,34 @@ public class DataGenerator {
 
     Resource generateTimeseriesData(List<TimeSeries> series, String format) throws IOException, BadRequestException {
         List<List<String>> grid = timeSeriesDataGrid(series);
-        String filename = new StringBuilder(SERIES_NAME)
+
+        String filename = generateTimeseriesDataFilename(series, format);
+        return generateResourceFromDataGrid(grid, filename);
+    }
+
+    String generateTimeseriesDataFilename(List<TimeSeries> series, String format) {
+        // This is progressive enhancement for a single series to give a human readable title.
+        // If it fails, go back to the default.
+        if (series.size() == 1) {
+            TimeSeries singleSeries = series.get(0);
+
+            if (singleSeries.getDescription() != null && singleSeries.getDescription().getTitle() != null) {
+                return new StringBuilder(singleSeries.getDescription().getTitle())
+                        .append("-")
+                        .append(FILE_NAME_DATE.format(new Date()))
+                        .append(".")
+                        .append(format)
+                        .toString();
+            }
+        } 
+
+        return new StringBuilder(SERIES_NAME)
                 .append("-")
                 .append(FILE_NAME_DATE.format(new Date()))
                 .append(".")
                 .append(format)
                 .toString();
-        return generateResourceFromDataGrid(grid, filename);
+
     }
 
 

@@ -2,6 +2,8 @@ package com.github.onsdigital.zebedee.reader;
 
 import au.com.bytecode.opencsv.CSVWriter;
 import com.github.onsdigital.zebedee.content.base.Content;
+import com.github.onsdigital.zebedee.content.page.base.PageDescription;
+import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeries;
 import com.github.onsdigital.zebedee.content.page.statistics.document.bulletin.Bulletin;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import org.apache.poi.ss.usermodel.Cell;
@@ -19,8 +21,10 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.io.OutputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -287,5 +291,53 @@ public class DataGeneratorTest {
             verify(csvWriterMock, times(1)).writeNext(row.toArray(new String[row.size()]));
         });
         verify(csvWriterMock, times(1)).flush();
+    }
+
+    @Test
+    public void shouldGenerateHumanReadableFilenameForSingleTimeseriesWithTitle() {
+        // Given a timeseries with a title
+        TimeSeries timeSeries = mock(TimeSeries.class);
+        PageDescription pageDescription = mock(PageDescription.class);
+        when(timeSeries.getDescription()).thenReturn(pageDescription);
+        when(pageDescription.getTitle()).thenReturn("my-title");
+        // When we generate a filename for the timeseries
+        String fileName = generator.generateTimeseriesDataFilename(Arrays.asList(timeSeries), "csv");
+
+        String expectedDate = new SimpleDateFormat("ddMMyy").format(new Date());
+        // Then the filename should be based on the title and the current date
+        assertThat(fileName, equalTo("my-title-" + expectedDate + ".csv"));
+    }
+
+    @Test
+    public void shouldGenerateDefaultFilenameForSingleTimeseriesWithoutDescription() {
+        // Given a timeseries without a title
+        TimeSeries timeSeries = mock(TimeSeries.class);
+        when(timeSeries.getDescription()).thenReturn(null);
+
+        // When we generate a filename for the timeseries
+        String fileName = generator.generateTimeseriesDataFilename(Arrays.asList(timeSeries), "csv");
+
+        String expectedDate = new SimpleDateFormat("ddMMyy").format(new Date());
+        // Then the filename should be based on the default series name and the current date
+        assertThat(fileName, equalTo("series-" + expectedDate + ".csv"));
+    }
+
+    @Test
+    public void shouldGenerateDefaultFilenameForMultipleTimeseries() {
+        // Given multiple timeseries, some with titles and some without
+        TimeSeries firstSeries = mock(TimeSeries.class);
+        PageDescription firstDescription = mock(PageDescription.class);
+        when(firstSeries.getDescription()).thenReturn(firstDescription);
+        when(firstDescription.getTitle()).thenReturn("first-title");
+
+        TimeSeries secondSeries = mock(TimeSeries.class);
+        when(secondSeries.getDescription()).thenReturn(null);
+
+        // When we generate a filename for the timeseries
+        String fileName = generator.generateTimeseriesDataFilename(Arrays.asList(firstSeries, secondSeries), "csv");
+
+        String expectedDate = new SimpleDateFormat("ddMMyy").format(new Date());
+        // Then the filename should be based on the default series name and the current date
+        assertThat(fileName, equalTo("series-" + expectedDate + ".csv"));
     }
 }

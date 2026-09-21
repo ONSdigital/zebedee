@@ -23,12 +23,12 @@
         <encoding>UTF-8</encoding>
         <project.build.sourceEncoding>${encoding}</project.build.sourceEncoding>
         <project.reporting.outputEncoding>${encoding}</project.reporting.outputEncoding>
-        <restolino.version>v0.8.3</restolino.version>
+        <restolino.version>v0.9.0</restolino.version>
         <httpino.version>0.0.11</httpino.version>
-        <fasterxml.jackson.version>2.21.4</fasterxml.jackson.version>
+        <fasterxml.jackson.version>2.22.2</fasterxml.jackson.version>
         <apache.poi.version>3.17</apache.poi.version>
         <spring.version>5.3.39</spring.version>
-        <dp.logging.version>v2.0.0-beta.18</dp.logging.version>
+        <dp.logging.version>v2.1.0</dp.logging.version>
         <batik.version>1.17</batik.version>
         <logback.version>1.3.16</logback.version>
         <mockito.version>3.12.4</mockito.version>
@@ -61,7 +61,7 @@
             <dependency>
                 <groupId>com.github.onsdigital</groupId>
                 <artifactId>dp-cryptolite-java</artifactId>
-                <version>1.9.0</version>
+                <version>1.11.0</version>
             </dependency>
 
             <!-- Any sub modules depending on Zebedee reader and content wrappers should depend on project version as all modules are released together under same version-->
@@ -145,7 +145,7 @@
             <dependency>
                 <groupId>org.xerial.snappy</groupId>
                 <artifactId>snappy-java</artifactId>
-                <version>1.1.10.5</version>
+                <version>1.1.10.8</version>
             </dependency>
 
             <!-- File upload -->
@@ -157,7 +157,7 @@
             <dependency>
                 <groupId>com.github.onsdigital</groupId>
                 <artifactId>encrypted-file-upload</artifactId>
-                <version>2.3.0</version>
+                <version>2.3.2</version>
             </dependency>
 
             <dependency>
@@ -169,7 +169,7 @@
             <dependency>
                 <groupId>com.github.onsdigital</groupId>
                 <artifactId>resource-utils</artifactId>
-                <version>resource-utils-1.2.3</version>
+                <version>resource-utils-1.2.4</version>
             </dependency>
 
             <dependency>
@@ -201,7 +201,7 @@
             <dependency>
                 <groupId>org.apache.httpcomponents.client5</groupId>
                 <artifactId>httpclient5</artifactId>
-                <version>5.3.1</version>
+                <version>5.6.4</version>
             </dependency>
 
             <dependency>
@@ -233,7 +233,7 @@
             <dependency>
                 <groupId>org.apache.httpcomponents.core5</groupId>
                 <artifactId>httpcore5</artifactId>
-                <version>5.3.6</version>
+                <version>5.4.3</version>
             </dependency>
             <dependency>
                 <groupId>commons-codec</groupId>
@@ -347,6 +347,16 @@
                 <scope>test</scope>
             </dependency>
 
+            <!-- 
+                zstd-jni upgraded to 1.5.7-16 to address CVE-2026-87795 and CVE-2026-87823
+                pending update to kafka-clients 3.x series
+            -->
+            <dependency>
+                <groupId>com.github.luben</groupId>
+                <artifactId>zstd-jni</artifactId>
+                <version>1.5.7-16</version>
+            </dependency>
+
             <!-- lz4-java: upgraded to 1.8.1 to address CVE-2025-12183 -->
             <dependency>
                 <groupId>org.lz4</groupId>
@@ -428,9 +438,26 @@
                         <!-- Note - OSS Index suppressions are global, not per dependency -->
                         <!--
                             Jira epic to remove the following exclusion: DIS-4777
+                            This is to upgrade jetty
                          -->
                         <exclude>CVE-2026-2332</exclude>
+                        <exclude>CVE-2026-10050</exclude>
+                        <exclude>CVE-2026-12611</exclude>
+                        <exclude>CVE-2026-19203</exclude>
                         <!-- End DIS-4777 -->
+
+                        <!-- 
+                            CVE covers logback-classic v1.3.16
+                            Epic to remove this exclusion: DIS-5085
+                        -->
+                        <exclude>CVE-2026-13006</exclude>
+                        <!-- End DIS-5085 -->
+
+                        <!-- Jira task to upgrade kafka-clients to v4: DIS-5444
+                            This is to remove exclusion for snappy-java
+                        -->
+                        <exclude>CVE-2026-90559</exclude>
+                        <!-- End DIS-5444 -->
                     </excludeVulnerabilityIds>
                 </configuration>
                 <executions>

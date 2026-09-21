@@ -347,6 +347,16 @@
                 <scope>test</scope>
             </dependency>
 
+            <!-- 
+                zstd-jni upgraded to 1.5.7-16 to address CVE-2026-87795 and CVE-2026-87823
+                pending update to kafka-clients 3.x series
+            -->
+            <dependency>
+                <groupId>com.github.luben</groupId>
+                <artifactId>zstd-jni</artifactId>
+                <version>1.5.7-16</version>
+            </dependency>
+
             <!-- lz4-java: upgraded to 1.8.1 to address CVE-2025-12183 -->
             <dependency>
                 <groupId>org.lz4</groupId>

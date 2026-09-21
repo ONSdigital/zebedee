@@ -25,7 +25,7 @@
         <project.reporting.outputEncoding>${encoding}</project.reporting.outputEncoding>
         <restolino.version>v0.9.0</restolino.version>
         <httpino.version>0.0.11</httpino.version>
-        <fasterxml.jackson.version>2.21.4</fasterxml.jackson.version>
+        <fasterxml.jackson.version>2.22.2</fasterxml.jackson.version>
         <apache.poi.version>3.17</apache.poi.version>
         <spring.version>5.3.39</spring.version>
         <dp.logging.version>v2.1.0</dp.logging.version>
@@ -440,12 +440,6 @@
                         -->
                         <exclude>CVE-2026-13006</exclude>
                         <!-- End DIS-5085 -->
-
-                         <!-- DIS-5289 
-                            Covers upgrading jackson 
-                        -->
-                        <exclude>CVE-2026-68497</exclude>
-                        <!-- End DIS-5289 -->
 
                         <!-- Jira task to upgrade kafka-clients to v4: DIS-5444
                             This is to remove exclusion for snappy-java

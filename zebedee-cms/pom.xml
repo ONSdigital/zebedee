@@ -245,7 +245,7 @@
         <dependency>
             <groupId>com.github.onsdigital.dp-permissions-api</groupId>
             <artifactId>dp-permissions-api-sdk-java</artifactId>
-            <version>v1.15.0</version>
+            <version>v1.16.0</version>
         </dependency>
 
         <!-- Test -->

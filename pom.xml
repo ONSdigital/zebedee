@@ -145,7 +145,7 @@
             <dependency>
                 <groupId>org.xerial.snappy</groupId>
                 <artifactId>snappy-java</artifactId>
-                <version>1.1.10.5</version>
+                <version>1.1.10.8</version>
             </dependency>
 
             <!-- File upload -->
@@ -446,6 +446,12 @@
                         -->
                         <exclude>CVE-2026-68497</exclude>
                         <!-- End DIS-5289 -->
+
+                        <!-- Jira task to upgrade kafka-clients to v4: DIS-5444
+                            This is to remove exclusion for snappy-java
+                        -->
+                        <exclude>CVE-2026-90559</exclude>
+                        <!-- End DIS-5444 -->
                     </excludeVulnerabilityIds>
                 </configuration>
                 <executions>

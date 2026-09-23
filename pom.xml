@@ -457,6 +457,7 @@
                             This is to remove exclusion for snappy-java
                         -->
                         <exclude>CVE-2026-90559</exclude>
+                        <exclude>CVE-2026-93452</exclude>
                         <!-- End DIS-5444 -->
                     </excludeVulnerabilityIds>
                 </configuration>

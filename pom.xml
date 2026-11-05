@@ -81,7 +81,7 @@
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-lang3</artifactId>
-                <version>3.14.0</version>
+                <version>3.21.0</version>
             </dependency>
             <dependency>
                 <groupId>commons-io</groupId>
@@ -454,7 +454,7 @@
                         <!-- End DIS-5085 -->
 
                         <!-- Jira task to upgrade kafka-clients to v4: DIS-5444
-                            This is to remove exclusion for snappy-java
+                            This is to remove exclusion for snappy-java and kafka-clients
                         -->
                         <exclude>CVE-2026-111115</exclude>
                         <exclude>CVE-2026-116593</exclude>

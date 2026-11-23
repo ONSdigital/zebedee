@@ -241,7 +241,7 @@ public class XlsToHtmlConverter extends ExcelToHtmlConverter {
         StringBuilder style = new StringBuilder();
 
         style.append("white-space:pre-wrap;");
-        ExcelToHtmlUtils.appendAlign(style, cellStyle.getAlignmentEnum().getCode());
+        ExcelToHtmlUtils.appendAlign(style, cellStyle.getAlignmentEnum());
 
         buildStyle_border(workbook, style, "top", cellStyle.getBorderTopEnum(),
                 cellStyle.getTopBorderColor());

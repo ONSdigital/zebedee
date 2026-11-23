@@ -26,7 +26,7 @@
         <restolino.version>v0.9.0</restolino.version>
         <httpino.version>0.0.11</httpino.version>
         <fasterxml.jackson.version>2.22.4</fasterxml.jackson.version>
-        <apache.poi.version>3.17</apache.poi.version>
+        <apache.poi.version>4.1.1</apache.poi.version>
         <spring.version>5.3.39</spring.version>
         <dp.logging.version>v2.1.2</dp.logging.version>
         <batik.version>1.17</batik.version>
@@ -409,14 +409,6 @@
                             <version>3.10.6.Final</version>
                         </exclude>
                         <!-- End DIS-1050 -->
-
-                        <!-- Jira ticket to upgrade: DIS-3661 -->
-                        <exclude>
-                            <groupId>org.apache.xmlbeans</groupId>
-                            <artifactId>xmlbeans</artifactId>
-                            <version>2.6.0</version>
-                        </exclude>
-                        <!-- End DIS-3661 -->
 
                         <!-- This is only used by spring-test for testing and the
                          next major version requires Java 17 -->

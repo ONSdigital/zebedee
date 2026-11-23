@@ -1,5 +1,6 @@
 package com.github.onsdigital.zebedee.data.processing;
 
+import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 
 /**
@@ -13,9 +14,9 @@ public class XSSFCellExpectation<T> {
     protected XSSFCellExpectation(T value) {
         this.value = value;
         if (Integer.class.equals(value.getClass()) || Double.class.equals(value.getClass())) {
-            this.cellType = XSSFCell.CELL_TYPE_NUMERIC;
+            this.cellType = CellType.NUMERIC.getCode();
         } else {
-            this.cellType = XSSFCell.CELL_TYPE_STRING;
+            this.cellType = CellType.STRING.getCode();
         }
     }
 

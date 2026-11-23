@@ -2,6 +2,7 @@ package com.github.onsdigital.zebedee.data.processing.xls;
 
 import com.github.onsdigital.zebedee.data.processing.DataGridRow;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.junit.After;
 import org.junit.Before;
@@ -97,8 +98,8 @@ public class TimeSeriesCellWriterTest {
         verify(rowMock, times(1)).createCell(2);
         verify(rowMock, times(1)).createCell(3);
         verify(rowMock, times(1)).createCell(4);
-        verify(cellMock, times(5)).setCellType(Cell.CELL_TYPE_NUMERIC);
-        verify(cellMock, times(1)).setCellType(Cell.CELL_TYPE_STRING);
+        verify(cellMock, times(5)).setCellType(CellType.NUMERIC);
+        verify(cellMock, times(1)).setCellType(CellType.STRING);
         verify(cellMock, times(1)).setCellValue(LABEL);
         verify(cellMock, times(TOTAL_ENTRIES)).setCellValue(0.0);
     }
@@ -158,47 +159,47 @@ public class TimeSeriesCellWriterTest {
     public void shouldReturnCorrectCellWriterForCellType() {
         setWriterMocks();
         assertThat("Incorrect CellWriter was returned.", numericCellWriterMock,
-                equalTo(writer.getCellWriter(Cell.CELL_TYPE_NUMERIC)));
+                equalTo(writer.getCellWriter(CellType.NUMERIC.getCode())));
 
         assertThat("Incorrect CellWriter was returned.", stringCellWriterMock,
-                equalTo(writer.getCellWriter(Cell.CELL_TYPE_STRING)));
+                equalTo(writer.getCellWriter(CellType.STRING.getCode())));
 
         assertThat("Incorrect CellWriter was returned.", stringCellWriterMock,
-                equalTo(writer.getCellWriter(Cell.CELL_TYPE_BLANK)));
+                equalTo(writer.getCellWriter(CellType.BLANK.getCode())));
     }
 
     @Test
     public void shouldReturnNumericCellType() {
         setWriterMocks();
-        assertThat("Incorrect CellWriter was returned.", Cell.CELL_TYPE_NUMERIC,
+        assertThat("Incorrect CellWriter was returned.", CellType.NUMERIC.getCode(),
                 equalTo(writer.getCellType("0")));
 
-        assertThat("Incorrect CellWriter was returned.", Cell.CELL_TYPE_NUMERIC,
+        assertThat("Incorrect CellWriter was returned.", CellType.NUMERIC.getCode(),
                 equalTo(writer.getCellType("0.001")));
 
-        assertThat("Incorrect CellWriter was returned.", Cell.CELL_TYPE_NUMERIC,
+        assertThat("Incorrect CellWriter was returned.", CellType.NUMERIC.getCode(),
                 equalTo(writer.getCellType("-0.001")));
 
-        assertThat("Incorrect CellWriter was returned.", Cell.CELL_TYPE_NUMERIC,
+        assertThat("Incorrect CellWriter was returned.", CellType.NUMERIC.getCode(),
                 equalTo(writer.getCellType("-0")));
 
-        assertThat("Incorrect CellWriter was returned.", Cell.CELL_TYPE_NUMERIC,
+        assertThat("Incorrect CellWriter was returned.", CellType.NUMERIC.getCode(),
                 equalTo(writer.getCellType("01")));
     }
 
     @Test
     public void shouldReturnStringCellType() {
         setWriterMocks();
-        assertThat("Incorrect CellWriter was returned.", Cell.CELL_TYPE_STRING,
+        assertThat("Incorrect CellWriter was returned.", CellType.STRING.getCode(),
                 equalTo(writer.getCellType("Hello")));
 
-        assertThat("Incorrect CellWriter was returned.", Cell.CELL_TYPE_STRING,
+        assertThat("Incorrect CellWriter was returned.", CellType.STRING.getCode(),
                 equalTo(writer.getCellType(null)));
 
-        assertThat("Incorrect CellWriter was returned.", Cell.CELL_TYPE_STRING,
+        assertThat("Incorrect CellWriter was returned.", CellType.STRING.getCode(),
                 equalTo(writer.getCellType("")));
 
-        assertThat("Incorrect CellWriter was returned.", Cell.CELL_TYPE_STRING,
+        assertThat("Incorrect CellWriter was returned.", CellType.STRING.getCode(),
                 equalTo(writer.getCellType("" +
                         ".123")));
     }

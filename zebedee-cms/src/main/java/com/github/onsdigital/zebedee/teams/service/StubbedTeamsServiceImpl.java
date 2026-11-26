@@ -116,17 +116,6 @@ public class StubbedTeamsServiceImpl implements TeamsService {
      */
     @Deprecated
     @Override
-    public List<AbstractMap.SimpleEntry<String, String>> getTeamMembersSummary(Session session) {
-        error().log(UNSUPPORTED_METHOD);
-        throw new UnsupportedOperationException(UNSUPPORTED_METHOD);
-    }
-
-    /**
-     * @deprecated because teams management will be moving to the dp-identity-api. Once the migration to the new service
-     *             is completed this method will be removed.
-     */
-    @Deprecated
-    @Override
     public List<String> listTeamsForUser(Session session) throws IOException {
         error().log(UNSUPPORTED_METHOD);
         throw new UnsupportedOperationException(UNSUPPORTED_METHOD);

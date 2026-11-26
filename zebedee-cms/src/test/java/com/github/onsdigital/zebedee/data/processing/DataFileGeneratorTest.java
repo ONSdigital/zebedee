@@ -7,6 +7,7 @@ import com.github.onsdigital.zebedee.data.json.TimeSerieses;
 import com.github.onsdigital.zebedee.data.processing.xls.TimeSeriesCellWriter;
 import com.github.onsdigital.zebedee.model.ContentWriter;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -169,9 +170,9 @@ public class DataFileGeneratorTest {
                 XSSFCellExpectation cellExpectation = rowExpectations.get(cellIndex);
 
                 assertThat(format("Cell is type incorrect row: {0} cell: {1}", rowIndex, cellIndex),
-                        cell.getCellType(), equalTo(cellExpectation.getCellType()));
+                        cell.getCellType().getCode(), equalTo(cellExpectation.getCellType()));
 
-                Object cellValue = cellExpectation.getCellType() == XSSFCell.CELL_TYPE_NUMERIC
+                Object cellValue = cellExpectation.getCellType() == CellType.NUMERIC.getCode()
                         ? cell.getNumericCellValue() : cell.getStringCellValue();
 
                 assertThat(format("Cell is value incorrect: row {0} cell: {1}", rowIndex, cellIndex),

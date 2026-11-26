@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee.data.processing.xls;
 
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -52,7 +53,7 @@ public class CellWriterTest {
     public void shouldWriteValueAndSetCellTypeAsNumeric() {
         numericCellWriter.writeCell(doubleStr, cellMock);
 
-        verify(cellMock, times(1)).setCellType(Cell.CELL_TYPE_NUMERIC);
+        verify(cellMock, times(1)).setCellType(CellType.NUMERIC);
         verify(cellMock, times(1)).setCellValue(doubleVal);
     }
 
@@ -60,7 +61,7 @@ public class CellWriterTest {
     public void shouldWriteValueAndSetCellTypeAsString() {
         stringCellWriter.writeCell(doubleStr, cellMock);
 
-        verify(cellMock, times(1)).setCellType(Cell.CELL_TYPE_STRING);
+        verify(cellMock, times(1)).setCellType(CellType.STRING);
         verify(cellMock, times(1)).setCellValue(doubleStr);
     }
 
@@ -70,7 +71,7 @@ public class CellWriterTest {
         try {
             numericCellWriter.writeCell(doubleStr + "xyz", cellMock);
         } catch (NumberFormatException e) {
-            verify(cellMock, times(1)).setCellType(Cell.CELL_TYPE_NUMERIC);
+            verify(cellMock, times(1)).setCellType(CellType.NUMERIC);
             verify(cellMock, never()).setCellValue(anyString());
             throw e;
         }

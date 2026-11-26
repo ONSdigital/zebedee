@@ -157,27 +157,6 @@ public class TeamsServiceImpl implements TeamsService {
     }
 
     @Override
-    public List<AbstractMap.SimpleEntry<String, String>> getTeamMembersSummary(Session session) throws IOException, UnauthorizedException, ForbiddenException {
-        validateSessionAndPermissions(session);
-        List<AbstractMap.SimpleEntry<String, String>> membersReport = new ArrayList<>();
-
-        for (Team team : listTeams()) {
-            if (team.getMembers() == null || team.getMembers().isEmpty()) {
-                membersReport.add(new AbstractMap.SimpleEntry<String, String>(team.getName(), ""));
-                continue;
-            }
-
-            membersReport.addAll(team.getMembers()
-                    .stream()
-                    .map(user -> new AbstractMap.SimpleEntry<String, String>(team.getName(), user))
-                    .collect(Collectors.toSet()));
-        }
-
-        Collections.sort(membersReport, sortTeamsReportList);
-        return membersReport;
-    }
-
-    @Override
     public List<String> listTeamsForUser(Session session) throws IOException {
         return listTeams().parallelStream()
                 .filter(t -> t.getMembers().contains(session.getEmail()))

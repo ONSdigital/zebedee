@@ -102,7 +102,6 @@ Publishing Collections
 * Ping
 * Service
 * Teams
-* TeamsReport
 * Users
 * CMD Specific auth
   * ServiceDatasetPermissions

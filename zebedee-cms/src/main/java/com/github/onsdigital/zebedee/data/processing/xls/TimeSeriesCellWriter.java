@@ -3,6 +3,7 @@ package com.github.onsdigital.zebedee.data.processing.xls;
 import com.github.onsdigital.zebedee.data.processing.DataGridRow;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 
 import java.util.regex.Pattern;
@@ -73,7 +74,7 @@ public class TimeSeriesCellWriter {
     }
 
     public void writeString(String input, Row row) throws NumberFormatException {
-        int cellType = Cell.CELL_TYPE_STRING;
+        int cellType = CellType.STRING.getCode();
         getCellWriter(cellType).writeCell(input, row.createCell(nextColumnIndex(row)));
     }
 
@@ -86,25 +87,25 @@ public class TimeSeriesCellWriter {
 
     /**
      * Get the approprite {@link CellWriter} impl for the requested {@link Cell} type.
-     * @param cellType see @{@link Cell#getCellType()}.
+     * @param cellType see @{@link CellType}.
      * @return
-     * {@link NumericCellWriter} If cellType == {@link Cell#CELL_TYPE_NUMERIC} otherwise {@link StringCellWriter}.
+     * {@link NumericCellWriter} If cellType == {@link CellType#NUMERIC} otherwise {@link StringCellWriter}.
      */
     CellWriter getCellWriter(int cellType) {
-        return cellType == Cell.CELL_TYPE_NUMERIC ? numericCellWriter : stringCellWriter;
+        return cellType == CellType.NUMERIC.getCode() ? numericCellWriter : stringCellWriter;
     }
 
     /**
-     * Determined the {@link Cell#getCellType()} for the supplied value.
+     * Determined the {@link CellType} for the supplied value.
      */
     int getCellType(String input) {
         if (StringUtils.isEmpty(input)) {
-            return Cell.CELL_TYPE_STRING;
+            return CellType.STRING.getCode();
         }
         if (INT_PATTERN.matcher(input).matches() || DECIMAL_PATTERN.matcher(input).matches()) {
-            return  Cell.CELL_TYPE_NUMERIC;
+            return CellType.NUMERIC.getCode();
         }
-        return Cell.CELL_TYPE_STRING;
+        return CellType.STRING.getCode();
     }
 
     private <T> void mandatoryCheck(T t, String message) {

@@ -122,17 +122,6 @@ public interface TeamsService {
     void removeTeamMember(String email, Team team, Session session) throws IOException, UnauthorizedException, NotFoundException, ForbiddenException;
 
     /**
-     * @return on the fly mapping of which teams currently contain which users. Format is teamName -> userEmail.
-     * @throws IOException If a filesystem error occurs.
-     *
-     * @deprecated because teams management will be moving to the dp-identity-api. Once the migration to the new service
-     *             is completed this method will be removed.
-     */
-    @Deprecated
-    List<AbstractMap.SimpleEntry<String, String>> getTeamMembersSummary(Session session) throws IOException,
-            UnauthorizedException, ForbiddenException;
-
-    /**
      * List of IDs of all teams a user is a member of.
      *
      * @param session the session for the user to get team membership for
